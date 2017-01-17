@@ -1,0 +1,8 @@
+<searchable xmlns:android="http://schemas.android.com/apk/res/android"
+    android:label="@string/AppName"
+    android:hint="@string/search_hint"
+    android:includeInGlobalSearch="true" 
+    android:voiceSearchMode="showVoiceSearchButton|launchRecognizer"
+    android:searchSettingsDescription="@string/search_hint"
+    android:searchSuggestAuthority="com.duckduckgo.mobile.android.providers.DuckDuckGoProvider"
+/>

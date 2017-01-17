@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="feed_overflow_menu_right_margin">8dp</dimen>
+</resources>

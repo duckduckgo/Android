@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/app/libs/OnionKit/OnionKit.iml" filepath="$PROJECT_DIR$/app/libs/OnionKit/OnionKit.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/libs/OnionKit/libnetcipher/libnetcipher.iml" filepath="$PROJECT_DIR$/app/libs/OnionKit/libnetcipher/libnetcipher.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/libs/libs.iml" filepath="$PROJECT_DIR$/app/libs/libs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tik_ddg_2017_init_project.iml" filepath="$PROJECT_DIR$/tik_ddg_2017_init_project.iml" />
+    </modules>
+  </component>
+</project>

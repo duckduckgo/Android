@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/PrefGroupGeneral">
+
+        <ListPreference
+            android:title="@string/PrefStartScreen"
+            android:summary="%s"
+            android:key="startScreenPref"
+            android:defaultValue="0"
+            android:entries="@array/startScreenArray"
+            android:entryValues="@array/startScreenValues"/>
+
+        <ListPreference
+            android:title="@string/PrefExternalBrowser"
+            android:summary="%s"
+            android:key="useExternalBrowserPref"
+            android:defaultValue="0"
+            android:entries="@array/useExternalBrowserArray"
+            android:entryValues="@array/useExternalBrowserValues"/>
+
+    </PreferenceCategory><!--
+
+    <PreferenceCategory android:title="@string/PrefGroupStories">
+
+        <Preference
+            android:title="@string/PrefSources"
+            android:key="sourcesPref"
+            android:defaultValue="" />
+
+        <SwitchPreference
+            android:title="@string/PrefReadable"
+            android:summaryOn="@string/PrefReadableSummary"
+            android:summaryOff="@string/PrefReadableSummary"
+            android:key="readablePref"
+            android:defaultValue="true" />
+
+        <SwitchPreference
+            android:title="@string/PrefAutoUpdate"
+            android:key="autoUpdatePref"
+            android:defaultValue="true" />
+
+    </PreferenceCategory>-->
+
+    <PreferenceCategory android:title="@string/PrefGroupSearch">
+
+        <SwitchPreferenceCompat
+            android:title="@string/PrefAutocomplete"
+            android:key="autocompletePref"
+            android:defaultValue="true"
+            android:disableDependentsState="true" />
+
+        <ListPreference
+            android:title="@string/PrefRegion"
+            android:key="regionPref"
+            android:summary="%s"
+            android:defaultValue="wt-wt"
+            android:entries="@array/regionArray"
+            android:entryValues="@array/regionValues" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/PrefGroupPrivacy">
+
+        <SwitchPreferenceCompat
+            android:title="@string/PrefEnableJavascript"
+            android:key="enableJavascriptPref"
+            android:defaultValue="true"/>
+
+        <SwitchPreferenceCompat
+            android:title="@string/PrefRecordHistory"
+            android:key="recordHistoryPref"
+            android:defaultValue="true" />
+
+        <Preference
+            android:title="@string/PrefClearHistory"
+            android:key="clearHistoryPref"
+            android:defaultValue="" />
+
+        <SwitchPreferenceCompat
+            android:title="@string/PrefRecordCookies"
+            android:key="recordCookiesPref"
+            android:defaultValue="true" />
+
+        <Preference
+            android:title="@string/PrefClearCookies"
+            android:key="clearCookiesPref"
+            android:defaultValue="" />
+
+        <Preference
+            android:title="@string/PrefClearBrowserCache"
+            android:key="clearWebCachePref"
+            android:defaultValue="" />
+
+        <SwitchPreferenceCompat
+            android:title="@string/PrefEnableAcra"
+            android:key="acra.alwaysaccept"
+            android:defaultValue="false"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/PrefGroupTor">
+
+        <SwitchPreferenceCompat
+            android:title="@string/PrefEnableTor"
+            android:key="enableTor"
+            android:defaultValue="false" />
+
+        <Preference
+            android:title="@string/PrefCheckOrbotStatus"
+            android:key="checkOrbotStatus"
+            android:dependency="enableTor" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/PrefGroupOther">
+
+        <Preference
+            android:title="@string/PrefAbout"
+            android:key="aboutPref"/>
+
+        <Preference
+            android:title="@string/PrefSendFeedback"
+            android:key="sendFeedbackPref"
+            android:defaultValue="" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

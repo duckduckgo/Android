@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<!--
+    <style name="DDGTheme" parent="DDGTheme.Base">
+        <item name="android:alertDialogTheme">@style/DDGDialog</item>
+        <item name="android:dialogTheme">@style/DDGDialog</item>
+    </style>
+-->
+</resources>

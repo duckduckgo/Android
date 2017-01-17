@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="AppName">DuckDuckGo</string>
+    <string name="SearchString">Sök DuckDuckGo&#8230;</string>
+    <string name="SettingsButtonContentDescription">Inställningar</string>
+    <string name="HomeButtonContentDescription">Hem</string>
+
+    <string name="search_hint">Sök&#8230;</string>
+
+    <string name="PrefGroupAppFlow">Applikation</string>
+    <string name="PrefGroupPrivacy">Sekretess</string>
+    <string name="PrefGroupFeedback">Återkoppling</string>
+    <string name="PrefTheme">Tema</string>
+    <string name="PrefThemeLight">Ljust</string>
+    <string name="PrefThemeDark">Mörkt</string>
+    <string name="PrefStartScreen">Hemskärm</string>
+    <string name="PrefStories">Berättelser</string>
+    <string name="PrefWaterCoolerStories">Berättelser</string>
+    <string name="PrefSavedItems">Sparade föremål</string>
+    <string name="PrefDuckMode">Sök</string>
+    <string name="PrefRecentSearch">Senaste sökningar</string>
+    <string name="PrefRecordHistory">Spara senaste</string>
+    <string name="PrefClearHistory">Rensa senaste</string>
+    <string name="PrefRecordCookies">Spara cookies</string>
+    <string name="PrefClearCookies">Rensa cookies</string>
+    <string name="PrefClearBrowserCache">Rensa webbläsarens cache</string>
+    <string name="PrefClearCacheAndCookies">Rensa cookies och cache</string>
+    <string name="PrefSources">Ändra källor</string>
+    <string name="PrefResetSources">Återställ källor</string>
+    <string name="PrefRegion">Region Boost</string>
+    <!-- Need context to above -->
+    <string name="PrefDirectQuery">Search on Tap</string>
+    <string name="PrefExternalBrowser">Använd extern webbläsare</string>
+    <string name="PrefNever">Aldrig</string>
+    <string name="PrefExternalBrowserExceptSearches">För icke-sök-resultat</string>
+    <string name="PrefExternalBrowserAlways">Alltid</string>
+    <string name="PrefClearCacheCookiesEveryLaunch">Varje start</string>
+    <string name="PrefClearCacheCookiesWeekly">Veckolig</string>
+    <string name="PrefClearCacheCookiesMonthly">Månatlig</string>
+    <string name="PrefSendFeedback">Skicka feedback</string>
+    <string name="PrefRate">Betygsätt app</string>
+    <string name="PrefAppSearch">Inkludera appar</string>
+    <string name="PrefMainFontSize">Storlek på typsnittet</string>
+    <string name="PrefEnableAcra">Automatisk kraschrapportering</string>
+    <string name="PrefAcraDisabled">Automatisk kraschrapportering Inaktiverad</string>
+    <string name="PrefAcraEnabled">Automatisk kraschrapportering Aktiverad</string>
+
+    <string name="PrefWaterCooler">Berättelser</string>
+    <string name="PrefAutocomplete">Automatisk ifyllning</string>
+    <string name="PrefSearchResults">Sökresultat</string>
+    <string name="PrefTurnOffAutocomplete">Inaktiverad</string>
+
+    <string name="PrefAutoUpdate">Automatisk uppdatering</string>
+    <string name="PrefReadable">Läsbarhet</string>
+    <string name="PrefGroupTor">Tor</string>
+    <string name="PrefEnableTor">Aktivera Tor</string>
+    <string name="PrefCheckOrbotStatus">Kontrollera Orbot-status</string>
+    <string name="OrbotStatusOkTitle">Orbot-status</string>
+    <string name="OrbotStatusOkMessage">Orbot verkar fungera bra!</string>
+    <string name="OrbotCheckSite">https://check.torproject.org</string>
+
+    <string name="ShareStory">Dela berättelse</string>
+    <string name="ShareSearch">Dela sökning</string>
+    <string name="SharePage">Dela sida</string>
+
+    <string name="RegularShareFormat">%1$s via DuckDuckGo för Android</string>
+    <string name="TwitterShareFormat">%1$s via @duckduckgo för Android</string>
+
+    <string name="Yes">Ja</string>
+    <string name="No">Nej</string>
+
+    <string name="Save">Spara</string>
+    <string name="Unsave">Ångra</string>
+    <string name="Share">Dela</string>
+    <string name="Refresh">Uppdatera</string>
+    <string name="Delete">Ta Bort</string>
+
+    <string name="LeftStories">Berättelser</string>
+    <string name="LeftSaved">Sparade</string>
+    <string name="LeftSettings">Inställningar</string>
+    <string name="LeftRecent">Nyligen</string>
+    <string name="LeftRecentQueries">Senaste förfrågningar</string>
+
+    <string name="Confirm">Bekräfta</string>
+    <string name="ConfirmClearHistory">All sökhistorik kommer tas bort. Är du säker?</string>
+    <string name="ConfirmClearCookies">Alla cookies kommer tas bort. Är du säker?</string>
+    <string name="ConfirmClearCacheAndCookies">Webbläsarcache kommer rensas. Är du säker?</string>
+
+    <string name="Default">Standard</string>
+    <string name="Defaults">Standard</string>
+    <string name="SuggestSource">Föreslå en källa</string>
+    <string name="SuggestedSources">Inkludera dessa källor:</string>
+
+    <string name="FeedbackTo">DuckDuckGo feedback &lt;help@duckduckgo.com&gt;</string>
+    <string name="FeedbackSubject">DuckDuckGo Android v2</string>
+
+    <string name="SavedFeedEmptyTitle">Du har inga sparade berättelser.</string>
+    <string name="SavedFeedEmptySubTitle">I sökfältets meny kan du spara berättelser.</string>
+    <string name="SavedResultsEmptyTitle">Du har inga sparade resultat.</string>
+    <string name="SavedResultsEmptySubTitle">I sökfältets meny kan du spara sökresultat.</string>
+
+    <string name="MoreMenuTitle">Sidval</string>
+
+    <string name="OpenInExternalBrowser">Öppna i extern webbläsare</string>
+    <string name="ConfirmExternalBrowser">Bekräfta</string>
+
+    <string name="ChangingFontSize">Ändra storlek på typsnittet&#8230;</string>
+
+
+    <string name="crash_toast_text">Applikationen Kraschade! Information om kraschen samlas och rapporteras in vid bekräftelse.</string>
+    <string name="crash_notif_ticker_text">Oväntat fel, rapportera gärna&#8230;</string>
+    <string name="crash_notif_title">DuckDuckGo kraschrapport</string>
+    <string name="crash_notif_text">Tryck här för att hjälpa oss att fixa felet.</string>
+    <string name="crash_dialog_text">Ett oväntat fel inträffade.
+        Hjälp oss fixa problemet genom att trycka \'OK\' för att skicka information om kraschen.
+        Informationen vi samlar är: APP_VERSION_CODE, APP_VERSION_NAME, ANDROID_VERSION, STACK_TRACE,
+        AVAILABLE_MEM_SIZE, ReportField.USER_COMMENT, LOGCAT.</string>
+    <string name="crash_dialog_comment_prompt">Kommentar: </string>
+    <string name="crash_dialog_ok_toast">Tack för din hjälp!</string>
+
+    <string name="ErrorAppNotFound">Applikationen kunde inte hittas</string>
+    <string name="ErrorActivityNotFound">Ingen relaterad aktivitet kunde hittas!</string>
+    <string name="ErrorDownloadFailed">Nedladdning misslyckades!</string>
+    <string name="ErrorDownloadOpenFail">Nedladdad fil kunde inte öppnas!</string>
+
+    <string name="ToastSchemeNotSupported">Kunde inte öppna nedladdad fil</string>
+
+    <string name="InfoReadStoriesFromCache">Anslutning misslyckades! Berättelser hämtade från cache&#8230;</string>
+    <string name="DefaultsSetToast">Källor återställda till standard.</string>
+    <string name="SuggestSourceToast">Kommer implementeras.</string>
+    <string name="Loading">Laddar&#8230;</string>
+
+    <string name="SummaryWaterCooler">
+        Dessa källor skapar en ström av intressanta berättelser som du vanligtvis inte hittar i
+        en nyhetsapp. Alla dessa källor är speciella strömmar som \"mest delade\" eller \"mest uppröstade\".
+        Titta in när du har lite tid över!
+        Observera: Du kan du ta bort Berättelser från din hemskärm genom hemskärmsinställningarna.
+    </string>
+
+    <string name="WaterCoolerSources">Berättelser</string>
+
+    <string name="InformHistory"><i>Spara senaste</i> är inaktiverad. Du kan aktivera det i <i>inställningar.</i></string>
+
+    <string name="Continue">Fortsätt</string>
+    <string name="Retry">Försök igen</string>
+    <string name="ErrorFeedTitle">Fel: Strömförfrågan</string>
+    <string name="ErrorFeedDetail">Strömförfrågan misslyckades, möjligen på grund av anslutningsproblem.
+        Du kan fortsätta använda cachade föremål eller försöka igen.</string>
+
+    <string name="Apply">Verkställ</string>
+    <string name="Cancel">Avbryt</string>
+    <string name="NoChange">Ingen Förändring</string>
+
+    <string name="OnlyOnPhone">Bara på telefon</string>
+    <string name="SelectAppToSend">Välj applikation att skicka</string>
+
+    <string name="ReadabilityOn">Läsbarhet På</string>
+    <string name="ReadabilityOff">Läsbarhet Av</string>
+
+    <string name="SavedSearches">Sparade sökningar</string>
+    <string name="SavedStories">Sparade berättelser</string>
+    <string name="StoryOptionsTitle">Berättelseval</string>
+    <string name="SearchOptionsTitle">Sökval</string>
+    <string name="PageOptionsTitle">Sidval</string>
+
+    <string name="ToastUnSaveStory">Berättelsen har tagits bort från dina sparade berättelser.</string>
+    <string name="ToastUnSaveSearch">Sökningen har tagits bort från dina sparade sökningar.</string>
+    <string name="ToastSaveStory">Din berättelse har sparats.</string>
+    <string name="ToastSaveSearch">Din sökning har sparats.</string>
+    <string name="ToastDeleteStoryInHistory">Berättelsen har tagits bort från din historik</string>
+    <string name="ToastDeleteUrlInHistory">URL:en har tagits bort från din historik.</string>
+
+    <string name="WelcomeHeader">Introducerar</string>
+    <string name="WelcomeTitle">DuckDuckGo Sök &amp; Berättelser</string>
+    <string name="WelcomeDescription">
+        Sök Anonymt.\nHitta Direkt.\nHåll Dig Uppdaterad.</string>
+    <string name="GetStarted">Kom igång</string>
+
+    <string name="BangButtonExplanation">Sökning på andra sidor blir lätt med !bang-kommandon.</string>
+
+    <string name="LeftRecentSearches">Senaste sökningar</string>
+    <string name="LeftRecentStories">Senaste berättelser</string>
+    <string name="NewSources">Vi har lagt till några häftiga berättelsekällor!</string>
+    <string name="NewSourcesOk">Visa</string>
+    <string name="NewSourcesNoThx">Senare</string>
+
+    <string name="WorldTraveler">World Traveler (none)</string>
+
+    <string name="pull_to_refresh_pull_label">Dra ned för att uppdatera</string>
+    <string name="pull_to_refresh_release_label">Släpp för att uppdatera</string>
+    <string name="pull_to_refresh_refreshing_label">Laddar&#8230;</string>
+
+
+    <!-- SSL Certificate dialogs -->
+    <!-- Title for an SSL Certificate dialog -->
+    <string name="ssl_certificate">Security certificate</string>
+    <!-- Message on an SSL Certificate dialog -->
+    <string name="ssl_certificate_is_valid">This certificate is valid.</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="issued_to">Issued to:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="common_name">Common name:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="org_name">Organization:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="org_unit">Organizational unit:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="issued_by">Issued by:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="validity_period">Validity:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="issued_on">Issued on:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="expires_on">Expires on:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="serial_number">Serial number:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="fingerprints">Fingerprints:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="sha256_fingerprint">SHA-256 fingerprint:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="sha1_fingerprint">SHA-1 fingerprint:</string>
+
+    <string name="WarnSSLTitle">Warning: SSL certificate</string>
+    <string name="WarnSSLDetail">SSL certificate of the server is not listed as trusted.
+        You can still choose to continue or cancel the request.</string>
+
+</resources>

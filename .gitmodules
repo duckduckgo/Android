@@ -1,0 +1,3 @@
+[submodule "app/libs/OnionKit"]
+	path = app/libs/OnionKit
+	url = https://github.com/guardianproject/NetCipher.git
