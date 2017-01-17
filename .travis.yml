@@ -15,7 +15,7 @@ android:
     - android-22
 
     # Additional components
-    - extra-google-m2repository
+    - extra-android-m2repository
 
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
