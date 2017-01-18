@@ -29,6 +29,9 @@ android {
     lintOptions {
         abortOnError false
     }
+    packagingOptions {
+        exclude 'LICENSE.txt'
+    }
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
             def alignedOutputFile = output.outputFile
