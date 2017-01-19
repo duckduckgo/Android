@@ -390,6 +390,10 @@ public class DuckDuckGo extends AppCompatActivity {
             String value = intent.getExtras().getCharSequence(Intent.EXTRA_PROCESS_TEXT).toString();
             searchOrGoToUrl(value);
         }
+        else if(Intent.ACTION_SEND.equals(intent.getAction())) {
+            String data = intent.getStringExtra(Intent.EXTRA_TEXT);
+            searchOrGoToUrl(data);
+        }
         else if(DDGControlVar.mDuckDuckGoContainer.webviewShowing) {
             Fragment fragment = fragmentManager.findFragmentByTag(WebFragment.TAG);
             if(fragmentManager.findFragmentByTag(WebFragment.TAG)== null || !fragment.isVisible()) {
