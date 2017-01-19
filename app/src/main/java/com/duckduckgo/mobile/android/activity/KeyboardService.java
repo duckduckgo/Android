@@ -2,7 +2,6 @@ package com.duckduckgo.mobile.android.activity;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
