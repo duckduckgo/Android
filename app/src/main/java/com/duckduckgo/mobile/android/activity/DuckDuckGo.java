@@ -98,6 +98,7 @@ public class DuckDuckGo extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "on create");
+
         canCommitFragmentSafely = true;
 
         keyboardService = new KeyboardService(this);
@@ -170,12 +171,14 @@ public class DuckDuckGo extends AppCompatActivity {
 
 		if(savedInstanceState==null) {
 			displayHomeScreen();
-            keyboardService.showKeyboard(getSearchField());
+            if(getIntent().getAction().equals(Intent.ACTION_MAIN)) {
+                keyboardService.showKeyboard(getSearchField());
+            }
         }
 
         // global search intent
         Intent intent = getIntent();
-        processIntent(intent);
+        //processIntent(intent);
     }
 
     private void initSearchField() {
@@ -383,6 +386,14 @@ public class DuckDuckGo extends AppCompatActivity {
             }
             keyboardService.showKeyboardDelayed(getSearchField());
         }
+        else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Intent.ACTION_PROCESS_TEXT.equals(intent.getAction())) {
+            String value = intent.getExtras().getCharSequence(Intent.EXTRA_PROCESS_TEXT).toString();
+            searchOrGoToUrl(value);
+        }
+        else if(Intent.ACTION_SEND.equals(intent.getAction())) {
+            String data = intent.getStringExtra(Intent.EXTRA_TEXT);
+            searchOrGoToUrl(data);
+        }
         else if(DDGControlVar.mDuckDuckGoContainer.webviewShowing) {
             Fragment fragment = fragmentManager.findFragmentByTag(WebFragment.TAG);
             if(fragmentManager.findFragmentByTag(WebFragment.TAG)== null || !fragment.isVisible()) {
@@ -397,6 +408,7 @@ public class DuckDuckGo extends AppCompatActivity {
         Log.d(TAG, "on new intent: " + intent.toString());
         newIntent = true;
         setIntent(intent);
+        processIntent(intent);
     }
 
     @Override
@@ -418,10 +430,10 @@ public class DuckDuckGo extends AppCompatActivity {
     protected void onResumeFragments() {
         super.onResumeFragments();
         canCommitFragmentSafely = true;
-        if(newIntent) {
+        //if(newIntent) {
             processIntent(getIntent());
-            newIntent = false;
-        }
+            //newIntent = false;
+        //}
     }
 
 	@Override
