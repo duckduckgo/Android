@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+    <com.duckduckgo.mobile.android.download.AsyncImageView
+        android:layout_width="@dimen/source_icon_dimen"
+        android:layout_height="@dimen/source_icon_dimen"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="?attr/listPreferredItemPaddingLeft"
+        android:scaleType="fitStart"
+        app:usePicasso="false"
+        android:id="@+id/sourceItemBackground"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="16dp"
+        android:id="@+id/sourceCheckbox"
+        android:checked="false"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/listview_item_height"
+        android:layout_centerVertical="true"
+        android:gravity="center_vertical"
+        android:layout_alignParentLeft="true"
+        android:paddingLeft="@dimen/actionbar_title_left_margin"
+        android:layout_marginRight="20dp"
+        android:layout_toLeftOf="@id/sourceCheckbox"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/search_dark"
+            android:textSize="14sp"
+            android:text="Test String!"
+            android:singleLine="true"
+            android:id="@+id/sourceTitleTextView" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/search_light"
+            android:textSize="12sp"
+            android:text="This is subtext string!"
+            android:singleLine="true"
+            android:id="@+id/sourceTitleSubTextView" />
+
+    </LinearLayout>
+
+</RelativeLayout>

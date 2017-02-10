@@ -1,0 +1,101 @@
+<manifest package="com.duckduckgo.mobile.android"
+          xmlns:android="http://schemas.android.com/apk/res/android"
+          android:installLocation="auto">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+    <application
+        android:hardwareAccelerated="true"
+        android:icon="@drawable/icon"
+        android:theme="@style/DDGTheme"
+        android:label="@string/AppName"
+        android:name="DDGApplication">
+
+        <!-- change value from "beta" to "release" for public app store builds -->
+        <meta-data android:name="DDGReleaseStatus" android:value="build" />
+
+        <activity
+            android:name=".activity.DuckDuckGo"
+            android:label="@string/AppName"
+            android:windowSoftInputMode="stateHidden"
+            android:launchMode="singleTop"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.ASSIST"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data
+                android:name="com.android.systemui.action_assist_icon"
+                android:resource="@drawable/icon"/>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.WEB_SEARCH" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.PROCESS_TEXT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+
+            <meta-data android:name="android.app.searchable"
+                       android:resource="@xml/searchable" />
+        </activity>
+
+        <receiver android:name=".Widget" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget" />
+        </receiver>
+
+        <activity android:name="org.acra.CrashReportDialog"
+                  android:theme="@style/Theme.Dialog"
+                  android:launchMode="singleInstance"
+                  android:excludeFromRecents="true"
+                  android:finishOnTaskLaunch="true" />
+
+        <provider android:name=".providers.DuckDuckGoProvider"
+                  android:authorities="com.duckduckgo.mobile.android.providers.DuckDuckGoProvider" />
+
+        <receiver android:name=".broadcast.DownloadReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
+            </intent-filter>
+        </receiver>
+
+        <activity android:name="info.guardianproject.onionkit.ui.CertDisplayActivity"
+                  android:configChanges="locale|orientation"
+                  android:theme="@android:style/Theme.Dialog"
+                  android:taskAffinity="" />
+    </application>
+
+</manifest>
+

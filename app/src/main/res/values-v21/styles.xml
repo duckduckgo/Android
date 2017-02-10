@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="OverflowMenuStyle" parent="Widget.AppCompat.PopupMenu.Overflow">
+    </style>
+
+    <style name="DDGDialog" parent="Theme.AppCompat.Light.Dialog"><!--
+        <item name="android:colorPrimary">@color/colorPrimary</item>-->
+        <item name="colorAccent">@color/colorPrimary</item>
+    </style>
+
+</resources>

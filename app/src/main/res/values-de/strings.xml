@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="AppName">DuckDuckGo</string>
+    <string name="SearchString">DuckDuckGo-Suche</string>
+    <string name="SettingsButtonContentDescription">Einstellungen</string>
+    <string name="HomeButtonContentDescription">Hauptansicht</string>
+    
+    <string name="search_hint">Suchen&#8230;</string>
+    
+    <string name="PrefGroupAppFlow">Anwendung</string>
+    <string name="PrefGroupPrivacy">Privatsphäre</string>
+    <string name="PrefGroupFeedback">Rückmeldung</string>
+    <string name="PrefTheme">Thema</string>
+    <string name="PrefThemeLight">Hell</string>
+    <string name="PrefThemeDark">Dunkel</string>
+    <string name="PrefStartScreen">Hauptansicht</string>
+    <string name="PrefStories">Geschichten</string>
+    <string name="PrefWaterCoolerStories">Geschichten</string>
+    <string name="PrefSavedItems">Gespeicherte Einträge</string>
+    <string name="PrefDuckMode">Entenmodus</string>
+    <string name="PrefRecentSearch">Letzte Suchen</string>
+    <string name="PrefRecordHistory">Verlauf speichern</string>
+    <string name="PrefClearHistory">Verlauf löschen</string>
+    <string name="PrefRecordCookies">Cookies speichern</string>
+    <string name="PrefClearCookies">Cookies löschen</string>
+    <string name="PrefClearBrowserCache">Browser-Zwischenspeicher leeren</string>
+    <string name="PrefClearCacheAndCookies">Cookies und Zwischenspeicher leeren</string>
+    <string name="PrefSources">Quellen bearbeiten</string>
+    <string name="PrefResetSources">Quellen zurücksetzen</string>
+    <string name="PrefRegion">Region</string>
+    <string name="PrefDirectQuery">Suchen während des Tippens</string>
+    <string name="PrefExternalBrowser">Externen Browser nutzen</string>
+    <string name="PrefSendFeedback">Rückmeldung geben</string>
+    <string name="PrefRate">App bewerten</string>
+    <string name="PrefAppSearch">Apps einbeziehen</string>
+    <string name="PrefMainFontSize">Schriftgröße</string>
+    <string name="PrefAbout">Über</string>
+    <string name="PrefEnableAcra">Automatische Absturzberichte</string>
+    <string name="PrefAcraDisabled">Automatische Berichte deaktiviert</string>
+    <string name="PrefAcraEnabled">Automatische Berichte aktiviert</string>
+    
+    <string name="PrefWaterCooler">Geschichten</string>
+    <string name="PrefAutocomplete">Autovervollständigung</string>
+    <string name="PrefSearchResults">Suchergebnisse</string>
+    <string name="PrefTurnOffAutocomplete">Deaktiviert</string>
+    
+    <string name="PrefAutoUpdate">Feeds automatisch erneuern</string>
+
+    <string name="PrefReadable">Lesbarkeit</string>
+    <string name="PrefReadableSummary">Eingeschaltet, wenn verfügbar</string>
+    <string name="PrefGroupTor">Tor</string>
+    <string name="PrefEnableTor">Tor aktivieren</string>
+    <string name="PrefCheckOrbotStatus">Orbot-Status prüfen</string>
+    <string name="OrbotStatusOkTitle">Orbot-Status</string>
+    <string name="OrbotStatusOkMessage">Orbot scheint einwandfrei zu funktionieren!</string>
+    <string name="OrbotCheckSite">https://check.torproject.org/?lang=de</string>
+    
+    <string name="ShareStory">Geschichte teilen</string>
+    <string name="ShareSearch">Suche teilen</string>
+    <string name="SharePage">Seite teilen</string>
+    
+    <string name="RegularShareFormat">%1$s via DuckDuckGo für Android</string>
+    <string name="TwitterShareFormat">%1$s via @duckduckgo für Android</string>
+    
+    <string name="Yes">Ja</string>
+    <string name="No">Nein</string>
+    
+    <string name="Save">Speichern</string>
+    <string name="Unsave">Speichern rückgängig machen</string>
+    <string name="Share">Teilen</string>
+    <string name="Refresh">Aktualisieren</string>
+    <string name="Delete">Entfernen</string>
+    
+    <string name="LeftStories">Geschichten</string>
+    <string name="LeftSaved">Gespeichert</string>
+    <string name="LeftSettings">Einstellungen</string>
+    <string name="LeftRecent">Letzte</string>
+    <string name="LeftRecentQueries">Letzte Suchen</string>
+    
+    <string name="Confirm">Bestätigen</string>
+    <string name="ConfirmClearHistory">Der gesamte Suchverlauf wird gelöscht. Sind Sie sicher?</string>
+    <string name="ConfirmClearCookies">Alle Cookies werden gelöscht. Sind Sie sicher?</string>
+    <string name="ConfirmClearCacheAndCookies">Zwischenspeicher wird gelöscht. Sind Sie sicher?</string>
+    
+    <string name="Default">Vorgabe</string>
+    <string name="Defaults">Vorgaben</string>
+    <string name="SuggestSource">Eine Quelle vorschlagen</string>
+    <string name="SuggestedSources">Bitte diese Quellen einfügen:</string>
+    
+    <string name="FeedbackTo">DuckDuckGo-Rückmeldungen &lt;help@duckduckgo.com&gt;</string>
+    <string name="FeedbackSubject">DuckDuckGo Android v2</string>
+    
+    <string name="SavedFeedEmptyTitle">Keine gespeicherten Geschichten</string>
+    <string name="SavedFeedEmptySubTitle">Geschichten können im Menü der Suchleiste gespeichert werden.</string>
+    <string name="SavedResultsEmptyTitle">Keine gespeicherte Suchergebnisse</string>
+    <string name="SavedResultsEmptySubTitle">Suchergebnisse können im Menü der Suchleiste gespeichert werden.</string>
+    
+    <string name="MoreMenuTitle">Seiteneinstellungen</string>
+    
+    <string name="OpenInExternalBrowser">In externem Browser öffnen</string>
+    <string name="ConfirmExternalBrowser">Bitte bestätigen</string>
+    
+    <string name="ChangingFontSize">Schriftgröße wird geändert&#8230;</string>
+
+
+    <string name="crash_toast_text">Anwendung abgestürzt! Absturzbezogene Daten werden gesammelt und nach Bestätigung gesendet.</string>
+    <string name="crash_notif_ticker_text">Unerwarteter Fehler, bitte senden Sie einen Bericht&#8230;</string>
+    <string name="crash_notif_title">DuckDuckGo-Absturzbericht</string>
+    <string name="crash_notif_text">Bitte hier klicken, um bei der Fehlerbehebung zu helfen.</string>
+    <string name="crash_dialog_text">Ein unerwarteter Fehler ist aufgetreten.
+        Bitte helfen Sie uns, das Problem zu beheben, indem Sie mit \'OK\' das Senden von absturzbezogenen Daten bestätigen. 
+        Die einzigen Daten, die wir erhalten sind: APP_VERSION_CODE, APP_VERSION_NAME, ANDROID_VERSION, STACK_TRACE,
+        AVAILABLE_MEM_SIZE, ReportField.USER_COMMENT, LOGCAT.</string>
+    <string name="crash_dialog_comment_prompt">Ihr Kommentar: </string>
+    <string name="crash_dialog_ok_toast">Danke für Ihre Hilfe!</string>
+    
+    <string name="ErrorAppNotFound">App nicht gefunden</string>
+    <string name="ErrorActivityNotFound">Keine zugehörige Aktivität gefunden!</string>
+    <string name="ErrorDownloadFailed">Herunterladen fehlgeschlagen!</string>
+    <string name="ErrorDownloadOpenFail">Heruntergeladene Datei konnte nicht geöffnet werden!</string>
+    
+    <string name="DefaultsSetToast">Quellen auf Vorgabe zurückgesetzt.</string>
+    <string name="InfoReadStoriesFromCache">Verbinden fehlgeschlagen! Zeige Geschichten aus dem Zwischenspeicher&#8230;</string>
+    <string name="SuggestSourceToast">Noch nicht implementiert.</string>
+    <string name="Loading">Lädt&#8230;</string>
+    
+    <string name="SummaryWaterCooler">
+	Diese Quellen erzeugen einen Strom von interessanten Geschichten, die Sie in regulären Apps nicht finden werden.
+	All diese Quellen sind etwas Spezielles wie \"most shared\" oder \"most up-voted.\"
+	Probieren Sie es aus, wenn Sie gerade fünf freie Minuten haben.
+	Hinweis: Sie können Geschichten aus der Hauptansicht entfernen mithilfe der Hauptansicht-Einstellungen.
+    </string>
+
+    <string name="WaterCoolerSources">Geschichten</string>
+    
+    <string name="InformHistory"><i>Aktuelle speichern</i> ist deaktiviert, kann aber in den <i>Einstellungen</i> aktiviert werden.</string>
+    
+    <string name="Continue">Weiter</string>
+    <string name="Retry">Nochmals versuchen</string>
+    <string name="ErrorFeedTitle">Fehler: Feed-Anfrage</string>
+    <string name="ErrorFeedDetail">Feed-Anfrage fehlgeschlagen, möglicherweise wegen eines Verbindungsproblems.
+        Es ist dennoch möglich, zwischengespeicherte Einträge zu durchsuchen oder probieren Sie es noch einmal.</string>
+        
+    <string name="Apply">Anwenden</string>
+    <string name="Cancel">Abbrechen</string>
+    <string name="NoChange">Keine Änderung</string>
+    
+    <string name="OnlyOnPhone">Nur auf dem Telefon</string>
+    <string name="SelectAppToSend">Anwendung zum Senden auswählen</string>
+    
+    <string name="ReadabilityOn">Lesbarkeit an</string>
+    <string name="ReadabilityOff">Lesbarkeit aus</string>
+    
+    <string name="SavedSearches">Gespeicherte Suchbegriffe</string>
+    <string name="SavedStories">Gespeicherte Geschichten</string>
+    <string name="StoryOptionsTitle">Geschichteneinstellungen</string>
+    <string name="SearchOptionsTitle">Sucheinstellungen</string>
+    <string name="PageOptionsTitle">Seiteneinstellungen</string>
+    
+    <string name="ToastUnSaveStory">Die Geschichte wurde aus Ihren gespeicherten Geschichten entfernt.</string>
+    <string name="ToastUnSaveSearch">Die Suche wurde aus Ihren gespeicherten Suchen entfernt.</string>
+    <string name="ToastSaveStory">Ihre Geschichte wurde gespeichert.</string>
+    <string name="ToastSaveSearch">Ihre Suche wurde gespeichert.</string>
+    <string name="ToastDeleteStoryInHistory">Die Geschichte wurde aus Ihrem Verlauf entfernt.</string>
+    <string name="ToastDeleteUrlInHistory">Die Adresse wurde aus Ihrem Verlauf entfernt.</string>
+    
+    <string name="WelcomeHeader">Willkommen</string>
+    <string name="WelcomeTitle">DuckDuckGo-Suche &amp; Geschichten</string>
+    <string name="WelcomeDescription">
+        Anonymes Suchen.\nSchnelles Finden.\nInformiert bleiben.</string>
+    <string name="GetStarted">Loslegen</string>
+    
+    <string name="BangButtonExplanation">Die Suche auf anderen Seiten ist einfach möglich mit den Vorschlägen anderer Seiten</string>
+    
+    <string name="LeftRecentSearches">Letzte Suchen</string>
+    <string name="LeftRecentStories">Letzte Geschichten</string>
+    <string name="NewSources">Wir haben einige interessante neue Geschichten zu den Quellen hinzugefügt!</string>
+    <string name="NewSourcesOk">Zeigen</string>
+    <string name="NewSourcesNoThx">Später</string>
+    <string name="WorldTraveler">Weltenbummler (keine)</string>
+
+
+    <!--new strings--><!--
+    <string name="add_favourites">Add to Favourites</string>
+    <string name="remove_favourites">Remove from Favourites</string>
+    <string name="share">Share this</string>
+    <string name="view_external">View in Browser</string>
+    <string name="reload">Reload</string>-->
+    <string name="stories">Geschichten</string>
+    <string name="help_feedback">Hilfe &amp; Rückmeldung</string>
+    <string name="settings">Einstellungen</string>
+
+    <!--favorites fragment -->
+    <string name="favorites">Favoriten</string>
+    <string name="favorite_stories">Favorisierte Geschichten</string>
+    <string name="favorite_stories_narrow">@string/stories</string>
+    <string name="favorite_search">Favorisierte Suchbegriffe</string>
+    <string name="favorite_search_narrow">Suchbegriffe</string>
+    <string name="empty_favorites_title">Keine Favoriten</string>
+    <string name="empty_favorites_text">Favorisierte Geschichten\nund Suchbegriffe\nwerden hier angezeigt.</string>
+
+    <!--recents fragment-->
+    <string name="recents">Verlauf</string>
+    <string name="recent_stories">Letzte Geschichten</string>
+    <string name="recent_stories_narrow">@string/stories</string>
+    <string name="recent_searches">Letzte Suchbegriffe</string>
+    <string name="recent_searches_narrow">Suchebegriffe</string>
+    <string name="empty_recents_title">Kein Verlauf</string>
+    <string name="empty_recents_text">Sobald du suchst\noder Geschichten liest, tauchen\ndeine Aktivitäten hier auf.</string>
+    <string name="disabled_recents_title">Verlauf deaktiviert</string>
+    <string name="disabled_recents_text">Du kannst den Verlauf in den Einstellungen aktivieren.</string>
+
+    <!--about fragment-->
+    <string name="about">Über</string>
+    <string name="about_text">Die Suchmaschine, die Sie nicht verfolgt.</string>
+    <string name="version">Version</string>
+    <string name="select_application">Anwendung auswählen</string>
+
+    <!--help feedback fragment-->
+    <string name="help">Hilfe</string>
+    <string name="android_help_center">Android-Hilfezentrale</string>
+    <string name="feedback">Rückmeldung</string>
+    <string name="leave_feedback">Rückmeldung geben</string>
+    <string name="rate">Die App bewerten</string>
+
+    <!-- change sources fragment-->
+    <string name="change_sources">Quellen verwalten</string>
+
+    <!-- menus -->
+    <string name="action_stories">@string/stories</string>
+    <string name="action_recents">@string/recents</string>
+    <string name="action_favorites">@string/favorites</string>
+    <string name="action_settings">@string/settings</string>
+    <string name="action_help_feedback">Hilfe &amp; Rückmeldung</string>
+    <string name="action_reload">Seite aktualisieren</string>
+    <string name="action_add_favorite">Zu Favoriten hinzufügen</string>
+    <string name="action_remove_favorite">Aus Favoriten entfernen</string>
+    <string name="action_share">Teilen</string>
+    <string name="action_view_external">Im Browser öffnen</string>
+    <string name="action_back">Zurück</string>
+    <string name="action_forward">Weiter</string>
+    <string name="action_close">Schließen</string>
+
+
+
+
+    
+    <!-- SSL Certificate dialogs -->
+    <!-- Title for an SSL Certificate dialog -->
+    <string name="ssl_certificate">Sicherheitszertifikat</string>
+    <!-- Message on an SSL Certificate dialog -->
+    <string name="ssl_certificate_is_valid">Dieses Zertifikat ist gültig.</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="issued_to">Betrifft:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="common_name">Üblicher Name:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="org_name">Organisation:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="org_unit">Abteilung:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="issued_by">Betrifft:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="validity_period">Gültigkeit:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="issued_on">Betrifft:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="expires_on">Läuft aus:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="serial_number">Seriennummer:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="fingerprints">Fingerabdruck:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="sha256_fingerprint">SHA-256-Fingerabdruck:</string>
+    <!-- Label for an information field on an SSL Certificate Dialog -->
+    <string name="sha1_fingerprint">SHA-1-Fingerabdruck:</string>
+    
+    <string name="WarnSSLTitle">Warnung: SSL-Zertifikat</string>
+    <string name="WarnSSLDetail">SSL-Zertifikat des Servers ist nicht als vertrauenswürdig gelistet. 
+        Sie können dennoch fortfahren oder die Anfrage abbrechen.</string>
+    
+</resources>

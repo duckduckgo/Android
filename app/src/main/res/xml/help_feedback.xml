@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/help">
+        <Preference
+            android:key="help_center"
+            android:title="@string/android_help_center"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/feedback">
+        <Preference
+            android:key="leave_feedback"
+            android:title="@string/leave_feedback"/>
+        <Preference
+            android:key="rate_app"
+            android:title="@string/rate"/>
+    </PreferenceCategory>
+    <PreferenceCategory/>
+
+</PreferenceScreen>

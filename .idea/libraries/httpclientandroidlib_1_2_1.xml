@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="httpclientandroidlib-1.2.1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/libs/OnionKit/libnetcipher/libs/httpclientandroidlib-1.2.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

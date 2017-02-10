@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="@dimen/listview_item_height"
+              android:gravity="center_vertical"
+              android:background="@android:color/transparent"
+              android:descendantFocusability="blocksDescendants">
+
+    <ImageView
+        android:id="@+id/item_icon"
+        android:layout_width="@dimen/searchlistview_item_icon_dimen"
+        android:layout_height="@dimen/searchlistview_item_icon_dimen"
+        android:layout_alignParentLeft="true"
+        android:scaleType="center"/>
+
+    <ImageButton
+        android:id="@+id/item_paste"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="@dimen/searchlistview_item_plus_margin"
+        android:scaleType="center"
+        android:src="@drawable/plus"
+        android:background="?attr/selectableItemBackground"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/item_text"
+        android:textColor="@color/search_dark"
+        android:textSize="16sp"
+        android:maxLines="2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/searchlistview_item_text_margin"
+        android:layout_marginRight="@dimen/searchlistview_item_text_margin"
+        android:layout_toRightOf="@id/item_icon"
+        android:layout_toLeftOf="@id/item_paste"/>
+
+    <TextView
+        android:id="@+id/item_text2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:textColor="@color/search_dark"
+        android:textSize="16sp"
+        android:layout_toRightOf="@id/item_text"/>
+    <TextView
+        android:id="@+id/item_text3"
+        android:textColor="@color/search_light"
+        android:textSize="16sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@id/item_text2"/>
+
+</RelativeLayout>
