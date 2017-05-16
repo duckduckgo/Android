@@ -9,9 +9,6 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/app/libs" />
-            <option value="$PROJECT_DIR$/app/libs/OnionKit" />
-            <option value="$PROJECT_DIR$/app/libs/OnionKit/libnetcipher" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

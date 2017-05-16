@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_go_back"
+        android:title="@string/browser_menu_action_back"
+        android:orderInCategory="100"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_go_forward"
+        android:title="@string/browser_menu_action_forward"
+        android:orderInCategory="200"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_refresh"
+        android:title="@string/browser_menu_action_refresh"
+        android:orderInCategory="300"
+        app:showAsAction="never"/>
+</menu>
