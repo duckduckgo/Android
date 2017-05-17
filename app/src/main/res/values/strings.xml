@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">DuckDuckGo</string>
 
+    <!-- Appbar -->
+    <string name="appbar_search_edit_text_hint">Search DuckDuckGo</string>
+
     <!-- Browser Menu -->
     <string name="browser_menu_action_back">Back</string>
     <string name="browser_menu_action_forward">Forward</string>

@@ -9,6 +9,7 @@ import com.duckduckgo.mobile.android.duckduckgo.util.DDGUrlHelper;
 public class BrowserPresenter implements BrowserContract.Presenter {
 
     private BrowserContract.View browserView;
+    private String displayedText;
 
     public BrowserPresenter(BrowserContract.View browserView) {
         this.browserView = browserView;
@@ -20,15 +21,18 @@ public class BrowserPresenter implements BrowserContract.Presenter {
         // TODO: 5/15/17 load previous session or load new page
         browserView.setCanGoBackEnabled(false);
         browserView.setCanGoForwardEnabled(false);
+        browserView.setCanReloadEnabled(false);
     }
 
     @Override
     public void requestLoadUrl(String url) {
+        displayedText = url;
         browserView.loadUrl(url);
     }
 
     @Override
     public void requestQuerySearch(String query) {
+        displayedText = query;
         String url = DDGUrlHelper.getUrlForQuery(query);
         requestLoadUrl(url);
     }
@@ -56,11 +60,14 @@ public class BrowserPresenter implements BrowserContract.Presenter {
 
     @Override
     public void onPageStarted(String url) {
+        browserView.setCanReloadEnabled(true);
     }
 
     @Override
     public void onPageFinished(String url) {
         checkIfHistoryNavigationPresent();
+        displayedText = DDGUrlHelper.isUrlDDG(url) ? DDGUrlHelper.getQuery(url) : url;
+        browserView.showTextInSearchBar(displayedText);
     }
 
     @Override

@@ -25,6 +25,7 @@ public interface BrowserContract {
 
     interface View extends BaseView<Presenter> {
         void loadUrl(@NonNull String url);
+        void showTextInSearchBar(String text);
         void goBack();
         void goForward();
         boolean canGoBack();
@@ -32,6 +33,7 @@ public interface BrowserContract {
         void setCanGoBackEnabled(boolean enabled);
         void setCanGoForwardEnabled(boolean enabled);
         void reload();
+        void setCanReloadEnabled(boolean enabled);
         void clearSearchBar();
         void focusSearchBar();
     }

@@ -1,20 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.Toolbar
+<android.support.design.widget.AppBarLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/appbar_toolbar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:focusableInTouchMode="true"
-    android:background="@color/colorPrimary"
-    app:contentInsetStart="0dp"
-    app:contentInsetEnd="0dp"
-    >
-    <EditText
-        android:id="@+id/appbar_edit_text"
+    android:theme="@style/AppBar">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/appbar_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:maxLines="1"
-        android:inputType="textNoSuggestions"
-        android:imeOptions="actionSearch"/>
-</android.support.v7.widget.Toolbar>
+        android:layout_height="?attr/actionBarSize"
+        android:focusableInTouchMode="true"
+        app:contentInsetStart="0dp"
+        app:contentInsetEnd="0dp"
+        app:popupTheme="@style/AppBar.Popup"
+        >
+        <EditText
+            android:id="@+id/appbar_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:paddingStart="8dp"
+            android:paddingLeft="8dp"
+            android:paddingEnd="8dp"
+            android:paddingRight="8dp"
+            android:selectAllOnFocus="true"
+            android:maxLines="1"
+            android:inputType="textNoSuggestions"
+            android:imeOptions="actionSearch"
+            android:textColor="#000"
+            android:textColorHint="#aaaaaa"
+            android:hint="@string/appbar_search_edit_text_hint"
+            android:background="@drawable/appbar_background"
+            android:layout_gravity="center_vertical"/>
+    </android.support.v7.widget.Toolbar>
+</android.support.design.widget.AppBarLayout>

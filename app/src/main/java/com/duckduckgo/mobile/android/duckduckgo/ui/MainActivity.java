@@ -1,12 +1,12 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui;
 
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity implements BrowserContract.V
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.e("handle_intent", "onCreate");
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
@@ -48,14 +47,27 @@ public class MainActivity extends AppCompatActivity implements BrowserContract.V
     @Override
     protected void onResume() {
         super.onResume();
-        Log.e("handle_intent", "onResume");
         browserPresenter.start();
+        webView.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        webView.onPause();
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if(webView != null) {
+            webView.destroy();
+        }
+        super.onDestroy();
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        Log.e("handle_intent", "onNewIntent");
         handleIntent(intent);
     }
 
@@ -75,6 +87,11 @@ public class MainActivity extends AppCompatActivity implements BrowserContract.V
     @Override
     public void loadUrl(@NonNull String url) {
         webView.loadUrl(url);
+    }
+
+    @Override
+    public void showTextInSearchBar(String text) {
+        searchEditText.setText(text);
     }
 
     @Override
@@ -115,6 +132,12 @@ public class MainActivity extends AppCompatActivity implements BrowserContract.V
     }
 
     @Override
+    public void setCanReloadEnabled(boolean enabled) {
+        MenuItem reloadMenuItem = toolbar.getMenu().findItem(R.id.action_refresh);
+        reloadMenuItem.setEnabled(enabled);
+    }
+
+    @Override
     public void clearSearchBar() {
         searchEditText.setText("");
     }
@@ -130,6 +153,8 @@ public class MainActivity extends AppCompatActivity implements BrowserContract.V
         initSearchEditText(searchEditText);
     }
 
+
+    @SuppressLint("SetJavaScriptEnabled")
     private void initWebView(WebView webView) {
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptCanOpenWindowsAutomatically(false);
@@ -166,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements BrowserContract.V
                     String query = v.getText().toString().trim();
                     browserPresenter.requestQuerySearch(query);
                     KeyboardHelper.hideKeyboard(v);
+                    v.clearFocus();
                     return true;
                 }
                 return false;
@@ -175,7 +201,6 @@ public class MainActivity extends AppCompatActivity implements BrowserContract.V
 
     private void handleIntent(Intent intent) {
         String action = intent.getAction();
-        Log.e("handle_intent", "intent, action: "+action);
         if(action.equals(Intent.ACTION_VIEW)) {
             String url = intent.getDataString();
             browserPresenter.requestLoadUrl(url);
