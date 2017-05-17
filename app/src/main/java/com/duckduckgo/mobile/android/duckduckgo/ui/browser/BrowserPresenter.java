@@ -34,6 +34,12 @@ public class BrowserPresenter implements BrowserContract.Presenter {
     }
 
     @Override
+    public void requestAssist() {
+        browserView.clearSearchBar();
+        browserView.focusSearchBar();
+    }
+
+    @Override
     public void navigateHistoryForward() {
         browserView.goForward();
     }

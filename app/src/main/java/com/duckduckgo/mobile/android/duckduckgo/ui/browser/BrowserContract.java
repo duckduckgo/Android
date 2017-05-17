@@ -14,6 +14,7 @@ public interface BrowserContract {
     interface Presenter extends BasePresenter {
         void requestLoadUrl(String url);
         void requestQuerySearch(String query);
+        void requestAssist();
         void navigateHistoryForward();
         void navigateHistoryBackward();
         void refreshCurrentPage();
@@ -31,5 +32,7 @@ public interface BrowserContract {
         void setCanGoBackEnabled(boolean enabled);
         void setCanGoForwardEnabled(boolean enabled);
         void reload();
+        void clearSearchBar();
+        void focusSearchBar();
     }
 }

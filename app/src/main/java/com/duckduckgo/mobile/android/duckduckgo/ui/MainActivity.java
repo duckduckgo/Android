@@ -1,9 +1,12 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui;
 
+import android.app.SearchManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
@@ -32,17 +35,28 @@ public class MainActivity extends AppCompatActivity implements BrowserContract.V
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.e("handle_intent", "onCreate");
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
         browserPresenter = new BrowserPresenter(this);
         initUI();
+
+        handleIntent(getIntent());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        Log.e("handle_intent", "onResume");
         browserPresenter.start();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.e("handle_intent", "onNewIntent");
+        handleIntent(intent);
     }
 
     @Override
@@ -100,6 +114,16 @@ public class MainActivity extends AppCompatActivity implements BrowserContract.V
         webView.reload();
     }
 
+    @Override
+    public void clearSearchBar() {
+        searchEditText.setText("");
+    }
+
+    @Override
+    public void focusSearchBar() {
+        searchEditText.requestFocus();
+    }
+
     private void initUI() {
         initWebView(webView);
         initToolbar(toolbar);
@@ -147,5 +171,19 @@ public class MainActivity extends AppCompatActivity implements BrowserContract.V
                 return false;
             }
         });
+    }
+
+    private void handleIntent(Intent intent) {
+        String action = intent.getAction();
+        Log.e("handle_intent", "intent, action: "+action);
+        if(action.equals(Intent.ACTION_VIEW)) {
+            String url = intent.getDataString();
+            browserPresenter.requestLoadUrl(url);
+        } else if(action.equals(Intent.ACTION_WEB_SEARCH)) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            browserPresenter.requestQuerySearch(query);
+        } else if(action.equals(Intent.ACTION_ASSIST)) {
+             browserPresenter.requestAssist();
+        }
     }
 }

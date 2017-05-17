@@ -5,10 +5,10 @@ package com.duckduckgo.mobile.android.duckduckgo.util;
  */
 
 public class DDGUrlHelper {
-    private static String BASE_URL = "https://duckduckgo.com/";
+    private static final String BASE_URL = "https://duckduckgo.com/";
 
-    private static String PARAM_REMOVE_OMNIBOX = "ko=-1";
-    private static String PARAM_QUERY = "q=";
+    private static final String PARAM_REMOVE_OMNIBOX = "ko=-1";
+    private static final String PARAM_QUERY = "q=";
 
     private DDGUrlHelper() {
     }
