@@ -1,23 +1,21 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.duckduckgo.mobile.android.duckduckgo.R;
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.BrowserContract;
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.BrowserPresenter;
-import com.duckduckgo.mobile.android.duckduckgo.util.DDGUrlHelper;
+import com.duckduckgo.mobile.android.duckduckgo.ui.browser.DDGWebViewClient;
 import com.duckduckgo.mobile.android.duckduckgo.util.KeyboardHelper;
 
 import butterknife.BindView;
@@ -45,6 +43,14 @@ public class MainActivity extends AppCompatActivity implements BrowserContract.V
     protected void onResume() {
         super.onResume();
         browserPresenter.start();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(browserPresenter.handleBackHistory()) {
+            return;
+        }
+        super.onBackPressed();
     }
 
     @Override
@@ -95,7 +101,19 @@ public class MainActivity extends AppCompatActivity implements BrowserContract.V
     }
 
     private void initUI() {
-        initWebView();
+        initWebView(webView);
+        initToolbar(toolbar);
+        initSearchEditText(searchEditText);
+    }
+
+    private void initWebView(WebView webView) {
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(false);
+        webSettings.setJavaScriptEnabled(true);
+        webView.setWebViewClient(new DDGWebViewClient(browserPresenter));
+    }
+
+    private void initToolbar(Toolbar toolbar) {
         toolbar.inflateMenu(R.menu.browser);
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
@@ -114,30 +132,19 @@ public class MainActivity extends AppCompatActivity implements BrowserContract.V
                 return false;
             }
         });
+    }
+
+    private void initSearchEditText(EditText searchEditText) {
         searchEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if(actionId == EditorInfo.IME_ACTION_SEARCH) {
                     String query = v.getText().toString().trim();
-                    String url = DDGUrlHelper.getUrlForQuery(query);
-                    browserPresenter.requestLoadUrl(url);
+                    browserPresenter.requestQuerySearch(query);
                     KeyboardHelper.hideKeyboard(v);
                     return true;
                 }
                 return false;
-            }
-        });
-    }
-
-    private void initWebView() {
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptCanOpenWindowsAutomatically(false);
-        webSettings.setJavaScriptEnabled(true);
-        webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                return true;
-                //return super.shouldOverrideUrlLoading(view, request);
             }
         });
     }

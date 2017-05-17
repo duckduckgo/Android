@@ -25,5 +25,12 @@ public class DDGWebViewClient extends WebViewClient {
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
         super.onPageStarted(view, url, favicon);
+        browserPresenter.onPageStarted(url);
+    }
+
+    @Override
+    public void onPageFinished(WebView view, String url) {
+        super.onPageFinished(view, url);
+        browserPresenter.onPageFinished(url);
     }
 }

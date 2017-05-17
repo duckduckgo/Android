@@ -15,15 +15,4 @@ public class KeyboardHelper {
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    public static void showKeyboard() {
-
-    }
-
-    public static void hideKeyboardDelayed() {
-
-    }
-
-    public static void showKeyboardDelayed() {
-
-    }
 }

@@ -13,11 +13,13 @@ public interface BrowserContract {
 
     interface Presenter extends BasePresenter {
         void requestLoadUrl(String url);
+        void requestQuerySearch(String query);
         void navigateHistoryForward();
         void navigateHistoryBackward();
         void refreshCurrentPage();
         void onPageStarted(String url);
         void onPageFinished(String url);
+        boolean handleBackHistory();
     }
 
     interface View extends BaseView<Presenter> {

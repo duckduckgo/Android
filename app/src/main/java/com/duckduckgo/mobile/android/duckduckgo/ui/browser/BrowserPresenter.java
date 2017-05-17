@@ -1,5 +1,7 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 
+import com.duckduckgo.mobile.android.duckduckgo.util.DDGUrlHelper;
+
 /**
  * Created by fgei on 5/15/17.
  */
@@ -26,6 +28,12 @@ public class BrowserPresenter implements BrowserContract.Presenter {
     }
 
     @Override
+    public void requestQuerySearch(String query) {
+        String url = DDGUrlHelper.getUrlForQuery(query);
+        requestLoadUrl(url);
+    }
+
+    @Override
     public void navigateHistoryForward() {
         browserView.goForward();
     }
@@ -42,12 +50,28 @@ public class BrowserPresenter implements BrowserContract.Presenter {
 
     @Override
     public void onPageStarted(String url) {
-
     }
 
     @Override
     public void onPageFinished(String url) {
+        checkIfHistoryNavigationPresent();
+    }
 
+    @Override
+    public boolean handleBackHistory() {
+        if(browserView.canGoBack()) {
+            navigateHistoryBackward();
+            return true;
+        }
+        return false;
+    }
+
+    private void setCanGoBack() {
+        setCanGoBack(browserView.canGoBack());
+    }
+
+    private void setCanGoForward() {
+        setCanGoForward(browserView.canGoForward());
     }
 
     private void setCanGoBack(boolean canGoBack) {
@@ -56,5 +80,10 @@ public class BrowserPresenter implements BrowserContract.Presenter {
 
     private void setCanGoForward(boolean canGoForward) {
         browserView.setCanGoForwardEnabled(canGoForward);
+    }
+
+    private void checkIfHistoryNavigationPresent() {
+        setCanGoBack();
+        setCanGoForward();
     }
 }
