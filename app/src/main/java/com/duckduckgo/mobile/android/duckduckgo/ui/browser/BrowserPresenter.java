@@ -1,6 +1,6 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 
-import com.duckduckgo.mobile.android.duckduckgo.util.DDGUrlHelper;
+import com.duckduckgo.mobile.android.duckduckgo.util.AppUrls;
 
 /**
  * Created by fgei on 5/15/17.
@@ -33,7 +33,7 @@ public class BrowserPresenter implements BrowserContract.Presenter {
     @Override
     public void requestQuerySearch(String query) {
         displayedText = query;
-        String url = DDGUrlHelper.getUrlForQuery(query);
+        String url = AppUrls.getSearchUrl(query);
         requestLoadUrl(url);
     }
 
@@ -66,7 +66,7 @@ public class BrowserPresenter implements BrowserContract.Presenter {
     @Override
     public void onPageFinished(String url) {
         checkIfHistoryNavigationPresent();
-        displayedText = DDGUrlHelper.isUrlDDG(url) ? DDGUrlHelper.getQuery(url) : url;
+        displayedText = AppUrls.isDuckDuckGo(url) ? AppUrls.getQuery(url) : url;
         browserView.showTextInSearchBar(displayedText);
     }
 
