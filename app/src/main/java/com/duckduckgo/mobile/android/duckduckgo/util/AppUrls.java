@@ -53,7 +53,8 @@ public class AppUrls {
         try {
             URI uri = new URI(url);
             String query = uri.getQuery();
-            String[] paramsSplit= query.split("&");
+            if(query == null || query.length() == 0) return "";
+            String[] paramsSplit = query.split("&");
             Map<String, String> params = new HashMap<>();
             for(String param : paramsSplit) {
                 String[] p = param.split("=");

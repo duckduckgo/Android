@@ -1,9 +1,11 @@
-package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
+package com.duckduckgo.mobile.android.duckduckgo.ui.browser.web;
 
 import android.graphics.Bitmap;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import com.duckduckgo.mobile.android.duckduckgo.ui.browser.BrowserPresenter;
 
 /**
  * Created by fgei on 5/15/17.
@@ -11,9 +13,9 @@ import android.webkit.WebViewClient;
 
 public class DDGWebViewClient extends WebViewClient {
 
-    private BrowserContract.Presenter browserPresenter;
+    private BrowserPresenter browserPresenter;
 
-    public DDGWebViewClient(BrowserContract.Presenter browserPresenter) {
+    public DDGWebViewClient(BrowserPresenter browserPresenter) {
         this.browserPresenter = browserPresenter;
     }
 
