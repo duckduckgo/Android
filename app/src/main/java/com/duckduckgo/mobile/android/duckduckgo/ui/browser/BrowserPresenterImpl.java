@@ -34,19 +34,17 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     @Override
     public void requestSearch(String text) {
         if(UrlUtils.isUrl(text)) {
-            String url = UrlUtils.getValidUrl(text);
+            String url = UrlUtils.getUrlWithScheme(text);
             requestLoadUrl(url);
         } else {
             requestQuerySearch(text);
         }
     }
 
-    //@Override
     private void requestLoadUrl(String url) {
         browserView.loadUrl(url);
     }
 
-    //@Override
     private void requestQuerySearch(String query) {
         String url = AppUrls.getSearchUrl(query);
         requestLoadUrl(url);
@@ -83,7 +81,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     @Override
     public void onPageFinished(String url) {
-        setNavigationMenuButtons();
+        setNavigationMenuButtonsEnabled();
     }
 
     @Override
@@ -122,7 +120,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
         omnibarView.setForwardEnabled(canGoForward);
     }
 
-    private void setNavigationMenuButtons() {
+    private void setNavigationMenuButtonsEnabled() {
         setCanGoBack();
         setCanGoForward();
     }

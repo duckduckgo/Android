@@ -6,10 +6,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
@@ -45,6 +47,7 @@ public class BrowserPresenterTest {
         final String urlInput = "https://test.com";
         browserPresenter.requestSearch(urlInput);
         verify(mockBrowserView, times(1)).loadUrl(urlInput);
+        verifyZeroInteractions(mockOmnibarView);
     }
 
     @Test
@@ -60,6 +63,7 @@ public class BrowserPresenterTest {
         browserPresenter.requestAssist();
         verify(mockOmnibarView, times(1)).clearText();
         verify(mockOmnibarView, times(1)).requestFocus();
+        verifyZeroInteractions(mockBrowserView);
     }
 
     @Test
@@ -119,8 +123,11 @@ public class BrowserPresenterTest {
         final boolean canGoForward = false;
         when(mockBrowserView.canGoForward()).thenReturn(canGoForward);
         browserPresenter.onPageFinished(text);
+        verify(mockBrowserView, times(1)).canGoBack();
+        verify(mockBrowserView, times(1)).canGoForward();
         verify(mockOmnibarView, times(1)).setForwardEnabled(canGoForward);
         verify(mockOmnibarView, times(1)).setBackEnabled(canGoBack);
+        verifyNoMoreInteractions(mockBrowserView);
     }
 
     @Test
@@ -140,5 +147,24 @@ public class BrowserPresenterTest {
         final boolean expectedSecond = false;
         assertEquals(resultSecond, expectedSecond);
         verify(mockBrowserView, times(1)).goBack();
+    }
+
+    @Test
+    public void shouldShowProgressBarIfProgressIsNot100() {
+        final int newProgress = 0;
+        browserPresenter.onProgressChanged(newProgress);
+        verifyZeroInteractions(mockBrowserView);
+        verify(mockOmnibarView, times(1)).showProgressBar();
+        verify(mockOmnibarView, times(1)).onProgressChanged(newProgress);
+    }
+
+    @Test
+    public void shouldHideProgressBarIfProgressIf100() {
+        final int newProgress = 100;
+        browserPresenter.onProgressChanged(newProgress);
+        verifyZeroInteractions(mockBrowserView);
+        verify(mockOmnibarView, times(1)).onProgressChanged(newProgress);
+        verify(mockOmnibarView, times(1)).hideProgressBar();
+        verifyNoMoreInteractions(mockOmnibarView);
     }
 }
