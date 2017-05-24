@@ -1,5 +1,8 @@
 package com.duckduckgo.mobile.android.duckduckgo.util;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -9,11 +12,12 @@ import java.net.URL;
 
 public class UrlUtils {
 
-    public static boolean isUrl(String url) {
+    public static boolean isUrl(@Nullable String url) {
+        if(url == null) return false;
         return url.contains(".") && !url.contains(" ");
     }
 
-    public static String getUrlWithScheme(String url) {
+    public static String getUrlWithScheme(@NonNull String url) {
         if(url.startsWith("http://") || url.startsWith("https://")) {
             return url;
         }

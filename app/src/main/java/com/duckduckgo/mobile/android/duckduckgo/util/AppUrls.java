@@ -1,6 +1,7 @@
 package com.duckduckgo.mobile.android.duckduckgo.util;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -48,6 +49,7 @@ public class AppUrls {
         return false;
     }
 
+    @Nullable
     public static String getQuery(@NonNull String url) {
         if(!isDuckDuckGo(url)) return null;
         try {

@@ -100,7 +100,7 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
 
     @Override
     public void onDestroyView() {
-        browserPresenter.detach();
+        browserPresenter.detachViews();
         unbinder.unbind();
         super.onDestroyView();
     }
@@ -142,7 +142,7 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
     }
 
     @Override
-    public void displayText(String text) {
+    public void displayText(@NonNull String text) {
         searchEditText.setText(text);
     }
 

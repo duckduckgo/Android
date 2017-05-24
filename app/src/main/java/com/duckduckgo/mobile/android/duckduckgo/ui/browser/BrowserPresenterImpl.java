@@ -1,5 +1,8 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import com.duckduckgo.mobile.android.duckduckgo.util.AppUrls;
 import com.duckduckgo.mobile.android.duckduckgo.util.UrlUtils;
 
@@ -16,23 +19,24 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     @Override
-    public void attachBrowserView(BrowserView browserView) {
+    public void attachBrowserView(@NonNull BrowserView browserView) {
         this.browserView = browserView;
     }
 
     @Override
-    public void attachOmnibarView(OmnibarView omnibarView) {
+    public void attachOmnibarView(@NonNull OmnibarView omnibarView) {
         this.omnibarView = omnibarView;
     }
 
     @Override
-    public void detach() {
+    public void detachViews() {
         this.browserView = null;
         this.omnibarView = null;
     }
 
     @Override
-    public void requestSearch(String text) {
+    public void requestSearch(@Nullable String text) {
+        if(text == null) return;
         if(UrlUtils.isUrl(text)) {
             String url = UrlUtils.getUrlWithScheme(text);
             requestLoadUrl(url);
@@ -41,11 +45,11 @@ public class BrowserPresenterImpl implements BrowserPresenter {
         }
     }
 
-    private void requestLoadUrl(String url) {
+    private void requestLoadUrl(@NonNull String url) {
         browserView.loadUrl(url);
     }
 
-    private void requestQuerySearch(String query) {
+    private void requestQuerySearch(@NonNull String query) {
         String url = AppUrls.getSearchUrl(query);
         requestLoadUrl(url);
     }
@@ -72,15 +76,16 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     @Override
-    public void onPageStarted(String url) {
+    public void onPageStarted(@Nullable String url) {
+        if(url == null) url = "";
         omnibarView.setRefreshEnabled(true);
         String query = AppUrls.isDuckDuckGo(url) ? AppUrls.getQuery(url) : "";
-        String displayedText = query != null && query.length() > 0 ? query : url;
-        omnibarView.displayText(displayedText);
+        String textToDisplay = query != null && query.length() > 0 ? query : url;
+        omnibarView.displayText(textToDisplay);
     }
 
     @Override
-    public void onPageFinished(String url) {
+    public void onPageFinished(@Nullable String url) {
         setNavigationMenuButtonsEnabled();
     }
 

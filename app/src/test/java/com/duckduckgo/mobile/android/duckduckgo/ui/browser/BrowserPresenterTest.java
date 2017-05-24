@@ -36,8 +36,8 @@ public class BrowserPresenterTest {
     }
 
     @Test
-    public void shouldHAveNoInteractionOnDetach() {
-        browserPresenter.detach();
+    public void shouldHaveNoInteractionsOnDetach() {
+        browserPresenter.detachViews();
         verifyZeroInteractions(mockBrowserView);
         verifyZeroInteractions(mockOmnibarView);
     }
@@ -56,6 +56,14 @@ public class BrowserPresenterTest {
         final String url = AppUrls.getSearchUrl(query);
         browserPresenter.requestSearch(query);
         verify(mockBrowserView, times(1)).loadUrl(url);
+    }
+
+    @Test
+    public void shouldHaveNoInteractionWhenSearchUrlIsNull() {
+        final String url = null;
+        browserPresenter.requestSearch(url);
+        verifyZeroInteractions(mockOmnibarView);
+        verifyZeroInteractions(mockBrowserView);
     }
 
     @Test
@@ -116,6 +124,13 @@ public class BrowserPresenterTest {
     }
 
     @Test
+    public void shouldUpdateOmnibarWithEmptyStringWhenPAgeStartsLoadingWithNullUrl() {
+        final String url = null;
+        browserPresenter.onPageStarted(url);
+        verify(mockOmnibarView, times(1)).displayText("");
+    }
+
+    @Test
     public void shouldUpdateOmnibarMenuNavigationWhenPageFinishesLoading() {
         String text = "https://test.com/";
         final boolean canGoBack = true;
@@ -166,5 +181,9 @@ public class BrowserPresenterTest {
         verify(mockOmnibarView, times(1)).onProgressChanged(newProgress);
         verify(mockOmnibarView, times(1)).hideProgressBar();
         verifyNoMoreInteractions(mockOmnibarView);
+    }
+    @Test
+    public void error() {
+        //assertEquals(true, false);
     }
 }

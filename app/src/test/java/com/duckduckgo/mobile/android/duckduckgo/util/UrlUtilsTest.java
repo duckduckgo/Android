@@ -33,6 +33,14 @@ public class UrlUtilsTest {
     }
 
     @Test
+    public void shouldReturnFalseIfNullIsProvided() {
+        final String url = null;
+        final boolean expected = false;
+        final boolean result = UrlUtils.isUrl(url);
+        assertEquals(expected, result);
+    }
+
+    @Test
     public void shouldReturnValidUrlWhenSchemeIsMissing() {
         final String expected = "http://test.com";
         final String text = "test.com";

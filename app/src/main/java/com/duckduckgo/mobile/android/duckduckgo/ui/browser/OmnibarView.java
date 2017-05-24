@@ -1,11 +1,13 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 
+import android.support.annotation.NonNull;
+
 /**
  * Created by fgei on 5/22/17.
  */
 
 public interface OmnibarView {
-    void displayText(String text);
+    void displayText(@NonNull String text);
     void clearText();
     void clearFocus();
     void requestFocus();

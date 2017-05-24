@@ -1,20 +1,23 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 /**
  * Created by fgei on 5/22/17.
  */
 
 public interface BrowserPresenter {
-    void attachBrowserView(BrowserView browserView);
-    void attachOmnibarView(OmnibarView omnibarView);
-    void detach();
-    void requestSearch(String text);
+    void attachBrowserView(@NonNull BrowserView browserView);
+    void attachOmnibarView(@NonNull OmnibarView omnibarView);
+    void detachViews();
+    void requestSearch(@Nullable String text);
     void requestAssist();
     void navigateHistoryForward();
     void navigateHistoryBackward();
     void refreshCurrentPage();
-    void onPageStarted(String url);
-    void onPageFinished(String url);
+    void onPageStarted(@Nullable String url);
+    void onPageFinished(@Nullable String url);
     void onProgressChanged(int newProgress);
     boolean handleBackHistory();
 }
