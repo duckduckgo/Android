@@ -35,8 +35,8 @@
                 android:maxLines="1"
                 android:inputType="textNoSuggestions"
                 android:imeOptions="actionSearch"
-                android:textColor="#000"
-                android:textColorHint="#aaaaaa"
+                android:textColor="@color/appbar_text_color"
+                android:textColorHint="@color/appbar_text_hint"
                 android:hint="@string/appbar_search_edit_text_hint"
                 android:background="@drawable/appbar_background"
                 android:layout_gravity="center_vertical"/>
