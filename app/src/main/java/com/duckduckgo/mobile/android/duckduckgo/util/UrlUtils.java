@@ -3,9 +3,6 @@ package com.duckduckgo.mobile.android.duckduckgo.util;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 /**
  * Created by fgei on 5/23/17.
  */
