@@ -12,6 +12,8 @@ import com.duckduckgo.mobile.android.duckduckgo.util.UrlUtils;
 
 public class BrowserPresenterImpl implements BrowserPresenter {
 
+    private static final int PROGRESS_COMPLETE = 100;
+
     private BrowserView browserView;
     private OmnibarView omnibarView;
 
@@ -30,8 +32,8 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     @Override
     public void detachViews() {
-        this.browserView = null;
-        this.omnibarView = null;
+        browserView = null;
+        omnibarView = null;
     }
 
     @Override
@@ -77,11 +79,9 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     @Override
     public void onPageStarted(@Nullable String url) {
-        if(url == null) url = "";
         omnibarView.setRefreshEnabled(true);
-        String query = AppUrls.isDuckDuckGo(url) ? AppUrls.getQuery(url) : "";
-        String textToDisplay = query != null && query.length() > 0 ? query : url;
-        omnibarView.displayText(textToDisplay);
+        String validUrl = url == null ? "" : url;
+        displayTextForUrl(validUrl);
     }
 
     @Override
@@ -92,9 +92,9 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     @Override
     public void onProgressChanged(int newProgress) {
         if(omnibarView == null) return;
-        if(newProgress < 100) {
+        if(newProgress < PROGRESS_COMPLETE) {
             omnibarView.showProgressBar();
-        } else if(newProgress == 100) {
+        } else if(newProgress == PROGRESS_COMPLETE) {
             omnibarView.hideProgressBar();
         }
         omnibarView.onProgressChanged(newProgress);
@@ -128,5 +128,26 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     private void setNavigationMenuButtonsEnabled() {
         setCanGoBack();
         setCanGoForward();
+    }
+
+    private void displayText(String textToDisplay) {
+        omnibarView.displayText(textToDisplay);
+    }
+
+    private void displayTextForUrl(String url) {
+        if(AppUrls.isDuckDuckGo(url)) {
+            displayTextForDuckDuckGoUrl(url);
+        } else {
+            displayText(url);
+        }
+    }
+
+    private void displayTextForDuckDuckGoUrl(String url) {
+        String textToDisplay = url;
+        String query = AppUrls.getQuery(url);
+        if(query != null && query.length() > 0) {
+            textToDisplay = query;
+            displayText(textToDisplay);
+        }
     }
 }

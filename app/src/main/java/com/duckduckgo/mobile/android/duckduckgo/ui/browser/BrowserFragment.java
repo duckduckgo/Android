@@ -36,7 +36,7 @@ import butterknife.Unbinder;
  * Created by fgei on 5/15/17.
  */
 
-public class BrowserFragment extends Fragment implements BrowserView, OmnibarView {//implements BrowserContract.View {
+public class BrowserFragment extends Fragment implements BrowserView, OmnibarView {
 
     public static final String TAG = BrowserFragment.class.getSimpleName();
 
@@ -248,7 +248,7 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
         searchEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(actionId == EditorInfo.IME_ACTION_SEARCH) {
+                if(actionId == EditorInfo.IME_ACTION_SEARCH || wasEnterPressed(event)) {
                     String text = v.getText().toString().trim();
                     browserPresenter.requestSearch(text);
                     KeyboardUtils.hideKeyboard(v);
@@ -258,5 +258,9 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
                 return false;
             }
         });
+    }
+
+    private boolean wasEnterPressed(KeyEvent event) {
+        return event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER;
     }
 }

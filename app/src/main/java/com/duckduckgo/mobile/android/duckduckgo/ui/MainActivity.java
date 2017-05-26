@@ -12,9 +12,9 @@ import com.duckduckgo.mobile.android.duckduckgo.ui.browser.BrowserPresenter;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int ACTIVITY_CONTAINER = android.R.id.content;
+    private static final int ACTIVITY_CONTAINER = android.R.id.content;
 
-    BrowserPresenter browserPresenter;
+    private BrowserPresenter browserPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
