@@ -1,146 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.Toolbar
+<android.support.design.widget.AppBarLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_alignParentTop="true"
-    android:id="@+id/toolbar"
-    android:minHeight="56dp"
-    app:contentInsetStart="0dp"
-    app:contentInsetEnd="0dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorPrimary"
-    app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-    app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
-
+    android:theme="@style/AppBar">
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
-        <RelativeLayout
-            android:id="@+id/searchBar"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/appbar_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_gravity="top"
-            android:gravity="center_vertical">
-
-            <ImageButton
-                android:visibility="gone"
-                android:id="@+id/home"
-                android:layout_width="@dimen/actionbar_button_width"
-                android:layout_height="@dimen/actionbar_button_height"
-                android:src="@drawable/home"
-                android:layout_alignParentLeft="true"
-                android:scaleType="center"
-                android:background="?attr/actionBarItemBackground"/>
-
-            <ImageButton
-                android:visibility="gone"
-                android:id="@+id/bang"
-                android:layout_width="@dimen/actionbar_button_width"
-                android:layout_height="@dimen/actionbar_button_height"
-                android:src="@drawable/bang"
-                android:layout_alignParentLeft="true"
-                android:scaleType="center"
-                android:background="?attr/actionBarItemBackground"/>
-
-            <ImageButton
-                android:visibility="gone"
-                android:id="@+id/overflow"
-                android:layout_width="@dimen/actionbar_button_width"
-                android:layout_height="@dimen/actionbar_button_height"
-                android:src="@drawable/menu_white"
-                android:layout_alignParentRight="true"
-                android:scaleType="center"
-                android:background="?attr/actionBarItemBackground"/>
-
-            <TextView
-                android:visibility="gone"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_alignParentLeft="true"
-                android:layout_marginLeft="@dimen/actionbar_title_left_margin"
-                android:gravity="center_vertical"
-                android:id="@+id/actionbar_title"
-                android:textColor="@color/actionbar_title"
-                android:textSize="18sp"/>
-
-            <RelativeLayout
-                android:id="@+id/search_container"
+            android:layout_height="?attr/actionBarSize"
+            android:focusableInTouchMode="true"
+            app:contentInsetStart="0dp"
+            app:contentInsetEnd="0dp"
+            app:popupTheme="@style/AppBar.Popup"
+            >
+            <EditText
+                android:id="@+id/appbar_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="@dimen/actionbar_margin"
-                android:layout_marginBottom="@dimen/actionbar_margin"
-                android:layout_marginLeft="@dimen/actionbar_margin"
-                android:layout_alignParentLeft="true"
-                android:layout_gravity="center_vertical"
-                android:background="@drawable/searchbar_background" >
-
-                <EditText
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:inputType="none"
-                    android:focusable="true"
-                    android:imeOptions="actionSearch"
-                    android:focusableInTouchMode="true" />
-
-                <ImageButton
-                    android:id="@+id/stop"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginRight="18.6dp"
-                    android:visibility="gone"
-                    android:src="@drawable/cross"
-                    android:background="@color/search_field"/>
-
-                <com.duckduckgo.mobile.android.views.autocomplete.DDGAutoCompleteTextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_toLeftOf="@id/stop"
-                    android:background="@drawable/searchbar_background"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="10dp"
-                    android:singleLine="true"
-                    android:textSize="@dimen/search_bar_text_size"
-                    android:textColor="@color/search_dark"
-                    android:selectAllOnFocus="true"
-                    android:dropDownWidth="wrap_content"
-                    android:dropDownAnchor="@id/toolbar"
-                    android:dropDownHorizontalOffset="0dp"
-                    android:dropDownVerticalOffset="3dp"
-                    android:completionThreshold="1"
-                    android:inputType="textNoSuggestions"
-                    android:imeOptions="actionSearch"
-                    android:textColorHint="@color/actionbar_title_hint"
-                    android:textColorHighlight="@color/accentGold"
-                    android:hint="@string/SearchString"
-                    android:id="@+id/searchEditText"/>
-
-            </RelativeLayout>
-
-            <FrameLayout
-                android:visibility="visible"
-                android:id="@+id/progress_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true">
-
-                <ProgressBar
-                    android:visibility="visible"
-                    android:id="@+id/progress_bar"
-                    android:layout_width="match_parent"
-                    android:layout_height="3dp"
-                    android:progress="0"
-                    android:max="100"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:indeterminate="false"
-                    android:progressDrawable="@drawable/progressbar"/>
-
-            </FrameLayout>
-
-        </RelativeLayout>
-
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:paddingStart="8dp"
+                android:paddingLeft="8dp"
+                android:paddingEnd="8dp"
+                android:paddingRight="8dp"
+                android:selectAllOnFocus="true"
+                android:maxLines="1"
+                android:inputType="textNoSuggestions"
+                android:imeOptions="actionSearch"
+                android:textColor="@color/appbar_text_color"
+                android:textColorHint="@color/appbar_text_hint"
+                android:hint="@string/appbar_search_edit_text_hint"
+                android:background="@drawable/appbar_background"
+                android:layout_gravity="center_vertical"/>
+        </android.support.v7.widget.Toolbar>
+        <ProgressBar
+            android:visibility="gone"
+            android:id="@+id/progress_bar"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:indeterminate="false"
+            android:layout_gravity="bottom"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"/>
     </FrameLayout>
-</android.support.v7.widget.Toolbar>
+</android.support.design.widget.AppBarLayout>
