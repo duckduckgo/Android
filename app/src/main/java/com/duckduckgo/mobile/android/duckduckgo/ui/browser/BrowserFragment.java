@@ -93,15 +93,12 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
     }
 
     @Override
-    public void onDestroy() {
-        if(webView != null) webView.destroy();
-        super.onDestroy();
-    }
-
-    @Override
     public void onDestroyView() {
         browserPresenter.detachViews();
         unbinder.unbind();
+        if(webView != null) {
+            webView.destroy();
+        }
         super.onDestroyView();
     }
 
