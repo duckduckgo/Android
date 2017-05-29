@@ -12,6 +12,8 @@ public interface BrowserPresenter {
 
     void attachOmnibarView(@NonNull OmnibarView omnibarView);
 
+    void attachTabView(@NonNull TabView tabView);
+
     void detachViews();
 
     void requestSearch(@Nullable String text);
@@ -23,6 +25,12 @@ public interface BrowserPresenter {
     void navigateHistoryBackward();
 
     void refreshCurrentPage();
+
+    void openTabSwitcher();
+
+    void createNewTab();
+
+    void openTab(int position);
 
     void onPageStarted(@Nullable String url);
 

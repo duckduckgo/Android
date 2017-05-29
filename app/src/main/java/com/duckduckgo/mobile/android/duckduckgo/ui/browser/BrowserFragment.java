@@ -3,6 +3,8 @@ package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,7 +25,10 @@ import android.widget.TextView;
 import com.duckduckgo.mobile.android.duckduckgo.Injector;
 import com.duckduckgo.mobile.android.duckduckgo.R;
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.web.DDGWebChromeClient;
+import com.duckduckgo.mobile.android.duckduckgo.ui.browser.web.DDGWebView;
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.web.DDGWebViewClient;
+import com.duckduckgo.mobile.android.duckduckgo.ui.navigator.Navigator;
+import com.duckduckgo.mobile.android.duckduckgo.ui.tabswitcher.TabSwitcherActivity;
 import com.duckduckgo.mobile.android.duckduckgo.util.KeyboardUtils;
 
 import java.lang.ref.WeakReference;
@@ -44,8 +49,10 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
         return new BrowserFragment();
     }
 
+    private static final int REQUEST_PICK_TAB = 199;
+
     @BindView(R.id.browser_web_view)
-    WebView webView;
+    DDGWebView webView;
 
     @BindView(R.id.appbar_toolbar)
     Toolbar toolbar;
@@ -72,6 +79,7 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
         unbinder = ButterKnife.bind(this, rootView);
         browserPresenter.attachBrowserView(this);
         browserPresenter.attachOmnibarView(this);
+        browserPresenter.attachTabView(webView);
         return rootView;
     }
 
@@ -116,33 +124,16 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
     }
 
     @Override
-    public void loadUrl(@NonNull String url) {
-        webView.loadUrl(url);
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_PICK_TAB) {
+            handleTabSwitcherResult(resultCode, data);
+        }
     }
 
     @Override
-    public void goBack() {
-        webView.goBack();
-    }
-
-    @Override
-    public void goForward() {
-        webView.goForward();
-    }
-
-    @Override
-    public boolean canGoBack() {
-        return webView.canGoBack();
-    }
-
-    @Override
-    public boolean canGoForward() {
-        return webView.canGoForward();
-    }
-
-    @Override
-    public void reload() {
-        webView.reload();
+    public void navigateToTabSwitcher() {
+        Navigator.navigateToTabSwitcher(getContext(), this, REQUEST_PICK_TAB);
     }
 
     @Override
@@ -242,6 +233,9 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
                     case R.id.action_refresh:
                         browserPresenter.refreshCurrentPage();
                         return true;
+                    case R.id.action_tab_switcher:
+                        browserPresenter.openTabSwitcher();
+                        return true;
                 }
                 return false;
             }
@@ -266,5 +260,19 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
 
     private boolean wasEnterPressed(KeyEvent event) {
         return event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER;
+    }
+
+    private void handleTabSwitcherResult(int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            switch (TabSwitcherActivity.getResultExtra(data)) {
+                case TabSwitcherActivity.RESULT_CREATE_NEW_TAB:
+                    browserPresenter.createNewTab();
+                    break;
+                case TabSwitcherActivity.RESULT_TAB_SELECTED:
+                    int tabPosition = TabSwitcherActivity.getResultTabSelected(data);
+                    browserPresenter.openTab(tabPosition);
+                    break;
+            }
+        }
     }
 }

@@ -17,6 +17,8 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     private BrowserView browserView;
     private OmnibarView omnibarView;
 
+    private TabView tabView;
+
     public BrowserPresenterImpl() {
     }
 
@@ -31,9 +33,28 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     @Override
+    public void attachTabView(@NonNull TabView tabView) {
+        this.tabView = tabView;
+    }
+
+    @Override
     public void detachViews() {
         browserView = null;
         omnibarView = null;
+        tabView = null;
+    }
+
+    @Override
+    public void openTabSwitcher() {
+        browserView.navigateToTabSwitcher();
+    }
+
+    @Override
+    public void createNewTab() {
+    }
+
+    @Override
+    public void openTab(int position) {
     }
 
     @Override
@@ -48,7 +69,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     private void requestLoadUrl(@NonNull String url) {
-        browserView.loadUrl(url);
+        tabView.loadUrl(url);
     }
 
     private void requestQuerySearch(@NonNull String query) {
@@ -64,17 +85,17 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     @Override
     public void navigateHistoryForward() {
-        browserView.goForward();
+        tabView.goForward();
     }
 
     @Override
     public void navigateHistoryBackward() {
-        browserView.goBack();
+        tabView.goBack();
     }
 
     @Override
     public void refreshCurrentPage() {
-        browserView.reload();
+        tabView.reload();
     }
 
     @Override
@@ -102,7 +123,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     @Override
     public boolean handleBackHistory() {
-        if (browserView.canGoBack()) {
+        if (tabView.canGoBack()) {
             navigateHistoryBackward();
             return true;
         }
@@ -110,11 +131,11 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     private void setCanGoBack() {
-        setCanGoBack(browserView.canGoBack());
+        setCanGoBack(tabView.canGoBack());
     }
 
     private void setCanGoForward() {
-        setCanGoForward(browserView.canGoForward());
+        setCanGoForward(tabView.canGoForward());
     }
 
     private void setCanGoBack(boolean canGoBack) {

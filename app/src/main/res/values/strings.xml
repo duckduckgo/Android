@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">DuckDuckGo</string>
 
+    <!-- General Strings -->
+    <string name="done">Done</string>
+
     <!-- Appbar -->
     <string name="appbar_search_edit_text_hint">Search DuckDuckGo</string>
 
@@ -8,4 +11,9 @@
     <string name="browser_menu_action_back">Back</string>
     <string name="browser_menu_action_forward">Forward</string>
     <string name="browser_menu_action_refresh">Refresh</string>
+    <string name="browser_menu_action_tab_switcher">Tab switcher</string>
+
+    <!-- TabSwitcher -->
+    <string name="tab_switcher_new_tab_button">+ New tab</string>
+    <string name="tab_switcher_done_button">@string/done</string>
 </resources>
