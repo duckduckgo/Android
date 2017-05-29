@@ -39,14 +39,14 @@ public class BrowserPresenterTest {
     }
 
     @Test
-    public void shouldHaveNoInteractionsOnDetach() {
+    public void whenDetachViewsThenHaveNoInteractionWithViews() {
         browserPresenter.detachViews();
         verifyZeroInteractions(mockBrowserView);
         verifyZeroInteractions(mockOmnibarView);
     }
 
     @Test
-    public void shouldLoadUrlFromInputUrl() {
+    public void whenRequestSearchWithUrlThenLoadUrlInBrowserView() {
         final String urlInput = "https://test.com";
         browserPresenter.requestSearch(urlInput);
         verify(mockBrowserView, times(1)).loadUrl(urlInput);
@@ -54,7 +54,7 @@ public class BrowserPresenterTest {
     }
 
     @Test
-    public void shouldLoadUrlFromInputText() {
+    public void whenRequestSearchWithQueryThenLoadUrlInBrowserView() {
         final String query = "ciao";
         final String url = AppUrls.getSearchUrl(query);
         browserPresenter.requestSearch(query);
@@ -62,7 +62,7 @@ public class BrowserPresenterTest {
     }
 
     @Test
-    public void shouldHaveNoInteractionWhenSearchUrlIsNull() {
+    public void whenRequestSearchWithNullThenHaveNoInteractionWithViews() {
         final String url = null;
         browserPresenter.requestSearch(url);
         verifyZeroInteractions(mockOmnibarView);
@@ -70,7 +70,7 @@ public class BrowserPresenterTest {
     }
 
     @Test
-    public void shouldClearOmnibarFromAssistAction() {
+    public void whenRequestAssistThenClearTextAndRequestFocusInOmnibarView() {
         browserPresenter.requestAssist();
         verify(mockOmnibarView, times(1)).clearText();
         verify(mockOmnibarView, times(1)).requestFocus();
@@ -78,25 +78,25 @@ public class BrowserPresenterTest {
     }
 
     @Test
-    public void shouldHaveNoOmnibarInteractionFromUrlInput() {
+    public void whenRequestSearchWithUrlThenHaveNoInteractionWithOmnibarView() {
         browserPresenter.requestSearch(anyString());
         verifyZeroInteractions(mockOmnibarView);
     }
 
     @Test
-    public void shouldHaveNoOmnibarInteractionFromQueryInput() {
+    public void whenReqeustSearchWithQueryThenHaveNoInteractionWithOmnibarView() {
         browserPresenter.requestSearch(anyString());
         verifyZeroInteractions(mockOmnibarView);
     }
 
     @Test
-    public void shouldHaveNoBrowserInteractionFromAssistAction() {
+    public void whenRequestAssistThenHaveNoInteractionWithBrowserView() {
         browserPresenter.requestAssist();
         verifyZeroInteractions(mockBrowserView);
     }
 
     @Test
-    public void shouldGoBack() {
+    public void whenNavigateHistoryBackThenGoBackAndNotGoForwardInBrowserView() {
         browserPresenter.navigateHistoryBackward();
         verify(mockBrowserView, times(1)).goBack();
         verify(mockBrowserView, times(0)).goForward();
@@ -104,7 +104,7 @@ public class BrowserPresenterTest {
     }
 
     @Test
-    public void shouldGoForward() {
+    public void whenNavigateHistoryForwardThenGoForwardAndNotGotBackInBrowserView() {
         browserPresenter.navigateHistoryForward();
         verify(mockBrowserView, times(1)).goForward();
         verify(mockBrowserView, times(0)).goBack();
@@ -112,7 +112,7 @@ public class BrowserPresenterTest {
     }
 
     @Test
-    public void shouldRefresh() {
+    public void whenRefreshCurrentPageThenReloadInOmnibarView() {
         browserPresenter.refreshCurrentPage();
         verify(mockBrowserView, times(1)).reload();
         verify(mockBrowserView, times(0)).goBack();
@@ -121,20 +121,20 @@ public class BrowserPresenterTest {
     }
 
     @Test
-    public void shouldUpdateOmnibarTextWhenPageStartsLoading() {
+    public void whenOnPageStartedThenDisplayTextInOmnibarView() {
         browserPresenter.onPageStarted(anyString());
         verify(mockOmnibarView, times(1)).displayText(anyString());
     }
 
     @Test
-    public void shouldUpdateOmnibarWithEmptyStringWhenPAgeStartsLoadingWithNullUrl() {
+    public void whenOnPageStartedWithNullThendisplayTextWithEmptyStringInOmnibarView() {
         final String url = null;
         browserPresenter.onPageStarted(url);
         verify(mockOmnibarView, times(1)).displayText("");
     }
 
     @Test
-    public void shouldUpdateOmnibarMenuNavigationWhenPageFinishesLoading() {
+    public void whenOnPageFinishedThenUpdateOmnibarNavigationMenu() {
         String text = "https://test.com/";
         final boolean canGoBack = true;
         when(mockBrowserView.canGoBack()).thenReturn(canGoBack);
@@ -163,7 +163,7 @@ public class BrowserPresenterTest {
     }
 
     @Test
-    public void shouldShowProgressBarIfProgressIsNot100() {
+    public void whenOnProgressChangedWithProgressNotCompleteThenShowProgressBarAndShowProgress() {
         final int newProgress = 0;
         browserPresenter.onProgressChanged(newProgress);
         verifyZeroInteractions(mockBrowserView);
@@ -172,7 +172,7 @@ public class BrowserPresenterTest {
     }
 
     @Test
-    public void shouldHideProgressBarIfProgressIf100() {
+    public void whenOnProgressChangedWithProgressCompleteThenShowProgressAndHideProgressBar() {
         final int newProgress = 100;
         browserPresenter.onProgressChanged(newProgress);
         verifyZeroInteractions(mockBrowserView);

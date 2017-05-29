@@ -22,76 +22,76 @@ public class AppUrlsTest {
         assertEquals(expected, actual);
     }
     @Test
-    public void isDuckDuckGoReturnTrueIfIsDDDG() throws Exception {
+    public void whenIsDuckDuckGoWithDDGUrlThenSucceeds() {
         final String url = "https://duckduckgo.com/?q=some+search&t=hy&ia=web";
         final boolean result = AppUrls.isDuckDuckGo(url);
         assertTrue(result);
     }
     @Test
-    public void isDuckDuckGoReturnTrueIfIsDDDGwithWWW() throws Exception {
+    public void whenIsDuckDuckGoWithDDGUrlWithWWWThenSucceeds() {
         final String url = "https://www.duckduckgo.com/?q=some+search&t=hy&ia=web";
         final boolean result = AppUrls.isDuckDuckGo(url);
         assertTrue(result);
     }
     @Test
-    public void isDuckDuckGoReturnFalseIfNotDDGUsingCorrectUrl() throws Exception {
+    public void whenIsDuckDuckGoWithNonDDGValidUrlThenFails() {
         final String url = "https://www.test.com/?ko=-1&kl=wt-wt&q=some%20search";
         final boolean result = AppUrls.isDuckDuckGo(url);
         assertFalse(result);
     }
     @Test
-    public void isDuckDuckGoReturnFalseIfNotDDGUsingCorrectUrlTatContainsDDG() throws Exception {
+    public void whenIsDuckDuckGoWithNonDDGValidUrlThatContainsDDGThenFails() {
         final String url = "https://www.test.com/?ko=-1&kl=wt-wt&q=duckduckgo.com";
         final boolean result = AppUrls.isDuckDuckGo(url);
         assertFalse(result);
     }
     @Test
-    public void isDuckDuckGoReturnFalseIfNotDDGUsingRandomText() throws Exception {
+    public void whenIsDuckDuckGoWithRandomTextThenfails() {
         final String url ="asd.oiasud";
         final boolean result = AppUrls.isDuckDuckGo(url);
         assertFalse(result);
     }
     @Test
-    public void isDuckDuckGoReturnFalseIfNotDDGUsingRandomTextThatContainsDDG() throws Exception {
+    public void whenIsDuckDuckGoWithRandomTextThatContainsDDGThenFails() {
         final String url = "as///d.duckduckgo.com";
         final boolean result = AppUrls.isDuckDuckGo(url);
         assertFalse(result);
     }
     @Test
-    public void getQueryReturnSearchParamsInDGUrlFromWeb() throws Exception {
+    public void whenGetQueryWithDDGUrlFromWebWithQueryThenReturnCorrectQuery() {
         final String url = "https://duckduckgo.com/?q=some+search&t=hc&ia=web";
         final String expected = "some search";
         final String result = AppUrls.getQuery(url);
         assertEquals(expected, result);
     }
     @Test
-    public void getQueryReturnSearchParamsInDGUrl() throws Exception {
+    public void whenGetQueryWithDDGUrlWithQueryThenReturnCorrectQuery() {
         final String url = "https://www.duckduckgo.com/?ko=-1&kl=wt-wt&q=some+search";
         final String expected = "some search";
         final String result = AppUrls.getQuery(url);
         assertEquals(expected, result);
     }
     @Test
-    public void getQueryReturnEmptyStringInDDGUrl() throws Exception {
+    public void whenGetQueryWithDDGUrlWithoutQueryThenReturnEmptyString() {
         final String url = "https://www.duckduckgo.com/?ko=-1&kl=wt-wt";
         final String expected = "";
         final String result = AppUrls.getQuery(url);
         assertEquals(expected, result);
     }
     @Test
-    public void getQueryReturnNullInNotDDGUrl() throws Exception {
+    public void whenGetQueryWithNonDDGUrlTheReturnNull() {
         final String url = "https://www.test.com/?ko=-1&kl=wt-wt&q=some+search";
         final String result = AppUrls.getQuery(url);
         assertNull(result);
     }
     @Test
-    public void getQueryReturnNullInRandomText() throws Exception {
+    public void whenGetQueryWithRandomTextThenReturnNull() {
         final String url = "asd''asd/////.com/?q=duckduckgo.com";
         final String result = AppUrls.getQuery(url);
         assertNull(result);
     }
     @Test
-    public void getSearchUrlCreatesCorrectUrlWithParams() throws Exception {
+    public void whenGetSearchUrlThenReturnCorrectDDGUrl() {
         final String expected = "https://www.duckduckgo.com/?ko=-1&kl=wt-wt&q=some+search";
         final String query = "some search";
         final String result = AppUrls.getSearchUrl(query);
