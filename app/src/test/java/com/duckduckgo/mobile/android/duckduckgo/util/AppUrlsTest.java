@@ -10,13 +10,13 @@ import static org.junit.Assert.*;
 
 public class AppUrlsTest {
     @Test
-    public void getBase_isCorrect() throws Exception {
+    public void whenGetBaseThenReturnBaseUrl() {
         final String expected = "duckduckgo.com";
         final String actual = AppUrls.getBase();
         assertEquals(expected, actual);
     }
     @Test
-    public void getHome_isCorrect() throws Exception {
+    public void whenGetHomeThenReturnHomeUrl() {
         final String expected = "https://www.duckduckgo.com/?ko=-1&kl=wt-wt";
         final String actual = AppUrls.getHome();
         assertEquals(expected, actual);
