@@ -42,36 +42,36 @@ public class AppUrls {
         try {
             URI uri = new URI(url);
             String authority = uri.getAuthority();
-            if(authority == null) return false;
+            if (authority == null) return false;
             return authority.contains(Url.BASE);
-        } catch(URISyntaxException e) {
+        } catch (URISyntaxException e) {
             return false;
         }
     }
 
     @Nullable
     public static String getQuery(@NonNull String url) {
-        if(!isDuckDuckGo(url)) return null;
+        if (!isDuckDuckGo(url)) return null;
         try {
             URI uri = new URI(url);
             String query = uri.getQuery();
-            if(query == null || query.length() == 0) return "";
+            if (query == null || query.length() == 0) return "";
             String[] paramsSplit = query.split("&");
             Map<String, String> params = new HashMap<>();
-            for(String param : paramsSplit) {
+            for (String param : paramsSplit) {
                 String[] p = param.split("=");
                 params.put(p[0], p[1]);
             }
-            if(params.containsKey(Params.SEARCH)) {
+            if (params.containsKey(Params.SEARCH)) {
                 String result = params.get(Params.SEARCH);
                 try {
                     result = URLDecoder.decode(result, "UTF-8");
-                } catch(UnsupportedEncodingException e) {
+                } catch (UnsupportedEncodingException e) {
                     return "";
                 }
                 return result;
             }
-        } catch(URISyntaxException e) {
+        } catch (URISyntaxException e) {
             return "";
         }
         return "";
@@ -82,7 +82,7 @@ public class AppUrls {
         String queryEncoded = query;
         try {
             queryEncoded = URLEncoder.encode(query, "UTF-8");
-        } catch(UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
         }
         StringBuilder builder = new StringBuilder(Url.HOME);
         builder.append("&").append(Params.SEARCH).append("=").append(queryEncoded);

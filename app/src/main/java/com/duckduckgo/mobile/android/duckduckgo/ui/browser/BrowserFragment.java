@@ -44,10 +44,17 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
         return new BrowserFragment();
     }
 
-    @BindView(R.id.browser_web_view) WebView webView;
-    @BindView(R.id.appbar_toolbar) Toolbar toolbar;
-    @BindView(R.id.appbar_edit_text) EditText searchEditText;
-    @BindView(R.id.progress_bar) ProgressBar progressBar;
+    @BindView(R.id.browser_web_view)
+    WebView webView;
+
+    @BindView(R.id.appbar_toolbar)
+    Toolbar toolbar;
+
+    @BindView(R.id.appbar_edit_text)
+    EditText searchEditText;
+
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar;
 
     private Unbinder unbinder;
     private BrowserPresenter browserPresenter;
@@ -73,7 +80,7 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
         super.onActivityCreated(savedInstanceState);
         initUI();
 
-        if(savedInstanceState != null) {
+        if (savedInstanceState != null) {
             webView.restoreState(savedInstanceState);
         }
     }
@@ -96,7 +103,7 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
     public void onDestroyView() {
         browserPresenter.detachViews();
         unbinder.unbind();
-        if(webView != null) {
+        if (webView != null) {
             webView.destroy();
         }
         super.onDestroyView();
@@ -178,7 +185,7 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
 
     @Override
     public void showProgressBar() {
-        if(progressBar.getVisibility() == View.GONE) {
+        if (progressBar.getVisibility() == View.GONE) {
             progressBar.setVisibility(View.VISIBLE);
             progressBar.animate().alpha(1);
         }
@@ -192,7 +199,7 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 ProgressBar progressBar = progressBarWeakReference.get();
-                if(progressBar != null) {
+                if (progressBar != null) {
                     progressBar.setVisibility(View.GONE);
                 }
             }
@@ -225,7 +232,7 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                switch(item.getItemId()) {
+                switch (item.getItemId()) {
                     case R.id.action_go_back:
                         browserPresenter.navigateHistoryBackward();
                         return true;
@@ -245,7 +252,7 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
         searchEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(actionId == EditorInfo.IME_ACTION_SEARCH || wasEnterPressed(event)) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH || wasEnterPressed(event)) {
                     String text = v.getText().toString().trim();
                     browserPresenter.requestSearch(text);
                     KeyboardUtils.hideKeyboard(v);

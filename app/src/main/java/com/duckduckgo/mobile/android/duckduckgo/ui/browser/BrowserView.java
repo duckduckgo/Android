@@ -8,9 +8,14 @@ import android.support.annotation.NonNull;
 
 public interface BrowserView {
     void loadUrl(@NonNull String url);
+
     void goBack();
+
     void goForward();
+
     boolean canGoBack();
+
     boolean canGoForward();
+
     void reload();
 }

@@ -24,9 +24,9 @@ public class MainActivity extends AppCompatActivity {
         browserPresenter = Injector.getBrowserPresenter();
 
         BrowserFragment browserFragment = (BrowserFragment) getSupportFragmentManager().findFragmentByTag(BrowserFragment.TAG);
-        if(browserFragment == null) browserFragment = BrowserFragment.newInstance();
+        if (browserFragment == null) browserFragment = BrowserFragment.newInstance();
 
-        if(savedInstanceState == null) {
+        if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(ACTIVITY_CONTAINER, browserFragment, BrowserFragment.TAG)
                     .commit();
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(browserPresenter.handleBackHistory()) {
+        if (browserPresenter.handleBackHistory()) {
             return;
         }
         super.onBackPressed();

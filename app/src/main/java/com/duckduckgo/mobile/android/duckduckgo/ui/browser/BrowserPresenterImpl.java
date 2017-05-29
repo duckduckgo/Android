@@ -38,8 +38,8 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     @Override
     public void requestSearch(@Nullable String text) {
-        if(text == null) return;
-        if(UrlUtils.isUrl(text)) {
+        if (text == null) return;
+        if (UrlUtils.isUrl(text)) {
             String url = UrlUtils.getUrlWithScheme(text);
             requestLoadUrl(url);
         } else {
@@ -91,10 +91,10 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     @Override
     public void onProgressChanged(int newProgress) {
-        if(omnibarView == null) return;
-        if(newProgress < PROGRESS_COMPLETE) {
+        if (omnibarView == null) return;
+        if (newProgress < PROGRESS_COMPLETE) {
             omnibarView.showProgressBar();
-        } else if(newProgress == PROGRESS_COMPLETE) {
+        } else if (newProgress == PROGRESS_COMPLETE) {
             omnibarView.hideProgressBar();
         }
         omnibarView.onProgressChanged(newProgress);
@@ -102,7 +102,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     @Override
     public boolean handleBackHistory() {
-        if(browserView.canGoBack()) {
+        if (browserView.canGoBack()) {
             navigateHistoryBackward();
             return true;
         }
@@ -135,7 +135,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     private void displayTextForUrl(String url) {
-        if(AppUrls.isDuckDuckGo(url)) {
+        if (AppUrls.isDuckDuckGo(url)) {
             displayTextForDuckDuckGoUrl(url);
         } else {
             displayText(url);
@@ -145,7 +145,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     private void displayTextForDuckDuckGoUrl(String url) {
         String textToDisplay = url;
         String query = AppUrls.getQuery(url);
-        if(query != null && query.length() > 0) {
+        if (query != null && query.length() > 0) {
             textToDisplay = query;
             displayText(textToDisplay);
         }

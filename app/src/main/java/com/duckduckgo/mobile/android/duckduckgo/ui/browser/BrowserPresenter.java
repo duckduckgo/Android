@@ -9,15 +9,26 @@ import android.support.annotation.Nullable;
 
 public interface BrowserPresenter {
     void attachBrowserView(@NonNull BrowserView browserView);
+
     void attachOmnibarView(@NonNull OmnibarView omnibarView);
+
     void detachViews();
+
     void requestSearch(@Nullable String text);
+
     void requestAssist();
+
     void navigateHistoryForward();
+
     void navigateHistoryBackward();
+
     void refreshCurrentPage();
+
     void onPageStarted(@Nullable String url);
+
     void onPageFinished(@Nullable String url);
+
     void onProgressChanged(int newProgress);
+
     boolean handleBackHistory();
 }

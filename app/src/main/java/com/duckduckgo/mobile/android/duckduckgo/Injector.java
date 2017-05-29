@@ -15,7 +15,7 @@ public class Injector {
 
     public static BrowserPresenter getBrowserPresenter() {
         String key = getKeyforClass(BrowserPresenter.class);
-        if(!presenters.containsKey(key)) {
+        if (!presenters.containsKey(key)) {
             presenters.put(key, instantiateBrowserPresenter());
         }
         return (BrowserPresenter) presenters.get(key);

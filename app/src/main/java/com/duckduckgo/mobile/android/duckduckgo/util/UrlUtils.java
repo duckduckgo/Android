@@ -10,12 +10,12 @@ import android.support.annotation.Nullable;
 public class UrlUtils {
 
     public static boolean isUrl(@Nullable String url) {
-        if(url == null) return false;
+        if (url == null) return false;
         return url.contains(".") && !url.contains(" ");
     }
 
     public static String getUrlWithScheme(@NonNull String url) {
-        if(url.startsWith("http://") || url.startsWith("https://")) {
+        if (url.startsWith("http://") || url.startsWith("https://")) {
             return url;
         }
         return "http://" + url;
