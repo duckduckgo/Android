@@ -9,7 +9,6 @@ import static org.junit.Assert.*;
  */
 
 public class AppUrlsTest {
-    //Base URLS
     @Test
     public void getBase_isCorrect() throws Exception {
         final String expected = "duckduckgo.com";
@@ -34,8 +33,6 @@ public class AppUrlsTest {
         final boolean result = AppUrls.isDuckDuckGo(url);
         assertTrue(result);
     }
-
-    //isDuckDuckGo
     @Test
     public void isDuckDuckGoReturnFalseIfNotDDGUsingCorrectUrl() throws Exception {
         final String url = "https://www.test.com/?ko=-1&kl=wt-wt&q=some%20search";
@@ -60,8 +57,6 @@ public class AppUrlsTest {
         final boolean result = AppUrls.isDuckDuckGo(url);
         assertFalse(result);
     }
-
-    //getQuery
     @Test
     public void getQueryReturnSearchParamsInDGUrlFromWeb() throws Exception {
         final String url = "https://duckduckgo.com/?q=some+search&t=hc&ia=web";
@@ -95,8 +90,6 @@ public class AppUrlsTest {
         final String result = AppUrls.getQuery(url);
         assertNull(result);
     }
-
-    //getSearchUrl
     @Test
     public void getSearchUrlCreatesCorrectUrlWithParams() throws Exception {
         final String expected = "https://www.duckduckgo.com/?ko=-1&kl=wt-wt&q=some+search";

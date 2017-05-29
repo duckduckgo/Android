@@ -45,8 +45,8 @@ public class AppUrls {
             if(authority == null) return false;
             return authority.contains(Url.BASE);
         } catch(URISyntaxException e) {
+            return false;
         }
-        return false;
     }
 
     @Nullable
@@ -67,10 +67,12 @@ public class AppUrls {
                 try {
                     result = URLDecoder.decode(result, "UTF-8");
                 } catch(UnsupportedEncodingException e) {
+                    return "";
                 }
                 return result;
             }
         } catch(URISyntaxException e) {
+            return "";
         }
         return "";
     }

@@ -14,30 +14,27 @@ public class UrlUtilsTest {
 
     @Test
     public void shouldReturnTrueIfCorrectUrlIsProvided() {
-        final boolean expected = true;
         final String[] urls = {"http://test.com", "https://test.com", "www.test.com"};
         for(String url : urls) {
             final boolean result = UrlUtils.isUrl(url);
-            assertEquals(expected, result);
+            assertTrue(result);
         }
     }
 
     @Test
     public void shouldReturnFalseIfWrongUrlIsProvided() {
-        final boolean expected = false;
         final String[] urls = {"test", "test:test", "http://", "https://test", "http test com"};
         for(String url : urls) {
             final boolean result = UrlUtils.isUrl(url);
-            assertEquals(expected, result);
+            assertFalse(result);
         }
     }
 
     @Test
     public void shouldReturnFalseIfNullIsProvided() {
         final String url = null;
-        final boolean expected = false;
         final boolean result = UrlUtils.isUrl(url);
-        assertEquals(expected, result);
+        assertFalse(result);
     }
 
     @Test
@@ -51,7 +48,6 @@ public class UrlUtilsTest {
     @Test
     public void shouldReturnValidUrlWhenSchemeIsPresent() {
         final String expected = "https://test.com";
-        final String test = "https://test.com";
         final String result = UrlUtils.getUrlWithScheme(expected);
         assertEquals(expected, result);
     }

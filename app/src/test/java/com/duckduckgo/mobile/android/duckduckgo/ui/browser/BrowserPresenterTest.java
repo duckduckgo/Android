@@ -6,9 +6,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -146,22 +149,17 @@ public class BrowserPresenterTest {
     }
 
     @Test
-    public void shouldHandleBackButtonCorrectly() {
-        // verify that back button is handled correctly
-        // when webview can go back
+    public void whenCanGoBackThenHandleBackHistorySucceeds() {
         when(mockBrowserView.canGoBack()).thenReturn(true);
-        final boolean resultFirst = browserPresenter.handleBackHistory();
-        final boolean expectedFirst = true;
-        assertEquals(resultFirst, expectedFirst);
+        assertTrue(browserPresenter.handleBackHistory());
         verify(mockBrowserView, times(1)).goBack();
+    }
 
-        // verify that presenter doesn't handle the back button
-        // when webview cannot go back
+    @Test
+    public void whenCannotGoBackThenHandleBackHistoryFails() {
         when(mockBrowserView.canGoBack()).thenReturn(false);
-        final boolean resultSecond = browserPresenter.handleBackHistory();
-        final boolean expectedSecond = false;
-        assertEquals(resultSecond, expectedSecond);
-        verify(mockBrowserView, times(1)).goBack();
+        assertFalse(browserPresenter.handleBackHistory());
+        verify(mockBrowserView, never()).goBack();
     }
 
     @Test
@@ -181,9 +179,5 @@ public class BrowserPresenterTest {
         verify(mockOmnibarView, times(1)).onProgressChanged(newProgress);
         verify(mockOmnibarView, times(1)).hideProgressBar();
         verifyNoMoreInteractions(mockOmnibarView);
-    }
-    @Test
-    public void error() {
-        //assertEquals(true, false);
     }
 }
