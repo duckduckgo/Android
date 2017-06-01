@@ -7,8 +7,11 @@ package com.duckduckgo.mobile.android.duckduckgo.ui.tabswitcher;
 public interface TabSwitcherView {
     void closeTabSwitcher();
 
-    void createNewTab();
+    void resultCreateNewTab();
 
-    void selectTab(int position);
-    //void closeTabSwitcherWithTabSelected();
+    void resultSelectTab(int tabIndex);
+
+    void resultRemoveTab(int tabIndex);
+
+    void resultRemoveAllTabs();
 }

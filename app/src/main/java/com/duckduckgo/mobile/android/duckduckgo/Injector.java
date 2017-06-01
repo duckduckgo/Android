@@ -13,6 +13,7 @@ import java.util.Map;
  */
 
 public class Injector {
+    //private static Map<String, Object> singletons= new HashMap<>();
     private static Map<String, Object> presenters = new HashMap<>();
 
     public static BrowserPresenter getBrowserPresenter() {
@@ -21,6 +22,7 @@ public class Injector {
             presenters.put(key, instantiateBrowserPresenter());
         }
         return (BrowserPresenter) presenters.get(key);
+        //return instantiateBrowserPresenter();
     }
 
     public static TabSwitcherPresenter getTabSwitcherPresenter() {
@@ -29,6 +31,7 @@ public class Injector {
             presenters.put(key, instantiateTabSwitcherPresenter());
         }
         return (TabSwitcherPresenter) presenters.get(key);
+        //return instantiateTabSwitcherPresenter();
     }
 
     private static BrowserPresenter instantiateBrowserPresenter() {

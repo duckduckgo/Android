@@ -3,8 +3,13 @@ package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.duckduckgo.mobile.android.duckduckgo.ui.browser.tab.Tab;
+import com.duckduckgo.mobile.android.duckduckgo.ui.browser.tab.TabManager;
+import com.duckduckgo.mobile.android.duckduckgo.ui.browser.tab.TabView;
 import com.duckduckgo.mobile.android.duckduckgo.util.AppUrls;
 import com.duckduckgo.mobile.android.duckduckgo.util.UrlUtils;
+
+import java.util.List;
 
 /**
  * Created by fgei on 5/22/17.
@@ -16,15 +21,43 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     private BrowserView browserView;
     private OmnibarView omnibarView;
-
     private TabView tabView;
 
+    private TabManager tabManager;
+
     public BrowserPresenterImpl() {
+        tabManager = new TabManager();
     }
 
     @Override
     public void attachBrowserView(@NonNull BrowserView browserView) {
         this.browserView = browserView;
+    }
+
+    @Override
+    public void load() {
+        if (tabManager.currentTab == null) {
+            createNewTab();
+        } else {
+            showTab(tabManager.currentTab);
+        }
+    }
+
+    @Override
+    public void restore(List<Tab> tabs, int currentIndex) {
+        tabManager.tabs = tabs;
+        tabManager.selectTab(currentIndex);
+        //showTab(tabManager.currentTab);
+    }
+
+    @Override
+    public List<Tab> saveTabs() {
+        return tabManager.tabs;
+    }
+
+    @Override
+    public int saveCurrentIndex() {
+        return tabManager.currentTab.index;
     }
 
     @Override
@@ -38,6 +71,11 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     @Override
+    public void detachTabView() {
+        tabView = null;
+    }
+
+    @Override
     public void detachViews() {
         browserView = null;
         omnibarView = null;
@@ -46,15 +84,35 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     @Override
     public void openTabSwitcher() {
-        browserView.navigateToTabSwitcher();
+        browserView.navigateToTabSwitcher(tabManager.tabs);
     }
 
     @Override
     public void createNewTab() {
+        tabManager.createNewTab();
+        browserView.createNewTabs();
+        showTab(tabManager.currentTab);
     }
 
     @Override
     public void openTab(int position) {
+        tabManager.selectTab(position);
+        showTab(tabManager.currentTab);
+    }
+
+    @Override
+    public void removeTab(int position) {
+
+    }
+
+    @Override
+    public void removeAllTabs() {
+        tabManager.clear();
+        omnibarView.clearText();
+        omnibarView.clearFocus();
+        browserView.removeAllTabs();
+        createNewTab();
+
     }
 
     @Override
@@ -100,6 +158,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     @Override
     public void onPageStarted(@Nullable String url) {
+        tabManager.currentTab.currentUrl = url;
         omnibarView.setRefreshEnabled(true);
         String validUrl = url == null ? "" : url;
         displayTextForUrl(validUrl);
@@ -123,7 +182,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     @Override
     public boolean handleBackHistory() {
-        if (tabView.canGoBack()) {
+        if (tabView != null && tabView.canGoBack()) {
             navigateHistoryBackward();
             return true;
         }
@@ -139,10 +198,12 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     private void setCanGoBack(boolean canGoBack) {
+        tabManager.currentTab.canGoBack = canGoBack;
         omnibarView.setBackEnabled(canGoBack);
     }
 
     private void setCanGoForward(boolean canGoForward) {
+        tabManager.currentTab.canGoForward = canGoForward;
         omnibarView.setForwardEnabled(canGoForward);
     }
 
@@ -152,6 +213,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     private void displayText(String textToDisplay) {
+        tabManager.currentTab.name = textToDisplay;
         omnibarView.displayText(textToDisplay);
     }
 
@@ -170,5 +232,15 @@ public class BrowserPresenterImpl implements BrowserPresenter {
             textToDisplay = query;
             displayText(textToDisplay);
         }
+    }
+
+    private void showTab(Tab tab) {
+        omnibarView.clearText();
+        omnibarView.clearFocus();
+        String displayText = tab.name != null ? tab.name : tab.currentUrl;
+        displayText(displayText);
+        omnibarView.setBackEnabled(tab.canGoBack);
+        omnibarView.setForwardEnabled(tab.canGoForward);
+        browserView.switchToTab(tab.index);
     }
 }

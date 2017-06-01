@@ -6,7 +6,7 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.webkit.WebView;
 
-import com.duckduckgo.mobile.android.duckduckgo.ui.browser.TabView;
+import com.duckduckgo.mobile.android.duckduckgo.ui.browser.tab.TabView;
 
 /**
  * Created by fgei on 5/29/17.

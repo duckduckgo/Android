@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.duckduckgo.mobile.android.duckduckgo.ui.browser.web.DDGWebView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/browser_web_view"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tab_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"/>

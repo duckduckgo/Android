@@ -1,5 +1,10 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.tabswitcher;
 
+import com.duckduckgo.mobile.android.duckduckgo.ui.browser.tab.Tab;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by fgei on 5/29/17.
  */
@@ -7,8 +12,10 @@ package com.duckduckgo.mobile.android.duckduckgo.ui.tabswitcher;
 public class TabSwitcherPresenterImpl implements TabSwitcherPresenter {
 
     private TabSwitcherView tabSwitcherView;
+    private List<Tab> tabsToDelete;
 
     public TabSwitcherPresenterImpl() {
+        tabsToDelete = new ArrayList<>();
     }
 
     @Override
@@ -23,12 +30,23 @@ public class TabSwitcherPresenterImpl implements TabSwitcherPresenter {
 
     @Override
     public void createNewTab() {
-        tabSwitcherView.createNewTab();
+        tabSwitcherView.resultCreateNewTab();
     }
 
     @Override
-    public void openTab(int position) {
-        tabSwitcherView.selectTab(position);
+    public void openTab(Tab tab) {
+        tabSwitcherView.resultSelectTab(tab.index);
+    }
+
+    @Override
+    public void closeTab(Tab tab) {
+        tabsToDelete.add(tab);
+        //tabSwitcherView.resultRemoveTab(tab.index);
+    }
+
+    @Override
+    public void closeAllTabs() {
+        tabSwitcherView.resultRemoveAllTabs();
     }
 
     @Override
@@ -39,10 +57,5 @@ public class TabSwitcherPresenterImpl implements TabSwitcherPresenter {
     @Override
     public void closeTabSwitcher() {
         tabSwitcherView.closeTabSwitcher();
-    }
-
-    @Override
-    public void actionFire() {
-
     }
 }

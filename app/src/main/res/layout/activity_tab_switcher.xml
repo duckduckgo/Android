@@ -28,6 +28,12 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom">
             <Button
+                android:id="@+id/tab_switcher_remove_all_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/tab_switcher_remove_all_button"/>
+            <Button
                 android:id="@+id/tab_switcher_done_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

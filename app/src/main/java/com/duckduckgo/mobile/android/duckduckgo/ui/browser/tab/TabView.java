@@ -1,4 +1,4 @@
-package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
+package com.duckduckgo.mobile.android.duckduckgo.ui.browser.tab;
 
 import android.support.annotation.NonNull;
 
