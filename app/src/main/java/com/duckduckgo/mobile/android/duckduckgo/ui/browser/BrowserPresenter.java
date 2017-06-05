@@ -25,7 +25,7 @@ public interface BrowserPresenter {
 
     void load();
 
-    void restore(List<Tab> tabs, int currentIndex);
+    void restore(@NonNull List<Tab> tabs, int currentIndex);
 
     List<Tab> saveTabs();
 
@@ -47,7 +47,7 @@ public interface BrowserPresenter {
 
     void openTab(int position);
 
-    void removeTab(int position);
+    void removeTabs(@NonNull List<Integer> tabsToRemove);
 
     void removeAllTabs();
 

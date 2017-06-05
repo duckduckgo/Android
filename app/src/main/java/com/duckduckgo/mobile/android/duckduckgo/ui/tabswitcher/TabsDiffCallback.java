@@ -35,15 +35,10 @@ public class TabsDiffCallback extends DiffUtil.Callback {
         Tab oldTab = oldTabs.get(oldItemPosition);
         Tab newTab = newTabs.get(newItemPosition);
         return oldTab.index == newTab.index;
-        //return false;
     }
 
     @Override
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-        /*Tab oldTab = oldTabs.get(oldItemPosition);
-        Tab newTab = newTabs.get(newItemPosition);
-        return oldTab.index == newTab.index;*/
         return true;
-        //return false;
     }
 }

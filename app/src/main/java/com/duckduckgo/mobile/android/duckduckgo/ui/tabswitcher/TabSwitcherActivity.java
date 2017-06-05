@@ -3,6 +3,8 @@ package com.duckduckgo.mobile.android.duckduckgo.ui.tabswitcher;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -40,7 +42,7 @@ public class TabSwitcherActivity extends AppCompatActivity implements TabSwitche
     public static final String RESULT_CREATE_NEW_TAB = "result_create_new_tab";
     public static final String RESULT_TAB_SELECTED = "result_tab_selected";
     public static final String RESULT_REMOVE_ALL_TABS = "result_remove_all_tabs";
-    public static final String RESULT_REMOVE_TAB = "result_remove_tab";
+    public static final String RESULT_DISMISSED = "extra_result_dismissed";
 
     public static String getResultExtra(Intent intent) {
         return intent.getStringExtra(EXTRA_RESULT);
@@ -48,6 +50,14 @@ public class TabSwitcherActivity extends AppCompatActivity implements TabSwitche
 
     public static int getResultTabSelected(Intent intent) {
         return intent.getIntExtra(EXTRA_RESULT_TAB_SELECTED, -1);
+    }
+
+    public static boolean hasResultTabDeleted(Intent intent) {
+        return intent.hasExtra(EXTRA_RESULT_TABS_REMOVED);
+    }
+
+    public static List<Integer> getResultTabDeleted(Intent intent) {
+        return intent.getIntegerArrayListExtra(EXTRA_RESULT_TABS_REMOVED);
     }
 
     private static final String EXTRA_TABS_TO_REMOVE = "extra_tabs_to_remove";
@@ -65,7 +75,7 @@ public class TabSwitcherActivity extends AppCompatActivity implements TabSwitche
     RecyclerView recyclerView;
 
     private TabSwitcherPresenter presenter;
-    private List<Integer> tabsToRemove = new ArrayList<>();
+    private TabSwitcherAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,13 +83,15 @@ public class TabSwitcherActivity extends AppCompatActivity implements TabSwitche
         setContentView(R.layout.activity_tab_switcher);
         ButterKnife.bind(this);
         presenter = Injector.getTabSwitcherPresenter();
-        initUI(getExtraTabs(getIntent().getExtras()));
+
+        initUI();
 
         if (savedInstanceState != null) {
-            List<Integer> savedList = savedInstanceState.getIntegerArrayList(EXTRA_TABS_TO_REMOVE);
-            if (savedList != null) {
-                tabsToRemove.addAll(savedList);
-            }
+            List<Tab> savedListTabs = savedInstanceState.getParcelableArrayList(EXTRA_TABS);
+            List<Tab> savedListTabsToRemove = savedInstanceState.getParcelableArrayList(EXTRA_TABS_TO_REMOVE);
+            presenter.restoreState(savedListTabs, savedListTabsToRemove);
+        } else {
+            presenter.load(getExtraTabs(getIntent().getExtras()));
         }
     }
 
@@ -103,45 +115,45 @@ public class TabSwitcherActivity extends AppCompatActivity implements TabSwitche
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putIntegerArrayList(EXTRA_TABS_TO_REMOVE, new ArrayList<Integer>(tabsToRemove));
+        outState.putParcelableArrayList(EXTRA_TABS, new ArrayList<Parcelable>(presenter.saveStateTabs()));
+        outState.putParcelableArrayList(EXTRA_TABS_TO_REMOVE, new ArrayList<Parcelable>(presenter.saveStateTabsToRemove()));
     }
 
     @Override
-    public void closeTabSwitcher() {
-        finish();
+    public void loadTabs(@NonNull List<Tab> tabs) {
+        adapter.setTabs(tabs);
     }
 
     @Override
-    public void resultCreateNewTab() {
-        Intent intent = new Intent();
-        intent.putExtra(EXTRA_RESULT, RESULT_CREATE_NEW_TAB);
-        setResult(RESULT_OK, intent);
-        finish();
+    public void closeTabSwitcher(@NonNull List<Integer> positionToDelete) {
+        Intent resultIntent = getIntentForTabsToDelete(positionToDelete);
+        resultIntent.putExtra(EXTRA_RESULT, RESULT_DISMISSED);
+        finishActivityWithResultOKAndExtraIntent(resultIntent);
     }
 
     @Override
-    public void resultSelectTab(int tabIndex) {
-        Intent intent = new Intent();
-        intent.putExtra(EXTRA_RESULT, RESULT_TAB_SELECTED);
-        intent.putExtra(EXTRA_RESULT_TAB_SELECTED, tabIndex);
-        setResult(RESULT_OK, intent);
-        finish();
+    public void resultCreateNewTab(@NonNull List<Integer> positionToDelete) {
+        Intent resultIntent = getIntentForTabsToDelete(positionToDelete);
+        resultIntent.putExtra(EXTRA_RESULT, RESULT_CREATE_NEW_TAB);
+        finishActivityWithResultOKAndExtraIntent(resultIntent);
     }
 
     @Override
-    public void resultRemoveTab(int tabIndex) {
-        tabsToRemove.add(tabIndex);
+    public void resultSelectTab(int selectedIndex, @NonNull List<Integer> positionToDelete) {
+        Intent resultIntent = getIntentForTabsToDelete(positionToDelete);
+        resultIntent.putExtra(EXTRA_RESULT, RESULT_TAB_SELECTED);
+        resultIntent.putExtra(EXTRA_RESULT_TAB_SELECTED, selectedIndex);
+        finishActivityWithResultOKAndExtraIntent(resultIntent);
     }
 
     @Override
     public void resultRemoveAllTabs() {
-        Intent intent = new Intent();
-        intent.putExtra(EXTRA_RESULT, RESULT_REMOVE_ALL_TABS);
-        setResult(RESULT_OK, intent);
-        finish();
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra(EXTRA_RESULT, RESULT_REMOVE_ALL_TABS);
+        finishActivityWithResultOKAndExtraIntent(resultIntent);
     }
 
-    private void initUI(List<Tab> tabs) {
+    private void initUI() {
         newTabButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -160,18 +172,18 @@ public class TabSwitcherActivity extends AppCompatActivity implements TabSwitche
                 presenter.closeAllTabs();
             }
         });
-        initRecyclerView(tabs);
+        initRecyclerView();
     }
 
-    private void initRecyclerView(List<Tab> tabs) {
-        TabSwitcherAdapter adapter = new TabSwitcherAdapter(tabs, new TabSwitcherAdapter.TabClickListener() {
+    private void initRecyclerView() {
+        adapter = new TabSwitcherAdapter(new TabSwitcherAdapter.TabClickListener() {
             @Override
-            public void onTabClicked(View v, Tab tab, int position) {
+            public void onTabClicked(Tab tab) {
                 presenter.openTab(tab);
             }
 
             @Override
-            public void onTabRemoved(View v, Tab tab, int position) {
+            public void onTabRemoved(Tab tab) {
                 presenter.closeTab(tab);
             }
         });
@@ -179,23 +191,16 @@ public class TabSwitcherActivity extends AppCompatActivity implements TabSwitche
         recyclerView.setAdapter(adapter);
     }
 
-    private boolean hasTabsToRemove() {
-        return tabsToRemove != null && tabsToRemove.size() > 0;
-    }
-
-    private void addExtraRemoveTabsToIntent(Intent intent) {
-        if (hasTabsToRemove()) {
-            intent.putExtra(EXTRA_RESULT_TABS_REMOVED, new ArrayList<>(tabsToRemove));
+    private Intent getIntentForTabsToDelete(List<Integer> positionToDelete) {
+        Intent intent = new Intent();
+        if (positionToDelete != null && !positionToDelete.isEmpty()) {
+            intent.putExtra(EXTRA_RESULT_TABS_REMOVED, new ArrayList<>(positionToDelete));
         }
+        return intent;
     }
 
-    private void finishActivity() {
-        if (hasTabsToRemove()) {
-            finishActivityWithResult(RESULT_OK, new Intent());
-        }
-    }
-
-    private void finishActivityWithResult(int result, Intent intent) {
-
+    private void finishActivityWithResultOKAndExtraIntent(Intent resultIntent) {
+        setResult(RESULT_OK, resultIntent);
+        finish();
     }
 }

@@ -1,5 +1,7 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 
+import android.support.annotation.NonNull;
+
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.tab.Tab;
 
 import java.util.List;
@@ -9,13 +11,13 @@ import java.util.List;
  */
 
 public interface BrowserView {
-    void navigateToTabSwitcher(List<Tab> tabs);
+    void navigateToTabSwitcher(@NonNull List<Tab> tabs);
 
-    void createNewTabs();
+    void createNewTab(@NonNull String id);
 
-    void switchToTab(int position);
+    void switchToTab(@NonNull String id);
 
-    void removeTab(int position);
+    void removeTab(@NonNull String id);
 
     void removeAllTabs();
 }

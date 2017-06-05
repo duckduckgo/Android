@@ -17,17 +17,22 @@ import java.util.List;
 public class TabSwitcherAdapter extends RecyclerView.Adapter<TabViewHolder> {
 
     public interface TabClickListener {
-        void onTabClicked(View v, Tab tab, int position);
+        void onTabClicked(Tab tab);
 
-        void onTabRemoved(View v, Tab tab, int position);
+        void onTabRemoved(Tab tab);
     }
 
     private TabClickListener tabClickListener;
     private List<Tab> tabs;
 
-    public TabSwitcherAdapter(List<Tab> tabs, TabClickListener tabClickListener) {
-        this.tabs = tabs;
+    public TabSwitcherAdapter(TabClickListener tabClickListener) {
+        tabs = new ArrayList<>();
         this.tabClickListener = tabClickListener;
+    }
+
+    public void setTabs(List<Tab> tabs) {
+        this.tabs.clear();
+        this.tabs.addAll(tabs);
     }
 
     @Override
@@ -42,13 +47,13 @@ public class TabSwitcherAdapter extends RecyclerView.Adapter<TabViewHolder> {
         holder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tabClickListener.onTabClicked(v, tab, holder.getAdapterPosition());
+                tabClickListener.onTabClicked(tab);
             }
         });
         holder.setOnRemoveClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tabClickListener.onTabRemoved(v, tab, holder.getAdapterPosition());
+                tabClickListener.onTabRemoved(tab);
                 removeTab(holder.getAdapterPosition());
 
             }

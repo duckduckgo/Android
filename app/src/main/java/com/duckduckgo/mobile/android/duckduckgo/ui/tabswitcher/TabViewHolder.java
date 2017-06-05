@@ -1,5 +1,6 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.tabswitcher;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,7 +31,7 @@ public class TabViewHolder extends RecyclerView.ViewHolder {
         ButterKnife.bind(this, itemView);
     }
 
-    public void setTab(Tab tab) {
+    public void setTab(@NonNull Tab tab) {
         titleTabTextView.setText(tab.name);
     }
 

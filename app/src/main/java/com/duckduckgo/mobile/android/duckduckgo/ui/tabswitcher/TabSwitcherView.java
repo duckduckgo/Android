@@ -1,17 +1,25 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.tabswitcher;
 
+import android.support.annotation.NonNull;
+
+import com.duckduckgo.mobile.android.duckduckgo.ui.browser.tab.Tab;
+
+import java.util.List;
+
 /**
  * Created by fgei on 5/29/17.
  */
 
 public interface TabSwitcherView {
-    void closeTabSwitcher();
+    void loadTabs(@NonNull List<Tab> tabs);
 
-    void resultCreateNewTab();
+    void closeTabSwitcher(@NonNull List<Integer> positionToDelete);
 
-    void resultSelectTab(int tabIndex);
+    void resultCreateNewTab(@NonNull List<Integer> positionToDelete);
 
-    void resultRemoveTab(int tabIndex);
+    void resultSelectTab(int selectedIndex, @NonNull List<Integer> positionToDelete);
 
     void resultRemoveAllTabs();
+
+
 }

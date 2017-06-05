@@ -43,7 +43,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.tabswitcher.TabSwitcherActivity"></activity>
+        <activity android:name=".ui.tabswitcher.TabSwitcherActivity" />
     </application>
 
 </manifest>

@@ -34,10 +34,13 @@ import com.duckduckgo.mobile.android.duckduckgo.ui.browser.web.DDGWebViewClient;
 import com.duckduckgo.mobile.android.duckduckgo.ui.navigator.Navigator;
 import com.duckduckgo.mobile.android.duckduckgo.ui.tabswitcher.TabSwitcherActivity;
 import com.duckduckgo.mobile.android.duckduckgo.util.KeyboardUtils;
+import com.duckduckgo.mobile.android.duckduckgo.util.WebViewUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -60,11 +63,9 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
     private static final String EXTRA_SELECTED_TAB_INDEX = "extra_selected_tab_index";
     private static final String EXTRA_TABS = "extra_tabs";
     private static final String EXTRA_WEBVIEW_STATE = "extra_webview_state_";
+    private static final String EXTRA_WEBVIEW_ID = "extra_webview_id";
 
-    private List<DDGWebView> webViews;
-
-    //@BindView(R.id.browser_web_view)
-    //DDGWebView webView;
+    private Map<String, DDGWebView> webViews;
 
     @BindView(R.id.tab_container)
     FrameLayout tabContainerFrameLayout;
@@ -77,6 +78,8 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
 
     @BindView(R.id.progress_bar)
     ProgressBar progressBar;
+
+    private WebView currentWebView;
 
     private Unbinder unbinder;
     private BrowserPresenter browserPresenter;
@@ -94,8 +97,6 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
         unbinder = ButterKnife.bind(this, rootView);
         browserPresenter.attachBrowserView(this);
         browserPresenter.attachOmnibarView(this);
-
-        //browserPresenter.attachTabView(webView);
         return rootView;
     }
 
@@ -104,33 +105,9 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
         super.onActivityCreated(savedInstanceState);
         initUI();
 
-        if (savedInstanceState == null) {
-            //browserPresenter.load();
-            Log.e("restore_state", "nothing :(");
-        } else {
-            int currentIndex = savedInstanceState.getInt(EXTRA_SELECTED_TAB_INDEX);
-            Log.e("restore_state", "current index: " + currentIndex);
-            List<Tab> tabs = savedInstanceState.getParcelableArrayList(EXTRA_TABS);
-            Log.e("restore_state", "extra tabs, size: " + tabs.size());
-            browserPresenter.restore(tabs, currentIndex);
-            int i = 0;
-            for (String key : savedInstanceState.keySet()) {
-                if (key.startsWith(EXTRA_WEBVIEW_STATE)) {
-                    Log.e("restore_state", "adding new webview, key: " + key);
-                    addNewWebView();
-                    int index = webViews.size() - 1;
-                    DDGWebView webView = webViews.get(index);
-                    Bundle state = savedInstanceState.getBundle(key);
-                    int tabLength = getBundleLength(state);
-                    Log.e("save_state", "tab " + i + " length: " + tabLength);
-                    webView.restoreState(state);
-                    i++;
-                }
-            }
-
-            //switchToTab(0);
-            //switchToTab(currentIndex);
-            //browserPresenter.load();
+        if (savedInstanceState != null) {
+            restorePresenterState(savedInstanceState);
+            restoreWebViews(savedInstanceState);
         }
     }
 
@@ -138,21 +115,19 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
     public void onResume() {
         super.onResume();
         browserPresenter.load();
-        resumeTabs();
-        //webView.resumeTimers();
-        //webView.onResume();
+        WebViewUtils.resume(currentWebView);
     }
 
 
     @Override
     public void onPause() {
-        pauseTabs();
+        WebViewUtils.pause(currentWebView);
         super.onPause();
     }
 
     @Override
     public void onDestroyView() {
-        destroyTabs();
+        destroyAllWebViews();
         browserPresenter.detachViews();
         unbinder.unbind();
         super.onDestroyView();
@@ -161,38 +136,8 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
-        outState.putParcelableArrayList(EXTRA_TABS, new ArrayList<Parcelable>(browserPresenter.saveTabs()));
-        Log.e("save_state", "extra tabs, size: " + outState.getParcelableArrayList(EXTRA_TABS).size());
-        outState.putInt(EXTRA_SELECTED_TAB_INDEX, browserPresenter.saveCurrentIndex());
-        Log.e("save_state", "extra selected tab index: " + outState.getInt(EXTRA_SELECTED_TAB_INDEX));
-
-        int i = 0;
-        int length = 0;
-        Log.e("save_state", "onSaveInstanceState----------");
-        for (DDGWebView webView : webViews) {
-            Bundle state = new Bundle();
-            webView.saveState(state);
-            String key = EXTRA_WEBVIEW_STATE + i;
-            outState.putBundle(key, state);
-            int tabLength = getBundleLength(state);
-            length += tabLength;
-            Log.e("save_state", "tab " + i + " length: " + tabLength);
-            i++;
-        }
-        Log.e("save_state", "total length: " + length);
-    }
-
-    private int getBundleLength(Bundle state) {
-        int length = 0;
-        for (String key : state.keySet()) {
-            Object value = state.get(key);
-            if (value.getClass().getSimpleName().equals(byte[].class.getSimpleName())) {
-                byte[] val = (byte[]) value;
-                length += val.length;
-            }
-        }
-        return length;
+        savePresenterState(outState);
+        saveWebViewsState(outState);
     }
 
     @Override
@@ -204,41 +149,38 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
     }
 
     @Override
-    public void navigateToTabSwitcher(List<Tab> tabs) {
+    public void navigateToTabSwitcher(@NonNull List<Tab> tabs) {
         Navigator.navigateToTabSwitcher(getContext(), this, REQUEST_PICK_TAB, tabs);
     }
 
     @Override
-    public void createNewTabs() {
-        pauseTabs();
-        addNewWebView();
+    public void createNewTab(@NonNull String id) {
+        WebViewUtils.pause(currentWebView);
+        addNewWebView(id);
     }
 
     @Override
-    public void switchToTab(int position) {
-        if (webViews.size() > position) {
-            pauseTabs();
-            DDGWebView webView = webViews.get(position);
+    public void switchToTab(@NonNull String id) {
+        if (webViews.containsKey(id)) {
+            WebViewUtils.pause(currentWebView);
+            DDGWebView webView = webViews.get(id);
+            WebViewUtils.resume(webView);
             showWebView(webView);
         }
     }
 
     @Override
-    public void removeTab(int position) {
-        if (webViews.size() > position) {
-            browserPresenter.detachTabView();
-            WebView webView = webViews.remove(position);
-            webView.pauseTimers();
-            webView.onPause();
-            webView.destroy();
-            webView = null;
-        }
+    public void removeTab(@NonNull String id) {
+        Log.e("tab_manager", "Browser view, removeTab, position: " + id);
+        browserPresenter.detachTabView();
+        WebView webView = webViews.remove(id);
+        WebViewUtils.destroy(webView);
     }
 
     @Override
     public void removeAllTabs() {
         browserPresenter.detachTabView();
-        destroyTabs();
+        destroyAllWebViews();
     }
 
     @Override
@@ -308,24 +250,24 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
     }
 
     private void initUI() {
-        webViews = new ArrayList<>();
-        //addNewWebView();
-        //initWebView(webView);
+        webViews = new HashMap<>();
         initToolbar(toolbar);
         initSearchEditText(searchEditText);
     }
 
-    private void addNewWebView() {
+    private void addNewWebView(String id) {
         DDGWebView webView = (DDGWebView) LayoutInflater.from(getContext()).inflate(R.layout.tab, null);
         initWebView(webView);
-        webViews.add(webView);
+        webViews.put(id, webView);
         showWebView(webView);
     }
 
     private void showWebView(DDGWebView webView) {
+        Log.e("tab_manager", "activity show web view");
         browserPresenter.attachTabView(webView);
         tabContainerFrameLayout.removeAllViews();
         tabContainerFrameLayout.addView(webView);
+        currentWebView = webView;
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -335,6 +277,11 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
         webSettings.setJavaScriptEnabled(true);
         webView.setWebViewClient(new DDGWebViewClient(browserPresenter));
         webView.setWebChromeClient(new DDGWebChromeClient(browserPresenter));
+    }
+
+    private void destroyAllWebViews() {
+        WebViewUtils.destroy(new ArrayList<WebView>(webViews.values()));
+        webViews.clear();
     }
 
     private void initToolbar(Toolbar toolbar) {
@@ -381,49 +328,90 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
         return event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER;
     }
 
-    private void resumeTabs() {
-        for (WebView webView : webViews) {
-            webView.resumeTimers();
-            webView.onResume();
-        }
+    private void restorePresenterState(Bundle savedInstanceState) {
+        int currentIndex = savedInstanceState.getInt(EXTRA_SELECTED_TAB_INDEX);
+        List<Tab> tabs = savedInstanceState.getParcelableArrayList(EXTRA_TABS);
+        if (tabs == null) tabs = new ArrayList<>();
+        browserPresenter.restore(tabs, currentIndex);
     }
 
-    private void pauseTabs() {
-        for (WebView webView : webViews) {
-            webView.pauseTimers();
-            webView.onPause();
-        }
-    }
-
-    private void destroyTabs() {
-        for (WebView webView : webViews) {
-            if (webView != null) {
-                webView.destroy();
-                webView = null;
+    private void restoreWebViews(Bundle savedInstanceState) {
+        for (String key : savedInstanceState.keySet()) {
+            if (key.startsWith(EXTRA_WEBVIEW_STATE)) {
+                Bundle state = savedInstanceState.getBundle(key);
+                String id = state != null ? state.getString(EXTRA_WEBVIEW_ID) : "";
+                addNewWebView(id);
+                DDGWebView webView = webViews.get(id);
+                webView.restoreState(state);
             }
         }
-        webViews.clear();
+    }
+
+    private void savePresenterState(Bundle outState) {
+        outState.putParcelableArrayList(EXTRA_TABS, new ArrayList<Parcelable>(browserPresenter.saveTabs()));
+        outState.putInt(EXTRA_SELECTED_TAB_INDEX, browserPresenter.saveCurrentIndex());
+    }
+
+    private void saveWebViewsState(Bundle outState) {
+        int webViewIndex = 0;
+        for (Map.Entry<String, DDGWebView> entry : webViews.entrySet()) {
+            Bundle state = new Bundle();
+            String id = entry.getKey();
+            state.putString(EXTRA_WEBVIEW_ID, id);
+            entry.getValue().saveState(state);
+            String key = EXTRA_WEBVIEW_STATE + webViewIndex;
+            outState.putBundle(key, state);
+            webViewIndex++;
+        }
     }
 
     private void handleTabSwitcherResult(int resultCode, Intent data) {
+        Log.e("tab_manager", "handle tab switcher result");
         if (resultCode == Activity.RESULT_OK) {
             switch (TabSwitcherActivity.getResultExtra(data)) {
-                case TabSwitcherActivity.RESULT_CREATE_NEW_TAB:
-                    browserPresenter.createNewTab();
-                    break;
-                case TabSwitcherActivity.RESULT_TAB_SELECTED:
-                    int tabPosition = TabSwitcherActivity.getResultTabSelected(data);
-                    browserPresenter.openTab(tabPosition);
-                    break;
-                case TabSwitcherActivity.RESULT_REMOVE_TAB:
-                    // TODO: 5/30/17
+                case TabSwitcherActivity.RESULT_DISMISSED:
                     break;
                 case TabSwitcherActivity.RESULT_REMOVE_ALL_TABS:
-                    browserPresenter.removeAllTabs();
+                    handleTabSwitcherResultDeleteAllTabs();
                     break;
+                case TabSwitcherActivity.RESULT_CREATE_NEW_TAB:
+                    handleTabSwitcherResultCreateNewTab();
+                    break;
+                case TabSwitcherActivity.RESULT_TAB_SELECTED:
+                    handleTabSwitcherResultSelectTab(data);
+                    break;
+            }
+            if (TabSwitcherActivity.hasResultTabDeleted(data)) {
+                handleTabSwitcherResultDeleteTabs(data);
             }
         }
     }
+
+    private void handleTabSwitcherResultDeleteTabs(Intent intent) {
+        List<Integer> positionToDelete = TabSwitcherActivity.getResultTabDeleted(intent);
+        String out = "";
+        for (int position : positionToDelete) out += position + " - ";
+        Log.e("tab_manager", "handle tab switcher result delete tabs, positions: " + out);
+        browserPresenter.removeTabs(positionToDelete);
+    }
+
+    private void handleTabSwitcherResultDeleteAllTabs() {
+        Log.e("tab_manager", "handle tab switcher result delete ALL tabs");
+        browserPresenter.removeAllTabs();
+    }
+
+    private void handleTabSwitcherResultCreateNewTab() {
+        Log.e("tab_manager", "handle tab switcher result Create new tab");
+        browserPresenter.createNewTab();
+    }
+
+    private void handleTabSwitcherResultSelectTab(Intent intent) {
+        int position = TabSwitcherActivity.getResultTabSelected(intent);
+        Log.e("tab_manager", "handle tab switcher result select tab, position: " + position);
+        browserPresenter.openTab(position);
+    }
+
+
 
     /*
 

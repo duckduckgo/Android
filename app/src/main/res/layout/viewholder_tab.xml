@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="56dp"
-    android:background="?attr/selectableItemBackground">
+    android:background="?attr/selectableItemBackground"
+    tools:ignore="Overdraw">
     <ImageButton
         android:id="@+id/tab_remove_image_button"
         android:layout_width="wrap_content"
@@ -10,7 +12,8 @@
         android:src="@drawable/ic_close_black_24dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
-        android:layout_gravity="end|center_vertical"/>
+        android:layout_gravity="end|center_vertical"
+        android:contentDescription="@string/tab_switcher_tab_remove_content_description"/>
     <TextView
         android:id="@+id/tab_title_text_view"
         android:layout_width="match_parent"
