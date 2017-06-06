@@ -34,7 +34,7 @@ public class Injector {
 
     private static TabManager getTabManager() {
         String key = getKeyforClass(TabManager.class);
-        if(!instances.containsKey(key)) {
+        if (!instances.containsKey(key)) {
             instances.put(key, instantiateTabManager());
         }
         return (TabManager) instances.get(key);

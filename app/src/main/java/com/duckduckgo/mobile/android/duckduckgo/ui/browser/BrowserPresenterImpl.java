@@ -74,7 +74,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     @Override
     public void load() {
-        if(tabManager.getCurrentTab() == null) {
+        if (tabManager.getCurrentTab() == null) {
             createNewTab();
         } else {
             showTab(tabManager.getCurrentTab());
