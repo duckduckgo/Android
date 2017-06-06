@@ -21,8 +21,8 @@ import butterknife.ButterKnife;
 
 public class TabViewHolder extends RecyclerView.ViewHolder {
 
-    private static String EMPTY_TITLE = "DuckDuckGo Home";
-    private static String EMPTY_SUBTITLE = "duckduckgo.com";
+    private static final String EMPTY_TITLE = "DuckDuckGo Home";
+    private static final String EMPTY_SUBTITLE = "duckduckgo.com";
 
     @BindView(R.id.tab_title_text_view)
     TextView titleTabTextView;

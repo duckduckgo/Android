@@ -92,7 +92,9 @@ public class TabSwitcherActivity extends AppCompatActivity implements TabSwitche
 
         if (savedInstanceState != null) {
             List<Tab> savedListTabs = savedInstanceState.getParcelableArrayList(EXTRA_TABS);
+            if (savedListTabs == null) savedListTabs = new ArrayList<>();
             List<Tab> savedListTabsToRemove = savedInstanceState.getParcelableArrayList(EXTRA_TABS_TO_REMOVE);
+            if (savedListTabsToRemove == null) savedListTabsToRemove = new ArrayList<>();
             presenter.restoreState(savedListTabs, savedListTabsToRemove);
         } else {
             presenter.load(getExtraTabs(getIntent().getExtras()));
