@@ -18,6 +18,4 @@ public interface BrowserView {
     void switchToTab(@NonNull String id);
 
     void removeTab(@NonNull String id);
-
-    void removeAllTabs();
 }

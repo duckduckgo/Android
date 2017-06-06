@@ -6,11 +6,18 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.duckduckgo.mobile.android.duckduckgo.ui.tabswitcher.TabSwitcherActivity">
-    <Button
-        android:id="@+id/tab_switcher_new_tab_button"
+    <android.support.design.widget.AppBarLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/tab_switcher_new_tab_button"/>
+        android:theme="@style/AppBar">
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/tab_switcher_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/AppBar.Popup"/>
+    </android.support.design.widget.AppBarLayout>
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -22,6 +29,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom">
+            <Button
+                android:id="@+id/tab_switcher_new_tab_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:text="@string/tab_switcher_new_tab_button"/>
             <Button
                 android:id="@+id/tab_switcher_remove_all_button"
                 android:layout_width="wrap_content"

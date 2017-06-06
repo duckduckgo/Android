@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 
@@ -61,6 +62,9 @@ public class TabSwitcherActivity extends AppCompatActivity implements TabSwitche
     }
 
     private static final String EXTRA_TABS_TO_REMOVE = "extra_tabs_to_remove";
+
+    @BindView(R.id.tab_switcher_toolbar)
+    Toolbar toolbar;
 
     @BindView(R.id.tab_switcher_new_tab_button)
     Button newTabButton;
@@ -154,6 +158,7 @@ public class TabSwitcherActivity extends AppCompatActivity implements TabSwitche
     }
 
     private void initUI() {
+        toolbar.setTitle(R.string.tab_switcher_toolbar);
         newTabButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

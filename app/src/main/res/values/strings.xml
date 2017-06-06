@@ -14,7 +14,8 @@
     <string name="browser_menu_action_tab_switcher">Tab switcher</string>
 
     <!-- TabSwitcher -->
-    <string name="tab_switcher_new_tab_button">+ New tab</string>
+    <string name="tab_switcher_toolbar">Tabs</string>
+    <string name="tab_switcher_new_tab_button">New</string>
     <string name="tab_switcher_done_button">@string/done</string>
     <string name="tab_switcher_remove_all_button">Remove All</string>
     <string name="tab_switcher_tab_remove_content_description">Remove tab</string>

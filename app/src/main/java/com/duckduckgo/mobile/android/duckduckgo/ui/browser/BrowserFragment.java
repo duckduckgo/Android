@@ -11,7 +11,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -171,16 +170,9 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
 
     @Override
     public void removeTab(@NonNull String id) {
-        Log.e("tab_manager", "Browser view, removeTab, position: " + id);
         browserPresenter.detachTabView();
         WebView webView = webViews.remove(id);
         WebViewUtils.destroy(webView);
-    }
-
-    @Override
-    public void removeAllTabs() {
-        browserPresenter.detachTabView();
-        destroyAllWebViews();
     }
 
     @Override
@@ -256,14 +248,12 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
     }
 
     private void addNewWebView(String id) {
-        DDGWebView webView = (DDGWebView) LayoutInflater.from(getContext()).inflate(R.layout.tab, null);
+        DDGWebView webView = (DDGWebView) LayoutInflater.from(getContext()).inflate(R.layout.tab, tabContainerFrameLayout, false);
         initWebView(webView);
         webViews.put(id, webView);
-        showWebView(webView);
     }
 
     private void showWebView(DDGWebView webView) {
-        Log.e("tab_manager", "activity show web view");
         browserPresenter.attachTabView(webView);
         tabContainerFrameLayout.removeAllViews();
         tabContainerFrameLayout.addView(webView);
@@ -366,7 +356,6 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
     }
 
     private void handleTabSwitcherResult(int resultCode, Intent data) {
-        Log.e("tab_manager", "handle tab switcher result");
         if (resultCode == Activity.RESULT_OK) {
             switch (TabSwitcherActivity.getResultExtra(data)) {
                 case TabSwitcherActivity.RESULT_DISMISSED:
@@ -389,49 +378,19 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
 
     private void handleTabSwitcherResultDeleteTabs(Intent intent) {
         List<Integer> positionToDelete = TabSwitcherActivity.getResultTabDeleted(intent);
-        String out = "";
-        for (int position : positionToDelete) out += position + " - ";
-        Log.e("tab_manager", "handle tab switcher result delete tabs, positions: " + out);
         browserPresenter.removeTabs(positionToDelete);
     }
 
     private void handleTabSwitcherResultDeleteAllTabs() {
-        Log.e("tab_manager", "handle tab switcher result delete ALL tabs");
         browserPresenter.removeAllTabs();
     }
 
     private void handleTabSwitcherResultCreateNewTab() {
-        Log.e("tab_manager", "handle tab switcher result Create new tab");
         browserPresenter.createNewTab();
     }
 
     private void handleTabSwitcherResultSelectTab(Intent intent) {
         int position = TabSwitcherActivity.getResultTabSelected(intent);
-        Log.e("tab_manager", "handle tab switcher result select tab, position: " + position);
         browserPresenter.openTab(position);
     }
-
-
-
-    /*
-
-            Bundle state2 = new Bundle();
-            for(String stateKey : state.keySet()) {
-                Object value = state.get(stateKey);
-                if(value.getClass().getSimpleName().equals(byte[].class.getSimpleName())) {
-                    byte[] stateValue = (byte[]) value;
-                    Log.e("save_state", "orig key: "+stateKey+" val: "+stateValue.toString()+" length: "+stateValue.length);
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream(stateValue.length);
-                    try {
-                        baos.write(stateValue);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    byte[] stateCopy = baos.toByteArray();
-                    Log.e("save_state", "copy key: "+stateKey+" val: "+stateCopy.toString()+" length: "+stateCopy.length);
-                    //state2.putByteArray(stateKey, stateValue);
-                    state2.putByteArray(stateKey, stateCopy);
-                }
-            }
-     */
 }

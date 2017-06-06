@@ -33,6 +33,8 @@ public interface BrowserPresenter {
 
     void requestSearch(@Nullable String text);
 
+    void requestSearchInNewTab(@Nullable String text);
+
     void requestAssist();
 
     void navigateHistoryForward();

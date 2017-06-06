@@ -1,7 +1,6 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.tabswitcher;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.tab.Tab;
 
@@ -36,12 +35,12 @@ public class TabSwitcherPresenterImpl implements TabSwitcherPresenter {
     }
 
     @Override
-    public void load(List<Tab> tabs) {
+    public void load(@NonNull List<Tab> tabs) {
         this.tabs = tabs;
     }
 
     @Override
-    public void restoreState(List<Tab> tabs, List<Tab> tabsToRemove) {
+    public void restoreState(@NonNull List<Tab> tabs, @NonNull List<Tab> tabsToRemove) {
         this.tabs = tabs;
         this.tabsToDelete = tabsToRemove;
     }
@@ -62,15 +61,13 @@ public class TabSwitcherPresenterImpl implements TabSwitcherPresenter {
     }
 
     @Override
-    public void openTab(Tab tab) {
+    public void openTab(@NonNull Tab tab) {
         tabSwitcherView.resultSelectTab(tab.index, getPositionsToDelete());
     }
 
     @Override
-    public void closeTab(Tab tab) {
-        Log.e("tab_manager", "tabswitcher presenter, closeTab: " + tab.toString());
+    public void closeTab(@NonNull Tab tab) {
         tabsToDelete.add(tab);
-        //tabSwitcherView.resultRemoveTab(tab.index);
     }
 
     @Override
@@ -89,13 +86,5 @@ public class TabSwitcherPresenterImpl implements TabSwitcherPresenter {
             out.add(tab.index);
         }
         return out;
-    }/*
-
-    private List<String> getTabIdsToDelete() {
-        List<String> ids = new ArrayList<>();
-        for(Tab tab : tabsToDelete) {
-            ids.add(tab.id);
-        }
-        return ids;
-    }*/
+    }
 }

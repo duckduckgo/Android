@@ -15,9 +15,9 @@ public interface TabSwitcherPresenter {
 
     void detachView();
 
-    void load(List<Tab> tabs);
+    void load(@NonNull List<Tab> tabs);
 
-    void restoreState(List<Tab> tabs, List<Tab> tabsToRemove);
+    void restoreState(@NonNull List<Tab> tabs, @NonNull List<Tab> tabsToRemove);
 
     List<Tab> saveStateTabs();
 
@@ -25,9 +25,9 @@ public interface TabSwitcherPresenter {
 
     void createNewTab();
 
-    void openTab(Tab tab);
+    void openTab(@NonNull Tab tab);
 
-    void closeTab(Tab tab);
+    void closeTab(@NonNull Tab tab);
 
     void closeAllTabs();
 
