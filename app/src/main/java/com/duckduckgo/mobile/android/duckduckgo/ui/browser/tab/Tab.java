@@ -3,8 +3,6 @@ package com.duckduckgo.mobile.android.duckduckgo.ui.browser.tab;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.duckduckgo.mobile.android.duckduckgo.util.AppUrls;
-
 import java.util.UUID;
 
 /**
@@ -26,13 +24,39 @@ public class Tab implements Parcelable {
     public static Tab createNewTab() {
         Tab tab = new Tab();
         tab.id = UUID.randomUUID().toString();
-        tab.currentUrl = AppUrls.getHome();
         return tab;
     }
 
     @Override
     public String toString() {
         return "tab -> name: " + name + " currentUrl: " + currentUrl + " index: " + index + " id: " + id + " canGoBack: " + canGoBack + " canGoForward: " + canGoForward;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Tab tab = (Tab) o;
+
+        if (index != tab.index) return false;
+        if (canGoBack != tab.canGoBack) return false;
+        if (canGoForward != tab.canGoForward) return false;
+        if (id != null ? !id.equals(tab.id) : tab.id != null) return false;
+        if (name != null ? !name.equals(tab.name) : tab.name != null) return false;
+        return currentUrl != null ? currentUrl.equals(tab.currentUrl) : tab.currentUrl == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (currentUrl != null ? currentUrl.hashCode() : 0);
+        result = 31 * result + index;
+        result = 31 * result + (canGoBack ? 1 : 0);
+        result = 31 * result + (canGoForward ? 1 : 0);
+        return result;
     }
 
     @Override

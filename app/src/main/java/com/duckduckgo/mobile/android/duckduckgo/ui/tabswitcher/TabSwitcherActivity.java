@@ -112,6 +112,14 @@ public class TabSwitcherActivity extends AppCompatActivity implements TabSwitche
     }
 
     @Override
+    protected void onDestroy() {
+        if (isFinishing()) {
+            Injector.clearTabSwitcherPresenter();
+        }
+        super.onDestroy();
+    }
+
+    @Override
     public void onBackPressed() {
         presenter.closeTabSwitcher();
     }

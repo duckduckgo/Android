@@ -49,7 +49,7 @@ public class TabManager {
     }
 
     public void selectTab(int position) {
-        if (tabs.size() > position) {
+        if (tabs.size() > position && position > 0) {
             Tab tab = tabs.get(position);
             setCurrentTab(tab);
         }

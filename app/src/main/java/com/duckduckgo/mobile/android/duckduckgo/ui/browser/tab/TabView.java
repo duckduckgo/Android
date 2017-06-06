@@ -9,6 +9,8 @@ import android.support.annotation.NonNull;
 public interface TabView {
     void loadUrl(@NonNull String url);
 
+    String getTitle();
+
     void goBack();
 
     void goForward();

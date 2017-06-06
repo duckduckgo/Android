@@ -32,6 +32,10 @@ public class Injector {
         return (TabSwitcherPresenter) instances.get(key);
     }
 
+    public static void clearTabSwitcherPresenter() {
+        clear(TabSwitcherPresenter.class);
+    }
+
     private static TabManager getTabManager() {
         String key = getKeyforClass(TabManager.class);
         if (!instances.containsKey(key)) {
@@ -50,6 +54,13 @@ public class Injector {
 
     private static TabManager instantiateTabManager() {
         return new TabManager();
+    }
+
+    private static <T> void clear(Class<T> clss) {
+        String key = getKeyforClass(clss);
+        if (instances.containsKey(key)) {
+            instances.remove(key);
+        }
     }
 
     private static <T> String getKeyforClass(Class<T> clss) {

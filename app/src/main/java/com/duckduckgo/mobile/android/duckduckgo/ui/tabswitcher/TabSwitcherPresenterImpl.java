@@ -25,13 +25,12 @@ public class TabSwitcherPresenterImpl implements TabSwitcherPresenter {
     @Override
     public void attach(@NonNull TabSwitcherView tabSwitcherView) {
         this.tabSwitcherView = tabSwitcherView;
-        tabSwitcherView.loadTabs(tabs);
+        showTabs(tabs);
     }
 
     @Override
     public void detachView() {
         tabSwitcherView = null;
-        tabsToDelete.clear();
     }
 
     @Override
@@ -41,8 +40,13 @@ public class TabSwitcherPresenterImpl implements TabSwitcherPresenter {
 
     @Override
     public void restoreState(@NonNull List<Tab> tabs, @NonNull List<Tab> tabsToRemove) {
-        this.tabs = tabs;
         this.tabsToDelete = tabsToRemove;
+        this.tabs.clear();
+        for (Tab tab : tabs) {
+            if (!tabsToDelete.contains(tab)) {
+                this.tabs.add(tab);
+            }
+        }
     }
 
     @Override
@@ -78,6 +82,10 @@ public class TabSwitcherPresenterImpl implements TabSwitcherPresenter {
     @Override
     public void closeTabSwitcher() {
         tabSwitcherView.closeTabSwitcher(getPositionsToDelete());
+    }
+
+    private void showTabs(List<Tab> tabs) {
+        tabSwitcherView.loadTabs(tabs);
     }
 
     private List<Integer> getPositionsToDelete() {

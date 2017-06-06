@@ -126,8 +126,8 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     private void showTab(Tab tab) {
         omnibarView.clearText();
         omnibarView.clearFocus();
-        String displayText = tab.name != null ? tab.name : tab.currentUrl;
-        displayText(displayText);
+        String displayText = tab.currentUrl;
+        displayTextForUrl(displayText);
         omnibarView.setBackEnabled(tab.canGoBack);
         omnibarView.setForwardEnabled(tab.canGoForward);
         browserView.switchToTab(tab.id);
@@ -190,6 +190,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     @Override
     public void onPageFinished(@Nullable String url) {
+        tabManager.getCurrentTab().name = tabView.getTitle();
         setNavigationMenuButtonsEnabled();
     }
 
@@ -237,7 +238,6 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     private void displayText(String textToDisplay) {
-        tabManager.getCurrentTab().name = textToDisplay;
         omnibarView.displayText(textToDisplay);
     }
 
