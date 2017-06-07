@@ -91,25 +91,14 @@ public class AppUrlsTest {
         assertNull(result);
     }
     @Test
-    public void whenUrlIdDDGWithQueryWithEncodedCharactersThenGetQueryReturnCorrectQuery() {
-        final String[] urls = new String[] {
-                "https://www.duckduckgo.com/?ko=-1&kl=wt-wt&q=1+%2B+1",
-                "https://www.duckduckgo.com/?ko=-1&kl=wt-wt&q=1%2B1",
-                "https://www.duckduckgo.com/?ko=-1&kl=wt-wt&q=1+%40+%25+%26++4"
-        };
-        final String[] expected = new String[] {
-                "1 + 1",
-                "1+1",
-                "1 @ % &  4"
-        };
-        for(int i=0; i< urls.length; i++) {
-            String url = urls[i];
-            assertEquals(expected[i], AppUrls.getQuery(url));
-        }
+    public void whenUrlIsDDGWithQueryWithEncodedCharactersThenGetQueryReturnCorrectQuery() {
+        assertEquals("1 + 1", AppUrls.getQuery("https://www.duckduckgo.com/?ko=-1&kl=wt-wt&q=1+%2B+1"));
+        assertEquals("1+1", AppUrls.getQuery("https://www.duckduckgo.com/?ko=-1&kl=wt-wt&q=1%2B1"));
+        assertEquals("1 @ % &  4", AppUrls.getQuery("https://www.duckduckgo.com/?ko=-1&kl=wt-wt&q=1+%40+%25+%26++4"));
 
     }
     @Test
-    public void whenGetSearchUrlThenReturnCorrectDDGUrl() {
+    public void whenProvidedQueryThenGetSearchUrlReturnCorrectDuckDuckGoUrl() {
         final String expected = "https://www.duckduckgo.com/?ko=-1&kl=wt-wt&q=some+search";
         final String query = "some search";
         final String result = AppUrls.getSearchUrl(query);

@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class UrlUtils {
 
-    private static final String WEB_URL_REGEX = "^(https?:\\/\\/)?([\\da-z\\.-]+\\.[a-z\\.]{2,6}|(([\\d]+[.]){3}[\\d]+))([\\/:?=&#]{1}[\\da-z\\.-]+)*[\\/\\?]?$";
+    private static final String WEB_URL_REGEX = "^(https?:\\/\\/)?([\\da-z\\.-]+\\.[a-z\\.]{2,6}|(([\\d]+[.]){3}[\\d]+))([\\/]?[\\/:?=&#]{1}[\\%\\da-zA-Z_\\.-]+)*[\\/\\?]?$";
 
     public static boolean isUrl(@Nullable String url) {
         if (url == null) return false;
