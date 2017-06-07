@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class AppUrls {
 
-    private class Url {
+    private class Urls {
         static final String BASE = "duckduckgo.com";
         static final String HOME = "https://www.duckduckgo.com/?ko=-1&kl=wt-wt";
     }
@@ -31,11 +31,11 @@ public class AppUrls {
     }
 
     public static String getBase() {
-        return Url.BASE;
+        return Urls.BASE;
     }
 
     public static String getHome() {
-        return Url.HOME;
+        return Urls.HOME;
     }
 
     public static boolean isDuckDuckGo(@NonNull String url) {
@@ -43,7 +43,7 @@ public class AppUrls {
             URI uri = new URI(url);
             String authority = uri.getAuthority();
             if (authority == null) return false;
-            return authority.contains(Url.BASE);
+            return authority.contains(Urls.BASE);
         } catch (URISyntaxException e) {
             return false;
         }
@@ -54,7 +54,7 @@ public class AppUrls {
         if (!isDuckDuckGo(url)) return null;
         try {
             URI uri = new URI(url);
-            String query = uri.getQuery();
+            String query = uri.getRawQuery();
             if (query == null || query.length() == 0) return "";
             String[] paramsSplit = query.split("&");
             Map<String, String> params = new HashMap<>();
@@ -84,7 +84,7 @@ public class AppUrls {
             queryEncoded = URLEncoder.encode(query, "UTF-8");
         } catch (UnsupportedEncodingException e) {
         }
-        StringBuilder builder = new StringBuilder(Url.HOME);
+        StringBuilder builder = new StringBuilder(Urls.HOME);
         builder.append("&").append(Params.SEARCH).append("=").append(queryEncoded);
         return builder.toString();
     }
