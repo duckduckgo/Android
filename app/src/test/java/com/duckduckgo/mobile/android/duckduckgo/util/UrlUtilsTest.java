@@ -1,10 +1,10 @@
 package com.duckduckgo.mobile.android.duckduckgo.util;
 
-import android.webkit.URLUtil;
-
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by fgei on 5/23/17.
@@ -15,7 +15,7 @@ public class UrlUtilsTest {
     @Test
     public void whenValidUrlThenisUrlIsTrue() {
         final String[] urls = {"http://test.com", "https://test.com", "www.test.com", "192.168.0.1", "120.0.20.0"};
-        for(String url : urls) {
+        for (String url : urls) {
             final boolean result = UrlUtils.isUrl(url);
             assertTrue(result);
         }
@@ -24,7 +24,7 @@ public class UrlUtilsTest {
     @Test
     public void whenInvalidUrlThenIsUrlIsFalse() {
         final String[] urls = {"test", "test:test", "http://", "https://test", "http test com", "120.20", "20", ".", " "};
-        for(String url : urls) {
+        for (String url : urls) {
             final boolean result = UrlUtils.isUrl(url);
             assertFalse(result);
         }
