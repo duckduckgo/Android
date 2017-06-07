@@ -2,6 +2,9 @@ package com.duckduckgo.mobile.android.duckduckgo;
 
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.BrowserPresenter;
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.BrowserPresenterImpl;
+import com.duckduckgo.mobile.android.duckduckgo.ui.browser.tab.TabManager;
+import com.duckduckgo.mobile.android.duckduckgo.ui.tabswitcher.TabSwitcherPresenter;
+import com.duckduckgo.mobile.android.duckduckgo.ui.tabswitcher.TabSwitcherPresenterImpl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,21 +14,56 @@ import java.util.Map;
  */
 
 public class Injector {
-    private static Map<String, Object> presenters = new HashMap<>();
+    private static Map<String, Object> instances = new HashMap<>();
 
     public static BrowserPresenter getBrowserPresenter() {
         String key = getKeyforClass(BrowserPresenter.class);
-        if (!presenters.containsKey(key)) {
-            presenters.put(key, instantiateBrowserPresenter());
+        if (!instances.containsKey(key)) {
+            instances.put(key, instantiateBrowserPresenter());
         }
-        return (BrowserPresenter) presenters.get(key);
+        return (BrowserPresenter) instances.get(key);
+    }
+
+    public static TabSwitcherPresenter getTabSwitcherPresenter() {
+        String key = getKeyforClass(TabSwitcherPresenter.class);
+        if (!instances.containsKey(key)) {
+            instances.put(key, instantiateTabSwitcherPresenter());
+        }
+        return (TabSwitcherPresenter) instances.get(key);
+    }
+
+    public static void clearTabSwitcherPresenter() {
+        clear(TabSwitcherPresenter.class);
+    }
+
+    private static TabManager getTabManager() {
+        String key = getKeyforClass(TabManager.class);
+        if (!instances.containsKey(key)) {
+            instances.put(key, instantiateTabManager());
+        }
+        return (TabManager) instances.get(key);
     }
 
     private static BrowserPresenter instantiateBrowserPresenter() {
-        return new BrowserPresenterImpl();
+        return new BrowserPresenterImpl(getTabManager());
     }
 
-    private static <T> String getKeyforClass(T t) {
-        return t.getClass().getSimpleName();
+    private static TabSwitcherPresenter instantiateTabSwitcherPresenter() {
+        return new TabSwitcherPresenterImpl();
+    }
+
+    private static TabManager instantiateTabManager() {
+        return new TabManager();
+    }
+
+    private static <T> void clear(Class<T> clss) {
+        String key = getKeyforClass(clss);
+        if (instances.containsKey(key)) {
+            instances.remove(key);
+        }
+    }
+
+    private static <T> String getKeyforClass(Class<T> clss) {
+        return clss.getSimpleName();
     }
 }

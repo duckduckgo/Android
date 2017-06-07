@@ -66,12 +66,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void handleActionView(Intent intent) {
         String url = intent.getDataString();
-        browserPresenter.requestSearch(url);
+        browserPresenter.requestSearchInNewTab(url);
     }
 
     private void handleActionWebSearch(Intent intent) {
         String query = intent.getStringExtra(SearchManager.QUERY);
-        browserPresenter.requestSearch(query);
+        browserPresenter.requestSearchInNewTab(query);
     }
 
     private void handleActionAssist() {

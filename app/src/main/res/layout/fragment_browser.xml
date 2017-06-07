@@ -9,6 +9,10 @@
     <include
         android:visibility="visible"
         layout="@layout/appbar"/>
+<!--
+    <include
+        layout="@layout/tab"/>
+        -->
 
     <include
         layout="@layout/browser"/>

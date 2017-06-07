@@ -83,6 +83,8 @@ public class AppUrls {
         try {
             queryEncoded = URLEncoder.encode(query, "UTF-8");
         } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            queryEncoded = query;
         }
         StringBuilder builder = new StringBuilder(Url.HOME);
         builder.append("&").append(Params.SEARCH).append("=").append(queryEncoded);

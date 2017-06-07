@@ -5,18 +5,23 @@
         android:id="@+id/action_go_back"
         android:title="@string/browser_menu_action_back"
         android:orderInCategory="100"
-        android:enabled="false"
+        android:enabled="true"
         app:showAsAction="never"/>
     <item
         android:id="@+id/action_go_forward"
         android:title="@string/browser_menu_action_forward"
         android:orderInCategory="200"
-        android:enabled="false"
+        android:enabled="true"
         app:showAsAction="never"/>
     <item
         android:id="@+id/action_refresh"
         android:title="@string/browser_menu_action_refresh"
         android:orderInCategory="300"
-        android:enabled="false"
+        android:enabled="true"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_tab_switcher"
+        android:title="@string/browser_menu_action_tab_switcher"
+        android:orderInCategory="400"
         app:showAsAction="never"/>
 </menu>
