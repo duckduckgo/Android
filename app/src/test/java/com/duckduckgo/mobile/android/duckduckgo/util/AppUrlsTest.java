@@ -22,73 +22,91 @@ public class AppUrlsTest {
         assertEquals(expected, actual);
     }
     @Test
-    public void whenIsDuckDuckGoWithDDGUrlThenSucceeds() {
+    public void whenUrlIsDDGThenIsDuckDuckGoIsTrue() {
         final String url = "https://duckduckgo.com/?q=some+search&t=hy&ia=web";
         final boolean result = AppUrls.isDuckDuckGo(url);
         assertTrue(result);
     }
     @Test
-    public void whenIsDuckDuckGoWithDDGUrlWithWWWThenSucceeds() {
+    public void whenUrlIsDDGWithWWWThenIsDuckDuckGoIsTrue() {
         final String url = "https://www.duckduckgo.com/?q=some+search&t=hy&ia=web";
         final boolean result = AppUrls.isDuckDuckGo(url);
         assertTrue(result);
     }
     @Test
-    public void whenIsDuckDuckGoWithNonDDGValidUrlThenFails() {
+    public void whenUrlIsValidNotDDGThenIsDuckDuckGoIsFalse() {
         final String url = "https://www.test.com/?ko=-1&kl=wt-wt&q=some%20search";
         final boolean result = AppUrls.isDuckDuckGo(url);
         assertFalse(result);
     }
     @Test
-    public void whenIsDuckDuckGoWithNonDDGValidUrlThatContainsDDGThenFails() {
+    public void whenUrlIsValidNotDDGAndContainsDuckDuckGoUrlThenIsDuckDuckGoIsFalse() {
         final String url = "https://www.test.com/?ko=-1&kl=wt-wt&q=duckduckgo.com";
         final boolean result = AppUrls.isDuckDuckGo(url);
         assertFalse(result);
     }
     @Test
-    public void whenIsDuckDuckGoWithRandomTextThenfails() {
+    public void whenUrlIsSimpleTextThenIsDuckDuckGoIsFalse() {
         final String url ="asd.oiasud";
         final boolean result = AppUrls.isDuckDuckGo(url);
         assertFalse(result);
     }
     @Test
-    public void whenIsDuckDuckGoWithRandomTextThatContainsDDGThenFails() {
+    public void whenUrlIsSimpleTextThatContainsDuckDuckGoThenIsDuckDuckGoReturnFalse() {
         final String url = "as///d.duckduckgo.com";
         final boolean result = AppUrls.isDuckDuckGo(url);
         assertFalse(result);
     }
     @Test
-    public void whenGetQueryWithDDGUrlFromWebWithQueryThenReturnCorrectQuery() {
+    public void whenUrlIsDDGFromWebWithQueryThenGetQueryReturnCorrectQuery() {
         final String url = "https://duckduckgo.com/?q=some+search&t=hc&ia=web";
         final String expected = "some search";
         final String result = AppUrls.getQuery(url);
         assertEquals(expected, result);
     }
     @Test
-    public void whenGetQueryWithDDGUrlWithQueryThenReturnCorrectQuery() {
+    public void whenUrlIsDDGWithQueryThenGetQueryReturnCorrectQuery() {
         final String url = "https://www.duckduckgo.com/?ko=-1&kl=wt-wt&q=some+search";
         final String expected = "some search";
         final String result = AppUrls.getQuery(url);
         assertEquals(expected, result);
     }
     @Test
-    public void whenGetQueryWithDDGUrlWithoutQueryThenReturnEmptyString() {
+    public void whenUrlIsDDGWithoutQueryThenGetQueryReturnEmptyString() {
         final String url = "https://www.duckduckgo.com/?ko=-1&kl=wt-wt";
         final String expected = "";
         final String result = AppUrls.getQuery(url);
         assertEquals(expected, result);
     }
     @Test
-    public void whenGetQueryWithNonDDGUrlTheReturnNull() {
+    public void whenUrlIsNotDDGWithQueryThenGetQueryReturnNull() {
         final String url = "https://www.test.com/?ko=-1&kl=wt-wt&q=some+search";
         final String result = AppUrls.getQuery(url);
         assertNull(result);
     }
     @Test
-    public void whenGetQueryWithRandomTextThenReturnNull() {
+    public void whenUrlIsRandomTextThenGetQueryReturnNull() {
         final String url = "asd''asd/////.com/?q=duckduckgo.com";
         final String result = AppUrls.getQuery(url);
         assertNull(result);
+    }
+    @Test
+    public void whenUrlIdDDGWithQueryWithEncodedCharactersThenGetQueryReturnCorrectQuery() {
+        final String[] urls = new String[] {
+                "https://www.duckduckgo.com/?ko=-1&kl=wt-wt&q=1+%2B+1",
+                "https://www.duckduckgo.com/?ko=-1&kl=wt-wt&q=1%2B1",
+                "https://www.duckduckgo.com/?ko=-1&kl=wt-wt&q=1+%40+%25+%26++4"
+        };
+        final String[] expected = new String[] {
+                "1 + 1",
+                "1+1",
+                "1 @ % &  4"
+        };
+        for(int i=0; i< urls.length; i++) {
+            String url = urls[i];
+            assertEquals(expected[i], AppUrls.getQuery(url));
+        }
+
     }
     @Test
     public void whenGetSearchUrlThenReturnCorrectDDGUrl() {

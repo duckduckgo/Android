@@ -1,6 +1,5 @@
 package com.duckduckgo.mobile.android.duckduckgo.util;
 
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
