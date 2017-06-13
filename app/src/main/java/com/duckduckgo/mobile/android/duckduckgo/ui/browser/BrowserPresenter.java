@@ -3,6 +3,8 @@ package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkModel;
+
 /**
  * Created by fgei on 5/22/17.
  */
@@ -24,6 +26,8 @@ public interface BrowserPresenter {
 
     void refreshCurrentPage();
 
+    void onReceiveTitle(@NonNull String title);
+
     void onPageStarted(@Nullable String url);
 
     void onPageFinished(@Nullable String url);
@@ -31,4 +35,12 @@ public interface BrowserPresenter {
     void onProgressChanged(int newProgress);
 
     boolean handleBackHistory();
+
+    void viewBookmarks();
+
+    void requestSaveCurrentPageAsBookmark();
+
+    void saveBookmark(@NonNull BookmarkModel bookmarkModel);
+
+    void loadBookmark(@NonNull BookmarkModel bookmarkModel);
 }

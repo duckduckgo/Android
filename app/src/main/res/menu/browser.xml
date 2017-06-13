@@ -19,4 +19,14 @@
         android:orderInCategory="300"
         android:enabled="false"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_bookmarks"
+        android:title="@string/browser_menu_bookmarks"
+        android:orderInCategory="400"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_save_bookmark"
+        android:title="@string/browser_menu_save_bookmark"
+        android:orderInCategory="500"
+        app:showAsAction="never"/>
 </menu>

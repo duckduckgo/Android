@@ -3,6 +3,8 @@ package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.duckduckgo.mobile.android.duckduckgo.domain.bookmark.BookmarkRepository;
+import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkModel;
 import com.duckduckgo.mobile.android.duckduckgo.util.AppUrls;
 import com.duckduckgo.mobile.android.duckduckgo.util.UrlUtils;
 
@@ -17,7 +19,12 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     private BrowserView browserView;
     private OmnibarView omnibarView;
 
-    public BrowserPresenterImpl() {
+    private BrowserSessionModel browserSessionModel;
+    private BookmarkRepository bookmarkRepository;
+
+    public BrowserPresenterImpl(BookmarkRepository bookmarkRepository) {
+        this.bookmarkRepository = bookmarkRepository;
+        browserSessionModel = new BrowserSessionModel();
     }
 
     @Override
@@ -78,7 +85,13 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     @Override
+    public void onReceiveTitle(@NonNull String title) {
+        browserSessionModel.setTitle(title);
+    }
+
+    @Override
     public void onPageStarted(@Nullable String url) {
+        browserSessionModel.setCurrentUrl(url);
         omnibarView.setRefreshEnabled(true);
         String validUrl = url == null ? "" : url;
         displayTextForUrl(validUrl);
@@ -92,6 +105,8 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     @Override
     public void onProgressChanged(int newProgress) {
         if (omnibarView == null) return;
+        browserSessionModel.setHasLoaded(newProgress == PROGRESS_COMPLETE);
+        browserSessionModel.setProgress(newProgress);
         if (newProgress < PROGRESS_COMPLETE) {
             omnibarView.showProgressBar();
         } else if (newProgress == PROGRESS_COMPLETE) {
@@ -109,6 +124,30 @@ public class BrowserPresenterImpl implements BrowserPresenter {
         return false;
     }
 
+    @Override
+    public void viewBookmarks() {
+        browserView.navigateToBookmarks();
+    }
+
+    @Override
+    public void requestSaveCurrentPageAsBookmark() {
+        BookmarkModel bookmarkModel = BookmarkModel.create();
+        bookmarkModel.setUrl(browserSessionModel.getCurrentUrl());
+        bookmarkModel.setName(browserSessionModel.getTitle());
+        bookmarkModel.setIndex(bookmarkRepository.getAll().size());
+        browserView.showConfirmSaveBookmark(bookmarkModel);
+    }
+
+    @Override
+    public void saveBookmark(@NonNull BookmarkModel bookmarkModel) {
+        bookmarkRepository.insert(bookmarkModel);
+    }
+
+    @Override
+    public void loadBookmark(@NonNull BookmarkModel bookmarkModel) {
+        requestLoadUrl(bookmarkModel.getUrl());
+    }
+
     private void setCanGoBack() {
         setCanGoBack(browserView.canGoBack());
     }
@@ -118,10 +157,12 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     private void setCanGoBack(boolean canGoBack) {
+        browserSessionModel.setCanGoBack(canGoBack);
         omnibarView.setBackEnabled(canGoBack);
     }
 
     private void setCanGoForward(boolean canGoForward) {
+        browserSessionModel.setCanGoForward(canGoForward);
         omnibarView.setForwardEnabled(canGoForward);
     }
 
