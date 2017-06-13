@@ -80,7 +80,7 @@ public class BookmarksPresenterImpl implements BookmarksPresenter {
     public void bookmarkSelected(int position) {
         BookmarkModel bookmarkModel = bookmarks.get(position);
         if (isEditing) {
-            bookmarksView.showEditBookmark(bookmarkModel);
+            bookmarksView.showEditBookmark(new BookmarkModel(bookmarkModel));
         } else {
             bookmarksView.resultOpenBookmark(bookmarkModel);
         }

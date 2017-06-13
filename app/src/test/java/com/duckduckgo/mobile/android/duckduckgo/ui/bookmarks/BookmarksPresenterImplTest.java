@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -46,7 +45,7 @@ public class BookmarksPresenterImplTest {
 
     private void initBookmarks() {
         mockBookmarks = new ArrayList<>();
-        for(int i=0; i<urls.length; i++) {
+        for (int i = 0; i < urls.length; i++) {
             BookmarkModel bookmarkModel = BookmarkModel.create();
             bookmarkModel.setIndex(i);
             bookmarkModel.setUrl(urls[i]);

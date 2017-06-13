@@ -63,8 +63,14 @@ public class BookmarkViewHolder extends RecyclerView.ViewHolder {
         dragImageView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
-                    onStartDragListener.onStartDrag(BookmarkViewHolder.this);
+                dragImageView.performClick();
+                switch (MotionEventCompat.getActionMasked(event)) {
+                    case MotionEvent.ACTION_DOWN:
+                        onStartDragListener.onStartDrag(BookmarkViewHolder.this);
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        v.performClick();
+                        return true;
                 }
                 return false;
             }
