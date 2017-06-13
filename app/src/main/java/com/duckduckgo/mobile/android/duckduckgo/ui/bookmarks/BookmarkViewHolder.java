@@ -1,6 +1,5 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks;
 
-import android.support.transition.TransitionManager;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;

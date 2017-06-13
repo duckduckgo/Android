@@ -2,8 +2,6 @@ package com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks;
 
 import android.support.annotation.NonNull;
 
-import java.util.List;
-
 /**
  * Created by fgei on 6/12/17.
  */
@@ -12,6 +10,8 @@ public interface BookmarksPresenter {
     void attachView(BookmarksView bookmarksView);
 
     void detachView();
+
+    void restore(boolean isEditing);
 
     void load();
 

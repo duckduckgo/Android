@@ -2,8 +2,8 @@ package com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks;
 
 import android.support.annotation.NonNull;
 
-import com.duckduckgo.mobile.android.duckduckgo.domain.bookmark.BookmarkRepository;
 import com.duckduckgo.mobile.android.duckduckgo.domain.bookmark.Bookmark;
+import com.duckduckgo.mobile.android.duckduckgo.domain.bookmark.BookmarkRepository;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +28,11 @@ public class BookmarksPresenterImpl implements BookmarksPresenter {
     }
 
     @Override
+    public void restore(boolean isEditing) {
+        this.isEditing = isEditing;
+    }
+
+    @Override
     public void attachView(BookmarksView bookmarksView) {
         this.bookmarksView = bookmarksView;
     }
@@ -39,6 +44,9 @@ public class BookmarksPresenterImpl implements BookmarksPresenter {
 
     @Override
     public void load() {
+        if(isEditing) {
+            edit();
+        }
         bookmarks.clear();
         for (Bookmark bookmark : bookmarkRepository.getAll()) {
             bookmarks.add(new BookmarkModel(bookmark));

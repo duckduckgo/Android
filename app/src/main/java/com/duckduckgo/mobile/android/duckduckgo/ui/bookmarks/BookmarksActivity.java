@@ -10,7 +10,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -39,6 +38,8 @@ public class BookmarksActivity extends AppCompatActivity implements BookmarksVie
 
     private static final String RESULT_BOOKMARK = "result_bookmark";
 
+    private static final String EXTRA_IS_EDITING = "extra_is_editing";
+
     @BindView(R.id.bookmarks_toolbar)
     Toolbar toolbar;
 
@@ -61,6 +62,11 @@ public class BookmarksActivity extends AppCompatActivity implements BookmarksVie
         initUI();
 
         presenter = Injector.injectBookmarkPresenter();
+
+        if(savedInstanceState != null) {
+            boolean isEditing = savedInstanceState.getBoolean(EXTRA_IS_EDITING);
+            presenter.restore(isEditing);
+        }
     }
 
     @Override
@@ -74,6 +80,12 @@ public class BookmarksActivity extends AppCompatActivity implements BookmarksVie
     protected void onPause() {
         presenter.detachView();
         super.onPause();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(EXTRA_IS_EDITING, adapter.isEditable());
     }
 
     @Override
@@ -96,7 +108,6 @@ public class BookmarksActivity extends AppCompatActivity implements BookmarksVie
 
     @Override
     public void showEmpty(boolean empty) {
-        Log.e("showEmpty", "empty: "+empty);
         recyclerView.setVisibility(empty ? View.GONE : View.VISIBLE);
         emptyTextView.setVisibility(empty ? View.VISIBLE : View.GONE);
     }

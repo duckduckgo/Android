@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bookmark_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="56dp"
     android:orientation="horizontal"
     android:background="?attr/selectableItemBackground"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    tools:ignore="Overdraw">
     <ImageButton
         android:visibility="gone"
         android:id="@+id/bookmark_delete_image_button"
@@ -15,15 +17,15 @@
         android:src="@drawable/ic_action_remove"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
-        android:background="#33ff0000"/>
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/content_description_delete_button"/>
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:background="#3300ff00">
+        android:layout_marginRight="16dp">
         <TextView
             android:id="@+id/bookmark_name_text_view"
             android:layout_width="match_parent"
@@ -36,6 +38,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical|end"
             android:scaleType="center"
-            android:src="@drawable/ic_action_reorder"/>
+            android:src="@drawable/ic_action_reorder"
+            android:contentDescription="@string/content_description_drag_item"/>
     </FrameLayout>
 </LinearLayout>

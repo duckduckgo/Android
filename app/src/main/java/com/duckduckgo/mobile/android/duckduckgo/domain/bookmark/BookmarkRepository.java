@@ -2,8 +2,6 @@ package com.duckduckgo.mobile.android.duckduckgo.domain.bookmark;
 
 import android.support.annotation.NonNull;
 
-import com.duckduckgo.mobile.android.duckduckgo.domain.bookmark.Bookmark;
-
 import java.util.List;
 
 /**

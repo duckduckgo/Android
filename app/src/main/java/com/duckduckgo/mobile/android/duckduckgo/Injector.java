@@ -4,8 +4,8 @@ import android.content.Context;
 
 import com.duckduckgo.mobile.android.duckduckgo.data.bookmark.BookmarkEntityMapper;
 import com.duckduckgo.mobile.android.duckduckgo.data.bookmark.BookmarkPreferences;
-import com.duckduckgo.mobile.android.duckduckgo.domain.bookmark.BookmarkRepository;
 import com.duckduckgo.mobile.android.duckduckgo.data.bookmark.BookmarkRepositoryImpl;
+import com.duckduckgo.mobile.android.duckduckgo.domain.bookmark.BookmarkRepository;
 import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarksPresenter;
 import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarksPresenterImpl;
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.BrowserPresenter;

@@ -29,4 +29,11 @@
     <string name="bookmark_dialog_cancel_button">@string/cancel</string>
     <string name="bookmark_dialog_title_edit">Edit bookmark</string>
     <string name="bookmark_dialog_title_save">Save bookmark</string>
+    <string name="bookmark_dialog_name_hint">Bookmark name</string>
+    <string name="bookmark_dialog_url_hint">Bookmark URL</string>
+
+    <!-- Content description -->
+    <string name="content_description_delete_button">Delete</string>
+    <string name="content_description_drag_item">Move item</string>
+
 </resources>

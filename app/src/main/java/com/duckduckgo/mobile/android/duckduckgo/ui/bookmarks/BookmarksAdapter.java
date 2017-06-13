@@ -2,7 +2,6 @@ package com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks;
 
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
