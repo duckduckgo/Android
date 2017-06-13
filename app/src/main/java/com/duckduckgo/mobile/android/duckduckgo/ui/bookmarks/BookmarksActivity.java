@@ -63,7 +63,7 @@ public class BookmarksActivity extends AppCompatActivity implements BookmarksVie
 
         presenter = Injector.injectBookmarkPresenter();
 
-        if(savedInstanceState != null) {
+        if (savedInstanceState != null) {
             boolean isEditing = savedInstanceState.getBoolean(EXTRA_IS_EDITING);
             presenter.restore(isEditing);
         }

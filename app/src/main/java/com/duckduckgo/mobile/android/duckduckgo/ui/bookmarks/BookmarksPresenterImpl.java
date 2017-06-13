@@ -44,7 +44,7 @@ public class BookmarksPresenterImpl implements BookmarksPresenter {
 
     @Override
     public void load() {
-        if(isEditing) {
+        if (isEditing) {
             edit();
         }
         bookmarks.clear();
