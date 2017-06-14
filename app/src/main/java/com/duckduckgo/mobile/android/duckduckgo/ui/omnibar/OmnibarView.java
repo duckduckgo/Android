@@ -1,4 +1,4 @@
-package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
+package com.duckduckgo.mobile.android.duckduckgo.ui.omnibar;
 
 import android.support.annotation.NonNull;
 
@@ -13,7 +13,7 @@ public interface OmnibarView {
 
     void clearFocus();
 
-    void requestFocus();
+    void requestSearchFocus();
 
     void setBackEnabled(boolean enabled);
 

@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.duckduckgo.mobile.android.duckduckgo.domain.bookmark.BookmarkRepository;
 import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
+import com.duckduckgo.mobile.android.duckduckgo.ui.omnibar.OmnibarView;
 import com.duckduckgo.mobile.android.duckduckgo.util.AppUrls;
 import com.duckduckgo.mobile.android.duckduckgo.util.UrlUtils;
 
@@ -66,7 +67,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     @Override
     public void requestAssist() {
         omnibarView.clearText();
-        omnibarView.requestFocus();
+        omnibarView.requestSearchFocus();
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
+import com.duckduckgo.mobile.android.duckduckgo.ui.omnibar.OmnibarView;
 
 /**
  * Created by fgei on 5/22/17.

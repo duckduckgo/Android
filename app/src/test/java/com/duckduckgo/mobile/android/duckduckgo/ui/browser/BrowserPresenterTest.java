@@ -1,6 +1,7 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 
 import com.duckduckgo.mobile.android.duckduckgo.domain.bookmark.BookmarkRepository;
+import com.duckduckgo.mobile.android.duckduckgo.ui.omnibar.OmnibarView;
 import com.duckduckgo.mobile.android.duckduckgo.util.AppUrls;
 
 import org.junit.Before;
