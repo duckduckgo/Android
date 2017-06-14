@@ -19,8 +19,8 @@ import com.duckduckgo.mobile.android.duckduckgo.Injector;
 import com.duckduckgo.mobile.android.duckduckgo.R;
 import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
 import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarksActivity;
-import com.duckduckgo.mobile.android.duckduckgo.ui.browser.web.DDGWebChromeClient;
-import com.duckduckgo.mobile.android.duckduckgo.ui.browser.web.DDGWebViewClient;
+import com.duckduckgo.mobile.android.duckduckgo.ui.tab.web.DDGWebChromeClient;
+import com.duckduckgo.mobile.android.duckduckgo.ui.tab.web.DDGWebViewClient;
 import com.duckduckgo.mobile.android.duckduckgo.ui.editbookmark.EditBookmarkDialogFragment;
 import com.duckduckgo.mobile.android.duckduckgo.ui.navigator.Navigator;
 import com.duckduckgo.mobile.android.duckduckgo.ui.omnibar.Omnibar;
@@ -33,7 +33,7 @@ import butterknife.Unbinder;
  * Created by fgei on 5/15/17.
  */
 
-public class BrowserFragment extends Fragment implements BrowserView {
+public class BrowserFragment extends Fragment {
 
     public static final String TAG = BrowserFragment.class.getSimpleName();
 
@@ -41,13 +41,11 @@ public class BrowserFragment extends Fragment implements BrowserView {
         return new BrowserFragment();
     }
 
-    private static final int REQUEST_PICK_BOOKMARK = 200;
-
-    @BindView(R.id.browser_web_view)
-    WebView webView;
-
     @BindView(R.id.omnibar)
     Omnibar omnibar;
+
+    @BindView(R.id.browser)
+    Browser browser;
 
     private Unbinder unbinder;
     private BrowserPresenter browserPresenter;
@@ -63,7 +61,7 @@ public class BrowserFragment extends Fragment implements BrowserView {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_browser, container, false);
         unbinder = ButterKnife.bind(this, rootView);
-        browserPresenter.attachBrowserView(this);
+        browserPresenter.attachBrowserView(browser);
         browserPresenter.attachOmnibarView(omnibar);
         return rootView;
     }
@@ -74,104 +72,41 @@ public class BrowserFragment extends Fragment implements BrowserView {
         initUI();
 
         if (savedInstanceState != null) {
-            webView.restoreState(savedInstanceState);
+            //browser.restoreState(savedInstanceState);
         }
+
+        browserPresenter.loadTabs();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        webView.resumeTimers();
-        webView.onResume();
+        browser.resume();
     }
 
     @Override
     public void onPause() {
-        webView.pauseTimers();
-        webView.onPause();
+        browser.pause();
         super.onPause();
     }
 
     @Override
     public void onDestroyView() {
-        browserPresenter.detachViews();
+        browserPresenter.detachBrowserView();
+        browserPresenter.detachOmnibarView();
+        browser.destroy();
         unbinder.unbind();
-        if (webView != null) {
-            webView.destroy();
-        }
         super.onDestroyView();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        webView.saveState(outState);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case REQUEST_PICK_BOOKMARK:
-                handleBookmarkResult(resultCode, data);
-                break;
-        }
-    }
-
-    @Override
-    public void loadUrl(@NonNull String url) {
-        webView.loadUrl(url);
-    }
-
-    @Override
-    public void goBack() {
-        webView.goBack();
-    }
-
-    @Override
-    public void goForward() {
-        webView.goForward();
-    }
-
-    @Override
-    public boolean canGoBack() {
-        return webView.canGoBack();
-    }
-
-    @Override
-    public boolean canGoForward() {
-        return webView.canGoForward();
-    }
-
-    @Override
-    public void reload() {
-        webView.reload();
-    }
-
-    @Override
-    public void showConfirmSaveBookmark(@NonNull BookmarkEntity bookmarkEntity) {
-        EditBookmarkDialogFragment dialog = EditBookmarkDialogFragment.newInstance(R.string.bookmark_dialog_title_save, bookmarkEntity);
-        dialog.show(getFragmentManager(), EditBookmarkDialogFragment.TAG);
-    }
-
-    @Override
-    public void navigateToBookmarks() {
-        Navigator.navigateToBookmarks(this, REQUEST_PICK_BOOKMARK);
+        //browser.saveState(outState);
     }
 
     private void initUI() {
-        initWebView(webView);
         initOmnibar(omnibar);
-    }
-
-
-    @SuppressLint("SetJavaScriptEnabled")
-    private void initWebView(WebView webView) {
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptCanOpenWindowsAutomatically(false);
-        webSettings.setJavaScriptEnabled(true);
-        webView.setWebViewClient(new DDGWebViewClient(browserPresenter));
-        webView.setWebChromeClient(new DDGWebChromeClient(browserPresenter));
     }
 
     private void initOmnibar(Omnibar omnibar) {
@@ -195,6 +130,9 @@ public class BrowserFragment extends Fragment implements BrowserView {
                     case R.id.action_save_bookmark:
                         browserPresenter.requestSaveCurrentPageAsBookmark();
                         return true;
+                    case R.id.action_create_new_tab:
+                        browserPresenter.createNewTab();
+                        return true;
                 }
                 return false;
             }
@@ -205,14 +143,5 @@ public class BrowserFragment extends Fragment implements BrowserView {
                 browserPresenter.requestSearch(text);
             }
         });
-    }
-
-    private void handleBookmarkResult(int resultCode, Intent data) {
-        if (resultCode == Activity.RESULT_OK) {
-            BookmarkEntity bookmarkEntity = BookmarksActivity.getResultBookmark(data);
-            if (bookmarkEntity != null) {
-                browserPresenter.loadBookmark(bookmarkEntity);
-            }
-        }
     }
 }

@@ -9,19 +9,11 @@ import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
  */
 
 public interface BrowserView {
-    void loadUrl(@NonNull String url);
+    void createNewTab(@NonNull String id);
 
-    void goBack();
+    void showTab(@NonNull String id);
 
-    void goForward();
+    void deleteTab(@NonNull String id);
 
-    boolean canGoBack();
-
-    boolean canGoForward();
-
-    void reload();
-
-    void showConfirmSaveBookmark(@NonNull BookmarkEntity bookmarkEntity);
-
-    void navigateToBookmarks();
+    void deleteAll();
 }

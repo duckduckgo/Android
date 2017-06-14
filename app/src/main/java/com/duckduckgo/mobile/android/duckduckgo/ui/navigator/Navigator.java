@@ -1,5 +1,6 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.navigator;
 
+import android.app.Activity;
 import android.support.v4.app.Fragment;
 
 import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarksActivity;
@@ -9,6 +10,10 @@ import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarksActivity;
  */
 
 public class Navigator {
+
+    public static void navigateToBookmarks(Activity fromActivity, int requestCode) {
+        fromActivity.startActivityForResult(BookmarksActivity.getStartIntent(fromActivity), requestCode);
+    }
 
     public static void navigateToBookmarks(Fragment fromFragment, int requestCode) {
         fromFragment.startActivityForResult(BookmarksActivity.getStartIntent(fromFragment.getContext()), requestCode);

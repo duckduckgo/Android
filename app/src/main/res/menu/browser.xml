@@ -29,4 +29,9 @@
         android:title="@string/browser_menu_save_bookmark"
         android:orderInCategory="500"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_create_new_tab"
+        android:title="Create new tab"
+        android:orderInCategory="600"
+        app:showAsAction="never"/>
 </menu>

@@ -1,18 +1,24 @@
-package com.duckduckgo.mobile.android.duckduckgo.ui;
+package com.duckduckgo.mobile.android.duckduckgo.ui.main;
 
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
 import com.duckduckgo.mobile.android.duckduckgo.Injector;
 import com.duckduckgo.mobile.android.duckduckgo.R;
 import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
+import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarksActivity;
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.BrowserFragment;
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.BrowserPresenter;
 import com.duckduckgo.mobile.android.duckduckgo.ui.editbookmark.EditBookmarkDialogFragment;
+import com.duckduckgo.mobile.android.duckduckgo.ui.navigator.Navigator;
 
-public class MainActivity extends AppCompatActivity implements EditBookmarkDialogFragment.OnEditBookmarkListener {
+public class MainActivity extends AppCompatActivity implements MainView, EditBookmarkDialogFragment.OnEditBookmarkListener {
+
+    private static final int REQUEST_PICK_BOOKMARK = 200;
 
     private static final int ACTIVITY_CONTAINER = android.R.id.content;
 
@@ -52,6 +58,27 @@ public class MainActivity extends AppCompatActivity implements EditBookmarkDialo
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_PICK_BOOKMARK:
+                handleBookmarkResult(resultCode, data);
+                break;
+        }
+    }
+
+    @Override
+    public void showConfirmSaveBookmark(@NonNull BookmarkEntity bookmarkEntity) {
+        EditBookmarkDialogFragment dialog = EditBookmarkDialogFragment.newInstance(R.string.bookmark_dialog_title_save, bookmarkEntity);
+        dialog.show(getSupportFragmentManager(), EditBookmarkDialogFragment.TAG);
+    }
+
+    @Override
+    public void navigateToBookmarks() {
+        Navigator.navigateToBookmarks(this, REQUEST_PICK_BOOKMARK);
+    }
+
+    @Override
     public void onBookmarkEdited(BookmarkEntity bookmark) {
         browserPresenter.saveBookmark(bookmark);
     }
@@ -83,5 +110,14 @@ public class MainActivity extends AppCompatActivity implements EditBookmarkDialo
 
     private void handleActionAssist() {
         browserPresenter.requestAssist();
+    }
+
+    private void handleBookmarkResult(int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            BookmarkEntity bookmarkEntity = BookmarksActivity.getResultBookmark(data);
+            if (bookmarkEntity != null) {
+                browserPresenter.loadBookmark(bookmarkEntity);
+            }
+        }
     }
 }
