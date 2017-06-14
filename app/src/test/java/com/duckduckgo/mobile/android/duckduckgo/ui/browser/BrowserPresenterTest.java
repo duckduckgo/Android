@@ -1,5 +1,6 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 
+import com.duckduckgo.mobile.android.duckduckgo.domain.bookmark.BookmarkRepository;
 import com.duckduckgo.mobile.android.duckduckgo.util.AppUrls;
 
 import org.junit.Before;
@@ -24,14 +25,16 @@ public class BrowserPresenterTest {
 
     private BrowserView mockBrowserView;
     private OmnibarView mockOmnibarView;
+    private BookmarkRepository mockBookmarkRepository;
     private BrowserPresenter browserPresenter;
 
     @Before
     public void setup() {
         mockBrowserView = mock(BrowserView.class);
         mockOmnibarView = mock(OmnibarView.class);
+        mockBookmarkRepository = mock(BookmarkRepository.class);
 
-        browserPresenter = new BrowserPresenterImpl();
+        browserPresenter = new BrowserPresenterImpl(mockBookmarkRepository);
         browserPresenter.attachBrowserView(mockBrowserView);
         browserPresenter.attachOmnibarView(mockOmnibarView);
     }

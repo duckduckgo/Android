@@ -3,6 +3,8 @@ package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,8 +24,12 @@ import android.widget.TextView;
 
 import com.duckduckgo.mobile.android.duckduckgo.Injector;
 import com.duckduckgo.mobile.android.duckduckgo.R;
+import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
+import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarksActivity;
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.web.DDGWebChromeClient;
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.web.DDGWebViewClient;
+import com.duckduckgo.mobile.android.duckduckgo.ui.editbookmark.EditBookmarkDialogFragment;
+import com.duckduckgo.mobile.android.duckduckgo.ui.navigator.Navigator;
 import com.duckduckgo.mobile.android.duckduckgo.util.KeyboardUtils;
 
 import java.lang.ref.WeakReference;
@@ -44,6 +50,8 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
         return new BrowserFragment();
     }
 
+    private static final int REQUEST_PICK_BOOKMARK = 200;
+
     @BindView(R.id.browser_web_view)
     WebView webView;
 
@@ -62,7 +70,7 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        browserPresenter = Injector.getBrowserPresenter();
+        browserPresenter = Injector.injectBrowserPresenter();
     }
 
     @Nullable
@@ -113,6 +121,16 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         webView.saveState(outState);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_PICK_BOOKMARK:
+                handleBookmarkResult(resultCode, data);
+                break;
+        }
     }
 
     @Override
@@ -211,6 +229,17 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
         progressBar.setProgress(newProgress);
     }
 
+    @Override
+    public void showConfirmSaveBookmark(@NonNull BookmarkEntity bookmarkEntity) {
+        EditBookmarkDialogFragment dialog = EditBookmarkDialogFragment.newInstance(R.string.bookmark_dialog_title_save, bookmarkEntity);
+        dialog.show(getFragmentManager(), EditBookmarkDialogFragment.TAG);
+    }
+
+    @Override
+    public void navigateToBookmarks() {
+        Navigator.navigateToBookmarks(this, REQUEST_PICK_BOOKMARK);
+    }
+
     private void initUI() {
         initWebView(webView);
         initToolbar(toolbar);
@@ -242,6 +271,12 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
                     case R.id.action_refresh:
                         browserPresenter.refreshCurrentPage();
                         return true;
+                    case R.id.action_bookmarks:
+                        browserPresenter.viewBookmarks();
+                        return true;
+                    case R.id.action_save_bookmark:
+                        browserPresenter.requestSaveCurrentPageAsBookmark();
+                        return true;
                 }
                 return false;
             }
@@ -266,5 +301,14 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
 
     private boolean wasEnterPressed(KeyEvent event) {
         return event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER;
+    }
+
+    private void handleBookmarkResult(int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            BookmarkEntity bookmarkEntity = BookmarksActivity.getResultBookmark(data);
+            if (bookmarkEntity != null) {
+                browserPresenter.loadBookmark(bookmarkEntity);
+            }
+        }
     }
 }

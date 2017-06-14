@@ -1,6 +1,12 @@
 <resources>
     <string name="app_name">DuckDuckGo</string>
 
+    <!-- General Strings -->
+    <string name="edit">Edit</string>
+    <string name="bookmarks">Bookmarks</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+
     <!-- Appbar -->
     <string name="appbar_search_edit_text_hint">Search DuckDuckGo</string>
 
@@ -8,4 +14,26 @@
     <string name="browser_menu_action_back">Back</string>
     <string name="browser_menu_action_forward">Forward</string>
     <string name="browser_menu_action_refresh">Refresh</string>
+    <string name="browser_menu_save_bookmark">Save bookmark</string>
+    <string name="browser_menu_bookmarks">@string/bookmarks</string>
+
+    <!-- Bookmarks -->
+    <string name="bookmarks_toolbar">@string/bookmarks</string>
+    <string name="bookmarks_empty">No bookmarks yet</string>
+
+    <!-- Bookmarks Menu -->
+    <string name="bookmarks_menu_edit">@string/edit</string>
+
+    <!-- Edit Bookmark Dialog -->
+    <string name="bookmark_dialog_save_button">@string/save</string>
+    <string name="bookmark_dialog_cancel_button">@string/cancel</string>
+    <string name="bookmark_dialog_title_edit">Edit bookmark</string>
+    <string name="bookmark_dialog_title_save">Save bookmark</string>
+    <string name="bookmark_dialog_name_hint">Bookmark name</string>
+    <string name="bookmark_dialog_url_hint">Bookmark URL</string>
+
+    <!-- Content description -->
+    <string name="content_description_delete_button">Delete</string>
+    <string name="content_description_drag_item">Move item</string>
+
 </resources>

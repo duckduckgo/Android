@@ -22,4 +22,10 @@ public class DDGWebChromeClient extends WebChromeClient {
         super.onProgressChanged(view, newProgress);
         browserPresenter.onProgressChanged(newProgress);
     }
+
+    @Override
+    public void onReceivedTitle(WebView view, String title) {
+        super.onReceivedTitle(view, title);
+        browserPresenter.onReceiveTitle(title);
+    }
 }

@@ -7,10 +7,12 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.duckduckgo.mobile.android.duckduckgo.Injector;
 import com.duckduckgo.mobile.android.duckduckgo.R;
+import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.BrowserFragment;
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.BrowserPresenter;
+import com.duckduckgo.mobile.android.duckduckgo.ui.editbookmark.EditBookmarkDialogFragment;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements EditBookmarkDialogFragment.OnEditBookmarkListener {
 
     private static final int ACTIVITY_CONTAINER = android.R.id.content;
 
@@ -21,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        browserPresenter = Injector.getBrowserPresenter();
+        browserPresenter = Injector.injectBrowserPresenter();
 
         BrowserFragment browserFragment = (BrowserFragment) getSupportFragmentManager().findFragmentByTag(BrowserFragment.TAG);
         if (browserFragment == null) browserFragment = BrowserFragment.newInstance();
@@ -47,6 +49,11 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         super.onBackPressed();
+    }
+
+    @Override
+    public void onBookmarkEdited(BookmarkEntity bookmark) {
+        browserPresenter.saveBookmark(bookmark);
     }
 
     private void handleIntent(Intent intent) {
