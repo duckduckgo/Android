@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.duckduckgo.mobile.android.duckduckgo.domain.bookmark.BookmarkRepository;
-import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkModel;
+import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
 import com.duckduckgo.mobile.android.duckduckgo.util.AppUrls;
 import com.duckduckgo.mobile.android.duckduckgo.util.UrlUtils;
 
@@ -131,21 +131,21 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     @Override
     public void requestSaveCurrentPageAsBookmark() {
-        BookmarkModel bookmarkModel = BookmarkModel.create();
-        bookmarkModel.setUrl(browserSessionModel.getCurrentUrl());
-        bookmarkModel.setName(browserSessionModel.getTitle());
-        bookmarkModel.setIndex(bookmarkRepository.getAll().size());
-        browserView.showConfirmSaveBookmark(bookmarkModel);
+        BookmarkEntity bookmarkEntity = BookmarkEntity.create();
+        bookmarkEntity.setUrl(browserSessionModel.getCurrentUrl());
+        bookmarkEntity.setName(browserSessionModel.getTitle());
+        bookmarkEntity.setIndex(bookmarkRepository.getAll().size());
+        browserView.showConfirmSaveBookmark(bookmarkEntity);
     }
 
     @Override
-    public void saveBookmark(@NonNull BookmarkModel bookmarkModel) {
-        bookmarkRepository.insert(bookmarkModel);
+    public void saveBookmark(@NonNull BookmarkEntity bookmarkEntity) {
+        bookmarkRepository.insert(bookmarkEntity);
     }
 
     @Override
-    public void loadBookmark(@NonNull BookmarkModel bookmarkModel) {
-        requestLoadUrl(bookmarkModel.getUrl());
+    public void loadBookmark(@NonNull BookmarkEntity bookmarkEntity) {
+        requestLoadUrl(bookmarkEntity.getUrl());
     }
 
     private void setCanGoBack() {

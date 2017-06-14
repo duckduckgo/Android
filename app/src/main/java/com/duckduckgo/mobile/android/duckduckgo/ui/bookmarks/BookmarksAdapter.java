@@ -25,7 +25,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarkViewHolder> i
         void onBookmarksSwap(int fromPosition, int toPosition);
     }
 
-    private List<BookmarkModel> bookmarks = new ArrayList<>();
+    private List<BookmarkEntity> bookmarks = new ArrayList<>();
     private boolean editable = false;
 
     private OnStartDragListener onStartDragListener;
@@ -36,7 +36,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarkViewHolder> i
         this.onBookmarkListener = onBookmarkListener;
     }
 
-    public void setBookmarks(List<BookmarkModel> bookmarks) {
+    public void setBookmarks(List<BookmarkEntity> bookmarks) {
         updateList(bookmarks);
     }
 
@@ -63,8 +63,8 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarkViewHolder> i
 
     @Override
     public void onBindViewHolder(BookmarkViewHolder holder, int position) {
-        BookmarkModel bookmarkModel = bookmarks.get(position);
-        holder.setBookmark(bookmarkModel);
+        BookmarkEntity bookmarkEntity = bookmarks.get(position);
+        holder.setBookmark(bookmarkEntity);
         holder.setEditable(editable);
     }
 
@@ -93,7 +93,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarkViewHolder> i
         onBookmarkListener.onBookmarkDeleted(view, position);
     }
 
-    private void updateList(List<BookmarkModel> newList) {
+    private void updateList(List<BookmarkEntity> newList) {
         BookmarkDiffCallback diffCallback = new BookmarkDiffCallback(bookmarks, newList);
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(diffCallback);
         bookmarks.clear();

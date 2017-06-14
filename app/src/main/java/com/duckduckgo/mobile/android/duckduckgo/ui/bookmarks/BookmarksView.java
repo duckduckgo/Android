@@ -9,7 +9,7 @@ import java.util.List;
  */
 
 public interface BookmarksView {
-    void loadBookmarks(@NonNull List<BookmarkModel> bookmarks);
+    void loadBookmarks(@NonNull List<BookmarkEntity> bookmarks);
 
     void showEmpty(boolean empty);
 
@@ -21,7 +21,7 @@ public interface BookmarksView {
 
     void close();
 
-    void showEditBookmark(@NonNull BookmarkModel bookmarkModel);
+    void showEditBookmark(@NonNull BookmarkEntity bookmarkEntity);
 
-    void resultOpenBookmark(@NonNull BookmarkModel bookmarkModel);
+    void resultOpenBookmark(@NonNull BookmarkEntity bookmarkEntity);
 }

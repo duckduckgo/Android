@@ -12,7 +12,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.duckduckgo.mobile.android.duckduckgo.R;
-import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkModel;
+import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,7 +25,7 @@ public class EditBookmarkDialogFragment extends AppCompatDialogFragment {
 
     public static final String TAG = EditBookmarkDialogFragment.class.getSimpleName();
 
-    public static EditBookmarkDialogFragment newInstance(int titleResId, @NonNull BookmarkModel bookmark) {
+    public static EditBookmarkDialogFragment newInstance(int titleResId, @NonNull BookmarkEntity bookmark) {
         EditBookmarkDialogFragment dialog = new EditBookmarkDialogFragment();
         Bundle args = new Bundle();
         args.putInt(EXTRA_TITLE, titleResId);
@@ -38,7 +38,7 @@ public class EditBookmarkDialogFragment extends AppCompatDialogFragment {
     private static final String EXTRA_BOOKMARK = "extra_bookmark";
 
     public interface OnEditBookmarkListener {
-        void onBookmarkEdited(BookmarkModel bookmark);
+        void onBookmarkEdited(BookmarkEntity bookmark);
     }
 
     @BindView(R.id.dialog_edit_bookmark_name_edit_text)
@@ -50,7 +50,7 @@ public class EditBookmarkDialogFragment extends AppCompatDialogFragment {
     private OnEditBookmarkListener onEditBookmarkListener;
 
     private int titleResId;
-    private BookmarkModel bookmarkModel;
+    private BookmarkEntity bookmarkEntity;
 
     @Override
     public void onAttach(Context context) {
@@ -72,7 +72,7 @@ public class EditBookmarkDialogFragment extends AppCompatDialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         titleResId = getArguments().getInt(EXTRA_TITLE);
-        bookmarkModel = getArguments().getParcelable(EXTRA_BOOKMARK);
+        bookmarkEntity = getArguments().getParcelable(EXTRA_BOOKMARK);
     }
 
     @NonNull
@@ -100,17 +100,17 @@ public class EditBookmarkDialogFragment extends AppCompatDialogFragment {
     }
 
     private void initUI() {
-        nameEditText.setText(bookmarkModel.getName());
-        urlEditText.setText(bookmarkModel.getUrl());
+        nameEditText.setText(bookmarkEntity.getName());
+        urlEditText.setText(bookmarkEntity.getUrl());
     }
 
     private void onSaveButtonClick() {
         onEditBookmarkListener.onBookmarkEdited(getEditedBookmark());
     }
 
-    private BookmarkModel getEditedBookmark() {
-        bookmarkModel.setName(nameEditText.getText().toString());
-        bookmarkModel.setUrl(urlEditText.getText().toString());
-        return bookmarkModel;
+    private BookmarkEntity getEditedBookmark() {
+        bookmarkEntity.setName(nameEditText.getText().toString());
+        bookmarkEntity.setUrl(urlEditText.getText().toString());
+        return bookmarkEntity;
     }
 }

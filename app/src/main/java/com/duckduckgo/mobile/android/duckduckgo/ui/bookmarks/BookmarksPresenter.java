@@ -25,5 +25,5 @@ public interface BookmarksPresenter {
 
     void bookmarksMoved(int fromPosition, int toPosition);
 
-    void saveEditedBookmark(@NonNull BookmarkModel bookmarkModel);
+    void saveEditedBookmark(@NonNull BookmarkEntity bookmarkEntity);
 }

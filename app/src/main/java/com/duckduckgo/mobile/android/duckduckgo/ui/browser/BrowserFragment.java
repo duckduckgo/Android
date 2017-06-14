@@ -24,7 +24,7 @@ import android.widget.TextView;
 
 import com.duckduckgo.mobile.android.duckduckgo.Injector;
 import com.duckduckgo.mobile.android.duckduckgo.R;
-import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkModel;
+import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
 import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarksActivity;
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.web.DDGWebChromeClient;
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.web.DDGWebViewClient;
@@ -230,8 +230,8 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
     }
 
     @Override
-    public void showConfirmSaveBookmark(@NonNull BookmarkModel bookmarkModel) {
-        EditBookmarkDialogFragment dialog = EditBookmarkDialogFragment.newInstance(R.string.bookmark_dialog_title_save, bookmarkModel);
+    public void showConfirmSaveBookmark(@NonNull BookmarkEntity bookmarkEntity) {
+        EditBookmarkDialogFragment dialog = EditBookmarkDialogFragment.newInstance(R.string.bookmark_dialog_title_save, bookmarkEntity);
         dialog.show(getFragmentManager(), EditBookmarkDialogFragment.TAG);
     }
 
@@ -305,9 +305,9 @@ public class BrowserFragment extends Fragment implements BrowserView, OmnibarVie
 
     private void handleBookmarkResult(int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
-            BookmarkModel bookmarkModel = BookmarksActivity.getResultBookmark(data);
-            if (bookmarkModel != null) {
-                browserPresenter.loadBookmark(bookmarkModel);
+            BookmarkEntity bookmarkEntity = BookmarksActivity.getResultBookmark(data);
+            if (bookmarkEntity != null) {
+                browserPresenter.loadBookmark(bookmarkEntity);
             }
         }
     }

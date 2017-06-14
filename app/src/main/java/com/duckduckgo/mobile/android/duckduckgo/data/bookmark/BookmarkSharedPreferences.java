@@ -11,41 +11,41 @@ import java.util.List;
  * Created by fgei on 6/12/17.
  */
 
-public class BookmarkPreferences {
+public class BookmarkSharedPreferences {
 
     private static final String PREF_NAME = "bookmarks";
 
     private SharedPreferences sharedPreferences;
 
-    public BookmarkPreferences(Context context) {
+    public BookmarkSharedPreferences(Context context) {
         sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
-    void insert(@NonNull BookmarkEntity bookmarkEntity) {
+    void insert(@NonNull BookmarkJsonEntity bookmarkJsonEntity) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        String key = getKeyForBookmark(bookmarkEntity);
-        editor.putString(key, bookmarkEntity.toJson());
+        String key = getKeyForBookmark(bookmarkJsonEntity);
+        editor.putString(key, bookmarkJsonEntity.toJson());
         editor.apply();
     }
 
-    void update(@NonNull BookmarkEntity bookmarkEntity) {
-        String key = getKeyForBookmark(bookmarkEntity);
+    void update(@NonNull BookmarkJsonEntity bookmarkJsonEntity) {
+        String key = getKeyForBookmark(bookmarkJsonEntity);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(key, bookmarkEntity.toJson());
+        editor.putString(key, bookmarkJsonEntity.toJson());
         editor.apply();
     }
 
-    void delete(@NonNull BookmarkEntity bookmarkEntity) {
-        String key = getKeyForBookmark(bookmarkEntity);
+    void delete(@NonNull BookmarkJsonEntity bookmarkJsonEntity) {
+        String key = getKeyForBookmark(bookmarkJsonEntity);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.remove(key);
         editor.apply();
     }
 
-    List<BookmarkEntity> getAll() {
-        List<BookmarkEntity> out = new ArrayList<>();
+    List<BookmarkJsonEntity> getAll() {
+        List<BookmarkJsonEntity> out = new ArrayList<>();
         for (Object item : sharedPreferences.getAll().values()) {
-            BookmarkEntity entity = new BookmarkEntity();
+            BookmarkJsonEntity entity = new BookmarkJsonEntity();
             entity.fromJson(item.toString());
             out.add(entity);
         }
@@ -57,7 +57,7 @@ public class BookmarkPreferences {
     }
 
     @NonNull
-    private String getKeyForBookmark(BookmarkEntity entity) {
+    private String getKeyForBookmark(BookmarkJsonEntity entity) {
         return entity.getId();
     }
 }

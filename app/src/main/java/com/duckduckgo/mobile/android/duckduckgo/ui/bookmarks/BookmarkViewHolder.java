@@ -77,8 +77,8 @@ public class BookmarkViewHolder extends RecyclerView.ViewHolder {
         });
     }
 
-    public void setBookmark(BookmarkModel bookmarkModel) {
-        nameTextView.setText(bookmarkModel.getName());
+    public void setBookmark(BookmarkEntity bookmarkEntity) {
+        nameTextView.setText(bookmarkEntity.getName());
     }
 
     public void setEditable(boolean editable) {

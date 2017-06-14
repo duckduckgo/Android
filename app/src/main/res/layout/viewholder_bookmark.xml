@@ -14,7 +14,7 @@
         android:id="@+id/bookmark_delete_image_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_action_remove"
+        android:src="@drawable/ic_remove_circle_black_24dp"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
         android:background="?attr/selectableItemBackgroundBorderless"
@@ -38,7 +38,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical|end"
             android:scaleType="center"
-            android:src="@drawable/ic_action_reorder"
+            android:src="@drawable/ic_reorder_black_24dp"
             android:contentDescription="@string/content_description_drag_item"/>
     </FrameLayout>
 </LinearLayout>

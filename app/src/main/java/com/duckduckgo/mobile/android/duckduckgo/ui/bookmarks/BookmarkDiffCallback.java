@@ -10,10 +10,10 @@ import java.util.List;
 
 public class BookmarkDiffCallback extends DiffUtil.Callback {
 
-    private List<BookmarkModel> oldList;
-    private List<BookmarkModel> newList;
+    private List<BookmarkEntity> oldList;
+    private List<BookmarkEntity> newList;
 
-    public BookmarkDiffCallback(List<BookmarkModel> oldList, List<BookmarkModel> newList) {
+    public BookmarkDiffCallback(List<BookmarkEntity> oldList, List<BookmarkEntity> newList) {
         this.oldList = oldList;
         this.newList = newList;
     }
@@ -30,15 +30,15 @@ public class BookmarkDiffCallback extends DiffUtil.Callback {
 
     @Override
     public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-        BookmarkModel oldItem = oldList.get(oldItemPosition);
-        BookmarkModel newItem = newList.get(newItemPosition);
+        BookmarkEntity oldItem = oldList.get(oldItemPosition);
+        BookmarkEntity newItem = newList.get(newItemPosition);
         return oldItem.getId().equals(newItem.getId());
     }
 
     @Override
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-        BookmarkModel oldItem = oldList.get(oldItemPosition);
-        BookmarkModel newItem = newList.get(newItemPosition);
+        BookmarkEntity oldItem = oldList.get(oldItemPosition);
+        BookmarkEntity newItem = newList.get(newItemPosition);
         return oldItem.getName().equals(newItem.getName());
     }
 }

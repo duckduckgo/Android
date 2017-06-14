@@ -20,7 +20,7 @@ public class BookmarksPresenterImpl implements BookmarksPresenter {
 
     private BookmarksView bookmarksView;
 
-    private List<BookmarkModel> bookmarks = new ArrayList<>();
+    private List<BookmarkEntity> bookmarks = new ArrayList<>();
     private boolean isEditing = false;
 
     public BookmarksPresenterImpl(BookmarkRepository bookmarkRepository) {
@@ -49,11 +49,11 @@ public class BookmarksPresenterImpl implements BookmarksPresenter {
         }
         bookmarks.clear();
         for (Bookmark bookmark : bookmarkRepository.getAll()) {
-            bookmarks.add(new BookmarkModel(bookmark));
+            bookmarks.add(new BookmarkEntity(bookmark));
         }
-        Collections.sort(bookmarks, new Comparator<BookmarkModel>() {
+        Collections.sort(bookmarks, new Comparator<BookmarkEntity>() {
             @Override
-            public int compare(BookmarkModel o1, BookmarkModel o2) {
+            public int compare(BookmarkEntity o1, BookmarkEntity o2) {
                 return o1.getIndex() - o2.getIndex();
             }
         });
@@ -78,26 +78,26 @@ public class BookmarksPresenterImpl implements BookmarksPresenter {
 
     @Override
     public void bookmarkSelected(int position) {
-        BookmarkModel bookmarkModel = bookmarks.get(position);
+        BookmarkEntity bookmarkEntity = bookmarks.get(position);
         if (isEditing) {
-            bookmarksView.showEditBookmark(new BookmarkModel(bookmarkModel));
+            bookmarksView.showEditBookmark(new BookmarkEntity(bookmarkEntity));
         } else {
-            bookmarksView.resultOpenBookmark(bookmarkModel);
+            bookmarksView.resultOpenBookmark(bookmarkEntity);
         }
     }
 
     @Override
     public void bookmarkDeleted(int position) {
-        BookmarkModel deletedBookmark = bookmarks.get(position);
+        BookmarkEntity deletedBookmark = bookmarks.get(position);
 
         bookmarkRepository.delete(deletedBookmark);
         bookmarks.remove(position);
 
-        for (BookmarkModel bookmarkModel : bookmarks) {
-            int currentIndex = bookmarkModel.getIndex();
+        for (BookmarkEntity bookmarkEntity : bookmarks) {
+            int currentIndex = bookmarkEntity.getIndex();
             if (currentIndex > position) {
-                bookmarkModel.setIndex(currentIndex - 1);
-                bookmarkRepository.update(bookmarkModel);
+                bookmarkEntity.setIndex(currentIndex - 1);
+                bookmarkRepository.update(bookmarkEntity);
             }
         }
         load();
@@ -105,10 +105,10 @@ public class BookmarksPresenterImpl implements BookmarksPresenter {
 
     @Override
     public void bookmarksMoved(int fromPosition, int toPosition) {
-        BookmarkModel from = bookmarks.get(fromPosition);
+        BookmarkEntity from = bookmarks.get(fromPosition);
         from.setIndex(toPosition);
 
-        BookmarkModel to = bookmarks.get(toPosition);
+        BookmarkEntity to = bookmarks.get(toPosition);
         to.setIndex(fromPosition);
 
         bookmarkRepository.update(from);
@@ -118,12 +118,12 @@ public class BookmarksPresenterImpl implements BookmarksPresenter {
     }
 
     @Override
-    public void saveEditedBookmark(@NonNull BookmarkModel bookmarkModel) {
-        bookmarkRepository.update(bookmarkModel);
+    public void saveEditedBookmark(@NonNull BookmarkEntity bookmarkEntity) {
+        bookmarkRepository.update(bookmarkEntity);
         load();
     }
 
-    private void loadBookmarks(List<BookmarkModel> bookmarks) {
+    private void loadBookmarks(List<BookmarkEntity> bookmarks) {
         setBookmarksVisibility();
         bookmarksView.loadBookmarks(bookmarks);
     }

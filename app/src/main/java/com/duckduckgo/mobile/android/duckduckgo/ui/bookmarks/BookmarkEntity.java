@@ -11,16 +11,16 @@ import java.util.UUID;
  * Created by fgei on 6/12/17.
  */
 
-public class BookmarkModel implements Bookmark, Parcelable {
+public class BookmarkEntity implements Bookmark, Parcelable {
     private String id;
     private String name;
     private String url;
     private int index;
 
-    public BookmarkModel() {
+    public BookmarkEntity() {
     }
 
-    public BookmarkModel(Bookmark bookmark) {
+    public BookmarkEntity(Bookmark bookmark) {
         id = bookmark.getId();
         name = bookmark.getName();
         url = bookmark.getUrl();
@@ -59,10 +59,10 @@ public class BookmarkModel implements Bookmark, Parcelable {
         this.index = index;
     }
 
-    public static BookmarkModel create() {
-        BookmarkModel bookmarkModel = new BookmarkModel();
-        bookmarkModel.id = UUID.randomUUID().toString();
-        return bookmarkModel;
+    public static BookmarkEntity create() {
+        BookmarkEntity bookmarkEntity = new BookmarkEntity();
+        bookmarkEntity.id = UUID.randomUUID().toString();
+        return bookmarkEntity;
     }
 
     @Override
@@ -78,22 +78,22 @@ public class BookmarkModel implements Bookmark, Parcelable {
         dest.writeInt(this.index);
     }
 
-    protected BookmarkModel(Parcel in) {
+    protected BookmarkEntity(Parcel in) {
         this.id = in.readString();
         this.name = in.readString();
         this.url = in.readString();
         this.index = in.readInt();
     }
 
-    public static final Creator<BookmarkModel> CREATOR = new Creator<BookmarkModel>() {
+    public static final Creator<BookmarkEntity> CREATOR = new Creator<BookmarkEntity>() {
         @Override
-        public BookmarkModel createFromParcel(Parcel source) {
-            return new BookmarkModel(source);
+        public BookmarkEntity createFromParcel(Parcel source) {
+            return new BookmarkEntity(source);
         }
 
         @Override
-        public BookmarkModel[] newArray(int size) {
-            return new BookmarkModel[size];
+        public BookmarkEntity[] newArray(int size) {
+            return new BookmarkEntity[size];
         }
     };
 }

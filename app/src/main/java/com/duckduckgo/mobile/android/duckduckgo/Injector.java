@@ -2,10 +2,9 @@ package com.duckduckgo.mobile.android.duckduckgo;
 
 import android.content.Context;
 
-import com.duckduckgo.mobile.android.duckduckgo.data.bookmark.BookmarkEntityMapper;
-import com.duckduckgo.mobile.android.duckduckgo.data.bookmark.BookmarkPreferences;
-import com.duckduckgo.mobile.android.duckduckgo.data.bookmark.BookmarkRepositoryImpl;
-import com.duckduckgo.mobile.android.duckduckgo.domain.bookmark.BookmarkRepository;
+import com.duckduckgo.mobile.android.duckduckgo.data.bookmark.BookmarkJsonEntityMapper;
+import com.duckduckgo.mobile.android.duckduckgo.data.bookmark.BookmarkSharedPreferences;
+import com.duckduckgo.mobile.android.duckduckgo.data.bookmark.SharedPreferencesBookmarkRepository;
 import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarksPresenter;
 import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarksPresenterImpl;
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.BrowserPresenter;
@@ -22,11 +21,11 @@ public class Injector {
     private static Map<String, Object> instances = new HashMap<>();
 
     public static void init(Context context) {
-        instances.put(getKeyforClass(BookmarkPreferences.class), instantiateBookmarkPreferences(context));
+        instances.put(getKeyforClass(BookmarkSharedPreferences.class), instantiateBookmarkPreferences(context));
     }
 
-    public static BookmarkPreferences injectBookmarkPreferences() {
-        return (BookmarkPreferences) instances.get(getKeyforClass(BookmarkPreferences.class));
+    public static BookmarkSharedPreferences injectBookmarkPreferences() {
+        return (BookmarkSharedPreferences) instances.get(getKeyforClass(BookmarkSharedPreferences.class));
     }
 
     public static BrowserPresenter injectBrowserPresenter() {
@@ -49,32 +48,32 @@ public class Injector {
         instances.remove(getKeyforClass(BookmarksPresenter.class));
     }
 
-    public static BookmarkRepository injectBookmarkRepository() {
-        String key = getKeyforClass(BookmarkRepository.class);
+    public static SharedPreferencesBookmarkRepository injectSharedPreferencesBookmarkRepository() {
+        String key = getKeyforClass(SharedPreferencesBookmarkRepository.class);
         if (!instances.containsKey(key)) {
-            instances.put(key, instantiateBookmarkRepositoryImpl());
+            instances.put(key, instantiateSharedPreferencesBookmarkRepository());
         }
-        return (BookmarkRepository) instances.get(key);
+        return (SharedPreferencesBookmarkRepository) instances.get(key);
     }
 
     private static BrowserPresenterImpl instantiateBrowserPresenterImpl() {
-        return new BrowserPresenterImpl(injectBookmarkRepository());
+        return new BrowserPresenterImpl(injectSharedPreferencesBookmarkRepository());
     }
 
     private static BookmarksPresenterImpl instantiateBookmarksPresenterImpl() {
-        return new BookmarksPresenterImpl(injectBookmarkRepository());
+        return new BookmarksPresenterImpl(injectSharedPreferencesBookmarkRepository());
     }
 
-    private static BookmarkRepositoryImpl instantiateBookmarkRepositoryImpl() {
-        return new BookmarkRepositoryImpl(injectBookmarkPreferences(), instantiateBookmarkEntityMapper());
+    private static SharedPreferencesBookmarkRepository instantiateSharedPreferencesBookmarkRepository() {
+        return new SharedPreferencesBookmarkRepository(injectBookmarkPreferences(), instantiateBookmarkJsonEntityMapper());
     }
 
-    private static BookmarkEntityMapper instantiateBookmarkEntityMapper() {
-        return new BookmarkEntityMapper();
+    private static BookmarkJsonEntityMapper instantiateBookmarkJsonEntityMapper() {
+        return new BookmarkJsonEntityMapper();
     }
 
-    private static BookmarkPreferences instantiateBookmarkPreferences(Context context) {
-        return new BookmarkPreferences(context);
+    private static BookmarkSharedPreferences instantiateBookmarkPreferences(Context context) {
+        return new BookmarkSharedPreferences(context);
     }
 
     private static <T> String getKeyforClass(Class<T> clss) {

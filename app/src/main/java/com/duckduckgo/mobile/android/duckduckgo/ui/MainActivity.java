@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.duckduckgo.mobile.android.duckduckgo.Injector;
 import com.duckduckgo.mobile.android.duckduckgo.R;
-import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkModel;
+import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.BrowserFragment;
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.BrowserPresenter;
 import com.duckduckgo.mobile.android.duckduckgo.ui.editbookmark.EditBookmarkDialogFragment;
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements EditBookmarkDialo
     }
 
     @Override
-    public void onBookmarkEdited(BookmarkModel bookmark) {
+    public void onBookmarkEdited(BookmarkEntity bookmark) {
         browserPresenter.saveBookmark(bookmark);
     }
 

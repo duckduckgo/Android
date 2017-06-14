@@ -2,7 +2,7 @@ package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 
 import android.support.annotation.NonNull;
 
-import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkModel;
+import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
 
 /**
  * Created by fgei on 5/22/17.
@@ -21,7 +21,7 @@ public interface BrowserView {
 
     void reload();
 
-    void showConfirmSaveBookmark(@NonNull BookmarkModel bookmarkModel);
+    void showConfirmSaveBookmark(@NonNull BookmarkEntity bookmarkEntity);
 
     void navigateToBookmarks();
 }

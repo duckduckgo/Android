@@ -1,6 +1,6 @@
 package com.duckduckgo.mobile.android.duckduckgo.data.bookmark;
 
-import com.duckduckgo.mobile.android.duckduckgo.data.Entity;
+import com.duckduckgo.mobile.android.duckduckgo.data.JsonEntity;
 import com.duckduckgo.mobile.android.duckduckgo.domain.bookmark.Bookmark;
 
 import org.json.JSONException;
@@ -10,16 +10,16 @@ import org.json.JSONObject;
  * Created by fgei on 6/12/17.
  */
 
-public class BookmarkEntity implements Bookmark, Entity {
+public class BookmarkJsonEntity implements Bookmark, JsonEntity {
     private String id;
     private String name;
     private String url;
     private int index;
 
-    public BookmarkEntity() {
+    public BookmarkJsonEntity() {
     }
 
-    public BookmarkEntity(Bookmark bookmark) {
+    public BookmarkJsonEntity(Bookmark bookmark) {
         id = bookmark.getId();
         name = bookmark.getName();
         url = bookmark.getUrl();

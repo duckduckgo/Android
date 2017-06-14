@@ -3,7 +3,7 @@ package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkModel;
+import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
 
 /**
  * Created by fgei on 5/22/17.
@@ -40,7 +40,7 @@ public interface BrowserPresenter {
 
     void requestSaveCurrentPageAsBookmark();
 
-    void saveBookmark(@NonNull BookmarkModel bookmarkModel);
+    void saveBookmark(@NonNull BookmarkEntity bookmarkEntity);
 
-    void loadBookmark(@NonNull BookmarkModel bookmarkModel);
+    void loadBookmark(@NonNull BookmarkEntity bookmarkEntity);
 }

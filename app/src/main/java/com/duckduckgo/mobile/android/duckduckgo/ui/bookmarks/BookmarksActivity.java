@@ -32,7 +32,7 @@ public class BookmarksActivity extends AppCompatActivity implements BookmarksVie
     }
 
     @Nullable
-    public static BookmarkModel getResultBookmark(Intent intent) {
+    public static BookmarkEntity getResultBookmark(Intent intent) {
         return intent.getParcelableExtra(RESULT_BOOKMARK);
     }
 
@@ -102,7 +102,7 @@ public class BookmarksActivity extends AppCompatActivity implements BookmarksVie
     }
 
     @Override
-    public void loadBookmarks(@NonNull List<BookmarkModel> bookmarks) {
+    public void loadBookmarks(@NonNull List<BookmarkEntity> bookmarks) {
         adapter.setBookmarks(bookmarks);
     }
 
@@ -135,15 +135,15 @@ public class BookmarksActivity extends AppCompatActivity implements BookmarksVie
     }
 
     @Override
-    public void showEditBookmark(@NonNull BookmarkModel bookmarkModel) {
-        EditBookmarkDialogFragment dialog = EditBookmarkDialogFragment.newInstance(R.string.bookmark_dialog_title_edit, bookmarkModel);
+    public void showEditBookmark(@NonNull BookmarkEntity bookmarkEntity) {
+        EditBookmarkDialogFragment dialog = EditBookmarkDialogFragment.newInstance(R.string.bookmark_dialog_title_edit, bookmarkEntity);
         dialog.show(getSupportFragmentManager(), EditBookmarkDialogFragment.TAG);
     }
 
     @Override
-    public void resultOpenBookmark(@NonNull BookmarkModel bookmarkModel) {
+    public void resultOpenBookmark(@NonNull BookmarkEntity bookmarkEntity) {
         Intent intent = new Intent();
-        intent.putExtra(RESULT_BOOKMARK, bookmarkModel);
+        intent.putExtra(RESULT_BOOKMARK, bookmarkEntity);
         setResult(RESULT_OK, intent);
         finish();
     }
@@ -154,7 +154,7 @@ public class BookmarksActivity extends AppCompatActivity implements BookmarksVie
     }
 
     @Override
-    public void onBookmarkEdited(BookmarkModel bookmark) {
+    public void onBookmarkEdited(BookmarkEntity bookmark) {
         presenter.saveEditedBookmark(bookmark);
     }
 
@@ -165,7 +165,7 @@ public class BookmarksActivity extends AppCompatActivity implements BookmarksVie
 
     private void initToolbar() {
         toolbar.setTitle(R.string.bookmarks_toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_action_remove);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

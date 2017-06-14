@@ -12,12 +12,12 @@ import java.util.List;
  * Created by fgei on 6/12/17.
  */
 
-public class BookmarkRepositoryImpl implements BookmarkRepository {
+public class SharedPreferencesBookmarkRepository implements BookmarkRepository {
 
-    private BookmarkPreferences preferences;
-    private BookmarkEntityMapper mapper;
+    private BookmarkSharedPreferences preferences;
+    private BookmarkJsonEntityMapper mapper;
 
-    public BookmarkRepositoryImpl(@NonNull BookmarkPreferences preferences, @NonNull BookmarkEntityMapper mapper) {
+    public SharedPreferencesBookmarkRepository(@NonNull BookmarkSharedPreferences preferences, @NonNull BookmarkJsonEntityMapper mapper) {
         this.preferences = preferences;
         this.mapper = mapper;
     }

@@ -46,16 +46,16 @@ public class BookmarksPresenterImplTest {
     private void initBookmarks() {
         mockBookmarks = new ArrayList<>();
         for (int i = 0; i < urls.length; i++) {
-            BookmarkModel bookmarkModel = BookmarkModel.create();
-            bookmarkModel.setIndex(i);
-            bookmarkModel.setUrl(urls[i]);
-            bookmarkModel.setName(names[i]);
-            mockBookmarks.add(bookmarkModel);
+            BookmarkEntity bookmarkEntity = BookmarkEntity.create();
+            bookmarkEntity.setIndex(i);
+            bookmarkEntity.setUrl(urls[i]);
+            bookmarkEntity.setName(names[i]);
+            mockBookmarks.add(bookmarkEntity);
         }
     }
 
-    private BookmarkModel createBookmarkModel() {
-        BookmarkModel out = BookmarkModel.create();
+    private BookmarkEntity createBookmarkModel() {
+        BookmarkEntity out = BookmarkEntity.create();
         out.setName(names[0]);
         out.setUrl(urls[0]);
         out.setIndex(1);
@@ -81,7 +81,7 @@ public class BookmarksPresenterImplTest {
     @Test
     public void whenLoadValidListThenShowBookmarks() {
         loadData();
-        verify(mockbookmarksView, times(1)).loadBookmarks(ArgumentMatchers.<BookmarkModel>anyList());
+        verify(mockbookmarksView, times(1)).loadBookmarks(ArgumentMatchers.<BookmarkEntity>anyList());
     }
 
     @Test
@@ -134,7 +134,7 @@ public class BookmarksPresenterImplTest {
         loadData();
         bookmarksPresenter.edit();
         bookmarksPresenter.bookmarkSelected(anyInt());
-        verify(mockbookmarksView).showEditBookmark(any(BookmarkModel.class));
+        verify(mockbookmarksView).showEditBookmark(any(BookmarkEntity.class));
     }
 
     @Test
@@ -142,7 +142,7 @@ public class BookmarksPresenterImplTest {
         loadData();
         bookmarksPresenter.edit();
         bookmarksPresenter.bookmarkDeleted(anyInt());
-        verify(mockBookmarkRepository, times(1)).delete(any(BookmarkModel.class));
+        verify(mockBookmarkRepository, times(1)).delete(any(BookmarkEntity.class));
     }
 
     @Test
@@ -152,19 +152,19 @@ public class BookmarksPresenterImplTest {
         loadData();
         bookmarksPresenter.edit();
         bookmarksPresenter.bookmarksMoved(fromPosition, toPosition);
-        verify(mockBookmarkRepository, times(2)).update(any(BookmarkModel.class));
+        verify(mockBookmarkRepository, times(2)).update(any(BookmarkEntity.class));
     }
 
     @Test
     public void whenNotEditingAndSelectBookmarkThenResultOpenBookmark() {
         loadData();
         bookmarksPresenter.bookmarkSelected(anyInt());
-        verify(mockbookmarksView).resultOpenBookmark(any(BookmarkModel.class));
+        verify(mockbookmarksView).resultOpenBookmark(any(BookmarkEntity.class));
     }
 
     @Test
     public void whenSaveEditedBookmarkThenUpdateBookmark() {
-        BookmarkModel editedBookmark = createBookmarkModel();
+        BookmarkEntity editedBookmark = createBookmarkModel();
         loadData();
         bookmarksPresenter.saveEditedBookmark(editedBookmark);
         verify(mockBookmarkRepository, times(1)).update(editedBookmark);
