@@ -74,7 +74,7 @@ public interface BrowserPresenter {
 
     void onProgressChanged(@NonNull String tabId, int newProgress);
 
-    boolean handleBackHistory();
+    boolean handleBackNavigation();
 
     void viewBookmarks();
 

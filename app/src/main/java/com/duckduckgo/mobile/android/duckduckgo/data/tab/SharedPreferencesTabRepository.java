@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import com.duckduckgo.mobile.android.duckduckgo.domain.tab.Tab;
 import com.duckduckgo.mobile.android.duckduckgo.domain.tab.TabRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,8 +23,12 @@ public class SharedPreferencesTabRepository implements TabRepository {
     }
 
     @Override
-    public List<? extends Tab> getAll() {
-        return tabSharedPreferences.getAll();
+    public List<Tab> getAll() {
+        List<Tab> list = new ArrayList<>();
+        for(Tab tab : tabSharedPreferences.getAll()) {
+            list.add(tab);
+        }
+        return list;
     }
 
     @Override

@@ -184,15 +184,16 @@ public class BrowserPresenterImpl implements BrowserPresenter {
             tabSwitcherView.showTabs(tabs);
         }
         browserView.deleteTab(tab.getId());
+        if(currentIndex < index) return;
         if (currentIndex > index) currentIndex--;
         if (tabs.size() == 0) {
             createNewTab();
 
             currentIndex = 0;
+            showTab(currentIndex);
         } else if (currentIndex >= tabs.size()) {
             currentIndex = tabs.size() - 1;
         }
-        showTab(currentIndex);
     }
 
     @Override
@@ -340,7 +341,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     @Override
-    public boolean handleBackHistory() {
+    public boolean handleBackNavigation() {
         if (tabSwitcherView != null) {
             dismissTabSwitcher();
             return true;

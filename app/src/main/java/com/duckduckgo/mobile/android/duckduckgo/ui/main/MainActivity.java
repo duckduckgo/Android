@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements MainView, EditBoo
 
     @Override
     public void onBackPressed() {
-        if (browserPresenter.handleBackHistory()) {
+        if (browserPresenter.handleBackNavigation()) {
             return;
         }
         super.onBackPressed();
