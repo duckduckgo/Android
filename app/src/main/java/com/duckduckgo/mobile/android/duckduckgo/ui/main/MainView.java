@@ -12,4 +12,8 @@ public interface MainView {
     void showConfirmSaveBookmark(@NonNull BookmarkEntity bookmarkEntity);
 
     void navigateToBookmarks();
+
+    void navigateToTabSwitcher();
+
+    void dismissTabSwitcher();
 }

@@ -1,8 +1,5 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,17 +9,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
 
 import com.duckduckgo.mobile.android.duckduckgo.Injector;
 import com.duckduckgo.mobile.android.duckduckgo.R;
-import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
-import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarksActivity;
-import com.duckduckgo.mobile.android.duckduckgo.ui.tab.web.DDGWebChromeClient;
-import com.duckduckgo.mobile.android.duckduckgo.ui.tab.web.DDGWebViewClient;
-import com.duckduckgo.mobile.android.duckduckgo.ui.editbookmark.EditBookmarkDialogFragment;
-import com.duckduckgo.mobile.android.duckduckgo.ui.navigator.Navigator;
 import com.duckduckgo.mobile.android.duckduckgo.ui.omnibar.Omnibar;
 
 import butterknife.BindView;
@@ -62,6 +51,7 @@ public class BrowserFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_browser, container, false);
         unbinder = ButterKnife.bind(this, rootView);
         browserPresenter.attachBrowserView(browser);
+
         browserPresenter.attachOmnibarView(omnibar);
         return rootView;
     }
@@ -71,11 +61,7 @@ public class BrowserFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         initUI();
 
-        if (savedInstanceState != null) {
-            //browser.restoreState(savedInstanceState);
-        }
-
-        browserPresenter.loadTabs();
+        browserPresenter.loadTabs(savedInstanceState != null);
     }
 
     @Override
@@ -102,7 +88,7 @@ public class BrowserFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        //browser.saveState(outState);
+        browserPresenter.saveSession();
     }
 
     private void initUI() {
@@ -130,8 +116,8 @@ public class BrowserFragment extends Fragment {
                     case R.id.action_save_bookmark:
                         browserPresenter.requestSaveCurrentPageAsBookmark();
                         return true;
-                    case R.id.action_create_new_tab:
-                        browserPresenter.createNewTab();
+                    case R.id.action_open_tab_switcher:
+                        browserPresenter.openTabSwitcher();
                         return true;
                 }
                 return false;
@@ -140,7 +126,7 @@ public class BrowserFragment extends Fragment {
         omnibar.setOnSearchListener(new Omnibar.OnSearchListener() {
             @Override
             public void onTextSearched(@NonNull String text) {
-                browserPresenter.requestSearch(text);
+                browserPresenter.requestSearchInCurrentTab(text);
             }
         });
     }

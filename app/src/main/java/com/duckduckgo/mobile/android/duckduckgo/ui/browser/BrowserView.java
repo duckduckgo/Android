@@ -2,8 +2,6 @@ package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 
 import android.support.annotation.NonNull;
 
-import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
-
 /**
  * Created by fgei on 5/22/17.
  */
@@ -15,5 +13,9 @@ public interface BrowserView {
 
     void deleteTab(@NonNull String id);
 
-    void deleteAll();
+    void deleteAllTabs();
+
+    void deleteAllPrivacyData();
+
+    void clearBrowser();
 }

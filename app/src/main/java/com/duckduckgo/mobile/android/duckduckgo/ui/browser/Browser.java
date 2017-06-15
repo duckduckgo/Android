@@ -5,14 +5,19 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.AttrRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StyleRes;
 import android.util.AttributeSet;
-import android.util.Log;
+import android.view.View;
+import android.webkit.CookieManager;
 import android.webkit.WebSettings;
+import android.webkit.WebStorage;
 import android.webkit.WebView;
+import android.webkit.WebViewDatabase;
 import android.widget.FrameLayout;
 
 import com.duckduckgo.mobile.android.duckduckgo.Injector;
@@ -58,6 +63,7 @@ public class Browser extends FrameLayout implements BrowserView {
     }
 
     private void init() {
+        setSaveEnabled(true);
         browserPresenter = Injector.injectBrowserPresenter();
     }
 
@@ -68,11 +74,13 @@ public class Browser extends FrameLayout implements BrowserView {
 
     @Override
     public void showTab(@NonNull String id) {
-        //browserPresenter.detachTabView();
         removeAllViews();
         currentId = id;
         DDGWebView webView = webViews.get(id);
+        if (webView == null) return;
         addView(webView);
+        bringChildToFront(webView);
+        webView.setVisibility(View.VISIBLE);
         browserPresenter.attachTabView(webView);
     }
 
@@ -86,43 +94,76 @@ public class Browser extends FrameLayout implements BrowserView {
     }
 
     @Override
-    public void deleteAll() {
+    public void deleteAllTabs() {
         browserPresenter.detachTabView();
         destroy();
         webViews.clear();
     }
 
-    public void saveState(Bundle outState) {
-        Bundle state = new Bundle();
-        for(Map.Entry<String, DDGWebView> entry : webViews.entrySet()) {
-            Bundle webViewState = new Bundle();
-            entry.getValue().saveState(webViewState);
-            state.putBundle(entry.getKey(), webViewState);
-        }
-        outState.putBundle(EXTRA_WEB_VIEW_STATE, state);
+    @Override
+    public void deleteAllPrivacyData() {
+        deleteCookies();
+        deleteLocalStorage();
+        deleteWebViewDatabase();
     }
 
-    public void restoreState(Bundle savedInstanceState) {
-        if(!savedInstanceState.containsKey(EXTRA_WEB_VIEW_STATE)) return;
-        Bundle state = savedInstanceState.getBundle(EXTRA_WEB_VIEW_STATE);
-        if(state == null) return;
-        for(String key : state.keySet()) {
+    @Override
+    public void clearBrowser() {
+        removeAllViews();
+    }
+
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        Parcelable superState = super.onSaveInstanceState();
+        SavedState ss = new SavedState(superState);
+        ss.currentId = currentId;
+        saveState(ss.state);
+        return ss;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        SavedState ss = (SavedState) state;
+        super.onRestoreInstanceState(ss.getSuperState());
+        restoreState(ss.state);
+        showTab(ss.currentId);
+    }
+
+    private void saveState(Bundle outState) {
+        Bundle states = new Bundle();
+        for (Map.Entry<String, DDGWebView> entry : webViews.entrySet()) {
+            String key = entry.getKey();
+            DDGWebView webView = entry.getValue();
+            Bundle stateWebView = new Bundle();
+            webView.saveState(stateWebView);
+            states.putBundle(key, stateWebView);
+        }
+        outState.putBundle(EXTRA_WEB_VIEW_STATE, states);
+    }
+
+    private void restoreState(Bundle savedInstanceState) {
+        if (!savedInstanceState.containsKey(EXTRA_WEB_VIEW_STATE)) return;
+        Bundle states = savedInstanceState.getBundle(EXTRA_WEB_VIEW_STATE);
+        if (states == null) return;
+        for (String key : states.keySet()) {
+            Bundle stateWebView = states.getBundle(key);
             createNewTab(key);
-            DDGWebView webView = getWebViewForId(key);
-            if(webView != null) {
-                webView.restoreState(state.getBundle(EXTRA_WEB_VIEW_STATE));
-            }
+            DDGWebView webView = getWebViewForTabId(key);
+            if (webView == null) return;
+            webView.restoreState(stateWebView);
         }
     }
 
     public void resume() {
-        browserPresenter.attachTabView(getWebViewForId(currentId));
-        resumeWebView(getWebViewForId(currentId));
+        DDGWebView webView = getWebViewForTabId(currentId);
+        if (webView == null) return;
+        browserPresenter.attachTabView(webView);
+        resumeWebView(webView);
     }
 
     public void pause() {
         browserPresenter.detachTabView();
-        pauseWebView(getWebViewForId(currentId));
+        pauseWebView(getWebViewForTabId(currentId));
     }
 
     public void destroy() {
@@ -132,39 +173,103 @@ public class Browser extends FrameLayout implements BrowserView {
     }
 
     private void resumeWebView(WebView webView) {
-        if(webView == null) return;
+        if (webView == null) return;
         webView.onResume();
         webView.resumeTimers();
     }
 
     private void pauseWebView(WebView webView) {
-        if(webView == null) return;
+        if (webView == null) return;
         webView.onPause();
         webView.pauseTimers();
     }
 
     private void destroyWebView(WebView webView) {
-        if(webView == null) return;
+        if (webView == null) return;
         webView.stopLoading();
         webView.destroy();
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private DDGWebView instantiateNewWebView(@NonNull String id) {
+    private DDGWebView instantiateNewWebView(@NonNull String tabId) {
         DDGWebView webView = new DDGWebView(getContext());
-        webView.setTabId(id);
+        webView.setTabId(tabId);
+        webView.setId(createViewId());
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptCanOpenWindowsAutomatically(false);
         webSettings.setJavaScriptEnabled(true);
-        webView.setWebViewClient(new DDGWebViewClient(browserPresenter));
-        webView.setWebChromeClient(new DDGWebChromeClient(browserPresenter));
+        webView.setWebViewClient(new DDGWebViewClient(browserPresenter, tabId));
+        webView.setWebChromeClient(new DDGWebChromeClient(browserPresenter, tabId));
         return webView;
     }
 
-    //@Nullable
-    private DDGWebView getWebViewForId(String id) {
-        //if(id == null) return null;
-        return webViews.get(id);
+    @Nullable
+    private DDGWebView getWebViewForTabId(String tabId) {
+        return webViews.get(tabId);
+    }
+
+    private int createViewId() {
+        if (Build.VERSION.SDK_INT >= 17) {
+            return generateViewId();
+        } else {
+            return webViews.size() + 1;
+        }
+    }
+
+    private void deleteCookies() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            CookieManager.getInstance().removeAllCookies(null);
+        } else {
+            deleteCookiesPreApi21();
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private void deleteCookiesPreApi21() {
+        CookieManager.getInstance().removeAllCookie();
+    }
+
+    private void deleteLocalStorage() {
+        WebStorage.getInstance().deleteAllData();
+    }
+
+    private void deleteWebViewDatabase() {
+        WebViewDatabase.getInstance(getContext()).clearFormData();
+        WebViewDatabase.getInstance(getContext()).clearHttpAuthUsernamePassword();
+    }
+
+    private static class SavedState extends BaseSavedState {
+        String currentId;
+        Bundle state;
+
+        public SavedState(Parcelable superState) {
+            super(superState);
+        }
+
+        public SavedState(Parcel source) {
+            super(source);
+            currentId = source.readString();
+            state = source.readBundle(getClass().getClassLoader());
+        }
+
+        @Override
+        public void writeToParcel(Parcel out, int flags) {
+            super.writeToParcel(out, flags);
+            out.writeString(currentId);
+            out.writeBundle(state);
+        }
+
+        public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<SavedState>() {
+            @Override
+            public SavedState createFromParcel(Parcel source) {
+                return new SavedState(source);
+            }
+
+            @Override
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
     }
 
 

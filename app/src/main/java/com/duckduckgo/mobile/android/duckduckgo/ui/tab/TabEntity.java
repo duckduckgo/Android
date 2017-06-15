@@ -14,7 +14,7 @@ public class TabEntity implements Tab {
     private String title = "";
     private String currentUrl = "";
     private boolean canGoBack = false;
-    private boolean canGoForward = true;
+    private boolean canGoForward = false;
 
     private TabEntity() {
 

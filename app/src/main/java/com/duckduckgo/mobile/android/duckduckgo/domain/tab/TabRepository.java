@@ -7,7 +7,7 @@ import java.util.List;
  */
 
 public interface TabRepository {
-    List<Tab> getAll();
+    List<? extends Tab> getAll();
 
     void insert(Tab tab);
 

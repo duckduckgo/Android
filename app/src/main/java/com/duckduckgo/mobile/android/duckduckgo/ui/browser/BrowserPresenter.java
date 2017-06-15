@@ -7,6 +7,7 @@ import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
 import com.duckduckgo.mobile.android.duckduckgo.ui.main.MainView;
 import com.duckduckgo.mobile.android.duckduckgo.ui.omnibar.OmnibarView;
 import com.duckduckgo.mobile.android.duckduckgo.ui.tab.TabView;
+import com.duckduckgo.mobile.android.duckduckgo.ui.tabswitcher.TabSwitcherView;
 
 /**
  * Created by fgei on 5/22/17.
@@ -29,15 +30,31 @@ public interface BrowserPresenter {
 
     void detachTabView();
 
-    void loadTabs();
+    void attachTabSwitcherView(@NonNull TabSwitcherView tabSwitcherView);
 
-    void createNewTab();
+    void detachTabSwitcherView();
 
-    void openTab(@NonNull String tabId);
+    void loadTabs(boolean restoreSession);
 
-    void closeTab(@NonNull String tabId);
+    void saveSession();
 
-    void requestSearch(@Nullable String text);
+    void openNewTab();
+
+    void openTab(int index);
+
+    void closeTab(int index);
+
+    void fire();
+
+    void openTabSwitcher();
+
+    void loadTabsSwitcherTabs();
+
+    void dismissTabSwitcher();
+
+    void requestSearchInCurrentTab(@Nullable String text);
+
+    void requestSearchInNewTab(@Nullable String text);
 
     void requestAssist();
 
@@ -52,6 +69,8 @@ public interface BrowserPresenter {
     void onPageStarted(@NonNull String tabId, @Nullable String url);
 
     void onPageFinished(@NonNull String tabId, @Nullable String url);
+
+    void onHistoryChanged(@NonNull String tabId, boolean canGoBack, boolean canGoForward);
 
     void onProgressChanged(@NonNull String tabId, int newProgress);
 

@@ -30,8 +30,8 @@
         android:orderInCategory="500"
         app:showAsAction="never"/>
     <item
-        android:id="@+id/action_create_new_tab"
-        android:title="Create new tab"
+        android:id="@+id/action_open_tab_switcher"
+        android:title="@string/browser_menu_open_tabswitcher"
         android:orderInCategory="600"
         app:showAsAction="never"/>
 </menu>

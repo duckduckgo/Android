@@ -2,15 +2,16 @@ package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.duckduckgo.mobile.android.duckduckgo.domain.bookmark.BookmarkRepository;
 import com.duckduckgo.mobile.android.duckduckgo.domain.tab.Tab;
+import com.duckduckgo.mobile.android.duckduckgo.domain.tab.TabRepository;
 import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
 import com.duckduckgo.mobile.android.duckduckgo.ui.main.MainView;
 import com.duckduckgo.mobile.android.duckduckgo.ui.omnibar.OmnibarView;
 import com.duckduckgo.mobile.android.duckduckgo.ui.tab.TabEntity;
 import com.duckduckgo.mobile.android.duckduckgo.ui.tab.TabView;
+import com.duckduckgo.mobile.android.duckduckgo.ui.tabswitcher.TabSwitcherView;
 import com.duckduckgo.mobile.android.duckduckgo.util.AppUrls;
 import com.duckduckgo.mobile.android.duckduckgo.util.UrlUtils;
 
@@ -25,20 +26,28 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     private static final int PROGRESS_COMPLETE = 100;
 
+    private static final int REQUEST_NO_ACTION = 0;
+    private static final int REQUEST_ASSIST = 10;
+    private static final int REQUEST_SEARCH_NEW_TAB = 11;
+
+    private int requestAction = REQUEST_NO_ACTION;
+    private String requestSearch = null;
+
     private MainView mainView;
     private OmnibarView omnibarView;
     private BrowserView browserView;
     private TabView tabView;
+    private TabSwitcherView tabSwitcherView;
 
-    private BrowserSessionModel browserSessionModel;
+    private TabRepository tabRepository;
     private BookmarkRepository bookmarkRepository;
 
     private List<TabEntity> tabs = new ArrayList<>();
     private int currentIndex = -1;
 
-    public BrowserPresenterImpl(BookmarkRepository bookmarkRepository) {
+    public BrowserPresenterImpl(@NonNull TabRepository tabRepository, @NonNull BookmarkRepository bookmarkRepository) {
+        this.tabRepository = tabRepository;
         this.bookmarkRepository = bookmarkRepository;
-        browserSessionModel = new BrowserSessionModel();
     }
 
     @Override
@@ -82,16 +91,57 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     @Override
-    public void loadTabs() {
-        TabEntity tab = TabEntity.create();
-        tabs.add(tab);
-        browserView.createNewTab(tab.getId());
-        currentIndex = tabs.indexOf(tab);
+    public void attachTabSwitcherView(@NonNull TabSwitcherView tabSwitcherView) {
+        this.tabSwitcherView = tabSwitcherView;
+    }
 
-        TabEntity currentTab = getCurrentTab();
-        //if(currentTab == null) return;
-        showTab(currentIndex);
+    @Override
+    public void detachTabSwitcherView() {
+        tabSwitcherView = null;
+    }
 
+    @Override
+    public void loadTabs(boolean restoreSession) {
+        if (restoreSession) {
+            tabs.clear();
+            for (Tab tab : tabRepository.getAll()) {
+                tabs.add(new TabEntity(tab));
+            }
+            currentIndex = 0;
+        }
+        tabRepository.deleteAll();
+        browserView.clearBrowser();
+
+        switch (requestAction) {
+            case REQUEST_ASSIST:
+                actionAssist();
+                break;
+            case REQUEST_SEARCH_NEW_TAB:
+                if (requestSearch != null) {
+                    actionSearchInNewTab(requestSearch);
+                }
+                break;
+            case REQUEST_NO_ACTION:
+            default:
+                if (tabs.size() == 0) {
+                    TabEntity tab = createNewTab();
+
+                    currentIndex = tabs.indexOf(tab);
+                }
+                showTab(currentIndex);
+        }
+        requestAction = REQUEST_NO_ACTION;
+        requestSearch = null;
+
+
+    }
+
+    @Override
+    public void saveSession() {
+        tabRepository.deleteAll();
+        for (TabEntity tab : tabs) {
+            tabRepository.insert(tab);
+        }
     }
 
     private void showTab(int index) {
@@ -99,7 +149,6 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
         currentIndex = index;
         TabEntity currentTab = getCurrentTab();
-        if(currentTab == null) return;
 
         browserView.showTab(currentTab.getId());
         setOmnibarForTab(currentTab);
@@ -107,26 +156,99 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     @Override
-    public void createNewTab() {
+    public void openNewTab() {
+        TabEntity tab = createNewTab();
+        int index = tabs.indexOf(tab);
+        dismissTabSwitcher();
+        showTab(index);
+    }
+
+    private TabEntity createNewTab() {
         TabEntity tab = TabEntity.create();
         tabs.add(tab);
         browserView.createNewTab(tab.getId());
-        int index = tabs.indexOf(tab);
+        return tab;
+    }
+
+    @Override
+    public void openTab(int index) {
+        dismissTabSwitcher();
         showTab(index);
     }
 
     @Override
-    public void openTab(@NonNull String tabId) {
+    public void closeTab(int index) {
+        TabEntity tab = tabs.get(index);
+        tabs.remove(tab);
+        if (tabSwitcherView != null) {
+            tabSwitcherView.showTabs(tabs);
+        }
+        browserView.deleteTab(tab.getId());
+        if (currentIndex > index) currentIndex--;
+        if (tabs.size() == 0) {
+            createNewTab();
+
+            currentIndex = 0;
+        } else if (currentIndex >= tabs.size()) {
+            currentIndex = tabs.size() - 1;
+        }
+        showTab(currentIndex);
+    }
+
+    @Override
+    public void fire() {
+        browserView.deleteAllTabs();
+        browserView.deleteAllPrivacyData();
+        tabRepository.deleteAll();
+        tabs.clear();
+
+        loadTabsSwitcherTabs();
 
     }
 
     @Override
-    public void closeTab(@NonNull String tabId) {
-
+    public void loadTabsSwitcherTabs() {
+        if (tabSwitcherView != null) {
+            tabSwitcherView.showTabs(tabs);
+        }
     }
 
     @Override
-    public void requestSearch(@Nullable String text) {
+    public void openTabSwitcher() {
+        mainView.navigateToTabSwitcher();
+    }
+
+    @Override
+    public void dismissTabSwitcher() {
+        if (tabSwitcherView != null) {
+            mainView.dismissTabSwitcher();
+            if (tabs.size() == 0) openNewTab();
+        }
+    }
+
+    @Override
+    public void requestSearchInCurrentTab(@Nullable String text) {
+        requestSearch(text);
+    }
+
+    @Override
+    public void requestSearchInNewTab(@Nullable String text) {
+        if (browserView == null) {
+            requestAction = REQUEST_SEARCH_NEW_TAB;
+            requestSearch = text;
+        } else {
+            actionSearchInNewTab(text);
+        }
+
+    }
+
+    private void actionSearchInNewTab(@Nullable String text) {
+        dismissTabSwitcher();
+        openNewTab();
+        requestSearch(text);
+    }
+
+    private void requestSearch(@Nullable String text) {
         if (text == null) return;
         if (UrlUtils.isUrl(text)) {
             String url = UrlUtils.getUrlWithScheme(text);
@@ -147,7 +269,16 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     @Override
     public void requestAssist() {
-        omnibarView.clearText();
+        if (browserView == null) {
+            requestAction = REQUEST_ASSIST;
+        } else {
+            actionAssist();
+        }
+    }
+
+    private void actionAssist() {
+        dismissTabSwitcher();
+        openNewTab();
         omnibarView.requestSearchFocus();
     }
 
@@ -169,19 +300,17 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     @Override
     public void onReceiveTitle(@NonNull String tabId, @NonNull String title) {
         TabEntity tab = getTabForId(tabId);
-        if(tab != null) {
+        if (tab != null) {
             tab.setTitle(title);
         }
-        browserSessionModel.setTitle(title);
     }
 
     @Override
     public void onPageStarted(@NonNull String tabId, @Nullable String url) {
         TabEntity tab = getTabForId(tabId);
-        if(tab != null) {
+        if (tab != null) {
             tab.setCurrentUrl(url);
         }
-        browserSessionModel.setCurrentUrl(url);
         omnibarView.setRefreshEnabled(true);
         String validUrl = url == null ? "" : url;
         displayTextForUrl(validUrl);
@@ -189,16 +318,19 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     @Override
     public void onPageFinished(@NonNull String tabId, @Nullable String url) {
-        if(!isCurrentTab(tabId)) return;
+        if (!isCurrentTab(tabId)) return;
         setNavigationMenuButtonsEnabled();
     }
 
     @Override
+    public void onHistoryChanged(@NonNull String tabId, boolean canGoBack, boolean canGoForward) {
+        setNavigationForTab(tabId, canGoBack, canGoForward);
+    }
+
+    @Override
     public void onProgressChanged(@NonNull String tabId, int newProgress) {
-        if(!isCurrentTab(tabId)) return;
+        if (!isCurrentTab(tabId)) return;
         if (omnibarView == null) return;
-        browserSessionModel.setHasLoaded(newProgress == PROGRESS_COMPLETE);
-        browserSessionModel.setProgress(newProgress);
         if (newProgress < PROGRESS_COMPLETE) {
             omnibarView.showProgressBar();
         } else if (newProgress == PROGRESS_COMPLETE) {
@@ -209,7 +341,10 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     @Override
     public boolean handleBackHistory() {
-        if (tabView.canGoBack()) {
+        if (tabSwitcherView != null) {
+            dismissTabSwitcher();
+            return true;
+        } else if (tabView.canGoBack()) {
             navigateHistoryBackward();
             return true;
         }
@@ -224,8 +359,6 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     @Override
     public void requestSaveCurrentPageAsBookmark() {
         BookmarkEntity bookmarkEntity = BookmarkEntity.create();
-        bookmarkEntity.setUrl(browserSessionModel.getCurrentUrl());
-        bookmarkEntity.setName(browserSessionModel.getTitle());
         bookmarkEntity.setIndex(bookmarkRepository.getAll().size());
         mainView.showConfirmSaveBookmark(bookmarkEntity);
     }
@@ -241,26 +374,34 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     private void setCanGoBack() {
+        if (tabView == null) return;
         setCanGoBack(tabView.canGoBack());
     }
 
     private void setCanGoForward() {
+        if (tabView == null) return;
         setCanGoForward(tabView.canGoForward());
     }
 
     private void setCanGoBack(boolean canGoBack) {
-        browserSessionModel.setCanGoBack(canGoBack);
         omnibarView.setBackEnabled(canGoBack);
     }
 
     private void setCanGoForward(boolean canGoForward) {
-        browserSessionModel.setCanGoForward(canGoForward);
         omnibarView.setForwardEnabled(canGoForward);
     }
 
     private void setNavigationMenuButtonsEnabled() {
         setCanGoBack();
         setCanGoForward();
+    }
+
+    private void setNavigationForTab(@NonNull String tabId, boolean canGoBack, boolean canGoForward) {
+        TabEntity tab = getTabForId(tabId);
+        if (tab == null) return;
+        tab.setCanGoBack(canGoBack);
+        tab.setCanGoForward(canGoForward);
+
     }
 
     private void resetOmnibar() {
@@ -274,6 +415,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     private void setOmnibarForTab(TabEntity tab) {
         displayTextForUrl(tab.getCurrentUrl());
+        omnibarView.setRefreshEnabled(true);
         omnibarView.setBackEnabled(tab.canGoBack());
         omnibarView.setForwardEnabled(tab.canGoForward());
     }
@@ -305,14 +447,14 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     @Nullable
     private TabEntity getCurrentTab() {
-        if(currentIndex < 0 || tabs.size() <= currentIndex) return null;
+        if (currentIndex < 0 || tabs.size() <= currentIndex) return null;
         return tabs.get(currentIndex);
     }
 
     @Nullable
     private TabEntity getTabForId(@NonNull String id) {
-        for(TabEntity tab : tabs) {
-            if(tab.getId().equals(id)) {
+        for (TabEntity tab : tabs) {
+            if (tab.getId().equals(id)) {
                 return tab;
             }
         }

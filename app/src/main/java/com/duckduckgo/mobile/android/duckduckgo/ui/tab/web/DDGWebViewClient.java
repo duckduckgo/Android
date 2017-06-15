@@ -31,11 +31,13 @@ public class DDGWebViewClient extends WebViewClient {
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
         super.onPageStarted(view, url, favicon);
         browserPresenter.onPageStarted(tabId, url);
+        browserPresenter.onHistoryChanged(tabId, view.canGoBack(), view.canGoForward());
     }
 
     @Override
     public void onPageFinished(WebView view, String url) {
         super.onPageFinished(view, url);
         browserPresenter.onPageFinished(tabId, url);
+        browserPresenter.onHistoryChanged(tabId, view.canGoBack(), view.canGoForward());
     }
 }

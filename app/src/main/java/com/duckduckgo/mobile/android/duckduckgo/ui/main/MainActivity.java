@@ -15,6 +15,7 @@ import com.duckduckgo.mobile.android.duckduckgo.ui.browser.BrowserFragment;
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.BrowserPresenter;
 import com.duckduckgo.mobile.android.duckduckgo.ui.editbookmark.EditBookmarkDialogFragment;
 import com.duckduckgo.mobile.android.duckduckgo.ui.navigator.Navigator;
+import com.duckduckgo.mobile.android.duckduckgo.ui.tabswitcher.TabSwitcherFragment;
 
 public class MainActivity extends AppCompatActivity implements MainView, EditBookmarkDialogFragment.OnEditBookmarkListener {
 
@@ -38,9 +39,22 @@ public class MainActivity extends AppCompatActivity implements MainView, EditBoo
             getSupportFragmentManager().beginTransaction()
                     .replace(ACTIVITY_CONTAINER, browserFragment, BrowserFragment.TAG)
                     .commit();
+            getSupportFragmentManager().executePendingTransactions();
         }
 
         handleIntent(getIntent());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        browserPresenter.attachMainview(this);
+    }
+
+    @Override
+    protected void onPause() {
+        browserPresenter.detachMainView();
+        super.onPause();
     }
 
     @Override
@@ -79,6 +93,16 @@ public class MainActivity extends AppCompatActivity implements MainView, EditBoo
     }
 
     @Override
+    public void navigateToTabSwitcher() {
+        showTabSwitcher();
+    }
+
+    @Override
+    public void dismissTabSwitcher() {
+        removeTabSwitcher();
+    }
+
+    @Override
     public void onBookmarkEdited(BookmarkEntity bookmark) {
         browserPresenter.saveBookmark(bookmark);
     }
@@ -100,12 +124,12 @@ public class MainActivity extends AppCompatActivity implements MainView, EditBoo
 
     private void handleActionView(Intent intent) {
         String url = intent.getDataString();
-        browserPresenter.requestSearch(url);
+        browserPresenter.requestSearchInNewTab(url);
     }
 
     private void handleActionWebSearch(Intent intent) {
         String query = intent.getStringExtra(SearchManager.QUERY);
-        browserPresenter.requestSearch(query);
+        browserPresenter.requestSearchInNewTab(query);
     }
 
     private void handleActionAssist() {
@@ -119,5 +143,16 @@ public class MainActivity extends AppCompatActivity implements MainView, EditBoo
                 browserPresenter.loadBookmark(bookmarkEntity);
             }
         }
+    }
+
+    private void showTabSwitcher() {
+        TabSwitcherFragment fragment = TabSwitcherFragment.newInstance();
+        getSupportFragmentManager().beginTransaction().add(ACTIVITY_CONTAINER, fragment, TabSwitcherFragment.TAG).commit();
+    }
+
+    private void removeTabSwitcher() {
+        TabSwitcherFragment fragment = (TabSwitcherFragment) getSupportFragmentManager().findFragmentByTag(TabSwitcherFragment.TAG);
+        if (fragment == null) return;
+        getSupportFragmentManager().beginTransaction().remove(fragment).commit();
     }
 }
