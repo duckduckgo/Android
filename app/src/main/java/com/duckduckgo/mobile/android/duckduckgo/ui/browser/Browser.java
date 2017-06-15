@@ -35,6 +35,7 @@ import java.util.Map;
 public class Browser extends FrameLayout implements BrowserView {
 
     private static final String EXTRA_WEB_VIEW_STATE = "extra_web_view_state";
+    private static final String EXTRA_CURRENT_ID = "extra_current_id";
 
     private Map<String, DDGWebView> webViews = new HashMap<>();
     private String currentId;
@@ -112,24 +113,7 @@ public class Browser extends FrameLayout implements BrowserView {
         removeAllViews();
     }
 
-    @Override
-    protected Parcelable onSaveInstanceState() {
-        Parcelable superState = super.onSaveInstanceState();
-        SavedState ss = new SavedState(superState);
-        ss.currentId = currentId;
-        saveState(ss.state);
-        return ss;
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Parcelable state) {
-        SavedState ss = (SavedState) state;
-        super.onRestoreInstanceState(ss.getSuperState());
-        restoreState(ss.state);
-        showTab(ss.currentId);
-    }
-
-    private void saveState(Bundle outState) {
+    public void saveState(Bundle outState) {
         Bundle states = new Bundle();
         for (Map.Entry<String, DDGWebView> entry : webViews.entrySet()) {
             String key = entry.getKey();
@@ -138,10 +122,11 @@ public class Browser extends FrameLayout implements BrowserView {
             webView.saveState(stateWebView);
             states.putBundle(key, stateWebView);
         }
+        outState.putString(EXTRA_CURRENT_ID, currentId);
         outState.putBundle(EXTRA_WEB_VIEW_STATE, states);
     }
 
-    private void restoreState(Bundle savedInstanceState) {
+    public void restoreState(Bundle savedInstanceState) {
         if (!savedInstanceState.containsKey(EXTRA_WEB_VIEW_STATE)) return;
         Bundle states = savedInstanceState.getBundle(EXTRA_WEB_VIEW_STATE);
         if (states == null) return;
@@ -152,6 +137,9 @@ public class Browser extends FrameLayout implements BrowserView {
             if (webView == null) return;
             webView.restoreState(stateWebView);
         }
+        if(!savedInstanceState.containsKey(EXTRA_CURRENT_ID)) return;
+        currentId = savedInstanceState.getString(EXTRA_CURRENT_ID);
+        showTab(currentId);
     }
 
     public void resume() {
@@ -237,40 +225,4 @@ public class Browser extends FrameLayout implements BrowserView {
         WebViewDatabase.getInstance(getContext()).clearFormData();
         WebViewDatabase.getInstance(getContext()).clearHttpAuthUsernamePassword();
     }
-
-    private static class SavedState extends BaseSavedState {
-        String currentId;
-        Bundle state;
-
-        public SavedState(Parcelable superState) {
-            super(superState);
-        }
-
-        public SavedState(Parcel source) {
-            super(source);
-            currentId = source.readString();
-            state = source.readBundle(getClass().getClassLoader());
-        }
-
-        @Override
-        public void writeToParcel(Parcel out, int flags) {
-            super.writeToParcel(out, flags);
-            out.writeString(currentId);
-            out.writeBundle(state);
-        }
-
-        public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<SavedState>() {
-            @Override
-            public SavedState createFromParcel(Parcel source) {
-                return new SavedState(source);
-            }
-
-            @Override
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-        };
-    }
-
-
 }

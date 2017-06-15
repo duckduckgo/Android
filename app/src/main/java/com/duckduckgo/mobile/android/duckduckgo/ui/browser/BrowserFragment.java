@@ -61,6 +61,10 @@ public class BrowserFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         initUI();
 
+        if(savedInstanceState != null) {
+            browser.restoreState(savedInstanceState);
+        }
+
         browserPresenter.loadTabs(savedInstanceState != null);
     }
 
@@ -89,6 +93,7 @@ public class BrowserFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         browserPresenter.saveSession();
+        browser.saveState(outState);
     }
 
     private void initUI() {
