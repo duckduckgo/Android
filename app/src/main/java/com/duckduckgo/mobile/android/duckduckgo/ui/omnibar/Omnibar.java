@@ -1,10 +1,11 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.omnibar;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
+import android.support.transition.Fade;
+import android.support.transition.Transition;
+import android.support.transition.TransitionManager;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -18,8 +19,6 @@ import android.widget.TextView;
 
 import com.duckduckgo.mobile.android.duckduckgo.R;
 import com.duckduckgo.mobile.android.duckduckgo.util.KeyboardUtils;
-
-import java.lang.ref.WeakReference;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -106,25 +105,18 @@ public class Omnibar extends AppBarLayout implements OmnibarView {
 
     @Override
     public void showProgressBar() {
-        if (progressBar.getVisibility() == View.GONE) {
-            progressBar.setVisibility(View.VISIBLE);
-            progressBar.animate().alpha(1);
-        }
+        if (progressBar.getVisibility() == View.VISIBLE) return;
+        TransitionManager.beginDelayedTransition(this);
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideProgressBar() {
-        final WeakReference<ProgressBar> progressBarWeakReference = new WeakReference<>(progressBar);
-        progressBar.animate().setStartDelay(400).alpha(0).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                ProgressBar progressBar = progressBarWeakReference.get();
-                if (progressBar != null) {
-                    progressBar.setVisibility(View.GONE);
-                }
-            }
-        });
+        if (progressBar.getVisibility() == View.GONE) return;
+        Transition fade = new Fade();
+        fade.setStartDelay(400);
+        TransitionManager.beginDelayedTransition(this, fade);
+        progressBar.setVisibility(View.GONE);
     }
 
     @Override

@@ -137,18 +137,16 @@ public class Browser extends FrameLayout implements BrowserView {
         }
         if (!savedInstanceState.containsKey(EXTRA_CURRENT_ID)) return;
         currentId = savedInstanceState.getString(EXTRA_CURRENT_ID);
-        showTab(currentId);
+        if (currentId != null) {
+            showTab(currentId);
+        }
     }
 
     public void resume() {
-        DDGWebView webView = getWebViewForTabId(currentId);
-        if (webView == null) return;
-        browserPresenter.attachTabView(webView);
-        resumeWebView(webView);
+        resumeWebView(getWebViewForTabId(currentId));
     }
 
     public void pause() {
-        browserPresenter.detachTabView();
         pauseWebView(getWebViewForTabId(currentId));
     }
 

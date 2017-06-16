@@ -337,6 +337,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
         } else if (newProgress == PROGRESS_COMPLETE) {
             omnibarView.hideProgressBar();
         }
+
         omnibarView.onProgressChanged(newProgress);
     }
 
@@ -361,6 +362,10 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     public void requestSaveCurrentPageAsBookmark() {
         BookmarkEntity bookmarkEntity = BookmarkEntity.create();
         bookmarkEntity.setIndex(bookmarkRepository.getAll().size());
+        TabEntity currentTab = getCurrentTab();
+        if (currentTab == null) return;
+        bookmarkEntity.setName(currentTab.getTitle());
+        bookmarkEntity.setUrl(currentTab.getCurrentUrl());
         mainView.showConfirmSaveBookmark(bookmarkEntity);
     }
 
