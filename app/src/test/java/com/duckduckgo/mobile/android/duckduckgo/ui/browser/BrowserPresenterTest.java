@@ -477,6 +477,8 @@ public class BrowserPresenterTest {
 
     @Test
     public void whenRequestSaveCurrentPageAsBookmarkThenMainViewShowConfirmSaveBookmark() {
+        startSession();
+        browserPresenter.openNewTab();
         browserPresenter.requestSaveCurrentPageAsBookmark();
         verify(mockMainView, times(1)).showConfirmSaveBookmark(any(BookmarkEntity.class));
     }
