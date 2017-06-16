@@ -6,11 +6,14 @@
               android:orientation="vertical"
               tools:context="com.duckduckgo.mobile.android.duckduckgo.ui.browser.BrowserFragment">
 
-    <include
-        android:visibility="visible"
-        layout="@layout/appbar"/>
+    <com.duckduckgo.mobile.android.duckduckgo.ui.omnibar.Omnibar
+        android:id="@+id/omnibar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
-    <include
-        layout="@layout/browser"/>
+    <com.duckduckgo.mobile.android.duckduckgo.ui.browser.Browser
+        android:id="@+id/browser"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </LinearLayout>

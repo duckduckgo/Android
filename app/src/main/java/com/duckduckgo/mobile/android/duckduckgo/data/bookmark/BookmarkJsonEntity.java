@@ -1,6 +1,6 @@
 package com.duckduckgo.mobile.android.duckduckgo.data.bookmark;
 
-import com.duckduckgo.mobile.android.duckduckgo.data.JsonEntity;
+import com.duckduckgo.mobile.android.duckduckgo.data.base.JsonEntity;
 import com.duckduckgo.mobile.android.duckduckgo.domain.bookmark.Bookmark;
 
 import org.json.JSONException;
@@ -51,6 +51,7 @@ public class BookmarkJsonEntity implements Bookmark, JsonEntity {
     private static final String KEY_NAME = "name";
     private static final String KEY_URL = "url";
 
+
     @Override
     public String toJson() {
         String json = "";
@@ -78,5 +79,10 @@ public class BookmarkJsonEntity implements Bookmark, JsonEntity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public String getKey() {
+        return id;
     }
 }

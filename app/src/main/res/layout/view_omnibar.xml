@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.AppBarLayout
+<merge
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     android:theme="@style/AppBar">
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <android.support.v7.widget.Toolbar
-            android:id="@+id/appbar_toolbar"
+            android:id="@+id/omnibar_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:focusableInTouchMode="true"
@@ -18,7 +16,7 @@
             app:popupTheme="@style/AppBar.Popup"
             >
             <EditText
-                android:id="@+id/appbar_edit_text"
+                android:id="@+id/omnibar_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="8dp"
@@ -43,11 +41,11 @@
         </android.support.v7.widget.Toolbar>
         <ProgressBar
             android:visibility="gone"
-            android:id="@+id/progress_bar"
+            android:id="@+id/omnibar_progress_bar"
             android:layout_width="match_parent"
             android:layout_height="3dp"
             android:indeterminate="false"
             android:layout_gravity="bottom"
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"/>
     </FrameLayout>
-</android.support.design.widget.AppBarLayout>
+</merge>

@@ -2,26 +2,20 @@ package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 
 import android.support.annotation.NonNull;
 
-import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
-
 /**
  * Created by fgei on 5/22/17.
  */
 
 public interface BrowserView {
-    void loadUrl(@NonNull String url);
+    void createNewTab(@NonNull String id);
 
-    void goBack();
+    void showTab(@NonNull String id);
 
-    void goForward();
+    void deleteTab(@NonNull String id);
 
-    boolean canGoBack();
+    void deleteAllTabs();
 
-    boolean canGoForward();
+    void deleteAllPrivacyData();
 
-    void reload();
-
-    void showConfirmSaveBookmark(@NonNull BookmarkEntity bookmarkEntity);
-
-    void navigateToBookmarks();
+    void clearBrowser();
 }

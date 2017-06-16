@@ -4,19 +4,57 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
+import com.duckduckgo.mobile.android.duckduckgo.ui.main.MainView;
+import com.duckduckgo.mobile.android.duckduckgo.ui.omnibar.OmnibarView;
+import com.duckduckgo.mobile.android.duckduckgo.ui.tab.TabView;
+import com.duckduckgo.mobile.android.duckduckgo.ui.tabswitcher.TabSwitcherView;
 
 /**
  * Created by fgei on 5/22/17.
  */
 
 public interface BrowserPresenter {
-    void attachBrowserView(@NonNull BrowserView browserView);
+    void attachMainview(@NonNull MainView mainView);
+
+    void detachMainView();
 
     void attachOmnibarView(@NonNull OmnibarView omnibarView);
 
-    void detachViews();
+    void detachOmnibarView();
 
-    void requestSearch(@Nullable String text);
+    void attachBrowserView(@NonNull BrowserView browserView);
+
+    void detachBrowserView();
+
+    void attachTabView(@NonNull TabView tabView);
+
+    void detachTabView();
+
+    void attachTabSwitcherView(@NonNull TabSwitcherView tabSwitcherView);
+
+    void detachTabSwitcherView();
+
+    void loadTabs(boolean restoreSession);
+
+    void saveSession();
+
+    void openNewTab();
+
+    void openTab(int index);
+
+    void closeTab(int index);
+
+    void fire();
+
+    void openTabSwitcher();
+
+    void loadTabsSwitcherTabs();
+
+    void dismissTabSwitcher();
+
+    void requestSearchInCurrentTab(@Nullable String text);
+
+    void requestSearchInNewTab(@Nullable String text);
 
     void requestAssist();
 
@@ -26,15 +64,17 @@ public interface BrowserPresenter {
 
     void refreshCurrentPage();
 
-    void onReceiveTitle(@NonNull String title);
+    void onReceiveTitle(@NonNull String tabId, @NonNull String title);
 
-    void onPageStarted(@Nullable String url);
+    void onPageStarted(@NonNull String tabId, @Nullable String url);
 
-    void onPageFinished(@Nullable String url);
+    void onPageFinished(@NonNull String tabId, @Nullable String url);
 
-    void onProgressChanged(int newProgress);
+    void onHistoryChanged(@NonNull String tabId, boolean canGoBack, boolean canGoForward);
 
-    boolean handleBackHistory();
+    void onProgressChanged(@NonNull String tabId, int newProgress);
+
+    boolean handleBackNavigation();
 
     void viewBookmarks();
 
