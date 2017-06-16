@@ -184,7 +184,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
             tabSwitcherView.showTabs(tabs);
         }
         browserView.deleteTab(tab.getId());
-        if(currentIndex < index) return;
+        if (currentIndex < index) return;
         if (currentIndex > index) currentIndex--;
         if (tabs.size() == 0) {
             createNewTab();

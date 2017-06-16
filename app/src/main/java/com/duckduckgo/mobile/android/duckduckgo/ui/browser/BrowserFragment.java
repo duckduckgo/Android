@@ -61,7 +61,7 @@ public class BrowserFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         initUI();
 
-        if(savedInstanceState != null) {
+        if (savedInstanceState != null) {
             browser.restoreState(savedInstanceState);
         }
 

@@ -31,7 +31,7 @@
         app:showAsAction="never"/>
     <item
         android:id="@+id/action_open_tab_switcher"
-        android:title="@string/browser_menu_open_tabswitcher"
+        android:title="@string/browser_menu_open_tab_switcher"
         android:orderInCategory="600"
         app:showAsAction="never"/>
 </menu>

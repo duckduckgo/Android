@@ -16,7 +16,7 @@
     <string name="browser_menu_action_refresh">Refresh</string>
     <string name="browser_menu_save_bookmark">Save bookmark</string>
     <string name="browser_menu_bookmarks">@string/bookmarks</string>
-    <string name="browser_menu_open_tabswitcher">Open tabswitcher</string>
+    <string name="browser_menu_open_tab_switcher">Open tab switcher</string>
 
     <!-- Bookmarks -->
     <string name="bookmarks_toolbar">@string/bookmarks</string>

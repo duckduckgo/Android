@@ -1,8 +1,5 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 
-import android.test.suitebuilder.annotation.SmallTest;
-
-import com.duckduckgo.mobile.android.duckduckgo.domain.bookmark.Bookmark;
 import com.duckduckgo.mobile.android.duckduckgo.domain.bookmark.BookmarkRepository;
 import com.duckduckgo.mobile.android.duckduckgo.domain.tab.Tab;
 import com.duckduckgo.mobile.android.duckduckgo.domain.tab.TabRepository;
@@ -12,7 +9,6 @@ import com.duckduckgo.mobile.android.duckduckgo.ui.omnibar.OmnibarView;
 import com.duckduckgo.mobile.android.duckduckgo.ui.tab.TabEntity;
 import com.duckduckgo.mobile.android.duckduckgo.ui.tab.TabView;
 import com.duckduckgo.mobile.android.duckduckgo.ui.tabswitcher.TabSwitcherView;
-import com.duckduckgo.mobile.android.duckduckgo.util.AppUrls;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,11 +21,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -89,7 +82,7 @@ public class BrowserPresenterTest {
 
     private void initTabs() {
         mockTabs.clear();
-        for(int i=0; i<urls.length; i++) {
+        for (int i = 0; i < urls.length; i++) {
             String url = urls[i];
             String title = titles[i];
             TabEntity tab = TabEntity.create();

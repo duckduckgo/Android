@@ -25,7 +25,7 @@ public class SharedPreferencesTabRepository implements TabRepository {
     @Override
     public List<Tab> getAll() {
         List<Tab> list = new ArrayList<>();
-        for(Tab tab : tabSharedPreferences.getAll()) {
+        for (Tab tab : tabSharedPreferences.getAll()) {
             list.add(tab);
         }
         return list;

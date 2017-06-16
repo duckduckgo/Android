@@ -5,8 +5,6 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.AttrRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -137,7 +135,7 @@ public class Browser extends FrameLayout implements BrowserView {
             if (webView == null) return;
             webView.restoreState(stateWebView);
         }
-        if(!savedInstanceState.containsKey(EXTRA_CURRENT_ID)) return;
+        if (!savedInstanceState.containsKey(EXTRA_CURRENT_ID)) return;
         currentId = savedInstanceState.getString(EXTRA_CURRENT_ID);
         showTab(currentId);
     }
