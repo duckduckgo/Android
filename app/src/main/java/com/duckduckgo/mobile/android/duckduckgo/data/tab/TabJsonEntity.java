@@ -10,7 +10,7 @@ import org.json.JSONObject;
  * Created by fgei on 6/14/17.
  */
 
-public class TabJsonEntity extends JsonEntity implements Tab {
+public class TabJsonEntity implements Tab, JsonEntity {
 
     private String id;
     private String title;

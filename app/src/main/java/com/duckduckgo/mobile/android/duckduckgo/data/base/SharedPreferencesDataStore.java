@@ -13,25 +13,24 @@ import java.util.List;
 public class SharedPreferencesDataStore<T extends JsonEntity> {
 
     private SharedPreferences sharedPreferences;
-    private Class<T> entityType;
+    private EntityCreator<T> entityCreator;
 
-    public SharedPreferencesDataStore(Context context, String fileName, Class<T> entityType) {
+    public interface EntityCreator<T> {
+        T create();
+    }
+
+    public SharedPreferencesDataStore(Context context, String fileName, EntityCreator<T> entityCreator) {
         sharedPreferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE);
-        this.entityType = entityType;
+        this.entityCreator = entityCreator;
     }
 
     public List<T> getAll() {
         List<T> out = new ArrayList<>();
         for (Object item : sharedPreferences.getAll().values()) {
-            try {
-                T t = entityType.newInstance();
-                t.fromJson(item.toString());
-                out.add(t);
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+            T t = entityCreator.create();
+            t.fromJson(item.toString());
+            out.add(t);
+
         }
         return out;
     }

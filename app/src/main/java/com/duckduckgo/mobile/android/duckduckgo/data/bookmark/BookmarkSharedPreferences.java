@@ -13,6 +13,11 @@ public class BookmarkSharedPreferences extends SharedPreferencesDataStore<Bookma
     private static final String PREF_NAME = "bookmarks";
 
     public BookmarkSharedPreferences(Context context) {
-        super(context, PREF_NAME, BookmarkJsonEntity.class);
+        super(context, PREF_NAME, new EntityCreator<BookmarkJsonEntity>() {
+            @Override
+            public BookmarkJsonEntity create() {
+                return new BookmarkJsonEntity();
+            }
+        });
     }
 }

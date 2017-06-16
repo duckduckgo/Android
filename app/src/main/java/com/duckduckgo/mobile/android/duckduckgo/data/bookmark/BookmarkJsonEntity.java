@@ -10,7 +10,7 @@ import org.json.JSONObject;
  * Created by fgei on 6/12/17.
  */
 
-public class BookmarkJsonEntity extends JsonEntity implements Bookmark {
+public class BookmarkJsonEntity implements Bookmark, JsonEntity {
     private String id;
     private String name;
     private String url;

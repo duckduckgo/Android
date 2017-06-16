@@ -13,6 +13,11 @@ public class TabSharedPreferences extends SharedPreferencesDataStore<TabJsonEnti
     private static final String PREF_NAME = "tabs";
 
     public TabSharedPreferences(Context context) {
-        super(context, PREF_NAME, TabJsonEntity.class);
+        super(context, PREF_NAME, new EntityCreator<TabJsonEntity>() {
+            @Override
+            public TabJsonEntity create() {
+                return new TabJsonEntity();
+            }
+        });
     }
 }
