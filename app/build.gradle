@@ -34,6 +34,8 @@ dependencies {
     compile 'com.jakewharton:butterknife:8.5.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
 
+    compile 'com.jakewharton.timber:timber:4.5.1'
+
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.2.0'
 }

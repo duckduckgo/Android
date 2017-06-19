@@ -11,6 +11,8 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import timber.log.Timber;
+
 /**
  * Created by fgei on 5/18/17.
  */
@@ -45,6 +47,7 @@ public class AppUrls {
             if (authority == null) return false;
             return authority.contains(Urls.BASE);
         } catch (URISyntaxException e) {
+            Timber.e(e, "isDuckDuckGo, url: %s", url);
             return false;
         }
     }
@@ -67,11 +70,13 @@ public class AppUrls {
                 try {
                     result = URLDecoder.decode(result, "UTF-8");
                 } catch (UnsupportedEncodingException e) {
+                    Timber.e(e, "getQuery, url: %s", url);
                     return "";
                 }
                 return result;
             }
         } catch (URISyntaxException e) {
+            Timber.e(e, "getQuery, url: %s", url);
             return "";
         }
         return "";
@@ -83,6 +88,7 @@ public class AppUrls {
         try {
             queryEncoded = URLEncoder.encode(query, "UTF-8");
         } catch (UnsupportedEncodingException e) {
+            Timber.e(e, "getSearchUrl, query: %s", query);
         }
         StringBuilder builder = new StringBuilder(Urls.HOME);
         builder.append("&").append(Params.SEARCH).append("=").append(queryEncoded);
