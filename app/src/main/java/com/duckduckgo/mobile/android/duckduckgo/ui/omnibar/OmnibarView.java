@@ -21,6 +21,10 @@ public interface OmnibarView {
 
     void setRefreshEnabled(boolean enabled);
 
+    void setEditing(boolean editing);
+
+    void setDeleteAllTextButtonVisible(boolean visible);
+
     void showProgressBar();
 
     void hideProgressBar();

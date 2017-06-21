@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="AppTheme" parent="AppTheme.Base"/>
+
     <style name="AppBar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
     </style>
     <style name="AppBar.Popup" parent="@style/ThemeOverlay.AppCompat.Light">
+    </style>
+
+    <style name="AppTheme.ProgressBar" parent="AppTheme">
+        <item name="colorAccent">@color/omnibar_progress_bar</item>
     </style>
 </resources>

@@ -58,6 +58,14 @@ public interface BrowserPresenter {
 
     void requestAssist();
 
+    void omnibarFocusChanged(boolean focused);
+
+    void omnibarTextChanged(@NonNull String text);
+
+    void cancelOmnibarText();
+
+    void cancelOmnibarFocus();
+
     void navigateHistoryForward();
 
     void navigateHistoryBackward();

@@ -45,6 +45,8 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     private List<TabEntity> tabs = new ArrayList<>();
     private int currentIndex = -1;
 
+    private boolean isEditing = false;
+
     public BrowserPresenterImpl(@NonNull TabRepository tabRepository, @NonNull BookmarkRepository bookmarkRepository) {
         this.tabRepository = tabRepository;
         this.bookmarkRepository = bookmarkRepository;
@@ -251,6 +253,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     private void requestSearch(@Nullable String text) {
         if (text == null) return;
+        if (isEditing) setOmnibarEditing(false);
         if (UrlUtils.isUrl(text)) {
             String url = UrlUtils.getUrlWithScheme(text);
             requestLoadUrl(url);
@@ -264,6 +267,9 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     private void requestQuerySearch(@NonNull String query) {
+        if (isEditing) {
+            setOmnibarEditing(false);
+        }
         String url = AppUrls.getSearchUrl(query);
         requestLoadUrl(url);
     }
@@ -281,6 +287,48 @@ public class BrowserPresenterImpl implements BrowserPresenter {
         dismissTabSwitcher();
         openNewTab();
         omnibarView.requestSearchFocus();
+    }
+
+    @Override
+    public void omnibarFocusChanged(boolean focused) {
+        if (focused) {
+            setOmnibarEditing(true);
+            TabEntity currentTab = getCurrentTab();
+            if (currentTab != null && currentTab.getCurrentUrl().length() > 0) {
+                omnibarView.setDeleteAllTextButtonVisible(true);
+            }
+        }
+    }
+
+    private void setOmnibarEditing(boolean isEditing) {
+        this.isEditing = isEditing;
+        omnibarView.setEditing(isEditing);
+        if (!isEditing) {
+            omnibarView.clearFocus();
+            omnibarView.setDeleteAllTextButtonVisible(false);
+        }
+    }
+
+    @Override
+    public void omnibarTextChanged(@NonNull String text) {
+        if (isEditing) {
+            omnibarView.setDeleteAllTextButtonVisible(text.length() > 0);
+        }
+    }
+
+    @Override
+    public void cancelOmnibarFocus() {
+        setOmnibarEditing(false);
+        cancelOmnibarText();
+        TabEntity currentTab = getCurrentTab();
+        if (currentTab != null) {
+            displayTextForUrl(currentTab.getCurrentUrl());
+        }
+    }
+
+    @Override
+    public void cancelOmnibarText() {
+        omnibarView.clearText();
     }
 
     @Override
@@ -345,6 +393,9 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     public boolean handleBackNavigation() {
         if (tabSwitcherView != null) {
             dismissTabSwitcher();
+            return true;
+        } else if (isEditing) {
+            cancelOmnibarFocus();
             return true;
         } else if (tabView.canGoBack()) {
             navigateHistoryBackward();
