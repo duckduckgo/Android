@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -204,8 +205,6 @@ public class BrowserPresenterTest {
         verify(mockOmnibarView, times(4)).setBackEnabled(canGoBack);
         verify(mockOmnibarView, times(4)).setForwardEnabled(canGoForward);
     }
-
-    // TODO: 6/15/17 test CloseTab
 
     @Test
     public void whenCloseTabWithTabSwitcherOpenThenReloadTabSwitcherList() {
@@ -402,6 +401,64 @@ public class BrowserPresenterTest {
     }
 
     @Test
+    public void whenOmnibarFocusChangeToFalseThenHaveNoInteractionWithOmnibarView() {
+        final boolean focus = false;
+        browserPresenter.omnibarFocusChanged(focus);
+        verifyZeroInteractions(mockOmnibarView);
+    }
+
+    @Test
+    public void whenOmnibarFocusChangeToTrueThenSetOmnibarEdiable() {
+        final boolean focus = true;
+        browserPresenter.omnibarFocusChanged(focus);
+        verify(mockOmnibarView, times(1)).setEditing(true);
+    }
+
+    @Test
+    public void whenCancelOmnibarFocusThenSetOmnibarNotEditable() {
+        browserPresenter.cancelOmnibarFocus();
+        verify(mockOmnibarView, times(1)).setEditing(false);
+    }
+
+    @Test
+    public void whenOmnibarTextChangedAndNotEditingThenNoInteractionWithOmnibarView() {
+        final String text = "test";
+        browserPresenter.omnibarTextChanged(text);
+        verifyZeroInteractions(mockOmnibarView);
+    }
+
+    @Test
+    public void whenOmnibarTextChangedToNonEmptyStringAndOmnibarEditingIsTrueThenShowDeleteButton() {
+        final String text = "test";
+        browserPresenter.omnibarFocusChanged(true);
+        browserPresenter.omnibarTextChanged(text);
+        verify(mockOmnibarView, times(1)).setDeleteAllTextButtonVisible(true);
+    }
+
+    @Test
+    public void whenOmnibarTextChangedToEmptyStringAndOmnibarEditingIsTrueThenHideDeleteButton() {
+        final String text = "";
+        browserPresenter.omnibarFocusChanged(true);
+        browserPresenter.omnibarTextChanged(text);
+        verify(mockOmnibarView, times(1)).setDeleteAllTextButtonVisible(false);
+    }
+
+    @Test
+    public void whenCancelOmnibarFocusFromLoadedUrlThenShowPreviousUrl() {
+        final String currentUrl = mockTabs.get(1).getCurrentUrl();
+        restoreSession();
+        browserPresenter.openTab(1);
+        browserPresenter.cancelOmnibarFocus();
+        verify(mockOmnibarView, atLeast(1)).displayText(currentUrl);
+    }
+
+    @Test
+    public void whenCancelOmnibarTextThenClearOmnibarText() {
+        browserPresenter.cancelOmnibarText();
+        verify(mockOmnibarView, times(1)).clearText();
+    }
+
+    @Test
     public void whenNavigateHistoryForwardThenTabViewGoForward() {
         browserPresenter.attachTabView(mockTabView);
         browserPresenter.navigateHistoryForward();
@@ -440,11 +497,18 @@ public class BrowserPresenterTest {
     }
 
     @Test
-    public void whenTabSwitcherIsclosedAndPressBackThenHaveNoInteractionWithTabSwitcherView() {
+    public void whenTabSwitcherIsClosedAndPressBackThenHaveNoInteractionWithTabSwitcherView() {
         when(mockTabView.canGoBack()).thenReturn(true);
         browserPresenter.attachTabView(mockTabView);
         browserPresenter.handleBackNavigation();
         verifyZeroInteractions(mockTabSwitcherView);
+    }
+
+    @Test
+    public void whenOmnibarIsEditableAndPressBackThenSetOmnibarEditableFalse() {
+        browserPresenter.omnibarFocusChanged(true);
+        browserPresenter.handleBackNavigation();
+        verify(mockOmnibarView, atLeast(1)).setEditing(false);
     }
 
     @Test
