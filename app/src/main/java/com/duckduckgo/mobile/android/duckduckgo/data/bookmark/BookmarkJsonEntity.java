@@ -6,6 +6,8 @@ import com.duckduckgo.mobile.android.duckduckgo.domain.bookmark.Bookmark;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import timber.log.Timber;
+
 /**
  * Created by fgei on 6/12/17.
  */
@@ -63,7 +65,7 @@ public class BookmarkJsonEntity implements Bookmark, JsonEntity {
             jsonObject.put(KEY_URL, url);
             json = jsonObject.toString();
         } catch (JSONException e) {
-            e.printStackTrace();
+            Timber.e(e, "toJson");
         }
         return json;
     }
@@ -77,7 +79,7 @@ public class BookmarkJsonEntity implements Bookmark, JsonEntity {
             name = jsonObject.getString(KEY_NAME);
             url = jsonObject.getString(KEY_URL);
         } catch (JSONException e) {
-            e.printStackTrace();
+            Timber.e(e, "fromJson, json: %s", json);
         }
     }
 

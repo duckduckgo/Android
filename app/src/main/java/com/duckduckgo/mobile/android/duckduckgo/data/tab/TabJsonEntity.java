@@ -6,6 +6,8 @@ import com.duckduckgo.mobile.android.duckduckgo.domain.tab.Tab;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import timber.log.Timber;
+
 /**
  * Created by fgei on 6/14/17.
  */
@@ -92,7 +94,7 @@ public class TabJsonEntity implements Tab, JsonEntity {
             jsonObject.put(KEY_CAN_GO_FORWARD, canGoForward);
             json = jsonObject.toString();
         } catch (JSONException e) {
-            e.printStackTrace();
+            Timber.e(e, "toJson");
         }
         return json;
     }
@@ -107,7 +109,7 @@ public class TabJsonEntity implements Tab, JsonEntity {
             canGoBack = jsonObject.getBoolean(KEY_CAN_GO_BACK);
             canGoForward = jsonObject.getBoolean(KEY_CAN_GO_FORWARD);
         } catch (JSONException e) {
-            e.printStackTrace();
+            Timber.e(e, "fromJson, json: %s", json);
         }
     }
 
