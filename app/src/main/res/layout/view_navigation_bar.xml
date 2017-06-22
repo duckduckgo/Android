@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical">
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/navigation_bar_divider"/>
+    <android.support.v7.widget.ActionMenuView
+        android:id="@+id/navigation_bar_action_menu_view"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_gravity="start"/>
+</merge>

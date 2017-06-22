@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
 import com.duckduckgo.mobile.android.duckduckgo.ui.main.MainView;
+import com.duckduckgo.mobile.android.duckduckgo.ui.navigationbar.NavigationBarView;
 import com.duckduckgo.mobile.android.duckduckgo.ui.omnibar.OmnibarView;
 import com.duckduckgo.mobile.android.duckduckgo.ui.tab.TabView;
 import com.duckduckgo.mobile.android.duckduckgo.ui.tabswitcher.TabSwitcherView;
@@ -21,6 +22,10 @@ public interface BrowserPresenter {
     void attachOmnibarView(@NonNull OmnibarView omnibarView);
 
     void detachOmnibarView();
+
+    void attachNavigationBarView(@NonNull NavigationBarView navigationBarView);
+
+    void detachNavigationBarView();
 
     void attachBrowserView(@NonNull BrowserView browserView);
 
@@ -91,4 +96,6 @@ public interface BrowserPresenter {
     void saveBookmark(@NonNull BookmarkEntity bookmarkEntity);
 
     void loadBookmark(@NonNull BookmarkEntity bookmarkEntity);
+
+    void requestCopyCurrentUrl();
 }

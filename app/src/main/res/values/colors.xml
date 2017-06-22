@@ -8,4 +8,9 @@
     <color name="omnibar_text_hint">#999999</color>
     <color name="omnibar_progress_bar">#2da1e4</color>
 
+    <color name="navigation_bar_divider">#dddddd</color>
+
+    <color name="navigation_bar_enabled">#8a000000</color>
+    <color name="navigation_bar_disabled">#999999</color>
+
 </resources>

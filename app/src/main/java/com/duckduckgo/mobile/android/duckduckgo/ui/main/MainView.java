@@ -16,4 +16,6 @@ public interface MainView {
     void navigateToTabSwitcher();
 
     void dismissTabSwitcher();
+
+    void copyUrlToClipboard(@NonNull String url);
 }

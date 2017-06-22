@@ -107,18 +107,6 @@ public class Omnibar extends AppBarLayout implements OmnibarView {
     }
 
     @Override
-    public void setBackEnabled(boolean enabled) {
-        MenuItem backMenuItem = toolbar.getMenu().findItem(R.id.action_go_back);
-        backMenuItem.setEnabled(enabled);
-    }
-
-    @Override
-    public void setForwardEnabled(boolean enabled) {
-        MenuItem forwardMenuItem = toolbar.getMenu().findItem(R.id.action_go_forward);
-        forwardMenuItem.setEnabled(enabled);
-    }
-
-    @Override
     public void setRefreshEnabled(boolean enabled) {
         MenuItem reloadMenuItem = toolbar.getMenu().findItem(R.id.action_refresh);
         reloadMenuItem.setEnabled(enabled);

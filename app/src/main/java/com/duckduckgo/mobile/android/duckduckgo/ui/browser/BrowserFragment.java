@@ -1,9 +1,13 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -12,6 +16,7 @@ import android.view.ViewGroup;
 
 import com.duckduckgo.mobile.android.duckduckgo.Injector;
 import com.duckduckgo.mobile.android.duckduckgo.R;
+import com.duckduckgo.mobile.android.duckduckgo.ui.navigationbar.NavigationBar;
 import com.duckduckgo.mobile.android.duckduckgo.ui.omnibar.Omnibar;
 
 import butterknife.BindView;
@@ -33,6 +38,9 @@ public class BrowserFragment extends Fragment {
     @BindView(R.id.omnibar)
     Omnibar omnibar;
 
+    @BindView(R.id.navigation_bar)
+    NavigationBar navigationBar;
+
     @BindView(R.id.browser)
     Browser browser;
 
@@ -51,8 +59,8 @@ public class BrowserFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_browser, container, false);
         unbinder = ButterKnife.bind(this, rootView);
         browserPresenter.attachBrowserView(browser);
-
         browserPresenter.attachOmnibarView(omnibar);
+        browserPresenter.attachNavigationBarView(navigationBar);
         return rootView;
     }
 
@@ -84,6 +92,7 @@ public class BrowserFragment extends Fragment {
     public void onDestroyView() {
         browserPresenter.detachBrowserView();
         browserPresenter.detachOmnibarView();
+        browserPresenter.detachNavigationBarView();
         browser.destroy();
         unbinder.unbind();
         super.onDestroyView();
@@ -98,6 +107,7 @@ public class BrowserFragment extends Fragment {
 
     private void initUI() {
         initOmnibar(omnibar);
+        initNavigationBar(navigationBar);
     }
 
     private void initOmnibar(Omnibar omnibar) {
@@ -106,23 +116,17 @@ public class BrowserFragment extends Fragment {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.action_go_back:
-                        browserPresenter.navigateHistoryBackward();
-                        return true;
-                    case R.id.action_go_forward:
-                        browserPresenter.navigateHistoryForward();
-                        return true;
                     case R.id.action_refresh:
                         browserPresenter.refreshCurrentPage();
                         return true;
-                    case R.id.action_bookmarks:
-                        browserPresenter.viewBookmarks();
+                    case R.id.action_new_tab:
+                        browserPresenter.openNewTab();
                         return true;
                     case R.id.action_save_bookmark:
                         browserPresenter.requestSaveCurrentPageAsBookmark();
                         return true;
-                    case R.id.action_open_tab_switcher:
-                        browserPresenter.openTabSwitcher();
+                    case R.id.action_copy_url:
+                        browserPresenter.requestCopyCurrentUrl();
                         return true;
                     case R.id.action_delete_all_text:
                         browserPresenter.cancelOmnibarText();
@@ -151,6 +155,33 @@ public class BrowserFragment extends Fragment {
             @Override
             public void onFocusChanged(boolean focus) {
                 browserPresenter.omnibarFocusChanged(focus);
+            }
+        });
+    }
+
+    private void initNavigationBar(NavigationBar navigationBar) {
+        navigationBar.inflateMenu(R.menu.navigation, getActivity().getMenuInflater());
+        navigationBar.setOnMenuItemClickListener(new ActionMenuView.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_back:
+                        browserPresenter.navigateHistoryBackward();
+                        return true;
+                    case R.id.action_forward:
+                        browserPresenter.navigateHistoryForward();
+                        return true;
+                    case R.id.action_share:
+                        // TODO: 6/22/17  
+                        return true;
+                    case R.id.action_bookmarks:
+                        browserPresenter.viewBookmarks();
+                        return true;
+                    case R.id.action_tab_switcher:
+                        browserPresenter.openTabSwitcher();
+                        return true;
+                }
+                return false;
             }
         });
     }

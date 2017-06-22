@@ -4,42 +4,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:id="@+id/group_menu">
         <item
-            android:id="@+id/action_go_back"
-            android:enabled="false"
-            android:orderInCategory="100"
-            android:title="@string/browser_menu_action_back"
-            app:showAsAction="never" />
-        <item
-            android:id="@+id/action_go_forward"
-            android:enabled="false"
-            android:orderInCategory="200"
-            android:title="@string/browser_menu_action_forward"
-            app:showAsAction="never" />
-        <item
             android:id="@+id/action_refresh"
             android:enabled="false"
-            android:orderInCategory="300"
-            android:title="@string/browser_menu_action_refresh"
-            app:showAsAction="never" />
+            android:orderInCategory="100"
+            android:title="@string/browser_menu_refresh"
+            app:showAsAction="never"/>
         <item
-            android:id="@+id/action_bookmarks"
-            android:orderInCategory="400"
-            android:title="@string/browser_menu_bookmarks"
-            app:showAsAction="never" />
+            android:id="@+id/action_new_tab"
+            android:orderInCategory="200"
+            android:title="@string/browser_menu_new_tab"
+            app:showAsAction="never"/>
         <item
             android:id="@+id/action_save_bookmark"
-            android:orderInCategory="500"
+            android:orderInCategory="300"
             android:title="@string/browser_menu_save_bookmark"
-            app:showAsAction="never" />
+            app:showAsAction="never"/>
         <item
-            android:id="@+id/action_open_tab_switcher"
-            android:orderInCategory="600"
-            android:title="@string/browser_menu_open_tab_switcher"
-            app:showAsAction="never" />
+            android:id="@+id/action_copy_url"
+            android:orderInCategory="400"
+            android:title="@string/browser_menu_copy_url"
+            app:showAsAction="never"/>
     </group>
     <item
         android:id="@+id/action_delete_all_text"
-        android:orderInCategory="700"
+        android:orderInCategory="600"
         android:visible="false"
         android:title="@string/browser_menu_delete_text"
         android:icon="@drawable/ic_cancel_light_grey_24dp"
