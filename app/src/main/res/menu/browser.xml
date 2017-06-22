@@ -1,37 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group android:id="@+id/group_menu">
+        <item
+            android:id="@+id/action_go_back"
+            android:enabled="false"
+            android:orderInCategory="100"
+            android:title="@string/browser_menu_action_back"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/action_go_forward"
+            android:enabled="false"
+            android:orderInCategory="200"
+            android:title="@string/browser_menu_action_forward"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/action_refresh"
+            android:enabled="false"
+            android:orderInCategory="300"
+            android:title="@string/browser_menu_action_refresh"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/action_bookmarks"
+            android:orderInCategory="400"
+            android:title="@string/browser_menu_bookmarks"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/action_save_bookmark"
+            android:orderInCategory="500"
+            android:title="@string/browser_menu_save_bookmark"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/action_open_tab_switcher"
+            android:orderInCategory="600"
+            android:title="@string/browser_menu_open_tab_switcher"
+            app:showAsAction="never" />
+    </group>
     <item
-        android:id="@+id/action_go_back"
-        android:title="@string/browser_menu_action_back"
-        android:orderInCategory="100"
-        android:enabled="false"
-        app:showAsAction="never"/>
-    <item
-        android:id="@+id/action_go_forward"
-        android:title="@string/browser_menu_action_forward"
-        android:orderInCategory="200"
-        android:enabled="false"
-        app:showAsAction="never"/>
-    <item
-        android:id="@+id/action_refresh"
-        android:title="@string/browser_menu_action_refresh"
-        android:orderInCategory="300"
-        android:enabled="false"
-        app:showAsAction="never"/>
-    <item
-        android:id="@+id/action_bookmarks"
-        android:title="@string/browser_menu_bookmarks"
-        android:orderInCategory="400"
-        app:showAsAction="never"/>
-    <item
-        android:id="@+id/action_save_bookmark"
-        android:title="@string/browser_menu_save_bookmark"
-        android:orderInCategory="500"
-        app:showAsAction="never"/>
-    <item
-        android:id="@+id/action_open_tab_switcher"
-        android:title="@string/browser_menu_open_tab_switcher"
-        android:orderInCategory="600"
-        app:showAsAction="never"/>
+        android:id="@+id/action_delete_all_text"
+        android:orderInCategory="700"
+        android:visible="false"
+        android:title="@string/browser_menu_delete_text"
+        android:icon="@drawable/ic_cancel_light_grey_24dp"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction" />
 </menu>

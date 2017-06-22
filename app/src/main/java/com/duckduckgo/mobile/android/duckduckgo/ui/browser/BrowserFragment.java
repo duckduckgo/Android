@@ -124,6 +124,9 @@ public class BrowserFragment extends Fragment {
                     case R.id.action_open_tab_switcher:
                         browserPresenter.openTabSwitcher();
                         return true;
+                    case R.id.action_delete_all_text:
+                        browserPresenter.cancelOmnibarText();
+                        return true;
                 }
                 return false;
             }
@@ -132,6 +135,22 @@ public class BrowserFragment extends Fragment {
             @Override
             public void onTextSearched(@NonNull String text) {
                 browserPresenter.requestSearchInCurrentTab(text);
+            }
+
+            @Override
+            public void onTextChanged(@NonNull String newText) {
+                browserPresenter.omnibarTextChanged(newText);
+            }
+
+            @Override
+            public void onCancel() {
+                browserPresenter.cancelOmnibarFocus();
+            }
+        });
+        omnibar.setOnFocusListener(new Omnibar.OnFocusListener() {
+            @Override
+            public void onFocusChanged(boolean focus) {
+                browserPresenter.omnibarFocusChanged(focus);
             }
         });
     }

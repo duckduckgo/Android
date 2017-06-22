@@ -7,8 +7,8 @@
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
 
-    <!-- Appbar -->
-    <string name="appbar_search_edit_text_hint">Search DuckDuckGo</string>
+    <!-- Omnibar -->
+    <string name="omnibar_search_edit_text_hint">Search DuckDuckGo</string>
 
     <!-- Browser Menu -->
     <string name="browser_menu_action_back">Back</string>
@@ -17,6 +17,7 @@
     <string name="browser_menu_save_bookmark">Save bookmark</string>
     <string name="browser_menu_bookmarks">@string/bookmarks</string>
     <string name="browser_menu_open_tab_switcher">Open tab switcher</string>
+    <string name="browser_menu_delete_text">Delete text</string>
 
     <!-- Bookmarks -->
     <string name="bookmarks_toolbar">@string/bookmarks</string>

@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#f3f3f3</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorAccent">#de5833</color>
 
-    <color name="appbar_text_color">#000000</color>
-    <color name="appbar_text_hint">#aaaaaa</color>
+    <color name="omnibar_text_color">#333333</color>
+    <color name="omnibar_text_hint">#999999</color>
+    <color name="omnibar_progress_bar">#2da1e4</color>
+
 </resources>
