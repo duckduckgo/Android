@@ -10,7 +10,7 @@
 
     <style name="AppTheme" parent="AppTheme.Base"/>
 
-    <style name="AppBar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+    <style name="AppBar" parent="@style/ThemeOverlay.AppCompat.ActionBar">
     </style>
     <style name="AppBar.Popup" parent="@style/ThemeOverlay.AppCompat.Light">
     </style>
