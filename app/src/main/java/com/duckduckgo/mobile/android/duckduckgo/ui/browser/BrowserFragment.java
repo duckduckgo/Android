@@ -1,8 +1,5 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;

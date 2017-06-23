@@ -5,6 +5,7 @@ import com.duckduckgo.mobile.android.duckduckgo.domain.tab.Tab;
 import com.duckduckgo.mobile.android.duckduckgo.domain.tab.TabRepository;
 import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
 import com.duckduckgo.mobile.android.duckduckgo.ui.main.MainView;
+import com.duckduckgo.mobile.android.duckduckgo.ui.navigationbar.NavigationBarView;
 import com.duckduckgo.mobile.android.duckduckgo.ui.omnibar.OmnibarView;
 import com.duckduckgo.mobile.android.duckduckgo.ui.tab.TabEntity;
 import com.duckduckgo.mobile.android.duckduckgo.ui.tab.TabView;
@@ -39,6 +40,7 @@ public class BrowserPresenterTest {
     private MainView mockMainView;
     private BrowserView mockBrowserView;
     private OmnibarView mockOmnibarView;
+    private NavigationBarView mockNavigationBarView;
     private TabView mockTabView;
     private TabSwitcherView mockTabSwitcherView;
     private TabRepository mockTabRepository;
@@ -53,6 +55,7 @@ public class BrowserPresenterTest {
         mockMainView = mock(MainView.class);
         mockBrowserView = mock(BrowserView.class);
         mockOmnibarView = mock(OmnibarView.class);
+        mockNavigationBarView = mock(NavigationBarView.class);
         mockTabView = mock(TabView.class);
         mockTabSwitcherView = mock(TabSwitcherView.class);
         mockTabRepository = mock(TabRepository.class);
@@ -63,6 +66,7 @@ public class BrowserPresenterTest {
         browserPresenter = new BrowserPresenterImpl(mockTabRepository, mockBookmarkRepository);
         browserPresenter.attachBrowserView(mockBrowserView);
         browserPresenter.attachOmnibarView(mockOmnibarView);
+        browserPresenter.attachNavigationBarView(mockNavigationBarView);
         browserPresenter.attachMainview(mockMainView);
     }
 
@@ -156,14 +160,20 @@ public class BrowserPresenterTest {
     @Test
     public void whenCreateNewTabThenResetOmnibarText() {
         restoreSession();
-        verify(mockOmnibarView, times(2)).setBackEnabled(anyBoolean());
-        verify(mockOmnibarView, times(2)).setForwardEnabled(anyBoolean());
         browserPresenter.openNewTab();
         verify(mockOmnibarView, times(2)).clearText();
         verify(mockOmnibarView, times(2)).clearFocus();
-        verify(mockOmnibarView, times(4)).setBackEnabled(false);
-        verify(mockOmnibarView, times(4)).setForwardEnabled(false);
         verify(mockOmnibarView, times(2)).setRefreshEnabled(false);
+    }
+
+    @Test
+    public void whenCreateNewTabThenResetNavigationBar() {
+        restoreSession();
+        verify(mockNavigationBarView, times(2)).setBackEnabled(anyBoolean());
+        verify(mockNavigationBarView, times(2)).setForwardEnabled(anyBoolean());
+        browserPresenter.openNewTab();
+        verify(mockNavigationBarView, times(4)).setBackEnabled(false);
+        verify(mockNavigationBarView, times(4)).setForwardEnabled(false);
     }
 
     @Test
@@ -192,18 +202,18 @@ public class BrowserPresenterTest {
     }
 
     @Test
-    public void whenOpenTabThenOmnibarUpdateBackAndForwardButtons() {
+    public void whenOpenTabThenUpdateNavigationBarBackAndForwardButtons() {
         final int position = 1;
         final boolean canGoBack = mockTabs.get(position).canGoBack();
         final boolean canGoForward = mockTabs.get(position).canGoForward();
         restoreSession();
         //reset and set the currentTab
-        verify(mockOmnibarView, times(2)).setBackEnabled(canGoBack);
-        verify(mockOmnibarView, times(2)).setForwardEnabled(canGoForward);
+        verify(mockNavigationBarView, times(2)).setBackEnabled(canGoBack);
+        verify(mockNavigationBarView, times(2)).setForwardEnabled(canGoForward);
         browserPresenter.openTab(position);
         //reset and set the new tab
-        verify(mockOmnibarView, times(4)).setBackEnabled(canGoBack);
-        verify(mockOmnibarView, times(4)).setForwardEnabled(canGoForward);
+        verify(mockNavigationBarView, times(4)).setBackEnabled(canGoBack);
+        verify(mockNavigationBarView, times(4)).setForwardEnabled(canGoForward);
     }
 
     @Test

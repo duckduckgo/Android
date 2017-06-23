@@ -346,11 +346,13 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     @Override
     public void navigateHistoryForward() {
         tabView.goForward();
+        setCanGoBack(true);
     }
 
     @Override
     public void navigateHistoryBackward() {
         tabView.goBack();
+        setCanGoForward(true);
     }
 
     @Override
@@ -445,7 +447,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     @Override
     public void requestCopyCurrentUrl() {
         TabEntity tab = getCurrentTab();
-        if(tab == null) return;
+        if (tab == null) return;
         String url = tab.getCurrentUrl();
         mainView.copyUrlToClipboard(url);
     }
