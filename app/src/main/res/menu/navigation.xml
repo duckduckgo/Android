@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_back"
+        android:title="@string/browser_menu_back"
+        android:icon="@drawable/ic_arrow_back_dark_24dp"
+        android:orderInCategory="100"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/action_forward"
+        android:title="@string/browser_menu_forward"
+        android:icon="@drawable/ic_arrow_forward_dark_24dp"
+        android:orderInCategory="200"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/action_bookmarks"
+        android:title="@string/browser_menu_bookmarks"
+        android:icon="@drawable/ic_bookmark_border_dark_24dp"
+        android:orderInCategory="300"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/action_tab_switcher"
+        android:title="@string/browser_menu_tab_switcher"
+        android:icon="@drawable/ic_filter_none_dark_24dp"
+        android:orderInCategory="400"
+        app:showAsAction="always"/>
+</menu>
