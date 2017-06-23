@@ -15,10 +15,6 @@ public interface OmnibarView {
 
     void requestSearchFocus();
 
-    void setBackEnabled(boolean enabled);
-
-    void setForwardEnabled(boolean enabled);
-
     void setRefreshEnabled(boolean enabled);
 
     void setEditing(boolean editing);

@@ -2,6 +2,9 @@ package com.duckduckgo.mobile.android.duckduckgo.ui.main;
 
 import android.app.Activity;
 import android.app.SearchManager;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,6 +14,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.duckduckgo.mobile.android.duckduckgo.Injector;
 import com.duckduckgo.mobile.android.duckduckgo.R;
@@ -108,6 +112,12 @@ public class MainActivity extends AppCompatActivity implements MainView, EditBoo
     }
 
     @Override
+    public void copyUrlToClipboard(@NonNull String url) {
+        copyTextToClipboard(getString(R.string.main_label_copy_url_to_clipboard), url);
+        Toast.makeText(this, R.string.main_copy_to_clipboard_success, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
     public void onBookmarkEdited(BookmarkEntity bookmark) {
         browserPresenter.saveBookmark(bookmark);
     }
@@ -171,5 +181,11 @@ public class MainActivity extends AppCompatActivity implements MainView, EditBoo
 
             getWindow().getDecorView().setSystemUiVisibility(lightText ? 0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
+    }
+
+    private void copyTextToClipboard(@NonNull String label, @NonNull String text) {
+        ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText(label, text);
+        clipboardManager.setPrimaryClip(clip);
     }
 }

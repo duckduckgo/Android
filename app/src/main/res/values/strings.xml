@@ -11,13 +11,19 @@
     <string name="omnibar_search_edit_text_hint">Search DuckDuckGo</string>
 
     <!-- Browser Menu -->
-    <string name="browser_menu_action_back">Back</string>
-    <string name="browser_menu_action_forward">Forward</string>
-    <string name="browser_menu_action_refresh">Refresh</string>
+    <string name="browser_menu_back">Back</string>
+    <string name="browser_menu_forward">Forward</string>
+    <string name="browser_menu_refresh">Refresh</string>
     <string name="browser_menu_save_bookmark">Save bookmark</string>
     <string name="browser_menu_bookmarks">@string/bookmarks</string>
-    <string name="browser_menu_open_tab_switcher">Open tab switcher</string>
+    <string name="browser_menu_tab_switcher">Tab switcher</string>
     <string name="browser_menu_delete_text">Delete text</string>
+    <string name="browser_menu_new_tab">New tab</string>
+    <string name="browser_menu_copy_url">Copy URL</string>
+
+    <!-- Main -->
+    <string name="main_label_copy_url_to_clipboard">URL</string>
+    <string name="main_copy_to_clipboard_success">Url copied to clipboard</string>
 
     <!-- Bookmarks -->
     <string name="bookmarks_toolbar">@string/bookmarks</string>

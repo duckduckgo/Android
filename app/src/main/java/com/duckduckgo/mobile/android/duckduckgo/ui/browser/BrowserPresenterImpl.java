@@ -9,6 +9,7 @@ import com.duckduckgo.mobile.android.duckduckgo.domain.tab.Tab;
 import com.duckduckgo.mobile.android.duckduckgo.domain.tab.TabRepository;
 import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.BookmarkEntity;
 import com.duckduckgo.mobile.android.duckduckgo.ui.main.MainView;
+import com.duckduckgo.mobile.android.duckduckgo.ui.navigationbar.NavigationBarView;
 import com.duckduckgo.mobile.android.duckduckgo.ui.omnibar.OmnibarView;
 import com.duckduckgo.mobile.android.duckduckgo.ui.tab.TabEntity;
 import com.duckduckgo.mobile.android.duckduckgo.ui.tab.TabView;
@@ -36,6 +37,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     private MainView mainView;
     private OmnibarView omnibarView;
+    private NavigationBarView navigationBarView;
     private BrowserView browserView;
     private TabView tabView;
     private TabSwitcherView tabSwitcherView;
@@ -71,6 +73,16 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     @Override
     public void detachOmnibarView() {
         omnibarView = null;
+    }
+
+    @Override
+    public void attachNavigationBarView(@NonNull NavigationBarView navigationBarView) {
+        this.navigationBarView = navigationBarView;
+    }
+
+    @Override
+    public void detachNavigationBarView() {
+        navigationBarView = null;
     }
 
     @Override
@@ -148,13 +160,13 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     private void showTab(int index) {
-        resetOmnibar();
+        resetToolbars();
 
         currentIndex = index;
         TabEntity currentTab = getCurrentTab();
 
         browserView.showTab(currentTab.getId());
-        setOmnibarForTab(currentTab);
+        setToolbarsForTab(currentTab);
 
     }
 
@@ -335,11 +347,13 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     @Override
     public void navigateHistoryForward() {
         tabView.goForward();
+        setCanGoBack(true);
     }
 
     @Override
     public void navigateHistoryBackward() {
         tabView.goBack();
+        setCanGoForward(true);
     }
 
     @Override
@@ -440,6 +454,14 @@ public class BrowserPresenterImpl implements BrowserPresenter {
         requestLoadUrl(bookmarkEntity.getUrl());
     }
 
+    @Override
+    public void requestCopyCurrentUrl() {
+        TabEntity tab = getCurrentTab();
+        if (tab == null) return;
+        String url = tab.getCurrentUrl();
+        mainView.copyUrlToClipboard(url);
+    }
+
     private void setCanGoBack() {
         if (tabView == null) return;
         setCanGoBack(tabView.canGoBack());
@@ -451,11 +473,11 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     private void setCanGoBack(boolean canGoBack) {
-        omnibarView.setBackEnabled(canGoBack);
+        navigationBarView.setBackEnabled(canGoBack);
     }
 
     private void setCanGoForward(boolean canGoForward) {
-        omnibarView.setForwardEnabled(canGoForward);
+        navigationBarView.setForwardEnabled(canGoForward);
     }
 
     private void setNavigationMenuButtonsEnabled() {
@@ -471,20 +493,36 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     }
 
+    private void resetToolbars() {
+        resetOmnibar();
+        resetNavigationBar();
+    }
+
     private void resetOmnibar() {
         omnibarView.clearText();
         omnibarView.clearFocus();
         omnibarView.hideProgressBar();
-        omnibarView.setBackEnabled(false);
-        omnibarView.setForwardEnabled(false);
         omnibarView.setRefreshEnabled(false);
+    }
+
+    private void resetNavigationBar() {
+        navigationBarView.setBackEnabled(false);
+        navigationBarView.setForwardEnabled(false);
+    }
+
+    private void setToolbarsForTab(TabEntity tab) {
+        setOmnibarForTab(tab);
+        setNavigationBarForTab(tab);
     }
 
     private void setOmnibarForTab(TabEntity tab) {
         displayTextForUrl(tab.getCurrentUrl());
         omnibarView.setRefreshEnabled(true);
-        omnibarView.setBackEnabled(tab.canGoBack());
-        omnibarView.setForwardEnabled(tab.canGoForward());
+    }
+
+    private void setNavigationBarForTab(TabEntity tab) {
+        navigationBarView.setBackEnabled(tab.canGoBack());
+        navigationBarView.setForwardEnabled(tab.canGoForward());
     }
 
     private void displayText(String textToDisplay) {
