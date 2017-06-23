@@ -18,7 +18,6 @@
     <string name="browser_menu_bookmarks">@string/bookmarks</string>
     <string name="browser_menu_tab_switcher">Tab switcher</string>
     <string name="browser_menu_delete_text">Delete text</string>
-    <string name="browser_menu_share">Share</string>
     <string name="browser_menu_new_tab">New tab</string>
     <string name="browser_menu_copy_url">Copy URL</string>
 

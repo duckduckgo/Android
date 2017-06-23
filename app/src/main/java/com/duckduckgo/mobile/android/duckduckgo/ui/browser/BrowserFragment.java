@@ -168,9 +168,6 @@ public class BrowserFragment extends Fragment {
                     case R.id.action_forward:
                         browserPresenter.navigateHistoryForward();
                         return true;
-                    case R.id.action_share:
-                        // TODO: 6/22/17  
-                        return true;
                     case R.id.action_bookmarks:
                         browserPresenter.viewBookmarks();
                         return true;

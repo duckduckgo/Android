@@ -14,21 +14,15 @@
         android:orderInCategory="200"
         app:showAsAction="always"/>
     <item
-        android:id="@+id/action_share"
-        android:title="@string/browser_menu_share"
-        android:icon="@drawable/ic_share_dark_24dp"
-        android:orderInCategory="300"
-        app:showAsAction="always"/>
-    <item
         android:id="@+id/action_bookmarks"
         android:title="@string/browser_menu_bookmarks"
         android:icon="@drawable/ic_bookmark_border_dark_24dp"
-        android:orderInCategory="400"
+        android:orderInCategory="300"
         app:showAsAction="always"/>
     <item
         android:id="@+id/action_tab_switcher"
         android:title="@string/browser_menu_tab_switcher"
         android:icon="@drawable/ic_filter_none_dark_24dp"
-        android:orderInCategory="500"
+        android:orderInCategory="400"
         app:showAsAction="always"/>
 </menu>
