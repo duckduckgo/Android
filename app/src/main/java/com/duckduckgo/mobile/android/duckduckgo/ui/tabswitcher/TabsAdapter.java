@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.duckduckgo.mobile.android.duckduckgo.ui.base.itemtouchhelper.ItemTouchHelperAdapter;
 import com.duckduckgo.mobile.android.duckduckgo.ui.tab.TabEntity;
 
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import java.util.List;
  * Created by fgei on 6/14/17.
  */
 
-public class TabsAdapter extends RecyclerView.Adapter<TabViewHolder> {
+public class TabsAdapter extends RecyclerView.Adapter<TabViewHolder> implements ItemTouchHelperAdapter {
 
     public interface OnTabListener {
         void onClick(View v, int position);
@@ -57,6 +58,16 @@ public class TabsAdapter extends RecyclerView.Adapter<TabViewHolder> {
     @Override
     public int getItemCount() {
         return tabs.size();
+    }
+
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        return false;
+    }
+
+    @Override
+    public void onItemDismiss(RecyclerView.ViewHolder holder, int position) {
+        onTabListener.onDelete(holder.itemView, position);
     }
 
     private void updateList(List<TabEntity> newList) {

@@ -5,8 +5,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.itemtouchhelper.ItemTouchHelperAdapter;
-import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.itemtouchhelper.OnStartDragListener;
+import com.duckduckgo.mobile.android.duckduckgo.ui.base.itemtouchhelper.OnStartDragListener;
+import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.itemtouchhelper.BookmarksTouchHelperAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.List;
  * Created by fgei on 6/12/17.
  */
 
-public class BookmarksAdapter extends RecyclerView.Adapter<BookmarkViewHolder> implements ItemTouchHelperAdapter {
+public class BookmarksAdapter extends RecyclerView.Adapter<BookmarkViewHolder> implements BookmarksTouchHelperAdapter {
 
     interface OnBookmarkListener {
         void onBookmarkSelected(View v, int position);

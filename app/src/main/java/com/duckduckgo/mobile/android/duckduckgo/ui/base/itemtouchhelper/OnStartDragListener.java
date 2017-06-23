@@ -1,4 +1,4 @@
-package com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.itemtouchhelper;
+package com.duckduckgo.mobile.android.duckduckgo.ui.base.itemtouchhelper;
 
 import android.support.v7.widget.RecyclerView;
 

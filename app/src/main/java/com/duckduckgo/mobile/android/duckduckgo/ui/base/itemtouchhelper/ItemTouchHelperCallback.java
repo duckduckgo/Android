@@ -1,21 +1,27 @@
-package com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.itemtouchhelper;
+package com.duckduckgo.mobile.android.duckduckgo.ui.base.itemtouchhelper;
 
 import android.graphics.Canvas;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
 /**
- * Created by fgei on 6/9/17.
+ * Created by fgei on 6/23/17.
  */
 
-public class DragItemTouchHelperCallback extends ItemTouchHelper.Callback {
+public abstract class ItemTouchHelperCallback<T extends ItemTouchHelperAdapter> extends ItemTouchHelper.Callback {
 
     private static final float ALPHA_FULL = 1.0f;
 
-    private final ItemTouchHelperAdapter adapter;
+    private final T adapter;
 
-    public DragItemTouchHelperCallback(ItemTouchHelperAdapter adapter) {
+    public abstract boolean isItemMoveEnabled();
+
+    public ItemTouchHelperCallback(T adapter) {
         this.adapter = adapter;
+    }
+
+    protected T getAdapter() {
+        return adapter;
     }
 
     @Override
@@ -25,13 +31,13 @@ public class DragItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     @Override
     public boolean isItemViewSwipeEnabled() {
-        return adapter.isEditable();
+        return true;
     }
 
     @Override
     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-        final int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
-        final int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
+        final int dragFlags = isItemMoveEnabled() ? ItemTouchHelper.UP | ItemTouchHelper.DOWN : 0;
+        final int swipeFlags = isItemViewSwipeEnabled() ? ItemTouchHelper.START | ItemTouchHelper.END : 0;
         return makeMovementFlags(dragFlags, swipeFlags);
     }
 

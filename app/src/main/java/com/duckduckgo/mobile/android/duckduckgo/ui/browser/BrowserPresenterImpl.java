@@ -1,5 +1,6 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -355,9 +356,18 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     @Override
+    public void onReceivedIcon(@NonNull String tabId, @NonNull Bitmap favicon) {
+        TabEntity tab = getTabForId(tabId);
+        if (tab != null) {
+            tab.setFavicon(favicon);
+        }
+    }
+
+    @Override
     public void onPageStarted(@NonNull String tabId, @Nullable String url) {
         TabEntity tab = getTabForId(tabId);
         if (tab != null) {
+            tab.setFavicon(null);
             tab.setCurrentUrl(url);
         }
         omnibarView.setRefreshEnabled(true);

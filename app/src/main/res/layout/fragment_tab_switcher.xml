@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
     <android.support.design.widget.AppBarLayout
@@ -7,17 +8,28 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppBar">
+        android:theme="@style/AppBar.TabSwitcher"
+        app:elevation="0dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:gravity="center"
+            android:text="@string/tab_switcher_toolbar"
+            android:textColor="#ffffff"
+            android:clickable="true"
+            style="@style/TextAppearance.AppCompat.Title"/>
+
         <android.support.v7.widget.Toolbar
+            android:visibility="gone"
             android:id="@+id/tab_switcher_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:popupTheme="@style/AppBar.Popup"/>
     </android.support.design.widget.AppBarLayout>
     <FrameLayout
-        android:background="#fff"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/tab_switcher_background">
         <android.support.v7.widget.RecyclerView
             android:id="@+id/tab_switcher_recycler_view"
             android:layout_width="match_parent"
@@ -25,28 +37,51 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom">
+            android:layout_gravity="bottom"
+            android:background="@color/tab_switcher_bottom_bar_background">
             <Button
                 android:id="@+id/tab_switcher_new_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:text="@string/tab_switcher_new_button"
-                style="@style/Widget.AppCompat.Button.Borderless"/>
-            <Button
-                android:id="@+id/tab_switcher_fire_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/tab_switcher_fire_button"
-                style="@style/Widget.AppCompat.Button.Borderless"/>
+                android:textColor="#ffffff"
+                android:textSize="16sp"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
             <Button
                 android:id="@+id/tab_switcher_done_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:text="@string/tab_switcher_done_button"
-                style="@style/Widget.AppCompat.Button.Borderless"/>
+                android:textColor="#ffffff"
+                android:textSize="16sp"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
         </FrameLayout>
+        <LinearLayout
+            android:id="@+id/tab_swither_fire_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="-16dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:background="@drawable/fire_background">
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="33.8dp"
+                android:src="@drawable/fire_temp"
+                android:contentDescription="@string/content_description_tabswitcher_fire_button"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="10dp"
+                android:text="@string/tab_switcher_fire_button"
+                android:textColor="@color/tab_switcher_bottom_bar_fire_button"
+                android:textSize="14sp"/>
+        </LinearLayout>
     </FrameLayout>
 </LinearLayout>

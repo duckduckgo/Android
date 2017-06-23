@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.duckduckgo.mobile.android.duckduckgo.R;
-import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.itemtouchhelper.OnStartDragListener;
+import com.duckduckgo.mobile.android.duckduckgo.ui.base.itemtouchhelper.OnStartDragListener;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

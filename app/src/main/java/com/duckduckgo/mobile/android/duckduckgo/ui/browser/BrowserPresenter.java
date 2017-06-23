@@ -1,5 +1,6 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.browser;
 
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -73,6 +74,8 @@ public interface BrowserPresenter {
     void refreshCurrentPage();
 
     void onReceiveTitle(@NonNull String tabId, @NonNull String title);
+
+    void onReceivedIcon(@NonNull String tabId, @NonNull Bitmap favicon);
 
     void onPageStarted(@NonNull String tabId, @Nullable String url);
 

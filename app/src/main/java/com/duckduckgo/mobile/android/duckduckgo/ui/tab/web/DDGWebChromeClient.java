@@ -1,5 +1,6 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.tab.web;
 
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -30,5 +31,11 @@ public class DDGWebChromeClient extends WebChromeClient {
     public void onReceivedTitle(WebView view, String title) {
         super.onReceivedTitle(view, title);
         browserPresenter.onReceiveTitle(tabId, title);
+    }
+
+    @Override
+    public void onReceivedIcon(WebView view, Bitmap icon) {
+        super.onReceivedIcon(view, icon);
+        browserPresenter.onReceivedIcon(tabId, icon);
     }
 }

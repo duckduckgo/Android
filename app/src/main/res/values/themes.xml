@@ -10,9 +10,17 @@
 
     <style name="AppTheme" parent="AppTheme.Base"/>
 
+    <style name="AppTheme.TabSwitcher" parent="AppTheme">
+        <item name="android:background">@color/tab_switcher_background</item>
+    </style>
+
     <style name="AppBar" parent="@style/ThemeOverlay.AppCompat.ActionBar">
     </style>
     <style name="AppBar.Popup" parent="@style/ThemeOverlay.AppCompat.Light">
+    </style>
+
+    <style name="AppBar.TabSwitcher" parent="AppBar">
+        <item name="colorPrimary">@color/tab_switcher_background</item>
     </style>
 
     <style name="AppTheme.ProgressBar" parent="AppTheme">

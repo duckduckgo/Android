@@ -1,5 +1,7 @@
 package com.duckduckgo.mobile.android.duckduckgo.ui.tab;
 
+import android.graphics.Bitmap;
+
 import com.duckduckgo.mobile.android.duckduckgo.domain.tab.Tab;
 
 import java.util.UUID;
@@ -15,6 +17,7 @@ public class TabEntity implements Tab {
     private String currentUrl = "";
     private boolean canGoBack = false;
     private boolean canGoForward = false;
+    private Bitmap favicon;
 
     private TabEntity() {
 
@@ -77,5 +80,13 @@ public class TabEntity implements Tab {
 
     public void setCanGoForward(boolean canGoForward) {
         this.canGoForward = canGoForward;
+    }
+
+    public Bitmap getFavicon() {
+        return favicon;
+    }
+
+    public void setFavicon(Bitmap favicon) {
+        this.favicon = favicon;
     }
 }

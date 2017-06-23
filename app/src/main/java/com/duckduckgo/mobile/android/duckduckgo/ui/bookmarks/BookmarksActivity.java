@@ -16,8 +16,8 @@ import android.widget.TextView;
 
 import com.duckduckgo.mobile.android.duckduckgo.Injector;
 import com.duckduckgo.mobile.android.duckduckgo.R;
-import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.itemtouchhelper.DragItemTouchHelperCallback;
-import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.itemtouchhelper.OnStartDragListener;
+import com.duckduckgo.mobile.android.duckduckgo.ui.base.itemtouchhelper.OnStartDragListener;
+import com.duckduckgo.mobile.android.duckduckgo.ui.bookmarks.itemtouchhelper.BookmarksTouchHelperCallback;
 import com.duckduckgo.mobile.android.duckduckgo.ui.editbookmark.EditBookmarkDialogFragment;
 
 import java.util.List;
@@ -205,7 +205,7 @@ public class BookmarksActivity extends AppCompatActivity implements BookmarksVie
         });
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
-        ItemTouchHelper.Callback callback = new DragItemTouchHelperCallback(adapter);
+        ItemTouchHelper.Callback callback = new BookmarksTouchHelperCallback(adapter);
         itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
     }
