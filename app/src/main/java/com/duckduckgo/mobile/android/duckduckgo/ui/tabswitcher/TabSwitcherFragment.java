@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,9 +34,6 @@ public class TabSwitcherFragment extends Fragment implements TabSwitcherView, On
     public static TabSwitcherFragment newInstance() {
         return new TabSwitcherFragment();
     }
-
-    @BindView(R.id.tab_switcher_toolbar)
-    Toolbar toolbar;
 
     @BindView(R.id.tab_switcher_recycler_view)
     RecyclerView recyclerView;
@@ -103,7 +99,6 @@ public class TabSwitcherFragment extends Fragment implements TabSwitcherView, On
     }
 
     private void initUI() {
-        initToolbar();
         initRecyclerView();
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,10 +118,6 @@ public class TabSwitcherFragment extends Fragment implements TabSwitcherView, On
                 browserPresenter.fire();
             }
         });
-    }
-
-    private void initToolbar() {
-        toolbar.setTitle(R.string.tab_switcher_toolbar);
     }
 
     private void initRecyclerView() {
