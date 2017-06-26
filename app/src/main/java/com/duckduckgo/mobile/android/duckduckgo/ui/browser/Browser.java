@@ -171,7 +171,11 @@ public class Browser extends FrameLayout implements BrowserView {
     private void destroyWebView(WebView webView) {
         if (webView == null) return;
         webView.stopLoading();
-        webView.destroy();
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            webView.destroy();
+        } else {
+            webView = null;
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")

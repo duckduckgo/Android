@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.duckduckgo.mobile.android.duckduckgo.R;
@@ -24,6 +25,9 @@ public class TabViewHolder extends RecyclerView.ViewHolder {
 
         void onTabDeleted(View v, int position);
     }
+
+    @BindView(R.id.tab_favicon_image_view)
+    ImageView faviconImageView;
 
     @BindView(R.id.tab_title_text_view)
     TextView titleTextView;
@@ -54,6 +58,12 @@ public class TabViewHolder extends RecyclerView.ViewHolder {
     public void setTab(TabEntity tabEntity) {
         titleTextView.setText(tabEntity.getTitle());
         urlTextView.setText(tabEntity.getCurrentUrl());
+
+        if (tabEntity.getFavicon() != null) {
+            faviconImageView.setImageBitmap(tabEntity.getFavicon());
+        } else {
+            faviconImageView.setImageResource(R.drawable.globe_temp);
+        }
     }
 
     public static TabViewHolder inflate(ViewGroup parent, OnTabListener onTabListener) {

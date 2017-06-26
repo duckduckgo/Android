@@ -5,7 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +13,7 @@ import android.widget.Button;
 
 import com.duckduckgo.mobile.android.duckduckgo.Injector;
 import com.duckduckgo.mobile.android.duckduckgo.R;
+import com.duckduckgo.mobile.android.duckduckgo.ui.base.itemtouchhelper.OnStartDragListener;
 import com.duckduckgo.mobile.android.duckduckgo.ui.browser.BrowserPresenter;
 import com.duckduckgo.mobile.android.duckduckgo.ui.tab.TabEntity;
 
@@ -26,16 +27,13 @@ import butterknife.Unbinder;
  * Created by fgei on 6/14/17.
  */
 
-public class TabSwitcherFragment extends Fragment implements TabSwitcherView {
+public class TabSwitcherFragment extends Fragment implements TabSwitcherView, OnStartDragListener {
 
     public static final String TAG = TabSwitcherFragment.class.getSimpleName();
 
     public static TabSwitcherFragment newInstance() {
         return new TabSwitcherFragment();
     }
-
-    @BindView(R.id.tab_switcher_toolbar)
-    Toolbar toolbar;
 
     @BindView(R.id.tab_switcher_recycler_view)
     RecyclerView recyclerView;
@@ -46,11 +44,12 @@ public class TabSwitcherFragment extends Fragment implements TabSwitcherView {
     @BindView(R.id.tab_switcher_new_button)
     Button newButton;
 
-    @BindView(R.id.tab_switcher_fire_button)
-    Button fireButton;
+    @BindView(R.id.tab_swither_fire_container)
+    View fireContainer;
 
     private Unbinder unbinder;
     private TabsAdapter adapter;
+    private ItemTouchHelper itemTouchHelper;
 
     private BrowserPresenter browserPresenter;
 
@@ -94,8 +93,12 @@ public class TabSwitcherFragment extends Fragment implements TabSwitcherView {
         adapter.setTabs(tabs);
     }
 
+    @Override
+    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+        itemTouchHelper.startDrag(viewHolder);
+    }
+
     private void initUI() {
-        initToolbar();
         initRecyclerView();
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,16 +112,12 @@ public class TabSwitcherFragment extends Fragment implements TabSwitcherView {
                 browserPresenter.openNewTab();
             }
         });
-        fireButton.setOnClickListener(new View.OnClickListener() {
+        fireContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 browserPresenter.fire();
             }
         });
-    }
-
-    private void initToolbar() {
-        toolbar.setTitle(R.string.tab_switcher_toolbar);
     }
 
     private void initRecyclerView() {
@@ -135,5 +134,8 @@ public class TabSwitcherFragment extends Fragment implements TabSwitcherView {
         });
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+        ItemTouchHelper.Callback callback = new TabsSwitcherTouchHelperCallback(adapter);
+        itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 }

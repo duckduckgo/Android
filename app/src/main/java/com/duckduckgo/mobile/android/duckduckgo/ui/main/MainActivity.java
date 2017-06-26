@@ -6,9 +6,14 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.duckduckgo.mobile.android.duckduckgo.Injector;
@@ -156,14 +161,26 @@ public class MainActivity extends AppCompatActivity implements MainView, EditBoo
     }
 
     private void showTabSwitcher() {
+        updateStatusBarColor(R.color.tab_switcher_background, true);
         TabSwitcherFragment fragment = TabSwitcherFragment.newInstance();
         getSupportFragmentManager().beginTransaction().add(ACTIVITY_CONTAINER, fragment, TabSwitcherFragment.TAG).commit();
     }
 
     private void removeTabSwitcher() {
+        updateStatusBarColor(R.color.colorPrimaryDark, false);
         TabSwitcherFragment fragment = (TabSwitcherFragment) getSupportFragmentManager().findFragmentByTag(TabSwitcherFragment.TAG);
         if (fragment == null) return;
         getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+    }
+
+    private void updateStatusBarColor(@ColorRes int color, boolean lightText) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, color));
+
+            getWindow().getDecorView().setSystemUiVisibility(lightText ? 0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        }
     }
 
     private void copyTextToClipboard(@NonNull String label, @NonNull String text) {

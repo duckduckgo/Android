@@ -50,5 +50,7 @@
     <string name="content_description_bookmark_delete_button">Delete bookmark</string>
     <string name="content_description_bookmark_drag_item">Move item</string>
     <string name="content_description_tab_delete_button">Delete tab</string>
+    <string name="content_description_tab_favicon_image_view">Favicon</string>
+    <string name="content_description_tabswitcher_fire_button">Delete all tabs and data</string>
 
 </resources>

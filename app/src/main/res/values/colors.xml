@@ -13,4 +13,12 @@
     <color name="navigation_bar_enabled">#8a000000</color>
     <color name="navigation_bar_disabled">#999999</color>
 
+    <color name="tab_switcher_background">#555555</color>
+    <color name="tab_switcher_bottom_bar_background">#333333</color>
+    <color name="tab_switcher_bottom_bar_fire_background">#111111</color>
+    <color name="tab_switcher_bottom_bar_fire_button">#999999</color>
+
+    <color name="tab_text_primary">#333333</color>
+    <color name="tab_text_secondary">#999999</color>
+
 </resources>
