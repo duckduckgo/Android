@@ -4,22 +4,22 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
-              tools:context="com.duckduckgo.mobile.android.duckduckgo.ui.browser.BrowserFragment">
+              tools:context="com.duckduckgo.app.ui.browser.BrowserFragment">
 
-    <com.duckduckgo.mobile.android.duckduckgo.ui.omnibar.Omnibar
+    <com.duckduckgo.app.ui.omnibar.Omnibar
         android:id="@+id/omnibar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"/>
 
-    <com.duckduckgo.mobile.android.duckduckgo.ui.browser.Browser
+    <com.duckduckgo.app.ui.browser.Browser
         android:id="@+id/browser"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
         android:layout_marginBottom="45dp"/>
 
-    <com.duckduckgo.mobile.android.duckduckgo.ui.navigationbar.NavigationBar
+    <com.duckduckgo.app.ui.navigationbar.NavigationBar
         android:id="@+id/navigation_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
