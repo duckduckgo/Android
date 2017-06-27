@@ -4,5 +4,5 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    tools:context="com.duckduckgo.mobile.android.duckduckgo.ui.main.MainActivity"/>
+    tools:context="com.duckduckgo.app.ui.main.MainActivity"/>
 <!--android:fitsSystemWindows="true"-->
