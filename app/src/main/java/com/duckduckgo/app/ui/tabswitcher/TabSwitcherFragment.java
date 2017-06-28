@@ -26,6 +26,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.duckduckgo.app.Injector;
 import com.duckduckgo.app.R;
@@ -54,7 +55,7 @@ public class TabSwitcherFragment extends Fragment implements TabSwitcherView, On
     Button doneButton;
 
     @BindView(R.id.tab_switcher_new_button)
-    Button newButton;
+    ImageButton newButton;
 
     @BindView(R.id.tab_swither_fire_container)
     View fireContainer;

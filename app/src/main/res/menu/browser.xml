@@ -30,7 +30,7 @@
         android:orderInCategory="600"
         android:visible="false"
         android:title="@string/browser_menu_delete_text"
-        android:icon="@drawable/ic_cancel_light_grey_24dp"
+        android:icon="@drawable/ic_clear"
         app:showAsAction="always"
         tools:ignore="AlwaysShowAction" />
 </menu>

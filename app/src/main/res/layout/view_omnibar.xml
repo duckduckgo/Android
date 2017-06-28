@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:theme="@style/AppBar">
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:focusableInTouchMode="true"
-        android:background="@drawable/omnibar_background">
+        android:focusableInTouchMode="true">
+        <View
+            android:id="@+id/background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/omnibar_background"/>
         <android.support.v7.widget.Toolbar
             android:id="@+id/omnibar_toolbar"
             android:layout_width="match_parent"
@@ -14,21 +19,24 @@
             android:layout_marginStart="4dp"
             android:layout_marginLeft="4dp"
             android:layout_marginEnd="4dp"
-            android:layout_marginRight="4dp">
+            android:layout_marginRight="4dp"
+            android:theme="@style/AppBar.Toolbar"
+            app:popupTheme="@style/AppBar.Popup">
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="horizontal">
-                <android.support.v7.widget.AppCompatImageButton
+                <ImageButton
                     android:visibility="gone"
                     android:id="@+id/omnibar_back_image_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
                     android:layout_gravity="center_vertical"
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
-                    android:src="@drawable/ic_arrow_back_dark_24dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"/>
+                    android:src="@drawable/ic_prev_arrow"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/content_description_omnibar_back_button"/>
                 <EditText
                     android:id="@+id/omnibar_edit_text"
                     android:layout_width="match_parent"
@@ -49,7 +57,7 @@
             android:visibility="gone"
             android:id="@+id/omnibar_progress_bar"
             android:layout_width="match_parent"
-            android:layout_height="2dp"
+            android:layout_height="3dp"
             android:indeterminate="false"
             android:layout_gravity="bottom"
             android:theme="@style/AppTheme.ProgressBar"

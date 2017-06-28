@@ -26,6 +26,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,6 +34,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -55,6 +57,9 @@ public class Omnibar extends AppBarLayout implements OmnibarView {
     public interface OnFocusListener {
         void onFocusChanged(boolean focus);
     }
+
+    @BindView(R.id.background)
+    View background;
 
     @BindView(R.id.omnibar_toolbar)
     Toolbar toolbar;
@@ -130,6 +135,8 @@ public class Omnibar extends AppBarLayout implements OmnibarView {
         if (backImageButton.getVisibility() == visibility) return;
         TransitionManager.beginDelayedTransition(this);
         backImageButton.setVisibility(visibility);
+
+        background.setVisibility(editing ? View.GONE : View.VISIBLE);
 
         Menu menu = toolbar.getMenu();
         menu.setGroupVisible(R.id.group_menu, !editing);

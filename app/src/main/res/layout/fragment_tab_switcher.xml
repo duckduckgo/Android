@@ -34,16 +34,15 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:background="@color/tab_switcher_bottom_bar_background">
-            <Button
+            <ImageButton
                 android:id="@+id/tab_switcher_new_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:text="@string/tab_switcher_new_button"
-                android:textColor="#ffffff"
-                android:textSize="16sp"
+                android:src="@drawable/ic_new"
                 style="@style/Widget.AppCompat.Button.Borderless"
-                android:background="?attr/selectableItemBackgroundBorderless"/>
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/content_description_tabswitcher_new_button"/>
             <Button
                 android:id="@+id/tab_switcher_done_button"
                 android:layout_width="wrap_content"
@@ -67,7 +66,7 @@
             <ImageView
                 android:layout_width="26dp"
                 android:layout_height="33.8dp"
-                android:src="@drawable/fire_temp"
+                android:src="@drawable/ic_fire"
                 android:contentDescription="@string/content_description_tabswitcher_fire_button"/>
             <TextView
                 android:layout_width="wrap_content"
@@ -75,7 +74,7 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="10dp"
                 android:text="@string/tab_switcher_fire_button"
-                android:textColor="@color/tab_switcher_bottom_bar_fire_button"
+                android:textColor="@color/tab_switcher_bottom_bar_fire_text"
                 android:textSize="14sp"/>
         </LinearLayout>
     </FrameLayout>

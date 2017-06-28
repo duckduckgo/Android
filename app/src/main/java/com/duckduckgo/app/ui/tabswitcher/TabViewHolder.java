@@ -74,7 +74,7 @@ public class TabViewHolder extends RecyclerView.ViewHolder {
         if (tabEntity.getFavicon() != null) {
             faviconImageView.setImageBitmap(tabEntity.getFavicon());
         } else {
-            faviconImageView.setImageResource(R.drawable.globe_temp);
+            faviconImageView.setImageResource(R.drawable.ic_globe);
         }
     }
 

@@ -9,19 +9,9 @@
         android:bottom="8dp"
         android:left="10dp"
         android:right="10dp"
-        android:top="10dp">
+        android:top="8dp">
         <shape android:shape="rectangle">
-            <solid android:color="#dddddd"/>
-            <corners android:radius="4dp"/>
-        </shape>
-    </item>
-    <item
-        android:bottom="9dp"
-        android:left="10dp"
-        android:right="10dp"
-        android:top="10dp">
-        <shape android:shape="rectangle">
-            <solid android:color="@android:color/white"/>
+            <solid android:color="@color/omnibar_primary_background"/>
             <corners android:radius="4dp"/>
         </shape>
     </item>

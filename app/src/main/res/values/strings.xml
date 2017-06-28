@@ -41,16 +41,17 @@
     <string name="bookmark_dialog_url_hint">Bookmark URL</string>
 
     <!-- Tab Switcher -->
-    <string name="tab_switcher_toolbar">Tabs</string>
-    <string name="tab_switcher_new_button">New</string>
-    <string name="tab_switcher_fire_button">Forget</string>
+    <string name="tab_switcher_toolbar">Private Tabs</string>
+    <string name="tab_switcher_fire_button">Clear All</string>
     <string name="tab_switcher_done_button">Done</string>
 
     <!-- Content description -->
+    <string name="content_description_omnibar_back_button">Cancel search input</string>
     <string name="content_description_bookmark_delete_button">Delete bookmark</string>
     <string name="content_description_bookmark_drag_item">Move item</string>
     <string name="content_description_tab_delete_button">Delete tab</string>
     <string name="content_description_tab_favicon_image_view">Favicon</string>
+    <string name="content_description_tabswitcher_new_button">Create new tab</string>
     <string name="content_description_tabswitcher_fire_button">Delete all tabs and data</string>
 
 </resources>

@@ -17,12 +17,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
-        android:layout_marginBottom="45dp"/>
+        android:layout_marginBottom="@dimen/bottom_bar_height"/>
 
     <com.duckduckgo.app.ui.navigationbar.NavigationBar
         android:id="@+id/navigation_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"/>
+        android:layout_height="@dimen/bottom_bar_height"
+        android:layout_gravity="bottom"
+        android:background="@color/colorPrimary"/>
 
 </FrameLayout>
