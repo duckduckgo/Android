@@ -49,6 +49,8 @@
                     android:textColor="@color/omnibar_text_color"
                     android:textColorHint="@color/omnibar_text_hint"
                     android:textSize="16sp"
+                    android:fontFamily="sans-serif"
+                    android:textStyle="normal"
                     android:hint="@string/omnibar_search_edit_text_hint"
                     android:background="@null"/>
             </LinearLayout>

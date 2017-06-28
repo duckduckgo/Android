@@ -11,13 +11,16 @@
         android:theme="@style/AppBar.TabSwitcher"
         app:elevation="0dp">
         <TextView
+            android:id="@+id/tab_switcher_title_text_view"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:gravity="center"
-            android:text="@string/tab_switcher_toolbar"
+            android:text="@string/tab_switcher_title"
             android:textColor="#ffffff"
-            android:clickable="true"
-            style="@style/TextAppearance.AppCompat.Title"/>
+            android:textSize="16sp"
+            android:fontFamily="sans-serif"
+            android:textStyle="normal"
+            android:clickable="true"/>
     </android.support.design.widget.AppBarLayout>
     <FrameLayout
         android:layout_width="match_parent"

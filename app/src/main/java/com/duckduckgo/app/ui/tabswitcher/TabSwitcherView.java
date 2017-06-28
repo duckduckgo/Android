@@ -22,4 +22,8 @@ import java.util.List;
 
 public interface TabSwitcherView {
     void showTabs(List<TabEntity> tabs);
+
+    void showTitle();
+
+    void showNoTabsTitle();
 }

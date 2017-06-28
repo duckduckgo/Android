@@ -18,6 +18,7 @@ package com.duckduckgo.app.ui.tabswitcher;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.duckduckgo.app.Injector;
 import com.duckduckgo.app.R;
@@ -47,6 +49,9 @@ public class TabSwitcherFragment extends Fragment implements TabSwitcherView, On
     public static TabSwitcherFragment newInstance() {
         return new TabSwitcherFragment();
     }
+
+    @BindView(R.id.tab_switcher_title_text_view)
+    TextView titletextView;
 
     @BindView(R.id.tab_switcher_recycler_view)
     RecyclerView recyclerView;
@@ -107,6 +112,16 @@ public class TabSwitcherFragment extends Fragment implements TabSwitcherView, On
     }
 
     @Override
+    public void showTitle() {
+        setTitle(R.string.tab_switcher_title);
+    }
+
+    @Override
+    public void showNoTabsTitle() {
+        setTitle(R.string.tab_switcher_title_no_tabs);
+    }
+
+    @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         itemTouchHelper.startDrag(viewHolder);
     }
@@ -150,5 +165,9 @@ public class TabSwitcherFragment extends Fragment implements TabSwitcherView, On
         ItemTouchHelper.Callback callback = new TabsSwitcherTouchHelperCallback(adapter);
         itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+
+    private void setTitle(@StringRes int resId) {
+        titletextView.setText(resId);
     }
 }
