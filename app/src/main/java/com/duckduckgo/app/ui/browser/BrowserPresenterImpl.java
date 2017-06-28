@@ -236,7 +236,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     public void loadTabsSwitcherTabs() {
         if (tabSwitcherView != null) {
             tabSwitcherView.showTabs(tabs);
-            if(tabs.size() == 0) {
+            if (tabs.size() == 0) {
                 tabSwitcherView.showNoTabsTitle();
             } else {
                 tabSwitcherView.showTitle();
