@@ -16,8 +16,10 @@
 
 package com.duckduckgo.app.ui.tabswitcher;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,6 +28,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.duckduckgo.app.Injector;
 import com.duckduckgo.app.R;
@@ -47,6 +51,9 @@ public class TabSwitcherFragment extends Fragment implements TabSwitcherView, On
         return new TabSwitcherFragment();
     }
 
+    @BindView(R.id.tab_switcher_title_text_view)
+    TextView titletextView;
+
     @BindView(R.id.tab_switcher_recycler_view)
     RecyclerView recyclerView;
 
@@ -54,7 +61,10 @@ public class TabSwitcherFragment extends Fragment implements TabSwitcherView, On
     Button doneButton;
 
     @BindView(R.id.tab_switcher_new_button)
-    Button newButton;
+    ImageButton newButton;
+
+    @BindView(R.id.tab_switcher_fire_text_view)
+    TextView fireTextView;
 
     @BindView(R.id.tab_swither_fire_container)
     View fireContainer;
@@ -106,24 +116,40 @@ public class TabSwitcherFragment extends Fragment implements TabSwitcherView, On
     }
 
     @Override
+    public void showTitle() {
+        setTitle(R.string.tab_switcher_title);
+    }
+
+    @Override
+    public void showNoTabsTitle() {
+        setTitle(R.string.tab_switcher_title_no_tabs);
+    }
+
+    @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         itemTouchHelper.startDrag(viewHolder);
     }
 
     private void initUI() {
         initRecyclerView();
+        Typeface fontRegular = Typeface.createFromAsset(getContext().getAssets(), "fonts/proximanova-regular.otf");
+        doneButton.setTypeface(fontRegular);
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 browserPresenter.dismissTabSwitcher();
             }
         });
+
         newButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 browserPresenter.openNewTab();
             }
         });
+
+        Typeface fontSemibold = Typeface.createFromAsset(getContext().getAssets(), "fonts/proximanova-semibold.otf");
+        fireTextView.setTypeface(fontSemibold);
         fireContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -149,5 +175,9 @@ public class TabSwitcherFragment extends Fragment implements TabSwitcherView, On
         ItemTouchHelper.Callback callback = new TabsSwitcherTouchHelperCallback(adapter);
         itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+
+    private void setTitle(@StringRes int resId) {
+        titletextView.setText(resId);
     }
 }

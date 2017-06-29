@@ -56,6 +56,9 @@ public class Omnibar extends AppBarLayout implements OmnibarView {
         void onFocusChanged(boolean focus);
     }
 
+    @BindView(R.id.background)
+    View background;
+
     @BindView(R.id.omnibar_toolbar)
     Toolbar toolbar;
 
@@ -130,6 +133,8 @@ public class Omnibar extends AppBarLayout implements OmnibarView {
         if (backImageButton.getVisibility() == visibility) return;
         TransitionManager.beginDelayedTransition(this);
         backImageButton.setVisibility(visibility);
+
+        background.setVisibility(editing ? View.GONE : View.VISIBLE);
 
         Menu menu = toolbar.getMenu();
         menu.setGroupVisible(R.id.group_menu, !editing);

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.ui.tabswitcher;
 
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +27,7 @@ import android.widget.TextView;
 
 import com.duckduckgo.app.R;
 import com.duckduckgo.app.ui.tab.TabEntity;
+import com.duckduckgo.app.util.UrlUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -65,16 +67,20 @@ public class TabViewHolder extends RecyclerView.ViewHolder {
                 onTabListener.onTabDeleted(v, getAdapterPosition());
             }
         });
+        Typeface font = Typeface.createFromAsset(itemView.getContext().getAssets(), "fonts/proximanova-semibold.otf");
+        titleTextView.setTypeface(font);
+        urlTextView.setTypeface(font);
     }
 
     public void setTab(TabEntity tabEntity) {
         titleTextView.setText(tabEntity.getTitle());
-        urlTextView.setText(tabEntity.getCurrentUrl());
+        String urlLabel = UrlUtils.getUrlWithoutScheme(tabEntity.getCurrentUrl());
+        urlTextView.setText(urlLabel);
 
         if (tabEntity.getFavicon() != null) {
             faviconImageView.setImageBitmap(tabEntity.getFavicon());
         } else {
-            faviconImageView.setImageResource(R.drawable.globe_temp);
+            faviconImageView.setImageResource(R.drawable.ic_globe);
         }
     }
 

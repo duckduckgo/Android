@@ -6,6 +6,7 @@ android {
     defaultConfig {
         applicationId "com.duckduckgo.app"
         minSdkVersion 16
+        //noinspection OldTargetApi
         targetSdkVersion 25
         versionCode buildVersionCode()
         versionName VERSION_NAME
@@ -46,7 +47,7 @@ android {
     }
 }
 
-ext.supportLibraryVersion = '25.3.1'
+ext.supportLibraryVersion = '25.4.0'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])

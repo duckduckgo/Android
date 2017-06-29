@@ -207,9 +207,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     public void closeTab(int index) {
         TabEntity tab = tabs.get(index);
         tabs.remove(tab);
-        if (tabSwitcherView != null) {
-            tabSwitcherView.showTabs(tabs);
-        }
+        loadTabsSwitcherTabs();
         browserView.deleteTab(tab.getId());
         if (currentIndex < index) return;
         if (currentIndex > index) currentIndex--;
@@ -238,6 +236,11 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     public void loadTabsSwitcherTabs() {
         if (tabSwitcherView != null) {
             tabSwitcherView.showTabs(tabs);
+            if (tabs.size() == 0) {
+                tabSwitcherView.showNoTabsTitle();
+            } else {
+                tabSwitcherView.showTitle();
+            }
         }
     }
 
