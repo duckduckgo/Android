@@ -52,6 +52,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:text="@string/tab_switcher_done_button"
+                android:textAllCaps="false"
                 android:textColor="#ffffff"
                 android:textSize="16sp"
                 style="@style/Widget.AppCompat.Button.Borderless"
@@ -72,6 +73,7 @@
                 android:src="@drawable/ic_fire"
                 android:contentDescription="@string/content_description_tabswitcher_fire_button"/>
             <TextView
+                android:id="@+id/tab_switcher_fire_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"

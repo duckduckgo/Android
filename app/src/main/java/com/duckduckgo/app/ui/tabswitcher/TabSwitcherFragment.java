@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.ui.tabswitcher;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -61,6 +62,9 @@ public class TabSwitcherFragment extends Fragment implements TabSwitcherView, On
 
     @BindView(R.id.tab_switcher_new_button)
     ImageButton newButton;
+
+    @BindView(R.id.tab_switcher_fire_text_view)
+    TextView fireTextView;
 
     @BindView(R.id.tab_swither_fire_container)
     View fireContainer;
@@ -128,18 +132,24 @@ public class TabSwitcherFragment extends Fragment implements TabSwitcherView, On
 
     private void initUI() {
         initRecyclerView();
+        Typeface fontRegular = Typeface.createFromAsset(getContext().getAssets(), "fonts/proximanova-regular.otf");
+        doneButton.setTypeface(fontRegular);
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 browserPresenter.dismissTabSwitcher();
             }
         });
+
         newButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 browserPresenter.openNewTab();
             }
         });
+
+        Typeface fontSemibold = Typeface.createFromAsset(getContext().getAssets(), "fonts/proximanova-semibold.otf");
+        fireTextView.setTypeface(fontSemibold);
         fireContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

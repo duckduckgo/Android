@@ -33,7 +33,7 @@
             android:maxLines="1"
             android:ellipsize="end"
             android:textColor="@color/tab_text_primary"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
         <TextView
             android:id="@+id/tab_url_text_view"
             android:layout_width="wrap_content"

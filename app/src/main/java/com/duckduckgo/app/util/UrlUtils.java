@@ -36,4 +36,18 @@ public class UrlUtils {
         }
         return "http://" + url;
     }
+
+    public static String getUrlWithoutScheme(@NonNull String url) {
+        String urlWithoutScheme = url;
+        if (url.startsWith("https://")) {
+            urlWithoutScheme = urlWithoutScheme.replace("https://", "");
+        }
+        if (url.startsWith("http://")) {
+            urlWithoutScheme = urlWithoutScheme.replace("http://", "");
+        }
+        if (url.startsWith("www.")) {
+            urlWithoutScheme = urlWithoutScheme.replace("www.", "");
+        }
+        return urlWithoutScheme;
+    }
 }
