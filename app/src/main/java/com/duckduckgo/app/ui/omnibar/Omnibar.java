@@ -239,6 +239,6 @@ public class Omnibar extends AppBarLayout implements OmnibarView {
     }
 
     private boolean wasEnterPressed(KeyEvent event) {
-        return event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER;
+        return event != null && event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER;
     }
 }
