@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="mockable-android-22">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/app/libs/OnionKit/libnetcipher/build/intermediates/mockable-android-22.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

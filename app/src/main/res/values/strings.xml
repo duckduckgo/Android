@@ -1,299 +1,58 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="AppName">DuckDuckGo</string>
-    <string name="SearchStringSmall">Search DDG or type URL</string>
-    <string name="SearchStringBig">Search DuckDuckGo or type URL</string>
-    <string name="SettingsButtonContentDescription">Settings</string>
-    <string name="HomeButtonContentDescription">Home</string>
-    
-    <string name="search_hint">Search&#8230;</string>
-    
-    <string name="PrefGroupGeneral">General</string>
-    <string name="PrefGroupStories">Stories</string>
-    <string name="PrefGroupSearch">Search</string>
-    <string name="PrefGroupOther">Other</string>
-    <string name="PrefGroupAppFlow">Application</string>
-    <string name="PrefGroupPrivacy">Privacy</string>
-    <string name="PrefGroupFeedback">Feedback</string>
-    <string name="PrefTheme">Theme</string>
-    <string name="PrefThemeLight">Light</string>
-    <string name="PrefThemeDark">Dark</string>
-    <string name="PrefStartScreen">Homepage</string>
-    <string name="PrefStories">Stories</string>
-    <string name="PrefWaterCoolerStories">Stories</string>
-    <string name="PrefSavedItems">@string/favorites</string>
-    <string name="PrefDuckMode">Search</string>
-    <string name="PrefRecentSearch">@string/recents</string>
-    <string name="PrefRecordHistory">Save Recents</string>
-    <string name="PrefClearHistory">Clear Recents</string>
-    <string name="PrefRecordCookies">Save Cookies</string>
-    <string name="PrefClearCookies">Clear Cookies</string>
-    <string name="PrefClearBrowserCache">Clear Browser Cache</string>
-    <string name="PrefClearCacheAndCookies">Clear Cookies and Cache</string>
-    <string name="PrefSources">Sources</string>
-    <string name="PrefResetSources">Reset Sources</string>
-    <string name="PrefRegion">Region</string>
-    <string name="PrefDirectQuery">Search on Tap</string>
-    <string name="PrefExternalBrowser">Use External Browser</string>
-    <string name="PrefNever">Never</string>
-    <string name="PrefExternalBrowserExceptSearches">For non-search results</string>
-    <string name="PrefExternalBrowserAlways">Always</string>
-    <string name="PrefClearCacheCookiesEveryLaunch">Every Launch</string>
-    <string name="PrefClearCacheCookiesWeekly">Weekly</string>
-    <string name="PrefClearCacheCookiesMonthly">Monthly</string>
-    <string name="PrefSendFeedback">Leave Feedback</string>
-    <string name="PrefAbout">About</string>
-    <string name="PrefRate">Rate App</string>
-    <string name="PrefAppSearch">Include Apps</string>
-    <string name="PrefMainFontSize">Font Size</string>
-    <string name="PrefEnableAcra">Automatic Crash Report</string>
-    <string name="PrefAcraDisabled">Automatic Reporting Disabled</string>
-    <string name="PrefAcraEnabled">Automatic Reporting Enabled</string>
-    <string name="PrefEnableJavascript">Enable Javascript</string>
-    
-    <string name="PrefWaterCooler">Stories</string>
-    <string name="PrefAutocomplete">Autocomplete</string>
-    <string name="PrefSearchResults">Search Results</string>
-    <string name="PrefTurnOffAutocomplete">Disabled</string>
+    <string name="app_name">DuckDuckGo</string>
 
-    <string name="PrefAutoUpdate">Automatic Feed Refresh</string>
-    <string name="PrefReadable">Readability</string>
-    <string name="PrefReadableSummary">On, when available</string>
-    <string name="PrefGroupTor">Tor</string>
-    <string name="PrefEnableTor">Enable Tor</string>
-    <string name="PrefCheckOrbotStatus">Check Orbot status</string>
-    <string name="OrbotStatusOkTitle">Orbot status</string>
-    <string name="OrbotStatusOkMessage">Orbot seems to be running fine!</string>
-    <string name="OrbotCheckSite">https://check.torproject.org</string>
-    
-    <string name="ShareStory">Share Story</string>
-    <string name="ShareSearch">Share Search</string>
-    <string name="SharePage">Share Page</string>
-    
-    <string name="RegularShareFormat">%1$s via DuckDuckGo for Android</string>
-    <string name="TwitterShareFormat">%1$s via @duckduckgo for Android</string>
-    
-    <string name="Yes">Yes</string>
-    <string name="No">No</string>
-    
-    <string name="Save">Save</string>
-    <string name="Unsave">Unsave</string>
-    <string name="Share">Share</string>
-    <string name="Refresh">Refresh</string>
-    <string name="Delete">Delete</string>
-    
-    <string name="LeftStories">Stories</string>
-    <string name="LeftSaved">Saved</string>
-    <string name="LeftSettings">Settings</string>
-    <string name="LeftRecent">Recent</string>
-    <string name="LeftRecentQueries">Recent Queries</string>
-    
-    <string name="Confirm">Confirm</string>
-    <string name="ConfirmClearHistory">All search history will be deleted. Are you sure?</string>
-    <string name="ConfirmClearCookies">All the cookies will be deleted. Are you sure?</string>
-    <string name="ConfirmClearCacheAndCookies">Browser cache will be deleted. Are you sure?</string>
-    
-    <string name="Default">Default</string>
-    <string name="Defaults">Reset to Default</string><!-- new -->
-    <string name="SuggestSource">Suggest a Source</string>
-    <string name="SuggestedSources">Please include these sources:</string>
-    
-    <string name="FeedbackTo">DuckDuckGo Feedback &lt;help@duckduckgo.com&gt;</string>
-    <string name="FeedbackSubject">DuckDuckGo Android v2</string>
-    
-    <string name="SavedFeedEmptyTitle">You have no saved stories</string>
-    <string name="SavedFeedEmptySubTitle">You can save stories in the search bar\'s actions menu.</string>
-    <string name="SavedResultsEmptyTitle">You have no saved results</string>
-    <string name="SavedResultsEmptySubTitle">You can save your search results in the search bar\'s actions menu.</string>
-    
-    <string name="MoreMenuTitle">Page Options</string>
-    
-    <string name="OpenInExternalBrowser">Open in External Browser</string>
-    <string name="ConfirmExternalBrowser">Please Confirm</string>
-    
-    <string name="ChangingFontSize">Changing Font Size&#8230;</string>
+    <!-- General Strings -->
+    <string name="edit">Edit</string>
+    <string name="bookmarks">Bookmarks</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
 
+    <!-- Omnibar -->
+    <string name="omnibar_search_edit_text_hint">Search DuckDuckGo</string>
 
-    <string name="crash_toast_text">Application crashed! Crash-related data will be collected and reported upon confirmation.</string>
-    <string name="crash_notif_ticker_text">Unexpected error, please send a report&#8230;</string>
-    <string name="crash_notif_title">DuckDuckGo crash report</string>
-    <string name="crash_notif_text">Please click here to help fix the issue.</string>
-    <string name="crash_dialog_text">An unexpected error occurred.
-        Please help us fix the problem by clicking \'OK\' to send crash-related data. 
-        The only data we will receive is: APP_VERSION_CODE, APP_VERSION_NAME, ANDROID_VERSION, STACK_TRACE,
-        AVAILABLE_MEM_SIZE, ReportField.USER_COMMENT, LOGCAT.</string>
-    <string name="crash_dialog_comment_prompt">Your comment: </string>
-    <string name="crash_dialog_ok_toast">Thank you for your help!</string>
-    
-    <string name="ErrorAppNotFound">App Not Found</string>
-    <string name="ErrorActivityNotFound">No related activity found!</string>
-    <string name="ErrorDownloadFailed">Download failed!</string>
-    <string name="ErrorDownloadOpenFail">Downloaded file could not be opened!</string>
+    <!-- Browser Menu -->
+    <string name="browser_menu_back">Back</string>
+    <string name="browser_menu_forward">Forward</string>
+    <string name="browser_menu_refresh">Refresh</string>
+    <string name="browser_menu_save_bookmark">Save bookmark</string>
+    <string name="browser_menu_bookmarks">@string/bookmarks</string>
+    <string name="browser_menu_tab_switcher">Tab switcher</string>
+    <string name="browser_menu_delete_text">Delete text</string>
+    <string name="browser_menu_new_tab">New tab</string>
+    <string name="browser_menu_copy_url">Copy URL</string>
 
-    <string name="ToastSchemeNotSupported">Unable to download file</string>
-    <string name="ToastDownloadManagerUnavailable">Unable to download file</string>
-    
-    <string name="InfoReadStoriesFromCache">Connection failed! Stories retrieved from cache&#8230;</string>
-    <string name="DefaultsSetToast">Sources reset to default.</string>
-    <string name="SuggestSourceToast">To be implemented.</string>
-    <string name="Loading">Loading&#8230;</string>
-    
-    <string name="SummaryWaterCooler">
-        These sources create a stream of interesting stories you won\'t find in regular news apps.
-        All of the sources are special feeds like \"most shared\" or \"most up-voted.\"
-        Check it out when you\'re waiting around for five minutes.
-        Note: you can remove Stories from your home screen using the \"Home Screen\" setting.
-    </string>
+    <!-- Main -->
+    <string name="main_label_copy_url_to_clipboard">URL</string>
+    <string name="main_copy_to_clipboard_success">Url copied to clipboard</string>
 
-    <string name="WaterCoolerSources">Stories</string>
-    
-    <string name="InformHistory"><i>Save recents</i> is disabled. You can enable it in <i>Settings.</i></string>
-    
-    <string name="Continue">Continue</string>
-    <string name="Retry">Retry</string>
-    <string name="ErrorFeedTitle">Error: Feed request</string>
-    <string name="ErrorFeedDetail">Feed request failed, possibly because of a connection problem.
-        You will still be able to browse cached items or you may choose to retry.</string>
-        
-    <string name="Apply">Apply</string>
-    <string name="Cancel">Cancel</string>
-    <string name="NoChange">No Change</string>
-    
-    <string name="OnlyOnPhone">Only on Phone</string>
-    <string name="SelectAppToSend">Select application to send</string>
-    
-    <string name="ReadabilityOn">Readability On</string>
-    <string name="ReadabilityOff">Readability Off</string>
-    
-    <string name="SavedSearches">Saved Searches</string>
-    <string name="SavedStories">Saved Stories</string>
-    <string name="StoryOptionsTitle">Story Options</string>
-    <string name="SearchOptionsTitle">Search Options</string>
-    <string name="PageOptionsTitle">Page Options</string>
-    
-    <string name="ToastUnSaveStory">The story has been removed from your saved stories.</string>
-    <string name="ToastUnSaveSearch">The search has been removed from your saved searches.</string>
-    <string name="ToastSaveStory">Your story was saved.</string>
-    <string name="ToastSaveSearch">Your search was saved.</string>
-    <string name="ToastDeleteStoryInHistory">The story has been removed from your history.</string>
-    <string name="ToastDeleteUrlInHistory">The url has been removed from your history.</string>
-    
-    <string name="WelcomeHeader">Introducing</string>
-    <string name="WelcomeTitle">DuckDuckGo Search &amp; Stories</string>
-    <string name="WelcomeDescription">
-        Search Anonymously.\nFind Instantly.\nStay Informed.</string>
-    <string name="GetStarted">Get Started</string>
-    
-    <string name="BangButtonExplanation">Searching on other sites is easy with !bang commands.</string>
-    
-    <string name="LeftRecentSearches">Recent Searches</string>
-    <string name="LeftRecentStories">Recent Stories</string>
-    <string name="NewSources">We\'ve added some cool new story sources!</string>
-    <string name="NewSourcesOk">Show me</string>
-    <string name="NewSourcesNoThx">Later</string>
+    <!-- Bookmarks -->
+    <string name="bookmarks_toolbar">@string/bookmarks</string>
+    <string name="bookmarks_empty">No bookmarks yet</string>
 
-    <string name="WorldTraveler">World Traveler (none)</string>
+    <!-- Bookmarks Menu -->
+    <string name="bookmarks_menu_edit">@string/edit</string>
 
+    <!-- Edit Bookmark Dialog -->
+    <string name="bookmark_dialog_save_button">@string/save</string>
+    <string name="bookmark_dialog_cancel_button">@string/cancel</string>
+    <string name="bookmark_dialog_title_edit">Edit bookmark</string>
+    <string name="bookmark_dialog_title_save">Save bookmark</string>
+    <string name="bookmark_dialog_name_hint">Bookmark name</string>
+    <string name="bookmark_dialog_url_hint">Bookmark URL</string>
 
-    <!--new strings--><!--
-    <string name="add_favourites">Add to Favourites</string>
-    <string name="remove_favourites">Remove from Favourites</string>
-    <string name="share">Share this</string>
-    <string name="view_external">View in Browser</string>
-    <string name="reload">Reload</string>-->
-    <string name="stories">Stories</string>
-    <string name="help_feedback">Help &amp; Feedback</string>
-    <string name="settings">Settings</string>
+    <!-- Tab Switcher -->
+    <string name="tab_switcher_title">Private Tabs</string>
+    <string name="tab_switcher_title_no_tabs">No Tabs</string>
+    <string name="tab_switcher_fire_button">Clear All</string>
+    <string name="tab_switcher_done_button">Done</string>
 
-    <!--favorites fragment -->
-    <string name="favorites">Favorites</string>
-    <string name="favorite_stories">Favorite Stories</string>
-    <string name="favorite_stories_narrow">@string/stories</string>
-    <string name="favorite_search">Favorite Searches</string>
-    <string name="favorite_search_narrow">Searches</string>
-    <string name="empty_favorites_title">No Favorites</string>
-    <string name="empty_favorites_text">Add searches and stories\nto your favourites, and they\nwill be shown here.</string>
+    <!-- Content description -->
+    <string name="content_description_omnibar_back_button">Cancel search input</string>
+    <string name="content_description_bookmark_delete_button">Delete bookmark</string>
+    <string name="content_description_bookmark_drag_item">Move item</string>
+    <string name="content_description_tab_delete_button">Delete tab</string>
+    <string name="content_description_tab_favicon_image_view">Favicon</string>
+    <string name="content_description_tabswitcher_new_button">Create new tab</string>
+    <string name="content_description_tabswitcher_fire_button">Delete all tabs and data</string>
 
-    <!--recents fragment-->
-    <string name="recents">Recents</string>
-    <string name="recent_stories">Recent Stories</string>
-    <string name="recent_stories_narrow">@string/stories</string>
-    <string name="recent_searches">Recent Searches</string>
-    <string name="recent_searches_narrow">Searches</string>
-    <string name="empty_recents_title">No Recents</string>
-    <string name="empty_recents_text">Once you start searching\nor browsing stories, your activity\nwill be shown here.</string>
-    <string name="disabled_recents_title">Recents Disabled</string>
-    <string name="disabled_recents_text">You can enable recents in Settings.</string>
-
-    <!--about fragment-->
-    <string name="about">About</string>
-    <string name="about_text">The search engine that doesn\'t\ntrack you.</string>
-    <string name="version">Version</string>
-    <string name="select_application">Select application</string>
-
-    <!--help feedback fragment-->
-    <string name="help">Help</string>
-    <string name="android_help_center">Android Help Center</string>
-    <string name="feedback">Feedback</string>
-    <string name="leave_feedback">Leave Feedback</string>
-    <string name="rate">Rate the App</string>
-
-    <!-- change sources fragment-->
-    <string name="change_sources">Sources</string>
-    <string name="options">Options</string>
-
-    <!-- menus -->
-    <string name="action_stories">@string/stories</string>
-    <string name="action_recents">@string/recents</string>
-    <string name="action_favorites">@string/favorites</string>
-    <string name="action_settings">@string/settings</string>
-    <string name="action_help_feedback">Help &amp; Feedback</string>
-    <string name="action_reload">Refresh Page</string>
-    <string name="action_add_favorite">Add to Favorites</string>
-    <string name="action_remove_favorite">Unfavorite</string>
-    <string name="action_share">Share</string>
-    <string name="action_view_external">View in Browser</string>
-    <string name="action_back">Back</string>
-    <string name="action_forward">Forward</string>
-    <string name="action_close">Close</string>
-    <string name="remove">Remove</string>
-
-
-
-
-    
-    <!-- SSL Certificate dialogs -->
-    <!-- Title for an SSL Certificate dialog -->
-    <string name="ssl_certificate">Security certificate</string>
-    <!-- Message on an SSL Certificate dialog -->
-    <string name="ssl_certificate_is_valid">This certificate is valid.</string>
-    <!-- Label for an information field on an SSL Certificate Dialog -->
-    <string name="issued_to">Issued to:</string>
-    <!-- Label for an information field on an SSL Certificate Dialog -->
-    <string name="common_name">Common name:</string>
-    <!-- Label for an information field on an SSL Certificate Dialog -->
-    <string name="org_name">Organization:</string>
-    <!-- Label for an information field on an SSL Certificate Dialog -->
-    <string name="org_unit">Organizational unit:</string>
-    <!-- Label for an information field on an SSL Certificate Dialog -->
-    <string name="issued_by">Issued by:</string>
-    <!-- Label for an information field on an SSL Certificate Dialog -->
-    <string name="validity_period">Validity:</string>
-    <!-- Label for an information field on an SSL Certificate Dialog -->
-    <string name="issued_on">Issued on:</string>
-    <!-- Label for an information field on an SSL Certificate Dialog -->
-    <string name="expires_on">Expires on:</string>
-    <!-- Label for an information field on an SSL Certificate Dialog -->
-    <string name="serial_number">Serial number:</string>
-    <!-- Label for an information field on an SSL Certificate Dialog -->
-    <string name="fingerprints">Fingerprints:</string>
-    <!-- Label for an information field on an SSL Certificate Dialog -->
-    <string name="sha256_fingerprint">SHA-256 fingerprint:</string>
-    <!-- Label for an information field on an SSL Certificate Dialog -->
-    <string name="sha1_fingerprint">SHA-1 fingerprint:</string>
-    
-    <string name="WarnSSLTitle">Warning: SSL certificate</string>
-    <string name="WarnSSLDetail">SSL certificate of the server is not listed as trusted. 
-        You can still choose to continue or cancel the request.</string>
-    
 </resources>

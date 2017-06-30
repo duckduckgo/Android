@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group android:id="@+id/group_menu">
+        <item
+            android:id="@+id/action_refresh"
+            android:enabled="false"
+            android:orderInCategory="100"
+            android:title="@string/browser_menu_refresh"
+            app:showAsAction="never"/>
+        <item
+            android:id="@+id/action_new_tab"
+            android:orderInCategory="200"
+            android:title="@string/browser_menu_new_tab"
+            app:showAsAction="never"/>
+        <item
+            android:id="@+id/action_save_bookmark"
+            android:orderInCategory="300"
+            android:title="@string/browser_menu_save_bookmark"
+            app:showAsAction="never"/>
+        <item
+            android:id="@+id/action_copy_url"
+            android:orderInCategory="400"
+            android:title="@string/browser_menu_copy_url"
+            app:showAsAction="never"/>
+    </group>
+    <item
+        android:id="@+id/action_delete_all_text"
+        android:orderInCategory="600"
+        android:visible="false"
+        android:title="@string/browser_menu_delete_text"
+        android:icon="@drawable/ic_clear"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction" />
+</menu>

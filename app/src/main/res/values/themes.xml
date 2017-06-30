@@ -1,61 +1,39 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <style name="DDGTheme" parent="DDGTheme.Base">
-
-    </style>
-
-    <style name="DDGTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowBackground">@drawable/launcher_window_background</item>
-        <item name="actionModeBackground">@color/action_mode_background</item>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme. -->
+    <style name="AppTheme.Base" parent="Theme.AppCompat.NoActionBar">
+        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorPrimary</item>
-        <item name="actionOverflowButtonStyle">@style/OverflowButton</item>
-        <item name="popUp">@style/DDGPopup</item>
-        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
-        <!-- material style for Preference-v14
-        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
-        -->
+        <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="DDGPopup" parent="Widget.AppCompat.PopupMenu"><!--PopupMenu-->
+    <style name="AppTheme" parent="AppTheme.Base"/>
+
+    <style name="AppTheme.TabSwitcher" parent="AppTheme">
+        <item name="android:background">@color/tab_switcher_background</item>
     </style>
 
-    <style name="DDGActionMode" parent="Theme.AppCompat">
-        <item name="actionModeBackground">@color/action_mode_background</item>
-        <item name="android:textColorSecondary">@color/white</item>
+    <style name="AppTheme.ProgressBar" parent="AppTheme">
+        <item name="colorAccent">@color/omnibar_progress_bar</item>
+        <item name="android:background">@color/omnibar_progress_bar_background</item>
     </style>
 
-    <style name="OverflowMenu" parent="Widget.AppCompat.Spinner.DropDown">
-
+    <style name="AppBar" parent="@style/ThemeOverlay.AppCompat.ActionBar">
     </style>
 
-    <style name="OverflowMenu2" parent="Widget.AppCompat.Light.PopupMenu.Overflow">
+    <style name="AppBar.Toolbar" parent="AppBar">
+        <item name="android:actionOverflowButtonStyle">@style/OverflowButton</item>
     </style>
 
-    <style name="DDGWhiteOverflow" parent="DDGTheme.Base">
-        <item name="android:tint">#ffffff</item>
+    <style name="AppBar.Popup" parent="@style/ThemeOverlay.AppCompat.Light">
+    </style>
+
+    <style name="AppBar.TabSwitcher" parent="AppBar">
+        <item name="colorPrimary">@color/tab_switcher_background</item>
     </style>
 
     <style name="OverflowButton" parent="Widget.AppCompat.ActionButton.Overflow">
-        <item name="android:minWidth">@dimen/actionbar_overflow_width</item>
-        <item name="android:layout_width">@dimen/actionbar_overflow_width</item>
-        <item name="android:padding">0dp</item>
+        <item name="android:tint">#ffffff</item>
     </style>
-
-    <style name="Test" parent="Widget.AppCompat.ActionButton.Overflow">
-
-    </style>
-
-    <style name="ToolbarStyle" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:textColorPrimary">@android:color/white</item>
-        <item name="android:textColorSecondary">@android:color/white</item>
-    </style>
-
-    <style name="DDGPopupAnimation" parent="android:Animation">
-        <item name="android:windowEnterAnimation">@anim/test_menu_open</item>
-        <item name="android:windowExitAnimation">@anim/test_menu_close</item>
-    </style>
-
 </resources>

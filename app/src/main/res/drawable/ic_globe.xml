@@ -1,0 +1,25 @@
+<!--
+  ~ Copyright (c) 2017 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:width="17dp"
+        android:height="16dp"
+        android:viewportWidth="17.0"
+        android:viewportHeight="16.0">
+    <path
+        android:pathData="M8.02,15.997a8,8 0,1 1,0 -16,8 8,0 0,1 0,16zM8.025,2.019A5.94,5.94 0,0 0,2.18 6.908v0.483l0.356,0.408 0.459,0.459s0.306,0.663 0.408,0.867c0.102,0.204 0.561,0.408 0.561,0.408l0.357,0.56s0,0.204 0.102,1.02c0.102,0.815 0.306,0.663 0.663,1.172 0.356,0.51 0.768,0.468 0.972,0.417 0.204,-0.051 -0.361,-0.875 -0.412,-1.232 -0.051,-0.357 0.051,-0.51 0.306,-1.275 0.255,-0.764 0.306,-0.408 0.459,-0.662 0.153,-0.255 0,-0.714 -0.153,-1.224s-0.306,-0.306 -0.306,-0.306 -1.121,-0.51 -1.835,-0.408c-0.714,0.102 -1.376,0 -1.376,-0.357 0,-0.356 0.101,-0.305 0.611,-0.764s0.51,-0.102 0.51,-0.102l0.804,-0.468 1.019,-0.686s0.762,-0.333 0.966,-0.588c0.204,-0.255 0.256,-1.036 0.46,-1.444 0.203,-0.408 0.914,-0.372 0.914,-0.372l0.104,-0.79c-0.035,-0.001 -0.069,-0.005 -0.104,-0.005zM10.429,2.53c-0.077,0.409 -0.144,0.808 -0.144,0.808l-0.107,0.964 0.475,0.821s-0.385,0.145 -0.278,0.466c0.107,0.322 0.312,0.56 -0.117,0.453 -0.428,-0.107 -0.883,0.241 -0.937,0.991 -0.053,0.749 -0.482,0.803 0.161,1.499 0.643,0.696 0.589,1.017 1.178,0.857 0.589,-0.161 0.892,0.047 0.892,0.047s0.7,0.166 0.54,0.434c-0.161,0.267 -0.361,0.483 -0.468,0.804 -0.107,0.321 -0.214,0.589 -0.268,1.071 -0.053,0.482 -0.214,0.964 -0.214,1.232v0.041a5.936,5.936 0,0 0,-0.713 -10.488z"
+        android:fillColor="#FFF"/>
+</vector>
