@@ -21,6 +21,7 @@ import android.content.Context;
 import com.duckduckgo.app.data.bookmark.BookmarkJsonEntityMapper;
 import com.duckduckgo.app.data.bookmark.BookmarkSharedPreferences;
 import com.duckduckgo.app.data.bookmark.SharedPreferencesBookmarkRepository;
+import com.duckduckgo.app.data.suggestion.DDGSuggestionRepository;
 import com.duckduckgo.app.data.tab.SharedPreferencesTabRepository;
 import com.duckduckgo.app.data.tab.TabJsonEntityMapper;
 import com.duckduckgo.app.data.tab.TabSharedPreferences;
@@ -84,6 +85,14 @@ public class Injector {
         return (SharedPreferencesBookmarkRepository) instances.get(key);
     }
 
+    public static DDGSuggestionRepository injectDDGSuggestionRepository() {
+        String key = getKeyforClass(DDGSuggestionRepository.class);
+        if (!instances.containsKey(key)) {
+            instances.put(key, instantiateDDGSuggestionRepository());
+        }
+        return (DDGSuggestionRepository) instances.get(key);
+    }
+
     private static BrowserPresenterImpl instantiateBrowserPresenterImpl() {
         return new BrowserPresenterImpl(injectSharedPreferencesTabRepository(), injectSharedPreferencesBookmarkRepository());
     }
@@ -98,6 +107,10 @@ public class Injector {
 
     private static SharedPreferencesBookmarkRepository instantiateSharedPreferencesBookmarkRepository() {
         return new SharedPreferencesBookmarkRepository(injectBookmarkSharedPreferences(), instantiateBookmarkJsonEntityMapper());
+    }
+
+    private static DDGSuggestionRepository instantiateDDGSuggestionRepository() {
+        return new DDGSuggestionRepository();
     }
 
     private static TabJsonEntityMapper instantiateTabJsonEntityMapper() {
