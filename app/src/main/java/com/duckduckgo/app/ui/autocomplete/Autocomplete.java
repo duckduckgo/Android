@@ -82,8 +82,8 @@ public class Autocomplete extends RecyclerView implements AutocompleteView {
     }
 
     @Override
-    public void addSuggestions(@NonNull List<SuggestionEntity> suggestions) {
-        adapter.setSuggestions(suggestions);
+    public void addSuggestions(@NonNull List<SuggestionEntity> suggestions, @NonNull String filter) {
+        adapter.setSuggestions(suggestions, filter);
         if (showAutocompleteResults) {
             if (getVisibility() != View.VISIBLE) {
                 setVisibility(View.VISIBLE);

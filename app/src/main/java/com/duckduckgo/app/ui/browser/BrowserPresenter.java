@@ -126,5 +126,5 @@ public interface BrowserPresenter {
 
     void autocompleteSuggestionAddToQuery(int position);
 
-    void onReceiveNewSuggestions(List<SuggestionEntity> list);
+    void onReceiveNewSuggestionsForQuery(@NonNull List<SuggestionEntity> list, @NonNull String query);
 }

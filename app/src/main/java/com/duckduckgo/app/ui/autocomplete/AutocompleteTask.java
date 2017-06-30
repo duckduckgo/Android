@@ -30,6 +30,7 @@ import java.util.List;
 public class AutocompleteTask extends AsyncTask<String, Void, List<SuggestionEntity>> {
     private WeakReference<BrowserPresenter> browserPresenterRef;
     private SuggestionRepository suggestionRepository;
+    private String query;
 
     public AutocompleteTask(@NonNull BrowserPresenter browserPresenter, @NonNull SuggestionRepository suggestionRepository) {
         browserPresenterRef = new WeakReference<>(browserPresenter);
@@ -38,7 +39,7 @@ public class AutocompleteTask extends AsyncTask<String, Void, List<SuggestionEnt
 
     @Override
     protected List<SuggestionEntity> doInBackground(String... params) {
-        String query = params[0];
+        query = params[0];
         List<SuggestionEntity> list = new ArrayList<>();
         for (Suggestion suggestion : suggestionRepository.getSuggestions(query)) {
             list.add(new SuggestionEntity(suggestion));
@@ -50,7 +51,7 @@ public class AutocompleteTask extends AsyncTask<String, Void, List<SuggestionEnt
     protected void onPostExecute(List<SuggestionEntity> suggestionEntities) {
         super.onPostExecute(suggestionEntities);
         if (browserPresenterRef.get() != null) {
-            browserPresenterRef.get().onReceiveNewSuggestions(suggestionEntities);
+            browserPresenterRef.get().onReceiveNewSuggestionsForQuery(suggestionEntities, query);
         }
     }
 }

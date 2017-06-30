@@ -16,7 +16,14 @@
 
 package com.duckduckgo.app.ui.autocomplete;
 
+import android.content.Context;
+import android.support.annotation.ColorRes;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,13 +72,29 @@ public class SuggestionViewHolder extends RecyclerView.ViewHolder {
 
     }
 
-    public void setSuggestion(SuggestionEntity suggestion) {
-        String suggestionText = suggestion.getSuggestion();
+    public void setSuggestion(@NonNull SuggestionEntity suggestion, @NonNull String filter) {
+        Spannable filterStyled = getColoredText(itemView.getContext(), filter, R.color.suggestion_text_primary);
 
-        suggestionTextView.setText(suggestionText);
+        suggestionTextView.setText(filterStyled);
+
+        String suggestionText = suggestion.getSuggestion().replace(filter, "");
+        Spannable suggestionStyled = getColoredText(itemView.getContext(), suggestionText, R.color.suggestion_text_secondary);
+
+        suggestionTextView.append(suggestionStyled);
 
         int iconResId = UrlUtils.isUrl(suggestionText) ? R.drawable.ic_globe : R.drawable.ic_small_loupe;
         iconImageView.setImageResource(iconResId);
+    }
+
+    private Spannable getColoredText(Context context, @NonNull String text, @ColorRes int color) {
+        Spannable textStyled = new SpannableString(text);
+        textStyled.setSpan(
+                new ForegroundColorSpan(
+                        ContextCompat.getColor(context, color)),
+                0,
+                text.length(),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return textStyled;
     }
 
     public static SuggestionViewHolder inflate(ViewGroup parent, OnSuggestionListener onSuggestionListener) {

@@ -33,13 +33,15 @@ public class SuggestionAdapter extends RecyclerView.Adapter<SuggestionViewHolder
 
     private OnSuggestionListener onSuggestionListener;
     private List<SuggestionEntity> suggestions;
+    private String filter = "";
 
     public SuggestionAdapter(@NonNull OnSuggestionListener onSuggestionListener) {
         this.onSuggestionListener = onSuggestionListener;
     }
 
-    public void setSuggestions(@NonNull List<SuggestionEntity> suggestions) {
+    public void setSuggestions(@NonNull List<SuggestionEntity> suggestions, @NonNull String filter) {
         this.suggestions = suggestions;
+        this.filter = filter;
         notifyDataSetChanged();
     }
 
@@ -66,7 +68,7 @@ public class SuggestionAdapter extends RecyclerView.Adapter<SuggestionViewHolder
     @Override
     public void onBindViewHolder(SuggestionViewHolder holder, int position) {
         SuggestionEntity suggestion = suggestions.get(position);
-        holder.setSuggestion(suggestion);
+        holder.setSuggestion(suggestion, filter);
     }
 
     @Override

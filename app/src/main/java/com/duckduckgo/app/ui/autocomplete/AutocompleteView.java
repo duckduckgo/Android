@@ -21,7 +21,7 @@ import android.support.annotation.NonNull;
 import java.util.List;
 
 public interface AutocompleteView {
-    void addSuggestions(@NonNull List<SuggestionEntity> suggestions);
+    void addSuggestions(@NonNull List<SuggestionEntity> suggestions, @NonNull String filter);
 
     void show();
 

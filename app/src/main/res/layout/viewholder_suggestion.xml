@@ -29,10 +29,10 @@
         android:src="@drawable/ic_small_loupe"/>
     <ImageButton
         android:id="@+id/suggestion_add_image_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginRight="24dp"
+        android:layout_width="41dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
         android:layout_gravity="center_vertical|end"
         android:src="@drawable/ic_add_to_query"
         android:background="?attr/selectableItemBackgroundBorderless"/>

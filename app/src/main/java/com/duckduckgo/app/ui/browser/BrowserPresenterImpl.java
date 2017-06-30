@@ -528,10 +528,10 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     @Override
-    public void onReceiveNewSuggestions(List<SuggestionEntity> list) {
+    public void onReceiveNewSuggestionsForQuery(@NonNull List<SuggestionEntity> list, @NonNull String query) {
         suggestions.clear();
         suggestions.addAll(list);
-        autocompleteView.addSuggestions(suggestions);
+        autocompleteView.addSuggestions(suggestions, query);
     }
 
     @Nullable
