@@ -35,8 +35,16 @@ public class SuggestionEntity implements Suggestion {
         return type;
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
+
     @Override
     public String getSuggestion() {
         return suggestion;
+    }
+
+    public void setSuggestion(String suggestion) {
+        this.suggestion = suggestion;
     }
 }

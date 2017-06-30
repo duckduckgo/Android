@@ -29,6 +29,8 @@ import android.widget.Toast;
 
 import com.duckduckgo.app.Injector;
 import com.duckduckgo.app.R;
+import com.duckduckgo.app.domain.suggestion.SuggestionRepository;
+import com.duckduckgo.app.ui.autocomplete.AutocompleteTask;
 import com.duckduckgo.app.ui.bookmarks.BookmarkEntity;
 import com.duckduckgo.app.ui.bookmarks.BookmarksActivity;
 import com.duckduckgo.app.ui.browser.BrowserFragment;
@@ -126,6 +128,11 @@ public class MainActivity extends AppCompatActivity implements MainView, EditBoo
     public void copyUrlToClipboard(@NonNull String url) {
         copyTextToClipboard(getString(R.string.main_label_copy_url_to_clipboard), url);
         Toast.makeText(this, R.string.main_copy_to_clipboard_success, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void loadSuggestions(@NonNull SuggestionRepository suggestionRepository, @NonNull String query) {
+        new AutocompleteTask(browserPresenter, suggestionRepository).execute(query);
     }
 
     @Override

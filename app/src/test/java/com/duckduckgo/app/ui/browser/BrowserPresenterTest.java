@@ -1,8 +1,11 @@
 package com.duckduckgo.app.ui.browser;
 
 import com.duckduckgo.app.domain.bookmark.BookmarkRepository;
+import com.duckduckgo.app.domain.suggestion.SuggestionRepository;
 import com.duckduckgo.app.domain.tab.Tab;
 import com.duckduckgo.app.domain.tab.TabRepository;
+import com.duckduckgo.app.ui.autocomplete.AutocompleteView;
+import com.duckduckgo.app.ui.autocomplete.SuggestionEntity;
 import com.duckduckgo.app.ui.bookmarks.BookmarkEntity;
 import com.duckduckgo.app.ui.main.MainView;
 import com.duckduckgo.app.ui.navigationbar.NavigationBarView;
@@ -10,6 +13,7 @@ import com.duckduckgo.app.ui.omnibar.OmnibarView;
 import com.duckduckgo.app.ui.tab.TabEntity;
 import com.duckduckgo.app.ui.tab.TabView;
 import com.duckduckgo.app.ui.tabswitcher.TabSwitcherView;
+import com.duckduckgo.app.util.AppUrls;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +29,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -32,18 +37,18 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 /**
- *    Copyright 2017 DuckDuckGo
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Copyright 2017 DuckDuckGo
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 public class BrowserPresenterTest {
@@ -53,13 +58,16 @@ public class BrowserPresenterTest {
     private OmnibarView mockOmnibarView;
     private NavigationBarView mockNavigationBarView;
     private TabView mockTabView;
+    private AutocompleteView mockAutocompleteView;
     private TabSwitcherView mockTabSwitcherView;
     private TabRepository mockTabRepository;
     private BookmarkRepository mockBookmarkRepository;
+    private SuggestionRepository mockSuggestionRepository;
 
     private BrowserPresenter browserPresenter;
 
     private List<Tab> mockTabs = new ArrayList<>();
+    private List<SuggestionEntity> mockSuggestions = new ArrayList<>();
 
     @Before
     public void setup() {
@@ -68,17 +76,20 @@ public class BrowserPresenterTest {
         mockOmnibarView = mock(OmnibarView.class);
         mockNavigationBarView = mock(NavigationBarView.class);
         mockTabView = mock(TabView.class);
+        mockAutocompleteView = mock(AutocompleteView.class);
         mockTabSwitcherView = mock(TabSwitcherView.class);
         mockTabRepository = mock(TabRepository.class);
         mockBookmarkRepository = mock(BookmarkRepository.class);
+        mockSuggestionRepository = mock(SuggestionRepository.class);
 
         initTabs();
 
-        browserPresenter = new BrowserPresenterImpl(mockTabRepository, mockBookmarkRepository);
+        browserPresenter = new BrowserPresenterImpl(mockTabRepository, mockBookmarkRepository, mockSuggestionRepository);
         browserPresenter.attachBrowserView(mockBrowserView);
         browserPresenter.attachOmnibarView(mockOmnibarView);
         browserPresenter.attachNavigationBarView(mockNavigationBarView);
         browserPresenter.attachMainview(mockMainView);
+        browserPresenter.attachAutocompleteView(mockAutocompleteView);
     }
 
     private void restoreSession() {
@@ -118,8 +129,24 @@ public class BrowserPresenterTest {
         return bookmark;
     }
 
+    private void initSuggestions() {
+        mockSuggestions.clear();
+        for (String suggestion : suggestions) {
+            mockSuggestions.add(createMockSuggestion(suggestion));
+        }
+    }
+
+    private SuggestionEntity createMockSuggestion(String suggestion) {
+        SuggestionEntity sugg = new SuggestionEntity();
+        sugg.setType("phrase");
+        sugg.setSuggestion(suggestion);
+        return sugg;
+    }
+
     private static String[] urls = {"https://duckduckgo.com/?q=test", "https://test.com", "https//duckduckgo.com"};
     private static String[] titles = {"test at DuckduckGo", "Test", "DuckDuckgo"};
+
+    private static String[] suggestions = {"instagram", "indeed", "ikea", "irctc", "itunes", "imdb", "icloud", "IRS", "images", "illinois lottery"};
 
     @Test
     public void whenDetachBrowserViewThenHaveNoInteractionWithBrowserView() {
@@ -137,6 +164,12 @@ public class BrowserPresenterTest {
     public void whenDetachOmnibarViewThenHaveNoInteractionWithOmnibarView() {
         browserPresenter.detachOmnibarView();
         verifyZeroInteractions(mockOmnibarView);
+    }
+
+    @Test
+    public void whenDetachAutocompleteViewThenHaveNoInteractionWithAutocompleteView() {
+        browserPresenter.detachAutocompleteView();
+        verifyZeroInteractions(mockAutocompleteView);
     }
 
     @Test
@@ -583,4 +616,90 @@ public class BrowserPresenterTest {
         browserPresenter.loadBookmark(bookmark);
         verify(mockTabView, times(1)).loadUrl(bookmark.getUrl());
     }
+
+    @Test
+    public void whenRequestCopyUrlThenMainViewCopyUrlToClipboard() {
+        restoreSession();
+        browserPresenter.openTab(0);
+        browserPresenter.requestCopyCurrentUrl();
+        verify(mockMainView, times(1)).copyUrlToClipboard(anyString());
+    }
+
+    @Test
+    public void whenRequestCopyUrlThenMainViewCopyUrlToClipboardTheCurrentUrl() {
+        restoreSession();
+        browserPresenter.openTab(0);
+        browserPresenter.requestCopyCurrentUrl();
+        verify(mockMainView, times(1)).copyUrlToClipboard(urls[0]);
+    }
+
+    @Test
+    public void whenOmnibarTextChangesAndIsEditingThenLoadAutocompleteSuggesitons() {
+        startSession();
+        final String input = "i";
+        browserPresenter.omnibarFocusChanged(true);
+        browserPresenter.omnibarTextChanged(input);
+        verify(mockMainView, times(1)).loadSuggestions(mockSuggestionRepository, input);
+    }
+
+    @Test
+    public void whenOmnibarTextChangesAndIsEditingThenShowAutocompleteSuggesitons() {
+        startSession();
+        final String input = "i";
+        browserPresenter.omnibarFocusChanged(true);
+        browserPresenter.omnibarTextChanged(input);
+        verify(mockAutocompleteView, times(1)).show();
+        verify(mockAutocompleteView, never()).hide();
+    }
+
+    @Test
+    public void whenOmnibarTextChangesWithEmptyTextAndIsEditingThenHideAutocompleteSuggesitons() {
+        startSession();
+        final String input = "";
+        browserPresenter.omnibarFocusChanged(true);
+        browserPresenter.omnibarTextChanged(input);
+        verify(mockAutocompleteView, times(1)).hide();
+        verify(mockAutocompleteView, never()).show();
+    }
+
+    @Test
+    public void whenOnReceiveNewSuggestionsForQueryThenAutocompleteViewCallsAddSuggestions() {
+        browserPresenter.onReceiveNewSuggestionsForQuery(ArgumentMatchers.<SuggestionEntity>anyList(), anyString());
+        verify(mockAutocompleteView, times(1)).addSuggestions(ArgumentMatchers.<SuggestionEntity>anyList(), anyString());
+    }
+
+    @Test
+    public void whenAutocompleteSuggestionClickedThenLoadRightUrl() {
+        initSuggestions();
+        startSession();
+        final String query = "i";
+        final int position = 0;
+        final String suggestion = mockSuggestions.get(position).getSuggestion();
+        final String expected = AppUrls.getSearchUrl(suggestion);
+        browserPresenter.attachTabView(mockTabView);
+        browserPresenter.omnibarFocusChanged(true);
+        browserPresenter.omnibarTextChanged(query);
+        browserPresenter.onReceiveNewSuggestionsForQuery(mockSuggestions, query);
+
+        browserPresenter.autocompleteSuggestionClicked(position);
+        verify(mockTabView, atLeast(1)).loadUrl(expected);
+    }
+
+    @Test
+    public void whenAutocompleteSuggestionAddToQueryThenDisplayTheRightText() {
+        initSuggestions();
+        startSession();
+        final String query = "i";
+        final int position = 0;
+        final String expected = mockSuggestions.get(position).getSuggestion();
+        browserPresenter.attachTabView(mockTabView);
+        browserPresenter.omnibarFocusChanged(true);
+        browserPresenter.omnibarTextChanged(query);
+        browserPresenter.onReceiveNewSuggestionsForQuery(mockSuggestions, query);
+
+        browserPresenter.autocompleteSuggestionAddToQuery(position);
+        verify(mockOmnibarView, atLeast(1)).displayText(expected);
+    }
+
+
 }

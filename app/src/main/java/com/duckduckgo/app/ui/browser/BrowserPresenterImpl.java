@@ -542,7 +542,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     private void loadAutocompleteResults(@NonNull String query) {
         showAutcompleteResults();
-        new AutocompleteTask(this, suggestionRepository).execute(query);
+        mainView.loadSuggestions(suggestionRepository, query);
     }
 
     private void showAutcompleteResults() {
