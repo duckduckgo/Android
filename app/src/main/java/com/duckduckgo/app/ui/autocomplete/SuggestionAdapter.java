@@ -21,8 +21,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.duckduckgo.app.domain.suggestion.Suggestion;
-
 import java.util.List;
 
 public class SuggestionAdapter extends RecyclerView.Adapter<SuggestionViewHolder> {

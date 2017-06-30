@@ -19,7 +19,6 @@ package com.duckduckgo.app.ui.browser;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.duckduckgo.app.domain.bookmark.BookmarkRepository;
 import com.duckduckgo.app.domain.suggestion.SuggestionRepository;
@@ -352,7 +351,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     private void setEditing(boolean editing) {
         isEditing = editing;
         setOmnibarEditing(isEditing);
-        if(!isEditing) {
+        if (!isEditing) {
             hideAutocompleteResults();
         }
     }
@@ -370,7 +369,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     public void omnibarTextChanged(@NonNull String text) {
         if (isEditing) {
             omnibarView.setDeleteAllTextButtonVisible(text.length() > 0);
-            if(text.length() > 0) {
+            if (text.length() > 0) {
                 loadAutocompleteResults(text);
             } else {
                 hideAutocompleteResults();
@@ -386,6 +385,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
         if (currentTab != null) {
             displayTextForUrl(currentTab.getCurrentUrl());
         }
+        omnibarView.closeKeyboard();
     }
 
     @Override
@@ -514,22 +514,16 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     @Override
     public void autocompleteSuggestionClicked(int position) {
-        Log.e("suggestion_test", "on suggestion clicked");
         SuggestionEntity suggestion = getSuggestion(position);
-        Log.e("suggestion_test", "on suggestion clicked 2");
-        if(suggestion == null) return;
-        Log.e("suggestion_test", "on suggestion clicked 3");
+        if (suggestion == null) return;
         requestSearchInCurrentTab(suggestion.getSuggestion());
-        Log.e("suggestion_test", "on suggestion clicked 4");
-        // TODO: 6/30/17  close keyboard
         omnibarView.closeKeyboard();
     }
 
     @Override
     public void autocompleteSuggestionAddToQuery(int position) {
-        Log.e("suggestion_test", "on suggestion add to query");
         SuggestionEntity suggestion = getSuggestion(position);
-        if(suggestion == null) return;
+        if (suggestion == null) return;
         displayText(suggestion.getSuggestion());
     }
 
@@ -542,7 +536,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     @Nullable
     private SuggestionEntity getSuggestion(int position) {
-        if(position >= suggestions.size()) return null;
+        if (position >= suggestions.size()) return null;
         return suggestions.get(position);
     }
 
