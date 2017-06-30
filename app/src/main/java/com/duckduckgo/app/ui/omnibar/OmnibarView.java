@@ -38,4 +38,6 @@ public interface OmnibarView {
     void hideProgressBar();
 
     void onProgressChanged(int newProgress);
+
+    void closeKeyboard();
 }

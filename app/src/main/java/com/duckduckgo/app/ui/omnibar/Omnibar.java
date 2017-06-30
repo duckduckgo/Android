@@ -168,6 +168,11 @@ public class Omnibar extends AppBarLayout implements OmnibarView {
         progressBar.setProgress(newProgress);
     }
 
+    @Override
+    public void closeKeyboard() {
+        KeyboardUtils.hideKeyboard(searchEditText);
+    }
+
     public void inflateMenu(int resId) {
         toolbar.inflateMenu(resId);
     }

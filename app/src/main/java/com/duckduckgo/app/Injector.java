@@ -94,7 +94,7 @@ public class Injector {
     }
 
     private static BrowserPresenterImpl instantiateBrowserPresenterImpl() {
-        return new BrowserPresenterImpl(injectSharedPreferencesTabRepository(), injectSharedPreferencesBookmarkRepository());
+        return new BrowserPresenterImpl(injectSharedPreferencesTabRepository(), injectSharedPreferencesBookmarkRepository(), injectDDGSuggestionRepository());
     }
 
     private static BookmarksPresenterImpl instantiateBookmarksPresenterImpl() {
