@@ -45,7 +45,7 @@
                 android:src="@drawable/ic_new"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/content_description_tabswitcher_new_button"/>
+                android:contentDescription="@string/tab_switcher_content_description_new_button"/>
             <Button
                 android:id="@+id/tab_switcher_done_button"
                 android:layout_width="wrap_content"
@@ -71,7 +71,7 @@
                 android:layout_width="26dp"
                 android:layout_height="33.8dp"
                 android:src="@drawable/ic_fire"
-                android:contentDescription="@string/content_description_tabswitcher_fire_button"/>
+                android:contentDescription="@string/tab_switcher_content_description_fire_button"/>
             <TextView
                 android:id="@+id/tab_switcher_fire_text_view"
                 android:layout_width="wrap_content"

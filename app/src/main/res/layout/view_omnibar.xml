@@ -22,14 +22,7 @@
             app:contentInsetStartWithNavigation="20dp"
             app:contentInsetLeft="20dp"
             android:theme="@style/AppBar.Toolbar"
-            app:popupTheme="@style/AppBar.Popup"><!--
-            android:layout_marginStart="4dp"
-            android:layout_marginLeft="4dp"
-            android:layout_marginEnd="4dp"
-            android:layout_marginRight="4dp"
-            app:contentInsetEnd="0dp"
-            app:contentInsetEndWithActions="0dp"
-            app:contentInsetRight="0dp"-->
+            app:popupTheme="@style/AppBar.Popup">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -46,7 +39,7 @@
                     android:layout_marginRight="12dp"
                     android:src="@drawable/ic_prev_arrow"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/content_description_omnibar_back_button"/>
+                    android:contentDescription="@string/omnibar_content_description_back_button"/>
                 <EditText
                     android:id="@+id/omnibar_edit_text"
                     android:layout_width="match_parent"

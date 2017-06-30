@@ -26,7 +26,8 @@
         android:layout_marginStart="24dp"
         android:layout_marginLeft="24dp"
         android:layout_gravity="center_vertical|start"
-        android:src="@drawable/ic_small_loupe"/>
+        android:src="@drawable/ic_small_loupe"
+        android:contentDescription="@string/suggestion_content_description_icon_image_view"/>
     <ImageButton
         android:id="@+id/suggestion_add_image_button"
         android:layout_width="41dp"
@@ -35,7 +36,8 @@
         android:layout_marginRight="10dp"
         android:layout_gravity="center_vertical|end"
         android:src="@drawable/ic_add_to_query"
-        android:background="?attr/selectableItemBackgroundBorderless"/>
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/suggestion_content_description_add_to_query_button"/>
     <TextView
         android:id="@+id/suggestion_title_text_view"
         android:layout_width="wrap_content"
