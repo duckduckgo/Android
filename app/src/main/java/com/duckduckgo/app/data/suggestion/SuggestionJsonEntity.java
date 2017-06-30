@@ -24,10 +24,6 @@ import org.json.JSONObject;
 
 import timber.log.Timber;
 
-/**
- * Created by fgei on 6/30/17.
- */
-
 public class SuggestionJsonEntity implements Suggestion, JsonEntity {
     private String type;
     private String suggestion;
@@ -57,7 +53,7 @@ public class SuggestionJsonEntity implements Suggestion, JsonEntity {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put(type, suggestion);
             json = jsonObject.toString();
-        } catch(JSONException e) {
+        } catch (JSONException e) {
             Timber.e(e, "toJson");
         }
         return json;

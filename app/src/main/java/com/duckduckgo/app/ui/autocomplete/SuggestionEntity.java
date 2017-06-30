@@ -14,10 +14,29 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.domain.suggestion;
+package com.duckduckgo.app.ui.autocomplete;
 
-public interface Suggestion {
-    String getType();
+import com.duckduckgo.app.domain.suggestion.Suggestion;
 
-    String getSuggestion();
+public class SuggestionEntity implements Suggestion {
+    private String type;
+    private String suggestion;
+
+    public SuggestionEntity() {
+    }
+
+    public SuggestionEntity(Suggestion suggestion) {
+        this.type = suggestion.getType();
+        this.suggestion = suggestion.getSuggestion();
+    }
+
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public String getSuggestion() {
+        return suggestion;
+    }
 }

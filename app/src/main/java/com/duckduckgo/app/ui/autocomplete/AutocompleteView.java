@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.domain.suggestion;
+package com.duckduckgo.app.ui.autocomplete;
 
-public interface Suggestion {
-    String getType();
+import android.support.annotation.NonNull;
 
-    String getSuggestion();
+import java.util.List;
+
+public interface AutocompleteView {
+    void addSuggestions(@NonNull List<SuggestionEntity> suggestions);
+
+    void show();
+
+    void hide();
 }

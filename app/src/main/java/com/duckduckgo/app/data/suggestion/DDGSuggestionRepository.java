@@ -38,10 +38,6 @@ import javax.net.ssl.HttpsURLConnection;
 
 import timber.log.Timber;
 
-/**
- * Created by fgei on 6/30/17.
- */
-
 public class DDGSuggestionRepository implements SuggestionRepository {
 
     @Override
@@ -54,23 +50,23 @@ public class DDGSuggestionRepository implements SuggestionRepository {
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             StringBuilder stringBuilder = new StringBuilder();
             String line;
-            while((line = reader.readLine()) != null) {
+            while ((line = reader.readLine()) != null) {
                 stringBuilder.append(line);
             }
             reader.close();
             JSONArray jsonArray = new JSONArray(stringBuilder.toString());
-            for(int i=0; i<jsonArray.length(); i++) {
+            for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 SuggestionJsonEntity suggestion = new SuggestionJsonEntity();
                 suggestion.fromJson(jsonObject.toString());
                 //list.add(new SuggestionJsonEntity(jsonObject.getString("phrase")));
                 list.add(suggestion);
             }
-        } catch(MalformedURLException e) {
+        } catch (MalformedURLException e) {
             Timber.e(e, "getSuggestions, query: %s", query);
-        } catch(IOException e) {
+        } catch (IOException e) {
             Timber.e(e, "getSuggestions, query: %s", query);
-        } catch(JSONException e) {
+        } catch (JSONException e) {
             Timber.e(e, "getSuggestions, query: %s", query);
         }
         return list;

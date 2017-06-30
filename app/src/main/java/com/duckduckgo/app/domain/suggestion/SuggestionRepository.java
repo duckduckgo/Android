@@ -20,10 +20,6 @@ import android.support.annotation.NonNull;
 
 import java.util.List;
 
-/**
- * Created by fgei on 6/30/17.
- */
-
 public interface SuggestionRepository {
     List<Suggestion> getSuggestions(@NonNull String query);
 }
