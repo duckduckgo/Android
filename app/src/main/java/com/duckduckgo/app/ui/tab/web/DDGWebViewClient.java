@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.ui.tab.web;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.webkit.WebResourceRequest;
@@ -26,6 +27,7 @@ import com.duckduckgo.app.ui.browser.BrowserPresenter;
 
 public class DDGWebViewClient extends WebViewClient {
 
+    public static boolean externalBrowser = false;
     private BrowserPresenter browserPresenter;
     private String tabId;
 
@@ -34,9 +36,24 @@ public class DDGWebViewClient extends WebViewClient {
         this.tabId = tabId;
     }
 
+    //to open links in external browser, supports only lollipop & above
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+
+        if (!externalBrowser) return false;//if external browser useage is false
+        Intent intent;
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            intent = new Intent(Intent.ACTION_VIEW, request.getUrl()).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (request.getUrl().getHost().endsWith("duckduckgo.com")) {
+                return false; //if url is duckduckgo.com then don't show the external browser dialog
+            }
+            view.getContext().startActivity(intent);
+            return true;
+        }
+
         return false;
+
     }
 
     @Override
@@ -52,4 +69,16 @@ public class DDGWebViewClient extends WebViewClient {
         browserPresenter.onPageFinished(tabId, url);
         browserPresenter.onHistoryChanged(tabId, view.canGoBack(), view.canGoForward());
     }
+
+    /* handling external links as intents deprecated method
+    @Deprecated
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+
+        if( Uri.parse(url).getHost().endsWith("facebook.com") ) {
+            return false;
+        }
+
+        return true;
+    } */
 }
