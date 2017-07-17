@@ -19,16 +19,18 @@
         android:layout_marginLeft="16dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/content_description_bookmark_delete_button"/>
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp">
         <TextView
             android:id="@+id/bookmark_name_text_view"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"/>
         <ImageView
@@ -40,5 +42,5 @@
             android:scaleType="center"
             android:src="@drawable/ic_reorder_black_24dp"
             android:contentDescription="@string/content_description_bookmark_drag_item"/>
-    </FrameLayout>
+    </LinearLayout>
 </LinearLayout>
