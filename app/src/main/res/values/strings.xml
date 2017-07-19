@@ -9,6 +9,7 @@
 
     <!-- Omnibar -->
     <string name="omnibar_search_edit_text_hint">Search DuckDuckGo</string>
+    <string name="omnibar_content_description_back_button">Cancel search input</string>
 
     <!-- Browser Menu -->
     <string name="browser_menu_back">Back</string>
@@ -29,6 +30,10 @@
     <string name="bookmarks_toolbar">@string/bookmarks</string>
     <string name="bookmarks_empty">No bookmarks yet</string>
 
+    <!-- Bookmark -->
+    <string name="bookmark_content_description_delete_button">Delete bookmark</string>
+    <string name="bookmark_content_description_drag_item">Move item</string>
+
     <!-- Bookmarks Menu -->
     <string name="bookmarks_menu_edit">@string/edit</string>
 
@@ -45,14 +50,15 @@
     <string name="tab_switcher_title_no_tabs">No Tabs</string>
     <string name="tab_switcher_fire_button">Clear All</string>
     <string name="tab_switcher_done_button">Done</string>
+    <string name="tab_switcher_content_description_new_button">Create new tab</string>
+    <string name="tab_switcher_content_description_fire_button">Delete all tabs and data</string>
 
-    <!-- Content description -->
-    <string name="content_description_omnibar_back_button">Cancel search input</string>
-    <string name="content_description_bookmark_delete_button">Delete bookmark</string>
-    <string name="content_description_bookmark_drag_item">Move item</string>
-    <string name="content_description_tab_delete_button">Delete tab</string>
-    <string name="content_description_tab_favicon_image_view">Favicon</string>
-    <string name="content_description_tabswitcher_new_button">Create new tab</string>
-    <string name="content_description_tabswitcher_fire_button">Delete all tabs and data</string>
+    <!-- Tab -->
+    <string name="tab_content_description_delete_button">Delete tab</string>
+    <string name="tab_content_description_favicon_image_view">Favicon</string>
+
+    <!-- Suggestion -->
+    <string name="suggestion_content_description_icon_image_view">Autocomplete suggestion</string>
+    <string name="suggestion_content_description_add_to_query_button">Add text to query</string>
 
 </resources>

@@ -16,10 +16,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:layout_marginStart="4dp"
-            android:layout_marginLeft="4dp"
             android:layout_marginEnd="4dp"
             android:layout_marginRight="4dp"
+            app:contentInsetStart="20dp"
+            app:contentInsetStartWithNavigation="20dp"
+            app:contentInsetLeft="20dp"
             android:theme="@style/AppBar.Toolbar"
             app:popupTheme="@style/AppBar.Popup">
             <LinearLayout
@@ -32,11 +33,13 @@
                     android:layout_width="18dp"
                     android:layout_height="18dp"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginRight="12dp"
                     android:src="@drawable/ic_prev_arrow"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/content_description_omnibar_back_button"/>
+                    android:contentDescription="@string/omnibar_content_description_back_button"/>
                 <EditText
                     android:id="@+id/omnibar_edit_text"
                     android:layout_width="match_parent"

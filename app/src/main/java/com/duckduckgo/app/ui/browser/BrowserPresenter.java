@@ -20,12 +20,16 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.duckduckgo.app.ui.autocomplete.AutocompleteView;
+import com.duckduckgo.app.ui.autocomplete.SuggestionEntity;
 import com.duckduckgo.app.ui.bookmarks.BookmarkEntity;
 import com.duckduckgo.app.ui.main.MainView;
 import com.duckduckgo.app.ui.navigationbar.NavigationBarView;
 import com.duckduckgo.app.ui.omnibar.OmnibarView;
 import com.duckduckgo.app.ui.tab.TabView;
 import com.duckduckgo.app.ui.tabswitcher.TabSwitcherView;
+
+import java.util.List;
 
 public interface BrowserPresenter {
     void attachMainview(@NonNull MainView mainView);
@@ -47,6 +51,10 @@ public interface BrowserPresenter {
     void attachTabView(@NonNull TabView tabView);
 
     void detachTabView();
+
+    void attachAutocompleteView(@NonNull AutocompleteView autocompleteView);
+
+    void detachAutocompleteView();
 
     void attachTabSwitcherView(@NonNull TabSwitcherView tabSwitcherView);
 
@@ -113,4 +121,10 @@ public interface BrowserPresenter {
     void loadBookmark(@NonNull BookmarkEntity bookmarkEntity);
 
     void requestCopyCurrentUrl();
+
+    void autocompleteSuggestionClicked(int position);
+
+    void autocompleteSuggestionAddToQuery(int position);
+
+    void onReceiveNewSuggestionsForQuery(@NonNull List<SuggestionEntity> list, @NonNull String query);
 }

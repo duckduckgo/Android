@@ -34,6 +34,7 @@ public class AppUrls {
     private class Urls {
         static final String BASE = "duckduckgo.com";
         static final String HOME = "https://www.duckduckgo.com/?ko=-1&kl=wt-wt";
+        static final String AUTOCOMPLETE = "https://www.duckduckgo.com/ac/";
     }
 
     private class Params {
@@ -96,14 +97,26 @@ public class AppUrls {
 
     @NonNull
     public static String getSearchUrl(@NonNull String query) {
+        StringBuilder builder = new StringBuilder(Urls.HOME);
+        builder.append("&").append(Params.SEARCH).append("=").append(getEncodedQuery(query));
+        return builder.toString();
+    }
+
+    @NonNull
+    public static String getAutocompleteUrl(@NonNull String query) {
+        StringBuilder builder = new StringBuilder(Urls.AUTOCOMPLETE);
+        builder.append("/?").append(Params.SEARCH).append("=").append(getEncodedQuery(query));
+        return builder.toString();
+    }
+
+    @NonNull
+    private static String getEncodedQuery(@NonNull String query) {
         String queryEncoded = query;
         try {
             queryEncoded = URLEncoder.encode(query, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            Timber.e(e, "getSearchUrl, query: %s", query);
+            Timber.e(e, "getEncodedQuery, query: %s", query);
         }
-        StringBuilder builder = new StringBuilder(Urls.HOME);
-        builder.append("&").append(Params.SEARCH).append("=").append(queryEncoded);
-        return builder.toString();
+        return queryEncoded;
     }
 }

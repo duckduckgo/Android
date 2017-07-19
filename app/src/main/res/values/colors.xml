@@ -10,6 +10,12 @@
     <color name="omnibar_progress_bar_background">#98c5e7</color>
     <color name="omnibar_primary_background">#666666</color>
 
+    <color name="autocomplete_shadow_background">#aaaaaaaa</color>
+
+    <color name="suggestion_text_primary">#ffffff</color>
+    <color name="suggestion_text_secondary">#aaaaaa</color>
+    <color name="suggestion_background">#333333</color>
+
     <color name="navigation_bar_enabled">#ffffff</color>
     <color name="navigation_bar_disabled">#999999</color>
 

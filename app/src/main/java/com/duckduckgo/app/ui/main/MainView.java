@@ -18,6 +18,7 @@ package com.duckduckgo.app.ui.main;
 
 import android.support.annotation.NonNull;
 
+import com.duckduckgo.app.domain.suggestion.SuggestionRepository;
 import com.duckduckgo.app.ui.bookmarks.BookmarkEntity;
 
 public interface MainView {
@@ -30,4 +31,6 @@ public interface MainView {
     void dismissTabSwitcher();
 
     void copyUrlToClipboard(@NonNull String url);
+
+    void loadSuggestions(@NonNull SuggestionRepository suggestionRepository, @NonNull String query);
 }

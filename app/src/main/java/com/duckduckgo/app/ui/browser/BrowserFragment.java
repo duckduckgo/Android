@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 
 import com.duckduckgo.app.Injector;
 import com.duckduckgo.app.R;
+import com.duckduckgo.app.ui.autocomplete.Autocomplete;
 import com.duckduckgo.app.ui.navigationbar.NavigationBar;
 import com.duckduckgo.app.ui.omnibar.Omnibar;
 
@@ -53,6 +54,9 @@ public class BrowserFragment extends Fragment {
     @BindView(R.id.browser)
     Browser browser;
 
+    @BindView(R.id.autocomplete)
+    Autocomplete autocomplete;
+
     private Unbinder unbinder;
     private BrowserPresenter browserPresenter;
 
@@ -70,6 +74,7 @@ public class BrowserFragment extends Fragment {
         browserPresenter.attachBrowserView(browser);
         browserPresenter.attachOmnibarView(omnibar);
         browserPresenter.attachNavigationBarView(navigationBar);
+        browserPresenter.attachAutocompleteView(autocomplete);
         return rootView;
     }
 
@@ -102,6 +107,7 @@ public class BrowserFragment extends Fragment {
         browserPresenter.detachBrowserView();
         browserPresenter.detachOmnibarView();
         browserPresenter.detachNavigationBarView();
+        browserPresenter.detachAutocompleteView();
         browser.destroy();
         unbinder.unbind();
         super.onDestroyView();
@@ -117,6 +123,7 @@ public class BrowserFragment extends Fragment {
     private void initUI() {
         initOmnibar(omnibar);
         initNavigationBar(navigationBar);
+        initAutocomplete(autocomplete);
     }
 
     private void initOmnibar(Omnibar omnibar) {
@@ -188,6 +195,20 @@ public class BrowserFragment extends Fragment {
                         return true;
                 }
                 return false;
+            }
+        });
+    }
+
+    private void initAutocomplete(Autocomplete autocomplete) {
+        autocomplete.setOnAutocompleteListener(new Autocomplete.OnAutocompleteListener() {
+            @Override
+            public void onSuggestionClick(View view, int position) {
+                browserPresenter.autocompleteSuggestionClicked(position);
+            }
+
+            @Override
+            public void onSuggestionAddToQuery(View view, int position) {
+                browserPresenter.autocompleteSuggestionAddToQuery(position);
             }
         });
     }

@@ -16,7 +16,7 @@
         android:layout_marginStart="14dp"
         android:layout_marginLeft="14dp"
         android:layout_gravity="start|center_vertical"
-        android:contentDescription="@string/content_description_tab_favicon_image_view"/>
+        android:contentDescription="@string/tab_content_description_favicon_image_view"/>
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -51,5 +51,5 @@
         android:layout_gravity="end|center_vertical"
         android:src="@drawable/ic_remove_circle_black_24dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/content_description_tab_delete_button"/>
+        android:contentDescription="@string/tab_content_description_delete_button"/>
 </FrameLayout>

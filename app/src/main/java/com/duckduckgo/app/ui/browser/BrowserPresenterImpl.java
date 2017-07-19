@@ -21,8 +21,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.duckduckgo.app.domain.bookmark.BookmarkRepository;
+import com.duckduckgo.app.domain.suggestion.SuggestionRepository;
 import com.duckduckgo.app.domain.tab.Tab;
 import com.duckduckgo.app.domain.tab.TabRepository;
+import com.duckduckgo.app.ui.autocomplete.AutocompleteTask;
+import com.duckduckgo.app.ui.autocomplete.AutocompleteView;
+import com.duckduckgo.app.ui.autocomplete.SuggestionEntity;
 import com.duckduckgo.app.ui.bookmarks.BookmarkEntity;
 import com.duckduckgo.app.ui.main.MainView;
 import com.duckduckgo.app.ui.navigationbar.NavigationBarView;
@@ -52,19 +56,25 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     private NavigationBarView navigationBarView;
     private BrowserView browserView;
     private TabView tabView;
+    private AutocompleteView autocompleteView;
     private TabSwitcherView tabSwitcherView;
 
     private TabRepository tabRepository;
     private BookmarkRepository bookmarkRepository;
+    private SuggestionRepository suggestionRepository;
 
     private List<TabEntity> tabs = new ArrayList<>();
     private int currentIndex = -1;
 
+    private List<SuggestionEntity> suggestions = new ArrayList<>();
+
     private boolean isEditing = false;
 
-    public BrowserPresenterImpl(@NonNull TabRepository tabRepository, @NonNull BookmarkRepository bookmarkRepository) {
+    public BrowserPresenterImpl(@NonNull TabRepository tabRepository, @NonNull BookmarkRepository bookmarkRepository,
+                                @NonNull SuggestionRepository suggestionRepository) {
         this.tabRepository = tabRepository;
         this.bookmarkRepository = bookmarkRepository;
+        this.suggestionRepository = suggestionRepository;
     }
 
     @Override
@@ -115,6 +125,16 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     @Override
     public void detachTabView() {
         tabView = null;
+    }
+
+    @Override
+    public void attachAutocompleteView(@NonNull AutocompleteView autocompleteView) {
+        this.autocompleteView = autocompleteView;
+    }
+
+    @Override
+    public void detachAutocompleteView() {
+        autocompleteView = null;
     }
 
     @Override
@@ -281,7 +301,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     private void requestSearch(@Nullable String text) {
         if (text == null) return;
-        if (isEditing) setOmnibarEditing(false);
+        if (isEditing) setEditing(false);
         if (UrlUtils.isUrl(text)) {
             String url = UrlUtils.getUrlWithScheme(text);
             requestLoadUrl(url);
@@ -296,7 +316,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
 
     private void requestQuerySearch(@NonNull String query) {
         if (isEditing) {
-            setOmnibarEditing(false);
+            setEditing(false);
         }
         String url = AppUrls.getSearchUrl(query);
         requestLoadUrl(url);
@@ -320,11 +340,19 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     @Override
     public void omnibarFocusChanged(boolean focused) {
         if (focused) {
-            setOmnibarEditing(true);
+            setEditing(true);
             TabEntity currentTab = getCurrentTab();
             if (currentTab != null && currentTab.getCurrentUrl().length() > 0) {
                 omnibarView.setDeleteAllTextButtonVisible(true);
             }
+        }
+    }
+
+    private void setEditing(boolean editing) {
+        isEditing = editing;
+        setOmnibarEditing(isEditing);
+        if (!isEditing) {
+            hideAutocompleteResults();
         }
     }
 
@@ -341,22 +369,29 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     public void omnibarTextChanged(@NonNull String text) {
         if (isEditing) {
             omnibarView.setDeleteAllTextButtonVisible(text.length() > 0);
+            if (text.length() > 0) {
+                loadAutocompleteResults(text);
+            } else {
+                hideAutocompleteResults();
+            }
         }
     }
 
     @Override
     public void cancelOmnibarFocus() {
-        setOmnibarEditing(false);
+        setEditing(false);
         cancelOmnibarText();
         TabEntity currentTab = getCurrentTab();
         if (currentTab != null) {
             displayTextForUrl(currentTab.getCurrentUrl());
         }
+        omnibarView.closeKeyboard();
     }
 
     @Override
     public void cancelOmnibarText() {
         omnibarView.clearText();
+        hideAutocompleteResults();
     }
 
     @Override
@@ -475,6 +510,47 @@ public class BrowserPresenterImpl implements BrowserPresenter {
         if (tab == null) return;
         String url = tab.getCurrentUrl();
         mainView.copyUrlToClipboard(url);
+    }
+
+    @Override
+    public void autocompleteSuggestionClicked(int position) {
+        SuggestionEntity suggestion = getSuggestion(position);
+        if (suggestion == null) return;
+        requestSearchInCurrentTab(suggestion.getSuggestion());
+        omnibarView.closeKeyboard();
+    }
+
+    @Override
+    public void autocompleteSuggestionAddToQuery(int position) {
+        SuggestionEntity suggestion = getSuggestion(position);
+        if (suggestion == null) return;
+        displayText(suggestion.getSuggestion());
+    }
+
+    @Override
+    public void onReceiveNewSuggestionsForQuery(@NonNull List<SuggestionEntity> list, @NonNull String query) {
+        suggestions.clear();
+        suggestions.addAll(list);
+        autocompleteView.addSuggestions(suggestions, query);
+    }
+
+    @Nullable
+    private SuggestionEntity getSuggestion(int position) {
+        if (position >= suggestions.size()) return null;
+        return suggestions.get(position);
+    }
+
+    private void loadAutocompleteResults(@NonNull String query) {
+        showAutcompleteResults();
+        mainView.loadSuggestions(suggestionRepository, query);
+    }
+
+    private void showAutcompleteResults() {
+        autocompleteView.show();
+    }
+
+    private void hideAutocompleteResults() {
+        autocompleteView.hide();
     }
 
     private void setCanGoBack() {

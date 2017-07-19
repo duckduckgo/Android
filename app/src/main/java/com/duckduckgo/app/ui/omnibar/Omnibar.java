@@ -168,6 +168,11 @@ public class Omnibar extends AppBarLayout implements OmnibarView {
         progressBar.setProgress(newProgress);
     }
 
+    @Override
+    public void closeKeyboard() {
+        KeyboardUtils.hideKeyboard(searchEditText);
+    }
+
     public void inflateMenu(int resId) {
         toolbar.inflateMenu(resId);
     }
@@ -234,6 +239,6 @@ public class Omnibar extends AppBarLayout implements OmnibarView {
     }
 
     private boolean wasEnterPressed(KeyEvent event) {
-        return event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER;
+        return event != null && event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER;
     }
 }

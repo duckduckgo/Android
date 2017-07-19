@@ -14,30 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.ui.omnibar;
+package com.duckduckgo.app.domain.suggestion;
 
-import android.support.annotation.NonNull;
+public interface Suggestion {
+    String getType();
 
-public interface OmnibarView {
-    void displayText(@NonNull String text);
-
-    void clearText();
-
-    void clearFocus();
-
-    void requestSearchFocus();
-
-    void setRefreshEnabled(boolean enabled);
-
-    void setEditing(boolean editing);
-
-    void setDeleteAllTextButtonVisible(boolean visible);
-
-    void showProgressBar();
-
-    void hideProgressBar();
-
-    void onProgressChanged(int newProgress);
-
-    void closeKeyboard();
+    String getSuggestion();
 }
