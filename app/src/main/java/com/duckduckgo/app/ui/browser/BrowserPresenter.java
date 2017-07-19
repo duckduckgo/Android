@@ -113,4 +113,5 @@ public interface BrowserPresenter {
     void loadBookmark(@NonNull BookmarkEntity bookmarkEntity);
 
     void requestCopyCurrentUrl();
+
 }

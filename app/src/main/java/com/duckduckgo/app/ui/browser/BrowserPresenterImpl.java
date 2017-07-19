@@ -60,6 +60,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     private List<TabEntity> tabs = new ArrayList<>();
     private int currentIndex = -1;
 
+
     private boolean isEditing = false;
 
     public BrowserPresenterImpl(@NonNull TabRepository tabRepository, @NonNull BookmarkRepository bookmarkRepository) {
@@ -553,7 +554,7 @@ public class BrowserPresenterImpl implements BrowserPresenter {
     }
 
     private void displayTextForDuckDuckGoUrl(String url) {
-        String textToDisplay = url;
+        String textToDisplay;
         String query = AppUrls.getQuery(url);
         if (query != null && query.length() > 0) {
             textToDisplay = query;
@@ -580,4 +581,6 @@ public class BrowserPresenterImpl implements BrowserPresenter {
         }
         return null;
     }
+
+
 }

@@ -31,6 +31,7 @@ import com.duckduckgo.app.Injector;
 import com.duckduckgo.app.R;
 import com.duckduckgo.app.ui.navigationbar.NavigationBar;
 import com.duckduckgo.app.ui.omnibar.Omnibar;
+import com.duckduckgo.app.ui.tab.web.DDGWebViewClient;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,22 +40,18 @@ import butterknife.Unbinder;
 public class BrowserFragment extends Fragment {
 
     public static final String TAG = BrowserFragment.class.getSimpleName();
+    @BindView(R.id.omnibar)
+    Omnibar omnibar;
+    @BindView(R.id.navigation_bar)
+    NavigationBar navigationBar;
+    @BindView(R.id.browser)
+    Browser browser;
+    private Unbinder unbinder;
+    private BrowserPresenter browserPresenter;
 
     public static BrowserFragment newInstance() {
         return new BrowserFragment();
     }
-
-    @BindView(R.id.omnibar)
-    Omnibar omnibar;
-
-    @BindView(R.id.navigation_bar)
-    NavigationBar navigationBar;
-
-    @BindView(R.id.browser)
-    Browser browser;
-
-    private Unbinder unbinder;
-    private BrowserPresenter browserPresenter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -139,6 +136,11 @@ public class BrowserFragment extends Fragment {
                         return true;
                     case R.id.action_delete_all_text:
                         browserPresenter.cancelOmnibarText();
+                        return true;
+
+                    case R.id.action_use_external_browser:
+                        item.setChecked((!item.isChecked()));
+                        DDGWebViewClient.externalBrowser = item.isChecked();
                         return true;
                 }
                 return false;

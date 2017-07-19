@@ -54,5 +54,6 @@
     <string name="content_description_tab_favicon_image_view">Favicon</string>
     <string name="content_description_tabswitcher_new_button">Create new tab</string>
     <string name="content_description_tabswitcher_fire_button">Delete all tabs and data</string>
+    <string name="use_external_browser">Use External Browser</string>
 
 </resources>
