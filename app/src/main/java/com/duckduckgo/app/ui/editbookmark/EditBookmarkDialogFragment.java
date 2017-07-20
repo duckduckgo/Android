@@ -26,6 +26,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.duckduckgo.app.R;
 import com.duckduckgo.app.ui.bookmarks.BookmarkEntity;
@@ -118,6 +119,7 @@ public class EditBookmarkDialogFragment extends AppCompatDialogFragment {
 
     private void onSaveButtonClick() {
         onEditBookmarkListener.onBookmarkEdited(getEditedBookmark());
+        Toast.makeText(getContext(), R.string.bookmark_saved_prompt, Toast.LENGTH_SHORT).show();
     }
 
     private BookmarkEntity getEditedBookmark() {

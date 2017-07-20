@@ -44,6 +44,7 @@
     <string name="bookmark_dialog_title_save">Save bookmark</string>
     <string name="bookmark_dialog_name_hint">Bookmark name</string>
     <string name="bookmark_dialog_url_hint">Bookmark URL</string>
+    <string name="bookmark_saved_prompt">Bookmark Saved</string>
 
     <!-- Tab Switcher -->
     <string name="tab_switcher_title">Private Tabs</string>
