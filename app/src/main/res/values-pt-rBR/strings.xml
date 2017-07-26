@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2017 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="app_name">DuckDuckGo</string>
+    <string name="edit">Editar</string>
+    <string name="bookmarks">Favoritos</string>
+    <string name="save">Salvar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="omnibar_search_edit_text_hint">Pesquisar DuckDuckGo</string>
+    <string name="browser_menu_back">Voltar</string>
+    <string name="browser_menu_forward">Avançar</string>
+    <string name="browser_menu_refresh">Recarregar</string>
+    <string name="browser_menu_save_bookmark">Salva  nos Favorito</string>
+    <string name="browser_menu_delete_text">Excluir texto</string>
+    <string name="browser_menu_new_tab">Nova aba</string>
+    <string name="browser_menu_copy_url">Copiar URL</string>
+    <string name="main_copy_to_clipboard_success">Url copiada</string>
+    <string name="bookmarks_empty">Nenhum favorito ainda</string>
+    <string name="bookmark_content_description_delete_button">Excluir favorito</string>
+    <string name="bookmark_content_description_drag_item">Mover item</string>
+    <string name="bookmark_dialog_title_edit">Editar favorito</string>
+    <string name="bookmark_dialog_title_save">Savar favotiro</string>
+    <string name="bookmark_dialog_name_hint">Nome do favorito</string>
+    <string name="bookmark_dialog_url_hint">URL do favorito</string>
+    <string name="bookmark_saved_prompt">Favorito salvo</string>
+    <string name="tab_switcher_title">Aba anônima</string>
+    <string name="tab_switcher_title_no_tabs">Nenuhuma aba</string>
+    <string name="tab_switcher_fire_button">Limpar tudo</string>
+    <string name="tab_switcher_done_button">Feito</string>
+    <string name="tab_switcher_content_description_new_button">Criar nova aba</string>
+    <string name="tab_switcher_content_description_fire_button">Exluir todas as abas e dados</string>
+    <string name="tab_content_description_delete_button">Excluir aba</string>
+    <string name="suggestion_content_description_icon_image_view">Sugestão de autocompletar texto</string>
+    <string name="browser_menu_tab_switcher">Alternat aba</string>
+    <string name="omnibar_content_description_back_button">Cancelar pesquisa</string>
+    <string name="suggestion_content_description_add_to_query_button">Add texto para consulta</string>
+</resources>
