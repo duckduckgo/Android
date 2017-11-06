@@ -21,9 +21,8 @@ CC:
 - [ ] Determine if there are any quick wins that improve the implementation
 
 
-###### PR DRI Checklist:
+###### Author Checklist:
 - [ ] Get advice or leverage existing code
 - [ ] Agree on technical approach with reviewer (if the changes are nuanced)
-- [ ] Ensure that there is a testing strategy (and documented non-automated tests)
-- [ ] Ensure there is a documented monitoring strategy (if necessary)
-- [ ] Consider systems implications (Database connections, Grafana stats, CPU)
+- [ ] Ensure that there is a testing strategy (and document any non-automated tests)
+- [ ] Consider implications (CPU, memory, database / preference migrations, statistics)
