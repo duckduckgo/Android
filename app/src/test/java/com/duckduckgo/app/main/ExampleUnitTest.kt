@@ -1,4 +1,4 @@
-package com.duckduckgo.app.duckduckgo
+package com.duckduckgo.app.main
 
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package com.duckduckgo.app.duckduckgo
+package com.duckduckgo.app.main
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4

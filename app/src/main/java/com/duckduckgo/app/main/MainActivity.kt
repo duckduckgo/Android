@@ -1,4 +1,4 @@
-package com.duckduckgo.app.duckduckgo
+package com.duckduckgo.app.main
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
