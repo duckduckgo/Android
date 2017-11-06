@@ -1,65 +1,47 @@
 apply plugin: 'com.android.application'
 
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply from: '../versioning.gradle'
+
+ext {
+    VERSION_NAME = "0.1.0"
+}
+
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.2"
     defaultConfig {
         applicationId "com.duckduckgo.app"
-        minSdkVersion 16
-        //noinspection OldTargetApi
-        targetSdkVersion 25
+        minSdkVersion 21
+        targetSdkVersion 26
         versionCode buildVersionCode()
         versionName VERSION_NAME
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-    }
-    signingConfigs {
-        release
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
         }
-    }
-    lintOptions {
-        abortOnError true
-        warningsAsErrors true
-    }
-    def Properties props = new Properties()
-    def propFile = new File('/Users/jenkins/jenkins_static/duckduckgo_android/ddg_android_build.properties')
-    if (propFile.exists()){
-        props.load(new FileInputStream(propFile))
-
-        if (props!=null && props.containsKey('key.store') && props.containsKey('key.store.password') &&
-                props.containsKey('key.alias') && props.containsKey('key.alias.password')) {
-            android.signingConfigs.release.storeFile = file(props['key.store'])
-            android.signingConfigs.release.storePassword = props['key.store.password']
-            android.signingConfigs.release.keyAlias = props['key.alias']
-            android.signingConfigs.release.keyPassword = props['key.alias.password']
-        } else {
-            println 'signing.properties found but some entries are missing'
-            android.buildTypes.release.signingConfig = null
-        }
-    } else {
-        println 'signing.properties not found'
-        android.buildTypes.release.signingConfig = null
     }
 }
 
-ext.supportLibraryVersion = '25.4.0'
+ext {
+    supportLibrary = "26.1.0"
+}
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation "com.android.support:appcompat-v7:$supportLibrary"
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.squareup.okhttp3:okhttp:3.9.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation "io.reactivex.rxjava2:rxjava:2.1.6"
 
-    compile "com.android.support:appcompat-v7:$supportLibraryVersion"
-    compile "com.android.support:design:$supportLibraryVersion"
+    testImplementation 'junit:junit:4.12'
 
-    compile 'com.jakewharton:butterknife:8.5.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
-
-    compile 'com.jakewharton.timber:timber:4.5.1'
-
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.2.0'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 }
