@@ -9,12 +9,21 @@ android:
     - platform-tools
 
     # The BuildTools version used by your project
-    - build-tools-25.0.2
+    - build-tools-26.0.2
 
     # The SDK version used to compile your project
-    - android-25
+    - android-26
 
     # Additional components
     - extra-android-m2repository
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache
 
 script: ./gradlew clean build
