@@ -16,37 +16,53 @@
 
 package com.duckduckgo.app.trackerdetection
 
+
+import android.support.test.InstrumentationRegistry
+import android.support.test.runner.AndroidJUnit4
+import com.duckduckgo.app.main.R
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
-class TrackerDetectorTest {
 
-    var testee: TrackerDetector = TrackerDetector()
+@RunWith(AndroidJUnit4::class)
+class TrackerDetectorInstrumentationTest {
+
+    private val documentUrl = "http://example.com"
+    private lateinit var testee: TrackerDetector
+
+    @Before
+    fun setup() {
+        val appContext = InstrumentationRegistry.getTargetContext()
+        val stream = appContext.resources.openRawResource(R.raw.easylist)
+        val data = stream.bufferedReader().use { it.readText().toByteArray() }
+        testee = TrackerDetector(data)
+    }
 
     @Test
     fun whenUrlIsInEasyListThenShouldBlockIsTrue() {
         val url = "http://imasdk.googleapis.com/js/sdkloader/ima3.js"
-        assertTrue(testee.shouldBlock(url))
+        assertTrue(testee.shouldBlock(url, documentUrl))
     }
 
     @Test
     fun whenUrlIsInEasyPrivacyListThenShouldBlockIsTrue() {
-
-        val url = "http://imasdk.googleapis.com/js/sdkloader/ima3.js"
-        assertTrue(testee.shouldBlock(url))
+        val url = "http://cdn.tagcommander.com/1705/tc_catalog.js"
+        assertTrue(testee.shouldBlock(url, documentUrl))
     }
 
     @Test
     fun whenUrlIsInDisconnectListThenShouldBlockIsTrue() {
         val url = "https://criteo.com/abcd.css"
-        assertTrue(testee.shouldBlock(url))
+        assertTrue(testee.shouldBlock(url, documentUrl))
     }
 
     @Test
     fun whenUrlIsNotInAnyTrackerListsThenShouldBlockIsFalse() {
-        var url = "https://duckduckgo.com"
-        assertFalse(testee.shouldBlock(url))
+        var url = "https://duckduckgo.com/index.html"
+        assertFalse(testee.shouldBlock(url, documentUrl))
     }
 
 }

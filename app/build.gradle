@@ -25,11 +25,18 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    externalNativeBuild {
+
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
 }
 
 ext {
     supportLibrary = "26.1.0"
 }
+
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])

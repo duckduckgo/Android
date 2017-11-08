@@ -18,15 +18,14 @@ package com.duckduckgo.app.trackerdetection
 
 class TrackerDetector {
 
-    constructor() {
-        loadLists()
+    val adBlockPlus = AdBlockPlus()
+
+    constructor(easylistData: ByteArray) {
+        adBlockPlus.loadData(easylistData)
     }
 
-    private fun loadLists() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    fun shouldBlock(url: String, documentUrl: String): Boolean {
+        return adBlockPlus.matches(url, documentUrl)
     }
 
-    fun shouldBlock(url: String): Boolean {
-        return false
-    }
 }
