@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
 
 ext {
@@ -25,10 +26,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 ext {
     supportLibrary = "26.1.0"
+    architectureComponents = "1.0.0"
+    dagger = "2.13"
 }
 
 dependencies {
@@ -39,8 +45,18 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.9.0'
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation "io.reactivex.rxjava2:rxjava:2.1.6"
+    implementation 'com.jakewharton.timber:timber:4.6.0'
+    implementation "android.arch.lifecycle:extensions:$architectureComponents"
+    implementation "android.arch.lifecycle:reactivestreams:$architectureComponents"
 
+    implementation "com.google.dagger:dagger-android:$dagger"
+    implementation "com.google.dagger:dagger-android-support:$dagger"
+    kapt "com.google.dagger:dagger-android-processor:$dagger"
+    kapt "com.google.dagger:dagger-compiler:$dagger"
+
+    testImplementation 'org.mockito:mockito-core:2.12.0'
     testImplementation 'junit:junit:4.12'
+    testImplementation "android.arch.core:core-testing:$architectureComponents"
 
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
