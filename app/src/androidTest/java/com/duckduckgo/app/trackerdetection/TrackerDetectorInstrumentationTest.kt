@@ -22,7 +22,7 @@ import android.support.test.runner.AndroidJUnit4
 import com.duckduckgo.app.main.R
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -31,14 +31,20 @@ import org.junit.runner.RunWith
 class TrackerDetectorInstrumentationTest {
 
     private val documentUrl = "http://example.com"
-    private lateinit var testee: TrackerDetector
 
-    @Before
-    fun setup() {
-        val appContext = InstrumentationRegistry.getTargetContext()
-        val easylistData = appContext.resources.openRawResource(R.raw.easylist).use { it.readBytes() }
-        val easyprivacyData = appContext.resources.openRawResource(R.raw.easyprivacy).use { it.readBytes() }
-        testee = TrackerDetector(easylistData, easyprivacyData)
+    companion object {
+
+        private lateinit var testee: TrackerDetector
+
+        @BeforeClass
+        @JvmStatic
+        fun setup() {
+            val appContext = InstrumentationRegistry.getTargetContext()
+            val easylistData = appContext.resources.openRawResource(R.raw.easylist).use { it.readBytes() }
+            val easyprivacyData = appContext.resources.openRawResource(R.raw.easyprivacy).use { it.readBytes() }
+            testee = TrackerDetector(easylistData, easyprivacyData)
+        }
+
     }
 
     @Test
@@ -52,7 +58,7 @@ class TrackerDetectorInstrumentationTest {
         val url = "http://cdn.tagcommander.com/1705/tc_catalog.js"
         assertTrue(testee.shouldBlock(url, documentUrl))
     }
-    
+
     @Test
     fun whenUrlIsNotInAnyTrackerListsThenShouldBlockIsFalse() {
         var url = "https://duckduckgo.com/index.html"

@@ -27,8 +27,9 @@ Java_com_duckduckgo_app_trackerdetection_AdBlockPlus_loadData(JNIEnv *env, jobje
 extern "C"
 JNIEXPORT jboolean
 JNICALL
-Java_com_duckduckgo_app_trackerdetection_AdBlockPlus_matches(JNIEnv *env, jobject /* this */,
-                                                             jstring url, jstring documentUrl,
+Java_com_duckduckgo_app_trackerdetection_AdBlockPlus_matches(JNIEnv *env,jobject /* this */,
+                                                             jstring url,
+                                                             jstring documentUrl,
                                                              jint filterOption) {
 
     jboolean isUrlCopy;
@@ -37,7 +38,7 @@ Java_com_duckduckgo_app_trackerdetection_AdBlockPlus_matches(JNIEnv *env, jobjec
     jboolean isDocumentCopy;
     const char *documentUrlChars = env->GetStringUTFChars(documentUrl, &isDocumentCopy);
     bool matches = easyprivacyClient.matches(urlChars, FONoFilterOption, documentUrlChars) ||
-                   easylistClient.matches(urlChars, FONoFilterOption, documentUrlChars);
+                   easylistClient.matches(urlChars, (FilterOption) filterOption, documentUrlChars);
 
     env->ReleaseStringUTFChars(url, urlChars);
     env->ReleaseStringUTFChars(documentUrl, documentUrlChars);

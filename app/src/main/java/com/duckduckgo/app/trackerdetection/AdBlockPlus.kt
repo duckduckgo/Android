@@ -35,6 +35,8 @@ class AdBlockPlus {
 
     fun matches(url: String, documentUrl: String): Boolean {
 
+        //TODO this is coarse, imporve it for real implementation, also check headers here
+
         var filterOption = FilterOption.None
         if (url.endsWith(".js", true)) {
             filterOption = FilterOption.Script
