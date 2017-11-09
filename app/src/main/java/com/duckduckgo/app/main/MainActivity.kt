@@ -18,15 +18,22 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
+        Log.d("TRACKERS", "Reading tracker files")
         val easylistData = resources.openRawResource(R.raw.easylist).use { it.readBytes() }
         val easyprivacyData = resources.openRawResource(R.raw.easyprivacy).use { it.readBytes() }
+
+        Log.d("TRACKERS", "Parsing")
+
         val trackerDetector = TrackerDetector(easylistData, easyprivacyData)
+
+        Log.d("TRACKERS", "Matching trackers")
 
         var documentUrl = "example.com"
         val blockedEasy = trackerDetector.shouldBlock("http://imasdk.googleapis.com/js/sdkloader/ima3.js", documentUrl)
         val blockedEasyPrivacy = trackerDetector.shouldBlock("http://cdn.tagcommander.com/1705/tc_catalog.js", documentUrl)
         val blockedNone = trackerDetector.shouldBlock("https://duckduckgo.com/index.html", documentUrl)
 
+        Log.d("TRACKERS", "Done!")
 
         Log.d("BLOCKED", "Easy tracker: " + blockedEasy)
         Log.d("BLOCKED", "EasyPrivacy tracker: " + blockedEasyPrivacy)
