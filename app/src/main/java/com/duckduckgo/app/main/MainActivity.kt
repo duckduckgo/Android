@@ -25,13 +25,11 @@ class MainActivity : AppCompatActivity() {
         var documentUrl = "example.com"
         val blockedEasy = trackerDetector.shouldBlock("http://imasdk.googleapis.com/js/sdkloader/ima3.js", documentUrl)
         val blockedEasyPrivacy = trackerDetector.shouldBlock("http://cdn.tagcommander.com/1705/tc_catalog.js", documentUrl)
-        val blockedDisconnect = trackerDetector.shouldBlock("https://criteo.com/abcd.css", documentUrl)
         val blockedNone = trackerDetector.shouldBlock("https://duckduckgo.com/index.html", documentUrl)
 
 
         Log.d("BLOCKED", "Easy tracker: " + blockedEasy)
         Log.d("BLOCKED", "EasyPrivacy tracker: " + blockedEasyPrivacy)
-        Log.d("BLOCKED", "Disconnect tracker: " + blockedDisconnect)
         Log.d("BLOCKED", "Nontracker: " + blockedNone)
 
         welcomeText.text = "DONE!"

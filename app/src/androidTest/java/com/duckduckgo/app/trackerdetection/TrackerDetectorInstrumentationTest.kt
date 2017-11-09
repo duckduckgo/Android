@@ -52,13 +52,7 @@ class TrackerDetectorInstrumentationTest {
         val url = "http://cdn.tagcommander.com/1705/tc_catalog.js"
         assertTrue(testee.shouldBlock(url, documentUrl))
     }
-
-    @Test
-    fun whenUrlIsInDisconnectListThenShouldBlockIsTrue() {
-        val url = "https://criteo.com/abcd.css"
-        assertTrue(testee.shouldBlock(url, documentUrl))
-    }
-
+    
     @Test
     fun whenUrlIsNotInAnyTrackerListsThenShouldBlockIsFalse() {
         var url = "https://duckduckgo.com/index.html"
