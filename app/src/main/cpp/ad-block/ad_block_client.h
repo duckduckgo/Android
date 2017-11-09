@@ -9,8 +9,8 @@
 #include "filter.h"
 #include "bad_fingerprint.h"
 #include "cosmetic_filter.h"
-#include "../bloomfilter/BloomFilter.h"
-#include "../hashset/HashSet.h"
+#include "../bloom-filter-cpp/BloomFilter.h"
+#include "../hashset-cpp/HashSet.h"
 
 class AdBlockClient {
  public:
@@ -29,7 +29,9 @@ class AdBlockClient {
       Filter **matchingExceptionFilter);
   // Serializes a the parsed data and bloom filter data into a single buffer.
   // The returned buffer should be deleted.
-  char * serialize(int *size, bool ignoreHTMLFilters = true);
+  char * serialize(int *size,
+      bool ignoreCosmeticFilters = true,
+      bool ignoreHtmlFilters = true);
   // Deserializes the buffer, a size is not needed since a serialized.
   // buffer is self described
   bool deserialize(char *buffer);
@@ -40,13 +42,15 @@ class AdBlockClient {
   }
 
   Filter *filters;
-  Filter *htmlRuleFilters;
+  Filter *cosmeticFilters;
+  Filter *htmlFilters;
   Filter *exceptionFilters;
   Filter *noFingerprintFilters;
   Filter *noFingerprintExceptionFilters;
 
   int numFilters;
-  int numHtmlRuleFilters;
+  int numCosmeticFilters;
+  int numHtmlFilters;
   int numExceptionFilters;
   int numNoFingerprintFilters;
   int numNoFingerprintExceptionFilters;
@@ -66,6 +70,8 @@ class AdBlockClient {
   unsigned int numExceptionFalsePositives;
   unsigned int numBloomFilterSaves;
   unsigned int numExceptionBloomFilterSaves;
+  unsigned int numHashSetSaves;
+  unsigned int numExceptionHashSetSaves;
 
  protected:
   // Determines if a passed in array of filter pointers matches for any of

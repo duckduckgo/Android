@@ -8,8 +8,8 @@
 
 #include <stdint.h>
 #include <string.h>
-#include "./base.h"
-#include "../bloomfilter/BloomFilter.h"
+#include "base.h"
+#include "../bloom-filter-cpp/BloomFilter.h"
 
 enum FilterType {
   FTNoFilterType = 0,
@@ -90,9 +90,7 @@ friend class AdBlockClient;
 
   // Checks to see if the filter options match for the passed in data
   bool matchesOptions(const char *input, FilterOption contextOption,
-      const char *contextDomain = nullptr,
-      const char *inputHost = nullptr,
-      int inputHostLen = 0);
+      const char *contextDomain = nullptr);
 
   void parseOptions(const char *input);
   bool containsDomain(const char *domain, bool anti = false) const;

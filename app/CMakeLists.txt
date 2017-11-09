@@ -18,12 +18,12 @@ add_library( # Sets the name of the library.
 
              # Provides a relative path to your source file(s).
              src/main/cpp/adblockplus-lib.cpp
-             src/main/cpp/adblockplus/ad_block_client.cc
-             src/main/cpp/adblockplus/cosmetic_filter.cc
-             src/main/cpp/adblockplus/filter.cpp
-             src/main/cpp/bloomfilter/BloomFilter.cpp
-             src/main/cpp/bloomfilter/hashFn.cpp
-             src/main/cpp/hashset/HashSet.cpp
+             src/main/cpp/ad-block/ad_block_client.cc
+             src/main/cpp/ad-block/cosmetic_filter.cc
+             src/main/cpp/ad-block/filter.cc
+             src/main/cpp/bloom-filter-cpp/BloomFilter.cpp
+             src/main/cpp/bloom-filter-cpp/hashFn.cpp
+             src/main/cpp/hashset-cpp/HashSet.cpp
             )
 
 # Searches for a specified prebuilt library and stores the path as a

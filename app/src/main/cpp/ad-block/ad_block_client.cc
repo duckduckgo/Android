@@ -5,7 +5,7 @@
 
 #include <string.h>
 #include <stdio.h>
-#include "./ad_block_client.h"
+#include "ad_block_client.h"
 
 #ifdef PERF_STATS
 #include <iostream>
@@ -13,7 +13,7 @@ using std::cout;
 using std::endl;
 #endif
 
-#include "./bad_fingerprints.h"
+#include "bad_fingerprints.h"
 
 const int kMaxLineLength = 2048;
 
@@ -221,8 +221,9 @@ void parseFilter(const char *input, const char *end, Filter *f,
             memcpy(f->host, p, len);
 
             if ((*(p + len) == '^' && (*(p + len + 1) == '\0'
-                    || *(p + len + 1) == '$' || *(p + len + 1) == '\n')) ||
-                *(p + len) == '\0' || *(p + len) == '$' || *(p + len) == '\n') {
+                    || *(p + len + 1) == '$' || isEndOfLine(*(p + len + 1)))) ||
+                *(p + len) == '\0' || *(p + len) == '$' ||
+                isEndOfLine(*(p + len))) {
               f->filterType =
                 static_cast<FilterType>(f->filterType | FTHostOnly);
             }
@@ -267,20 +268,35 @@ void parseFilter(const char *input, const char *end, Filter *f,
             continue;
           }
           break;
-        case '/':
-          if ((parseState == FPStart || parseState == FPPastWhitespace)
-              && input[strlen(input) -1] == '/') {
-            // Just copy out the whole regex and return early
-            int len = static_cast<int>(strlen(input)) - i - 1;
-            f->data = new char[len];
-            f->data[len - 1] = '\0';
-            memcpy(f->data, input + i + 1, len - 1);
-            f->filterType = FTRegex;
-            return;
+        case '/': {
+          const size_t inputLen = strlen(input);
+          if (parseState == FPStart || parseState == FPPastWhitespace) {
+            if (input[inputLen - 1] == '/' && inputLen > 1) {
+              // Just copy out the whole regex and return early
+              int len = static_cast<int>(inputLen) - i - 1;
+              f->data = new char[len];
+              f->data[len - 1] = '\0';
+              memcpy(f->data, input + i + 1, len - 1);
+              f->filterType = FTRegex;
+              return;
+            } else {
+              parseState = FPData;
+            }
           }
           break;
-
+        }
         case '$':
+          if (*(p+1) == '$') {
+              if (i != 0) {
+                f->domainList = new char[i + 1];
+                memcpy(f->domainList, data, i + 1);
+                i = 0;
+              }
+              parseState = FPDataOnly;
+              f->filterType = FTHTMLFiltering;
+              p+=2;
+              continue;
+          }
           f->parseOptions(p + 1);
           earlyBreak = true;
           continue;
@@ -359,12 +375,14 @@ void parseFilter(const char *input, const char *end, Filter *f,
 
 
 AdBlockClient::AdBlockClient() : filters(nullptr),
-  htmlRuleFilters(nullptr),
+  cosmeticFilters(nullptr),
+  htmlFilters(nullptr),
   exceptionFilters(nullptr),
   noFingerprintFilters(nullptr),
   noFingerprintExceptionFilters(nullptr),
   numFilters(0),
-  numHtmlRuleFilters(0),
+  numCosmeticFilters(0),
+  numHtmlFilters(0),
   numExceptionFilters(0),
   numNoFingerprintFilters(0),
   numNoFingerprintExceptionFilters(0),
@@ -379,6 +397,8 @@ AdBlockClient::AdBlockClient() : filters(nullptr),
   numExceptionFalsePositives(0),
   numBloomFilterSaves(0),
   numExceptionBloomFilterSaves(0),
+  numHashSetSaves(0),
+  numExceptionHashSetSaves(0),
   deserializedBuffer(nullptr) {
 }
 
@@ -392,9 +412,13 @@ void AdBlockClient::clear() {
     delete[] filters;
     filters = nullptr;
   }
-  if (htmlRuleFilters) {
-    delete[] htmlRuleFilters;
-    htmlRuleFilters = nullptr;
+  if (cosmeticFilters) {
+    delete[] cosmeticFilters;
+    cosmeticFilters = nullptr;
+  }
+  if (htmlFilters) {
+    delete[] htmlFilters;
+    htmlFilters = nullptr;
   }
   if (exceptionFilters) {
     delete[] exceptionFilters;
@@ -430,7 +454,8 @@ void AdBlockClient::clear() {
   }
 
   numFilters = 0;
-  numHtmlRuleFilters = 0;
+  numCosmeticFilters = 0;
+  numHtmlFilters = 0;
   numExceptionFilters = 0;
   numNoFingerprintFilters = 0;
   numNoFingerprintExceptionFilters = 0;
@@ -440,6 +465,8 @@ void AdBlockClient::clear() {
   numExceptionFalsePositives = 0;
   numBloomFilterSaves = 0;
   numExceptionBloomFilterSaves = 0;
+  numHashSetSaves = 0;
+  numExceptionHashSetSaves = 0;
 }
 
 bool AdBlockClient::hasMatchingFilters(Filter *filter, int numFilters,
@@ -573,7 +600,12 @@ bool AdBlockClient::matches(const char *input, FilterOption contextOption,
         hostAnchoredHashSet, inputHost, inputHostLen,
         contextOption, contextDomain);
     if (bloomFilterMiss && hostAnchoredHashSetMiss) {
-      numBloomFilterSaves++;
+      if (bloomFilterMiss) {
+        numBloomFilterSaves++;
+      }
+      if (hostAnchoredHashSetMiss) {
+        numHashSetSaves++;
+      }
       return false;
     }
 
@@ -617,8 +649,20 @@ bool AdBlockClient::matches(const char *input, FilterOption contextOption,
   // Now that we have a matching rule, we should check if no exception rule
   // hits, if none hits, we should block
   if (bloomExceptionFilterMiss && hostAnchoredExceptionHashSetMiss) {
-    numExceptionBloomFilterSaves++;
+    if (bloomExceptionFilterMiss) {
+      numExceptionBloomFilterSaves++;
+    }
+    if (hostAnchoredExceptionHashSetMiss) {
+      numExceptionHashSetSaves++;
+    }
     return true;
+  }
+
+  // If tehre wasn't an exception has set miss, it was a hit, and hash set is
+  // deterministic so we shouldn't block this resource.
+  if (!hostAnchoredExceptionHashSetMiss) {
+    numExceptionHashSetSaves++;
+    return false;
   }
 
   if (!bloomExceptionFilterMiss) {
@@ -734,7 +778,8 @@ bool AdBlockClient::parse(const char *input) {
   const char *lineStart = p;
 
   int newNumFilters = 0;
-  int newNumHtmlRuleFilters = 0;
+  int newNumCosmeticFilters = 0;
+  int newNumHtmlFilters = 0;
   int newNumExceptionFilters = 0;
   int newNumNoFingerprintFilters = 0;
   int newNumNoFingerprintExceptionFilters = 0;
@@ -749,7 +794,7 @@ bool AdBlockClient::parse(const char *input) {
   // so sometimes we won't even have STL So we can't use something like a vector
   // here.
   while (true) {
-    if (*p == '\n' || *p == '\0') {
+    if (isEndOfLine(*p) || *p == '\0') {
       Filter f;
       parseFilter(lineStart, p, &f);
       if (!f.hasUnsupportedOptions()) {
@@ -764,10 +809,13 @@ bool AdBlockClient::parse(const char *input) {
             }
             break;
           case FTElementHiding:
-            newNumHtmlRuleFilters++;
+            newNumCosmeticFilters++;
             break;
           case FTElementHidingException:
-            newNumHtmlRuleFilters++;
+            newNumCosmeticFilters++;
+            break;
+          case FTHTMLFiltering:
+            newNumHtmlFilters++;
             break;
           case FTEmpty:
           case FTComment:
@@ -797,7 +845,8 @@ bool AdBlockClient::parse(const char *input) {
 #ifdef PERF_STATS
   cout << "Fingerprint size: " << kFingerprintSize << endl;
   cout << "Num new filters: " << newNumFilters << endl;
-  cout << "Num new HTML rule filters: " << newNumHtmlRuleFilters << endl;
+  cout << "Num new cosmetic filters: " << newNumCosmeticFilters << endl;
+  cout << "Num new HTML filters: " << newNumHtmlFilters << endl;
   cout << "Num new exception filters: " << newNumExceptionFilters << endl;
   cout << "Num new no fingerprint filters: "
     << newNumNoFingerprintFilters << endl;
@@ -810,8 +859,10 @@ bool AdBlockClient::parse(const char *input) {
 #endif
 
   Filter *newFilters = new Filter[newNumFilters + numFilters];
-  Filter *newHtmlRuleFilters =
-    new Filter[newNumHtmlRuleFilters + numHtmlRuleFilters];
+  Filter *newCosmeticFilters =
+    new Filter[newNumCosmeticFilters + numCosmeticFilters];
+  Filter *newHtmlFilters =
+    new Filter[newNumHtmlFilters + numHtmlFilters];
   Filter *newExceptionFilters =
     new Filter[newNumExceptionFilters + numExceptionFilters];
   Filter *newNoFingerprintFilters =
@@ -822,8 +873,10 @@ bool AdBlockClient::parse(const char *input) {
 
   memset(newFilters, 0,
       sizeof(Filter) * (newNumFilters + numFilters));
-  memset(newHtmlRuleFilters, 0,
-      sizeof(Filter) * (newNumHtmlRuleFilters + numHtmlRuleFilters));
+  memset(newCosmeticFilters, 0,
+      sizeof(Filter) * (newNumCosmeticFilters + numCosmeticFilters));
+  memset(newHtmlFilters, 0,
+      sizeof(Filter) * (newNumHtmlFilters + numHtmlFilters));
   memset(newExceptionFilters, 0,
       sizeof(Filter) * (newNumExceptionFilters + numExceptionFilters));
   memset(newNoFingerprintFilters, 0,
@@ -833,19 +886,22 @@ bool AdBlockClient::parse(const char *input) {
         + numNoFingerprintExceptionFilters));
 
   Filter *curFilters = newFilters;
-  Filter *curHtmlRuleFilters = newHtmlRuleFilters;
+  Filter *curCosmeticFilters = newCosmeticFilters;
+  Filter *curHtmlFilters = newHtmlFilters;
   Filter *curExceptionFilters = newExceptionFilters;
   Filter *curNoFingerprintFilters = newNoFingerprintFilters;
   Filter *curNoFingerprintExceptionFilters = newNoFingerprintExceptionFilters;
 
   // If we've had a parse before copy the old data into the new data structure
-  if (filters || htmlRuleFilters || exceptionFilters || noFingerprintFilters
-      || noFingerprintExceptionFilters
+  if (filters || cosmeticFilters || htmlFilters || exceptionFilters ||
+      noFingerprintFilters || noFingerprintExceptionFilters
       /*|| hostAnchoredFilters || hostAnchoredExceptionFilters */) {
     // Copy the old data in
     memcpy(newFilters, filters, sizeof(Filter) * numFilters);
-    memcpy(newHtmlRuleFilters, htmlRuleFilters,
-        sizeof(Filter) * numHtmlRuleFilters);
+    memcpy(newCosmeticFilters, cosmeticFilters,
+        sizeof(Filter) * numCosmeticFilters);
+    memcpy(newHtmlFilters, htmlFilters,
+        sizeof(Filter) * numHtmlFilters);
     memcpy(newExceptionFilters, exceptionFilters,
         sizeof(Filter) * numExceptionFilters);
     memcpy(newNoFingerprintFilters, noFingerprintFilters,
@@ -857,20 +913,23 @@ bool AdBlockClient::parse(const char *input) {
     // Set the old filter lists borrwedMemory to true since it'll be taken by
     // the new filters.
     setFilterBorrowedMemory(filters, numFilters);
-    setFilterBorrowedMemory(htmlRuleFilters, numHtmlRuleFilters);
+    setFilterBorrowedMemory(cosmeticFilters, numCosmeticFilters);
+    setFilterBorrowedMemory(htmlFilters, numHtmlFilters);
     setFilterBorrowedMemory(exceptionFilters, numExceptionFilters);
     setFilterBorrowedMemory(noFingerprintFilters, numNoFingerprintFilters);
     setFilterBorrowedMemory(noFingerprintExceptionFilters,
         numNoFingerprintExceptionFilters);
     delete[] filters;
-    delete[] htmlRuleFilters;
+    delete[] cosmeticFilters;
+    delete[] htmlFilters;
     delete[] exceptionFilters;
     delete[] noFingerprintFilters;
     delete[] noFingerprintExceptionFilters;
 
     // Adjust the current pointers to be just after the copied in data
     curFilters += numFilters;
-    curHtmlRuleFilters += numHtmlRuleFilters;
+    curCosmeticFilters += numCosmeticFilters;
+    curHtmlFilters += numHtmlFilters;
     curExceptionFilters += numExceptionFilters;
     curNoFingerprintFilters += numNoFingerprintFilters;
     curNoFingerprintExceptionFilters += numNoFingerprintExceptionFilters;
@@ -878,7 +937,8 @@ bool AdBlockClient::parse(const char *input) {
 
   // And finally update with the new counts
   numFilters += newNumFilters;
-  numHtmlRuleFilters += newNumHtmlRuleFilters;
+  numCosmeticFilters += newNumCosmeticFilters;
+  numHtmlFilters += newNumHtmlFilters;
   numExceptionFilters += newNumExceptionFilters;
   numNoFingerprintFilters += newNumNoFingerprintFilters;
   numNoFingerprintExceptionFilters += newNumNoFingerprintExceptionFilters;
@@ -887,7 +947,8 @@ bool AdBlockClient::parse(const char *input) {
 
   // Adjust the new member list pointers
   filters = newFilters;
-  htmlRuleFilters = newHtmlRuleFilters;
+  cosmeticFilters = newCosmeticFilters;
+  htmlFilters = newHtmlFilters;
   exceptionFilters = newExceptionFilters;
   noFingerprintFilters = newNoFingerprintFilters;
   noFingerprintExceptionFilters = newNoFingerprintExceptionFilters;
@@ -896,7 +957,7 @@ bool AdBlockClient::parse(const char *input) {
   lineStart = p;
 
   while (true) {
-    if (*p == '\n' || *p == '\0') {
+    if (isEndOfLine(*p) || *p == '\0') {
       Filter f;
       parseFilter(lineStart, p, &f, bloomFilter, exceptionBloomFilter,
           hostAnchoredHashSet,
@@ -917,8 +978,12 @@ bool AdBlockClient::parse(const char *input) {
             break;
           case FTElementHiding:
           case FTElementHidingException:
-            (*curHtmlRuleFilters).swapData(&f);
-            curHtmlRuleFilters++;
+            (*curCosmeticFilters).swapData(&f);
+            curCosmeticFilters++;
+            break;
+          case FTHTMLFiltering:
+            (*curHtmlFilters).swapData(&f);
+            curHtmlFilters++;
             break;
           case FTEmpty:
           case FTComment:
@@ -1002,9 +1067,13 @@ int serializeFilters(char * buffer, size_t bufferSizeAvail,
 }
 
 // Returns a newly allocated buffer, caller must manually delete[] the buffer
-char * AdBlockClient::serialize(int *totalSize, bool ignoreHTMLFilters) {
+char * AdBlockClient::serialize(int *totalSize,
+    bool ignoreCosmeticFilters,
+    bool ignoreHtmlFilters) {
   *totalSize = 0;
-  int adjustedNumHTMLFilters = ignoreHTMLFilters ? 0 : numHtmlRuleFilters;
+  int adjustedNumCosmeticFilters =
+    ignoreCosmeticFilters ? 0 : numCosmeticFilters;
+  int adjustedNumHtmlFilters = ignoreHtmlFilters ? 0 : numHtmlFilters;
 
   uint32_t hostAnchoredHashSetSize = 0;
   char *hostAnchoredHashSetBuffer = nullptr;
@@ -1024,16 +1093,17 @@ char * AdBlockClient::serialize(int *totalSize, bool ignoreHTMLFilters) {
   // Get the number of bytes that we'll need
   char sz[512];
   *totalSize += 1 + snprintf(sz, sizeof(sz),
-      "%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x", numFilters,
-      numExceptionFilters, adjustedNumHTMLFilters, numNoFingerprintFilters,
-      numNoFingerprintExceptionFilters, numHostAnchoredFilters,
-      numHostAnchoredExceptionFilters,
+      "%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x", numFilters,
+      numExceptionFilters, adjustedNumCosmeticFilters, adjustedNumHtmlFilters,
+      numNoFingerprintFilters, numNoFingerprintExceptionFilters,
+      numHostAnchoredFilters, numHostAnchoredExceptionFilters,
       bloomFilter ? bloomFilter->getByteBufferSize() : 0, exceptionBloomFilter
         ? exceptionBloomFilter->getByteBufferSize() : 0,
         hostAnchoredHashSetSize, hostAnchoredExceptionHashSetSize);
   *totalSize += serializeFilters(nullptr, 0, filters, numFilters) +
     serializeFilters(nullptr, 0, exceptionFilters, numExceptionFilters) +
-    serializeFilters(nullptr, 0, htmlRuleFilters, adjustedNumHTMLFilters) +
+    serializeFilters(nullptr, 0, cosmeticFilters, adjustedNumCosmeticFilters) +
+    serializeFilters(nullptr, 0, htmlFilters, adjustedNumHtmlFilters) +
     serializeFilters(nullptr, 0,
         noFingerprintFilters, numNoFingerprintFilters) +
     serializeFilters(nullptr, 0, noFingerprintExceptionFilters,
@@ -1055,8 +1125,10 @@ char * AdBlockClient::serialize(int *totalSize, bool ignoreHTMLFilters) {
   pos += serializeFilters(buffer + pos, *totalSize - pos, filters, numFilters);
   pos += serializeFilters(buffer + pos, *totalSize - pos,
       exceptionFilters, numExceptionFilters);
-  pos += serializeFilters(buffer + pos, *totalSize - pos, htmlRuleFilters,
-      adjustedNumHTMLFilters);
+  pos += serializeFilters(buffer + pos, *totalSize - pos, cosmeticFilters,
+      adjustedNumCosmeticFilters);
+  pos += serializeFilters(buffer + pos, *totalSize - pos, htmlFilters,
+      adjustedNumHtmlFilters);
   pos += serializeFilters(buffer + pos, *totalSize - pos, noFingerprintFilters,
       numNoFingerprintFilters);
   pos += serializeFilters(buffer + pos, *totalSize - pos,
@@ -1130,17 +1202,18 @@ bool AdBlockClient::deserialize(char *buffer) {
   int bloomFilterSize = 0, exceptionBloomFilterSize = 0,
       hostAnchoredHashSetSize = 0, hostAnchoredExceptionHashSetSize = 0;
   int pos = 0;
-  sscanf(buffer + pos, "%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x", &numFilters,
-      &numExceptionFilters, &numHtmlRuleFilters, &numNoFingerprintFilters,
-      &numNoFingerprintExceptionFilters, &numHostAnchoredFilters,
-      &numHostAnchoredExceptionFilters, &bloomFilterSize,
-      &exceptionBloomFilterSize, &hostAnchoredHashSetSize,
-      &hostAnchoredExceptionHashSetSize);
+  sscanf(buffer + pos, "%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x", &numFilters,
+      &numExceptionFilters, &numCosmeticFilters, &numHtmlFilters,
+      &numNoFingerprintFilters, &numNoFingerprintExceptionFilters,
+      &numHostAnchoredFilters, &numHostAnchoredExceptionFilters,
+      &bloomFilterSize, &exceptionBloomFilterSize,
+      &hostAnchoredHashSetSize, &hostAnchoredExceptionHashSetSize);
   pos += static_cast<int>(strlen(buffer + pos)) + 1;
 
   filters = new Filter[numFilters];
   exceptionFilters = new Filter[numExceptionFilters];
-  htmlRuleFilters = new Filter[numHtmlRuleFilters];
+  cosmeticFilters = new Filter[numCosmeticFilters];
+  htmlFilters = new Filter[numHtmlFilters];
   noFingerprintFilters = new Filter[numNoFingerprintFilters];
   noFingerprintExceptionFilters = new Filter[numNoFingerprintExceptionFilters];
 
@@ -1148,7 +1221,9 @@ bool AdBlockClient::deserialize(char *buffer) {
   pos += deserializeFilters(buffer + pos,
       exceptionFilters, numExceptionFilters);
   pos += deserializeFilters(buffer + pos,
-      htmlRuleFilters, numHtmlRuleFilters);
+      cosmeticFilters, numCosmeticFilters);
+  pos += deserializeFilters(buffer + pos,
+      htmlFilters, numHtmlFilters);
   pos += deserializeFilters(buffer + pos,
       noFingerprintFilters, numNoFingerprintFilters);
   pos += deserializeFilters(buffer + pos,

@@ -1,6 +1,6 @@
 #include <jni.h>
 #include <string>
-#include "adblockplus/ad_block_client.h"
+#include "ad-block/ad_block_client.h"
 
 
 AdBlockClient client = AdBlockClient();

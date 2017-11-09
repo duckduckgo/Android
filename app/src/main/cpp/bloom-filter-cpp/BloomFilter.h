@@ -8,8 +8,8 @@
 
 #include <math.h>
 #include <stdint.h>
-#include "./hashFn.h"
-#include "./base.h"
+#include "hashFn.h"
+#include "base.h"
 
 static HashFn h1(13);
 static HashFn h2(17);

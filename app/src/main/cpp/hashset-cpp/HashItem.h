@@ -6,7 +6,7 @@
 #ifndef HASHITEM_H_
 #define HASHITEM_H_
 
-#include "./base.h"
+#include "base.h"
 
 template<class T>
 class HashItem {

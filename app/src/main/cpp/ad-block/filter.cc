@@ -5,14 +5,19 @@
 
 #include <string.h>
 #include <math.h>
-#include "./filter.h"
-#include "../bloomfilter/hashFn.h"
-#include "./ad_block_client.h"
+#include "filter.h"
+#include "../bloom-filter-cpp/hashFn.h"
+#include "ad_block_client.h"
 
 #ifdef ENABLE_REGEX
 #include <string>
 #include <regex> // NOLINT
 #endif
+
+
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 static HashFn h(19);
 
@@ -328,7 +333,7 @@ bool Filter::hasUnsupportedOptions() const {
 // By specifying context params, you can filter out the number of rules
 // which are considered.
 bool Filter::matchesOptions(const char *input, FilterOption context,
-    const char *contextDomain, const char *inputHost, int inputHostLen) {
+    const char *contextDomain) {
   if (hasUnsupportedOptions()) {
     return false;
   }
@@ -354,7 +359,6 @@ bool Filter::matchesOptions(const char *input, FilterOption context,
 
     char shouldBlockDomainsBuffer[2048];
     char shouldSkipDomainsBuffer[2048];
-
 
     // This is purely an optimizaiton to avoid allocation a bunch of things
     // we don't need to. This will use stack allocation above as long as it's
@@ -395,16 +399,13 @@ bool Filter::matchesOptions(const char *input, FilterOption context,
   // If we're in the context of third-party site, then consider
   // third-party option checks
   if (context & (FOThirdParty | FONotThirdParty)) {
-    if ((filterOption & FOThirdParty) && host) {
-      if (!inputHost) {
-        inputHost = getUrlHost(input, &inputHostLen);
-      }
-      bool inputHostIsThirdParty =
-        isThirdPartyHost(host, static_cast<int>(strlen(host)),
-            inputHost, inputHostLen);
-      if (inputHostIsThirdParty || !(context & FOThirdParty)) {
-        return false;
-      }
+    if ((filterOption & FOThirdParty) &&
+        (context & FONotThirdParty)) {
+      return false;
+    }
+    if ((antiFilterOption & FOThirdParty) &&
+        (context & FOThirdParty)) {
+      return false;
     }
   }
 
