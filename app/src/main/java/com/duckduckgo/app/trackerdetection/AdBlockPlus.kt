@@ -30,7 +30,7 @@ class AdBlockPlus {
         System.loadLibrary("adblockplus-lib")
     }
 
-    external fun loadData(data: ByteArray)
+    external fun loadData(easylistData: ByteArray, easyprivacyData: ByteArray): Boolean
 
 
     fun matches(url: String, documentUrl: String): Boolean {
@@ -45,7 +45,6 @@ class AdBlockPlus {
         }
 
         return matches(url, documentUrl, filterOption)
-
     }
 
     external fun matches(url: String, documentUrl: String, filterOption: Int): Boolean

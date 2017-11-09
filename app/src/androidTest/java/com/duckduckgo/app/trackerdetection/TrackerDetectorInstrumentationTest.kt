@@ -36,9 +36,9 @@ class TrackerDetectorInstrumentationTest {
     @Before
     fun setup() {
         val appContext = InstrumentationRegistry.getTargetContext()
-        val stream = appContext.resources.openRawResource(R.raw.easylist)
-        val data = stream.bufferedReader().use { it.readText().toByteArray() }
-        testee = TrackerDetector(data)
+        val easylistData = appContext.resources.openRawResource(R.raw.easylist).use { it.readBytes() }
+        val easyprivacyData = appContext.resources.openRawResource(R.raw.easyprivacy).use { it.readBytes() }
+        testee = TrackerDetector(easylistData, easyprivacyData)
     }
 
     @Test

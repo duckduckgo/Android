@@ -20,8 +20,8 @@ class TrackerDetector {
 
     val adBlockPlus = AdBlockPlus()
 
-    constructor(easylistData: ByteArray) {
-        adBlockPlus.loadData(easylistData)
+    constructor(easylistData: ByteArray, easyPrivacyData: ByteArray) {
+        adBlockPlus.loadData(easylistData, easyPrivacyData)
     }
 
     fun shouldBlock(url: String, documentUrl: String): Boolean {
