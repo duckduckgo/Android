@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
+import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 
 import javax.inject.Inject
 

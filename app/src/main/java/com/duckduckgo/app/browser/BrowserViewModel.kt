@@ -18,10 +18,11 @@ package com.duckduckgo.app.browser
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 
 
 class BrowserViewModel(
-        private val queryUrlConverter: QueryUrlConverter) : ViewModel() {
+        private val queryUrlConverter: OmnibarEntryConverter) : ViewModel() {
 
     val query: MutableLiveData<String> = MutableLiveData()
 

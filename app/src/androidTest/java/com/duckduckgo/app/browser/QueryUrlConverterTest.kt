@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.net.Uri
 import android.support.test.runner.AndroidJUnit4
+import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith

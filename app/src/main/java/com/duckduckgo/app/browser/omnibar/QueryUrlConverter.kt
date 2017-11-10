@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.app.browser.omnibar
 
 import android.net.Uri
 import android.support.v4.util.PatternsCompat
-import com.duckduckgo.app.browser.QueryUrlConverter.Query.baseUrl
-import com.duckduckgo.app.browser.QueryUrlConverter.Query.http
-import com.duckduckgo.app.browser.QueryUrlConverter.Query.https
-import com.duckduckgo.app.browser.QueryUrlConverter.Query.httpsScheme
-import com.duckduckgo.app.browser.QueryUrlConverter.Query.localhost
-import com.duckduckgo.app.browser.QueryUrlConverter.Query.querySource
-import com.duckduckgo.app.browser.QueryUrlConverter.Query.space
-import com.duckduckgo.app.browser.QueryUrlConverter.Query.webUrlRegex
+import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.baseUrl
+import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.http
+import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.https
+import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.httpsScheme
+import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.localhost
+import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.querySource
+import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.space
+import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.webUrlRegex
 import javax.inject.Inject
 
-class QueryUrlConverter @Inject constructor() {
+class QueryUrlConverter @Inject constructor() : OmnibarEntryConverter {
 
     object Query {
         val https = "https"
@@ -41,7 +42,7 @@ class QueryUrlConverter @Inject constructor() {
         val webUrlRegex = PatternsCompat.WEB_URL.toRegex()
     }
 
-    fun isWebUrl(inputQuery: String): Boolean {
+    override fun isWebUrl(inputQuery: String): Boolean {
         val uri = Uri.parse(inputQuery)
         if (uri.scheme == null) return isWebUrl(httpsScheme + inputQuery)
         if (uri.scheme != http && uri.scheme != https) return false
@@ -61,7 +62,7 @@ class QueryUrlConverter @Inject constructor() {
         return false
     }
 
-    fun convertQueryToUri(inputQuery: String): Uri {
+    override fun convertQueryToUri(inputQuery: String): Uri {
         return Uri.Builder()
                 .scheme(https)
                 .authority(baseUrl)
