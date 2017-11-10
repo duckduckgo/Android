@@ -52,11 +52,11 @@ class BrowserWebViewClient(val trackerDetector: TrackerDetector) : WebViewClient
     private fun block(url: String?, documentUrl: String?): Boolean {
 
         if (url != null && documentUrl != null && trackerDetector.shouldBlock(url, documentUrl)) {
-            Timber.v("NOT blocked ${url}")
+            Timber.v("BLOCKED ${url}")
             return true
         }
 
-        Timber.v("BLOCKED ${url}")
+        Timber.v("NOT blocked ${url}")
         return false
     }
 
