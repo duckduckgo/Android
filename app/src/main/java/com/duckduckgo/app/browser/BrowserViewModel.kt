@@ -25,13 +25,18 @@ class BrowserViewModel(
 
     val query: MutableLiveData<String> = MutableLiveData()
 
-    fun onQueryEntered(inputQuery: String) {
+    fun onQueryEntered(input: String) {
 
-        if(inputQuery.isBlank()) {
+        if(input.isBlank()) {
             return
         }
 
-        query.value = queryUrlConverter.convertInputToUri(inputQuery)
+        if(queryUrlConverter.isWebUrl(input)) {
+            query.value = input
+
+        } else {
+            query.value = queryUrlConverter.convertQueryToUri(input).toString()
+        }
     }
 }
 

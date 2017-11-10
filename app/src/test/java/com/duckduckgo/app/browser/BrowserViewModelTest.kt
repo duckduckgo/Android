@@ -57,7 +57,7 @@ class BrowserViewModelTest {
 
     @Test
     fun whenNonEmptyInputThenQueryMadeAvailableToActivity() {
-        Mockito.doReturn(validFullUri()).`when`(urlConverter).convertInputToUri(anyString())
+        Mockito.doReturn(validFullUri()).`when`(urlConverter).convertQueryToUri(anyString())
 
         testee.query.observeForever(observer)
         testee.onQueryEntered("foo")

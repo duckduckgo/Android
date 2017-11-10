@@ -17,38 +17,58 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
+import android.support.v4.util.PatternsCompat
 import com.duckduckgo.app.browser.QueryUrlConverter.Query.baseUrl
-import com.duckduckgo.app.browser.QueryUrlConverter.Query.httpScheme
+import com.duckduckgo.app.browser.QueryUrlConverter.Query.http
+import com.duckduckgo.app.browser.QueryUrlConverter.Query.https
 import com.duckduckgo.app.browser.QueryUrlConverter.Query.httpsScheme
+import com.duckduckgo.app.browser.QueryUrlConverter.Query.localhost
 import com.duckduckgo.app.browser.QueryUrlConverter.Query.querySource
-import com.duckduckgo.app.browser.QueryUrlConverter.Query.scheme
-import timber.log.Timber
+import com.duckduckgo.app.browser.QueryUrlConverter.Query.space
+import com.duckduckgo.app.browser.QueryUrlConverter.Query.webUrlRegex
 import javax.inject.Inject
 
 class QueryUrlConverter @Inject constructor() {
 
     object Query {
-        val scheme = "https"
+        val https = "https"
+        val httpsScheme = "$https://"
+        val http = "http"
         val baseUrl = "duckduckgo.com"
         val querySource = "ddg_android"
-        val httpsScheme = "https://"
-        val httpScheme = "http://"
+        val localhost = "localhost"
+        val space = " "
+        val webUrlRegex = PatternsCompat.WEB_URL.toRegex()
     }
 
-    fun convertInputToUri(inputQuery: String): String {
-        if (inputQuery.startsWith(httpScheme) || inputQuery.startsWith(httpsScheme)) {
-            Timber.d("Detected as full URL - $inputQuery")
-            return inputQuery
-        }
+    fun isWebUrl(inputQuery: String): Boolean {
+        val uri = Uri.parse(inputQuery)
+        if (uri.scheme == null) return isWebUrl(httpsScheme + inputQuery)
+        if (uri.scheme != http && uri.scheme != https) return false
+        if (uri.userInfo != null) return false
+        if (uri.host == null) return false
+        if (uri.path.contains(space)) return false
 
+        return isValidHost(uri.host)
+    }
+
+    private fun isValidHost(host: String): Boolean {
+        if (host == localhost) return true
+        if (host.contains(space)) return false
+        if (host.contains("!")) return false
+
+        if (webUrlRegex.containsMatchIn(host)) return true
+        return false
+    }
+
+    fun convertQueryToUri(inputQuery: String): Uri {
         return Uri.Builder()
-                .scheme(scheme)
+                .scheme(https)
                 .authority(baseUrl)
                 .appendQueryParameter("q", inputQuery)
                 .appendQueryParameter("tappv", formatAppVersion())
                 .appendQueryParameter("t", querySource)
                 .build()
-                .toString()
     }
 
     private fun formatAppVersion(): String {
