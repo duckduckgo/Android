@@ -14,9 +14,6 @@ android:
     # The SDK version used to compile your project
     - android-26
 
-    # Additional components
-    - extra-android-m2repository
-
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -26,4 +23,4 @@ cache:
     - $HOME/.gradle/wrapper/
     - $HOME/.android/build-cache
 
-script: ./gradlew clean build
+script: ./gradlew build connectedCheck
