@@ -23,7 +23,6 @@ import android.webkit.WebViewClient
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.Function
 import kotlinx.android.synthetic.main.activity_main.view.*
 import timber.log.Timber
 
@@ -33,36 +32,39 @@ class BrowserWebViewClient(val trackerDetector: TrackerDetector) : WebViewClient
     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
         Timber.v("Intercepting Url ${request?.url}")
 
-        val url = request?.url.toString()
-        val documentUrl = view?.safeUrl()
-        if (url != null && documentUrl != null && trackerDetector.shouldBlock(url, documentUrl)) {
-            Timber.v("Tracker blocked  ${url}")
+        if (block(request?.url?.toString(), view?.url)) {
             return true
         }
 
-        Timber.v("Tracker did not block  ${url}")
         return false
     }
 
     override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
         Timber.v("Intercepting resource ${request?.url}")
 
-        val url = request?.url?.toString()
-        val documentUrl = view?.safeUrl()
-        if (url != null && documentUrl != null && trackerDetector.shouldBlock(url, documentUrl)) {
-            Timber.v("Tracker blocked  ${url}")
+        if (block(request?.url?.toString(), view?.safeUrl())) {
             return WebResourceResponse(null, null, null)
         }
 
-        Timber.v("Tracker did not block  ${url}")
         return null
+    }
+
+    private fun block(url: String?, documentUrl: String?): Boolean {
+
+        if (url != null && documentUrl != null && trackerDetector.shouldBlock(url, documentUrl)) {
+            Timber.v("NOT blocked ${url}")
+            return true
+        }
+
+        Timber.v("BLOCKED ${url}")
+        return false
     }
 
     fun WebView.safeUrl(): String? {
         return Observable.just(webView)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(AndroidSchedulers.mainThread())
                 .map { webView -> webView.url }
                 .blockingFirst()
     }
+
 }
