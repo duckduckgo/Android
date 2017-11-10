@@ -14,23 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global
-
-import com.duckduckgo.app.di.DaggerAppComponent
-import com.duckduckgo.app.browser.BuildConfig
-import dagger.android.AndroidInjector
-import dagger.android.DaggerApplication
-import dagger.android.HasActivityInjector
-import timber.log.Timber
+package com.duckduckgo.app.browser
 
 
-class DuckDuckGoApplication : HasActivityInjector, DaggerApplication()  {
-    override fun applicationInjector(): AndroidInjector<out DaggerApplication>
-            = DaggerAppComponent.builder().create(this)
+import android.arch.lifecycle.ViewModel
+import android.arch.lifecycle.ViewModelProvider
 
-    override fun onCreate() {
-        super.onCreate()
+import javax.inject.Inject
 
-        if(BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
+@Suppress("UNCHECKED_CAST")
+class BrowserViewModelFactory @Inject constructor() : ViewModelProvider.Factory {
+
+    @Inject
+    lateinit var queryUrlConverter: QueryUrlConverter
+
+    override fun <T : ViewModel> create(aClass: Class<T>): T {
+        if (aClass.isAssignableFrom(BrowserViewModel::class.java)) {
+            return BrowserViewModel(queryUrlConverter) as T
+        }
+        throw IllegalArgumentException("Unknown view model")
     }
 }
+
+

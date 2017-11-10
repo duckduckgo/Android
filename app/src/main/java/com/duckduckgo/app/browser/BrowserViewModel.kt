@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global
+package com.duckduckgo.app.browser
 
-import com.duckduckgo.app.di.DaggerAppComponent
-import com.duckduckgo.app.browser.BuildConfig
-import dagger.android.AndroidInjector
-import dagger.android.DaggerApplication
-import dagger.android.HasActivityInjector
-import timber.log.Timber
+import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.ViewModel
 
 
-class DuckDuckGoApplication : HasActivityInjector, DaggerApplication()  {
-    override fun applicationInjector(): AndroidInjector<out DaggerApplication>
-            = DaggerAppComponent.builder().create(this)
+class BrowserViewModel(
+        private val queryUrlConverter: QueryUrlConverter) : ViewModel() {
 
-    override fun onCreate() {
-        super.onCreate()
+    val query: MutableLiveData<String> = MutableLiveData()
 
-        if(BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
+    fun onQueryEntered(inputQuery: String) {
+
+        if(inputQuery.isBlank()) {
+            return
+        }
+
+        query.value = queryUrlConverter.convertInputToUri(inputQuery)
     }
 }
+

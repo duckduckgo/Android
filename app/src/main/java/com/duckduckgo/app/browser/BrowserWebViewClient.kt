@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global
+package com.duckduckgo.app.browser
 
-import com.duckduckgo.app.di.DaggerAppComponent
-import com.duckduckgo.app.browser.BuildConfig
-import dagger.android.AndroidInjector
-import dagger.android.DaggerApplication
-import dagger.android.HasActivityInjector
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import timber.log.Timber
 
+class BrowserWebViewClient : WebViewClient() {
 
-class DuckDuckGoApplication : HasActivityInjector, DaggerApplication()  {
-    override fun applicationInjector(): AndroidInjector<out DaggerApplication>
-            = DaggerAppComponent.builder().create(this)
-
-    override fun onCreate() {
-        super.onCreate()
-
-        if(BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
+    override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+        Timber.v("Url ${request?.url}")
+        return false
     }
 }

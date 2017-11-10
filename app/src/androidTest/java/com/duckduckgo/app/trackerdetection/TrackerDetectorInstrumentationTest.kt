@@ -19,7 +19,7 @@ package com.duckduckgo.app.trackerdetection
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
-import com.duckduckgo.app.main.R
+import com.duckduckgo.app.browser.R
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.BeforeClass
