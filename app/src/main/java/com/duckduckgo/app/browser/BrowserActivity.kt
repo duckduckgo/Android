@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -47,15 +48,17 @@ class BrowserActivity : AppCompatActivity() {
             userEnteredQuery()
         })
 
-        configureWebViewControls()
+        configureWebView()
     }
 
     private fun userEnteredQuery() {
         viewModel.onQueryEntered(urlInput.text.toString())
     }
 
-    private fun configureWebViewControls() {
+    @SuppressLint("SetJavaScriptEnabled")
+    private fun configureWebView() {
         webView.webViewClient = BrowserWebViewClient()
+        webView.settings.javaScriptEnabled = true
         refreshWebViewButton.setOnClickListener({ webView.reload() })
         navigateBackButton.setOnClickListener({ webView.goBack() })
         navigateForward.setOnClickListener({ webView.goForward() })
