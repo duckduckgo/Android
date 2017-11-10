@@ -15,7 +15,7 @@ android:
     - android-27
 
     # Specify at least once system image
-    sys-img-armeabi-v7a-android-22
+    - sys-img-armeabi-v7a-android-22
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
