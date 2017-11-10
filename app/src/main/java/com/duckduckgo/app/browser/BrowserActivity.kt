@@ -25,15 +25,18 @@ import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_main.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class BrowserActivity : AppCompatActivity() {
 
+    @Inject lateinit var requestRewriter: DuckDuckGoRequestRewriter
+    @Inject lateinit var webViewClient: BrowserWebViewClient
+    @Inject lateinit var viewModelFactory: BrowserViewModelFactory
+
     private val viewModel: BrowserViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(BrowserViewModel::class.java)
     }
-
-    @Inject lateinit var viewModelFactory : BrowserViewModelFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
@@ -41,7 +44,10 @@ class BrowserActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         viewModel.query.observe(this, Observer {
-            webView.loadUrl(it)
+            if (savedInstanceState == null) {
+                Timber.v("Webview loading url $it")
+                webView.loadUrl(it)
+            }
         })
 
         loadUrlButton.setOnClickListener({
@@ -57,7 +63,7 @@ class BrowserActivity : AppCompatActivity() {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
-        webView.webViewClient = BrowserWebViewClient()
+        webView.webViewClient = webViewClient
         webView.settings.javaScriptEnabled = true
         refreshWebViewButton.setOnClickListener({ webView.reload() })
         navigateBackButton.setOnClickListener({ webView.goBack() })

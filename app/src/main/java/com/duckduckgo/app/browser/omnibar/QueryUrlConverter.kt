@@ -18,18 +18,17 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.net.Uri
 import android.support.v4.util.PatternsCompat
-import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.browser.DuckDuckGoRequestRewriter
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.baseUrl
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.http
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.https
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.httpsScheme
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.localhost
-import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.querySource
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.space
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.webUrlRegex
 import javax.inject.Inject
 
-class QueryUrlConverter @Inject constructor() : OmnibarEntryConverter {
+class QueryUrlConverter @Inject constructor(private val requestRewriter: DuckDuckGoRequestRewriter) : OmnibarEntryConverter {
 
     object Query {
         val https = "https"
@@ -63,17 +62,22 @@ class QueryUrlConverter @Inject constructor() : OmnibarEntryConverter {
     }
 
     override fun convertQueryToUri(inputQuery: String): Uri {
-        return Uri.Builder()
+        val uriBuilder = Uri.Builder()
                 .scheme(https)
-                .authority(baseUrl)
                 .appendQueryParameter("q", inputQuery)
-                .appendQueryParameter("tappv", formatAppVersion())
-                .appendQueryParameter("t", querySource)
-                .build()
+                .authority(baseUrl)
+
+        requestRewriter.addCustomQueryParams(uriBuilder)
+
+        return uriBuilder.build()
     }
 
-    private fun formatAppVersion(): String {
-        return String.format("android_%s", BuildConfig.VERSION_NAME.replace(".", "_"))
+    override fun convertUri(input: String): String {
+        val uri = Uri.parse(input)
+        if (uri.host == baseUrl) {
+            return requestRewriter.rewriteRequestWithCustomQueryParams(uri).toString()
+        }
+        return input
     }
 
 }

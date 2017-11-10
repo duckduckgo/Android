@@ -33,7 +33,7 @@ class BrowserViewModel(
         }
 
         if(queryUrlConverter.isWebUrl(input)) {
-            query.value = input
+            query.value = queryUrlConverter.convertUri(input)
 
         } else {
             query.value = queryUrlConverter.convertQueryToUri(input).toString()

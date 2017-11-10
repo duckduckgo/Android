@@ -20,11 +20,19 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import timber.log.Timber
+import javax.inject.Inject
 
-class BrowserWebViewClient : WebViewClient() {
+class BrowserWebViewClient @Inject constructor(private val requestRewriter: DuckDuckGoRequestRewriter): WebViewClient() {
 
-    override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-        Timber.v("Url ${request?.url}")
+    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+        Timber.v("Url ${request.url}")
+
+        if (requestRewriter.shouldRewriteRequest(request)) {
+            val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(request.url)
+            view.loadUrl(newUri.toString())
+            return true
+        }
+
         return false
     }
 }

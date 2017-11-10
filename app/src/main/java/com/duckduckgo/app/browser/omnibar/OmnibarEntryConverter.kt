@@ -23,4 +23,5 @@ interface OmnibarEntryConverter {
 
     fun isWebUrl(inputQuery: String): Boolean
     fun convertQueryToUri(inputQuery: String): Uri
+    fun convertUri(input: String): String
 }
