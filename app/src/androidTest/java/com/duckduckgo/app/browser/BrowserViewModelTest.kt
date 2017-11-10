@@ -21,6 +21,7 @@ import android.arch.lifecycle.Observer
 import android.net.Uri
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import mock
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers
@@ -37,11 +38,17 @@ class BrowserViewModelTest {
     val observer: Observer<String> = mock()
 
     val testOmnibarConverter: OmnibarEntryConverter = object : OmnibarEntryConverter {
+        override fun convertUri(input: String): String  = "duckduckgo.com"
         override fun isWebUrl(inputQuery: String): Boolean = true
         override fun convertQueryToUri(inputQuery: String): Uri = Uri.parse("duckduckgo.com")
     }
 
-    val testee = BrowserViewModel(testOmnibarConverter)
+    private lateinit var testee :BrowserViewModel
+
+    @Before
+    fun before() {
+        testee = BrowserViewModel(testOmnibarConverter)
+    }
 
     @Test
     fun whenEmptyInputQueryThenNoQueryMadeAvailableToActivity() {
