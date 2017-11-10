@@ -37,7 +37,7 @@ Java_com_duckduckgo_app_trackerdetection_AdBlockPlus_matches(JNIEnv *env,jobject
 
     jboolean isDocumentCopy;
     const char *documentUrlChars = env->GetStringUTFChars(documentUrl, &isDocumentCopy);
-    bool matches = easyprivacyClient.matches(urlChars, FONoFilterOption, documentUrlChars) ||
+    bool matches = easyprivacyClient.matches(urlChars, (FilterOption) filterOption, documentUrlChars) ||
                    easylistClient.matches(urlChars, (FilterOption) filterOption, documentUrlChars);
 
     env->ReleaseStringUTFChars(url, urlChars);

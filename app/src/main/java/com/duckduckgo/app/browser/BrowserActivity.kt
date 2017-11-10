@@ -20,12 +20,12 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_main.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class BrowserActivity : AppCompatActivity() {
@@ -52,17 +52,13 @@ class BrowserActivity : AppCompatActivity() {
         configureWebViewControls()
     }
 
-    override fun onResume() {
-        super.onResume()
-        loadTrackerBlocker()
-    }
-
     private fun userEnteredQuery() {
         viewModel.onQueryEntered(urlInput.text.toString())
     }
 
     private fun configureWebViewControls() {
-        webView.webViewClient = BrowserWebViewClient()
+        webView.webViewClient = BrowserWebViewClient(loadTrackerDetector())
+        webView.settings.javaScriptEnabled = true
         refreshWebViewButton.setOnClickListener({ webView.reload() })
         navigateBackButton.setOnClickListener({ webView.goBack() })
         navigateForward.setOnClickListener({ webView.goForward() })
@@ -74,6 +70,17 @@ class BrowserActivity : AppCompatActivity() {
             }
             false
         })
+
+    }
+
+    private fun loadTrackerDetector(): TrackerDetector {
+        Timber.v("TRACKER: loading lists")
+        val easylistData = resources.openRawResource(R.raw.easylist).use { it.readBytes() }
+        val easyprivacyData = resources.openRawResource(R.raw.easyprivacy).use { it.readBytes() }
+        Timber.v("TRACKERS: parsing lists")
+        val trackerDetector = TrackerDetector(easylistData, easyprivacyData)
+        Timber.v("TRACKERS: parsing done")
+        return trackerDetector
     }
 
     override fun onSaveInstanceState(bundle: Bundle?) {
@@ -84,28 +91,5 @@ class BrowserActivity : AppCompatActivity() {
     override fun onRestoreInstanceState(bundle: Bundle?) {
         super.onRestoreInstanceState(bundle)
         webView.restoreState(bundle)
-    }
-
-    private fun loadTrackerBlocker() {
-        Log.d("TRACKERS", "Reading tracker files")
-        val easylistData = resources.openRawResource(R.raw.easylist).use { it.readBytes() }
-        val easyprivacyData = resources.openRawResource(R.raw.easyprivacy).use { it.readBytes() }
-
-        Log.d("TRACKERS", "Parsing")
-
-        val trackerDetector = TrackerDetector(easylistData, easyprivacyData)
-
-        Log.d("TRACKERS", "Matching trackers")
-
-        var documentUrl = "example.com"
-        val blockedEasy = trackerDetector.shouldBlock("http://imasdk.googleapis.com/js/sdkloader/ima3.js", documentUrl)
-        val blockedEasyPrivacy = trackerDetector.shouldBlock("http://cdn.tagcommander.com/1705/tc_catalog.js", documentUrl)
-        val blockedNone = trackerDetector.shouldBlock("https://duckduckgo.com/index.html", documentUrl)
-
-        Log.d("TRACKERS", "Done!")
-
-        Log.d("BLOCKED", "Easy tracker: " + blockedEasy)
-        Log.d("BLOCKED", "EasyPrivacy tracker: " + blockedEasyPrivacy)
-        Log.d("BLOCKED", "Nontracker: " + blockedNone)
     }
 }

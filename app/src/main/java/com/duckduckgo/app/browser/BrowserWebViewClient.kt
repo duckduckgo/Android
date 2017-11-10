@@ -17,14 +17,52 @@
 package com.duckduckgo.app.browser
 
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.duckduckgo.app.trackerdetection.TrackerDetector
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.Function
+import kotlinx.android.synthetic.main.activity_main.view.*
 import timber.log.Timber
 
-class BrowserWebViewClient : WebViewClient() {
+
+class BrowserWebViewClient(val trackerDetector: TrackerDetector) : WebViewClient() {
 
     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-        Timber.v("Url ${request?.url}")
+        Timber.v("Intercepting Url ${request?.url}")
+
+        val url = request?.url.toString()
+        val documentUrl = view?.safeUrl()
+        if (url != null && documentUrl != null && trackerDetector.shouldBlock(url, documentUrl)) {
+            Timber.v("Tracker blocked  ${url}")
+            return true
+        }
+
+        Timber.v("Tracker did not block  ${url}")
         return false
+    }
+
+    override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
+        Timber.v("Intercepting resource ${request?.url}")
+
+        val url = request?.url?.toString()
+        val documentUrl = view?.safeUrl()
+        if (url != null && documentUrl != null && trackerDetector.shouldBlock(url, documentUrl)) {
+            Timber.v("Tracker blocked  ${url}")
+            return WebResourceResponse(null, null, null)
+        }
+
+        Timber.v("Tracker did not block  ${url}")
+        return null
+    }
+
+    fun WebView.safeUrl(): String? {
+        return Observable.just(webView)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .map { webView -> webView.url }
+                .blockingFirst()
     }
 }
