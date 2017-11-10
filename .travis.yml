@@ -15,9 +15,8 @@ android:
     - android-27
 
 before_install:
-  - mkdir "$ANDROID_HOME/licenses" || true
-  - echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
   - sdkmanager tools
+  - yes | sdkmanager --licenses
   - sdkmanager "system-images;android-22;default;armeabi-v7a"
   # Create and start emulator for the script. Meant to race the install task.
   - echo no | avdmanager create avd --force -n test -k "system-images;android-22;default;armeabi-v7a"
