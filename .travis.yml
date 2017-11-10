@@ -14,22 +14,24 @@ android:
     # The SDK version used to compile your project
     - android-27
 
-    # Specify at least once system image
-    - sys-img-armeabi-v7a-android-22
+before_install:
+  - sdkmanager tools
+  - sdkmanager "system-images;android-22;default;armeabi-v7a"
+  # Create and start emulator for the script. Meant to race the install task.
+  - echo no | avdmanager create avd --force -n test -k "system-images;android-22;default;armeabi-v7a"
+  - $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window &
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
 cache:
   directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
+    - $HOME/.gradle
     - $HOME/.android/build-cache
 
 before_script:
-- echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
-- emulator -avd test -no-skin -no-audio -no-window &
-- android-wait-for-emulator
-- adb shell input keyevent 82 &
+  - android-wait-for-emulator
+  - adb shell input keyevent 82
 
 script: ./gradlew build connectedCheck
