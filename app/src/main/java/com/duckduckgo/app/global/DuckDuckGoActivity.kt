@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.app.global
 
-import com.duckduckgo.app.browser.BrowserActivity
+import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
+import dagger.android.AndroidInjection
 
-import dagger.Module
-import dagger.android.ContributesAndroidInjector
 
-@Module
-abstract class ActivitiesModule {
+abstract class DuckDuckGoActivity : AppCompatActivity() {
 
-    @ContributesAndroidInjector
-    abstract fun browserActivity(): BrowserActivity
+    override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidInjection.inject(this)
+        super.onCreate(savedInstanceState)
+    }
 }

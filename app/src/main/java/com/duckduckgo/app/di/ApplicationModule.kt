@@ -18,16 +18,15 @@ package com.duckduckgo.app.di
 
 import android.app.Application
 import android.content.Context
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import javax.inject.Singleton
 
-@Module
-class AppModule {
 
-    @Provides
+@Module
+abstract class ApplicationModule {
+
     @Singleton
-    internal fun context(application: Application): Context {
-        return application
-    }
+    @Binds
+    abstract fun bindContext(application: Application): Context
 }

@@ -16,20 +16,15 @@
 
 package com.duckduckgo.app.di
 
+import com.duckduckgo.app.browser.BrowserActivity
 
-import com.duckduckgo.app.global.DuckDuckGoApplication
-import dagger.Component
-import dagger.android.AndroidInjector
-import dagger.android.support.AndroidSupportInjectionModule
-import javax.inject.Singleton
+import dagger.Module
+import dagger.android.ContributesAndroidInjector
 
-@Singleton
-@Component(modules = arrayOf(
-        ApplicationModule::class,
-        ActivityBindingModule::class,
-        AndroidSupportInjectionModule::class))
-interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
+@Module
+abstract class ActivityBindingModule {
 
-    @Component.Builder
-    abstract class Builder : AndroidInjector.Builder<DuckDuckGoApplication>()
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun browserActivity(): BrowserActivity
 }

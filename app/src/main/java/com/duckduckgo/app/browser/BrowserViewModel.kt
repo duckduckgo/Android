@@ -18,7 +18,10 @@ package com.duckduckgo.app.browser
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import android.arch.lifecycle.ViewModelProvider
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
+import javax.inject.Inject
 
 
 class BrowserViewModel(
@@ -39,5 +42,21 @@ class BrowserViewModel(
             query.value = queryUrlConverter.convertQueryToUri(input).toString()
         }
     }
+
+    @Suppress("UNCHECKED_CAST")
+    class BrowserViewModelFactory @Inject constructor() : ViewModelProvider.Factory {
+
+        @Inject
+        lateinit var queryUrlConverter: QueryUrlConverter
+
+        override fun <T : ViewModel> create(aClass: Class<T>): T {
+            if (aClass.isAssignableFrom(BrowserViewModel::class.java)) {
+                return BrowserViewModel(queryUrlConverter) as T
+            }
+            throw IllegalArgumentException("Unknown view model")
+        }
+    }
 }
+
+
 

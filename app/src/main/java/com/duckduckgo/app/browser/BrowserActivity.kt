@@ -20,26 +20,23 @@ import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
-import dagger.android.AndroidInjection
+import com.duckduckgo.app.global.DuckDuckGoActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class BrowserActivity : AppCompatActivity() {
+class BrowserActivity : DuckDuckGoActivity() {
 
-    @Inject lateinit var requestRewriter: DuckDuckGoRequestRewriter
     @Inject lateinit var webViewClient: BrowserWebViewClient
-    @Inject lateinit var viewModelFactory: BrowserViewModelFactory
+    @Inject lateinit var viewModelFactory: BrowserViewModel.BrowserViewModelFactory
 
     private val viewModel: BrowserViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(BrowserViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
