@@ -42,9 +42,8 @@ class TrackerDetectorInstrumentationTest {
             val appContext = InstrumentationRegistry.getTargetContext()
             val easylistData = appContext.resources.openRawResource(R.raw.easylist).use { it.readBytes() }
             val easyprivacyData = appContext.resources.openRawResource(R.raw.easyprivacy).use { it.readBytes() }
-            testee = TrackerDetector(easylistData, easyprivacyData)
+            testee = TrackerDetector(AdBlockPlus(easylistData), AdBlockPlus(easyprivacyData))
         }
-
     }
 
     @Test
@@ -61,7 +60,7 @@ class TrackerDetectorInstrumentationTest {
 
     @Test
     fun whenUrlIsNotInAnyTrackerListsThenShouldBlockIsFalse() {
-        var url = "https://duckduckgo.com/index.html"
+        val url = "https://duckduckgo.com/index.html"
         assertFalse(testee.shouldBlock(url, documentUrl))
     }
 

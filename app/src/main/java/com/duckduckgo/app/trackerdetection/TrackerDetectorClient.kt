@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2017 DuckDuckGo
- *
+ *  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,10 +16,8 @@
 
 package com.duckduckgo.app.trackerdetection
 
-class TrackerDetector constructor(private val easylistClient: TrackerDetectorClient, private val easyprivacyClient: TrackerDetectorClient) {
+interface TrackerDetectorClient {
 
-    fun shouldBlock(url: String, documentUrl: String): Boolean {
-        return easyprivacyClient.matches(url, documentUrl) || easylistClient.matches(url, documentUrl)
-    }
+    fun matches(url: String, documentUrl: String): Boolean
 
 }

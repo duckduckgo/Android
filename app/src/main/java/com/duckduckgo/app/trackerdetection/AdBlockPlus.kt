@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection;
+package com.duckduckgo.app.trackerdetection
 
 
-class AdBlockPlus {
+class AdBlockPlus : TrackerDetectorClient {
 
     companion object FilterOption {
         val None = 0
@@ -26,18 +26,30 @@ class AdBlockPlus {
         val Stylesheet = 4
     }
 
+    private var nativeClientPointer: Long
+
     init {
         System.loadLibrary("adblockplus-lib")
     }
 
-    external fun loadData(easylistData: ByteArray, easyprivacyData: ByteArray): Boolean
+    constructor(data: ByteArray) {
+        nativeClientPointer = createClient()
+        loadData(data)
+    }
+
+    private external fun createClient(): Long
 
 
-    fun matches(url: String, documentUrl: String): Boolean {
+    private fun loadData(data: ByteArray) {
+        loadData(nativeClientPointer, data)
+    }
 
-        //TODO this is coarse, imporve it for real implementation, also check headers here
+    private external fun loadData(clientPointer: Long, data: ByteArray)
+    
+    override fun matches(url: String, documentUrl: String): Boolean {
 
         var filterOption = FilterOption.None
+
         if (url.endsWith(".js", true)) {
             filterOption = FilterOption.Script
         } else if (url.endsWith(".css", true)) {
@@ -46,8 +58,16 @@ class AdBlockPlus {
             filterOption = FilterOption.Image
         }
 
-        return matches(url, documentUrl, filterOption)
+        return matches(nativeClientPointer, url, documentUrl, filterOption)
     }
 
-    external fun matches(url: String, documentUrl: String, filterOption: Int): Boolean
+    private external fun matches(clientPointer: Long, url: String, documentUrl: String, filterOption: Int): Boolean
+
+
+    protected fun finalize() {
+        deleteClient(nativeClientPointer)
+    }
+
+    private external fun deleteClient(clientPointer: Long)
+
 }

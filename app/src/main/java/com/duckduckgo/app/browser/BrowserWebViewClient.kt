@@ -16,12 +16,10 @@
 
 package com.duckduckgo.app.browser
 
-import android.app.Application
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -32,6 +30,7 @@ import javax.inject.Inject
 
 class BrowserWebViewClient @Inject constructor(private val requestRewriter: DuckDuckGoRequestRewriter) : WebViewClient() {
 
+    //TODO inject this
     lateinit var trackerDetector: TrackerDetector
 
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {

@@ -23,7 +23,7 @@ import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.DuckDuckGoApplication
+import com.duckduckgo.app.trackerdetection.AdBlockPlus
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
@@ -78,13 +78,12 @@ class BrowserActivity : DuckDuckGoActivity() {
         })
     }
 
-    //TODO move to dI
     private fun buildTrackerDetector(): TrackerDetector {
         Timber.v("TRACKER: loading lists")
         val easylistData = resources.openRawResource(R.raw.easylist).use { it.readBytes() }
         val easyprivacyData = resources.openRawResource(R.raw.easyprivacy).use { it.readBytes() }
         Timber.v("TRACKERS: parsing lists")
-        val trackerDetector = TrackerDetector(easylistData, easyprivacyData)
+        val trackerDetector = TrackerDetector(AdBlockPlus(easylistData), AdBlockPlus(easyprivacyData))
         Timber.v("TRACKERS: parsing done")
         return trackerDetector
     }
