@@ -23,7 +23,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import javax.inject.Inject
 
-
 class BrowserViewModel(
         private val queryUrlConverter: OmnibarEntryConverter) : ViewModel() {
 

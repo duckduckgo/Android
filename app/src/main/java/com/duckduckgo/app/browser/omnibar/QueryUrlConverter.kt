@@ -19,31 +19,22 @@ package com.duckduckgo.app.browser.omnibar
 import android.net.Uri
 import android.support.v4.util.PatternsCompat
 import com.duckduckgo.app.browser.DuckDuckGoRequestRewriter
-import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.baseUrl
-import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.http
-import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.https
-import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.httpsScheme
-import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.localhost
-import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.space
-import com.duckduckgo.app.browser.omnibar.QueryUrlConverter.Query.webUrlRegex
 import javax.inject.Inject
 
 class QueryUrlConverter @Inject constructor(private val requestRewriter: DuckDuckGoRequestRewriter) : OmnibarEntryConverter {
 
-    object Query {
-        val https = "https"
-        val httpsScheme = "$https://"
-        val http = "http"
-        val baseUrl = "duckduckgo.com"
-        val querySource = "ddg_android"
-        val localhost = "localhost"
-        val space = " "
-        val webUrlRegex = PatternsCompat.WEB_URL.toRegex()
+    companion object {
+        private const val https = "https"
+        private const val http = "http"
+        private const val baseUrl = "duckduckgo.com"
+        private const val localhost = "localhost"
+        private const val space = " "
+        private val webUrlRegex = PatternsCompat.WEB_URL.toRegex()
     }
 
     override fun isWebUrl(inputQuery: String): Boolean {
         val uri = Uri.parse(inputQuery)
-        if (uri.scheme == null) return isWebUrl(httpsScheme + inputQuery)
+        if (uri.scheme == null) return isWebUrl("$https://$inputQuery")
         if (uri.scheme != http && uri.scheme != https) return false
         if (uri.userInfo != null) return false
         if (uri.host == null) return false
@@ -73,11 +64,16 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: DuckDuc
     }
 
     override fun convertUri(input: String): String {
-        val uri = Uri.parse(input)
+        var uri = Uri.parse(input)
+
+        if(uri.scheme == null) {
+            uri = Uri.parse("$http://$input")
+        }
+
         if (uri.host == baseUrl) {
             return requestRewriter.rewriteRequestWithCustomQueryParams(uri).toString()
         }
-        return input
+        return uri.toString()
     }
 
 }

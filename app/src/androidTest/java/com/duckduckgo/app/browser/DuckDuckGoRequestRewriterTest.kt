@@ -17,8 +17,6 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
-import com.duckduckgo.app.browser.DuckDuckGoRequestRewriter.Constants.appVersionParam
-import com.duckduckgo.app.browser.DuckDuckGoRequestRewriter.Constants.sourceParam
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -39,15 +37,15 @@ class DuckDuckGoRequestRewriterTest {
     fun whenAddingCustomParamsSourceParameterIsAdded() {
         testee.addCustomQueryParams(builder)
         val uri = builder.build()
-        assertTrue(uri.queryParameterNames.contains(sourceParam))
-        assertEquals("ddg_android", uri.getQueryParameter(sourceParam))
+        assertTrue(uri.queryParameterNames.contains("t"))
+        assertEquals("ddg_android", uri.getQueryParameter("t"))
     }
 
     @Test
     fun whenAddingCustomParamsAppVersionParameterIsAdded() {
         testee.addCustomQueryParams(builder)
         val uri = builder.build()
-        assertTrue(uri.queryParameterNames.contains(appVersionParam))
-        assertEquals("android_${BuildConfig.VERSION_NAME.replace(".", "_")}", uri.getQueryParameter(appVersionParam))
+        assertTrue(uri.queryParameterNames.contains("tappv"))
+        assertEquals("android_${BuildConfig.VERSION_NAME.replace(".", "_")}", uri.getQueryParameter("tappv"))
     }
 }
