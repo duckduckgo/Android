@@ -10,12 +10,12 @@ ext {
 }
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     buildToolsVersion "26.0.2"
     defaultConfig {
         applicationId "com.duckduckgo.app"
         minSdkVersion 21
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode buildVersionCode()
         versionName VERSION_NAME
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -32,8 +32,20 @@ android {
             path "CMakeLists.txt"
         }
     }
+    lintOptions {
+        abortOnError false
+    }
     testOptions {
         unitTests.returnDefaultValues = true
+    }
+    sourceSets {
+        String sharedTestDir = 'src/sharedTest/java'
+        test {
+            java.srcDir sharedTestDir
+        }
+        androidTest {
+            java.srcDir sharedTestDir
+        }
     }
 }
 
@@ -68,4 +80,6 @@ dependencies {
 
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    androidTestImplementation 'org.mockito:mockito-android:2.12.0'
+    androidTestImplementation "android.arch.core:core-testing:$architectureComponents"
 }

@@ -16,21 +16,32 @@
 
 package com.duckduckgo.app.browser
 
+import android.app.Application
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_main.view.*
 import timber.log.Timber
+import javax.inject.Inject
 
 
-class BrowserWebViewClient(val trackerDetector: TrackerDetector) : WebViewClient() {
+class BrowserWebViewClient @Inject constructor(private val requestRewriter: DuckDuckGoRequestRewriter) : WebViewClient() {
 
-    override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-        Timber.v("Intercepting Url ${request?.url}")
+    lateinit var trackerDetector: TrackerDetector
+
+    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+        Timber.v("Url ${request.url}")
+
+        if (requestRewriter.shouldRewriteRequest(request)) {
+            val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(request.url)
+            view.loadUrl(newUri.toString())
+            return true
+        }
 
         if (block(request?.url?.toString(), view?.url)) {
             return true
@@ -66,5 +77,4 @@ class BrowserWebViewClient(val trackerDetector: TrackerDetector) : WebViewClient
                 .map { webView -> webView.url }
                 .blockingFirst()
     }
-
 }

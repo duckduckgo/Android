@@ -14,26 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.app.browser.omnibar
+
+import android.net.Uri
 
 
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
+interface OmnibarEntryConverter {
 
-import javax.inject.Inject
-
-@Suppress("UNCHECKED_CAST")
-class BrowserViewModelFactory @Inject constructor() : ViewModelProvider.Factory {
-
-    @Inject
-    lateinit var queryUrlConverter: QueryUrlConverter
-
-    override fun <T : ViewModel> create(aClass: Class<T>): T {
-        if (aClass.isAssignableFrom(BrowserViewModel::class.java)) {
-            return BrowserViewModel(queryUrlConverter) as T
-        }
-        throw IllegalArgumentException("Unknown view model")
-    }
+    fun isWebUrl(inputQuery: String): Boolean
+    fun convertQueryToUri(inputQuery: String): Uri
+    fun convertUri(input: String): String
 }
-
-

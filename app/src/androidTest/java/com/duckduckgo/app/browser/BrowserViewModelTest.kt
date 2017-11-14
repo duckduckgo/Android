@@ -18,13 +18,14 @@ package com.duckduckgo.app.browser
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
+import android.net.Uri
+import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import mock
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 
@@ -36,10 +37,18 @@ class BrowserViewModelTest {
     @Mock
     val observer: Observer<String> = mock()
 
-    @Mock
-    val urlConverter: QueryUrlConverter = mock()
+    val testOmnibarConverter: OmnibarEntryConverter = object : OmnibarEntryConverter {
+        override fun convertUri(input: String): String  = "duckduckgo.com"
+        override fun isWebUrl(inputQuery: String): Boolean = true
+        override fun convertQueryToUri(inputQuery: String): Uri = Uri.parse("duckduckgo.com")
+    }
 
-    val testee = BrowserViewModel(urlConverter)
+    private lateinit var testee :BrowserViewModel
+
+    @Before
+    fun before() {
+        testee = BrowserViewModel(testOmnibarConverter)
+    }
 
     @Test
     fun whenEmptyInputQueryThenNoQueryMadeAvailableToActivity() {
@@ -57,12 +66,8 @@ class BrowserViewModelTest {
 
     @Test
     fun whenNonEmptyInputThenQueryMadeAvailableToActivity() {
-        Mockito.doReturn(validFullUri()).`when`(urlConverter).convertInputToUri(anyString())
-
         testee.query.observeForever(observer)
         testee.onQueryEntered("foo")
         verify(observer).onChanged(ArgumentMatchers.anyString())
     }
-
-    private fun validFullUri(): String = "https://duckduckgo.com"
 }

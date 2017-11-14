@@ -16,48 +16,54 @@
 
 package com.duckduckgo.app.browser
 
+import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
+import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.trackerdetection.TrackerDetector
-import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class BrowserActivity : AppCompatActivity() {
+class BrowserActivity : DuckDuckGoActivity() {
+
+    @Inject lateinit var webViewClient: BrowserWebViewClient
+    @Inject lateinit var viewModelFactory: BrowserViewModel.BrowserViewModelFactory
 
     private val viewModel: BrowserViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(BrowserViewModel::class.java)
     }
 
-    @Inject lateinit var viewModelFactory : BrowserViewModelFactory
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         viewModel.query.observe(this, Observer {
-            webView.loadUrl(it)
+            if (savedInstanceState == null) {
+                Timber.v("Webview loading url $it")
+                webView.loadUrl(it)
+            }
         })
 
         loadUrlButton.setOnClickListener({
             userEnteredQuery()
         })
 
-        configureWebViewControls()
+        configureWebView()
     }
 
     private fun userEnteredQuery() {
         viewModel.onQueryEntered(urlInput.text.toString())
     }
 
-    private fun configureWebViewControls() {
-        webView.webViewClient = BrowserWebViewClient(loadTrackerDetector())
+    @SuppressLint("SetJavaScriptEnabled")
+    private fun configureWebView() {
+        webViewClient.trackerDetector = buildTrackerDetector()
+        webView.webViewClient = webViewClient
         webView.settings.javaScriptEnabled = true
         refreshWebViewButton.setOnClickListener({ webView.reload() })
         navigateBackButton.setOnClickListener({ webView.goBack() })
@@ -70,10 +76,10 @@ class BrowserActivity : AppCompatActivity() {
             }
             false
         })
-
     }
 
-    private fun loadTrackerDetector(): TrackerDetector {
+    //TODO move to dI
+    private fun buildTrackerDetector(): TrackerDetector {
         Timber.v("TRACKER: loading lists")
         val easylistData = resources.openRawResource(R.raw.easylist).use { it.readBytes() }
         val easyprivacyData = resources.openRawResource(R.raw.easyprivacy).use { it.readBytes() }

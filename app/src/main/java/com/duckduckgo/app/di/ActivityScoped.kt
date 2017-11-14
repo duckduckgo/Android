@@ -16,20 +16,16 @@
 
 package com.duckduckgo.app.di
 
+import javax.inject.Scope
 
-import com.duckduckgo.app.global.DuckDuckGoApplication
-import dagger.Component
-import dagger.android.AndroidInjector
-import dagger.android.support.AndroidSupportInjectionModule
-import javax.inject.Singleton
 
-@Singleton
-@Component(modules = arrayOf(
-        ApplicationModule::class,
-        ActivityBindingModule::class,
-        AndroidSupportInjectionModule::class))
-interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
-
-    @Component.Builder
-    abstract class Builder : AndroidInjector.Builder<DuckDuckGoApplication>()
-}
+/**
+ * In Dagger, an unscoped component cannot depend on a scoped component. As
+ * [AppComponent] is a scoped component (`@Singleton`, we create a custom
+ * scope to be used by all fragment components. Additionally, a component with a specific scope
+ * cannot have a sub component with the same scope.
+ */
+@MustBeDocumented
+@Scope
+@Retention(AnnotationRetention.RUNTIME)
+annotation class ActivityScoped

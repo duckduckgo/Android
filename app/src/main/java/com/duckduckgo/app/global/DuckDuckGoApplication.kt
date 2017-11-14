@@ -16,21 +16,32 @@
 
 package com.duckduckgo.app.global
 
-import com.duckduckgo.app.di.DaggerAppComponent
+import android.app.Activity
+import android.app.Application
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.di.DaggerAppComponent
 import dagger.android.AndroidInjector
-import dagger.android.DaggerApplication
+import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import timber.log.Timber
+import javax.inject.Inject
 
 
-class DuckDuckGoApplication : HasActivityInjector, DaggerApplication()  {
-    override fun applicationInjector(): AndroidInjector<out DaggerApplication>
-            = DaggerAppComponent.builder().create(this)
+class DuckDuckGoApplication : HasActivityInjector, Application() {
+
+    @Inject
+    lateinit var injector: DispatchingAndroidInjector<Activity>
 
     override fun onCreate() {
         super.onCreate()
 
+        DaggerAppComponent.builder().create(this).inject(this)
+
         if(BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
     }
+
+    override fun activityInjector(): AndroidInjector<Activity> {
+        return injector
+    }
+
 }
