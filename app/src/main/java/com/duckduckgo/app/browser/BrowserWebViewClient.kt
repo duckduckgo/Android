@@ -43,7 +43,7 @@ class BrowserWebViewClient @Inject constructor(private val requestRewriter: Duck
             return true
         }
 
-        if (block(request?.url?.toString(), view?.url)) {
+        if (block(request.url?.toString(), view.url)) {
             return true
         }
 
