@@ -18,17 +18,15 @@ package com.duckduckgo.app.browser
 
 import android.net.Uri
 import android.webkit.WebResourceRequest
-import com.duckduckgo.app.browser.DuckDuckGoRequestRewriter.Constants.appVersionParam
-import com.duckduckgo.app.browser.DuckDuckGoRequestRewriter.Constants.sourceParam
-import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import timber.log.Timber
 import javax.inject.Inject
 
 class DuckDuckGoRequestRewriter @Inject constructor() {
 
-    object Constants {
-        val sourceParam = "t"
-        val appVersionParam = "tappv"
+    companion object {
+        private const val sourceParam = "t"
+        private const val appVersionParam = "tappv"
+        private const val querySource = "ddg_android"
     }
 
     fun rewriteRequestWithCustomQueryParams(request: Uri): Uri {
@@ -49,13 +47,12 @@ class DuckDuckGoRequestRewriter @Inject constructor() {
         return newUri
     }
 
-    fun shouldRewriteRequest(request: WebResourceRequest): Boolean {
-        return request.url.host == "duckduckgo.com" && !request.url.queryParameterNames.containsAll(arrayListOf(sourceParam, appVersionParam))
-    }
+    fun shouldRewriteRequest(request: WebResourceRequest): Boolean =
+            request.url.host == "duckduckgo.com" && !request.url.queryParameterNames.containsAll(arrayListOf(sourceParam, appVersionParam))
 
     fun addCustomQueryParams(builder: Uri.Builder) {
         builder.appendQueryParameter(appVersionParam, formatAppVersion())
-        builder.appendQueryParameter(sourceParam, QueryUrlConverter.Query.querySource)
+        builder.appendQueryParameter(sourceParam, querySource)
     }
 
     private fun formatAppVersion(): String {

@@ -282,6 +282,14 @@ class QueryUrlConverterTest {
         assertDuckDuckGoSearchQuery(expected, result)
     }
 
+    @Test
+    fun whenIsWebUrlMissingSchemeThenHttpWillBeAddedUponConversion() {
+        val input = "example.com"
+        val expected = "http://$input"
+        val result = testee.convertUri(input)
+        assertEquals(expected, result)
+    }
+
     private fun assertDuckDuckGoSearchQuery(query: String, uri: Uri) {
         assertEquals("duckduckgo.com", uri.host)
         assertEquals("https", uri.scheme)
