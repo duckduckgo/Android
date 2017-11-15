@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.graphics.Bitmap
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -23,6 +24,8 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class BrowserWebViewClient @Inject constructor(private val requestRewriter: DuckDuckGoRequestRewriter): WebViewClient() {
+
+    var webViewClientListener: WebViewClientListener? = null
 
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         Timber.v("Url ${request.url}")
@@ -35,4 +38,14 @@ class BrowserWebViewClient @Inject constructor(private val requestRewriter: Duck
 
         return false
     }
+
+    override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+        webViewClientListener?.loadingStateChange(true)
+        webViewClientListener?.urlChanged(url)
+    }
+
+    override fun onPageFinished(view: WebView?, url: String?) {
+        webViewClientListener?.loadingStateChange(false)
+    }
+
 }
