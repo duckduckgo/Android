@@ -24,6 +24,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.trackerdetection.AdBlockPlus
+import com.duckduckgo.app.trackerdetection.TrackerDataProvider
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
@@ -79,13 +80,15 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun buildTrackerDetector(): TrackerDetector {
-        Timber.v("TRACKER: loading lists")
-        val easylistData = resources.openRawResource(R.raw.easylist).use { it.readBytes() }
-        val easyprivacyData = resources.openRawResource(R.raw.easyprivacy).use { it.readBytes() }
-        Timber.v("TRACKERS: parsing lists")
-        val trackerDetector = TrackerDetector(AdBlockPlus(easylistData), AdBlockPlus(easyprivacyData))
-        Timber.v("TRACKERS: parsing done")
-        return trackerDetector
+        val dataProvider = TrackerDataProvider(applicationContext)
+        Timber.d("Data provider has preprocessed data? %s", dataProvider.hasProcessedData)
+        val easylistClient = AdBlockPlus(dataProvider.easylist, dataProvider.hasProcessedData)
+        val easyprivacyClient = AdBlockPlus(dataProvider.easyprivacy, dataProvider.hasProcessedData)
+        if (!dataProvider.hasProcessedData) {
+            dataProvider.saveProcessedEasylistData(easylistClient.getProcessedData())
+            dataProvider.saveProcessedEasyprivacyData(easyprivacyClient.getProcessedData())
+        }
+        return TrackerDetector(easylistClient, easyprivacyClient)
     }
 
     override fun onSaveInstanceState(bundle: Bundle?) {

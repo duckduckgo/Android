@@ -42,7 +42,7 @@ class TrackerDetectorInstrumentationTest {
             val appContext = InstrumentationRegistry.getTargetContext()
             val easylistData = appContext.resources.openRawResource(R.raw.easylist).use { it.readBytes() }
             val easyprivacyData = appContext.resources.openRawResource(R.raw.easyprivacy).use { it.readBytes() }
-            testee = TrackerDetector(AdBlockPlus(easylistData), AdBlockPlus(easyprivacyData))
+            testee = TrackerDetector(AdBlockPlus(easylistData, false), AdBlockPlus(easyprivacyData, false))
         }
     }
 
@@ -54,7 +54,7 @@ class TrackerDetectorInstrumentationTest {
 
     @Test
     fun whenUrlIsInEasyPrivacyListThenShouldBlockIsTrue() {
-        val url = "http://cdn.tagcommander.com/1705/tc_catalog.js"
+        val url = "http://cdn.tagcommander.com/1705/tc_catalog.css"
         assertTrue(testee.shouldBlock(url, documentUrl))
     }
 

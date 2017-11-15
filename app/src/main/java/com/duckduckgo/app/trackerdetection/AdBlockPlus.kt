@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import timber.log.Timber
+
 
 class AdBlockPlus : TrackerDetectorClient {
 
@@ -32,20 +34,37 @@ class AdBlockPlus : TrackerDetectorClient {
         System.loadLibrary("adblockplus-lib")
     }
 
-    constructor(data: ByteArray) {
+    constructor(data: ByteArray, processed: Boolean) {
         nativeClientPointer = createClient()
-        loadData(data)
+        Timber.v("Loading list")
+        if (processed) {
+            loadProcessedData(data)
+        } else {
+            loadBasicData(data)
+        }
+        Timber.v("Loding complete")
     }
 
     private external fun createClient(): Long
 
-
-    private fun loadData(data: ByteArray) {
-        loadData(nativeClientPointer, data)
+    private fun loadBasicData(data: ByteArray) {
+        loadBasicData(nativeClientPointer, data)
     }
 
-    private external fun loadData(clientPointer: Long, data: ByteArray)
-    
+    private external fun loadBasicData(clientPointer: Long, data: ByteArray)
+
+    private fun loadProcessedData(data: ByteArray) {
+        loadProcessedData(nativeClientPointer, data)
+    }
+
+    private external fun loadProcessedData(clientPointer: Long, data: ByteArray)
+
+    fun getProcessedData(): ByteArray {
+        return getProcessedData(nativeClientPointer)
+    }
+
+    private external fun getProcessedData(clientPointer: Long): ByteArray
+
     override fun matches(url: String, documentUrl: String): Boolean {
 
         var filterOption = FilterOption.None
