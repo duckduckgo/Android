@@ -42,7 +42,9 @@ class TrackerDetectorInstrumentationTest {
             val appContext = InstrumentationRegistry.getTargetContext()
             val easylistData = appContext.resources.openRawResource(R.raw.easylist).use { it.readBytes() }
             val easyprivacyData = appContext.resources.openRawResource(R.raw.easyprivacy).use { it.readBytes() }
-            testee = TrackerDetector(AdBlockPlus(easylistData, false), AdBlockPlus(easyprivacyData, false))
+            var privacyAdblock = AdBlockPlus(easyprivacyData, false)
+            var easyAdblock = AdBlockPlus(easylistData, false)
+            testee = TrackerDetector(easyAdblock, privacyAdblock)
         }
     }
 

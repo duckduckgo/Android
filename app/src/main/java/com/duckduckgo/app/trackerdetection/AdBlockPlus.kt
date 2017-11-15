@@ -84,9 +84,9 @@ class AdBlockPlus : TrackerDetectorClient {
 
 
     protected fun finalize() {
-        deleteClient(nativeClientPointer)
+        releaseClient(nativeClientPointer)
     }
 
-    private external fun deleteClient(clientPointer: Long)
+    private external fun releaseClient(clientPointer: Long)
 
 }
