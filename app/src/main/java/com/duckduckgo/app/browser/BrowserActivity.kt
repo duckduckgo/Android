@@ -20,17 +20,23 @@ import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import kotlinx.android.synthetic.main.activity_main.*
+import com.duckduckgo.app.global.ViewModelFactory
+import kotlinx.android.synthetic.main.activity_browser.*
+import kotlinx.android.synthetic.main.content_browser.*
 import timber.log.Timber
 import javax.inject.Inject
 
 class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var webViewClient: BrowserWebViewClient
-    @Inject lateinit var viewModelFactory: BrowserViewModel.BrowserViewModelFactory
+    @Inject lateinit var webChromeClient: BrowserChromeClient
+    @Inject lateinit var viewModelFactory: ViewModelFactory
 
     private val viewModel: BrowserViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(BrowserViewModel::class.java)
@@ -38,20 +44,35 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_browser)
+
+        viewModel.viewState.observe(this, Observer<BrowserViewModel.ViewState> {
+            it!!
+            when (it.loadingData) {
+                true -> pageLoadingIndicator.visibility = View.VISIBLE
+                false -> pageLoadingIndicator.visibility = View.INVISIBLE
+            }
+
+            it.url?.let { urlInput.setText(it) }
+
+            pageLoadingIndicator.progress = it.progress
+        })
 
         viewModel.query.observe(this, Observer {
-            if (savedInstanceState == null) {
-                Timber.v("Webview loading url $it")
-                webView.loadUrl(it)
-            }
+            it?.let { Timber.w("Here"); webView.loadUrl(it) }
         })
 
-        loadUrlButton.setOnClickListener({
-            userEnteredQuery()
-        })
+        swipeToRefreshContainer.setOnRefreshListener {
+            swipeToRefreshContainer.isRefreshing = false
+        }
 
+        configureToolbar()
         configureWebView()
+    }
+
+    private fun configureToolbar() {
+        setSupportActionBar(toolbar)
+        supportActionBar?.title = null
     }
 
     private fun userEnteredQuery() {
@@ -61,10 +82,10 @@ class BrowserActivity : DuckDuckGoActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
         webView.webViewClient = webViewClient
+        webView.webChromeClient = webChromeClient
         webView.settings.javaScriptEnabled = true
-        refreshWebViewButton.setOnClickListener({ webView.reload() })
-        navigateBackButton.setOnClickListener({ webView.goBack() })
-        navigateForward.setOnClickListener({ webView.goForward() })
+
+        viewModel.registerWebViewListener(webViewClient, webChromeClient)
 
         urlInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -83,5 +104,28 @@ class BrowserActivity : DuckDuckGoActivity() {
     override fun onRestoreInstanceState(bundle: Bundle?) {
         super.onRestoreInstanceState(bundle)
         webView.restoreState(bundle)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_browser_activity, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.refresh_menu_item -> {
+                webView.reload()
+                return true
+            }
+            R.id.back_menu_item -> {
+                webView.goBack()
+                return true
+            }
+            R.id.forward_menu_item -> {
+                webView.goForward()
+                return true
+            }
+        }
+        return false
     }
 }

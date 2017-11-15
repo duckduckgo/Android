@@ -18,42 +18,59 @@ package com.duckduckgo.app.browser
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
-import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
-import javax.inject.Inject
+import com.duckduckgo.app.global.SingleLiveEvent
+import timber.log.Timber
 
-class BrowserViewModel(
-        private val queryUrlConverter: OmnibarEntryConverter) : ViewModel() {
+class BrowserViewModel(private val queryUrlConverter: OmnibarEntryConverter) :
+        WebViewClientListener,
+        ViewModel() {
 
-    val query: MutableLiveData<String> = MutableLiveData()
+    val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    val query: SingleLiveEvent<String> = SingleLiveEvent()
+
+    data class ViewState(
+            val loadingData: Boolean,
+            val progress: Int,
+            val url: String?
+    )
+
+    fun registerWebViewListener(browserWebViewClient: BrowserWebViewClient, browserChromeClient: BrowserChromeClient) {
+        browserWebViewClient.webViewClientListener = this
+        browserChromeClient.webViewClientListener = this
+    }
 
     fun onQueryEntered(input: String) {
 
-        if(input.isBlank()) {
+        if (input.isBlank()) {
             return
         }
 
-        if(queryUrlConverter.isWebUrl(input)) {
-            query.value = queryUrlConverter.convertUri(input)
-
+        val convertedQuery: String = if (queryUrlConverter.isWebUrl(input)) {
+            queryUrlConverter.convertUri(input)
         } else {
-            query.value = queryUrlConverter.convertQueryToUri(input).toString()
+            queryUrlConverter.convertQueryToUri(input).toString()
         }
+        query.value = convertedQuery
     }
 
-    @Suppress("UNCHECKED_CAST")
-    class BrowserViewModelFactory @Inject constructor() : ViewModelProvider.Factory {
+    override fun progressChanged(newProgress: Int) {
+        Timber.v("Loading in progress $newProgress")
+        viewState.value = currentViewState().copy(progress = newProgress)
+    }
 
-        @Inject
-        lateinit var queryUrlConverter: QueryUrlConverter
+    override fun loadingStateChange(isLoading: Boolean) {
+        Timber.v("Loading state changed. isLoading=$isLoading")
+        viewState.value = currentViewState().copy(loadingData = isLoading)
+    }
 
-        override fun <T : ViewModel> create(aClass: Class<T>): T {
-            if (aClass.isAssignableFrom(BrowserViewModel::class.java)) {
-                return BrowserViewModel(queryUrlConverter) as T
-            }
-            throw IllegalArgumentException("Unknown view model")
-        }
+    override fun urlChanged(url: String?) {
+        Timber.v("Url changed: $url")
+        viewState.value = currentViewState().copy(url = url)
+    }
+
+    private fun currentViewState(): ViewState {
+        return viewState.value ?: return ViewState(loadingData = false, progress = 0, url = null)
     }
 }
 

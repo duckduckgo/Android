@@ -63,6 +63,7 @@ dependencies {
 
     implementation "com.google.dagger:dagger-android:$dagger"
     implementation "com.google.dagger:dagger-android-support:$dagger"
+    implementation 'com.android.support:design:27.0.1'
     kapt "com.google.dagger:dagger-android-processor:$dagger"
     kapt "com.google.dagger:dagger-compiler:$dagger"
 
