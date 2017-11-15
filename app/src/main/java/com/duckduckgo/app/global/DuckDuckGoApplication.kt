@@ -35,13 +35,14 @@ class DuckDuckGoApplication : HasActivityInjector, Application() {
     override fun onCreate() {
         super.onCreate()
 
-        DaggerAppComponent.builder().create(this).inject(this)
+        DaggerAppComponent.builder()
+                .application(this)
+                .create(this)
+                .inject(this)
 
         if(BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
     }
 
-    override fun activityInjector(): AndroidInjector<Activity> {
-        return injector
-    }
+    override fun activityInjector(): AndroidInjector<Activity> = injector
 
 }
