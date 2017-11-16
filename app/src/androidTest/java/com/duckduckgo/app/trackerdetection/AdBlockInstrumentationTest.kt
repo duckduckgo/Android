@@ -18,6 +18,7 @@ package com.duckduckgo.app.trackerdetection;
 
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName.EASYLIST
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -25,69 +26,46 @@ import org.junit.Test
 
 class AdBlockInstrumentationTest {
 
-    private val documentUrl = "http://example.com"
-
-    @Test
-    fun whenEasylistDataInitiallyLoadedThenEasylistTrackerIsBlocked() {
-        val testee = AdBlockPlus(easylistData(), false)
-        assertTrue(testee.matches("http://imasdk.googleapis.com/js/sdkloader/ima3.js", documentUrl))
+    companion object {
+        private val documentUrl = "http://example.com"
+        private val trackerUrl = "http://imasdk.googleapis.com/js/sdkloader/ima3.js"
+        private val nonTrackerUrl = "http://duckduckgo.com"
     }
 
     @Test
-    fun whenEasylistDataInitiallyLoadedThenNonTrackerNotBlocked() {
-        val testee = AdBlockPlus(easylistData(), false)
-        assertFalse(testee.matches("http://duckduckgo.com", documentUrl))
-    }
-
-
-    @Test
-    fun whenEasylistDataReloadedThenEasylistTrackerIsBlocked() {
-        var testee = AdBlockPlus(easylistData(), false)
-        testee = AdBlockPlus(testee.getProcessedData(), true)
-        assertTrue(testee.matches("http://imasdk.googleapis.com/js/sdkloader/ima3.js", documentUrl))
+    fun whenBasicDataLoadedThenTrackerIsBlocked() {
+        val testee = AdBlockPlus(EASYLIST)
+        testee.loadBasicData(data())
+        assertTrue(testee.matches(trackerUrl, documentUrl))
     }
 
     @Test
-    fun whenEasylistDataReloadedThenNonTrackerNotBlocked() {
-        var testee = AdBlockPlus(easylistData(), false)
-        testee = AdBlockPlus(testee.getProcessedData(), true)
-        assertFalse(testee.matches("http://duckduckgo.com", documentUrl))
+    fun whenBasicDataLoadedThenNonTrackerIsNotBlocked() {
+        val testee = AdBlockPlus(EASYLIST)
+        testee.loadBasicData(data())
+        assertFalse(testee.matches(nonTrackerUrl, documentUrl))
     }
 
     @Test
-    fun whenEasyprivacyDataInitiallyLoadedThenEasyprivacyTrackerIsBlocked() {
-        val testee = AdBlockPlus(easyprivacyData(), false)
-        assertTrue(testee.matches("http://cdn.tagcommander.com/1705/tc_catalog.css", documentUrl))
+    fun whenProcessedDataLoadedThenTrackerIsBlocked() {
+        val original = AdBlockPlus(EASYLIST)
+        original.loadBasicData(data())
+        val testee = AdBlockPlus(EASYLIST)
+        testee.loadProcessedData(original.getProcessedData())
+        assertTrue(testee.matches(trackerUrl, documentUrl))
     }
 
     @Test
-    fun whenEasyprivacyDataInitiallyLoadedThenNonTrackerNotBlocked() {
-        val testee = AdBlockPlus(easyprivacyData(), false)
-        assertFalse(testee.matches("http://duckduckgo.com", documentUrl))
+    fun whenProcessedDataLoadedThenNonTrackerIsNotBlocked() {
+        val original = AdBlockPlus(EASYLIST)
+        original.loadBasicData(data())
+        val testee = AdBlockPlus(EASYLIST)
+        testee.loadProcessedData(original.getProcessedData())
+        assertFalse(testee.matches(nonTrackerUrl, documentUrl))
     }
 
-    @Test
-    fun whenEasyprivacyDataReloadedThenEasyprivacyTrackerIsBlocked() {
-        var testee = AdBlockPlus(easyprivacyData(), false)
-        testee = AdBlockPlus(testee.getProcessedData(), true)
-        assertTrue(testee.matches("http://cdn.tagcommander.com/1705/tc_catalog.css", documentUrl))
-    }
-
-    @Test
-    fun whenEasyprivacyDataReloadedThenNonTrackerNotBlocked() {
-        var testee = AdBlockPlus(easyprivacyData(), false)
-        testee = AdBlockPlus(testee.getProcessedData(), true)
-        assertFalse(testee.matches("http://duckduckgo.com", documentUrl))
-    }
-
-    private fun easylistData(): ByteArray {
+    private fun data(): ByteArray {
         val appContext = InstrumentationRegistry.getTargetContext()
         return appContext.resources.openRawResource(R.raw.easylist_small).use { it.readBytes() }
-    }
-
-
-    private fun easyprivacyData(): ByteArray {
-        val appContext = InstrumentationRegistry.getTargetContext()
-        return appContext.resources.openRawResource(R.raw.easyprivacy_small).use { it.readBytes() }
     }
 }

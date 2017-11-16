@@ -20,6 +20,8 @@ package com.duckduckgo.app.trackerdetection
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName.EASYLIST
+import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName.EASYPRIVACY
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.BeforeClass
@@ -38,13 +40,24 @@ class TrackerDetectorInstrumentationTest {
 
         @BeforeClass
         @JvmStatic
-        fun setup() {
+        fun beforeClass() {
             val appContext = InstrumentationRegistry.getTargetContext()
+
             val easylistData = appContext.resources.openRawResource(R.raw.easylist).use { it.readBytes() }
+            var basicEasylistAdblock = AdBlockPlus(EASYLIST)
+            basicEasylistAdblock.loadBasicData(easylistData)
+            var easylistAdblock = AdBlockPlus(EASYLIST)
+            easylistAdblock.loadProcessedData(basicEasylistAdblock.getProcessedData())
+
             val easyprivacyData = appContext.resources.openRawResource(R.raw.easyprivacy).use { it.readBytes() }
-            var privacyAdblock = AdBlockPlus(easyprivacyData, false)
-            var easyAdblock = AdBlockPlus(easylistData, false)
-            testee = TrackerDetector(easyAdblock, privacyAdblock)
+            var basicEasyprivacyAdblock = AdBlockPlus(EASYPRIVACY)
+            basicEasyprivacyAdblock.loadBasicData(easyprivacyData)
+            var easyprivacyAdblock = AdBlockPlus(EASYPRIVACY)
+            easyprivacyAdblock.loadProcessedData(basicEasyprivacyAdblock.getProcessedData())
+
+            testee = TrackerDetector()
+            testee.addClient(easyprivacyAdblock)
+            testee.addClient(easylistAdblock)
         }
     }
 

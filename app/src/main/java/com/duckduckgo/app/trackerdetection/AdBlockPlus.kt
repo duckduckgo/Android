@@ -16,10 +16,11 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName
 import timber.log.Timber
 
 
-class AdBlockPlus : TrackerDetectorClient {
+class AdBlockPlus : TrackerDetectionClient {
 
     companion object FilterOption {
         val None = 0
@@ -28,33 +29,32 @@ class AdBlockPlus : TrackerDetectorClient {
         val Stylesheet = 4
     }
 
-    private var nativeClientPointer: Long
+    override val name: ClientName
+    private val nativeClientPointer: Long
 
     init {
         System.loadLibrary("adblockplus-lib")
     }
 
-    constructor(data: ByteArray, processed: Boolean) {
+    constructor(name: ClientName) {
+        this.name = name
         nativeClientPointer = createClient()
-        Timber.v("Loading list")
-        if (processed) {
-            loadProcessedData(data)
-        } else {
-            loadBasicData(data)
-        }
-        Timber.v("Loding complete")
     }
 
     private external fun createClient(): Long
 
-    private fun loadBasicData(data: ByteArray) {
+    fun loadBasicData(data: ByteArray) {
+        Timber.v("Loading basic data")
         loadBasicData(nativeClientPointer, data)
+        Timber.v("Loading complete")
     }
 
     private external fun loadBasicData(clientPointer: Long, data: ByteArray)
 
-    private fun loadProcessedData(data: ByteArray) {
+    fun loadProcessedData(data: ByteArray) {
+        Timber.v("Loading preprocessed data")
         loadProcessedData(nativeClientPointer, data)
+        Timber.v("Loading complete")
     }
 
     private external fun loadProcessedData(clientPointer: Long, data: ByteArray)

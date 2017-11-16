@@ -18,8 +18,12 @@ package com.duckduckgo.app.browser
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
+import android.content.Context
 import android.net.Uri
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.trackerdetection.TrackerDetector
+import com.duckduckgo.app.trackerdetection.api.TrackerListService
+import com.duckduckgo.app.trackerdetection.store.TrackerDataProvider
 import mock
 import org.junit.Before
 import org.junit.Rule
@@ -37,17 +41,24 @@ class BrowserViewModelTest {
     @Mock
     val observer: Observer<String> = mock()
 
+    @Mock
+    val mockContext: Context = mock()
+
+    @Mock
+    val mockTrackerService: TrackerListService = mock()
+
+
     val testOmnibarConverter: OmnibarEntryConverter = object : OmnibarEntryConverter {
-        override fun convertUri(input: String): String  = "duckduckgo.com"
+        override fun convertUri(input: String): String = "duckduckgo.com"
         override fun isWebUrl(inputQuery: String): Boolean = true
         override fun convertQueryToUri(inputQuery: String): Uri = Uri.parse("duckduckgo.com")
     }
 
-    private lateinit var testee :BrowserViewModel
+    private lateinit var testee: BrowserViewModel
 
     @Before
     fun before() {
-        testee = BrowserViewModel(testOmnibarConverter)
+        testee = BrowserViewModel(testOmnibarConverter, TrackerDataProvider(mockContext), TrackerDetector(), mockTrackerService)
     }
 
     @Test

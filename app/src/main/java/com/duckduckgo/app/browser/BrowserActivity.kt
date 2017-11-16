@@ -23,9 +23,6 @@ import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.trackerdetection.AdBlockPlus
-import com.duckduckgo.app.trackerdetection.TrackerDataProvider
-import com.duckduckgo.app.trackerdetection.TrackerDetector
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -63,7 +60,6 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
-        webViewClient.trackerDetector = buildTrackerDetector()
         webView.webViewClient = webViewClient
         webView.settings.javaScriptEnabled = true
         refreshWebViewButton.setOnClickListener({ webView.reload() })
@@ -79,16 +75,9 @@ class BrowserActivity : DuckDuckGoActivity() {
         })
     }
 
-    private fun buildTrackerDetector(): TrackerDetector {
-        val dataProvider = TrackerDataProvider(applicationContext)
-        Timber.d("Data provider has preprocessed data? %s", dataProvider.hasProcessedData)
-        val easylistClient = AdBlockPlus(dataProvider.easylist, dataProvider.hasProcessedData)
-        val easyprivacyClient = AdBlockPlus(dataProvider.easyprivacy, dataProvider.hasProcessedData)
-        if (!dataProvider.hasProcessedData) {
-            dataProvider.saveProcessedEasylistData(easylistClient.getProcessedData())
-            dataProvider.saveProcessedEasyprivacyData(easyprivacyClient.getProcessedData())
-        }
-        return TrackerDetector(easylistClient, easyprivacyClient)
+    override fun onResume() {
+        super.onResume()
+        viewModel.onResume()
     }
 
     override fun onSaveInstanceState(bundle: Bundle?) {

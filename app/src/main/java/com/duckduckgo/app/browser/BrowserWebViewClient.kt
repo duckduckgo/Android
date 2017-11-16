@@ -28,10 +28,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 
-class BrowserWebViewClient @Inject constructor(private val requestRewriter: DuckDuckGoRequestRewriter) : WebViewClient() {
-
-    //TODO inject this
-    lateinit var trackerDetector: TrackerDetector
+class BrowserWebViewClient @Inject constructor(private val requestRewriter: DuckDuckGoRequestRewriter, var trackerDetector: TrackerDetector) : WebViewClient() {
 
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         Timber.v("Url ${request.url}")
@@ -61,8 +58,12 @@ class BrowserWebViewClient @Inject constructor(private val requestRewriter: Duck
 
     private fun block(url: String?, documentUrl: String?): Boolean {
 
+        if (trackerDetector == null) {
+            return false
+        }
+
         if (url != null && documentUrl != null && trackerDetector.shouldBlock(url, documentUrl)) {
-            Timber.v("BLOCKED ${url}")
+            Timber.v("WAS BLOCKED ${url}")
             return true
         }
 
@@ -76,4 +77,5 @@ class BrowserWebViewClient @Inject constructor(private val requestRewriter: Duck
                 .map { webView -> webView.url }
                 .blockingFirst()
     }
+
 }

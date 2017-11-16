@@ -21,20 +21,33 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
+import com.duckduckgo.app.trackerdetection.AdBlockPlus
+import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName
+import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName.EASYLIST
+import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName.EASYPRIVACY
+import com.duckduckgo.app.trackerdetection.TrackerDetector
+import com.duckduckgo.app.trackerdetection.api.TrackerListService
+import com.duckduckgo.app.trackerdetection.store.TrackerDataProvider
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import javax.inject.Inject
 
 class BrowserViewModel(
-        private val queryUrlConverter: OmnibarEntryConverter) : ViewModel() {
+        private val queryUrlConverter: OmnibarEntryConverter,
+        private val trackerDataProvider: TrackerDataProvider,
+        private val trackerDetector: TrackerDetector,
+        private val trackerListService: TrackerListService) : ViewModel() {
 
     val query: MutableLiveData<String> = MutableLiveData()
 
     fun onQueryEntered(input: String) {
 
-        if(input.isBlank()) {
+        if (input.isBlank()) {
             return
         }
 
-        if(queryUrlConverter.isWebUrl(input)) {
+        if (queryUrlConverter.isWebUrl(input)) {
             query.value = queryUrlConverter.convertUri(input)
 
         } else {
@@ -48,13 +61,63 @@ class BrowserViewModel(
         @Inject
         lateinit var queryUrlConverter: QueryUrlConverter
 
+        @Inject
+        lateinit var trackerDataProvider: TrackerDataProvider
+
+        @Inject
+        lateinit var trackerDetector: TrackerDetector
+
+        @Inject
+        lateinit var trackerListService: TrackerListService
+
         override fun <T : ViewModel> create(aClass: Class<T>): T {
             if (aClass.isAssignableFrom(BrowserViewModel::class.java)) {
-                return BrowserViewModel(queryUrlConverter) as T
+                return BrowserViewModel(queryUrlConverter, trackerDataProvider, trackerDetector, trackerListService) as T
             }
             throw IllegalArgumentException("Unknown view model")
         }
     }
+
+    fun onResume() {
+        loadTrackerClients()
+    }
+
+    private fun loadTrackerClients() {
+
+        if (!trackerDetector.hasClient(EASYLIST)) {
+            addTrackerClient(EASYLIST)
+        }
+
+        if (!trackerDetector.hasClient(EASYPRIVACY)) {
+            addTrackerClient(EASYPRIVACY)
+        }
+    }
+
+    private fun addTrackerClient(name: ClientName) {
+
+        if (trackerDataProvider.hasData(name)) {
+            val client = AdBlockPlus(name)
+            client.loadProcessedData(trackerDataProvider.loadData(name))
+            trackerDetector.addClient(client)
+            return
+        }
+
+        trackerListService.list(name.name.toLowerCase())
+                .subscribeOn(Schedulers.io())
+                .map { responseBody ->
+                    val client = AdBlockPlus(name)
+                    client.loadBasicData(responseBody.bytes())
+                    return@map client
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ client ->
+                    trackerDataProvider.saveData(name, client.getProcessedData())
+                    trackerDetector.addClient(client)
+                }, { error ->
+                    Timber.e(error)
+                })
+    }
+
 }
 
 

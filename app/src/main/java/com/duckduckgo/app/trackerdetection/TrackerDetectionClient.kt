@@ -16,7 +16,14 @@
 
 package com.duckduckgo.app.trackerdetection
 
-interface TrackerDetectorClient {
+interface TrackerDetectionClient {
+
+    enum class ClientName {
+        EASYLIST,
+        EASYPRIVACY
+    }
+
+    val name: ClientName
 
     fun matches(url: String, documentUrl: String): Boolean
 
