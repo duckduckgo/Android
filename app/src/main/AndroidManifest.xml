@@ -16,9 +16,11 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".BrowserActivity"
+            android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
