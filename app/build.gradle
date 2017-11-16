@@ -39,12 +39,15 @@ android {
         unitTests.returnDefaultValues = true
     }
     sourceSets {
-        String sharedTestDir = 'src/sharedTest/java'
+        String sharedTestJavaDir = 'src/sharedTest/java'
+        String sharedTestResourcesDir = 'src/sharedTest/resources'
         test {
-            java.srcDir sharedTestDir
+            java.srcDir sharedTestJavaDir
+            resources.srcDir sharedTestResourcesDir
         }
         androidTest {
-            java.srcDir sharedTestDir
+            java.srcDir sharedTestJavaDir
+            resources.srcDir sharedTestResourcesDir
         }
     }
 }

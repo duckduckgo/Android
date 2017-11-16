@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.trackerdetection;
 
-import android.support.test.InstrumentationRegistry
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName.EASYLIST
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -29,7 +27,7 @@ class AdBlockInstrumentationTest {
     companion object {
         private val documentUrl = "http://example.com"
         private val trackerUrl = "http://imasdk.googleapis.com/js/sdkloader/ima3.js"
-        private val nonTrackerUrl = "http://duckduckgo.com"
+        private val nonTrackerUrl = "http://duckduckgo.com/index.html"
     }
 
     @Test
@@ -65,7 +63,6 @@ class AdBlockInstrumentationTest {
     }
 
     private fun data(): ByteArray {
-        val appContext = InstrumentationRegistry.getTargetContext()
-        return appContext.resources.openRawResource(R.raw.easylist_small).use { it.readBytes() }
+        return javaClass.classLoader.getResource("easylist_sample").readBytes()
     }
 }
