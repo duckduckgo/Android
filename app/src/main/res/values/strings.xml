@@ -5,5 +5,4 @@
     <string name="back">Back</string>
     <string name="forward">Forward</string>
     <string name="omnibarInputHint">Search or URL</string>
-    <string name="title_activity_test">TestActivity</string>
 </resources>

@@ -24,12 +24,15 @@
     tools:context="com.duckduckgo.app.browser.BrowserActivity">
 
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
+        android:fitsSystemWindows="true"
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
+            app:layout_scrollFlags="scroll|enterAlways"
             android:layout_height="match_parent">
 
             <android.support.v7.widget.Toolbar
@@ -37,27 +40,31 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
+                app:contentInsetEnd="0dp"
+                app:contentInsetStart="0dp"
                 app:layout_scrollFlags="scroll|enterAlways"
                 app:popupTheme="@style/AppTheme.PopupOverlay">
 
                 <EditText
                     android:id="@+id/urlInput"
-                    android:layout_width="300dp"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_margin="8dp"
                     android:background="@color/omnibarBackground"
                     android:fontFamily="sans-serif-medium"
                     android:hint="@string/omnibarInputHint"
-                    android:inputType="textUri|textShortMessage"
+                    android:imeOptions="flagNoExtractUi|actionDone"
+                    android:inputType="textUri|textShortMessage|textNoSuggestions"
                     android:maxLines="1"
                     android:padding="10dp"
+                    android:text="test"
                     android:textColor="#ffffff"
                     android:textSize="13sp"
                     android:textStyle="normal"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     tools:text="https://duckduckgo.com/?q=henr.."
                     />
-
 
             </android.support.v7.widget.Toolbar>
 
@@ -65,12 +72,13 @@
                 android:id="@+id/pageLoadingIndicator"
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
+                android:layout_height="4dp"
+                android:layout_marginBottom="4dp"
                 android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/urlInput"
+                app:layout_constraintTop_toBottomOf="@id/toolbar"
                 tools:progress="50"
                 tools:visibility="visible"
                 />
@@ -78,13 +86,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipeToRefreshContainer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    <include layout="@layout/content_browser"/>
 
-        <include layout="@layout/content_browser"/>
-
-    </android.support.v4.widget.SwipeRefreshLayout>
 </android.support.design.widget.CoordinatorLayout>
