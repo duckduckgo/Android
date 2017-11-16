@@ -5,7 +5,6 @@ android:
     # Uncomment the lines below if you want to
     # use the latest revision of Android SDK Tools
     - tools
-    - tools
     - platform-tools
 
     # The BuildTools version used by your project
@@ -21,8 +20,9 @@ before_install:
   - echo "d56f5187479451eabf01fb78af6dfcb131a6481e" > "$ANDROID_HOME/licenses/android-sdk-license"
   - sdkmanager tools
   - yes | sdkmanager --licenses
+  - echo "Fetching ndk-bundle. Suppressing output to avoid travis 4MG size limit"
   - sdkmanager "ndk-bundle" >/dev/null
-  - echo "Fetching ndk done"
+  - echo "Fetching ndk-bnundle complete"
   - sdkmanager "system-images;android-22;default;armeabi-v7a"
   # Create and start emulator for the script. Meant to race the install task.
   - echo no | avdmanager create avd --force -n test -k "system-images;android-22;default;armeabi-v7a"
