@@ -44,7 +44,7 @@ android {
 }
 
 ext {
-    supportLibrary = "26.1.0"
+    supportLibrary = "27.0.1"
     architectureComponents = "1.0.0"
     dagger = "2.13"
 }
@@ -53,6 +53,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     implementation "com.android.support:appcompat-v7:$supportLibrary"
+    implementation "com.android.support:design:$supportLibrary"
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.squareup.okhttp3:okhttp:3.9.0'
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
@@ -63,7 +64,7 @@ dependencies {
 
     implementation "com.google.dagger:dagger-android:$dagger"
     implementation "com.google.dagger:dagger-android-support:$dagger"
-    implementation 'com.android.support:design:27.0.1'
+
     kapt "com.google.dagger:dagger-android-processor:$dagger"
     kapt "com.google.dagger:dagger-compiler:$dagger"
 
