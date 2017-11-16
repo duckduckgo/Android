@@ -139,4 +139,9 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
         return false
     }
+
+    override fun onBackPressed() {
+        if (webView.canGoBack()) webView.goBack()
+        else super.onBackPressed()
+    }
 }
