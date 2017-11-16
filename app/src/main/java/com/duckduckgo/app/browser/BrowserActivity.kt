@@ -47,15 +47,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         setContentView(R.layout.activity_browser)
 
         viewModel.viewState.observe(this, Observer<BrowserViewModel.ViewState> {
-            it!!
-            when (it.loadingData) {
-                true -> pageLoadingIndicator.visibility = View.VISIBLE
-                false -> pageLoadingIndicator.visibility = View.INVISIBLE
-            }
-
-            it.url?.let { urlInput.setText(it) }
-
-            pageLoadingIndicator.progress = it.progress
+            it?.let { render(it) }
         })
 
         viewModel.query.observe(this, Observer {
@@ -63,11 +55,30 @@ class BrowserActivity : DuckDuckGoActivity() {
         })
 
         swipeToRefreshContainer.setOnRefreshListener {
-            swipeToRefreshContainer.isRefreshing = false
+            webView.reload()
         }
 
         configureToolbar()
         configureWebView()
+    }
+
+    private fun render(it: BrowserViewModel.ViewState) {
+        when (it.loadingData) {
+            true -> pageLoadingIndicator.visibility = View.VISIBLE
+            false -> {
+                pageLoadingIndicator.visibility = View.INVISIBLE
+                swipeToRefreshContainer.isRefreshing = false
+            }
+        }
+
+        it.url?.let {
+            if (urlInput.text.toString() != it) {
+                urlInput.setText(it)
+                appBarLayout.setExpanded(true, true)
+            }
+        }
+
+        pageLoadingIndicator.progress = it.progress
     }
 
     private fun configureToolbar() {
