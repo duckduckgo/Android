@@ -15,10 +15,13 @@ JNIEXPORT void
 JNICALL
 Java_com_duckduckgo_app_trackerdetection_AdBlockPlus_releaseClient(JNIEnv *env,
                                                                    jobject /* this */,
-                                                                   jlong clientPointer) {
+                                                                   jlong clientPointer,
+                                                                   jlong dataPointer) {
     AdBlockClient *client = (AdBlockClient *) clientPointer;
     delete client;
 
+    char *processedData = (char *) dataPointer;
+    delete[] processedData;
 }
 
 
@@ -41,7 +44,7 @@ Java_com_duckduckgo_app_trackerdetection_AdBlockPlus_loadBasicData(JNIEnv *env,
 }
 
 extern "C"
-JNIEXPORT void
+JNIEXPORT jlong
 JNICALL
 Java_com_duckduckgo_app_trackerdetection_AdBlockPlus_loadProcessedData(JNIEnv *env,
                                                                        jobject /* this */,
@@ -54,7 +57,11 @@ Java_com_duckduckgo_app_trackerdetection_AdBlockPlus_loadProcessedData(JNIEnv *e
 
     AdBlockClient *client = (AdBlockClient *) clientPointer;
     client->deserialize(dataChars);
-    // cannot delete datachars - adblock needs it
+
+    // We cannot delete datachars here as adblock keeps a ptr to it.
+    // Instead we send back a ptr ref so we can delete it later in the release method
+    return (long) dataChars;
+
 }
 
 
