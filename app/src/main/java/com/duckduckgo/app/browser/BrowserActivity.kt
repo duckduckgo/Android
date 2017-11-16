@@ -27,9 +27,11 @@ import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.view.hide
+import com.duckduckgo.app.global.view.hideKeyboard
+import com.duckduckgo.app.global.view.show
 import kotlinx.android.synthetic.main.activity_browser.*
 import kotlinx.android.synthetic.main.content_browser.*
-import timber.log.Timber
 import javax.inject.Inject
 
 class BrowserActivity : DuckDuckGoActivity() {
@@ -51,22 +53,20 @@ class BrowserActivity : DuckDuckGoActivity() {
         })
 
         viewModel.query.observe(this, Observer {
-            it?.let { Timber.w("Here"); webView.loadUrl(it) }
+            it?.let { webView.loadUrl(it) }
         })
 
-        swipeToRefreshContainer.setOnRefreshListener {
-            webView.reload()
-        }
-
+        configureSwipeToRefresh()
         configureToolbar()
         configureWebView()
+        configureUrlInput()
     }
 
     private fun render(it: BrowserViewModel.ViewState) {
         when (it.loadingData) {
-            true -> pageLoadingIndicator.visibility = View.VISIBLE
+            true -> pageLoadingIndicator.show()
             false -> {
-                pageLoadingIndicator.visibility = View.INVISIBLE
+                pageLoadingIndicator.hide()
                 swipeToRefreshContainer.isRefreshing = false
             }
         }
@@ -79,6 +79,13 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
 
         pageLoadingIndicator.progress = it.progress
+        if(it.isEditing) clearUrlButton.show() else clearUrlButton.hide()
+    }
+
+    private fun configureSwipeToRefresh() {
+        swipeToRefreshContainer.setOnRefreshListener {
+            webView.reload()
+        }
     }
 
     private fun configureToolbar() {
@@ -86,8 +93,18 @@ class BrowserActivity : DuckDuckGoActivity() {
         supportActionBar?.title = null
     }
 
+    private fun configureUrlInput() {
+        urlInput.onFocusChangeListener = View.OnFocusChangeListener { _: View, hasFocus: Boolean ->
+            viewModel.urlFocusChanged(hasFocus)
+        }
+
+        clearUrlButton.setOnClickListener { urlInput.setText("") }
+    }
+
     private fun userEnteredQuery() {
         viewModel.onQueryEntered(urlInput.text.toString())
+        urlInput.hideKeyboard()
+        focusDummy.requestFocus()
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -95,6 +112,9 @@ class BrowserActivity : DuckDuckGoActivity() {
         webView.webViewClient = webViewClient
         webView.webChromeClient = webChromeClient
         webView.settings.javaScriptEnabled = true
+        webView.setOnTouchListener({ _, _ ->
+            focusDummy.requestFocus(); false
+        })
 
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
 

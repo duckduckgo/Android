@@ -30,9 +30,10 @@ class BrowserViewModel(private val queryUrlConverter: OmnibarEntryConverter) :
     val query: SingleLiveEvent<String> = SingleLiveEvent()
 
     data class ViewState(
-            val loadingData: Boolean,
-            val progress: Int,
-            val url: String?
+            val loadingData: Boolean = false,
+            val progress: Int = 0,
+            val url: String? = null,
+            val isEditing: Boolean = false
     )
 
     fun registerWebViewListener(browserWebViewClient: BrowserWebViewClient, browserChromeClient: BrowserChromeClient) {
@@ -70,7 +71,11 @@ class BrowserViewModel(private val queryUrlConverter: OmnibarEntryConverter) :
     }
 
     private fun currentViewState(): ViewState {
-        return viewState.value ?: return ViewState(loadingData = false, progress = 0, url = null)
+        return viewState.value ?: return ViewState()
+    }
+
+    fun urlFocusChanged(hasFocus: Boolean) {
+        viewState.value = currentViewState().copy(isEditing = hasFocus)
     }
 }
 

@@ -44,29 +44,47 @@
                 app:contentInsetStart="0dp"
                 app:layout_scrollFlags="scroll|enterAlways"
                 app:popupTheme="@style/AppTheme.PopupOverlay">
-
-                <EditText
-                    android:id="@+id/urlInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="8dp"
-                    android:background="@color/omnibarBackground"
-                    android:fontFamily="sans-serif-medium"
-                    android:hint="@string/omnibarInputHint"
-                    android:imeOptions="flagNoExtractUi|actionDone"
-                    android:inputType="textUri|textShortMessage|textNoSuggestions"
-                    android:maxLines="1"
-                    android:padding="10dp"
-                    android:text="test"
-                    android:textColor="#ffffff"
-                    android:textSize="13sp"
-                    android:textStyle="normal"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    tools:text="https://duckduckgo.com/?q=henr.."
-                    />
-
             </android.support.v7.widget.Toolbar>
+
+            <EditText
+                android:id="@+id/urlInput"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="8dp"
+                android:background="@color/omnibarBackground"
+                android:fontFamily="sans-serif-medium"
+                android:hint="@string/omnibarInputHint"
+                android:imeOptions="flagNoExtractUi|actionDone"
+                android:inputType="textUri|textShortMessage|textNoSuggestions"
+                android:maxLines="1"
+                android:padding="10dp"
+                android:paddingEnd="40dp"
+                android:text="test"
+                android:elevation="4dp"
+                android:selectAllOnFocus="true"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:textColor="#ffffff"
+                android:textSize="13sp"
+                android:textStyle="normal"
+                tools:text="https://duckduckgo.com/?q=henr..https://duckduckgo.com/?q=henr.."
+                />
+
+            <ImageView
+                android:id="@+id/clearUrlButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                app:layout_constraintTop_toTopOf="@id/urlInput"
+                app:layout_constraintEnd_toEndOf="@id/urlInput"
+                android:layout_marginEnd="6dp"
+                android:tint="#FFF"
+                android:elevation="6dp"
+                android:background="?selectableItemBackground"
+                tools:visibility="visible"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/urlInput"
+                android:src="@drawable/ic_cancel_24dp"
+                />
 
             <ProgressBar
                 android:id="@+id/pageLoadingIndicator"
@@ -87,5 +105,11 @@
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_browser"/>
+
+    <View
+        android:id="@+id/focusDummy"
+        android:layout_width="0dp"
+        android:focusableInTouchMode="true"
+        android:layout_height="0dp" />
 
 </android.support.design.widget.CoordinatorLayout>
