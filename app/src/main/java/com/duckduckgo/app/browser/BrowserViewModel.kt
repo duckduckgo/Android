@@ -18,9 +18,8 @@ package com.duckduckgo.app.browser
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
-import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
+import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.trackerdetection.AdBlockPlus
 import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName
 import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName.EASYLIST
@@ -31,15 +30,25 @@ import com.duckduckgo.app.trackerdetection.store.TrackerDataProvider
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
-import javax.inject.Inject
 
 class BrowserViewModel(
         private val queryUrlConverter: OmnibarEntryConverter,
         private val trackerDataProvider: TrackerDataProvider,
         private val trackerDetector: TrackerDetector,
-        private val trackerListService: TrackerListService) : ViewModel() {
+        private val trackerListService: TrackerListService) :
+        WebViewClientListener, ViewModel() {
 
-    val query: MutableLiveData<String> = MutableLiveData()
+    val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    val query: SingleLiveEvent<String> = SingleLiveEvent()
+
+    init {
+        viewState.value = ViewState()
+    }
+
+    fun registerWebViewListener(browserWebViewClient: BrowserWebViewClient, browserChromeClient: BrowserChromeClient) {
+        browserWebViewClient.webViewClientListener = this
+        browserChromeClient.webViewClientListener = this
+    }
 
     init {
         loadTrackerClients()
@@ -51,36 +60,41 @@ class BrowserViewModel(
             return
         }
 
-        if (queryUrlConverter.isWebUrl(input)) {
-            query.value = queryUrlConverter.convertUri(input)
-
+        val convertedQuery: String = if (queryUrlConverter.isWebUrl(input)) {
+            queryUrlConverter.convertUri(input)
         } else {
-            query.value = queryUrlConverter.convertQueryToUri(input).toString()
+            queryUrlConverter.convertQueryToUri(input).toString()
         }
+        query.value = convertedQuery
     }
 
-    @Suppress("UNCHECKED_CAST")
-    class BrowserViewModelFactory @Inject constructor() : ViewModelProvider.Factory {
-
-        @Inject
-        lateinit var queryUrlConverter: QueryUrlConverter
-
-        @Inject
-        lateinit var trackerDataProvider: TrackerDataProvider
-
-        @Inject
-        lateinit var trackerDetector: TrackerDetector
-
-        @Inject
-        lateinit var trackerListService: TrackerListService
-
-        override fun <T : ViewModel> create(aClass: Class<T>): T {
-            if (aClass.isAssignableFrom(BrowserViewModel::class.java)) {
-                return BrowserViewModel(queryUrlConverter, trackerDataProvider, trackerDetector, trackerListService) as T
-            }
-            throw IllegalArgumentException("Unknown view model")
-        }
+    override fun progressChanged(newProgress: Int) {
+        Timber.v("Loading in progress $newProgress")
+        viewState.value = currentViewState().copy(progress = newProgress)
     }
+
+    override fun loadingStateChange(isLoading: Boolean) {
+        Timber.v("Loading state changed. isLoading=$isLoading")
+        viewState.value = currentViewState().copy(isLoading = isLoading)
+    }
+
+    override fun urlChanged(url: String?) {
+        Timber.v("Url changed: $url")
+        viewState.value = currentViewState().copy(url = url)
+    }
+
+    private fun currentViewState(): ViewState = viewState.value!!
+
+    fun urlFocusChanged(hasFocus: Boolean) {
+        viewState.value = currentViewState().copy(isEditing = hasFocus)
+    }
+
+    data class ViewState(
+            val isLoading: Boolean = false,
+            val progress: Int = 0,
+            val url: String? = null,
+            val isEditing: Boolean = false
+    )
 
     private fun loadTrackerClients() {
 

@@ -43,8 +43,6 @@ class DuckDuckGoApplication : HasActivityInjector, Application() {
         if(BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
     }
 
-    override fun activityInjector(): AndroidInjector<Activity> {
-        return injector
-    }
+    override fun activityInjector(): AndroidInjector<Activity> = injector
 
 }

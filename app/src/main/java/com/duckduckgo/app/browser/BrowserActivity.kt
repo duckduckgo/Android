@@ -20,17 +20,25 @@ import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import kotlinx.android.synthetic.main.activity_main.*
-import timber.log.Timber
+import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.view.hide
+import com.duckduckgo.app.global.view.hideKeyboard
+import com.duckduckgo.app.global.view.show
+import kotlinx.android.synthetic.main.activity_browser.*
+import kotlinx.android.synthetic.main.content_browser.*
 import javax.inject.Inject
 
 class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var webViewClient: BrowserWebViewClient
-    @Inject lateinit var viewModelFactory: BrowserViewModel.BrowserViewModelFactory
+    @Inject lateinit var webChromeClient: BrowserChromeClient
+    @Inject lateinit var viewModelFactory: ViewModelFactory
 
     private val viewModel: BrowserViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(BrowserViewModel::class.java)
@@ -38,33 +46,81 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_browser)
+
+        viewModel.viewState.observe(this, Observer<BrowserViewModel.ViewState> {
+            it?.let { render(it) }
+        })
 
         viewModel.query.observe(this, Observer {
-            if (savedInstanceState == null) {
-                Timber.v("Webview loading url $it")
-                webView.loadUrl(it)
-            }
+            it?.let { webView.loadUrl(it) }
         })
 
-        loadUrlButton.setOnClickListener({
-            userEnteredQuery()
-        })
-
+        configureSwipeToRefresh()
+        configureToolbar()
         configureWebView()
+        configureUrlInput()
+    }
+
+    private fun render(viewState: BrowserViewModel.ViewState) {
+        when (viewState.isLoading) {
+            true -> pageLoadingIndicator.show()
+            false -> {
+                pageLoadingIndicator.hide()
+                swipeToRefreshContainer.isRefreshing = false
+            }
+        }
+
+        viewState.url?.let {
+            if (urlInput.text.toString() != it) {
+                urlInput.setText(it)
+                appBarLayout.setExpanded(true, true)
+            }
+        }
+
+        pageLoadingIndicator.progress = viewState.progress
+        if (viewState.isEditing) clearUrlButton.show() else clearUrlButton.hide()
+    }
+
+    private fun configureSwipeToRefresh() {
+        swipeToRefreshContainer.setOnRefreshListener {
+            webView.reload()
+        }
+    }
+
+    private fun configureToolbar() {
+        setSupportActionBar(toolbar)
+        supportActionBar?.title = null
+    }
+
+    private fun configureUrlInput() {
+        urlInput.onFocusChangeListener = View.OnFocusChangeListener { _: View, hasFocus: Boolean ->
+            viewModel.urlFocusChanged(hasFocus)
+        }
+
+        clearUrlButton.setOnClickListener { urlInput.setText("") }
     }
 
     private fun userEnteredQuery() {
         viewModel.onQueryEntered(urlInput.text.toString())
+        urlInput.hideKeyboard()
+        focusDummy.requestFocus()
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
         webView.webViewClient = webViewClient
+        webView.webChromeClient = webChromeClient
         webView.settings.javaScriptEnabled = true
-        refreshWebViewButton.setOnClickListener({ webView.reload() })
-        navigateBackButton.setOnClickListener({ webView.goBack() })
-        navigateForward.setOnClickListener({ webView.goForward() })
+        webView.settings.builtInZoomControls = true
+        webView.settings.setSupportZoom(true)
+        webView.settings.useWideViewPort = true
+        webView.setOnTouchListener { _, _ ->
+            focusDummy.requestFocus()
+            false
+        }
+
+        viewModel.registerWebViewListener(webViewClient, webChromeClient)
 
         urlInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -75,13 +131,41 @@ class BrowserActivity : DuckDuckGoActivity() {
         })
     }
 
-    override fun onSaveInstanceState(bundle: Bundle?) {
-        super.onSaveInstanceState(bundle)
+    override fun onSaveInstanceState(bundle: Bundle) {
         webView.saveState(bundle)
+        super.onSaveInstanceState(bundle)
     }
 
-    override fun onRestoreInstanceState(bundle: Bundle?) {
+    override fun onRestoreInstanceState(bundle: Bundle) {
         super.onRestoreInstanceState(bundle)
         webView.restoreState(bundle)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_browser_activity, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.refresh_menu_item -> {
+                webView.reload()
+                return true
+            }
+            R.id.back_menu_item -> {
+                webView.goBack()
+                return true
+            }
+            R.id.forward_menu_item -> {
+                webView.goForward()
+                return true
+            }
+        }
+        return false
+    }
+
+    override fun onBackPressed() {
+        if (webView.canGoBack()) webView.goBack()
+        else super.onBackPressed()
     }
 }

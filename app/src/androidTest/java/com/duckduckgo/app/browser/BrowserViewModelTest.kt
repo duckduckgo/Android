@@ -29,6 +29,8 @@ import com.duckduckgo.app.trackerdetection.store.TrackerDataProvider
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.whenever
 import mock
+import org.junit.After
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -41,6 +43,9 @@ class BrowserViewModelTest {
 
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @Mock
+    val viewStateObserver: Observer<BrowserViewModel.ViewState> = mock()
 
     @Mock
     private val observer: Observer<String> = mock()
@@ -63,27 +68,79 @@ class BrowserViewModelTest {
     @Before
     fun before() {
         testee = BrowserViewModel(testOmnibarConverter, TrackerDataProvider(mockContext), testTrackerDetector(), mockTrackerService)
+        testee.query.observeForever(observer)
+        testee.viewState.observeForever(viewStateObserver)
+    }
+
+    @After
+    fun after() {
+        testee.query.removeObserver(observer)
+        testee.viewState.removeObserver(viewStateObserver)
     }
 
     @Test
     fun whenEmptyInputQueryThenNoQueryMadeAvailableToActivity() {
-        testee.query.observeForever(observer)
         testee.onQueryEntered("")
         verify(observer, never()).onChanged(ArgumentMatchers.anyString())
     }
 
     @Test
     fun whenBlankInputQueryThenNoQueryMadeAvailableToActivity() {
-        testee.query.observeForever(observer)
         testee.onQueryEntered("     ")
         verify(observer, never()).onChanged(ArgumentMatchers.anyString())
     }
 
     @Test
     fun whenNonEmptyInputThenQueryMadeAvailableToActivity() {
-        testee.query.observeForever(observer)
         testee.onQueryEntered("foo")
         verify(observer).onChanged(ArgumentMatchers.anyString())
+    }
+
+    @Test
+    fun whenViewModelNotifiedThatWebViewIsLoadingThenViewStateIsUpdated() {
+        testee.loadingStateChange(true)
+        assertTrue(testee.viewState.value!!.isLoading)
+    }
+
+    @Test
+    fun whenViewModelNotifiedThatWebViewIsNotLoadingThenViewStateIsUpdated() {
+        testee.loadingStateChange(false)
+        assertFalse(testee.viewState.value!!.isLoading)
+    }
+
+    @Test
+    fun whenViewModelNotifiedThatUrlFocusChangedGotFocusThenViewStateIsUpdated() {
+        testee.urlFocusChanged(true)
+        assertTrue(testee.viewState.value!!.isEditing)
+    }
+
+    @Test
+    fun whenViewModelNotifiedThatUrlFocusChangedLostFocusThenViewStateIsUpdated() {
+        testee.urlFocusChanged(false)
+        assertFalse(testee.viewState.value!!.isEditing)
+    }
+
+    @Test
+    fun whenNoUrlEverEnteredThenViewStateHasNull() {
+        assertNull(testee.viewState.value!!.url)
+    }
+
+    @Test
+    fun whenUrlChangedThenViewStateIsUpdated() {
+        testee.urlChanged("duckduckgo.com")
+        assertEquals("duckduckgo.com", testee.viewState.value!!.url)
+    }
+
+    @Test
+    fun whenViewModelGetsProgressUpdateThenViewStateIsUpdated() {
+        testee.progressChanged(0)
+        assertEquals(0, testee.viewState.value!!.progress)
+
+        testee.progressChanged(50)
+        assertEquals(50, testee.viewState.value!!.progress)
+
+        testee.progressChanged(100)
+        assertEquals(100, testee.viewState.value!!.progress)
     }
 
     private fun testTrackerDetector(): TrackerDetector {
