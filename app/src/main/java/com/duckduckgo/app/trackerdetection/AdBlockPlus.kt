@@ -25,21 +25,26 @@ class AdBlockPlus(override val name: ClientName) : TrackerDetectionClient {
     private val nativeClientPointer: Long
     private var processedDataPointer: Long = 0
 
-
     private external fun createClient(): Long
 
+    init {
+        nativeClientPointer = createClient()
+    }
+
     fun loadBasicData(data: ByteArray) {
-        Timber.v("Loading basic data")
+        val timestamp = System.currentTimeMillis()
+        Timber.d("Loading basic data")
         loadBasicData(nativeClientPointer, data)
-        Timber.v("Loading complete")
+        Timber.d("Loading completed in ${System.currentTimeMillis() - timestamp}ms")
     }
 
     private external fun loadBasicData(clientPointer: Long, data: ByteArray)
 
     fun loadProcessedData(data: ByteArray) {
-        Timber.v("Loading preprocessed data")
+        val timestamp = System.currentTimeMillis()
+        Timber.d("Loading preprocessed data")
         processedDataPointer = loadProcessedData(nativeClientPointer, data)
-        Timber.v("Loading complete")
+        Timber.d("Loading completed in ${System.currentTimeMillis() - timestamp}ms")
     }
 
     private external fun loadProcessedData(clientPointer: Long, data: ByteArray): Long
@@ -57,15 +62,11 @@ class AdBlockPlus(override val name: ClientName) : TrackerDetectionClient {
     private external fun matches(clientPointer: Long, url: String, documentUrl: String, filterOption: Int): Boolean
 
 
-    @SuppressWarnings("unused")
+    @Suppress("unused", "protectedInFinal")
     protected fun finalize() {
         releaseClient(nativeClientPointer, processedDataPointer)
     }
 
     private external fun releaseClient(clientPointer: Long, processedDataPointer: Long)
-
-    init {
-        nativeClientPointer = createClient()
-    }
 
 }

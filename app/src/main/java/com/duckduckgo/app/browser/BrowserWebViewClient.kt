@@ -49,20 +49,20 @@ class BrowserWebViewClient @Inject constructor(private val requestRewriter: Duck
     }
 
     @WorkerThread
-    override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
-        Timber.v("Intercepting resource ${request?.url}")
+    override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
+        Timber.v("Intercepting resource ${request.url}")
 
-        if (block(request, view?.safeUrl())) {
+        if (block(request, view.safeUrl())) {
             return WebResourceResponse(null, null, null)
         }
 
         return null
     }
 
-    private fun block(request: WebResourceRequest?, documentUrl: String?): Boolean {
+    private fun block(request: WebResourceRequest, documentUrl: String?): Boolean {
 
-        val url = request?.url?.toString()
-        if (url != null && documentUrl != null && trackerDetector.shouldBlock(url, documentUrl, ResourceType.from(request))) {
+        val url = request.url.toString()
+        if (documentUrl != null && trackerDetector.shouldBlock(url, documentUrl, ResourceType.from(request))) {
             Timber.v("WAS BLOCKED $url")
             return true
         }

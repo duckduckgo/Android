@@ -107,11 +107,11 @@ class BrowserViewModel(
                 .map { responseBody ->
                     val client = AdBlockPlus(name)
                     client.loadBasicData(responseBody.bytes())
+                    trackerDataProvider.saveData(name, client.getProcessedData())
                     return@map client
                 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ client ->
-                    trackerDataProvider.saveData(name, client.getProcessedData())
                     trackerDetector.addClient(client)
                 }, { error ->
                     Timber.e(error)

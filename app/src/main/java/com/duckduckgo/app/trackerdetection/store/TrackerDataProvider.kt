@@ -17,32 +17,31 @@
 package com.duckduckgo.app.trackerdetection.store
 
 import android.content.Context
-import com.duckduckgo.app.trackerdetection.TrackerDetectionClient
-import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName.EASYLIST
-import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName.EASYPRIVACY
+import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName
 import javax.inject.Inject
 
 class TrackerDataProvider @Inject constructor(private val context: Context) {
 
-    fun hasData(client: TrackerDetectionClient.ClientName): Boolean {
+    fun hasData(client: ClientName): Boolean {
         return context.fileExists(client.name)
     }
 
-    fun loadData(client: TrackerDetectionClient.ClientName): ByteArray {
+    fun loadData(client: ClientName): ByteArray {
         return context.openFileInput(client.name).use { it.readBytes() }
     }
 
-    fun saveData(client: TrackerDetectionClient.ClientName, byteArray: ByteArray) {
+    fun saveData(client: ClientName, byteArray: ByteArray) {
         context.openFileOutput(client.name, Context.MODE_PRIVATE).write(byteArray)
     }
 
-    fun clearData(client: TrackerDetectionClient.ClientName) {
+    fun clearData(client: ClientName) {
         context.deleteFile(client.name)
     }
 
     fun clearAll() {
-        context.deleteFile(EASYLIST.name)
-        context.deleteFile(EASYPRIVACY.name)
+        for (client: ClientName in ClientName.values()) {
+            context.deleteFile(client.name)
+        }
     }
 
     private fun Context.fileExists(filename: String): Boolean {
