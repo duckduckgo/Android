@@ -32,6 +32,10 @@ class DuckDuckGoApplication : HasActivityInjector, Application() {
     @Inject
     lateinit var injector: DispatchingAndroidInjector<Activity>
 
+    init {
+        System.loadLibrary("adblockplus-lib")
+    }
+
     override fun onCreate() {
         super.onCreate()
 

@@ -25,9 +25,6 @@ class AdBlockPlus(override val name: ClientName) : TrackerDetectionClient {
     private val nativeClientPointer: Long
     private var processedDataPointer: Long = 0
 
-    init {
-        System.loadLibrary("adblockplus-lib")
-    }
 
     private external fun createClient(): Long
 
