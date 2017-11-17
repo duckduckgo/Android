@@ -17,7 +17,9 @@
 package com.duckduckgo.app.di
 
 
+import android.app.Application
 import com.duckduckgo.app.global.DuckDuckGoApplication
+import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjector
 import dagger.android.support.AndroidSupportInjectionModule
@@ -27,9 +29,14 @@ import javax.inject.Singleton
 @Component(modules = arrayOf(
         ApplicationModule::class,
         ActivityBindingModule::class,
-        AndroidSupportInjectionModule::class))
+        AndroidSupportInjectionModule::class,
+        NetworkModule::class))
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 
     @Component.Builder
-    abstract class Builder : AndroidInjector.Builder<DuckDuckGoApplication>()
+    abstract class Builder : AndroidInjector.Builder<DuckDuckGoApplication>() {
+
+        @BindsInstance
+        abstract fun application(application: Application): AppComponent.Builder
+    }
 }

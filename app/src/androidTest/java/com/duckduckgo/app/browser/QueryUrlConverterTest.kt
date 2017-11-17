@@ -26,7 +26,6 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class QueryUrlConverterTest {
 
-
     val testee: QueryUrlConverter = QueryUrlConverter(DuckDuckGoRequestRewriter())
 
     @Test
@@ -233,7 +232,7 @@ class QueryUrlConverterTest {
 
     @Test
     fun whenGivenSimpleStringThenIsWebUrlIsFalse() {
-        assertFalse(testee.isWebUrl( "randomtext"))
+        assertFalse(testee.isWebUrl("randomtext"))
     }
 
     @Test
@@ -243,12 +242,12 @@ class QueryUrlConverterTest {
 
     @Test
     fun whenGivenStringWithDotSuffixThenIsWebUrlIsFalse() {
-        assertFalse(testee.isWebUrl( "randomtext."))
+        assertFalse(testee.isWebUrl("randomtext."))
     }
 
     @Test
     fun whenGivenNumberThenIsWebUrlIsFalse() {
-        assertFalse(testee.isWebUrl( "33"))
+        assertFalse(testee.isWebUrl("33"))
     }
 
     @Test
