@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.support.annotation.WorkerThread
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
@@ -47,6 +48,7 @@ class BrowserWebViewClient @Inject constructor(private val requestRewriter: Duck
         return false
     }
 
+    @WorkerThread
     override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
         Timber.v("Intercepting resource ${request?.url}")
 
@@ -69,6 +71,11 @@ class BrowserWebViewClient @Inject constructor(private val requestRewriter: Duck
         return false
     }
 
+
+    /**
+     * Access the webview url from another thread, jumps onto the main thread to achieve this
+     */
+    @WorkerThread
     private fun WebView.safeUrl(): String? {
         return Observable.just(webView)
                 .observeOn(AndroidSchedulers.mainThread())
