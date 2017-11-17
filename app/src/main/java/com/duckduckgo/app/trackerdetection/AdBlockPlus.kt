@@ -25,11 +25,11 @@ class AdBlockPlus(override val name: ClientName) : TrackerDetectionClient {
     private val nativeClientPointer: Long
     private var processedDataPointer: Long = 0
 
-    private external fun createClient(): Long
-
     init {
         nativeClientPointer = createClient()
     }
+
+    private external fun createClient(): Long
 
     fun loadBasicData(data: ByteArray) {
         val timestamp = System.currentTimeMillis()
