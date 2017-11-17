@@ -29,7 +29,8 @@ import javax.inject.Singleton
 @Component(modules = arrayOf(
         ApplicationModule::class,
         ActivityBindingModule::class,
-        AndroidSupportInjectionModule::class))
+        AndroidSupportInjectionModule::class,
+        NetworkModule::class))
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 
     @Component.Builder
@@ -38,6 +39,4 @@ interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
         @BindsInstance
         abstract fun application(application: Application): AppComponent.Builder
     }
-
-
 }

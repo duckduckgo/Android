@@ -1,0 +1,20 @@
+[Adblock Plus 1.1]
+! Version: 201711011335
+! Title: EasyPrivacy
+! Last modified: 01 Nov 2017 13:35 UTC
+! Expires: 4 days (update frequency)
+! Homepage: https://easylist.to/
+! Licence: https://easylist.to/pages/licence.html
+! 
+! Please report any unblocked tracking or problems
+! in the forums (https://forums.lanik.us/)
+! or via e-mail (easylist.subscription@gmail.com).
+! 
+! -----------------General tracking systems-----------------!
+! *** easylist:easyprivacy/easyprivacy_general.txt ***
+/TagCommander.cfc?
+/tagcommander/*
+||tagcommander.com^$third-party
+||tagcommander.laredoute.
+@@||tagcommander.com^*/tc_$script
+@@||cdscdn.com/Js/external/tagcommander/tc_nav.js$domain=cdiscount.com
