@@ -79,6 +79,7 @@
                     android:id="@+id/clearUrlButton"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:contentDescription="@string/clearButtonContentDescription"
                     android:background="?selectableItemBackground"
                     android:elevation="6dp"
                     android:src="@drawable/ic_cancel_24dp"
