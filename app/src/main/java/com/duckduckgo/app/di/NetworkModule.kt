@@ -28,7 +28,7 @@ import javax.inject.Singleton
 
 
 @Module
-class NetworkModule() {
+class NetworkModule {
 
     @Provides
     @Singleton

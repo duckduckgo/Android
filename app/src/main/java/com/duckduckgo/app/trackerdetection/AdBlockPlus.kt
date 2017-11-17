@@ -20,26 +20,13 @@ import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName
 import timber.log.Timber
 
 
-class AdBlockPlus : TrackerDetectionClient {
+class AdBlockPlus(override val name: ClientName) : TrackerDetectionClient {
 
-    companion object FilterOption {
-        val None = 0
-        val Script = 1
-        val Image = 2
-        val Stylesheet = 4
-    }
-
-    override val name: ClientName
     private val nativeClientPointer: Long
     private var processedDataPointer: Long = 0
 
     init {
         System.loadLibrary("adblockplus-lib")
-    }
-
-    constructor(name: ClientName) {
-        this.name = name
-        nativeClientPointer = createClient()
     }
 
     private external fun createClient(): Long
@@ -66,28 +53,22 @@ class AdBlockPlus : TrackerDetectionClient {
 
     private external fun getProcessedData(clientPointer: Long): ByteArray
 
-    override fun matches(url: String, documentUrl: String): Boolean {
-
-        var filterOption = FilterOption.None
-
-        if (url.endsWith(".js", true)) {
-            filterOption = FilterOption.Script
-        } else if (url.endsWith(".css", true)) {
-            filterOption = FilterOption.Stylesheet
-        } else if (url.endsWith(".png", true) || url.endsWith(".jpg", true) || url.endsWith(".jpeg", true) || url.endsWith(".gif", true)) {
-            filterOption = FilterOption.Image
-        }
-
-        return matches(nativeClientPointer, url, documentUrl, filterOption)
+    override fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean {
+        return matches(nativeClientPointer, url, documentUrl, resourceType.filterOption)
     }
 
     private external fun matches(clientPointer: Long, url: String, documentUrl: String, filterOption: Int): Boolean
 
 
+    @SuppressWarnings("unused")
     protected fun finalize() {
         releaseClient(nativeClientPointer, processedDataPointer)
     }
 
     private external fun releaseClient(clientPointer: Long, processedDataPointer: Long)
+
+    init {
+        nativeClientPointer = createClient()
+    }
 
 }

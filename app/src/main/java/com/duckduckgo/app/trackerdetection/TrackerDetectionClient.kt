@@ -25,6 +25,6 @@ interface TrackerDetectionClient {
 
     val name: ClientName
 
-    fun matches(url: String, documentUrl: String): Boolean
+    fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean
 
 }

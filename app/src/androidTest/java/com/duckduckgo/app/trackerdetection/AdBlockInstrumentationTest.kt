@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection;
+package com.duckduckgo.app.trackerdetection
 
 import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName.EASYLIST
 import org.junit.Assert.assertFalse
@@ -28,20 +28,21 @@ class AdBlockInstrumentationTest {
         private val documentUrl = "http://example.com"
         private val trackerUrl = "http://imasdk.googleapis.com/js/sdkloader/ima3.js"
         private val nonTrackerUrl = "http://duckduckgo.com/index.html"
+        private val resourceType = ResourceType.UNKNOWN
     }
 
     @Test
     fun whenBasicDataLoadedThenTrackerIsBlocked() {
         val testee = AdBlockPlus(EASYLIST)
         testee.loadBasicData(data())
-        assertTrue(testee.matches(trackerUrl, documentUrl))
+        assertTrue(testee.matches(trackerUrl, documentUrl, resourceType))
     }
 
     @Test
     fun whenBasicDataLoadedThenNonTrackerIsNotBlocked() {
         val testee = AdBlockPlus(EASYLIST)
         testee.loadBasicData(data())
-        assertFalse(testee.matches(nonTrackerUrl, documentUrl))
+        assertFalse(testee.matches(nonTrackerUrl, documentUrl, resourceType))
     }
 
     @Test
@@ -50,7 +51,7 @@ class AdBlockInstrumentationTest {
         original.loadBasicData(data())
         val testee = AdBlockPlus(EASYLIST)
         testee.loadProcessedData(original.getProcessedData())
-        assertTrue(testee.matches(trackerUrl, documentUrl))
+        assertTrue(testee.matches(trackerUrl, documentUrl, resourceType))
     }
 
     @Test
@@ -59,7 +60,7 @@ class AdBlockInstrumentationTest {
         original.loadBasicData(data())
         val testee = AdBlockPlus(EASYLIST)
         testee.loadProcessedData(original.getProcessedData())
-        assertFalse(testee.matches(nonTrackerUrl, documentUrl))
+        assertFalse(testee.matches(nonTrackerUrl, documentUrl, resourceType))
     }
 
     private fun data(): ByteArray {

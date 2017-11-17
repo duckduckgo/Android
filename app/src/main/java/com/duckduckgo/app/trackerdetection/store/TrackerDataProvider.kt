@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.store;
+package com.duckduckgo.app.trackerdetection.store
 
 import android.content.Context
 import com.duckduckgo.app.trackerdetection.TrackerDetectionClient
@@ -45,7 +45,7 @@ class TrackerDataProvider @Inject constructor(private val context: Context) {
         context.deleteFile(EASYPRIVACY.name)
     }
 
-    fun Context.fileExists(filename: String): Boolean {
+    private fun Context.fileExists(filename: String): Boolean {
         val file = getFileStreamPath(filename)
         return file != null && file.exists()
     }

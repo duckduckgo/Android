@@ -39,16 +39,16 @@ class BrowserViewModelTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @Mock
-    val observer: Observer<String> = mock()
+    private val observer: Observer<String> = mock()
 
     @Mock
-    val mockContext: Context = mock()
+    private val mockContext: Context = mock()
 
     @Mock
-    val mockTrackerService: TrackerListService = mock()
+    private val mockTrackerService: TrackerListService = mock()
 
 
-    val testOmnibarConverter: OmnibarEntryConverter = object : OmnibarEntryConverter {
+    private val testOmnibarConverter: OmnibarEntryConverter = object : OmnibarEntryConverter {
         override fun convertUri(input: String): String = "duckduckgo.com"
         override fun isWebUrl(inputQuery: String): Boolean = true
         override fun convertQueryToUri(inputQuery: String): Uri = Uri.parse("duckduckgo.com")

@@ -16,12 +16,13 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.whenever
 import mock
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
-import org.mockito.Mockito.`when`
 
 
 class TrackerDetectorTest {
@@ -31,43 +32,44 @@ class TrackerDetectorTest {
     companion object {
         private val documentUrl = "http://example.com/index.com"
         private val resourceUrl = "http://somedomain.com/update.js"
+        private val resourceType = ResourceType.UNKNOWN
     }
 
     @Test
     fun whenThereAreNoClientsThenShouldBlockIsFalse() {
-        assertFalse(trackerDetector.shouldBlock(resourceUrl, documentUrl))
+        assertFalse(trackerDetector.shouldBlock(resourceUrl, documentUrl, resourceType))
     }
 
     @Test
     fun whenAllClientsFailToMatchThenSouldBlockIsFalse() {
         trackerDetector.addClient(neverMatchingClient())
         trackerDetector.addClient(neverMatchingClient())
-        assertFalse(trackerDetector.shouldBlock(resourceUrl, documentUrl))
+        assertFalse(trackerDetector.shouldBlock(resourceUrl, documentUrl, resourceType))
     }
 
     @Test
     fun whenAllClientsMatchThenShouldBlockIsTrue() {
         trackerDetector.addClient(alwaysMatchingClient())
         trackerDetector.addClient(alwaysMatchingClient())
-        assertTrue(trackerDetector.shouldBlock(resourceUrl, documentUrl))
+        assertTrue(trackerDetector.shouldBlock(resourceUrl, documentUrl, resourceType))
     }
 
     @Test
     fun whenSomeClientsMatchThenShouldBlockIsTrue() {
         trackerDetector.addClient(neverMatchingClient())
         trackerDetector.addClient(alwaysMatchingClient())
-        assertTrue(trackerDetector.shouldBlock(resourceUrl, documentUrl))
+        assertTrue(trackerDetector.shouldBlock(resourceUrl, documentUrl, resourceType))
     }
 
-    fun alwaysMatchingClient(): TrackerDetectionClient {
+    private fun alwaysMatchingClient(): TrackerDetectionClient {
         val client: TrackerDetectionClient = mock()
-        `when`(client.matches(anyString(), anyString())).thenReturn(true)
+        whenever(client.matches(anyString(), anyString(), any())).thenReturn(true)
         return client
     }
 
-    fun neverMatchingClient(): TrackerDetectionClient {
+    private fun neverMatchingClient(): TrackerDetectionClient {
         val client: TrackerDetectionClient = mock()
-        `when`(client.matches(anyString(), anyString())).thenReturn(false)
+        whenever(client.matches(anyString(), anyString(), any())).thenReturn(false)
         return client
     }
 

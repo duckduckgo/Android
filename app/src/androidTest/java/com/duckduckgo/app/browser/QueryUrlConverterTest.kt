@@ -26,7 +26,6 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class QueryUrlConverterTest {
 
-
     val testee: QueryUrlConverter = QueryUrlConverter(DuckDuckGoRequestRewriter())
 
     @Test

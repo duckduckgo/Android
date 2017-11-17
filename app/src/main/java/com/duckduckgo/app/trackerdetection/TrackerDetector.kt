@@ -29,17 +29,16 @@ class TrackerDetector @Inject constructor() {
         clients.add(client)
     }
 
-    fun shouldBlock(url: String, documentUrl: String): Boolean {
+    fun hasClient(name: ClientName): Boolean {
+        return clients.filter { it.name == name }.isNotEmpty()
+    }
+
+    fun shouldBlock(url: String, documentUrl: String, resourceType: ResourceType): Boolean {
         for (client: TrackerDetectionClient in clients) {
-            if (client.matches(url, documentUrl)) {
+            if (client.matches(url, documentUrl, resourceType)) {
                 return true
             }
         }
         return false
     }
-
-    fun hasClient(name: ClientName): Boolean {
-        return clients.filter { it.name == name }.isNotEmpty()
-    }
-
 }

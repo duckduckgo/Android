@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.api;
+package com.duckduckgo.app.trackerdetection.api
 
 import io.reactivex.Observable
 import okhttp3.ResponseBody

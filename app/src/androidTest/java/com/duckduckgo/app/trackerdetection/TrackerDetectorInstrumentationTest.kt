@@ -17,7 +17,6 @@
 package com.duckduckgo.app.trackerdetection
 
 
-import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
 import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName.EASYLIST
 import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName.EASYPRIVACY
@@ -33,14 +32,15 @@ class TrackerDetectorInstrumentationTest {
 
     companion object {
         private val documentUrl = "http://example.com"
+        private val resourceType = ResourceType.UNKNOWN
     }
 
     private lateinit var testee: TrackerDetector
 
     @Before
     fun before() {
-        var easylistAdblock = adblockClient(EASYLIST, "easylist_sample")
-        var easyprivacyAdblock = adblockClient(EASYPRIVACY, "easyprivacy_sample")
+        val easylistAdblock = adblockClient(EASYLIST, "easylist_sample")
+        val easyprivacyAdblock = adblockClient(EASYPRIVACY, "easyprivacy_sample")
         testee = TrackerDetector()
         testee.addClient(easyprivacyAdblock)
         testee.addClient(easylistAdblock)
@@ -49,26 +49,26 @@ class TrackerDetectorInstrumentationTest {
     @Test
     fun whenUrlIsInEasyListThenShouldBlockIsTrue() {
         val url = "http://imasdk.googleapis.com/js/sdkloader/ima3.js"
-        assertTrue(testee.shouldBlock(url, documentUrl))
+        assertTrue(testee.shouldBlock(url, documentUrl, resourceType))
     }
 
     @Test
     fun whenUrlIsInEasyPrivacyListThenShouldBlockIsTrue() {
         val url = "http://cdn.tagcommander.com/1705/tc_catalog.css"
-        assertTrue(testee.shouldBlock(url, documentUrl))
+        assertTrue(testee.shouldBlock(url, documentUrl, resourceType))
     }
 
     @Test
     fun whenUrlIsNotInAnyTrackerListsThenShouldBlockIsFalse() {
         val url = "https://duckduckgo.com/index.html"
-        assertFalse(testee.shouldBlock(url, documentUrl))
+        assertFalse(testee.shouldBlock(url, documentUrl, resourceType))
     }
 
     private fun adblockClient(name: TrackerDetectionClient.ClientName, dataFile: String): TrackerDetectionClient {
         val data = javaClass.classLoader.getResource(dataFile).readBytes()
-        var initialAdBlock = AdBlockPlus(name)
+        val initialAdBlock = AdBlockPlus(name)
         initialAdBlock.loadBasicData(data)
-        var adblockWithProcessedData = AdBlockPlus(name)
+        val adblockWithProcessedData = AdBlockPlus(name)
         adblockWithProcessedData.loadProcessedData(initialAdBlock.getProcessedData())
         return adblockWithProcessedData
     }
