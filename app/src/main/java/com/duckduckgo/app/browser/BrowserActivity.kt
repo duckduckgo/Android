@@ -75,11 +75,6 @@ class BrowserActivity : DuckDuckGoActivity() {
         })
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.onResume()
-    }
-
     override fun onSaveInstanceState(bundle: Bundle?) {
         super.onSaveInstanceState(bundle)
         webView.saveState(bundle)

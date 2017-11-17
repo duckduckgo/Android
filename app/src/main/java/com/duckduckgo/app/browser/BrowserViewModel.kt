@@ -41,6 +41,10 @@ class BrowserViewModel(
 
     val query: MutableLiveData<String> = MutableLiveData()
 
+    init {
+        loadTrackerClients()
+    }
+
     fun onQueryEntered(input: String) {
 
         if (input.isBlank()) {
@@ -76,10 +80,6 @@ class BrowserViewModel(
             }
             throw IllegalArgumentException("Unknown view model")
         }
-    }
-
-    fun onResume() {
-        loadTrackerClients()
     }
 
     private fun loadTrackerClients() {
