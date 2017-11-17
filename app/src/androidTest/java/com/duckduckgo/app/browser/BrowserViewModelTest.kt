@@ -21,9 +21,13 @@ import android.arch.lifecycle.Observer
 import android.content.Context
 import android.net.Uri
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.trackerdetection.TrackerDetectionClient
+import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
 import com.duckduckgo.app.trackerdetection.store.TrackerDataProvider
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.whenever
 import mock
 import org.junit.Before
 import org.junit.Rule
@@ -58,7 +62,7 @@ class BrowserViewModelTest {
 
     @Before
     fun before() {
-        testee = BrowserViewModel(testOmnibarConverter, TrackerDataProvider(mockContext), TrackerDetector(), mockTrackerService)
+        testee = BrowserViewModel(testOmnibarConverter, TrackerDataProvider(mockContext), testTrackerDetector(), mockTrackerService)
     }
 
     @Test
@@ -80,5 +84,19 @@ class BrowserViewModelTest {
         testee.query.observeForever(observer)
         testee.onQueryEntered("foo")
         verify(observer).onChanged(ArgumentMatchers.anyString())
+    }
+
+    private fun testTrackerDetector(): TrackerDetector {
+        val trackerDetector = TrackerDetector()
+        trackerDetector.addClient(clientMock(ClientName.EASYLIST))
+        trackerDetector.addClient(clientMock(ClientName.EASYPRIVACY))
+        return trackerDetector
+    }
+
+    private fun clientMock(name: ClientName): TrackerDetectionClient {
+        val client: TrackerDetectionClient = mock()
+        whenever(client.name).thenReturn(name)
+        whenever(client.matches(ArgumentMatchers.anyString(), ArgumentMatchers.anyString(), any())).thenReturn(false)
+        return client
     }
 }
