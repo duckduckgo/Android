@@ -29,12 +29,9 @@ class BrowserViewModel(private val queryUrlConverter: OmnibarEntryConverter) :
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val query: SingleLiveEvent<String> = SingleLiveEvent()
 
-    data class ViewState(
-            val loadingData: Boolean = false,
-            val progress: Int = 0,
-            val url: String? = null,
-            val isEditing: Boolean = false
-    )
+    init {
+        viewState.value = ViewState()
+    }
 
     fun registerWebViewListener(browserWebViewClient: BrowserWebViewClient, browserChromeClient: BrowserChromeClient) {
         browserWebViewClient.webViewClientListener = this
@@ -62,7 +59,7 @@ class BrowserViewModel(private val queryUrlConverter: OmnibarEntryConverter) :
 
     override fun loadingStateChange(isLoading: Boolean) {
         Timber.v("Loading state changed. isLoading=$isLoading")
-        viewState.value = currentViewState().copy(loadingData = isLoading)
+        viewState.value = currentViewState().copy(isLoading = isLoading)
     }
 
     override fun urlChanged(url: String?) {
@@ -70,13 +67,18 @@ class BrowserViewModel(private val queryUrlConverter: OmnibarEntryConverter) :
         viewState.value = currentViewState().copy(url = url)
     }
 
-    private fun currentViewState(): ViewState {
-        return viewState.value ?: return ViewState()
-    }
+    private fun currentViewState(): ViewState = viewState.value!!
 
     fun urlFocusChanged(hasFocus: Boolean) {
         viewState.value = currentViewState().copy(isEditing = hasFocus)
     }
+
+    data class ViewState(
+            val isLoading: Boolean = false,
+            val progress: Int = 0,
+            val url: String? = null,
+            val isEditing: Boolean = false
+    )
 }
 
 

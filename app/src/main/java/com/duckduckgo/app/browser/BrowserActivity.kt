@@ -63,7 +63,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun render(it: BrowserViewModel.ViewState) {
-        when (it.loadingData) {
+        when (it.isLoading) {
             true -> pageLoadingIndicator.show()
             false -> {
                 pageLoadingIndicator.hide()
@@ -112,6 +112,9 @@ class BrowserActivity : DuckDuckGoActivity() {
         webView.webViewClient = webViewClient
         webView.webChromeClient = webChromeClient
         webView.settings.javaScriptEnabled = true
+        webView.settings.builtInZoomControls = true
+        webView.settings.setSupportZoom(true)
+        webView.settings.useWideViewPort = true
         webView.setOnTouchListener({ _, _ ->
             focusDummy.requestFocus(); false
         })
@@ -127,12 +130,12 @@ class BrowserActivity : DuckDuckGoActivity() {
         })
     }
 
-    override fun onSaveInstanceState(bundle: Bundle?) {
-        super.onSaveInstanceState(bundle)
+    override fun onSaveInstanceState(bundle: Bundle) {
         webView.saveState(bundle)
+        super.onSaveInstanceState(bundle)
     }
 
-    override fun onRestoreInstanceState(bundle: Bundle?) {
+    override fun onRestoreInstanceState(bundle: Bundle) {
         super.onRestoreInstanceState(bundle)
         webView.restoreState(bundle)
     }
