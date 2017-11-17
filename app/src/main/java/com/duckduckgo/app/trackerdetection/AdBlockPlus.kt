@@ -20,13 +20,20 @@ import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName
 import timber.log.Timber
 
 
-class AdBlockPlus(override val name: ClientName) : TrackerDetectionClient {
+class AdBlockPlus : TrackerDetectionClient {
 
+    override val name: ClientName
     private val nativeClientPointer: Long
-    private var processedDataPointer: Long = 0
+    private var processedDataPointer: Long
 
     init {
+        System.loadLibrary("adblockplus-lib")
+    }
+
+    constructor(name: ClientName) {
+        this.name = name
         nativeClientPointer = createClient()
+        processedDataPointer = 0
     }
 
     private external fun createClient(): Long
