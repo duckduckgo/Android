@@ -56,7 +56,6 @@ class BrowserActivity : DuckDuckGoActivity() {
             it?.let { webView.loadUrl(it) }
         })
 
-        configureSwipeToRefresh()
         configureToolbar()
         configureWebView()
         configureUrlInput()
@@ -67,7 +66,6 @@ class BrowserActivity : DuckDuckGoActivity() {
             true -> pageLoadingIndicator.show()
             false -> {
                 pageLoadingIndicator.hide()
-                swipeToRefreshContainer.isRefreshing = false
             }
         }
 
@@ -80,12 +78,6 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         pageLoadingIndicator.progress = viewState.progress
         if (viewState.isEditing) clearUrlButton.show() else clearUrlButton.hide()
-    }
-
-    private fun configureSwipeToRefresh() {
-        swipeToRefreshContainer.setOnRefreshListener {
-            webView.reload()
-        }
     }
 
     private fun configureToolbar() {
