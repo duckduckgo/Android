@@ -38,7 +38,7 @@ enum class ResourceType(val filterOption: Int) {
             var headerResult: ResourceType? = null
             var urlResult: ResourceType? = null
 
-            val acceptHeader = webResourceRequest.requestHeaders["Accept"]
+            val acceptHeader = webResourceRequest.requestHeaders?.get("Accept")
             if (acceptHeader != null) {
                headerResult = from(acceptHeader)
             }
