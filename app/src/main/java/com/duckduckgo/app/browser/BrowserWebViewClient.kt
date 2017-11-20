@@ -88,7 +88,7 @@ class BrowserWebViewClient @Inject constructor(private val requestRewriter: Duck
     /**
      * Access the webview url from another thread, jumps onto the main thread to achieve this
      */
-    @WorkerThread
+    @AnyThread
     private fun WebView.safeUrl(): String? {
         return Observable.just(webView)
                 .observeOn(AndroidSchedulers.mainThread())
