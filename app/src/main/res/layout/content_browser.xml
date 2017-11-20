@@ -29,18 +29,13 @@
     app:layout_constraintTop_toBottomOf="@id/urlInput"
     tools:context="com.duckduckgo.app.browser.BrowserActivity">
 
-    <android.support.v4.widget.NestedScrollView
-        android:id="@+id/scrollView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <WebView
+        <com.duckduckgo.app.browser.NestedWebView
             android:id="@+id/webView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             />
-
-    </android.support.v4.widget.NestedScrollView>
 
 </android.support.v4.widget.SwipeRefreshLayout>
