@@ -111,10 +111,15 @@ class BrowserActivity : DuckDuckGoActivity() {
     private fun configureWebView() {
         webView.webViewClient = webViewClient
         webView.webChromeClient = webChromeClient
-        webView.settings.javaScriptEnabled = true
-        webView.settings.builtInZoomControls = true
-        webView.settings.setSupportZoom(true)
-        webView.settings.useWideViewPort = true
+
+        webView.settings.apply {
+            javaScriptEnabled = true
+            useWideViewPort = true
+            builtInZoomControls = true
+            displayZoomControls = false
+            setSupportZoom(true)
+        }
+
         webView.setOnTouchListener { _, _ ->
             focusDummy.requestFocus()
             false
