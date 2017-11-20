@@ -16,8 +16,9 @@
 
 package com.duckduckgo.app.browser
 
-import android.support.annotation.WorkerThread
 import android.graphics.Bitmap
+import android.support.annotation.AnyThread
+import android.support.annotation.WorkerThread
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
