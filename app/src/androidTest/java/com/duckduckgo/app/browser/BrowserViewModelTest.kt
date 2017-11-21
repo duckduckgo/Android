@@ -99,7 +99,7 @@ class BrowserViewModelTest {
     @Test
     fun whenViewModelNotifiedThatWebViewIsLoadingThenViewStateIsUpdated() {
         testee.loadingStateChange(true)
-        assertFalse(testee.viewState.value!!.isLoading)
+        assertTrue(testee.viewState.value!!.isLoading)
     }
 
     @Test
