@@ -49,8 +49,9 @@ class AdBlockInstrumentationTest {
     fun whenProcessedDataLoadedThenTrackerIsBlocked() {
         val original = AdBlockPlus(EASYLIST)
         original.loadBasicData(data())
+        val processedData = original.getProcessedData()
         val testee = AdBlockPlus(EASYLIST)
-        testee.loadProcessedData(original.getProcessedData())
+        testee.loadProcessedData(processedData)
         assertTrue(testee.matches(trackerUrl, documentUrl, resourceType))
     }
 
@@ -58,8 +59,9 @@ class AdBlockInstrumentationTest {
     fun whenProcessedDataLoadedThenNonTrackerIsNotBlocked() {
         val original = AdBlockPlus(EASYLIST)
         original.loadBasicData(data())
+        val processedData = original.getProcessedData()
         val testee = AdBlockPlus(EASYLIST)
-        testee.loadProcessedData(original.getProcessedData())
+        testee.loadProcessedData(processedData)
         assertFalse(testee.matches(nonTrackerUrl, documentUrl, resourceType))
     }
 
