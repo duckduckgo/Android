@@ -18,15 +18,28 @@ package com.duckduckgo.app.global
 
 import android.app.Activity
 import android.app.Application
+import android.content.Context
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.DaggerAppComponent
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
+import org.acra.ACRA
+import org.acra.ReportField
+import org.acra.ReportingInteractionMode
+import org.acra.annotation.ReportsCrashes
 import timber.log.Timber
 import javax.inject.Inject
 
-
+@ReportsCrashes(
+        formUri = "https://duckduckgo.com/crash.js",
+        mode = ReportingInteractionMode.DIALOG,
+        customReportContent = arrayOf(ReportField.APP_VERSION_CODE, ReportField.APP_VERSION_NAME, ReportField.ANDROID_VERSION, ReportField.STACK_TRACE, ReportField.AVAILABLE_MEM_SIZE, ReportField.USER_COMMENT, ReportField.LOGCAT, ReportField.PRODUCT, ReportField.PHONE_MODEL),
+        resToastText = R.string.crash_toast_text,
+        resDialogText = R.string.crash_dialog_text,
+        resDialogCommentPrompt = R.string.crash_dialog_comment_prompt,
+        resDialogOkToast = R.string.crash_dialog_ok_toast)
 class DuckDuckGoApplication : HasActivityInjector, Application() {
 
     @Inject
@@ -45,4 +58,11 @@ class DuckDuckGoApplication : HasActivityInjector, Application() {
 
     override fun activityInjector(): AndroidInjector<Activity> = injector
 
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+
+        if(!BuildConfig.DEBUG) {
+            ACRA.init(this)
+        }
+    }
 }
