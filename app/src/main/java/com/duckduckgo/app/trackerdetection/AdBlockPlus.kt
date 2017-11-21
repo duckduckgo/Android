@@ -24,6 +24,7 @@ class AdBlockPlus : TrackerDetectionClient {
 
     override val name: ClientName
     private val nativeClientPointer: Long
+    private var rawDataPointer: Long
     private var processedDataPointer: Long
 
     init {
@@ -33,6 +34,7 @@ class AdBlockPlus : TrackerDetectionClient {
     constructor(name: ClientName) {
         this.name = name
         nativeClientPointer = createClient()
+        rawDataPointer = 0
         processedDataPointer = 0
     }
 
@@ -41,11 +43,11 @@ class AdBlockPlus : TrackerDetectionClient {
     fun loadBasicData(data: ByteArray) {
         val timestamp = System.currentTimeMillis()
         Timber.d("Loading basic data")
-        loadBasicData(nativeClientPointer, data)
+        rawDataPointer = loadBasicData(nativeClientPointer, data)
         Timber.d("Loading completed in ${System.currentTimeMillis() - timestamp}ms")
     }
 
-    private external fun loadBasicData(clientPointer: Long, data: ByteArray)
+    private external fun loadBasicData(clientPointer: Long, data: ByteArray): Long
 
     fun loadProcessedData(data: ByteArray) {
         val timestamp = System.currentTimeMillis()
@@ -71,9 +73,9 @@ class AdBlockPlus : TrackerDetectionClient {
 
     @Suppress("unused", "protectedInFinal")
     protected fun finalize() {
-        releaseClient(nativeClientPointer, processedDataPointer)
+        releaseClient(nativeClientPointer, rawDataPointer, processedDataPointer)
     }
 
-    private external fun releaseClient(clientPointer: Long, processedDataPointer: Long)
+    private external fun releaseClient(clientPointer: Long, rawDataPointer: Long, processedDataPointer: Long)
 
 }
