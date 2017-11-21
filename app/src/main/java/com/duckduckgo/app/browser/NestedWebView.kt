@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.content.Context
+import android.support.v4.view.NestedScrollingChild
 import android.support.v4.view.NestedScrollingChildHelper
 import android.support.v4.view.ViewCompat
 import android.util.AttributeSet
@@ -28,20 +29,18 @@ import android.webkit.WebView
  *
  * Based on https://github.com/takahirom/webview-in-coordinatorlayout
  */
-class NestedWebView : WebView {
-
-    constructor(context: Context) : this(context, null)
-    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+class NestedWebView : WebView, NestedScrollingChild {
 
     private var lastY: Int = 0
     private val scrollOffset = IntArray(2)
     private val scrollConsumed = IntArray(2)
-    private var nestedOffsetY: Int = 0
+    private var nestedOffetY: Int = 0
+    private var nestedScrollHelper: NestedScrollingChildHelper = NestedScrollingChildHelper(this)
 
-    private val mChildHelper: NestedScrollingChildHelper = NestedScrollingChildHelper(this)
-
-    init {
+    constructor(context: Context) : this(context, null)
+    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+        nestedScrollHelper = NestedScrollingChildHelper(this)
         isNestedScrollingEnabled = true
     }
 
@@ -49,71 +48,72 @@ class NestedWebView : WebView {
         var returnValue = false
 
         val event = MotionEvent.obtain(ev)
-        val action = ev.action
+        val action = event.actionMasked
         if (action == MotionEvent.ACTION_DOWN) {
-            nestedOffsetY = 0
+            nestedOffetY = 0
         }
         val eventY = event.y.toInt()
-        event.offsetLocation(0f, nestedOffsetY.toFloat())
+        event.offsetLocation(0f, nestedOffetY.toFloat())
+
         when (action) {
             MotionEvent.ACTION_MOVE -> {
                 var deltaY = lastY - eventY
-                // NestedPreScroll
+
                 if (dispatchNestedPreScroll(0, deltaY, scrollConsumed, scrollOffset)) {
                     deltaY -= scrollConsumed[1]
                     lastY = eventY - scrollOffset[1]
                     event.offsetLocation(0f, (-scrollOffset[1]).toFloat())
-                    nestedOffsetY += scrollOffset[1]
+                    nestedOffetY += scrollOffset[1]
                 }
+
                 returnValue = super.onTouchEvent(event)
 
-                // NestedScroll
                 if (dispatchNestedScroll(0, scrollOffset[1], 0, deltaY, scrollOffset)) {
                     event.offsetLocation(0f, scrollOffset[1].toFloat())
-                    nestedOffsetY += scrollOffset[1]
+                    nestedOffetY += scrollOffset[1]
                     lastY -= scrollOffset[1]
                 }
             }
+
             MotionEvent.ACTION_DOWN -> {
                 returnValue = super.onTouchEvent(event)
                 lastY = eventY
-                // start NestedScroll
+
                 startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL)
             }
+
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 returnValue = super.onTouchEvent(event)
-                // end NestedScroll
                 stopNestedScroll()
             }
         }
+
         return returnValue
     }
 
     override fun setNestedScrollingEnabled(enabled: Boolean) {
-        mChildHelper.isNestedScrollingEnabled = enabled
+        nestedScrollHelper.isNestedScrollingEnabled = enabled
     }
-
-    override fun isNestedScrollingEnabled(): Boolean = mChildHelper.isNestedScrollingEnabled
-
-    override fun startNestedScroll(axes: Int): Boolean = mChildHelper.startNestedScroll(axes)
 
     override fun stopNestedScroll() {
-        mChildHelper.stopNestedScroll()
+        nestedScrollHelper.stopNestedScroll()
     }
 
-    override fun hasNestedScrollingParent(): Boolean = mChildHelper.hasNestedScrollingParent()
+    override fun isNestedScrollingEnabled(): Boolean = nestedScrollHelper.isNestedScrollingEnabled
 
-    override fun dispatchNestedScroll(dxConsumed: Int, dyConsumed: Int, dxUnconsumed: Int, dyUnconsumed: Int,
-                                      offsetInWindow: IntArray?): Boolean =
-            mChildHelper.dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, offsetInWindow)
+    override fun startNestedScroll(axes: Int): Boolean = nestedScrollHelper.startNestedScroll(axes)
+
+    override fun hasNestedScrollingParent(): Boolean = nestedScrollHelper.hasNestedScrollingParent()
+
+    override fun dispatchNestedScroll(dxConsumed: Int, dyConsumed: Int, dxUnconsumed: Int, dyUnconsumed: Int, offsetInWindow: IntArray?): Boolean =
+            nestedScrollHelper.dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, offsetInWindow)
 
     override fun dispatchNestedPreScroll(dx: Int, dy: Int, consumed: IntArray?, offsetInWindow: IntArray?): Boolean =
-            mChildHelper.dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow)
+            nestedScrollHelper.dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow)
 
     override fun dispatchNestedFling(velocityX: Float, velocityY: Float, consumed: Boolean): Boolean =
-            mChildHelper.dispatchNestedFling(velocityX, velocityY, consumed)
+            nestedScrollHelper.dispatchNestedFling(velocityX, velocityY, consumed)
 
     override fun dispatchNestedPreFling(velocityX: Float, velocityY: Float): Boolean =
-            mChildHelper.dispatchNestedPreFling(velocityX, velocityY)
-
+            nestedScrollHelper.dispatchNestedPreFling(velocityX, velocityY)
 }
