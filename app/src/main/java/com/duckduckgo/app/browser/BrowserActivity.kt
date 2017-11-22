@@ -149,7 +149,7 @@ class BrowserActivity : DuckDuckGoActivity() {
                 webView.reload()
                 return true
             }
-            R.id.back_menu_item -> {
+            R.id.menu_item_burn -> {
                 webView.goBack()
                 return true
             }

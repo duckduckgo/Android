@@ -19,12 +19,8 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/menu_item_burn"
-        android:title="@string/back"/>
-    <item
-        android:id="@+id/forward_menu_item"
-        android:title="@string/forward"/>
-    <item
-        android:id="@+id/refresh_menu_item"
-        app:showAsAction="never"
-        android:title="@string/refresh"/>
+        android:title="@string/burn"
+        android:icon="@drawable/fire"
+        app:showAsAction="always"
+        />
 </menu>

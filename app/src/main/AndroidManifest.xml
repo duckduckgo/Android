@@ -16,14 +16,27 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".BrowserActivity"
-            android:screenOrientation="fullSensor"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name="com.duckduckgo.app.home.HomeActivity"
+            android:label="@string/title_activity_home"
+            android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
+        <activity
+            android:name="com.duckduckgo.app.home.HomeSearchActivity"
+            android:parentActivityName="com.duckduckgo.app.home.HomeActivity"
+            android:windowSoftInputMode="stateAlwaysVisible"
+            android:label="@string/title_activity_home_search"
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
 
