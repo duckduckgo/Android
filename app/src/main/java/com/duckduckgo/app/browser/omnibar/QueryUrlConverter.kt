@@ -66,7 +66,7 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: DuckDuc
     override fun convertUri(input: String): String {
         var uri = Uri.parse(input)
 
-        if(uri.scheme == null) {
+        if (uri.scheme == null) {
             uri = Uri.parse("$http://$input")
         }
 

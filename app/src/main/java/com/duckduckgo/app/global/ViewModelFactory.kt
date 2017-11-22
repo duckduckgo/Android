@@ -42,4 +42,4 @@ class ViewModelFactory @Inject constructor(
                         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
             } as T
-    }
+}
