@@ -6,7 +6,7 @@ apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
 
 ext {
-    VERSION_NAME = "0.1.0"
+    VERSION_NAME = "0.2.0"
 }
 
 android {
@@ -19,6 +19,7 @@ android {
         versionCode buildVersionCode()
         versionName VERSION_NAME
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        archivesBaseName = "duckduckgo-$versionName"
     }
     signingConfigs {
         release
