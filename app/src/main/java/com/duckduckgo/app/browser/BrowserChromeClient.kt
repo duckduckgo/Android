@@ -21,7 +21,7 @@ import android.webkit.WebView
 import javax.inject.Inject
 
 
-class BrowserChromeClient @Inject constructor(): WebChromeClient() {
+class BrowserChromeClient @Inject constructor() : WebChromeClient() {
 
     var webViewClientListener: WebViewClientListener? = null
 

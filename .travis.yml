@@ -42,3 +42,10 @@ before_script:
   - adb shell input keyevent 82
 
 script: ./gradlew build connectedCheck
+
+notifications:
+  slack:
+    on_success: never
+    on_failure: change
+    rooms:
+    - secure: wGlok1fuT5CdmQFt2C9oyym18YfLZ7Xc3DRVnYd+uMCZ6gSPZzkpNVWEw0UmNT299OZXG7QOryTnkG958OGGaYWu4LU5GSpBPyzCWdUXPngXB9sHhXdEt74mUNGVA5HcOUlK3cv50TVhnMzzZqSXGh3xrFZHTD0KI9u9Nu5by00Io/33qffzN2B0HSCJ7Rhot+x1HTZA31CvCZ1mDSo4WgngCpDlpyKISf66h8TXwgBDBQK89pMtt9+NQghKiveduHBTR0Lmw8a+yRq0gnuOX7br44awHR4ZWnRsveJJPwNJykBkMAXH1BRgJCqcjPls3qM4rgKApAwUAnii73+9qqQdzv/0PNBWUavQe1/WJIrH77S4239dbsOTHKRTIWEK57SRJ5IZOVZFXG8efLKUQbBXYq4O9OqecrOFwmRoPyBNUKK777R4iex7yO5ezk8IOG2KCdkqc0IV/GI64U4b7DgSu2c8cXtdr8HyZLwP1OEcP2kUsB9CdkLFxTBBoVOT8aDsyqyPte8mHKsE/3qm+06tKh9f31NXITRyOVF5eKmPoJGW/KPteY4+nI0nohI38Q6VRDywN4sRt24IRgrU0C0QFDtjp7GSTN8QULK0gq3oVIqW8NAK9fCIuoYBTiFzJE6PENlxG7wPsL7Ng2mFFsgTVCy5ghOkI9ju7G2rcb4=

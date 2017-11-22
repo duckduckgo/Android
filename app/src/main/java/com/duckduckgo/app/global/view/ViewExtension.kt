@@ -22,7 +22,6 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 
 
-
 /*
  * Common view operations, simplified as Kotlin extensions
  * Based on https://github.com/ravidsrk/kotlinextensions.com
@@ -31,7 +30,7 @@ import android.view.inputmethod.InputMethodManager
 /**
  * Show the view  (visibility = View.VISIBLE)
  */
-fun View.show() : View {
+fun View.show(): View {
     if (visibility != View.VISIBLE) {
         visibility = View.VISIBLE
     }
@@ -41,7 +40,7 @@ fun View.show() : View {
 /**
  * Hide the view. (visibility = View.INVISIBLE)
  */
-fun View.hide() : View {
+fun View.hide(): View {
     if (visibility != View.INVISIBLE) {
         visibility = View.INVISIBLE
     }
@@ -51,7 +50,7 @@ fun View.hide() : View {
 /**
  * Remove the view (visibility = View.GONE)
  */
-fun View.remove() : View {
+fun View.remove(): View {
     if (visibility != View.GONE) {
         visibility = View.GONE
     }
@@ -66,6 +65,7 @@ fun View.showKeyboard() {
     this.requestFocus()
     imm.showSoftInput(this, 0)
 }
+
 /**
  * Try to hide the keyboard and returns whether it worked
  * https://stackoverflow.com/questions/1109022/close-hide-the-android-soft-keyboard
@@ -74,9 +74,10 @@ fun View.hideKeyboard(): Boolean {
     try {
         val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         return inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
-    } catch (ignored: RuntimeException) { }
+    } catch (ignored: RuntimeException) {
+    }
     return false
 }
 
-fun Int.toDp() : Int = (this / Resources.getSystem().displayMetrics.density).toInt()
-fun Int.toPx() : Int = (this * Resources.getSystem().displayMetrics.density).toInt()
+fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density).toInt()
+fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
