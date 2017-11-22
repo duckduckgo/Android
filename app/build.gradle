@@ -75,7 +75,7 @@ dependencies {
     implementation "android.arch.lifecycle:reactivestreams:$architectureComponents"
     implementation "com.google.dagger:dagger-android:$dagger"
     implementation "com.google.dagger:dagger-android-support:$dagger"
-    implementation 'com.faendir:acra:4.10.0'
+    releaseImplementation 'com.faendir:acra:4.10.0'
 
     kapt "com.google.dagger:dagger-android-processor:$dagger"
     kapt "com.google.dagger:dagger-compiler:$dagger"
