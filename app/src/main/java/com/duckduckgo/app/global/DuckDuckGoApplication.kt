@@ -40,7 +40,7 @@ class DuckDuckGoApplication : HasActivityInjector, Application() {
                 .create(this)
                 .inject(this)
 
-        if(BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
+        if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
     }
 
     override fun activityInjector(): AndroidInjector<Activity> = injector

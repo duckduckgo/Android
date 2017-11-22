@@ -56,7 +56,6 @@ class BrowserActivity : DuckDuckGoActivity() {
             it?.let { webView.loadUrl(it) }
         })
 
-        configureSwipeToRefresh()
         configureToolbar()
         configureWebView()
         configureUrlInput()
@@ -67,7 +66,6 @@ class BrowserActivity : DuckDuckGoActivity() {
             true -> pageLoadingIndicator.show()
             false -> {
                 pageLoadingIndicator.hide()
-                swipeToRefreshContainer.isRefreshing = false
             }
         }
 
@@ -80,12 +78,6 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         pageLoadingIndicator.progress = viewState.progress
         if (viewState.isEditing) clearUrlButton.show() else clearUrlButton.hide()
-    }
-
-    private fun configureSwipeToRefresh() {
-        swipeToRefreshContainer.setOnRefreshListener {
-            webView.reload()
-        }
     }
 
     private fun configureToolbar() {
@@ -111,10 +103,15 @@ class BrowserActivity : DuckDuckGoActivity() {
     private fun configureWebView() {
         webView.webViewClient = webViewClient
         webView.webChromeClient = webChromeClient
-        webView.settings.javaScriptEnabled = true
-        webView.settings.builtInZoomControls = true
-        webView.settings.setSupportZoom(true)
-        webView.settings.useWideViewPort = true
+
+        webView.settings.apply {
+            javaScriptEnabled = true
+            useWideViewPort = true
+            builtInZoomControls = true
+            displayZoomControls = false
+            setSupportZoom(true)
+        }
+
         webView.setOnTouchListener { _, _ ->
             focusDummy.requestFocus()
             false

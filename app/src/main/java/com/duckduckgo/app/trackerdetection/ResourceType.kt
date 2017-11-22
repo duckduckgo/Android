@@ -40,7 +40,7 @@ enum class ResourceType(val filterOption: Int) {
 
             val acceptHeader = webResourceRequest.requestHeaders?.get("Accept")
             if (acceptHeader != null) {
-               headerResult = from(acceptHeader)
+                headerResult = from(acceptHeader)
             }
 
             val url = webResourceRequest.url

@@ -17,7 +17,7 @@
 package com.duckduckgo.app.browser
 
 interface WebViewClientListener {
-    fun loadingStateChange(isLoading : Boolean)
+    fun loadingStateChange(isLoading: Boolean)
     fun progressChanged(newProgress: Int)
     fun urlChanged(url: String?)
 }
