@@ -29,7 +29,12 @@
             android:name="com.duckduckgo.app.privacydashboard.PrivacyDashboardActivity"
             android:label="@string/privacyDashboardActivityTitle"
             android:parentActivityName=".BrowserActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="org.acra.dialog.CrashReportDialog"
+            android:theme="@style/CrashReportingDialogStyle"
+            tools:replace="android:theme" />
+
     </application>
 
 </manifest>
