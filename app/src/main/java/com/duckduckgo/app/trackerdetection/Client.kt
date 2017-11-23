@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2017 DuckDuckGo
- *
+ *  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.app.trackerdetection
 
-import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.privacydashboard.PrivacyDashboardActivity
+interface Client {
 
-import dagger.Module
-import dagger.android.ContributesAndroidInjector
+    enum class ClientName {
+        EASYLIST,
+        EASYPRIVACY
+    }
 
-@Module
-abstract class ActivityBindingModule {
+    val name: ClientName
 
-    @ActivityScoped
-    @ContributesAndroidInjector
-    abstract fun browserActivity(): BrowserActivity
+    fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean
 
-    @ActivityScoped
-    @ContributesAndroidInjector
-    abstract fun privacyDashboardActivity(): PrivacyDashboardActivity
 }

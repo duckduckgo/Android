@@ -30,6 +30,7 @@ import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.hide
 import com.duckduckgo.app.global.view.hideKeyboard
 import com.duckduckgo.app.global.view.show
+import com.duckduckgo.app.privacydashboard.PrivacyDashboardActivity
 import kotlinx.android.synthetic.main.activity_browser.*
 import kotlinx.android.synthetic.main.content_browser.*
 import javax.inject.Inject
@@ -145,6 +146,10 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.privacy_dashboard -> {
+                launchPrivacyDashboard()
+                return true
+            }
             R.id.refresh_menu_item -> {
                 webView.reload()
                 return true
@@ -161,8 +166,16 @@ class BrowserActivity : DuckDuckGoActivity() {
         return false
     }
 
+    fun launchPrivacyDashboard() {
+        val siteMonitor = viewModel.siteMonitor
+        if (siteMonitor != null) {
+            startActivity(PrivacyDashboardActivity.newIntent(this, siteMonitor))
+        }
+    }
+
     override fun onBackPressed() {
         if (webView.canGoBack()) webView.goBack()
         else super.onBackPressed()
     }
+
 }

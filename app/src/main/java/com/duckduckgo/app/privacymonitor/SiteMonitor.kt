@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2017 DuckDuckGo
- *  
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection
+package com.duckduckgo.app.privacymonitor
 
-interface TrackerDetectionClient {
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import java.io.Serializable
 
-    enum class ClientName {
-        EASYLIST,
-        EASYPRIVACY
+class SiteMonitor : Serializable {
+
+    var url: String? = null
+
+    private var trackingEvents: MutableList<TrackingEvent> = ArrayList()
+
+    val trackerNetworkCount: Int
+        get() = 0
+
+    fun trackerDetected(event: TrackingEvent) {
+        trackingEvents.add(event)
     }
-
-    val name: ClientName
-
-    fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean
 
 }

@@ -21,8 +21,8 @@ import android.arch.lifecycle.Observer
 import android.content.Context
 import android.net.Uri
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
-import com.duckduckgo.app.trackerdetection.TrackerDetectionClient
-import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName
+import com.duckduckgo.app.trackerdetection.Client
+import com.duckduckgo.app.trackerdetection.Client.ClientName
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
 import com.duckduckgo.app.trackerdetection.store.TrackerDataProvider
@@ -98,13 +98,13 @@ class BrowserViewModelTest {
 
     @Test
     fun whenViewModelNotifiedThatWebViewIsLoadingThenViewStateIsUpdated() {
-        testee.loadingStateChange(true)
+        testee.loadingStarted()
         assertTrue(testee.viewState.value!!.isLoading)
     }
 
     @Test
-    fun whenViewModelNotifiedThatWebViewIsNotLoadingThenViewStateIsUpdated() {
-        testee.loadingStateChange(false)
+    fun whenViewModelNotifiedThatWebViewHasFinishedLoadingThenViewStateIsUpdated() {
+        testee.loadingFinished()
         assertFalse(testee.viewState.value!!.isLoading)
     }
 
@@ -150,8 +150,8 @@ class BrowserViewModelTest {
         return trackerDetector
     }
 
-    private fun clientMock(name: ClientName): TrackerDetectionClient {
-        val client: TrackerDetectionClient = mock()
+    private fun clientMock(name: ClientName): Client {
+        val client: Client = mock()
         whenever(client.name).thenReturn(name)
         whenever(client.matches(ArgumentMatchers.anyString(), ArgumentMatchers.anyString(), any())).thenReturn(false)
         return client

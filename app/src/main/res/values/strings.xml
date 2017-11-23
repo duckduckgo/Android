@@ -1,9 +1,19 @@
 <resources>
+
     <string name="app_name">DuckDuckGo</string>
     <string name="go">Go</string>
+    <string name="privacyDashboard">Privacy Dashboard</string>
     <string name="refresh">Refresh</string>
     <string name="back">Back</string>
     <string name="forward">Forward</string>
     <string name="omnibarInputHint">Search or URL</string>
     <string name="clearButtonContentDescription">Clear search input</string>
+
+    <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
+    <string name="privacyProtectionToggle">Privacy Protection On</string>
+    <string name="privacyProtectionState">PRIVACY PROTECTION ENABLED</string>
+    <string name="privacyGradeContentDescription">Privacy Grade</string>
+    <string name="trackerNetworksContentDescription">Tracker networks icon</string>
+    <string name="trackerNetworksBlocked">%s Tracker Networks Blocked</string>
+
 </resources>

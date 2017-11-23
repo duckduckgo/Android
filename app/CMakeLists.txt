@@ -11,13 +11,13 @@ cmake_minimum_required(VERSION 3.4.1)
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-             adblockplus-lib
+             adblockclient-lib
 
              # Sets the library as a shared library.
              SHARED
 
              # Provides a relative path to your source file(s).
-             src/main/cpp/adblockplus-lib.cpp
+             src/main/cpp/adblockclient-lib.cpp
              src/main/cpp/ad-block/ad_block_client.cc
              src/main/cpp/ad-block/cosmetic_filter.cc
              src/main/cpp/ad-block/filter.cc
@@ -44,7 +44,7 @@ find_library( # Sets the name of the path variable.
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-                       adblockplus-lib
+                       adblockclient-lib
 
                        # Links the target library to the log library
                        # included in the NDK.

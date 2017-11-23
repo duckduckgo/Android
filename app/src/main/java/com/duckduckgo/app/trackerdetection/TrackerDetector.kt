@@ -16,16 +16,16 @@
 
 package com.duckduckgo.app.trackerdetection
 
-import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName
+import com.duckduckgo.app.trackerdetection.Client.ClientName
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class TrackerDetector @Inject constructor() {
 
-    private val clients = ArrayList<TrackerDetectionClient>()
+    private val clients = ArrayList<Client>()
 
-    fun addClient(client: TrackerDetectionClient) {
+    fun addClient(client: Client) {
         clients.add(client)
     }
 
@@ -34,7 +34,7 @@ class TrackerDetector @Inject constructor() {
     }
 
     fun shouldBlock(url: String, documentUrl: String, resourceType: ResourceType): Boolean {
-        for (client: TrackerDetectionClient in clients) {
+        for (client: Client in clients) {
             if (client.matches(url, documentUrl, resourceType)) {
                 return true
             }

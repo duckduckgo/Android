@@ -20,6 +20,7 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import com.duckduckgo.app.browser.BrowserViewModel
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
+import com.duckduckgo.app.privacydashboard.PrivacyDashboardViewModel
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
 import com.duckduckgo.app.trackerdetection.store.TrackerDataProvider
@@ -38,6 +39,7 @@ class ViewModelFactory @Inject constructor(
             with(modelClass) {
                 when {
                     isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, trackerDataProvier, trackerDetector, trackerListService)
+                    isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel()
                     else ->
                         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }

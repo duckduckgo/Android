@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.app.privacydashboard
 
-import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.privacydashboard.PrivacyDashboardActivity
+import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.ViewModel
+import com.duckduckgo.app.privacymonitor.SiteMonitor
+import javax.inject.Inject
 
-import dagger.Module
-import dagger.android.ContributesAndroidInjector
 
-@Module
-abstract class ActivityBindingModule {
+class PrivacyDashboardViewModel @Inject constructor() : ViewModel() {
 
-    @ActivityScoped
-    @ContributesAndroidInjector
-    abstract fun browserActivity(): BrowserActivity
+    var liveSiteMonitor: MutableLiveData<SiteMonitor> = MutableLiveData()
 
-    @ActivityScoped
-    @ContributesAndroidInjector
-    abstract fun privacyDashboardActivity(): PrivacyDashboardActivity
+    fun attachSiteMonitor(siteMonitor: SiteMonitor) {
+        liveSiteMonitor.value = siteMonitor
+    }
+
 }

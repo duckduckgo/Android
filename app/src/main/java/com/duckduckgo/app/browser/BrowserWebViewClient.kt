@@ -25,6 +25,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.duckduckgo.app.trackerdetection.ResourceType
 import com.duckduckgo.app.trackerdetection.TrackerDetector
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.content_browser.view.*
@@ -53,14 +54,14 @@ class BrowserWebViewClient @Inject constructor(private val requestRewriter: Duck
     }
 
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-        webViewClientListener?.loadingStateChange(true)
+        webViewClientListener?.loadingStarted()
         webViewClientListener?.urlChanged(url)
     }
 
     override fun onPageFinished(view: WebView?, url: String?) {
-        webViewClientListener?.loadingStateChange(false)
+        webViewClientListener?.loadingFinished()
+        webViewClientListener?.urlChanged(url)
     }
-
 
     @WorkerThread
     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
@@ -78,6 +79,7 @@ class BrowserWebViewClient @Inject constructor(private val requestRewriter: Duck
         val url = request.url.toString()
         if (documentUrl != null && trackerDetector.shouldBlock(url, documentUrl, ResourceType.from(request))) {
             Timber.v("WAS BLOCKED $url")
+            webViewClientListener?.trackerDetected(TrackingEvent(url, documentUrl, true))
             return true
         }
 

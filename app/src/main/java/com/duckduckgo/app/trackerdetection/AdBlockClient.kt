@@ -16,11 +16,11 @@
 
 package com.duckduckgo.app.trackerdetection
 
-import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName
+import com.duckduckgo.app.trackerdetection.Client.ClientName
 import timber.log.Timber
 
 
-class AdBlockPlus : TrackerDetectionClient {
+class AdBlockClient : Client {
 
     override val name: ClientName
     private val nativeClientPointer: Long
@@ -28,7 +28,7 @@ class AdBlockPlus : TrackerDetectionClient {
     private var processedDataPointer: Long
 
     init {
-        System.loadLibrary("adblockplus-lib")
+        System.loadLibrary("adblockclient-lib")
     }
 
     constructor(name: ClientName) {

@@ -41,7 +41,7 @@ class TrackerDetectorTest {
     }
 
     @Test
-    fun whenAllClientsFailToMatchThenSouldBlockIsFalse() {
+    fun whenAllClientsFailToMatchThenShouldBlockIsFalse() {
         trackerDetector.addClient(neverMatchingClient())
         trackerDetector.addClient(neverMatchingClient())
         assertFalse(trackerDetector.shouldBlock(resourceUrl, documentUrl, resourceType))
@@ -61,14 +61,14 @@ class TrackerDetectorTest {
         assertTrue(trackerDetector.shouldBlock(resourceUrl, documentUrl, resourceType))
     }
 
-    private fun alwaysMatchingClient(): TrackerDetectionClient {
-        val client: TrackerDetectionClient = mock()
+    private fun alwaysMatchingClient(): Client {
+        val client: Client = mock()
         whenever(client.matches(anyString(), anyString(), any())).thenReturn(true)
         return client
     }
 
-    private fun neverMatchingClient(): TrackerDetectionClient {
-        val client: TrackerDetectionClient = mock()
+    private fun neverMatchingClient(): Client {
+        val client: Client = mock()
         whenever(client.matches(anyString(), anyString(), any())).thenReturn(false)
         return client
     }

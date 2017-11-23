@@ -18,8 +18,8 @@ package com.duckduckgo.app.trackerdetection
 
 
 import android.support.test.runner.AndroidJUnit4
-import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName.EASYLIST
-import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName.EASYPRIVACY
+import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYLIST
+import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYPRIVACY
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -64,11 +64,11 @@ class TrackerDetectorInstrumentationTest {
         assertFalse(testee.shouldBlock(url, documentUrl, resourceType))
     }
 
-    private fun adblockClient(name: TrackerDetectionClient.ClientName, dataFile: String): TrackerDetectionClient {
+    private fun adblockClient(name: Client.ClientName, dataFile: String): Client {
         val data = javaClass.classLoader.getResource(dataFile).readBytes()
-        val initialAdBlock = AdBlockPlus(name)
+        val initialAdBlock = AdBlockClient(name)
         initialAdBlock.loadBasicData(data)
-        val adblockWithProcessedData = AdBlockPlus(name)
+        val adblockWithProcessedData = AdBlockClient(name)
         adblockWithProcessedData.loadProcessedData(initialAdBlock.getProcessedData())
         return adblockWithProcessedData
     }
