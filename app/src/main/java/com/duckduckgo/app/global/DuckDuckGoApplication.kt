@@ -26,23 +26,38 @@ import dagger.android.HasActivityInjector
 import timber.log.Timber
 import javax.inject.Inject
 
-
 class DuckDuckGoApplication : HasActivityInjector, Application() {
 
     @Inject
     lateinit var injector: DispatchingAndroidInjector<Activity>
 
+    @Inject
+    lateinit var crashReportingInitializer: CrashReportingInitializer
+
     override fun onCreate() {
         super.onCreate()
 
+        configureDependencyInjection()
+        configureLogging()
+        configureCrashReporting()
+    }
+
+    private fun configureLogging() {
+        if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
+    }
+
+    private fun configureDependencyInjection() {
         DaggerAppComponent.builder()
                 .application(this)
                 .create(this)
                 .inject(this)
+    }
 
-        if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
+    private fun configureCrashReporting() {
+        crashReportingInitializer.init(this)
     }
 
     override fun activityInjector(): AndroidInjector<Activity> = injector
+
 
 }

@@ -94,9 +94,9 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:4.6.0'
     implementation "android.arch.lifecycle:extensions:$architectureComponents"
     implementation "android.arch.lifecycle:reactivestreams:$architectureComponents"
-
     implementation "com.google.dagger:dagger-android:$dagger"
     implementation "com.google.dagger:dagger-android-support:$dagger"
+    releaseImplementation 'com.faendir:acra:4.10.0'
 
     kapt "com.google.dagger:dagger-android-processor:$dagger"
     kapt "com.google.dagger:dagger-compiler:$dagger"
