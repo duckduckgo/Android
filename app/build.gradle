@@ -6,7 +6,7 @@ apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
 
 ext {
-    VERSION_NAME = "0.1.0"
+    VERSION_NAME = "0.2.0"
 }
 
 android {
@@ -19,11 +19,16 @@ android {
         versionCode buildVersionCode()
         versionName VERSION_NAME
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        archivesBaseName = "duckduckgo-$versionName"
+    }
+    signingConfigs {
+        release
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     externalNativeBuild {
@@ -50,6 +55,22 @@ android {
             resources.srcDir sharedTestResourcesDir
         }
     }
+
+    def staticConfigPath = "${System.getenv('HOME')}/jenkins_static/com.duckduckgo.mobile.android"
+    def propertiesPath = "${staticConfigPath}/ddg_android_build.properties"
+    def propertiesFile = new File(propertiesPath)
+    if (propertiesFile.exists()) {
+        println "Signing properties found"
+        def props = new Properties()
+        props.load(new FileInputStream(propertiesFile))
+        android.signingConfigs.release.storeFile = file("${staticConfigPath}/${props['key.store']}")
+        android.signingConfigs.release.storePassword = props['key.store.password']
+        android.signingConfigs.release.keyAlias = props['key.alias']
+        android.signingConfigs.release.keyPassword = props['key.alias.password']
+    } else {
+        println "Signing properties not found at ${propertiesPath}, releases will NOT succeed"
+        android.buildTypes.release.signingConfig = null
+    }
 }
 
 ext {
@@ -73,9 +94,9 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:4.6.0'
     implementation "android.arch.lifecycle:extensions:$architectureComponents"
     implementation "android.arch.lifecycle:reactivestreams:$architectureComponents"
-
     implementation "com.google.dagger:dagger-android:$dagger"
     implementation "com.google.dagger:dagger-android-support:$dagger"
+    releaseImplementation 'com.faendir:acra:4.10.0'
 
     kapt "com.google.dagger:dagger-android-processor:$dagger"
     kapt "com.google.dagger:dagger-compiler:$dagger"

@@ -33,6 +33,12 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="org.acra.dialog.CrashReportDialog"
+            tools:replace="android:theme"
+            android:theme="@style/CrashReportingDialogStyle" />
+
     </application>
 
 </manifest>
