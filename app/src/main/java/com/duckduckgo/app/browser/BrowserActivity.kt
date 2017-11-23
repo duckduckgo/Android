@@ -19,14 +19,17 @@ package com.duckduckgo.app.browser
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.hide
 import com.duckduckgo.app.global.view.hideKeyboard
 import com.duckduckgo.app.global.view.show
@@ -40,8 +43,14 @@ class BrowserActivity : DuckDuckGoActivity() {
     @Inject lateinit var webChromeClient: BrowserChromeClient
     @Inject lateinit var viewModelFactory: ViewModelFactory
 
+    private var acceptingRenderUpdates = true
+
     private val viewModel: BrowserViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(BrowserViewModel::class.java)
+    }
+
+    companion object {
+        fun starter(context: Context): Intent = Intent(context, BrowserActivity::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,11 +71,19 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: BrowserViewModel.ViewState) {
+
+        if (!acceptingRenderUpdates) return
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+
+        when (viewState.browserShowing) {
+            true -> webView.show()
+            false -> webView.hide()
+        }
+
         when (viewState.isLoading) {
             true -> pageLoadingIndicator.show()
-            false -> {
-                pageLoadingIndicator.hide()
-            }
+            false -> pageLoadingIndicator.hide()
         }
 
         viewState.url?.let {
@@ -77,24 +94,34 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
 
         pageLoadingIndicator.progress = viewState.progress
-        if (viewState.isEditing) clearUrlButton.show() else clearUrlButton.hide()
+        when (viewState.isEditing) {
+            true -> clearUrlButton.show()
+            false -> clearUrlButton.hide()
+        }
     }
 
     private fun configureToolbar() {
         setSupportActionBar(toolbar)
-        supportActionBar?.title = null
+
+        supportActionBar?.let {
+            it.title = null
+            it.setDisplayHomeAsUpEnabled(true)
+            it.setDisplayShowHomeEnabled(true)
+        }
     }
 
     private fun configureUrlInput() {
-        urlInput.onFocusChangeListener = View.OnFocusChangeListener { _: View, hasFocus: Boolean ->
-            viewModel.urlFocusChanged(hasFocus)
-        }
+        urlInput.addTextChangedListener(object : TextChangedWatcher() {
+            override fun afterTextChanged(editable: Editable) {
+                viewModel.onUserChangingOmnibarInputValue(editable.toString())
+            }
+        })
 
         clearUrlButton.setOnClickListener { urlInput.setText("") }
     }
 
     private fun userEnteredQuery() {
-        viewModel.onQueryEntered(urlInput.text.toString())
+        viewModel.onUserSubmittedQuery(urlInput.text.toString())
         urlInput.hideKeyboard()
         focusDummy.requestFocus()
     }
@@ -145,6 +172,12 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            android.R.id.home -> {
+                clearViewPriorToAnimation()
+                supportFinishAfterTransition()
+                return true
+            }
+
             R.id.refresh_menu_item -> {
                 webView.reload()
                 return true
@@ -162,7 +195,16 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     override fun onBackPressed() {
-        if (webView.canGoBack()) webView.goBack()
-        else super.onBackPressed()
+        if (webView.canGoBack()) {
+            webView.goBack()
+            return
+        }
+        clearViewPriorToAnimation()
+        super.onBackPressed()    }
+
+    private fun clearViewPriorToAnimation() {
+        acceptingRenderUpdates = false
+        urlInput.text.clear()
+        webView.hide()
     }
 }

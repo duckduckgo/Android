@@ -80,19 +80,19 @@ class BrowserViewModelTest {
 
     @Test
     fun whenEmptyInputQueryThenNoQueryMadeAvailableToActivity() {
-        testee.onQueryEntered("")
+        testee.onUserSubmittedQuery("")
         verify(observer, never()).onChanged(ArgumentMatchers.anyString())
     }
 
     @Test
     fun whenBlankInputQueryThenNoQueryMadeAvailableToActivity() {
-        testee.onQueryEntered("     ")
+        testee.onUserSubmittedQuery("     ")
         verify(observer, never()).onChanged(ArgumentMatchers.anyString())
     }
 
     @Test
     fun whenNonEmptyInputThenQueryMadeAvailableToActivity() {
-        testee.onQueryEntered("foo")
+        testee.onUserSubmittedQuery("foo")
         verify(observer).onChanged(ArgumentMatchers.anyString())
     }
 
@@ -109,14 +109,14 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenViewModelNotifiedThatUrlFocusChangedGotFocusThenViewStateIsUpdated() {
-        testee.urlFocusChanged(true)
+    fun whenViewModelNotifiedThatQueryEnteredThenViewStateIsEditingFlagUpdated() {
+        testee.onUserChangingOmnibarInputValue("foo")
         assertTrue(testee.viewState.value!!.isEditing)
     }
 
     @Test
-    fun whenViewModelNotifiedThatUrlFocusChangedLostFocusThenViewStateIsUpdated() {
-        testee.urlFocusChanged(false)
+    fun whenViewModelNotifiedThatNoQueryEnteredThenViewStateIsEditingFlagUpdated() {
+        testee.onUserChangingOmnibarInputValue("")
         assertFalse(testee.viewState.value!!.isEditing)
     }
 

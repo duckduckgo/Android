@@ -38,10 +38,19 @@ class BrowserViewModel(
         private val trackerListService: TrackerListService) :
         WebViewClientListener, ViewModel() {
 
+    data class ViewState(
+            val isLoading: Boolean = false,
+            val progress: Int = 0,
+            val url: String? = null,
+            val isEditing: Boolean = false,
+            val browserShowing: Boolean = false
+    )
+
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val query: SingleLiveEvent<String> = SingleLiveEvent()
 
     init {
+        loadTrackerClients()
         viewState.value = ViewState()
     }
 
@@ -50,11 +59,11 @@ class BrowserViewModel(
         browserChromeClient.webViewClientListener = this
     }
 
-    init {
-        loadTrackerClients()
+    fun onUserChangingOmnibarInputValue(currentOmnibarInput: String) {
+        viewState.value = currentViewState().copy(isEditing = currentOmnibarInput.isNotEmpty())
     }
 
-    fun onQueryEntered(input: String) {
+    fun onUserSubmittedQuery(input: String) {
 
         if (input.isBlank()) {
             return
@@ -65,6 +74,7 @@ class BrowserViewModel(
         } else {
             queryUrlConverter.convertQueryToUri(input).toString()
         }
+
         query.value = convertedQuery
     }
 
@@ -80,21 +90,10 @@ class BrowserViewModel(
 
     override fun urlChanged(url: String?) {
         Timber.v("Url changed: $url")
-        viewState.value = currentViewState().copy(url = url)
+        viewState.value = currentViewState().copy(url = url, browserShowing = true)
     }
 
     private fun currentViewState(): ViewState = viewState.value!!
-
-    fun urlFocusChanged(hasFocus: Boolean) {
-        viewState.value = currentViewState().copy(isEditing = hasFocus)
-    }
-
-    data class ViewState(
-            val isLoading: Boolean = false,
-            val progress: Int = 0,
-            val url: String? = null,
-            val isEditing: Boolean = false
-    )
 
     private fun loadTrackerClients() {
 
@@ -131,7 +130,6 @@ class BrowserViewModel(
                     Timber.e(error)
                 })
     }
-
 }
 
 

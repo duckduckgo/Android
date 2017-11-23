@@ -58,6 +58,7 @@
                         android:background="@color/omnibarBackground"
                         android:elevation="4dp"
                         android:fontFamily="sans-serif-medium"
+                        android:transitionName="@string/transition_url_input"
                         android:hint="@string/omnibarInputHint"
                         android:imeOptions="flagNoExtractUi|actionDone"
                         android:inputType="textUri|textShortMessage|textNoSuggestions"

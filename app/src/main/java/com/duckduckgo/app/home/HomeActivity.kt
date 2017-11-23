@@ -21,6 +21,7 @@ import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityOptionsCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
@@ -42,7 +43,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun showSearchActivity() {
-        val intent = HomeSearchActivity.starter(this)
+        val intent = BrowserActivity.starter(this)
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, searchInputBox, getString(R.string.transition_url_input))
         startActivity(intent, options.toBundle())
     }
