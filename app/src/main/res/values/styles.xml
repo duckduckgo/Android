@@ -17,6 +17,8 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="CrashReportingDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert" />
+    <style name="CrashReportingDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert" >
+        <item name="android:padding">4dp</item>
+    </style>
 
 </resources>
