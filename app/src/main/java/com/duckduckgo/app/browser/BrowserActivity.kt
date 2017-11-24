@@ -88,11 +88,9 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         if (viewState.searchTerm != null) {
             urlInput.updateIfDifferent(viewState.searchTerm)
-        } else if (viewState.url != null) {
-            if (!viewState.isEditing && urlInput.isDifferent(viewState.url)) {
-                urlInput.setText(viewState.url)
-                appBarLayout.setExpanded(true, true)
-            }
+        } else if (shouldUpdateUrl(viewState, viewState.url)) {
+            urlInput.setText(viewState.url)
+            appBarLayout.setExpanded(true, true)
         }
 
         pageLoadingIndicator.progress = viewState.progress
@@ -101,6 +99,9 @@ class BrowserActivity : DuckDuckGoActivity() {
             false -> clearUrlButton.hide()
         }
     }
+
+    private fun shouldUpdateUrl(viewState: BrowserViewModel.ViewState, url: String?) =
+            viewState.url != null && !viewState.isEditing && urlInput.isDifferent(url)
 
     private fun configureToolbar() {
         setSupportActionBar(toolbar)
@@ -210,10 +211,10 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 }
 
-private fun EditText.isDifferent(newInput: String): Boolean = text.toString() != newInput
+private fun EditText.isDifferent(newInput: String?): Boolean = text.toString() != newInput
 
 private fun EditText.updateIfDifferent(newInput: String) {
-    if(isDifferent(newInput)) {
+    if (isDifferent(newInput)) {
         setText(newInput)
     }
 }

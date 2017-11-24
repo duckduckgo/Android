@@ -90,7 +90,7 @@ class BrowserViewModel(
         Timber.v("Url changed: $url")
         var newViewState = currentViewState().copy(url = url, browserShowing = true)
 
-        if(!duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
+        if (!duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
             newViewState = newViewState.copy(searchTerm = null)
         }
         viewState.value = newViewState
