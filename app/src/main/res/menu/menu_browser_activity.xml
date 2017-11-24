@@ -18,7 +18,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/menu_item_burn"
+        android:id="@+id/back_menu_item"
         android:title="@string/back"/>
     <item
         android:id="@+id/forward_menu_item"

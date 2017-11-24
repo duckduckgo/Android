@@ -8,6 +8,4 @@
     <string name="clearButtonContentDescription">Clear search input</string>
     <string name="title_activity_home">HomeActivity</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
-    <string name="burn">Burn History</string>
-    <string name="title_activity_home_search">HomeSearchActivity</string>
 </resources>

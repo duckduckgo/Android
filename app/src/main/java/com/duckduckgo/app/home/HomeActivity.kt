@@ -19,7 +19,6 @@ package com.duckduckgo.app.home
 import android.os.Bundle
 import android.support.v4.app.ActivityOptionsCompat
 import android.support.v7.app.AppCompatActivity
-import android.view.Menu
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import kotlinx.android.synthetic.main.content_home.*
@@ -38,11 +37,6 @@ class HomeActivity : AppCompatActivity() {
         val intent = BrowserActivity.starter(this)
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, searchInputBox, getString(R.string.transition_url_input))
         startActivity(intent, options.toBundle())
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_burn, menu)
-        return super.onCreateOptionsMenu(menu)
     }
 
 }
