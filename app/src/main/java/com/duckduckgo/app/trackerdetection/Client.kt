@@ -20,7 +20,8 @@ interface Client {
 
     enum class ClientName {
         EASYLIST,
-        EASYPRIVACY
+        EASYPRIVACY,
+        DISCONNECT
     }
 
     val name: ClientName
