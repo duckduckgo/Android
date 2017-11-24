@@ -67,7 +67,7 @@ class BrowserViewModelTest {
 
     @Before
     fun before() {
-        testee = BrowserViewModel(testOmnibarConverter, TrackerDataProvider(mockContext), testTrackerDetector(), mockTrackerService)
+        testee = BrowserViewModel(testOmnibarConverter, TrackerDataProvider(mockContext), testTrackerDetector(), mockTrackerService, DuckDuckGoUrlDetector())
         testee.query.observeForever(observer)
         testee.viewState.observeForever(viewStateObserver)
     }
@@ -109,14 +109,14 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenViewModelNotifiedThatQueryEnteredThenViewStateIsEditingFlagUpdated() {
-        testee.onUserChangingOmnibarInputValue("foo")
+    fun whenViewModelNotifiedThatUrlFocusChangedGotFocusThenViewStateIsUpdated() {
+        testee.urlFocusChanged(true)
         assertTrue(testee.viewState.value!!.isEditing)
     }
 
     @Test
-    fun whenViewModelNotifiedThatNoQueryEnteredThenViewStateIsEditingFlagUpdated() {
-        testee.onUserChangingOmnibarInputValue("")
+    fun whenViewModelNotifiedThatUrlFocusChangedLostFocusThenViewStateIsUpdated() {
+        testee.urlFocusChanged(false)
         assertFalse(testee.viewState.value!!.isEditing)
     }
 

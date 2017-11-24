@@ -22,14 +22,14 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.EditText
 import android.widget.TextView
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
-import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.hide
 import com.duckduckgo.app.global.view.hideKeyboard
 import com.duckduckgo.app.global.view.show
@@ -86,9 +86,11 @@ class BrowserActivity : DuckDuckGoActivity() {
             false -> pageLoadingIndicator.hide()
         }
 
-        viewState.url?.let {
-            if (urlInput.text.toString() != it) {
-                urlInput.setText(it)
+        if (viewState.searchTerm != null) {
+            urlInput.updateIfDifferent(viewState.searchTerm)
+        } else if (viewState.url != null) {
+            if (!viewState.isEditing && urlInput.isDifferent(viewState.url)) {
+                urlInput.setText(viewState.url)
                 appBarLayout.setExpanded(true, true)
             }
         }
@@ -111,11 +113,9 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUrlInput() {
-        urlInput.addTextChangedListener(object : TextChangedWatcher() {
-            override fun afterTextChanged(editable: Editable) {
-                viewModel.onUserChangingOmnibarInputValue(editable.toString())
-            }
-        })
+        urlInput.onFocusChangeListener = View.OnFocusChangeListener { _: View, hasFocus: Boolean ->
+            viewModel.urlFocusChanged(hasFocus)
+        }
 
         clearUrlButton.setOnClickListener { urlInput.setText("") }
     }
@@ -200,11 +200,20 @@ class BrowserActivity : DuckDuckGoActivity() {
             return
         }
         clearViewPriorToAnimation()
-        super.onBackPressed()    }
+        super.onBackPressed()
+    }
 
     private fun clearViewPriorToAnimation() {
         acceptingRenderUpdates = false
         urlInput.text.clear()
         webView.hide()
+    }
+}
+
+private fun EditText.isDifferent(newInput: String): Boolean = text.toString() != newInput
+
+private fun EditText.updateIfDifferent(newInput: String) {
+    if(isDifferent(newInput)) {
+        setText(newInput)
     }
 }

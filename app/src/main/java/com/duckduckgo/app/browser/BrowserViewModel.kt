@@ -35,7 +35,8 @@ class BrowserViewModel(
         private val queryUrlConverter: OmnibarEntryConverter,
         private val trackerDataProvider: TrackerDataProvider,
         private val trackerDetector: TrackerDetector,
-        private val trackerListService: TrackerListService) :
+        private val trackerListService: TrackerListService,
+        private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector) :
         WebViewClientListener, ViewModel() {
 
     data class ViewState(
@@ -43,7 +44,8 @@ class BrowserViewModel(
             val progress: Int = 0,
             val url: String? = null,
             val isEditing: Boolean = false,
-            val browserShowing: Boolean = false
+            val browserShowing: Boolean = false,
+            val searchTerm: String? = null
     )
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -59,23 +61,19 @@ class BrowserViewModel(
         browserChromeClient.webViewClientListener = this
     }
 
-    fun onUserChangingOmnibarInputValue(currentOmnibarInput: String) {
-        viewState.value = currentViewState().copy(isEditing = currentOmnibarInput.isNotEmpty())
-    }
-
     fun onUserSubmittedQuery(input: String) {
 
         if (input.isBlank()) {
             return
         }
 
-        val convertedQuery: String = if (queryUrlConverter.isWebUrl(input)) {
-            queryUrlConverter.convertUri(input)
+        if (queryUrlConverter.isWebUrl(input)) {
+            viewState.value = currentViewState().copy(searchTerm = null)
+            query.value = queryUrlConverter.convertUri(input)
         } else {
-            queryUrlConverter.convertQueryToUri(input).toString()
+            viewState.value = currentViewState().copy(searchTerm = input)
+            query.value = queryUrlConverter.convertQueryToUri(input).toString()
         }
-
-        query.value = convertedQuery
     }
 
     override fun progressChanged(newProgress: Int) {
@@ -90,7 +88,12 @@ class BrowserViewModel(
 
     override fun urlChanged(url: String?) {
         Timber.v("Url changed: $url")
-        viewState.value = currentViewState().copy(url = url, browserShowing = true)
+        var newViewState = currentViewState().copy(url = url, browserShowing = true)
+
+        if(!duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
+            newViewState = newViewState.copy(searchTerm = null)
+        }
+        viewState.value = newViewState
     }
 
     private fun currentViewState(): ViewState = viewState.value!!
@@ -129,6 +132,10 @@ class BrowserViewModel(
                 }, { error ->
                     Timber.e(error)
                 })
+    }
+
+    fun urlFocusChanged(hasFocus: Boolean) {
+        viewState.value = currentViewState().copy(isEditing = hasFocus)
     }
 }
 
