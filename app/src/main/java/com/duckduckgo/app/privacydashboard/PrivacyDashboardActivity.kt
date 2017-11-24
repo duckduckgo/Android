@@ -38,7 +38,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
     companion object {
 
-        fun newIntent(context: Context, monitor: SiteMonitor): Intent {
+        fun intent(context: Context, monitor: SiteMonitor): Intent {
             val intent = Intent(context, PrivacyDashboardActivity::class.java)
             intent.putExtra(SiteMonitor::class.java.name, monitor)
             return intent

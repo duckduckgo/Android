@@ -169,7 +169,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     fun launchPrivacyDashboard() {
         val siteMonitor = viewModel.siteMonitor
         if (siteMonitor != null) {
-            startActivity(PrivacyDashboardActivity.newIntent(this, siteMonitor))
+            startActivity(PrivacyDashboardActivity.intent(this, siteMonitor))
         }
     }
 
