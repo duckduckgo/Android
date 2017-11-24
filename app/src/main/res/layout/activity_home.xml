@@ -17,24 +17,11 @@
 
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.duckduckgo.app.home.HomeActivity">
 
     <include layout="@layout/content_home"/>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:borderWidth="0dp"
-        app:elevation="6dp"
-        android:backgroundTint="#5e6168"
-        app:fabSize="normal"
-        android:src="@drawable/fire"/>
 
 </android.support.design.widget.CoordinatorLayout>
