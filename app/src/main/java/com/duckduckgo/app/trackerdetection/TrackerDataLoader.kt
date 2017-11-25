@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection;
+package com.duckduckgo.app.trackerdetection
 
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
+import com.duckduckgo.app.trackerdetection.model.NetworkTrackers
 import com.duckduckgo.app.trackerdetection.store.TrackerDataStore
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -25,25 +26,22 @@ import timber.log.Timber
 import javax.inject.Inject
 
 
-class ClientLoader @Inject constructor(private val trackerDataStore: TrackerDataStore,
-                                       private val trackerListService: TrackerListService) {
+class TrackerDataLoader @Inject constructor(private val trackerDetector: TrackerDetector,
+                                            private val trackerDataStore: TrackerDataStore,
+                                            private val trackerListService: TrackerListService,
+                                            private val networkTrackers: NetworkTrackers) {
 
-    fun loadClients(trackerDetector: TrackerDetector) {
-
-        if (!trackerDetector.hasClient(Client.ClientName.EASYLIST)) {
-            addAdblockClient(trackerDetector, Client.ClientName.EASYLIST)
-        }
-
-        if (!trackerDetector.hasClient(Client.ClientName.EASYPRIVACY)) {
-            addAdblockClient(trackerDetector, Client.ClientName.EASYPRIVACY)
-        }
-
-        if (!trackerDetector.hasClient(Client.ClientName.DISCONNECT)) {
-            addDisconnectClient(trackerDetector, Client.ClientName.DISCONNECT)
-        }
+    fun loadData() {
+        loadTrackerClients()
     }
 
-    private fun addAdblockClient(trackerDetector: TrackerDetector, name: Client.ClientName) {
+    private fun loadTrackerClients() {
+        loadAdblockData(Client.ClientName.EASYLIST)
+        loadAdblockData(Client.ClientName.EASYPRIVACY)
+        loadDisconnectData()
+    }
+
+    private fun loadAdblockData(name: Client.ClientName) {
 
         if (trackerDataStore.hasData(name)) {
             val client = AdBlockClient(name)
@@ -68,18 +66,18 @@ class ClientLoader @Inject constructor(private val trackerDataStore: TrackerData
                 })
     }
 
-    private fun addDisconnectClient(trackerDetector: TrackerDetector, name: Client.ClientName) {
+    private fun loadDisconnectData() {
 
         trackerListService.disconnect()
                 .subscribeOn(Schedulers.io())
                 .map { jsonMap ->
-                    val data = convertJsonMapToTrackers(jsonMap)
-                    val client = DisconnectClient(name, data)
-                    return@map client
+                    return@map convertJsonMapToTrackers(jsonMap)
                 }
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ client ->
+                .subscribe({ data ->
+                    val client = DisconnectClient(Client.ClientName.DISCONNECT, data)
                     trackerDetector.addClient(client)
+                    networkTrackers.updateData(data)
                 }, { error ->
                     Timber.e(error)
                 })

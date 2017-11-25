@@ -14,20 +14,25 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacydashboard
+package com.duckduckgo.app.global
 
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
-import com.duckduckgo.app.sitemonitor.SiteMonitor
-import javax.inject.Inject
+import android.net.Uri
+import org.junit.Assert.assertEquals
+import org.junit.Test
 
 
-class PrivacyDashboardViewModel @Inject constructor() : ViewModel() {
+class UrlSchemeTest {
 
-    var liveSiteMonitor: MutableLiveData<SiteMonitor> = MutableLiveData()
+    @Test
+    fun whenUriDoesNotHaveASchemeThenWithSchemeAppendsHttp() {
+        val url = "someurl"
+        assertEquals("http://${url}", Uri.parse(url).withScheme().toString())
+    }
 
-    fun attachSiteMonitor(siteMonitor: SiteMonitor) {
-        liveSiteMonitor.value = siteMonitor
+    @Test
+    fun whenUriHasASchemeThenWithSchemeHasNoEffect() {
+        val url = "http://someurl"
+        assertEquals(url, Uri.parse(url).withScheme().toString())
     }
 
 }

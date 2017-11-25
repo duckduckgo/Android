@@ -14,22 +14,28 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection;
+package com.duckduckgo.app.trackerdetection
 
 import android.net.Uri
+import com.duckduckgo.app.global.withScheme
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
+import com.duckduckgo.app.trackerdetection.model.ResourceType
 
 class DisconnectClient(override val name: Client.ClientName, private val trackers: List<DisconnectTracker>) : Client {
 
     override fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean {
 
-        val uri = Uri.parse(url)
-        val trackerUris = trackers.map { Uri.parse("http://${it.url}") }
+        val host = Uri.parse(url).host ?: return false
 
-        if (trackerUris.filter { uri.host == it.host || uri.host.endsWith(".${it.host}") }.isNotEmpty()) {
-            return true
-        }
-
-        return false
+        return trackers
+                .filter { bannedCategories().contains(it.category) }
+                .map { Uri.parse(it.url).withScheme() }
+                .filter { host == it.host || host.endsWith(".${it.host}") }
+                .isNotEmpty()
     }
+
+    private fun bannedCategories(): List<String> {
+        return listOf("Analytics", "Advertising", "Social")
+    }
+
 }

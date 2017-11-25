@@ -16,9 +16,10 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import com.duckduckgo.app.trackerdetection.model.ResourceType
 import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
-import mock
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test

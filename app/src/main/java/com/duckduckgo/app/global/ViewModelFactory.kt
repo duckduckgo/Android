@@ -21,18 +21,20 @@ import android.arch.lifecycle.ViewModelProvider
 import com.duckduckgo.app.browser.BrowserViewModel
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.privacydashboard.PrivacyDashboardViewModel
+import com.duckduckgo.app.trackerdetection.model.NetworkTrackers
 import javax.inject.Inject
 
 
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory @Inject constructor(
-        private val queryUrlConverter: QueryUrlConverter
+        private val queryUrlConverter: QueryUrlConverter,
+        private val networkTrackers: NetworkTrackers
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
             with(modelClass) {
                 when {
-                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter)
+                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, networkTrackers)
                     isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel()
                     else ->
                         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")

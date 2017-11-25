@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection
+package com.duckduckgo.app.trackerdetection.model
 
 import android.net.Uri
 import android.webkit.WebResourceRequest
@@ -48,31 +48,31 @@ enum class ResourceType(val filterOption: Int) {
                 urlResult = from(url)
             }
 
-            return headerResult ?: urlResult ?: ResourceType.UNKNOWN
+            return headerResult ?: urlResult ?: UNKNOWN
         }
 
         private fun from(acceptHeader: String): ResourceType? {
             if (acceptHeader.contains("image/")) {
-                return ResourceType.IMAGE
+                return IMAGE
             }
             if (acceptHeader.contains("/css")) {
-                return ResourceType.CSS
+                return CSS
             }
             if (acceptHeader.contains("javascript")) {
-                return ResourceType.SCRIPT
+                return SCRIPT
             }
             return null
         }
 
         private fun from(url: Uri): ResourceType? {
             if (url.hasExtension("png", "jpg", "jpeg", "webp", "svg", "gif", "bmp", "tiff")) {
-                return ResourceType.IMAGE
+                return IMAGE
             }
             if (url.hasExtension("css")) {
-                return ResourceType.CSS
+                return CSS
             }
             if (url.hasExtension("js")) {
-                return ResourceType.SCRIPT
+                return SCRIPT
             }
             return null
         }

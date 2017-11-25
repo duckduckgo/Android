@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.model;
+package com.duckduckgo.app.trackerdetection.model
 
-class DisconnectTracker(val url: String,
-                        val category: String,
-                        val networkName: String,
-                        val networkUrl: String)
+data class DisconnectTracker(override val url: String,
+                             val category: String,
+                             override val networkName: String,
+                             override val networkUrl: String) : NetworkTracker

@@ -23,9 +23,8 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.duckduckgo.app.trackerdetection.ClientLoader
-import com.duckduckgo.app.trackerdetection.ResourceType
 import com.duckduckgo.app.trackerdetection.TrackerDetector
+import com.duckduckgo.app.trackerdetection.model.ResourceType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -36,15 +35,11 @@ import javax.inject.Inject
 
 class BrowserWebViewClient @Inject constructor(
         private val requestRewriter: DuckDuckGoRequestRewriter,
-        private var trackerDetector: TrackerDetector,
-        private var clientLoader: ClientLoader
+        private var trackerDetector: TrackerDetector
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
 
-    init {
-        clientLoader.loadClients(trackerDetector)
-    }
 
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         Timber.v("Url ${request.url}")

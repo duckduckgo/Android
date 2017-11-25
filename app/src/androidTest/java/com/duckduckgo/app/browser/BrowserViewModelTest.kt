@@ -20,7 +20,8 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
 import android.net.Uri
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
-import mock
+import com.duckduckgo.app.trackerdetection.model.NetworkTrackers
+import com.nhaarman.mockito_kotlin.mock
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -52,7 +53,7 @@ class BrowserViewModelTest {
 
     @Before
     fun before() {
-        testee = BrowserViewModel(testOmnibarConverter)
+        testee = BrowserViewModel(testOmnibarConverter, NetworkTrackers())
         testee.query.observeForever(observer)
         testee.viewState.observeForever(viewStateObserver)
     }

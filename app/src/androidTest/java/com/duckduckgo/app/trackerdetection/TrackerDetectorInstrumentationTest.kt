@@ -20,6 +20,7 @@ package com.duckduckgo.app.trackerdetection
 import android.support.test.runner.AndroidJUnit4
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYLIST
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYPRIVACY
+import com.duckduckgo.app.trackerdetection.model.ResourceType
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before

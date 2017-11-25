@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import com.duckduckgo.app.trackerdetection.model.ResourceType
+
 interface Client {
 
     enum class ClientName {

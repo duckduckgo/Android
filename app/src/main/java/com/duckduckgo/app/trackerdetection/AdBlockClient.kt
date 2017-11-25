@@ -17,6 +17,7 @@
 package com.duckduckgo.app.trackerdetection
 
 import com.duckduckgo.app.trackerdetection.Client.ClientName
+import com.duckduckgo.app.trackerdetection.model.ResourceType
 import timber.log.Timber
 
 

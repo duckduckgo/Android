@@ -19,13 +19,14 @@ package com.duckduckgo.app.browser.omnibar
 import android.net.Uri
 import android.support.v4.util.PatternsCompat
 import com.duckduckgo.app.browser.DuckDuckGoRequestRewriter
+import com.duckduckgo.app.global.UrlScheme.Companion.http
+import com.duckduckgo.app.global.UrlScheme.Companion.https
+import com.duckduckgo.app.global.withScheme
 import javax.inject.Inject
 
 class QueryUrlConverter @Inject constructor(private val requestRewriter: DuckDuckGoRequestRewriter) : OmnibarEntryConverter {
 
     companion object {
-        private const val https = "https"
-        private const val http = "http"
         private const val baseUrl = "duckduckgo.com"
         private const val localhost = "localhost"
         private const val space = " "
@@ -33,8 +34,7 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: DuckDuc
     }
 
     override fun isWebUrl(inputQuery: String): Boolean {
-        val uri = Uri.parse(inputQuery)
-        if (uri.scheme == null) return isWebUrl("$https://$inputQuery")
+        val uri = Uri.parse(inputQuery).withScheme()
         if (uri.scheme != http && uri.scheme != https) return false
         if (uri.userInfo != null) return false
         if (uri.host == null) return false
@@ -64,15 +64,12 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: DuckDuc
     }
 
     override fun convertUri(input: String): String {
-        var uri = Uri.parse(input)
-
-        if (uri.scheme == null) {
-            uri = Uri.parse("$http://$input")
-        }
+        var uri = Uri.parse(input).withScheme()
 
         if (uri.host == baseUrl) {
             return requestRewriter.rewriteRequestWithCustomQueryParams(uri).toString()
         }
+
         return uri.toString()
     }
 

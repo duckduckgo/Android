@@ -26,7 +26,7 @@ import android.view.MenuItem
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
-import com.duckduckgo.app.privacymonitor.SiteMonitor
+import com.duckduckgo.app.sitemonitor.SiteMonitor
 import kotlinx.android.synthetic.main.activity_privacy_dashboard.*
 import kotlinx.android.synthetic.main.content_privacy_dashboard.*
 import javax.inject.Inject

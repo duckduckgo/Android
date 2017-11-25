@@ -18,6 +18,6 @@ package com.duckduckgo.app.trackerdetection.model
 
 import java.io.Serializable
 
-class TrackingEvent(val trackerUrl: String,
-                    val documentUrl: String,
-                    val blocked: Boolean) : Serializable
+data class TrackingEvent(val trackerUrl: String,
+                         val documentUrl: String,
+                         val blocked: Boolean) : Serializable

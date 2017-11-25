@@ -18,7 +18,8 @@ package com.duckduckgo.app.trackerdetection
 
 import android.net.Uri
 import android.webkit.WebResourceRequest
-import com.duckduckgo.app.trackerdetection.ResourceType.*
+import com.duckduckgo.app.trackerdetection.model.ResourceType
+import com.duckduckgo.app.trackerdetection.model.ResourceType.*
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Assert.assertEquals
@@ -26,7 +27,6 @@ import org.junit.Test
 
 
 class ResourceTypeInstrumentationTest {
-
 
     companion object {
         private val unknownHeader = "text/plain"

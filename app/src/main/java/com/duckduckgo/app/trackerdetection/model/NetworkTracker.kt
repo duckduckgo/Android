@@ -14,22 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacymonitor
+package com.duckduckgo.app.trackerdetection.model
 
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import java.io.Serializable
 
-class SiteMonitor : Serializable {
-
-    var url: String? = null
-
-    private var trackingEvents: MutableList<TrackingEvent> = ArrayList()
-
-    val trackerNetworkCount: Int
-        get() = 0
-
-    fun trackerDetected(event: TrackingEvent) {
-        trackingEvents.add(event)
-    }
-
+interface NetworkTracker : Serializable {
+    val url: String
+    val networkName: String
+    val networkUrl: String
 }
