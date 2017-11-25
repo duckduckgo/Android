@@ -33,12 +33,12 @@ class NetworkTrackers @Inject constructor() : Serializable {
 
     fun network(url: String): String? {
 
-        val host = Uri.parse(url).host ?: return null
+        val host = Uri.parse(url)?.host ?: return null
 
         return trackers
                 .filter { it: NetworkTracker ->
                     val comparisonHost = Uri.parse(it.url).withScheme().host
-                    host != null && (host == comparisonHost || host.endsWith(".${comparisonHost}"))
+                    host != null && (host == comparisonHost || host.endsWith(".$comparisonHost"))
                 }
                 .map { it.networkName }
                 .firstOrNull()

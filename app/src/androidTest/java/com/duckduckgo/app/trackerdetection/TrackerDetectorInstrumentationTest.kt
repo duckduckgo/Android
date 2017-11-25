@@ -40,8 +40,8 @@ class TrackerDetectorInstrumentationTest {
 
     @Before
     fun before() {
-        val easylistAdblock = adblockClient(EASYLIST, "easylist_sample")
-        val easyprivacyAdblock = adblockClient(EASYPRIVACY, "easyprivacy_sample")
+        val easylistAdblock = adblockClient(EASYLIST, "binary/easylist_sample")
+        val easyprivacyAdblock = adblockClient(EASYPRIVACY, "binary/easyprivacy_sample")
         testee = TrackerDetector()
         testee.addClient(easyprivacyAdblock)
         testee.addClient(easylistAdblock)

@@ -19,6 +19,8 @@ package com.duckduckgo.app.di
 import android.content.Context
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
+import com.duckduckgo.app.trackerdetection.api.DisconnectJsonAdapter
+import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -40,12 +42,18 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun retrofit(okHttpClient: OkHttpClient, context: Context): Retrofit {
+    fun moshi(): Moshi {
+        return Moshi.Builder().add(DisconnectJsonAdapter()).build()
+    }
+
+    @Provides
+    @Singleton
+    fun retrofit(okHttpClient: OkHttpClient, moshi: Moshi, context: Context): Retrofit {
         return Retrofit.Builder()
                 .baseUrl(context.getString(R.string.baseUrl))
                 .client(okHttpClient)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(MoshiConverterFactory.create())
+                .addConverterFactory(MoshiConverterFactory.create(moshi))
                 .build()
     }
 

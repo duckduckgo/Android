@@ -31,8 +31,8 @@ class TrackerDetectorTest {
     private val trackerDetector = TrackerDetector()
 
     companion object {
-        private val documentUrl = "http://example.com/index.com"
-        private val resourceUrl = "http://somedomain.com/update.js"
+        private const val documentUrl = "http://example.com/index.com"
+        private const val resourceUrl = "http://somedomain.com/update.js"
         private val resourceType = ResourceType.UNKNOWN
     }
 

@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection
+package com.duckduckgo.app.trackerdetection.model
 
 import android.net.Uri
 import android.webkit.WebResourceRequest
-import com.duckduckgo.app.trackerdetection.model.ResourceType
 import com.duckduckgo.app.trackerdetection.model.ResourceType.*
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever

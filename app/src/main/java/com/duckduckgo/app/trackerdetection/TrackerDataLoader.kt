@@ -17,7 +17,6 @@
 package com.duckduckgo.app.trackerdetection
 
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
-import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 import com.duckduckgo.app.trackerdetection.model.NetworkTrackers
 import com.duckduckgo.app.trackerdetection.store.TrackerDataStore
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -32,10 +31,6 @@ class TrackerDataLoader @Inject constructor(private val trackerDetector: Tracker
                                             private val networkTrackers: NetworkTrackers) {
 
     fun loadData() {
-        loadTrackerClients()
-    }
-
-    private fun loadTrackerClients() {
         loadAdblockData(Client.ClientName.EASYLIST)
         loadAdblockData(Client.ClientName.EASYPRIVACY)
         loadDisconnectData()
@@ -70,36 +65,13 @@ class TrackerDataLoader @Inject constructor(private val trackerDetector: Tracker
 
         trackerListService.disconnect()
                 .subscribeOn(Schedulers.io())
-                .map { jsonMap ->
-                    return@map convertJsonMapToTrackers(jsonMap)
-                }
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ data ->
-                    val client = DisconnectClient(Client.ClientName.DISCONNECT, data)
+                .subscribe({ response ->
+                    val client = DisconnectClient(Client.ClientName.DISCONNECT, response.trackers)
                     trackerDetector.addClient(client)
-                    networkTrackers.updateData(data)
+                    networkTrackers.updateData(response.trackers)
                 }, { error ->
                     Timber.e(error)
                 })
-    }
-
-    private fun convertJsonMapToTrackers(json: Map<String, Any>): List<DisconnectTracker> {
-        var trackers = ArrayList<DisconnectTracker>()
-        for ((category, list) in json["categories"] as Map<String, List<Map<String, Map<String, Any>>>>) {
-            for (trackerGroup in list) {
-                trackers.addAll(convertJsonGroupToTrackers(category, trackerGroup))
-            }
-        }
-        return trackers
-    }
-
-    private fun convertJsonGroupToTrackers(category: String, json: Map<String, Map<String, Any>>): List<DisconnectTracker> {
-        val networkName = json.keys.first()
-        val networkUrl = json.values.first().keys.first()
-        val trackerUrls = json.values.first().values.first { it as? List<String> != null } as? List<String>
-        if (trackerUrls != null) {
-            return trackerUrls.map { DisconnectTracker(it, category, networkName, networkUrl) }
-        }
-        return ArrayList<DisconnectTracker>()
     }
 }

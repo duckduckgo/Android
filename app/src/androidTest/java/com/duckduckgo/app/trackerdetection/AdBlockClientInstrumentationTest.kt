@@ -23,7 +23,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 
-class AdBlockInstrumentationTest {
+class AdBlockClientInstrumentationTest {
 
     companion object {
         private val documentUrl = "http://example.com"
@@ -67,6 +67,6 @@ class AdBlockInstrumentationTest {
     }
 
     private fun data(): ByteArray {
-        return javaClass.classLoader.getResource("easylist_sample").readBytes()
+        return javaClass.classLoader.getResource("binary/easylist_sample").readBytes()
     }
 }

@@ -28,13 +28,13 @@ import org.junit.Test
 
 class SiteMonitorTest {
 
-    val mockNetworkTrackers: NetworkTrackers = mock()
+    private val mockNetworkTrackers: NetworkTrackers = mock()
 
     companion object {
-        val documentUrl = "http://example.com"
-        val tracker = "http://standalonetracker.com/script.js"
-        val networkATracker = "http://networkAtracker.com/script.js"
-        val networkBTracker = "http://networkBtracker.com/script.js"
+        private const val documentUrl = "http://example.com"
+        private const val tracker = "http://standalonetracker.com/script.js"
+        private const val networkATracker = "http://networkAtracker.com/script.js"
+        private const val networkBTracker = "http://networkBtracker.com/script.js"
     }
 
     init {

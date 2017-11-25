@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.api
+package com.duckduckgo.app.trackerdetection.api;
 
-import io.reactivex.Observable
-import okhttp3.ResponseBody
-import retrofit2.http.GET
-import retrofit2.http.Query
+import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
+import com.squareup.moshi.Json
 
-interface TrackerListService {
+class DisconnectList {
 
-    @GET("/contentblocking.js")
-    fun list(@Query("l") list: String): Observable<ResponseBody>
+    @Json(name = "categories")
+    lateinit var trackers: List<DisconnectTracker>
 
-    @GET("/contentblocking.js?l=disconnect")
-    fun disconnect(): Observable<DisconnectList>
 }
