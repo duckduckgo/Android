@@ -166,7 +166,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         return false
     }
 
-    fun launchPrivacyDashboard() {
+    private fun launchPrivacyDashboard() {
         val siteMonitor = viewModel.siteMonitor
         if (siteMonitor != null) {
             startActivity(PrivacyDashboardActivity.intent(this, siteMonitor))

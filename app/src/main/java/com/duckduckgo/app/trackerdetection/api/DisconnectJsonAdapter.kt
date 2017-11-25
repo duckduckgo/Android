@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.api;
+package com.duckduckgo.app.trackerdetection.api
 
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 import com.squareup.moshi.FromJson
@@ -24,7 +24,7 @@ class DisconnectJsonAdapter {
 
     @FromJson
     fun fromJson(json: Map<String, List<Map<String, Map<String, Any>>>>): List<DisconnectTracker> {
-        var trackers = ArrayList<DisconnectTracker>()
+        val trackers = ArrayList<DisconnectTracker>()
         for ((category, list) in json) {
             for (trackerGroup in list) {
                 trackers.addAll(convertGroup(category, trackerGroup))
@@ -40,6 +40,6 @@ class DisconnectJsonAdapter {
         if (trackerUrls != null) {
             return trackerUrls.map { DisconnectTracker(it, category, networkName, networkUrl) }
         }
-        return ArrayList<DisconnectTracker>()
+        return ArrayList()
     }
 }

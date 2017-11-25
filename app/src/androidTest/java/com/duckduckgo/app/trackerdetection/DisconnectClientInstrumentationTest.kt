@@ -26,54 +26,53 @@ import org.junit.Test
 class DisconnectClientInstrumentationTest {
 
     companion object {
-        private const val documentUrl = "http://example.com"
-        private const val nonTracker = "http://nontracker.com"
-        private const val tracker = "http://addthis.com"
-        private const val subdomainTracker = "http://subdomain.addthis.com"
-        private const val looksLikeTracker = "http://notaddthis.com"
+        private const val categoryBanned = "Social"
+        private const val categoryAllowed = "Content"
+        private const val network = "Network"
+        private const val networkUrl = "http://www.network.com/"
+        private const val documentUrl = "http://example.com/index.htm"
         private val resourceType = ResourceType.UNKNOWN
     }
 
     @Test
     fun whenUrlIsATrackerInBlockedCategoryThenMatchesIsTrue() {
-        val data = listOf(DisconnectTracker(tracker, "Social", "Network", "http://www.network.com/"))
+        val data = listOf(DisconnectTracker("tracker.com", categoryBanned, network, networkUrl))
         val testee = DisconnectClient(Client.ClientName.DISCONNECT, data)
-        assertTrue(testee.matches(tracker, documentUrl, resourceType))
+        assertTrue(testee.matches("http://tracker.com/script.js", documentUrl, resourceType))
     }
 
     @Test
     fun whenUrlIsATrackerOutsideBlockedCategoryThenMatchesIsFalse() {
-        val data = listOf(DisconnectTracker(tracker, "Content", "Network", "http://www.network.com/"))
+        val data = listOf(DisconnectTracker("tracker.com", categoryAllowed, network, networkUrl))
         val testee = DisconnectClient(Client.ClientName.DISCONNECT, data)
-        assertFalse(testee.matches(tracker, documentUrl, resourceType))
+        assertFalse(testee.matches("http://tracker.com/script.js", documentUrl, resourceType))
     }
 
     @Test
     fun whenUrlIsNotATrackerThenMatchesIsFalse() {
-        val data = listOf(DisconnectTracker(tracker, "Social", "Network", "http://www.network.com/"))
+        val data = listOf(DisconnectTracker("tracker.com", categoryBanned, network, networkUrl))
         val testee = DisconnectClient(Client.ClientName.DISCONNECT, data)
-        assertFalse(testee.matches(nonTracker, documentUrl, resourceType))
+        assertFalse(testee.matches("http://nontracker.com/script.js", documentUrl, resourceType))
     }
 
     @Test
     fun whenUrlIsASubdomainOfATrackerThenMatchesIsTrue() {
-        val data = listOf(DisconnectTracker(tracker, "Social", "Network", "http://www.network.com/"))
+        val data = listOf(DisconnectTracker("tracker.com", categoryBanned, network, networkUrl))
         val testee = DisconnectClient(Client.ClientName.DISCONNECT, data)
-        assertTrue(testee.matches(subdomainTracker, documentUrl, resourceType))
-    }
-
-    @Test
-    fun whenUrlIsContaintButIsNotSubdomainOfATrackerThenMatchesIsFalse() {
-        val data = listOf(DisconnectTracker(tracker, "Social", "Network", "http://www.network.com/"))
-        val testee = DisconnectClient(Client.ClientName.DISCONNECT, data)
-        assertFalse(testee.matches(looksLikeTracker, documentUrl, resourceType))
+        assertTrue(testee.matches("http://subdomian.tracker.com/script.js", documentUrl, resourceType))
     }
 
     @Test
     fun whenUrlIsAParentDomainOfATrackerThenMatchesIsFalse() {
-        val data = listOf(DisconnectTracker(subdomainTracker, "Social", "Network", "http://www.network.com/"))
+        val data = listOf(DisconnectTracker("subdomain.tracker.com", categoryBanned, network, networkUrl))
         val testee = DisconnectClient(Client.ClientName.DISCONNECT, data)
-        assertFalse(testee.matches(tracker, documentUrl, resourceType))
+        assertFalse(testee.matches("http://tracker.com/script.js", documentUrl, resourceType))
     }
 
+    @Test
+    fun whenUrlContaintsButIsNotSubdomainOfATrackerThenMatchesIsFalse() {
+        val data = listOf(DisconnectTracker("tracker.com", categoryBanned, network, networkUrl))
+        val testee = DisconnectClient(Client.ClientName.DISCONNECT, data)
+        assertFalse(testee.matches("http://notsubdomainoftracker.com", documentUrl, resourceType))
+    }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.api;
+package com.duckduckgo.app.trackerdetection.api
 
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 import com.squareup.moshi.Json

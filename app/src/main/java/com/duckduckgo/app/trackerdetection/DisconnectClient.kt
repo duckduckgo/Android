@@ -17,7 +17,7 @@
 package com.duckduckgo.app.trackerdetection
 
 import android.net.Uri
-import com.duckduckgo.app.global.withScheme
+import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 import com.duckduckgo.app.trackerdetection.model.ResourceType
 
@@ -25,13 +25,12 @@ class DisconnectClient(override val name: Client.ClientName, private val tracker
 
     override fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean {
 
-        val host = Uri.parse(url)?.host ?: return false
+        val host = Uri.parse(url)?.baseHost() ?: return false
 
         return trackers
                 .filter { bannedCategories().contains(it.category) }
-                .map { Uri.parse(it.url).withScheme() }
-                .filter { host == it.host || host.endsWith(".${it.host}") }
-                .isNotEmpty()
+                .map { Uri.parse(it.url) }
+                .any { host == it.baseHost() || host.endsWith(".${it.baseHost()}") }
     }
 
     private fun bannedCategories(): List<String> {

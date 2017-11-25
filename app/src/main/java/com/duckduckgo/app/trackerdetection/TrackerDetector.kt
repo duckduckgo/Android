@@ -31,7 +31,7 @@ class TrackerDetector @Inject constructor() {
     }
 
     fun hasClient(name: ClientName): Boolean {
-        return clients.filter { it.name == name }.isNotEmpty()
+        return clients.any { it.name == name }
     }
 
     fun shouldBlock(url: String, documentUrl: String, resourceType: ResourceType): Boolean {

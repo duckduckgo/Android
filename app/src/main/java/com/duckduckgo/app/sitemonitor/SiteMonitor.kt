@@ -28,8 +28,7 @@ class SiteMonitor constructor(private val networkTrackers: NetworkTrackers) : Se
 
     val trackerNetworkCount: Int
         get() = trackingEvents
-                .map { networkTrackers.network(it.trackerUrl) }
-                .filterNotNull()
+                .mapNotNull { networkTrackers.network(it.trackerUrl) }
                 .distinct()
                 .count()
 

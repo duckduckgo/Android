@@ -18,6 +18,7 @@ package com.duckduckgo.app.global
 
 import android.net.Uri
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 
@@ -26,13 +27,37 @@ class UrlSchemeTest {
     @Test
     fun whenUriDoesNotHaveASchemeThenWithSchemeAppendsHttp() {
         val url = "someurl"
-        assertEquals("http://${url}", Uri.parse(url).withScheme().toString())
+        assertEquals("http://$url", Uri.parse(url).withScheme().toString())
     }
 
     @Test
     fun whenUriHasASchemeThenWithSchemeHasNoEffect() {
         val url = "http://someurl"
         assertEquals(url, Uri.parse(url).withScheme().toString())
+    }
+
+    @Test
+    fun whenUriBeginsWithWwwThenBaseHostReturnsWithoutWww() {
+        val url = "http://www.somehost.com"
+        assertEquals("somehost.com", Uri.parse(url).baseHost())
+    }
+
+    @Test
+    fun whenUriDoesNotBeginWithWwwThenBaseHostHostUnchanged() {
+        val url = "http://somehost.com"
+        assertEquals("somehost.com", Uri.parse(url).baseHost())
+    }
+
+    @Test
+    fun whenUriDoesNotHaveASchemeThenBaseHostStillResolvesHost() {
+        val url = "www.somehost.com"
+        assertEquals("somehost.com", Uri.parse(url).baseHost())
+    }
+
+    @Test
+    fun whenUriDoesIsInvalidHostThenBadeHostIsNull() {
+        val url = "about:blank"
+        assertNull(Uri.parse(url).baseHost())
     }
 
 }

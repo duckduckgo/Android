@@ -17,7 +17,7 @@
 package com.duckduckgo.app.trackerdetection.model
 
 import android.net.Uri
-import com.duckduckgo.app.global.withScheme
+import com.duckduckgo.app.global.baseHost
 import java.io.Serializable
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -33,12 +33,13 @@ class NetworkTrackers @Inject constructor() : Serializable {
 
     fun network(url: String): String? {
 
-        val host = Uri.parse(url)?.host ?: return null
+        val lookupHost = Uri.parse(url)?.baseHost() ?: return null
 
         return trackers
                 .filter { it: NetworkTracker ->
-                    val comparisonHost = Uri.parse(it.url).withScheme().host
-                    host != null && (host == comparisonHost || host.endsWith(".$comparisonHost"))
+                    val trackerHost = Uri.parse(it.url).baseHost()
+                    val networkHost = Uri.parse(it.networkUrl).baseHost()
+                    lookupHost == trackerHost || lookupHost == networkHost || lookupHost.endsWith(".$trackerHost") || lookupHost.endsWith(".$networkHost")
                 }
                 .map { it.networkName }
                 .firstOrNull()

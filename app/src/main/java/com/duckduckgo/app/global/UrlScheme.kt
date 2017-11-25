@@ -31,3 +31,11 @@ fun Uri.withScheme(): Uri {
 
     return this
 }
+
+/**
+ * Trys to resolve a host (even if the scheme is missing) returning
+ * a basic host without the "www" subdomain.
+ */
+fun Uri.baseHost(): String? {
+    return withScheme().host?.removePrefix("www.")
+}

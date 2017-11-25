@@ -79,7 +79,7 @@ enum class ResourceType(val filterOption: Int) {
 
         private fun Uri.hasExtension(vararg extensions: String): Boolean {
             val baseUrl = "$scheme$schemeSpecificPart$authority$path"
-            return extensions.filter { baseUrl.endsWith(".$it", true) }.isNotEmpty()
+            return extensions.any { baseUrl.endsWith(".$it", true) }
         }
     }
 }
