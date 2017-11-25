@@ -22,7 +22,7 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 
 
-class UrlSchemeTest {
+class UrlTest {
 
     @Test
     fun whenUriDoesNotHaveASchemeThenWithSchemeAppendsHttp() {
@@ -43,7 +43,7 @@ class UrlSchemeTest {
     }
 
     @Test
-    fun whenUriDoesNotBeginWithWwwThenBaseHostHostUnchanged() {
+    fun whenUriDoesNotBeginWithWwwThenBaseHosReturnsWithSameHost() {
         val url = "http://somehost.com"
         assertEquals("somehost.com", Uri.parse(url).baseHost())
     }
@@ -55,7 +55,7 @@ class UrlSchemeTest {
     }
 
     @Test
-    fun whenUriDoesIsInvalidHostThenBadeHostIsNull() {
+    fun whenUriContainsInvalidHostThenBaseHostIsNull() {
         val url = "about:blank"
         assertNull(Uri.parse(url).baseHost())
     }

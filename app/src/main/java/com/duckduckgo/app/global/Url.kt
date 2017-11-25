@@ -16,6 +16,8 @@
 package com.duckduckgo.app.global
 
 import android.net.Uri
+import android.net.Uri.parse
+import com.duckduckgo.app.global.UrlScheme.Companion.http
 
 class UrlScheme {
     companion object {
@@ -26,14 +28,14 @@ class UrlScheme {
 
 fun Uri.withScheme(): Uri {
     if (scheme == null) {
-        return Uri.parse("${UrlScheme.http}://${toString()}")
+        return parse("${http}://${toString()}")
     }
 
     return this
 }
 
 /**
- * Trys to resolve a host (even if the scheme is missing) returning
+ * Trys to resolve a host (even if the scheme is missing), returning
  * a basic host without the "www" subdomain.
  */
 fun Uri.baseHost(): String? {

@@ -45,7 +45,7 @@ class NetworkTrackersInstrumentationTest {
     }
 
     @Test
-    fun whenUrlDoesNotMatchesEitherTrackerOrNetworkUrlThenNullIsReturned() {
+    fun whenUrlDoesNotMatchEitherTrackerOrNetworkUrlThenNullIsReturned() {
         val data = listOf(DisconnectTracker("tracker.com", category, network, "http://www.network.com/"))
         testee.updateData(data)
         assertNull(testee.network("http://example.com/index.html"))
