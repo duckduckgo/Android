@@ -34,7 +34,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun showSearchActivity() {
-        val intent = BrowserActivity.starter(this)
+        val intent = BrowserActivity.intent(this)
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, searchInputBox, getString(R.string.transition_url_input))
         startActivity(intent, options.toBundle())
     }

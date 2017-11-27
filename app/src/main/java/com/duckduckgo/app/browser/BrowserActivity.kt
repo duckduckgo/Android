@@ -50,7 +50,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        fun starter(context: Context): Intent = Intent(context, BrowserActivity::class.java)
+        fun intent(context: Context): Intent = Intent(context, BrowserActivity::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
