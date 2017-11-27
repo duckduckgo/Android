@@ -6,6 +6,12 @@
           "http://anadurl.com/": [
             "99anadurl.com"
           ]
+        },
+        "ItIsATracker": {
+          "dnt": "eff",
+          "https://itisatracker.com/": [
+            "itisatracker.com"
+          ]
         }
       }
     ],
