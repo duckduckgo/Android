@@ -15,16 +15,13 @@
   ~ limitations under the License.
   -->
 
-<com.duckduckgo.app.browser.NestedWebView
-    android:id="@+id/webView"
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:focusable="true"
-    android:focusableInTouchMode="true"
-    android:visibility="gone"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:visibility="visible"/>
+    tools:context="com.duckduckgo.app.home.HomeActivity">
 
+    <include layout="@layout/content_home"/>
+
+</android.support.design.widget.CoordinatorLayout>

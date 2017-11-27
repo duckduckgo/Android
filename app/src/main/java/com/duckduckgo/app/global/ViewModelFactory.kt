@@ -19,6 +19,7 @@ package com.duckduckgo.app.global
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import com.duckduckgo.app.browser.BrowserViewModel
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
@@ -31,13 +32,14 @@ class ViewModelFactory @Inject constructor(
         private val queryUrlConverter: QueryUrlConverter,
         private val trackerDataProvier: TrackerDataProvider,
         private val trackerDetector: TrackerDetector,
-        private val trackerListService: TrackerListService
+        private val trackerListService: TrackerListService,
+        private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
             with(modelClass) {
                 when {
-                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, trackerDataProvier, trackerDetector, trackerListService)
+                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, trackerDataProvier, trackerDetector, trackerListService, duckDuckGoUrlDetector)
                     else ->
                         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }

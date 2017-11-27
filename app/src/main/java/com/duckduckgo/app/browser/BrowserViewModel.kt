@@ -35,13 +35,25 @@ class BrowserViewModel(
         private val queryUrlConverter: OmnibarEntryConverter,
         private val trackerDataProvider: TrackerDataProvider,
         private val trackerDetector: TrackerDetector,
-        private val trackerListService: TrackerListService) :
+        private val trackerListService: TrackerListService,
+        private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector) :
         WebViewClientListener, ViewModel() {
+
+    data class ViewState(
+            val isLoading: Boolean = false,
+            val progress: Int = 0,
+            val url: String? = null,
+            val isEditing: Boolean = false,
+            val browserShowing: Boolean = false,
+            val showClearButton: Boolean = false
+    )
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val query: SingleLiveEvent<String> = SingleLiveEvent()
+    private var lastQuery: String? = null
 
     init {
+        loadTrackerClients()
         viewState.value = ViewState()
     }
 
@@ -50,22 +62,21 @@ class BrowserViewModel(
         browserChromeClient.webViewClientListener = this
     }
 
-    init {
-        loadTrackerClients()
-    }
-
-    fun onQueryEntered(input: String) {
+    fun onUserSubmittedQuery(input: String) {
 
         if (input.isBlank()) {
             return
         }
 
-        val convertedQuery: String = if (queryUrlConverter.isWebUrl(input)) {
-            queryUrlConverter.convertUri(input)
+        if (queryUrlConverter.isWebUrl(input)) {
+            lastQuery = null
+            query.value = queryUrlConverter.convertUri(input)
         } else {
-            queryUrlConverter.convertQueryToUri(input).toString()
+            lastQuery = input
+            query.value = queryUrlConverter.convertQueryToUri(input).toString()
         }
-        query.value = convertedQuery
+
+        viewState.value = currentViewState().copy(showClearButton = false)
     }
 
     override fun progressChanged(newProgress: Int) {
@@ -80,21 +91,15 @@ class BrowserViewModel(
 
     override fun urlChanged(url: String?) {
         Timber.v("Url changed: $url")
-        viewState.value = currentViewState().copy(url = url)
+        var newViewState = currentViewState().copy(url = url, browserShowing = true)
+
+        if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
+            newViewState = newViewState.copy(url = lastQuery)
+        }
+        viewState.value = newViewState
     }
 
     private fun currentViewState(): ViewState = viewState.value!!
-
-    fun urlFocusChanged(hasFocus: Boolean) {
-        viewState.value = currentViewState().copy(isEditing = hasFocus)
-    }
-
-    data class ViewState(
-            val isLoading: Boolean = false,
-            val progress: Int = 0,
-            val url: String? = null,
-            val isEditing: Boolean = false
-    )
 
     private fun loadTrackerClients() {
 
@@ -132,6 +137,18 @@ class BrowserViewModel(
                 })
     }
 
+    fun urlFocusChanged(hasFocus: Boolean) {
+        if(!hasFocus) {
+            viewState.value = currentViewState().copy(isEditing = hasFocus, showClearButton = false)
+        } else {
+            viewState.value = currentViewState().copy(isEditing = hasFocus)
+        }
+    }
+
+    fun onUrlInputValueChanged(query: String, hasFocus: Boolean) {
+        val showClearButton = hasFocus && query.isNotEmpty()
+        viewState.value = currentViewState().copy(isEditing = hasFocus, showClearButton = showClearButton)
+    }
 }
 
 

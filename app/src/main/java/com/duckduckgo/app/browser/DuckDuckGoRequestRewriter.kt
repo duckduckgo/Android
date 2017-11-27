@@ -21,7 +21,7 @@ import android.webkit.WebResourceRequest
 import timber.log.Timber
 import javax.inject.Inject
 
-class DuckDuckGoRequestRewriter @Inject constructor() {
+class DuckDuckGoRequestRewriter @Inject constructor(private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector) {
 
     companion object {
         private const val sourceParam = "t"
@@ -48,7 +48,7 @@ class DuckDuckGoRequestRewriter @Inject constructor() {
     }
 
     fun shouldRewriteRequest(request: WebResourceRequest): Boolean =
-            request.url.host == "duckduckgo.com" && !request.url.queryParameterNames.containsAll(arrayListOf(sourceParam, appVersionParam))
+            duckDuckGoUrlDetector.isDuckDuckGoUrl(request.url) && !request.url.queryParameterNames.containsAll(arrayListOf(sourceParam, appVersionParam))
 
     fun addCustomQueryParams(builder: Uri.Builder) {
         builder.appendQueryParameter(appVersionParam, formatAppVersion())

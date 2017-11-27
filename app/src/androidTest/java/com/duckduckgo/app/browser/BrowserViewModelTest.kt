@@ -67,7 +67,7 @@ class BrowserViewModelTest {
 
     @Before
     fun before() {
-        testee = BrowserViewModel(testOmnibarConverter, TrackerDataProvider(mockContext), testTrackerDetector(), mockTrackerService)
+        testee = BrowserViewModel(testOmnibarConverter, TrackerDataProvider(mockContext), testTrackerDetector(), mockTrackerService, DuckDuckGoUrlDetector())
         testee.query.observeForever(observer)
         testee.viewState.observeForever(viewStateObserver)
     }
@@ -80,19 +80,19 @@ class BrowserViewModelTest {
 
     @Test
     fun whenEmptyInputQueryThenNoQueryMadeAvailableToActivity() {
-        testee.onQueryEntered("")
+        testee.onUserSubmittedQuery("")
         verify(observer, never()).onChanged(ArgumentMatchers.anyString())
     }
 
     @Test
     fun whenBlankInputQueryThenNoQueryMadeAvailableToActivity() {
-        testee.onQueryEntered("     ")
+        testee.onUserSubmittedQuery("     ")
         verify(observer, never()).onChanged(ArgumentMatchers.anyString())
     }
 
     @Test
     fun whenNonEmptyInputThenQueryMadeAvailableToActivity() {
-        testee.onQueryEntered("foo")
+        testee.onUserSubmittedQuery("foo")
         verify(observer).onChanged(ArgumentMatchers.anyString())
     }
 

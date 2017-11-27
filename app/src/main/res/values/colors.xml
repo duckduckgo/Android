@@ -5,4 +5,6 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="omnibarBackground">#5e6168</color>
+    <color name="windowBackground">#2f3135</color>
+
 </resources>
