@@ -44,7 +44,8 @@ class BrowserViewModel(
             val progress: Int = 0,
             val url: String? = null,
             val isEditing: Boolean = false,
-            val browserShowing: Boolean = false
+            val browserShowing: Boolean = false,
+            val showClearButton: Boolean = false
     )
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -136,6 +137,10 @@ class BrowserViewModel(
 
     fun urlFocusChanged(hasFocus: Boolean) {
         viewState.value = currentViewState().copy(isEditing = hasFocus)
+    }
+
+    fun onUserUpdatingQuery(query: String) {
+        viewState.value = currentViewState().copy(isEditing = true, showClearButton = query.isNotEmpty())
     }
 }
 

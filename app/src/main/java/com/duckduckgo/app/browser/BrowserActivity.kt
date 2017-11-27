@@ -22,6 +22,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -29,10 +30,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
-import com.duckduckgo.app.global.view.hide
-import com.duckduckgo.app.global.view.hideKeyboard
-import com.duckduckgo.app.global.view.isDifferent
-import com.duckduckgo.app.global.view.show
+import com.duckduckgo.app.global.view.*
 import kotlinx.android.synthetic.main.activity_browser.*
 import kotlinx.android.synthetic.main.content_browser.*
 import javax.inject.Inject
@@ -91,7 +89,8 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
 
         pageLoadingIndicator.progress = viewState.progress
-        when (viewState.isEditing) {
+
+        when(viewState.showClearButton) {
             true -> clearUrlButton.show()
             false -> clearUrlButton.hide()
         }
@@ -114,6 +113,12 @@ class BrowserActivity : DuckDuckGoActivity() {
         urlInput.onFocusChangeListener = View.OnFocusChangeListener { _: View, hasFocus: Boolean ->
             viewModel.urlFocusChanged(hasFocus)
         }
+
+        urlInput.addTextChangedListener(object : TextChangedWatcher(){
+            override fun afterTextChanged(editable: Editable) {
+                viewModel.onUserUpdatingQuery(urlInput.text.toString())
+            }
+        })
 
         clearUrlButton.setOnClickListener { urlInput.setText("") }
     }
