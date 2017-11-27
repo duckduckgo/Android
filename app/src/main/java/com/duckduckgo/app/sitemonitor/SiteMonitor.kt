@@ -36,7 +36,9 @@ class SiteMonitor constructor(private val networkTrackers: NetworkTrackers) : Se
         get() = trackingEvents.size
 
     fun trackerDetected(event: TrackingEvent) {
-        trackingEvents.add(event)
+        synchronized(trackingEvents) {
+            trackingEvents.add(event)
+        }
     }
 
 }
