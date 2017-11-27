@@ -14,22 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.app.trackerdetection.api
 
-import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.privacydashboard.PrivacyDashboardActivity
+import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
+import com.squareup.moshi.Json
 
-import dagger.Module
-import dagger.android.ContributesAndroidInjector
+class DisconnectList {
 
-@Module
-abstract class ActivityBindingModule {
+    @Json(name = "categories")
+    lateinit var trackers: List<DisconnectTracker>
 
-    @ActivityScoped
-    @ContributesAndroidInjector
-    abstract fun browserActivity(): BrowserActivity
-
-    @ActivityScoped
-    @ContributesAndroidInjector
-    abstract fun privacyDashboardActivity(): PrivacyDashboardActivity
 }

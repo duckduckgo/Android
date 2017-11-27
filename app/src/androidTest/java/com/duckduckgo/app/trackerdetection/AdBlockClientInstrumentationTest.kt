@@ -16,13 +16,14 @@
 
 package com.duckduckgo.app.trackerdetection
 
-import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName.EASYLIST
+import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYLIST
+import com.duckduckgo.app.trackerdetection.model.ResourceType
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 
-class AdBlockInstrumentationTest {
+class AdBlockClientInstrumentationTest {
 
     companion object {
         private val documentUrl = "http://example.com"
@@ -33,39 +34,39 @@ class AdBlockInstrumentationTest {
 
     @Test
     fun whenBasicDataLoadedThenTrackerIsBlocked() {
-        val testee = AdBlockPlus(EASYLIST)
+        val testee = AdBlockClient(EASYLIST)
         testee.loadBasicData(data())
         assertTrue(testee.matches(trackerUrl, documentUrl, resourceType))
     }
 
     @Test
     fun whenBasicDataLoadedThenNonTrackerIsNotBlocked() {
-        val testee = AdBlockPlus(EASYLIST)
+        val testee = AdBlockClient(EASYLIST)
         testee.loadBasicData(data())
         assertFalse(testee.matches(nonTrackerUrl, documentUrl, resourceType))
     }
 
     @Test
     fun whenProcessedDataLoadedThenTrackerIsBlocked() {
-        val original = AdBlockPlus(EASYLIST)
+        val original = AdBlockClient(EASYLIST)
         original.loadBasicData(data())
         val processedData = original.getProcessedData()
-        val testee = AdBlockPlus(EASYLIST)
+        val testee = AdBlockClient(EASYLIST)
         testee.loadProcessedData(processedData)
         assertTrue(testee.matches(trackerUrl, documentUrl, resourceType))
     }
 
     @Test
     fun whenProcessedDataLoadedThenNonTrackerIsNotBlocked() {
-        val original = AdBlockPlus(EASYLIST)
+        val original = AdBlockClient(EASYLIST)
         original.loadBasicData(data())
         val processedData = original.getProcessedData()
-        val testee = AdBlockPlus(EASYLIST)
+        val testee = AdBlockClient(EASYLIST)
         testee.loadProcessedData(processedData)
         assertFalse(testee.matches(nonTrackerUrl, documentUrl, resourceType))
     }
 
     private fun data(): ByteArray {
-        return javaClass.classLoader.getResource("easylist_sample").readBytes()
+        return javaClass.classLoader.getResource("binary/easylist_sample").readBytes()
     }
 }

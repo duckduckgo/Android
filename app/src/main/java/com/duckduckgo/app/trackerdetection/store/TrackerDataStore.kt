@@ -17,10 +17,10 @@
 package com.duckduckgo.app.trackerdetection.store
 
 import android.content.Context
-import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName
+import com.duckduckgo.app.trackerdetection.Client.ClientName
 import javax.inject.Inject
 
-class TrackerDataProvider @Inject constructor(private val context: Context) {
+class TrackerDataStore @Inject constructor(private val context: Context) {
 
     fun hasData(client: ClientName): Boolean {
         return context.fileExists(client.name)

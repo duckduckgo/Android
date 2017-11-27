@@ -4,7 +4,7 @@
 extern "C"
 JNIEXPORT jlong
 JNICALL
-Java_com_duckduckgo_app_trackerdetection_AdBlockPlus_createClient(JNIEnv *env,
+Java_com_duckduckgo_app_trackerdetection_AdBlockClient_createClient(JNIEnv *env,
                                                                   jobject /* this */) {
     AdBlockClient *client = new AdBlockClient();
     return (long) client;
@@ -13,7 +13,7 @@ Java_com_duckduckgo_app_trackerdetection_AdBlockPlus_createClient(JNIEnv *env,
 extern "C"
 JNIEXPORT void
 JNICALL
-Java_com_duckduckgo_app_trackerdetection_AdBlockPlus_releaseClient(JNIEnv *env,
+Java_com_duckduckgo_app_trackerdetection_AdBlockClient_releaseClient(JNIEnv *env,
                                                                    jobject /* this */,
                                                                    jlong clientPointer,
                                                                    jlong rawDataPointer,
@@ -32,7 +32,7 @@ Java_com_duckduckgo_app_trackerdetection_AdBlockPlus_releaseClient(JNIEnv *env,
 extern "C"
 JNIEXPORT jlong
 JNICALL
-Java_com_duckduckgo_app_trackerdetection_AdBlockPlus_loadBasicData(JNIEnv *env,
+Java_com_duckduckgo_app_trackerdetection_AdBlockClient_loadBasicData(JNIEnv *env,
                                                                    jobject /* this */,
                                                                    jlong clientPointer,
                                                                    jbyteArray data) {
@@ -50,7 +50,7 @@ Java_com_duckduckgo_app_trackerdetection_AdBlockPlus_loadBasicData(JNIEnv *env,
 extern "C"
 JNIEXPORT jlong
 JNICALL
-Java_com_duckduckgo_app_trackerdetection_AdBlockPlus_loadProcessedData(JNIEnv *env,
+Java_com_duckduckgo_app_trackerdetection_AdBlockClient_loadProcessedData(JNIEnv *env,
                                                                        jobject /* this */,
                                                                        jlong clientPointer,
                                                                        jbyteArray data) {
@@ -72,7 +72,7 @@ Java_com_duckduckgo_app_trackerdetection_AdBlockPlus_loadProcessedData(JNIEnv *e
 extern "C"
 JNIEXPORT jbyteArray
 JNICALL
-Java_com_duckduckgo_app_trackerdetection_AdBlockPlus_getProcessedData(JNIEnv *env,
+Java_com_duckduckgo_app_trackerdetection_AdBlockClient_getProcessedData(JNIEnv *env,
                                                                       jobject /* this */,
                                                                       jlong clientPointer) {
 
@@ -91,7 +91,7 @@ Java_com_duckduckgo_app_trackerdetection_AdBlockPlus_getProcessedData(JNIEnv *en
 extern "C"
 JNIEXPORT jboolean
 JNICALL
-Java_com_duckduckgo_app_trackerdetection_AdBlockPlus_matches(JNIEnv *env,
+Java_com_duckduckgo_app_trackerdetection_AdBlockClient_matches(JNIEnv *env,
                                                              jobject /* this */,
                                                              jlong clientPointer,
                                                              jstring url,

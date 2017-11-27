@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2017 DuckDuckGo
- *  
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection
+package com.duckduckgo.app.privacydashboard
 
-interface TrackerDetectionClient {
+import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.ViewModel
+import com.duckduckgo.app.sitemonitor.SiteMonitor
+import javax.inject.Inject
 
-    enum class ClientName {
-        EASYLIST,
-        EASYPRIVACY
+
+class PrivacyDashboardViewModel @Inject constructor() : ViewModel() {
+
+    var liveSiteMonitor: MutableLiveData<SiteMonitor> = MutableLiveData()
+
+    fun attachSiteMonitor(siteMonitor: SiteMonitor) {
+        liveSiteMonitor.value = siteMonitor
     }
-
-    val name: ClientName
-
-    fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean
 
 }

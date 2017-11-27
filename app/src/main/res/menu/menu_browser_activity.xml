@@ -17,6 +17,13 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/privacy_dashboard"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_unknown"
+        android:title="@string/privacyDashboard"/>
+
     <item
         android:id="@+id/back_menu_item"
         android:title="@string/back"/>
@@ -27,4 +34,5 @@
         android:id="@+id/refresh_menu_item"
         app:showAsAction="never"
         android:title="@string/refresh"/>
+
 </menu>

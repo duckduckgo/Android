@@ -31,6 +31,7 @@ import android.widget.TextView
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
+import com.duckduckgo.app.privacydashboard.PrivacyDashboardActivity
 import kotlinx.android.synthetic.main.activity_browser.*
 import kotlinx.android.synthetic.main.content_browser.*
 import javax.inject.Inject
@@ -202,7 +203,10 @@ class BrowserActivity : DuckDuckGoActivity() {
                 supportFinishAfterTransition()
                 return true
             }
-
+            R.id.privacy_dashboard -> {
+                launchPrivacyDashboard()
+                return true
+            }
             R.id.refresh_menu_item -> {
                 webView.reload()
                 return true
@@ -219,6 +223,13 @@ class BrowserActivity : DuckDuckGoActivity() {
         return false
     }
 
+    private fun launchPrivacyDashboard() {
+        val siteMonitor = viewModel.siteMonitor
+        if (siteMonitor != null) {
+            startActivity(PrivacyDashboardActivity.intent(this, siteMonitor))
+        }
+    }
+
     override fun onBackPressed() {
         if (webView.canGoBack()) {
             webView.goBack()
@@ -233,4 +244,5 @@ class BrowserActivity : DuckDuckGoActivity() {
         urlInput.text.clear()
         webView.hide()
     }
+
 }
