@@ -74,8 +74,6 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         if (!acceptingRenderUpdates) return
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(false)
-
         when (viewState.browserShowing) {
             true -> webView.show()
             false -> webView.hide()
