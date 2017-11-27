@@ -75,6 +75,8 @@ class BrowserViewModel(
             lastQuery = input
             query.value = queryUrlConverter.convertQueryToUri(input).toString()
         }
+
+        viewState.value = currentViewState().copy(showClearButton = false)
     }
 
     override fun progressChanged(newProgress: Int) {
@@ -136,11 +138,16 @@ class BrowserViewModel(
     }
 
     fun urlFocusChanged(hasFocus: Boolean) {
-        viewState.value = currentViewState().copy(isEditing = hasFocus)
+        if(!hasFocus) {
+            viewState.value = currentViewState().copy(isEditing = hasFocus, showClearButton = false)
+        } else {
+            viewState.value = currentViewState().copy(isEditing = hasFocus)
+        }
     }
 
-    fun onUserUpdatingQuery(query: String) {
-        viewState.value = currentViewState().copy(isEditing = true, showClearButton = query.isNotEmpty())
+    fun onUrlInputValueChanged(query: String, hasFocus: Boolean) {
+        val showClearButton = hasFocus && query.isNotEmpty()
+        viewState.value = currentViewState().copy(isEditing = hasFocus, showClearButton = showClearButton)
     }
 }
 

@@ -90,10 +90,20 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         pageLoadingIndicator.progress = viewState.progress
 
-        when(viewState.showClearButton) {
-            true -> clearUrlButton.show()
-            false -> clearUrlButton.hide()
+        when (viewState.showClearButton) {
+            true -> showClearButton()
+            false -> hideClearButton()
         }
+    }
+
+    private fun showClearButton() {
+        clearUrlButton.show()
+        urlInput.updatePadding(paddingEnd = 40.toPx())
+    }
+
+    private fun hideClearButton() {
+        clearUrlButton.hide()
+        urlInput.updatePadding(paddingEnd = 10.toPx())
     }
 
     private fun shouldUpdateUrl(viewState: BrowserViewModel.ViewState, url: String?) =
@@ -112,11 +122,15 @@ class BrowserActivity : DuckDuckGoActivity() {
     private fun configureUrlInput() {
         urlInput.onFocusChangeListener = View.OnFocusChangeListener { _: View, hasFocus: Boolean ->
             viewModel.urlFocusChanged(hasFocus)
+
+            if (hasFocus) {
+                viewModel.onUrlInputValueChanged(urlInput.text.toString(), urlInput.hasFocus())
+            }
         }
 
-        urlInput.addTextChangedListener(object : TextChangedWatcher(){
+        urlInput.addTextChangedListener(object : TextChangedWatcher() {
             override fun afterTextChanged(editable: Editable) {
-                viewModel.onUserUpdatingQuery(urlInput.text.toString())
+                viewModel.onUrlInputValueChanged(urlInput.text.toString(), urlInput.hasFocus())
             }
         })
 
