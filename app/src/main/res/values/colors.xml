@@ -1,25 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#444444</color>
-    <color name="colorPrimaryDark">#000000</color>
-    <color name="colorAccent">#de5833</color>
+    <color name="colorPrimary">#47494c</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
 
-    <color name="omnibar_text_color">#ffffff</color>
-    <color name="omnibar_text_hint">#cccccc</color>
-    <color name="omnibar_progress_bar">#4495d4</color>
-    <color name="omnibar_progress_bar_background">#98c5e7</color>
-    <color name="omnibar_primary_background">#666666</color>
+    <color name="omnibarBackground">#5e6168</color>
+    <color name="windowBackground">#2f3135</color>
 
-    <color name="navigation_bar_enabled">#ffffff</color>
-    <color name="navigation_bar_disabled">#999999</color>
+    <color name="black">#333333</color>
+    <color name="subtleGrey">#f0f0f0</color>
+    <color name="warmGrey">#939393</color>
+    <color name="midGreen">#3fa140</color>
 
-    <color name="tab_switcher_background">#222222</color>
-    <color name="tab_switcher_bottom_bar_background">#444444</color>
-    <color name="tab_switcher_bottom_bar_fire_background">#111111</color>
-    <color name="tab_switcher_bottom_bar_fire_text">#666666</color>
-
-    <color name="tab_text_primary">#ffffff</color>
-    <color name="tab_text_secondary">#cccccc</color>
-
-    <color name="tab_background">#666666</color>
 </resources>

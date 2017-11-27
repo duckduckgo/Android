@@ -1,0 +1,73 @@
+{
+  "categories": {
+    "Advertising": [
+      {
+        "anadurl.com": {
+          "http://anadurl.com/": [
+            "99anadurl.com"
+          ]
+        },
+        "ItIsATracker": {
+          "dnt": "eff",
+          "https://itisatracker.com/": [
+            "itisatracker.com"
+          ]
+        }
+      }
+    ],
+    "Analytics": [
+      {
+        "analytics.com": {
+          "http://analyticsurl.com/": [
+            "analyticsurl.com"
+          ]
+        }
+      }
+    ],
+    "Content": [
+      {
+        "content.com": {
+          "http://acontenturl.com/": [
+            "acontenturl.com"
+          ]
+        }
+      }
+    ],
+    "Disconnect": [
+      {
+        "disconnect.com": {
+          "http://adisconnecturl.com/": [
+            "adisconnecturl.com"
+          ]
+        }
+      }
+    ],
+    "Social": [
+      {
+        "asocialurl.com": {
+          "http://asocialurl.com/": [
+            "99asocialurl.com"
+          ]
+        }
+      },
+      {
+        "anothersocialurl.com": {
+          "http://www.anothersocialurl.com/": [
+            "anothersocialurl.com",
+            "55anothersocialurl.com",
+            "99anothersocialurl.com"
+          ]
+        }
+      }
+    ],
+    "UnknownCategory": [
+      {
+        "unknowncategory.com": {
+          "http://unknowncategoryurl.com/": [
+            "anunknowncategory.com"
+          ]
+        }
+      }
+    ]
+  }
+}

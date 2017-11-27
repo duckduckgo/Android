@@ -1,49 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.duckduckgo.app">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.duckduckgo.app.browser">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name=".App"
+        android:name="com.duckduckgo.app.global.DuckDuckGoApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".ui.main.MainActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:launchMode="singleInstance">
+            android:name=".BrowserActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateAlwaysVisible">
+        </activity>
+        <activity
+            android:name="com.duckduckgo.app.home.HomeActivity"
+            android:label="@string/title_activity_home"
+            android:parentActivityName="com.duckduckgo.app.home.HomeActivity"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.WEB_SEARCH" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.ASSIST" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-            </intent-filter>
         </activity>
-        <activity android:name=".ui.bookmarks.BookmarksActivity" />
+        <activity
+            android:name="com.duckduckgo.app.privacydashboard.PrivacyDashboardActivity"
+            android:label="@string/privacyDashboardActivityTitle"
+            android:parentActivityName=".BrowserActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="org.acra.dialog.CrashReportDialog"
+            android:theme="@style/CrashReportingDialogStyle"
+            tools:replace="android:theme" />
+
     </application>
 
 </manifest>

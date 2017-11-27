@@ -1,58 +1,22 @@
 <resources>
+
     <string name="app_name">DuckDuckGo</string>
+    <string name="go">Go</string>
+    <string name="privacyDashboard">Privacy Dashboard</string>
+    <string name="refresh">Refresh</string>
+    <string name="back">Back</string>
+    <string name="forward">Forward</string>
+    <string name="omnibarInputHint">Search or type URL</string>
+    <string name="clearButtonContentDescription">Clear search input</string>
 
-    <!-- General Strings -->
-    <string name="edit">Edit</string>
-    <string name="bookmarks">Bookmarks</string>
-    <string name="save">Save</string>
-    <string name="cancel">Cancel</string>
-
-    <!-- Omnibar -->
-    <string name="omnibar_search_edit_text_hint">Search DuckDuckGo</string>
-
-    <!-- Browser Menu -->
-    <string name="browser_menu_back">Back</string>
-    <string name="browser_menu_forward">Forward</string>
-    <string name="browser_menu_refresh">Refresh</string>
-    <string name="browser_menu_save_bookmark">Save bookmark</string>
-    <string name="browser_menu_bookmarks">@string/bookmarks</string>
-    <string name="browser_menu_tab_switcher">Tab switcher</string>
-    <string name="browser_menu_delete_text">Delete text</string>
-    <string name="browser_menu_new_tab">New tab</string>
-    <string name="browser_menu_copy_url">Copy URL</string>
-
-    <!-- Main -->
-    <string name="main_label_copy_url_to_clipboard">URL</string>
-    <string name="main_copy_to_clipboard_success">Url copied to clipboard</string>
-
-    <!-- Bookmarks -->
-    <string name="bookmarks_toolbar">@string/bookmarks</string>
-    <string name="bookmarks_empty">No bookmarks yet</string>
-
-    <!-- Bookmarks Menu -->
-    <string name="bookmarks_menu_edit">@string/edit</string>
-
-    <!-- Edit Bookmark Dialog -->
-    <string name="bookmark_dialog_save_button">@string/save</string>
-    <string name="bookmark_dialog_cancel_button">@string/cancel</string>
-    <string name="bookmark_dialog_title_edit">Edit bookmark</string>
-    <string name="bookmark_dialog_title_save">Save bookmark</string>
-    <string name="bookmark_dialog_name_hint">Bookmark name</string>
-    <string name="bookmark_dialog_url_hint">Bookmark URL</string>
-
-    <!-- Tab Switcher -->
-    <string name="tab_switcher_title">Private Tabs</string>
-    <string name="tab_switcher_title_no_tabs">No Tabs</string>
-    <string name="tab_switcher_fire_button">Clear All</string>
-    <string name="tab_switcher_done_button">Done</string>
-
-    <!-- Content description -->
-    <string name="content_description_omnibar_back_button">Cancel search input</string>
-    <string name="content_description_bookmark_delete_button">Delete bookmark</string>
-    <string name="content_description_bookmark_drag_item">Move item</string>
-    <string name="content_description_tab_delete_button">Delete tab</string>
-    <string name="content_description_tab_favicon_image_view">Favicon</string>
-    <string name="content_description_tabswitcher_new_button">Create new tab</string>
-    <string name="content_description_tabswitcher_fire_button">Delete all tabs and data</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
+    
+    <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
+    <string name="privacyProtectionToggle">Privacy Protection On</string>
+    <string name="privacyProtectionState">PRIVACY PROTECTION ENABLED</string>
+    <string name="privacyGradeContentDescription">Privacy Grade</string>
+    <string name="trackerNetworksContentDescription">Tracker networks icon</string>
+    <string name="trackerNetworksBlocked">%s Tracker Networks Blocked</string>
 
 </resources>

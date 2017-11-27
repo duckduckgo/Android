@@ -1,0 +1,26 @@
+<!--
+  ~ Copyright (c) 2017 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:width="22dp"
+        android:height="22dp"
+        android:viewportWidth="22.0"
+        android:viewportHeight="22.0">
+    <path
+        android:pathData="M11.923,11.67a0.87,0.87 0,0 0,0.223 0.595l-1.98,0.506c-0.283,-0.342 -0.446,-0.804 -0.446,-1.37 0,-1.681 1.92,-1.934 1.92,-2.679 0,-0.327 -0.238,-0.58 -0.878,-0.58 -0.566,0 -1.146,0.298 -1.563,0.774L7.769,7.28c0.82,-0.923 2.055,-1.4 3.276,-1.4 1.964,0 3.185,0.953 3.185,2.382 0,2.129 -2.307,2.292 -2.307,3.409m-0.849,4.45c-0.759,0 -1.399,-0.64 -1.399,-1.399 0,-0.744 0.64,-1.384 1.4,-1.384 0.758,0 1.399,0.64 1.399,1.384 0,0.76 -0.64,1.4 -1.4,1.4M11,0C4.925,0 0,4.925 0,11s4.925,11 11,11 11,-4.925 11,-11S17.075,0 11,0"
+        android:fillType="evenOdd"
+        android:fillColor="#A7A8AB"/>
+</vector>
