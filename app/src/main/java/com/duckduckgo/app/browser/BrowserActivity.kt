@@ -68,6 +68,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         configureToolbar()
         configureWebView()
         configureUrlInput()
+        configureRootViewTouchHandler()
     }
 
     private fun render(viewState: BrowserViewModel.ViewState) {
@@ -160,6 +161,14 @@ class BrowserActivity : DuckDuckGoActivity() {
     override fun onRestoreInstanceState(bundle: Bundle) {
         super.onRestoreInstanceState(bundle)
         webView.restoreState(bundle)
+    }
+
+    private fun configureRootViewTouchHandler() {
+        rootView.setOnTouchListener { _, _ ->
+            clearViewPriorToAnimation()
+            supportFinishAfterTransition()
+            true
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
