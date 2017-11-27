@@ -84,9 +84,7 @@ class BrowserActivity : DuckDuckGoActivity() {
             false -> pageLoadingIndicator.hide()
         }
 
-        if (viewState.searchTerm != null) {
-            urlInput.updateIfDifferent(viewState.searchTerm)
-        } else if (shouldUpdateUrl(viewState, viewState.url)) {
+        if (shouldUpdateUrl(viewState, viewState.url)) {
             urlInput.setText(viewState.url)
             appBarLayout.setExpanded(true, true)
         }

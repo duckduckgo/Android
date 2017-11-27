@@ -44,12 +44,12 @@ class BrowserViewModel(
             val progress: Int = 0,
             val url: String? = null,
             val isEditing: Boolean = false,
-            val browserShowing: Boolean = false,
-            val searchTerm: String? = null
+            val browserShowing: Boolean = false
     )
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val query: SingleLiveEvent<String> = SingleLiveEvent()
+    private var lastQuery: String? = null
 
     init {
         loadTrackerClients()
@@ -68,10 +68,10 @@ class BrowserViewModel(
         }
 
         if (queryUrlConverter.isWebUrl(input)) {
-            viewState.value = currentViewState().copy(searchTerm = null)
+            lastQuery = null
             query.value = queryUrlConverter.convertUri(input)
         } else {
-            viewState.value = currentViewState().copy(searchTerm = input)
+            lastQuery = input
             query.value = queryUrlConverter.convertQueryToUri(input).toString()
         }
     }
@@ -90,8 +90,8 @@ class BrowserViewModel(
         Timber.v("Url changed: $url")
         var newViewState = currentViewState().copy(url = url, browserShowing = true)
 
-        if (!duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
-            newViewState = newViewState.copy(searchTerm = null)
+        if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
+            newViewState = newViewState.copy(url = lastQuery)
         }
         viewState.value = newViewState
     }
