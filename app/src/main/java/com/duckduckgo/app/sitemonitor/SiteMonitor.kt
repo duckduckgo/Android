@@ -19,12 +19,13 @@ package com.duckduckgo.app.sitemonitor
 import com.duckduckgo.app.trackerdetection.model.NetworkTrackers
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import java.io.Serializable
+import java.util.concurrent.CopyOnWriteArrayList
 
 class SiteMonitor constructor(private val networkTrackers: NetworkTrackers) : Serializable {
 
     var url: String? = null
 
-    private var trackingEvents: MutableList<TrackingEvent> = ArrayList()
+    private val trackingEvents = CopyOnWriteArrayList<TrackingEvent>()
 
     val trackerNetworkCount: Int
         get() = trackingEvents
@@ -36,9 +37,7 @@ class SiteMonitor constructor(private val networkTrackers: NetworkTrackers) : Se
         get() = trackingEvents.size
 
     fun trackerDetected(event: TrackingEvent) {
-        synchronized(trackingEvents) {
-            trackingEvents.add(event)
-        }
+        trackingEvents.add(event)
     }
 
 }

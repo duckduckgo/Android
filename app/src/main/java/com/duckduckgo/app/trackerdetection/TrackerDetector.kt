@@ -18,13 +18,14 @@ package com.duckduckgo.app.trackerdetection
 
 import com.duckduckgo.app.trackerdetection.Client.ClientName
 import com.duckduckgo.app.trackerdetection.model.ResourceType
+import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class TrackerDetector @Inject constructor() {
 
-    private val clients = ArrayList<Client>()
+    private val clients = CopyOnWriteArrayList<Client>()
 
     fun addClient(client: Client) {
         clients.add(client)
