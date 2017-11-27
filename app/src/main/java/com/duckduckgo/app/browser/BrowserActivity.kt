@@ -26,12 +26,12 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
 import android.widget.TextView
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.hide
 import com.duckduckgo.app.global.view.hideKeyboard
+import com.duckduckgo.app.global.view.isDifferent
 import com.duckduckgo.app.global.view.show
 import kotlinx.android.synthetic.main.activity_browser.*
 import kotlinx.android.synthetic.main.content_browser.*
@@ -204,13 +204,5 @@ class BrowserActivity : DuckDuckGoActivity() {
         acceptingRenderUpdates = false
         urlInput.text.clear()
         webView.hide()
-    }
-}
-
-private fun EditText.isDifferent(newInput: String?): Boolean = text.toString() != newInput
-
-private fun EditText.updateIfDifferent(newInput: String) {
-    if (isDifferent(newInput)) {
-        setText(newInput)
     }
 }
