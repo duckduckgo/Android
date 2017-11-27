@@ -5,9 +5,11 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="omnibarBackground">#5e6168</color>
+    <color name="windowBackground">#2f3135</color>
 
     <color name="black">#333333</color>
     <color name="subtleGrey">#f0f0f0</color>
     <color name="warmGrey">#939393</color>
     <color name="midGreen">#3fa140</color>
+
 </resources>

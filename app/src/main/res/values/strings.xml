@@ -6,9 +6,12 @@
     <string name="refresh">Refresh</string>
     <string name="back">Back</string>
     <string name="forward">Forward</string>
-    <string name="omnibarInputHint">Search or URL</string>
+    <string name="omnibarInputHint">Search or type URL</string>
     <string name="clearButtonContentDescription">Clear search input</string>
 
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
+    
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
     <string name="privacyProtectionToggle">Privacy Protection On</string>
     <string name="privacyProtectionState">PRIVACY PROTECTION ENABLED</string>

@@ -29,7 +29,7 @@ class DuckDuckGoRequestRewriterTest {
 
     @Before
     fun before() {
-        testee = DuckDuckGoRequestRewriter()
+        testee = DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector())
         builder = Uri.Builder()
     }
 

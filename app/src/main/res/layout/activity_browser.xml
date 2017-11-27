@@ -21,6 +21,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/rootView"
     tools:context="com.duckduckgo.app.browser.BrowserActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -58,6 +59,7 @@
                         android:background="@color/omnibarBackground"
                         android:elevation="4dp"
                         android:fontFamily="sans-serif-medium"
+                        android:transitionName="@string/transition_url_input"
                         android:hint="@string/omnibarInputHint"
                         android:imeOptions="flagNoExtractUi|actionDone"
                         android:inputType="textUri|textShortMessage|textNoSuggestions"

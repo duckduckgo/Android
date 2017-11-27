@@ -19,7 +19,10 @@ package com.duckduckgo.app.browser
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -27,9 +30,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
-import com.duckduckgo.app.global.view.hide
-import com.duckduckgo.app.global.view.hideKeyboard
-import com.duckduckgo.app.global.view.show
+import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacydashboard.PrivacyDashboardActivity
 import kotlinx.android.synthetic.main.activity_browser.*
 import kotlinx.android.synthetic.main.content_browser.*
@@ -41,8 +42,14 @@ class BrowserActivity : DuckDuckGoActivity() {
     @Inject lateinit var webChromeClient: BrowserChromeClient
     @Inject lateinit var viewModelFactory: ViewModelFactory
 
+    private var acceptingRenderUpdates = true
+
     private val viewModel: BrowserViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(BrowserViewModel::class.java)
+    }
+
+    companion object {
+        fun intent(context: Context): Intent = Intent(context, BrowserActivity::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,42 +67,79 @@ class BrowserActivity : DuckDuckGoActivity() {
         configureToolbar()
         configureWebView()
         configureUrlInput()
+        configureRootViewTouchHandler()
     }
 
     private fun render(viewState: BrowserViewModel.ViewState) {
-        when (viewState.isLoading) {
-            true -> pageLoadingIndicator.show()
-            false -> {
-                pageLoadingIndicator.hide()
-            }
+
+        if (!acceptingRenderUpdates) return
+
+        when (viewState.browserShowing) {
+            true -> webView.show()
+            false -> webView.hide()
         }
 
-        viewState.url?.let {
-            if (urlInput.text.toString() != it) {
-                urlInput.setText(it)
-                appBarLayout.setExpanded(true, true)
-            }
+        when (viewState.isLoading) {
+            true -> pageLoadingIndicator.show()
+            false -> pageLoadingIndicator.hide()
+        }
+
+        if (shouldUpdateUrl(viewState, viewState.url)) {
+            urlInput.setText(viewState.url)
+            appBarLayout.setExpanded(true, true)
         }
 
         pageLoadingIndicator.progress = viewState.progress
-        if (viewState.isEditing) clearUrlButton.show() else clearUrlButton.hide()
+
+        when (viewState.showClearButton) {
+            true -> showClearButton()
+            false -> hideClearButton()
+        }
     }
+
+    private fun showClearButton() {
+        clearUrlButton.show()
+        urlInput.updatePadding(paddingEnd = 40.toPx())
+    }
+
+    private fun hideClearButton() {
+        clearUrlButton.hide()
+        urlInput.updatePadding(paddingEnd = 10.toPx())
+    }
+
+    private fun shouldUpdateUrl(viewState: BrowserViewModel.ViewState, url: String?) =
+            viewState.url != null && !viewState.isEditing && urlInput.isDifferent(url)
 
     private fun configureToolbar() {
         setSupportActionBar(toolbar)
-        supportActionBar?.title = null
+
+        supportActionBar?.let {
+            it.title = null
+            it.setDisplayHomeAsUpEnabled(true)
+            it.setDisplayShowHomeEnabled(true)
+        }
     }
 
     private fun configureUrlInput() {
         urlInput.onFocusChangeListener = View.OnFocusChangeListener { _: View, hasFocus: Boolean ->
             viewModel.urlFocusChanged(hasFocus)
+
+            if (hasFocus) {
+                viewModel.onUrlInputValueChanged(urlInput.text.toString(), urlInput.hasFocus())
+            }
         }
+
+        urlInput.addTextChangedListener(object : TextChangedWatcher() {
+            override fun afterTextChanged(editable: Editable) {
+                viewModel.onUrlInputValueChanged(urlInput.text.toString(), urlInput.hasFocus())
+            }
+        })
 
         clearUrlButton.setOnClickListener { urlInput.setText("") }
     }
 
     private fun userEnteredQuery() {
-        viewModel.onQueryEntered(urlInput.text.toString())
+        viewModel.onUserSubmittedQuery(urlInput.text.toString())
         urlInput.hideKeyboard()
         focusDummy.requestFocus()
     }
@@ -139,6 +183,14 @@ class BrowserActivity : DuckDuckGoActivity() {
         webView.restoreState(bundle)
     }
 
+    private fun configureRootViewTouchHandler() {
+        rootView.setOnTouchListener { _, _ ->
+            clearViewPriorToAnimation()
+            supportFinishAfterTransition()
+            true
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_browser_activity, menu)
         return true
@@ -146,6 +198,11 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            android.R.id.home -> {
+                clearViewPriorToAnimation()
+                supportFinishAfterTransition()
+                return true
+            }
             R.id.privacy_dashboard -> {
                 launchPrivacyDashboard()
                 return true
@@ -174,8 +231,18 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     override fun onBackPressed() {
-        if (webView.canGoBack()) webView.goBack()
-        else super.onBackPressed()
+        if (webView.canGoBack()) {
+            webView.goBack()
+            return
+        }
+        clearViewPriorToAnimation()
+        super.onBackPressed()
+    }
+
+    private fun clearViewPriorToAnimation() {
+        acceptingRenderUpdates = false
+        urlInput.text.clear()
+        webView.hide()
     }
 
 }

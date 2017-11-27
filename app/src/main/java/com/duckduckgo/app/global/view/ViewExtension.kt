@@ -50,7 +50,7 @@ fun View.hide(): View {
 /**
  * Remove the view (visibility = View.GONE)
  */
-fun View.remove(): View {
+fun View.gone(): View {
     if (visibility != View.GONE) {
         visibility = View.GONE
     }
@@ -77,6 +77,18 @@ fun View.hideKeyboard(): Boolean {
     } catch (ignored: RuntimeException) {
     }
     return false
+}
+
+/**
+ * Update the padding. Only specify the padding you want updated; all others will take current value
+ *
+ * Values are to be specified in pixels.
+ */
+fun View.updatePadding(paddingStart: Int = getPaddingStart(),
+                       paddingTop: Int = getPaddingTop(),
+                       paddingEnd: Int = getPaddingEnd(),
+                       paddingBottom: Int = getPaddingBottom()) {
+    setPaddingRelative(paddingStart, paddingTop, paddingEnd, paddingBottom)
 }
 
 fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density).toInt()

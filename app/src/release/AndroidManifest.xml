@@ -15,16 +15,17 @@
   ~ limitations under the License.
   -->
 
-<com.duckduckgo.app.browser.NestedWebView
-    android:id="@+id/webView"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:focusable="true"
-    android:focusableInTouchMode="true"
-    android:visibility="gone"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:visibility="visible"/>
+<manifest package="com.duckduckgo.app.browser"
+          xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
 
+    <application tools:ignore="GoogleAppIndexingWarning">
+
+        <activity
+            android:name="org.acra.dialog.CrashReportDialog"
+            tools:replace="android:theme"
+            android:theme="@style/CrashReportingDialogStyle" />
+
+    </application>
+
+</manifest>
