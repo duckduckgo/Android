@@ -22,7 +22,7 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 
 
-class UrlTest {
+class UriExtensionTest {
 
     @Test
     fun whenUriDoesNotHaveASchemeThenWithSchemeAppendsHttp() {

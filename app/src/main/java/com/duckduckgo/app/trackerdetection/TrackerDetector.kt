@@ -36,11 +36,6 @@ class TrackerDetector @Inject constructor() {
     }
 
     fun shouldBlock(url: String, documentUrl: String, resourceType: ResourceType): Boolean {
-        for (client: Client in clients) {
-            if (client.matches(url, documentUrl, resourceType)) {
-                return true
-            }
-        }
-        return false
+        return clients.any { it.matches(url, documentUrl, resourceType) }
     }
 }

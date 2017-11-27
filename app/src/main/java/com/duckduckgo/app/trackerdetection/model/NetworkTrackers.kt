@@ -32,16 +32,15 @@ class NetworkTrackers @Inject constructor() : Serializable {
     }
 
     fun network(url: String): String? {
-
-        val lookupHost = Uri.parse(url)?.baseHost() ?: return null
-
         return trackers
-                .filter { it: NetworkTracker ->
-                    val trackerHost = Uri.parse(it.url).baseHost()
-                    val networkHost = Uri.parse(it.networkUrl).baseHost()
-                    lookupHost == trackerHost || lookupHost == networkHost || lookupHost.endsWith(".$trackerHost") || lookupHost.endsWith(".$networkHost")
-                }
+                .filter { isSameOrSubDomain(it.url, url) || isSameOrSubDomain(it.networkUrl, url) }
                 .map { it.networkName }
                 .firstOrNull()
+    }
+
+    private fun isSameOrSubDomain(parent: String, child: String): Boolean {
+        val parentHost = Uri.parse(parent)?.baseHost() ?: return false
+        val childHost = Uri.parse(child)?.baseHost() ?: return false
+        return parentHost == childHost || childHost.endsWith(".$parentHost")
     }
 }

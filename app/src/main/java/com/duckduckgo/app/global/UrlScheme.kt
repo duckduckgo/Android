@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2017 DuckDuckGo
  *
- * Licensed under the   Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -13,31 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.duckduckgo.app.global
 
-import android.net.Uri
-import android.net.Uri.parse
-import com.duckduckgo.app.global.UrlScheme.Companion.http
 
 class UrlScheme {
     companion object {
         const val https = "https"
         const val http = "http"
     }
-}
-
-fun Uri.withScheme(): Uri {
-    if (scheme == null) {
-        return parse("${http}://${toString()}")
-    }
-
-    return this
-}
-
-/**
- * Trys to resolve a host (even if the scheme is missing), returning
- * a basic host without the "www" subdomain.
- */
-fun Uri.baseHost(): String? {
-    return withScheme().host?.removePrefix("www.")
 }
