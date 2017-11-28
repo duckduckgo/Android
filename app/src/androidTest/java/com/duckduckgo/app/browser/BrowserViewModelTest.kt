@@ -155,6 +155,7 @@ class BrowserViewModelTest {
 
     @Test
     fun whenUserDismissesKeyboardAfterBrowserShownThenShouldNotConsumeBackButtonEvent() {
+        testee.urlChanged("")
         assertFalse(testee.userDismissedKeyboard())
     }
 }
