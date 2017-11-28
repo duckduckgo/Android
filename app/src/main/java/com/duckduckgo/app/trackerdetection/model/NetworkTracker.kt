@@ -14,22 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.app.trackerdetection.model
 
-import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.privacydashboard.PrivacyDashboardActivity
+import java.io.Serializable
 
-import dagger.Module
-import dagger.android.ContributesAndroidInjector
-
-@Module
-abstract class ActivityBindingModule {
-
-    @ActivityScoped
-    @ContributesAndroidInjector
-    abstract fun browserActivity(): BrowserActivity
-
-    @ActivityScoped
-    @ContributesAndroidInjector
-    abstract fun privacyDashboardActivity(): PrivacyDashboardActivity
+interface NetworkTracker : Serializable {
+    val url: String
+    val networkName: String
+    val networkUrl: String
 }

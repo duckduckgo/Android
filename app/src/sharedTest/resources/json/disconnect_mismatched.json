@@ -1,0 +1,24 @@
+{
+	"categories": {
+		"Advertising": [{
+			"anadurl.com": {
+				"http://anadurl.com/": [
+					"99anadurl.com"
+				]
+			}
+		}],
+		"Social": [{
+			"http://asocialurl.com/": [
+				"99asocialurl.com"
+			]
+		}, {
+			"anothersocialurl.com": {
+				"http://www.anothersocialurl.com/": [
+					"anothersocialurl.com",
+					"55anothersocialurl.com",
+					"99anothersocialurl.com"
+				]
+			}
+		}]
+	}
+}

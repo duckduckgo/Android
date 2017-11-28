@@ -20,23 +20,15 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.trackerdetection.AdBlockPlus
-import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName
-import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName.EASYLIST
-import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName.EASYPRIVACY
-import com.duckduckgo.app.trackerdetection.TrackerDetector
-import com.duckduckgo.app.trackerdetection.api.TrackerListService
-import com.duckduckgo.app.trackerdetection.store.TrackerDataProvider
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import com.duckduckgo.app.sitemonitor.SiteMonitor
+import com.duckduckgo.app.trackerdetection.model.NetworkTrackers
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import timber.log.Timber
 
 class BrowserViewModel(
         private val queryUrlConverter: OmnibarEntryConverter,
-        private val trackerDataProvider: TrackerDataProvider,
-        private val trackerDetector: TrackerDetector,
-        private val trackerListService: TrackerListService,
-        private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector) :
+        private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+        private val networkTrackers: NetworkTrackers) :
         WebViewClientListener, ViewModel() {
 
     data class ViewState(
@@ -58,9 +50,9 @@ class BrowserViewModel(
     }
 
     private var lastQuery: String? = null
+    var siteMonitor: SiteMonitor? = null
 
     init {
-        loadTrackerClients()
         viewState.value = ViewState()
     }
 
@@ -91,9 +83,15 @@ class BrowserViewModel(
         viewState.value = currentViewState().copy(progress = newProgress)
     }
 
-    override fun loadingStateChange(isLoading: Boolean) {
-        Timber.v("Loading state changed. isLoading=$isLoading")
-        viewState.value = currentViewState().copy(isLoading = isLoading)
+    override fun loadingStarted() {
+        Timber.v("Loading started")
+        viewState.value = currentViewState().copy(isLoading = true)
+        siteMonitor = SiteMonitor(networkTrackers)
+    }
+
+    override fun loadingFinished() {
+        Timber.v("Loading finished")
+        viewState.value = currentViewState().copy(isLoading = false)
     }
 
     override fun urlChanged(url: String?) {
@@ -104,48 +102,18 @@ class BrowserViewModel(
             newViewState = newViewState.copy(url = lastQuery)
         }
         viewState.value = newViewState
+        siteMonitor?.url = url
+    }
+
+    override fun trackerDetected(event: TrackingEvent) {
+        siteMonitor?.trackerDetected(event)
     }
 
     private fun currentViewState(): ViewState = viewState.value!!
 
-    private fun loadTrackerClients() {
-
-        if (!trackerDetector.hasClient(EASYLIST)) {
-            addTrackerClient(EASYLIST)
-        }
-
-        if (!trackerDetector.hasClient(EASYPRIVACY)) {
-            addTrackerClient(EASYPRIVACY)
-        }
-    }
-
-    private fun addTrackerClient(name: ClientName) {
-
-        if (trackerDataProvider.hasData(name)) {
-            val client = AdBlockPlus(name)
-            client.loadProcessedData(trackerDataProvider.loadData(name))
-            trackerDetector.addClient(client)
-            return
-        }
-
-        trackerListService.list(name.name.toLowerCase())
-                .subscribeOn(Schedulers.io())
-                .map { responseBody ->
-                    val client = AdBlockPlus(name)
-                    client.loadBasicData(responseBody.bytes())
-                    trackerDataProvider.saveData(name, client.getProcessedData())
-                    return@map client
-                }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ client ->
-                    trackerDetector.addClient(client)
-                }, { error ->
-                    Timber.e(error)
-                })
-    }
 
     fun urlFocusChanged(hasFocus: Boolean) {
-        if(!hasFocus) {
+        if (!hasFocus) {
             viewState.value = currentViewState().copy(isEditing = hasFocus, showClearButton = false)
         } else {
             viewState.value = currentViewState().copy(isEditing = hasFocus)
@@ -157,11 +125,19 @@ class BrowserViewModel(
         viewState.value = currentViewState().copy(isEditing = hasFocus, showClearButton = showClearButton)
     }
 
-    fun userDismissedKeyboard() {
-        if(!currentViewState().browserShowing) {
+    /**
+     * Returns a boolean indicating if the back button pressed was consumed or not
+     *
+     * May also instruct the Activity to navigate to a different screen because of the back button press
+     */
+    fun userDismissedKeyboard(): Boolean {
+        if (!currentViewState().browserShowing) {
             navigation.value = NavigationCommand.LANDING_PAGE
+            return true
         }
+        return false
     }
+
 }
 
 

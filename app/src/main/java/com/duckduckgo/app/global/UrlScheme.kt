@@ -14,22 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.app.global
 
-import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.privacydashboard.PrivacyDashboardActivity
 
-import dagger.Module
-import dagger.android.ContributesAndroidInjector
-
-@Module
-abstract class ActivityBindingModule {
-
-    @ActivityScoped
-    @ContributesAndroidInjector
-    abstract fun browserActivity(): BrowserActivity
-
-    @ActivityScoped
-    @ContributesAndroidInjector
-    abstract fun privacyDashboardActivity(): PrivacyDashboardActivity
+class UrlScheme {
+    companion object {
+        const val https = "https"
+        const val http = "http"
+    }
 }

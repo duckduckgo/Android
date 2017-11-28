@@ -23,8 +23,9 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.duckduckgo.app.trackerdetection.ResourceType
 import com.duckduckgo.app.trackerdetection.TrackerDetector
+import com.duckduckgo.app.trackerdetection.model.ResourceType
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.content_browser.view.*
@@ -32,9 +33,13 @@ import timber.log.Timber
 import javax.inject.Inject
 
 
-class BrowserWebViewClient @Inject constructor(private val requestRewriter: DuckDuckGoRequestRewriter, private var trackerDetector: TrackerDetector) : WebViewClient() {
+class BrowserWebViewClient @Inject constructor(
+        private val requestRewriter: DuckDuckGoRequestRewriter,
+        private var trackerDetector: TrackerDetector
+) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
+
 
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         Timber.v("Url ${request.url}")
@@ -53,14 +58,14 @@ class BrowserWebViewClient @Inject constructor(private val requestRewriter: Duck
     }
 
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-        webViewClientListener?.loadingStateChange(true)
+        webViewClientListener?.loadingStarted()
         webViewClientListener?.urlChanged(url)
     }
 
     override fun onPageFinished(view: WebView?, url: String?) {
-        webViewClientListener?.loadingStateChange(false)
+        webViewClientListener?.loadingFinished()
+        webViewClientListener?.urlChanged(url)
     }
-
 
     @WorkerThread
     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
@@ -78,6 +83,7 @@ class BrowserWebViewClient @Inject constructor(private val requestRewriter: Duck
         val url = request.url.toString()
         if (documentUrl != null && trackerDetector.shouldBlock(url, documentUrl, ResourceType.from(request))) {
             Timber.v("WAS BLOCKED $url")
+            webViewClientListener?.trackerDetected(TrackingEvent(url, documentUrl, true))
             return true
         }
 

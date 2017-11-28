@@ -14,22 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.app.trackerdetection.model
 
-import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.privacydashboard.PrivacyDashboardActivity
-
-import dagger.Module
-import dagger.android.ContributesAndroidInjector
-
-@Module
-abstract class ActivityBindingModule {
-
-    @ActivityScoped
-    @ContributesAndroidInjector
-    abstract fun browserActivity(): BrowserActivity
-
-    @ActivityScoped
-    @ContributesAndroidInjector
-    abstract fun privacyDashboardActivity(): PrivacyDashboardActivity
-}
+data class DisconnectTracker(override val url: String,
+                             val category: String,
+                             override val networkName: String,
+                             override val networkUrl: String) : NetworkTracker

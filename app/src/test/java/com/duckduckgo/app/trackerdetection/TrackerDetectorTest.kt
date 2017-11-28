@@ -16,9 +16,10 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import com.duckduckgo.app.trackerdetection.model.ResourceType
 import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
-import mock
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -30,8 +31,8 @@ class TrackerDetectorTest {
     private val trackerDetector = TrackerDetector()
 
     companion object {
-        private val documentUrl = "http://example.com/index.com"
-        private val resourceUrl = "http://somedomain.com/update.js"
+        private const val documentUrl = "http://example.com/index.com"
+        private const val resourceUrl = "http://somedomain.com/update.js"
         private val resourceType = ResourceType.UNKNOWN
     }
 
@@ -41,7 +42,7 @@ class TrackerDetectorTest {
     }
 
     @Test
-    fun whenAllClientsFailToMatchThenSouldBlockIsFalse() {
+    fun whenAllClientsFailToMatchThenShouldBlockIsFalse() {
         trackerDetector.addClient(neverMatchingClient())
         trackerDetector.addClient(neverMatchingClient())
         assertFalse(trackerDetector.shouldBlock(resourceUrl, documentUrl, resourceType))
@@ -61,14 +62,14 @@ class TrackerDetectorTest {
         assertTrue(trackerDetector.shouldBlock(resourceUrl, documentUrl, resourceType))
     }
 
-    private fun alwaysMatchingClient(): TrackerDetectionClient {
-        val client: TrackerDetectionClient = mock()
+    private fun alwaysMatchingClient(): Client {
+        val client: Client = mock()
         whenever(client.matches(anyString(), anyString(), any())).thenReturn(true)
         return client
     }
 
-    private fun neverMatchingClient(): TrackerDetectionClient {
-        val client: TrackerDetectionClient = mock()
+    private fun neverMatchingClient(): Client {
+        val client: Client = mock()
         whenever(client.matches(anyString(), anyString(), any())).thenReturn(false)
         return client
     }

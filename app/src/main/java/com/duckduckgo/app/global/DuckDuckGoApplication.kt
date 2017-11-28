@@ -20,6 +20,7 @@ import android.app.Activity
 import android.app.Application
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.DaggerAppComponent
+import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
@@ -34,12 +35,16 @@ class DuckDuckGoApplication : HasActivityInjector, Application() {
     @Inject
     lateinit var crashReportingInitializer: CrashReportingInitializer
 
+    @Inject
+    lateinit var trackerDataLoader: TrackerDataLoader
+
     override fun onCreate() {
         super.onCreate()
 
         configureDependencyInjection()
         configureLogging()
         configureCrashReporting()
+        configureTrackerData()
     }
 
     private fun configureLogging() {
@@ -55,6 +60,10 @@ class DuckDuckGoApplication : HasActivityInjector, Application() {
 
     private fun configureCrashReporting() {
         crashReportingInitializer.init(this)
+    }
+
+    private fun configureTrackerData() {
+        trackerDataLoader.loadData()
     }
 
     override fun activityInjector(): AndroidInjector<Activity> = injector

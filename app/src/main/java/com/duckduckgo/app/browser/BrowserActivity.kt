@@ -32,6 +32,7 @@ import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
+import com.duckduckgo.app.privacydashboard.PrivacyDashboardActivity
 import kotlinx.android.synthetic.main.activity_browser.*
 import kotlinx.android.synthetic.main.content_browser.*
 import javax.inject.Inject
@@ -144,11 +145,14 @@ class BrowserActivity : DuckDuckGoActivity() {
         })
 
         urlInput.onBackKeyListener = object : OnBackKeyListener {
-            override fun onBackKey(): Boolean {
-                viewModel.userDismissedKeyboard()
-                return true
-            }
+            override fun onBackKey(): Boolean = viewModel.userDismissedKeyboard()
         }
+
+        urlInput.addTextChangedListener(object : TextChangedWatcher() {
+            override fun afterTextChanged(editable: Editable) {
+                viewModel.onUrlInputValueChanged(urlInput.text.toString(), urlInput.hasFocus())
+            }
+        })
 
         clearUrlButton.setOnClickListener { urlInput.setText("") }
     }
@@ -216,7 +220,10 @@ class BrowserActivity : DuckDuckGoActivity() {
                 finishActivityAnimated()
                 return true
             }
-
+            R.id.privacy_dashboard -> {
+                launchPrivacyDashboard()
+                return true
+            }
             R.id.refresh_menu_item -> {
                 webView.reload()
                 return true
@@ -236,6 +243,13 @@ class BrowserActivity : DuckDuckGoActivity() {
     private fun finishActivityAnimated() {
         clearViewPriorToAnimation()
         supportFinishAfterTransition()
+    }
+
+    private fun launchPrivacyDashboard() {
+        val siteMonitor = viewModel.siteMonitor
+        if (siteMonitor != null) {
+            startActivity(PrivacyDashboardActivity.intent(this, siteMonitor))
+        }
     }
 
     override fun onBackPressed() {

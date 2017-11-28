@@ -18,19 +18,12 @@ package com.duckduckgo.app.browser
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
-import android.content.Context
 import android.net.Uri
 import com.duckduckgo.app.browser.BrowserViewModel.NavigationCommand
 import com.duckduckgo.app.browser.BrowserViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
-import com.duckduckgo.app.trackerdetection.TrackerDetectionClient
-import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName
-import com.duckduckgo.app.trackerdetection.TrackerDetector
-import com.duckduckgo.app.trackerdetection.api.TrackerListService
-import com.duckduckgo.app.trackerdetection.store.TrackerDataProvider
-import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.whenever
-import mock
+import com.duckduckgo.app.trackerdetection.model.NetworkTrackers
+import com.nhaarman.mockito_kotlin.mock
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -55,13 +48,6 @@ class BrowserViewModelTest {
     @Mock
     private val navigationObserver: Observer<NavigationCommand> = mock()
 
-    @Mock
-    private val mockContext: Context = mock()
-
-    @Mock
-    private val mockTrackerService: TrackerListService = mock()
-
-
     private val testOmnibarConverter: OmnibarEntryConverter = object : OmnibarEntryConverter {
         override fun convertUri(input: String): String = "duckduckgo.com"
         override fun isWebUrl(inputQuery: String): Boolean = true
@@ -72,7 +58,7 @@ class BrowserViewModelTest {
 
     @Before
     fun before() {
-        testee = BrowserViewModel(testOmnibarConverter, TrackerDataProvider(mockContext), testTrackerDetector(), mockTrackerService, DuckDuckGoUrlDetector())
+        testee = BrowserViewModel(testOmnibarConverter, DuckDuckGoUrlDetector(), NetworkTrackers())
         testee.query.observeForever(queryObserver)
         testee.viewState.observeForever(viewStateObserver)
         testee.navigation.observeForever(navigationObserver)
@@ -105,13 +91,13 @@ class BrowserViewModelTest {
 
     @Test
     fun whenViewModelNotifiedThatWebViewIsLoadingThenViewStateIsUpdated() {
-        testee.loadingStateChange(true)
+        testee.loadingStarted()
         assertTrue(testee.viewState.value!!.isLoading)
     }
 
     @Test
-    fun whenViewModelNotifiedThatWebViewIsNotLoadingThenViewStateIsUpdated() {
-        testee.loadingStateChange(false)
+    fun whenViewModelNotifiedThatWebViewHasFinishedLoadingThenViewStateIsUpdated() {
+        testee.loadingFinished()
         assertFalse(testee.viewState.value!!.isLoading)
     }
 
@@ -162,17 +148,13 @@ class BrowserViewModelTest {
         verify(navigationObserver, never()).onChanged(NavigationCommand.LANDING_PAGE)
     }
 
-    private fun testTrackerDetector(): TrackerDetector {
-        val trackerDetector = TrackerDetector()
-        trackerDetector.addClient(clientMock(ClientName.EASYLIST))
-        trackerDetector.addClient(clientMock(ClientName.EASYPRIVACY))
-        return trackerDetector
+    @Test
+    fun whenUserDismissesKeyboardBeforeBrowserShownThenShouldConsumeBackButtonEvent() {
+        assertTrue(testee.userDismissedKeyboard())
     }
 
-    private fun clientMock(name: ClientName): TrackerDetectionClient {
-        val client: TrackerDetectionClient = mock()
-        whenever(client.name).thenReturn(name)
-        whenever(client.matches(ArgumentMatchers.anyString(), ArgumentMatchers.anyString(), any())).thenReturn(false)
-        return client
+    @Test
+    fun whenUserDismissesKeyboardAfterBrowserShownThenShouldNotConsumeBackButtonEvent() {
+        assertFalse(testee.userDismissedKeyboard())
     }
 }

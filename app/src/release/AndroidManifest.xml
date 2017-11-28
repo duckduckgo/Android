@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (c) 2017 DuckDuckGo
   ~
@@ -14,5 +15,17 @@
   ~ limitations under the License.
   -->
 
-<resources>
-</resources>
+<manifest package="com.duckduckgo.app.browser"
+          xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
+
+    <application tools:ignore="GoogleAppIndexingWarning">
+
+        <activity
+            android:name="org.acra.dialog.CrashReportDialog"
+            tools:replace="android:theme"
+            android:theme="@style/CrashReportingDialogStyle" />
+
+    </application>
+
+</manifest>

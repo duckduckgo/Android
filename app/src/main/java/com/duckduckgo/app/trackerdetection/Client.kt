@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2017 DuckDuckGo
- *
+ *  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,20 @@
  * limitations under the License.
  */
 
-import org.mockito.Mockito
+package com.duckduckgo.app.trackerdetection
 
-inline fun <reified T: Any> mock() = Mockito.mock(T::class.java)
+import com.duckduckgo.app.trackerdetection.model.ResourceType
+
+interface Client {
+
+    enum class ClientName {
+        EASYLIST,
+        EASYPRIVACY,
+        DISCONNECT
+    }
+
+    val name: ClientName
+
+    fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean
+
+}
