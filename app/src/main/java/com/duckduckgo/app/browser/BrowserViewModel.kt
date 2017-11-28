@@ -48,8 +48,15 @@ class BrowserViewModel(
             val showClearButton: Boolean = false
     )
 
+    /* Observable data for Activity to subscribe to */
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val query: SingleLiveEvent<String> = SingleLiveEvent()
+    val navigation: SingleLiveEvent<NavigationCommand> = SingleLiveEvent()
+
+    enum class NavigationCommand {
+        LANDING_PAGE
+    }
+
     private var lastQuery: String? = null
 
     init {
@@ -148,6 +155,12 @@ class BrowserViewModel(
     fun onUrlInputValueChanged(query: String, hasFocus: Boolean) {
         val showClearButton = hasFocus && query.isNotEmpty()
         viewState.value = currentViewState().copy(isEditing = hasFocus, showClearButton = showClearButton)
+    }
+
+    fun userDismissedKeyboard() {
+        if(!currentViewState().browserShowing) {
+            navigation.value = NavigationCommand.LANDING_PAGE
+        }
     }
 }
 

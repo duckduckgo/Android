@@ -28,6 +28,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
+import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
@@ -61,6 +62,14 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         viewModel.query.observe(this, Observer {
             it?.let { webView.loadUrl(it) }
+        })
+
+        viewModel.navigation.observe(this, Observer {
+            when (it) {
+                BrowserViewModel.NavigationCommand.LANDING_PAGE -> {
+                    finishActivityAnimated()
+                }
+            }
         })
 
         configureToolbar()
@@ -134,6 +143,13 @@ class BrowserActivity : DuckDuckGoActivity() {
             }
         })
 
+        urlInput.onBackKeyListener = object : OnBackKeyListener {
+            override fun onBackKey(): Boolean {
+                viewModel.userDismissedKeyboard()
+                return true
+            }
+        }
+
         clearUrlButton.setOnClickListener { urlInput.setText("") }
     }
 
@@ -184,8 +200,7 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     private fun configureRootViewTouchHandler() {
         rootView.setOnTouchListener { _, _ ->
-            clearViewPriorToAnimation()
-            supportFinishAfterTransition()
+            finishActivityAnimated()
             true
         }
     }
@@ -198,8 +213,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                clearViewPriorToAnimation()
-                supportFinishAfterTransition()
+                finishActivityAnimated()
                 return true
             }
 
@@ -217,6 +231,11 @@ class BrowserActivity : DuckDuckGoActivity() {
             }
         }
         return false
+    }
+
+    private fun finishActivityAnimated() {
+        clearViewPriorToAnimation()
+        supportFinishAfterTransition()
     }
 
     override fun onBackPressed() {

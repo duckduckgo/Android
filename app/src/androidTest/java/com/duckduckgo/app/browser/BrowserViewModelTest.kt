@@ -20,6 +20,8 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
 import android.content.Context
 import android.net.Uri
+import com.duckduckgo.app.browser.BrowserViewModel.NavigationCommand
+import com.duckduckgo.app.browser.BrowserViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.trackerdetection.TrackerDetectionClient
 import com.duckduckgo.app.trackerdetection.TrackerDetectionClient.ClientName
@@ -45,10 +47,13 @@ class BrowserViewModelTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @Mock
-    val viewStateObserver: Observer<BrowserViewModel.ViewState> = mock()
+    private val viewStateObserver: Observer<ViewState> = mock()
 
     @Mock
-    private val observer: Observer<String> = mock()
+    private val queryObserver: Observer<String> = mock()
+
+    @Mock
+    private val navigationObserver: Observer<NavigationCommand> = mock()
 
     @Mock
     private val mockContext: Context = mock()
@@ -68,32 +73,34 @@ class BrowserViewModelTest {
     @Before
     fun before() {
         testee = BrowserViewModel(testOmnibarConverter, TrackerDataProvider(mockContext), testTrackerDetector(), mockTrackerService, DuckDuckGoUrlDetector())
-        testee.query.observeForever(observer)
+        testee.query.observeForever(queryObserver)
         testee.viewState.observeForever(viewStateObserver)
+        testee.navigation.observeForever(navigationObserver)
     }
 
     @After
     fun after() {
-        testee.query.removeObserver(observer)
+        testee.query.removeObserver(queryObserver)
         testee.viewState.removeObserver(viewStateObserver)
+        testee.navigation.removeObserver(navigationObserver)
     }
 
     @Test
     fun whenEmptyInputQueryThenNoQueryMadeAvailableToActivity() {
         testee.onUserSubmittedQuery("")
-        verify(observer, never()).onChanged(ArgumentMatchers.anyString())
+        verify(queryObserver, never()).onChanged(ArgumentMatchers.anyString())
     }
 
     @Test
     fun whenBlankInputQueryThenNoQueryMadeAvailableToActivity() {
         testee.onUserSubmittedQuery("     ")
-        verify(observer, never()).onChanged(ArgumentMatchers.anyString())
+        verify(queryObserver, never()).onChanged(ArgumentMatchers.anyString())
     }
 
     @Test
     fun whenNonEmptyInputThenQueryMadeAvailableToActivity() {
         testee.onUserSubmittedQuery("foo")
-        verify(observer).onChanged(ArgumentMatchers.anyString())
+        verify(queryObserver).onChanged(ArgumentMatchers.anyString())
     }
 
     @Test
@@ -141,6 +148,18 @@ class BrowserViewModelTest {
 
         testee.progressChanged(100)
         assertEquals(100, testee.viewState.value!!.progress)
+    }
+
+    @Test
+    fun whenUserDismissesKeyboardBeforeBrowserShownThenShouldNavigateToLandingPage() {
+        testee.userDismissedKeyboard()
+        verify(navigationObserver).onChanged(NavigationCommand.LANDING_PAGE)
+    }
+
+    @Test
+    fun whenUserDismissesKeyboardAfterBrowserShownThenShouldNotNavigateToLandingPage() {
+        testee.urlChanged("")
+        verify(navigationObserver, never()).onChanged(NavigationCommand.LANDING_PAGE)
     }
 
     private fun testTrackerDetector(): TrackerDetector {
