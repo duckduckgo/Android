@@ -16,9 +16,11 @@
 
 package com.duckduckgo.app.trackerdetection.api
 
+import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import junit.framework.Assert.assertEquals
+import junit.framework.Assert.assertTrue
 import org.junit.Test
 
 class DisconnectJsonConverterTest {
@@ -30,7 +32,30 @@ class DisconnectJsonConverterTest {
     fun whenDisconnectFormatIsValidThenDataIsConverted() {
         val json = json("json/disconnect.json")
         val trackers = jsonAdapter.fromJson(json).trackers
-        assertEquals(9, trackers.count())
+        assertEquals(10, trackers.count())
+    }
+
+    @Test
+    fun whenDisconnectFormatIsValidThenBasicElementsAreConvertedCorrectly() {
+        val json = json("json/disconnect.json")
+        val trackers = jsonAdapter.fromJson(json).trackers
+        assertTrue(trackers.contains(DisconnectTracker("acontenturl.com", "Content", "Content Co", "http://acontenturl.com/")))
+    }
+
+    @Test
+    fun whenDisconnectFormatIsValidThenElementsContaingDntEntryAreConvertedCorrectly() {
+        val json = json("json/disconnect.json")
+        val trackers = jsonAdapter.fromJson(json).trackers
+        assertTrue(trackers.contains(DisconnectTracker("itisatracker.com", "Advertising", "ItsATracker", "https://itisatracker.com/")))
+    }
+
+    @Test
+    fun whenDisconnectFormatIsValidThenNetworksWithMultipleTrackersAreConvertedCorrectly() {
+        val json = json("json/disconnect.json")
+        val trackers = jsonAdapter.fromJson(json).trackers
+        assertTrue(trackers.contains(DisconnectTracker("anothersocialurl.com", "Social", "SocialNet", "http://www.anothersocialurl.com/")))
+        assertTrue(trackers.contains(DisconnectTracker("55anothersocialurl.com", "Social", "SocialNet", "http://www.anothersocialurl.com/")))
+        assertTrue(trackers.contains(DisconnectTracker("99anothersocialurl.com", "Social", "SocialNet", "http://www.anothersocialurl.com/")))
     }
 
     @Test(expected = JsonDataException::class)

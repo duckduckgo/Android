@@ -64,7 +64,6 @@ class BrowserWebViewClient @Inject constructor(
 
     override fun onPageFinished(view: WebView?, url: String?) {
         webViewClientListener?.loadingFinished()
-        webViewClientListener?.urlChanged(url)
     }
 
     @WorkerThread
