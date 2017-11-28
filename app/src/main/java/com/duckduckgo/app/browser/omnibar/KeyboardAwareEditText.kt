@@ -17,9 +17,11 @@
 package com.duckduckgo.app.browser.omnibar
 
 import android.content.Context
+import android.graphics.Rect
 import android.support.v7.widget.AppCompatEditText
 import android.util.AttributeSet
 import android.view.KeyEvent
+import com.duckduckgo.app.global.view.showKeyboard
 
 /**
  * Variant of EditText which detects when the user has dismissed the soft keyboard
@@ -36,6 +38,7 @@ class KeyboardAwareEditText : AppCompatEditText {
     override fun onKeyPreIme(keyCode: Int, event: KeyEvent): Boolean {
 
         if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP) {
+
             if (onBackKeyListener != null) {
                 return onBackKeyListener!!.onBackKey()
             }
@@ -44,6 +47,14 @@ class KeyboardAwareEditText : AppCompatEditText {
         }
 
         return super.onKeyPreIme(keyCode, event)
+    }
+
+    override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
+        super.onFocusChanged(focused, direction, previouslyFocusedRect)
+
+        if(focused) {
+            showKeyboard()
+        }
     }
 }
 

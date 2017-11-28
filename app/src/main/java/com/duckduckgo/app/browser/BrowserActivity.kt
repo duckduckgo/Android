@@ -145,7 +145,10 @@ class BrowserActivity : DuckDuckGoActivity() {
         })
 
         urlInput.onBackKeyListener = object : OnBackKeyListener {
-            override fun onBackKey(): Boolean = viewModel.userDismissedKeyboard()
+            override fun onBackKey(): Boolean {
+                focusDummy.requestFocus()
+                return viewModel.userDismissedKeyboard()
+            }
         }
 
         urlInput.addTextChangedListener(object : TextChangedWatcher() {
