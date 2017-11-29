@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser
 
 import android.graphics.Bitmap
-import android.support.annotation.AnyThread
 import android.support.annotation.WorkerThread
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
@@ -26,9 +25,6 @@ import android.webkit.WebViewClient
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.ResourceType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import kotlinx.android.synthetic.main.content_browser.view.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -39,6 +35,7 @@ class BrowserWebViewClient @Inject constructor(
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
+    var currentUrl: String? = null
 
 
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
@@ -47,15 +44,11 @@ class BrowserWebViewClient @Inject constructor(
             view.loadUrl(newUri.toString())
             return true
         }
-
-        if (block(request, view.url)) {
-            return true
-        }
-
         return false
     }
 
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+        currentUrl = url
         webViewClientListener?.loadingStarted()
         webViewClientListener?.urlChanged(url)
     }
@@ -68,7 +61,7 @@ class BrowserWebViewClient @Inject constructor(
     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
         Timber.v("Intercepting resource ${request.url}")
 
-        if (block(request, view.safeUrl())) {
+        if (block(request, currentUrl)) {
             return WebResourceResponse(null, null, null)
         }
 
@@ -77,23 +70,11 @@ class BrowserWebViewClient @Inject constructor(
 
     private fun block(request: WebResourceRequest, documentUrl: String?): Boolean {
         val url = request.url.toString()
+
         if (documentUrl != null && trackerDetector.shouldBlock(url, documentUrl, ResourceType.from(request))) {
             webViewClientListener?.trackerDetected(TrackingEvent(url, documentUrl, true))
             return true
         }
         return false
     }
-
-
-    /**
-     * Access the webview url from any thread; jumps onto the main thread to achieve this
-     */
-    @AnyThread
-    private fun WebView.safeUrl(): String? {
-        return Observable.just(webView)
-                .observeOn(AndroidSchedulers.mainThread())
-                .map { webView -> webView.url }
-                .blockingFirst()
-    }
-
 }

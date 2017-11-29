@@ -43,7 +43,7 @@ class DisconnectJsonConverterTest {
     }
 
     @Test
-    fun whenDisconnectFormatIsValidThenElementsContaingDntEntryAreConvertedCorrectly() {
+    fun whenDisconnectFormatIsValidThenElementsContainingDntEntryAreConvertedCorrectly() {
         val json = json("json/disconnect.json")
         val trackers = jsonAdapter.fromJson(json).trackers
         assertTrue(trackers.contains(DisconnectTracker("itisatracker.com", "Advertising", "ItsATracker", "https://itisatracker.com/")))
