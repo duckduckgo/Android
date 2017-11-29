@@ -28,6 +28,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
+import com.duckduckgo.app.browser.BrowserViewModel.NavigationCommand.LANDING_PAGE
 import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
@@ -66,10 +67,8 @@ class BrowserActivity : DuckDuckGoActivity() {
         })
 
         viewModel.navigation.observe(this, Observer {
-            when (it) {
-                BrowserViewModel.NavigationCommand.LANDING_PAGE -> {
-                    finishActivityAnimated()
-                }
+            if (it == LANDING_PAGE) {
+                finishActivityAnimated()
             }
         })
 
