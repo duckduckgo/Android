@@ -40,8 +40,15 @@ class BrowserViewModel(
             val showClearButton: Boolean = false
     )
 
+    /* Observable data for Activity to subscribe to */
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val query: SingleLiveEvent<String> = SingleLiveEvent()
+    val navigation: SingleLiveEvent<NavigationCommand> = SingleLiveEvent()
+
+    enum class NavigationCommand {
+        LANDING_PAGE
+    }
+
     private var lastQuery: String? = null
     var siteMonitor: SiteMonitor? = null
 
@@ -90,6 +97,7 @@ class BrowserViewModel(
     override fun urlChanged(url: String?) {
         Timber.v("Url changed: $url")
         var newViewState = currentViewState().copy(url = url, browserShowing = true)
+
         if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
             newViewState = newViewState.copy(url = lastQuery)
         }
@@ -116,6 +124,20 @@ class BrowserViewModel(
         val showClearButton = hasFocus && query.isNotEmpty()
         viewState.value = currentViewState().copy(isEditing = hasFocus, showClearButton = showClearButton)
     }
+
+    /**
+     * Returns a boolean indicating if the back button pressed was consumed or not
+     *
+     * May also instruct the Activity to navigate to a different screen because of the back button press
+     */
+    fun userDismissedKeyboard(): Boolean {
+        if (!currentViewState().browserShowing) {
+            navigation.value = NavigationCommand.LANDING_PAGE
+            return true
+        }
+        return false
+    }
+
 }
 
 
