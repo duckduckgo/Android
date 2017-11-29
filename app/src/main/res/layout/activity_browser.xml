@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2017 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,13 +14,12 @@
   ~ limitations under the License.
   -->
 
-<android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/rootView"
     tools:context="com.duckduckgo.app.browser.BrowserActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -51,15 +49,15 @@
                     android:layout_height="match_parent"
                     app:layout_scrollFlags="scroll|enterAlways">
 
-                    <EditText
+                    <com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
                         android:id="@+id/urlInput"
+                        style="@style/Base.V7.Widget.AppCompat.EditText"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_margin="8dp"
                         android:background="@color/omnibarBackground"
                         android:elevation="4dp"
                         android:fontFamily="sans-serif-medium"
-                        android:transitionName="@string/transition_url_input"
                         android:hint="@string/omnibarInputHint"
                         android:imeOptions="flagNoExtractUi|actionDone"
                         android:inputType="textUri|textShortMessage|textNoSuggestions"
@@ -72,10 +70,10 @@
                         android:textColor="#ffffff"
                         android:textSize="13sp"
                         android:textStyle="normal"
+                        android:transitionName="@string/transition_url_input"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        tools:text="https://duckduckgo.com/?q=henr..https://duckduckgo.com/?q=henr.."
-                        />
+                        tools:text="https://duckduckgo.com/?q=henr..https://duckduckgo.com/?q=henr.." />
 
                     <ImageView
                         android:id="@+id/clearUrlButton"
@@ -91,8 +89,7 @@
                         app:layout_constraintBottom_toBottomOf="@id/urlInput"
                         app:layout_constraintEnd_toEndOf="@id/urlInput"
                         app:layout_constraintTop_toTopOf="@id/urlInput"
-                        tools:visibility="visible"
-                        />
+                        tools:visibility="visible" />
 
                 </android.support.constraint.ConstraintLayout>
 
@@ -110,18 +107,17 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/toolbar"
                 tools:progress="50"
-                tools:visibility="visible"
-                />
+                tools:visibility="visible" />
         </android.support.constraint.ConstraintLayout>
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_browser"/>
+    <include layout="@layout/content_browser" />
 
     <View
         android:id="@+id/focusDummy"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:focusableInTouchMode="true"/>
+        android:focusableInTouchMode="true" />
 
 </android.support.design.widget.CoordinatorLayout>

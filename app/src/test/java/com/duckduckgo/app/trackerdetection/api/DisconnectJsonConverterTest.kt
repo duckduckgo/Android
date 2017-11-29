@@ -19,8 +19,8 @@ package com.duckduckgo.app.trackerdetection.api
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.assertTrue
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class DisconnectJsonConverterTest {
