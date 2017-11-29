@@ -22,7 +22,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-open class NetworkTrackers @Inject constructor() : Serializable {
+class NetworkTrackers @Inject constructor() : Serializable {
 
     private var trackers: List<NetworkTracker> = ArrayList()
 
