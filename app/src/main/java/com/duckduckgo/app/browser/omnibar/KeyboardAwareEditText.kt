@@ -34,6 +34,7 @@ class KeyboardAwareEditText : AppCompatEditText {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     var onBackKeyListener: OnBackKeyListener? = null
+    private var showImeAfterFirstLayout: Boolean = true
 
     override fun onKeyPreIme(keyCode: Int, event: KeyEvent): Boolean {
 
@@ -49,10 +50,20 @@ class KeyboardAwareEditText : AppCompatEditText {
         return super.onKeyPreIme(keyCode, event)
     }
 
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+        if (showImeAfterFirstLayout) {
+            post({
+                showKeyboard()
+                showImeAfterFirstLayout = false
+            })
+        }
+    }
+
     override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
         super.onFocusChanged(focused, direction, previouslyFocusedRect)
 
-        if(focused) {
+        if (focused) {
             showKeyboard()
         }
     }
