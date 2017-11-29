@@ -207,7 +207,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun configureRootViewTouchHandler() {
-        rootView.setOnTouchListener { _, _ ->
+        webViewContainer.setOnTouchListener { _, _ ->
             finishActivityAnimated()
             true
         }
