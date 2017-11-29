@@ -124,8 +124,6 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         supportActionBar?.let {
             it.title = null
-            it.setDisplayHomeAsUpEnabled(true)
-            it.setDisplayShowHomeEnabled(true)
         }
     }
 
@@ -219,10 +217,6 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> {
-                finishActivityAnimated()
-                return true
-            }
             R.id.privacy_dashboard -> {
                 launchPrivacyDashboard()
                 return true
