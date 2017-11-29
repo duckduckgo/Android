@@ -16,14 +16,17 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.trackerdetection.Client.ClientName
+import com.duckduckgo.app.trackerdetection.model.NetworkTrackers
 import com.duckduckgo.app.trackerdetection.model.ResourceType
+import timber.log.Timber
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TrackerDetector @Inject constructor() {
+class TrackerDetector @Inject constructor(private val networkTrackers: NetworkTrackers) {
 
     private val clients = CopyOnWriteArrayList<Client>()
 
@@ -36,6 +39,25 @@ class TrackerDetector @Inject constructor() {
     }
 
     fun shouldBlock(url: String, documentUrl: String, resourceType: ResourceType): Boolean {
-        return clients.any { it.matches(url, documentUrl, resourceType) }
+
+        if (firstParty(url, documentUrl)) {
+            Timber.v("${url} is a first party url")
+            return false
+        }
+
+        val matches = clients.any { it.matches(url, documentUrl, resourceType) }
+        val matchText = if (matches) "WAS" else "was not"
+        Timber.v("${url} ${matchText} identified as a tracker")
+
+        return matches
+
+    }
+
+    private fun firstParty(firstUrl: String, secondUrl: String): Boolean {
+        return sameOrSubdomain(firstUrl, secondUrl) || sameOrSubdomain(secondUrl, firstUrl) || sameNetwork(firstUrl, secondUrl)
+    }
+
+    private fun sameNetwork(firstUrl: String, secondUrl: String): Boolean {
+        return networkTrackers.network(firstUrl) != null && networkTrackers.network(firstUrl) == networkTrackers.network(secondUrl)
     }
 }

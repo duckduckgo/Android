@@ -16,21 +16,16 @@
 
 package com.duckduckgo.app.trackerdetection
 
-import android.net.Uri
-import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 import com.duckduckgo.app.trackerdetection.model.ResourceType
 
 class DisconnectClient(override val name: Client.ClientName, private val trackers: List<DisconnectTracker>) : Client {
 
     override fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean {
-
-        val host = Uri.parse(url)?.baseHost() ?: return false
-
         return trackers
                 .filter { bannedCategories().contains(it.category) }
-                .map { Uri.parse(it.url) }
-                .any { host == it.baseHost() || host.endsWith(".${it.baseHost()}") }
+                .any { sameOrSubdomain(url, it.url) }
     }
 
     private fun bannedCategories(): List<String> {

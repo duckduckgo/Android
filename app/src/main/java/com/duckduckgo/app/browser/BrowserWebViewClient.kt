@@ -42,8 +42,6 @@ class BrowserWebViewClient @Inject constructor(
 
 
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-        Timber.v("Url ${request.url}")
-
         if (requestRewriter.shouldRewriteRequest(request)) {
             val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(request.url)
             view.loadUrl(newUri.toString())
@@ -78,15 +76,11 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     private fun block(request: WebResourceRequest, documentUrl: String?): Boolean {
-
         val url = request.url.toString()
         if (documentUrl != null && trackerDetector.shouldBlock(url, documentUrl, ResourceType.from(request))) {
-            Timber.v("WAS BLOCKED $url")
             webViewClientListener?.trackerDetected(TrackingEvent(url, documentUrl, true))
             return true
         }
-
-        Timber.v("NOT blocked $url")
         return false
     }
 
