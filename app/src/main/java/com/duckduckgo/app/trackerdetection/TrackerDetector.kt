@@ -41,13 +41,13 @@ class TrackerDetector @Inject constructor(private val networkTrackers: NetworkTr
     fun shouldBlock(url: String, documentUrl: String, resourceType: ResourceType): Boolean {
 
         if (firstParty(url, documentUrl)) {
-            Timber.v("${url} is a first party url")
+            Timber.v("$url is a first party url")
             return false
         }
 
         val matches = clients.any { it.matches(url, documentUrl, resourceType) }
         val matchText = if (matches) "WAS" else "was not"
-        Timber.v("${documentUrl} resource ${url} ${matchText} identified as a tracker")
+        Timber.v("$documentUrl resource $url $matchText identified as a tracker")
 
         return matches
 

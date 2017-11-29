@@ -35,7 +35,7 @@ class BrowserWebViewClient @Inject constructor(
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
-    var currentUrl: String? = null
+    private var currentUrl: String? = null
 
 
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {

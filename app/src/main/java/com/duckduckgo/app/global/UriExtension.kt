@@ -21,7 +21,7 @@ import com.duckduckgo.app.global.UrlScheme.Companion.http
 
 fun Uri.withScheme(): Uri {
     if (scheme == null) {
-        return parse("${http}://${toString()}")
+        return parse("$http://${toString()}")
     }
 
     return this
