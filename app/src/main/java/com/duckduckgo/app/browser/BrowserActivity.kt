@@ -76,6 +76,10 @@ class BrowserActivity : DuckDuckGoActivity() {
         configureWebView()
         configureUrlInput()
         configureRootViewTouchHandler()
+
+        if (shouldShowKeyboard()) {
+            urlInput.showKeyboard()
+        }
     }
 
     private fun render(viewState: BrowserViewModel.ViewState) {
@@ -262,4 +266,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         urlInput.text.clear()
         webView.hide()
     }
+
+    private fun shouldShowKeyboard(): Boolean =
+            viewModel.viewState.value?.browserShowing ?: false ?: true
 }

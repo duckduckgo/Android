@@ -18,8 +18,7 @@
             android:name=".BrowserActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysVisible">
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name="com.duckduckgo.app.home.HomeActivity"
