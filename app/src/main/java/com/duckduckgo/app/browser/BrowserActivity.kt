@@ -35,7 +35,6 @@ import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacydashboard.PrivacyDashboardActivity
 import kotlinx.android.synthetic.main.activity_browser.*
-import kotlinx.android.synthetic.main.content_browser.*
 import javax.inject.Inject
 
 class BrowserActivity : DuckDuckGoActivity() {
@@ -75,7 +74,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         configureToolbar()
         configureWebView()
         configureUrlInput()
-        configureRootViewTouchHandler()
+        configureDummyViewTouchHandler()
 
         if (shouldShowKeyboard()) {
             urlInput.showKeyboard()
@@ -206,8 +205,11 @@ class BrowserActivity : DuckDuckGoActivity() {
         webView.restoreState(bundle)
     }
 
-    private fun configureRootViewTouchHandler() {
-        webViewContainer.setOnTouchListener { _, _ ->
+    /**
+     * Dummy view captures touches on areas outside of the toolbar, before the WebView is visible
+     */
+    private fun configureDummyViewTouchHandler() {
+        focusDummy.setOnTouchListener { _, _ ->
             finishActivityAnimated()
             true
         }

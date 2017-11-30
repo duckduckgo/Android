@@ -14,110 +14,125 @@
   ~ limitations under the License.
   -->
 
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.duckduckgo.app.browser.BrowserActivity">
+    app:layout_scrollFlags="scroll|enterAlways"
+    tools:context="com.duckduckgo.app.browser.BrowserActivity"
+    tools:menu="menu_browser_activity">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/appBarLayout"
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/rootView"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:fitsSystemWindows="true"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_height="match_parent">
 
-        <android.support.constraint.ConstraintLayout
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appBarLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:fitsSystemWindows="true"
+            android:theme="@style/AppTheme.AppBarOverlay"
             app:layout_scrollFlags="scroll|enterAlways">
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
+            <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                app:contentInsetEnd="0dp"
-                app:contentInsetStart="0dp"
-                app:layout_scrollFlags="scroll|enterAlways"
-                app:popupTheme="@style/AppTheme.PopupOverlay">
+                android:layout_height="match_parent"
+                app:layout_scrollFlags="scroll|enterAlways">
 
-                <android.support.constraint.ConstraintLayout
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layout_scrollFlags="scroll|enterAlways">
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="?attr/colorPrimary"
+                    app:contentInsetEnd="0dp"
+                    app:contentInsetStart="0dp"
+                    app:layout_scrollFlags="scroll|enterAlways"
+                    app:popupTheme="@style/AppTheme.PopupOverlay">
 
-                    <com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
-                        android:id="@+id/urlInput"
-                        style="@style/Base.V7.Widget.AppCompat.EditText"
+                    <android.support.constraint.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_margin="8dp"
-                        android:background="@color/omnibarBackground"
-                        android:elevation="4dp"
-                        android:fontFamily="sans-serif-medium"
-                        android:hint="@string/omnibarInputHint"
-                        android:imeOptions="flagNoExtractUi|actionDone"
-                        android:inputType="textUri|textShortMessage|textNoSuggestions"
-                        android:maxLines="1"
-                        android:paddingBottom="4dp"
-                        android:paddingEnd="40dp"
-                        android:paddingStart="10dp"
-                        android:paddingTop="4dp"
-                        android:selectAllOnFocus="true"
-                        android:textColor="#ffffff"
-                        android:textSize="13sp"
-                        android:textStyle="normal"
-                        android:transitionName="@string/transition_url_input"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        tools:text="https://duckduckgo.com/?q=henr..https://duckduckgo.com/?q=henr.." />
+                        android:layout_height="match_parent">
 
-                    <ImageView
-                        android:id="@+id/clearUrlButton"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginEnd="6dp"
-                        android:background="?selectableItemBackground"
-                        android:contentDescription="@string/clearButtonContentDescription"
-                        android:elevation="6dp"
-                        android:src="@drawable/ic_cancel_24dp"
-                        android:tint="#FFF"
-                        android:visibility="gone"
-                        app:layout_constraintBottom_toBottomOf="@id/urlInput"
-                        app:layout_constraintEnd_toEndOf="@id/urlInput"
-                        app:layout_constraintTop_toTopOf="@id/urlInput"
-                        tools:visibility="visible" />
+                        <com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
+                            android:id="@+id/urlInput"
+                            style="@style/Base.V7.Widget.AppCompat.EditText"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="8dp"
+                            android:background="@color/omnibarBackground"
+                            android:elevation="4dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:hint="@string/omnibarInputHint"
+                            android:imeOptions="flagNoExtractUi|actionDone"
+                            android:inputType="textUri|textShortMessage|textNoSuggestions"
+                            android:maxLines="1"
+                            android:paddingBottom="4dp"
+                            android:paddingEnd="40dp"
+                            android:paddingStart="10dp"
+                            android:paddingTop="4dp"
+                            android:selectAllOnFocus="true"
+                            android:textColor="#ffffff"
+                            android:textSize="13sp"
+                            android:textStyle="normal"
+                            android:transitionName="@string/transition_url_input"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            tools:text="https://duckduckgo.com/?q=henr..https://duckduckgo.com/?q=henr.." />
 
-                </android.support.constraint.ConstraintLayout>
+                        <ImageView
+                            android:id="@+id/clearUrlButton"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginEnd="6dp"
+                            android:background="?selectableItemBackground"
+                            android:contentDescription="@string/clearButtonContentDescription"
+                            android:elevation="6dp"
+                            android:src="@drawable/ic_cancel_24dp"
+                            android:tint="#FFF"
+                            android:visibility="gone"
+                            app:layout_constraintBottom_toBottomOf="@id/urlInput"
+                            app:layout_constraintEnd_toEndOf="@+id/urlInput"
+                            app:layout_constraintTop_toTopOf="@id/urlInput"
+                            tools:visibility="visible" />
 
-            </android.support.v7.widget.Toolbar>
+                    </android.support.constraint.ConstraintLayout>
 
-            <ProgressBar
-                android:id="@+id/pageLoadingIndicator"
-                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="4dp"
-                android:layout_marginBottom="4dp"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/toolbar"
-                tools:progress="50"
-                tools:visibility="visible" />
-        </android.support.constraint.ConstraintLayout>
+                </android.support.v7.widget.Toolbar>
 
-    </android.support.design.widget.AppBarLayout>
+                <ProgressBar
+                    android:id="@+id/pageLoadingIndicator"
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:visibility="invisible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    tools:progress="50"
+                    tools:visibility="visible" />
 
-    <include layout="@layout/content_browser" />
+            </android.support.constraint.ConstraintLayout>
 
-    <View
-        android:id="@+id/focusDummy"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:focusableInTouchMode="true" />
+        </android.support.design.widget.AppBarLayout>
 
-</android.support.design.widget.CoordinatorLayout>
+        <View
+            android:id="@+id/focusDummy"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:focusableInTouchMode="true" />
+
+        <com.duckduckgo.app.browser.NestedWebView
+            android:id="@+id/webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:visibility="gone"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:visibility="visible" />
+
+    </android.support.design.widget.CoordinatorLayout>
+</android.support.constraint.ConstraintLayout>
+
