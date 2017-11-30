@@ -28,7 +28,7 @@ import com.duckduckgo.app.trackerdetection.model.ResourceType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import kotlinx.android.synthetic.main.content_browser.view.*
+import kotlinx.android.synthetic.main.activity_browser.view.*
 import timber.log.Timber
 import javax.inject.Inject
 
