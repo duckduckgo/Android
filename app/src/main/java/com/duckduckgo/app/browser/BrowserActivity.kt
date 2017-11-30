@@ -264,6 +264,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     private fun clearViewPriorToAnimation() {
         acceptingRenderUpdates = false
         urlInput.text.clear()
+        urlInput.hideKeyboard()
         webView.hide()
     }
 
