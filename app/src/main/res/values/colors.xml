@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#47494c</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimaryDark">@color/darkGrey</color>
+    <color name="colorPrimary">@color/charcoalGrey</color>
+    <color name="colorAccent">@color/orange</color>
 
-    <color name="omnibarBackground">#5e6168</color>
-    <color name="windowBackground">#2f3135</color>
+    <color name="windowBackground">@color/charcoal</color>
+    <color name="searchBackground">@color/slateGray</color>
 
-    <color name="black">#333333</color>
-    <color name="subtleGrey">#f0f0f0</color>
+    <color name="almostBlack">#333333</color>
+    <color name="darkGrey">#222325</color>
+    <color name="charcoal">#2f3135</color>
+    <color name="charcoalGrey">#47494c</color>
+    <color name="slateGray">#5e6168</color>
     <color name="warmGrey">#939393</color>
+    <color name="subtleGrey">#f0f0f0</color>
+
     <color name="midGreen">#3fa140</color>
+    <color name="orange">#de5833</color>
 
 </resources>

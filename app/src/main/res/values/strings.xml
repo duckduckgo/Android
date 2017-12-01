@@ -1,6 +1,8 @@
 <resources>
 
-    <string name="app_name">DuckDuckGo</string>
+    <string name="appName">DuckDuckGo</string>
+    <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
+
     <string name="go">Go</string>
     <string name="privacyDashboard">Privacy Dashboard</string>
     <string name="refresh">Refresh</string>
@@ -8,8 +10,6 @@
     <string name="forward">Forward</string>
     <string name="omnibarInputHint">Search or type URL</string>
     <string name="clearButtonContentDescription">Clear search input</string>
-    <string name="title_activity_home">HomeActivity</string>
-    <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
 
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
     <string name="privacyProtectionToggle">Privacy Protection On</string>

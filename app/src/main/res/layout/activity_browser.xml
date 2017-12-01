@@ -61,7 +61,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_margin="8dp"
-                            android:background="@color/omnibarBackground"
+                            android:background="@color/searchBackground"
                             android:elevation="4dp"
                             android:fontFamily="sans-serif-medium"
                             android:hint="@string/omnibarInputHint"
