@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.graphics.Bitmap
+import android.support.annotation.AnyThread
 import android.support.annotation.WorkerThread
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
@@ -25,6 +26,8 @@ import android.webkit.WebViewClient
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.ResourceType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -61,6 +64,10 @@ class BrowserWebViewClient @Inject constructor(
     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
         Timber.v("Intercepting resource ${request.url}")
 
+        if (view.elementClicked() == request.url.toString()) {
+            return null
+        }
+
         if (block(request, currentUrl)) {
             return WebResourceResponse(null, null, null)
         }
@@ -75,6 +82,24 @@ class BrowserWebViewClient @Inject constructor(
             webViewClientListener?.trackerDetected(TrackingEvent(url, documentUrl, true))
             return true
         }
+        
         return false
+    }
+
+    private fun WebView.elementClicked(): String? {
+        return safeHitTestResult()?.extra
+    }
+
+    /**
+     * Access the webview hit test result from any thread; jumps onto the main thread to achieve this
+     */
+    @AnyThread
+    private fun WebView.safeHitTestResult(): WebView.HitTestResult {
+        return Observable.just(this)
+                .observeOn(AndroidSchedulers.mainThread())
+                .map { webView ->
+                    webView.hitTestResult
+                }
+                .blockingFirst()
     }
 }
