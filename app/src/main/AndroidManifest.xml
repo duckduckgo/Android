@@ -9,8 +9,7 @@
         android:name="com.duckduckgo.app.global.DuckDuckGoApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/appName"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
@@ -18,12 +17,11 @@
             android:name=".BrowserActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysVisible">
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name="com.duckduckgo.app.home.HomeActivity"
-            android:label="@string/title_activity_home"
+            android:label="@string/appName"
             android:parentActivityName="com.duckduckgo.app.home.HomeActivity"
             android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme.NoActionBar">
@@ -38,11 +36,6 @@
             android:label="@string/privacyDashboardActivityTitle"
             android:parentActivityName=".BrowserActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name="org.acra.dialog.CrashReportDialog"
-            android:theme="@style/CrashReportingDialogStyle"
-            tools:replace="android:theme" />
-
     </application>
 
 </manifest>

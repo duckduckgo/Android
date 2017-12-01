@@ -16,62 +16,107 @@
 
 package com.duckduckgo.app.trackerdetection
 
-
-import android.support.test.runner.AndroidJUnit4
-import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYLIST
-import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYPRIVACY
+import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
+import com.duckduckgo.app.trackerdetection.model.NetworkTrackers
 import com.duckduckgo.app.trackerdetection.model.ResourceType
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyString
+import java.util.*
 
 
-@RunWith(AndroidJUnit4::class)
 class TrackerDetectorInstrumentationTest {
 
+    private val networkTrackers = NetworkTrackers()
+    private val trackerDetector = TrackerDetector(networkTrackers)
+
     companion object {
-        private val documentUrl = "http://example.com"
         private val resourceType = ResourceType.UNKNOWN
-    }
-
-    private lateinit var testee: TrackerDetector
-
-    @Before
-    fun before() {
-        val easylistAdblock = adblockClient(EASYLIST, "binary/easylist_sample")
-        val easyprivacyAdblock = adblockClient(EASYPRIVACY, "binary/easyprivacy_sample")
-        testee = TrackerDetector()
-        testee.addClient(easyprivacyAdblock)
-        testee.addClient(easylistAdblock)
+        private val network = "Network"
     }
 
     @Test
-    fun whenUrlIsInEasyListThenShouldBlockIsTrue() {
-        val url = "http://imasdk.googleapis.com/js/sdkloader/ima3.js"
-        assertTrue(testee.shouldBlock(url, documentUrl, resourceType))
+    fun whenThereAreNoClientsThenShouldBlockIsFalse() {
+        assertFalse(trackerDetector.shouldBlock("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
     }
 
     @Test
-    fun whenUrlIsInEasyPrivacyListThenShouldBlockIsTrue() {
-        val url = "http://cdn.tagcommander.com/1705/tc_catalog.css"
-        assertTrue(testee.shouldBlock(url, documentUrl, resourceType))
+    fun whenAllClientsFailToMatchThenShouldBlockIsFalse() {
+        trackerDetector.addClient(neverMatchingClient())
+        trackerDetector.addClient(neverMatchingClient())
+        assertFalse(trackerDetector.shouldBlock("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
     }
 
     @Test
-    fun whenUrlIsNotInAnyTrackerListsThenShouldBlockIsFalse() {
-        val url = "https://duckduckgo.com/index.html"
-        assertFalse(testee.shouldBlock(url, documentUrl, resourceType))
+    fun whenAllClientsMatchThenShouldBlockIsTrue() {
+        trackerDetector.addClient(alwaysMatchingClient())
+        trackerDetector.addClient(alwaysMatchingClient())
+        assertTrue(trackerDetector.shouldBlock("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
     }
 
-    private fun adblockClient(name: Client.ClientName, dataFile: String): Client {
-        val data = javaClass.classLoader.getResource(dataFile).readBytes()
-        val initialAdBlock = AdBlockClient(name)
-        initialAdBlock.loadBasicData(data)
-        val adblockWithProcessedData = AdBlockClient(name)
-        adblockWithProcessedData.loadProcessedData(initialAdBlock.getProcessedData())
-        return adblockWithProcessedData
+    @Test
+    fun whenSomeClientsMatchThenShouldBlockIsTrue() {
+        trackerDetector.addClient(neverMatchingClient())
+        trackerDetector.addClient(alwaysMatchingClient())
+        assertTrue(trackerDetector.shouldBlock("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
+    }
+
+    @Test
+    fun whenUrlHasSameDomainAsDocumentThenShouldBlockIsFalse() {
+        trackerDetector.addClient(alwaysMatchingClient())
+        assertFalse(trackerDetector.shouldBlock("http://example.com/update.js", "http://example.com/index.com", resourceType))
+    }
+
+    @Test
+    fun whenUrlIsSubdomainOfDocumentThenShouldBlockIsFalse() {
+        trackerDetector.addClient(alwaysMatchingClient())
+        assertFalse(trackerDetector.shouldBlock("http://mobile.example.com/update.js", "http://example.com/index.com", resourceType))
+    }
+
+    @Test
+    fun whenUrlIsParentOfDocumentThenShouldBlockIsFalse() {
+        trackerDetector.addClient(alwaysMatchingClient())
+        assertFalse(trackerDetector.shouldBlock("http://example.com/update.js", "http://mobile.example.com/index.com", resourceType))
+    }
+
+    @Test
+    fun whenUrlIsNetworkOfDocumentThenShouldBlockIsFalse() {
+        val networks = Arrays.asList(DisconnectTracker("example.com", "", network, "http://thirdparty.com/"))
+        networkTrackers.updateData(networks)
+        assertFalse(trackerDetector.shouldBlock("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
+    }
+
+    @Test
+    fun whenDocumentIsNetworkOfUrlThenShouldBlockIsFalse() {
+        val networks = Arrays.asList(DisconnectTracker("thirdparty.com", "", network, "http://example.com"))
+        networkTrackers.updateData(networks)
+        assertFalse(trackerDetector.shouldBlock("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
+    }
+
+    @Test
+    fun whenUrlSharesSameNetworkAsDocumentThenShouldBlockIsFalse() {
+        val networks = Arrays.asList(
+                DisconnectTracker("thirdparty.com", "", network, "http://network.com"),
+                DisconnectTracker("example.com", "", network, "http://network.com")
+        )
+        networkTrackers.updateData(networks)
+        assertFalse(trackerDetector.shouldBlock("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
+    }
+
+    private fun alwaysMatchingClient(): Client {
+        val client: Client = mock()
+        whenever(client.matches(anyString(), anyString(), any())).thenReturn(true)
+        return client
+    }
+
+    private fun neverMatchingClient(): Client {
+        val client: Client = mock()
+        whenever(client.matches(anyString(), anyString(), any())).thenReturn(false)
+        return client
     }
 
 }

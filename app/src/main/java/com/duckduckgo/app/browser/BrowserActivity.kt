@@ -28,12 +28,13 @@ import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
+import com.duckduckgo.app.browser.BrowserViewModel.NavigationCommand.LANDING_PAGE
+import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacydashboard.PrivacyDashboardActivity
 import kotlinx.android.synthetic.main.activity_browser.*
-import kotlinx.android.synthetic.main.content_browser.*
 import javax.inject.Inject
 
 class BrowserActivity : DuckDuckGoActivity() {
@@ -64,10 +65,20 @@ class BrowserActivity : DuckDuckGoActivity() {
             it?.let { webView.loadUrl(it) }
         })
 
+        viewModel.navigation.observe(this, Observer {
+            if (it == LANDING_PAGE) {
+                finishActivityAnimated()
+            }
+        })
+
         configureToolbar()
         configureWebView()
         configureUrlInput()
-        configureRootViewTouchHandler()
+        configureDummyViewTouchHandler()
+
+        if (shouldShowKeyboard()) {
+            urlInput.showKeyboard()
+        }
     }
 
     private fun render(viewState: BrowserViewModel.ViewState) {
@@ -115,8 +126,6 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         supportActionBar?.let {
             it.title = null
-            it.setDisplayHomeAsUpEnabled(true)
-            it.setDisplayShowHomeEnabled(true)
         }
     }
 
@@ -126,6 +135,19 @@ class BrowserActivity : DuckDuckGoActivity() {
 
             if (hasFocus) {
                 viewModel.onUrlInputValueChanged(urlInput.text.toString(), urlInput.hasFocus())
+            }
+        }
+
+        urlInput.addTextChangedListener(object : TextChangedWatcher() {
+            override fun afterTextChanged(editable: Editable) {
+                viewModel.onUrlInputValueChanged(urlInput.text.toString(), urlInput.hasFocus())
+            }
+        })
+
+        urlInput.onBackKeyListener = object : OnBackKeyListener {
+            override fun onBackKey(): Boolean {
+                focusDummy.requestFocus()
+                return viewModel.userDismissedKeyboard()
             }
         }
 
@@ -183,10 +205,12 @@ class BrowserActivity : DuckDuckGoActivity() {
         webView.restoreState(bundle)
     }
 
-    private fun configureRootViewTouchHandler() {
-        rootView.setOnTouchListener { _, _ ->
-            clearViewPriorToAnimation()
-            supportFinishAfterTransition()
+    /**
+     * Dummy view captures touches on areas outside of the toolbar, before the WebView is visible
+     */
+    private fun configureDummyViewTouchHandler() {
+        focusDummy.setOnTouchListener { _, _ ->
+            finishActivityAnimated()
             true
         }
     }
@@ -198,11 +222,6 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> {
-                clearViewPriorToAnimation()
-                supportFinishAfterTransition()
-                return true
-            }
             R.id.privacy_dashboard -> {
                 launchPrivacyDashboard()
                 return true
@@ -221,6 +240,11 @@ class BrowserActivity : DuckDuckGoActivity() {
             }
         }
         return false
+    }
+
+    private fun finishActivityAnimated() {
+        clearViewPriorToAnimation()
+        supportFinishAfterTransition()
     }
 
     private fun launchPrivacyDashboard() {
@@ -242,7 +266,10 @@ class BrowserActivity : DuckDuckGoActivity() {
     private fun clearViewPriorToAnimation() {
         acceptingRenderUpdates = false
         urlInput.text.clear()
+        urlInput.hideKeyboard()
         webView.hide()
     }
 
+    private fun shouldShowKeyboard(): Boolean =
+            viewModel.viewState.value?.browserShowing ?: false ?: true
 }
