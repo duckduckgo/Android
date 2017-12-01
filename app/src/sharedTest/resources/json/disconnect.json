@@ -2,14 +2,16 @@
   "categories": {
     "Advertising": [
       {
-        "anadurl.com": {
+        "99": {
           "http://anadurl.com/": [
             "99anadurl.com"
           ]
-        },
-        "ItIsATracker": {
-          "dnt": "eff",
-          "https://itisatracker.com/": [
+        }
+      },
+      {
+        "ItsATracker": {
+            "dnt": "eff",
+            "https://itisatracker.com/": [
             "itisatracker.com"
           ]
         }
@@ -17,7 +19,7 @@
     ],
     "Analytics": [
       {
-        "analytics.com": {
+        "Analytics Net": {
           "http://analyticsurl.com/": [
             "analyticsurl.com"
           ]
@@ -26,7 +28,7 @@
     ],
     "Content": [
       {
-        "content.com": {
+        "Content Co": {
           "http://acontenturl.com/": [
             "acontenturl.com"
           ]
@@ -44,14 +46,14 @@
     ],
     "Social": [
       {
-        "asocialurl.com": {
+        "asocial co": {
           "http://asocialurl.com/": [
             "99asocialurl.com"
           ]
         }
       },
       {
-        "anothersocialurl.com": {
+        "SocialNet": {
           "http://www.anothersocialurl.com/": [
             "anothersocialurl.com",
             "55anothersocialurl.com",
@@ -62,7 +64,7 @@
     ],
     "UnknownCategory": [
       {
-        "unknowncategory.com": {
+        "Another Net": {
           "http://unknowncategoryurl.com/": [
             "anunknowncategory.com"
           ]

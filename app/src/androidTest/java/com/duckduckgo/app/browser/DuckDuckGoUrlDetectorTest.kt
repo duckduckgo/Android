@@ -26,7 +26,7 @@ class DuckDuckGoUrlDetectorTest {
     private lateinit var testee: DuckDuckGoUrlDetector
 
     @Before
-    fun setup(){
+    fun setup() {
         testee = DuckDuckGoUrlDetector()
     }
 

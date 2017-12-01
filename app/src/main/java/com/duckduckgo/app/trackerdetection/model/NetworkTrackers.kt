@@ -16,8 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection.model
 
-import android.net.Uri
-import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import java.io.Serializable
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -33,14 +32,8 @@ class NetworkTrackers @Inject constructor() : Serializable {
 
     fun network(url: String): String? {
         return trackers
-                .filter { isSameOrSubDomain(it.url, url) || isSameOrSubDomain(it.networkUrl, url) }
+                .filter { sameOrSubdomain(url, it.url) || sameOrSubdomain(url, it.networkUrl) }
                 .map { it.networkName }
                 .firstOrNull()
-    }
-
-    private fun isSameOrSubDomain(parent: String, child: String): Boolean {
-        val parentHost = Uri.parse(parent)?.baseHost() ?: return false
-        val childHost = Uri.parse(child)?.baseHost() ?: return false
-        return parentHost == childHost || childHost.endsWith(".$parentHost")
     }
 }
