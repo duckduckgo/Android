@@ -26,6 +26,7 @@ class NetworkTrackersInstrumentationTest {
     companion object {
         private const val category = "Social"
         private const val network = "Network"
+        private const val majorNetwork = "google"
     }
 
     private val testee = NetworkTrackers()
@@ -77,6 +78,27 @@ class NetworkTrackersInstrumentationTest {
         val data = listOf(DisconnectTracker("tracker.com", category, network, "http://www.network.com/"))
         testee.updateData(data)
         assertNull(testee.network("http://notsubdomainofnetwork.com/index.html"))
+    }
+
+    @Test
+    fun whenUrlMatchesTrackerInMajorNetworkThenMajorNetworkReturnsName() {
+        val data = listOf(DisconnectTracker("tracker.com", category, majorNetwork, "http://www.network.com/"))
+        testee.updateData(data)
+        assertEquals(majorNetwork, testee.majorNetwork("http://tracker.com/script.js"))
+    }
+
+    @Test
+    fun whenUrlMatchesTrackerOutsideMajorNetworkThenMajorNetworkIsNull() {
+        val data = listOf(DisconnectTracker("tracker.com", category, network, "http://www.network.com/"))
+        testee.updateData(data)
+        assertNull(testee.majorNetwork("http://tracker.com/script.js"))
+    }
+
+    @Test
+    fun whenUrlIsNotATrackerThenMajorNetworkIsNull() {
+        val data = listOf(DisconnectTracker("tracker.com", category, network, "http://www.network.com/"))
+        testee.updateData(data)
+        assertNull(testee.majorNetwork("http://example.com/index.html"))
     }
 
 }
