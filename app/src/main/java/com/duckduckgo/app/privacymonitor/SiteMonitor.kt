@@ -14,30 +14,48 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.sitemonitor
+package com.duckduckgo.app.privacymonitor
 
+import android.net.Uri
+import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.trackerdetection.model.NetworkTrackers
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import java.io.Serializable
 import java.util.concurrent.CopyOnWriteArrayList
 
-class SiteMonitor constructor(private val networkTrackers: NetworkTrackers) : Serializable {
+class SiteMonitor constructor(override val url: String, private val networkTrackers: NetworkTrackers) : PrivacyMonitor, Serializable {
 
-    var url: String? = null
+    var hasHttpResources = false
 
     private val trackingEvents = CopyOnWriteArrayList<TrackingEvent>()
 
-    val trackerNetworkCount: Int
+    override val uri: Uri?
+        get() = Uri.parse(url)
+
+    override val https: HttpsStatus
+        get() = httpsStatus()
+
+    private fun httpsStatus(): HttpsStatus {
+
+        val uri = uri ?: return HttpsStatus.NONE
+
+        if (uri.isHttps) {
+            return if (hasHttpResources) HttpsStatus.MIXED else HttpsStatus.SECURE
+        }
+
+        return HttpsStatus.NONE
+    }
+
+    override val trackerCount: Int
+        get() = trackingEvents.size
+
+    override val trackerNetworkCount: Int
         get() = trackingEvents
                 .mapNotNull { networkTrackers.network(it.trackerUrl) }
                 .distinct()
                 .count()
 
-    val trackerCount: Int
-        get() = trackingEvents.size
-
     fun trackerDetected(event: TrackingEvent) {
         trackingEvents.add(event)
     }
-
 }

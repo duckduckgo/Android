@@ -21,8 +21,8 @@ import android.net.Uri
 class UriString {
     companion object {
         fun sameOrSubdomain(child: String, parent: String): Boolean {
-            val childHost = Uri.parse(child)?.baseHost() ?: return false
-            val parentHost = Uri.parse(parent)?.baseHost() ?: return false
+            val childHost = Uri.parse(child)?.baseHost ?: return false
+            val parentHost = Uri.parse(parent)?.baseHost ?: return false
             return parentHost == childHost || childHost.endsWith(".$parentHost")
         }
     }

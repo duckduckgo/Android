@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.app.privacymonitor
 
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 
-interface WebViewClientListener {
-    fun loadingStarted()
-    fun loadingFinished()
-    fun progressChanged(newProgress: Int)
-    fun urlChanged(url: String?)
-    fun trackerDetected(event: TrackingEvent)
-    fun pageHasHttpResources()
+enum class HttpsStatus {
+    NONE,
+    MIXED,
+    SECURE
 }

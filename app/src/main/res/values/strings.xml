@@ -18,4 +18,8 @@
     <string name="trackerNetworksContentDescription">Tracker networks icon</string>
     <string name="trackerNetworksBlocked">%s Tracker Networks Blocked</string>
 
+    <string name="httpsGood">Encrypted connection</string>
+    <string name="httpsMixed">Mixed encryption connection</string>
+    <string name="httpsBad">Unencrypted connection</string>
+
 </resources>

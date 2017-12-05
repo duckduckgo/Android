@@ -27,6 +27,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.widget.TextView
 import com.duckduckgo.app.browser.BrowserViewModel.NavigationCommand.LANDING_PAGE
 import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
@@ -176,6 +177,7 @@ class BrowserActivity : DuckDuckGoActivity() {
             useWideViewPort = true
             builtInZoomControls = true
             displayZoomControls = false
+            mixedContentMode = MIXED_CONTENT_COMPATIBILITY_MODE
             setSupportZoom(true)
         }
 

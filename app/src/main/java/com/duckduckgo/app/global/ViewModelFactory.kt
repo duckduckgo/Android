@@ -18,6 +18,7 @@ package com.duckduckgo.app.global
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
+import android.content.Context
 import com.duckduckgo.app.browser.BrowserViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
@@ -30,14 +31,15 @@ import javax.inject.Inject
 class ViewModelFactory @Inject constructor(
         private val queryUrlConverter: QueryUrlConverter,
         private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-        private val networkTrackers: NetworkTrackers
+        private val networkTrackers: NetworkTrackers,
+        private val context: Context
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
             with(modelClass) {
                 when {
                     isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, duckDuckGoUrlDetector, networkTrackers)
-                    isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel()
+                    isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(context = context)
                     else ->
                         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }

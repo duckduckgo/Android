@@ -17,8 +17,7 @@
 package com.duckduckgo.app.global
 
 import android.net.Uri
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assert.*
 import org.junit.Test
 
 
@@ -38,26 +37,61 @@ class UriExtensionTest {
 
     @Test
     fun whenUriBeginsWithWwwThenBaseHostReturnsWithoutWww() {
-        val url = "http://www.somehost.com"
-        assertEquals("somehost.com", Uri.parse(url).baseHost())
+        val url = "http://www.example.com"
+        assertEquals("example.com", Uri.parse(url).baseHost)
     }
 
     @Test
     fun whenUriDoesNotBeginWithWwwThenBaseHosReturnsWithSameHost() {
-        val url = "http://somehost.com"
-        assertEquals("somehost.com", Uri.parse(url).baseHost())
+        val url = "http://example.com"
+        assertEquals("example.com", Uri.parse(url).baseHost)
     }
 
     @Test
     fun whenUriDoesNotHaveASchemeThenBaseHostStillResolvesHost() {
-        val url = "www.somehost.com"
-        assertEquals("somehost.com", Uri.parse(url).baseHost())
+        val url = "www.example.com"
+        assertEquals("example.com", Uri.parse(url).baseHost)
     }
 
     @Test
     fun whenUriContainsInvalidHostThenBaseHostIsNull() {
         val url = "about:blank"
-        assertNull(Uri.parse(url).baseHost())
+        assertNull(Uri.parse(url).baseHost)
     }
 
+    @Test
+    fun whenUriIsHttpThenIsHttpIsTrue() {
+        val url = "http://example.com"
+        assertTrue(Uri.parse(url).isHttp)
+    }
+
+    @Test
+    fun whenUriIsHttpsThenIsHttpIsFalse() {
+        val url = "https://example.com"
+        assertFalse(Uri.parse(url).isHttp)
+    }
+
+    @Test
+    fun whenUriIsMalformedThenIsHttpIsFalse() {
+        val url = "[example com]"
+        assertFalse(Uri.parse(url).isHttp)
+    }
+
+    @Test
+    fun whenUriIsHttpsThenIsHttpsIsTrue() {
+        val url = "https://example.com"
+        assertTrue(Uri.parse(url).isHttps)
+    }
+
+    @Test
+    fun whenUriIsHttpThenIsHttpsIsFalse() {
+        val url = "http://example.com"
+        assertFalse(Uri.parse(url).isHttps)
+    }
+
+    @Test
+    fun whenUriIsMalformedThenIsHtpsIsFalse() {
+        val url = "[example com]"
+        assertFalse(Uri.parse(url).isHttps)
+    }
 }
