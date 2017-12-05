@@ -61,23 +61,23 @@ class PrivacyDashboardViewModelTest {
     fun whenHttpsStatusIsSecureThenTextAndIconReflectSame() {
         whenever(monitor.https).thenReturn(HttpsStatus.SECURE)
         testee.updatePrivacyMonitor(monitor)
-        assertEquals("Encrypted connection", testee.viewState.value?.httpsText)
+        assertEquals(getStringResource(R.string.httpsGood), testee.viewState.value?.httpsText)
         assertEquals(R.drawable.dashboard_https_good, testee.viewState.value?.httpsIcon)
     }
 
     @Test
-    fun whenHttpsStatusIsMixedThenTextAndIconReflectsSame() {
+    fun whenHttpsStatusIsMixedThenTextAndIconReflectSame() {
         whenever(monitor.https).thenReturn(HttpsStatus.MIXED)
         testee.updatePrivacyMonitor(monitor)
-        assertEquals("Mixed encryption connection", testee.viewState.value?.httpsText)
+        assertEquals(getStringResource(R.string.httpsMixed), testee.viewState.value?.httpsText)
         assertEquals(R.drawable.dashboard_https_neutral, testee.viewState.value?.httpsIcon)
     }
 
     @Test
-    fun whenHttpsStatusIsNoneThenTextAndIconReflectsSame() {
+    fun whenHttpsStatusIsNoneThenTextAndIconReflectSame() {
         whenever(monitor.https).thenReturn(HttpsStatus.NONE)
         testee.updatePrivacyMonitor(monitor)
-        assertEquals("Unencrypted connection", testee.viewState.value?.httpsText)
+        assertEquals(getStringResource(R.string.httpsBad), testee.viewState.value?.httpsText)
         assertEquals(R.drawable.dashboard_https_bad, testee.viewState.value?.httpsIcon)
     }
 
@@ -93,5 +93,9 @@ class PrivacyDashboardViewModelTest {
         whenever(monitor.trackerNetworkCount).thenReturn(10)
         testee.updatePrivacyMonitor(monitor)
         assertEquals("10 Tracker Networks Blocked", testee.viewState.value?.trackerNetworksText)
+    }
+
+    private fun getStringResource(id: Int): String {
+        return InstrumentationRegistry.getTargetContext().getString(id)
     }
 }
