@@ -42,9 +42,7 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun moshi(): Moshi {
-        return Moshi.Builder().add(DisconnectJsonAdapter()).build()
-    }
+    fun moshi(): Moshi = Moshi.Builder().add(DisconnectJsonAdapter()).build()
 
     @Provides
     @Singleton
@@ -58,7 +56,6 @@ class NetworkModule {
     }
 
     @Provides
-    fun trackerListService(retrofit: Retrofit): TrackerListService {
-        return retrofit.create(TrackerListService::class.java)
-    }
+    fun trackerListService(retrofit: Retrofit): TrackerListService =
+            retrofit.create(TrackerListService::class.java)
 }

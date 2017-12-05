@@ -28,8 +28,6 @@ class DisconnectClient(override val name: Client.ClientName, private val tracker
                 .any { sameOrSubdomain(url, it.url) }
     }
 
-    private fun bannedCategories(): List<String> {
-        return listOf("Analytics", "Advertising", "Social")
-    }
+    private fun bannedCategories(): List<String> = listOf("Analytics", "Advertising", "Social")
 
 }

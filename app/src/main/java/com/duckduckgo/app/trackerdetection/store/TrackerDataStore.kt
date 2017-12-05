@@ -22,13 +22,10 @@ import javax.inject.Inject
 
 class TrackerDataStore @Inject constructor(private val context: Context) {
 
-    fun hasData(client: ClientName): Boolean {
-        return context.fileExists(client.name)
-    }
+    fun hasData(client: ClientName): Boolean = context.fileExists(client.name)
 
-    fun loadData(client: ClientName): ByteArray {
-        return context.openFileInput(client.name).use { it.readBytes() }
-    }
+    fun loadData(client: ClientName): ByteArray =
+            context.openFileInput(client.name).use { it.readBytes() }
 
     fun saveData(client: ClientName, byteArray: ByteArray) {
         context.openFileOutput(client.name, Context.MODE_PRIVATE).write(byteArray)

@@ -37,7 +37,7 @@ class DisconnectJsonAdapter {
         val networkName = json.keys.first()
         val networkGroup = json.values.first().filter { it.value as? List<String> != null } as Map<String, List<String>>
         val networkUrl = networkGroup.keys.first()
-        val trackerUrls = networkGroup.values.first()
+        val trackerUrls = networkGroup.values.firstOrNull()
         if (trackerUrls != null) {
             return trackerUrls.map { DisconnectTracker(it, category, networkName, networkUrl) }
         }

@@ -21,19 +21,14 @@ import com.duckduckgo.app.trackerdetection.model.ResourceType
 import timber.log.Timber
 
 
-class AdBlockClient : Client {
+class AdBlockClient(override val name: ClientName) : Client {
 
-    override val name: ClientName
     private val nativeClientPointer: Long
     private var rawDataPointer: Long
     private var processedDataPointer: Long
 
     init {
         System.loadLibrary("adblockclient-lib")
-    }
-
-    constructor(name: ClientName) {
-        this.name = name
         nativeClientPointer = createClient()
         rawDataPointer = 0
         processedDataPointer = 0
@@ -59,15 +54,12 @@ class AdBlockClient : Client {
 
     private external fun loadProcessedData(clientPointer: Long, data: ByteArray): Long
 
-    fun getProcessedData(): ByteArray {
-        return getProcessedData(nativeClientPointer)
-    }
+    fun getProcessedData(): ByteArray = getProcessedData(nativeClientPointer)
 
     private external fun getProcessedData(clientPointer: Long): ByteArray
 
-    override fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean {
-        return matches(nativeClientPointer, url, documentUrl, resourceType.filterOption)
-    }
+    override fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean =
+            matches(nativeClientPointer, url, documentUrl, resourceType.filterOption)
 
     private external fun matches(clientPointer: Long, url: String, documentUrl: String, filterOption: Int): Boolean
 

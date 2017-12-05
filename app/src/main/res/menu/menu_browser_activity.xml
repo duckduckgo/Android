@@ -21,7 +21,7 @@
     <item
         android:id="@+id/privacy_dashboard"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_unknown"
+        android:icon="@drawable/privacy_icon_unknown"
         android:title="@string/privacyDashboard"/>
 
     <item

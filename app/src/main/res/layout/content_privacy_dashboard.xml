@@ -20,7 +20,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:ignore="Overdraw">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -41,7 +42,7 @@
                 android:contentDescription="@string/privacyGradeContentDescription"
                 android:paddingBottom="12dp"
                 android:paddingTop="20dp"
-                android:src="@drawable/privacy_grade_unknown"
+                android:src="@drawable/privacy_banner_unknown"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent" />
 
@@ -96,6 +97,7 @@
             <TextView
                 android:id="@+id/httpsText"
                 style="@style/dashboardEntryText"
+                android:textIsSelectable="true"
                 app:layout_constraintStart_toEndOf="@id/httpsIcon"
                 tools:text="8 Tracker Networks Blocked" />
 
@@ -110,6 +112,7 @@
             <TextView
                 android:id="@+id/networksText"
                 style="@style/dashboardEntryText"
+                android:textIsSelectable="true"
                 app:layout_constraintStart_toEndOf="@id/networksIcon"
                 app:layout_constraintTop_toBottomOf="@id/httpsText"
                 tools:text="8 Tracker Networks Blocked" />
@@ -126,6 +129,7 @@
             <TextView
                 android:id="@+id/majorNetworksText"
                 style="@style/dashboardEntryText"
+                android:textIsSelectable="true"
                 app:layout_constraintStart_toEndOf="@id/majorNetworksIcon"
                 app:layout_constraintTop_toBottomOf="@id/networksText"
                 tools:text="3 Major Tracker Networks Blocked" />
