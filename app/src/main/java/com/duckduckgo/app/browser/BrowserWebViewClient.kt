@@ -23,6 +23,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.duckduckgo.app.global.isHttp
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.ResourceType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -64,6 +65,10 @@ class BrowserWebViewClient @Inject constructor(
     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
         Timber.v("Intercepting resource ${request.url}")
 
+        if (request.url != null && request.url.isHttp) {
+            webViewClientListener?.pageHasHttpResources()
+        }
+
         if (view.elementClicked() == request.url.toString()) {
             return null
         }
@@ -82,12 +87,12 @@ class BrowserWebViewClient @Inject constructor(
             webViewClientListener?.trackerDetected(TrackingEvent(url, documentUrl, true))
             return true
         }
-        
+
         return false
     }
 
     private fun WebView.elementClicked(): String? {
-        return safeHitTestResult()?.extra
+        return safeHitTestResult().extra
     }
 
     /**

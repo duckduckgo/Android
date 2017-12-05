@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.app.privacymonitor
 
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import android.net.Uri
 
-interface WebViewClientListener {
-    fun loadingStarted()
-    fun loadingFinished()
-    fun progressChanged(newProgress: Int)
-    fun urlChanged(url: String?)
-    fun trackerDetected(event: TrackingEvent)
-    fun pageHasHttpResources()
+interface PrivacyMonitor {
+
+    val url: String
+    val uri: Uri?
+    val https: HttpsStatus
+    val trackerCount: Int
+    val trackerNetworkCount: Int
+
 }

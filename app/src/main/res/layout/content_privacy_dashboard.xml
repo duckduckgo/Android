@@ -81,33 +81,36 @@
             android:id="@+id/review"
             android:layout_width="match_parent"
             android:layout_height="199dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
             app:layout_constraintTop_toBottomOf="@id/privacyGrade">
 
+            <ImageView
+                android:id="@+id/httpsIcon"
+                android:src="@drawable/dashboard_https_good"
+                app:layout_constraintBottom_toBottomOf="@id/httpsText"
+                app:layout_constraintTop_toTopOf="@id/httpsText"
+                style="@style/dashboardEntryIcon" />
+
+            <TextView
+                android:id="@+id/httpsText"
+                app:layout_constraintStart_toEndOf="@id/httpsIcon"
+                tools:text="8 Tracker Networks Blocked"
+                style="@style/dashboardEntryText" />
 
             <ImageView
                 android:id="@+id/trackerNetworksIcon"
-                android:layout_width="66dp"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/trackerNetworksContentDescription"
-                android:src="@drawable/tracker_networks_blocked"
+                android:src="@drawable/dashboard_tracker_networks_blocked"
                 app:layout_constraintBottom_toBottomOf="@id/trackerNetworksText"
-                app:layout_constraintTop_toTopOf="@id/trackerNetworksText" />
+                app:layout_constraintTop_toTopOf="@id/trackerNetworksText"
+                style="@style/dashboardEntryIcon" />
 
             <TextView
                 android:id="@+id/trackerNetworksText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:paddingBottom="25dp"
-                android:paddingEnd="22dp"
-                android:paddingStart="0dp"
-                android:paddingTop="25dp"
-                android:textColor="@color/almostBlack"
-                android:textIsSelectable="true"
-                android:textSize="14sp"
-                android:textStyle="normal"
+                app:layout_constraintTop_toBottomOf="@id/httpsText"
                 app:layout_constraintStart_toEndOf="@id/trackerNetworksIcon"
-                tools:text="8 Tracker Networks Blocked" />
+                tools:text="8 Tracker Networks Blocked"
+                style="@style/dashboardEntryText" />
 
 
         </android.support.constraint.ConstraintLayout>

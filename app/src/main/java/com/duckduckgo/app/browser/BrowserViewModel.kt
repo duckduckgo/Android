@@ -20,7 +20,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.sitemonitor.SiteMonitor
+import com.duckduckgo.app.privacymonitor.SiteMonitor
 import com.duckduckgo.app.trackerdetection.model.NetworkTrackers
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import timber.log.Timber
@@ -86,7 +86,7 @@ class BrowserViewModel(
     override fun loadingStarted() {
         Timber.v("Loading started")
         viewState.value = currentViewState().copy(isLoading = true)
-        siteMonitor = SiteMonitor(networkTrackers)
+        siteMonitor = null
     }
 
     override fun loadingFinished() {
@@ -102,11 +102,17 @@ class BrowserViewModel(
             newViewState = newViewState.copy(url = lastQuery)
         }
         viewState.value = newViewState
-        siteMonitor?.url = url
+        if (url != null) {
+            siteMonitor = SiteMonitor(url, networkTrackers)
+        }
     }
 
     override fun trackerDetected(event: TrackingEvent) {
         siteMonitor?.trackerDetected(event)
+    }
+
+    override fun pageHasHttpResources() {
+        siteMonitor?.hasHttpResources = true
     }
 
     private fun currentViewState(): ViewState = viewState.value!!

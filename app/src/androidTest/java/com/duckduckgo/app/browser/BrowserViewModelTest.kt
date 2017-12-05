@@ -37,6 +37,7 @@ import org.mockito.Mockito.verify
 class BrowserViewModelTest {
 
     @get:Rule
+    @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @Mock

@@ -17,8 +17,7 @@
 package com.duckduckgo.app.global
 
 import android.net.Uri
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assert.*
 import org.junit.Test
 
 
@@ -38,26 +37,57 @@ class UriExtensionTest {
 
     @Test
     fun whenUriBeginsWithWwwThenBaseHostReturnsWithoutWww() {
-        val url = "http://www.somehost.com"
-        assertEquals("somehost.com", Uri.parse(url).baseHost())
+        val url = "http://www.example.com"
+        assertEquals("example.com", Uri.parse(url).baseHost)
     }
 
     @Test
     fun whenUriDoesNotBeginWithWwwThenBaseHosReturnsWithSameHost() {
-        val url = "http://somehost.com"
-        assertEquals("somehost.com", Uri.parse(url).baseHost())
+        val url = "http://example.com"
+        assertEquals("example.com", Uri.parse(url).baseHost)
     }
 
     @Test
     fun whenUriDoesNotHaveASchemeThenBaseHostStillResolvesHost() {
-        val url = "www.somehost.com"
-        assertEquals("somehost.com", Uri.parse(url).baseHost())
+        val url = "www.example.com"
+        assertEquals("example.com", Uri.parse(url).baseHost)
     }
 
     @Test
     fun whenUriContainsInvalidHostThenBaseHostIsNull() {
         val url = "about:blank"
-        assertNull(Uri.parse(url).baseHost())
+        assertNull(Uri.parse(url).baseHost)
     }
 
+    @Test
+    fun whenUriIsHttpIrrespectiveOfCaseThenIsHttpIsTrue() {
+        assertTrue(Uri.parse("http://example.com").isHttp)
+        assertTrue(Uri.parse("HTTP://example.com").isHttp)
+    }
+
+    @Test
+    fun whenUriIsHttpsThenIsHttpIsFalse() {
+        assertFalse(Uri.parse("https://example.com").isHttp)
+    }
+
+    @Test
+    fun whenUriIsMalformedThenIsHttpIsFalse() {
+        assertFalse(Uri.parse("[example com]").isHttp)
+    }
+
+    @Test
+    fun whenUriIsHttpsIrrespectiveOfCaseThenIsHttpsIsTrue() {
+        assertTrue(Uri.parse("https://example.com").isHttps)
+        assertTrue(Uri.parse("HTTPS://example.com").isHttps)
+    }
+
+    @Test
+    fun whenUriIsHttpThenIsHttpsIsFalse() {
+        assertFalse(Uri.parse("http://example.com").isHttps)
+    }
+
+    @Test
+    fun whenUriIsMalformedThenIsHtpsIsFalse() {
+        assertFalse(Uri.parse("[example com]").isHttps)
+    }
 }

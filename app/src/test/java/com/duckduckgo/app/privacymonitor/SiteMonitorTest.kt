@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.sitemonitor
+package com.duckduckgo.app.privacymonitor
 
 
 import com.duckduckgo.app.trackerdetection.model.NetworkTrackers
@@ -22,7 +22,6 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Test
 
 
@@ -31,7 +30,7 @@ class SiteMonitorTest {
     private val mockNetworkTrackers: NetworkTrackers = mock()
 
     companion object {
-        private const val documentUrl = "http://example.com"
+        private const val document = "http://example.com"
         private const val tracker = "http://standalonetracker.com/script.js"
         private const val networkATracker = "http://networkAtracker.com/script.js"
         private const val networkBTracker = "http://networkBtracker.com/script.js"
@@ -44,59 +43,52 @@ class SiteMonitorTest {
     }
 
     @Test
-    fun whenSiteMonitorCreatedThenUrlIsNull() {
-        val testee = SiteMonitor(mockNetworkTrackers)
-        assertNull(testee.url)
+    fun whenSiteMonitorCreatedThenUrlIsCorrect() {
+        val testee = SiteMonitor(document, mockNetworkTrackers)
+        assertEquals(document, testee.url)
     }
 
     @Test
     fun whenSiteMonitorCreatedThenTrackerCountIsZero() {
-        val testee = SiteMonitor(mockNetworkTrackers)
+        val testee = SiteMonitor(document, mockNetworkTrackers)
         assertEquals(0, testee.trackerCount)
     }
 
     @Test
     fun whenSiteMonitorCreatedThenNetworkCountIsZero() {
-        val testee = SiteMonitor(mockNetworkTrackers)
+        val testee = SiteMonitor(document, mockNetworkTrackers)
         assertEquals(0, testee.trackerNetworkCount)
     }
 
     @Test
-    fun whenUrlIsSetThenUrlIsUpdated() {
-        val testee = SiteMonitor(mockNetworkTrackers)
-        testee.url = documentUrl
-        assertEquals(documentUrl, testee.url)
-    }
-
-    @Test
     fun whenTrackersAreDetectedThenTrackerCountIsIncremented() {
-        val testee = SiteMonitor(mockNetworkTrackers)
-        testee.trackerDetected(TrackingEvent(tracker, documentUrl, true))
-        testee.trackerDetected(TrackingEvent(tracker, documentUrl, true))
+        val testee = SiteMonitor(document, mockNetworkTrackers)
+        testee.trackerDetected(TrackingEvent(tracker, document, true))
+        testee.trackerDetected(TrackingEvent(tracker, document, true))
         assertEquals(2, testee.trackerCount)
     }
 
     @Test
     fun whenUniqueTrackerNetworksAreDetectedThenTrackerNetworkCountIsIncrementedEachTime() {
-        val testee = SiteMonitor(mockNetworkTrackers)
-        testee.trackerDetected(TrackingEvent(networkATracker, documentUrl, true))
-        testee.trackerDetected(TrackingEvent(networkBTracker, documentUrl, true))
+        val testee = SiteMonitor(document, mockNetworkTrackers)
+        testee.trackerDetected(TrackingEvent(networkATracker, document, true))
+        testee.trackerDetected(TrackingEvent(networkBTracker, document, true))
         assertEquals(2, testee.trackerNetworkCount)
     }
 
     @Test
     fun whenDuplicateTrackerNetworksDetectedThenTrackerNetworkCountIsIncrementedOnlyFirstTime() {
-        val testee = SiteMonitor(mockNetworkTrackers)
-        testee.trackerDetected(TrackingEvent(networkATracker, documentUrl, true))
-        testee.trackerDetected(TrackingEvent(networkATracker, documentUrl, true))
+        val testee = SiteMonitor(document, mockNetworkTrackers)
+        testee.trackerDetected(TrackingEvent(networkATracker, document, true))
+        testee.trackerDetected(TrackingEvent(networkATracker, document, true))
         assertEquals(1, testee.trackerNetworkCount)
     }
 
     @Test
     fun whenNonNetworkTrackersAreDetectedThenTrackerNetworkCountIsNotIncremented() {
-        val testee = SiteMonitor(mockNetworkTrackers)
-        testee.trackerDetected(TrackingEvent(tracker, documentUrl, true))
-        testee.trackerDetected(TrackingEvent(tracker, documentUrl, true))
+        val testee = SiteMonitor(document, mockNetworkTrackers)
+        testee.trackerDetected(TrackingEvent(tracker, document, true))
+        testee.trackerDetected(TrackingEvent(tracker, document, true))
         assertEquals(0, testee.trackerNetworkCount)
     }
 }
