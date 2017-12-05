@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.privacydashboard
 
+import android.annotation.SuppressLint
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.content.Context
@@ -25,7 +26,7 @@ import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import javax.inject.Inject
 
 
-class PrivacyDashboardViewModel @Inject constructor(private val context: Context) : ViewModel() {
+class PrivacyDashboardViewModel @Inject constructor(@SuppressLint("StaticFieldLeak") private val context: Context) : ViewModel() {
 
     data class ViewState(
             val domain: String,

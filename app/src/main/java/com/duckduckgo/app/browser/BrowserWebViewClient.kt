@@ -92,7 +92,7 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     private fun WebView.elementClicked(): String? {
-        return safeHitTestResult()?.extra
+        return safeHitTestResult().extra
     }
 
     /**

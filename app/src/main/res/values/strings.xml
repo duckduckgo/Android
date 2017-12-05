@@ -3,7 +3,6 @@
     <string name="appName">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
 
-    <string name="go">Go</string>
     <string name="privacyDashboard">Privacy Dashboard</string>
     <string name="refresh">Refresh</string>
     <string name="back">Back</string>
