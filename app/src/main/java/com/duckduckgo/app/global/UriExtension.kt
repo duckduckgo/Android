@@ -35,7 +35,7 @@ val Uri.baseHost: String?
     get() = withScheme().host?.removePrefix("www.")
 
 val Uri.isHttp: Boolean
-    get() = scheme?.equals(UrlScheme.http) ?: false
+    get() = scheme?.equals(UrlScheme.http, true) ?: false
 
 val Uri.isHttps: Boolean
-    get() = scheme?.equals(UrlScheme.https) ?: false
+    get() = scheme?.equals(UrlScheme.https, true) ?: false

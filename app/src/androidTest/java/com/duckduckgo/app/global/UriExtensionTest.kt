@@ -60,38 +60,34 @@ class UriExtensionTest {
     }
 
     @Test
-    fun whenUriIsHttpThenIsHttpIsTrue() {
-        val url = "http://example.com"
-        assertTrue(Uri.parse(url).isHttp)
+    fun whenUriIsHttpIrrespectiveOfCaseThenIsHttpIsTrue() {
+        assertTrue(Uri.parse("http://example.com").isHttp)
+        assertTrue(Uri.parse("HTTP://example.com").isHttp)
     }
 
     @Test
     fun whenUriIsHttpsThenIsHttpIsFalse() {
-        val url = "https://example.com"
-        assertFalse(Uri.parse(url).isHttp)
+        assertFalse(Uri.parse("https://example.com").isHttp)
     }
 
     @Test
     fun whenUriIsMalformedThenIsHttpIsFalse() {
-        val url = "[example com]"
-        assertFalse(Uri.parse(url).isHttp)
+        assertFalse(Uri.parse("[example com]").isHttp)
     }
 
     @Test
-    fun whenUriIsHttpsThenIsHttpsIsTrue() {
-        val url = "https://example.com"
-        assertTrue(Uri.parse(url).isHttps)
+    fun whenUriIsHttpsIrrespectiveOfCaseThenIsHttpsIsTrue() {
+        assertTrue(Uri.parse("https://example.com").isHttps)
+        assertTrue(Uri.parse("HTTPS://example.com").isHttps)
     }
 
     @Test
     fun whenUriIsHttpThenIsHttpsIsFalse() {
-        val url = "http://example.com"
-        assertFalse(Uri.parse(url).isHttps)
+        assertFalse(Uri.parse("http://example.com").isHttps)
     }
 
     @Test
     fun whenUriIsMalformedThenIsHtpsIsFalse() {
-        val url = "[example com]"
-        assertFalse(Uri.parse(url).isHttps)
+        assertFalse(Uri.parse("[example com]").isHttps)
     }
 }
