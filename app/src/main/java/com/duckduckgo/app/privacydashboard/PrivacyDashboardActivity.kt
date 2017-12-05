@@ -89,6 +89,9 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         domain.text = viewState.domain
         httpsText.text = viewState.httpsText
         httpsIcon.setImageDrawable(getDrawable(viewState.httpsIcon))
-        trackerNetworksText.text = viewState.trackerNetworksText
+        networksIcon.setImageDrawable(getDrawable(viewState.networksIcon))
+        networksText.text = viewState.networksText
+        majorNetworksIcon.setImageDrawable(getDrawable(viewState.majorNetworksIcon))
+        majorNetworksText.text = viewState.majorNetworksText
     }
 }

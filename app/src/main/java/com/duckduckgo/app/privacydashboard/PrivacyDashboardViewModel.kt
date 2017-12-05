@@ -32,8 +32,10 @@ class PrivacyDashboardViewModel @Inject constructor(@SuppressLint("StaticFieldLe
             val domain: String,
             val httpsIcon: Int,
             val httpsText: String,
-            val trackerNetworksText: String,
-            val trackerNetworksIcon: Int = R.drawable.dashboard_tracker_networks_blocked
+            val networksText: String,
+            val networksIcon: Int = R.drawable.dashboard_networks_blocked,
+            val majorNetworksText: String,
+            val majorNetworksIcon: Int = R.drawable.dashboard_major_networks_blocked
     )
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -43,7 +45,8 @@ class PrivacyDashboardViewModel @Inject constructor(@SuppressLint("StaticFieldLe
                 domain = "",
                 httpsIcon = httpsIcon(HttpsStatus.SECURE),
                 httpsText = httpsText(HttpsStatus.SECURE),
-                trackerNetworksText = trackerNetworksText(0)
+                networksText = networksText(0),
+                majorNetworksText = majorNetworksText(0)
         )
     }
 
@@ -52,7 +55,8 @@ class PrivacyDashboardViewModel @Inject constructor(@SuppressLint("StaticFieldLe
                 domain = monitor.uri?.host ?: "",
                 httpsIcon = httpsIcon(monitor.https),
                 httpsText = httpsText(monitor.https),
-                trackerNetworksText = trackerNetworksText(monitor.trackerNetworkCount)
+                networksText = networksText(monitor.networkCount),
+                majorNetworksText = majorNetworksText(monitor.majorNetworkCount)
         )
     }
 
@@ -68,6 +72,10 @@ class PrivacyDashboardViewModel @Inject constructor(@SuppressLint("StaticFieldLe
         HttpsStatus.SECURE -> R.drawable.dashboard_https_good
     }
 
-    private fun trackerNetworksText(trackerNetworkCount: Int): String =
-            context.getString(R.string.trackerNetworksBlocked, trackerNetworkCount.toString())
+    private fun networksText(trackerNetworkCount: Int): String =
+            context.getString(R.string.networksBlocked, trackerNetworkCount.toString())
+
+
+    private fun majorNetworksText(trackerNetworkCount: Int): String =
+            context.getString(R.string.majorNetworksBlocked, trackerNetworkCount.toString())
 }

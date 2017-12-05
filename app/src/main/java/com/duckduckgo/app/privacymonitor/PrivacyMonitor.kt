@@ -24,6 +24,6 @@ interface PrivacyMonitor {
     val uri: Uri?
     val https: HttpsStatus
     val trackerCount: Int
-    val trackerNetworkCount: Int
-
+    val networkCount: Int
+    val majorNetworkCount: Int
 }

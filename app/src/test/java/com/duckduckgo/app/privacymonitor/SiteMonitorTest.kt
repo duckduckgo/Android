@@ -57,7 +57,7 @@ class SiteMonitorTest {
     @Test
     fun whenSiteMonitorCreatedThenNetworkCountIsZero() {
         val testee = SiteMonitor(document, mockNetworkTrackers)
-        assertEquals(0, testee.trackerNetworkCount)
+        assertEquals(0, testee.networkCount)
     }
 
     @Test
@@ -69,26 +69,26 @@ class SiteMonitorTest {
     }
 
     @Test
-    fun whenUniqueTrackerNetworksAreDetectedThenTrackerNetworkCountIsIncrementedEachTime() {
+    fun whenUniqueTrackerNetworksAreDetectedThenNetworkCountIsIncrementedEachTime() {
         val testee = SiteMonitor(document, mockNetworkTrackers)
         testee.trackerDetected(TrackingEvent(networkATracker, document, true))
         testee.trackerDetected(TrackingEvent(networkBTracker, document, true))
-        assertEquals(2, testee.trackerNetworkCount)
+        assertEquals(2, testee.networkCount)
     }
 
     @Test
-    fun whenDuplicateTrackerNetworksDetectedThenTrackerNetworkCountIsIncrementedOnlyFirstTime() {
+    fun whenDuplicateTrackerNetworksDetectedThenNetworkCountIsIncrementedOnlyFirstTime() {
         val testee = SiteMonitor(document, mockNetworkTrackers)
         testee.trackerDetected(TrackingEvent(networkATracker, document, true))
         testee.trackerDetected(TrackingEvent(networkATracker, document, true))
-        assertEquals(1, testee.trackerNetworkCount)
+        assertEquals(1, testee.networkCount)
     }
 
     @Test
-    fun whenNonNetworkTrackersAreDetectedThenTrackerNetworkCountIsNotIncremented() {
+    fun whenNonNetworkTrackersAreDetectedThenNetworkCountIsNotIncremented() {
         val testee = SiteMonitor(document, mockNetworkTrackers)
         testee.trackerDetected(TrackingEvent(tracker, document, true))
         testee.trackerDetected(TrackingEvent(tracker, document, true))
-        assertEquals(0, testee.trackerNetworkCount)
+        assertEquals(0, testee.networkCount)
     }
 }

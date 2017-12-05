@@ -15,5 +15,5 @@
   -->
 
 <resources>
-    <string name="baseUrl">https://www.duckduckgo.com</string>
+    <string name="baseUrl">https://duckduckgo.com</string>
 </resources>

@@ -15,7 +15,8 @@
     <string name="privacyProtectionState">PRIVACY PROTECTION ENABLED</string>
     <string name="privacyGradeContentDescription">Privacy Grade</string>
     <string name="trackerNetworksContentDescription">Tracker networks icon</string>
-    <string name="trackerNetworksBlocked">%s Tracker Networks Blocked</string>
+    <string name="networksBlocked">%s Tracker Networks Blocked</string>
+    <string name="majorNetworksBlocked">%s Major Tracker Networks Blocked</string>
 
     <string name="httpsGood">Encrypted Connection</string>
     <string name="httpsMixed">Mixed Encryption connection</string>

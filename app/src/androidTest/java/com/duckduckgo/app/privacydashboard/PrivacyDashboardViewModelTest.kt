@@ -82,17 +82,31 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenNoTrackersNetworksThenTrackerNetworkTextShowsZero() {
-        whenever(monitor.trackerNetworkCount).thenReturn(0)
+    fun whenNoTrackersNetworksThenNetworkTextShowsZero() {
+        whenever(monitor.networkCount).thenReturn(0)
         testee.updatePrivacyMonitor(monitor)
-        assertEquals("0 Tracker Networks Blocked", testee.viewState.value?.trackerNetworksText)
+        assertEquals("0 Tracker Networks Blocked", testee.viewState.value?.networksText)
     }
 
     @Test
-    fun whenTenTrackersNetworksThenTrackerNetworkTextShowsTen() {
-        whenever(monitor.trackerNetworkCount).thenReturn(10)
+    fun whenTenTrackersNetworksThenNetworkTextShowsTen() {
+        whenever(monitor.networkCount).thenReturn(10)
         testee.updatePrivacyMonitor(monitor)
-        assertEquals("10 Tracker Networks Blocked", testee.viewState.value?.trackerNetworksText)
+        assertEquals("10 Tracker Networks Blocked", testee.viewState.value?.networksText)
+    }
+
+    @Test
+    fun whenNoMajorTrackersNetworksThenMajorNetworkTextShowsZero() {
+        whenever(monitor.majorNetworkCount).thenReturn(0)
+        testee.updatePrivacyMonitor(monitor)
+        assertEquals("0 Major Tracker Networks Blocked", testee.viewState.value?.majorNetworksText)
+    }
+
+    @Test
+    fun whenTenMajorTrackersNetworksThenMajorNetworkTextShowsTen() {
+        whenever(monitor.majorNetworkCount).thenReturn(10)
+        testee.updatePrivacyMonitor(monitor)
+        assertEquals("10 Major Tracker Networks Blocked", testee.viewState.value?.majorNetworksText)
     }
 
     private fun getStringResource(id: Int): String {
