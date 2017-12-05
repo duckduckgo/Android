@@ -81,51 +81,54 @@
             android:id="@+id/review"
             android:layout_width="match_parent"
             android:layout_height="199dp"
-            android:paddingTop="10dp"
             android:paddingBottom="10dp"
+            android:paddingTop="10dp"
             app:layout_constraintTop_toBottomOf="@id/privacyGrade">
 
             <ImageView
                 android:id="@+id/httpsIcon"
+                style="@style/dashboardEntryIcon"
+                android:importantForAccessibility="no"
                 android:src="@drawable/dashboard_https_good"
                 app:layout_constraintBottom_toBottomOf="@id/httpsText"
-                app:layout_constraintTop_toTopOf="@id/httpsText"
-                style="@style/dashboardEntryIcon" />
+                app:layout_constraintTop_toTopOf="@id/httpsText" />
 
             <TextView
                 android:id="@+id/httpsText"
+                style="@style/dashboardEntryText"
                 app:layout_constraintStart_toEndOf="@id/httpsIcon"
-                tools:text="8 Tracker Networks Blocked"
-                style="@style/dashboardEntryText" />
+                tools:text="8 Tracker Networks Blocked" />
 
             <ImageView
                 android:id="@+id/networksIcon"
+                style="@style/dashboardEntryIcon"
+                android:importantForAccessibility="no"
                 android:src="@drawable/dashboard_networks_blocked"
                 app:layout_constraintBottom_toBottomOf="@id/networksText"
-                app:layout_constraintTop_toTopOf="@id/networksText"
-                style="@style/dashboardEntryIcon" />
+                app:layout_constraintTop_toTopOf="@id/networksText" />
 
             <TextView
                 android:id="@+id/networksText"
-                app:layout_constraintTop_toBottomOf="@id/httpsText"
+                style="@style/dashboardEntryText"
                 app:layout_constraintStart_toEndOf="@id/networksIcon"
-                tools:text="8 Tracker Networks Blocked"
-                style="@style/dashboardEntryText" />
+                app:layout_constraintTop_toBottomOf="@id/httpsText"
+                tools:text="8 Tracker Networks Blocked" />
 
 
             <ImageView
                 android:id="@+id/majorNetworksIcon"
+                style="@style/dashboardEntryIcon"
+                android:importantForAccessibility="no"
                 android:src="@drawable/dashboard_major_networks_blocked"
                 app:layout_constraintBottom_toBottomOf="@id/majorNetworksText"
-                app:layout_constraintTop_toTopOf="@id/majorNetworksText"
-                style="@style/dashboardEntryIcon" />
+                app:layout_constraintTop_toTopOf="@id/majorNetworksText" />
 
             <TextView
                 android:id="@+id/majorNetworksText"
-                app:layout_constraintTop_toBottomOf="@id/networksText"
+                style="@style/dashboardEntryText"
                 app:layout_constraintStart_toEndOf="@id/majorNetworksIcon"
-                tools:text="3 Major Tracker Networks Blocked"
-                style="@style/dashboardEntryText" />
+                app:layout_constraintTop_toBottomOf="@id/networksText"
+                tools:text="3 Major Tracker Networks Blocked" />
 
         </android.support.constraint.ConstraintLayout>
 

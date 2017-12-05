@@ -35,7 +35,7 @@ class SiteMonitorTest {
         private const val networkATracker = "http://networkAtracker.com/script.js"
         private const val networkBTracker = "http://networkBtracker.com/script.js"
         private const val majorNetworkATracker = "http://majorNetworkAtracker.com/script.js"
-        private const val majorNetworkBTracker = "http://majorNnetworkBtracker.com/script.js"
+        private const val majorNetworkBTracker = "http://majorNetworkBtracker.com/script.js"
     }
 
     init {
