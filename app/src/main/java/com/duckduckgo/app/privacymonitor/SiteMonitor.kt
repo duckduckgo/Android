@@ -49,11 +49,18 @@ class SiteMonitor constructor(override val url: String, private val networkTrack
     override val trackerCount: Int
         get() = trackingEvents.size
 
-    override val trackerNetworkCount: Int
+    override val networkCount: Int
         get() = trackingEvents
                 .mapNotNull { networkTrackers.network(it.trackerUrl) }
                 .distinct()
                 .count()
+
+    override val majorNetworkCount: Int
+        get() = trackingEvents
+                .mapNotNull { networkTrackers.majorNetwork(it.trackerUrl) }
+                .distinct()
+                .count()
+
 
     fun trackerDetected(event: TrackingEvent) {
         trackingEvents.add(event)
