@@ -31,7 +31,7 @@ class NetworkTrackers @Inject constructor() : Serializable {
                             val percentageOfPahges: Int)
 
     companion object {
-        private var majorNetworks = Arrays.asList(
+        private var majorNetworks = arrayOf(
                 MajorNetwork("google", "google.com", 84),
                 MajorNetwork("facebook", "facebook.com", 36),
                 MajorNetwork("twitter", "twitter.com", 16),
@@ -52,17 +52,13 @@ class NetworkTrackers @Inject constructor() : Serializable {
     }
 
     fun network(url: String): String? {
-        return trackers
-                .filter { sameOrSubdomain(url, it.url) || sameOrSubdomain(url, it.networkUrl) }
-                .map { it.networkName }
-                .firstOrNull()
+        val network = trackers.find { sameOrSubdomain(url, it.url) || sameOrSubdomain(url, it.networkUrl) }
+        return network?.networkName
     }
 
     fun majorNetwork(url: String): String? {
-        return majorNetworks
-                .filter { network(url).equals(it.name, true) }
-                .map { it.name }
-                .firstOrNull()
+        val majorNetwork = majorNetworks.find { network(url).equals(it.name, true) }
+        return majorNetwork?.name
     }
 
 }
