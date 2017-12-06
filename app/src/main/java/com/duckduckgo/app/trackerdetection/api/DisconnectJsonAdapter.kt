@@ -35,11 +35,11 @@ class DisconnectJsonAdapter {
 
     private fun convertGroup(category: String, json: Map<String, Map<String, Any>>): List<DisconnectTracker> {
         val networkName = json.keys.first()
-        val networkGroup = json.values.first().filter { it.value as? List<String> != null } as Map<String, List<String>>
+        val networkGroup = json.values.first().filter { it.value as? List<*> != null }
         val networkUrl = networkGroup.keys.first()
-        val trackerUrls = networkGroup.values.firstOrNull()
+        val trackerUrls = networkGroup.values.firstOrNull() as? List<*>
         if (trackerUrls != null) {
-            return trackerUrls.map { DisconnectTracker(it, category, networkName, networkUrl) }
+            return trackerUrls.map { DisconnectTracker(it as String, category, networkName, networkUrl) }
         }
         return ArrayList()
     }
