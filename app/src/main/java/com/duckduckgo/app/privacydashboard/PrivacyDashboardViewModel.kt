@@ -25,8 +25,8 @@ import com.duckduckgo.app.privacymonitor.HttpsStatus
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import javax.inject.Inject
 
-
-class PrivacyDashboardViewModel @Inject constructor(@SuppressLint("StaticFieldLeak") private val context: Context) : ViewModel() {
+@SuppressLint("StaticFieldLeak")
+class PrivacyDashboardViewModel @Inject constructor(private val context: Context) : ViewModel() {
 
     data class ViewState(
             val domain: String,

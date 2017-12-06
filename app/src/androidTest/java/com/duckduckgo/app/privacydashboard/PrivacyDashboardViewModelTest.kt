@@ -109,7 +109,6 @@ class PrivacyDashboardViewModelTest {
         assertEquals("10 Major Tracker Networks Blocked", testee.viewState.value?.majorNetworksText)
     }
 
-    private fun getStringResource(id: Int): String {
-        return InstrumentationRegistry.getTargetContext().getString(id)
-    }
+    private fun getStringResource(id: Int): String =
+            InstrumentationRegistry.getTargetContext().getString(id)
 }

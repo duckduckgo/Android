@@ -64,8 +64,7 @@ class DisconnectJsonConverterTest {
         jsonAdapter.fromJson(json).trackers
     }
 
-    private fun json(resourceName: String): String {
-        return javaClass.classLoader.getResource(resourceName).openStream().bufferedReader().use { it.readText() }
-    }
+    private fun json(resourceName: String): String =
+            javaClass.classLoader.getResource(resourceName).openStream().bufferedReader().use { it.readText() }
 
 }

@@ -34,9 +34,7 @@ class TrackerDetector @Inject constructor(private val networkTrackers: NetworkTr
         clients.add(client)
     }
 
-    fun hasClient(name: ClientName): Boolean {
-        return clients.any { it.name == name }
-    }
+    fun hasClient(name: ClientName): Boolean = clients.any { it.name == name }
 
     fun shouldBlock(url: String, documentUrl: String, resourceType: ResourceType): Boolean {
 
@@ -53,11 +51,9 @@ class TrackerDetector @Inject constructor(private val networkTrackers: NetworkTr
 
     }
 
-    private fun firstParty(firstUrl: String, secondUrl: String): Boolean {
-        return sameOrSubdomain(firstUrl, secondUrl) || sameOrSubdomain(secondUrl, firstUrl) || sameNetwork(firstUrl, secondUrl)
-    }
+    private fun firstParty(firstUrl: String, secondUrl: String): Boolean =
+            sameOrSubdomain(firstUrl, secondUrl) || sameOrSubdomain(secondUrl, firstUrl) || sameNetwork(firstUrl, secondUrl)
 
-    private fun sameNetwork(firstUrl: String, secondUrl: String): Boolean {
-        return networkTrackers.network(firstUrl) != null && networkTrackers.network(firstUrl) == networkTrackers.network(secondUrl)
-    }
+    private fun sameNetwork(firstUrl: String, secondUrl: String): Boolean =
+            networkTrackers.network(firstUrl) != null && networkTrackers.network(firstUrl) == networkTrackers.network(secondUrl)
 }

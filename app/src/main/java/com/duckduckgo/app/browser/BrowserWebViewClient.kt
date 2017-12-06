@@ -91,9 +91,7 @@ class BrowserWebViewClient @Inject constructor(
         return false
     }
 
-    private fun WebView.elementClicked(): String? {
-        return safeHitTestResult().extra
-    }
+    private fun WebView.elementClicked(): String? = safeHitTestResult().extra
 
     /**
      * Access the webview hit test result from any thread; jumps onto the main thread to achieve this
