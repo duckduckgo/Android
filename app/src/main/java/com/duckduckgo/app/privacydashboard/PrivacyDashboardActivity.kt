@@ -26,7 +26,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.privacydashboard.PrivacyDashboardViewModel.ViewState
-import com.duckduckgo.app.privacymonitor.SiteMonitor
+import com.duckduckgo.app.privacymonitor.PrivacyMonitor
+import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import kotlinx.android.synthetic.main.activity_privacy_dashboard.*
 import kotlinx.android.synthetic.main.content_privacy_dashboard.*
 import javax.inject.Inject
@@ -35,13 +36,12 @@ import javax.inject.Inject
 class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var viewModelFactory: ViewModelFactory
+    @Inject lateinit var repository: PrivacyMonitorRepository
 
     companion object {
 
-        fun intent(context: Context, monitor: SiteMonitor): Intent {
-            val intent = Intent(context, PrivacyDashboardActivity::class.java)
-            intent.putExtra(SiteMonitor::class.java.name, monitor)
-            return intent
+        fun intent(context: Context): Intent {
+            return Intent(context, PrivacyDashboardActivity::class.java)
         }
     }
 
@@ -50,12 +50,12 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         setContentView(R.layout.activity_privacy_dashboard)
         configureToolbar()
 
-        if (savedInstanceState == null) {
-            loadIntentData()
-        }
-
         viewModel.viewState.observe(this, Observer<ViewState> {
             it?.let { render(it) }
+        })
+
+        repository.privacyMonitor.observe(this, Observer<PrivacyMonitor> {
+            viewModel.onPrivacyMonitorChanged(it)
         })
     }
 
@@ -66,13 +66,6 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
     private fun configureToolbar() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-
-    private fun loadIntentData() {
-        val siteMonitor = intent.getSerializableExtra(SiteMonitor::class.java.name) as SiteMonitor?
-        if (siteMonitor != null) {
-            viewModel.updatePrivacyMonitor(siteMonitor)
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

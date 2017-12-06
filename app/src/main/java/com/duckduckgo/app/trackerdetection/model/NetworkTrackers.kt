@@ -17,14 +17,13 @@
 package com.duckduckgo.app.trackerdetection.model
 
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
-import java.io.Serializable
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
 
 @Singleton
-class NetworkTrackers @Inject constructor() : Serializable {
+class NetworkTrackers @Inject constructor() {
 
     data class MajorNetwork(val name: String,
                             val domain: String,

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.privacymonitor
 
 import android.net.Uri
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 
 interface PrivacyMonitor {
 
@@ -26,4 +27,6 @@ interface PrivacyMonitor {
     val trackerCount: Int
     val networkCount: Int
     val majorNetworkCount: Int
+    var hasHttpResources: Boolean
+    fun trackerDetected(event: TrackingEvent)
 }

@@ -23,10 +23,11 @@ import android.content.Context
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacymonitor.HttpsStatus
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
-import javax.inject.Inject
+import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 
 @SuppressLint("StaticFieldLeak")
-class PrivacyDashboardViewModel @Inject constructor(private val context: Context) : ViewModel() {
+class PrivacyDashboardViewModel(
+        private val context: Context) : ViewModel() {
 
     data class ViewState(
             val domain: String,
@@ -41,6 +42,18 @@ class PrivacyDashboardViewModel @Inject constructor(private val context: Context
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
 
     init {
+        resetPrivacyMonitor()
+    }
+
+    fun onPrivacyMonitorChanged(monitor: PrivacyMonitor?) {
+        if (monitor == null) {
+            resetPrivacyMonitor()
+        } else {
+            updatePrivacyMonitor(monitor)
+        }
+    }
+
+    private fun resetPrivacyMonitor() {
         viewState.value = ViewState(
                 domain = "",
                 httpsIcon = httpsIcon(HttpsStatus.SECURE),
@@ -50,7 +63,7 @@ class PrivacyDashboardViewModel @Inject constructor(private val context: Context
         )
     }
 
-    fun updatePrivacyMonitor(monitor: PrivacyMonitor) {
+    private fun updatePrivacyMonitor(monitor: PrivacyMonitor) {
         viewState.value = viewState.value?.copy(
                 domain = monitor.uri?.host ?: "",
                 httpsIcon = httpsIcon(monitor.https),

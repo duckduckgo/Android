@@ -250,10 +250,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun launchPrivacyDashboard() {
-        val siteMonitor = viewModel.siteMonitor
-        if (siteMonitor != null) {
-            startActivity(PrivacyDashboardActivity.intent(this, siteMonitor))
-        }
+        startActivity(PrivacyDashboardActivity.intent(this))
     }
 
     override fun onBackPressed() {
