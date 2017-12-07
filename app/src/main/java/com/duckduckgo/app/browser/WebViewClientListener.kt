@@ -24,4 +24,5 @@ interface WebViewClientListener {
     fun progressChanged(newProgress: Int)
     fun urlChanged(url: String?)
     fun trackerDetected(event: TrackingEvent)
+    fun pageHasHttpResources()
 }

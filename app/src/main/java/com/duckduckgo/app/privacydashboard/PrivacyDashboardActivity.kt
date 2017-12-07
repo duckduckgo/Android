@@ -20,13 +20,14 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
-import com.duckduckgo.app.sitemonitor.SiteMonitor
+import com.duckduckgo.app.privacydashboard.PrivacyDashboardViewModel.ViewState
+import com.duckduckgo.app.privacymonitor.PrivacyMonitor
+import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import kotlinx.android.synthetic.main.activity_privacy_dashboard.*
 import kotlinx.android.synthetic.main.content_privacy_dashboard.*
 import javax.inject.Inject
@@ -35,13 +36,12 @@ import javax.inject.Inject
 class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var viewModelFactory: ViewModelFactory
+    @Inject lateinit var repository: PrivacyMonitorRepository
 
     companion object {
 
-        fun intent(context: Context, monitor: SiteMonitor): Intent {
-            val intent = Intent(context, PrivacyDashboardActivity::class.java)
-            intent.putExtra(SiteMonitor::class.java.name, monitor)
-            return intent
+        fun intent(context: Context): Intent {
+            return Intent(context, PrivacyDashboardActivity::class.java)
         }
     }
 
@@ -50,12 +50,12 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         setContentView(R.layout.activity_privacy_dashboard)
         configureToolbar()
 
-        if (savedInstanceState == null) {
-            loadIntentData()
-        }
-
-        viewModel.liveSiteMonitor.observe(this, Observer<SiteMonitor> {
+        viewModel.viewState.observe(this, Observer<ViewState> {
             it?.let { render(it) }
+        })
+
+        repository.privacyMonitor.observe(this, Observer<PrivacyMonitor> {
+            viewModel.onPrivacyMonitorChanged(it)
         })
     }
 
@@ -68,13 +68,6 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
-    private fun loadIntentData() {
-        val siteMonitor = intent.getSerializableExtra(SiteMonitor::class.java.name) as SiteMonitor?
-        if (siteMonitor != null) {
-            viewModel.attachSiteMonitor(siteMonitor)
-        }
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
@@ -85,8 +78,13 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun render(siteMonitor: SiteMonitor) {
-        domain.text = Uri.parse(siteMonitor.url).host
-        trackerNetworksText.text = getString(R.string.trackerNetworksBlocked, siteMonitor.trackerNetworkCount.toString())
+    private fun render(viewState: ViewState) {
+        domain.text = viewState.domain
+        httpsText.text = viewState.httpsText
+        httpsIcon.setImageDrawable(getDrawable(viewState.httpsIcon))
+        networksIcon.setImageDrawable(getDrawable(viewState.networksIcon))
+        networksText.text = viewState.networksText
+        majorNetworksIcon.setImageDrawable(getDrawable(viewState.majorNetworksIcon))
+        majorNetworksText.text = viewState.majorNetworksText
     }
 }

@@ -23,9 +23,9 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.duckduckgo.app.global.isHttp
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.ResourceType
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import timber.log.Timber
@@ -64,6 +64,10 @@ class BrowserWebViewClient @Inject constructor(
     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
         Timber.v("Intercepting resource ${request.url}")
 
+        if (request.url != null && request.url.isHttp) {
+            webViewClientListener?.pageHasHttpResources()
+        }
+
         if (view.elementClicked() == request.url.toString()) {
             return null
         }
@@ -78,17 +82,17 @@ class BrowserWebViewClient @Inject constructor(
     private fun block(request: WebResourceRequest, documentUrl: String?): Boolean {
         val url = request.url.toString()
 
-        if (documentUrl != null && trackerDetector.shouldBlock(url, documentUrl, ResourceType.from(request))) {
-            webViewClientListener?.trackerDetected(TrackingEvent(url, documentUrl, true))
-            return true
+        if (documentUrl == null) {
+            return false
         }
-        
-        return false
+
+        val trackingEvent = trackerDetector.evaluate(url, documentUrl, ResourceType.from(request)) ?: return false
+        webViewClientListener?.trackerDetected(trackingEvent)
+
+        return true
     }
 
-    private fun WebView.elementClicked(): String? {
-        return safeHitTestResult()?.extra
-    }
+    private fun WebView.elementClicked(): String? = safeHitTestResult().extra
 
     /**
      * Access the webview hit test result from any thread; jumps onto the main thread to achieve this

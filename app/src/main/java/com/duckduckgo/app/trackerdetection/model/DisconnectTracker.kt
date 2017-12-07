@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection.model
 
-data class DisconnectTracker(override val url: String,
+data class DisconnectTracker(val url: String,
                              val category: String,
-                             override val networkName: String,
-                             override val networkUrl: String) : NetworkTracker
+                             val networkName: String,
+                             val networkUrl: String)

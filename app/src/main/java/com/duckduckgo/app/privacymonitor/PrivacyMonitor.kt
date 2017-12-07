@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.model
+package com.duckduckgo.app.privacymonitor
 
-import java.io.Serializable
+import android.net.Uri
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 
-interface NetworkTracker : Serializable {
+interface PrivacyMonitor {
+
     val url: String
-    val networkName: String
-    val networkUrl: String
+    val uri: Uri?
+    val https: HttpsStatus
+    val trackerCount: Int
+    val networkCount: Int
+    val majorNetworkCount: Int
+    var hasHttpResources: Boolean
+    fun trackerDetected(event: TrackingEvent)
 }

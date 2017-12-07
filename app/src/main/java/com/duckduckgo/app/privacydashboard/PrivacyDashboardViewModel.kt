@@ -16,18 +16,78 @@
 
 package com.duckduckgo.app.privacydashboard
 
+import android.annotation.SuppressLint
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import com.duckduckgo.app.sitemonitor.SiteMonitor
-import javax.inject.Inject
+import android.content.Context
+import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.privacymonitor.HttpsStatus
+import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 
+@SuppressLint("StaticFieldLeak")
+class PrivacyDashboardViewModel(
+        private val context: Context) : ViewModel() {
 
-class PrivacyDashboardViewModel @Inject constructor() : ViewModel() {
+    data class ViewState(
+            val domain: String,
+            val httpsIcon: Int,
+            val httpsText: String,
+            val networksText: String,
+            val networksIcon: Int = R.drawable.dashboard_networks_blocked,
+            val majorNetworksText: String,
+            val majorNetworksIcon: Int = R.drawable.dashboard_major_networks_blocked
+    )
 
-    var liveSiteMonitor: MutableLiveData<SiteMonitor> = MutableLiveData()
+    val viewState: MutableLiveData<ViewState> = MutableLiveData()
 
-    fun attachSiteMonitor(siteMonitor: SiteMonitor) {
-        liveSiteMonitor.value = siteMonitor
+    init {
+        resetPrivacyMonitor()
     }
 
+    fun onPrivacyMonitorChanged(monitor: PrivacyMonitor?) {
+        if (monitor == null) {
+            resetPrivacyMonitor()
+        } else {
+            updatePrivacyMonitor(monitor)
+        }
+    }
+
+    private fun resetPrivacyMonitor() {
+        viewState.value = ViewState(
+                domain = "",
+                httpsIcon = httpsIcon(HttpsStatus.SECURE),
+                httpsText = httpsText(HttpsStatus.SECURE),
+                networksText = networksText(0),
+                majorNetworksText = majorNetworksText(0)
+        )
+    }
+
+    private fun updatePrivacyMonitor(monitor: PrivacyMonitor) {
+        viewState.value = viewState.value?.copy(
+                domain = monitor.uri?.host ?: "",
+                httpsIcon = httpsIcon(monitor.https),
+                httpsText = httpsText(monitor.https),
+                networksText = networksText(monitor.networkCount),
+                majorNetworksText = majorNetworksText(monitor.majorNetworkCount)
+        )
+    }
+
+    private fun httpsText(status: HttpsStatus): String = when (status) {
+        HttpsStatus.NONE -> context.getString(R.string.httpsBad)
+        HttpsStatus.MIXED -> context.getString(R.string.httpsMixed)
+        HttpsStatus.SECURE -> context.getString(R.string.httpsGood)
+    }
+
+    private fun httpsIcon(status: HttpsStatus): Int = when (status) {
+        HttpsStatus.NONE -> R.drawable.dashboard_https_bad
+        HttpsStatus.MIXED -> R.drawable.dashboard_https_neutral
+        HttpsStatus.SECURE -> R.drawable.dashboard_https_good
+    }
+
+    private fun networksText(trackerNetworkCount: Int): String =
+            context.getString(R.string.networksBlocked, trackerNetworkCount.toString())
+
+
+    private fun majorNetworksText(trackerNetworkCount: Int): String =
+            context.getString(R.string.majorNetworksBlocked, trackerNetworkCount.toString())
 }

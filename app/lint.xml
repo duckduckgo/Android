@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="IconColors">
+        <ignore path="src/main/res/drawable*/privacy_icon_unknown.*" />
+    </issue>
+    <issue id="IconExpectedSize">
+        <ignore path="src/main/res/drawable-*/privacy_icon_unknown.*" />
+    </issue>
+</lint>

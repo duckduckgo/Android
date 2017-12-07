@@ -66,7 +66,6 @@ class AdBlockClientInstrumentationTest {
         assertFalse(testee.matches(nonTrackerUrl, documentUrl, resourceType))
     }
 
-    private fun data(): ByteArray {
-        return javaClass.classLoader.getResource("binary/easylist_sample").readBytes()
-    }
+    private fun data(): ByteArray =
+            javaClass.classLoader.getResource("binary/easylist_sample").readBytes()
 }

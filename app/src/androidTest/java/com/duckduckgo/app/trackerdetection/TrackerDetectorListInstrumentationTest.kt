@@ -20,10 +20,11 @@ package com.duckduckgo.app.trackerdetection
 import android.support.test.runner.AndroidJUnit4
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYLIST
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYPRIVACY
-import com.duckduckgo.app.trackerdetection.model.NetworkTrackers
 import com.duckduckgo.app.trackerdetection.model.ResourceType
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,27 +44,29 @@ class TrackerDetectorListInstrumentationTest {
     fun before() {
         val easylistAdblock = adblockClient(EASYLIST, "binary/easylist_sample")
         val easyprivacyAdblock = adblockClient(EASYPRIVACY, "binary/easyprivacy_sample")
-        testee = TrackerDetector(NetworkTrackers())
+        testee = TrackerDetector(TrackerNetworks())
         testee.addClient(easyprivacyAdblock)
         testee.addClient(easylistAdblock)
     }
 
     @Test
-    fun whenUrlIsInEasyListThenShouldBlockIsTrue() {
+    fun whenUrlIsInEasyListThenEvaluateReturnsTrackingEvent() {
         val url = "http://imasdk.googleapis.com/js/sdkloader/ima3.js"
-        assertTrue(testee.shouldBlock(url, documentUrl, resourceType))
+        val expected = TrackingEvent(documentUrl, url, null, true)
+        assertEquals(expected, testee.evaluate(url, documentUrl, resourceType))
     }
 
     @Test
-    fun whenUrlIsInEasyPrivacyListThenShouldBlockIsTrue() {
+    fun whenUrlIsInEasyPrivacyListThenEvaluateReturnsTrackingEvent() {
         val url = "http://cdn.tagcommander.com/1705/tc_catalog.css"
-        assertTrue(testee.shouldBlock(url, documentUrl, resourceType))
+        val expected = TrackingEvent(documentUrl, url, null, true)
+        assertEquals(expected, testee.evaluate(url, documentUrl, resourceType))
     }
 
     @Test
-    fun whenUrlIsNotInAnyTrackerListsThenShouldBlockIsFalse() {
+    fun whenUrlIsNotInAnyTrackerListsThenEvaluateReturnsNull() {
         val url = "https://duckduckgo.com/index.html"
-        assertFalse(testee.shouldBlock(url, documentUrl, resourceType))
+        assertNull(testee.evaluate(url, documentUrl, resourceType))
     }
 
     private fun adblockClient(name: Client.ClientName, dataFile: String): Client {

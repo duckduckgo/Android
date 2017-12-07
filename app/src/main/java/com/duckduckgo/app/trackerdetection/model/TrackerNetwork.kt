@@ -16,24 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection.model
 
-import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
-import java.io.Serializable
-import javax.inject.Inject
-import javax.inject.Singleton
-
-@Singleton
-class NetworkTrackers @Inject constructor() : Serializable {
-
-    private var trackers: List<NetworkTracker> = ArrayList()
-
-    fun updateData(trackers: List<NetworkTracker>) {
-        this.trackers = trackers
-    }
-
-    fun network(url: String): String? {
-        return trackers
-                .filter { sameOrSubdomain(url, it.url) || sameOrSubdomain(url, it.networkUrl) }
-                .map { it.networkName }
-                .firstOrNull()
-    }
-}
+data class TrackerNetwork(val name: String,
+                          val url: String,
+                          val percentageOfPages: Int? = null,
+                          val isMajor: Boolean = false)
