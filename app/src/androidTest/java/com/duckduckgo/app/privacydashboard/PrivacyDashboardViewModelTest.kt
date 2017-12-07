@@ -60,7 +60,7 @@ class PrivacyDashboardViewModelTest {
     @Test
     fun whenHttpsStatusIsSecureThenTextAndIconReflectSame() {
         whenever(monitor.https).thenReturn(HttpsStatus.SECURE)
-        testee.updatePrivacyMonitor(monitor)
+        testee.onPrivacyMonitorChanged(monitor)
         assertEquals(getStringResource(R.string.httpsGood), testee.viewState.value?.httpsText)
         assertEquals(R.drawable.dashboard_https_good, testee.viewState.value?.httpsIcon)
     }
@@ -68,7 +68,7 @@ class PrivacyDashboardViewModelTest {
     @Test
     fun whenHttpsStatusIsMixedThenTextAndIconReflectSame() {
         whenever(monitor.https).thenReturn(HttpsStatus.MIXED)
-        testee.updatePrivacyMonitor(monitor)
+        testee.onPrivacyMonitorChanged(monitor)
         assertEquals(getStringResource(R.string.httpsMixed), testee.viewState.value?.httpsText)
         assertEquals(R.drawable.dashboard_https_neutral, testee.viewState.value?.httpsIcon)
     }
@@ -76,7 +76,7 @@ class PrivacyDashboardViewModelTest {
     @Test
     fun whenHttpsStatusIsNoneThenTextAndIconReflectSame() {
         whenever(monitor.https).thenReturn(HttpsStatus.NONE)
-        testee.updatePrivacyMonitor(monitor)
+        testee.onPrivacyMonitorChanged(monitor)
         assertEquals(getStringResource(R.string.httpsBad), testee.viewState.value?.httpsText)
         assertEquals(R.drawable.dashboard_https_bad, testee.viewState.value?.httpsIcon)
     }
@@ -84,28 +84,28 @@ class PrivacyDashboardViewModelTest {
     @Test
     fun whenNoTrackersNetworksThenNetworkTextShowsZero() {
         whenever(monitor.networkCount).thenReturn(0)
-        testee.updatePrivacyMonitor(monitor)
+        testee.onPrivacyMonitorChanged(monitor)
         assertEquals("0 Tracker Networks Blocked", testee.viewState.value?.networksText)
     }
 
     @Test
     fun whenTenTrackersNetworksThenNetworkTextShowsTen() {
         whenever(monitor.networkCount).thenReturn(10)
-        testee.updatePrivacyMonitor(monitor)
+        testee.onPrivacyMonitorChanged(monitor)
         assertEquals("10 Tracker Networks Blocked", testee.viewState.value?.networksText)
     }
 
     @Test
     fun whenNoMajorTrackersNetworksThenMajorNetworkTextShowsZero() {
         whenever(monitor.majorNetworkCount).thenReturn(0)
-        testee.updatePrivacyMonitor(monitor)
+        testee.onPrivacyMonitorChanged(monitor)
         assertEquals("0 Major Tracker Networks Blocked", testee.viewState.value?.majorNetworksText)
     }
 
     @Test
     fun whenTenMajorTrackersNetworksThenMajorNetworkTextShowsTen() {
         whenever(monitor.majorNetworkCount).thenReturn(10)
-        testee.updatePrivacyMonitor(monitor)
+        testee.onPrivacyMonitorChanged(monitor)
         assertEquals("10 Major Tracker Networks Blocked", testee.viewState.value?.majorNetworksText)
     }
 

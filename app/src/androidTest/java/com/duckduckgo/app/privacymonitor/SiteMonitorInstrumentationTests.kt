@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.privacymonitor
 
-import com.duckduckgo.app.trackerdetection.model.NetworkTrackers
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -30,26 +29,26 @@ class SiteMonitorInstrumentationTests {
 
     @Test
     fun whenUrlIsHttpsThenHttpsStatusIsSecure() {
-        val testee = SiteMonitor(httpsDocument, NetworkTrackers())
+        val testee = SiteMonitor(httpsDocument)
         assertEquals(HttpsStatus.SECURE, testee.https)
     }
 
     @Test
     fun whenUrlIsHttpThenHttpsStatusIsNone() {
-        val testee = SiteMonitor(httpDocument, NetworkTrackers())
+        val testee = SiteMonitor(httpDocument)
         assertEquals(HttpsStatus.NONE, testee.https)
     }
 
     @Test
     fun whenUrlIsHttpsWithHttpResourcesThenHttpsStatusIsMixed() {
-        val testee = SiteMonitor(httpsDocument, NetworkTrackers())
+        val testee = SiteMonitor(httpsDocument)
         testee.hasHttpResources = true
         assertEquals(HttpsStatus.MIXED, testee.https)
     }
 
     @Test
     fun whenUrlIsMalformedThenHttpsStatusIsNone() {
-        val testee = SiteMonitor(malformesDocument, NetworkTrackers())
+        val testee = SiteMonitor(malformesDocument)
         assertEquals(HttpsStatus.NONE, testee.https)
     }
 }

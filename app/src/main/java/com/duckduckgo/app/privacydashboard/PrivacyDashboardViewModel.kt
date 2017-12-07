@@ -23,7 +23,6 @@ import android.content.Context
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacymonitor.HttpsStatus
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
-import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 
 @SuppressLint("StaticFieldLeak")
 class PrivacyDashboardViewModel(

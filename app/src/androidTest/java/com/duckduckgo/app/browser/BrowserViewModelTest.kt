@@ -22,7 +22,7 @@ import android.net.Uri
 import com.duckduckgo.app.browser.BrowserViewModel.NavigationCommand
 import com.duckduckgo.app.browser.BrowserViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
-import com.duckduckgo.app.trackerdetection.model.NetworkTrackers
+import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.nhaarman.mockito_kotlin.mock
 import org.junit.After
 import org.junit.Assert.*
@@ -59,7 +59,7 @@ class BrowserViewModelTest {
 
     @Before
     fun before() {
-        testee = BrowserViewModel(testOmnibarConverter, DuckDuckGoUrlDetector(), NetworkTrackers())
+        testee = BrowserViewModel(testOmnibarConverter, DuckDuckGoUrlDetector(), PrivacyMonitorRepository())
         testee.query.observeForever(queryObserver)
         testee.viewState.observeForever(viewStateObserver)
         testee.navigation.observeForever(navigationObserver)

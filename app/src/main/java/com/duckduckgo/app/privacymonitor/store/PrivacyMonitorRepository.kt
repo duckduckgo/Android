@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacymonitor.store;
+package com.duckduckgo.app.privacymonitor.store
 
 
 import android.arch.lifecycle.MutableLiveData

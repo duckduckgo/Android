@@ -18,11 +18,10 @@ package com.duckduckgo.app.privacymonitor
 
 import android.net.Uri
 import com.duckduckgo.app.global.isHttps
-import com.duckduckgo.app.trackerdetection.model.NetworkTrackers
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import java.util.concurrent.CopyOnWriteArrayList
 
-class SiteMonitor constructor(override val url: String, private val networkTrackers: NetworkTrackers) : PrivacyMonitor {
+class SiteMonitor constructor(override val url: String) : PrivacyMonitor {
 
     override var hasHttpResources = false
 
@@ -50,13 +49,14 @@ class SiteMonitor constructor(override val url: String, private val networkTrack
 
     override val networkCount: Int
         get() = trackingEvents
-                .mapNotNull { networkTrackers.network(it.trackerUrl) }
+                .mapNotNull { it.trackerNetwork }
                 .distinct()
                 .count()
 
     override val majorNetworkCount: Int
         get() = trackingEvents
-                .mapNotNull { networkTrackers.majorNetwork(it.trackerUrl) }
+                .filter { it.trackerNetwork?.isMajor ?: false }
+                .mapNotNull { it.trackerNetwork?.name }
                 .distinct()
                 .count()
 

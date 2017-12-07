@@ -23,14 +23,12 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import com.duckduckgo.app.privacymonitor.SiteMonitor
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
-import com.duckduckgo.app.trackerdetection.model.NetworkTrackers
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import timber.log.Timber
 
 class BrowserViewModel(
         private val queryUrlConverter: OmnibarEntryConverter,
         private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-        private val networkTrackers: NetworkTrackers,
         private val privacyMonitorRepository: PrivacyMonitorRepository) :
         WebViewClientListener, ViewModel() {
 
@@ -58,7 +56,7 @@ class BrowserViewModel(
 
     init {
         viewState.value = ViewState()
-        privacyMonitorRepository.privacyMonitor = MutableLiveData<PrivacyMonitor>()
+        privacyMonitorRepository.privacyMonitor = MutableLiveData()
     }
 
     fun registerWebViewListener(browserWebViewClient: BrowserWebViewClient, browserChromeClient: BrowserChromeClient) {
@@ -92,7 +90,7 @@ class BrowserViewModel(
         Timber.v("Loading started")
         viewState.value = currentViewState().copy(isLoading = true)
         siteMonitor = null
-        privacyMonitorRepository.privacyMonitor.postValue(siteMonitor)
+        postSiteMonitor()
     }
 
     override fun loadingFinished() {
@@ -109,18 +107,22 @@ class BrowserViewModel(
         }
         viewState.value = newViewState
         if (url != null) {
-            siteMonitor = SiteMonitor(url, networkTrackers)
-            privacyMonitorRepository.privacyMonitor.postValue(siteMonitor)
+            siteMonitor = SiteMonitor(url)
+            postSiteMonitor()
         }
     }
 
     override fun trackerDetected(event: TrackingEvent) {
         siteMonitor?.trackerDetected(event)
-        privacyMonitorRepository.privacyMonitor.postValue(siteMonitor)
+        postSiteMonitor()
     }
 
     override fun pageHasHttpResources() {
         siteMonitor?.hasHttpResources = true
+        postSiteMonitor()
+    }
+
+    private fun postSiteMonitor() {
         privacyMonitorRepository.privacyMonitor.postValue(siteMonitor)
     }
 
