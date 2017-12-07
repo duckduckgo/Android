@@ -26,7 +26,6 @@ import android.webkit.WebViewClient
 import com.duckduckgo.app.global.isHttp
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.ResourceType
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import timber.log.Timber
@@ -83,12 +82,14 @@ class BrowserWebViewClient @Inject constructor(
     private fun block(request: WebResourceRequest, documentUrl: String?): Boolean {
         val url = request.url.toString()
 
-        if (documentUrl != null && trackerDetector.shouldBlock(url, documentUrl, ResourceType.from(request))) {
-            webViewClientListener?.trackerDetected(TrackingEvent(url, documentUrl, true))
-            return true
+        if (documentUrl == null) {
+            return false
         }
 
-        return false
+        val trackingEvent = trackerDetector.evaluate(url, documentUrl, ResourceType.from(request)) ?: return false
+        webViewClientListener?.trackerDetected(trackingEvent)
+
+        return true
     }
 
     private fun WebView.elementClicked(): String? = safeHitTestResult().extra

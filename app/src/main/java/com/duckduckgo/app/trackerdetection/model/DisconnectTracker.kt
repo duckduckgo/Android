@@ -16,9 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection.model
 
-import java.io.Serializable
-
 data class DisconnectTracker(val url: String,
                              val category: String,
                              val networkName: String,
-                             val networkUrl: String) : Serializable
+                             val networkUrl: String)

@@ -16,22 +16,19 @@
 
 package com.duckduckgo.app.trackerdetection
 
-import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
-import com.duckduckgo.app.trackerdetection.model.NetworkTrackers
-import com.duckduckgo.app.trackerdetection.model.ResourceType
+import com.duckduckgo.app.trackerdetection.model.*
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
-import java.util.*
 
 
 class TrackerDetectorInstrumentationTest {
 
-    private val networkTrackers = NetworkTrackers()
+    private val networkTrackers = TrackerNetworks()
     private val trackerDetector = TrackerDetector(networkTrackers)
 
     companion object {
@@ -40,71 +37,89 @@ class TrackerDetectorInstrumentationTest {
     }
 
     @Test
-    fun whenThereAreNoClientsThenShouldBlockIsFalse() {
-        assertFalse(trackerDetector.shouldBlock("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
+    fun whenThereAreNoClientsThenEvaluateReturnsNull() {
+        assertNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
     }
 
     @Test
-    fun whenAllClientsFailToMatchThenShouldBlockIsFalse() {
+    fun whenAllClientsFailToMatchThenEvaluateReturnsNull() {
         trackerDetector.addClient(neverMatchingClient())
         trackerDetector.addClient(neverMatchingClient())
-        assertFalse(trackerDetector.shouldBlock("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
+        assertNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
     }
 
     @Test
-    fun whenAllClientsMatchThenShouldBlockIsTrue() {
+    fun whenAllClientsMatchThenEvaluateReturnsTrackingEvent() {
         trackerDetector.addClient(alwaysMatchingClient())
         trackerDetector.addClient(alwaysMatchingClient())
-        assertTrue(trackerDetector.shouldBlock("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
+        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, true)
+        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType)
+        assertEquals(expected, actual)
     }
 
     @Test
-    fun whenSomeClientsMatchThenShouldBlockIsTrue() {
+    fun whenSomeClientsMatchThenEvaluateReturnsTrackingEvent() {
         trackerDetector.addClient(neverMatchingClient())
         trackerDetector.addClient(alwaysMatchingClient())
-        assertTrue(trackerDetector.shouldBlock("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
+        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, true)
+        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType)
+        assertEquals(expected, actual)
     }
 
     @Test
-    fun whenUrlHasSameDomainAsDocumentThenShouldBlockIsFalse() {
-        trackerDetector.addClient(alwaysMatchingClient())
-        assertFalse(trackerDetector.shouldBlock("http://example.com/update.js", "http://example.com/index.com", resourceType))
-    }
-
-    @Test
-    fun whenUrlIsSubdomainOfDocumentThenShouldBlockIsFalse() {
-        trackerDetector.addClient(alwaysMatchingClient())
-        assertFalse(trackerDetector.shouldBlock("http://mobile.example.com/update.js", "http://example.com/index.com", resourceType))
-    }
-
-    @Test
-    fun whenUrlIsParentOfDocumentThenShouldBlockIsFalse() {
-        trackerDetector.addClient(alwaysMatchingClient())
-        assertFalse(trackerDetector.shouldBlock("http://example.com/update.js", "http://mobile.example.com/index.com", resourceType))
-    }
-
-    @Test
-    fun whenUrlIsNetworkOfDocumentThenShouldBlockIsFalse() {
-        val networks = Arrays.asList(DisconnectTracker("example.com", "", network, "http://thirdparty.com/"))
+    fun whenTrackerIsPartOfNetworkThenEvaluateReturnsTrackingEventWithNetwork() {
+        val networks = arrayListOf(
+                DisconnectTracker("thirdparty.com", "", network, "http://network.com")
+        )
         networkTrackers.updateData(networks)
-        assertFalse(trackerDetector.shouldBlock("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
+        trackerDetector.addClient(alwaysMatchingClient())
+
+        val network = TrackerNetwork(network, "http://network.com")
+        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", network, true)
+        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType)
+        assertEquals(expected, actual)
     }
 
     @Test
-    fun whenDocumentIsNetworkOfUrlThenShouldBlockIsFalse() {
-        val networks = Arrays.asList(DisconnectTracker("thirdparty.com", "", network, "http://example.com"))
+    fun whenUrlHasSameDomainAsDocumentThenEvaluateReturnsNull() {
+        trackerDetector.addClient(alwaysMatchingClient())
+        assertNull(trackerDetector.evaluate("http://example.com/update.js", "http://example.com/index.com", resourceType))
+    }
+
+    @Test
+    fun whenUrlIsSubdomainOfDocumentThenEvaluateReturnsNull() {
+        trackerDetector.addClient(alwaysMatchingClient())
+        assertNull(trackerDetector.evaluate("http://mobile.example.com/update.js", "http://example.com/index.com", resourceType))
+    }
+
+    @Test
+    fun whenUrlIsParentOfDocumentThenEvaluateReturnsNull() {
+        trackerDetector.addClient(alwaysMatchingClient())
+        assertNull(trackerDetector.evaluate("http://example.com/update.js", "http://mobile.example.com/index.com", resourceType))
+    }
+
+    @Test
+    fun whenUrlIsNetworkOfDocumentThenEvaluateReturnsNull() {
+        val networks = arrayListOf(DisconnectTracker("example.com", "", network, "http://thirdparty.com/"))
         networkTrackers.updateData(networks)
-        assertFalse(trackerDetector.shouldBlock("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
+        assertNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
     }
 
     @Test
-    fun whenUrlSharesSameNetworkAsDocumentThenShouldBlockIsFalse() {
-        val networks = Arrays.asList(
+    fun whenDocumentIsNetworkOfUrlThenEvaluateReturnsNull() {
+        val networks = arrayListOf(DisconnectTracker("thirdparty.com", "", network, "http://example.com"))
+        networkTrackers.updateData(networks)
+        assertNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
+    }
+
+    @Test
+    fun whenUrlSharesSameNetworkAsDocumentThenEvaluateReturnsNull() {
+        val networks = arrayListOf(
                 DisconnectTracker("thirdparty.com", "", network, "http://network.com"),
                 DisconnectTracker("example.com", "", network, "http://network.com")
         )
         networkTrackers.updateData(networks)
-        assertFalse(trackerDetector.shouldBlock("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
+        assertNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
     }
 
     private fun alwaysMatchingClient(): Client {

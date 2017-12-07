@@ -18,15 +18,16 @@ package com.duckduckgo.app.trackerdetection
 
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.trackerdetection.Client.ClientName
-import com.duckduckgo.app.trackerdetection.model.NetworkTrackers
 import com.duckduckgo.app.trackerdetection.model.ResourceType
+import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import timber.log.Timber
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TrackerDetector @Inject constructor(private val networkTrackers: NetworkTrackers) {
+class TrackerDetector @Inject constructor(private val networkTrackers: TrackerNetworks) {
 
     private val clients = CopyOnWriteArrayList<Client>()
 
@@ -36,19 +37,21 @@ class TrackerDetector @Inject constructor(private val networkTrackers: NetworkTr
 
     fun hasClient(name: ClientName): Boolean = clients.any { it.name == name }
 
-    fun shouldBlock(url: String, documentUrl: String, resourceType: ResourceType): Boolean {
+    fun evaluate(url: String, documentUrl: String, resourceType: ResourceType): TrackingEvent? {
 
         if (firstParty(url, documentUrl)) {
             Timber.v("$url is a first party url")
-            return false
+            return null
         }
 
         val matches = clients.any { it.matches(url, documentUrl, resourceType) }
-        val matchText = if (matches) "WAS" else "was not"
-        Timber.v("$documentUrl resource $url $matchText identified as a tracker")
+        if (matches) {
+            val matchText = if (matches) "WAS" else "was not"
+            Timber.v("$documentUrl resource $url $matchText identified as a tracker")
+            return TrackingEvent(documentUrl, url, networkTrackers.network(url), true)
+        }
 
-        return matches
-
+        return null
     }
 
     private fun firstParty(firstUrl: String, secondUrl: String): Boolean =

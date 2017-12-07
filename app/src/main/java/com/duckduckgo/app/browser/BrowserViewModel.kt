@@ -21,14 +21,14 @@ import android.arch.lifecycle.ViewModel
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.privacymonitor.SiteMonitor
-import com.duckduckgo.app.trackerdetection.model.NetworkTrackers
+import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import timber.log.Timber
 
 class BrowserViewModel(
         private val queryUrlConverter: OmnibarEntryConverter,
         private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-        private val networkTrackers: NetworkTrackers) :
+        private val privacyMonitorRepository: PrivacyMonitorRepository) :
         WebViewClientListener, ViewModel() {
 
     data class ViewState(
@@ -50,10 +50,12 @@ class BrowserViewModel(
     }
 
     private var lastQuery: String? = null
-    var siteMonitor: SiteMonitor? = null
+
+    private var siteMonitor: SiteMonitor? = null
 
     init {
         viewState.value = ViewState()
+        privacyMonitorRepository.privacyMonitor = MutableLiveData()
     }
 
     fun registerWebViewListener(browserWebViewClient: BrowserWebViewClient, browserChromeClient: BrowserChromeClient) {
@@ -87,6 +89,7 @@ class BrowserViewModel(
         Timber.v("Loading started")
         viewState.value = currentViewState().copy(isLoading = true)
         siteMonitor = null
+        postSiteMonitor()
     }
 
     override fun loadingFinished() {
@@ -103,16 +106,23 @@ class BrowserViewModel(
         }
         viewState.value = newViewState
         if (url != null) {
-            siteMonitor = SiteMonitor(url, networkTrackers)
+            siteMonitor = SiteMonitor(url)
+            postSiteMonitor()
         }
     }
 
     override fun trackerDetected(event: TrackingEvent) {
         siteMonitor?.trackerDetected(event)
+        postSiteMonitor()
     }
 
     override fun pageHasHttpResources() {
         siteMonitor?.hasHttpResources = true
+        postSiteMonitor()
+    }
+
+    private fun postSiteMonitor() {
+        privacyMonitorRepository.privacyMonitor.postValue(siteMonitor)
     }
 
     private fun currentViewState(): ViewState = viewState.value!!

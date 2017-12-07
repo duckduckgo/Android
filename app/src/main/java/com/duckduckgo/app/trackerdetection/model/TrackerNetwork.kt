@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacymonitor
+package com.duckduckgo.app.trackerdetection.model
 
-import android.net.Uri
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-
-interface PrivacyMonitor {
-
-    val url: String
-    val uri: Uri?
-    val https: HttpsStatus
-    val trackerCount: Int
-    val networkCount: Int
-    val majorNetworkCount: Int
-    var hasHttpResources: Boolean
-    fun trackerDetected(event: TrackingEvent)
-}
+data class TrackerNetwork(val name: String,
+                          val url: String,
+                          val percentageOfPages: Int? = null,
+                          val isMajor: Boolean = false)

@@ -17,7 +17,7 @@
 package com.duckduckgo.app.trackerdetection
 
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
-import com.duckduckgo.app.trackerdetection.model.NetworkTrackers
+import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.store.TrackerDataStore
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -28,7 +28,7 @@ import javax.inject.Inject
 class TrackerDataLoader @Inject constructor(private val trackerDetector: TrackerDetector,
                                             private val trackerDataStore: TrackerDataStore,
                                             private val trackerListService: TrackerListService,
-                                            private val networkTrackers: NetworkTrackers) {
+                                            private val networkTrackers: TrackerNetworks) {
 
     fun loadData() {
         loadAdblockData(Client.ClientName.EASYLIST)
