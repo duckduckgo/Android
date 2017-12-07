@@ -23,10 +23,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
+import android.view.KeyEvent.KEYCODE_ENTER
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.widget.TextView
 import com.duckduckgo.app.browser.BrowserViewModel.NavigationCommand.LANDING_PAGE
@@ -188,8 +189,8 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
 
-        urlInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
+        urlInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, keyEvent ->
+            if (actionId == IME_ACTION_DONE || keyEvent.keyCode == KEYCODE_ENTER) {
                 userEnteredQuery()
                 return@OnEditorActionListener true
             }
