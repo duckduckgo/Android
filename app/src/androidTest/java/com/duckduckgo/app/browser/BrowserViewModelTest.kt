@@ -30,7 +30,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers
-import org.mockito.Mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 
@@ -40,14 +39,10 @@ class BrowserViewModelTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @Mock
-    private val viewStateObserver: Observer<ViewState> = mock()
-
-    @Mock
-    private val queryObserver: Observer<String> = mock()
-
-    @Mock
-    private val navigationObserver: Observer<NavigationCommand> = mock()
+    private lateinit var viewStateObserver: Observer<ViewState>
+    private lateinit var queryObserver: Observer<String>
+    private lateinit var navigationObserver: Observer<NavigationCommand>
+    private lateinit var testee: BrowserViewModel
 
     private val testOmnibarConverter: OmnibarEntryConverter = object : OmnibarEntryConverter {
         override fun convertUri(input: String): String = "duckduckgo.com"
@@ -55,10 +50,11 @@ class BrowserViewModelTest {
         override fun convertQueryToUri(inputQuery: String): Uri = Uri.parse("duckduckgo.com")
     }
 
-    private lateinit var testee: BrowserViewModel
-
     @Before
     fun before() {
+        viewStateObserver = mock()
+        queryObserver = mock()
+        navigationObserver = mock()
         testee = BrowserViewModel(testOmnibarConverter, DuckDuckGoUrlDetector(), PrivacyMonitorRepository())
         testee.query.observeForever(queryObserver)
         testee.viewState.observeForever(viewStateObserver)

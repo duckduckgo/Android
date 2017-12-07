@@ -29,7 +29,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
 
 class PrivacyDashboardViewModelTest {
 
@@ -37,16 +36,14 @@ class PrivacyDashboardViewModelTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @Mock
-    private val viewStateObserver: Observer<PrivacyDashboardViewModel.ViewState> = mock()
-
-    @Mock
-    private val monitor: PrivacyMonitor = mock()
-
+    private lateinit var viewStateObserver: Observer<PrivacyDashboardViewModel.ViewState>
+    private lateinit var monitor: PrivacyMonitor
     private lateinit var testee: PrivacyDashboardViewModel
 
     @Before
     fun before() {
+        viewStateObserver = mock()
+        monitor = mock()
         testee = PrivacyDashboardViewModel(InstrumentationRegistry.getTargetContext())
         testee.viewState.observeForever(viewStateObserver)
         whenever(monitor.https).thenReturn(HttpsStatus.SECURE)

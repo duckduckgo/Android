@@ -74,7 +74,7 @@ android {
 }
 
 ext {
-    supportLibrary = "27.0.1"
+    supportLibrary = "27.0.2"
     architectureComponents = "1.0.0"
     dagger = "2.13"
     retrofit = "2.3.0"
@@ -103,14 +103,14 @@ dependencies {
     kapt "com.google.dagger:dagger-android-processor:$dagger"
     kapt "com.google.dagger:dagger-compiler:$dagger"
 
-    testImplementation "org.mockito:mockito-core:2.12.0"
+    testImplementation "org.mockito:mockito-core:2.13.0"
     testImplementation "com.nhaarman:mockito-kotlin-kt1.1:1.5.0"
     testImplementation "junit:junit:4.12"
     testImplementation "android.arch.core:core-testing:$architectureComponents"
 
     androidTestImplementation "com.android.support.test:runner:1.0.1"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:3.0.1"
-    androidTestImplementation "org.mockito:mockito-android:2.12.0"
+    androidTestImplementation "org.mockito:mockito-android:2.13.0"
     androidTestImplementation "com.nhaarman:mockito-kotlin-kt1.1:1.5.0"
     androidTestImplementation "android.arch.core:core-testing:$architectureComponents"
 }
