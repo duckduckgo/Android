@@ -51,6 +51,8 @@ class TrackerDetector @Inject constructor(private val networkTrackers: TrackerNe
             return TrackingEvent(documentUrl, url, networkTrackers.network(url), true)
         }
 
+        Timber.v("$documentUrl resource $url was not identified as a tracker")
+
         return null
     }
 
