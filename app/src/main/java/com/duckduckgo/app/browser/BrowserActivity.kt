@@ -110,13 +110,17 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun showClearButton() {
-        clearUrlButton.show()
-        urlInput.updatePadding(paddingEnd = 40.toPx())
+        urlInput.post {
+            clearUrlButton.show()
+            urlInput.updatePadding(paddingEnd = 40.toPx())
+        }
     }
 
     private fun hideClearButton() {
-        clearUrlButton.hide()
-        urlInput.updatePadding(paddingEnd = 10.toPx())
+        urlInput.post {
+            clearUrlButton.hide()
+            urlInput.updatePadding(paddingEnd = 10.toPx())
+        }
     }
 
     private fun shouldUpdateUrl(viewState: BrowserViewModel.ViewState, url: String?) =
@@ -131,17 +135,13 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUrlInput() {
-        urlInput.onFocusChangeListener = View.OnFocusChangeListener { _: View, hasFocus: Boolean ->
-            viewModel.urlFocusChanged(hasFocus)
-
-            if (hasFocus) {
-                viewModel.onUrlInputValueChanged(urlInput.text.toString(), urlInput.hasFocus())
-            }
+        urlInput.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus: Boolean ->
+            viewModel.onUrlInputStateChanged(urlInput.text.toString(), hasFocus)
         }
 
         urlInput.addTextChangedListener(object : TextChangedWatcher() {
             override fun afterTextChanged(editable: Editable) {
-                viewModel.onUrlInputValueChanged(urlInput.text.toString(), urlInput.hasFocus())
+                viewModel.onUrlInputStateChanged(urlInput.text.toString(), urlInput.hasFocus())
             }
         })
 
@@ -151,12 +151,6 @@ class BrowserActivity : DuckDuckGoActivity() {
                 return viewModel.userDismissedKeyboard()
             }
         }
-
-        urlInput.addTextChangedListener(object : TextChangedWatcher() {
-            override fun afterTextChanged(editable: Editable) {
-                viewModel.onUrlInputValueChanged(urlInput.text.toString(), urlInput.hasFocus())
-            }
-        })
 
         clearUrlButton.setOnClickListener { urlInput.setText("") }
     }
