@@ -207,6 +207,16 @@ class PrivacyDashboardViewModelTest {
         assertEquals("10 Major Tracker Networks Found", testee.viewState.value?.majorNetworksText)
     }
 
+    @Test
+    fun whenNoDataThenDefaultValuesAreUsed() {
+        val viewState = testee.viewState.value!!
+        assertEquals(getStringResource(R.string.httpsGood), viewState.httpsText)
+        assertEquals(R.drawable.dashboard_networks_good, testee.viewState.value?.networksIcon)
+        assertEquals("0 Tracker Networks Blocked", testee.viewState.value?.networksText)
+        assertEquals(R.drawable.dashboard_major_networks_good, testee.viewState.value?.majorNetworksIcon)
+        assertEquals("0 Major Tracker Networks Blocked", testee.viewState.value?.majorNetworksText)
+    }
+
     private fun getStringResource(id: Int): String =
             InstrumentationRegistry.getTargetContext().getString(id)
 }

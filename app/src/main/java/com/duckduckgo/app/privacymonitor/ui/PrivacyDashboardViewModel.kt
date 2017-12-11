@@ -20,6 +20,8 @@ import android.annotation.SuppressLint
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.content.Context
+import android.support.annotation.ColorRes
+import android.support.annotation.DrawableRes
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacymonitor.HttpsStatus
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
@@ -32,15 +34,15 @@ class PrivacyDashboardViewModel(private val context: Context,
     data class ViewState(
             val domain: String,
             val heading: String,
-            val httpsIcon: Int,
+            @DrawableRes val httpsIcon: Int,
             val httpsText: String,
             val networksText: String,
-            val networksIcon: Int = R.drawable.dashboard_networks_good,
+            @DrawableRes val networksIcon: Int = R.drawable.dashboard_networks_good,
             val majorNetworksText: String,
-            val majorNetworksIcon: Int = R.drawable.dashboard_major_networks_good,
+            @DrawableRes val majorNetworksIcon: Int = R.drawable.dashboard_major_networks_good,
             val toggleEnabled: Boolean,
             val toggleText: String,
-            val toggleBackgroundColor: Int = R.color.midGreen
+            @ColorRes val toggleBackgroundColor: Int = R.color.midGreen
     )
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -72,7 +74,7 @@ class PrivacyDashboardViewModel(private val context: Context,
                 networksIcon = R.drawable.dashboard_networks_good,
                 networksText = networksText(),
                 majorNetworksText = majorNetworksText(),
-                majorNetworksIcon = R.drawable.dashboard_networks_good,
+                majorNetworksIcon = R.drawable.dashboard_major_networks_good,
                 toggleEnabled = settingsStore.privacyOn,
                 toggleText = toggleText(),
                 toggleBackgroundColor = toggleBackgroundColor()
@@ -108,6 +110,7 @@ class PrivacyDashboardViewModel(private val context: Context,
         return context.getString(resource)
     }
 
+    @DrawableRes
     private fun httpsIcon(status: HttpsStatus): Int = when (status) {
         HttpsStatus.NONE -> R.drawable.dashboard_https_bad
         HttpsStatus.MIXED -> R.drawable.dashboard_https_neutral
@@ -120,6 +123,7 @@ class PrivacyDashboardViewModel(private val context: Context,
         HttpsStatus.SECURE -> context.getString(R.string.httpsGood)
     }
 
+    @DrawableRes
     private fun networksIcon(allBlocked: Boolean = true, networksCount: Int = 0): Int {
         val isGood = allBlocked || networksCount == 0
         return if (isGood) R.drawable.dashboard_networks_good else R.drawable.dashboard_networks_bad
@@ -130,6 +134,7 @@ class PrivacyDashboardViewModel(private val context: Context,
         return context.getString(resource, networkCount.toString())
     }
 
+    @DrawableRes
     private fun majorNetworksIcon(allBlocked: Boolean = true, majorNetworksCount: Int = 0): Int {
         val isGood = allBlocked || majorNetworksCount == 0
         return if (isGood) R.drawable.dashboard_major_networks_good else R.drawable.dashboard_major_networks_bad
@@ -145,6 +150,7 @@ class PrivacyDashboardViewModel(private val context: Context,
         return context.getString(resource)
     }
 
+    @ColorRes
     private fun toggleBackgroundColor(): Int {
         return if (settingsStore.privacyOn) R.color.midGreen else R.color.warmerGrey
     }
