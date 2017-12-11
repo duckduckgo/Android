@@ -26,7 +26,7 @@ import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.After
-import org.junit.Assert.assertEquals
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -40,21 +40,53 @@ class PrivacyDashboardViewModelTest {
     private lateinit var viewStateObserver: Observer<PrivacyDashboardViewModel.ViewState>
     private lateinit var monitor: PrivacyMonitor
     private lateinit var settingStore: PrivacySettingsStore
-    private lateinit var testee: PrivacyDashboardViewModel
+
+    private val testee: PrivacyDashboardViewModel by lazy {
+        val model = PrivacyDashboardViewModel(InstrumentationRegistry.getTargetContext(), settingStore)
+        model.viewState.observeForever(viewStateObserver)
+        model
+    }
 
     @Before
     fun before() {
         viewStateObserver = mock()
         monitor = mock()
         settingStore = mock()
-        testee = PrivacyDashboardViewModel(InstrumentationRegistry.getTargetContext(), settingStore)
-        testee.viewState.observeForever(viewStateObserver)
         whenever(monitor.https).thenReturn(HttpsStatus.SECURE)
     }
 
     @After
     fun after() {
         testee.viewState.removeObserver(viewStateObserver)
+        settingStore = mock()
+    }
+
+    @Test
+    fun whenPrivacyInitiallyOnAndSwitchedOffThenShouldReloadIsTrue() {
+        whenever(settingStore.privacyOn)
+                .thenReturn(true)
+                .thenReturn(false)
+        assertTrue(testee.shouldReloadPage)
+    }
+
+    @Test
+    fun whenPrivacyInitiallyOnAndUnchangedThenShouldReloadIsFalse() {
+        whenever(settingStore.privacyOn).thenReturn(true)
+        assertFalse(testee.shouldReloadPage)
+    }
+
+    @Test
+    fun whenPrivacyInitiallyOffAndSwitchedOnThenShouldReloadIsTrue() {
+        whenever(settingStore.privacyOn)
+                .thenReturn(false)
+                .thenReturn(true)
+        assertTrue(testee.shouldReloadPage)
+    }
+
+    @Test
+    fun whenPrivacyInitiallyOffAndUnchangedThenShouldReloadIsFalse() {
+        whenever(settingStore.privacyOn).thenReturn(false)
+        assertFalse(testee.shouldReloadPage)
     }
 
     @Test

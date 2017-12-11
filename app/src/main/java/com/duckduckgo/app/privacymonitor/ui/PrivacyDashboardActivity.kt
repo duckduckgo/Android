@@ -63,7 +63,6 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
         privacyToggle.setOnCheckedChangeListener { _, enabled ->
             viewModel.onPrivacyToggled(enabled)
-            setResult(RESULT_RELOAD)
         }
     }
 
@@ -79,11 +78,18 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                super.onBackPressed()
+                onBackPressed()
                 return true
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onBackPressed() {
+        if (viewModel.shouldReloadPage) {
+            setResult(RESULT_RELOAD)
+        }
+        super.onBackPressed()
     }
 
     private fun render(viewState: ViewState) {

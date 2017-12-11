@@ -44,11 +44,15 @@ class PrivacyDashboardViewModel(private val context: Context,
     )
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    private val initialPrivacyOnSetting = settingsStore.privacyOn
     private var monitor: PrivacyMonitor? = null
 
     init {
         resetPrivacyMonitor()
     }
+
+    val shouldReloadPage: Boolean
+        get() = initialPrivacyOnSetting != settingsStore.privacyOn
 
     fun onPrivacyMonitorChanged(monitor: PrivacyMonitor?) {
         this.monitor = monitor
