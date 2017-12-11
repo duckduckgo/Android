@@ -93,6 +93,9 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: ViewState) {
+        if (isFinishing) {
+            return
+        }
         privacyToggle.isChecked = viewState.toggleEnabled
         privacyToggleText.text = viewState.toggleText
         domain.text = viewState.domain

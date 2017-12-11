@@ -60,6 +60,9 @@ class SiteMonitor constructor(override val url: String) : PrivacyMonitor {
                 .distinct()
                 .count()
 
+    override val allTrackersBlocked: Boolean
+        get() = trackingEvents.none { it.blocked == false }
+
     override fun trackerDetected(event: TrackingEvent) {
         trackingEvents.add(event)
     }
