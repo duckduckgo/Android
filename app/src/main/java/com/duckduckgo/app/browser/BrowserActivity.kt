@@ -34,7 +34,9 @@ import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
-import com.duckduckgo.app.privacydashboard.PrivacyDashboardActivity
+import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
+import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.REQUEST_DASHBOARD
+import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RESULT_RELOAD
 import kotlinx.android.synthetic.main.activity_browser.*
 import javax.inject.Inject
 
@@ -250,7 +252,15 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun launchPrivacyDashboard() {
-        startActivity(PrivacyDashboardActivity.intent(this))
+        startActivityForResult(PrivacyDashboardActivity.intent(this), REQUEST_DASHBOARD)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_DASHBOARD && resultCode == RESULT_RELOAD) {
+            webView.reload()
+            return
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onBackPressed() {

@@ -11,11 +11,14 @@
     <color name="darkGrey">#222325</color>
     <color name="charcoal">#2f3135</color>
     <color name="charcoalGrey">#47494c</color>
+    <color name="charcoalGreyTwo">#4a4c4f</color>
     <color name="slateGray">#5e6168</color>
     <color name="warmGrey">#939393</color>
+    <color name="warmerGrey">#777777</color>
     <color name="subtleGrey">#f0f0f0</color>
 
     <color name="midGreen">#3fa140</color>
+    <color name="treeGreen">#165416</color>
     <color name="orange">#de5833</color>
 
 </resources>

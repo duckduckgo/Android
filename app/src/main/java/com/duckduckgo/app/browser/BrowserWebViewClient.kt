@@ -72,14 +72,14 @@ class BrowserWebViewClient @Inject constructor(
             return null
         }
 
-        if (block(request, currentUrl)) {
+        if (shouldBlock(request, currentUrl)) {
             return WebResourceResponse(null, null, null)
         }
 
         return null
     }
 
-    private fun block(request: WebResourceRequest, documentUrl: String?): Boolean {
+    private fun shouldBlock(request: WebResourceRequest, documentUrl: String?): Boolean {
         val url = request.url.toString()
 
         if (documentUrl == null) {
@@ -89,7 +89,7 @@ class BrowserWebViewClient @Inject constructor(
         val trackingEvent = trackerDetector.evaluate(url, documentUrl, ResourceType.from(request)) ?: return false
         webViewClientListener?.trackerDetected(trackingEvent)
 
-        return true
+        return trackingEvent.blocked
     }
 
     private fun WebView.elementClicked(): String? = safeHitTestResult().extra

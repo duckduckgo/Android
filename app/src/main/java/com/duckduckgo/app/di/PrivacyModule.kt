@@ -16,20 +16,15 @@
 
 package com.duckduckgo.app.di
 
-import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
-
+import com.duckduckgo.app.privacymonitor.store.PrivacySettingsSharedPreferences
+import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
+import dagger.Binds
 import dagger.Module
-import dagger.android.ContributesAndroidInjector
+
 
 @Module
-abstract class ActivityBindingModule {
+abstract class PrivacyModule {
 
-    @ActivityScoped
-    @ContributesAndroidInjector
-    abstract fun browserActivity(): BrowserActivity
-
-    @ActivityScoped
-    @ContributesAndroidInjector
-    abstract fun privacyDashboardActivity(): PrivacyDashboardActivity
+    @Binds
+    abstract fun bindPrivacySettingsStore(privacySettingsStore: PrivacySettingsSharedPreferences): PrivacySettingsStore
 }

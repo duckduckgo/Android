@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacydashboard
+package com.duckduckgo.app.privacymonitor.ui
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
@@ -22,6 +22,7 @@ import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacymonitor.HttpsStatus
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
+import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.After
@@ -38,13 +39,15 @@ class PrivacyDashboardViewModelTest {
 
     private lateinit var viewStateObserver: Observer<PrivacyDashboardViewModel.ViewState>
     private lateinit var monitor: PrivacyMonitor
+    private lateinit var settingStore: PrivacySettingsStore
     private lateinit var testee: PrivacyDashboardViewModel
 
     @Before
     fun before() {
         viewStateObserver = mock()
         monitor = mock()
-        testee = PrivacyDashboardViewModel(InstrumentationRegistry.getTargetContext())
+        settingStore = mock()
+        testee = PrivacyDashboardViewModel(InstrumentationRegistry.getTargetContext(), settingStore)
         testee.viewState.observeForever(viewStateObserver)
         whenever(monitor.https).thenReturn(HttpsStatus.SECURE)
     }
@@ -79,31 +82,75 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenNoTrackersNetworksThenNetworkTextShowsZero() {
+    fun whenPrivacyOnAndNoTrackersNetworksThenNetworkIconIsGoodAndTextShowsZeroBlocked() {
+        whenever(settingStore.privacyOn).thenReturn(true)
         whenever(monitor.networkCount).thenReturn(0)
         testee.onPrivacyMonitorChanged(monitor)
+        assertEquals(R.drawable.dashboard_networks_good, testee.viewState.value?.networksIcon)
         assertEquals("0 Tracker Networks Blocked", testee.viewState.value?.networksText)
     }
 
     @Test
-    fun whenTenTrackersNetworksThenNetworkTextShowsTen() {
+    fun whenPrivacyOffAndNoTrackersNetworksThenNetworkIconIsGoodAndTextShowsZeroFound() {
+        whenever(settingStore.privacyOn).thenReturn(false)
+        whenever(monitor.networkCount).thenReturn(0)
+        testee.onPrivacyMonitorChanged(monitor)
+        assertEquals(R.drawable.dashboard_networks_good, testee.viewState.value?.networksIcon)
+        assertEquals("0 Tracker Networks Found", testee.viewState.value?.networksText)
+    }
+
+    @Test
+    fun whenPrivacyOnAndTenTrackersNetworksThenNetworkIconIsGoodAndTextShowsTenBlocked() {
+        whenever(settingStore.privacyOn).thenReturn(true)
         whenever(monitor.networkCount).thenReturn(10)
         testee.onPrivacyMonitorChanged(monitor)
+        assertEquals(R.drawable.dashboard_networks_good, testee.viewState.value?.networksIcon)
         assertEquals("10 Tracker Networks Blocked", testee.viewState.value?.networksText)
     }
 
     @Test
-    fun whenNoMajorTrackersNetworksThenMajorNetworkTextShowsZero() {
+    fun whenPrivacyOffAndTenTrackersNetworksThenNetworkIconIsBadAndTextShowsTenFound() {
+        whenever(settingStore.privacyOn).thenReturn(false)
+        whenever(monitor.networkCount).thenReturn(10)
+        testee.onPrivacyMonitorChanged(monitor)
+        assertEquals(R.drawable.dashboard_networks_bad, testee.viewState.value?.networksIcon)
+        assertEquals("10 Tracker Networks Found", testee.viewState.value?.networksText)
+    }
+
+    @Test
+    fun whenPrivacyOnAndNoMajorTrackersNetworksThenMajorNetworkIconIsGoodAndTextShowsZeroBlocked() {
+        whenever(settingStore.privacyOn).thenReturn(true)
         whenever(monitor.majorNetworkCount).thenReturn(0)
         testee.onPrivacyMonitorChanged(monitor)
+        assertEquals(R.drawable.dashboard_major_networks_good, testee.viewState.value?.majorNetworksIcon)
         assertEquals("0 Major Tracker Networks Blocked", testee.viewState.value?.majorNetworksText)
     }
 
     @Test
-    fun whenTenMajorTrackersNetworksThenMajorNetworkTextShowsTen() {
+    fun whenPrivacyOffAndNoMajorTrackersNetworksThenMajorNetworkIconIsGoodAndTextShowsZeroFound() {
+        whenever(settingStore.privacyOn).thenReturn(false)
+        whenever(monitor.majorNetworkCount).thenReturn(0)
+        testee.onPrivacyMonitorChanged(monitor)
+        assertEquals(R.drawable.dashboard_major_networks_good, testee.viewState.value?.majorNetworksIcon)
+        assertEquals("0 Major Tracker Networks Found", testee.viewState.value?.majorNetworksText)
+    }
+
+    @Test
+    fun whenPrivacyOnAndTenMajorTrackerNetworksThenMajorNetworkIconIsGoodAndTextShowsTenBlocked() {
+        whenever(settingStore.privacyOn).thenReturn(true)
         whenever(monitor.majorNetworkCount).thenReturn(10)
         testee.onPrivacyMonitorChanged(monitor)
+        assertEquals(R.drawable.dashboard_major_networks_good, testee.viewState.value?.majorNetworksIcon)
         assertEquals("10 Major Tracker Networks Blocked", testee.viewState.value?.majorNetworksText)
+    }
+
+    @Test
+    fun whenPrivacyOffAndTenMajorTrackerNetworksThenMajorNetworkIconIsBadAndTextShowsTenFound() {
+        whenever(settingStore.privacyOn).thenReturn(false)
+        whenever(monitor.majorNetworkCount).thenReturn(10)
+        testee.onPrivacyMonitorChanged(monitor)
+        assertEquals(R.drawable.dashboard_major_networks_bad, testee.viewState.value?.majorNetworksIcon)
+        assertEquals("10 Major Tracker Networks Found", testee.viewState.value?.majorNetworksText)
     }
 
     private fun getStringResource(id: Int): String =
