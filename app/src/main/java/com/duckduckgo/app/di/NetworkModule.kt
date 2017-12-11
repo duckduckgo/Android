@@ -35,7 +35,7 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun okhttpClient(): OkHttpClient {
+    fun okHttpClient(): OkHttpClient {
         val client = OkHttpClient.Builder()
         return client.build()
     }

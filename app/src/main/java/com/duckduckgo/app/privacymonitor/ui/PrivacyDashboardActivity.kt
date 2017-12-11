@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacydashboard
+package com.duckduckgo.app.privacymonitor.ui
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
@@ -25,9 +25,9 @@ import android.view.MenuItem
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
-import com.duckduckgo.app.privacydashboard.PrivacyDashboardViewModel.ViewState
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
+import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardViewModel.ViewState
 import kotlinx.android.synthetic.main.activity_privacy_dashboard.*
 import kotlinx.android.synthetic.main.content_privacy_dashboard.*
 import javax.inject.Inject
@@ -39,6 +39,9 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
     @Inject lateinit var repository: PrivacyMonitorRepository
 
     companion object {
+
+        val REQUEST_DASHBOARD = 1000
+        val RESULT_RELOAD = 1000
 
         fun intent(context: Context): Intent {
             return Intent(context, PrivacyDashboardActivity::class.java)
@@ -57,6 +60,10 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         repository.privacyMonitor.observe(this, Observer<PrivacyMonitor> {
             viewModel.onPrivacyMonitorChanged(it)
         })
+
+        privacyToggle.setOnCheckedChangeListener { _, enabled ->
+            viewModel.onPrivacyToggled(enabled)
+        }
     }
 
     private val viewModel: PrivacyDashboardViewModel by lazy {
@@ -71,20 +78,34 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                super.onBackPressed()
+                onBackPressed()
                 return true
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onBackPressed() {
+        if (viewModel.shouldReloadPage) {
+            setResult(RESULT_RELOAD)
+        }
+        super.onBackPressed()
+    }
+
     private fun render(viewState: ViewState) {
+        if (isFinishing) {
+            return
+        }
+        privacyToggle.isChecked = viewState.toggleEnabled
+        privacyToggleText.text = viewState.toggleText
         domain.text = viewState.domain
+        heading.text = viewState.heading
+        httpsIcon.setImageResource(viewState.httpsIcon)
+        networksIcon.setImageResource(viewState.networksIcon)
+        majorNetworksIcon.setImageResource(viewState.majorNetworksIcon)
         httpsText.text = viewState.httpsText
-        httpsIcon.setImageDrawable(getDrawable(viewState.httpsIcon))
-        networksIcon.setImageDrawable(getDrawable(viewState.networksIcon))
         networksText.text = viewState.networksText
-        majorNetworksIcon.setImageDrawable(getDrawable(viewState.majorNetworksIcon))
         majorNetworksText.text = viewState.majorNetworksText
+        privacyToggleContainer.setBackgroundColor(resources.getColor(viewState.toggleBackgroundColor))
     }
 }

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.trackerdetection
 
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
+import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
 import com.duckduckgo.app.trackerdetection.Client.ClientName
 import com.duckduckgo.app.trackerdetection.model.ResourceType
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
@@ -27,7 +28,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TrackerDetector @Inject constructor(private val networkTrackers: TrackerNetworks) {
+class TrackerDetector @Inject constructor(private val networkTrackers: TrackerNetworks, private val settings: PrivacySettingsStore) {
 
     private val clients = CopyOnWriteArrayList<Client>()
 
@@ -48,8 +49,10 @@ class TrackerDetector @Inject constructor(private val networkTrackers: TrackerNe
         if (matches) {
             val matchText = if (matches) "WAS" else "was not"
             Timber.v("$documentUrl resource $url $matchText identified as a tracker")
-            return TrackingEvent(documentUrl, url, networkTrackers.network(url), true)
+            return TrackingEvent(documentUrl, url, networkTrackers.network(url), settings.privacyOn)
         }
+
+        Timber.v("$documentUrl resource $url was not identified as a tracker")
 
         return null
     }

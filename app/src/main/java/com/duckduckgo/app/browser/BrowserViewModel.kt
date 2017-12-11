@@ -144,7 +144,6 @@ class BrowserViewModel(
         }
         return false
     }
-
 }
 
 

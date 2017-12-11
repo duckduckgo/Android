@@ -32,7 +32,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.duckduckgo.app.privacydashboard.PrivacyDashboardActivity"
+            android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
             android:label="@string/privacyDashboardActivityTitle"
             android:parentActivityName=".BrowserActivity"
             android:theme="@style/AppTheme.NoActionBar" />

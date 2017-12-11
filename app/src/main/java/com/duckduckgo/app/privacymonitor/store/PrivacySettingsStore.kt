@@ -14,22 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.app.privacymonitor.store
 
-import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
-
-import dagger.Module
-import dagger.android.ContributesAndroidInjector
-
-@Module
-abstract class ActivityBindingModule {
-
-    @ActivityScoped
-    @ContributesAndroidInjector
-    abstract fun browserActivity(): BrowserActivity
-
-    @ActivityScoped
-    @ContributesAndroidInjector
-    abstract fun privacyDashboardActivity(): PrivacyDashboardActivity
+interface PrivacySettingsStore {
+    var privacyOn: Boolean
 }

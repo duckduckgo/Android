@@ -27,6 +27,7 @@ interface PrivacyMonitor {
     val trackerCount: Int
     val networkCount: Int
     val majorNetworkCount: Int
+    val allTrackersBlocked: Boolean
     var hasHttpResources: Boolean
     fun trackerDetected(event: TrackingEvent)
 }

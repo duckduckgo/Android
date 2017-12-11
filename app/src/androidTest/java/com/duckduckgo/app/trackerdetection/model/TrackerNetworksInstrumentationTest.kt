@@ -21,7 +21,7 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 
 
-class NetworkTrackersInstrumentationTest {
+class TrackerNetworksInstrumentationTest {
 
     companion object {
         private const val category = "Social"

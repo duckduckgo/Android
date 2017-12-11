@@ -18,11 +18,14 @@ package com.duckduckgo.app.trackerdetection
 
 
 import android.support.test.runner.AndroidJUnit4
+import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYLIST
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYPRIVACY
 import com.duckduckgo.app.trackerdetection.model.ResourceType
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
@@ -39,12 +42,16 @@ class TrackerDetectorListInstrumentationTest {
     }
 
     private lateinit var testee: TrackerDetector
+    private lateinit var settingStore: PrivacySettingsStore
+
 
     @Before
     fun before() {
         val easylistAdblock = adblockClient(EASYLIST, "binary/easylist_sample")
         val easyprivacyAdblock = adblockClient(EASYPRIVACY, "binary/easyprivacy_sample")
-        testee = TrackerDetector(TrackerNetworks())
+        settingStore = mock()
+        whenever(settingStore.privacyOn).thenReturn(true)
+        testee = TrackerDetector(TrackerNetworks(), settingStore)
         testee.addClient(easyprivacyAdblock)
         testee.addClient(easylistAdblock)
     }
