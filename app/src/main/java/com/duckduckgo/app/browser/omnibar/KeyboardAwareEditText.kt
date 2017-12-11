@@ -39,12 +39,7 @@ class KeyboardAwareEditText : AppCompatEditText {
     override fun onKeyPreIme(keyCode: Int, event: KeyEvent): Boolean {
 
         if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP) {
-
-            if (onBackKeyListener != null) {
-                return onBackKeyListener!!.onBackKey()
-            }
-
-            return false
+            return onBackKeyListener?.onBackKey() ?: false
         }
 
         return super.onKeyPreIme(keyCode, event)
@@ -53,10 +48,10 @@ class KeyboardAwareEditText : AppCompatEditText {
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
         if (showImeAfterFirstLayout) {
-            post({
+            post {
                 showKeyboard()
                 showImeAfterFirstLayout = false
-            })
+            }
         }
     }
 

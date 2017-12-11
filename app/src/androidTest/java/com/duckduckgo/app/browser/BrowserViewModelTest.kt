@@ -99,14 +99,14 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenViewModelNotifiedThatUrlFocusChangedGotFocusThenViewStateIsUpdated() {
-        testee.urlFocusChanged(true)
+    fun whenViewModelNotifiedThatUrlGotFocusThenViewStateIsUpdated() {
+        testee.onUrlInputStateChanged("", true)
         assertTrue(testee.viewState.value!!.isEditing)
     }
 
     @Test
-    fun whenViewModelNotifiedThatUrlFocusChangedLostFocusThenViewStateIsUpdated() {
-        testee.urlFocusChanged(false)
+    fun whenViewModelNotifiedThatUrlLostFocusThenViewStateIsUpdated() {
+        testee.onUrlInputStateChanged("", false)
         assertFalse(testee.viewState.value!!.isEditing)
     }
 

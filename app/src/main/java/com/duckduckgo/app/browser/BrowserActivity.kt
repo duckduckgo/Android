@@ -23,10 +23,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
+import android.view.KeyEvent.KEYCODE_ENTER
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.widget.TextView
 import com.duckduckgo.app.browser.BrowserViewModel.NavigationCommand.LANDING_PAGE
@@ -34,7 +35,9 @@ import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
-import com.duckduckgo.app.privacydashboard.PrivacyDashboardActivity
+import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
+import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.REQUEST_DASHBOARD
+import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RESULT_RELOAD
 import kotlinx.android.synthetic.main.activity_browser.*
 import javax.inject.Inject
 
@@ -110,13 +113,17 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun showClearButton() {
-        clearUrlButton.show()
-        urlInput.updatePadding(paddingEnd = 40.toPx())
+        urlInput.post {
+            clearUrlButton.show()
+            urlInput.updatePadding(paddingEnd = 40.toPx())
+        }
     }
 
     private fun hideClearButton() {
-        clearUrlButton.hide()
-        urlInput.updatePadding(paddingEnd = 10.toPx())
+        urlInput.post {
+            clearUrlButton.hide()
+            urlInput.updatePadding(paddingEnd = 10.toPx())
+        }
     }
 
     private fun shouldUpdateUrl(viewState: BrowserViewModel.ViewState, url: String?) =
@@ -131,17 +138,13 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUrlInput() {
-        urlInput.onFocusChangeListener = View.OnFocusChangeListener { _: View, hasFocus: Boolean ->
-            viewModel.urlFocusChanged(hasFocus)
-
-            if (hasFocus) {
-                viewModel.onUrlInputValueChanged(urlInput.text.toString(), urlInput.hasFocus())
-            }
+        urlInput.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus: Boolean ->
+            viewModel.onUrlInputStateChanged(urlInput.text.toString(), hasFocus)
         }
 
         urlInput.addTextChangedListener(object : TextChangedWatcher() {
             override fun afterTextChanged(editable: Editable) {
-                viewModel.onUrlInputValueChanged(urlInput.text.toString(), urlInput.hasFocus())
+                viewModel.onUrlInputStateChanged(urlInput.text.toString(), urlInput.hasFocus())
             }
         })
 
@@ -151,12 +154,6 @@ class BrowserActivity : DuckDuckGoActivity() {
                 return viewModel.userDismissedKeyboard()
             }
         }
-
-        urlInput.addTextChangedListener(object : TextChangedWatcher() {
-            override fun afterTextChanged(editable: Editable) {
-                viewModel.onUrlInputValueChanged(urlInput.text.toString(), urlInput.hasFocus())
-            }
-        })
 
         clearUrlButton.setOnClickListener { urlInput.setText("") }
     }
@@ -174,6 +171,7 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         webView.settings.apply {
             javaScriptEnabled = true
+            loadWithOverviewMode = true
             useWideViewPort = true
             builtInZoomControls = true
             displayZoomControls = false
@@ -188,8 +186,8 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
 
-        urlInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
+        urlInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, keyEvent ->
+            if (actionId == IME_ACTION_DONE || keyEvent.keyCode == KEYCODE_ENTER) {
                 userEnteredQuery()
                 return@OnEditorActionListener true
             }
@@ -250,7 +248,15 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun launchPrivacyDashboard() {
-        startActivity(PrivacyDashboardActivity.intent(this))
+        startActivityForResult(PrivacyDashboardActivity.intent(this), REQUEST_DASHBOARD)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_DASHBOARD && resultCode == RESULT_RELOAD) {
+            webView.reload()
+            return
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onBackPressed() {

@@ -127,16 +127,7 @@ class BrowserViewModel(
 
     private fun currentViewState(): ViewState = viewState.value!!
 
-
-    fun urlFocusChanged(hasFocus: Boolean) {
-        if (!hasFocus) {
-            viewState.value = currentViewState().copy(isEditing = hasFocus, showClearButton = false)
-        } else {
-            viewState.value = currentViewState().copy(isEditing = hasFocus)
-        }
-    }
-
-    fun onUrlInputValueChanged(query: String, hasFocus: Boolean) {
+    fun onUrlInputStateChanged(query: String, hasFocus: Boolean) {
         val showClearButton = hasFocus && query.isNotEmpty()
         viewState.value = currentViewState().copy(isEditing = hasFocus, showClearButton = showClearButton)
     }
@@ -153,7 +144,6 @@ class BrowserViewModel(
         }
         return false
     }
-
 }
 
 

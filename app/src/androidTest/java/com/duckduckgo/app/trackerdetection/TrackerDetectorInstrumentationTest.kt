@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
 import com.duckduckgo.app.trackerdetection.model.*
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
@@ -29,7 +30,8 @@ import org.mockito.ArgumentMatchers.anyString
 class TrackerDetectorInstrumentationTest {
 
     private val networkTrackers = TrackerNetworks()
-    private val trackerDetector = TrackerDetector(networkTrackers)
+    private val settingStore: PrivacySettingsStore = mock()
+    private val trackerDetector = TrackerDetector(networkTrackers, settingStore)
 
     companion object {
         private val resourceType = ResourceType.UNKNOWN
@@ -49,7 +51,8 @@ class TrackerDetectorInstrumentationTest {
     }
 
     @Test
-    fun whenAllClientsMatchThenEvaluateReturnsTrackingEvent() {
+    fun whenPrivacyOnAndAllClientsMatchThenEvaluateReturnsBlockedTrackingEvent() {
+        whenever(settingStore.privacyOn).thenReturn(true)
         trackerDetector.addClient(alwaysMatchingClient())
         trackerDetector.addClient(alwaysMatchingClient())
         val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, true)
@@ -58,10 +61,31 @@ class TrackerDetectorInstrumentationTest {
     }
 
     @Test
-    fun whenSomeClientsMatchThenEvaluateReturnsTrackingEvent() {
+    fun whenPrivacyOffAndAllClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() {
+        whenever(settingStore.privacyOn).thenReturn(false)
+        trackerDetector.addClient(alwaysMatchingClient())
+        trackerDetector.addClient(alwaysMatchingClient())
+        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, false)
+        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType)
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun whenPrivacyOnAndSomeClientsMatchThenEvaluateReturnsBlockedTrackingEvent() {
+        whenever(settingStore.privacyOn).thenReturn(true)
         trackerDetector.addClient(neverMatchingClient())
         trackerDetector.addClient(alwaysMatchingClient())
         val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, true)
+        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType)
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun whenPrivacyOffAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() {
+        whenever(settingStore.privacyOn).thenReturn(false)
+        trackerDetector.addClient(neverMatchingClient())
+        trackerDetector.addClient(alwaysMatchingClient())
+        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, false)
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType)
         assertEquals(expected, actual)
     }
@@ -71,6 +95,7 @@ class TrackerDetectorInstrumentationTest {
         val networks = arrayListOf(
                 DisconnectTracker("thirdparty.com", "", network, "http://network.com")
         )
+        whenever(settingStore.privacyOn).thenReturn(true)
         networkTrackers.updateData(networks)
         trackerDetector.addClient(alwaysMatchingClient())
 

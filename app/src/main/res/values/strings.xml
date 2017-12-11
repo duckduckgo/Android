@@ -11,12 +11,17 @@
     <string name="clearButtonContentDescription">Clear search input</string>
 
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
-    <string name="privacyProtectionToggle">Privacy Protection On</string>
-    <string name="privacyProtectionState">PRIVACY PROTECTION ENABLED</string>
+    <string name="privacyProtectionEnabled">PRIVACY PROTECTION ENABLED</string>
+    <string name="privacyProtectionDisabled">PRIVACY PROTECTION DISABLED</string>
     <string name="privacyGradeContentDescription">Privacy Grade</string>
     <string name="trackerNetworksContentDescription">Tracker networks icon</string>
     <string name="networksBlocked">%s Tracker Networks Blocked</string>
+    <string name="networksFound">%s Tracker Networks Found</string>
     <string name="majorNetworksBlocked">%s Major Tracker Networks Blocked</string>
+    <string name="majorNetworksFound">%s Major Tracker Networks Found</string>
+    <string name="privacyProtectionToggleOn">Privacy Protection On</string>
+    <string name="privacyProtectionToggleOff">Privacy Protection Off</string>
+
 
     <string name="httpsGood">Encrypted Connection</string>
     <string name="httpsMixed">Mixed Encryption connection</string>
