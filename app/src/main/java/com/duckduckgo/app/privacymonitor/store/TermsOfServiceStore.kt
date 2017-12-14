@@ -14,22 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacymonitor
+package com.duckduckgo.app.privacymonitor.store
 
-import android.net.Uri
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 
-interface PrivacyMonitor {
+interface TermsOfServiceStore {
 
-    val url: String
-    val uri: Uri?
-    val https: HttpsStatus
-    val termsOfService: TermsOfService
-    val trackerCount: Int
-    val networkCount: Int
-    val majorNetworkCount: Int
-    val allTrackersBlocked: Boolean
-    var hasHttpResources: Boolean
-    fun trackerDetected(event: TrackingEvent)
+    fun retrieveTerms(url: String): TermsOfService?
+
 }

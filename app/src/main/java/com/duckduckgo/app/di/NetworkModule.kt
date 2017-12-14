@@ -18,7 +18,8 @@ package com.duckduckgo.app.di
 
 import android.content.Context
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.trackerdetection.api.DisconnectJsonAdapter
+import com.duckduckgo.app.privacymonitor.api.TermsOfServiceListAdapter
+import com.duckduckgo.app.trackerdetection.api.DisconnectListJsonAdapter
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
 import com.squareup.moshi.Moshi
 import dagger.Module
@@ -42,7 +43,10 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun moshi(): Moshi = Moshi.Builder().add(DisconnectJsonAdapter()).build()
+    fun moshi(): Moshi = Moshi.Builder()
+            .add(DisconnectListJsonAdapter())
+            .add(TermsOfServiceListAdapter())
+            .build()
 
     @Provides
     @Singleton

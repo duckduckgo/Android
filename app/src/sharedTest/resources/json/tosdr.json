@@ -1,0 +1,60 @@
+{
+    "example.com": {
+        "score": -20,
+        "all": {
+            "bad": [
+                    "they can delete your account without prior notice and without a reason",
+                    "class action waiver",
+                    "targeted third-party advertising",
+                    "no promise to inform/notify",
+                    "sets third-party cookies and/or ads",
+                    "no liability for unauthorized access",
+                    "user needs to check tosback.org"
+                    ],
+            "good": [
+                     "easy to read",
+                     "you can request access and deletion of personal data"
+                     ]
+        },
+        "match": {
+            "bad": [
+                    "targeted third-party advertising",
+                    "some other issue",
+                    "yet another issue"
+                    ],
+            "good": [
+                     "you can request access and deletion of personal data"
+                     ]
+        },
+        "class": false
+    },
+    "anotherexample.com": {
+        "score": 50,
+        "all": {
+            "bad": [
+                    "no quality guarantee",
+                    "promotional communications are not opt-out",
+                    "no quality guarantee",
+                    "user needs to check tosback.org",
+                    "they can delete your account without prior notice and without a reason",
+                    "responsible and indemnify",
+                    "they become the owner of ideas you give them"
+                    ],
+            "good": [
+                     "pseudonyms allowed",
+                     "info given about security practices",
+                     "no third-party access without a warrant",
+                     "only necessary logs are kept",
+                     "only temporary session cookies",
+                     "legal documents published under reusable license"
+                     ]
+        },
+        "match": {
+            "bad": [],
+            "good": [
+                     "no third-party access without a warrant"
+                     ]
+        },
+        "class": "B"
+    }
+}

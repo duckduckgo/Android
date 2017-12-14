@@ -17,9 +17,11 @@
 package com.duckduckgo.app.privacymonitor
 
 
+import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Test
 
 
@@ -44,6 +46,19 @@ class SiteMonitorTest {
     fun whenSiteMonitorCreatedThenUrlIsCorrect() {
         val testee = SiteMonitor(document)
         assertEquals(document, testee.url)
+    }
+
+    @Test
+    fun whenSiteMonitorCreatedWithoutTermsThenTermsAreGenerated() {
+        val testee = SiteMonitor(document)
+        assertNotNull(testee.termsOfService)
+    }
+
+    @Test
+    fun whenSiteMonitorCreatedWithTermsThenTermsAreSet() {
+        val terms = TermsOfService()
+        val testee = SiteMonitor(document, terms)
+        assertEquals(terms, testee.termsOfService)
     }
 
     @Test

@@ -22,6 +22,7 @@ import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacymonitor.HttpsStatus
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
+import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
@@ -40,6 +41,7 @@ class PrivacyDashboardViewModelTest {
     private lateinit var viewStateObserver: Observer<PrivacyDashboardViewModel.ViewState>
     private lateinit var monitor: PrivacyMonitor
     private lateinit var settingStore: PrivacySettingsStore
+    private var terms = TermsOfService()
 
     private val testee: PrivacyDashboardViewModel by lazy {
         val model = PrivacyDashboardViewModel(InstrumentationRegistry.getTargetContext(), settingStore)
@@ -53,6 +55,7 @@ class PrivacyDashboardViewModelTest {
         monitor = mock()
         settingStore = mock()
         whenever(monitor.https).thenReturn(HttpsStatus.SECURE)
+        whenever(monitor.termsOfService).thenReturn(terms)
     }
 
     @After
@@ -215,6 +218,35 @@ class PrivacyDashboardViewModelTest {
         assertEquals("0 Tracker Networks Blocked", testee.viewState.value?.networksText)
         assertEquals(R.drawable.dashboard_major_networks_good, testee.viewState.value?.majorNetworksIcon)
         assertEquals("0 Major Tracker Networks Blocked", testee.viewState.value?.majorNetworksText)
+    }
+
+    @Test
+    fun whenTermsAreGoodThenTextAndIconReflectSame() {
+        terms = TermsOfService(classification = "A", goodPrivacyTerms = listOf("good"))
+        whenever(terms.practices).thenReturn(TermsOfService.GOOD)
+        assertEquals(getStringResource(R.string.termsGood), testee.viewState.value?.termsText)
+        assertEquals(R.drawable.dashboard_terms_good, testee.viewState.value?.termsIcon)
+    }
+
+    @Test
+    fun whenTermsArePoorThenTextAndIconReflectSame() {
+        terms = TermsOfService(classification = "E", badPrivacyTerms = listOf("bad"))
+        whenever(terms.practices).thenReturn(TermsOfService.POOR)
+        assertEquals(getStringResource(R.string.termsBad), testee.viewState.value?.termsText)
+        assertEquals(R.drawable.dashboard_terms_bad, testee.viewState.value?.termsIcon)
+    }
+
+    @Test
+    fun whenTermsAreMixedThenTextAndIconReflectSame() {
+        terms = TermsOfService(goodPrivacyTerms = listOf("good"), badPrivacyTerms = listOf("bad"))
+        assertEquals(getStringResource(R.string.termsMixed), testee.viewState.value?.termsText)
+        assertEquals(R.drawable.dashboard_terms_neutral, testee.viewState.value?.termsIcon)
+    }
+
+    @Test
+    fun whenTermsAreUnknownThenTextAndIconReflectSame() {
+        assertEquals(getStringResource(R.string.termsUnknown), testee.viewState.value?.termsText)
+        assertEquals(R.drawable.dashboard_terms_neutral, testee.viewState.value?.termsIcon)
     }
 
     private fun getStringResource(id: Int): String =

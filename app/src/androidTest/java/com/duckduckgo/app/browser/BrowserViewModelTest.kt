@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.BrowserViewModel.NavigationCommand
 import com.duckduckgo.app.browser.BrowserViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
+import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
 import com.nhaarman.mockito_kotlin.mock
 import org.junit.After
 import org.junit.Assert.*
@@ -42,6 +43,7 @@ class BrowserViewModelTest {
     private lateinit var viewStateObserver: Observer<ViewState>
     private lateinit var queryObserver: Observer<String>
     private lateinit var navigationObserver: Observer<NavigationCommand>
+    private lateinit var termsOfServiceStore: TermsOfServiceStore
     private lateinit var testee: BrowserViewModel
 
     private val testOmnibarConverter: OmnibarEntryConverter = object : OmnibarEntryConverter {
@@ -55,7 +57,8 @@ class BrowserViewModelTest {
         viewStateObserver = mock()
         queryObserver = mock()
         navigationObserver = mock()
-        testee = BrowserViewModel(testOmnibarConverter, DuckDuckGoUrlDetector(), PrivacyMonitorRepository())
+        termsOfServiceStore = mock()
+        testee = BrowserViewModel(testOmnibarConverter, DuckDuckGoUrlDetector(), termsOfServiceStore, PrivacyMonitorRepository())
         testee.query.observeForever(queryObserver)
         testee.viewState.observeForever(viewStateObserver)
         testee.navigation.observeForever(navigationObserver)

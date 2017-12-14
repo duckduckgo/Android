@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacymonitor
+package com.duckduckgo.app.privacymonitor.api;
 
-import android.net.Uri
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.squareup.moshi.FromJson
 
-interface PrivacyMonitor {
+class TermsOfServiceListAdapter {
 
-    val url: String
-    val uri: Uri?
-    val https: HttpsStatus
-    val termsOfService: TermsOfService
-    val trackerCount: Int
-    val networkCount: Int
-    val majorNetworkCount: Int
-    val allTrackersBlocked: Boolean
-    var hasHttpResources: Boolean
-    fun trackerDetected(event: TrackingEvent)
+    @FromJson
+    fun fromJson(json: Map<String, TermsOfServiceJson>): List<TermsOfService> {
+        val tos = ArrayList<TermsOfService>()
+        for (entry in json) {
+            val classification = entry.value.classification as? String
+            tos.add(TermsOfService(entry.key, entry.value.score, classification, entry.value.match.good, entry.value.match.bad))
+        }
+        return tos
+    }
 }

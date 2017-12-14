@@ -21,13 +21,16 @@ import android.arch.lifecycle.ViewModel
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.privacymonitor.SiteMonitor
+import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
+import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import timber.log.Timber
 
 class BrowserViewModel(
         private val queryUrlConverter: OmnibarEntryConverter,
         private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+        private val termsOfServiceStore: TermsOfServiceStore,
         private val privacyMonitorRepository: PrivacyMonitorRepository) :
         WebViewClientListener, ViewModel() {
 
@@ -106,7 +109,8 @@ class BrowserViewModel(
         }
         viewState.value = newViewState
         if (url != null) {
-            siteMonitor = SiteMonitor(url)
+            val terms = termsOfServiceStore.retrieveTerms(url) ?: TermsOfService()
+            siteMonitor = SiteMonitor(url, terms)
             postSiteMonitor()
         }
     }

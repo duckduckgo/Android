@@ -25,6 +25,8 @@ import android.support.annotation.DrawableRes
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacymonitor.HttpsStatus
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
+import com.duckduckgo.app.privacymonitor.model.TermsOfService
+import com.duckduckgo.app.privacymonitor.model.TermsOfService.Companion.Practices
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
 
 @SuppressLint("StaticFieldLeak")
@@ -40,6 +42,8 @@ class PrivacyDashboardViewModel(private val context: Context,
             @DrawableRes val networksIcon: Int = R.drawable.dashboard_networks_good,
             val majorNetworksText: String,
             @DrawableRes val majorNetworksIcon: Int = R.drawable.dashboard_major_networks_good,
+            @DrawableRes val termsIcon: Int,
+            val termsText: String,
             val toggleEnabled: Boolean,
             val toggleText: String,
             @ColorRes val toggleBackgroundColor: Int = R.color.midGreen
@@ -77,7 +81,9 @@ class PrivacyDashboardViewModel(private val context: Context,
                 majorNetworksIcon = R.drawable.dashboard_major_networks_good,
                 toggleEnabled = settingsStore.privacyOn,
                 toggleText = toggleText(),
-                toggleBackgroundColor = toggleBackgroundColor()
+                toggleBackgroundColor = toggleBackgroundColor(),
+                termsIcon = termsIcon(TermsOfService.GOOD),
+                termsText = termsText(TermsOfService.GOOD)
         )
     }
 
@@ -89,7 +95,9 @@ class PrivacyDashboardViewModel(private val context: Context,
                 networksIcon = networksIcon(monitor.allTrackersBlocked, monitor.networkCount),
                 networksText = networksText(monitor.allTrackersBlocked, monitor.networkCount),
                 majorNetworksIcon = majorNetworksIcon(monitor.allTrackersBlocked, monitor.majorNetworkCount),
-                majorNetworksText = majorNetworksText(monitor.allTrackersBlocked, monitor.majorNetworkCount)
+                majorNetworksText = majorNetworksText(monitor.allTrackersBlocked, monitor.majorNetworkCount),
+                termsIcon = termsIcon(monitor.termsOfService.practices),
+                termsText = termsText(monitor.termsOfService.practices)
         )
     }
 
@@ -143,6 +151,20 @@ class PrivacyDashboardViewModel(private val context: Context,
     private fun majorNetworksText(allBlocked: Boolean = true, networkCount: Int = 0): String {
         val resource = if (allBlocked) R.string.majorNetworksBlocked else R.string.majorNetworksFound
         return context.getString(resource, networkCount.toString())
+    }
+
+    @DrawableRes
+    private fun termsIcon(@Practices practices: Long): Int = when (practices) {
+        TermsOfService.GOOD -> R.drawable.dashboard_terms_good
+        TermsOfService.POOR -> R.drawable.dashboard_terms_bad
+        else -> R.drawable.dashboard_terms_neutral
+    }
+
+    private fun termsText(@Practices practices: Long): String = when (practices) {
+        TermsOfService.GOOD -> context.getString(R.string.termsGood)
+        TermsOfService.POOR -> context.getString(R.string.termsBad)
+        TermsOfService.MIXED -> context.getString(R.string.termsMixed)
+        else -> context.getString(R.string.termsUnknown)
     }
 
     private fun toggleText(): String {
