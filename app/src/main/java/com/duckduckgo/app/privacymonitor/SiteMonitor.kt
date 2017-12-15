@@ -62,7 +62,7 @@ class SiteMonitor(override val url: String, override val termsOfService: TermsOf
                 .count()
 
     override val allTrackersBlocked: Boolean
-        get() = trackingEvents.none { it.blocked == false }
+        get() = trackingEvents.none { !it.blocked }
 
     override fun trackerDetected(event: TrackingEvent) {
         trackingEvents.add(event)

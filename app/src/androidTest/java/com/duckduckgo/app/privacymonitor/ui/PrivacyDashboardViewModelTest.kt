@@ -248,7 +248,7 @@ class PrivacyDashboardViewModelTest {
 
     @Test
     fun whenTermsAreMixedThenTextAndIconReflectSame() {
-        var terms = TermsOfService(goodPrivacyTerms = listOf("good"), badPrivacyTerms = listOf("bad"))
+        val terms = TermsOfService(goodPrivacyTerms = listOf("good"), badPrivacyTerms = listOf("bad"))
         testee.onPrivacyMonitorChanged(monitor(terms))
         assertEquals(getStringResource(R.string.termsMixed), testee.viewState.value?.termsText)
         assertEquals(R.drawable.dashboard_terms_neutral, testee.viewState.value?.termsIcon)
@@ -262,7 +262,7 @@ class PrivacyDashboardViewModelTest {
     }
 
     private fun monitor(terms: TermsOfService = TermsOfService()): PrivacyMonitor {
-        var monitor: PrivacyMonitor = mock()
+        val monitor: PrivacyMonitor = mock()
         whenever(monitor.https).thenReturn(HttpsStatus.SECURE)
         whenever(monitor.termsOfService).thenReturn(terms)
         return monitor

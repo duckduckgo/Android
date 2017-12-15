@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacymonitor.api;
+package com.duckduckgo.app.privacymonitor.api
 
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.squareup.moshi.FromJson

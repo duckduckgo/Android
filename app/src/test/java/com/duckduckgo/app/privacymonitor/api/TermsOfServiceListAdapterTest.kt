@@ -42,7 +42,7 @@ class TermsOfServiceListAdapterTest {
         val json = json("json/tosdr.json")
         val terms = jsonAdapter.fromJson(json)
 
-        val firstTerm = terms.first { it.name == "example.com" }!!
+        val firstTerm = terms.first { it.name == "example.com" }
         assertEquals(-20, firstTerm.score)
         assertNull(firstTerm.classification)
         assertEquals(1, firstTerm.goodPrivacyTerms.count())
