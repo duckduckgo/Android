@@ -16,7 +16,11 @@
 
 package com.duckduckgo.app.privacymonitor
 
+import com.duckduckgo.app.privacymonitor.model.TermsOfService
+import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SiteMonitorInstrumentationTests {
@@ -29,26 +33,34 @@ class SiteMonitorInstrumentationTests {
 
     @Test
     fun whenUrlIsHttpsThenHttpsStatusIsSecure() {
-        val testee = SiteMonitor(httpsDocument)
+        val testee = SiteMonitor(httpsDocument, TermsOfService(), TrackerNetworks())
         assertEquals(HttpsStatus.SECURE, testee.https)
     }
 
     @Test
     fun whenUrlIsHttpThenHttpsStatusIsNone() {
-        val testee = SiteMonitor(httpDocument)
+        val testee = SiteMonitor(httpDocument, TermsOfService(), TrackerNetworks())
         assertEquals(HttpsStatus.NONE, testee.https)
     }
 
     @Test
     fun whenUrlIsHttpsWithHttpResourcesThenHttpsStatusIsMixed() {
-        val testee = SiteMonitor(httpsDocument)
+        val testee = SiteMonitor(httpsDocument, TermsOfService(), TrackerNetworks())
         testee.hasHttpResources = true
         assertEquals(HttpsStatus.MIXED, testee.https)
     }
 
     @Test
     fun whenUrlIsMalformedThenHttpsStatusIsNone() {
-        val testee = SiteMonitor(malformesDocument)
+        val testee = SiteMonitor(malformesDocument, TermsOfService(), TrackerNetworks())
         assertEquals(HttpsStatus.NONE, testee.https)
     }
+
+    @Test
+    fun whenIpTrackerDetectedThenHasObscureTrackerIsTrue() {
+        val testee = SiteMonitor(httpDocument, TermsOfService(), TrackerNetworks())
+        testee.trackerDetected(TrackingEvent(httpDocument, "http://54.229.105.203/abc", null, true))
+        assertTrue(testee.hasObscureTracker)
+    }
+
 }

@@ -90,4 +90,16 @@ class UriExtensionTest {
     fun whenUriIsMalformedThenIsHtpsIsFalse() {
         assertFalse(Uri.parse("[example com]").isHttps)
     }
+
+    @Test
+    fun whenIpUriThenHasIpHostIsTrue() {
+        assertTrue(Uri.parse("https://54.229.105.203/something").hasIpHost)
+        assertTrue(Uri.parse("54.229.105.203/something").hasIpHost)
+    }
+
+    @Test
+    fun whenStandardUriThenHasIpHostIsFalse() {
+        assertFalse(Uri.parse("http://example.com").hasIpHost)
+    }
+
 }

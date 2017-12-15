@@ -21,6 +21,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.view.MenuItem
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -96,6 +97,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         if (isFinishing) {
             return
         }
+        privacyBanner.setImageResource(viewState.privacyBanner)
         privacyToggle.isChecked = viewState.toggleEnabled
         privacyToggleText.text = viewState.toggleText
         domain.text = viewState.domain
@@ -106,7 +108,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         httpsText.text = viewState.httpsText
         networksText.text = viewState.networksText
         majorNetworksText.text = viewState.majorNetworksText
-        privacyToggleContainer.setBackgroundColor(resources.getColor(viewState.toggleBackgroundColor))
+        privacyToggleContainer.setBackgroundColor(ContextCompat.getColor(this, viewState.toggleBackgroundColor))
         termsIcon.setImageResource(viewState.termsIcon)
         termsText.text = viewState.termsText
     }

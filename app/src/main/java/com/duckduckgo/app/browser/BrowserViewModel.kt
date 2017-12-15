@@ -24,6 +24,7 @@ import com.duckduckgo.app.privacymonitor.SiteMonitor
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
+import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import timber.log.Timber
 
@@ -31,6 +32,7 @@ class BrowserViewModel(
         private val queryUrlConverter: OmnibarEntryConverter,
         private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
         private val termsOfServiceStore: TermsOfServiceStore,
+        private val trackerNetworks: TrackerNetworks,
         private val privacyMonitorRepository: PrivacyMonitorRepository) :
         WebViewClientListener, ViewModel() {
 
@@ -110,7 +112,7 @@ class BrowserViewModel(
         viewState.value = newViewState
         if (url != null) {
             val terms = termsOfServiceStore.retrieveTerms(url) ?: TermsOfService()
-            siteMonitor = SiteMonitor(url, terms)
+            siteMonitor = SiteMonitor(url, terms, trackerNetworks)
             postSiteMonitor()
         }
     }
