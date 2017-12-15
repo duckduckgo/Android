@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.api
+package com.duckduckgo.app.privacymonitor.api
 
-import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 import com.squareup.moshi.Json
 
-class DisconnectList {
+data class TermsOfServiceJson(val score: Int,
+                              @field:Json(name = "class")
+                              val classification: Any,
+                              val match: Match) {
 
-    @Json(name = "categories")
-    lateinit var trackers: List<DisconnectTracker>
-
+    data class Match(val good: List<String>, val bad: List<String>)
 }

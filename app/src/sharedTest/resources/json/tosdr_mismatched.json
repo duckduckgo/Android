@@ -1,0 +1,7 @@
+{
+    "somedomain.com": {
+        "match": {
+        },
+        "class": false
+    }
+}

@@ -14,22 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacymonitor
+package com.duckduckgo.app.trackerdetection.api
 
-import android.net.Uri
-import com.duckduckgo.app.privacymonitor.model.TermsOfService
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
+import com.squareup.moshi.Json
 
-interface PrivacyMonitor {
+class DisconnectListJson {
 
-    val url: String
-    val uri: Uri?
-    val https: HttpsStatus
-    val termsOfService: TermsOfService
-    val trackerCount: Int
-    val networkCount: Int
-    val majorNetworkCount: Int
-    val allTrackersBlocked: Boolean
-    var hasHttpResources: Boolean
-    fun trackerDetected(event: TrackingEvent)
+    @Json(name = "categories")
+    lateinit var trackers: List<DisconnectTracker>
+
 }

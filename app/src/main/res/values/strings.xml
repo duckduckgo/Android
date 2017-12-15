@@ -27,4 +27,10 @@
     <string name="httpsMixed">Mixed Encryption connection</string>
     <string name="httpsBad">Unencrypted Connection</string>
 
+    <string name="termsGood">Good Privacy Practices</string>
+    <string name="termsMixed">Mixed Privacy Practices"</string>
+    <string name="termsBad">"Poor Privacy Practices"</string>
+    <string name="termsUnknown">Unknown Privacy Practices</string>
+
+
 </resources>

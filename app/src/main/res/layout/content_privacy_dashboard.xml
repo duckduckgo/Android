@@ -134,6 +134,22 @@
                 app:layout_constraintTop_toBottomOf="@id/networksText"
                 tools:text="3 Major Tracker Networks Blocked" />
 
+            <ImageView
+                android:id="@+id/termsIcon"
+                style="@style/DashboardEntryIcon"
+                android:importantForAccessibility="no"
+                android:src="@drawable/dashboard_terms_good"
+                app:layout_constraintBottom_toBottomOf="@id/termsText"
+                app:layout_constraintTop_toTopOf="@id/termsText" />
+
+            <TextView
+                android:id="@+id/termsText"
+                style="@style/DashboardEntryText"
+                android:textIsSelectable="true"
+                app:layout_constraintStart_toEndOf="@id/termsIcon"
+                app:layout_constraintTop_toBottomOf="@id/majorNetworksText"
+                tools:text="Good Privacy" />
+
         </android.support.constraint.ConstraintLayout>
 
         <android.support.constraint.ConstraintLayout

@@ -107,5 +107,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         networksText.text = viewState.networksText
         majorNetworksText.text = viewState.majorNetworksText
         privacyToggleContainer.setBackgroundColor(resources.getColor(viewState.toggleBackgroundColor))
+        termsIcon.setImageResource(viewState.termsIcon)
+        termsText.text = viewState.termsText
     }
 }

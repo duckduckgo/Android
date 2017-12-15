@@ -18,10 +18,11 @@ package com.duckduckgo.app.privacymonitor
 
 import android.net.Uri
 import com.duckduckgo.app.global.isHttps
+import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import java.util.concurrent.CopyOnWriteArrayList
 
-class SiteMonitor constructor(override val url: String) : PrivacyMonitor {
+class SiteMonitor(override val url: String, override val termsOfService: TermsOfService = TermsOfService()) : PrivacyMonitor {
 
     override var hasHttpResources = false
 
@@ -61,7 +62,7 @@ class SiteMonitor constructor(override val url: String) : PrivacyMonitor {
                 .count()
 
     override val allTrackersBlocked: Boolean
-        get() = trackingEvents.none { it.blocked == false }
+        get() = trackingEvents.none { !it.blocked }
 
     override fun trackerDetected(event: TrackingEvent) {
         trackingEvents.add(event)
