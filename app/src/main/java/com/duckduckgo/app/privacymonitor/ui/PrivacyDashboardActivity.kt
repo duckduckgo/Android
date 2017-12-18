@@ -20,8 +20,10 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
+import android.text.Html
 import android.view.MenuItem
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -98,18 +100,28 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
             return
         }
         privacyBanner.setImageResource(viewState.privacyBanner)
-        privacyToggle.isChecked = viewState.toggleEnabled
-        privacyToggleText.text = viewState.toggleText
         domain.text = viewState.domain
-        heading.text = viewState.heading
+        heading.text = Html.fromHtml(viewState.heading, Html.ImageGetter { getHtmlDrawable(it.toInt()) }, null)
         httpsIcon.setImageResource(viewState.httpsIcon)
         networksIcon.setImageResource(viewState.networksIcon)
         majorNetworksIcon.setImageResource(viewState.majorNetworksIcon)
         httpsText.text = viewState.httpsText
         networksText.text = viewState.networksText
         majorNetworksText.text = viewState.majorNetworksText
-        privacyToggleContainer.setBackgroundColor(ContextCompat.getColor(this, viewState.toggleBackgroundColor))
         termsIcon.setImageResource(viewState.termsIcon)
         termsText.text = viewState.termsText
+        configureToggle(viewState.toggleEnabled)
+    }
+
+    private fun configureToggle(enabled: Boolean) {
+        val backgroundColor = if (enabled) R.color.midGreen else R.color.warmerGrey
+        privacyToggleContainer.setBackgroundColor(ContextCompat.getColor(this, backgroundColor))
+        privacyToggle.isChecked = enabled
+    }
+
+    private fun getHtmlDrawable(resource: Int): Drawable {
+        val drawable = getDrawable(resource)
+        drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+        return drawable
     }
 }

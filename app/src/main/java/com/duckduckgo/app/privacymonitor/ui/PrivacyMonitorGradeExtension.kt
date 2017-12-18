@@ -35,19 +35,38 @@ val PrivacyMonitor.score: Int
         return score
     }
 
+val PrivacyMonitor.improvedScore: Int
+    get() = baseScore
+
+
 private val PrivacyMonitor.baseScore: Int
     get() {
         var score = 1
         score += Math.ceil((memberNetwork?.percentageOfPages ?: 0) / 10.0).toInt()
-        if (https == HttpsStatus.SECURE) {
-            score -= 1
-        }
         score += termsOfService.gradingScore
+        if (https != HttpsStatus.SECURE) {
+            score += 1
+        }
         return score
     }
 
-val PrivacyMonitor.improvedScore: Int
-    get() = baseScore
+@PrivacyGrade.Companion.Grade
+val PrivacyMonitor.grade: Long
+    get() = calculateGrade(score)
+
+@PrivacyGrade.Companion.Grade
+val PrivacyMonitor.improvedGrade: Long
+    get() = calculateGrade(improvedScore)
+
+@PrivacyGrade.Companion.Grade
+private fun calculateGrade(score: Int): Long {
+    return when {
+        score <= 0 -> PrivacyGrade.A
+        score == 1 -> PrivacyGrade.B
+        score == 2 -> PrivacyGrade.C
+        else -> PrivacyGrade.D
+    }
+}
 
 val TermsOfService.gradingScore: Int
     get() {
@@ -63,15 +82,4 @@ val TermsOfService.gradingScore: Int
             score > 0 -> return 1
         }
         return 0
-    }
-
-@PrivacyGrade.Companion.Grade
-val PrivacyMonitor.grade: Long
-    get() {
-        return when {
-            score <= 0 -> PrivacyGrade.A
-            score == 1 -> PrivacyGrade.B
-            score == 2 -> PrivacyGrade.C
-            else -> PrivacyGrade.D
-        }
     }

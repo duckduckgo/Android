@@ -50,8 +50,9 @@ class SiteMonitor(override val url: String,
         return HttpsStatus.NONE
     }
 
-    override val memberNetwork: TrackerNetwork?
-        get() = trackerNetworks.network(url)
+    override val memberNetwork: TrackerNetwork? by lazy {
+        trackerNetworks.network(url)
+    }
 
     override val trackerCount: Int
         get() = trackingEvents.size

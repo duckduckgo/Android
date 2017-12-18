@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.privacymonitor
 
-import com.duckduckgo.app.privacymonitor.HttpsStatus.NONE
-import com.duckduckgo.app.privacymonitor.HttpsStatus.SECURE
+import com.duckduckgo.app.privacymonitor.HttpsStatus.*
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
+import com.duckduckgo.app.privacymonitor.ui.improvedScore
 import com.duckduckgo.app.privacymonitor.ui.score
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.nhaarman.mockito_kotlin.mock
@@ -33,20 +33,86 @@ class PrivacyMonitorGradeExtensionTest {
     }
 
     @Test
+    fun whenHttpsMixedThenScoreIsIncrementedByOne() {
+        val privacyMonitor = monitor(https = MIXED)
+        assertEquals(defaultScore + 1, privacyMonitor.score)
+    }
+
+    @Test
+    fun whenHttpThenScoreIsIncrementedByOne() {
+        val privacyMonitor = monitor(https = NONE)
+        assertEquals(defaultScore + 1, privacyMonitor.score)
+    }
+
+    @Test
+    fun whenHttpsThenScoreIsUnchanged() {
+        val privacyMonitor = monitor(https = SECURE)
+        assertEquals(defaultScore, privacyMonitor.score)
+    }
+
+    @Test
+    fun whenTermsClassificationIsAThenScoreIsDecrementedByOne() {
+        val privacyMonitor = monitor(terms = TermsOfService(classification = "A"))
+        assertEquals(defaultScore - 1, privacyMonitor.score)
+    }
+
+    @Test
+    fun whenTermsClassificationIsBThenScoreIsUnchanged() {
+        val privacyMonitor = monitor(terms = TermsOfService(classification = "B"))
+        assertEquals(defaultScore, privacyMonitor.score)
+    }
+
+    @Test
+    fun whenTermsClassificationIsCThenScoreIsUnchanged() {
+        val privacyMonitor = monitor(terms = TermsOfService(classification = "C"))
+        assertEquals(defaultScore, privacyMonitor.score)
+    }
+
+    @Test
+    fun whenTermsClassificationIsDThenScoreIsIncrementedByOne() {
+        val privacyMonitor = monitor(terms = TermsOfService(classification = "D"))
+        assertEquals(defaultScore + 1, privacyMonitor.score)
+    }
+
+    @Test
+    fun whenTermsClassificationIsEThenScoreIsIncrementedByTwo() {
+        val privacyMonitor = monitor(terms = TermsOfService(classification = "E"))
+        assertEquals(defaultScore + 2, privacyMonitor.score)
+    }
+
+    @Test
+    fun whenTermsScoreIsPositiveThenScoreIsIncrementedByOne() {
+        val privacyMonitor = monitor(terms = TermsOfService(score = 5))
+        assertEquals(defaultScore + 1, privacyMonitor.score)
+    }
+
+    @Test
+    fun whenTermsScoreIsNegativeThenScoreIsDecrementedByOne() {
+        val privacyMonitor = monitor(terms = TermsOfService(score = -5))
+        assertEquals(defaultScore - 1, privacyMonitor.score)
+    }
+
+    @Test
+    fun whenTermsScoreIsZeroThenScoreIsUnchanged() {
+        val privacyMonitor = monitor(terms = TermsOfService(score = 0))
+        assertEquals(defaultScore, privacyMonitor.score)
+    }
+
+    @Test
     fun whenZeroTrackersThenScoreIsDefault() {
-        val privacyMonitor = monitor(0)
+        val privacyMonitor = monitor(trackerCount = 0)
         assertEquals(defaultScore, privacyMonitor.score)
     }
 
     @Test
     fun whenOneTrackerThenScoreIsIncrementedByOne() {
-        val privacyMonitor = monitor(1)
+        val privacyMonitor = monitor(trackerCount = 1)
         assertEquals(defaultScore + 1, privacyMonitor.score)
     }
 
     @Test
     fun whenElevenTrackersThenScoreIsIncrementedByTwo() {
-        val privacyMonitor = monitor(11)
+        val privacyMonitor = monitor(trackerCount = 11)
         assertEquals(defaultScore + 2, privacyMonitor.score)
     }
 
@@ -68,24 +134,30 @@ class PrivacyMonitorGradeExtensionTest {
         assertEquals(defaultScore + 1, privacyMonitor.score)
     }
 
+
     @Test
-    fun whenHttpsSecureThenScoreIsDecrementedByOne() {
-        val privacyMonitor = monitor(https = SECURE)
-        assertEquals(defaultScore - 1, privacyMonitor.score)
+    fun whenImprovedScoreThenTackerMetricsIgnored() {
+        val privacyMonitor = monitor(
+                TrackerNetwork("", "", 5, true),
+                TermsOfService(classification = "D"),
+                NONE,
+                5,
+                2,
+                true)
+        assertEquals(defaultScore + 6, privacyMonitor.score)
+        assertEquals(defaultScore + 3, privacyMonitor.improvedScore)
     }
 
-    //TODO terms tests
-    //TODO improvedScore tests
-
-    private fun monitor(trackerCount: Int = 0,
+    private fun monitor(memberNetwork: TrackerNetwork? = null,
+                        terms: TermsOfService = TermsOfService(),
+                        https: HttpsStatus = SECURE,
+                        trackerCount: Int = 0,
                         majorTrackerCount: Int = 0,
-                        memberNetwork: TrackerNetwork? = null,
-                        hasObscureTracker: Boolean = false,
-                        https: HttpsStatus = NONE): PrivacyMonitor {
+                        hasObscureTracker: Boolean = false): PrivacyMonitor {
 
         val monitor: PrivacyMonitor = mock()
-        whenever(monitor.termsOfService).thenReturn(TermsOfService())
         whenever(monitor.memberNetwork).thenReturn(memberNetwork)
+        whenever(monitor.termsOfService).thenReturn(terms)
         whenever(monitor.trackerCount).thenReturn(trackerCount)
         whenever(monitor.majorNetworkCount).thenReturn(majorTrackerCount)
         whenever(monitor.hasObscureTracker).thenReturn(hasObscureTracker)

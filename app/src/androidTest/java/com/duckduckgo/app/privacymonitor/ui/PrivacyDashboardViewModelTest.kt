@@ -88,6 +88,38 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
+    fun whenPrivacyOffThenHeadingIndicatesDisabled() {
+        whenever(settingStore.privacyOn).thenReturn(false)
+        assertEquals(getStringResource(R.string.privacyProtectionDisabled), testee.viewState.value?.heading)
+    }
+
+    @Test
+    fun whenPrivacyOnAndFullUpgradeThenHeadingIndicatesUpgrade() {
+        whenever(settingStore.privacyOn).thenReturn(true)
+        val monitor = monitor()
+        whenever(monitor.allTrackersBlocked).thenReturn(true)
+        whenever(monitor.majorNetworkCount).thenReturn(2)
+        testee.onPrivacyMonitorChanged(monitor)
+        assertTrue(testee.viewState.value!!.heading.contains("UPGRADED FROM"))
+    }
+
+    @Test
+    fun whenPrivacyOnWithOnlyPartialUpgradeThenHeadingIndicatesEnabled() {
+        whenever(settingStore.privacyOn).thenReturn(true)
+        val monitor = monitor()
+        whenever(monitor.allTrackersBlocked).thenReturn(false)
+        whenever(monitor.majorNetworkCount).thenReturn(2)
+        testee.onPrivacyMonitorChanged(monitor)
+        assertEquals(getStringResource(R.string.privacyProtectionEnabled), testee.viewState.value?.heading)
+    }
+
+    @Test
+    fun whenPrivacyOnAndNoUpgradeThenHeadingIndicatesEnabled() {
+        whenever(settingStore.privacyOn).thenReturn(true)
+        assertEquals(getStringResource(R.string.privacyProtectionEnabled), testee.viewState.value?.heading)
+    }
+
+    @Test
     fun whenHttpsStatusIsSecureThenTextAndIconReflectSame() {
         val monitor = monitor()
         whenever(monitor.https).thenReturn(HttpsStatus.SECURE)
