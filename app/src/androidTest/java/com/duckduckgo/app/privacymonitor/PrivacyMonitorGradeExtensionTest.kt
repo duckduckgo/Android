@@ -136,7 +136,7 @@ class PrivacyMonitorGradeExtensionTest {
 
 
     @Test
-    fun whenImprovedScoreThenTackerMetricsIgnored() {
+    fun whenImprovedScoreThenTrackerMetricsIgnored() {
         val privacyMonitor = monitor(
                 TrackerNetwork("", "", 5, true),
                 TermsOfService(classification = "D"),

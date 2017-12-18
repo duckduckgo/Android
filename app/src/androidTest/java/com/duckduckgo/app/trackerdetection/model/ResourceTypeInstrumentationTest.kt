@@ -87,9 +87,9 @@ class ResourceTypeInstrumentationTest {
         assertEquals(UNKNOWN, ResourceType.from(requestMock))
     }
 
-    private fun buildRequestMock(accpetHeader: String, url: Uri): WebResourceRequest {
+    private fun buildRequestMock(acceptHeader: String, url: Uri): WebResourceRequest {
         val requestMock: WebResourceRequest = mock()
-        val headers: HashMap<String, String> = hashMapOf("Accept" to accpetHeader)
+        val headers: HashMap<String, String> = hashMapOf("Accept" to acceptHeader)
         whenever(requestMock.url).thenReturn(url)
         whenever(requestMock.requestHeaders).thenReturn(headers)
         return requestMock

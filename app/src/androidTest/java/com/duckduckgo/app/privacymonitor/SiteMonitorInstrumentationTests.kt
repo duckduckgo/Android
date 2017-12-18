@@ -28,7 +28,7 @@ class SiteMonitorInstrumentationTests {
     companion object {
         private const val httpDocument = "http://example.com"
         private const val httpsDocument = "https://example.com"
-        private const val malformesDocument = "[example com]"
+        private const val malformedDocument = "[example com]"
     }
 
     @Test
@@ -52,7 +52,7 @@ class SiteMonitorInstrumentationTests {
 
     @Test
     fun whenUrlIsMalformedThenHttpsStatusIsNone() {
-        val testee = SiteMonitor(malformesDocument, TermsOfService(), TrackerNetworks())
+        val testee = SiteMonitor(malformedDocument, TermsOfService(), TrackerNetworks())
         assertEquals(HttpsStatus.NONE, testee.https)
     }
 
