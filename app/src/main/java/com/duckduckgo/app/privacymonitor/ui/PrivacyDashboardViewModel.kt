@@ -129,10 +129,7 @@ class PrivacyDashboardViewModel(private val context: Context,
 
     @DrawableRes
     private fun privacyBanner(): Int {
-        val monitor = monitor
-        if (monitor == null) {
-            return R.drawable.privacygrade_banner_unknown
-        }
+        val monitor = monitor ?: return R.drawable.privacygrade_banner_unknown
         if (monitor.allTrackersBlocked) {
             return privacyBanner(monitor.improvedGrade)
         }
