@@ -26,13 +26,13 @@ import dagger.android.support.AndroidSupportInjectionModule
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = arrayOf(
-        ApplicationModule::class,
-        ActivityBindingModule::class,
-        AndroidSupportInjectionModule::class,
-        NetworkModule::class,
-        PrivacyModule::class)
-)
+@Component(modules = [
+    (ApplicationModule::class),
+    (ActivityBindingModule::class),
+    (AndroidSupportInjectionModule::class),
+    (NetworkModule::class),
+    (PrivacyModule::class)
+])
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 
     @Component.Builder

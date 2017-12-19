@@ -17,12 +17,17 @@
 package com.duckduckgo.app.privacymonitor
 
 import android.net.Uri
+import com.duckduckgo.app.global.hasIpHost
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
+import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
+import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import java.util.concurrent.CopyOnWriteArrayList
 
-class SiteMonitor(override val url: String, override val termsOfService: TermsOfService = TermsOfService()) : PrivacyMonitor {
+class SiteMonitor(override val url: String,
+                  override val termsOfService: TermsOfService,
+                  private val trackerNetworks: TrackerNetworks) : PrivacyMonitor {
 
     override var hasHttpResources = false
 
@@ -45,6 +50,10 @@ class SiteMonitor(override val url: String, override val termsOfService: TermsOf
         return HttpsStatus.NONE
     }
 
+    override val memberNetwork: TrackerNetwork? by lazy {
+        trackerNetworks.network(url)
+    }
+
     override val trackerCount: Int
         get() = trackingEvents.size
 
@@ -60,6 +69,10 @@ class SiteMonitor(override val url: String, override val termsOfService: TermsOf
                 .mapNotNull { it.trackerNetwork?.name }
                 .distinct()
                 .count()
+
+    override val hasObscureTracker: Boolean
+        get() = trackingEvents.any { Uri.parse(it.trackerUrl).hasIpHost }
+
 
     override val allTrackersBlocked: Boolean
         get() = trackingEvents.none { !it.blocked }

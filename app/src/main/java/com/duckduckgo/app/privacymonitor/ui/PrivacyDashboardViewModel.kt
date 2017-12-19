@@ -20,11 +20,12 @@ import android.annotation.SuppressLint
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.content.Context
-import android.support.annotation.ColorRes
 import android.support.annotation.DrawableRes
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacymonitor.HttpsStatus
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
+import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
+import com.duckduckgo.app.privacymonitor.model.PrivacyGrade.Companion.Grade
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.privacymonitor.model.TermsOfService.Companion.Practices
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
@@ -34,19 +35,18 @@ class PrivacyDashboardViewModel(private val context: Context,
                                 private val settingsStore: PrivacySettingsStore) : ViewModel() {
 
     data class ViewState(
+            @DrawableRes val privacyBanner: Int,
             val domain: String,
             val heading: String,
             @DrawableRes val httpsIcon: Int,
             val httpsText: String,
             val networksText: String,
-            @DrawableRes val networksIcon: Int = R.drawable.dashboard_networks_good,
+            @DrawableRes val networksIcon: Int,
             val majorNetworksText: String,
-            @DrawableRes val majorNetworksIcon: Int = R.drawable.dashboard_major_networks_good,
+            @DrawableRes val majorNetworksIcon: Int,
             @DrawableRes val termsIcon: Int,
             val termsText: String,
-            val toggleEnabled: Boolean,
-            val toggleText: String,
-            @ColorRes val toggleBackgroundColor: Int = R.color.midGreen
+            val toggleEnabled: Boolean
     )
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -71,6 +71,7 @@ class PrivacyDashboardViewModel(private val context: Context,
 
     private fun resetViewState() {
         viewState.value = ViewState(
+                privacyBanner = R.drawable.privacygrade_banner_unknown,
                 domain = "",
                 heading = headingText(),
                 httpsIcon = httpsIcon(HttpsStatus.SECURE),
@@ -80,16 +81,17 @@ class PrivacyDashboardViewModel(private val context: Context,
                 majorNetworksText = majorNetworksText(),
                 majorNetworksIcon = R.drawable.dashboard_major_networks_good,
                 toggleEnabled = settingsStore.privacyOn,
-                toggleText = toggleText(),
-                toggleBackgroundColor = toggleBackgroundColor(),
                 termsIcon = termsIcon(TermsOfService.GOOD),
                 termsText = termsText(TermsOfService.GOOD)
         )
     }
 
     private fun updatePrivacyMonitor(monitor: PrivacyMonitor) {
+        this.monitor = monitor
         viewState.value = viewState.value?.copy(
+                privacyBanner = privacyBanner(),
                 domain = monitor.uri?.host ?: "",
+                heading = headingText(),
                 httpsIcon = httpsIcon(monitor.https),
                 httpsText = httpsText(monitor.https),
                 networksIcon = networksIcon(monitor.allTrackersBlocked, monitor.networkCount),
@@ -106,16 +108,71 @@ class PrivacyDashboardViewModel(private val context: Context,
             settingsStore.privacyOn = enabled
             viewState.value = viewState.value?.copy(
                     heading = headingText(),
-                    toggleEnabled = enabled,
-                    toggleText = toggleText(),
-                    toggleBackgroundColor = toggleBackgroundColor()
+                    privacyBanner = privacyBanner(),
+                    toggleEnabled = enabled
             )
         }
     }
 
     private fun headingText(): String {
+        val monitor = monitor
+        if (monitor != null && monitor.allTrackersBlocked) {
+            val before = monitor.grade
+            val after = monitor.improvedGrade
+            if (before != after) {
+                return context.getString(R.string.privacyProtectionUpgraded, privacyGradeIcon(before), privacyGradeIcon(after))
+            }
+        }
         val resource = if (settingsStore.privacyOn) R.string.privacyProtectionEnabled else R.string.privacyProtectionDisabled
         return context.getString(resource)
+    }
+
+    @DrawableRes
+    private fun privacyBanner(): Int {
+        val monitor = monitor ?: return R.drawable.privacygrade_banner_unknown
+        if (monitor.allTrackersBlocked) {
+            return privacyBanner(monitor.improvedGrade)
+        }
+        return privacyBanner(monitor.grade)
+    }
+
+    private fun privacyBanner(grade: Long?): Int {
+        if (settingsStore.privacyOn) {
+            return privacyBannerOn(grade)
+        }
+        return privacyBannerOff(grade)
+    }
+
+    @DrawableRes
+    private fun privacyBannerOn(@Grade grade: Long?): Int {
+        return when (grade) {
+            PrivacyGrade.A -> R.drawable.privacygrade_banner_a_on
+            PrivacyGrade.B -> R.drawable.privacygrade_banner_b_on
+            PrivacyGrade.C -> R.drawable.privacygrade_banner_c_on
+            PrivacyGrade.D -> R.drawable.privacygrade_banner_d_on
+            else -> R.drawable.privacygrade_banner_unknown
+        }
+    }
+
+    @DrawableRes
+    private fun privacyBannerOff(@Grade grade: Long?): Int {
+        return when (grade) {
+            PrivacyGrade.A -> R.drawable.privacygrade_banner_a_off
+            PrivacyGrade.B -> R.drawable.privacygrade_banner_b_off
+            PrivacyGrade.C -> R.drawable.privacygrade_banner_c_off
+            PrivacyGrade.D -> R.drawable.privacygrade_banner_d_off
+            else -> R.drawable.privacygrade_banner_unknown
+        }
+    }
+
+    @DrawableRes
+    private fun privacyGradeIcon(@Grade grade: Long?): Int {
+        return when (grade) {
+            PrivacyGrade.A -> R.drawable.privacygrade_icon_small_a
+            PrivacyGrade.B -> R.drawable.privacygrade_icon_small_b
+            PrivacyGrade.C -> R.drawable.privacygrade_icon_small_c
+            else -> R.drawable.privacygrade_icon_small_d
+        }
     }
 
     @DrawableRes
@@ -165,15 +222,5 @@ class PrivacyDashboardViewModel(private val context: Context,
         TermsOfService.POOR -> context.getString(R.string.termsBad)
         TermsOfService.MIXED -> context.getString(R.string.termsMixed)
         else -> context.getString(R.string.termsUnknown)
-    }
-
-    private fun toggleText(): String {
-        val resource = if (settingsStore.privacyOn) R.string.privacyProtectionToggleOn else R.string.privacyProtectionToggleOff
-        return context.getString(resource)
-    }
-
-    @ColorRes
-    private fun toggleBackgroundColor(): Int {
-        return if (settingsStore.privacyOn) R.color.midGreen else R.color.warmerGrey
     }
 }

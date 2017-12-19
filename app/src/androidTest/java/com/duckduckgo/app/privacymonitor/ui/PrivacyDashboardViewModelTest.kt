@@ -88,6 +88,60 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
+    fun whenFullUpgradeThenHeadingIndicatesUpgrade() {
+        val monitor = monitor()
+        whenever(monitor.allTrackersBlocked).thenReturn(true)
+        whenever(monitor.majorNetworkCount).thenReturn(2)
+        testee.onPrivacyMonitorChanged(monitor)
+        assertTrue(testee.viewState.value!!.heading.contains("UPGRADED FROM"))
+    }
+
+    @Test
+    fun whenPartialUpgradeAndPrivacyOnThenHeadingIndicatesEnabled() {
+        whenever(settingStore.privacyOn).thenReturn(true)
+        val monitor = monitor()
+        whenever(monitor.allTrackersBlocked).thenReturn(false)
+        whenever(monitor.majorNetworkCount).thenReturn(2)
+        testee.onPrivacyMonitorChanged(monitor)
+        assertEquals(getStringResource(R.string.privacyProtectionEnabled), testee.viewState.value?.heading)
+    }
+
+    @Test
+    fun whenPartialUpgradeAndPrivacyOffThenHeadingIndicatesDisabled() {
+        whenever(settingStore.privacyOn).thenReturn(false)
+        val monitor = monitor()
+        whenever(monitor.allTrackersBlocked).thenReturn(false)
+        whenever(monitor.majorNetworkCount).thenReturn(2)
+        testee.onPrivacyMonitorChanged(monitor)
+        assertEquals(getStringResource(R.string.privacyProtectionDisabled), testee.viewState.value?.heading)
+    }
+
+    @Test
+    fun whenNoUpgradeAndPrivacyOnThenHeadingIndicatesEnabled() {
+        whenever(settingStore.privacyOn).thenReturn(true)
+        val monitor = monitor()
+        whenever(monitor.allTrackersBlocked).thenReturn(true)
+        testee.onPrivacyMonitorChanged(monitor)
+        assertEquals(getStringResource(R.string.privacyProtectionEnabled), testee.viewState.value?.heading)
+    }
+
+    @Test
+    fun whenNoUpgradeAndPrivacyOffThenHeadingIndicatesDisabled() {
+        whenever(settingStore.privacyOn).thenReturn(false)
+        val monitor = monitor()
+        whenever(monitor.allTrackersBlocked).thenReturn(false)
+        whenever(monitor.majorNetworkCount).thenReturn(2)
+        testee.onPrivacyMonitorChanged(monitor)
+        assertEquals(getStringResource(R.string.privacyProtectionDisabled), testee.viewState.value?.heading)
+    }
+
+    @Test
+    fun whenPrivacyOnAndNoUpgradeThenHeadingIndicatesEnabled() {
+        whenever(settingStore.privacyOn).thenReturn(true)
+        assertEquals(getStringResource(R.string.privacyProtectionEnabled), testee.viewState.value?.heading)
+    }
+
+    @Test
     fun whenHttpsStatusIsSecureThenTextAndIconReflectSame() {
         val monitor = monitor()
         whenever(monitor.https).thenReturn(HttpsStatus.SECURE)

@@ -25,6 +25,7 @@ data class TermsOfService(val name: String? = null,
                           val badPrivacyTerms: List<String> = ArrayList()) {
 
     companion object {
+
         @IntDef(POOR, GOOD, MIXED)
         @Retention(AnnotationRetention.SOURCE)
         annotation class Practices
