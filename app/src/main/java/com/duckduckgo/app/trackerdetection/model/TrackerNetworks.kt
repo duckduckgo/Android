@@ -36,7 +36,7 @@ class TrackerNetworks @Inject constructor() : Serializable {
                 TrackerNetwork("oracle", "oracle.com", 10, true),
                 TrackerNetwork("mediamath", "mediamath.com", 9, true),
                 TrackerNetwork("yahoo", "yahoo.com", 9, true),
-                TrackerNetwork("maxcdn", "maxcdn.com", 7, true),
+                TrackerNetwork("stackpath", "stackpath.com", 7, true),
                 TrackerNetwork("automattic", "automattic.com", 7, true)
         )
     }

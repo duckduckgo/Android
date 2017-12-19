@@ -6,7 +6,7 @@ apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
 
 ext {
-    VERSION_NAME = "0.5.0"
+    VERSION_NAME = "0.6.0"
 }
 
 android {
@@ -25,6 +25,9 @@ android {
         release
     }
     buildTypes {
+        debug {
+            testCoverageEnabled = true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

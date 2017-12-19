@@ -22,6 +22,7 @@ import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacymonitor.HttpsStatus
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
+import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
@@ -38,7 +39,6 @@ class PrivacyDashboardViewModelTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var viewStateObserver: Observer<PrivacyDashboardViewModel.ViewState>
-    private lateinit var monitor: PrivacyMonitor
     private lateinit var settingStore: PrivacySettingsStore
 
     private val testee: PrivacyDashboardViewModel by lazy {
@@ -50,9 +50,7 @@ class PrivacyDashboardViewModelTest {
     @Before
     fun before() {
         viewStateObserver = mock()
-        monitor = mock()
         settingStore = mock()
-        whenever(monitor.https).thenReturn(HttpsStatus.SECURE)
     }
 
     @After
@@ -90,7 +88,61 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
+    fun whenFullUpgradeThenHeadingIndicatesUpgrade() {
+        val monitor = monitor()
+        whenever(monitor.allTrackersBlocked).thenReturn(true)
+        whenever(monitor.majorNetworkCount).thenReturn(2)
+        testee.onPrivacyMonitorChanged(monitor)
+        assertTrue(testee.viewState.value!!.heading.contains("UPGRADED FROM"))
+    }
+
+    @Test
+    fun whenPartialUpgradeAndPrivacyOnThenHeadingIndicatesEnabled() {
+        whenever(settingStore.privacyOn).thenReturn(true)
+        val monitor = monitor()
+        whenever(monitor.allTrackersBlocked).thenReturn(false)
+        whenever(monitor.majorNetworkCount).thenReturn(2)
+        testee.onPrivacyMonitorChanged(monitor)
+        assertEquals(getStringResource(R.string.privacyProtectionEnabled), testee.viewState.value?.heading)
+    }
+
+    @Test
+    fun whenPartialUpgradeAndPrivacyOffThenHeadingIndicatesDisabled() {
+        whenever(settingStore.privacyOn).thenReturn(false)
+        val monitor = monitor()
+        whenever(monitor.allTrackersBlocked).thenReturn(false)
+        whenever(monitor.majorNetworkCount).thenReturn(2)
+        testee.onPrivacyMonitorChanged(monitor)
+        assertEquals(getStringResource(R.string.privacyProtectionDisabled), testee.viewState.value?.heading)
+    }
+
+    @Test
+    fun whenNoUpgradeAndPrivacyOnThenHeadingIndicatesEnabled() {
+        whenever(settingStore.privacyOn).thenReturn(true)
+        val monitor = monitor()
+        whenever(monitor.allTrackersBlocked).thenReturn(true)
+        testee.onPrivacyMonitorChanged(monitor)
+        assertEquals(getStringResource(R.string.privacyProtectionEnabled), testee.viewState.value?.heading)
+    }
+
+    @Test
+    fun whenNoUpgradeAndPrivacyOffThenHeadingIndicatesDisabled() {
+        whenever(settingStore.privacyOn).thenReturn(false)
+        val monitor = monitor()
+        whenever(monitor.allTrackersBlocked).thenReturn(false)
+        testee.onPrivacyMonitorChanged(monitor)
+        assertEquals(getStringResource(R.string.privacyProtectionDisabled), testee.viewState.value?.heading)
+    }
+
+    @Test
+    fun whenPrivacyOnAndNoUpgradeThenHeadingIndicatesEnabled() {
+        whenever(settingStore.privacyOn).thenReturn(true)
+        assertEquals(getStringResource(R.string.privacyProtectionEnabled), testee.viewState.value?.heading)
+    }
+
+    @Test
     fun whenHttpsStatusIsSecureThenTextAndIconReflectSame() {
+        val monitor = monitor()
         whenever(monitor.https).thenReturn(HttpsStatus.SECURE)
         testee.onPrivacyMonitorChanged(monitor)
         assertEquals(getStringResource(R.string.httpsGood), testee.viewState.value?.httpsText)
@@ -99,6 +151,7 @@ class PrivacyDashboardViewModelTest {
 
     @Test
     fun whenHttpsStatusIsMixedThenTextAndIconReflectSame() {
+        val monitor = monitor()
         whenever(monitor.https).thenReturn(HttpsStatus.MIXED)
         testee.onPrivacyMonitorChanged(monitor)
         assertEquals(getStringResource(R.string.httpsMixed), testee.viewState.value?.httpsText)
@@ -107,6 +160,7 @@ class PrivacyDashboardViewModelTest {
 
     @Test
     fun whenHttpsStatusIsNoneThenTextAndIconReflectSame() {
+        val monitor = monitor()
         whenever(monitor.https).thenReturn(HttpsStatus.NONE)
         testee.onPrivacyMonitorChanged(monitor)
         assertEquals(getStringResource(R.string.httpsBad), testee.viewState.value?.httpsText)
@@ -115,6 +169,7 @@ class PrivacyDashboardViewModelTest {
 
     @Test
     fun whenNoTrackersNetworksThenNetworkIconIsGood() {
+        val monitor = monitor()
         whenever(monitor.networkCount).thenReturn(0)
         testee.onPrivacyMonitorChanged(monitor)
         assertEquals(R.drawable.dashboard_networks_good, testee.viewState.value?.networksIcon)
@@ -122,6 +177,7 @@ class PrivacyDashboardViewModelTest {
 
     @Test
     fun whenTenTrackerNetworksAndAllBlockedThenNetworkIconIsGood() {
+        val monitor = monitor()
         whenever(monitor.networkCount).thenReturn(10)
         whenever(monitor.allTrackersBlocked).thenReturn(true)
         testee.onPrivacyMonitorChanged(monitor)
@@ -130,6 +186,7 @@ class PrivacyDashboardViewModelTest {
 
     @Test
     fun whenTenTrackerNetworksAndNotAllBlockedThenNetworkIconIsBad() {
+        val monitor = monitor()
         whenever(monitor.networkCount).thenReturn(10)
         whenever(monitor.allTrackersBlocked).thenReturn(false)
         testee.onPrivacyMonitorChanged(monitor)
@@ -138,6 +195,7 @@ class PrivacyDashboardViewModelTest {
 
     @Test
     fun whenNoMajorTrackersNetworksThenMajorNetworkIconIsGood() {
+        val monitor = monitor()
         whenever(monitor.majorNetworkCount).thenReturn(0)
         testee.onPrivacyMonitorChanged(monitor)
         assertEquals(R.drawable.dashboard_major_networks_good, testee.viewState.value?.majorNetworksIcon)
@@ -145,6 +203,7 @@ class PrivacyDashboardViewModelTest {
 
     @Test
     fun whenTenMajorTrackerNetworksAndAllBlockedThenMajorNetworkIconIsGood() {
+        val monitor = monitor()
         whenever(monitor.majorNetworkCount).thenReturn(10)
         whenever(monitor.allTrackersBlocked).thenReturn(true)
         testee.onPrivacyMonitorChanged(monitor)
@@ -153,6 +212,7 @@ class PrivacyDashboardViewModelTest {
 
     @Test
     fun whenTenMajorTrackerNetworksAndNotAllBlockedThenMajorNetworkIconIsBad() {
+        val monitor = monitor()
         whenever(monitor.majorNetworkCount).thenReturn(10)
         whenever(monitor.allTrackersBlocked).thenReturn(false)
         testee.onPrivacyMonitorChanged(monitor)
@@ -161,6 +221,7 @@ class PrivacyDashboardViewModelTest {
 
     @Test
     fun whenNoTrackerNetworksThenNetworkTextShowsZeroBlocked() {
+        val monitor = monitor()
         whenever(monitor.networkCount).thenReturn(0)
         whenever(monitor.allTrackersBlocked).thenReturn(true)
         testee.onPrivacyMonitorChanged(monitor)
@@ -169,6 +230,7 @@ class PrivacyDashboardViewModelTest {
 
     @Test
     fun whenTenTrackerNetworksAndAllBlockedThenNetworkTextShowsTenBlocked() {
+        val monitor = monitor()
         whenever(monitor.networkCount).thenReturn(10)
         whenever(monitor.allTrackersBlocked).thenReturn(true)
         testee.onPrivacyMonitorChanged(monitor)
@@ -177,6 +239,7 @@ class PrivacyDashboardViewModelTest {
 
     @Test
     fun whenTenTrackersNetworksAndNotAllBlockedThenNetworkTextShowsTenFound() {
+        val monitor = monitor()
         whenever(monitor.networkCount).thenReturn(10)
         whenever(monitor.allTrackersBlocked).thenReturn(false)
         testee.onPrivacyMonitorChanged(monitor)
@@ -185,6 +248,7 @@ class PrivacyDashboardViewModelTest {
 
     @Test
     fun whenNoMajorTrackersNetworksThenMajorNetworkTextShowsZeroBlocked() {
+        val monitor = monitor()
         whenever(monitor.majorNetworkCount).thenReturn(0)
         whenever(monitor.allTrackersBlocked).thenReturn(true)
         testee.onPrivacyMonitorChanged(monitor)
@@ -193,6 +257,7 @@ class PrivacyDashboardViewModelTest {
 
     @Test
     fun whenTenMajorTrackerNetworksAndAllBlockedThenMajorNetworkTextShowsTenBlocked() {
+        val monitor = monitor()
         whenever(monitor.majorNetworkCount).thenReturn(10)
         whenever(monitor.allTrackersBlocked).thenReturn(true)
         testee.onPrivacyMonitorChanged(monitor)
@@ -201,6 +266,7 @@ class PrivacyDashboardViewModelTest {
 
     @Test
     fun whenTenMajorTrackerNetworksAndNotAllBlockedThenMajorNetworkTextShowsTenFound() {
+        val monitor = monitor()
         whenever(monitor.majorNetworkCount).thenReturn(10)
         whenever(monitor.allTrackersBlocked).thenReturn(false)
         testee.onPrivacyMonitorChanged(monitor)
@@ -215,6 +281,44 @@ class PrivacyDashboardViewModelTest {
         assertEquals("0 Tracker Networks Blocked", testee.viewState.value?.networksText)
         assertEquals(R.drawable.dashboard_major_networks_good, testee.viewState.value?.majorNetworksIcon)
         assertEquals("0 Major Tracker Networks Blocked", testee.viewState.value?.majorNetworksText)
+    }
+
+    @Test
+    fun whenTermsAreGoodThenTextAndIconReflectSame() {
+        val terms = TermsOfService(classification = "A", goodPrivacyTerms = listOf("good"))
+        testee.onPrivacyMonitorChanged(monitor(terms))
+        assertEquals(getStringResource(R.string.termsGood), testee.viewState.value?.termsText)
+        assertEquals(R.drawable.dashboard_terms_good, testee.viewState.value?.termsIcon)
+    }
+
+    @Test
+    fun whenTermsArePoorThenTextAndIconReflectSame() {
+        val terms = TermsOfService(classification = "E", badPrivacyTerms = listOf("bad"))
+        testee.onPrivacyMonitorChanged(monitor(terms))
+        assertEquals(getStringResource(R.string.termsBad), testee.viewState.value?.termsText)
+        assertEquals(R.drawable.dashboard_terms_bad, testee.viewState.value?.termsIcon)
+    }
+
+    @Test
+    fun whenTermsAreMixedThenTextAndIconReflectSame() {
+        val terms = TermsOfService(goodPrivacyTerms = listOf("good"), badPrivacyTerms = listOf("bad"))
+        testee.onPrivacyMonitorChanged(monitor(terms))
+        assertEquals(getStringResource(R.string.termsMixed), testee.viewState.value?.termsText)
+        assertEquals(R.drawable.dashboard_terms_neutral, testee.viewState.value?.termsIcon)
+    }
+
+    @Test
+    fun whenTermsAreUnknownThenTextAndIconReflectSame() {
+        testee.onPrivacyMonitorChanged(monitor())
+        assertEquals(getStringResource(R.string.termsUnknown), testee.viewState.value?.termsText)
+        assertEquals(R.drawable.dashboard_terms_neutral, testee.viewState.value?.termsIcon)
+    }
+
+    private fun monitor(terms: TermsOfService = TermsOfService()): PrivacyMonitor {
+        val monitor: PrivacyMonitor = mock()
+        whenever(monitor.https).thenReturn(HttpsStatus.SECURE)
+        whenever(monitor.termsOfService).thenReturn(terms)
+        return monitor
     }
 
     private fun getStringResource(id: Int): String =

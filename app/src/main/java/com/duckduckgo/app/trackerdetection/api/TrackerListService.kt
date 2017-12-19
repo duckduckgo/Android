@@ -27,5 +27,5 @@ interface TrackerListService {
     fun list(@Query("l") list: String): Observable<ResponseBody>
 
     @GET("/contentblocking.js?l=disconnect")
-    fun disconnect(): Observable<DisconnectList>
+    fun disconnect(): Observable<DisconnectListJson>
 }

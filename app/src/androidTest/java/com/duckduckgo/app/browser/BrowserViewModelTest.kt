@@ -20,9 +20,12 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
 import android.net.Uri
 import com.duckduckgo.app.browser.BrowserViewModel.NavigationCommand
-import com.duckduckgo.app.browser.BrowserViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
+import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
+import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.nhaarman.mockito_kotlin.mock
 import org.junit.After
 import org.junit.Assert.*
@@ -39,9 +42,9 @@ class BrowserViewModelTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private lateinit var viewStateObserver: Observer<ViewState>
     private lateinit var queryObserver: Observer<String>
     private lateinit var navigationObserver: Observer<NavigationCommand>
+    private lateinit var termsOfServiceStore: TermsOfServiceStore
     private lateinit var testee: BrowserViewModel
 
     private val testOmnibarConverter: OmnibarEntryConverter = object : OmnibarEntryConverter {
@@ -52,19 +55,17 @@ class BrowserViewModelTest {
 
     @Before
     fun before() {
-        viewStateObserver = mock()
         queryObserver = mock()
         navigationObserver = mock()
-        testee = BrowserViewModel(testOmnibarConverter, DuckDuckGoUrlDetector(), PrivacyMonitorRepository())
+        termsOfServiceStore = mock()
+        testee = BrowserViewModel(testOmnibarConverter, DuckDuckGoUrlDetector(), termsOfServiceStore, TrackerNetworks(), PrivacyMonitorRepository())
         testee.query.observeForever(queryObserver)
-        testee.viewState.observeForever(viewStateObserver)
         testee.navigation.observeForever(navigationObserver)
     }
 
     @After
     fun after() {
         testee.query.removeObserver(queryObserver)
-        testee.viewState.removeObserver(viewStateObserver)
         testee.navigation.removeObserver(navigationObserver)
     }
 
@@ -154,5 +155,35 @@ class BrowserViewModelTest {
     fun whenUserDismissesKeyboardAfterBrowserShownThenShouldNotConsumeBackButtonEvent() {
         testee.urlChanged("")
         assertFalse(testee.userDismissedKeyboard())
+    }
+
+    @Test
+    fun whenLoadingStartedThenPrivacyGradeIsCleared() {
+        testee.loadingStarted()
+        assertNull(testee.viewState.value!!.privacyGrade)
+    }
+
+    @Test
+    fun whenUrlChangedThenPrivacyGradeIsReset() {
+        testee.urlChanged("https://example.com")
+        assertEquals(PrivacyGrade.B, testee.viewState.value!!.privacyGrade)
+    }
+
+    @Test
+    fun whenTrackerDetectedThenPrivacyGradeIsUpdated() {
+        testee.urlChanged("https://example.com")
+        testee.trackerDetected(TrackingEvent("", "", null, false))
+        assertEquals(PrivacyGrade.C, testee.viewState.value!!.privacyGrade)
+    }
+
+    @Test
+    fun whenInitialisedThenPrivacyGradeIsNotShown() {
+        assertFalse(testee.viewState.value!!.showPrivacyGrade)
+    }
+
+    @Test
+    fun whenUrlUpdatedThenPrivacyGradeIsShown() {
+        testee.urlChanged((""))
+        assertTrue(testee.viewState.value!!.showPrivacyGrade)
     }
 }

@@ -18,6 +18,8 @@ package com.duckduckgo.app.di
 
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsSharedPreferences
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
+import com.duckduckgo.app.privacymonitor.store.TermsOfServiceRawStore
+import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
 import dagger.Binds
 import dagger.Module
 
@@ -27,4 +29,7 @@ abstract class PrivacyModule {
 
     @Binds
     abstract fun bindPrivacySettingsStore(privacySettingsStore: PrivacySettingsSharedPreferences): PrivacySettingsStore
+
+    @Binds
+    abstract fun bindTermsOfServiceStore(termsOfServiceStore: TermsOfServiceRawStore): TermsOfServiceStore
 }

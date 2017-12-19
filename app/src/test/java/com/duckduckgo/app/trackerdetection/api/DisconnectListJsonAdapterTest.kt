@@ -23,10 +23,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class DisconnectJsonConverterTest {
+class DisconnectListJsonAdapterTest {
 
-    private val moshi = Moshi.Builder().add(DisconnectJsonAdapter()).build()
-    private val jsonAdapter = moshi.adapter(DisconnectList::class.java)
+    private val moshi = Moshi.Builder().add(DisconnectListJsonAdapter()).build()
+    private val jsonAdapter = moshi.adapter(DisconnectListJson::class.java)
 
     @Test
     fun whenDisconnectFormatIsValidThenDataIsConverted() {

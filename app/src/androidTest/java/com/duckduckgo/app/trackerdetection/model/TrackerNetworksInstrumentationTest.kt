@@ -81,7 +81,7 @@ class TrackerNetworksInstrumentationTest {
     }
 
     @Test
-    fun whenUrlContainsButIsNotSubdomainOfNetworkrUrlThenNullIsReturned() {
+    fun whenUrlContainsButIsNotSubdomainOfNetworkUrlThenNullIsReturned() {
         val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl))
         testee.updateData(data)
         assertNull(testee.network("http://notsubdomainofnetwork.com/index.html"))

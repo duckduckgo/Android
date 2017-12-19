@@ -20,7 +20,7 @@ import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 import com.squareup.moshi.FromJson
 
 
-class DisconnectJsonAdapter {
+class DisconnectListJsonAdapter {
 
     @FromJson
     fun fromJson(json: Map<String, List<Map<String, Map<String, Any>>>>): List<DisconnectTracker> {

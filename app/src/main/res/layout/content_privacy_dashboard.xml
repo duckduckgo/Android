@@ -36,13 +36,13 @@
             android:background="@color/subtleGrey">
 
             <ImageView
-                android:id="@+id/gradeImage"
+                android:id="@+id/privacyBanner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/privacyGradeContentDescription"
                 android:paddingBottom="12dp"
                 android:paddingTop="20dp"
-                android:src="@drawable/privacy_banner_unknown"
+                android:src="@drawable/privacygrade_banner_unknown"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent" />
 
@@ -57,7 +57,7 @@
                 android:textStyle="bold"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/gradeImage"
+                app:layout_constraintTop_toBottomOf="@id/privacyBanner"
                 tools:text="theatlantic.com" />
 
             <TextView
@@ -134,6 +134,22 @@
                 app:layout_constraintTop_toBottomOf="@id/networksText"
                 tools:text="3 Major Tracker Networks Blocked" />
 
+            <ImageView
+                android:id="@+id/termsIcon"
+                style="@style/DashboardEntryIcon"
+                android:importantForAccessibility="no"
+                android:src="@drawable/dashboard_terms_good"
+                app:layout_constraintBottom_toBottomOf="@id/termsText"
+                app:layout_constraintTop_toTopOf="@id/termsText" />
+
+            <TextView
+                android:id="@+id/termsText"
+                style="@style/DashboardEntryText"
+                android:textIsSelectable="true"
+                app:layout_constraintStart_toEndOf="@id/termsIcon"
+                app:layout_constraintTop_toBottomOf="@id/majorNetworksText"
+                tools:text="Good Privacy" />
+
         </android.support.constraint.ConstraintLayout>
 
         <android.support.constraint.ConstraintLayout
@@ -150,7 +166,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:text="@string/privacyProtectionToggleOn"
+                android:text="@string/privacyProtectionToggle"
                 android:textColor="@android:color/white"
                 android:textSize="14sp"
                 android:textStyle="normal"
