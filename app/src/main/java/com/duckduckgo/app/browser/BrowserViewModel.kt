@@ -21,9 +21,11 @@ import android.arch.lifecycle.ViewModel
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.privacymonitor.SiteMonitor
+import com.duckduckgo.app.privacymonitor.model.PrivacyGrade.Companion.Grade
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
+import com.duckduckgo.app.privacymonitor.ui.improvedGrade
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import timber.log.Timber
@@ -42,7 +44,9 @@ class BrowserViewModel(
             val url: String? = null,
             val isEditing: Boolean = false,
             val browserShowing: Boolean = false,
-            val showClearButton: Boolean = false
+            val showClearButton: Boolean = false,
+            @Grade val privacyGrade: Long? = null,
+            val showPrivacyGrade: Boolean = false
     )
 
     /* Observable data for Activity to subscribe to */
@@ -94,7 +98,7 @@ class BrowserViewModel(
         Timber.v("Loading started")
         viewState.value = currentViewState().copy(isLoading = true)
         siteMonitor = null
-        postSiteMonitor()
+        onSiteMonitorChanged()
     }
 
     override fun loadingFinished() {
@@ -104,7 +108,7 @@ class BrowserViewModel(
 
     override fun urlChanged(url: String?) {
         Timber.v("Url changed: $url")
-        var newViewState = currentViewState().copy(url = url, browserShowing = true)
+        var newViewState = currentViewState().copy(url = url, browserShowing = true, showPrivacyGrade = true)
 
         if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
             newViewState = newViewState.copy(url = lastQuery)
@@ -113,21 +117,22 @@ class BrowserViewModel(
         if (url != null) {
             val terms = termsOfServiceStore.retrieveTerms(url) ?: TermsOfService()
             siteMonitor = SiteMonitor(url, terms, trackerNetworks)
-            postSiteMonitor()
+            onSiteMonitorChanged()
         }
     }
 
     override fun trackerDetected(event: TrackingEvent) {
         siteMonitor?.trackerDetected(event)
-        postSiteMonitor()
+        onSiteMonitorChanged()
     }
 
     override fun pageHasHttpResources() {
         siteMonitor?.hasHttpResources = true
-        postSiteMonitor()
+        onSiteMonitorChanged()
     }
 
-    private fun postSiteMonitor() {
+    private fun onSiteMonitorChanged() {
+        viewState.postValue(currentViewState().copy(privacyGrade = siteMonitor?.improvedGrade))
         privacyMonitorRepository.privacyMonitor.postValue(siteMonitor)
     }
 

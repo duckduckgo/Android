@@ -35,7 +35,7 @@ val PrivacyMonitor.score: Int
         return score
     }
 
-val PrivacyMonitor.improvedScore: Int
+val PrivacyMonitor.potentialScore: Int
     get() = baseScore
 
 
@@ -50,13 +50,26 @@ private val PrivacyMonitor.baseScore: Int
         return score
     }
 
+val PrivacyMonitor.improvedScore: Int
+    get() {
+        if (allTrackersBlocked) {
+            return potentialScore
+        }
+        return score
+    }
+
 @PrivacyGrade.Companion.Grade
 val PrivacyMonitor.grade: Long
     get() = calculateGrade(score)
 
 @PrivacyGrade.Companion.Grade
+val PrivacyMonitor.potentialGrade: Long
+    get() = calculateGrade(potentialScore)
+
+@PrivacyGrade.Companion.Grade
 val PrivacyMonitor.improvedGrade: Long
     get() = calculateGrade(improvedScore)
+
 
 @PrivacyGrade.Companion.Grade
 private fun calculateGrade(score: Int): Long {

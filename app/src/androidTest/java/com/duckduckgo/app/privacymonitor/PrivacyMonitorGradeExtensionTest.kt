@@ -19,6 +19,7 @@ package com.duckduckgo.app.privacymonitor
 import com.duckduckgo.app.privacymonitor.HttpsStatus.*
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.privacymonitor.ui.improvedScore
+import com.duckduckgo.app.privacymonitor.ui.potentialScore
 import com.duckduckgo.app.privacymonitor.ui.score
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.nhaarman.mockito_kotlin.mock
@@ -134,9 +135,8 @@ class PrivacyMonitorGradeExtensionTest {
         assertEquals(defaultScore + 1, privacyMonitor.score)
     }
 
-
     @Test
-    fun whenImprovedScoreThenTrackerMetricsIgnored() {
+    fun whenPotentialScoreThenTrackerMetricsIgnored() {
         val privacyMonitor = monitor(
                 TrackerNetwork("", "", 5, true),
                 TermsOfService(classification = "D"),
@@ -145,7 +145,33 @@ class PrivacyMonitorGradeExtensionTest {
                 2,
                 true)
         assertEquals(defaultScore + 6, privacyMonitor.score)
-        assertEquals(defaultScore + 3, privacyMonitor.improvedScore)
+        assertEquals(defaultScore + 3, privacyMonitor.potentialScore)
+    }
+
+    @Test
+    fun whenAllTrackersBlockedThenImporvedScoreIsEqualToPotentialScore() {
+        val privacyMonitor = monitor(
+                TrackerNetwork("", "", 5, true),
+                TermsOfService(classification = "D"),
+                NONE,
+                5,
+                2,
+                true,
+                allTrackerBlocked = true)
+        assertEquals(privacyMonitor.potentialScore, privacyMonitor.improvedScore)
+    }
+
+    @Test
+    fun whenNotAllTrackersBlockedThenImprovedScoreIsEqualToScore() {
+        val privacyMonitor = monitor(
+                TrackerNetwork("", "", 5, true),
+                TermsOfService(classification = "D"),
+                NONE,
+                5,
+                2,
+                true,
+                allTrackerBlocked = false)
+        assertEquals(privacyMonitor.score, privacyMonitor.improvedScore)
     }
 
     private fun monitor(memberNetwork: TrackerNetwork? = null,
@@ -153,8 +179,8 @@ class PrivacyMonitorGradeExtensionTest {
                         https: HttpsStatus = SECURE,
                         trackerCount: Int = 0,
                         majorTrackerCount: Int = 0,
-                        hasObscureTracker: Boolean = false): PrivacyMonitor {
-
+                        hasObscureTracker: Boolean = false,
+                        allTrackerBlocked: Boolean = true): PrivacyMonitor {
         val monitor: PrivacyMonitor = mock()
         whenever(monitor.memberNetwork).thenReturn(memberNetwork)
         whenever(monitor.termsOfService).thenReturn(terms)
@@ -162,6 +188,7 @@ class PrivacyMonitorGradeExtensionTest {
         whenever(monitor.majorNetworkCount).thenReturn(majorTrackerCount)
         whenever(monitor.hasObscureTracker).thenReturn(hasObscureTracker)
         whenever(monitor.https).thenReturn(https)
+        whenever(monitor.allTrackersBlocked).thenReturn(allTrackerBlocked)
         return monitor
     }
 }

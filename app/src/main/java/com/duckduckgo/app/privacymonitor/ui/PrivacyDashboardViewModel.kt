@@ -89,7 +89,7 @@ class PrivacyDashboardViewModel(private val context: Context,
     private fun updatePrivacyMonitor(monitor: PrivacyMonitor) {
         this.monitor = monitor
         viewState.value = viewState.value?.copy(
-                privacyBanner = privacyBanner(),
+                privacyBanner = privacyBanner(monitor.improvedGrade),
                 domain = monitor.uri?.host ?: "",
                 heading = headingText(),
                 httpsIcon = httpsIcon(monitor.https),
@@ -108,7 +108,7 @@ class PrivacyDashboardViewModel(private val context: Context,
             settingsStore.privacyOn = enabled
             viewState.value = viewState.value?.copy(
                     heading = headingText(),
-                    privacyBanner = privacyBanner(),
+                    privacyBanner = privacyBanner(monitor?.improvedGrade),
                     toggleEnabled = enabled
             )
         }
@@ -116,7 +116,7 @@ class PrivacyDashboardViewModel(private val context: Context,
 
     private fun headingText(): String {
         val monitor = monitor
-        if (monitor != null && monitor.allTrackersBlocked) {
+        if (monitor != null) {
             val before = monitor.grade
             val after = monitor.improvedGrade
             if (before != after) {
@@ -125,15 +125,6 @@ class PrivacyDashboardViewModel(private val context: Context,
         }
         val resource = if (settingsStore.privacyOn) R.string.privacyProtectionEnabled else R.string.privacyProtectionDisabled
         return context.getString(resource)
-    }
-
-    @DrawableRes
-    private fun privacyBanner(): Int {
-        val monitor = monitor ?: return R.drawable.privacygrade_banner_unknown
-        if (monitor.allTrackersBlocked) {
-            return privacyBanner(monitor.improvedGrade)
-        }
-        return privacyBanner(monitor.grade)
     }
 
     private fun privacyBanner(grade: Long?): Int {
