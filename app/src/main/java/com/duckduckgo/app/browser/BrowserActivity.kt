@@ -113,7 +113,7 @@ class BrowserActivity : DuckDuckGoActivity() {
             false -> hideClearButton()
         }
 
-        updatePrivacyGrade(viewState.privacyGrade)
+        updatePrivacyGrade(viewState.privacyGrade, viewState.showPrivacyGrade)
     }
 
     private fun showClearButton() {
@@ -130,7 +130,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updatePrivacyGrade(@Grade privacyGrade: Long?) {
+    private fun updatePrivacyGrade(@Grade privacyGrade: Long?, show: Boolean) {
         val resource = when (privacyGrade) {
             PrivacyGrade.A -> R.drawable.privacygrade_icon_a
             PrivacyGrade.B -> R.drawable.privacygrade_icon_b
@@ -138,7 +138,9 @@ class BrowserActivity : DuckDuckGoActivity() {
             PrivacyGrade.D -> R.drawable.privacygrade_icon_d
             else -> R.drawable.privacygrade_icon_unknown
         }
-        toolbar.menu.findItem(R.id.privacy_dashboard)?.icon = getDrawable(resource)
+        val menuItem = toolbar.menu.findItem(R.id.privacy_dashboard)
+        menuItem?.icon = getDrawable(resource)
+        menuItem?.isVisible = show
     }
 
     private fun shouldUpdateUrl(viewState: BrowserViewModel.ViewState, url: String?) =

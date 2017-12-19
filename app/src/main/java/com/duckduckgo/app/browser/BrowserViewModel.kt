@@ -45,7 +45,8 @@ class BrowserViewModel(
             val isEditing: Boolean = false,
             val browserShowing: Boolean = false,
             val showClearButton: Boolean = false,
-            @Grade val privacyGrade: Long? = null
+            @Grade val privacyGrade: Long? = null,
+            val showPrivacyGrade: Boolean = false
     )
 
     /* Observable data for Activity to subscribe to */
@@ -107,7 +108,7 @@ class BrowserViewModel(
 
     override fun urlChanged(url: String?) {
         Timber.v("Url changed: $url")
-        var newViewState = currentViewState().copy(url = url, browserShowing = true)
+        var newViewState = currentViewState().copy(url = url, browserShowing = true, showPrivacyGrade = true)
 
         if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
             newViewState = newViewState.copy(url = lastQuery)

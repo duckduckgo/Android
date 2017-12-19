@@ -165,14 +165,25 @@ class BrowserViewModelTest {
 
     @Test
     fun whenUrlChangedThenPrivacyGradeIsReset() {
-        testee.urlChanged("https://test.com")
+        testee.urlChanged("https://example.com")
         assertEquals(PrivacyGrade.B, testee.viewState.value!!.privacyGrade)
     }
 
     @Test
     fun whenTrackerDetectedThenPrivacyGradeIsUpdated() {
-        testee.urlChanged("https://test.com")
-        testee.trackerDetected(TrackingEvent("", "", null, true))
+        testee.urlChanged("https://example.com")
+        testee.trackerDetected(TrackingEvent("", "", null, false))
         assertEquals(PrivacyGrade.C, testee.viewState.value!!.privacyGrade)
+    }
+
+    @Test
+    fun whenInitialisedThenPrivacyGradeIsNotShown() {
+        assertFalse(testee.viewState.value!!.showPrivacyGrade)
+    }
+
+    @Test
+    fun whenUrlUpdatedThenPrivacyGradeIsShown() {
+        testee.urlChanged((""))
+        assertTrue(testee.viewState.value!!.showPrivacyGrade)
     }
 }
