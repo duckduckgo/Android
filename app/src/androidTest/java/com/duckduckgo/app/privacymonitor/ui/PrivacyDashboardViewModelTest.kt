@@ -130,7 +130,6 @@ class PrivacyDashboardViewModelTest {
         whenever(settingStore.privacyOn).thenReturn(false)
         val monitor = monitor()
         whenever(monitor.allTrackersBlocked).thenReturn(false)
-        whenever(monitor.majorNetworkCount).thenReturn(2)
         testee.onPrivacyMonitorChanged(monitor)
         assertEquals(getStringResource(R.string.privacyProtectionDisabled), testee.viewState.value?.heading)
     }

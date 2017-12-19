@@ -35,6 +35,8 @@ import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
+import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
+import com.duckduckgo.app.privacymonitor.model.PrivacyGrade.Companion.Grade
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.REQUEST_DASHBOARD
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RESULT_RELOAD
@@ -110,6 +112,8 @@ class BrowserActivity : DuckDuckGoActivity() {
             true -> showClearButton()
             false -> hideClearButton()
         }
+
+        updatePrivacyGrade(viewState.privacyGrade)
     }
 
     private fun showClearButton() {
@@ -124,6 +128,17 @@ class BrowserActivity : DuckDuckGoActivity() {
             clearUrlButton.hide()
             urlInput.updatePadding(paddingEnd = 10.toPx())
         }
+    }
+
+    private fun updatePrivacyGrade(@Grade privacyGrade: Long?) {
+        val resource = when (privacyGrade) {
+            PrivacyGrade.A -> R.drawable.privacygrade_icon_a
+            PrivacyGrade.B -> R.drawable.privacygrade_icon_b
+            PrivacyGrade.C -> R.drawable.privacygrade_icon_c
+            PrivacyGrade.D -> R.drawable.privacygrade_icon_d
+            else -> R.drawable.privacygrade_icon_unknown
+        }
+        toolbar.menu.findItem(R.id.privacy_dashboard)?.icon = getDrawable(resource)
     }
 
     private fun shouldUpdateUrl(viewState: BrowserViewModel.ViewState, url: String?) =
