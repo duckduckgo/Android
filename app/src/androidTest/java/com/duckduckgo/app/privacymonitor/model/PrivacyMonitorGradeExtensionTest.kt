@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacymonitor
+package com.duckduckgo.app.privacymonitor.model
 
+import com.duckduckgo.app.privacymonitor.HttpsStatus
 import com.duckduckgo.app.privacymonitor.HttpsStatus.*
-import com.duckduckgo.app.privacymonitor.model.TermsOfService
-import com.duckduckgo.app.privacymonitor.ui.improvedScore
-import com.duckduckgo.app.privacymonitor.ui.potentialScore
-import com.duckduckgo.app.privacymonitor.ui.score
+import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever

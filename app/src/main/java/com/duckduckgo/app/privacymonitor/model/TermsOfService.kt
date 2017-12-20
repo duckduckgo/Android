@@ -16,24 +16,17 @@
 
 package com.duckduckgo.app.privacymonitor.model
 
-import android.support.annotation.IntDef
-
 data class TermsOfService(val name: String? = null,
                           val score: Int = 0,
                           val classification: String? = null,
                           val goodPrivacyTerms: List<String> = ArrayList(),
                           val badPrivacyTerms: List<String> = ArrayList()) {
 
-    companion object {
-
-        @IntDef(POOR, GOOD, MIXED)
-        @Retention(AnnotationRetention.SOURCE)
-        annotation class Practices
-
-        const val POOR = 0L
-        const val GOOD = 1L
-        const val MIXED = 2L
-        const val UNKNOWN = 3L
+    enum class Practices {
+        POOR,
+        GOOD,
+        MIXED,
+        UNKNOWN
     }
 
     private val noTerms: Boolean
@@ -42,24 +35,24 @@ data class TermsOfService(val name: String? = null,
     private val mixedTerms: Boolean
         get() = !goodPrivacyTerms.isEmpty() && !badPrivacyTerms.isEmpty()
 
-    val practices: Long
+    val practices: Practices
         get() {
             if (noTerms) {
-                return UNKNOWN
+                return Practices.UNKNOWN
             }
             when (classification) {
-                "A" -> return GOOD
-                "B" -> return MIXED
-                "C", "D", "E" -> return POOR
+                "A" -> return Practices.GOOD
+                "B" -> return Practices.MIXED
+                "C", "D", "E" -> return Practices.POOR
             }
             if (mixedTerms) {
-                return MIXED
+                return Practices.MIXED
             }
             when {
-                score < 0 -> return GOOD
-                score > 0 -> return POOR
-                score == 0 -> return MIXED
+                score < 0 -> return Practices.GOOD
+                score > 0 -> return Practices.POOR
+                score == 0 -> return Practices.MIXED
             }
-            return UNKNOWN
+            return Practices.UNKNOWN
         }
 }

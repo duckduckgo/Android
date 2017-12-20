@@ -14,12 +14,6 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".BrowserActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-        <activity
             android:name="com.duckduckgo.app.home.HomeActivity"
             android:label="@string/appName"
             android:parentActivityName="com.duckduckgo.app.home.HomeActivity"
@@ -27,15 +21,26 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
+            android:name=".BrowserActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
             android:label="@string/privacyDashboardActivityTitle"
             android:parentActivityName=".BrowserActivity"
+            android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity"
+            android:label="@string/privacyTermsActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+
     </application>
 
 </manifest>

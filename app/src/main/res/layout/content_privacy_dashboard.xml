@@ -87,68 +87,83 @@
             android:paddingTop="10dp"
             app:layout_constraintTop_toBottomOf="@id/privacyGrade">
 
-            <ImageView
-                android:id="@+id/httpsIcon"
-                style="@style/DashboardEntryIcon"
-                android:importantForAccessibility="no"
-                android:src="@drawable/dashboard_https_good"
-                app:layout_constraintBottom_toBottomOf="@id/httpsText"
-                app:layout_constraintTop_toTopOf="@id/httpsText" />
+            <LinearLayout
+                android:id="@+id/httpsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/httpsText"
-                style="@style/DashboardEntryText"
-                android:textIsSelectable="true"
-                app:layout_constraintStart_toEndOf="@id/httpsIcon"
-                tools:text="8 Tracker Networks Blocked" />
+                <ImageView
+                    android:id="@+id/httpsIcon"
+                    style="@style/DashboardEntryIcon"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/dashboard_https_good" />
 
-            <ImageView
-                android:id="@+id/networksIcon"
-                style="@style/DashboardEntryIcon"
-                android:importantForAccessibility="no"
-                android:src="@drawable/dashboard_networks_good"
-                app:layout_constraintBottom_toBottomOf="@id/networksText"
-                app:layout_constraintTop_toTopOf="@id/networksText" />
+                <TextView
+                    android:id="@+id/httpsText"
+                    style="@style/DashboardEntryText"
+                    app:layout_constraintStart_toEndOf="@id/httpsIcon"
+                    tools:text="8 Tracker Networks Blocked" />
 
-            <TextView
-                android:id="@+id/networksText"
-                style="@style/DashboardEntryText"
-                android:textIsSelectable="true"
-                app:layout_constraintStart_toEndOf="@id/networksIcon"
-                app:layout_constraintTop_toBottomOf="@id/httpsText"
-                tools:text="8 Tracker Networks Blocked" />
+            </LinearLayout>
 
-            <ImageView
-                android:id="@+id/majorNetworksIcon"
-                style="@style/DashboardEntryIcon"
-                android:importantForAccessibility="no"
-                android:src="@drawable/dashboard_major_networks_good"
-                app:layout_constraintBottom_toBottomOf="@id/majorNetworksText"
-                app:layout_constraintTop_toTopOf="@id/majorNetworksText" />
 
-            <TextView
-                android:id="@+id/majorNetworksText"
-                style="@style/DashboardEntryText"
-                android:textIsSelectable="true"
-                app:layout_constraintStart_toEndOf="@id/majorNetworksIcon"
-                app:layout_constraintTop_toBottomOf="@id/networksText"
-                tools:text="3 Major Tracker Networks Blocked" />
+            <LinearLayout
+                android:id="@+id/networksContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/httpsContainer">
 
-            <ImageView
-                android:id="@+id/termsIcon"
-                style="@style/DashboardEntryIcon"
-                android:importantForAccessibility="no"
-                android:src="@drawable/dashboard_terms_good"
-                app:layout_constraintBottom_toBottomOf="@id/termsText"
-                app:layout_constraintTop_toTopOf="@id/termsText" />
+                <ImageView
+                    android:id="@+id/networksIcon"
+                    style="@style/DashboardEntryIcon"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/dashboard_networks_good" />
 
-            <TextView
-                android:id="@+id/termsText"
-                style="@style/DashboardEntryText"
-                android:textIsSelectable="true"
-                app:layout_constraintStart_toEndOf="@id/termsIcon"
-                app:layout_constraintTop_toBottomOf="@id/majorNetworksText"
-                tools:text="Good Privacy" />
+                <TextView
+                    android:id="@+id/networksText"
+                    style="@style/DashboardEntryText"
+                    tools:text="8 Tracker Networks Blocked" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/majorNetworksContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/networksContainer">
+
+                <ImageView
+                    android:id="@+id/majorNetworksIcon"
+                    style="@style/DashboardEntryIcon"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/dashboard_major_networks_good" />
+
+                <TextView
+                    android:id="@+id/majorNetworksText"
+                    style="@style/DashboardEntryText"
+                    tools:text="3 Major Tracker Networks Blocked" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/practicesContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onPracticesClicked"
+                app:layout_constraintTop_toBottomOf="@id/majorNetworksContainer">
+
+                <ImageView
+                    android:id="@+id/practicesIcon"
+                    style="@style/DashboardEntryIcon"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/practices_icon_good" />
+
+                <TextView
+                    android:id="@+id/practicesText"
+                    style="@style/DashboardEntryText"
+                    tools:text="Good Privacy" />
+
+            </LinearLayout>
 
         </android.support.constraint.ConstraintLayout>
 

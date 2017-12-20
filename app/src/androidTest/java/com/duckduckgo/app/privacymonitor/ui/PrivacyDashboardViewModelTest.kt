@@ -284,34 +284,10 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenTermsAreGoodThenTextAndIconReflectSame() {
+    fun whenTermsAreUpdatedThenPracticesAreUpdatedInViewModel() {
         val terms = TermsOfService(classification = "A", goodPrivacyTerms = listOf("good"))
         testee.onPrivacyMonitorChanged(monitor(terms))
-        assertEquals(getStringResource(R.string.termsGood), testee.viewState.value?.termsText)
-        assertEquals(R.drawable.dashboard_terms_good, testee.viewState.value?.termsIcon)
-    }
-
-    @Test
-    fun whenTermsArePoorThenTextAndIconReflectSame() {
-        val terms = TermsOfService(classification = "E", badPrivacyTerms = listOf("bad"))
-        testee.onPrivacyMonitorChanged(monitor(terms))
-        assertEquals(getStringResource(R.string.termsBad), testee.viewState.value?.termsText)
-        assertEquals(R.drawable.dashboard_terms_bad, testee.viewState.value?.termsIcon)
-    }
-
-    @Test
-    fun whenTermsAreMixedThenTextAndIconReflectSame() {
-        val terms = TermsOfService(goodPrivacyTerms = listOf("good"), badPrivacyTerms = listOf("bad"))
-        testee.onPrivacyMonitorChanged(monitor(terms))
-        assertEquals(getStringResource(R.string.termsMixed), testee.viewState.value?.termsText)
-        assertEquals(R.drawable.dashboard_terms_neutral, testee.viewState.value?.termsIcon)
-    }
-
-    @Test
-    fun whenTermsAreUnknownThenTextAndIconReflectSame() {
-        testee.onPrivacyMonitorChanged(monitor())
-        assertEquals(getStringResource(R.string.termsUnknown), testee.viewState.value?.termsText)
-        assertEquals(R.drawable.dashboard_terms_neutral, testee.viewState.value?.termsIcon)
+        assertEquals(TermsOfService.Practices.GOOD, testee.viewState.value!!.practices)
     }
 
     private fun monitor(terms: TermsOfService = TermsOfService()): PrivacyMonitor {

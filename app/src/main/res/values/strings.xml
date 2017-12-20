@@ -26,9 +26,11 @@
     <string name="httpsMixed">Mixed Encryption connection</string>
     <string name="httpsBad">Unencrypted Connection</string>
 
-    <string name="termsGood">Good Privacy Practices</string>
-    <string name="termsMixed">Mixed Privacy Practices"</string>
-    <string name="termsBad">"Poor Privacy Practices"</string>
-    <string name="termsUnknown">Unknown Privacy Practices</string>
+    <string name="privacyTermsActivityTitle">Privacy Practices</string>
+    <string name="practicesGood">Good Privacy Practices</string>
+    <string name="practicesMixed">Mixed Privacy Practices"</string>
+    <string name="practicesBad">"Poor Privacy Practices"</string>
+    <string name="practicesUnknown">Unknown Privacy Practices</string>
+    <string name="practices_overview">Privacy practices indicate how much the personal information that you share with a website is protected.</string>
 
 </resources>

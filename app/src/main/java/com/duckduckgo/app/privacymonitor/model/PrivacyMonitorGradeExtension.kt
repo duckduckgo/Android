@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacymonitor.ui
+package com.duckduckgo.app.privacymonitor.model
 
 import com.duckduckgo.app.privacymonitor.HttpsStatus
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
-import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
-import com.duckduckgo.app.privacymonitor.model.TermsOfService
 
 
 val PrivacyMonitor.score: Int
