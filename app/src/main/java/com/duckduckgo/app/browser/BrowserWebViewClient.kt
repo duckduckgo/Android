@@ -24,6 +24,7 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.duckduckgo.app.global.isHttp
+import com.duckduckgo.app.httpsupgrade.HTTPSUpgrader
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.ResourceType
 import io.reactivex.Observable
@@ -34,7 +35,8 @@ import javax.inject.Inject
 
 class BrowserWebViewClient @Inject constructor(
         private val requestRewriter: DuckDuckGoRequestRewriter,
-        private var trackerDetector: TrackerDetector
+        private var trackerDetector: TrackerDetector,
+        private var httpsUpgrader: HTTPSUpgrader
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -47,6 +49,12 @@ class BrowserWebViewClient @Inject constructor(
             view.loadUrl(newUri.toString())
             return true
         }
+
+        if (httpsUpgrader.shouldUpgrade(request)) {
+            // TODO upgrade
+            return true
+        }
+
         return false
     }
 

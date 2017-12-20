@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.app.httpsupgrade.db
 
-import android.app.Application
-import android.arch.persistence.room.Room
-import android.content.Context
-import com.duckduckgo.app.global.db.AppDatabase
-import dagger.Binds
-import dagger.Module
-import dagger.Provides
-import javax.inject.Singleton
+import android.arch.persistence.room.*
 
+@Dao
+interface HTTPSUpgradeDomainDAO {
 
-@Module
-abstract class ApplicationModule {
+    @Insert
+    fun insertAll(vararg domains: HTTPSUpgradeDomain)
 
-    @Singleton
-    @Binds
-    abstract fun bindContext(application: Application): Context
+    @Query("select count(1) > 0 from https_upgrade_domain where :host glob domain")
+    fun contains(host: String) : Boolean
+
+    @Query("delete from https_upgrade_domain")
+    fun deleteAll()
 
 }

@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.app.httpsupgrade
 
-import android.app.Application
-import android.arch.persistence.room.Room
-import android.content.Context
-import com.duckduckgo.app.global.db.AppDatabase
-import dagger.Binds
-import dagger.Module
-import dagger.Provides
-import javax.inject.Singleton
+import android.webkit.WebResourceRequest
+import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomainDAO
+import javax.inject.Inject
 
+class HTTPSUpgrader @Inject constructor(private val dao: HTTPSUpgradeDomainDAO) {
 
-@Module
-abstract class ApplicationModule {
+    fun shouldUpgrade(request: WebResourceRequest) : Boolean {
 
-    @Singleton
-    @Binds
-    abstract fun bindContext(application: Application): Context
+        return false
+    }
 
 }

@@ -16,21 +16,23 @@
 
 package com.duckduckgo.app.di
 
-import android.app.Application
 import android.arch.persistence.room.Room
 import android.content.Context
 import com.duckduckgo.app.global.db.AppDatabase
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
-
 @Module
-abstract class ApplicationModule {
+class DatabaseModule {
 
+    @Provides
     @Singleton
-    @Binds
-    abstract fun bindContext(application: Application): Context
+    fun provideDatabase(context: Context)
+            = Room.databaseBuilder(context, AppDatabase::class.java, "app.db").build()
+
+    @Provides
+    fun provideHTTPSUpgradeDomainDAO(database: AppDatabase) =
+            database.httpsUpgradeDomainDAO()
 
 }
