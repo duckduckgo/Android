@@ -123,6 +123,24 @@ class BrowserViewModelTest {
     }
 
     @Test
+    fun whenUrlChangedWithDuckDuckGoUrlContainingQueryThenUrlRewrittenToContainQuery() {
+        testee.urlChanged("http://duckduckgo.com?q=test")
+        assertEquals("test", testee.viewState.value!!.url)
+    }
+
+    @Test
+    fun whenUrlChangedWithDuckDuckGoUrlNotContainingQueryThenFullUrlShown() {
+        testee.urlChanged("http://duckduckgo.com")
+        assertEquals("http://duckduckgo.com", testee.viewState.value!!.url)
+    }
+
+    @Test
+    fun whenUrlChangedWithNonDuckDuckGoUrlThenFullUrlShown() {
+        testee.urlChanged("http://example.com")
+        assertEquals("http://example.com", testee.viewState.value!!.url)
+    }
+
+    @Test
     fun whenViewModelGetsProgressUpdateThenViewStateIsUpdated() {
         testee.progressChanged(0)
         assertEquals(0, testee.viewState.value!!.progress)

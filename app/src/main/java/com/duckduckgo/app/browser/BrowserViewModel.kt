@@ -58,8 +58,6 @@ class BrowserViewModel(
         LANDING_PAGE
     }
 
-    private var lastQuery: String? = null
-
     private var siteMonitor: SiteMonitor? = null
 
     init {
@@ -79,14 +77,12 @@ class BrowserViewModel(
         }
 
         if (queryUrlConverter.isWebUrl(input)) {
-            lastQuery = null
             query.value = queryUrlConverter.convertUri(input)
         } else {
-            lastQuery = input
             query.value = queryUrlConverter.convertQueryToUri(input).toString()
         }
 
-        viewState.value = currentViewState().copy(showClearButton = false)
+        viewState.value = currentViewState().copy(showClearButton = false, url = input)
     }
 
     override fun progressChanged(newProgress: Int) {
@@ -108,17 +104,18 @@ class BrowserViewModel(
 
     override fun urlChanged(url: String?) {
         Timber.v("Url changed: $url")
+        if (url == null) return
+
         var newViewState = currentViewState().copy(url = url, browserShowing = true, showPrivacyGrade = true)
 
-        if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
-            newViewState = newViewState.copy(url = lastQuery)
+        if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url) && duckDuckGoUrlDetector.hasQuery(url)) {
+            newViewState = newViewState.copy(url = duckDuckGoUrlDetector.extractQuery(url))
         }
         viewState.value = newViewState
-        if (url != null) {
-            val terms = termsOfServiceStore.retrieveTerms(url) ?: TermsOfService()
-            siteMonitor = SiteMonitor(url, terms, trackerNetworks)
-            onSiteMonitorChanged()
-        }
+
+        val terms = termsOfServiceStore.retrieveTerms(url) ?: TermsOfService()
+        siteMonitor = SiteMonitor(url, terms, trackerNetworks)
+        onSiteMonitorChanged()
     }
 
     override fun trackerDetected(event: TrackingEvent) {
