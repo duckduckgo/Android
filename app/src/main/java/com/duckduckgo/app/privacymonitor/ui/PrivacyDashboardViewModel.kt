@@ -186,8 +186,8 @@ class PrivacyDashboardViewModel(private val context: Context,
     }
 
     private fun networksText(allBlocked: Boolean = true, networkCount: Int = 0): String {
-        val resource = if (allBlocked) R.string.networksBlocked else R.string.networksFound
-        return context.getString(resource, networkCount.toString())
+        val resource = if (allBlocked) R.plurals.networksBlocked else R.plurals.networksFound
+        return context.resources.getQuantityString(resource, networkCount, networkCount)
     }
 
     @DrawableRes
@@ -197,8 +197,8 @@ class PrivacyDashboardViewModel(private val context: Context,
     }
 
     private fun majorNetworksText(allBlocked: Boolean = true, networkCount: Int = 0): String {
-        val resource = if (allBlocked) R.string.majorNetworksBlocked else R.string.majorNetworksFound
-        return context.getString(resource, networkCount.toString())
+        val resource = if (allBlocked) R.plurals.majorNetworksBlocked else R.plurals.majorNetworksFound
+        return context.resources.getQuantityString(resource, networkCount, networkCount)
     }
 
     @DrawableRes
