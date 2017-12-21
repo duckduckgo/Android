@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.graphics.Bitmap
+import android.net.Uri
 import android.support.annotation.AnyThread
 import android.support.annotation.WorkerThread
 import android.webkit.WebResourceRequest
@@ -43,9 +44,29 @@ class BrowserWebViewClient @Inject constructor(
     private var currentUrl: String? = null
 
 
+    /**
+     * This is the new method of url overriding available from API 24 onwards
+     */
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-        if (requestRewriter.shouldRewriteRequest(request)) {
-            val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(request.url)
+        val url = request.url
+        return shouldOverride(view, url)
+    }
+
+    /**
+     * * This is the old, deprecated method of url overriding available until API 23
+     */
+    @Suppress("OverridingDeprecatedMember")
+    override fun shouldOverrideUrlLoading(view: WebView, urlString: String): Boolean {
+        val url = Uri.parse(urlString)
+        return shouldOverride(view, url)
+    }
+
+    /**
+     * API-agnostic implementation of deciding whether to override url or not
+     */
+    private fun shouldOverride(view: WebView, url: Uri) : Boolean {
+        if (requestRewriter.shouldRewriteRequest(url)) {
+            val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(url)
             view.loadUrl(newUri.toString())
             return true
         }
