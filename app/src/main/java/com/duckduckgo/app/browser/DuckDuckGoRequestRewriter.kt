@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
-import android.webkit.WebResourceRequest
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -47,8 +46,8 @@ class DuckDuckGoRequestRewriter @Inject constructor(private val duckDuckGoUrlDet
         return newUri
     }
 
-    fun shouldRewriteRequest(request: WebResourceRequest): Boolean =
-            duckDuckGoUrlDetector.isDuckDuckGoUrl(request.url) && !request.url.queryParameterNames.containsAll(arrayListOf(sourceParam, appVersionParam))
+    fun shouldRewriteRequest(uri: Uri): Boolean =
+            duckDuckGoUrlDetector.isDuckDuckGoUrl(uri) && !uri.queryParameterNames.containsAll(arrayListOf(sourceParam, appVersionParam))
 
     fun addCustomQueryParams(builder: Uri.Builder) {
         builder.appendQueryParameter(appVersionParam, formatAppVersion())
