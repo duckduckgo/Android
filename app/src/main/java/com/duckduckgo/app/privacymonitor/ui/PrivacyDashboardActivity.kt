@@ -49,6 +49,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
         val REQUEST_DASHBOARD = 1000
         val RESULT_RELOAD = 1000
+        val RESULT_TOSDR = 1001
 
         fun intent(context: Context): Intent {
             return Intent(context, PrivacyDashboardActivity::class.java)
@@ -123,7 +124,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         privacyToggle.isChecked = enabled
     }
 
-    @SuppressWarnings("deprecation")
+    @Suppress("deprecation")
     private fun htmlHeading(heading: String): Spanned {
         if (SDK_INT >= N) {
             return Html.fromHtml(heading, Html.FROM_HTML_MODE_COMPACT, Html.ImageGetter { htmlDrawable(it.toInt()) }, null)
@@ -138,6 +139,13 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
     }
 
     fun onPracticesClicked(view: View) {
-        startActivity(PrivacyPracticesActivity.intent(this))
+        startActivityForResult(PrivacyPracticesActivity.intent(this), REQUEST_DASHBOARD)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_DASHBOARD && resultCode == RESULT_TOSDR) {
+            setResult(RESULT_TOSDR)
+            finish()
+        }
     }
 }

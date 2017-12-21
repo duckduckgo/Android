@@ -61,10 +61,6 @@ val PrivacyMonitor.grade: Long
     get() = calculateGrade(score)
 
 @PrivacyGrade.Companion.Grade
-val PrivacyMonitor.potentialGrade: Long
-    get() = calculateGrade(potentialScore)
-
-@PrivacyGrade.Companion.Grade
 val PrivacyMonitor.improvedGrade: Long
     get() = calculateGrade(improvedScore)
 

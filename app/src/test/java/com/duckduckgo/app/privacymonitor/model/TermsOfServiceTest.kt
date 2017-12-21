@@ -34,7 +34,7 @@ class TermsOfServiceTest {
     }
 
     @Test
-    fun whenClassificationIsAAndReasonsExistThenPracticesGood() {
+    fun whenClassificationIsAAndReasonsExistThenPracticesAreGood() {
         val testee = TermsOfService(classification = "A", goodPrivacyTerms = listOf(goodTerm), badPrivacyTerms = listOf(badTerm))
         assertEquals(Practices.GOOD, testee.practices)
     }
@@ -46,25 +46,25 @@ class TermsOfServiceTest {
     }
 
     @Test
-    fun whenClassificationIsCAndReasonsExistThenPracticesPoor() {
+    fun whenClassificationIsCAndReasonsExistThenPracticesArePoor() {
         val testee = TermsOfService(classification = "C", goodPrivacyTerms = listOf(goodTerm), badPrivacyTerms = listOf(badTerm))
         assertEquals(Practices.POOR, testee.practices)
     }
 
     @Test
-    fun whenClassificationIsDAndReasonsExistThenPracticesPoor() {
+    fun whenClassificationIsDAndReasonsExistThenPracticesArePoor() {
         val testee = TermsOfService(classification = "D", goodPrivacyTerms = listOf(goodTerm), badPrivacyTerms = listOf(badTerm))
         assertEquals(Practices.POOR, testee.practices)
     }
 
     @Test
-    fun whenClassificationIsEAndReasonsExistThenPracticesPoor() {
+    fun whenClassificationIsEAndReasonsExistThenPracticesArePoor() {
         val testee = TermsOfService(classification = "E", goodPrivacyTerms = listOf(goodTerm), badPrivacyTerms = listOf(badTerm))
         assertEquals(Practices.POOR, testee.practices)
     }
 
     @Test
-    fun whenNoClassificationWithGoodAndBadReasonsThenPracticesMixed() {
+    fun whenNoClassificationWithGoodAndBadReasonsThenPracticesAreMixed() {
         val testee = TermsOfService(goodPrivacyTerms = listOf(goodTerm), badPrivacyTerms = listOf(badTerm))
         assertEquals(Practices.MIXED, testee.practices)
     }

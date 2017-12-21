@@ -85,7 +85,8 @@
             android:layout_height="199dp"
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
-            app:layout_constraintTop_toBottomOf="@id/privacyGrade">
+            app:layout_constraintTop_toBottomOf="@id/privacyGrade"
+            tools:ignore="SelectableText,UseCompoundDrawables">
 
             <LinearLayout
                 android:id="@+id/httpsContainer"
@@ -149,6 +150,7 @@
                 android:id="@+id/practicesContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
                 android:onClick="onPracticesClicked"
                 app:layout_constraintTop_toBottomOf="@id/majorNetworksContainer">
 

@@ -21,6 +21,8 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.widget.LinearLayoutManager
+import android.view.View
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
@@ -28,6 +30,8 @@ import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import kotlinx.android.synthetic.main.activity_privacy_dashboard.*
 import kotlinx.android.synthetic.main.content_privacy_practices.*
+import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.REQUEST_DASHBOARD
+import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RESULT_TOSDR
 import javax.inject.Inject
 
 
@@ -35,6 +39,8 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var viewModelFactory: ViewModelFactory
     @Inject lateinit var repository: PrivacyMonitorRepository
+
+    private val practicesAdapter = PrivacyPracticesAdapter()
 
     companion object {
 
@@ -47,6 +53,7 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_privacy_practices)
         configureToolbar()
+        configureRecycler()
 
         viewModel.viewState.observe(this, Observer<PrivacyPracticesViewModel.ViewState> {
             it?.let { render(it) }
@@ -66,9 +73,20 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
+    private fun configureRecycler() {
+        practicesList.layoutManager = LinearLayoutManager(this)
+        practicesList.adapter = practicesAdapter
+    }
+
     private fun render(viewState: PrivacyPracticesViewModel.ViewState) {
         practicesBanner.setImageResource(viewState.practices.banner())
         domain.text = viewState.domain
         heading.text = viewState.practices.text(applicationContext)
+        practicesAdapter.updateData(viewState.goodTerms, viewState.badTerms)
+    }
+
+    fun onTosdrLinkClicked(view: View) {
+        setResult(PrivacyDashboardActivity.RESULT_TOSDR)
+        finish()
     }
 }

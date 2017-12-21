@@ -32,6 +32,10 @@ class PrivacyPracticesViewModel : ViewModel() {
 
     val viewState: MutableLiveData<PrivacyPracticesViewModel.ViewState> = MutableLiveData()
 
+    init {
+        resetViewState()
+    }
+
     private fun resetViewState() {
         viewState.value = PrivacyPracticesViewModel.ViewState(
                 domain = "",

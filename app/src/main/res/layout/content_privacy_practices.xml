@@ -13,8 +13,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -23,90 +22,132 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:ignore="Overdraw">
 
-    <android.support.constraint.ConstraintLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context="com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity"
-        tools:showIn="@layout/activity_privacy_practices">
+        android:layout_above="@id/bottomDivider"
+        android:layout_alignParentTop="true">
 
         <android.support.constraint.ConstraintLayout
-            android:id="@+id/practicesBannerContainer"
             android:layout_width="match_parent"
-            android:layout_height="169dp"
-            android:background="@color/subtleGrey">
+            android:layout_height="wrap_content"
+            tools:context="com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity"
+            tools:showIn="@layout/activity_privacy_practices">
 
-            <ImageView
-                android:id="@+id/practicesBanner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/privacyGradeContentDescription"
-                android:paddingBottom="12dp"
-                android:paddingTop="20dp"
-                android:src="@drawable/practices_banner_neutral"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent" />
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/practicesBannerContainer"
+                android:layout_width="match_parent"
+                android:layout_height="169dp"
+                android:background="@color/subtleGrey">
+
+                <ImageView
+                    android:id="@+id/practicesBanner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/privacyGradeContentDescription"
+                    android:paddingBottom="12dp"
+                    android:paddingTop="20dp"
+                    android:src="@drawable/practices_banner_neutral"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent" />
+
+                <TextView
+                    android:id="@+id/domain"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:textColor="@color/almostBlack"
+                    android:textIsSelectable="true"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/practicesBanner"
+                    tools:text="theatlantic.com" />
+
+                <TextView
+                    android:id="@+id/heading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="sans-serif"
+                    android:gravity="center_horizontal"
+                    android:letterSpacing="0.14"
+                    android:text="@string/practicesMixed"
+                    android:textAllCaps="true"
+                    android:textColor="@color/warmGrey"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/domain" />
+
+            </android.support.constraint.ConstraintLayout>
 
             <TextView
-                android:id="@+id/domain"
+                android:id="@+id/practicesOverview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:textColor="@color/almostBlack"
-                android:textIsSelectable="true"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/practicesBanner"
-                tools:text="theatlantic.com" />
-
-            <TextView
-                android:id="@+id/heading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="23dp"
                 android:fontFamily="sans-serif"
                 android:gravity="center_horizontal"
-                android:letterSpacing="0.14"
-                android:text="@string/practicesMixed"
-                android:textAllCaps="true"
-                android:textColor="@color/warmGrey"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/domain" />
+                android:lineSpacingExtra="6sp"
+                android:paddingEnd="20dp"
+                android:paddingStart="20dp"
+                android:text="@string/practices_overview"
+                android:textColor="@color/almostBlack"
+                android:textSize="14sp"
+                android:textStyle="normal"
+                app:layout_constraintTop_toBottomOf="@id/practicesBannerContainer" />
+
+            <View
+                android:id="@+id/topDivider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="22dp"
+                android:background="@color/subtleGrey"
+                app:layout_constraintTop_toBottomOf="@id/practicesOverview" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/practicesList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="22dp"
+                android:layout_marginTop="22dp"
+                app:layout_constraintTop_toBottomOf="@id/topDivider" />
 
         </android.support.constraint.ConstraintLayout>
 
-        <TextView
-            android:id="@+id/practicesOverview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="23dp"
-            android:fontFamily="sans-serif"
-            android:gravity="center_horizontal"
-            android:lineSpacingExtra="6sp"
-            android:paddingEnd="20dp"
-            android:paddingStart="20dp"
-            android:text="@string/practices_overview"
-            android:textColor="@color/almostBlack"
-            android:textSize="14sp"
-            android:textStyle="normal"
-            app:layout_constraintTop_toBottomOf="@id/practicesBannerContainer" />
+    </ScrollView>
 
-        <View
-            android:id="@+id/divider"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="23dp"
-            android:background="@color/subtleGrey"
-            app:layout_constraintTop_toBottomOf="@id/practicesOverview" />
+    <View
+        android:id="@+id/bottomDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_above="@id/tosdrLink"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        android:background="@color/subtleGrey" />
 
-    </android.support.constraint.ConstraintLayout>
+    <TextView
+        android:id="@+id/tosdrLink"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:fontFamily="sans-serif"
+        android:gravity="center_horizontal"
+        android:lineSpacingExtra="4sp"
+        android:onClick="onTosdrLinkClicked"
+        android:paddingBottom="22dp"
+        android:paddingTop="22dp"
+        android:text="@string/practices_tosdr_link"
+        android:textColor="@color/almostBlack"
+        android:textIsSelectable="false"
+        android:textSize="14sp"
+        android:textStyle="normal"
+        tools:ignore="SelectableText" />
 
-
-</ScrollView>
+</RelativeLayout>
