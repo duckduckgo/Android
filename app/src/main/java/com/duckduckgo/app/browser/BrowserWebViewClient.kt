@@ -71,8 +71,9 @@ class BrowserWebViewClient @Inject constructor(
             return true
         }
 
-        if (httpsUpgrader.shouldUpgrade(request)) {
-            // TODO upgrade
+        if (httpsUpgrader.shouldUpgrade(url)) {
+            val newUri = httpsUpgrader.upgrade(url)
+            view.loadUrl(newUri.toString())
             return true
         }
 

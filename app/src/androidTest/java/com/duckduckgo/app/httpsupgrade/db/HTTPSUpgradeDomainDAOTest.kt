@@ -24,7 +24,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
-class HTTPSUpgradeDomainDAOInstrumentationTest {
+class HTTPSUpgradeDomainDAOTest {
 
     companion object {
         var exactMatchDomain = "bbc.co.uk"

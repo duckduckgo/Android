@@ -16,15 +16,22 @@
 
 package com.duckduckgo.app.httpsupgrade
 
-import android.webkit.WebResourceRequest
+import android.net.Uri
 import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomainDAO
 import javax.inject.Inject
 
 class HTTPSUpgrader @Inject constructor(private val dao: HTTPSUpgradeDomainDAO) {
 
-    fun shouldUpgrade(request: WebResourceRequest) : Boolean {
+    fun shouldUpgrade(uri: Uri) : Boolean {
+        if (uri.scheme == "https") {
+            return false
+        }
 
-        return false
+        return dao.contains(uri.host)
+    }
+
+    fun upgrade(uri: Uri): Uri {
+        return uri.buildUpon().scheme("https").build()
     }
 
 }
