@@ -41,7 +41,7 @@ class BrowserViewModel(
     data class ViewState(
             val isLoading: Boolean = false,
             val progress: Int = 0,
-            val url: String? = null,
+            val omnibarText: String? = null,
             val isEditing: Boolean = false,
             val browserShowing: Boolean = false,
             val showClearButton: Boolean = false,
@@ -82,7 +82,7 @@ class BrowserViewModel(
             query.value = queryUrlConverter.convertQueryToUri(input).toString()
         }
 
-        viewState.value = currentViewState().copy(showClearButton = false, url = input)
+        viewState.value = currentViewState().copy(showClearButton = false, omnibarText = input)
     }
 
     override fun progressChanged(newProgress: Int) {
@@ -106,10 +106,10 @@ class BrowserViewModel(
         Timber.v("Url changed: $url")
         if (url == null) return
 
-        var newViewState = currentViewState().copy(url = url, browserShowing = true, showPrivacyGrade = true)
+        var newViewState = currentViewState().copy(omnibarText = url, browserShowing = true, showPrivacyGrade = true)
 
         if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url) && duckDuckGoUrlDetector.hasQuery(url)) {
-            newViewState = newViewState.copy(url = duckDuckGoUrlDetector.extractQuery(url))
+            newViewState = newViewState.copy(omnibarText = duckDuckGoUrlDetector.extractQuery(url))
         }
         viewState.value = newViewState
 
@@ -135,7 +135,7 @@ class BrowserViewModel(
 
     private fun currentViewState(): ViewState = viewState.value!!
 
-    fun onUrlInputStateChanged(query: String, hasFocus: Boolean) {
+    fun onOmnibarInputStateChanged(query: String, hasFocus: Boolean) {
         val showClearButton = hasFocus && query.isNotEmpty()
         viewState.value = currentViewState().copy(isEditing = hasFocus, showClearButton = showClearButton)
     }

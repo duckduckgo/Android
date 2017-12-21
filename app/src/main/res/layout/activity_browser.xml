@@ -56,7 +56,7 @@
                         android:layout_height="match_parent">
 
                         <com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
-                            android:id="@+id/urlInput"
+                            android:id="@+id/omnibarTextInput"
                             style="@style/Base.V7.Widget.AppCompat.EditText"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
@@ -82,7 +82,7 @@
                             tools:text="https://duckduckgo.com/?q=henr..https://duckduckgo.com/?q=henr.." />
 
                         <ImageView
-                            android:id="@+id/clearUrlButton"
+                            android:id="@+id/clearOmnibarInputButton"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:layout_marginEnd="6dp"
@@ -92,9 +92,9 @@
                             android:src="@drawable/ic_cancel_24dp"
                             android:tint="#FFF"
                             android:visibility="gone"
-                            app:layout_constraintBottom_toBottomOf="@id/urlInput"
-                            app:layout_constraintEnd_toEndOf="@+id/urlInput"
-                            app:layout_constraintTop_toTopOf="@id/urlInput"
+                            app:layout_constraintBottom_toBottomOf="@id/omnibarTextInput"
+                            app:layout_constraintEnd_toEndOf="@+id/omnibarTextInput"
+                            app:layout_constraintTop_toTopOf="@id/omnibarTextInput"
                             tools:visibility="visible" />
 
                     </android.support.constraint.ConstraintLayout>

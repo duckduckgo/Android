@@ -101,13 +101,13 @@ class BrowserViewModelTest {
 
     @Test
     fun whenViewModelNotifiedThatUrlGotFocusThenViewStateIsUpdated() {
-        testee.onUrlInputStateChanged("", true)
+        testee.onOmnibarInputStateChanged("", true)
         assertTrue(testee.viewState.value!!.isEditing)
     }
 
     @Test
     fun whenViewModelNotifiedThatUrlLostFocusThenViewStateIsUpdated() {
-        testee.onUrlInputStateChanged("", false)
+        testee.onOmnibarInputStateChanged("", false)
         assertFalse(testee.viewState.value!!.isEditing)
     }
 
