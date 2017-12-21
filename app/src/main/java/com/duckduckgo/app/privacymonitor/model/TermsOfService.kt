@@ -29,15 +29,15 @@ data class TermsOfService(val name: String? = null,
         UNKNOWN
     }
 
-    private val noTerms: Boolean
+    private val hasNoTerms: Boolean
         get() = goodPrivacyTerms.isEmpty() && badPrivacyTerms.isEmpty()
 
-    private val mixedTerms: Boolean
+    private val hasMixedTerms: Boolean
         get() = !goodPrivacyTerms.isEmpty() && !badPrivacyTerms.isEmpty()
 
     val practices: Practices
         get() {
-            if (noTerms) {
+            if (hasNoTerms) {
                 return Practices.UNKNOWN
             }
             when (classification) {
@@ -45,7 +45,7 @@ data class TermsOfService(val name: String? = null,
                 "B" -> return Practices.MIXED
                 "C", "D", "E" -> return Practices.POOR
             }
-            if (mixedTerms) {
+            if (hasMixedTerms) {
                 return Practices.MIXED
             }
             when {

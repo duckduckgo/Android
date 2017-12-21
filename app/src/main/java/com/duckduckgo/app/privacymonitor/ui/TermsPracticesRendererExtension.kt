@@ -26,19 +26,19 @@ import com.duckduckgo.app.privacymonitor.model.TermsOfService.Practices.*
 fun TermsOfService.Practices.banner(): Int = when (this) {
     GOOD -> R.drawable.practices_banner_good
     POOR -> R.drawable.practices_banner_bad
-    else -> R.drawable.practices_banner_neutral
+    MIXED, UNKNOWN -> R.drawable.practices_banner_neutral
 }
 
 @DrawableRes
 fun TermsOfService.Practices.icon(): Int = when (this) {
     GOOD -> R.drawable.practices_icon_good
     POOR -> R.drawable.practices_icon_bad
-    else -> R.drawable.practices_icon_neutral
+    MIXED, UNKNOWN -> R.drawable.practices_icon_neutral
 }
 
 fun TermsOfService.Practices.text(context: Context): String = when (this) {
     GOOD -> context.getString(R.string.practicesGood)
     POOR -> context.getString(R.string.practicesBad)
     MIXED -> context.getString(R.string.practicesMixed)
-    else -> context.getString(R.string.practicesUnknown)
+    UNKNOWN -> context.getString(R.string.practicesUnknown)
 }

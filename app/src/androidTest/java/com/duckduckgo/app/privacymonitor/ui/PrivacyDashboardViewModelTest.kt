@@ -28,7 +28,6 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.After
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -38,8 +37,8 @@ class PrivacyDashboardViewModelTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private lateinit var viewStateObserver: Observer<PrivacyDashboardViewModel.ViewState>
-    private lateinit var settingStore: PrivacySettingsStore
+    private var viewStateObserver: Observer<PrivacyDashboardViewModel.ViewState> = mock()
+    private var settingStore: PrivacySettingsStore = mock()
 
     private val testee: PrivacyDashboardViewModel by lazy {
         val model = PrivacyDashboardViewModel(InstrumentationRegistry.getTargetContext(), settingStore)
@@ -47,16 +46,9 @@ class PrivacyDashboardViewModelTest {
         model
     }
 
-    @Before
-    fun before() {
-        viewStateObserver = mock()
-        settingStore = mock()
-    }
-
     @After
     fun after() {
         testee.viewState.removeObserver(viewStateObserver)
-        settingStore = mock()
     }
 
     @Test

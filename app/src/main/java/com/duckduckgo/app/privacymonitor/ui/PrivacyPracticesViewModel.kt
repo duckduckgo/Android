@@ -30,14 +30,14 @@ class PrivacyPracticesViewModel : ViewModel() {
             val badTerms: List<String>
     )
 
-    val viewState: MutableLiveData<PrivacyPracticesViewModel.ViewState> = MutableLiveData()
+    val viewState: MutableLiveData<ViewState> = MutableLiveData()
 
     init {
         resetViewState()
     }
 
     private fun resetViewState() {
-        viewState.value = PrivacyPracticesViewModel.ViewState(
+        viewState.value = ViewState(
                 domain = "",
                 practices = TermsOfService.Practices.UNKNOWN,
                 goodTerms = ArrayList(),
@@ -50,13 +50,11 @@ class PrivacyPracticesViewModel : ViewModel() {
             resetViewState()
             return
         }
-        viewState.value = PrivacyPracticesViewModel.ViewState(
+        viewState.value = viewState.value?.copy(
                 domain = monitor.uri?.host ?: "",
                 practices = monitor.termsOfService.practices,
                 goodTerms = monitor.termsOfService.goodPrivacyTerms,
                 badTerms = monitor.termsOfService.badPrivacyTerms
         )
     }
-
-
 }
