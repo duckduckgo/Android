@@ -17,13 +17,16 @@
 package com.duckduckgo.app.di
 
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.global.AppConfigurationJobService
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
-
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
+
 @Module
-abstract class ActivityBindingModule {
+abstract class AndroidBindingModule {
+
+    /* Activities */
 
     @ActivityScoped
     @ContributesAndroidInjector
@@ -32,4 +35,10 @@ abstract class ActivityBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector
     abstract fun privacyDashboardActivity(): PrivacyDashboardActivity
+
+
+    /* Services */
+
+    @ContributesAndroidInjector
+    abstract fun jobService() : AppConfigurationJobService
 }
