@@ -40,6 +40,7 @@ import com.duckduckgo.app.privacymonitor.model.PrivacyGrade.Companion.Grade
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.REQUEST_DASHBOARD
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RESULT_RELOAD
+import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RESULT_TOSDR
 import kotlinx.android.synthetic.main.activity_browser.*
 import javax.inject.Inject
 
@@ -269,11 +270,13 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_DASHBOARD && resultCode == RESULT_RELOAD) {
-            webView.reload()
-            return
+        if (requestCode != REQUEST_DASHBOARD) {
+            super.onActivityResult(requestCode, resultCode, data)
         }
-        super.onActivityResult(requestCode, resultCode, data)
+        when (resultCode) {
+            RESULT_RELOAD -> webView.reload()
+            RESULT_TOSDR -> webView.loadUrl(getString(R.string.tosdrUrl))
+        }
     }
 
     override fun onBackPressed() {

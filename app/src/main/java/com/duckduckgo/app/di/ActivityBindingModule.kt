@@ -18,6 +18,7 @@ package com.duckduckgo.app.di
 
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
+import com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity
 
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -32,4 +33,8 @@ abstract class ActivityBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector
     abstract fun privacyDashboardActivity(): PrivacyDashboardActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun privacyTermsActivity(): PrivacyPracticesActivity
 }
