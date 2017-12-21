@@ -100,7 +100,6 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:$architectureComponents"
     implementation "android.arch.lifecycle:reactivestreams:$architectureComponents"
     implementation "android.arch.persistence.room:runtime:$architectureComponents"
-    implementation "android.arch.persistence.room:rxjava2:$architectureComponents" // TODO check we actually use this
     implementation "com.google.dagger:dagger-android:$dagger"
     implementation "com.google.dagger:dagger-android-support:$dagger"
     releaseImplementation 'com.faendir:acra:4.10.0'
