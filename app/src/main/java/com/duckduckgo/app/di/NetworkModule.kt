@@ -18,6 +18,7 @@ package com.duckduckgo.app.di
 
 import android.content.Context
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.httpsupgrade.api.HTTPSUpgradeListService
 import com.duckduckgo.app.privacymonitor.api.TermsOfServiceListAdapter
 import com.duckduckgo.app.trackerdetection.api.DisconnectListJsonAdapter
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
@@ -43,13 +44,6 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun moshi(): Moshi = Moshi.Builder()
-            .add(DisconnectListJsonAdapter())
-            .add(TermsOfServiceListAdapter())
-            .build()
-
-    @Provides
-    @Singleton
     fun retrofit(okHttpClient: OkHttpClient, moshi: Moshi, context: Context): Retrofit {
         return Retrofit.Builder()
                 .baseUrl(context.getString(R.string.baseUrl))
@@ -62,4 +56,9 @@ class NetworkModule {
     @Provides
     fun trackerListService(retrofit: Retrofit): TrackerListService =
             retrofit.create(TrackerListService::class.java)
+
+    @Provides
+    fun httpsUpgradeListService(retrofit: Retrofit): HTTPSUpgradeListService =
+            retrofit.create(HTTPSUpgradeListService::class.java)
+
 }

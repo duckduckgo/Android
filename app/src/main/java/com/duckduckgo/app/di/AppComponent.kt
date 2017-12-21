@@ -32,7 +32,8 @@ import javax.inject.Singleton
     (AndroidSupportInjectionModule::class),
     (NetworkModule::class),
     (PrivacyModule::class),
-    (DatabaseModule::class)
+    (DatabaseModule::class),
+    (JsonModule::class)
 ])
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 

@@ -20,6 +20,7 @@ import android.app.Activity
 import android.app.Application
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.DaggerAppComponent
+import com.duckduckgo.app.httpsupgrade.HTTPSUpgradeListLoader
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -38,6 +39,9 @@ class DuckDuckGoApplication : HasActivityInjector, Application() {
     @Inject
     lateinit var trackerDataLoader: TrackerDataLoader
 
+    @Inject
+    lateinit var httpsUpgradeListDataLoader: HTTPSUpgradeListLoader
+
     override fun onCreate() {
         super.onCreate()
 
@@ -45,6 +49,7 @@ class DuckDuckGoApplication : HasActivityInjector, Application() {
         configureLogging()
         configureCrashReporting()
         configureTrackerData()
+        configureHttpsUpgradeData()
     }
 
     private fun configureLogging() {
@@ -64,6 +69,10 @@ class DuckDuckGoApplication : HasActivityInjector, Application() {
 
     private fun configureTrackerData() {
         trackerDataLoader.loadData()
+    }
+
+    private fun configureHttpsUpgradeData() {
+        httpsUpgradeListDataLoader.loadData()
     }
 
     override fun activityInjector(): AndroidInjector<Activity> = injector

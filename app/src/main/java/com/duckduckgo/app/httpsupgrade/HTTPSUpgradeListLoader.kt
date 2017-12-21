@@ -16,25 +16,25 @@
 
 package com.duckduckgo.app.httpsupgrade
 
-import android.net.Uri
-import android.support.annotation.MainThread
-import android.support.annotation.WorkerThread
+import com.duckduckgo.app.httpsupgrade.api.HTTPSUpgradeListService
+import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomain
 import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomainDAO
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
-class HTTPSUpgrader @Inject constructor(private val dao: HTTPSUpgradeDomainDAO) {
+class HTTPSUpgradeListLoader @Inject constructor (private var service: HTTPSUpgradeListService,
+                             private var dao: HTTPSUpgradeDomainDAO) {
 
-    @WorkerThread
-    fun shouldUpgrade(uri: Uri) : Boolean {
-        if (uri.scheme == "https") {
-            return false
-        }
+    fun loadData() {
 
-        return dao.contains(uri.host)
-    }
+        service.https()
+                .subscribeOn(Schedulers.io())
+                .map { responseBody ->
+                    dao.deleteAll()
+                    val domains: Array<HTTPSUpgradeDomain> = responseBody.simpleUpgrade.top500.toTypedArray()
+                    dao.insertAll(*domains)
+                }.subscribe()
 
-    fun upgrade(uri: Uri): Uri {
-        return uri.buildUpon().scheme("https").build()
     }
 
 }
