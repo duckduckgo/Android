@@ -101,25 +101,43 @@ class BrowserViewModelTest {
 
     @Test
     fun whenViewModelNotifiedThatUrlGotFocusThenViewStateIsUpdated() {
-        testee.onUrlInputStateChanged("", true)
+        testee.onOmnibarInputStateChanged("", true)
         assertTrue(testee.viewState.value!!.isEditing)
     }
 
     @Test
     fun whenViewModelNotifiedThatUrlLostFocusThenViewStateIsUpdated() {
-        testee.onUrlInputStateChanged("", false)
+        testee.onOmnibarInputStateChanged("", false)
         assertFalse(testee.viewState.value!!.isEditing)
     }
 
     @Test
-    fun whenNoUrlEverEnteredThenViewStateHasNull() {
-        assertNull(testee.viewState.value!!.url)
+    fun whenNoOmnibarTextEverEnteredThenViewStateHasNull() {
+        assertNull(testee.viewState.value!!.omnibarText)
     }
 
     @Test
     fun whenUrlChangedThenViewStateIsUpdated() {
         testee.urlChanged("duckduckgo.com")
-        assertEquals("duckduckgo.com", testee.viewState.value!!.url)
+        assertEquals("duckduckgo.com", testee.viewState.value!!.omnibarText)
+    }
+
+    @Test
+    fun whenUrlChangedWithDuckDuckGoUrlContainingQueryThenUrlRewrittenToContainQuery() {
+        testee.urlChanged("http://duckduckgo.com?q=test")
+        assertEquals("test", testee.viewState.value!!.omnibarText)
+    }
+
+    @Test
+    fun whenUrlChangedWithDuckDuckGoUrlNotContainingQueryThenFullUrlShown() {
+        testee.urlChanged("http://duckduckgo.com")
+        assertEquals("http://duckduckgo.com", testee.viewState.value!!.omnibarText)
+    }
+
+    @Test
+    fun whenUrlChangedWithNonDuckDuckGoUrlThenFullUrlShown() {
+        testee.urlChanged("http://example.com")
+        assertEquals("http://example.com", testee.viewState.value!!.omnibarText)
     }
 
     @Test
