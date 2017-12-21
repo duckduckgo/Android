@@ -30,7 +30,7 @@ interface PrivacyMonitor {
     val memberNetwork: TrackerNetwork?
     val trackerCount: Int
     val networkCount: Int
-    val majorNetworkCount: Int
+    val hasTrackerFromMajorNetwork: Boolean
     val allTrackersBlocked: Boolean
     val hasObscureTracker: Boolean
     var hasHttpResources: Boolean

@@ -41,10 +41,8 @@ class PrivacyDashboardViewModel(private val applicationContext: Context,
             val heading: String,
             @DrawableRes val httpsIcon: Int,
             val httpsText: String,
-            val networksText: String,
-            @DrawableRes val networksIcon: Int,
-            val majorNetworksText: String,
-            @DrawableRes val majorNetworksIcon: Int,
+            val networkCount: Int,
+            val allTrackersBlocked: Boolean,
             val practices: TermsOfService.Practices,
             val toggleEnabled: Boolean
     )
@@ -76,27 +74,22 @@ class PrivacyDashboardViewModel(private val applicationContext: Context,
                 heading = headingText(),
                 httpsIcon = httpsIcon(HttpsStatus.SECURE),
                 httpsText = httpsText(HttpsStatus.SECURE),
-                networksIcon = R.drawable.dashboard_networks_good,
-                networksText = networksText(),
-                majorNetworksText = majorNetworksText(),
-                majorNetworksIcon = R.drawable.dashboard_major_networks_good,
-                toggleEnabled = settingsStore.privacyOn,
-                practices = TermsOfService.Practices.GOOD
+                networkCount = 0,
+                allTrackersBlocked = true,
+                practices = TermsOfService.Practices.UNKNOWN,
+                toggleEnabled = settingsStore.privacyOn
         )
     }
 
     private fun updatePrivacyMonitor(monitor: PrivacyMonitor) {
-        this.monitor = monitor
         viewState.value = viewState.value?.copy(
                 privacyBanner = privacyBanner(monitor.improvedGrade),
                 domain = monitor.uri?.host ?: "",
                 heading = headingText(),
                 httpsIcon = httpsIcon(monitor.https),
                 httpsText = httpsText(monitor.https),
-                networksIcon = networksIcon(monitor.allTrackersBlocked, monitor.networkCount),
-                networksText = networksText(monitor.allTrackersBlocked, monitor.networkCount),
-                majorNetworksIcon = majorNetworksIcon(monitor.allTrackersBlocked, monitor.majorNetworkCount),
-                majorNetworksText = majorNetworksText(monitor.allTrackersBlocked, monitor.majorNetworkCount),
+                networkCount = monitor.networkCount,
+                allTrackersBlocked = monitor.allTrackersBlocked,
                 practices = monitor.termsOfService.practices
         )
     }
@@ -175,27 +168,5 @@ class PrivacyDashboardViewModel(private val applicationContext: Context,
         HttpsStatus.NONE -> applicationContext.getString(R.string.httpsBad)
         HttpsStatus.MIXED -> applicationContext.getString(R.string.httpsMixed)
         HttpsStatus.SECURE -> applicationContext.getString(R.string.httpsGood)
-    }
-
-    @DrawableRes
-    private fun networksIcon(allBlocked: Boolean = true, networksCount: Int = 0): Int {
-        val isGood = allBlocked || networksCount == 0
-        return if (isGood) R.drawable.dashboard_networks_good else R.drawable.dashboard_networks_bad
-    }
-
-    private fun networksText(allBlocked: Boolean = true, networkCount: Int = 0): String {
-        val resource = if (allBlocked) R.plurals.networksBlocked else R.plurals.networksFound
-        return applicationContext.resources.getQuantityString(resource, networkCount, networkCount)
-    }
-
-    @DrawableRes
-    private fun majorNetworksIcon(allBlocked: Boolean = true, majorNetworksCount: Int = 0): Int {
-        val isGood = allBlocked || majorNetworksCount == 0
-        return if (isGood) R.drawable.dashboard_major_networks_good else R.drawable.dashboard_major_networks_bad
-    }
-
-    private fun majorNetworksText(allBlocked: Boolean = true, networkCount: Int = 0): String {
-        val resource = if (allBlocked) R.plurals.majorNetworksBlocked else R.plurals.majorNetworksFound
-        return applicationContext.resources.getQuantityString(resource, networkCount, networkCount)
     }
 }

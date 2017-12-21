@@ -123,7 +123,7 @@ class PrivacyMonitorGradeExtensionTest {
 
     @Test
     fun whenHasMajorTrackerThenScoreIsIncrementedByOne() {
-        val privacyMonitor = monitor(majorTrackerCount = 1)
+        val privacyMonitor = monitor(hasTrackerFromMajorNetwork = true)
         assertEquals(defaultScore + 1, privacyMonitor.score)
     }
 
@@ -140,20 +140,20 @@ class PrivacyMonitorGradeExtensionTest {
                 TermsOfService(classification = "D"),
                 NONE,
                 5,
-                2,
+                true,
                 true)
         assertEquals(defaultScore + 6, privacyMonitor.score)
         assertEquals(defaultScore + 3, privacyMonitor.potentialScore)
     }
 
     @Test
-    fun whenAllTrackersBlockedThenImporvedScoreIsEqualToPotentialScore() {
+    fun whenAllTrackersBlockedThenImprovedScoreIsEqualToPotentialScore() {
         val privacyMonitor = monitor(
                 TrackerNetwork("", "", 5, true),
                 TermsOfService(classification = "D"),
                 NONE,
                 5,
-                2,
+                true,
                 true,
                 allTrackerBlocked = true)
         assertEquals(privacyMonitor.potentialScore, privacyMonitor.improvedScore)
@@ -166,7 +166,7 @@ class PrivacyMonitorGradeExtensionTest {
                 TermsOfService(classification = "D"),
                 NONE,
                 5,
-                2,
+                true,
                 true,
                 allTrackerBlocked = false)
         assertEquals(privacyMonitor.score, privacyMonitor.improvedScore)
@@ -176,14 +176,14 @@ class PrivacyMonitorGradeExtensionTest {
                         terms: TermsOfService = TermsOfService(),
                         https: HttpsStatus = SECURE,
                         trackerCount: Int = 0,
-                        majorTrackerCount: Int = 0,
+                        hasTrackerFromMajorNetwork: Boolean = false,
                         hasObscureTracker: Boolean = false,
                         allTrackerBlocked: Boolean = true): PrivacyMonitor {
         val monitor: PrivacyMonitor = mock()
         whenever(monitor.memberNetwork).thenReturn(memberNetwork)
         whenever(monitor.termsOfService).thenReturn(terms)
         whenever(monitor.trackerCount).thenReturn(trackerCount)
-        whenever(monitor.majorNetworkCount).thenReturn(majorTrackerCount)
+        whenever(monitor.hasTrackerFromMajorNetwork).thenReturn(hasTrackerFromMajorNetwork)
         whenever(monitor.hasObscureTracker).thenReturn(hasObscureTracker)
         whenever(monitor.https).thenReturn(https)
         whenever(monitor.allTrackersBlocked).thenReturn(allTrackerBlocked)
