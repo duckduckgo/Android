@@ -56,17 +56,14 @@ val PrivacyMonitor.improvedScore: Int
         return score
     }
 
-@PrivacyGrade.Companion.Grade
-val PrivacyMonitor.grade: Long
+val PrivacyMonitor.grade: PrivacyGrade
     get() = calculateGrade(score)
 
-@PrivacyGrade.Companion.Grade
-val PrivacyMonitor.improvedGrade: Long
+val PrivacyMonitor.improvedGrade: PrivacyGrade
     get() = calculateGrade(improvedScore)
 
 
-@PrivacyGrade.Companion.Grade
-private fun calculateGrade(score: Int): Long {
+private fun calculateGrade(score: Int): PrivacyGrade {
     return when {
         score <= 0 -> PrivacyGrade.A
         score == 1 -> PrivacyGrade.B

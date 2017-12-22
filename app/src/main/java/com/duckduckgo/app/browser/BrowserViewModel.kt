@@ -21,7 +21,7 @@ import android.arch.lifecycle.ViewModel
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.privacymonitor.SiteMonitor
-import com.duckduckgo.app.privacymonitor.model.PrivacyGrade.Companion.Grade
+import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.privacymonitor.model.improvedGrade
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
@@ -45,12 +45,12 @@ class BrowserViewModel(
             val isEditing: Boolean = false,
             val browserShowing: Boolean = false,
             val showClearButton: Boolean = false,
-            @Grade val privacyGrade: Long? = null,
             val showPrivacyGrade: Boolean = false
     )
 
     /* Observable data for Activity to subscribe to */
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
     val query: SingleLiveEvent<String> = SingleLiveEvent()
     val navigation: SingleLiveEvent<NavigationCommand> = SingleLiveEvent()
 
@@ -129,7 +129,7 @@ class BrowserViewModel(
     }
 
     private fun onSiteMonitorChanged() {
-        viewState.postValue(currentViewState().copy(privacyGrade = siteMonitor?.improvedGrade))
+        privacyGrade.postValue(siteMonitor?.improvedGrade)
         privacyMonitorRepository.privacyMonitor.postValue(siteMonitor)
     }
 

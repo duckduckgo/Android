@@ -25,7 +25,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacymonitor.HttpsStatus
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
-import com.duckduckgo.app.privacymonitor.model.PrivacyGrade.Companion.Grade
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.privacymonitor.model.grade
 import com.duckduckgo.app.privacymonitor.model.improvedGrade
@@ -125,7 +124,7 @@ class PrivacyDashboardViewModel(private val applicationContext: Context,
         return applicationContext.getString(resource)
     }
 
-    private fun privacyBanner(grade: Long?): Int {
+    private fun privacyBanner(grade: PrivacyGrade?): Int {
         if (settingsStore.privacyOn) {
             return privacyBannerOn(grade)
         }
@@ -133,7 +132,7 @@ class PrivacyDashboardViewModel(private val applicationContext: Context,
     }
 
     @DrawableRes
-    private fun privacyBannerOn(@Grade grade: Long?): Int {
+    private fun privacyBannerOn(grade: PrivacyGrade?): Int {
         return when (grade) {
             PrivacyGrade.A -> R.drawable.privacygrade_banner_a_on
             PrivacyGrade.B -> R.drawable.privacygrade_banner_b_on
@@ -144,7 +143,7 @@ class PrivacyDashboardViewModel(private val applicationContext: Context,
     }
 
     @DrawableRes
-    private fun privacyBannerOff(@Grade grade: Long?): Int {
+    private fun privacyBannerOff(grade: PrivacyGrade?): Int {
         return when (grade) {
             PrivacyGrade.A -> R.drawable.privacygrade_banner_a_off
             PrivacyGrade.B -> R.drawable.privacygrade_banner_b_off
@@ -155,12 +154,12 @@ class PrivacyDashboardViewModel(private val applicationContext: Context,
     }
 
     @DrawableRes
-    private fun privacyGradeIcon(@Grade grade: Long?): Int {
+    private fun privacyGradeIcon(grade: PrivacyGrade): Int {
         return when (grade) {
             PrivacyGrade.A -> R.drawable.privacygrade_icon_small_a
             PrivacyGrade.B -> R.drawable.privacygrade_icon_small_b
             PrivacyGrade.C -> R.drawable.privacygrade_icon_small_c
-            else -> R.drawable.privacygrade_icon_small_d
+            PrivacyGrade.D -> R.drawable.privacygrade_icon_small_d
         }
     }
 
