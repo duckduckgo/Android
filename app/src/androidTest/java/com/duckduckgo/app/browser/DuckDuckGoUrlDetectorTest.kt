@@ -16,8 +16,7 @@
 
 package com.duckduckgo.app.browser
 
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
@@ -43,6 +42,28 @@ class DuckDuckGoUrlDetectorTest {
     @Test
     fun whenCheckingFullDDGUrlThenIdentifiedAsDDGUrl() {
         assertTrue(testee.isDuckDuckGoUrl("https://duckduckgo.com/?q=test%20search&tappv=android_0_2_0&t=ddg_android"))
+    }
+
+    @Test
+    fun whenDDGUrlContainsQueryThenQueryCanBeExtracted() {
+        val query = testee.extractQuery("https://duckduck.com?q=test%20search")
+        assertEquals("test search", query)
+    }
+
+    @Test
+    fun whenDDGUrlDoesNotContainsQueryThenQueryIsNull() {
+        val query = testee.extractQuery("https://duckduck.com")
+        assertNull(query)
+    }
+
+    @Test
+    fun whenDDGUrlContainsQueryThenQueryDetected() {
+        assertTrue(testee.hasQuery("https://duckduck.com?q=test%20search"))
+    }
+
+    @Test
+    fun whenDDGUrlDoesNotContainsQueryThenQueryIsNotDetected() {
+        assertFalse(testee.hasQuery("https://duckduck.com"))
     }
 }
 

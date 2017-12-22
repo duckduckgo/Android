@@ -22,15 +22,28 @@ import javax.inject.Inject
 
 class DuckDuckGoUrlDetector @Inject constructor() {
 
-    fun isDuckDuckGoUrl(uri: Uri?): Boolean {
-        if (uri == null) return false
-
+    fun isDuckDuckGoUrl(uri: Uri): Boolean {
         return "duckduckgo.com" == uri.host
     }
 
-    fun isDuckDuckGoUrl(uriString: String?): Boolean {
-        if (uriString == null) return false
+    fun isDuckDuckGoUrl(uriString: String): Boolean {
+        return isDuckDuckGoUrl(uriString.toUri())
+    }
 
-        return isDuckDuckGoUrl(Uri.parse(uriString))
+    fun hasQuery(uriString: String): Boolean {
+        return uriString.toUri().queryParameterNames.contains(queryParameter)
+    }
+
+    fun extractQuery(uriString: String): String? {
+        val uri = uriString.toUri()
+        return uri.getQueryParameter(queryParameter)
+    }
+
+    private companion object {
+        const val queryParameter = "q"
+    }
+
+    private fun String.toUri(): Uri {
+        return Uri.parse(this)
     }
 }

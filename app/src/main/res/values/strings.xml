@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
@@ -13,11 +13,11 @@
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
     <string name="privacyProtectionEnabled">PRIVACY PROTECTION ENABLED</string>
     <string name="privacyProtectionDisabled">PRIVACY PROTECTION DISABLED</string>
-    <string name="privacyProtectionUpgraded">UPGRADED FROM &lt;img src="%d" /> TO &lt;img src="%d" /></string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">UPGRADED FROM &lt;img src="%d" /> TO &lt;img src="%d" /></string>
     <string name="privacyGradeContentDescription">Privacy Grade</string>
     <string name="trackerNetworksContentDescription">Tracker networks icon</string>
 
-    <plurals name="networksBlocked" >
+    <plurals name="networksBlocked">
         <item quantity="one">%s Tracker Network Blocked</item>
         <item quantity="other">%s Tracker Networks Blocked</item>
     </plurals>
@@ -27,25 +27,20 @@
         <item quantity="other">%s Tracker Networks Found</item>
     </plurals>
 
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%s Major Tracker Network Blocked</item>
-        <item quantity="other">%s Major Tracker Networks Blocked</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%s Major Tracker Network Found</item>
-        <item quantity="other">%s Major Tracker Networks Found</item>
-    </plurals>
-
     <string name="privacyProtectionToggle">Privacy Protection</string>
 
     <string name="httpsGood">Encrypted Connection</string>
     <string name="httpsMixed">Mixed Encryption connection</string>
     <string name="httpsBad">Unencrypted Connection</string>
 
-    <string name="termsGood">Good Privacy Practices</string>
-    <string name="termsMixed">Mixed Privacy Practices"</string>
-    <string name="termsBad">"Poor Privacy Practices"</string>
-    <string name="termsUnknown">Unknown Privacy Practices</string>
+    <string name="privacyTermsActivityTitle">Privacy Practices</string>
+    <string name="practicesGood">Good Privacy Practices</string>
+    <string name="practicesMixed">Mixed Privacy Practices"</string>
+    <string name="practicesBad">"Poor Privacy Practices"</string>
+    <string name="practicesUnknown">Unknown Privacy Practices</string>
+    <string name="practices_overview">Privacy practices indicate how much the personal information that you share with a website is protected.</string>
+    <string name="practices_tosdr_link">Privacy Practices results from&#160;<b><u>TOSDR</u></b></string>
+    <string name="practices_icon_content_good">Good Practice Icon</string>
+    <string name="practices_icon_content_bad">Bad Practice Icon</string>
 
 </resources>

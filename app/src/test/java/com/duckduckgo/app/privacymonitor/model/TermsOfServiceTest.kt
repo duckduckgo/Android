@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.privacymonitor.model
 
+import com.duckduckgo.app.privacymonitor.model.TermsOfService.Practices
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -29,78 +30,78 @@ class TermsOfServiceTest {
     @Test
     fun whenNoDataThenPracticesUnknown() {
         val testee = TermsOfService()
-        assertEquals(TermsOfService.UNKNOWN, testee.practices)
+        assertEquals(Practices.UNKNOWN, testee.practices)
     }
 
     @Test
-    fun whenClassificationIsAAndReasonsExistThenPracticesGood() {
+    fun whenClassificationIsAAndReasonsExistThenPracticesAreGood() {
         val testee = TermsOfService(classification = "A", goodPrivacyTerms = listOf(goodTerm), badPrivacyTerms = listOf(badTerm))
-        assertEquals(TermsOfService.GOOD, testee.practices)
+        assertEquals(Practices.GOOD, testee.practices)
     }
 
     @Test
-    fun whenClassificationIsAndReasonsExistThenPracticesGood() {
+    fun whenClassificationIsBAndReasonsExistThenPracticesAreMixed() {
         val testee = TermsOfService(classification = "B", goodPrivacyTerms = listOf(goodTerm), badPrivacyTerms = listOf(badTerm))
-        assertEquals(TermsOfService.MIXED, testee.practices)
+        assertEquals(Practices.MIXED, testee.practices)
     }
 
     @Test
-    fun whenClassificationIsCAndReasonsExistThenPracticesPoor() {
+    fun whenClassificationIsCAndReasonsExistThenPracticesArePoor() {
         val testee = TermsOfService(classification = "C", goodPrivacyTerms = listOf(goodTerm), badPrivacyTerms = listOf(badTerm))
-        assertEquals(TermsOfService.POOR, testee.practices)
+        assertEquals(Practices.POOR, testee.practices)
     }
 
     @Test
-    fun whenClassificationIsDAndReasonsExistThenPracticesGood() {
+    fun whenClassificationIsDAndReasonsExistThenPracticesArePoor() {
         val testee = TermsOfService(classification = "D", goodPrivacyTerms = listOf(goodTerm), badPrivacyTerms = listOf(badTerm))
-        assertEquals(TermsOfService.POOR, testee.practices)
+        assertEquals(Practices.POOR, testee.practices)
     }
 
     @Test
-    fun whenClassificationIsEAndReasonsExistThenPracticesGood() {
+    fun whenClassificationIsEAndReasonsExistThenPracticesArePoor() {
         val testee = TermsOfService(classification = "E", goodPrivacyTerms = listOf(goodTerm), badPrivacyTerms = listOf(badTerm))
-        assertEquals(TermsOfService.POOR, testee.practices)
+        assertEquals(Practices.POOR, testee.practices)
     }
 
     @Test
-    fun whenNoClassificationWithGoodAndBadReasonsThenPracticesMixed() {
+    fun whenNoClassificationWithGoodAndBadReasonsThenPracticesAreMixed() {
         val testee = TermsOfService(goodPrivacyTerms = listOf(goodTerm), badPrivacyTerms = listOf(badTerm))
-        assertEquals(TermsOfService.MIXED, testee.practices)
+        assertEquals(Practices.MIXED, testee.practices)
     }
 
     @Test
-    fun whenGoodTermsAndScoreLessThanZeroThenPracticesArePoor() {
+    fun whenGoodTermsAndScoreLessThanZeroThenPracticesAreGood() {
         val testee = TermsOfService(score = -10, goodPrivacyTerms = listOf(goodTerm))
-        assertEquals(TermsOfService.GOOD, testee.practices)
+        assertEquals(Practices.GOOD, testee.practices)
     }
 
     @Test
-    fun whenBadTermsAndScoreLessThanZeroThenPracticesArePoor() {
+    fun whenBadTermsAndScoreLessThanZeroThenPracticesAreGood() {
         val testee = TermsOfService(score = -10, badPrivacyTerms = listOf(badTerm))
-        assertEquals(TermsOfService.GOOD, testee.practices)
+        assertEquals(Practices.GOOD, testee.practices)
     }
 
     @Test
     fun whenGoodTermsAndScoreOfZeroThenPracticesAreMixed() {
         val testee = TermsOfService(score = 0, goodPrivacyTerms = listOf(goodTerm))
-        assertEquals(TermsOfService.MIXED, testee.practices)
+        assertEquals(Practices.MIXED, testee.practices)
     }
 
     @Test
     fun whenBadTermsAndScoreOfZeroThenPracticesAreMixed() {
         val testee = TermsOfService(score = 0, badPrivacyTerms = listOf(badTerm))
-        assertEquals(TermsOfService.MIXED, testee.practices)
+        assertEquals(Practices.MIXED, testee.practices)
     }
 
     @Test
     fun whenGoodTermsAndScoreGreaterThanZeroThenPracticesArePoor() {
         val testee = TermsOfService(score = 10, goodPrivacyTerms = listOf(goodTerm))
-        assertEquals(TermsOfService.POOR, testee.practices)
+        assertEquals(Practices.POOR, testee.practices)
     }
 
     @Test
     fun whenBadTermsAndScoreGreaterThanZeroThenPracticesArePoor() {
         val testee = TermsOfService(score = 10, badPrivacyTerms = listOf(badTerm))
-        assertEquals(TermsOfService.POOR, testee.practices)
+        assertEquals(Practices.POOR, testee.practices)
     }
 }

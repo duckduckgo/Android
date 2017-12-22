@@ -101,25 +101,43 @@ class BrowserViewModelTest {
 
     @Test
     fun whenViewModelNotifiedThatUrlGotFocusThenViewStateIsUpdated() {
-        testee.onUrlInputStateChanged("", true)
+        testee.onOmnibarInputStateChanged("", true)
         assertTrue(testee.viewState.value!!.isEditing)
     }
 
     @Test
     fun whenViewModelNotifiedThatUrlLostFocusThenViewStateIsUpdated() {
-        testee.onUrlInputStateChanged("", false)
+        testee.onOmnibarInputStateChanged("", false)
         assertFalse(testee.viewState.value!!.isEditing)
     }
 
     @Test
-    fun whenNoUrlEverEnteredThenViewStateHasNull() {
-        assertNull(testee.viewState.value!!.url)
+    fun whenNoOmnibarTextEverEnteredThenViewStateHasNull() {
+        assertNull(testee.viewState.value!!.omnibarText)
     }
 
     @Test
     fun whenUrlChangedThenViewStateIsUpdated() {
         testee.urlChanged("duckduckgo.com")
-        assertEquals("duckduckgo.com", testee.viewState.value!!.url)
+        assertEquals("duckduckgo.com", testee.viewState.value!!.omnibarText)
+    }
+
+    @Test
+    fun whenUrlChangedWithDuckDuckGoUrlContainingQueryThenUrlRewrittenToContainQuery() {
+        testee.urlChanged("http://duckduckgo.com?q=test")
+        assertEquals("test", testee.viewState.value!!.omnibarText)
+    }
+
+    @Test
+    fun whenUrlChangedWithDuckDuckGoUrlNotContainingQueryThenFullUrlShown() {
+        testee.urlChanged("http://duckduckgo.com")
+        assertEquals("http://duckduckgo.com", testee.viewState.value!!.omnibarText)
+    }
+
+    @Test
+    fun whenUrlChangedWithNonDuckDuckGoUrlThenFullUrlShown() {
+        testee.urlChanged("http://example.com")
+        assertEquals("http://example.com", testee.viewState.value!!.omnibarText)
     }
 
     @Test
@@ -160,20 +178,20 @@ class BrowserViewModelTest {
     @Test
     fun whenLoadingStartedThenPrivacyGradeIsCleared() {
         testee.loadingStarted()
-        assertNull(testee.viewState.value!!.privacyGrade)
+        assertNull(testee.privacyGrade.value)
     }
 
     @Test
     fun whenUrlChangedThenPrivacyGradeIsReset() {
         testee.urlChanged("https://example.com")
-        assertEquals(PrivacyGrade.B, testee.viewState.value!!.privacyGrade)
+        assertEquals(PrivacyGrade.B, testee.privacyGrade.value)
     }
 
     @Test
     fun whenTrackerDetectedThenPrivacyGradeIsUpdated() {
         testee.urlChanged("https://example.com")
         testee.trackerDetected(TrackingEvent("", "", null, false))
-        assertEquals(PrivacyGrade.C, testee.viewState.value!!.privacyGrade)
+        assertEquals(PrivacyGrade.C, testee.privacyGrade.value)
     }
 
     @Test

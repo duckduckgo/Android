@@ -16,19 +16,10 @@
 
 package com.duckduckgo.app.privacymonitor.model
 
-import android.support.annotation.IntDef
 
-
-class PrivacyGrade {
-    companion object {
-        @IntDef(A, B, C, D)
-        @Retention(AnnotationRetention.SOURCE)
-        annotation class Grade
-
-        const val A = 0L
-        const val B = 1L
-        const val C = 2L
-        const val D = 3L
-        const val E = 4L
-    }
+enum class PrivacyGrade {
+    A,
+    B,
+    C,
+    D
 }

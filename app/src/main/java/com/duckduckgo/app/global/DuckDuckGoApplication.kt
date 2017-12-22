@@ -22,6 +22,7 @@ import android.app.Service
 import android.app.job.JobScheduler
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.DaggerAppComponent
+import com.duckduckgo.app.httpsupgrade.HTTPSUpgradeListLoader
 import com.duckduckgo.app.global.job.JobBuilder
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -47,6 +48,9 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
     @Inject
     lateinit var jobScheduler: JobScheduler
 
+    @Inject
+    lateinit var httpsUpgradeListDataLoader: HTTPSUpgradeListLoader
+
     override fun onCreate() {
         super.onCreate()
 
@@ -54,6 +58,7 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
         configureLogging()
         configureCrashReporting()
         configureDataDownloader()
+        configureHttpsUpgradeData()
     }
 
     private fun configureLogging() {
@@ -83,6 +88,10 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
         } else {
             Timber.i("Job already scheduled; no need to schedule again")
         }
+    }
+
+    private fun configureHttpsUpgradeData() {
+        httpsUpgradeListDataLoader.loadData()
     }
 
     override fun activityInjector(): AndroidInjector<Activity> = activityInjector

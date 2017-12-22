@@ -21,10 +21,14 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES.N
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.text.Html
+import android.text.Spanned
 import android.view.MenuItem
+import android.view.View
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
@@ -38,18 +42,20 @@ import javax.inject.Inject
 
 class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
-    @Inject lateinit var viewModelFactory: ViewModelFactory
-    @Inject lateinit var repository: PrivacyMonitorRepository
-
     companion object {
 
         val REQUEST_DASHBOARD = 1000
         val RESULT_RELOAD = 1000
+        val RESULT_TOSDR = 1001
 
         fun intent(context: Context): Intent {
             return Intent(context, PrivacyDashboardActivity::class.java)
         }
     }
+
+    @Inject lateinit var viewModelFactory: ViewModelFactory
+    @Inject lateinit var repository: PrivacyMonitorRepository
+    private val networksRenderer = NetworksRenderer()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,15 +107,13 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         }
         privacyBanner.setImageResource(viewState.privacyBanner)
         domain.text = viewState.domain
-        heading.text = Html.fromHtml(viewState.heading, Html.ImageGetter { getHtmlDrawable(it.toInt()) }, null)
+        heading.text = htmlHeading(viewState.heading)
         httpsIcon.setImageResource(viewState.httpsIcon)
-        networksIcon.setImageResource(viewState.networksIcon)
-        majorNetworksIcon.setImageResource(viewState.majorNetworksIcon)
         httpsText.text = viewState.httpsText
-        networksText.text = viewState.networksText
-        majorNetworksText.text = viewState.majorNetworksText
-        termsIcon.setImageResource(viewState.termsIcon)
-        termsText.text = viewState.termsText
+        networksIcon.setImageResource(networksRenderer.networksIcon(viewState.allTrackersBlocked))
+        networksText.text = networksRenderer.networksText(this, viewState.networkCount, viewState.allTrackersBlocked)
+        practicesIcon.setImageResource(viewState.practices.icon())
+        practicesText.text = viewState.practices.text(this)
         configureToggle(viewState.toggleEnabled)
     }
 
@@ -119,9 +123,28 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         privacyToggle.isChecked = enabled
     }
 
-    private fun getHtmlDrawable(resource: Int): Drawable {
+    @Suppress("deprecation")
+    private fun htmlHeading(heading: String): Spanned {
+        if (SDK_INT >= N) {
+            return Html.fromHtml(heading, Html.FROM_HTML_MODE_COMPACT, Html.ImageGetter { htmlDrawable(it.toInt()) }, null)
+        }
+        return Html.fromHtml(heading, Html.ImageGetter { htmlDrawable(it.toInt()) }, null)
+    }
+
+    private fun htmlDrawable(resource: Int): Drawable {
         val drawable = getDrawable(resource)
         drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
         return drawable
+    }
+
+    fun onPracticesClicked(view: View) {
+        startActivityForResult(PrivacyPracticesActivity.intent(this), REQUEST_DASHBOARD)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_DASHBOARD && resultCode == RESULT_TOSDR) {
+            setResult(RESULT_TOSDR)
+            finish()
+        }
     }
 }
