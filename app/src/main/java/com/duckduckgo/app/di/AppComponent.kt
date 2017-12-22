@@ -28,6 +28,7 @@ import javax.inject.Singleton
 @Singleton
 @Component(modules = [
     (ApplicationModule::class),
+    (JobsModule::class),
     (AndroidBindingModule::class),
     (AndroidSupportInjectionModule::class),
     (NetworkModule::class),

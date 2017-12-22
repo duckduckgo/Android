@@ -18,25 +18,34 @@ package com.duckduckgo.app.global
 
 import android.app.Activity
 import android.app.Application
+import android.app.Service
+import android.app.job.JobScheduler
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.DaggerAppComponent
-import com.duckduckgo.app.trackerdetection.TrackerDataLoader
+import com.duckduckgo.app.global.job.JobBuilder
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
+import dagger.android.HasServiceInjector
 import timber.log.Timber
 import javax.inject.Inject
 
-class DuckDuckGoApplication : HasActivityInjector, Application() {
+class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Application() {
 
     @Inject
-    lateinit var injector: DispatchingAndroidInjector<Activity>
+    lateinit var activityInjector: DispatchingAndroidInjector<Activity>
+
+    @Inject
+    lateinit var serviceInjector: DispatchingAndroidInjector<Service>
 
     @Inject
     lateinit var crashReportingInitializer: CrashReportingInitializer
 
     @Inject
-    lateinit var trackerDataLoader: TrackerDataLoader
+    lateinit var jobBuilder: JobBuilder
+
+    @Inject
+    lateinit var jobScheduler: JobScheduler
 
     override fun onCreate() {
         super.onCreate()
@@ -44,7 +53,7 @@ class DuckDuckGoApplication : HasActivityInjector, Application() {
         configureDependencyInjection()
         configureLogging()
         configureCrashReporting()
-        configureTrackerData()
+        configureDataDownloader()
     }
 
     private fun configureLogging() {
@@ -62,11 +71,21 @@ class DuckDuckGoApplication : HasActivityInjector, Application() {
         crashReportingInitializer.init(this)
     }
 
-    private fun configureTrackerData() {
-        trackerDataLoader.loadData()
+    private fun configureDataDownloader() {
+        val jobInfo = jobBuilder.appConfigurationJob(this)
+
+        val schedulingRequired = jobScheduler.allPendingJobs
+                .filter { jobInfo.id == it.id }
+                .count() == 0
+
+        if(schedulingRequired) {
+            Timber.i("Scheduling of background sync job, successful = %s", jobScheduler.schedule(jobInfo))
+        } else {
+            Timber.i("Job already scheduled; no need to schedule again")
+        }
     }
 
-    override fun activityInjector(): AndroidInjector<Activity> = injector
+    override fun activityInjector(): AndroidInjector<Activity> = activityInjector
 
-
+    override fun serviceInjector(): AndroidInjector<Service> = serviceInjector
 }

@@ -4,6 +4,7 @@
     package="com.duckduckgo.app.browser">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name="com.duckduckgo.app.global.DuckDuckGoApplication"
@@ -17,8 +18,7 @@
             android:name=".BrowserActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.duckduckgo.app.home.HomeActivity"
             android:label="@string/appName"
@@ -36,6 +36,11 @@
             android:label="@string/privacyDashboardActivityTitle"
             android:parentActivityName=".BrowserActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <service
+            android:name="com.duckduckgo.app.global.AppConfigurationJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
     </application>
 
 </manifest>
