@@ -19,6 +19,7 @@ package com.duckduckgo.app.httpsupgrade
 import android.net.Uri
 import android.support.annotation.MainThread
 import android.support.annotation.WorkerThread
+import com.duckduckgo.app.global.UrlScheme
 import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomainDAO
 import javax.inject.Inject
 
@@ -26,7 +27,7 @@ class HTTPSUpgrader @Inject constructor(private val dao: HTTPSUpgradeDomainDAO) 
 
     @WorkerThread
     fun shouldUpgrade(uri: Uri) : Boolean {
-        if (uri.scheme == "https") {
+        if (uri.scheme == UrlScheme.https) {
             return false
         }
 
@@ -34,7 +35,7 @@ class HTTPSUpgrader @Inject constructor(private val dao: HTTPSUpgradeDomainDAO) 
     }
 
     fun upgrade(uri: Uri): Uri {
-        return uri.buildUpon().scheme("https").build()
+        return uri.buildUpon().scheme(UrlScheme.https).build()
     }
 
 }
