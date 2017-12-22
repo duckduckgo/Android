@@ -28,8 +28,8 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:paddingBottom">13dp</item>
-        <item name="android:paddingTop">13dp</item>
+        <item name="android:paddingBottom">15dp</item>
+        <item name="android:paddingTop">15dp</item>
         <item name="android:paddingEnd">22dp</item>
         <item name="android:textColor">@color/almostBlack</item>
         <item name="android:textIsSelectable">false</item>
