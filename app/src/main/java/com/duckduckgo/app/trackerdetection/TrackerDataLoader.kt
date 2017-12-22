@@ -31,6 +31,9 @@ class TrackerDataLoader @Inject constructor(private val trackerDetector: Tracker
                                             private val networkTrackers: TrackerNetworks) {
 
     fun loadData() {
+
+        Timber.i("Loading Tracker data")
+
         loadAdblockData(Client.ClientName.EASYLIST)
         loadAdblockData(Client.ClientName.EASYPRIVACY)
         loadDisconnectData()

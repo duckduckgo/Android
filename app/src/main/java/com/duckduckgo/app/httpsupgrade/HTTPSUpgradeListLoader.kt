@@ -20,12 +20,15 @@ import com.duckduckgo.app.httpsupgrade.api.HTTPSUpgradeListService
 import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomain
 import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomainDAO
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import javax.inject.Inject
 
 class HTTPSUpgradeListLoader @Inject constructor (private var service: HTTPSUpgradeListService,
                              private var dao: HTTPSUpgradeDomainDAO) {
 
     fun loadData() {
+
+        Timber.i("Loading HTTPS Upgrade data")
 
         service.https()
                 .subscribeOn(Schedulers.io())

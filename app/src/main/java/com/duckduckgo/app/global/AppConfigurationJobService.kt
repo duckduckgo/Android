@@ -18,6 +18,7 @@ package com.duckduckgo.app.global
 
 import android.app.job.JobParameters
 import android.app.job.JobService
+import com.duckduckgo.app.httpsupgrade.HTTPSUpgradeListLoader
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import dagger.android.AndroidInjection
 import io.reactivex.Completable
@@ -32,6 +33,9 @@ class AppConfigurationJobService : JobService() {
     @Inject
     lateinit var trackerDataLoader: TrackerDataLoader
 
+    @Inject
+    lateinit var httpsUpgradeListDataLoader: HTTPSUpgradeListLoader
+
     private var downloadTask: Disposable? = null
 
     override fun onCreate() {
@@ -42,7 +46,10 @@ class AppConfigurationJobService : JobService() {
     override fun onStartJob(params: JobParameters?): Boolean {
         Timber.i("onStartJob")
 
-        downloadTask = Completable.fromAction({ trackerDataLoader.loadData() })
+        downloadTask = Completable.fromAction({
+            trackerDataLoader.loadData()
+            httpsUpgradeListDataLoader.loadData()
+        })
                 .subscribeOn(Schedulers.io())
                 .doOnComplete({ jobFinishedSuccessfully(params) })
                 .doOnError({ jobFinishedFailed(params) })
