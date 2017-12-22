@@ -21,7 +21,7 @@ import android.arch.persistence.room.RoomDatabase
 import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomain
 import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomainDAO
 
-@Database(entities = arrayOf(HTTPSUpgradeDomain::class), exportSchema = false, version = 1)
+@Database(entities = arrayOf(HTTPSUpgradeDomain::class), exportSchema = true, version = 1)
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun httpsUpgradeDomainDAO() : HTTPSUpgradeDomainDAO

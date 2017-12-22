@@ -21,16 +21,12 @@ import android.arch.persistence.room.Ignore
 import android.arch.persistence.room.PrimaryKey
 
 @Entity(tableName = "https_upgrade_domain")
-class HTTPSUpgradeDomain {
+class HTTPSUpgradeDomain() {
 
     @PrimaryKey var domain: String = ""
 
-    // Required for Room
-    @Suppress("unused")
-    constructor()
-
     @Ignore
-    constructor(domain: String) {
+    constructor(domain: String) : this() {
         this.domain = domain
     }
 

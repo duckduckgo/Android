@@ -36,7 +36,7 @@ class HTTPSUpgraderTest {
     }
 
     @Test
-    fun whenGiveUriItIsUpgradedToHttps() {
+    fun whenGivenUriItIsUpgradedToHttps() {
         val input = Uri.parse("http://www.example.com/some/path/to/a/file.txt")
         val expected = Uri.parse("https://www.example.com/some/path/to/a/file.txt")
         assertEquals(expected, testee.upgrade(input))
@@ -45,17 +45,17 @@ class HTTPSUpgraderTest {
     @Test
     fun whenUriIsHttpAndInUpgradeListThenShouldUpgrade() {
         whenever(mockDao.contains("www.example.com")).thenReturn(true)
-        assertTrue(testee.shouldUpgrade(Uri.parse("http://www.example.com")));
+        assertTrue(testee.shouldUpgrade(Uri.parse("http://www.example.com")))
     }
 
     @Test
     fun whenUriIsHttpAndIsNotInUpgradeListThenShouldNotUpgrade() {
-        assertFalse(testee.shouldUpgrade(Uri.parse("http://www.example.com")));
+        assertFalse(testee.shouldUpgrade(Uri.parse("http://www.example.com")))
     }
 
     @Test
     fun whenUriIsHttpsThenShouldNotUpgrade() {
-        assertFalse(testee.shouldUpgrade(Uri.parse("https://www.example.com")));
+        assertFalse(testee.shouldUpgrade(Uri.parse("https://www.example.com")))
     }
 
 }

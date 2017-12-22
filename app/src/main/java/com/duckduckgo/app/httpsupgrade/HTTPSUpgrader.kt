@@ -17,7 +17,6 @@
 package com.duckduckgo.app.httpsupgrade
 
 import android.net.Uri
-import android.support.annotation.MainThread
 import android.support.annotation.WorkerThread
 import com.duckduckgo.app.global.UrlScheme
 import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomainDAO

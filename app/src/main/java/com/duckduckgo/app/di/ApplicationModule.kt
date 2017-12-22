@@ -17,12 +17,9 @@
 package com.duckduckgo.app.di
 
 import android.app.Application
-import android.arch.persistence.room.Room
 import android.content.Context
-import com.duckduckgo.app.global.db.AppDatabase
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import javax.inject.Singleton
 
 

@@ -24,7 +24,6 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.duckduckgo.app.browser.R.id.webView
 import com.duckduckgo.app.global.isHttp
 import com.duckduckgo.app.httpsupgrade.HTTPSUpgrader
 import com.duckduckgo.app.trackerdetection.TrackerDetector
@@ -99,7 +98,7 @@ class BrowserWebViewClient @Inject constructor(
 
         if (request.isForMainFrame && request.url != null && httpsUpgrader.shouldUpgrade(request.url)) {
             val newUri = httpsUpgrader.upgrade(request.url)
-            loadUrlOnUIThread(view, newUri.toString())
+            view.post({ view.loadUrl(newUri.toString()) })
             return WebResourceResponse(null, null, null)
         }
 
@@ -136,15 +135,6 @@ class BrowserWebViewClient @Inject constructor(
                     webView.hitTestResult
                 }
                 .blockingFirst()
-    }
-
-    private fun loadUrlOnUIThread(webView: WebView, url: String) {
-
-        Observable.just(url)
-                .observeOn(AndroidSchedulers.mainThread())
-                .map { newUrl -> webView.loadUrl(newUrl) }
-                .subscribe()
-
     }
 
 }
