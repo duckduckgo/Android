@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.app.global.db
 
-import android.app.Application
-import android.content.Context
-import dagger.Binds
-import dagger.Module
-import javax.inject.Singleton
+import android.arch.persistence.room.Database
+import android.arch.persistence.room.RoomDatabase
+import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomain
+import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomainDAO
 
+@Database(entities = arrayOf(HTTPSUpgradeDomain::class), exportSchema = true, version = 1)
+abstract class AppDatabase: RoomDatabase() {
 
-@Module
-abstract class ApplicationModule {
-
-    @Singleton
-    @Binds
-    abstract fun bindContext(application: Application): Context
+    abstract fun httpsUpgradeDomainDAO() : HTTPSUpgradeDomainDAO
 
 }

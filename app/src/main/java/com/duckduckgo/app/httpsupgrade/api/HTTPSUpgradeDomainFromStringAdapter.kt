@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.app.httpsupgrade.api
 
-import android.app.Application
-import android.content.Context
-import dagger.Binds
-import dagger.Module
-import javax.inject.Singleton
+import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomain
+import com.squareup.moshi.FromJson
 
+class HTTPSUpgradeDomainFromStringAdapter {
 
-@Module
-abstract class ApplicationModule {
-
-    @Singleton
-    @Binds
-    abstract fun bindContext(application: Application): Context
+    @FromJson fun adapt(domain: String) = HTTPSUpgradeDomain(domain)
 
 }

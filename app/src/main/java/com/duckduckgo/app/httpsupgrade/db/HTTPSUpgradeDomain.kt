@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.app.httpsupgrade.db
 
-import android.app.Application
-import android.content.Context
-import dagger.Binds
-import dagger.Module
-import javax.inject.Singleton
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.Ignore
+import android.arch.persistence.room.PrimaryKey
 
+@Entity(tableName = "https_upgrade_domain")
+class HTTPSUpgradeDomain() {
 
-@Module
-abstract class ApplicationModule {
+    @PrimaryKey var domain: String = ""
 
-    @Singleton
-    @Binds
-    abstract fun bindContext(application: Application): Context
+    @Ignore
+    constructor(domain: String) : this() {
+        this.domain = domain
+    }
 
 }

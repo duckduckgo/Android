@@ -23,7 +23,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class SiteMonitorInstrumentationTests {
+class SiteMonitorInstrumentationTest {
 
     companion object {
         private const val httpDocument = "http://example.com"
