@@ -24,7 +24,7 @@ val PrivacyMonitor.score: Int
     get() {
         var score = baseScore
         score += Math.ceil(trackerCount / 10.0).toInt()
-        if (majorNetworkCount > 0) {
+        if (hasTrackerFromMajorNetwork) {
             score += 1
         }
         if (hasObscureTracker) {

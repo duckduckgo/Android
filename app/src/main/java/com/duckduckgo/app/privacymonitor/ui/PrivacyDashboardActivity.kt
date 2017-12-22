@@ -42,9 +42,6 @@ import javax.inject.Inject
 
 class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
-    @Inject lateinit var viewModelFactory: ViewModelFactory
-    @Inject lateinit var repository: PrivacyMonitorRepository
-
     companion object {
 
         val REQUEST_DASHBOARD = 1000
@@ -55,6 +52,10 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
             return Intent(context, PrivacyDashboardActivity::class.java)
         }
     }
+
+    @Inject lateinit var viewModelFactory: ViewModelFactory
+    @Inject lateinit var repository: PrivacyMonitorRepository
+    private val networksRenderer = NetworksRenderer()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,11 +109,9 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         domain.text = viewState.domain
         heading.text = htmlHeading(viewState.heading)
         httpsIcon.setImageResource(viewState.httpsIcon)
-        networksIcon.setImageResource(viewState.networksIcon)
-        majorNetworksIcon.setImageResource(viewState.majorNetworksIcon)
         httpsText.text = viewState.httpsText
-        networksText.text = viewState.networksText
-        majorNetworksText.text = viewState.majorNetworksText
+        networksIcon.setImageResource(networksRenderer.networksIcon(viewState.allTrackersBlocked))
+        networksText.text = networksRenderer.networksText(this, viewState.networkCount, viewState.allTrackersBlocked)
         practicesIcon.setImageResource(viewState.practices.icon())
         practicesText.text = viewState.practices.text(this)
         configureToggle(viewState.toggleEnabled)
