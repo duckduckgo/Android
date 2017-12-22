@@ -36,7 +36,6 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
-import com.duckduckgo.app.privacymonitor.model.PrivacyGrade.Companion.Grade
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.REQUEST_DASHBOARD
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RESULT_RELOAD
@@ -60,12 +59,19 @@ class BrowserActivity : DuckDuckGoActivity() {
         fun intent(context: Context): Intent = Intent(context, BrowserActivity::class.java)
     }
 
+    private val privacyGradeMenu: MenuItem?
+        get() = toolbar.menu.findItem(R.id.privacy_dashboard)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_browser)
 
         viewModel.viewState.observe(this, Observer<BrowserViewModel.ViewState> {
             it?.let { render(it) }
+        })
+
+        viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
+            it?.let { renderPrivacyGrade(it) }
         })
 
         viewModel.query.observe(this, Observer {
@@ -114,7 +120,7 @@ class BrowserActivity : DuckDuckGoActivity() {
             false -> hideClearButton()
         }
 
-        updatePrivacyGrade(viewState.privacyGrade, viewState.showPrivacyGrade)
+        privacyGradeMenu?.isVisible = viewState.showPrivacyGrade
     }
 
     private fun showClearButton() {
@@ -131,7 +137,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updatePrivacyGrade(@Grade privacyGrade: Long?, show: Boolean) {
+    private fun renderPrivacyGrade(privacyGrade: PrivacyGrade?) {
         val resource = when (privacyGrade) {
             PrivacyGrade.A -> R.drawable.privacygrade_icon_a
             PrivacyGrade.B -> R.drawable.privacygrade_icon_b
@@ -139,9 +145,7 @@ class BrowserActivity : DuckDuckGoActivity() {
             PrivacyGrade.D -> R.drawable.privacygrade_icon_d
             else -> R.drawable.privacygrade_icon_unknown
         }
-        val menuItem = toolbar.menu.findItem(R.id.privacy_dashboard)
-        menuItem?.icon = getDrawable(resource)
-        menuItem?.isVisible = show
+        privacyGradeMenu?.icon = getDrawable(resource)
     }
 
     private fun shouldUpdateOmnibarTextInput(viewState: BrowserViewModel.ViewState, omnibarInput: String?) =
