@@ -28,16 +28,16 @@ class TrackerNetworks @Inject constructor() : Serializable {
 
     companion object {
         private var majorNetworks = arrayOf(
-                TrackerNetwork("google", "google.com", 84, true),
-                TrackerNetwork("facebook", "facebook.com", 36, true),
-                TrackerNetwork("twitter", "twitter.com", 16, true),
-                TrackerNetwork("amazon.com", "amazon.com", 14, true),
-                TrackerNetwork("appnexus", "appnexus.com", 10, true),
-                TrackerNetwork("oracle", "oracle.com", 10, true),
-                TrackerNetwork("mediamath", "mediamath.com", 9, true),
-                TrackerNetwork("yahoo", "yahoo.com", 9, true),
-                TrackerNetwork("stackpath", "stackpath.com", 7, true),
-                TrackerNetwork("automattic", "automattic.com", 7, true)
+                TrackerNetwork(name = "google", url = "google.com", percentageOfPages = 84, isMajor = true),
+                TrackerNetwork(name = "facebook", url = "facebook.com", percentageOfPages = 36, isMajor = true),
+                TrackerNetwork(name = "twitter", url = "twitter.com", percentageOfPages = 16, isMajor = true),
+                TrackerNetwork(name = "amazon.com", url = "amazon.com", percentageOfPages = 14, isMajor = true),
+                TrackerNetwork(name = "appnexus", url = "appnexus.com", percentageOfPages = 10, isMajor = true),
+                TrackerNetwork(name = "oracle", url = "oracle.com", percentageOfPages = 10, isMajor = true),
+                TrackerNetwork(name = "mediamath", url = "mediamath.com", percentageOfPages = 9, isMajor = true),
+                TrackerNetwork(name = "yahoo", url = "yahoo.com", percentageOfPages = 9, isMajor = true),
+                TrackerNetwork(name = "stackpath", url = "stackpath.com", percentageOfPages = 7, isMajor = true),
+                TrackerNetwork(name = "automattic", url = "automattic.com", percentageOfPages = 7, isMajor = true)
         )
     }
 
@@ -48,8 +48,15 @@ class TrackerNetworks @Inject constructor() : Serializable {
     }
 
     fun network(url: String): TrackerNetwork? {
-        val entry = data.find { sameOrSubdomain(url, it.url) || sameOrSubdomain(url, it.networkUrl) } ?: return null
-        return majorNetwork(entry.networkName) ?: TrackerNetwork(name = entry.networkName, url = entry.networkUrl)
+        val disconnect = data.find { sameOrSubdomain(url, it.url) || sameOrSubdomain(url, it.networkUrl) } ?: return null
+        val major = majorNetwork(disconnect.networkName)
+        val combined = TrackerNetwork(
+                name = disconnect.networkName,
+                url = disconnect.networkUrl,
+                category = disconnect.category,
+                percentageOfPages = major?.percentageOfPages,
+                isMajor = major != null)
+        return combined
     }
 
     private fun majorNetwork(networkName: String): TrackerNetwork? {

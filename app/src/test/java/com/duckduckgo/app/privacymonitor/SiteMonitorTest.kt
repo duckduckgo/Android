@@ -37,7 +37,7 @@ class SiteMonitorTest {
 
         private val networkA = TrackerNetwork("NetworkA", "networkA.com")
         private val networkB = TrackerNetwork("NetworkB", "networkB.com")
-        private val majorNetwork = TrackerNetwork("MajorNetwork", "majorNetwork.com", 0, true)
+        private val majorNetwork = TrackerNetwork("MajorNetwork", "majorNetwork.com", "", 0, true)
     }
 
     @Test

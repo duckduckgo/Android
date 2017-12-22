@@ -19,6 +19,7 @@ package com.duckduckgo.app.privacymonitor
 import android.net.Uri
 import com.duckduckgo.app.global.hasIpHost
 import com.duckduckgo.app.global.isHttps
+import com.duckduckgo.app.privacymonitor.model.HttpsStatus
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
@@ -31,7 +32,7 @@ class SiteMonitor(override val url: String,
 
     override var hasHttpResources = false
 
-    private val trackingEvents = CopyOnWriteArrayList<TrackingEvent>()
+    override val trackingEvents = CopyOnWriteArrayList<TrackingEvent>()
 
     override val uri: Uri?
         get() = Uri.parse(url)

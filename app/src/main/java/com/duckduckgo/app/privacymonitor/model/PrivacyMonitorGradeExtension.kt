@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.privacymonitor.model
 
-import com.duckduckgo.app.privacymonitor.HttpsStatus
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 
 

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.privacymonitor
 
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
+import com.duckduckgo.app.privacymonitor.model.HttpsStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import org.junit.Assert.assertEquals

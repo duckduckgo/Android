@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacymonitor
+package com.duckduckgo.app.privacymonitor.model
 
 
 enum class HttpsStatus {

@@ -29,8 +29,13 @@ class NetworksRenderer {
     }
 
     @DrawableRes
+    fun networksBanner(allTrackersBlocked: Boolean): Int {
+        return if (allTrackersBlocked) R.drawable.networks_banner_good else R.drawable.networks_banner_bad
+    }
+
+    @DrawableRes
     fun networksIcon(allTrackersBlocked: Boolean): Int {
-        return if (allTrackersBlocked) R.drawable.dashboard_networks_good else R.drawable.dashboard_networks_bad
+        return if (allTrackersBlocked) R.drawable.networks_icon_good else R.drawable.networks_icon_bad
     }
 
 }

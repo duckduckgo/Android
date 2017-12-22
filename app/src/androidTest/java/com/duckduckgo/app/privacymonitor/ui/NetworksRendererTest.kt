@@ -45,14 +45,26 @@ class NetworksRendererTest {
     }
 
     @Test
+    fun whenAllTrackersBlockedThenNetworksBannerIsGood() {
+        val resource = testee.networksBanner(true)
+        assertEquals(R.drawable.networks_banner_good, resource)
+    }
+
+    @Test
+    fun whenNotAllTrackersBlockedThenNetworksBannerIsBad() {
+        val resource = testee.networksBanner(false)
+        assertEquals(R.drawable.networks_banner_bad, resource)
+    }
+
+    @Test
     fun whenAllTrackersBlockedThenNetworksIconIsGood() {
         val resource = testee.networksIcon(true)
-        assertEquals(R.drawable.dashboard_networks_good, resource)
+        assertEquals(R.drawable.networks_icon_good, resource)
     }
 
     @Test
     fun whenNotAllTrackersBlockedThenNetworksIconIsBad() {
         val resource = testee.networksIcon(false)
-        assertEquals(R.drawable.dashboard_networks_bad, resource)
+        assertEquals(R.drawable.networks_icon_bad, resource)
     }
 }

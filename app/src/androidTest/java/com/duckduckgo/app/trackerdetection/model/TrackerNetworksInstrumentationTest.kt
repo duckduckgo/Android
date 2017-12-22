@@ -91,7 +91,7 @@ class TrackerNetworksInstrumentationTest {
     fun whenUrlMatchesTrackerInMajorNetworkThenMajorNetworkIsReturned() {
         val data = listOf(DisconnectTracker("tracker.com", category, majorNetworkName, networkUrl))
         testee.updateData(data)
-        val expected = TrackerNetwork(majorNetworkName, majorNetworkUrl, majorNetworkPercentage, true)
+        val expected = TrackerNetwork(majorNetworkName, majorNetworkUrl, "", majorNetworkPercentage, true)
         assertEquals(expected, testee.network("http://tracker.com/script.js"))
     }
 }
