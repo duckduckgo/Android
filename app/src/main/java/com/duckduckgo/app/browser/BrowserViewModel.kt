@@ -21,11 +21,11 @@ import android.arch.lifecycle.ViewModel
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.privacymonitor.SiteMonitor
-import com.duckduckgo.app.privacymonitor.model.PrivacyGrade.Companion.Grade
+import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
+import com.duckduckgo.app.privacymonitor.model.improvedGrade
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
-import com.duckduckgo.app.privacymonitor.ui.improvedGrade
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import timber.log.Timber
@@ -41,24 +41,22 @@ class BrowserViewModel(
     data class ViewState(
             val isLoading: Boolean = false,
             val progress: Int = 0,
-            val url: String? = null,
+            val omnibarText: String? = null,
             val isEditing: Boolean = false,
             val browserShowing: Boolean = false,
             val showClearButton: Boolean = false,
-            @Grade val privacyGrade: Long? = null,
             val showPrivacyGrade: Boolean = false
     )
 
     /* Observable data for Activity to subscribe to */
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
     val query: SingleLiveEvent<String> = SingleLiveEvent()
     val navigation: SingleLiveEvent<NavigationCommand> = SingleLiveEvent()
 
     enum class NavigationCommand {
         LANDING_PAGE
     }
-
-    private var lastQuery: String? = null
 
     private var siteMonitor: SiteMonitor? = null
 
@@ -79,14 +77,12 @@ class BrowserViewModel(
         }
 
         if (queryUrlConverter.isWebUrl(input)) {
-            lastQuery = null
             query.value = queryUrlConverter.convertUri(input)
         } else {
-            lastQuery = input
             query.value = queryUrlConverter.convertQueryToUri(input).toString()
         }
 
-        viewState.value = currentViewState().copy(showClearButton = false)
+        viewState.value = currentViewState().copy(showClearButton = false, omnibarText = input)
     }
 
     override fun progressChanged(newProgress: Int) {
@@ -108,17 +104,18 @@ class BrowserViewModel(
 
     override fun urlChanged(url: String?) {
         Timber.v("Url changed: $url")
-        var newViewState = currentViewState().copy(url = url, browserShowing = true, showPrivacyGrade = true)
+        if (url == null) return
 
-        if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
-            newViewState = newViewState.copy(url = lastQuery)
+        var newViewState = currentViewState().copy(omnibarText = url, browserShowing = true, showPrivacyGrade = true)
+
+        if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url) && duckDuckGoUrlDetector.hasQuery(url)) {
+            newViewState = newViewState.copy(omnibarText = duckDuckGoUrlDetector.extractQuery(url))
         }
         viewState.value = newViewState
-        if (url != null) {
-            val terms = termsOfServiceStore.retrieveTerms(url) ?: TermsOfService()
-            siteMonitor = SiteMonitor(url, terms, trackerNetworks)
-            onSiteMonitorChanged()
-        }
+
+        val terms = termsOfServiceStore.retrieveTerms(url) ?: TermsOfService()
+        siteMonitor = SiteMonitor(url, terms, trackerNetworks)
+        onSiteMonitorChanged()
     }
 
     override fun trackerDetected(event: TrackingEvent) {
@@ -132,13 +129,13 @@ class BrowserViewModel(
     }
 
     private fun onSiteMonitorChanged() {
-        viewState.postValue(currentViewState().copy(privacyGrade = siteMonitor?.improvedGrade))
+        privacyGrade.postValue(siteMonitor?.improvedGrade)
         privacyMonitorRepository.privacyMonitor.postValue(siteMonitor)
     }
 
     private fun currentViewState(): ViewState = viewState.value!!
 
-    fun onUrlInputStateChanged(query: String, hasFocus: Boolean) {
+    fun onOmnibarInputStateChanged(query: String, hasFocus: Boolean) {
         val showClearButton = hasFocus && query.isNotEmpty()
         viewState.value = currentViewState().copy(isEditing = hasFocus, showClearButton = showClearButton)
     }

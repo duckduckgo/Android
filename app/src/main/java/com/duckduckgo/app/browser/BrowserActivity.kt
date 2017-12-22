@@ -36,10 +36,10 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
-import com.duckduckgo.app.privacymonitor.model.PrivacyGrade.Companion.Grade
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.REQUEST_DASHBOARD
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RESULT_RELOAD
+import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RESULT_TOSDR
 import kotlinx.android.synthetic.main.activity_browser.*
 import javax.inject.Inject
 
@@ -59,12 +59,19 @@ class BrowserActivity : DuckDuckGoActivity() {
         fun intent(context: Context): Intent = Intent(context, BrowserActivity::class.java)
     }
 
+    private val privacyGradeMenu: MenuItem?
+        get() = toolbar.menu.findItem(R.id.privacy_dashboard)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_browser)
 
         viewModel.viewState.observe(this, Observer<BrowserViewModel.ViewState> {
             it?.let { render(it) }
+        })
+
+        viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
+            it?.let { renderPrivacyGrade(it) }
         })
 
         viewModel.query.observe(this, Observer {
@@ -79,11 +86,11 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         configureToolbar()
         configureWebView()
-        configureUrlInput()
+        configureOmnibarTextInput()
         configureDummyViewTouchHandler()
 
         if (shouldShowKeyboard()) {
-            urlInput.showKeyboard()
+            omnibarTextInput.showKeyboard()
         }
     }
 
@@ -101,8 +108,8 @@ class BrowserActivity : DuckDuckGoActivity() {
             false -> pageLoadingIndicator.hide()
         }
 
-        if (shouldUpdateUrl(viewState, viewState.url)) {
-            urlInput.setText(viewState.url)
+        if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
+            omnibarTextInput.setText(viewState.omnibarText)
             appBarLayout.setExpanded(true, true)
         }
 
@@ -113,24 +120,24 @@ class BrowserActivity : DuckDuckGoActivity() {
             false -> hideClearButton()
         }
 
-        updatePrivacyGrade(viewState.privacyGrade, viewState.showPrivacyGrade)
+        privacyGradeMenu?.isVisible = viewState.showPrivacyGrade
     }
 
     private fun showClearButton() {
-        urlInput.post {
-            clearUrlButton.show()
-            urlInput.updatePadding(paddingEnd = 40.toPx())
+        omnibarTextInput.post {
+            clearOmnibarInputButton.show()
+            omnibarTextInput.updatePadding(paddingEnd = 40.toPx())
         }
     }
 
     private fun hideClearButton() {
-        urlInput.post {
-            clearUrlButton.hide()
-            urlInput.updatePadding(paddingEnd = 10.toPx())
+        omnibarTextInput.post {
+            clearOmnibarInputButton.hide()
+            omnibarTextInput.updatePadding(paddingEnd = 10.toPx())
         }
     }
 
-    private fun updatePrivacyGrade(@Grade privacyGrade: Long?, show: Boolean) {
+    private fun renderPrivacyGrade(privacyGrade: PrivacyGrade?) {
         val resource = when (privacyGrade) {
             PrivacyGrade.A -> R.drawable.privacygrade_icon_a
             PrivacyGrade.B -> R.drawable.privacygrade_icon_b
@@ -138,13 +145,11 @@ class BrowserActivity : DuckDuckGoActivity() {
             PrivacyGrade.D -> R.drawable.privacygrade_icon_d
             else -> R.drawable.privacygrade_icon_unknown
         }
-        val menuItem = toolbar.menu.findItem(R.id.privacy_dashboard)
-        menuItem?.icon = getDrawable(resource)
-        menuItem?.isVisible = show
+        privacyGradeMenu?.icon = getDrawable(resource)
     }
 
-    private fun shouldUpdateUrl(viewState: BrowserViewModel.ViewState, url: String?) =
-            viewState.url != null && !viewState.isEditing && urlInput.isDifferent(url)
+    private fun shouldUpdateOmnibarTextInput(viewState: BrowserViewModel.ViewState, omnibarInput: String?) =
+            viewState.omnibarText != null && !viewState.isEditing && omnibarTextInput.isDifferent(omnibarInput)
 
     private fun configureToolbar() {
         setSupportActionBar(toolbar)
@@ -154,30 +159,30 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun configureUrlInput() {
-        urlInput.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus: Boolean ->
-            viewModel.onUrlInputStateChanged(urlInput.text.toString(), hasFocus)
+    private fun configureOmnibarTextInput() {
+        omnibarTextInput.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus: Boolean ->
+            viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), hasFocus)
         }
 
-        urlInput.addTextChangedListener(object : TextChangedWatcher() {
+        omnibarTextInput.addTextChangedListener(object : TextChangedWatcher() {
             override fun afterTextChanged(editable: Editable) {
-                viewModel.onUrlInputStateChanged(urlInput.text.toString(), urlInput.hasFocus())
+                viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), omnibarTextInput.hasFocus())
             }
         })
 
-        urlInput.onBackKeyListener = object : OnBackKeyListener {
+        omnibarTextInput.onBackKeyListener = object : OnBackKeyListener {
             override fun onBackKey(): Boolean {
                 focusDummy.requestFocus()
                 return viewModel.userDismissedKeyboard()
             }
         }
 
-        clearUrlButton.setOnClickListener { urlInput.setText("") }
+        clearOmnibarInputButton.setOnClickListener { omnibarTextInput.setText("") }
     }
 
     private fun userEnteredQuery() {
-        viewModel.onUserSubmittedQuery(urlInput.text.toString())
-        urlInput.hideKeyboard()
+        viewModel.onUserSubmittedQuery(omnibarTextInput.text.toString())
+        omnibarTextInput.hideKeyboard()
         focusDummy.requestFocus()
     }
 
@@ -203,7 +208,7 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
 
-        urlInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, keyEvent ->
+        omnibarTextInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, keyEvent ->
             if (actionId == IME_ACTION_DONE || keyEvent.keyCode == KEYCODE_ENTER) {
                 userEnteredQuery()
                 return@OnEditorActionListener true
@@ -269,11 +274,13 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_DASHBOARD && resultCode == RESULT_RELOAD) {
-            webView.reload()
-            return
+        if (requestCode != REQUEST_DASHBOARD) {
+            super.onActivityResult(requestCode, resultCode, data)
         }
-        super.onActivityResult(requestCode, resultCode, data)
+        when (resultCode) {
+            RESULT_RELOAD -> webView.reload()
+            RESULT_TOSDR -> webView.loadUrl(getString(R.string.tosdrUrl))
+        }
     }
 
     override fun onBackPressed() {
@@ -287,8 +294,8 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     private fun clearViewPriorToAnimation() {
         acceptingRenderUpdates = false
-        urlInput.text.clear()
-        urlInput.hideKeyboard()
+        omnibarTextInput.text.clear()
+        omnibarTextInput.hideKeyboard()
         webView.hide()
     }
 

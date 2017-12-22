@@ -25,13 +25,13 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacymonitor.HttpsStatus
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
-import com.duckduckgo.app.privacymonitor.model.PrivacyGrade.Companion.Grade
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
-import com.duckduckgo.app.privacymonitor.model.TermsOfService.Companion.Practices
+import com.duckduckgo.app.privacymonitor.model.grade
+import com.duckduckgo.app.privacymonitor.model.improvedGrade
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
 
 @SuppressLint("StaticFieldLeak")
-class PrivacyDashboardViewModel(private val context: Context,
+class PrivacyDashboardViewModel(private val applicationContext: Context,
                                 private val settingsStore: PrivacySettingsStore) : ViewModel() {
 
     data class ViewState(
@@ -40,12 +40,9 @@ class PrivacyDashboardViewModel(private val context: Context,
             val heading: String,
             @DrawableRes val httpsIcon: Int,
             val httpsText: String,
-            val networksText: String,
-            @DrawableRes val networksIcon: Int,
-            val majorNetworksText: String,
-            @DrawableRes val majorNetworksIcon: Int,
-            @DrawableRes val termsIcon: Int,
-            val termsText: String,
+            val networkCount: Int,
+            val allTrackersBlocked: Boolean,
+            val practices: TermsOfService.Practices,
             val toggleEnabled: Boolean
     )
 
@@ -76,30 +73,23 @@ class PrivacyDashboardViewModel(private val context: Context,
                 heading = headingText(),
                 httpsIcon = httpsIcon(HttpsStatus.SECURE),
                 httpsText = httpsText(HttpsStatus.SECURE),
-                networksIcon = R.drawable.dashboard_networks_good,
-                networksText = networksText(),
-                majorNetworksText = majorNetworksText(),
-                majorNetworksIcon = R.drawable.dashboard_major_networks_good,
-                toggleEnabled = settingsStore.privacyOn,
-                termsIcon = termsIcon(TermsOfService.GOOD),
-                termsText = termsText(TermsOfService.GOOD)
+                networkCount = 0,
+                allTrackersBlocked = true,
+                practices = TermsOfService.Practices.UNKNOWN,
+                toggleEnabled = settingsStore.privacyOn
         )
     }
 
     private fun updatePrivacyMonitor(monitor: PrivacyMonitor) {
-        this.monitor = monitor
         viewState.value = viewState.value?.copy(
                 privacyBanner = privacyBanner(monitor.improvedGrade),
                 domain = monitor.uri?.host ?: "",
                 heading = headingText(),
                 httpsIcon = httpsIcon(monitor.https),
                 httpsText = httpsText(monitor.https),
-                networksIcon = networksIcon(monitor.allTrackersBlocked, monitor.networkCount),
-                networksText = networksText(monitor.allTrackersBlocked, monitor.networkCount),
-                majorNetworksIcon = majorNetworksIcon(monitor.allTrackersBlocked, monitor.majorNetworkCount),
-                majorNetworksText = majorNetworksText(monitor.allTrackersBlocked, monitor.majorNetworkCount),
-                termsIcon = termsIcon(monitor.termsOfService.practices),
-                termsText = termsText(monitor.termsOfService.practices)
+                networkCount = monitor.networkCount,
+                allTrackersBlocked = monitor.allTrackersBlocked,
+                practices = monitor.termsOfService.practices
         )
     }
 
@@ -120,14 +110,14 @@ class PrivacyDashboardViewModel(private val context: Context,
             val before = monitor.grade
             val after = monitor.improvedGrade
             if (before != after) {
-                return context.getString(R.string.privacyProtectionUpgraded, privacyGradeIcon(before), privacyGradeIcon(after))
+                return applicationContext.getString(R.string.privacyProtectionUpgraded, privacyGradeIcon(before), privacyGradeIcon(after))
             }
         }
         val resource = if (settingsStore.privacyOn) R.string.privacyProtectionEnabled else R.string.privacyProtectionDisabled
-        return context.getString(resource)
+        return applicationContext.getString(resource)
     }
 
-    private fun privacyBanner(grade: Long?): Int {
+    private fun privacyBanner(grade: PrivacyGrade?): Int {
         if (settingsStore.privacyOn) {
             return privacyBannerOn(grade)
         }
@@ -135,7 +125,7 @@ class PrivacyDashboardViewModel(private val context: Context,
     }
 
     @DrawableRes
-    private fun privacyBannerOn(@Grade grade: Long?): Int {
+    private fun privacyBannerOn(grade: PrivacyGrade?): Int {
         return when (grade) {
             PrivacyGrade.A -> R.drawable.privacygrade_banner_a_on
             PrivacyGrade.B -> R.drawable.privacygrade_banner_b_on
@@ -146,7 +136,7 @@ class PrivacyDashboardViewModel(private val context: Context,
     }
 
     @DrawableRes
-    private fun privacyBannerOff(@Grade grade: Long?): Int {
+    private fun privacyBannerOff(grade: PrivacyGrade?): Int {
         return when (grade) {
             PrivacyGrade.A -> R.drawable.privacygrade_banner_a_off
             PrivacyGrade.B -> R.drawable.privacygrade_banner_b_off
@@ -157,12 +147,12 @@ class PrivacyDashboardViewModel(private val context: Context,
     }
 
     @DrawableRes
-    private fun privacyGradeIcon(@Grade grade: Long?): Int {
+    private fun privacyGradeIcon(grade: PrivacyGrade): Int {
         return when (grade) {
             PrivacyGrade.A -> R.drawable.privacygrade_icon_small_a
             PrivacyGrade.B -> R.drawable.privacygrade_icon_small_b
             PrivacyGrade.C -> R.drawable.privacygrade_icon_small_c
-            else -> R.drawable.privacygrade_icon_small_d
+            PrivacyGrade.D -> R.drawable.privacygrade_icon_small_d
         }
     }
 
@@ -174,44 +164,8 @@ class PrivacyDashboardViewModel(private val context: Context,
     }
 
     private fun httpsText(status: HttpsStatus): String = when (status) {
-        HttpsStatus.NONE -> context.getString(R.string.httpsBad)
-        HttpsStatus.MIXED -> context.getString(R.string.httpsMixed)
-        HttpsStatus.SECURE -> context.getString(R.string.httpsGood)
-    }
-
-    @DrawableRes
-    private fun networksIcon(allBlocked: Boolean = true, networksCount: Int = 0): Int {
-        val isGood = allBlocked || networksCount == 0
-        return if (isGood) R.drawable.dashboard_networks_good else R.drawable.dashboard_networks_bad
-    }
-
-    private fun networksText(allBlocked: Boolean = true, networkCount: Int = 0): String {
-        val resource = if (allBlocked) R.string.networksBlocked else R.string.networksFound
-        return context.getString(resource, networkCount.toString())
-    }
-
-    @DrawableRes
-    private fun majorNetworksIcon(allBlocked: Boolean = true, majorNetworksCount: Int = 0): Int {
-        val isGood = allBlocked || majorNetworksCount == 0
-        return if (isGood) R.drawable.dashboard_major_networks_good else R.drawable.dashboard_major_networks_bad
-    }
-
-    private fun majorNetworksText(allBlocked: Boolean = true, networkCount: Int = 0): String {
-        val resource = if (allBlocked) R.string.majorNetworksBlocked else R.string.majorNetworksFound
-        return context.getString(resource, networkCount.toString())
-    }
-
-    @DrawableRes
-    private fun termsIcon(@Practices practices: Long): Int = when (practices) {
-        TermsOfService.GOOD -> R.drawable.dashboard_terms_good
-        TermsOfService.POOR -> R.drawable.dashboard_terms_bad
-        else -> R.drawable.dashboard_terms_neutral
-    }
-
-    private fun termsText(@Practices practices: Long): String = when (practices) {
-        TermsOfService.GOOD -> context.getString(R.string.termsGood)
-        TermsOfService.POOR -> context.getString(R.string.termsBad)
-        TermsOfService.MIXED -> context.getString(R.string.termsMixed)
-        else -> context.getString(R.string.termsUnknown)
+        HttpsStatus.NONE -> applicationContext.getString(R.string.httpsBad)
+        HttpsStatus.MIXED -> applicationContext.getString(R.string.httpsMixed)
+        HttpsStatus.SECURE -> applicationContext.getString(R.string.httpsGood)
     }
 }

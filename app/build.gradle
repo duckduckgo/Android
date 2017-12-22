@@ -6,7 +6,7 @@ apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
 
 ext {
-    VERSION_NAME = "0.6.0"
+    VERSION_NAME = "0.7.0"
 }
 
 android {
@@ -99,17 +99,20 @@ dependencies {
     implementation "com.jakewharton.timber:timber:4.6.0"
     implementation "android.arch.lifecycle:extensions:$architectureComponents"
     implementation "android.arch.lifecycle:reactivestreams:$architectureComponents"
+    implementation "android.arch.persistence.room:runtime:$architectureComponents"
     implementation "com.google.dagger:dagger-android:$dagger"
     implementation "com.google.dagger:dagger-android-support:$dagger"
     releaseImplementation 'com.faendir:acra:4.10.0'
 
     kapt "com.google.dagger:dagger-android-processor:$dagger"
     kapt "com.google.dagger:dagger-compiler:$dagger"
+    kapt "android.arch.persistence.room:compiler:$architectureComponents"
 
     testImplementation "org.mockito:mockito-core:2.13.0"
     testImplementation "com.nhaarman:mockito-kotlin-kt1.1:1.5.0"
     testImplementation "junit:junit:4.12"
     testImplementation "android.arch.core:core-testing:$architectureComponents"
+    testImplementation "android.arch.persistence.room:testing:$architectureComponents"
 
     androidTestImplementation "com.android.support.test:runner:1.0.1"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:3.0.1"
