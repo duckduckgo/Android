@@ -18,25 +18,42 @@ package com.duckduckgo.app.job
 
 import android.app.job.JobScheduler
 import android.content.Context
+import android.support.annotation.CheckResult
+import com.duckduckgo.app.global.job.APP_CONFIGURATION_JOB_ID
 import com.duckduckgo.app.global.job.JobBuilder
+import io.reactivex.Completable
 import timber.log.Timber
 import javax.inject.Inject
 
 class AppConfigurationSyncer @Inject constructor(
         private val jobBuilder: JobBuilder,
-        private val jobScheduler: JobScheduler) {
+        private val jobScheduler: JobScheduler,
+        private val appConfigurationDownloader: AppConfigurationDownloader) {
+
+    @CheckResult
+    fun scheduleImmediateSync(): Completable {
+        Timber.i("Running immediate attempt to download app configuration")
+        return appConfigurationDownloader.downloadTask()
+    }
+
+    /**
+     * Scheduling the same job again would kill the existing job if it was running.
+     *
+     * So this method can be used to first query if the job is already scheduled.
+     */
+    fun jobScheduled(): Boolean {
+        return jobScheduler.allPendingJobs
+                .filter { APP_CONFIGURATION_JOB_ID == it.id }
+                .count() > 0
+    }
 
     fun scheduleRegularSync(context: Context) {
         val jobInfo = jobBuilder.appConfigurationJob(context)
 
-        val schedulingRequired = jobScheduler.allPendingJobs
-                .filter { jobInfo.id == it.id }
-                .count() == 0
-
-        if (schedulingRequired) {
-            Timber.i("Scheduling of background sync job, successful = %s", jobScheduler.schedule(jobInfo))
+        if (jobScheduler.schedule(jobInfo) == JobScheduler.RESULT_SUCCESS) {
+            Timber.i("Job scheduled successfully")
         } else {
-            Timber.i("Job already scheduled; no need to schedule again")
+            Timber.e("Failed to schedule job")
         }
     }
 }

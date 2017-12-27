@@ -78,8 +78,26 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
         crashReportingInitializer.init(this)
     }
 
+    /**
+     * If the data downloader job is already scheduled, this method does nothing.
+     *
+     * Otherwise, it immediately syncs data. Upon completion (successful or error),
+     * it will schedule a recurring job to keep the data in sync.
+     *
+     * We need to kick off an immediate attempt as Android OS versions vary in their
+     * implementation of scheduling jobs, such that some versions don't immediately try
+     * and execute the job, even if the job criteria is matched.
+     */
     private fun configureDataDownloader() {
-        appConfigurationSyncer.scheduleRegularSync(this)
+
+        if (!appConfigurationSyncer.jobScheduled()) {
+            appConfigurationSyncer.scheduleImmediateSync()
+                    .subscribeOn(Schedulers.io())
+                    .doAfterTerminate({
+                        appConfigurationSyncer.scheduleRegularSync(this)
+                    })
+                    .subscribe({}, { Timber.w(it, "Failed to download initial app configuration") })
+        }
     }
 
     override fun activityInjector(): AndroidInjector<Activity> = activityInjector

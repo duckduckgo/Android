@@ -23,11 +23,9 @@ import com.duckduckgo.app.job.AppConfigurationJobService
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class JobBuilder @Inject constructor(){
+const val APP_CONFIGURATION_JOB_ID = 1
 
-    companion object {
-        private const val APP_CONFIGURATION_JOB_ID = 1
-    }
+class JobBuilder @Inject constructor(){
 
     fun appConfigurationJob(context: Context): JobInfo {
 

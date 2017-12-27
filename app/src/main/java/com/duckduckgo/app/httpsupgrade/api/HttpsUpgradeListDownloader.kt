@@ -20,6 +20,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
 import io.reactivex.Completable
 import timber.log.Timber
+import java.io.IOException
 import javax.inject.Inject
 
 
@@ -42,6 +43,8 @@ class HttpsUpgradeListDownloader @Inject constructor(
                     httpsUpgradeDao.deleteAll()
                     httpsUpgradeDao.insertAll(*domains)
                 })
+            } else {
+                throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
         })
     }

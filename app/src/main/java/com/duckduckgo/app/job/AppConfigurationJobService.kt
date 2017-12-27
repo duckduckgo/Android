@@ -18,11 +18,7 @@ package com.duckduckgo.app.job
 
 import android.app.job.JobParameters
 import android.app.job.JobService
-import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeListDownloader
-import com.duckduckgo.app.trackerdetection.Client.ClientName.*
-import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import dagger.android.AndroidInjection
-import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
@@ -32,10 +28,7 @@ import javax.inject.Inject
 class AppConfigurationJobService : JobService() {
 
     @Inject
-    lateinit var trackerDataDownloader: TrackerDataDownloader
-
-    @Inject
-    lateinit var httpsUpgradeListDownloader: HttpsUpgradeListDownloader
+    lateinit var appConfigurationDownloader: AppConfigurationDownloader
 
     private var downloadTask: Disposable? = null
 
@@ -47,12 +40,7 @@ class AppConfigurationJobService : JobService() {
     override fun onStartJob(params: JobParameters?): Boolean {
         Timber.i("onStartJob")
 
-        val easyListDownload = trackerDataDownloader.downloadList(EASYLIST)
-        val easyPrivacyDownload = trackerDataDownloader.downloadList(EASYPRIVACY)
-        val disconnectDownload = trackerDataDownloader.downloadList(DISCONNECT)
-        val httpsUpgradeDownload = httpsUpgradeListDownloader.downloadList()
-
-        Completable.merge(mutableListOf(easyListDownload, easyPrivacyDownload, disconnectDownload, httpsUpgradeDownload))
+        appConfigurationDownloader.downloadTask()
                 .subscribeOn(Schedulers.io())
                 .doOnComplete {
                     Timber.i("Successfully downloaded all data")
@@ -63,7 +51,9 @@ class AppConfigurationJobService : JobService() {
                     jobFinishedFailed(params)
                 })
                 .subscribeOn(Schedulers.io())
-                .subscribe()
+                .subscribe({}, {
+                    Timber.w(it, "Failed to download app configuration")
+                })
 
         return true
     }

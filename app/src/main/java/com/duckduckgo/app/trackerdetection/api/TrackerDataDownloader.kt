@@ -24,6 +24,7 @@ import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.store.TrackerDataStore
 import io.reactivex.Completable
 import timber.log.Timber
+import java.io.IOException
 import javax.inject.Inject
 
 
@@ -36,11 +37,14 @@ class TrackerDataDownloader @Inject constructor(
     // this should run on every sync
     fun downloadList(clientName: Client.ClientName): Completable {
 
+        Timber.i("Downloading tracker data: ${clientName.name}")
+
         return when (clientName) {
             DISCONNECT -> disconnectDownload()
             EASYLIST, EASYPRIVACY -> easyDownload(clientName)
         }
     }
+
     private fun disconnectDownload(): Completable {
 
         return Completable.fromAction({
@@ -52,6 +56,8 @@ class TrackerDataDownloader @Inject constructor(
 
                 trackerDataDao.insertAll(body.trackers)
                 trackerDataLoader.loadDisconnectData()
+            } else {
+                throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
         })
     }
@@ -72,6 +78,8 @@ class TrackerDataDownloader @Inject constructor(
                     persistTrackerData(clientName, bodyBytes)
                     trackerDataLoader.loadAdblockData(clientName)
                 }
+            } else {
+                throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
         })
     }
