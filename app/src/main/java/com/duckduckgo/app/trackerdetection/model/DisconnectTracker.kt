@@ -16,7 +16,12 @@
 
 package com.duckduckgo.app.trackerdetection.model
 
-data class DisconnectTracker(val url: String,
-                             val category: String,
-                             val networkName: String,
-                             val networkUrl: String)
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.PrimaryKey
+
+@Entity(tableName = "disconnect_tracker")
+data class DisconnectTracker(
+        @PrimaryKey val url: String,
+        val category: String,
+        val networkName: String,
+        val networkUrl: String)

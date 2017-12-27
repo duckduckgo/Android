@@ -18,8 +18,9 @@ package com.duckduckgo.app.global
 
 import android.app.job.JobParameters
 import android.app.job.JobService
-import com.duckduckgo.app.httpsupgrade.HTTPSUpgradeListLoader
-import com.duckduckgo.app.trackerdetection.TrackerDataLoader
+import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeListDownloader
+import com.duckduckgo.app.trackerdetection.Client.ClientName.*
+import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import dagger.android.AndroidInjection
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
@@ -31,10 +32,10 @@ import javax.inject.Inject
 class AppConfigurationJobService : JobService() {
 
     @Inject
-    lateinit var trackerDataLoader: TrackerDataLoader
+    lateinit var trackerDataDownloader: TrackerDataDownloader
 
     @Inject
-    lateinit var httpsUpgradeListDataLoader: HTTPSUpgradeListLoader
+    lateinit var httpsUpgradeListDownloader: HttpsUpgradeListDownloader
 
     private var downloadTask: Disposable? = null
 
@@ -46,13 +47,22 @@ class AppConfigurationJobService : JobService() {
     override fun onStartJob(params: JobParameters?): Boolean {
         Timber.i("onStartJob")
 
-        downloadTask = Completable.fromAction({
-            trackerDataLoader.loadData()
-            httpsUpgradeListDataLoader.loadData()
-        })
+        val easyListDownload = trackerDataDownloader.downloadList(EASYLIST)
+        val easyPrivacyDownload = trackerDataDownloader.downloadList(EASYPRIVACY)
+        val disconnectDownload = trackerDataDownloader.downloadList(DISCONNECT)
+        val httpsUpgradeDownload = httpsUpgradeListDownloader.downloadList()
+
+        Completable.merge(mutableListOf(easyListDownload, easyPrivacyDownload, disconnectDownload, httpsUpgradeDownload))
                 .subscribeOn(Schedulers.io())
-                .doOnComplete({ jobFinishedSuccessfully(params) })
-                .doOnError({ jobFinishedFailed(params) })
+                .doOnComplete {
+                    Timber.i("Successfully downloaded all data")
+                    jobFinishedSuccessfully(params)
+                }
+                .doOnError({
+                    Timber.w("Failed to download all data")
+                    jobFinishedFailed(params)
+                })
+                .subscribeOn(Schedulers.io())
                 .subscribe()
 
         return true

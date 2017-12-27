@@ -14,14 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.httpsupgrade.api
+package com.duckduckgo.app.trackerdetection.db
 
-import retrofit2.Call
-import retrofit2.http.GET
+import android.arch.persistence.room.Dao
+import android.arch.persistence.room.Insert
+import android.arch.persistence.room.OnConflictStrategy
+import android.arch.persistence.room.Query
+import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 
-interface HTTPSUpgradeListService {
 
-    @GET("/contentblocking.js?l=https")
-    fun https(): Call<HTTPSUpgradeJson>
+@Dao
+interface TrackerDataDao {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(trackers: List<DisconnectTracker>)
+
+    @Query("Select * from disconnect_tracker")
+    fun getAll() : List<DisconnectTracker>
 
 }

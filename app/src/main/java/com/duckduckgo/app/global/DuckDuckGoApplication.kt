@@ -22,12 +22,13 @@ import android.app.Service
 import android.app.job.JobScheduler
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.DaggerAppComponent
-import com.duckduckgo.app.httpsupgrade.HTTPSUpgradeListLoader
 import com.duckduckgo.app.global.job.JobBuilder
+import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import dagger.android.HasServiceInjector
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -49,7 +50,7 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
     lateinit var jobScheduler: JobScheduler
 
     @Inject
-    lateinit var httpsUpgradeListDataLoader: HTTPSUpgradeListLoader
+    lateinit var trackerDataLoader: TrackerDataLoader
 
     override fun onCreate() {
         super.onCreate()
@@ -57,8 +58,13 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
         configureDependencyInjection()
         configureLogging()
         configureCrashReporting()
+
+        loadTrackerData()
         configureDataDownloader()
-        configureHttpsUpgradeData()
+    }
+
+    private fun loadTrackerData() {
+        Schedulers.io().scheduleDirect { trackerDataLoader.loadData() }
     }
 
     private fun configureLogging() {
@@ -83,15 +89,11 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
                 .filter { jobInfo.id == it.id }
                 .count() == 0
 
-        if(schedulingRequired) {
+        if (schedulingRequired) {
             Timber.i("Scheduling of background sync job, successful = %s", jobScheduler.schedule(jobInfo))
         } else {
             Timber.i("Job already scheduled; no need to schedule again")
         }
-    }
-
-    private fun configureHttpsUpgradeData() {
-        httpsUpgradeListDataLoader.loadData()
     }
 
     override fun activityInjector(): AndroidInjector<Activity> = activityInjector

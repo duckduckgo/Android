@@ -35,4 +35,7 @@ class DatabaseModule {
     fun provideHTTPSUpgradeDomainDAO(database: AppDatabase) =
             database.httpsUpgradeDomainDAO()
 
+    @Provides
+    fun provideDisconnectTrackDao(database: AppDatabase) = database.trackerDataDao()
+
 }

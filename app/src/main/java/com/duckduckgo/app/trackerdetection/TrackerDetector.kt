@@ -62,4 +62,8 @@ class TrackerDetector @Inject constructor(private val networkTrackers: TrackerNe
 
     private fun sameNetwork(firstUrl: String, secondUrl: String): Boolean =
             networkTrackers.network(firstUrl) != null && networkTrackers.network(firstUrl) == networkTrackers.network(secondUrl)
+
+    fun removeClient(client: Client) {
+        clients.remove(client)
+    }
 }
