@@ -22,6 +22,6 @@ import retrofit2.http.GET
 interface HTTPSUpgradeListService {
 
     @GET("/contentblocking.js?l=https")
-    fun https(): Call<HTTPSUpgradeJson>
+    fun https(): Call<HttpsUpgradeJson>
 
 }

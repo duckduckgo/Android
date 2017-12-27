@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.di
 
-import com.duckduckgo.app.httpsupgrade.api.HTTPSUpgradeDomainFromStringAdapter
-import com.duckduckgo.app.httpsupgrade.api.HTTPSUpgradeJson
+import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeDomainFromStringAdapter
+import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeJson
 import com.duckduckgo.app.privacymonitor.api.TermsOfServiceListAdapter
 import com.duckduckgo.app.trackerdetection.api.DisconnectListJsonAdapter
 import com.squareup.moshi.JsonAdapter
@@ -34,12 +34,12 @@ class JsonModule {
     fun moshi(): Moshi = Moshi.Builder()
             .add(DisconnectListJsonAdapter())
             .add(TermsOfServiceListAdapter())
-            .add(HTTPSUpgradeDomainFromStringAdapter())
+            .add(HttpsUpgradeDomainFromStringAdapter())
             .build()
 
     @Provides
-    fun httpsUpgradeDomainAdapter(moshi: Moshi): JsonAdapter<HTTPSUpgradeJson> {
-        return moshi.adapter(HTTPSUpgradeJson::class.java)
+    fun httpsUpgradeDomainAdapter(moshi: Moshi): JsonAdapter<HttpsUpgradeJson> {
+        return moshi.adapter(HttpsUpgradeJson::class.java)
     }
 
 }

@@ -17,6 +17,10 @@
 package com.duckduckgo.app.httpsupgrade.api
 
 import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomain
+import com.squareup.moshi.FromJson
 
-data class HTTPSUpgradeJson(val simpleUpgrade: SimpleUpgradeListJson)
-data class SimpleUpgradeListJson(val top500: List<HTTPSUpgradeDomain>)
+class HttpsUpgradeDomainFromStringAdapter {
+
+    @FromJson fun adapt(domain: String) = HTTPSUpgradeDomain(domain)
+
+}

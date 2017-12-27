@@ -21,12 +21,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 
-class HTTPSUpgradeJsonTest {
+class HttpsUpgradeJsonTest {
 
     @Test
     fun whenGivenValidJsonThenParsesCorrectly() {
-        val moshi = Moshi.Builder().add(HTTPSUpgradeDomainFromStringAdapter()).build()
-        val adapter = moshi.adapter(HTTPSUpgradeJson::class.java)
+        val moshi = Moshi.Builder().add(HttpsUpgradeDomainFromStringAdapter()).build()
+        val adapter = moshi.adapter(HttpsUpgradeJson::class.java)
         val list = adapter.fromJson(json())
         assertEquals(5, list.simpleUpgrade.top500.count())
     }
