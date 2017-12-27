@@ -16,11 +16,11 @@
 
 package com.duckduckgo.app.httpsupgrade.api
 
-import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomain
+import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomain
 import com.squareup.moshi.FromJson
 
 class HttpsUpgradeDomainFromStringAdapter {
 
-    @FromJson fun adapt(domain: String) = HTTPSUpgradeDomain(domain)
+    @FromJson fun adapt(domain: String) = HttpsUpgradeDomain(domain)
 
 }

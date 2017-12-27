@@ -17,7 +17,7 @@
 package com.duckduckgo.app.di
 
 import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.global.AppConfigurationJobService
+import com.duckduckgo.app.job.AppConfigurationJobService
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity
 

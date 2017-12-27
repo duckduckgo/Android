@@ -19,10 +19,9 @@ package com.duckduckgo.app.global
 import android.app.Activity
 import android.app.Application
 import android.app.Service
-import android.app.job.JobScheduler
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.DaggerAppComponent
-import com.duckduckgo.app.global.job.JobBuilder
+import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -44,13 +43,10 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
     lateinit var crashReportingInitializer: CrashReportingInitializer
 
     @Inject
-    lateinit var jobBuilder: JobBuilder
-
-    @Inject
-    lateinit var jobScheduler: JobScheduler
-
-    @Inject
     lateinit var trackerDataLoader: TrackerDataLoader
+
+    @Inject
+    lateinit var appConfigurationSyncer: AppConfigurationSyncer
 
     override fun onCreate() {
         super.onCreate()
@@ -83,17 +79,7 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
     }
 
     private fun configureDataDownloader() {
-        val jobInfo = jobBuilder.appConfigurationJob(this)
-
-        val schedulingRequired = jobScheduler.allPendingJobs
-                .filter { jobInfo.id == it.id }
-                .count() == 0
-
-        if (schedulingRequired) {
-            Timber.i("Scheduling of background sync job, successful = %s", jobScheduler.schedule(jobInfo))
-        } else {
-            Timber.i("Job already scheduled; no need to schedule again")
-        }
+        appConfigurationSyncer.scheduleRegularSync(this)
     }
 
     override fun activityInjector(): AndroidInjector<Activity> = activityInjector

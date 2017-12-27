@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global
+package com.duckduckgo.app.job
 
 import android.app.job.JobParameters
 import android.app.job.JobService

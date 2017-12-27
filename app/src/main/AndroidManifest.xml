@@ -43,7 +43,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <service
-            android:name="com.duckduckgo.app.global.AppConfigurationJobService"
+            android:name="com.duckduckgo.app.job.AppConfigurationJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
     </application>

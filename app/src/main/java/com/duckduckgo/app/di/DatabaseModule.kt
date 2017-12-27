@@ -32,8 +32,8 @@ class DatabaseModule {
             = Room.databaseBuilder(context, AppDatabase::class.java, "app.db").build()
 
     @Provides
-    fun provideHTTPSUpgradeDomainDAO(database: AppDatabase) =
-            database.httpsUpgradeDomainDAO()
+    fun provideHttpsUpgradeDomainDao(database: AppDatabase) =
+            database.httpsUpgradeDomainDao()
 
     @Provides
     fun provideDisconnectTrackDao(database: AppDatabase) = database.trackerDataDao()

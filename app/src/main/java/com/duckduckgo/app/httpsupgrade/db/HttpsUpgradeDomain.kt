@@ -21,7 +21,7 @@ import android.arch.persistence.room.Ignore
 import android.arch.persistence.room.PrimaryKey
 
 @Entity(tableName = "https_upgrade_domain")
-class HTTPSUpgradeDomain() {
+class HttpsUpgradeDomain() {
 
     @PrimaryKey var domain: String = ""
 

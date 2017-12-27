@@ -17,16 +17,16 @@
 package com.duckduckgo.app.httpsupgrade.api
 
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomainDAO
+import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
 import io.reactivex.Completable
 import timber.log.Timber
 import javax.inject.Inject
 
 
 class HttpsUpgradeListDownloader @Inject constructor(
-        private val service: HTTPSUpgradeListService,
+        private val service: HttpsUpgradeListService,
         private val database: AppDatabase,
-        private val httpsUpgradeDao: HTTPSUpgradeDomainDAO) {
+        private val httpsUpgradeDao: HttpsUpgradeDomainDao) {
 
     fun downloadList(): Completable {
         Timber.i("Downloading HTTPS Upgrade data")

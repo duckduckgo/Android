@@ -19,7 +19,7 @@ package com.duckduckgo.app.global.job
 import android.app.job.JobInfo
 import android.content.ComponentName
 import android.content.Context
-import com.duckduckgo.app.global.AppConfigurationJobService
+import com.duckduckgo.app.job.AppConfigurationJobService
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 

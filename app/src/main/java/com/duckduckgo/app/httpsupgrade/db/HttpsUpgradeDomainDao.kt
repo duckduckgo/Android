@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.httpsupgrade.api
+package com.duckduckgo.app.httpsupgrade.db
 
-import retrofit2.Call
-import retrofit2.http.GET
+import android.arch.persistence.room.Dao
+import android.arch.persistence.room.Insert
+import android.arch.persistence.room.OnConflictStrategy
+import android.arch.persistence.room.Query
 
-interface HTTPSUpgradeListService {
+@Dao
+interface HttpsUpgradeDomainDao {
 
-    @GET("/contentblocking.js?l=https")
-    fun https(): Call<HttpsUpgradeJson>
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(vararg domains: HttpsUpgradeDomain)
+
+    @Query("select count(1) > 0 from https_upgrade_domain where :host glob domain")
+    fun contains(host: String) : Boolean
+
+    @Query("delete from https_upgrade_domain")
+    fun deleteAll()
 
 }

@@ -24,7 +24,7 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.duckduckgo.app.global.isHttp
-import com.duckduckgo.app.httpsupgrade.HTTPSUpgrader
+import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.ResourceType
 import timber.log.Timber
@@ -34,7 +34,7 @@ import javax.inject.Inject
 class BrowserWebViewClient @Inject constructor(
         private val requestRewriter: DuckDuckGoRequestRewriter,
         private var trackerDetector: TrackerDetector,
-        private var httpsUpgrader: HTTPSUpgrader
+        private var httpsUpgrader: HttpsUpgrader
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null

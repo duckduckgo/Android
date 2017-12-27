@@ -18,7 +18,7 @@ package com.duckduckgo.app.di
 
 import android.content.Context
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.httpsupgrade.api.HTTPSUpgradeListService
+import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeListService
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
 import com.squareup.moshi.Moshi
 import dagger.Module
@@ -60,8 +60,8 @@ class NetworkModule {
             retrofit.create(TrackerListService::class.java)
 
     @Provides
-    fun httpsUpgradeListService(retrofit: Retrofit): HTTPSUpgradeListService =
-            retrofit.create(HTTPSUpgradeListService::class.java)
+    fun httpsUpgradeListService(retrofit: Retrofit): HttpsUpgradeListService =
+            retrofit.create(HttpsUpgradeListService::class.java)
 
     companion object {
         private const val CACHE_SIZE: Long = 10 * 1024 * 1024 // 10MB

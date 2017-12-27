@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.httpsupgrade.api
 
-import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomain
+import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomain
 
 data class HttpsUpgradeJson(val simpleUpgrade: SimpleUpgradeListJson)
-data class SimpleUpgradeListJson(val top500: List<HTTPSUpgradeDomain>)
+data class SimpleUpgradeListJson(val top500: List<HttpsUpgradeDomain>)
