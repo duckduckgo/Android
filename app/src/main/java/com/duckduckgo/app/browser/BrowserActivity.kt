@@ -40,6 +40,7 @@ import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.REQUEST_DASHBOARD
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RESULT_RELOAD
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RESULT_TOSDR
+import com.duckduckgo.app.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_browser.*
 import javax.inject.Inject
 
@@ -260,6 +261,10 @@ class BrowserActivity : DuckDuckGoActivity() {
                 webView.goForward()
                 return true
             }
+            R.id.settings_menu_item -> {
+                launchSettingsView()
+                return true
+            }
         }
         return false
     }
@@ -271,6 +276,10 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     private fun launchPrivacyDashboard() {
         startActivityForResult(PrivacyDashboardActivity.intent(this), REQUEST_DASHBOARD)
+    }
+
+    private fun launchSettingsView() {
+        startActivity(SettingsActivity.intent(this))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
