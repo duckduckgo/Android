@@ -42,13 +42,21 @@ class SettingsActivity : DuckDuckGoActivity() {
         setContentView(R.layout.activity_settings)
         setupActionBar()
 
+        configureUiEventHandlers()
+        observeViewModel()
+        viewModel.start()
+    }
+
+    private fun configureUiEventHandlers() {
+        about.setOnClickListener { /* navigate to about screen */ }
+    }
+
+    private fun observeViewModel() {
         viewModel.viewState.observe(this, Observer<SettingsViewModel.ViewState> { viewState ->
             viewState?.let {
                 version.text = it.version
             }
         })
-
-        viewModel.start()
     }
 
     private fun setupActionBar() {
