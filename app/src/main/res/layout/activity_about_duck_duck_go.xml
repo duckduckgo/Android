@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Copyright (c) 2017 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,38 +15,27 @@
   ~ limitations under the License.
   -->
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:ignore="Overdraw">
+    tools:context="com.duckduckgo.app.about.AboutDuckDuckGoActivity">
 
-    <LinearLayout
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:theme="@style/AppTheme.AppBarOverlay">
 
-        <TextView
-            style="@style/SettingsContentLabel"
-            android:text="@string/settings_version" />
-
-        <TextView
-            android:id="@+id/version"
-            style="@style/SettingsContentValue"
-            tools:text="DuckDuckGo 123.43.5456" />
-
-        <TextView
-            android:id="@+id/about"
-            style="@style/SettingsContentLabel"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:paddingTop="12dp"
-            android:background="?attr/selectableItemBackground"
-            android:paddingBottom="12dp"
-            android:text="@string/about_duckduckgo" />
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-    </LinearLayout>
+    </android.support.design.widget.AppBarLayout>
 
+    <include layout="@layout/content_about_duck_duck_go" />
 
-</ScrollView>
+</android.support.design.widget.CoordinatorLayout>

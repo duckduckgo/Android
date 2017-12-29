@@ -17,8 +17,7 @@
             android:name="com.duckduckgo.app.home.HomeActivity"
             android:label="@string/appName"
             android:parentActivityName="com.duckduckgo.app.home.HomeActivity"
-            android:screenOrientation="fullSensor"
-            >
+            android:screenOrientation="fullSensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,20 +27,29 @@
         <activity
             android:name=".BrowserActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="fullSensor"/>
+            android:screenOrientation="fullSensor" />
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
             android:label="@string/privacyDashboardActivityTitle"
             android:parentActivityName=".BrowserActivity"
-            android:screenOrientation="fullSensor"/>
+            android:screenOrientation="fullSensor" />
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity"
             android:label="@string/privacyTermsActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"/>
+            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
+            android:screenOrientation="fullSensor" />
         <activity
-            android:parentActivityName=".BrowserActivity"
             android:name="com.duckduckgo.app.settings.SettingsActivity"
-            android:label="@string/title_activity_settings" />
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".BrowserActivity"
+            android:screenOrientation="fullSensor" />
+        <activity
+            android:name="com.duckduckgo.app.about.AboutDuckDuckGoActivity"
+            android:label="@string/title_activity_about_duck_duck_go"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+            android:theme="@style/AppTheme"
+            android:screenOrientation="fullSensor" >
+        </activity>
     </application>
 
 </manifest>

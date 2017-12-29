@@ -21,6 +21,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
@@ -48,7 +49,7 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUiEventHandlers() {
-        about.setOnClickListener { /* navigate to about screen */ }
+        about.setOnClickListener { startActivity(AboutDuckDuckGoActivity.intent(this)) }
     }
 
     private fun observeViewModel() {
