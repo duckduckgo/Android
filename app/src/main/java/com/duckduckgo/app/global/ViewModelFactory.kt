@@ -27,6 +27,7 @@ import com.duckduckgo.app.privacymonitor.store.PrivacySettingsSharedPreferences
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardViewModel
 import com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesViewModel
+import com.duckduckgo.app.settings.SettingsViewModel
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import javax.inject.Inject
 
@@ -48,6 +49,7 @@ class ViewModelFactory @Inject constructor(
                     isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, duckDuckGoUrlDetector, termsOfServiceStore, trackerNetworks, privacyMonitorRepository)
                     isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(context, privacySettingsStore)
                     isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
+                    isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel()
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
             } as T

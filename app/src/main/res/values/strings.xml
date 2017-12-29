@@ -43,4 +43,11 @@
     <string name="practices_icon_content_good">Good Practice Icon</string>
     <string name="practices_icon_content_bad">Bad Practice Icon</string>
 
+
+    <!-- Settings Activity -->
+    <string name="title_activity_settings">Settings</string>
+    <string name="settings_menu_item_title">Settings</string>
+    <string name="settings_version">Version</string>
+
+
 </resources>
