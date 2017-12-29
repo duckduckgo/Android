@@ -28,30 +28,20 @@
         android:orientation="vertical">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginStart="20dp"
-            android:fontFamily="sans-serif"
-            android:text="@string/settings_version"
-            android:textColor="@color/white"
-            android:textSize="17sp"
-            android:textStyle="normal" />
+            style="@style/SettingsContentLabel"
+            android:text="@string/settings_version" />
 
         <TextView
             android:id="@+id/version"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="6dp"
-            android:fontFamily="sans-serif-medium"
-            android:lineSpacingExtra="4sp"
-            android:textColor="#969799"
-            android:textSize="12sp"
-            android:textStyle="normal"
+            style="@style/SettingsContentValue"
             tools:text="DuckDuckGo 123.43.5456" />
+
+        <TextView
+            android:id="@+id/about"
+            style="@style/SettingsContentLabel"
+            android:layout_width="match_parent"
+            android:padding="12dp"
+            android:text="@string/about_duckduckgo" />
 
     </LinearLayout>
 
