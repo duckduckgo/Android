@@ -64,7 +64,7 @@ class PrivacyPracticesViewModelTest {
     }
 
     @Test
-    fun whenTermsAreUpdatedThenViewModelPracticesAndTermsListsAresUpdated() {
+    fun whenTermsAreUpdatedThenViewModelPracticesAndTermsListsAreUpdated() {
         val terms = TermsOfService(classification = "C", goodPrivacyTerms = listOf("good", "good"), badPrivacyTerms = listOf("good"))
         testee.onPrivacyMonitorChanged(monitor(terms = terms))
         val viewState = testee.viewState.value!!

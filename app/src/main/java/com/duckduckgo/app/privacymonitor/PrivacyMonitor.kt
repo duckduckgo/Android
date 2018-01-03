@@ -17,6 +17,7 @@
 package com.duckduckgo.app.privacymonitor
 
 import android.net.Uri
+import com.duckduckgo.app.privacymonitor.model.HttpsStatus
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -28,7 +29,9 @@ interface PrivacyMonitor {
     val https: HttpsStatus
     val termsOfService: TermsOfService
     val memberNetwork: TrackerNetwork?
+    val trackingEvents: List<TrackingEvent>
     val trackerCount: Int
+    val distinctTrackersByNetwork: Map<String, List<TrackingEvent>>
     val networkCount: Int
     val hasTrackerFromMajorNetwork: Boolean
     val allTrackersBlocked: Boolean

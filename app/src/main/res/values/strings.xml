@@ -15,7 +15,13 @@
     <string name="privacyProtectionDisabled">PRIVACY PROTECTION DISABLED</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">UPGRADED FROM &lt;img src="%d" /> TO &lt;img src="%d" /></string>
     <string name="privacyGradeContentDescription">Privacy Grade</string>
-    <string name="trackerNetworksContentDescription">Tracker networks icon</string>
+
+    <string name="httpsGood">Encrypted Connection</string>
+    <string name="httpsMixed">Mixed Encryption connection</string>
+    <string name="httpsBad">Unencrypted Connection</string>
+
+    <string name="networksActivityTitle">Tracker Networks</string>
+    <string name="networksOverview">Tracker networks aggregate your web history into a data profile about you. Major tracker networks are more harmful because they can track and target you across more of the internet.</string>
 
     <plurals name="networksBlocked">
         <item quantity="one">%s Tracker Network Blocked</item>
@@ -27,12 +33,6 @@
         <item quantity="other">%s Tracker Networks Found</item>
     </plurals>
 
-    <string name="privacyProtectionToggle">Privacy Protection</string>
-
-    <string name="httpsGood">Encrypted Connection</string>
-    <string name="httpsMixed">Mixed Encryption connection</string>
-    <string name="httpsBad">Unencrypted Connection</string>
-
     <string name="privacyTermsActivityTitle">Privacy Practices</string>
     <string name="practicesGood">Good Privacy Practices</string>
     <string name="practicesMixed">Mixed Privacy Practices"</string>
@@ -42,5 +42,6 @@
     <string name="practices_tosdr_link">Privacy Practices results from&#160;<b><u>TOSDR</u></b></string>
     <string name="practices_icon_content_good">Good Practice Icon</string>
     <string name="practices_icon_content_bad">Bad Practice Icon</string>
+    <string name="privacyProtectionToggle">Privacy Protection</string>
 
 </resources>

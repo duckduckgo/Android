@@ -22,7 +22,7 @@ import android.arch.lifecycle.ViewModel
 import android.content.Context
 import android.support.annotation.DrawableRes
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.privacymonitor.HttpsStatus
+import com.duckduckgo.app.privacymonitor.model.HttpsStatus
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
