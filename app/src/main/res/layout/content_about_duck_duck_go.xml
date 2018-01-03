@@ -15,70 +15,80 @@
   -->
 
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.duckduckgo.app.about.AboutDuckDuckGoActivity"
     tools:showIn="@layout/activity_about_duck_duck_go">
 
-    <LinearLayout
+    <ScrollView
+        android:id="@+id/longDescriptionContainer"
+        android:layout_width="match_parent"
+        android:fillViewport="true"
+        android:fadeScrollbars="false"
+        android:layout_above="@id/learnMoreLink"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            tools:ignore="UseCompoundDrawables">
+
+            <ImageView
+                android:id="@+id/ddgLogo"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:contentDescription="@string/duckDuckGoLogoDescription"
+                android:src="@drawable/full_logo" />
+
+            <TextView
+                android:id="@+id/ddgAboutUsLongDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="30dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="10dp"
+                android:fontFamily="sans-serif"
+                android:lineSpacingExtra="6sp"
+                android:text="@string/ddg_about"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="normal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/ddgLogo"
+                tools:text="Long description would go here\n\nLots and lots of words" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/learnMoreLink"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="20dp"
+        android:padding="12dp"
+        android:background="#3f4145"
+        android:elevation="4dp"
+        android:fontFamily="sans-serif"
+        android:lineSpacingExtra="6sp"
+        android:text="@string/ddg_link"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="normal" />
 
-        <ImageView
-            android:id="@+id/ddgLogo"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="20dp"
-            android:contentDescription="@string/duckDuckGoLogoDescription"
-            android:src="@drawable/full_logo" />
-
-        <TextView
-            android:id="@+id/ddgAboutUsLongDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="30dp"
-            android:layout_marginStart="30dp"
-            android:layout_marginTop="10dp"
-            android:fontFamily="sans-serif"
-            android:lineSpacingExtra="6sp"
-            android:text="@string/ddg_about"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:textStyle="normal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ddgLogo"
-            tools:text="hi there" />
-
-        <TextView
-            android:id="@+id/learnMoreLink"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
-            android:layout_marginEnd="30dp"
-            android:layout_marginStart="30dp"
-            android:layout_marginTop="20dp"
-            android:autoLink="web"
-            android:fontFamily="sans-serif"
-            android:lineSpacingExtra="6sp"
-            android:text="@string/ddg_link"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:textStyle="normal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ddgAboutUsLongDescription" />
-
-    </LinearLayout>
-</ScrollView>
+</RelativeLayout>

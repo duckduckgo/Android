@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.duckduckgo.app.browser.R
 import kotlinx.android.synthetic.main.activity_about_duck_duck_go.*
+import kotlinx.android.synthetic.main.content_about_duck_duck_go.*
 
 class AboutDuckDuckGoActivity : AppCompatActivity() {
 
@@ -29,6 +30,11 @@ class AboutDuckDuckGoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about_duck_duck_go)
         configureActionBar()
+
+        learnMoreLink.setOnClickListener {
+            setResult(RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE)
+            finish()
+        }
     }
 
     private fun configureActionBar() {
@@ -40,6 +46,10 @@ class AboutDuckDuckGoActivity : AppCompatActivity() {
         fun intent(context: Context): Intent {
             return Intent(context, AboutDuckDuckGoActivity::class.java)
         }
+
+        const val RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE = 100
     }
+
+
 
 }

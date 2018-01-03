@@ -49,7 +49,7 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUiEventHandlers() {
-        about.setOnClickListener { startActivity(AboutDuckDuckGoActivity.intent(this)) }
+        about.setOnClickListener { startActivityForResult(AboutDuckDuckGoActivity.intent(this), REQUEST_CODE_ABOUT_DDG) }
     }
 
     private fun observeViewModel() {
@@ -65,9 +65,20 @@ class SettingsActivity : DuckDuckGoActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when(requestCode) {
+            REQUEST_CODE_ABOUT_DDG -> {
+                setResult(AboutDuckDuckGoActivity.RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE)
+                finish()
+            }
+        }
+    }
+
     companion object {
         fun intent(context: Context): Intent {
             return Intent(context, SettingsActivity::class.java)
         }
+
+        private const val REQUEST_CODE_ABOUT_DDG = 100
     }
 }
