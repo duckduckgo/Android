@@ -41,7 +41,6 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
     private val practicesAdapter = PrivacyPracticesAdapter()
 
     companion object {
-
         fun intent(context: Context): Intent {
             return Intent(context, PrivacyPracticesActivity::class.java)
         }

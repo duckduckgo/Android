@@ -36,6 +36,11 @@
             android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name="com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity"
+            android:label="@string/networksActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity"
             android:label="@string/privacyTermsActivityTitle"
             android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
