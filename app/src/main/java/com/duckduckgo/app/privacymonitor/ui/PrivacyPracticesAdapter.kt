@@ -53,7 +53,7 @@ class PrivacyPracticesAdapter : RecyclerView.Adapter<PrivacyPracticesAdapter.Pra
     }
 
     fun updateData(goodTerms: List<String>, badTerms: List<String>) {
-        this.terms = goodTerms.map { Pair(GOOD, it) } + badTerms.map { Pair(BAD, it) }
+        terms = goodTerms.map { GOOD to it } + badTerms.map { BAD to it }
         notifyDataSetChanged()
     }
 

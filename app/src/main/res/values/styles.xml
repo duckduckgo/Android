@@ -40,7 +40,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:clickable">false</item>
-        <item name="android:contentDescription">@string/trackerNetworksContentDescription</item>
+        <item name="android:importantForAccessibility">no</item>
     </style>
 
     <style name="SettingsContentLabel">

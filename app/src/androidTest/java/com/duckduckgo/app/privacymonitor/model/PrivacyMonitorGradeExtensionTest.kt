@@ -16,9 +16,8 @@
 
 package com.duckduckgo.app.privacymonitor.model
 
-import com.duckduckgo.app.privacymonitor.HttpsStatus
-import com.duckduckgo.app.privacymonitor.HttpsStatus.*
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
+import com.duckduckgo.app.privacymonitor.model.HttpsStatus.*
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
@@ -117,7 +116,7 @@ class PrivacyMonitorGradeExtensionTest {
 
     @Test
     fun whenSiteIsMajorNetworkMemberThenScoreIsIncrementedByPercentage() {
-        val privacyMonitor = monitor(memberNetwork = TrackerNetwork("", "", 45, true))
+        val privacyMonitor = monitor(memberNetwork = TrackerNetwork("", "", "", 45, true))
         assertEquals(defaultScore + 5, privacyMonitor.score)
     }
 
@@ -136,7 +135,7 @@ class PrivacyMonitorGradeExtensionTest {
     @Test
     fun whenPotentialScoreThenTrackerMetricsIgnored() {
         val privacyMonitor = monitor(
-                TrackerNetwork("", "", 5, true),
+                TrackerNetwork("", "", "", 5, true),
                 TermsOfService(classification = "D"),
                 NONE,
                 5,
@@ -149,7 +148,7 @@ class PrivacyMonitorGradeExtensionTest {
     @Test
     fun whenAllTrackersBlockedThenImprovedScoreIsEqualToPotentialScore() {
         val privacyMonitor = monitor(
-                TrackerNetwork("", "", 5, true),
+                TrackerNetwork("", "", "", 5, true),
                 TermsOfService(classification = "D"),
                 NONE,
                 5,
@@ -162,7 +161,7 @@ class PrivacyMonitorGradeExtensionTest {
     @Test
     fun whenNotAllTrackersBlockedThenImprovedScoreIsEqualToScore() {
         val privacyMonitor = monitor(
-                TrackerNetwork("", "", 5, true),
+                TrackerNetwork("", "", "", 5, true),
                 TermsOfService(classification = "D"),
                 NONE,
                 5,
