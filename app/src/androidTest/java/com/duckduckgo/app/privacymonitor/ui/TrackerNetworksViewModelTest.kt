@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,25 +20,25 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
 import android.net.Uri
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
-import com.duckduckgo.app.privacymonitor.model.TermsOfService
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
-
-class PrivacyPracticesViewModelTest {
+class TrackerNetworksViewModelTest {
 
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private var viewStateObserver: Observer<PrivacyPracticesViewModel.ViewState> = mock()
+    private var viewStateObserver: Observer<TrackerNetworksViewModel.ViewState> = mock()
 
-    private val testee: PrivacyPracticesViewModel by lazy {
-        val model = PrivacyPracticesViewModel()
+    private val testee: TrackerNetworksViewModel by lazy {
+        val model = TrackerNetworksViewModel()
         model.viewState.observeForever(viewStateObserver)
         model
     }
@@ -52,9 +52,9 @@ class PrivacyPracticesViewModelTest {
     fun whenNoDataThenDefaultValuesAreUsed() {
         val viewState = testee.viewState.value!!
         assertEquals("", viewState.domain)
-        assertEquals(TermsOfService.Practices.UNKNOWN, viewState.practices)
-        assertEquals(0, viewState.goodTerms.size)
-        assertEquals(0, viewState.badTerms.size)
+        assertEquals(0, viewState.networkCount)
+        assertEquals(true, viewState.allTrackersBlocked)
+        assertTrue(viewState.trackingEventsByNetwork.isEmpty())
     }
 
     @Test
@@ -64,21 +64,26 @@ class PrivacyPracticesViewModelTest {
     }
 
     @Test
-    fun whenTermsAreUpdatedThenViewModelPracticesAndTermsListsAreUpdated() {
-        val terms = TermsOfService(classification = "C", goodPrivacyTerms = listOf("good", "good"), badPrivacyTerms = listOf("good"))
-        testee.onPrivacyMonitorChanged(monitor(terms = terms))
+    fun whenNetworkCountIsUpdatedThenViewModelCountUpdated() {
+        testee.onPrivacyMonitorChanged(monitor(networkCount = 10))
         val viewState = testee.viewState.value!!
-        assertEquals(TermsOfService.Practices.POOR, viewState.practices)
-        assertEquals(2, viewState.goodTerms.size)
-        assertEquals(1, viewState.badTerms.size)
+        assertEquals(10, viewState.networkCount)
     }
 
-    private fun monitor(url: String = "", terms: TermsOfService = TermsOfService()): PrivacyMonitor {
+    @Test
+    fun whenTrackersUpdatedThenViewModelTrackersUpdated() {
+        val trackersByNetwork = hashMapOf("Network" to arrayListOf(TrackingEvent("", "", null, true)))
+        testee.onPrivacyMonitorChanged(monitor(trackersByNetwork = trackersByNetwork))
+        val viewState = testee.viewState.value!!
+        assertEquals(trackersByNetwork, viewState.trackingEventsByNetwork)
+    }
+
+    private fun monitor(url: String = "", networkCount: Int = 0, trackersByNetwork: Map<String, List<TrackingEvent>> = HashMap()): PrivacyMonitor {
         val monitor: PrivacyMonitor = mock()
         whenever(monitor.url).thenReturn(url)
         whenever(monitor.uri).thenReturn(Uri.parse(url))
-        whenever(monitor.termsOfService).thenReturn(terms)
+        whenever(monitor.networkCount).thenReturn(networkCount)
+        whenever(monitor.distinctTrackersByNetwork).thenReturn(trackersByNetwork)
         return monitor
     }
-
 }

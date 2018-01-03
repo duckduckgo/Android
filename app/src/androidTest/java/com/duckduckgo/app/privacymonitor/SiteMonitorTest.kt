@@ -22,8 +22,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import org.junit.Assert
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Test
 
 class SiteMonitorTest {
@@ -36,6 +35,8 @@ class SiteMonitorTest {
 
         private const val trackerA = "http://standalonetrackerA.com/script.js"
         private const val trackerB = "http://standalonetrackerB.com/script.js"
+        private const val trackerC = "http://standalonetrackerC.com/script.js"
+
         private const val networkATracker = "http://networkAtracker.com/script.js"
         private const val networkBTracker = "http://networkBtracker.com/script.js"
         private const val majorNetworkTracker = "http://majorNetworkTracker.com/script.js"
@@ -133,11 +134,19 @@ class SiteMonitorTest {
     }
 
     @Test
-    fun whenNonNetworkTrackersAreDetectedThenNetworkCountIsIncrementedForEachDomain() {
+    fun whenUnqiueNonNetworkTrackersAreDetectedThenNetworkCountIsIncrementedForEachDomain() {
         val testee = SiteMonitor(document, TermsOfService(), TrackerNetworks())
         testee.trackerDetected(TrackingEvent(document, trackerA, null, true))
         testee.trackerDetected(TrackingEvent(document, trackerB, null, true))
         assertEquals(2, testee.networkCount)
+    }
+
+    @Test
+    fun whenDuplicateNonNetworkTrackersAreDetectedThenNetworkCountIsIncrementedOnce() {
+        val testee = SiteMonitor(document, TermsOfService(), TrackerNetworks())
+        testee.trackerDetected(TrackingEvent(document, trackerA, null, true))
+        testee.trackerDetected(TrackingEvent(document, trackerA, null, true))
+        assertEquals(1, testee.networkCount)
     }
 
     @Test
@@ -151,6 +160,31 @@ class SiteMonitorTest {
     fun whenNonMajorNetworkTrackerIsDetectedThenHasTrackerFromMajorNetworkIsFalse() {
         val testee = SiteMonitor(document, TermsOfService(), TrackerNetworks())
         testee.trackerDetected(TrackingEvent(document, trackerA, networkA, true))
-        Assert.assertFalse(testee.hasTrackerFromMajorNetwork)
+        assertFalse(testee.hasTrackerFromMajorNetwork)
+    }
+
+    @Test
+    fun whenNoTrackersDetectedThenDistinctTrackerByNetworkIsEmpty() {
+        val testee = SiteMonitor(document, TermsOfService(), TrackerNetworks())
+        assertEquals(0, testee.distinctTrackersByNetwork.size)
+    }
+
+    @Test
+    fun whenTrackersDetectedThenDistinctTrackersByNetworkMapsTrackerByNetworkOrHost() {
+        val testee = SiteMonitor(document, TermsOfService(), TrackerNetworks())
+
+        // Two distinct trackers, trackerA and tracker B for network A
+        testee.trackerDetected(TrackingEvent(document, trackerA, networkA, true))
+        testee.trackerDetected(TrackingEvent(document, trackerA, networkA, true))
+        testee.trackerDetected(TrackingEvent(document, trackerB, networkA, true))
+        testee.trackerDetected(TrackingEvent(document, trackerB, networkA, true))
+
+        // One distinct trackerC with no network
+        testee.trackerDetected(TrackingEvent(document, trackerC, null, true))
+        testee.trackerDetected(TrackingEvent(document, trackerC, null, true))
+
+        val result = testee.distinctTrackersByNetwork
+        assertEquals(2, result["NetworkA"]!!.size)
+        assertEquals(1, result["standalonetrackerC.com"]!!.size)
     }
 }
