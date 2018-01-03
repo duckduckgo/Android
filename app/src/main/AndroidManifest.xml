@@ -36,8 +36,7 @@
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity"
             android:label="@string/networksActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity" />
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity"
             android:label="@string/privacyTermsActivityTitle"
