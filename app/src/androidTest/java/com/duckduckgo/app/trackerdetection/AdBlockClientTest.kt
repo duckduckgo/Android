@@ -23,7 +23,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 
-class AdBlockClientInstrumentationTest {
+class AdBlockClientTest {
 
     companion object {
         private val documentUrl = "http://example.com"

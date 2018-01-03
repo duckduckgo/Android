@@ -34,7 +34,7 @@ import org.junit.runner.RunWith
 
 
 @RunWith(AndroidJUnit4::class)
-class TrackerDetectorListInstrumentationTest {
+class TrackerDetectorListTest {
 
     companion object {
         private val documentUrl = "http://example.com"

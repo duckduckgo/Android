@@ -19,8 +19,6 @@ package com.duckduckgo.app.di
 import android.content.Context
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.httpsupgrade.api.HTTPSUpgradeListService
-import com.duckduckgo.app.privacymonitor.api.TermsOfServiceListAdapter
-import com.duckduckgo.app.trackerdetection.api.DisconnectListJsonAdapter
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
 import com.squareup.moshi.Moshi
 import dagger.Module

@@ -38,4 +38,13 @@ class NetworksRenderer {
         return if (allTrackersBlocked) R.drawable.networks_icon_good else R.drawable.networks_icon_bad
     }
 
+    @DrawableRes
+    fun networkPillIcon(context: Context, networkName: String): Int? {
+        val drawable = "network_pill_$networkName"
+                .replace(" ", "")
+                .replace(".", "")
+                .toLowerCase()
+        val resource = context.resources.getIdentifier(drawable, "drawable", context.packageName)
+        return if (resource != 0) resource else null
+    }
 }

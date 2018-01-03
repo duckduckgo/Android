@@ -21,7 +21,7 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 
 
-class TrackerNetworksInstrumentationTest {
+class TrackerNetworksTest {
 
     companion object {
         private const val category = "Social"
@@ -38,7 +38,7 @@ class TrackerNetworksInstrumentationTest {
     fun whenUrlMatchesTrackerUrlThenNetworkIsReturned() {
         val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl))
         testee.updateData(data)
-        val expected = TrackerNetwork(networkName, networkUrl)
+        val expected = TrackerNetwork(networkName, networkUrl, category)
         assertEquals(expected, testee.network("http://tracker.com/script.js"))
     }
 
@@ -46,7 +46,7 @@ class TrackerNetworksInstrumentationTest {
     fun whenUrlMatchesNetworkUrlThenNetworkIsReturned() {
         val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl))
         testee.updateData(data)
-        val expected = TrackerNetwork(networkName, networkUrl)
+        val expected = TrackerNetwork(networkName, networkUrl, category)
         assertEquals(expected, testee.network("http://www.network.com/index.html"))
     }
 
@@ -61,7 +61,7 @@ class TrackerNetworksInstrumentationTest {
     fun whenUrlSubdomainMatchesTrackerUrlThenNetworkIsReturned() {
         val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl))
         testee.updateData(data)
-        val expected = TrackerNetwork(networkName, networkUrl)
+        val expected = TrackerNetwork(networkName, networkUrl, category)
         assertEquals(expected, testee.network("http://subdomain.tracker.com/script.js"))
     }
 
@@ -69,7 +69,7 @@ class TrackerNetworksInstrumentationTest {
     fun whenUrlSubdomainMatchesNetworkUrlThenNetworkIsReturned() {
         val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl))
         testee.updateData(data)
-        val expected = TrackerNetwork(networkName, networkUrl)
+        val expected = TrackerNetwork(networkName, networkUrl, category)
         assertEquals(expected, testee.network("http://www.subdomain.network.com/index.html"))
     }
 
@@ -89,9 +89,9 @@ class TrackerNetworksInstrumentationTest {
 
     @Test
     fun whenUrlMatchesTrackerInMajorNetworkThenMajorNetworkIsReturned() {
-        val data = listOf(DisconnectTracker("tracker.com", category, majorNetworkName, networkUrl))
+        val data = listOf(DisconnectTracker("tracker.com", category, majorNetworkName, majorNetworkUrl))
         testee.updateData(data)
-        val expected = TrackerNetwork(majorNetworkName, majorNetworkUrl, "", majorNetworkPercentage, true)
+        val expected = TrackerNetwork(majorNetworkName, majorNetworkUrl, category, majorNetworkPercentage, true)
         assertEquals(expected, testee.network("http://tracker.com/script.js"))
     }
 }

@@ -25,7 +25,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 
-class ResourceTypeInstrumentationTest {
+class ResourceTypeTest {
 
     companion object {
         private val unknownHeader = "text/plain"

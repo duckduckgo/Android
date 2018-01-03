@@ -27,7 +27,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 
 
-class TrackerDetectorInstrumentationTest {
+class TrackerDetectorTest {
 
     private val networkTrackers = TrackerNetworks()
     private val settingStore: PrivacySettingsStore = mock()
@@ -93,13 +93,13 @@ class TrackerDetectorInstrumentationTest {
     @Test
     fun whenTrackerIsPartOfNetworkThenEvaluateReturnsTrackingEventWithNetwork() {
         val networks = arrayListOf(
-                DisconnectTracker("thirdparty.com", "", network, "http://network.com")
+                DisconnectTracker("thirdparty.com", "category", network, "http://network.com")
         )
         whenever(settingStore.privacyOn).thenReturn(true)
         networkTrackers.updateData(networks)
         trackerDetector.addClient(alwaysMatchingClient())
 
-        val network = TrackerNetwork(network, "http://network.com")
+        val network = TrackerNetwork(network, "http://network.com", category = "category")
         val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", network, true)
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType)
         assertEquals(expected, actual)

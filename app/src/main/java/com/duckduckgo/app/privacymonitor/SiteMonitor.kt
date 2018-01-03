@@ -17,6 +17,7 @@
 package com.duckduckgo.app.privacymonitor
 
 import android.net.Uri
+import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.hasIpHost
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.privacymonitor.model.HttpsStatus
@@ -58,11 +59,20 @@ class SiteMonitor(override val url: String,
     override val trackerCount: Int
         get() = trackingEvents.size
 
+    override val distinctTrackersByNetwork: Map<String, List<TrackingEvent>>
+        get() {
+            val networks = HashMap<String, MutableList<TrackingEvent>>().toMutableMap()
+            for (event: TrackingEvent in trackingEvents.distinctBy { Uri.parse(it.trackerUrl).baseHost }) {
+                val network = event.trackerNetwork?.name ?: Uri.parse(event.trackerUrl).baseHost ?: event.trackerUrl
+                val events = networks[network] ?: ArrayList()
+                events.add(event)
+                networks[network] = events
+            }
+            return networks
+        }
+
     override val networkCount: Int
-        get() = trackingEvents
-                .mapNotNull { it.trackerNetwork }
-                .distinct()
-                .count()
+        get() = distinctTrackersByNetwork.count()
 
     override val hasTrackerFromMajorNetwork: Boolean
         get() = trackingEvents.any { it.trackerNetwork?.isMajor ?: false }

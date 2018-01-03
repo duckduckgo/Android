@@ -17,23 +17,22 @@
 package com.duckduckgo.app.privacymonitor.ui
 
 import android.net.Uri
+import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-
 import android.widget.TextView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import kotlinx.android.synthetic.main.item_tracker_network_element.view.*
 import kotlinx.android.synthetic.main.item_tracker_network_header.view.*
 
 
 class NetworkTrackersAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-    private var data: List<ViewData> = ArrayList()
 
     companion object {
         val HEADER = 0
@@ -43,6 +42,17 @@ class NetworkTrackersAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     interface ViewData
     data class Header(val networkName: String) : ViewData
     data class Row(val tracker: TrackingEvent) : ViewData
+
+    class HeaderViewHolder(val root: View,
+                           val network: TextView,
+                           val icon: ImageView) : RecyclerView.ViewHolder(root)
+
+    class RowViewHolder(val root: View,
+                        val host: TextView,
+                        val category: TextView) : RecyclerView.ViewHolder(root)
+
+    private var viewData: List<ViewData> = ArrayList()
+    private var networkRenderer: NetworksRenderer = NetworksRenderer()
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
@@ -58,50 +68,74 @@ class NetworkTrackersAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val element = data[position]
-        if (holder is HeaderViewHolder && element is Header) {
-            holder.network.text = element.networkName
-        } else if (holder is RowViewHolder && element is Row) {
-            holder.host.text = Uri.parse(element.tracker.trackerUrl).baseHost
-            holder.category.text = element.tracker.trackerNetwork?.category
+        val viewElement = viewData[position]
+        if (holder is HeaderViewHolder && viewElement is Header) {
+            onBindHeader(holder, viewElement)
+        } else if (holder is RowViewHolder && viewElement is Row) {
+            onBindRow(holder, viewElement)
         }
+    }
+
+    private fun onBindRow(holder: RowViewHolder, viewElement: Row) {
+        holder.host.text = Uri.parse(viewElement.tracker.trackerUrl).baseHost
+        holder.category.text = viewElement.tracker.trackerNetwork?.category
+    }
+
+    private fun onBindHeader(holder: HeaderViewHolder, viewElement: Header) {
+        val iconResource = networkRenderer.networkPillIcon(holder.icon.context, viewElement.networkName)
+        if (iconResource != null) {
+            holder.icon.setImageResource(iconResource)
+        }
+        holder.network.text = viewElement.networkName
     }
 
     override fun getItemCount(): Int {
-        return data.size
+        return viewData.size
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (data[position] is Header) HEADER else ROW
+        return if (viewData[position] is Header) HEADER else ROW
     }
 
-    fun updateData(trackers: List<TrackingEvent>) {
-        var organised = HashMap<String, MutableList<TrackingEvent>>().toMutableMap()
-        for (tracker: TrackingEvent in trackers) {
-            val network = tracker.trackerNetwork?.name ?: Uri.parse(tracker.trackerUrl).baseHost ?: tracker.trackerUrl
-            var entries = organised.get(network) ?: ArrayList()
-            entries.add(tracker)
-            organised[network] = entries
-        }
+    fun updateData(data: Map<String, List<TrackingEvent>>) {
+        val majorNetworkKeys = TrackerNetworks.majorNetworks.map { it.name }.filter { data.containsKey(it) }
+        val otherKeys = data.keys.filter { !majorNetworkKeys.contains(it) }.sorted()
 
-        var flat = ArrayList<ViewData>().toMutableList()
-        for (key: String in organised.keys) {
-            flat.add(Header(key))
-            for (tracker: TrackingEvent in organised[key]!!) {
-                flat.add(Row(tracker))
-            }
-        }
+        val oldViewData = viewData
+        val newViewData = generateViewData(majorNetworkKeys, data) + generateViewData(otherKeys, data)
+        val diffCallback = DiffCallback(oldViewData, newViewData)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
 
-        data = flat
-        notifyDataSetChanged()
+        viewData = newViewData
+        diffResult.dispatchUpdatesTo(this)
     }
 
-    class HeaderViewHolder(val root: View,
-                           val network: TextView,
-                           val icon: ImageView) : RecyclerView.ViewHolder(root)
+    private fun generateViewData(keys: List<String>, data: Map<String, List<TrackingEvent>>): List<ViewData> {
+        val viewData = ArrayList<ViewData>().toMutableList()
+        for (key: String in keys) {
+            viewData.add(Header(key))
+            data[key]!!.mapTo(viewData) { Row(it) }
+        }
+        return viewData
+    }
 
-    class RowViewHolder(val root: View,
-                        val host: TextView,
-                        val category: TextView) : RecyclerView.ViewHolder(root)
+    class DiffCallback(private val old: List<ViewData>, private val new: List<ViewData>) : DiffUtil.Callback() {
 
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return old[oldItemPosition] == new[newItemPosition]
+        }
+
+        override fun getOldListSize(): Int {
+            return old.size
+        }
+
+        override fun getNewListSize(): Int {
+            return new.size
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return old[oldItemPosition] == new[newItemPosition]
+        }
+    }
 }
+

@@ -79,6 +79,6 @@ class TrackerNetworksActivity : DuckDuckGoActivity() {
         networksBanner.setImageResource(networksRenderer.networksBanner(viewState.allTrackersBlocked))
         domain.text = viewState.domain
         heading.text = networksRenderer.networksText(this, viewState.networkCount, viewState.allTrackersBlocked)
-        networksAdapter.updateData(viewState.trackingEvents)
+        networksAdapter.updateData(viewState.trackingEventsByNetwork)
     }
 }

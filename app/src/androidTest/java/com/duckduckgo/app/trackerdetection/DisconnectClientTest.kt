@@ -23,7 +23,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 
-class DisconnectClientInstrumentationTest {
+class DisconnectClientTest {
 
     companion object {
         private const val categoryBanned = "Social"

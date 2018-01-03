@@ -27,7 +27,7 @@ class TrackerNetworksViewModel : ViewModel() {
             val domain: String,
             val allTrackersBlocked: Boolean,
             val networkCount: Int,
-            val trackingEvents: List<TrackingEvent>
+            val trackingEventsByNetwork: Map<String, List<TrackingEvent>>
     )
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -41,7 +41,7 @@ class TrackerNetworksViewModel : ViewModel() {
                 domain = "",
                 networkCount = 0,
                 allTrackersBlocked = true,
-                trackingEvents = ArrayList()
+                trackingEventsByNetwork = HashMap()
         )
     }
 
@@ -54,7 +54,7 @@ class TrackerNetworksViewModel : ViewModel() {
                 domain = monitor.uri?.host ?: "",
                 networkCount = monitor.networkCount,
                 allTrackersBlocked = monitor.allTrackersBlocked,
-                trackingEvents = monitor.trackingEvents
+                trackingEventsByNetwork = monitor.distinctTrackersByNetwork
         )
     }
 }

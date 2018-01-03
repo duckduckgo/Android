@@ -21,7 +21,6 @@
     <string name="httpsBad">Unencrypted Connection</string>
 
     <string name="networksActivityTitle">Tracker Networks</string>
-    <string name="networksContentDescription">Tracker networks icon</string>
     <string name="networksOverview">Tracker networks aggregate your web history into a data profile about you. Major tracker networks are more harmful because they can track and target you across more of the internet.</string>
 
     <plurals name="networksBlocked">
