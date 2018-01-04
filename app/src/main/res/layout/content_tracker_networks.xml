@@ -77,7 +77,7 @@
                     android:textColor="@color/warmGrey"
                     android:textSize="12sp"
                     android:textStyle="bold"
-                    android:textIsSelectable="true"
+                    android:textIsSelectable="false"
                     tools:text="8 TRACKERS BLOCKED"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
