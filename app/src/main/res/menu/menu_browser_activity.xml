@@ -20,9 +20,16 @@
 
     <item
         android:id="@+id/privacy_dashboard"
-        app:showAsAction="ifRoom"
+        app:showAsAction="always"
         android:visible="false"
         android:icon="@drawable/privacygrade_icon_unknown"
+        android:title="@string/privacyDashboard"/>
+
+    <item
+        android:id="@+id/fire"
+        app:showAsAction="always"
+        android:visible="false"
+        android:icon="@drawable/icon_fire"
         android:title="@string/privacyDashboard"/>
 
     <item

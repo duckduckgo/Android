@@ -5,6 +5,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowBackground">@color/windowBackground</item>
+        <item name="android:actionButtonStyle">@style/ActionButtonStyle</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -18,6 +19,12 @@
 
     <style name="SwitchTheme" parent="Widget.AppCompat.CompoundButton.Switch">
         <item name="colorControlActivated">@android:color/white</item>
+    </style>
+
+    <style name="ActionButtonStyle" parent="@android:style/Widget.Holo.Light.ActionButton">
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingStart">6dp</item>
+        <item name="android:paddingEnd">6dp</item>
     </style>
 
     <style name="CrashReportingDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">

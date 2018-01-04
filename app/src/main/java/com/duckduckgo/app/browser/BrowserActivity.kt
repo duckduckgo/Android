@@ -62,6 +62,9 @@ class BrowserActivity : DuckDuckGoActivity() {
     private val privacyGradeMenu: MenuItem?
         get() = toolbar.menu.findItem(R.id.privacy_dashboard)
 
+    private val fireMenu: MenuItem?
+        get() = toolbar.menu.findItem(R.id.fire)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_browser)
@@ -121,6 +124,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
 
         privacyGradeMenu?.isVisible = viewState.showPrivacyGrade
+        fireMenu?.isVisible = viewState.showFireButton
     }
 
     private fun showClearButton() {
@@ -248,6 +252,10 @@ class BrowserActivity : DuckDuckGoActivity() {
                 launchPrivacyDashboard()
                 return true
             }
+            R.id.fire -> {
+                launchFire()
+                return true
+            }
             R.id.refresh_menu_item -> {
                 webView.reload()
                 return true
@@ -264,6 +272,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         return false
     }
 
+
     private fun finishActivityAnimated() {
         clearViewPriorToAnimation()
         supportFinishAfterTransition()
@@ -271,6 +280,9 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     private fun launchPrivacyDashboard() {
         startActivityForResult(PrivacyDashboardActivity.intent(this), REQUEST_DASHBOARD)
+    }
+
+    private fun launchFire() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
