@@ -93,7 +93,7 @@ class PrivacyDashboardViewModelTest {
     fun whenFullUpgradeThenHeadingIndicatesUpgrade() {
         val monitor = monitor(allTrackersBlocked = true, trackerCount = 2)
         testee.onPrivacyMonitorChanged(monitor)
-        assertTrue(testee.viewState.value!!.heading.contains("UPGRADED FROM"))
+        assertTrue(testee.viewState.value!!.heading.contains("ENHANCED FROM"))
     }
 
     @Test
