@@ -13,7 +13,7 @@
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
     <string name="privacyProtectionEnabled">PRIVACY PROTECTION ENABLED</string>
     <string name="privacyProtectionDisabled">PRIVACY PROTECTION DISABLED</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">UPGRADED FROM &lt;img src="%d" /> TO &lt;img src="%d" /></string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ENHANCED FROM &lt;img src="%d" /> TO &lt;img src="%d" /></string>
     <string name="privacyGradeContentDescription">Privacy Grade</string>
 
     <string name="httpsGood">Encrypted Connection</string>
