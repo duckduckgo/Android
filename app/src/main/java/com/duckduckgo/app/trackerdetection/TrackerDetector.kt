@@ -18,7 +18,6 @@ package com.duckduckgo.app.trackerdetection
 
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
-import com.duckduckgo.app.trackerdetection.Client.ClientName
 import com.duckduckgo.app.trackerdetection.model.ResourceType
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -32,11 +31,16 @@ class TrackerDetector @Inject constructor(private val networkTrackers: TrackerNe
 
     private val clients = CopyOnWriteArrayList<Client>()
 
+    /**
+     * Adds a new client. If the client's name matches an existing client, old client is replaced
+     */
     fun addClient(client: Client) {
+        val existingClient = clients.firstOrNull { client.name == it.name }
+        if (existingClient != null) {
+            removeClient(existingClient)
+        }
         clients.add(client)
     }
-
-    fun hasClient(name: ClientName): Boolean = clients.any { it.name == name }
 
     fun evaluate(url: String, documentUrl: String, resourceType: ResourceType): TrackingEvent? {
 
@@ -66,4 +70,6 @@ class TrackerDetector @Inject constructor(private val networkTrackers: TrackerNe
     fun removeClient(client: Client) {
         clients.remove(client)
     }
+
+    val clientCount get() = clients.count()
 }

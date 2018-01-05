@@ -47,12 +47,8 @@ class TrackerDataLoader @Inject constructor(
 
         if (trackerDataStore.hasData(name)) {
             Timber.i("Found adblock tracker ${name.name}")
-
             val client = AdBlockClient(name)
             client.loadProcessedData(trackerDataStore.loadData(name))
-
-            // remove old client, then add the client again
-            trackerDetector.removeClient(client)
             trackerDetector.addClient(client)
         } else {
             Timber.i("No adblock tracker ${name.name} found")
