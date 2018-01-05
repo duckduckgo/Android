@@ -21,7 +21,7 @@ import com.duckduckgo.app.job.AppConfigurationJobService
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity
 import com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity
-
+import com.duckduckgo.app.settings.SettingsActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -47,9 +47,13 @@ abstract class AndroidBindingModule {
     @ContributesAndroidInjector
     abstract fun privacyTermsActivity(): PrivacyPracticesActivity
 
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun settingsActivity(): SettingsActivity
+
+
     /* Services */
 
     @ContributesAndroidInjector
     abstract fun jobService(): AppConfigurationJobService
-
 }

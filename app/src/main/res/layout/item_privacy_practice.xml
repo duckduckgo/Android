@@ -33,7 +33,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@drawable/icon_success"
-        android:contentDescription="@string/practices_icon_content_good" />
+        android:contentDescription="@string/practicesIconContentGood" />
 
     <TextView
         android:id="@+id/description"
