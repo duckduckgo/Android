@@ -35,10 +35,7 @@ class TrackerDetector @Inject constructor(private val networkTrackers: TrackerNe
      * Adds a new client. If the client's name matches an existing client, old client is replaced
      */
     fun addClient(client: Client) {
-        val existingClient = clients.firstOrNull { client.name == it.name }
-        if (existingClient != null) {
-            removeClient(existingClient)
-        }
+        clients.removeAll { client.name == it.name }
         clients.add(client)
     }
 
