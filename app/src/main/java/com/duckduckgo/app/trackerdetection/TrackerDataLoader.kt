@@ -60,7 +60,6 @@ class TrackerDataLoader @Inject constructor(
         Timber.i("Loaded ${trackers.size} disconnect trackers from DB")
 
         val client = DisconnectClient(Client.ClientName.DISCONNECT, trackers)
-        trackerDetector.removeClient(client)
         trackerDetector.addClient(client)
         networkTrackers.updateData(trackers)
     }
