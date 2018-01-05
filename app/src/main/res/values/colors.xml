@@ -7,6 +7,7 @@
     <color name="windowBackground">@color/charcoal</color>
     <color name="searchBackground">@color/slateGray</color>
 
+    <color name="white">#FFFFFF</color>
     <color name="almostBlack">#333333</color>
     <color name="darkGrey">#222325</color>
     <color name="charcoal">#2f3135</color>
@@ -16,7 +17,8 @@
     <color name="warmerGrey">#777777</color>
     <color name="subtleGrey">#f0f0f0</color>
 
-    <color name="midGreen">#3fa140</color>
     <color name="orange">#de5833</color>
+    <color name="powderBlue">#50BFFF</color>
+    <color name="midGreen">#3fa140</color>
 
 </resources>

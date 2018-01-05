@@ -42,7 +42,7 @@ class PrivacyPracticesAdapter : RecyclerView.Adapter<PrivacyPracticesAdapter.Pra
 
     override fun onBindViewHolder(holder: PracticeViewHolder, position: Int) {
         val term = terms[position]
-        val descriptionResource = if (term.first == GOOD) R.string.practices_icon_content_good else R.string.practices_icon_content_bad
+        val descriptionResource = if (term.first == GOOD) R.string.practicesIconContentGood else R.string.practicesIconContentBad
         holder.icon.contentDescription = holder.icon.context.getText(descriptionResource)
         holder.icon.setImageResource(if (term.first == GOOD) R.drawable.icon_success else R.drawable.icon_fail)
         holder.description.text = term.second.capitalize()

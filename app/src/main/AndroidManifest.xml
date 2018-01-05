@@ -17,35 +17,43 @@
             android:name="com.duckduckgo.app.home.HomeActivity"
             android:label="@string/appName"
             android:parentActivityName="com.duckduckgo.app.home.HomeActivity"
-            android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:screenOrientation="fullSensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".BrowserActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="fullSensor" />
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
             android:label="@string/privacyDashboardActivityTitle"
             android:parentActivityName=".BrowserActivity"
-            android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="fullSensor" />
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity"
             android:label="@string/networksActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity" />
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity"
             android:label="@string/privacyTermsActivityTitle"
             android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-
+            android:screenOrientation="fullSensor" />
+        <activity
+            android:name="com.duckduckgo.app.settings.SettingsActivity"
+            android:label="@string/settingsActivityTitle"
+            android:parentActivityName=".BrowserActivity"
+            android:screenOrientation="fullSensor" />
+        <activity
+            android:name="com.duckduckgo.app.about.AboutDuckDuckGoActivity"
+            android:label="@string/aboutActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+            android:theme="@style/AppTheme"
+            android:screenOrientation="fullSensor" >
+        </activity>
     </application>
 
 </manifest>
