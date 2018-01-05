@@ -38,28 +38,28 @@
     <string name="practicesMixed">Mixed Privacy Practices"</string>
     <string name="practicesBad">"Poor Privacy Practices"</string>
     <string name="practicesUnknown">Unknown Privacy Practices</string>
-    <string name="practices_overview">Privacy practices indicate how much the personal information that you share with a website is protected.</string>
-    <string name="practices_tosdr_link">Privacy Practices results from&#160;<b><u>TOSDR</u></b></string>
-    <string name="practices_icon_content_good">Good Practice Icon</string>
-    <string name="practices_icon_content_bad">Bad Practice Icon</string>
+    <string name="practicesOverview">Privacy practices indicate how much the personal information that you share with a website is protected.</string>
+    <string name="practicesTosdrLink">Privacy Practices results from&#160;<b><u>TOSDR</u></b></string>
+    <string name="practicesIconContentGood">Good Practice Icon</string>
+    <string name="practicesIconContentBad">Bad Practice Icon</string>
     <string name="privacyProtectionToggle">Privacy Protection</string>
 
 
     <!-- Settings Activity -->
-    <string name="title_activity_settings">Settings</string>
-    <string name="settings_menu_item_title">Settings</string>
-    <string name="settings_version">Version</string>
-    <string name="about_duckduckgo">About DuckDuckGo</string>
+    <string name="settingsActivityTitle">Settings</string>
+    <string name="settingsMenuItemTitle">Settings</string>
+    <string name="settingsVersion">Version</string>
+    <string name="aboutDuckduckgo">About DuckDuckGo</string>
 
     <!-- About Activity -->
-    <string name="title_activity_about_duck_duck_go">About us</string>
-    <string name="ddg_about">
-        Privacy, simplified.\n\n\
-        At DuckDuckGo, we\'re setting the new standard of trust online.\n\n\
-        DuckDuckGo Privacy Browser provides all the privacy essentials you need to protect yourself as you search and browse the web, including tracker blocking, smarter encryption, and DuckDuckGo private search.\n\n\
+    <string name="aboutActivityTitle">About us</string>
+
+    <string name="aboutHeading">Privacy, simplified.</string>
+    <string name="aboutDescription">
+        At DuckDuckGo, we\'re setting the new standard of trust online.\n\
+        DuckDuckGo Privacy Browser provides all the privacy essentials you need to protect yourself as you search and browse the web, including tracker blocking, smarter encryption, and DuckDuckGo private search.\n\
         After all, the internet shouldn\'t feel so creepy, and getting the privacy you deserve online should be as simple closing the blinds.</string>
-    <string name="ddg_link">More at <font color="#50BFFF">duckduckgo.com/about</font></string>
-    <string name="aboutDdgUrl">https://duckduckgo.com/about</string>
+    <string name="aboutMoreLink">More at duckduckgo.com/about</string>
 
 
 </resources>

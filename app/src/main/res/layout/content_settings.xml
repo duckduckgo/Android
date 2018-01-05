@@ -29,7 +29,7 @@
 
         <TextView
             style="@style/SettingsContentLabel"
-            android:text="@string/settings_version" />
+            android:text="@string/settingsVersion" />
 
         <TextView
             android:id="@+id/version"
@@ -43,7 +43,7 @@
             android:paddingTop="12dp"
             android:background="?attr/selectableItemBackground"
             android:paddingBottom="12dp"
-            android:text="@string/about_duckduckgo" />
+            android:text="@string/aboutDuckduckgo" />
 
     </LinearLayout>
 

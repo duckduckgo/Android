@@ -44,12 +44,12 @@
             android:screenOrientation="fullSensor" />
         <activity
             android:name="com.duckduckgo.app.settings.SettingsActivity"
-            android:label="@string/title_activity_settings"
+            android:label="@string/settingsActivityTitle"
             android:parentActivityName=".BrowserActivity"
             android:screenOrientation="fullSensor" />
         <activity
             android:name="com.duckduckgo.app.about.AboutDuckDuckGoActivity"
-            android:label="@string/title_activity_about_duck_duck_go"
+            android:label="@string/aboutActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             android:theme="@style/AppTheme"
             android:screenOrientation="fullSensor" >

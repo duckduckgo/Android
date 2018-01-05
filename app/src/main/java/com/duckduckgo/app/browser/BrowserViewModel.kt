@@ -175,7 +175,7 @@ class BrowserViewModel(
     fun receivedSettingsResult(resultCode: Int) {
         when (resultCode) {
             RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE -> {
-                val url = stringResolver.getString(R.string.aboutDdgUrl)
+                val url = stringResolver.getString(R.string.aboutUrl)
                 command.value = Navigate(url)
             }
         }
