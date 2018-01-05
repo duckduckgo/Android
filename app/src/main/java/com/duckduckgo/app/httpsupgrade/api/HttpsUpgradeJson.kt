@@ -16,12 +16,7 @@
 
 package com.duckduckgo.app.httpsupgrade.api
 
-import io.reactivex.Observable
-import retrofit2.http.GET
+import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomain
 
-interface HTTPSUpgradeListService {
-
-    @GET("/contentblocking.js?l=https")
-    fun https(): Observable<HTTPSUpgradeJson>
-
-}
+data class HttpsUpgradeJson(val simpleUpgrade: SimpleUpgradeListJson)
+data class SimpleUpgradeListJson(val top500: List<HttpsUpgradeDomain>)

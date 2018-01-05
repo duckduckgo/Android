@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.db
+package com.duckduckgo.app.trackerdetection.db
 
-import android.arch.persistence.room.Database
-import android.arch.persistence.room.RoomDatabase
-import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomain
-import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
-import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
+import android.arch.persistence.room.Dao
+import android.arch.persistence.room.Insert
+import android.arch.persistence.room.OnConflictStrategy
+import android.arch.persistence.room.Query
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 
-@Database(exportSchema = true, version = 2, entities = [
-    HttpsUpgradeDomain::class,
-    DisconnectTracker::class
-])
-abstract class AppDatabase : RoomDatabase() {
 
-    abstract fun httpsUpgradeDomainDao(): HttpsUpgradeDomainDao
-    abstract fun trackerDataDao(): TrackerDataDao
+@Dao
+interface TrackerDataDao {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(trackers: List<DisconnectTracker>)
+
+    @Query("Select * from disconnect_tracker")
+    fun getAll() : List<DisconnectTracker>
 
 }

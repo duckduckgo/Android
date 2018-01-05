@@ -14,9 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.httpsupgrade.api
+package com.duckduckgo.app.httpsupgrade.db
 
-import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomain
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.Ignore
+import android.arch.persistence.room.PrimaryKey
 
-data class HTTPSUpgradeJson(val simpleUpgrade: SimpleUpgradeListJson)
-data class SimpleUpgradeListJson(val top500: List<HTTPSUpgradeDomain>)
+@Entity(tableName = "https_upgrade_domain")
+class HttpsUpgradeDomain() {
+
+    @PrimaryKey var domain: String = ""
+
+    @Ignore
+    constructor(domain: String) : this() {
+        this.domain = domain
+    }
+
+}

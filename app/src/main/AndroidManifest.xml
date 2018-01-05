@@ -4,6 +4,7 @@
     package="com.duckduckgo.app.browser">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name="com.duckduckgo.app.global.DuckDuckGoApplication"
@@ -36,7 +37,8 @@
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity"
             android:label="@string/networksActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity" />
+            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity"
+            android:screenOrientation="fullSensor" />
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity"
             android:label="@string/privacyTermsActivityTitle"
@@ -51,9 +53,13 @@
             android:name="com.duckduckgo.app.about.AboutDuckDuckGoActivity"
             android:label="@string/aboutActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            android:theme="@style/AppTheme"
-            android:screenOrientation="fullSensor" >
-        </activity>
+            android:screenOrientation="fullSensor"
+            android:theme="@style/AppTheme" />
+
+        <service
+            android:name="com.duckduckgo.app.job.AppConfigurationJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
     </application>
 
 </manifest>

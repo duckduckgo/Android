@@ -16,16 +16,16 @@
 
 package com.duckduckgo.app.trackerdetection.api
 
-import io.reactivex.Observable
 import okhttp3.ResponseBody
+import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface TrackerListService {
 
     @GET("/contentblocking.js")
-    fun list(@Query("l") list: String): Observable<ResponseBody>
+    fun list(@Query("l") list: String): Call<ResponseBody>
 
     @GET("/contentblocking.js?l=disconnect")
-    fun disconnect(): Observable<DisconnectListJson>
+    fun disconnect(): Call<DisconnectListJson>
 }

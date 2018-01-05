@@ -16,62 +16,51 @@
 
 package com.duckduckgo.app.trackerdetection
 
-import com.duckduckgo.app.trackerdetection.api.TrackerListService
+import android.support.annotation.WorkerThread
+import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.store.TrackerDataStore
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
 
-
-class TrackerDataLoader @Inject constructor(private val trackerDetector: TrackerDetector,
-                                            private val trackerDataStore: TrackerDataStore,
-                                            private val trackerListService: TrackerListService,
-                                            private val networkTrackers: TrackerNetworks) {
+@WorkerThread
+class TrackerDataLoader @Inject constructor(
+        private val trackerDetector: TrackerDetector,
+        private val trackerDataStore: TrackerDataStore,
+        private val trackerDataDao: TrackerDataDao,
+        private val networkTrackers: TrackerNetworks) {
 
     fun loadData() {
+
+        Timber.i("Loading Tracker data")
+
+        // these are stored to disk, then fed to the C++ adblock module
         loadAdblockData(Client.ClientName.EASYLIST)
         loadAdblockData(Client.ClientName.EASYPRIVACY)
+
+        // stored in DB, then read into memory
         loadDisconnectData()
     }
 
-    private fun loadAdblockData(name: Client.ClientName) {
+    fun loadAdblockData(name: Client.ClientName) {
+        Timber.i("Looking for adblock tracker ${name.name} to load")
 
         if (trackerDataStore.hasData(name)) {
+            Timber.i("Found adblock tracker ${name.name}")
             val client = AdBlockClient(name)
             client.loadProcessedData(trackerDataStore.loadData(name))
             trackerDetector.addClient(client)
-            return
+        } else {
+            Timber.i("No adblock tracker ${name.name} found")
         }
-
-        trackerListService.list(name.name.toLowerCase())
-                .subscribeOn(Schedulers.io())
-                .map { responseBody ->
-                    val client = AdBlockClient(name)
-                    client.loadBasicData(responseBody.bytes())
-                    trackerDataStore.saveData(name, client.getProcessedData())
-                    return@map client
-                }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ client ->
-                    trackerDetector.addClient(client)
-                }, { error ->
-                    Timber.e(error)
-                })
     }
 
-    private fun loadDisconnectData() {
+    fun loadDisconnectData() {
+        val trackers = trackerDataDao.getAll()
+        Timber.i("Loaded ${trackers.size} disconnect trackers from DB")
 
-        trackerListService.disconnect()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ response ->
-                    val client = DisconnectClient(Client.ClientName.DISCONNECT, response.trackers)
-                    trackerDetector.addClient(client)
-                    networkTrackers.updateData(response.trackers)
-                }, { error ->
-                    Timber.e(error)
-                })
+        val client = DisconnectClient(Client.ClientName.DISCONNECT, trackers)
+        trackerDetector.addClient(client)
+        networkTrackers.updateData(trackers)
     }
 }

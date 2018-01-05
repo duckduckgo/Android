@@ -20,10 +20,10 @@ import android.net.Uri
 import android.support.annotation.WorkerThread
 import com.duckduckgo.app.global.UrlScheme
 import com.duckduckgo.app.global.isHttps
-import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomainDAO
+import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
 import javax.inject.Inject
 
-class HTTPSUpgrader @Inject constructor(private val dao: HTTPSUpgradeDomainDAO) {
+class HttpsUpgrader @Inject constructor(private val dao: HttpsUpgradeDomainDao) {
 
     @WorkerThread
     fun shouldUpgrade(uri: Uri) : Boolean {

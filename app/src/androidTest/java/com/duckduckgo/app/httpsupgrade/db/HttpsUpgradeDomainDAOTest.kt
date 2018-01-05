@@ -20,11 +20,12 @@ import android.arch.persistence.room.Room
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-class HTTPSUpgradeDomainDAOTest {
+class HttpsUpgradeDomainDaoTest {
 
     companion object {
         var exactMatchDomain = "bbc.co.uk"
@@ -36,12 +37,12 @@ class HTTPSUpgradeDomainDAOTest {
     }
 
     private lateinit var db: AppDatabase
-    private lateinit var dao: HTTPSUpgradeDomainDAO
+    private lateinit var dao: HttpsUpgradeDomainDao
 
     @Before
     fun before() {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java).build()
-        dao = db.httpsUpgradeDomainDAO()
+        dao = db.httpsUpgradeDomainDao()
     }
 
     @After
@@ -51,44 +52,44 @@ class HTTPSUpgradeDomainDAOTest {
 
     @Test
     fun whenExactMatchDomainAddedAndThenAllDeletedThenDoesNotContainExactMatchDomain() {
-        dao.insertAll(HTTPSUpgradeDomain(exactMatchDomain))
+        dao.insertAll(HttpsUpgradeDomain(exactMatchDomain))
         dao.deleteAll()
         assertFalse(dao.contains(exactMatchDomain))
     }
 
     @Test
     fun whenWildcardDomainInsertedModelThenDoesNotContainParentOfWildcardDomain() {
-        dao.insertAll(HTTPSUpgradeDomain(wildcardDomain))
+        dao.insertAll(HttpsUpgradeDomain(wildcardDomain))
         assertFalse(dao.contains(parentOfWildcardDomain))
     }
 
     @Test
     fun whenOtherWildcardDomainInsertedThenModelDoesNotContainExampleWildcardDomain() {
-        dao.insertAll(HTTPSUpgradeDomain(otherWildcardDomain))
+        dao.insertAll(HttpsUpgradeDomain(otherWildcardDomain))
         assertFalse(dao.contains(exampleWildcardDomain))
     }
 
     @Test
     fun whenWildcardDomainInsertedThenModelDoesNotContainExactMatchDomain() {
-        dao.insertAll(HTTPSUpgradeDomain(wildcardDomain))
+        dao.insertAll(HttpsUpgradeDomain(wildcardDomain))
         assertFalse(dao.contains(exactMatchDomain))
     }
 
     @Test
     fun whenWildcardDomainInsertedThenModelContainsExampleWildcardDomain() {
-        dao.insertAll(HTTPSUpgradeDomain(wildcardDomain))
+        dao.insertAll(HttpsUpgradeDomain(wildcardDomain))
         assertTrue(dao.contains(exampleWildcardDomain))
     }
 
     @Test
     fun whenExactMatchDomainInsertedThenModelDoesNotContainOtherDomain() {
-        dao.insertAll(HTTPSUpgradeDomain(exactMatchDomain))
+        dao.insertAll(HttpsUpgradeDomain(exactMatchDomain))
         assertFalse(dao.contains(otherDomain))
     }
 
     @Test
     fun whenExactMatchDomainIsInsertedThenModelContainsExactMatchDomain() {
-        dao.insertAll(HTTPSUpgradeDomain(exactMatchDomain))
+        dao.insertAll(HttpsUpgradeDomain(exactMatchDomain))
         assertTrue(dao.contains(exactMatchDomain))
     }
 

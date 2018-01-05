@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.httpsupgrade.api
+package com.duckduckgo.app.global
 
-import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomain
-import com.squareup.moshi.FromJson
+import android.os.Looper
 
-class HTTPSUpgradeDomainFromStringAdapter {
 
-    @FromJson fun adapt(domain: String) = HTTPSUpgradeDomain(domain)
 
-}
+fun Thread.isAndroidMainThread(): Boolean =
+        Thread.currentThread().id == Looper.getMainLooper().thread.id
