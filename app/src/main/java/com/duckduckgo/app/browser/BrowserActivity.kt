@@ -23,12 +23,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
-import android.view.KeyEvent.KEYCODE_ENTER
+import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
+import android.view.inputmethod.EditorInfo
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+import android.webkit.WebView
 import android.widget.TextView
 import com.duckduckgo.app.browser.BrowserViewModel.NavigationCommand.LANDING_PAGE
 import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
@@ -50,6 +51,9 @@ class BrowserActivity : DuckDuckGoActivity() {
     @Inject lateinit var viewModelFactory: ViewModelFactory
 
     private var acceptingRenderUpdates = true
+
+    /* Making WebView lazy, as it slows down the initial transition/animation to this view to inflate it early */
+    private var webView: WebView? = null
 
     private val viewModel: BrowserViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(BrowserViewModel::class.java)
@@ -75,7 +79,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         })
 
         viewModel.query.observe(this, Observer {
-            it?.let { webView.loadUrl(it) }
+            it?.let { webView?.loadUrl(it) }
         })
 
         viewModel.navigation.observe(this, Observer {
@@ -85,7 +89,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         })
 
         configureToolbar()
-        configureWebView()
+        configureWebViewListener()
         configureOmnibarTextInput()
         configureDummyViewTouchHandler()
 
@@ -94,13 +98,25 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun configureWebViewListener() {
+        viewModel.registerWebViewListener(webViewClient, webChromeClient)
+
+        omnibarTextInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, keyEvent ->
+            if (actionId == EditorInfo.IME_ACTION_DONE || keyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
+                userEnteredQuery()
+                return@OnEditorActionListener true
+            }
+            false
+        })
+    }
+
     private fun render(viewState: BrowserViewModel.ViewState) {
 
         if (!acceptingRenderUpdates) return
 
         when (viewState.browserShowing) {
-            true -> webView.show()
-            false -> webView.hide()
+            true -> showWebView()
+            false -> hideWebView()
         }
 
         when (viewState.isLoading) {
@@ -121,6 +137,18 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
 
         privacyGradeMenu?.isVisible = viewState.showPrivacyGrade
+    }
+
+    private fun showWebView() {
+        if (webView == null) {
+            webView = webViewViewStub.inflate() as NestedWebView?
+            configureWebView()
+        }
+        webView?.show()
+    }
+
+    private fun hideWebView() {
+        webView?.hide()
     }
 
     private fun showClearButton() {
@@ -188,43 +216,36 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
-        webView.webViewClient = webViewClient
-        webView.webChromeClient = webChromeClient
+        webView?.let {
+            it.webViewClient = webViewClient
+            it.webChromeClient = webChromeClient
 
-        webView.settings.apply {
-            javaScriptEnabled = true
-            loadWithOverviewMode = true
-            useWideViewPort = true
-            builtInZoomControls = true
-            displayZoomControls = false
-            mixedContentMode = MIXED_CONTENT_COMPATIBILITY_MODE
-            setSupportZoom(true)
-        }
-
-        webView.setOnTouchListener { _, _ ->
-            focusDummy.requestFocus()
-            false
-        }
-
-        viewModel.registerWebViewListener(webViewClient, webChromeClient)
-
-        omnibarTextInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, keyEvent ->
-            if (actionId == IME_ACTION_DONE || keyEvent.keyCode == KEYCODE_ENTER) {
-                userEnteredQuery()
-                return@OnEditorActionListener true
+            it.settings.apply {
+                javaScriptEnabled = true
+                loadWithOverviewMode = true
+                useWideViewPort = true
+                builtInZoomControls = true
+                displayZoomControls = false
+                mixedContentMode = MIXED_CONTENT_COMPATIBILITY_MODE
+                setSupportZoom(true)
             }
-            false
-        })
+
+            it.setOnTouchListener { _, _ ->
+                focusDummy.requestFocus()
+                it.hideKeyboard()
+                false
+            }
+        }
     }
 
     override fun onSaveInstanceState(bundle: Bundle) {
-        webView.saveState(bundle)
+        webView?.saveState(bundle)
         super.onSaveInstanceState(bundle)
     }
 
     override fun onRestoreInstanceState(bundle: Bundle) {
         super.onRestoreInstanceState(bundle)
-        webView.restoreState(bundle)
+        webView?.restoreState(bundle)
     }
 
     /**
@@ -249,19 +270,19 @@ class BrowserActivity : DuckDuckGoActivity() {
                 return true
             }
             R.id.refresh_menu_item -> {
-                webView.reload()
+                webView?.reload()
                 return true
             }
             R.id.back_menu_item -> {
-                webView.goBack()
+                webView?.goBack()
                 return true
             }
             R.id.forward_menu_item -> {
-                webView.goForward()
+                webView?.goForward()
                 return true
             }
+            else -> return false
         }
-        return false
     }
 
     private fun finishActivityAnimated() {
@@ -278,16 +299,17 @@ class BrowserActivity : DuckDuckGoActivity() {
             super.onActivityResult(requestCode, resultCode, data)
         }
         when (resultCode) {
-            RESULT_RELOAD -> webView.reload()
-            RESULT_TOSDR -> webView.loadUrl(getString(R.string.tosdrUrl))
+            RESULT_RELOAD -> webView?.reload()
+            RESULT_TOSDR -> webView?.loadUrl(getString(R.string.tosdrUrl))
         }
     }
 
     override fun onBackPressed() {
-        if (webView.canGoBack()) {
-            webView.goBack()
+        if (webView != null && webView!!.canGoBack()) {
+            webView?.goBack()
             return
         }
+
         clearViewPriorToAnimation()
         super.onBackPressed()
     }
@@ -296,7 +318,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         acceptingRenderUpdates = false
         omnibarTextInput.text.clear()
         omnibarTextInput.hideKeyboard()
-        webView.hide()
+        webView?.hide()
     }
 
     private fun shouldShowKeyboard(): Boolean =

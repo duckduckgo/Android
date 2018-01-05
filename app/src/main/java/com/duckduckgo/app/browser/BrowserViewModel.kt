@@ -76,13 +76,13 @@ class BrowserViewModel(
             return
         }
 
+        viewState.value = currentViewState().copy(showClearButton = false, omnibarText = input, browserShowing = true)
+
         if (queryUrlConverter.isWebUrl(input)) {
             query.value = queryUrlConverter.convertUri(input)
         } else {
             query.value = queryUrlConverter.convertQueryToUri(input).toString()
         }
-
-        viewState.value = currentViewState().copy(showClearButton = false, omnibarText = input)
     }
 
     override fun progressChanged(newProgress: Int) {
