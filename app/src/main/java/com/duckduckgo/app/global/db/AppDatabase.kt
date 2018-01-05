@@ -23,7 +23,7 @@ import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
 import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 
-@Database(exportSchema = true, version = 1, entities = [
+@Database(exportSchema = true, version = 2, entities = [
     HttpsUpgradeDomain::class,
     DisconnectTracker::class
 ])
