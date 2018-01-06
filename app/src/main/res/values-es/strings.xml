@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2018 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="appName">DuckDuckGo</string>
+    <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
+
+    <string name="privacyDashboard">Panel de privacidad</string>
+    <string name="refresh">Recargar</string>
+    <string name="back">Atrás</string>
+    <string name="forward">Siguiente</string>
+    <string name="omnibarInputHint">Buscar o escribir URL</string>
+    <string name="clearButtonContentDescription">Borrar entrada de búsqueda</string>
+
+    <string name="privacyDashboardActivityTitle">Panel de privacidad</string>
+    <string name="privacyProtectionEnabled">PROTECCIÓN DE PRIVACIDAD HABILITADA</string>
+    <string name="privacyProtectionDisabled">PROTECCIÓN DE PRIVACIDAD DESACTIVADA</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">MEJORADA DE &lt;img src="%d" /> A &lt;img src="%d" /></string>
+    <string name="privacyGradeContentDescription">Grado de privacidad</string>
+
+    <string name="httpsGood">Conexión Encriptada</string>
+    <string name="httpsMixed">Conexión de encriptación mixta</string>
+    <string name="httpsBad">Conexión no cifrada</string>
+
+    <string name="networksActivityTitle">Redes Rastreadoras</string>
+    <string name="networksOverview">Las redes de rastreadores agregan su historial web a un perfil de datos sobre usted. Las principales redes de seguimiento son más dañinas porque pueden rastrearlo y orientarlo a través de más rastreadores de Internet.</string>
+
+    <plurals name="networksBlocked">
+        <item quantity="one">%s Rastreador Bloqueado</item>
+        <item quantity="other">%s Rastreadores Bloqueados</item>
+    </plurals>
+
+    <plurals name="networksFound">
+        <item quantity="one">%s Rastreador Encontrado</item>
+        <item quantity="other">%s Rastreadores Encontrados</item>
+    </plurals>
+
+    <string name="privacyTermsActivityTitle">Prácticas de privacidad</string>
+    <string name="practicesGood">Prácticas de privacidad buenas</string>
+    <string name="practicesMixed">Prácticas de privacidad mixtas"</string>
+    <string name="practicesBad">"Prácticas de privacidad malas"</string>
+    <string name="practicesUnknown">Prácticas de privacidad desconocidas</string>
+    <string name="practicesOverview">Las prácticas de privacidad indican cuánto está protegida la información personal que comparte con un sitio web.</string>
+    <string name="practicesTosdrLink">Resultados de Prácticas de Privacidad de&#160;<b><u>TOSDR</u></b></string>
+    <string name="practicesIconContentGood">Icono de buenas prácticas</string>
+    <string name="practicesIconContentBad">Icono de malas prácticas</string>
+    <string name="privacyProtectionToggle">Protección de privacidad</string>
+
+
+    <!-- Settings Activity -->
+    <string name="settingsActivityTitle">Ajustes</string>
+    <string name="settingsMenuItemTitle">Ajustes</string>
+    <string name="settingsVersion">Versión</string>
+    <string name="aboutDuckduckgo">Sobre DuckDuckGo</string>
+
+    <!-- About Activity -->
+    <string name="aboutActivityTitle">Sobre nosotros</string>
+
+    <string name="aboutHeading">Privacidad, simplificada.</string>
+    <string name="aboutDescription">
+        En DuckDuckGo, estamos estableciendo el nuevo estándar de confianza en online.\n\
+        DuckDuckGo Privacy Browser proporciona todos los elementos esenciales de privacidad que necesita para protegerse mientras busca y navega por la web, incluyendo bloqueo de rasteradores, encriptación más inteligente, y búsqueda privada en DuckDuckGo.\n\
+        Después de todo, internet no debería ser tan espeluznante, y obtener la privacidad que se merece en línea debería ser tan simple como cerrar las persianas.</string>
+    <string name="aboutMoreLink">Más en duckduckgo.com/about</string>
+
+
+</resources>
