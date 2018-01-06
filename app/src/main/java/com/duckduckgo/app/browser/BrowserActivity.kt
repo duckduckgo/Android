@@ -54,8 +54,14 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        fun intent(context: Context): Intent = Intent(context, BrowserActivity::class.java)
 
+        fun intent(context: Context, sharedText: String? = null): Intent {
+            val intent = Intent(context, BrowserActivity::class.java)
+            intent.putExtra(SHARED_TEXT_EXTRA, sharedText)
+            return intent
+        }
+
+        private const val SHARED_TEXT_EXTRA = "SHARED_TEXT_EXTRA"
         private const val REQUEST_SETTINGS = 1001
     }
 
@@ -74,12 +80,12 @@ class BrowserActivity : DuckDuckGoActivity() {
             it?.let { renderPrivacyGrade(it) }
         })
 
-        viewModel.query.observe(this, Observer {
+        viewModel.url.observe(this, Observer {
             it?.let { webView.loadUrl(it) }
         })
 
         viewModel.command.observe(this, Observer {
-            when(it) {
+            when (it) {
                 is BrowserViewModel.Command.Refresh -> webView.reload()
                 is BrowserViewModel.Command.Navigate -> {
                     focusDummy.requestFocus()
@@ -97,8 +103,15 @@ class BrowserActivity : DuckDuckGoActivity() {
         configureOmnibarTextInput()
         configureDummyViewTouchHandler()
 
-        if (shouldShowKeyboard()) {
-            omnibarTextInput.showKeyboard()
+        if (savedInstanceState == null) {
+            consumeSharedTextExtra()
+        }
+    }
+
+    private fun consumeSharedTextExtra() {
+        val sharedText = intent.getStringExtra(SHARED_TEXT_EXTRA)
+        if (sharedText != null) {
+            viewModel.onSharedTextReceived(sharedText)
         }
     }
 
@@ -290,7 +303,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when(requestCode) {
+        when (requestCode) {
             REQUEST_DASHBOARD -> viewModel.receivedDashboardResult(resultCode)
             REQUEST_SETTINGS -> viewModel.receivedSettingsResult(resultCode)
             else -> super.onActivityResult(requestCode, resultCode, data)
@@ -312,7 +325,4 @@ class BrowserActivity : DuckDuckGoActivity() {
         omnibarTextInput.hideKeyboard()
         webView.hide()
     }
-
-    private fun shouldShowKeyboard(): Boolean =
-            viewModel.viewState.value?.browserShowing ?: false ?: true
 }
