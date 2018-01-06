@@ -28,11 +28,16 @@ class DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(context: Context)
-            = Room.databaseBuilder(context, AppDatabase::class.java, "app.db").build()
+    fun provideDatabase(context: Context) = Room
+            .databaseBuilder(context, AppDatabase::class.java, "app.db")
+            .fallbackToDestructiveMigration()
+            .build()
 
     @Provides
-    fun provideHTTPSUpgradeDomainDAO(database: AppDatabase) =
-            database.httpsUpgradeDomainDAO()
+    fun provideHttpsUpgradeDomainDao(database: AppDatabase) =
+            database.httpsUpgradeDomainDao()
+
+    @Provides
+    fun provideDisconnectTrackDao(database: AppDatabase) = database.trackerDataDao()
 
 }

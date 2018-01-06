@@ -18,12 +18,18 @@ package com.duckduckgo.app.global.db
 
 import android.arch.persistence.room.Database
 import android.arch.persistence.room.RoomDatabase
-import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomain
-import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomainDAO
+import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomain
+import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
+import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
+import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 
-@Database(entities = arrayOf(HTTPSUpgradeDomain::class), exportSchema = true, version = 1)
-abstract class AppDatabase: RoomDatabase() {
+@Database(exportSchema = true, version = 2, entities = [
+    HttpsUpgradeDomain::class,
+    DisconnectTracker::class
+])
+abstract class AppDatabase : RoomDatabase() {
 
-    abstract fun httpsUpgradeDomainDAO() : HTTPSUpgradeDomainDAO
+    abstract fun httpsUpgradeDomainDao(): HttpsUpgradeDomainDao
+    abstract fun trackerDataDao(): TrackerDataDao
 
 }

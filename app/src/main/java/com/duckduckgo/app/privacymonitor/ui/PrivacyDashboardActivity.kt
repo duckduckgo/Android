@@ -137,6 +137,10 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         return drawable
     }
 
+    fun onNetworksClicked(view: View) {
+        startActivity(TrackerNetworksActivity.intent(this))
+    }
+
     fun onPracticesClicked(view: View) {
         startActivityForResult(PrivacyPracticesActivity.intent(this), REQUEST_DASHBOARD)
     }

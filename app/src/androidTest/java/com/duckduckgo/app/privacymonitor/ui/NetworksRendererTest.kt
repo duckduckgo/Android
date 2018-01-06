@@ -19,6 +19,7 @@ package com.duckduckgo.app.privacymonitor.ui
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class NetworksRendererTest {
@@ -45,14 +46,50 @@ class NetworksRendererTest {
     }
 
     @Test
+    fun whenAllTrackersBlockedThenNetworksBannerIsGood() {
+        val resource = testee.networksBanner(true)
+        assertEquals(R.drawable.networks_banner_good, resource)
+    }
+
+    @Test
+    fun whenNotAllTrackersBlockedThenNetworksBannerIsBad() {
+        val resource = testee.networksBanner(false)
+        assertEquals(R.drawable.networks_banner_bad, resource)
+    }
+
+    @Test
     fun whenAllTrackersBlockedThenNetworksIconIsGood() {
         val resource = testee.networksIcon(true)
-        assertEquals(R.drawable.dashboard_networks_good, resource)
+        assertEquals(R.drawable.networks_icon_good, resource)
     }
 
     @Test
     fun whenNotAllTrackersBlockedThenNetworksIconIsBad() {
         val resource = testee.networksIcon(false)
-        assertEquals(R.drawable.dashboard_networks_bad, resource)
+        assertEquals(R.drawable.networks_icon_bad, resource)
+    }
+
+    @Test
+    fun whenNetworkNameMatchesPillIconThenResourceIsReturned() {
+        val resource = testee.networkPillIcon(context, "facebook")
+        assertEquals(R.drawable.network_pill_facebook, resource)
+    }
+
+    @Test
+    fun whenNetworkNameSansDotsMatchesPillIconThenResourceIsReturned() {
+        val resource = testee.networkPillIcon(context, "amazon.com")
+        assertEquals(R.drawable.network_pill_amazoncom, resource)
+    }
+
+    @Test
+    fun whenNetworkNameSansSpacesMatchesPillIconThenResourceIsReturned() {
+        val resource = testee.networkPillIcon(context, "fox one stop media")
+        assertEquals(R.drawable.network_pill_foxonestopmedia, resource)
+    }
+
+    @Test
+    fun whenNetworkNameDoesNotMatchPillIconThenNull() {
+        val resource = testee.networkPillIcon(context, "unknownnetwork")
+        assertNull(resource)
     }
 }

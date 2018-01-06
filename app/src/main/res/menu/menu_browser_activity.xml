@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2017 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,24 +15,29 @@
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/privacy_dashboard"
-        app:showAsAction="ifRoom"
-        android:visible="false"
         android:icon="@drawable/privacygrade_icon_unknown"
-        android:title="@string/privacyDashboard"/>
+        android:title="@string/privacyDashboard"
+        android:visible="false"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/back_menu_item"
-        android:title="@string/back"/>
+        android:title="@string/back" />
     <item
         android:id="@+id/forward_menu_item"
-        android:title="@string/forward"/>
+        android:title="@string/forward" />
     <item
         android:id="@+id/refresh_menu_item"
-        app:showAsAction="never"
-        android:title="@string/refresh"/>
+        android:title="@string/refresh"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/settings_menu_item"
+        android:title="@string/settingsMenuItemTitle"
+        app:showAsAction="never" />
 
 </menu>

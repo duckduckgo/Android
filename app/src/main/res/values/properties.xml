@@ -17,4 +17,5 @@
 <resources>
     <string name="baseUrl">https://duckduckgo.com</string>
     <string name="tosdrUrl">"https://tosdr.org</string>
+    <string name="aboutUrl">https://duckduckgo.com/about</string>
 </resources>

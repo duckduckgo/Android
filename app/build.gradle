@@ -6,7 +6,7 @@ apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
 
 ext {
-    VERSION_NAME = "0.7.0"
+    VERSION_NAME = "0.8.0"
 }
 
 android {

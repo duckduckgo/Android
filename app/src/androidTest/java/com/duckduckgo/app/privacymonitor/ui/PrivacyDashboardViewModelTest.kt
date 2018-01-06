@@ -20,7 +20,7 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.privacymonitor.HttpsStatus
+import com.duckduckgo.app.privacymonitor.model.HttpsStatus
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
@@ -93,7 +93,7 @@ class PrivacyDashboardViewModelTest {
     fun whenFullUpgradeThenHeadingIndicatesUpgrade() {
         val monitor = monitor(allTrackersBlocked = true, trackerCount = 2)
         testee.onPrivacyMonitorChanged(monitor)
-        assertTrue(testee.viewState.value!!.heading.contains("UPGRADED FROM"))
+        assertTrue(testee.viewState.value!!.heading.contains("ENHANCED FROM"))
     }
 
     @Test

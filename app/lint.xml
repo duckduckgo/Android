@@ -6,4 +6,7 @@
     <issue id="IconExpectedSize">
         <ignore path="src/main/res/drawable-*/privacygrade_icon_*" />
     </issue>
+    <issue id="UnusedResources">
+        <ignore path="src/main/res/drawable-*/network_pill_*" />
+    </issue>
 </lint>
