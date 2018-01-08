@@ -4,6 +4,7 @@
     package="com.duckduckgo.app.browser">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name="com.duckduckgo.app.global.DuckDuckGoApplication"
@@ -13,38 +14,73 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+
         <activity
             android:name="com.duckduckgo.app.home.HomeActivity"
             android:label="@string/appName"
-            android:parentActivityName="com.duckduckgo.app.home.HomeActivity"
-            android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:launchMode="singleTask"
+            android:screenOrientation="fullSensor">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- Allows app to become default browser -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="https" />
+                <data android:scheme="http" />
+            </intent-filter>
+
+            <!-- Allows apps to consume links and text shared from other apps e.g chrome -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+
         </activity>
+
         <activity
             android:name=".BrowserActivity"
+            android:allowTaskReparenting="true"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:parentActivityName="com.duckduckgo.app.home.HomeActivity"
+            android:screenOrientation="fullSensor" />
+
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
             android:label="@string/privacyDashboardActivityTitle"
             android:parentActivityName=".BrowserActivity"
-            android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="fullSensor" />
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity"
             android:label="@string/networksActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
+            android:screenOrientation="fullSensor" />
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity"
             android:label="@string/privacyTermsActivityTitle"
             android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="fullSensor" />
+        <activity
+            android:name="com.duckduckgo.app.settings.SettingsActivity"
+            android:label="@string/settingsActivityTitle"
+            android:parentActivityName=".BrowserActivity"
+            android:screenOrientation="fullSensor" />
+        <activity
+            android:name="com.duckduckgo.app.about.AboutDuckDuckGoActivity"
+            android:label="@string/aboutActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/AppTheme" />
+
+        <service
+            android:name="com.duckduckgo.app.job.AppConfigurationJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
     </application>
 

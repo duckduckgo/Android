@@ -19,8 +19,11 @@ package com.duckduckgo.app.browser
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
 import android.net.Uri
-import com.duckduckgo.app.browser.BrowserViewModel.NavigationCommand
+import com.duckduckgo.app.browser.BrowserViewModel.Command
+import com.duckduckgo.app.browser.BrowserViewModel.Command.LandingPage
+import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.global.StringResolver
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
@@ -32,6 +35,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
@@ -43,8 +47,9 @@ class BrowserViewModelTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var queryObserver: Observer<String>
-    private lateinit var navigationObserver: Observer<NavigationCommand>
+    private lateinit var navigationObserver: Observer<Command>
     private lateinit var termsOfServiceStore: TermsOfServiceStore
+    private lateinit var mockStringResolver: StringResolver
     private lateinit var testee: BrowserViewModel
 
     private val testOmnibarConverter: OmnibarEntryConverter = object : OmnibarEntryConverter {
@@ -55,18 +60,22 @@ class BrowserViewModelTest {
 
     @Before
     fun before() {
+        mockStringResolver = mock()
         queryObserver = mock()
         navigationObserver = mock()
         termsOfServiceStore = mock()
-        testee = BrowserViewModel(testOmnibarConverter, DuckDuckGoUrlDetector(), termsOfServiceStore, TrackerNetworks(), PrivacyMonitorRepository())
-        testee.query.observeForever(queryObserver)
-        testee.navigation.observeForever(navigationObserver)
+        testee = BrowserViewModel(testOmnibarConverter, DuckDuckGoUrlDetector(), termsOfServiceStore, TrackerNetworks(), PrivacyMonitorRepository(), object : StringResolver {
+            override fun getString(stringId: Int): String = ""
+            override fun getString(stringId: Int, vararg formatArgs: Any): String = ""
+        })
+        testee.url.observeForever(queryObserver)
+        testee.command.observeForever(navigationObserver)
     }
 
     @After
     fun after() {
-        testee.query.removeObserver(queryObserver)
-        testee.navigation.removeObserver(navigationObserver)
+        testee.url.removeObserver(queryObserver)
+        testee.command.removeObserver(navigationObserver)
     }
 
     @Test
@@ -141,6 +150,15 @@ class BrowserViewModelTest {
     }
 
     @Test
+    fun whenSharedTextReceivedThenNavigationTriggered() {
+        testee.onSharedTextReceived("http://example.com")
+        val captor: ArgumentCaptor<Command> = ArgumentCaptor.forClass(Command::class.java);
+        verify(navigationObserver).onChanged(captor.capture())
+        assertNotNull(captor.value)
+        assertTrue(captor.value is Navigate)
+    }
+
+    @Test
     fun whenViewModelGetsProgressUpdateThenViewStateIsUpdated() {
         testee.progressChanged(0)
         assertEquals(0, testee.viewState.value!!.progress)
@@ -155,13 +173,13 @@ class BrowserViewModelTest {
     @Test
     fun whenUserDismissesKeyboardBeforeBrowserShownThenShouldNavigateToLandingPage() {
         testee.userDismissedKeyboard()
-        verify(navigationObserver).onChanged(NavigationCommand.LANDING_PAGE)
+        verify(navigationObserver).onChanged(ArgumentMatchers.any(LandingPage::class.java))
     }
 
     @Test
     fun whenUserDismissesKeyboardAfterBrowserShownThenShouldNotNavigateToLandingPage() {
         testee.urlChanged("")
-        verify(navigationObserver, never()).onChanged(NavigationCommand.LANDING_PAGE)
+        verify(navigationObserver, never()).onChanged(ArgumentMatchers.any(LandingPage::class.java))
     }
 
     @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.httpsupgrade.api
+package com.duckduckgo.app.global
 
-import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomain
+import android.content.Intent
 
-data class HTTPSUpgradeJson(val simpleUpgrade: SimpleUpgradeListJson)
-data class SimpleUpgradeListJson(val top500: List<HTTPSUpgradeDomain>)
+val Intent.intentText: String?
+    get() {
+        return data?.toString() ?: getStringExtra(Intent.EXTRA_TEXT)
+    }

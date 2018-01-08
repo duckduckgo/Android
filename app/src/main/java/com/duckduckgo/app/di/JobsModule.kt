@@ -16,30 +16,20 @@
 
 package com.duckduckgo.app.di
 
-import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeDomainFromStringAdapter
-import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeJson
-import com.duckduckgo.app.privacymonitor.api.TermsOfServiceListAdapter
-import com.duckduckgo.app.trackerdetection.api.DisconnectListJsonAdapter
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
+import android.app.job.JobScheduler
+import android.content.Context
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
+
 @Module
-class JsonModule {
+class JobsModule {
 
-    @Provides
     @Singleton
-    fun moshi(): Moshi = Moshi.Builder()
-            .add(DisconnectListJsonAdapter())
-            .add(TermsOfServiceListAdapter())
-            .add(HttpsUpgradeDomainFromStringAdapter())
-            .build()
-
     @Provides
-    fun httpsUpgradeDomainAdapter(moshi: Moshi): JsonAdapter<HttpsUpgradeJson> {
-        return moshi.adapter(HttpsUpgradeJson::class.java)
+    fun providesJobScheduler(context: Context): JobScheduler {
+        return context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
     }
 
 }

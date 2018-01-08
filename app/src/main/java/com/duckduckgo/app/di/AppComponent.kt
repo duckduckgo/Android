@@ -28,12 +28,14 @@ import javax.inject.Singleton
 @Singleton
 @Component(modules = [
     (ApplicationModule::class),
-    (ActivityBindingModule::class),
+    (JobsModule::class),
+    (AndroidBindingModule::class),
     (AndroidSupportInjectionModule::class),
     (NetworkModule::class),
     (PrivacyModule::class),
     (DatabaseModule::class),
-    (JsonModule::class)
+    (JsonModule::class),
+    (StringModule::class)
 ])
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 

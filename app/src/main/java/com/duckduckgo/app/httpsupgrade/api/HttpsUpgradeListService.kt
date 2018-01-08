@@ -16,11 +16,12 @@
 
 package com.duckduckgo.app.httpsupgrade.api
 
-import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomain
-import com.squareup.moshi.FromJson
+import retrofit2.Call
+import retrofit2.http.GET
 
-class HTTPSUpgradeDomainFromStringAdapter {
+interface HttpsUpgradeListService {
 
-    @FromJson fun adapt(domain: String) = HTTPSUpgradeDomain(domain)
+    @GET("/contentblocking.js?l=https")
+    fun https(): Call<HttpsUpgradeJson>
 
 }

@@ -18,20 +18,26 @@ package com.duckduckgo.app.global
 
 import android.app.Activity
 import android.app.Application
+import android.app.Service
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.DaggerAppComponent
-import com.duckduckgo.app.httpsupgrade.HTTPSUpgradeListLoader
+import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
+import dagger.android.HasServiceInjector
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
 
-class DuckDuckGoApplication : HasActivityInjector, Application() {
+class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Application() {
 
     @Inject
-    lateinit var injector: DispatchingAndroidInjector<Activity>
+    lateinit var activityInjector: DispatchingAndroidInjector<Activity>
+
+    @Inject
+    lateinit var serviceInjector: DispatchingAndroidInjector<Service>
 
     @Inject
     lateinit var crashReportingInitializer: CrashReportingInitializer
@@ -40,7 +46,7 @@ class DuckDuckGoApplication : HasActivityInjector, Application() {
     lateinit var trackerDataLoader: TrackerDataLoader
 
     @Inject
-    lateinit var httpsUpgradeListDataLoader: HTTPSUpgradeListLoader
+    lateinit var appConfigurationSyncer: AppConfigurationSyncer
 
     override fun onCreate() {
         super.onCreate()
@@ -48,8 +54,13 @@ class DuckDuckGoApplication : HasActivityInjector, Application() {
         configureDependencyInjection()
         configureLogging()
         configureCrashReporting()
-        configureTrackerData()
-        configureHttpsUpgradeData()
+
+        loadTrackerData()
+        configureDataDownloader()
+    }
+
+    private fun loadTrackerData() {
+        Schedulers.io().scheduleDirect { trackerDataLoader.loadData() }
     }
 
     private fun configureLogging() {
@@ -67,15 +78,29 @@ class DuckDuckGoApplication : HasActivityInjector, Application() {
         crashReportingInitializer.init(this)
     }
 
-    private fun configureTrackerData() {
-        trackerDataLoader.loadData()
+    /**
+     * If the data downloader job is already scheduled, this method does nothing.
+     *
+     * Otherwise, it immediately syncs data. Upon completion (successful or error),
+     * it will schedule a recurring job to keep the data in sync.
+     *
+     * We need to kick off an immediate attempt as Android OS versions vary in their
+     * implementation of scheduling jobs, such that some versions don't immediately try
+     * and execute the job, even if the job criteria is matched.
+     */
+    private fun configureDataDownloader() {
+
+        if (!appConfigurationSyncer.jobScheduled()) {
+            appConfigurationSyncer.scheduleImmediateSync()
+                    .subscribeOn(Schedulers.io())
+                    .doAfterTerminate({
+                        appConfigurationSyncer.scheduleRegularSync(this)
+                    })
+                    .subscribe({}, { Timber.w(it, "Failed to download initial app configuration") })
+        }
     }
 
-    private fun configureHttpsUpgradeData() {
-        httpsUpgradeListDataLoader.loadData()
-    }
+    override fun activityInjector(): AndroidInjector<Activity> = activityInjector
 
-    override fun activityInjector(): AndroidInjector<Activity> = injector
-
-
+    override fun serviceInjector(): AndroidInjector<Service> = serviceInjector
 }

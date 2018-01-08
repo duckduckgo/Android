@@ -16,21 +16,37 @@
 
 package com.duckduckgo.app.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.ActivityOptionsCompat
 import android.support.v7.app.AppCompatActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.intentText
 import kotlinx.android.synthetic.main.content_home.*
 
 class HomeActivity : AppCompatActivity() {
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
         searchInputBox.setOnClickListener { showSearchActivity() }
+
+        if (savedInstanceState == null) {
+            consumeSharedText(intent)
+        }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        consumeSharedText(intent)
+    }
+
+    private fun consumeSharedText(intent: Intent?) {
+        val sharedText = intent?.intentText ?: return
+        val browserIntent = BrowserActivity.intent(this, sharedText)
+        startActivity(browserIntent)
     }
 
     private fun showSearchActivity() {

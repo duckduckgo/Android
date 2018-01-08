@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.httpsupgrade.api
+package com.duckduckgo.app.httpsupgrade.db
 
-import io.reactivex.Observable
-import retrofit2.http.GET
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.Ignore
+import android.arch.persistence.room.PrimaryKey
 
-interface HTTPSUpgradeListService {
+@Entity(tableName = "https_upgrade_domain")
+class HttpsUpgradeDomain() {
 
-    @GET("/contentblocking.js?l=https")
-    fun https(): Observable<HTTPSUpgradeJson>
+    @PrimaryKey var domain: String = ""
+
+    @Ignore
+    constructor(domain: String) : this() {
+        this.domain = domain
+    }
 
 }

@@ -17,22 +17,22 @@
 package com.duckduckgo.app.httpsupgrade
 
 import android.net.Uri
-import com.duckduckgo.app.httpsupgrade.db.HTTPSUpgradeDomainDAO
+import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
-class HTTPSUpgraderTest {
+class HttpsUpgraderTest {
 
-    lateinit var testee: HTTPSUpgrader
-    lateinit var mockDao: HTTPSUpgradeDomainDAO
+    lateinit var testee: HttpsUpgrader
+    lateinit var mockDao: HttpsUpgradeDomainDao
 
     @Before
     fun before() {
         mockDao = mock()
-        testee = HTTPSUpgrader(mockDao)
+        testee = HttpsUpgrader(mockDao)
     }
 
     @Test

@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.model
+package com.duckduckgo.app.global
 
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.PrimaryKey
+import android.os.Looper
 
-@Entity(tableName = "disconnect_tracker")
-data class DisconnectTracker(
-        @PrimaryKey val url: String,
-        val category: String,
-        val networkName: String,
-        val networkUrl: String)
+
+
+fun Thread.isAndroidMainThread(): Boolean =
+        Thread.currentThread().id == Looper.getMainLooper().thread.id

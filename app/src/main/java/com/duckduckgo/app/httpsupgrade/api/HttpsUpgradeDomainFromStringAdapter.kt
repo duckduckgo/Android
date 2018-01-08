@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.httpsupgrade.db
+package com.duckduckgo.app.httpsupgrade.api
 
-import android.arch.persistence.room.*
+import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomain
+import com.squareup.moshi.FromJson
 
-@Dao
-interface HTTPSUpgradeDomainDAO {
+class HttpsUpgradeDomainFromStringAdapter {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(vararg domains: HTTPSUpgradeDomain)
-
-    @Query("select count(1) > 0 from https_upgrade_domain where :host glob domain")
-    fun contains(host: String) : Boolean
-
-    @Query("delete from https_upgrade_domain")
-    fun deleteAll()
+    @FromJson fun adapt(domain: String) = HttpsUpgradeDomain(domain)
 
 }

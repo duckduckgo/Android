@@ -18,14 +18,20 @@ package com.duckduckgo.app.browser
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import com.duckduckgo.app.about.AboutDuckDuckGoActivity.Companion.RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE
+import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
+import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.StringResolver
 import com.duckduckgo.app.privacymonitor.SiteMonitor
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.privacymonitor.model.improvedGrade
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
+import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RESULT_RELOAD
+import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RESULT_TOSDR
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import timber.log.Timber
@@ -35,7 +41,8 @@ class BrowserViewModel(
         private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
         private val termsOfServiceStore: TermsOfServiceStore,
         private val trackerNetworks: TrackerNetworks,
-        private val privacyMonitorRepository: PrivacyMonitorRepository) :
+        private val privacyMonitorRepository: PrivacyMonitorRepository,
+        private val stringResolver: StringResolver) :
         WebViewClientListener, ViewModel() {
 
     data class ViewState(
@@ -52,11 +59,13 @@ class BrowserViewModel(
     /* Observable data for Activity to subscribe to */
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
-    val query: SingleLiveEvent<String> = SingleLiveEvent()
-    val navigation: SingleLiveEvent<NavigationCommand> = SingleLiveEvent()
+    val url: SingleLiveEvent<String> = SingleLiveEvent()
+    val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    enum class NavigationCommand {
-        LANDING_PAGE
+    sealed class Command {
+        class LandingPage : Command()
+        class Refresh : Command()
+        class Navigate(val url: String) : Command()
     }
 
     private var siteMonitor: SiteMonitor? = null
@@ -72,18 +81,18 @@ class BrowserViewModel(
     }
 
     fun onUserSubmittedQuery(input: String) {
-
         if (input.isBlank()) {
             return
         }
-
-        if (queryUrlConverter.isWebUrl(input)) {
-            query.value = queryUrlConverter.convertUri(input)
-        } else {
-            query.value = queryUrlConverter.convertQueryToUri(input).toString()
-        }
-
+        url.value = buildUrl(input)
         viewState.value = currentViewState().copy(showClearButton = false, omnibarText = input)
+    }
+
+    fun buildUrl(input: String): String {
+        if (queryUrlConverter.isWebUrl(input)) {
+            return queryUrlConverter.convertUri(input)
+        }
+        return queryUrlConverter.convertQueryToUri(input).toString()
     }
 
     override fun progressChanged(newProgress: Int) {
@@ -153,6 +162,10 @@ class BrowserViewModel(
         )
     }
 
+    fun onSharedTextReceived(input: String) {
+        command.value = Navigate(buildUrl(input))
+    }
+
     /**
      * Returns a boolean indicating if the back button pressed was consumed or not
      *
@@ -160,10 +173,29 @@ class BrowserViewModel(
      */
     fun userDismissedKeyboard(): Boolean {
         if (!currentViewState().browserShowing) {
-            navigation.value = NavigationCommand.LANDING_PAGE
+            command.value = Command.LandingPage()
             return true
         }
         return false
+    }
+
+    fun receivedDashboardResult(resultCode: Int) {
+        when (resultCode) {
+            RESULT_RELOAD -> command.value = Refresh()
+            RESULT_TOSDR -> {
+                val url = stringResolver.getString(R.string.tosdrUrl)
+                command.value = Navigate(url)
+            }
+        }
+    }
+
+    fun receivedSettingsResult(resultCode: Int) {
+        when (resultCode) {
+            RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE -> {
+                val url = stringResolver.getString(R.string.aboutUrl)
+                command.value = Navigate(url)
+            }
+        }
     }
 }
 

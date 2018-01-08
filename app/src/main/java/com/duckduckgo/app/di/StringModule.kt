@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,28 +16,19 @@
 
 package com.duckduckgo.app.di
 
-import android.arch.persistence.room.Room
 import android.content.Context
-import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.AndroidStringResolver
+import com.duckduckgo.app.global.StringResolver
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
 
 @Module
-class DatabaseModule {
+class StringModule {
 
     @Provides
-    @Singleton
-    fun provideDatabase(context: Context) = Room
-            .databaseBuilder(context, AppDatabase::class.java, "app.db")
-            .fallbackToDestructiveMigration()
-            .build()
-
-    @Provides
-    fun provideHttpsUpgradeDomainDao(database: AppDatabase) =
-            database.httpsUpgradeDomainDao()
-
-    @Provides
-    fun provideDisconnectTrackDao(database: AppDatabase) = database.trackerDataDao()
+    fun providesStringResolver(context: Context): StringResolver {
+        return AndroidStringResolver(context)
+    }
 
 }
+
