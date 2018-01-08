@@ -22,14 +22,14 @@
         android:icon="@drawable/privacygrade_icon_unknown"
         android:title="@string/privacyDashboard"
         android:visible="false"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/fire"
         android:icon="@drawable/icon_fire"
         android:title="@string/privacyDashboard"
         android:visible="false"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/back_menu_item"

@@ -218,8 +218,32 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenUrlUpdatedThenPrivacyGradeIsShown() {
-        testee.urlChanged((""))
+    fun whenOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsShown() {
+        testee.onOmnibarInputStateChanged("", false)
         assertTrue(testee.viewState.value!!.showPrivacyGrade)
     }
+
+    @Test
+    fun whenOmnibarInputHasFocusThenPrivacyGradeIsNotShown() {
+        testee.onOmnibarInputStateChanged("", true)
+        assertFalse(testee.viewState.value!!.showPrivacyGrade)
+    }
+
+    @Test
+    fun whenInitialisedThenFireButtonIsShown() {
+        assertTrue(testee.viewState.value!!.showFireButton)
+    }
+
+    @Test
+    fun whenOmnibarInputDoesNotHaveFocusThenFireButtonIsShown() {
+        testee.onOmnibarInputStateChanged("", false)
+        assertTrue(testee.viewState.value!!.showFireButton)
+    }
+
+    @Test
+    fun whenOmnibarInputHasFocusThenFireButtonIsNotShown() {
+        testee.onOmnibarInputStateChanged("", true)
+        assertFalse(testee.viewState.value!!.showFireButton)
+    }
+
 }

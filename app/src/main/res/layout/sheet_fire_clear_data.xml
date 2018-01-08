@@ -26,8 +26,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
-        android:drawableLeft="@drawable/icon_fire_glyph_24dp"
         android:drawablePadding="24dp"
+        android:drawableStart="@drawable/icon_fire_glyph_24dp"
         android:fontFamily="sans-serif"
         android:gravity="center_vertical"
         android:paddingBottom="17dp"
@@ -39,13 +39,13 @@
         android:textSize="16sp"
         android:textStyle="normal" />
 
-    <TextView
+    <android.support.v7.widget.AppCompatTextView
         android:id="@+id/cancelOption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
-        android:drawableLeft="@drawable/ic_clear_black_24px"
         android:drawablePadding="24dp"
+        android:drawableStart="@drawable/ic_clear_black_24px"
         android:drawableTint="@color/brownishGray"
         android:fontFamily="sans-serif"
         android:gravity="center_vertical"

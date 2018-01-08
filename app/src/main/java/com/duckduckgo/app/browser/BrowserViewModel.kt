@@ -53,7 +53,7 @@ class BrowserViewModel(
             val browserShowing: Boolean = false,
             val showClearButton: Boolean = false,
             val showPrivacyGrade: Boolean = false,
-            val showFireButton: Boolean = false
+            val showFireButton: Boolean = true
     )
 
     /* Observable data for Activity to subscribe to */
