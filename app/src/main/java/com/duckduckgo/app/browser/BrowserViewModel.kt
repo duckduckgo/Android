@@ -58,7 +58,7 @@ class BrowserViewModel(
     /* Observable data for Activity to subscribe to */
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
-    val query: SingleLiveEvent<String> = SingleLiveEvent()
+    val url: SingleLiveEvent<String> = SingleLiveEvent()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     sealed class Command {
@@ -80,18 +80,18 @@ class BrowserViewModel(
     }
 
     fun onUserSubmittedQuery(input: String) {
-
         if (input.isBlank()) {
             return
         }
-
-        if (queryUrlConverter.isWebUrl(input)) {
-            query.value = queryUrlConverter.convertUri(input)
-        } else {
-            query.value = queryUrlConverter.convertQueryToUri(input).toString()
-        }
-
+        url.value = buildUrl(input)
         viewState.value = currentViewState().copy(showClearButton = false, omnibarText = input)
+    }
+
+    fun buildUrl(input: String): String {
+        if (queryUrlConverter.isWebUrl(input)) {
+            return queryUrlConverter.convertUri(input)
+        }
+        return queryUrlConverter.convertQueryToUri(input).toString()
     }
 
     override fun progressChanged(newProgress: Int) {
@@ -147,6 +147,10 @@ class BrowserViewModel(
     fun onOmnibarInputStateChanged(query: String, hasFocus: Boolean) {
         val showClearButton = hasFocus && query.isNotEmpty()
         viewState.value = currentViewState().copy(isEditing = hasFocus, showClearButton = showClearButton)
+    }
+
+    fun onSharedTextReceived(input: String) {
+        command.value = Navigate(buildUrl(input))
     }
 
     /**
