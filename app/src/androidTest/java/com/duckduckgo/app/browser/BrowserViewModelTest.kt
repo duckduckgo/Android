@@ -19,6 +19,9 @@ package com.duckduckgo.app.browser
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
 import android.net.Uri
+import com.duckduckgo.app.browser.BrowserViewModel.Command
+import com.duckduckgo.app.browser.BrowserViewModel.Command.LandingPage
+import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.StringResolver
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
@@ -32,6 +35,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
@@ -43,7 +47,7 @@ class BrowserViewModelTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var queryObserver: Observer<String>
-    private lateinit var navigationObserver: Observer<BrowserViewModel.Command>
+    private lateinit var navigationObserver: Observer<Command>
     private lateinit var termsOfServiceStore: TermsOfServiceStore
     private lateinit var mockStringResolver: StringResolver
     private lateinit var testee: BrowserViewModel
@@ -64,13 +68,13 @@ class BrowserViewModelTest {
             override fun getString(stringId: Int): String = ""
             override fun getString(stringId: Int, vararg formatArgs: Any): String = ""
         })
-        testee.query.observeForever(queryObserver)
+        testee.url.observeForever(queryObserver)
         testee.command.observeForever(navigationObserver)
     }
 
     @After
     fun after() {
-        testee.query.removeObserver(queryObserver)
+        testee.url.removeObserver(queryObserver)
         testee.command.removeObserver(navigationObserver)
     }
 
@@ -146,6 +150,15 @@ class BrowserViewModelTest {
     }
 
     @Test
+    fun whenSharedTextReceivedThenNavigationTriggered() {
+        testee.onSharedTextReceived("http://example.com")
+        val captor: ArgumentCaptor<Command> = ArgumentCaptor.forClass(Command::class.java);
+        verify(navigationObserver).onChanged(captor.capture())
+        assertNotNull(captor.value)
+        assertTrue(captor.value is Navigate)
+    }
+
+    @Test
     fun whenViewModelGetsProgressUpdateThenViewStateIsUpdated() {
         testee.progressChanged(0)
         assertEquals(0, testee.viewState.value!!.progress)
@@ -160,13 +173,13 @@ class BrowserViewModelTest {
     @Test
     fun whenUserDismissesKeyboardBeforeBrowserShownThenShouldNavigateToLandingPage() {
         testee.userDismissedKeyboard()
-        verify(navigationObserver).onChanged(ArgumentMatchers.any(BrowserViewModel.Command.LandingPage::class.java))
+        verify(navigationObserver).onChanged(ArgumentMatchers.any(LandingPage::class.java))
     }
 
     @Test
     fun whenUserDismissesKeyboardAfterBrowserShownThenShouldNotNavigateToLandingPage() {
         testee.urlChanged("")
-        verify(navigationObserver, never()).onChanged(ArgumentMatchers.any(BrowserViewModel.Command.LandingPage::class.java))
+        verify(navigationObserver, never()).onChanged(ArgumentMatchers.any(LandingPage::class.java))
     }
 
     @Test
