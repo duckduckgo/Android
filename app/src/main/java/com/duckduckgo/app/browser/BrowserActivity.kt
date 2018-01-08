@@ -308,7 +308,6 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     private fun launchFire() {
         FireDialog(this) {
-            webView.clearCache(true)
             finishActivityAnimated()
         }.show()
     }

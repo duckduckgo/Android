@@ -9,7 +9,7 @@
     <string name="forward">Forward</string>
     <string name="omnibarInputHint">Search or type URL</string>
     <string name="clearButtonContentDescription">Clear search input</string>
-    <string name="fire_clear_all">Clear All Tabs and Data</string>
+    <string name="fire_clear_all">Clear All Data</string>
     <string name="fire_cancel">Cancel</string>
 
     <!-- Privacy Dashboard Activities -->
