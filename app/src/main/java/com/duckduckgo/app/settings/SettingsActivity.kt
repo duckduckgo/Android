@@ -68,8 +68,10 @@ class SettingsActivity : DuckDuckGoActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when(requestCode) {
             REQUEST_CODE_ABOUT_DDG -> {
-                setResult(AboutDuckDuckGoActivity.RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE)
-                finish()
+                if(resultCode == AboutDuckDuckGoActivity.RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE ) {
+                    setResult(resultCode)
+                    finish()
+                }
             }
         }
     }
