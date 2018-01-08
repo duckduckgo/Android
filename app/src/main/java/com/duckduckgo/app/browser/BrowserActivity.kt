@@ -297,7 +297,6 @@ class BrowserActivity : DuckDuckGoActivity() {
         return false
     }
 
-
     private fun finishActivityAnimated() {
         clearViewPriorToAnimation()
         supportFinishAfterTransition()
@@ -308,7 +307,10 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun launchFire() {
-
+        FireDialog(this) {
+            webView.clearCache(true)
+            finishActivityAnimated()
+        }.show()
     }
 
     private fun launchSettingsView() {

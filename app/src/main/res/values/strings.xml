@@ -9,7 +9,10 @@
     <string name="forward">Forward</string>
     <string name="omnibarInputHint">Search or type URL</string>
     <string name="clearButtonContentDescription">Clear search input</string>
+    <string name="fire_clear_all">Clear All Tabs and Data</string>
+    <string name="fire_cancel">Cancel</string>
 
+    <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
     <string name="privacyProtectionEnabled">PRIVACY PROTECTION ENABLED</string>
     <string name="privacyProtectionDisabled">PRIVACY PROTECTION DISABLED</string>
@@ -53,7 +56,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">About us</string>
-
     <string name="aboutHeading">Privacy, simplified.</string>
     <string name="aboutDescription">
         At DuckDuckGo, we\'re setting the new standard of trust online.\n\
