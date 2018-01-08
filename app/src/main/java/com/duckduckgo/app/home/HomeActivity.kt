@@ -44,11 +44,9 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun consumeSharedText(intent: Intent?) {
-        val sharedText = intent?.intentText
-        if (sharedText != null) {
-            val intent = BrowserActivity.intent(this, sharedText)
-            startActivity(intent)
-        }
+        val sharedText = intent?.intentText ?: return
+        val browserIntent = BrowserActivity.intent(this, sharedText)
+        startActivity(browserIntent)
     }
 
     private fun showSearchActivity() {
