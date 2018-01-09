@@ -26,7 +26,7 @@ interface WebViewClientListener {
     fun trackerDetected(event: TrackingEvent)
     fun pageHasHttpResources()
 
-    fun sendEmailRequested(emailAddress: String, subject: String?, body: String?)
+    fun sendEmailRequested(emailAddress: String)
     fun sendSmsRequested(telephoneNumber: String)
     fun dialTelephoneNumberRequested(telephoneNumber: String)
 }

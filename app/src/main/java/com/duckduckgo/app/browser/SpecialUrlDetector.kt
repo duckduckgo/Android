@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser
 
-import android.net.MailTo
 import android.net.Uri
 import javax.inject.Inject
 
@@ -26,9 +25,7 @@ class SpecialUrlDetector @Inject constructor() {
     sealed class UrlType {
         class Web(val webAddress: String) : UrlType()
         class Telephone(val telephoneNumber: String) : UrlType()
-        class Email(val emailAddress: String,
-                    val subject: String?,
-                    val body: String?) : UrlType()
+        class Email(val emailAddress: String) : UrlType()
         class Sms(val telephoneNumber: String) : UrlType()
     }
 
@@ -52,13 +49,7 @@ class SpecialUrlDetector @Inject constructor() {
             UrlType.Telephone(uriString.removePrefix("$TELPROMPT_SCHEME:"))
 
     private fun buildEmail(uriString: String): UrlType {
-        val uri = MailTo.parse(uriString)
-
-        val toAddress = uri.to
-        val subject = uri.subject
-        val body = uri.body
-
-        return UrlType.Email(toAddress, subject, body)
+        return UrlType.Email(uriString)
     }
 
     private fun buildSms(uriString: String) =

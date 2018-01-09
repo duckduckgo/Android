@@ -67,7 +67,7 @@ class BrowserWebViewClient @Inject constructor(
         val urlType = specialUrlDetector.determineType(url)
 
         return when (urlType) {
-            is SpecialUrlDetector.UrlType.Email -> consume { webViewClientListener?.sendEmailRequested(urlType.emailAddress, urlType.subject, urlType.body) }
+            is SpecialUrlDetector.UrlType.Email -> consume { webViewClientListener?.sendEmailRequested(urlType.emailAddress) }
             is SpecialUrlDetector.UrlType.Telephone -> consume { webViewClientListener?.dialTelephoneNumberRequested(urlType.telephoneNumber) }
             is SpecialUrlDetector.UrlType.Sms -> consume { webViewClientListener?.sendSmsRequested(urlType.telephoneNumber) }
             is SpecialUrlDetector.UrlType.Web -> {

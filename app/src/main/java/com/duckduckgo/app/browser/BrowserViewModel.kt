@@ -69,9 +69,7 @@ class BrowserViewModel(
         class Navigate(val url: String) : Command()
         class DialNumber(val telephoneNumber: String) : Command()
         class SendSms(val telephoneNumber: String) : Command()
-        class SendEmail(val emailAddress: String,
-                        val subject: String? = "",
-                        val body: String? = "") : Command()
+        class SendEmail(val emailAddress: String) : Command()
     }
 
     private var siteMonitor: SiteMonitor? = null
@@ -119,8 +117,8 @@ class BrowserViewModel(
     }
 
     @AnyThread
-    override fun sendEmailRequested(emailAddress: String, subject: String?, body: String?) {
-        command.postValue(Command.SendEmail(emailAddress, subject, body))
+    override fun sendEmailRequested(emailAddress: String) {
+        command.postValue(Command.SendEmail(emailAddress))
     }
 
     @AnyThread

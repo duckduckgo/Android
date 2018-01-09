@@ -97,9 +97,9 @@ class SpecialUrlDetectorTest {
     }
 
     @Test
-    fun whenUrlIsMailtoThenSchemeRemoved() {
+    fun whenUrlIsMailtoThenSchemePreserved() {
         val type = testee.determineType("mailto:foo@example.com") as Email
-        assertEquals("foo@example.com", type.emailAddress)
+        assertEquals("mailto:foo@example.com", type.emailAddress)
     }
 
     @Test

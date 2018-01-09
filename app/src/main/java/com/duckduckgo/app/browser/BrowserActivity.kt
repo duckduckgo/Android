@@ -100,10 +100,8 @@ class BrowserActivity : DuckDuckGoActivity() {
                     launchExternalActivity(intent)
                 }
                 is BrowserViewModel.Command.SendEmail -> {
-                    val intent = Intent(Intent.ACTION_SEND)
-                    intent.putExtra(Intent.EXTRA_EMAIL, it.emailAddress)
-                    intent.putExtra(Intent.EXTRA_SUBJECT, it.subject)
-                    intent.putExtra(Intent.EXTRA_TEXT, it.body)
+                    val intent = Intent(Intent.ACTION_SENDTO)
+                    intent.data = Uri.parse(it.emailAddress)
                     launchExternalActivity(intent)
                 }
                 is BrowserViewModel.Command.SendSms -> {
