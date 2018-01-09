@@ -125,7 +125,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         if (intent.resolveActivity(packageManager) != null) {
             startActivity(intent)
         } else {
-            Toast.makeText(this, "No compatible app installed", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.no_compatible_third_party_app_installed, Toast.LENGTH_SHORT).show()
         }
     }
 

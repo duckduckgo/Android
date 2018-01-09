@@ -4,11 +4,14 @@
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
 
     <string name="privacyDashboard">Privacy Dashboard</string>
+
+    <!-- Browser Activity -->
     <string name="refresh">Refresh</string>
     <string name="back">Back</string>
     <string name="forward">Forward</string>
     <string name="omnibarInputHint">Search or type URL</string>
     <string name="clearButtonContentDescription">Clear search input</string>
+    <string name="no_compatible_third_party_app_installed">No compatible app installed</string>
 
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
     <string name="privacyProtectionEnabled">PRIVACY PROTECTION ENABLED</string>
