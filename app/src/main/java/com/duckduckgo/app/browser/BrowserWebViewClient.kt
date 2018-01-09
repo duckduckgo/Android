@@ -34,7 +34,8 @@ import javax.inject.Inject
 class BrowserWebViewClient @Inject constructor(
         private val requestRewriter: DuckDuckGoRequestRewriter,
         private var trackerDetector: TrackerDetector,
-        private var httpsUpgrader: HttpsUpgrader
+        private var httpsUpgrader: HttpsUpgrader,
+        private val specialUrlDetector: SpecialUrlDetector
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -62,13 +63,22 @@ class BrowserWebViewClient @Inject constructor(
      * API-agnostic implementation of deciding whether to override url or not
      */
     private fun shouldOverride(view: WebView, url: Uri): Boolean {
-        if (requestRewriter.shouldRewriteRequest(url)) {
-            val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(url)
-            view.loadUrl(newUri.toString())
-            return true
-        }
 
-        return false
+        val urlType = specialUrlDetector.determineType(url)
+
+        return when (urlType) {
+            is SpecialUrlDetector.UrlType.Email -> consume { webViewClientListener?.sendEmailRequested(urlType.emailAddress, urlType.subject, urlType.body) }
+            is SpecialUrlDetector.UrlType.Telephone -> consume { webViewClientListener?.dialTelephoneNumberRequested(urlType.telephoneNumber) }
+            is SpecialUrlDetector.UrlType.Sms -> consume { webViewClientListener?.sendSmsRequested(urlType.telephoneNumber) }
+            is SpecialUrlDetector.UrlType.Web -> {
+                if (requestRewriter.shouldRewriteRequest(url)) {
+                    val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(url)
+                    view.loadUrl(newUri.toString())
+                    return true
+                }
+                return false
+            }
+        }
     }
 
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
@@ -115,6 +125,16 @@ class BrowserWebViewClient @Inject constructor(
         val trackingEvent = trackerDetector.evaluate(url, documentUrl, ResourceType.from(request)) ?: return false
         webViewClientListener?.trackerDetected(trackingEvent)
         return trackingEvent.blocked
+    }
+
+    /**
+     * Utility to function to execute a function, and then return true
+     *
+     * Useful to reduce clutter in repeatedly including `return true` after doing the real work.
+     */
+    private inline fun consume(function: () -> Unit): Boolean {
+        function()
+        return true
     }
 
 }
