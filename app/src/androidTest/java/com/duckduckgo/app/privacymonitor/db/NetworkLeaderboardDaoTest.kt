@@ -52,14 +52,14 @@ class NetworkLeaderboardDaoTest {
         val percents: Array<NetworkPercent>? = dao.networkPercents().blockingObserve()
 
         assertEquals(2, percents!!.size)
-        assertEquals(3, percents!![0].totalDomainsVisited)
-        assertEquals(3, percents!![1].totalDomainsVisited)
+        assertEquals(3, percents[0].totalDomainsVisited)
+        assertEquals(3, percents[1].totalDomainsVisited)
 
-        assertEquals(66, (percents!![0].percent * 100).toInt())
-        assertEquals("Network1", percents!![0].networkName)
+        assertEquals(66, (percents[0].percent * 100).toInt())
+        assertEquals("Network1", percents[0].networkName)
 
-        assertEquals(33, (percents!![1].percent * 100).toInt())
-        assertEquals("Network2", percents!![1].networkName)
+        assertEquals(33, (percents[1].percent * 100).toInt())
+        assertEquals("Network2", percents[1].networkName)
     }
 
 }
