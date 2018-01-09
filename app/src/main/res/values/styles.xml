@@ -84,4 +84,8 @@
         <item name="android:textStyle">normal</item>
     </style>
 
+    <style name="TransparentToolbar" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="android:colorControlNormal">@color/white</item>
+    </style>
+
 </resources>
