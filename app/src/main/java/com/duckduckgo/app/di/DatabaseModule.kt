@@ -34,10 +34,12 @@ class DatabaseModule {
             .build()
 
     @Provides
-    fun provideHttpsUpgradeDomainDao(database: AppDatabase) =
-            database.httpsUpgradeDomainDao()
+    fun provideHttpsUpgradeDomainDao(database: AppDatabase) = database.httpsUpgradeDomainDao()
 
     @Provides
     fun provideDisconnectTrackDao(database: AppDatabase) = database.trackerDataDao()
+
+    @Provides
+    fun providesNetworkLeaderboardDao(database: AppDatabase) = database.networkLeaderboardDao()
 
 }

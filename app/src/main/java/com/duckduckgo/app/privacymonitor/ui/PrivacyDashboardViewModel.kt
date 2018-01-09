@@ -20,19 +20,17 @@ import android.annotation.SuppressLint
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.content.Context
+import android.net.Network
 import android.support.annotation.DrawableRes
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.privacymonitor.model.HttpsStatus
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
-import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
-import com.duckduckgo.app.privacymonitor.model.TermsOfService
-import com.duckduckgo.app.privacymonitor.model.grade
-import com.duckduckgo.app.privacymonitor.model.improvedGrade
+import com.duckduckgo.app.privacymonitor.model.*
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
 
 @SuppressLint("StaticFieldLeak")
 class PrivacyDashboardViewModel(private val applicationContext: Context,
-                                private val settingsStore: PrivacySettingsStore) : ViewModel() {
+                                private val settingsStore: PrivacySettingsStore,
+                                private val networkLeaderboard: NetworkLeaderboard) : ViewModel() {
 
     data class ViewState(
             @DrawableRes val privacyBanner: Int,
@@ -43,12 +41,20 @@ class PrivacyDashboardViewModel(private val applicationContext: Context,
             val networkCount: Int,
             val allTrackersBlocked: Boolean,
             val practices: TermsOfService.Practices,
-            val toggleEnabled: Boolean
+            val toggleEnabled: Boolean,
+            val showNetworkTrackerSummary: Boolean,
+            val networkTrackerSummaryName1: String?,
+            val networkTrackerSummaryName2: String?,
+            val networkTrackerSummaryName3: String?,
+            val networkTrackerSummaryPercent1: Float,
+            val networkTrackerSummaryPercent2: Float,
+            val networkTrackerSummaryPercent3: Float
     )
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     private val privacyInitiallyOn = settingsStore.privacyOn
     private var monitor: PrivacyMonitor? = null
+    private var networkPercents: Array<NetworkPercent>? = null
 
     init {
         resetViewState()
@@ -67,6 +73,7 @@ class PrivacyDashboardViewModel(private val applicationContext: Context,
     }
 
     private fun resetViewState() {
+        networkPercents = networkLeaderboard.networkPercents()
         viewState.value = ViewState(
                 privacyBanner = R.drawable.privacygrade_banner_unknown,
                 domain = "",
@@ -75,12 +82,20 @@ class PrivacyDashboardViewModel(private val applicationContext: Context,
                 httpsText = httpsText(HttpsStatus.SECURE),
                 networkCount = 0,
                 allTrackersBlocked = true,
+                toggleEnabled = settingsStore.privacyOn,
                 practices = TermsOfService.Practices.UNKNOWN,
-                toggleEnabled = settingsStore.privacyOn
+                showNetworkTrackerSummary = networkLeaderboard.shouldShow(),
+                networkTrackerSummaryName1 = topNetworkName(0),
+                networkTrackerSummaryName2 = topNetworkName(1),
+                networkTrackerSummaryName3 = topNetworkName(2),
+                networkTrackerSummaryPercent1 = topNetworkPercent(0) ?: 0f,
+                networkTrackerSummaryPercent2 = topNetworkPercent(1) ?: 0f,
+                networkTrackerSummaryPercent3 = topNetworkPercent(2) ?: 0f
         )
     }
 
     private fun updatePrivacyMonitor(monitor: PrivacyMonitor) {
+        networkPercents = networkLeaderboard.networkPercents()
         viewState.value = viewState.value?.copy(
                 privacyBanner = privacyBanner(monitor.improvedGrade),
                 domain = monitor.uri?.host ?: "",
@@ -89,7 +104,14 @@ class PrivacyDashboardViewModel(private val applicationContext: Context,
                 httpsText = httpsText(monitor.https),
                 networkCount = monitor.networkCount,
                 allTrackersBlocked = monitor.allTrackersBlocked,
-                practices = monitor.termsOfService.practices
+                practices = monitor.termsOfService.practices,
+                showNetworkTrackerSummary = networkLeaderboard.shouldShow(),
+                networkTrackerSummaryName1 = topNetworkName(0),
+                networkTrackerSummaryName2 = topNetworkName(1),
+                networkTrackerSummaryName3 = topNetworkName(2),
+                networkTrackerSummaryPercent1 = topNetworkPercent(0) ?: 0f,
+                networkTrackerSummaryPercent2 = topNetworkPercent(1) ?: 0f,
+                networkTrackerSummaryPercent3 = topNetworkPercent(2) ?: 0f
         )
     }
 
@@ -168,4 +190,15 @@ class PrivacyDashboardViewModel(private val applicationContext: Context,
         HttpsStatus.MIXED -> applicationContext.getString(R.string.httpsMixed)
         HttpsStatus.SECURE -> applicationContext.getString(R.string.httpsGood)
     }
+
+    private fun topNetworkPercent(index: Int): Float? {
+        val size = networkPercents?.size ?: return null
+        return if (size > index) networkPercents!![index].percent else null
+    }
+
+    private fun topNetworkName(index: Int): String? {
+        val size = networkPercents?.size ?: return null
+        return if (size > index) networkPercents!![index].networkName else null
+    }
+
 }

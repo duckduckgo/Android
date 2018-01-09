@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.httpsupgrade.db
+package com.duckduckgo.app.privacymonitor.db
 
 import android.arch.persistence.room.Entity
-import android.arch.persistence.room.Ignore
-import android.arch.persistence.room.PrimaryKey
 
-@Entity(tableName = "https_upgrade_domain")
-data class HttpsUpgradeDomain(@PrimaryKey var domain: String)
+@Entity(tableName = "network_leaderboard",
+        primaryKeys = arrayOf("networkName", "domainVisited"))
+data class NetworkLeaderboardEntry(
+        val networkName: String,
+        val domainVisited: String)
