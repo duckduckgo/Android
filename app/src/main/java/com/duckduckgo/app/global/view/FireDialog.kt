@@ -14,32 +14,30 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.app.global.view
 
 import android.content.Context
 import android.support.design.widget.BottomSheetDialog
 import android.view.View
 import android.webkit.CookieManager
 import android.webkit.WebView
+import com.duckduckgo.app.browser.R
 import kotlinx.android.synthetic.main.sheet_fire_clear_data.*
 
-class FireDialog(context: Context, clearAllCallback: () -> Unit) : BottomSheetDialog(context) {
+class FireDialog(context: Context, clearAllCallback: (() -> Unit)) : BottomSheetDialog(context) {
 
     init {
-
         val contentView = View.inflate(getContext(), R.layout.sheet_fire_clear_data, null)
         setContentView(contentView)
         clearAllOption.setOnClickListener {
             clearCache()
-            clearCookies(context)
+            clearCookies()
             clearAllCallback()
             dismiss()
         }
-
         cancelOption.setOnClickListener {
             dismiss()
         }
-
     }
 
     private fun clearCache() {
@@ -48,7 +46,7 @@ class FireDialog(context: Context, clearAllCallback: () -> Unit) : BottomSheetDi
         webView.clearHistory()
     }
 
-    private fun clearCookies(context: Context) {
+    private fun clearCookies() {
         CookieManager.getInstance().removeAllCookies(null)
     }
 }

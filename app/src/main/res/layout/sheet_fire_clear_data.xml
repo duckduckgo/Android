@@ -34,7 +34,7 @@
         android:paddingEnd="24dp"
         android:paddingStart="24dp"
         android:paddingTop="24dp"
-        android:text="@string/fire_clear_all"
+        android:text="@string/fireClearAll"
         android:textColor="@color/brickOrange"
         android:textSize="16sp"
         android:textStyle="normal" />
@@ -53,7 +53,7 @@
         android:paddingEnd="24dp"
         android:paddingStart="24dp"
         android:paddingTop="17dp"
-        android:text="@string/fire_cancel"
+        android:text="@string/fireCancel"
         android:textColor="@color/brownishGray"
         android:textSize="16sp"
         android:textStyle="normal"

@@ -30,6 +30,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.widget.TextView
+import android.widget.Toast
 import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
@@ -66,10 +67,10 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private val privacyGradeMenu: MenuItem?
-        get() = toolbar.menu.findItem(R.id.privacy_dashboard)
+        get() = toolbar.menu.findItem(R.id.privacy_dashboard_menu_item)
 
     private val fireMenu: MenuItem?
-        get() = toolbar.menu.findItem(R.id.fire)
+        get() = toolbar.menu.findItem(R.id.fire_menu_item)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -269,11 +270,11 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.privacy_dashboard -> {
+            R.id.privacy_dashboard_menu_item -> {
                 launchPrivacyDashboard()
                 return true
             }
-            R.id.fire -> {
+            R.id.fire_menu_item -> {
                 launchFire()
                 return true
             }
@@ -308,6 +309,7 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     private fun launchFire() {
         FireDialog(this) {
+            Toast.makeText(this, R.string.fireDataCleared, Toast.LENGTH_SHORT).show()
             finishActivityAnimated()
         }.show()
     }

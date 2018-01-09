@@ -9,8 +9,6 @@
     <string name="forward">Forward</string>
     <string name="omnibarInputHint">Search or type URL</string>
     <string name="clearButtonContentDescription">Clear search input</string>
-    <string name="fire_clear_all">Clear All Data</string>
-    <string name="fire_cancel">Cancel</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
@@ -47,6 +45,11 @@
     <string name="practicesIconContentBad">Bad Practice Icon</string>
     <string name="privacyProtectionToggle">Privacy Protection</string>
 
+    <!-- Fire -->
+    <string name="fireClearAll">Clear All Data</string>
+    <string name="fireAllCleared">All data cleared</string>
+    <string name="fireCancel">Cancel</string>
+    <string name="fireDataCleared">Data cleared</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Settings</string>
@@ -62,6 +65,5 @@
         DuckDuckGo Privacy Browser provides all the privacy essentials you need to protect yourself as you search and browse the web, including tracker blocking, smarter encryption, and DuckDuckGo private search.\n\
         After all, the internet shouldn\'t feel so creepy, and getting the privacy you deserve online should be as simple closing the blinds.</string>
     <string name="aboutMoreLink">More at duckduckgo.com/about</string>
-
-
+    
 </resources>
