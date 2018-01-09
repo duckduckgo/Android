@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.di
 
-import com.duckduckgo.app.privacymonitor.model.DatabaseNetworkLeaderboard
-import com.duckduckgo.app.privacymonitor.model.NetworkLeaderboard
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsSharedPreferences
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceRawStore
@@ -34,8 +32,5 @@ abstract class PrivacyModule {
 
     @Binds
     abstract fun bindTermsOfServiceStore(termsOfServiceStore: TermsOfServiceRawStore): TermsOfServiceStore
-
-    @Binds
-    abstract fun bindNetworkLeaderboard(networkLeaderboard: DatabaseNetworkLeaderboard): NetworkLeaderboard
 
 }

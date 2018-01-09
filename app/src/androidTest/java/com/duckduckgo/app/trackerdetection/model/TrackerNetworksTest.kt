@@ -18,8 +18,8 @@ package com.duckduckgo.app.trackerdetection.model
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Ignore
 import org.junit.Test
-
 
 class TrackerNetworksTest {
 
