@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
+import com.duckduckgo.app.privacymonitor.renderer.NetworksRenderer
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import kotlinx.android.synthetic.main.activity_tracker_networks.*
 import kotlinx.android.synthetic.main.content_tracker_networks.*
@@ -37,7 +38,7 @@ class TrackerNetworksActivity : DuckDuckGoActivity() {
     @Inject lateinit var viewModelFactory: ViewModelFactory
     @Inject lateinit var repository: PrivacyMonitorRepository
     private val networksRenderer = NetworksRenderer()
-    private val networksAdapter = NetworkTrackersAdapter()
+    private val networksAdapter = TrackerNetworksAdapter()
 
 
     companion object {

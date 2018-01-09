@@ -26,13 +26,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.app.privacymonitor.renderer.NetworksRenderer
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import kotlinx.android.synthetic.main.item_tracker_network_element.view.*
 import kotlinx.android.synthetic.main.item_tracker_network_header.view.*
 
 
-class NetworkTrackersAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         val HEADER = 0

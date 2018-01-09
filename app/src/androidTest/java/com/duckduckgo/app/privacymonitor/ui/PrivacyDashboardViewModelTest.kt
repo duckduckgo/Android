@@ -20,8 +20,9 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.privacymonitor.model.HttpsStatus
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
+import com.duckduckgo.app.privacymonitor.model.HttpsStatus
+import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
 import com.nhaarman.mockito_kotlin.mock
@@ -55,7 +56,8 @@ class PrivacyDashboardViewModelTest {
     fun whenNoDataThenDefaultValuesAreUsed() {
         val viewState = testee.viewState.value!!
         assertEquals("", viewState.domain)
-        assertEquals(getStringResource(R.string.httpsGood), viewState.httpsText)
+        assertEquals(PrivacyGrade.UNKNOWN, viewState.privacyGrade)
+        assertEquals(HttpsStatus.SECURE, viewState.httpsStatus)
         assertEquals(0, viewState.networkCount)
         assertTrue(viewState.allTrackersBlocked)
         assertEquals(TermsOfService.Practices.UNKNOWN, testee.viewState.value!!.practices)
@@ -135,27 +137,16 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenHttpsStatusIsSecureThenTextAndIconReflectSame() {
-        val monitor = monitor(https = HttpsStatus.SECURE)
+    fun whenMonitorHasTrackersThenViewModelPrivacyGradeIsUpdated() {
+        val monitor = monitor(allTrackersBlocked = false, trackerCount = 1000)
         testee.onPrivacyMonitorChanged(monitor)
-        assertEquals(getStringResource(R.string.httpsGood), testee.viewState.value?.httpsText)
-        assertEquals(R.drawable.dashboard_https_good, testee.viewState.value?.httpsIcon)
+        assertEquals(PrivacyGrade.D, testee.viewState.value?.privacyGrade)
     }
 
     @Test
-    fun whenHttpsStatusIsMixedThenTextAndIconReflectSame() {
-        val monitor = monitor(https = HttpsStatus.MIXED)
-        testee.onPrivacyMonitorChanged(monitor)
-        assertEquals(getStringResource(R.string.httpsMixed), testee.viewState.value?.httpsText)
-        assertEquals(R.drawable.dashboard_https_neutral, testee.viewState.value?.httpsIcon)
-    }
-
-    @Test
-    fun whenHttpsStatusIsNoneThenTextAndIconReflectSame() {
-        val monitor = monitor(https = HttpsStatus.NONE)
-        testee.onPrivacyMonitorChanged(monitor)
-        assertEquals(getStringResource(R.string.httpsBad), testee.viewState.value?.httpsText)
-        assertEquals(R.drawable.dashboard_https_bad, testee.viewState.value?.httpsIcon)
+    fun whenMonitorHttpsStatusIsUpdatedThenViewModelIsUpdated() {
+        testee.onPrivacyMonitorChanged(monitor(https = HttpsStatus.MIXED))
+        assertEquals(HttpsStatus.MIXED, testee.viewState.value?.httpsStatus)
     }
 
     @Test

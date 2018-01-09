@@ -33,6 +33,10 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
+import com.duckduckgo.app.privacymonitor.renderer.NetworksRenderer
+import com.duckduckgo.app.privacymonitor.renderer.banner
+import com.duckduckgo.app.privacymonitor.renderer.icon
+import com.duckduckgo.app.privacymonitor.renderer.text
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardViewModel.ViewState
 import kotlinx.android.synthetic.main.activity_privacy_dashboard.*
@@ -105,11 +109,11 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         if (isFinishing) {
             return
         }
-        privacyBanner.setImageResource(viewState.privacyBanner)
+        privacyBanner.setImageResource(viewState.privacyGrade.banner(viewState.toggleEnabled))
         domain.text = viewState.domain
         heading.text = htmlHeading(viewState.heading)
-        httpsIcon.setImageResource(viewState.httpsIcon)
-        httpsText.text = viewState.httpsText
+        httpsIcon.setImageResource(viewState.httpsStatus.icon())
+        httpsText.text = viewState.httpsStatus.text(this)
         networksIcon.setImageResource(networksRenderer.networksIcon(viewState.allTrackersBlocked))
         networksText.text = networksRenderer.networksText(this, viewState.networkCount, viewState.allTrackersBlocked)
         practicesIcon.setImageResource(viewState.practices.icon())

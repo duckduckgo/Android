@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacymonitor.ui
+package com.duckduckgo.app.privacymonitor.renderer
 
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
+import com.duckduckgo.app.privacymonitor.renderer.banner
+import com.duckduckgo.app.privacymonitor.renderer.icon
+import com.duckduckgo.app.privacymonitor.renderer.text
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
