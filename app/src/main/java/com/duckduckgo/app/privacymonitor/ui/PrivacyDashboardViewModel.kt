@@ -16,13 +16,14 @@
 
 package com.duckduckgo.app.privacymonitor.ui
 
-import android.arch.lifecycle.*
+import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModel
 import android.support.annotation.VisibleForTesting
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacymonitor.db.NetworkPercent
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import com.duckduckgo.app.privacymonitor.model.*
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
 

@@ -17,7 +17,6 @@
 package com.duckduckgo.app.httpsupgrade.db
 
 import android.arch.persistence.room.Entity
-import android.arch.persistence.room.Ignore
 import android.arch.persistence.room.PrimaryKey
 
 @Entity(tableName = "https_upgrade_domain")
