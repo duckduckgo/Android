@@ -40,16 +40,16 @@ class NetworksRenderer {
 
     @DrawableRes
     fun networkPillIcon(context: Context, networkName: String): Int? {
-        return networkIcon(context, networkName, "network_pill")
+        return networkIcon(context, networkName, "network_pill_")
     }
 
     @DrawableRes
     fun networkLogoIcon(context: Context, networkName: String): Int? {
-        return networkIcon(context, networkName, "network_logo")
+        return networkIcon(context, networkName, "network_logo_")
     }
 
     private fun networkIcon(context: Context, networkName: String, prefix: String): Int? {
-        val drawable = "prefix_$networkName"
+        val drawable = "$prefix$networkName"
                 .replace(" ", "")
                 .replace(".", "")
                 .toLowerCase()

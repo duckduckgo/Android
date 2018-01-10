@@ -68,7 +68,7 @@ class PrivacyDashboardViewModel(private val applicationContext: Context,
     }
 
     @VisibleForTesting
-    override fun onCleared() {
+    override public fun onCleared() {
         super.onCleared()
         networkPercentsData.removeObserver(networkPercentsObserver)
     }

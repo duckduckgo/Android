@@ -70,26 +70,26 @@ class NetworksRendererTest {
     }
 
     @Test
-    fun whenNetworkNameMatchesPillIconThenResourceIsReturned() {
-        val resource = testee.networkPillIcon(context, "facebook")
-        assertEquals(R.drawable.network_pill_facebook, resource)
+    fun whenNetworkNameMatchesLogoIconThenResourceIsReturned() {
+        val resource = testee.networkLogoIcon(context, "facebook")
+        assertEquals(R.drawable.network_logo_facebook, resource)
     }
 
     @Test
-    fun whenNetworkNameSansDotsMatchesPillIconThenResourceIsReturned() {
-        val resource = testee.networkPillIcon(context, "amazon.com")
-        assertEquals(R.drawable.network_pill_amazoncom, resource)
+    fun whenNetworkNameSansDotsMatchesLogoIconThenResourceIsReturned() {
+        val resource = testee.networkLogoIcon(context, "amazon.com")
+        assertEquals(R.drawable.network_logo_amazoncom, resource)
     }
 
     @Test
     fun whenNetworkNameSansSpacesMatchesPillIconThenResourceIsReturned() {
-        val resource = testee.networkPillIcon(context, "fox one stop media")
-        assertEquals(R.drawable.network_pill_foxonestopmedia, resource)
+        val resource = testee.networkLogoIcon(context, "fox one stop media")
+        assertEquals(R.drawable.network_logo_foxonestopmedia, resource)
     }
 
     @Test
-    fun whenNetworkNameDoesNotMatchPillIconThenNull() {
-        val resource = testee.networkPillIcon(context, "unknownnetwork")
+    fun whenNetworkNameDoesNotMatchLogoIconThenNull() {
+        val resource = testee.networkLogoIcon(context, "unknownnetwork")
         assertNull(resource)
     }
 }
