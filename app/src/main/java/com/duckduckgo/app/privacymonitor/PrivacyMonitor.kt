@@ -33,6 +33,7 @@ interface PrivacyMonitor {
     val trackerCount: Int
     val distinctTrackersByNetwork: Map<String, List<TrackingEvent>>
     val networkCount: Int
+    val majorNetworkCount: Int
     val hasTrackerFromMajorNetwork: Boolean
     val allTrackersBlocked: Boolean
     val hasObscureTracker: Boolean

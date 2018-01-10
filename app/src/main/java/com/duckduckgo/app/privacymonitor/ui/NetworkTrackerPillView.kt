@@ -23,11 +23,12 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.privacymonitor.renderer.TrackersRenderer
 import kotlinx.android.synthetic.main.view_network_tracker_pill.view.*
 
 class NetworkTrackerPillView: FrameLayout {
 
-    val renderer = NetworksRenderer()
+    val renderer = TrackersRenderer()
 
     constructor(context: Context) : super(context, null) {
         initLayout()

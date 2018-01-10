@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,27 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacymonitor.ui
+package com.duckduckgo.app.privacymonitor.renderer
 
 import android.content.Context
 import android.support.annotation.DrawableRes
 import com.duckduckgo.app.browser.R
 
 
-class NetworksRenderer {
+class TrackersRenderer {
+
+    fun trackersText(context: Context, trackerCount: Int, allTrackersBlocked: Boolean): String {
+        val resource = if (allTrackersBlocked) R.plurals.trackerBlocked else R.plurals.trackersFound
+        return context.resources.getQuantityString(resource, trackerCount, trackerCount)
+    }
 
     fun networksText(context: Context, networkCount: Int, allTrackersBlocked: Boolean): String {
         val resource = if (allTrackersBlocked) R.plurals.networksBlocked else R.plurals.networksFound
+        return context.resources.getQuantityString(resource, networkCount, networkCount)
+    }
+
+    fun majorNetworksText(context: Context, networkCount: Int, allTrackersBlocked: Boolean): String {
+        val resource = if (allTrackersBlocked) R.plurals.majorNetworksBlocked else R.plurals.majorNetworksFound
         return context.resources.getQuantityString(resource, networkCount, networkCount)
     }
 
@@ -63,4 +73,10 @@ class NetworksRenderer {
         return "$to100%"
     }
 
+    @DrawableRes
+    fun successFailureIcon(count: Int): Int = when (count) {
+        0 -> R.drawable.icon_success
+        else -> R.drawable.icon_fail
+    }
+    
 }

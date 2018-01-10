@@ -6,6 +6,7 @@
 
     <color name="windowBackground">@color/charcoal</color>
     <color name="searchBackground">@color/slateGray</color>
+    <color name="divider">@color/subtleGreyTwo</color>
 
     <color name="white">#FFFFFF</color>
     <color name="almostBlack">#333333</color>
@@ -17,6 +18,7 @@
     <color name="warmGrey">#939393</color>
     <color name="warmerGrey">#777777</color>
     <color name="subtleGrey">#f0f0f0</color>
+    <color name="subtleGreyTwo">#D8D8D8</color>
 
     <color name="orange">#de5833</color>
     <color name="brickOrange">#d03a10</color>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacymonitor.ui
+package com.duckduckgo.app.privacymonitor.renderer
 
 import android.content.Context
 import android.support.annotation.DrawableRes
@@ -34,6 +34,12 @@ fun TermsOfService.Practices.icon(): Int = when (this) {
     GOOD -> R.drawable.practices_icon_good
     POOR -> R.drawable.practices_icon_bad
     MIXED, UNKNOWN -> R.drawable.practices_icon_neutral
+}
+
+@DrawableRes
+fun TermsOfService.Practices.successFailureIcon(): Int = when (this) {
+    GOOD -> R.drawable.icon_success
+    POOR, MIXED, UNKNOWN -> R.drawable.icon_fail
 }
 
 fun TermsOfService.Practices.text(context: Context): String = when (this) {

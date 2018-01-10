@@ -29,51 +29,9 @@
         tools:context="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
         tools:showIn="@layout/activity_privacy_dashboard">
 
-        <android.support.constraint.ConstraintLayout
+        <include
             android:id="@+id/privacyGrade"
-            android:layout_width="match_parent"
-            android:layout_height="212dp"
-            android:background="@color/subtleGrey">
-
-            <ImageView
-                android:id="@+id/privacyBanner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/privacyGradeContentDescription"
-                android:paddingBottom="12dp"
-                android:paddingTop="20dp"
-                android:src="@drawable/privacygrade_banner_unknown"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent" />
-
-            <TextView
-                android:id="@+id/domain"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:textColor="@color/almostBlack"
-                android:textIsSelectable="true"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/privacyBanner"
-                tools:text="theatlantic.com" />
-
-            <TextView
-                android:id="@+id/heading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:layout_marginTop="5dp"
-                android:gravity="center_horizontal"
-                android:text="@string/privacyProtectionEnabled"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/domain"
-                style="@style/DashboardHeader" />
-
-        </android.support.constraint.ConstraintLayout>
+            layout="@layout/include_privacy_dashboard_header" />
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/review"

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacymonitor.ui
+package com.duckduckgo.app.privacymonitor.renderer
 
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
@@ -22,10 +22,46 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
-class NetworksRendererTest {
+class TrackersRendererTest {
 
     private val context = InstrumentationRegistry.getTargetContext()
-    private val testee = NetworksRenderer()
+    private val testee = TrackersRenderer()
+
+    @Test
+    fun whenNoTrackersThenTrackersTextShowsZeroBlocked() {
+        val text = testee.trackersText(context, 0, true)
+        assertEquals("0 Trackers Blocked", text)
+    }
+
+    @Test
+    fun whenTenTrackersAndAllBlockedThenTrackerTextShowsTenBlocked() {
+        val text = testee.trackersText(context, 10, true)
+        assertEquals("10 Trackers Blocked", text)
+    }
+
+    @Test
+    fun whenTenTrackersAndNotAllBlockedThenTrackerTextShowsTenFound() {
+        val text = testee.trackersText(context, 10, false)
+        assertEquals("10 Trackers Found", text)
+    }
+
+    @Test
+    fun whenNoMajorNetworksThenNetworksTextShowsZeroBlocked() {
+        val text = testee.majorNetworksText(context, 0, true)
+        assertEquals("0 Major Tracker Networks Blocked", text)
+    }
+
+    @Test
+    fun whenTenMajorNetworksAndAllBlockedThenNetworksTextShowsTenBlocked() {
+        val text = testee.majorNetworksText(context, 10, true)
+        assertEquals("10 Major Tracker Networks Blocked", text)
+    }
+
+    @Test
+    fun whenTenMajorNetworksAndNotAllBlockedThenNetworksTextShowsTenFound() {
+        val text = testee.majorNetworksText(context, 10, false)
+        assertEquals("10 Major Tracker Networks Found", text)
+    }
 
     @Test
     fun whenPercentNullPercentageIsBlank() {
@@ -115,5 +151,15 @@ class NetworksRendererTest {
     fun whenNetworkNameDoesNotMatchLogoIconThenNull() {
         val resource = testee.networkLogoIcon(context, "unknownnetwork")
         assertNull(resource)
+    }
+
+    @Test
+    fun whenCountIsZeroThenIconIsSuccess() {
+        assertEquals(R.drawable.icon_success, testee.successFailureIcon(0))
+    }
+
+    @Test
+    fun whenCountIsNotZeroThenIconIsFailure() {
+        assertEquals(R.drawable.icon_fail, testee.successFailureIcon(1))
     }
 }
