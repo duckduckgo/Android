@@ -24,15 +24,15 @@ import android.webkit.WebView
 import com.duckduckgo.app.browser.R
 import kotlinx.android.synthetic.main.sheet_fire_clear_data.*
 
-class FireDialog(context: Context, clearAllCallback: (() -> Unit)) : BottomSheetDialog(context) {
+class FireDialog(context: Context, clearStarted: (() -> Unit), clearComplete: (() -> Unit)) : BottomSheetDialog(context) {
 
     init {
         val contentView = View.inflate(getContext(), R.layout.sheet_fire_clear_data, null)
         setContentView(contentView)
         clearAllOption.setOnClickListener {
+            clearStarted()
             clearCache()
-            clearCookies()
-            clearAllCallback()
+            clearCookies(clearComplete)
             dismiss()
         }
         cancelOption.setOnClickListener {
@@ -46,7 +46,9 @@ class FireDialog(context: Context, clearAllCallback: (() -> Unit)) : BottomSheet
         webView.clearHistory()
     }
 
-    private fun clearCookies() {
-        CookieManager.getInstance().removeAllCookies(null)
+    private fun clearCookies(clearAllCallback: (() -> Unit)) {
+        CookieManager.getInstance().removeAllCookies {
+            clearAllCallback()
+        }
     }
 }

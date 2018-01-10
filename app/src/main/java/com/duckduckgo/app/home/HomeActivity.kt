@@ -88,9 +88,9 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun launchFire() {
-        FireDialog(this) {
+        FireDialog(this, {}, {
             Toast.makeText(this, R.string.fireDataCleared, Toast.LENGTH_SHORT).show()
-        }.show()
+        }).show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

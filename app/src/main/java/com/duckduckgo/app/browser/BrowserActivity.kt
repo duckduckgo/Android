@@ -308,10 +308,11 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun launchFire() {
-        FireDialog(this) {
-            Toast.makeText(this, R.string.fireDataCleared, Toast.LENGTH_SHORT).show()
+        FireDialog(this, {
             finishActivityAnimated()
-        }.show()
+        }, {
+            Toast.makeText(this, R.string.fireDataCleared, Toast.LENGTH_SHORT).show()
+        }).show()
     }
 
     private fun launchSettingsView() {
