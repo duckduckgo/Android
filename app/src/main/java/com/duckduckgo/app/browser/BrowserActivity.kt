@@ -39,6 +39,7 @@ import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.REQUEST_DASHBOARD
+import com.duckduckgo.app.privacymonitor.renderer.icon
 import com.duckduckgo.app.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_browser.*
 import javax.inject.Inject
@@ -82,7 +83,9 @@ class BrowserActivity : DuckDuckGoActivity() {
         })
 
         viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
-            it?.let { renderPrivacyGrade(it) }
+            it?.let {
+                privacyGradeMenu?.icon = getDrawable(it.icon())
+            }
         })
 
         viewModel.url.observe(this, Observer {
@@ -181,17 +184,6 @@ class BrowserActivity : DuckDuckGoActivity() {
             clearOmnibarInputButton.hide()
             omnibarTextInput.updatePadding(paddingEnd = 10.toPx())
         }
-    }
-
-    private fun renderPrivacyGrade(privacyGrade: PrivacyGrade?) {
-        val resource = when (privacyGrade) {
-            PrivacyGrade.A -> R.drawable.privacygrade_icon_a
-            PrivacyGrade.B -> R.drawable.privacygrade_icon_b
-            PrivacyGrade.C -> R.drawable.privacygrade_icon_c
-            PrivacyGrade.D -> R.drawable.privacygrade_icon_d
-            else -> R.drawable.privacygrade_icon_unknown
-        }
-        privacyGradeMenu?.icon = getDrawable(resource)
     }
 
     private fun shouldUpdateOmnibarTextInput(viewState: BrowserViewModel.ViewState, omnibarInput: String?) =

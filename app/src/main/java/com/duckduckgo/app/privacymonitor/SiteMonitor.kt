@@ -74,6 +74,9 @@ class SiteMonitor(override val url: String,
     override val networkCount: Int
         get() = distinctTrackersByNetwork.count()
 
+    override val majorNetworkCount: Int
+        get() = trackingEvents.distinctBy { it.trackerNetwork?.url }.count { it.trackerNetwork?.isMajor ?: false}
+
     override val hasTrackerFromMajorNetwork: Boolean
         get() = trackingEvents.any { it.trackerNetwork?.isMajor ?: false }
 

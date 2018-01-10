@@ -57,6 +57,11 @@
             android:parentActivityName=".BrowserActivity"
             android:screenOrientation="fullSensor" />
         <activity
+            android:name="com.duckduckgo.app.privacymonitor.ui.ScorecardActivity"
+            android:label="@string/scorecardActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
+            android:screenOrientation="fullSensor" />
+        <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity"
             android:label="@string/networksActivityTitle"
             android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
