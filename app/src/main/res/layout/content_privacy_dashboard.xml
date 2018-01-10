@@ -19,7 +19,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="@color/subtleGrey"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:ignore="Overdraw">
 
@@ -85,6 +85,7 @@
             android:layout_height="169dp"
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
+            android:background="@android:color/white"
             app:layout_constraintTop_toBottomOf="@id/privacyGrade"
             tools:ignore="SelectableText,UseCompoundDrawables">
 
@@ -182,6 +183,61 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
         </android.support.constraint.ConstraintLayout>
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/networkTrackerSummary"
+            android:layout_width="match_parent"
+            android:layout_height="108dp"
+            android:paddingEnd="20dp"
+            android:paddingStart="20dp"
+            app:layout_constraintTop_toBottomOf="@id/privacyToggleContainer">
+
+            <TextView
+                android:id="@+id/networkTrackerSummaryHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:fontFamily="sans-serif"
+                android:gravity="center_horizontal"
+                android:letterSpacing="0.14"
+                android:text="@string/networkTrackerSummaryHeader"
+                android:textColor="@color/warmGrey"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.duckduckgo.app.privacymonitor.ui.NetworkTrackerPillView
+                android:id="@+id/networkTrackerSummaryPill1"
+                android:layout_marginTop="13dp"
+                app:layout_constraintRight_toLeftOf="@+id/networkTrackerSummaryPill2"
+                app:layout_constraintTop_toBottomOf="@+id/networkTrackerSummaryHeader"
+                android:layout_marginEnd="12dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.app.privacymonitor.ui.NetworkTrackerPillView
+                android:id="@+id/networkTrackerSummaryPill2"
+                android:layout_marginTop="13dp"
+                app:layout_constraintTop_toBottomOf="@+id/networkTrackerSummaryHeader"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.app.privacymonitor.ui.NetworkTrackerPillView
+                android:id="@+id/networkTrackerSummaryPill3"
+                android:layout_marginTop="13dp"
+                app:layout_constraintTop_toBottomOf="@+id/networkTrackerSummaryHeader"
+                app:layout_constraintLeft_toRightOf="@+id/networkTrackerSummaryPill2"
+                android:layout_marginStart="12dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
+        </android.support.constraint.ConstraintLayout>
+
 
     </android.support.constraint.ConstraintLayout>
 
