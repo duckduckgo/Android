@@ -87,11 +87,11 @@ class ScorecardActivity : DuckDuckGoActivity() {
         trackers.setDrawableEnd(trackersRenderer.successFailureIcon(viewState.trackerCount))
         majorNetworks.text = trackersRenderer.majorNetworksText(this, viewState.majorNetworkCount, viewState.allTrackersBlocked)
         majorNetworks.setDrawableEnd(trackersRenderer.successFailureIcon(viewState.majorNetworkCount))
-        showIsMemeberOfMajorNetwork(viewState.showIsMemberOfMajorNetwork)
+        showIsMemberOfMajorNetwork(viewState.showIsMemberOfMajorNetwork)
         showEnhancedGrade(viewState.showEnhancedGrade)
     }
 
-    private fun showIsMemeberOfMajorNetwork(show: Boolean) {
+    private fun showIsMemberOfMajorNetwork(show: Boolean) {
         siteIsMajorNetworkMember.visibility = if (show) View.VISIBLE else View.GONE
     }
 
