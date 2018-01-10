@@ -28,6 +28,24 @@ class NetworksRendererTest {
     private val testee = NetworksRenderer()
 
     @Test
+    fun whenPercentNullPercentageIsBlank() {
+        val text = testee.percentage(null)
+        assertEquals("", text)
+    }
+
+    @Test
+    fun whenPercentIsRecurringFractionPercentageIsRoundNumber() {
+        val text = testee.percentage(0.333333333f)
+        assertEquals("33%", text)
+    }
+
+    @Test
+    fun whenPercentIsHalfPercentageIs50Percent() {
+        val text = testee.percentage(0.5f)
+        assertEquals("50%", text)
+    }
+
+    @Test
     fun whenNoTrackerNetworksThenNetworksTextShowsZeroBlocked() {
         val text = testee.networksText(context, 0, true)
         assertEquals("0 Tracker Networks Blocked", text)
@@ -67,6 +85,12 @@ class NetworksRendererTest {
     fun whenNotAllTrackersBlockedThenNetworksIconIsBad() {
         val resource = testee.networksIcon(false)
         assertEquals(R.drawable.networks_icon_bad, resource)
+    }
+
+    @Test
+    fun whenNetworkNameMatchesPillIconThenResourceIsReturned() {
+        val resource = testee.networkPillIcon(context, "facebook")
+        assertEquals(R.drawable.network_pill_facebook, resource)
     }
 
     @Test
