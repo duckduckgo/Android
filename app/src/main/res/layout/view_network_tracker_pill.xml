@@ -25,7 +25,7 @@
     <!-- content description set to network name in code -->
     <ImageView
         android:contentDescription="@string/appName"
-        android:id="@+id/networkTrackerSummaryPillIcon"
+        android:id="@+id/icon"
         android:layout_marginStart="9dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -35,8 +35,8 @@
         android:src="@android:drawable/btn_star" />
 
     <View
-        android:id="@+id/networkTrackerSummaryPillSeparator"
-        app:layout_constraintLeft_toRightOf="@id/networkTrackerSummaryPillIcon"
+        android:id="@+id/separator"
+        app:layout_constraintLeft_toRightOf="@id/icon"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginStart="5dp"
@@ -45,14 +45,16 @@
         android:background="@color/subtleGrey" />
 
     <TextView
-        android:id="@+id/networkTrackerSummaryPillPercentage"
+        android:id="@+id/percentage"
         android:layout_marginStart="7dp"
-        app:layout_constraintLeft_toRightOf="@id/networkTrackerSummaryPillSeparator"
+        app:layout_constraintLeft_toRightOf="@id/separator"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="3dp"
         android:textColor="@color/white"
         android:layout_width="wrap_content"
-        android:layout_height="17sp"
+        android:layout_height="16sp"
+        android:fontFamily="sans-serif-medium"
         tools:text="64%" />
 
 </android.support.constraint.ConstraintLayout>

@@ -20,9 +20,14 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.TextView
 import com.duckduckgo.app.browser.R
+import kotlinx.android.synthetic.main.view_network_tracker_pill.view.*
 
 class NetworkTrackerPillView: FrameLayout {
+
+    val renderer = NetworksRenderer()
 
     constructor(context: Context) : super(context, null) {
         initLayout()
@@ -38,6 +43,11 @@ class NetworkTrackerPillView: FrameLayout {
 
     fun initLayout() {
         View.inflate(context, R.layout.view_network_tracker_pill, this)
+    }
+
+    fun render(networkName: String?, percent: Float?) {
+        icon.setImageResource(renderer.networkPillIcon(context, networkName ?: "") ?: R.drawable.network_pill_amazoncom)
+        percentage.text = renderer.percentage(percent)
     }
 
 }
