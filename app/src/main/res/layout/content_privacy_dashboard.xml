@@ -66,16 +66,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:layout_marginTop="5dp"
-                android:fontFamily="sans-serif"
                 android:gravity="center_horizontal"
-                android:letterSpacing="0.14"
                 android:text="@string/privacyProtectionEnabled"
-                android:textColor="@color/warmGrey"
-                android:textSize="12sp"
-                android:textStyle="bold"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/domain" />
+                app:layout_constraintTop_toBottomOf="@id/domain"
+                style="@style/DashboardHeader" />
 
         </android.support.constraint.ConstraintLayout>
 
@@ -197,15 +193,24 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="22dp"
-                android:fontFamily="sans-serif"
                 android:gravity="center_horizontal"
-                android:letterSpacing="0.14"
                 android:text="@string/networkTrackerSummaryHeader"
-                android:textColor="@color/warmGrey"
-                android:textSize="12sp"
-                android:textStyle="bold"
+                android:elegantTextHeight="true"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                style="@style/DashboardHeader" />
+
+            <TextView
+                android:id="@+id/networkTrackerSummaryNotReady"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/networkTrackerSummaryNotReady"
+                android:textAlignment="center"
+                android:layout_marginTop="22dp"
+                android:layout_marginStart="40dp"
+                android:layout_marginEnd="40dp"
+                android:fontFamily="sans-serif-medium"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.duckduckgo.app.privacymonitor.ui.NetworkTrackerPillView
@@ -235,11 +240,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-
         </android.support.constraint.ConstraintLayout>
 
-
     </android.support.constraint.ConstraintLayout>
-
 
 </ScrollView>

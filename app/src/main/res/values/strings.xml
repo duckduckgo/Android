@@ -48,6 +48,7 @@
     <string name="privacyProtectionToggle">Privacy Protection</string>
 
     <string name="networkTrackerSummaryHeader">TRACKER NETWORK TOP OFFENDERS</string>
+    <string name="networkTrackerSummaryNotReady">We\'re still collecting data to show how many trackers we\'ve blocked.</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Settings</string>

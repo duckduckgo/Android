@@ -21,6 +21,7 @@ import android.arch.lifecycle.*
 import android.content.Context
 import android.net.Network
 import android.support.annotation.DrawableRes
+import android.support.annotation.VisibleForTesting
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
@@ -66,7 +67,8 @@ class PrivacyDashboardViewModel(private val applicationContext: Context,
         networkPercentsData.observeForever(networkPercentsObserver)
     }
 
-    override public fun onCleared() {
+    @VisibleForTesting
+    override fun onCleared() {
         super.onCleared()
         networkPercentsData.removeObserver(networkPercentsObserver)
     }

@@ -46,7 +46,7 @@ class NetworkTrackerPillView: FrameLayout {
     }
 
     fun render(networkName: String?, percent: Float?) {
-        icon.setImageResource(renderer.networkPillIcon(context, networkName ?: "") ?: R.drawable.network_pill_amazoncom)
+        icon.setImageResource(renderer.networkIcon(context, networkName ?: "") ?: 0)
         percentage.text = renderer.percentage(percent)
     }
 

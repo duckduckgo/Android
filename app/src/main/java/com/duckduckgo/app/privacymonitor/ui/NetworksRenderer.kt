@@ -40,11 +40,27 @@ class NetworksRenderer {
 
     @DrawableRes
     fun networkPillIcon(context: Context, networkName: String): Int? {
-        val drawable = "network_pill_$networkName"
+        return networkIcon(context, networkName, "network_pill")
+    }
+
+    @DrawableRes
+    fun networkLogoIcon(context: Context, networkName: String): Int? {
+        return networkIcon(context, networkName, "network_logo")
+    }
+
+    private fun networkIcon(context: Context, networkName: String, prefix: String): Int? {
+        val drawable = "prefix_$networkName"
                 .replace(" ", "")
                 .replace(".", "")
                 .toLowerCase()
         val resource = context.resources.getIdentifier(drawable, "drawable", context.packageName)
         return if (resource != 0) resource else null
     }
+
+    fun percentage(percent: Float?): String? {
+        percent ?: return ""
+        val to100 = (percent * 100).toInt()
+        return "$to100%"
+    }
+
 }
