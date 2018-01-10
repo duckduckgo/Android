@@ -44,6 +44,11 @@
 
         </activity>
 
+        <activity android:name="com.duckduckgo.app.onboarding.OnboardingActivity"
+            android:label="@string/privacyDashboardActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.home.HomeActivity"
+            android:screenOrientation="fullSensor" />
+
         <activity
             android:name=".BrowserActivity"
             android:allowTaskReparenting="true"
@@ -86,6 +91,7 @@
         <service
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
+
 
     </application>
 

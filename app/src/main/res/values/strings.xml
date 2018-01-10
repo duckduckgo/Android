@@ -5,6 +5,8 @@
 
     <string name="privacyDashboard">Privacy Dashboard</string>
 
+    <!-- Onboarding Activity -->
+
     <!-- Browser Activity -->
     <string name="refresh">Refresh</string>
     <string name="back">Back</string>
