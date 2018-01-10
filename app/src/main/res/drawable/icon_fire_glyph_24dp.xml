@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2018 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,18 +14,13 @@
   ~ limitations under the License.
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/fire_menu_item"
-        android:icon="@drawable/icon_fire"
-        android:title="@string/privacyDashboard"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/settings_menu_item"
-        android:title="@string/settingsMenuItemTitle"
-        app:showAsAction="never" />
-
-</menu>
+        android:gravity="center"
+        android:left="3.5dp"
+        android:right="3.5dp">
+        <bitmap xmlns:android="http://schemas.android.com/apk/res/android"
+            android:scaleType="fitXY"
+            android:src="@drawable/icon_fire_glyph" />
+    </item>
+</layer-list>

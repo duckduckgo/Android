@@ -68,7 +68,10 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private val privacyGradeMenu: MenuItem?
-        get() = toolbar.menu.findItem(R.id.privacy_dashboard)
+        get() = toolbar.menu.findItem(R.id.privacy_dashboard_menu_item)
+
+    private val fireMenu: MenuItem?
+        get() = toolbar.menu.findItem(R.id.fire_menu_item)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -163,6 +166,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
 
         privacyGradeMenu?.isVisible = viewState.showPrivacyGrade
+        fireMenu?.isVisible = viewState.showFireButton
     }
 
     private fun showClearButton() {
@@ -286,8 +290,12 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.privacy_dashboard -> {
+            R.id.privacy_dashboard_menu_item -> {
                 launchPrivacyDashboard()
+                return true
+            }
+            R.id.fire_menu_item -> {
+                launchFire()
                 return true
             }
             R.id.refresh_menu_item -> {
@@ -317,6 +325,14 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     private fun launchPrivacyDashboard() {
         startActivityForResult(PrivacyDashboardActivity.intent(this), REQUEST_DASHBOARD)
+    }
+
+    private fun launchFire() {
+        FireDialog(this, {
+            finishActivityAnimated()
+        }, {
+            Toast.makeText(this, R.string.fireDataCleared, Toast.LENGTH_SHORT).show()
+        }).show()
     }
 
     private fun launchSettingsView() {
