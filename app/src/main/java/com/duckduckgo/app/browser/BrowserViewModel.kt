@@ -17,7 +17,9 @@
 package com.duckduckgo.app.browser
 
 import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
+import android.support.annotation.VisibleForTesting
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity.Companion.RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
@@ -32,6 +34,8 @@ import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RESULT_RELOAD
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RESULT_TOSDR
+import com.duckduckgo.app.settings.db.AppConfigurationDao
+import com.duckduckgo.app.settings.db.AppConfigurationEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import timber.log.Timber
@@ -42,7 +46,8 @@ class BrowserViewModel(
         private val termsOfServiceStore: TermsOfServiceStore,
         private val trackerNetworks: TrackerNetworks,
         private val privacyMonitorRepository: PrivacyMonitorRepository,
-        private val stringResolver: StringResolver) :
+        private val stringResolver: StringResolver,
+        appConfigurationDao: AppConfigurationDao) :
         WebViewClientListener, ViewModel() {
 
     data class ViewState(
@@ -55,23 +60,42 @@ class BrowserViewModel(
             val showPrivacyGrade: Boolean = false
     )
 
-    /* Observable data for Activity to subscribe to */
-    val viewState: MutableLiveData<ViewState> = MutableLiveData()
-    val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
-    val url: SingleLiveEvent<String> = SingleLiveEvent()
-    val command: SingleLiveEvent<Command> = SingleLiveEvent()
-
     sealed class Command {
         class LandingPage : Command()
         class Refresh : Command()
         class Navigate(val url: String) : Command()
     }
 
+    /* Observable data for Activity to subscribe to */
+    val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
+    val url: SingleLiveEvent<String> = SingleLiveEvent()
+    val command: SingleLiveEvent<Command> = SingleLiveEvent()
+
+
+    @VisibleForTesting
+    val appConfigurationObserver: Observer<AppConfigurationEntity> = Observer { appConfiguration ->
+        appConfiguration?.let {
+            Timber.i("App configuration downloaded: ${it.appConfigurationDownloaded}")
+            appConfigurationDownloaded = it.appConfigurationDownloaded
+        }
+    }
+
+    private val appConfigurationObservable = appConfigurationDao.appConfigurationStatus()
     private var siteMonitor: SiteMonitor? = null
+    private var appConfigurationDownloaded = false
 
     init {
         viewState.value = ViewState()
         privacyMonitorRepository.privacyMonitor = MutableLiveData()
+
+        appConfigurationObservable.observeForever(appConfigurationObserver)
+    }
+
+    @VisibleForTesting
+    public override fun onCleared() {
+        super.onCleared()
+        appConfigurationObservable.removeObserver(appConfigurationObserver)
     }
 
     fun registerWebViewListener(browserWebViewClient: BrowserWebViewClient, browserChromeClient: BrowserChromeClient) {
@@ -87,7 +111,7 @@ class BrowserViewModel(
         viewState.value = currentViewState().copy(showClearButton = false, omnibarText = input)
     }
 
-    fun buildUrl(input: String): String {
+    private fun buildUrl(input: String): String {
         if (queryUrlConverter.isWebUrl(input)) {
             return queryUrlConverter.convertUri(input)
         }
@@ -115,7 +139,7 @@ class BrowserViewModel(
         Timber.v("Url changed: $url")
         if (url == null) return
 
-        var newViewState = currentViewState().copy(omnibarText = url, browserShowing = true, showPrivacyGrade = true)
+        var newViewState = currentViewState().copy(omnibarText = url, browserShowing = true, showPrivacyGrade = appConfigurationDownloaded)
 
         if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url) && duckDuckGoUrlDetector.hasQuery(url)) {
             newViewState = newViewState.copy(omnibarText = duckDuckGoUrlDetector.extractQuery(url))

@@ -18,15 +18,20 @@ package com.duckduckgo.app.browser
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
+import android.arch.persistence.room.Room
 import android.net.Uri
+import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.LandingPage
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.StringResolver
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
+import com.duckduckgo.app.settings.db.AppConfigurationDao
+import com.duckduckgo.app.settings.db.AppConfigurationEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.nhaarman.mockito_kotlin.mock
@@ -46,11 +51,13 @@ class BrowserViewModelTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
+    private lateinit var testee: BrowserViewModel
     private lateinit var queryObserver: Observer<String>
     private lateinit var navigationObserver: Observer<Command>
     private lateinit var termsOfServiceStore: TermsOfServiceStore
     private lateinit var mockStringResolver: StringResolver
-    private lateinit var testee: BrowserViewModel
+    private lateinit var db: AppDatabase
+    private lateinit var dao: AppConfigurationDao
 
     private val testOmnibarConverter: OmnibarEntryConverter = object : OmnibarEntryConverter {
         override fun convertUri(input: String): String = "duckduckgo.com"
@@ -60,6 +67,11 @@ class BrowserViewModelTest {
 
     @Before
     fun before() {
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
+        dao = db.appConfigurationDao()
+
         mockStringResolver = mock()
         queryObserver = mock()
         navigationObserver = mock()
@@ -67,13 +79,15 @@ class BrowserViewModelTest {
         testee = BrowserViewModel(testOmnibarConverter, DuckDuckGoUrlDetector(), termsOfServiceStore, TrackerNetworks(), PrivacyMonitorRepository(), object : StringResolver {
             override fun getString(stringId: Int): String = ""
             override fun getString(stringId: Int, vararg formatArgs: Any): String = ""
-        })
+        }, dao)
         testee.url.observeForever(queryObserver)
         testee.command.observeForever(navigationObserver)
     }
 
     @After
     fun after() {
+        testee.onCleared()
+        db.close()
         testee.url.removeObserver(queryObserver)
         testee.command.removeObserver(navigationObserver)
     }
@@ -218,8 +232,17 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenUrlUpdatedThenPrivacyGradeIsShown() {
+    fun whenUrlUpdatedAfterConfigDownloadThenPrivacyGradeIsShown() {
+        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
         testee.urlChanged((""))
         assertTrue(testee.viewState.value!!.showPrivacyGrade)
+    }
+
+
+    @Test
+    fun whenUrlUpdatedBeforeConfigDownloadThenPrivacyGradeIsShown() {
+        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = false))
+        testee.urlChanged((""))
+        assertFalse(testee.viewState.value!!.showPrivacyGrade)
     }
 }

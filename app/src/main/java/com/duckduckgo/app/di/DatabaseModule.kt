@@ -16,11 +16,15 @@
 
 package com.duckduckgo.app.di
 
+import android.arch.persistence.db.SupportSQLiteDatabase
 import android.arch.persistence.room.Room
+import android.arch.persistence.room.RoomDatabase
 import android.content.Context
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.settings.db.AppConfigurationDao
 import dagger.Module
 import dagger.Provides
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Singleton
 
 @Module
@@ -28,10 +32,29 @@ class DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(context: Context) = Room
-            .databaseBuilder(context, AppDatabase::class.java, "app.db")
-            .fallbackToDestructiveMigration()
-            .build()
+    fun provideDatabase(context: Context): AppDatabase {
+        return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
+                .fallbackToDestructiveMigration()
+                .addCallback(initialDbCreationCallback())
+                .build()
+    }
+
+    /**
+     * Use this callback as a chance to seed the database with initial data.
+     */
+    private fun initialDbCreationCallback(): RoomDatabase.Callback {
+        return object : RoomDatabase.Callback() {
+            override fun onCreate(db: SupportSQLiteDatabase) {
+                super.onCreate(db)
+                // insert the data on the IO Thread
+
+                Schedulers.io().scheduleDirect({
+                    //language=RoomSql
+                    db.execSQL("INSERT INTO app_configuration (key, appConfigurationDownloaded) VALUES ('${AppConfigurationDao.KEY}', 'false')")
+                })
+            }
+        }
+    }
 
     @Provides
     fun provideHttpsUpgradeDomainDao(database: AppDatabase) =
