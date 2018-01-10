@@ -57,7 +57,8 @@ class BrowserViewModel(
             val isEditing: Boolean = false,
             val browserShowing: Boolean = false,
             val showClearButton: Boolean = false,
-            val showPrivacyGrade: Boolean = false
+            val showPrivacyGrade: Boolean = false,
+            val showFireButton: Boolean = true
     )
 
     /* Observable data for Activity to subscribe to */
@@ -138,16 +139,23 @@ class BrowserViewModel(
         Timber.v("Url changed: $url")
         if (url == null) return
 
-        var newViewState = currentViewState().copy(omnibarText = url, browserShowing = true, showPrivacyGrade = true)
-
-        if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url) && duckDuckGoUrlDetector.hasQuery(url)) {
-            newViewState = newViewState.copy(omnibarText = duckDuckGoUrlDetector.extractQuery(url))
-        }
-        viewState.value = newViewState
+        viewState.value = currentViewState().copy(
+                omnibarText = omnibarText(url),
+                browserShowing = true,
+                showPrivacyGrade = true,
+                showFireButton = true
+        )
 
         val terms = termsOfServiceStore.retrieveTerms(url) ?: TermsOfService()
         siteMonitor = SiteMonitor(url, terms, trackerNetworks)
         onSiteMonitorChanged()
+    }
+
+    private fun omnibarText(url: String): String {
+        if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url) && duckDuckGoUrlDetector.hasQuery(url)) {
+            return duckDuckGoUrlDetector.extractQuery(url) ?: url
+        }
+        return url
     }
 
     override fun trackerDetected(event: TrackingEvent) {
@@ -173,7 +181,12 @@ class BrowserViewModel(
 
     fun onOmnibarInputStateChanged(query: String, hasFocus: Boolean) {
         val showClearButton = hasFocus && query.isNotEmpty()
-        viewState.value = currentViewState().copy(isEditing = hasFocus, showClearButton = showClearButton)
+        viewState.value = currentViewState().copy(
+                isEditing = hasFocus,
+                showClearButton = showClearButton,
+                showPrivacyGrade = !hasFocus,
+                showFireButton = !hasFocus
+        )
     }
 
     fun onSharedTextReceived(input: String) {

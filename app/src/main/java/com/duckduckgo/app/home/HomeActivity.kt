@@ -22,10 +22,12 @@ import android.support.v4.app.ActivityOptionsCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.intentText
+import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
@@ -77,19 +79,29 @@ class HomeActivity : AppCompatActivity() {
                 startActivityForResult(SettingsActivity.intent(this), SETTINGS_REQUEST_CODE)
                 true
             }
+            R.id.fire_menu_item -> {
+                launchFire()
+                true
+            }
             else -> return super.onOptionsItemSelected(item)
         }
     }
 
+    private fun launchFire() {
+        FireDialog(this, {}, {
+            Toast.makeText(this, R.string.fireDataCleared, Toast.LENGTH_SHORT).show()
+        }).show()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when(requestCode) {
+        when (requestCode) {
             SETTINGS_REQUEST_CODE -> onHandleSettingsResult(resultCode)
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
     private fun onHandleSettingsResult(resultCode: Int) {
-        when(resultCode) {
+        when (resultCode) {
             AboutDuckDuckGoActivity.RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE -> {
                 startActivity(BrowserActivity.intent(this, getString(R.string.aboutUrl)))
             }
