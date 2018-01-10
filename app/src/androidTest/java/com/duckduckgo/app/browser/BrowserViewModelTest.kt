@@ -83,6 +83,7 @@ class BrowserViewModelTest {
                 TrackerNetworks(),
                 PrivacyMonitorRepository(),
                 testStringResolver,
+                SpecialUrlDetector(),
                 testNetworkLeaderboardDao)
         testee.url.observeForever(queryObserver)
         testee.command.observeForever(navigationObserver)
