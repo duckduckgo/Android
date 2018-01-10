@@ -36,6 +36,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.nhaarman.mockito_kotlin.mock
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -88,11 +89,11 @@ class BrowserViewModelTest {
         testee.command.observeForever(navigationObserver)
     }
 
-//    @After
-//    fun after() {
-//        testee.url.removeObserver(queryObserver)
-//        testee.command.removeObserver(navigationObserver)
-//    }
+    @After
+    fun after() {
+        testee.url.removeObserver(queryObserver)
+        testee.command.removeObserver(navigationObserver)
+    }
 
     @Test
     fun whenTrackerDetectedThenNetworkLeaderbardUpdated() {
