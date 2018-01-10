@@ -45,14 +45,13 @@ class ViewModelFactory @Inject constructor(
         private val trackerNetworks: TrackerNetworks,
         private val context: Context,
         private val stringResolver: StringResolver,
-        private val specialUrlDetector: SpecialUrlDetector,
         private val networkLeaderboardDao: NetworkLeaderboardDao
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
             with(modelClass) {
                 when {
-                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, duckDuckGoUrlDetector, termsOfServiceStore, trackerNetworks, privacyMonitorRepository, stringResolver, specialUrlDetector, networkLeaderboardDao)
+                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, duckDuckGoUrlDetector, termsOfServiceStore, trackerNetworks, privacyMonitorRepository, stringResolver, networkLeaderboardDao)
                     isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(context, privacySettingsStore, networkLeaderboardDao)
                     isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                     isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()

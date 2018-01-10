@@ -47,7 +47,6 @@ class BrowserViewModel(
         private val trackerNetworks: TrackerNetworks,
         private val privacyMonitorRepository: PrivacyMonitorRepository,
         private val stringResolver: StringResolver,
-        private val urlTypeDetector: SpecialUrlDetector,
         private val networkLeaderboardDao: NetworkLeaderboardDao) :
         WebViewClientListener, ViewModel() {
 
