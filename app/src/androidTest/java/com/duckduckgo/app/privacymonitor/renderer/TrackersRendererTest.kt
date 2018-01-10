@@ -18,7 +18,6 @@ package com.duckduckgo.app.privacymonitor.renderer
 
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test

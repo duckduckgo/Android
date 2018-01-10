@@ -152,7 +152,7 @@ class BrowserViewModelTest {
     @Test
     fun whenSharedTextReceivedThenNavigationTriggered() {
         testee.onSharedTextReceived("http://example.com")
-        val captor: ArgumentCaptor<Command> = ArgumentCaptor.forClass(Command::class.java);
+        val captor: ArgumentCaptor<Command> = ArgumentCaptor.forClass(Command::class.java)
         verify(navigationObserver).onChanged(captor.capture())
         assertNotNull(captor.value)
         assertTrue(captor.value is Navigate)

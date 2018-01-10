@@ -97,7 +97,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawableEnd="@drawable/privacygrade_icon_small_d"
-                android:text="Privacy Grade" />
+                android:text="@string/scorecardPrivacyGrade" />
 
             <TextView
                 android:id="@+id/afterGrade"
@@ -105,7 +105,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawableEnd="@drawable/privacygrade_icon_small_a"
-                android:text="Enhanced Grade" />
+                android:text="@string/scorecardEnhancedGrade" />
 
         </LinearLayout>
 

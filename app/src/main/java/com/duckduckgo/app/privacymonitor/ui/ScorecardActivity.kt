@@ -99,7 +99,7 @@ class ScorecardActivity : DuckDuckGoActivity() {
         afterGrade.visibility = if (show) View.VISIBLE else View.GONE
     }
 
-    fun TextView.setDrawableEnd(@DrawableRes resource: Int) {
+    private fun TextView.setDrawableEnd(@DrawableRes resource: Int) {
         if (resource == 0) {
             return
         }

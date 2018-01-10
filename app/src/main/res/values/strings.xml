@@ -59,6 +59,8 @@
 
     <string name="scorecardActivityTitle">Privacy Grade</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Site is Major Tracker Network</string>
+    <string name="scorecardPrivacyGrade">Privacy Grade</string>
+    <string name="scorecardEnhancedGrade">Enhanced Grade</string>
 
     <string name="privacyTermsActivityTitle">Privacy Practices</string>
     <string name="practicesGood">Good Privacy Practices</string>
@@ -73,7 +75,6 @@
 
     <!-- Fire -->
     <string name="fireClearAll">Clear All Data</string>
-    <string name="fireAllCleared">All data cleared</string>
     <string name="fireCancel">Cancel</string>
     <string name="fireDataCleared">Data cleared</string>
 
@@ -91,5 +92,5 @@
         DuckDuckGo Privacy Browser provides all the privacy essentials you need to protect yourself as you search and browse the web, including tracker blocking, smarter encryption, and DuckDuckGo private search.\n\
         After all, the internet shouldn\'t feel so creepy, and getting the privacy you deserve online should be as simple closing the blinds.</string>
     <string name="aboutMoreLink">More at duckduckgo.com/about</string>
-    
+
 </resources>
