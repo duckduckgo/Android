@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import android.support.annotation.AnyThread
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity.Companion.RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
@@ -42,7 +43,8 @@ class BrowserViewModel(
         private val termsOfServiceStore: TermsOfServiceStore,
         private val trackerNetworks: TrackerNetworks,
         private val privacyMonitorRepository: PrivacyMonitorRepository,
-        private val stringResolver: StringResolver) :
+        private val stringResolver: StringResolver,
+        private val urlTypeDetector: SpecialUrlDetector) :
         WebViewClientListener, ViewModel() {
 
     data class ViewState(
@@ -65,6 +67,9 @@ class BrowserViewModel(
         class LandingPage : Command()
         class Refresh : Command()
         class Navigate(val url: String) : Command()
+        class DialNumber(val telephoneNumber: String) : Command()
+        class SendSms(val telephoneNumber: String) : Command()
+        class SendEmail(val emailAddress: String) : Command()
     }
 
     private var siteMonitor: SiteMonitor? = null
@@ -109,6 +114,21 @@ class BrowserViewModel(
     override fun loadingFinished() {
         Timber.v("Loading finished")
         viewState.value = currentViewState().copy(isLoading = false)
+    }
+
+    @AnyThread
+    override fun sendEmailRequested(emailAddress: String) {
+        command.postValue(Command.SendEmail(emailAddress))
+    }
+
+    @AnyThread
+    override fun dialTelephoneNumberRequested(telephoneNumber: String) {
+        command.postValue(Command.DialNumber(telephoneNumber))
+    }
+
+    @AnyThread
+    override fun sendSmsRequested(telephoneNumber: String) {
+        command.postValue(Command.SendSms(telephoneNumber))
     }
 
     override fun urlChanged(url: String?) {

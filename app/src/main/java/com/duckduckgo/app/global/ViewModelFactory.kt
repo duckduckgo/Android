@@ -21,14 +21,15 @@ import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import com.duckduckgo.app.browser.BrowserViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.SpecialUrlDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsSharedPreferences
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardViewModel
 import com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesViewModel
-import com.duckduckgo.app.settings.SettingsViewModel
 import com.duckduckgo.app.privacymonitor.ui.TrackerNetworksViewModel
+import com.duckduckgo.app.settings.SettingsViewModel
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import javax.inject.Inject
 
@@ -42,13 +43,14 @@ class ViewModelFactory @Inject constructor(
         private val termsOfServiceStore: TermsOfServiceStore,
         private val trackerNetworks: TrackerNetworks,
         private val context: Context,
-        private val stringResolver: StringResolver
+        private val stringResolver: StringResolver,
+        private val specialUrlDetector: SpecialUrlDetector
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
             with(modelClass) {
                 when {
-                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, duckDuckGoUrlDetector, termsOfServiceStore, trackerNetworks, privacyMonitorRepository, stringResolver)
+                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, duckDuckGoUrlDetector, termsOfServiceStore, trackerNetworks, privacyMonitorRepository, stringResolver, specialUrlDetector)
                     isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(context, privacySettingsStore)
                     isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                     isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()

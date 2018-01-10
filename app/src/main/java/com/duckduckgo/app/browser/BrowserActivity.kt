@@ -21,6 +21,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.view.KeyEvent.KEYCODE_ENTER
@@ -30,6 +31,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.widget.TextView
+import android.widget.Toast
 import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
@@ -91,9 +93,20 @@ class BrowserActivity : DuckDuckGoActivity() {
                     focusDummy.requestFocus()
                     webView.loadUrl(it.url)
                 }
-                is BrowserViewModel.Command.LandingPage -> {
-                    finishActivityAnimated()
-                    return@Observer
+                is BrowserViewModel.Command.LandingPage -> finishActivityAnimated()
+                is BrowserViewModel.Command.DialNumber -> {
+                    val intent = Intent(Intent.ACTION_DIAL)
+                    intent.data = Uri.parse("tel:${it.telephoneNumber}")
+                    launchExternalActivity(intent)
+                }
+                is BrowserViewModel.Command.SendEmail -> {
+                    val intent = Intent(Intent.ACTION_SENDTO)
+                    intent.data = Uri.parse(it.emailAddress)
+                    launchExternalActivity(intent)
+                }
+                is BrowserViewModel.Command.SendSms -> {
+                    val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${it.telephoneNumber}"))
+                    startActivity(intent)
                 }
             }
         })
@@ -105,6 +118,14 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         if (savedInstanceState == null) {
             consumeSharedTextExtra()
+        }
+    }
+
+    private fun launchExternalActivity(intent: Intent) {
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent)
+        } else {
+            Toast.makeText(this, R.string.no_compatible_third_party_app_installed, Toast.LENGTH_SHORT).show()
         }
     }
 
