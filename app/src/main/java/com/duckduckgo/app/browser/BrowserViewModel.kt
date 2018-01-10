@@ -159,9 +159,16 @@ class BrowserViewModel(
     }
 
     override fun trackerDetected(event: TrackingEvent) {
+        updateSiteMonitor(event)
+        updateNetworkLeaderboard(event)
+    }
+
+    private fun updateSiteMonitor(event: TrackingEvent) {
         siteMonitor?.trackerDetected(event)
         onSiteMonitorChanged()
+    }
 
+    private fun updateNetworkLeaderboard(event: TrackingEvent) {
         val networkName = event.trackerNetwork?.name ?: return
         val domainVisited = Uri.parse(event.documentUrl).host ?: return
         networkLeaderboardDao.insert(NetworkLeaderboardEntry(networkName, domainVisited))

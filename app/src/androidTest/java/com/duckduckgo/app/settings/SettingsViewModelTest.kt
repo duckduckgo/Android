@@ -23,7 +23,6 @@ import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.*
 
 class SettingsViewModelTest {
 
