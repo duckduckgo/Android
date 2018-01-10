@@ -38,3 +38,11 @@ fun HttpsStatus.text(context: Context): String {
         HttpsStatus.SECURE -> context.getString(R.string.httpsGood)
     }
 }
+
+@DrawableRes
+fun HttpsStatus.successFailureIcon(): Int {
+    return when (this) {
+        HttpsStatus.SECURE -> R.drawable.icon_success
+        HttpsStatus.MIXED, HttpsStatus.NONE -> R.drawable.icon_fail
+    }
+}

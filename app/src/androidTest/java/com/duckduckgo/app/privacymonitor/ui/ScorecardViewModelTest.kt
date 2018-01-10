@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,17 +30,17 @@ import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 
-class PrivacyDashboardViewModelTest {
+class ScorecardViewModelTest {
 
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private var viewStateObserver: Observer<PrivacyDashboardViewModel.ViewState> = mock()
+    private var viewStateObserver: Observer<ScorecardViewModel.ViewState> = mock()
     private var settingStore: PrivacySettingsStore = mock()
 
-    private val testee: PrivacyDashboardViewModel by lazy {
-        val model = PrivacyDashboardViewModel(settingStore)
+    private val testee: ScorecardViewModel by lazy {
+        val model = ScorecardViewModel(settingStore)
         model.viewState.observeForever(viewStateObserver)
         model
     }
@@ -57,37 +57,12 @@ class PrivacyDashboardViewModelTest {
         assertEquals(PrivacyGrade.UNKNOWN, viewState.beforeGrade)
         assertEquals(PrivacyGrade.UNKNOWN, viewState.afterGrade)
         assertEquals(HttpsStatus.SECURE, viewState.httpsStatus)
-        assertEquals(0, viewState.networkCount)
+        assertEquals(0, viewState.trackerCount)
+        assertEquals(0, viewState.majorNetworkCount)
         assertTrue(viewState.allTrackersBlocked)
+        assertFalse(viewState.showIsMemberOfMajorNetwork)
+        assertFalse(viewState.showEnhancedGrade)
         assertEquals(TermsOfService.Practices.UNKNOWN, testee.viewState.value!!.practices)
-    }
-
-    @Test
-    fun whenPrivacyInitiallyOnAndSwitchedOffThenShouldReloadIsTrue() {
-        whenever(settingStore.privacyOn)
-                .thenReturn(true)
-                .thenReturn(false)
-        assertTrue(testee.shouldReloadPage)
-    }
-
-    @Test
-    fun whenPrivacyInitiallyOnAndUnchangedThenShouldReloadIsFalse() {
-        whenever(settingStore.privacyOn).thenReturn(true)
-        assertFalse(testee.shouldReloadPage)
-    }
-
-    @Test
-    fun whenPrivacyInitiallyOffAndSwitchedOnThenShouldReloadIsTrue() {
-        whenever(settingStore.privacyOn)
-                .thenReturn(false)
-                .thenReturn(true)
-        assertTrue(testee.shouldReloadPage)
-    }
-
-    @Test
-    fun whenPrivacyInitiallyOffAndUnchangedThenShouldReloadIsFalse() {
-        whenever(settingStore.privacyOn).thenReturn(false)
-        assertFalse(testee.shouldReloadPage)
     }
 
     @Test
@@ -105,9 +80,9 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenNetworkCountIsUpdatedThenCountIsUpdatedInViewModel() {
-        testee.onPrivacyMonitorChanged(monitor(networkCount = 10))
-        assertEquals(10, testee.viewState.value!!.networkCount)
+    fun whenTrackerCountIsUpdatedThenCountIsUpdatedInViewModel() {
+        testee.onPrivacyMonitorChanged(monitor(trackerCount = 10))
+        assertEquals(10, testee.viewState.value!!.trackerCount)
     }
 
     @Test
@@ -127,6 +102,20 @@ class PrivacyDashboardViewModelTest {
         val terms = TermsOfService(classification = "A", goodPrivacyTerms = listOf("good"))
         testee.onPrivacyMonitorChanged(monitor(terms = terms))
         assertEquals(TermsOfService.Practices.GOOD, testee.viewState.value!!.practices)
+    }
+
+    @Test
+    fun whenMonitorHasDifferentBeforeAndImprovedGradeThenShowEnhancedGradeIsTrue() {
+        val monitor = monitor(allTrackersBlocked = true, trackerCount = 10)
+        testee.onPrivacyMonitorChanged(monitor)
+        assertTrue(testee.viewState.value!!.showEnhancedGrade)
+    }
+
+    @Test
+    fun whenMonitorHasSameBeforeAndImprovedGradeThenShowEnhancedGradeIsFalse() {
+        val monitor = monitor(allTrackersBlocked = true, trackerCount = 0)
+        testee.onPrivacyMonitorChanged(monitor)
+        assertFalse(testee.viewState.value!!.showEnhancedGrade)
     }
 
     private fun monitor(https: HttpsStatus = HttpsStatus.SECURE,

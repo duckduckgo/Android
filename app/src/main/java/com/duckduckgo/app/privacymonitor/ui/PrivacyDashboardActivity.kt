@@ -20,27 +20,21 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.Drawable
-import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES.N
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
-import android.text.Html
-import android.text.Spanned
 import android.view.MenuItem
 import android.view.View
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
-import com.duckduckgo.app.privacymonitor.renderer.NetworksRenderer
-import com.duckduckgo.app.privacymonitor.renderer.banner
-import com.duckduckgo.app.privacymonitor.renderer.icon
-import com.duckduckgo.app.privacymonitor.renderer.text
+import com.duckduckgo.app.privacymonitor.renderer.*
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardViewModel.ViewState
 import kotlinx.android.synthetic.main.activity_privacy_dashboard.*
 import kotlinx.android.synthetic.main.content_privacy_dashboard.*
+import kotlinx.android.synthetic.main.include_privacy_dashboard_header.*
 import javax.inject.Inject
 
 
@@ -59,7 +53,8 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var viewModelFactory: ViewModelFactory
     @Inject lateinit var repository: PrivacyMonitorRepository
-    private val networksRenderer = NetworksRenderer()
+    private val trackersRenderer = TrackersRenderer()
+    private val upgradeRenderer = PrivacyUpgradeRenderer()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,6 +68,10 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         repository.privacyMonitor.observe(this, Observer<PrivacyMonitor> {
             viewModel.onPrivacyMonitorChanged(it)
         })
+
+        privacyGrade.setOnClickListener {
+            onScorecardClicked()
+        }
 
         privacyToggle.setOnCheckedChangeListener { _, enabled ->
             viewModel.onPrivacyToggled(enabled)
@@ -109,36 +108,26 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         if (isFinishing) {
             return
         }
-        privacyBanner.setImageResource(viewState.privacyGrade.banner(viewState.toggleEnabled))
+        privacyBanner.setImageResource(viewState.afterGrade.banner(viewState.toggleEnabled))
         domain.text = viewState.domain
-        heading.text = htmlHeading(viewState.heading)
+        heading.text = upgradeRenderer.heading(this, viewState.beforeGrade, viewState.afterGrade, viewState.toggleEnabled).html(this)
         httpsIcon.setImageResource(viewState.httpsStatus.icon())
         httpsText.text = viewState.httpsStatus.text(this)
-        networksIcon.setImageResource(networksRenderer.networksIcon(viewState.allTrackersBlocked))
-        networksText.text = networksRenderer.networksText(this, viewState.networkCount, viewState.allTrackersBlocked)
+        networksIcon.setImageResource(trackersRenderer.networksIcon(viewState.allTrackersBlocked))
+        networksText.text = trackersRenderer.networksText(this, viewState.networkCount, viewState.allTrackersBlocked)
         practicesIcon.setImageResource(viewState.practices.icon())
         practicesText.text = viewState.practices.text(this)
-        configureToggle(viewState.toggleEnabled)
+        renderToggle(viewState.toggleEnabled)
     }
 
-    private fun configureToggle(enabled: Boolean) {
+    private fun renderToggle(enabled: Boolean) {
         val backgroundColor = if (enabled) R.color.midGreen else R.color.warmerGrey
         privacyToggleContainer.setBackgroundColor(ContextCompat.getColor(this, backgroundColor))
         privacyToggle.isChecked = enabled
     }
 
-    @Suppress("deprecation")
-    private fun htmlHeading(heading: String): Spanned {
-        if (SDK_INT >= N) {
-            return Html.fromHtml(heading, Html.FROM_HTML_MODE_COMPACT, Html.ImageGetter { htmlDrawable(it.toInt()) }, null)
-        }
-        return Html.fromHtml(heading, Html.ImageGetter { htmlDrawable(it.toInt()) }, null)
-    }
-
-    private fun htmlDrawable(resource: Int): Drawable {
-        val drawable = getDrawable(resource)
-        drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
-        return drawable
+    fun onScorecardClicked() {
+        startActivity(ScorecardActivity.intent(this))
     }
 
     fun onNetworksClicked(view: View) {

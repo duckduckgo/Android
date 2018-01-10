@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,6 @@ package com.duckduckgo.app.privacymonitor.renderer
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
-import com.duckduckgo.app.privacymonitor.renderer.banner
-import com.duckduckgo.app.privacymonitor.renderer.icon
-import com.duckduckgo.app.privacymonitor.renderer.text
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -75,6 +72,30 @@ class TermsPracticesRendererExtensionTest {
     fun whenTermsAreUnknownThenIconIsNeutral() {
         val testee = TermsOfService.Practices.UNKNOWN
         assertEquals(R.drawable.practices_icon_neutral, testee.icon())
+    }
+
+    @Test
+    fun whenTermsAreGoodThenSuccessFailureIconIsSuccess() {
+        val testee = TermsOfService.Practices.GOOD
+        assertEquals(R.drawable.icon_success, testee.successFailureIcon())
+    }
+
+    @Test
+    fun whenTermsArePoorThenSuccessFailureIconIsFailure() {
+        val testee = TermsOfService.Practices.POOR
+        assertEquals(R.drawable.icon_fail, testee.successFailureIcon())
+    }
+
+    @Test
+    fun whenTermsAreMixedThenSuccessFailureIconIsFailure() {
+        val testee = TermsOfService.Practices.MIXED
+        assertEquals(R.drawable.icon_fail, testee.successFailureIcon())
+    }
+
+    @Test
+    fun whenTermsAreUnknownThenSuccessFailureIconIsFailure() {
+        val testee = TermsOfService.Practices.UNKNOWN
+        assertEquals(R.drawable.icon_fail, testee.successFailureIcon())
     }
 
     @Test

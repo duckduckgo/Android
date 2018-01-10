@@ -25,6 +25,8 @@ import org.junit.Test
 
 class HttpsStatusRendererExtenstionTest {
 
+    private val context: Context = InstrumentationRegistry.getTargetContext()
+
     @Test
     fun whenHttpsStatusIsSecureThenTextReflectsSame() {
         assertEquals(context.getString(R.string.httpsGood), HttpsStatus.SECURE.text(context))
@@ -55,6 +57,18 @@ class HttpsStatusRendererExtenstionTest {
         assertEquals(R.drawable.dashboard_https_bad, HttpsStatus.NONE.icon())
     }
 
-    private val context: Context = InstrumentationRegistry.getTargetContext()
+    @Test
+    fun whenHttpsStatusIsSecureThenSuccessFailureIconIsSuccess() {
+        assertEquals(R.drawable.icon_success, HttpsStatus.SECURE.successFailureIcon())
+    }
 
+    @Test
+    fun whenHttpsStatusIsMixedThenSuccessFailureIconIsFailure() {
+        assertEquals(R.drawable.icon_fail, HttpsStatus.MIXED.successFailureIcon())
+    }
+
+    @Test
+    fun whenHttpsStatusIsNoneThenSuccessFailureIconIsFailure() {
+        assertEquals(R.drawable.icon_fail, HttpsStatus.NONE.successFailureIcon())
+    }
 }

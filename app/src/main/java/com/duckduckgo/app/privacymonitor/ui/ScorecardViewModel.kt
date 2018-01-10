@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,29 +22,28 @@ import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import com.duckduckgo.app.privacymonitor.model.*
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
 
-class PrivacyDashboardViewModel(private val settingsStore: PrivacySettingsStore) : ViewModel() {
+class ScorecardViewModel(private val settingsStore: PrivacySettingsStore) : ViewModel() {
 
     data class ViewState(
             val domain: String,
             val beforeGrade: PrivacyGrade,
             val afterGrade: PrivacyGrade,
             val httpsStatus: HttpsStatus,
-            val networkCount: Int,
+            val trackerCount: Int,
+            val majorNetworkCount: Int,
             val allTrackersBlocked: Boolean,
             val practices: TermsOfService.Practices,
-            val toggleEnabled: Boolean
+            val privacyOn: Boolean,
+            val showIsMemberOfMajorNetwork: Boolean,
+            val showEnhancedGrade: Boolean
     )
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
-    private val privacyInitiallyOn = settingsStore.privacyOn
     private var monitor: PrivacyMonitor? = null
 
     init {
         resetViewState()
     }
-
-    val shouldReloadPage: Boolean
-        get() = privacyInitiallyOn != settingsStore.privacyOn
 
     fun onPrivacyMonitorChanged(monitor: PrivacyMonitor?) {
         this.monitor = monitor
@@ -61,10 +60,13 @@ class PrivacyDashboardViewModel(private val settingsStore: PrivacySettingsStore)
                 beforeGrade = PrivacyGrade.UNKNOWN,
                 afterGrade = PrivacyGrade.UNKNOWN,
                 httpsStatus = HttpsStatus.SECURE,
-                networkCount = 0,
+                trackerCount = 0,
+                majorNetworkCount = 0,
                 allTrackersBlocked = true,
                 practices = TermsOfService.Practices.UNKNOWN,
-                toggleEnabled = settingsStore.privacyOn
+                privacyOn = settingsStore.privacyOn,
+                showIsMemberOfMajorNetwork = false,
+                showEnhancedGrade = false
         )
     }
 
@@ -73,20 +75,13 @@ class PrivacyDashboardViewModel(private val settingsStore: PrivacySettingsStore)
                 domain = monitor.uri?.host ?: "",
                 beforeGrade = monitor.grade,
                 afterGrade = monitor.improvedGrade,
+                trackerCount = monitor.trackerCount,
+                majorNetworkCount = monitor.majorNetworkCount,
                 httpsStatus = monitor.https,
-                networkCount = monitor.networkCount,
                 allTrackersBlocked = monitor.allTrackersBlocked,
-                practices = monitor.termsOfService.practices
+                practices = monitor.termsOfService.practices,
+                showIsMemberOfMajorNetwork = monitor.memberNetwork?.percentageOfPages ?: 0 > 0,
+                showEnhancedGrade = monitor.grade != monitor.improvedGrade
         )
     }
-
-    fun onPrivacyToggled(enabled: Boolean) {
-        if (enabled != viewState.value?.toggleEnabled) {
-            settingsStore.privacyOn = enabled
-            viewState.value = viewState.value?.copy(
-                    toggleEnabled = enabled
-            )
-        }
-    }
-
 }
