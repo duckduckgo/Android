@@ -23,6 +23,7 @@ import com.duckduckgo.app.privacymonitor.model.HttpsStatus
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
+import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.After
@@ -86,6 +87,12 @@ class ScorecardViewModelTest {
     }
 
     @Test
+    fun whenMajorNetworkCountIsUpdatedThenCountIsUpdatedInViewModel() {
+        testee.onPrivacyMonitorChanged(monitor(majorNetworkCount = 10))
+        assertEquals(10, testee.viewState.value!!.majorNetworkCount)
+    }
+
+    @Test
     fun whenAllBlockedUpdatedToFalseThenViewModelIsUpdated() {
         testee.onPrivacyMonitorChanged(monitor(allTrackersBlocked = false))
         assertEquals(false, testee.viewState.value!!.allTrackersBlocked)
@@ -105,6 +112,27 @@ class ScorecardViewModelTest {
     }
 
     @Test
+    fun whenIsMemberOfMajorNetworkThenShowIsMemberOfMajorNetworkIsTrue() {
+        val monitor = monitor(memberNetwork = TrackerNetwork("", "", "", 5, true))
+        testee.onPrivacyMonitorChanged(monitor)
+        assertTrue(testee.viewState.value!!.showIsMemberOfMajorNetwork)
+    }
+
+    @Test
+    fun whenIsNotMemberOfMajorNetworkThenShowIsMemberOfMajorNetworkIsFalse() {
+        val monitor = monitor(memberNetwork = TrackerNetwork("", "", "", null, false))
+        testee.onPrivacyMonitorChanged(monitor)
+        assertFalse(testee.viewState.value!!.showIsMemberOfMajorNetwork)
+    }
+
+    @Test
+    fun whenIsNotMemberOfAnyNetworkThenShowIsMemberOfMajorNetworkIsFalse() {
+        val monitor = monitor(memberNetwork = null)
+        testee.onPrivacyMonitorChanged(monitor)
+        assertFalse(testee.viewState.value!!.showIsMemberOfMajorNetwork)
+    }
+
+    @Test
     fun whenMonitorHasDifferentBeforeAndImprovedGradeThenShowEnhancedGradeIsTrue() {
         val monitor = monitor(allTrackersBlocked = true, trackerCount = 10)
         testee.onPrivacyMonitorChanged(monitor)
@@ -120,14 +148,16 @@ class ScorecardViewModelTest {
 
     private fun monitor(https: HttpsStatus = HttpsStatus.SECURE,
                         trackerCount: Int = 0,
-                        networkCount: Int = 0,
+                        majorNetworkCount: Int = 0,
                         hasTrackerFromMajorNetwork: Boolean = false,
                         allTrackersBlocked: Boolean = true,
-                        terms: TermsOfService = TermsOfService()): PrivacyMonitor {
+                        terms: TermsOfService = TermsOfService(),
+                        memberNetwork: TrackerNetwork? = null): PrivacyMonitor {
         val monitor: PrivacyMonitor = mock()
         whenever(monitor.https).thenReturn(https)
+        whenever(monitor.memberNetwork).thenReturn(memberNetwork)
         whenever(monitor.trackerCount).thenReturn(trackerCount)
-        whenever(monitor.networkCount).thenReturn(networkCount)
+        whenever(monitor.majorNetworkCount).thenReturn(majorNetworkCount)
         whenever(monitor.hasTrackerFromMajorNetwork).thenReturn(hasTrackerFromMajorNetwork)
         whenever(monitor.allTrackersBlocked).thenReturn(allTrackersBlocked)
         whenever(monitor.termsOfService).thenReturn(terms)

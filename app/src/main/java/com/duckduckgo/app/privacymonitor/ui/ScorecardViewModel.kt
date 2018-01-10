@@ -80,7 +80,7 @@ class ScorecardViewModel(private val settingsStore: PrivacySettingsStore) : View
                 httpsStatus = monitor.https,
                 allTrackersBlocked = monitor.allTrackersBlocked,
                 practices = monitor.termsOfService.practices,
-                showIsMemberOfMajorNetwork = monitor.memberNetwork?.percentageOfPages ?: 0 > 0,
+                showIsMemberOfMajorNetwork = monitor.memberNetwork?.isMajor ?: false,
                 showEnhancedGrade = monitor.grade != monitor.improvedGrade
         )
     }

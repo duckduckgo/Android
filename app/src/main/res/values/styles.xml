@@ -64,10 +64,10 @@
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">@color/almostBlack</item>
-        <item name="android:paddingBottom">15dp</item>
-        <item name="android:paddingTop">15dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingTop">12dp</item>
         <item name="android:paddingEnd">20dp</item>
-        <item name="android:paddingStart">15dp</item>
+        <item name="android:paddingStart">20dp</item>
     </style>
 
     <style name="ScorecardSpecialText">
@@ -75,10 +75,10 @@
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">@color/midGreen</item>
-        <item name="android:paddingBottom">15dp</item>
-        <item name="android:paddingTop">15dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingTop">12dp</item>
         <item name="android:paddingEnd">20dp</item>
-        <item name="android:paddingStart">15dp</item>
+        <item name="android:paddingStart">20dp</item>
     </style>
 
     <style name="SettingsContentLabel">
