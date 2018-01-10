@@ -31,7 +31,9 @@ class HttpsUpgrader @Inject constructor(private val dao: HttpsUpgradeDomainDao) 
             return false
         }
 
-        return dao.contains(uri.host)
+        val host = uri.host ?: return false
+
+        return dao.contains(host)
     }
 
     fun upgrade(uri: Uri): Uri {

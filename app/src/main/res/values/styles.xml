@@ -5,8 +5,10 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowBackground">@color/windowBackground</item>
+        <item name="android:actionButtonStyle">@style/ActionButtonStyle</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
@@ -15,6 +17,20 @@
 
     <style name="SwitchTheme" parent="Widget.AppCompat.CompoundButton.Switch">
         <item name="colorControlActivated">@android:color/white</item>
+    </style>
+
+    <style name="ActionButtonStyle" parent="@android:style/Widget.Holo.Light.ActionButton">
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+    </style>
+
+    <style name="BottomSheetDialog" parent="Theme.Design.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
+    </style>
+
+    <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="behavior_peekHeight">512dp</item>
     </style>
 
     <style name="CrashReportingDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
@@ -88,6 +104,10 @@
         <item name="android:textColor">#969799</item>
         <item name="android:textSize">12sp</item>
         <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="TransparentToolbar" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="android:colorControlNormal">@color/white</item>
     </style>
 
 </resources>

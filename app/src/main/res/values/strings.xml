@@ -4,12 +4,16 @@
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
 
     <string name="privacyDashboard">Privacy Dashboard</string>
+
+    <!-- Browser Activity -->
     <string name="refresh">Refresh</string>
     <string name="back">Back</string>
     <string name="forward">Forward</string>
     <string name="omnibarInputHint">Search or type URL</string>
     <string name="clearButtonContentDescription">Clear search input</string>
+    <string name="no_compatible_third_party_app_installed">No compatible app installed</string>
 
+    <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
     <string name="privacyProtectionEnabled">PRIVACY PROTECTION ENABLED</string>
     <string name="privacyProtectionDisabled">PRIVACY PROTECTION DISABLED</string>
@@ -67,6 +71,12 @@
     <string name="practicesIconContentBad">Bad Practice Icon</string>
     <string name="privacyProtectionToggle">Privacy Protection</string>
 
+    <!-- Fire -->
+    <string name="fireClearAll">Clear All Data</string>
+    <string name="fireAllCleared">All data cleared</string>
+    <string name="fireCancel">Cancel</string>
+    <string name="fireDataCleared">Data cleared</string>
+
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Settings</string>
     <string name="settingsMenuItemTitle">Settings</string>
@@ -75,13 +85,11 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">About us</string>
-
     <string name="aboutHeading">Privacy, simplified.</string>
     <string name="aboutDescription">
         At DuckDuckGo, we\'re setting the new standard of trust online.\n\
         DuckDuckGo Privacy Browser provides all the privacy essentials you need to protect yourself as you search and browse the web, including tracker blocking, smarter encryption, and DuckDuckGo private search.\n\
         After all, the internet shouldn\'t feel so creepy, and getting the privacy you deserve online should be as simple closing the blinds.</string>
     <string name="aboutMoreLink">More at duckduckgo.com/about</string>
-
-
+    
 </resources>
