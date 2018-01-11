@@ -20,18 +20,23 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
+import android.arch.persistence.room.Room
 import android.net.Uri
+import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.LandingPage
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.StringResolver
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacymonitor.db.NetworkPercent
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
+import com.duckduckgo.app.settings.db.AppConfigurationDao
+import com.duckduckgo.app.settings.db.AppConfigurationEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -43,7 +48,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers
-import org.mockito.Mockito.*
+import org.mockito.Mockito.never
+import org.mockito.Mockito.verify
 
 class BrowserViewModelTest {
 
@@ -53,19 +59,26 @@ class BrowserViewModelTest {
 
     private var lastEntry: NetworkLeaderboardEntry? = null
 
-    private val queryObserver: Observer<String> = mock()
-    private val navigationObserver: Observer<Command> = mock()
-    private val termsOfServiceStore: TermsOfServiceStore = mock()
-
     private val testStringResolver: StringResolver = object : StringResolver {
         override fun getString(stringId: Int): String = ""
         override fun getString(stringId: Int, vararg formatArgs: Any): String = ""
     }
 
     private val testNetworkLeaderboardDao: NetworkLeaderboardDao = object : NetworkLeaderboardDao {
-        override fun insert(leaderboardEntry: NetworkLeaderboardEntry) { lastEntry = leaderboardEntry }
-        override fun networkPercents(): LiveData<Array<NetworkPercent>> { return MutableLiveData<Array<NetworkPercent>>() }
+        override fun insert(leaderboardEntry: NetworkLeaderboardEntry) {
+            lastEntry = leaderboardEntry
+        }
+
+        override fun networkPercents(): LiveData<Array<NetworkPercent>> {
+            return MutableLiveData<Array<NetworkPercent>>()
+        }
     }
+    private lateinit var queryObserver: Observer<String>
+    private lateinit var navigationObserver: Observer<Command>
+    private lateinit var termsOfServiceStore: TermsOfServiceStore
+    private lateinit var mockStringResolver: StringResolver
+    private lateinit var db: AppDatabase
+    private lateinit var appConfigurationDao: AppConfigurationDao
 
     private val testOmnibarConverter: OmnibarEntryConverter = object : OmnibarEntryConverter {
         override fun convertUri(input: String): String = "duckduckgo.com"
@@ -77,6 +90,16 @@ class BrowserViewModelTest {
 
     @Before
     fun before() {
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
+        appConfigurationDao = db.appConfigurationDao()
+
+        mockStringResolver = mock()
+        queryObserver = mock()
+        navigationObserver = mock()
+        termsOfServiceStore = mock()
+
         testee = BrowserViewModel(
                 testOmnibarConverter,
                 DuckDuckGoUrlDetector(),
@@ -84,13 +107,16 @@ class BrowserViewModelTest {
                 TrackerNetworks(),
                 PrivacyMonitorRepository(),
                 testStringResolver,
-                testNetworkLeaderboardDao)
+                testNetworkLeaderboardDao, appConfigurationDao)
+
         testee.url.observeForever(queryObserver)
         testee.command.observeForever(navigationObserver)
     }
 
     @After
     fun after() {
+        testee.onCleared()
+        db.close()
         testee.url.removeObserver(queryObserver)
         testee.command.removeObserver(navigationObserver)
     }
@@ -243,9 +269,31 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsShown() {
+    fun whenUrlUpdatedAfterConfigDownloadThenPrivacyGradeIsShown() {
+        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
+        testee.urlChanged((""))
+        assertTrue(testee.viewState.value!!.showPrivacyGrade)
+    }
+
+    @Test
+    fun whenUrlUpdatedBeforeConfigDownloadThenPrivacyGradeIsShown() {
+        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = false))
+        testee.urlChanged((""))
+        assertFalse(testee.viewState.value!!.showPrivacyGrade)
+    }
+
+    @Test
+    fun whenOmnibarInputDoesNotHaveFocusAndAppConfigDownloadedThenPrivacyGradeIsShown() {
+        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
         testee.onOmnibarInputStateChanged("", false)
         assertTrue(testee.viewState.value!!.showPrivacyGrade)
+    }
+
+    @Test
+    fun whenOmnibarInputDoesNotHaveFocusAndAppConfigNotDownloadedThenPrivacyGradeIsNotShown() {
+        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = false))
+        testee.onOmnibarInputStateChanged("", false)
+        assertFalse(testee.viewState.value!!.showPrivacyGrade)
     }
 
     @Test
@@ -270,5 +318,4 @@ class BrowserViewModelTest {
         testee.onOmnibarInputStateChanged("", true)
         assertFalse(testee.viewState.value!!.showFireButton)
     }
-
 }

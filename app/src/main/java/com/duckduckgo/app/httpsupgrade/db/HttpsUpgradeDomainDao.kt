@@ -20,6 +20,7 @@ import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
+import org.intellij.lang.annotations.Language
 
 @Dao
 interface HttpsUpgradeDomainDao {
@@ -27,6 +28,7 @@ interface HttpsUpgradeDomainDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg domains: HttpsUpgradeDomain)
 
+    @Language("RoomSql")
     @Query("select count(1) > 0 from https_upgrade_domain where :host glob domain")
     fun contains(host: String) : Boolean
 
