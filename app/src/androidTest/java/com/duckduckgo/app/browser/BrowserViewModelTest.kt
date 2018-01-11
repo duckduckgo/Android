@@ -283,9 +283,17 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsShown() {
+    fun whenOmnibarInputDoesNotHaveFocusAndAppConfigDownloadedThenPrivacyGradeIsShown() {
+        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
         testee.onOmnibarInputStateChanged("", false)
         assertTrue(testee.viewState.value!!.showPrivacyGrade)
+    }
+
+    @Test
+    fun whenOmnibarInputDoesNotHaveFocusAndAppConfigNotDownloadedThenPrivacyGradeIsNotShown() {
+        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = false))
+        testee.onOmnibarInputStateChanged("", false)
+        assertFalse(testee.viewState.value!!.showPrivacyGrade)
     }
 
     @Test

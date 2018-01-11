@@ -19,10 +19,9 @@ package com.duckduckgo.app.browser
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
-
-import android.support.annotation.VisibleForTesting
 import android.net.Uri
 import android.support.annotation.AnyThread
+import android.support.annotation.VisibleForTesting
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity.Companion.RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
@@ -212,7 +211,7 @@ class BrowserViewModel(
         viewState.value = currentViewState().copy(
                 isEditing = hasFocus,
                 showClearButton = showClearButton,
-                showPrivacyGrade = !hasFocus,
+                showPrivacyGrade = appConfigurationDownloaded && !hasFocus,
                 showFireButton = !hasFocus
         )
     }
