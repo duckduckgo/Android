@@ -18,7 +18,6 @@ package com.duckduckgo.app.httpsupgrade
 
 import android.net.Uri
 import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
-import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
