@@ -17,10 +17,7 @@
 package com.duckduckgo.app.settings.db
 
 import android.arch.lifecycle.LiveData
-import android.arch.persistence.room.Dao
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.PrimaryKey
-import android.arch.persistence.room.Query
+import android.arch.persistence.room.*
 import android.support.annotation.CheckResult
 import com.duckduckgo.app.settings.db.AppConfigurationDao.Companion.KEY
 import org.intellij.lang.annotations.Language
@@ -30,8 +27,8 @@ import org.intellij.lang.annotations.Language
 interface AppConfigurationDao {
 
     @Language("RoomSql")
-    @Query("UPDATE app_configuration SET appConfigurationDownloaded=1")
-    fun configurationDownloadSuccessful()
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun configurationDownloadSuccessful(appConfigurationEntity: AppConfigurationEntity)
 
     @Language("RoomSql")
     @CheckResult

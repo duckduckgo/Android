@@ -18,6 +18,7 @@ package com.duckduckgo.app.job
 
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeListDownloader
+import com.duckduckgo.app.settings.db.AppConfigurationEntity
 import com.duckduckgo.app.trackerdetection.Client
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import io.reactivex.Completable
@@ -38,7 +39,8 @@ class AppConfigurationDownloader @Inject constructor(
         return Completable.merge(mutableListOf(easyListDownload, easyPrivacyDownload, disconnectDownload, httpsUpgradeDownload))
                 .doOnComplete {
                     Timber.i("Download task completed successfully")
-                    appDatabase.appConfigurationDao().configurationDownloadSuccessful()
+                    val appConfiguration = AppConfigurationEntity(appConfigurationDownloaded = true)
+                    appDatabase.appConfigurationDao().configurationDownloadSuccessful(appConfiguration)
                 }
     }
 }
