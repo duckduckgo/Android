@@ -38,6 +38,20 @@ class HttpsUpgraderTest {
     }
 
     @Test
+    fun whenMixedCaseDomainIsASubdominOfAWildCardInTheDatabaseThenShouldUpgrade() {
+        whenever(mockDao.hasDomain("www.example.com")).thenReturn(false)
+        whenever(mockDao.hasDomain("*.example.com")).thenReturn(true)
+        assertTrue(testee.shouldUpgrade(Uri.parse("http://www.EXAMPLE.com")))
+        verify(mockDao).hasDomain("*.example.com")
+
+    }
+    @Test
+    fun whenMixedCaseUriIsHttpAndInUpgradeListThenShouldUpgrade() {
+        whenever(mockDao.hasDomain("www.example.com")).thenReturn(true)
+        assertTrue(testee.shouldUpgrade(Uri.parse("http://www.EXAMPLE.com")))
+    }
+
+    @Test
     fun whenGivenUriItIsUpgradedToHttps() {
         val input = Uri.parse("http://www.example.com/some/path/to/a/file.txt")
         val expected = Uri.parse("https://www.example.com/some/path/to/a/file.txt")

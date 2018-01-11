@@ -31,7 +31,7 @@ class HttpsUpgrader @Inject constructor(private val dao: HttpsUpgradeDomainDao) 
             return false
         }
 
-        val host = uri.host ?: return false
+        val host = (uri.host ?: return false).toLowerCase()
         return dao.hasDomain(host) || matchesWildcard(host)
     }
 
