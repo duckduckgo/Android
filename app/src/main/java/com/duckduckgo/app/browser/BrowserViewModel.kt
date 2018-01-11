@@ -20,6 +20,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
 import android.support.annotation.VisibleForTesting
+import android.support.annotation.AnyThread
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity.Companion.RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
@@ -47,8 +48,8 @@ class BrowserViewModel(
         private val trackerNetworks: TrackerNetworks,
         private val privacyMonitorRepository: PrivacyMonitorRepository,
         private val stringResolver: StringResolver,
-        appConfigurationDao: AppConfigurationDao) :
-        WebViewClientListener, ViewModel() {
+        private val urlTypeDetector: SpecialUrlDetector,
+        appConfigurationDao: AppConfigurationDao) : WebViewClientListener, ViewModel() {
 
     data class ViewState(
             val isLoading: Boolean = false,
@@ -57,13 +58,17 @@ class BrowserViewModel(
             val isEditing: Boolean = false,
             val browserShowing: Boolean = false,
             val showClearButton: Boolean = false,
-            val showPrivacyGrade: Boolean = false
+            val showPrivacyGrade: Boolean = false,
+            val showFireButton: Boolean = true
     )
 
     sealed class Command {
         class LandingPage : Command()
         class Refresh : Command()
         class Navigate(val url: String) : Command()
+        class DialNumber(val telephoneNumber: String) : Command()
+        class SendSms(val telephoneNumber: String) : Command()
+        class SendEmail(val emailAddress: String) : Command()
     }
 
     /* Observable data for Activity to subscribe to */
@@ -135,11 +140,30 @@ class BrowserViewModel(
         viewState.value = currentViewState().copy(isLoading = false)
     }
 
+    @AnyThread
+    override fun sendEmailRequested(emailAddress: String) {
+        command.postValue(Command.SendEmail(emailAddress))
+    }
+
+    @AnyThread
+    override fun dialTelephoneNumberRequested(telephoneNumber: String) {
+        command.postValue(Command.DialNumber(telephoneNumber))
+    }
+
+    @AnyThread
+    override fun sendSmsRequested(telephoneNumber: String) {
+        command.postValue(Command.SendSms(telephoneNumber))
+    }
+
     override fun urlChanged(url: String?) {
         Timber.v("Url changed: $url")
         if (url == null) return
 
-        var newViewState = currentViewState().copy(omnibarText = url, browserShowing = true, showPrivacyGrade = appConfigurationDownloaded)
+        var newViewState = currentViewState().copy(
+                omnibarText = url,
+                browserShowing = true,
+                showFireButton = true,
+                showPrivacyGrade = appConfigurationDownloaded)
 
         if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url) && duckDuckGoUrlDetector.hasQuery(url)) {
             newViewState = newViewState.copy(omnibarText = duckDuckGoUrlDetector.extractQuery(url))
@@ -149,6 +173,13 @@ class BrowserViewModel(
         val terms = termsOfServiceStore.retrieveTerms(url) ?: TermsOfService()
         siteMonitor = SiteMonitor(url, terms, trackerNetworks)
         onSiteMonitorChanged()
+    }
+
+    private fun omnibarText(url: String): String {
+        if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url) && duckDuckGoUrlDetector.hasQuery(url)) {
+            return duckDuckGoUrlDetector.extractQuery(url) ?: url
+        }
+        return url
     }
 
     override fun trackerDetected(event: TrackingEvent) {
@@ -170,7 +201,12 @@ class BrowserViewModel(
 
     fun onOmnibarInputStateChanged(query: String, hasFocus: Boolean) {
         val showClearButton = hasFocus && query.isNotEmpty()
-        viewState.value = currentViewState().copy(isEditing = hasFocus, showClearButton = showClearButton)
+        viewState.value = currentViewState().copy(
+                isEditing = hasFocus,
+                showClearButton = showClearButton,
+                showPrivacyGrade = !hasFocus,
+                showFireButton = !hasFocus
+        )
     }
 
     fun onSharedTextReceived(input: String) {

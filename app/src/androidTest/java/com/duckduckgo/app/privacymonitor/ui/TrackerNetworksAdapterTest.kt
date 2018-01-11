@@ -20,9 +20,9 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class NetworkTrackersAdapterTest {
+class TrackerNetworksAdapterTest {
 
-    private val testee = NetworkTrackersAdapter()
+    private val testee = TrackerNetworksAdapter()
 
     @Test
     fun whenInitializedThenCountIsZero() {
@@ -38,19 +38,18 @@ class NetworkTrackersAdapterTest {
     @Test
     fun whenDataContainsEntriesThenCorrectElementsAreCreated() {
         testee.updateData(data())
-        assertEquals(NetworkTrackersAdapter.HEADER, testee.getItemViewType(0))
-        assertEquals(NetworkTrackersAdapter.ROW, testee.getItemViewType(1))
-        assertEquals(NetworkTrackersAdapter.ROW, testee.getItemViewType(2))
-        assertEquals(NetworkTrackersAdapter.HEADER, testee.getItemViewType(3))
-        assertEquals(NetworkTrackersAdapter.ROW, testee.getItemViewType(4))
-        assertEquals(NetworkTrackersAdapter.ROW, testee.getItemViewType(5))
+        assertEquals(TrackerNetworksAdapter.HEADER, testee.getItemViewType(0))
+        assertEquals(TrackerNetworksAdapter.ROW, testee.getItemViewType(1))
+        assertEquals(TrackerNetworksAdapter.ROW, testee.getItemViewType(2))
+        assertEquals(TrackerNetworksAdapter.HEADER, testee.getItemViewType(3))
+        assertEquals(TrackerNetworksAdapter.ROW, testee.getItemViewType(4))
+        assertEquals(TrackerNetworksAdapter.ROW, testee.getItemViewType(5))
     }
 
     private fun data(): HashMap<String, ArrayList<TrackingEvent>> {
         val trackingEvent = TrackingEvent("", "", null, true)
         val listA = arrayListOf(trackingEvent, trackingEvent)
         val listB = arrayListOf(trackingEvent, trackingEvent)
-        val data = hashMapOf("Label A" to listA, "Label B" to listB)
-        return data
+        return hashMapOf("Label A" to listA, "Label B" to listB)
     }
 }

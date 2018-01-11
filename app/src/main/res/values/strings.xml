@@ -4,12 +4,16 @@
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
 
     <string name="privacyDashboard">Privacy Dashboard</string>
+
+    <!-- Browser Activity -->
     <string name="refresh">Refresh</string>
     <string name="back">Back</string>
     <string name="forward">Forward</string>
     <string name="omnibarInputHint">Search or type URL</string>
     <string name="clearButtonContentDescription">Clear search input</string>
+    <string name="no_compatible_third_party_app_installed">No compatible app installed</string>
 
+    <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
     <string name="privacyProtectionEnabled">PRIVACY PROTECTION ENABLED</string>
     <string name="privacyProtectionDisabled">PRIVACY PROTECTION DISABLED</string>
@@ -23,6 +27,16 @@
     <string name="networksActivityTitle">Tracker Networks</string>
     <string name="networksOverview">Tracker networks aggregate your web history into a data profile about you. Major tracker networks are more harmful because they can track and target you across more of the internet.</string>
 
+    <plurals name="trackersFound">
+        <item quantity="one">%s Tracker Found</item>
+        <item quantity="other">%s Trackers Found</item>
+    </plurals>
+
+    <plurals name="trackerBlocked">
+        <item quantity="one">%s Tracker Blocked</item>
+        <item quantity="other">%s Trackers Blocked</item>
+    </plurals>
+
     <plurals name="networksBlocked">
         <item quantity="one">%s Tracker Network Blocked</item>
         <item quantity="other">%s Tracker Networks Blocked</item>
@@ -32,6 +46,21 @@
         <item quantity="one">%s Tracker Network Found</item>
         <item quantity="other">%s Tracker Networks Found</item>
     </plurals>
+
+    <plurals name="majorNetworksFound">
+        <item quantity="one">%s Major Tracker Network Found</item>
+        <item quantity="other">%s Major Tracker Networks Found</item>
+    </plurals>
+
+    <plurals name="majorNetworksBlocked">
+        <item quantity="one">%s Major Tracker Network Blocked</item>
+        <item quantity="other">%s Major Tracker Networks Blocked</item>
+    </plurals>
+
+    <string name="scorecardActivityTitle">Privacy Grade</string>
+    <string name="scorecardSiteIsMemberOfMajorNetwork">Site is Major Tracker Network</string>
+    <string name="scorecardPrivacyGrade">Privacy Grade</string>
+    <string name="scorecardEnhancedGrade">Enhanced Grade</string>
 
     <string name="privacyTermsActivityTitle">Privacy Practices</string>
     <string name="practicesGood">Good Privacy Practices</string>
@@ -44,6 +73,10 @@
     <string name="practicesIconContentBad">Bad Practice Icon</string>
     <string name="privacyProtectionToggle">Privacy Protection</string>
 
+    <!-- Fire -->
+    <string name="fireClearAll">Clear All Data</string>
+    <string name="fireCancel">Cancel</string>
+    <string name="fireDataCleared">Data cleared</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Settings</string>
@@ -53,13 +86,11 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">About us</string>
-
     <string name="aboutHeading">Privacy, simplified.</string>
     <string name="aboutDescription">
         At DuckDuckGo, we\'re setting the new standard of trust online.\n\
         DuckDuckGo Privacy Browser provides all the privacy essentials you need to protect yourself as you search and browse the web, including tracker blocking, smarter encryption, and DuckDuckGo private search.\n\
         After all, the internet shouldn\'t feel so creepy, and getting the privacy you deserve online should be as simple closing the blinds.</string>
     <string name="aboutMoreLink">More at duckduckgo.com/about</string>
-
 
 </resources>

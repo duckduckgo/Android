@@ -150,17 +150,27 @@ class SiteMonitorTest {
     }
 
     @Test
-    fun whenMajorNetworkTrackerIsDetectedThenHasTrackerFromMajorNetworkIsTrue() {
+    fun whenNonMajorNetworkTrackerIsDetectedThenMajorNetworkCoutnIsZeroAndHasTrackerFromMajorNetworkIsFalse() {
+        val testee = SiteMonitor(document, TermsOfService(), TrackerNetworks())
+        testee.trackerDetected(TrackingEvent(document, trackerA, networkA, true))
+        assertEquals(0, testee.majorNetworkCount)
+        assertFalse(testee.hasTrackerFromMajorNetwork)
+    }
+
+    @Test
+    fun whenMajorNetworkTrackerIsDetectedThenMajorNetworkCountIsOneAndHasTrackerFromMajorNetworkIsTrue() {
         val testee = SiteMonitor(document, TermsOfService(), TrackerNetworks())
         testee.trackerDetected(TrackingEvent(document, majorNetworkTracker, majorNetwork, true))
+        assertEquals(1, testee.majorNetworkCount)
         assertTrue(testee.hasTrackerFromMajorNetwork)
     }
 
     @Test
-    fun whenNonMajorNetworkTrackerIsDetectedThenHasTrackerFromMajorNetworkIsFalse() {
+    fun whenDuplicateMajorNetworkIsDetectedThenMajorNetworkCountIsStillOne() {
         val testee = SiteMonitor(document, TermsOfService(), TrackerNetworks())
-        testee.trackerDetected(TrackingEvent(document, trackerA, networkA, true))
-        assertFalse(testee.hasTrackerFromMajorNetwork)
+        testee.trackerDetected(TrackingEvent(document, trackerA, majorNetwork, true))
+        testee.trackerDetected(TrackingEvent(document, trackerB, majorNetwork, true))
+        assertEquals(1, testee.majorNetworkCount)
     }
 
     @Test

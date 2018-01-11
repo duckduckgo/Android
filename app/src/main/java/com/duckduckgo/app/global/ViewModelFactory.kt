@@ -18,9 +18,9 @@ package com.duckduckgo.app.global
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
-import android.content.Context
 import com.duckduckgo.app.browser.BrowserViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.SpecialUrlDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
@@ -28,6 +28,7 @@ import com.duckduckgo.app.privacymonitor.store.PrivacySettingsSharedPreferences
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardViewModel
 import com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesViewModel
+import com.duckduckgo.app.privacymonitor.ui.ScorecardViewModel
 import com.duckduckgo.app.privacymonitor.ui.TrackerNetworksViewModel
 import com.duckduckgo.app.settings.SettingsViewModel
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
@@ -42,7 +43,7 @@ class ViewModelFactory @Inject constructor(
         private val privacySettingsStore: PrivacySettingsSharedPreferences,
         private val termsOfServiceStore: TermsOfServiceStore,
         private val trackerNetworks: TrackerNetworks,
-        private val context: Context,
+        private val specialUrlDetector: SpecialUrlDetector,
         private val stringResolver: StringResolver,
         private val appDatabase: AppDatabase
 ) : ViewModelProvider.NewInstanceFactory() {
@@ -50,8 +51,9 @@ class ViewModelFactory @Inject constructor(
     override fun <T : ViewModel> create(modelClass: Class<T>) =
             with(modelClass) {
                 when {
-                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, duckDuckGoUrlDetector, termsOfServiceStore, trackerNetworks, privacyMonitorRepository, stringResolver, appDatabase.appConfigurationDao())
-                    isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(context, privacySettingsStore)
+                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, duckDuckGoUrlDetector, termsOfServiceStore, trackerNetworks, privacyMonitorRepository, stringResolver, specialUrlDetector, appDatabase.appConfigurationDao())
+                    isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(privacySettingsStore)
+                    isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                     isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                     isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
                     isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel()

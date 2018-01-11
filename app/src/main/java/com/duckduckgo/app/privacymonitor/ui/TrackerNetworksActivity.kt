@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
+import com.duckduckgo.app.privacymonitor.renderer.TrackersRenderer
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import kotlinx.android.synthetic.main.activity_tracker_networks.*
 import kotlinx.android.synthetic.main.content_tracker_networks.*
@@ -36,8 +37,8 @@ class TrackerNetworksActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var viewModelFactory: ViewModelFactory
     @Inject lateinit var repository: PrivacyMonitorRepository
-    private val networksRenderer = NetworksRenderer()
-    private val networksAdapter = NetworkTrackersAdapter()
+    private val trackersRenderer = TrackersRenderer()
+    private val networksAdapter = TrackerNetworksAdapter()
 
 
     companion object {
@@ -76,9 +77,9 @@ class TrackerNetworksActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: TrackerNetworksViewModel.ViewState) {
-        networksBanner.setImageResource(networksRenderer.networksBanner(viewState.allTrackersBlocked))
+        networksBanner.setImageResource(trackersRenderer.networksBanner(viewState.allTrackersBlocked))
         domain.text = viewState.domain
-        heading.text = networksRenderer.networksText(this, viewState.networkCount, viewState.allTrackersBlocked)
+        heading.text = trackersRenderer.networksText(this, viewState.networkCount, viewState.allTrackersBlocked)
         networksAdapter.updateData(viewState.trackingEventsByNetwork)
     }
 }
