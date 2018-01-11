@@ -19,7 +19,7 @@ package com.duckduckgo.app.privacymonitor.db
 import android.arch.persistence.room.Entity
 
 @Entity(tableName = "network_leaderboard",
-        primaryKeys = arrayOf("networkName", "domainVisited"))
+        primaryKeys = ["networkName", "domainVisited"])
 data class NetworkLeaderboardEntry(
         val networkName: String,
         val domainVisited: String)

@@ -103,7 +103,7 @@ class HttpsUpgradeDomainDaoTest {
     }
 
     @Test
-    fun whenModelModelContainsTwoItemsThenCountIsTwo() {
+    fun whenModelContainsTwoItemsThenCountIsTwo() {
         dao.insertAll(HttpsUpgradeDomain(exactMatchDomain), HttpsUpgradeDomain(otherDomain))
         assertEquals(2, dao.count())
     }
