@@ -18,8 +18,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/privacy_dashboard"
+        android:id="@+id/privacy_dashboard_menu_item"
         android:icon="@drawable/privacygrade_icon_unknown"
+        android:title="@string/privacyDashboard"
+        android:visible="false"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/fire_menu_item"
+        android:icon="@drawable/icon_fire"
         android:title="@string/privacyDashboard"
         android:visible="false"
         app:showAsAction="ifRoom" />

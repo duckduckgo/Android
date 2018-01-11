@@ -17,13 +17,27 @@
 package com.duckduckgo.app.browser
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
+import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
+import android.arch.persistence.room.Room
 import android.net.Uri
+import android.support.test.InstrumentationRegistry
+import com.duckduckgo.app.browser.BrowserViewModel.Command
+import com.duckduckgo.app.browser.BrowserViewModel.Command.LandingPage
+import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.StringResolver
+import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
+import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardEntry
+import com.duckduckgo.app.privacymonitor.db.NetworkPercent
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
+import com.duckduckgo.app.settings.db.AppConfigurationDao
+import com.duckduckgo.app.settings.db.AppConfigurationEntity
+import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.nhaarman.mockito_kotlin.mock
@@ -32,6 +46,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
@@ -42,11 +57,28 @@ class BrowserViewModelTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
+    private var lastEntry: NetworkLeaderboardEntry? = null
+
+    private val testStringResolver: StringResolver = object : StringResolver {
+        override fun getString(stringId: Int): String = ""
+        override fun getString(stringId: Int, vararg formatArgs: Any): String = ""
+    }
+
+    private val testNetworkLeaderboardDao: NetworkLeaderboardDao = object : NetworkLeaderboardDao {
+        override fun insert(leaderboardEntry: NetworkLeaderboardEntry) {
+            lastEntry = leaderboardEntry
+        }
+
+        override fun networkPercents(): LiveData<Array<NetworkPercent>> {
+            return MutableLiveData<Array<NetworkPercent>>()
+        }
+    }
     private lateinit var queryObserver: Observer<String>
-    private lateinit var navigationObserver: Observer<BrowserViewModel.Command>
+    private lateinit var navigationObserver: Observer<Command>
     private lateinit var termsOfServiceStore: TermsOfServiceStore
     private lateinit var mockStringResolver: StringResolver
-    private lateinit var testee: BrowserViewModel
+    private lateinit var db: AppDatabase
+    private lateinit var appConfigurationDao: AppConfigurationDao
 
     private val testOmnibarConverter: OmnibarEntryConverter = object : OmnibarEntryConverter {
         override fun convertUri(input: String): String = "duckduckgo.com"
@@ -54,24 +86,47 @@ class BrowserViewModelTest {
         override fun convertQueryToUri(inputQuery: String): Uri = Uri.parse("duckduckgo.com")
     }
 
+    private lateinit var testee: BrowserViewModel
+
     @Before
     fun before() {
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
+        appConfigurationDao = db.appConfigurationDao()
+
         mockStringResolver = mock()
         queryObserver = mock()
         navigationObserver = mock()
         termsOfServiceStore = mock()
-        testee = BrowserViewModel(testOmnibarConverter, DuckDuckGoUrlDetector(), termsOfServiceStore, TrackerNetworks(), PrivacyMonitorRepository(), object : StringResolver {
-            override fun getString(stringId: Int): String = ""
-            override fun getString(stringId: Int, vararg formatArgs: Any): String = ""
-        })
-        testee.query.observeForever(queryObserver)
+
+        testee = BrowserViewModel(
+                testOmnibarConverter,
+                DuckDuckGoUrlDetector(),
+                termsOfServiceStore,
+                TrackerNetworks(),
+                PrivacyMonitorRepository(),
+                testStringResolver,
+                testNetworkLeaderboardDao, appConfigurationDao)
+
+        testee.url.observeForever(queryObserver)
         testee.command.observeForever(navigationObserver)
     }
 
     @After
     fun after() {
-        testee.query.removeObserver(queryObserver)
+        testee.onCleared()
+        db.close()
+        testee.url.removeObserver(queryObserver)
         testee.command.removeObserver(navigationObserver)
+    }
+
+    @Test
+    fun whenTrackerDetectedThenNetworkLeaderbardUpdated() {
+        testee.trackerDetected(TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", TrackerNetwork("Network1", "www.tracker.com"), false))
+        assertNotNull(lastEntry)
+        assertEquals(lastEntry!!.domainVisited, "www.example.com")
+        assertEquals(lastEntry!!.networkName, "Network1")
     }
 
     @Test
@@ -146,6 +201,15 @@ class BrowserViewModelTest {
     }
 
     @Test
+    fun whenSharedTextReceivedThenNavigationTriggered() {
+        testee.onSharedTextReceived("http://example.com")
+        val captor: ArgumentCaptor<Command> = ArgumentCaptor.forClass(Command::class.java)
+        verify(navigationObserver).onChanged(captor.capture())
+        assertNotNull(captor.value)
+        assertTrue(captor.value is Navigate)
+    }
+
+    @Test
     fun whenViewModelGetsProgressUpdateThenViewStateIsUpdated() {
         testee.progressChanged(0)
         assertEquals(0, testee.viewState.value!!.progress)
@@ -160,13 +224,13 @@ class BrowserViewModelTest {
     @Test
     fun whenUserDismissesKeyboardBeforeBrowserShownThenShouldNavigateToLandingPage() {
         testee.userDismissedKeyboard()
-        verify(navigationObserver).onChanged(ArgumentMatchers.any(BrowserViewModel.Command.LandingPage::class.java))
+        verify(navigationObserver).onChanged(ArgumentMatchers.any(LandingPage::class.java))
     }
 
     @Test
     fun whenUserDismissesKeyboardAfterBrowserShownThenShouldNotNavigateToLandingPage() {
         testee.urlChanged("")
-        verify(navigationObserver, never()).onChanged(ArgumentMatchers.any(BrowserViewModel.Command.LandingPage::class.java))
+        verify(navigationObserver, never()).onChanged(ArgumentMatchers.any(LandingPage::class.java))
     }
 
     @Test
@@ -205,8 +269,53 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenUrlUpdatedThenPrivacyGradeIsShown() {
+    fun whenUrlUpdatedAfterConfigDownloadThenPrivacyGradeIsShown() {
+        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
         testee.urlChanged((""))
         assertTrue(testee.viewState.value!!.showPrivacyGrade)
+    }
+
+    @Test
+    fun whenUrlUpdatedBeforeConfigDownloadThenPrivacyGradeIsShown() {
+        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = false))
+        testee.urlChanged((""))
+        assertFalse(testee.viewState.value!!.showPrivacyGrade)
+    }
+
+    @Test
+    fun whenOmnibarInputDoesNotHaveFocusAndAppConfigDownloadedThenPrivacyGradeIsShown() {
+        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
+        testee.onOmnibarInputStateChanged("", false)
+        assertTrue(testee.viewState.value!!.showPrivacyGrade)
+    }
+
+    @Test
+    fun whenOmnibarInputDoesNotHaveFocusAndAppConfigNotDownloadedThenPrivacyGradeIsNotShown() {
+        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = false))
+        testee.onOmnibarInputStateChanged("", false)
+        assertFalse(testee.viewState.value!!.showPrivacyGrade)
+    }
+
+    @Test
+    fun whenOmnibarInputHasFocusThenPrivacyGradeIsNotShown() {
+        testee.onOmnibarInputStateChanged("", true)
+        assertFalse(testee.viewState.value!!.showPrivacyGrade)
+    }
+
+    @Test
+    fun whenInitialisedThenFireButtonIsShown() {
+        assertTrue(testee.viewState.value!!.showFireButton)
+    }
+
+    @Test
+    fun whenOmnibarInputDoesNotHaveFocusThenFireButtonIsShown() {
+        testee.onOmnibarInputStateChanged("", false)
+        assertTrue(testee.viewState.value!!.showFireButton)
+    }
+
+    @Test
+    fun whenOmnibarInputHasFocusThenFireButtonIsNotShown() {
+        testee.onOmnibarInputStateChanged("", true)
+        assertFalse(testee.viewState.value!!.showFireButton)
     }
 }

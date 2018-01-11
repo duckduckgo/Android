@@ -21,6 +21,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.view.KeyEvent.KEYCODE_ENTER
@@ -30,11 +31,13 @@ import android.view.View
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.widget.TextView
+import android.widget.Toast
 import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
+import com.duckduckgo.app.privacymonitor.renderer.icon
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.REQUEST_DASHBOARD
 import com.duckduckgo.app.settings.SettingsActivity
@@ -54,13 +57,22 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        fun intent(context: Context): Intent = Intent(context, BrowserActivity::class.java)
 
+        fun intent(context: Context, sharedText: String? = null): Intent {
+            val intent = Intent(context, BrowserActivity::class.java)
+            intent.putExtra(SHARED_TEXT_EXTRA, sharedText)
+            return intent
+        }
+
+        private const val SHARED_TEXT_EXTRA = "SHARED_TEXT_EXTRA"
         private const val REQUEST_SETTINGS = 1001
     }
 
     private val privacyGradeMenu: MenuItem?
-        get() = toolbar.menu.findItem(R.id.privacy_dashboard)
+        get() = toolbar.menu.findItem(R.id.privacy_dashboard_menu_item)
+
+    private val fireMenu: MenuItem?
+        get() = toolbar.menu.findItem(R.id.fire_menu_item)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,23 +83,36 @@ class BrowserActivity : DuckDuckGoActivity() {
         })
 
         viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
-            it?.let { renderPrivacyGrade(it) }
+            it?.let {
+                privacyGradeMenu?.icon = getDrawable(it.icon())
+            }
         })
 
-        viewModel.query.observe(this, Observer {
+        viewModel.url.observe(this, Observer {
             it?.let { webView.loadUrl(it) }
         })
 
         viewModel.command.observe(this, Observer {
-            when(it) {
+            when (it) {
                 is BrowserViewModel.Command.Refresh -> webView.reload()
                 is BrowserViewModel.Command.Navigate -> {
                     focusDummy.requestFocus()
                     webView.loadUrl(it.url)
                 }
-                is BrowserViewModel.Command.LandingPage -> {
-                    finishActivityAnimated()
-                    return@Observer
+                is BrowserViewModel.Command.LandingPage -> finishActivityAnimated()
+                is BrowserViewModel.Command.DialNumber -> {
+                    val intent = Intent(Intent.ACTION_DIAL)
+                    intent.data = Uri.parse("tel:${it.telephoneNumber}")
+                    launchExternalActivity(intent)
+                }
+                is BrowserViewModel.Command.SendEmail -> {
+                    val intent = Intent(Intent.ACTION_SENDTO)
+                    intent.data = Uri.parse(it.emailAddress)
+                    launchExternalActivity(intent)
+                }
+                is BrowserViewModel.Command.SendSms -> {
+                    val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${it.telephoneNumber}"))
+                    startActivity(intent)
                 }
             }
         })
@@ -97,8 +122,23 @@ class BrowserActivity : DuckDuckGoActivity() {
         configureOmnibarTextInput()
         configureDummyViewTouchHandler()
 
-        if (shouldShowKeyboard()) {
-            omnibarTextInput.showKeyboard()
+        if (savedInstanceState == null) {
+            consumeSharedTextExtra()
+        }
+    }
+
+    private fun launchExternalActivity(intent: Intent) {
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent)
+        } else {
+            Toast.makeText(this, R.string.no_compatible_third_party_app_installed, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun consumeSharedTextExtra() {
+        val sharedText = intent.getStringExtra(SHARED_TEXT_EXTRA)
+        if (sharedText != null) {
+            viewModel.onSharedTextReceived(sharedText)
         }
     }
 
@@ -129,6 +169,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
 
         privacyGradeMenu?.isVisible = viewState.showPrivacyGrade
+        fireMenu?.isVisible = viewState.showFireButton
     }
 
     private fun showClearButton() {
@@ -143,17 +184,6 @@ class BrowserActivity : DuckDuckGoActivity() {
             clearOmnibarInputButton.hide()
             omnibarTextInput.updatePadding(paddingEnd = 10.toPx())
         }
-    }
-
-    private fun renderPrivacyGrade(privacyGrade: PrivacyGrade?) {
-        val resource = when (privacyGrade) {
-            PrivacyGrade.A -> R.drawable.privacygrade_icon_a
-            PrivacyGrade.B -> R.drawable.privacygrade_icon_b
-            PrivacyGrade.C -> R.drawable.privacygrade_icon_c
-            PrivacyGrade.D -> R.drawable.privacygrade_icon_d
-            else -> R.drawable.privacygrade_icon_unknown
-        }
-        privacyGradeMenu?.icon = getDrawable(resource)
     }
 
     private fun shouldUpdateOmnibarTextInput(viewState: BrowserViewModel.ViewState, omnibarInput: String?) =
@@ -252,8 +282,12 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.privacy_dashboard -> {
+            R.id.privacy_dashboard_menu_item -> {
                 launchPrivacyDashboard()
+                return true
+            }
+            R.id.fire_menu_item -> {
+                launchFire()
                 return true
             }
             R.id.refresh_menu_item -> {
@@ -285,12 +319,20 @@ class BrowserActivity : DuckDuckGoActivity() {
         startActivityForResult(PrivacyDashboardActivity.intent(this), REQUEST_DASHBOARD)
     }
 
+    private fun launchFire() {
+        FireDialog(this, {
+            finishActivityAnimated()
+        }, {
+            Toast.makeText(this, R.string.fireDataCleared, Toast.LENGTH_SHORT).show()
+        }).show()
+    }
+
     private fun launchSettingsView() {
         startActivityForResult(SettingsActivity.intent(this), REQUEST_SETTINGS)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when(requestCode) {
+        when (requestCode) {
             REQUEST_DASHBOARD -> viewModel.receivedDashboardResult(resultCode)
             REQUEST_SETTINGS -> viewModel.receivedSettingsResult(resultCode)
             else -> super.onActivityResult(requestCode, resultCode, data)
@@ -312,7 +354,4 @@ class BrowserActivity : DuckDuckGoActivity() {
         omnibarTextInput.hideKeyboard()
         webView.hide()
     }
-
-    private fun shouldShowKeyboard(): Boolean =
-            viewModel.viewState.value?.browserShowing ?: false ?: true
 }

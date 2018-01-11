@@ -6,7 +6,7 @@ apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
 
 ext {
-    VERSION_NAME = "0.8.0"
+    VERSION_NAME = "0.9.0"
 }
 
 android {
@@ -20,6 +20,12 @@ android {
         versionName VERSION_NAME
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         archivesBaseName = "duckduckgo-$versionName"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
     }
     signingConfigs {
         release
@@ -79,7 +85,7 @@ android {
 ext {
     supportLibrary = "27.0.2"
     architectureComponents = "1.0.0"
-    dagger = "2.13"
+    dagger = "2.14.1"
     retrofit = "2.3.0"
 }
 
@@ -94,29 +100,35 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofit"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit"
-    implementation "io.reactivex.rxjava2:rxjava:2.1.7"
+    implementation "io.reactivex.rxjava2:rxjava:2.1.8"
     implementation "io.reactivex.rxjava2:rxandroid:2.0.1"
     implementation "com.jakewharton.timber:timber:4.6.0"
-    implementation "android.arch.lifecycle:extensions:$architectureComponents"
-    implementation "android.arch.lifecycle:reactivestreams:$architectureComponents"
-    implementation "android.arch.persistence.room:runtime:$architectureComponents"
     implementation "com.google.dagger:dagger-android:$dagger"
     implementation "com.google.dagger:dagger-android-support:$dagger"
     releaseImplementation 'com.faendir:acra:4.10.0'
 
+    // ViewModel and LiveData
+    implementation "android.arch.lifecycle:extensions:$architectureComponents"
+    kapt "android.arch.lifecycle:compiler:$architectureComponents"
+    testImplementation "android.arch.core:core-testing:$architectureComponents"
+    androidTestImplementation "android.arch.core:core-testing:$architectureComponents"
+
+    // Room
+    implementation "android.arch.persistence.room:runtime:$architectureComponents"
+    kapt "android.arch.persistence.room:compiler:$architectureComponents"
+    testImplementation "android.arch.persistence.room:testing:$architectureComponents"
+
+    // Dagger
     kapt "com.google.dagger:dagger-android-processor:$dagger"
     kapt "com.google.dagger:dagger-compiler:$dagger"
-    kapt "android.arch.persistence.room:compiler:$architectureComponents"
 
     testImplementation "org.mockito:mockito-core:2.13.0"
     testImplementation "com.nhaarman:mockito-kotlin-kt1.1:1.5.0"
     testImplementation "junit:junit:4.12"
-    testImplementation "android.arch.core:core-testing:$architectureComponents"
-    testImplementation "android.arch.persistence.room:testing:$architectureComponents"
 
     androidTestImplementation "com.android.support.test:runner:1.0.1"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:3.0.1"
     androidTestImplementation "org.mockito:mockito-android:2.13.0"
     androidTestImplementation "com.nhaarman:mockito-kotlin-kt1.1:1.5.0"
-    androidTestImplementation "android.arch.core:core-testing:$architectureComponents"
+
 }

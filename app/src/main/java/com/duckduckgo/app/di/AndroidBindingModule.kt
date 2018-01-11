@@ -20,6 +20,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.job.AppConfigurationJobService
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity
+import com.duckduckgo.app.privacymonitor.ui.ScorecardActivity
 import com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import dagger.Module
@@ -38,6 +39,10 @@ abstract class AndroidBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector
     abstract fun privacyDashboardActivity(): PrivacyDashboardActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun scorecardActivity(): ScorecardActivity
 
     @ActivityScoped
     @ContributesAndroidInjector

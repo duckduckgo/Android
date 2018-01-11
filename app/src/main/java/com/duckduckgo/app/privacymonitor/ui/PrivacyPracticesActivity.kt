@@ -27,6 +27,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
+import com.duckduckgo.app.privacymonitor.renderer.banner
+import com.duckduckgo.app.privacymonitor.renderer.text
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import kotlinx.android.synthetic.main.activity_privacy_dashboard.*
 import kotlinx.android.synthetic.main.content_privacy_practices.*

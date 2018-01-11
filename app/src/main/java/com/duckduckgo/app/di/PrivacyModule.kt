@@ -32,4 +32,5 @@ abstract class PrivacyModule {
 
     @Binds
     abstract fun bindTermsOfServiceStore(termsOfServiceStore: TermsOfServiceRawStore): TermsOfServiceStore
+
 }

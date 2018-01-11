@@ -17,19 +17,19 @@
 package com.duckduckgo.app.privacymonitor.ui
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
+import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Observer
-import android.support.test.InstrumentationRegistry
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.privacymonitor.model.HttpsStatus
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
+import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
+import com.duckduckgo.app.privacymonitor.db.NetworkPercent
+import com.duckduckgo.app.privacymonitor.model.HttpsStatus
+import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
-import org.junit.After
+import org.junit.*
 import org.junit.Assert.*
-import org.junit.Rule
-import org.junit.Test
 
 class PrivacyDashboardViewModelTest {
 
@@ -39,23 +39,63 @@ class PrivacyDashboardViewModelTest {
 
     private var viewStateObserver: Observer<PrivacyDashboardViewModel.ViewState> = mock()
     private var settingStore: PrivacySettingsStore = mock()
+    private var networkLeaderboard: NetworkLeaderboardDao = mock()
+    private var networkPercentsLiveData: LiveData<Array<NetworkPercent>> = mock()
 
     private val testee: PrivacyDashboardViewModel by lazy {
-        val model = PrivacyDashboardViewModel(InstrumentationRegistry.getTargetContext(), settingStore)
+        val model = PrivacyDashboardViewModel(settingStore, networkLeaderboard)
         model.viewState.observeForever(viewStateObserver)
         model
+    }
+
+    @Before
+    fun before() {
+        whenever(networkPercentsLiveData.value).thenReturn(emptyArray())
+        whenever(networkLeaderboard.networkPercents()).thenReturn(networkPercentsLiveData)
     }
 
     @After
     fun after() {
         testee.viewState.removeObserver(viewStateObserver)
+        testee.onCleared()
+    }
+
+    @Test
+    fun whenNetworkLeaderboardDataAvailableViewStateUsesIt() {
+        testee.onNetworkPercentsChanged(arrayOf(
+                NetworkPercent("Network1", 1.0f, 20),
+                NetworkPercent("Network2", 2.0f, 20),
+                NetworkPercent("Network3", 3.0f, 20)))
+
+        val viewState = testee.viewState.value!!
+        assertEquals("Network1", viewState.networkTrackerSummaryName1)
+        assertEquals("Network2", viewState.networkTrackerSummaryName2)
+        assertEquals("Network3", viewState.networkTrackerSummaryName3)
+        assertEquals(1.0f, viewState.networkTrackerSummaryPercent1)
+        assertEquals(2.0f, viewState.networkTrackerSummaryPercent2)
+        assertEquals(3.0f, viewState.networkTrackerSummaryPercent3)
+    }
+
+    @Test
+    fun whenNoDataNetworkLeaderboardViewStateIsDefault() {
+        testee.onNetworkPercentsChanged(emptyArray())
+
+        val viewState = testee.viewState.value!!
+        assertNull(viewState.networkTrackerSummaryName1)
+        assertNull(viewState.networkTrackerSummaryName2)
+        assertNull(viewState.networkTrackerSummaryName3)
+        assertEquals(0.0f, viewState.networkTrackerSummaryPercent1)
+        assertEquals(0.0f, viewState.networkTrackerSummaryPercent2)
+        assertEquals(0.0f, viewState.networkTrackerSummaryPercent3)
     }
 
     @Test
     fun whenNoDataThenDefaultValuesAreUsed() {
         val viewState = testee.viewState.value!!
         assertEquals("", viewState.domain)
-        assertEquals(getStringResource(R.string.httpsGood), viewState.httpsText)
+        assertEquals(PrivacyGrade.UNKNOWN, viewState.beforeGrade)
+        assertEquals(PrivacyGrade.UNKNOWN, viewState.afterGrade)
+        assertEquals(HttpsStatus.SECURE, viewState.httpsStatus)
         assertEquals(0, viewState.networkCount)
         assertTrue(viewState.allTrackersBlocked)
         assertEquals(TermsOfService.Practices.UNKNOWN, testee.viewState.value!!.practices)
@@ -90,72 +130,17 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenFullUpgradeThenHeadingIndicatesUpgrade() {
-        val monitor = monitor(allTrackersBlocked = true, trackerCount = 2)
+    fun whenMonitorHasTrackersThenViewModelGradesAreUpdated() {
+        val monitor = monitor(allTrackersBlocked = true, trackerCount = 1000)
         testee.onPrivacyMonitorChanged(monitor)
-        assertTrue(testee.viewState.value!!.heading.contains("ENHANCED FROM"))
+        assertEquals(PrivacyGrade.D, testee.viewState.value?.beforeGrade)
+        assertEquals(PrivacyGrade.B, testee.viewState.value?.afterGrade)
     }
 
     @Test
-    fun whenPartialUpgradeAndPrivacyOnThenHeadingIndicatesEnabled() {
-        whenever(settingStore.privacyOn).thenReturn(true)
-        val monitor = monitor(allTrackersBlocked = false, trackerCount = 2)
-        testee.onPrivacyMonitorChanged(monitor)
-        assertEquals(getStringResource(R.string.privacyProtectionEnabled), testee.viewState.value?.heading)
-    }
-
-    @Test
-    fun whenPartialUpgradeAndPrivacyOffThenHeadingIndicatesDisabled() {
-        whenever(settingStore.privacyOn).thenReturn(false)
-        val monitor = monitor(allTrackersBlocked = false, trackerCount = 2)
-        testee.onPrivacyMonitorChanged(monitor)
-        assertEquals(getStringResource(R.string.privacyProtectionDisabled), testee.viewState.value?.heading)
-    }
-
-    @Test
-    fun whenNoUpgradeAndPrivacyOnThenHeadingIndicatesEnabled() {
-        whenever(settingStore.privacyOn).thenReturn(true)
-        val monitor = monitor(allTrackersBlocked = true)
-        testee.onPrivacyMonitorChanged(monitor)
-        assertEquals(getStringResource(R.string.privacyProtectionEnabled), testee.viewState.value?.heading)
-    }
-
-    @Test
-    fun whenNoUpgradeAndPrivacyOffThenHeadingIndicatesDisabled() {
-        whenever(settingStore.privacyOn).thenReturn(false)
-        val monitor = monitor(allTrackersBlocked = false)
-        testee.onPrivacyMonitorChanged(monitor)
-        assertEquals(getStringResource(R.string.privacyProtectionDisabled), testee.viewState.value?.heading)
-    }
-
-    @Test
-    fun whenPrivacyOnAndNoUpgradeThenHeadingIndicatesEnabled() {
-        whenever(settingStore.privacyOn).thenReturn(true)
-        assertEquals(getStringResource(R.string.privacyProtectionEnabled), testee.viewState.value?.heading)
-    }
-
-    @Test
-    fun whenHttpsStatusIsSecureThenTextAndIconReflectSame() {
-        val monitor = monitor(https = HttpsStatus.SECURE)
-        testee.onPrivacyMonitorChanged(monitor)
-        assertEquals(getStringResource(R.string.httpsGood), testee.viewState.value?.httpsText)
-        assertEquals(R.drawable.dashboard_https_good, testee.viewState.value?.httpsIcon)
-    }
-
-    @Test
-    fun whenHttpsStatusIsMixedThenTextAndIconReflectSame() {
-        val monitor = monitor(https = HttpsStatus.MIXED)
-        testee.onPrivacyMonitorChanged(monitor)
-        assertEquals(getStringResource(R.string.httpsMixed), testee.viewState.value?.httpsText)
-        assertEquals(R.drawable.dashboard_https_neutral, testee.viewState.value?.httpsIcon)
-    }
-
-    @Test
-    fun whenHttpsStatusIsNoneThenTextAndIconReflectSame() {
-        val monitor = monitor(https = HttpsStatus.NONE)
-        testee.onPrivacyMonitorChanged(monitor)
-        assertEquals(getStringResource(R.string.httpsBad), testee.viewState.value?.httpsText)
-        assertEquals(R.drawable.dashboard_https_bad, testee.viewState.value?.httpsIcon)
+    fun whenMonitorHttpsStatusIsUpdatedThenViewModelIsUpdated() {
+        testee.onPrivacyMonitorChanged(monitor(https = HttpsStatus.MIXED))
+        assertEquals(HttpsStatus.MIXED, testee.viewState.value?.httpsStatus)
     }
 
     @Test
@@ -199,6 +184,4 @@ class PrivacyDashboardViewModelTest {
         return monitor
     }
 
-    private fun getStringResource(id: Int): String =
-            InstrumentationRegistry.getTargetContext().getString(id)
 }
