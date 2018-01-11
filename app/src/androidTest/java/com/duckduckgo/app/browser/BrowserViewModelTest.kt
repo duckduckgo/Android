@@ -48,7 +48,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers
-import org.mockito.Mockito.*
+import org.mockito.Mockito.never
+import org.mockito.Mockito.verify
 
 class BrowserViewModelTest {
 
@@ -64,8 +65,13 @@ class BrowserViewModelTest {
     }
 
     private val testNetworkLeaderboardDao: NetworkLeaderboardDao = object : NetworkLeaderboardDao {
-        override fun insert(leaderboardEntry: NetworkLeaderboardEntry) { lastEntry = leaderboardEntry }
-        override fun networkPercents(): LiveData<Array<NetworkPercent>> { return MutableLiveData<Array<NetworkPercent>>() }
+        override fun insert(leaderboardEntry: NetworkLeaderboardEntry) {
+            lastEntry = leaderboardEntry
+        }
+
+        override fun networkPercents(): LiveData<Array<NetworkPercent>> {
+            return MutableLiveData<Array<NetworkPercent>>()
+        }
     }
     private lateinit var queryObserver: Observer<String>
     private lateinit var navigationObserver: Observer<Command>
@@ -84,9 +90,7 @@ class BrowserViewModelTest {
 
     @Before
     fun before() {
-
-
-          db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java)
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java)
                 .allowMainThreadQueries()
                 .build()
         appConfigurationDao = db.appConfigurationDao()
@@ -270,7 +274,6 @@ class BrowserViewModelTest {
         testee.urlChanged((""))
         assertTrue(testee.viewState.value!!.showPrivacyGrade)
     }
-
 
     @Test
     fun whenUrlUpdatedBeforeConfigDownloadThenPrivacyGradeIsShown() {
