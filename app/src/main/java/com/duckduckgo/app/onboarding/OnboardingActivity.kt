@@ -16,15 +16,115 @@
 
 package com.duckduckgo.app.onboarding
 
+import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
+import android.support.v4.app.FragmentPagerAdapter
+import android.support.v4.view.ViewPager.OnPageChangeListener
+import android.support.v7.app.AppCompatActivity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.DuckDuckGoActivity
+import kotlinx.android.synthetic.main.activity_onboarding.*
 
-class OnboardingActivity : DuckDuckGoActivity() {
+
+class OnboardingActivity : AppCompatActivity() {
+
+    companion object {
+        val firstColor = R.color.lighMuddyGreen
+        val secondColor = R.color.lightWindowsBlue
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_onboarding)
+        configurePager()
     }
 
+    override fun onResume() {
+        refreshPageColor()
+        super.onResume()
+    }
+
+    private fun configurePager() {
+
+        viewPager.adapter = PagerAdapter(supportFragmentManager)
+
+        viewPager.addOnPageChangeListener(object : OnPageChangeListener {
+            override fun onPageScrollStateChanged(state: Int) {
+            }
+
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                if (positionOffset == 0.toFloat()) {
+                    return
+                }
+                transitionToNewColor(positionOffset)
+            }
+
+            override fun onPageSelected(position: Int) {
+            }
+        })
+    }
+
+    @SuppressLint("NewApi")
+    private fun refreshPageColor() {
+        val resource = if (viewPager.currentItem == 0) firstColor else secondColor
+        updateColor(getColor(resource))
+    }
+
+    @SuppressLint("NewApi")
+    private fun transitionToNewColor(positionOffset: Float) {
+
+        val fromRatio = 1 - positionOffset
+        val toRatio = positionOffset
+        val fromColor = resources.getColor(firstColor)
+        val toColor = resources.getColor(secondColor)
+
+        val alpha = Color.alpha(fromColor) * fromRatio + Color.alpha(toColor) * toRatio
+        val red = Color.red(fromColor) * fromRatio + Color.red(toColor) * toRatio
+        val green = Color.green(fromColor) * fromRatio + Color.green(toColor) * toRatio
+        val blue = Color.blue(fromColor) * fromRatio + Color.blue(toColor) * toRatio
+        val combined = Color.argb(alpha.toInt(), red.toInt(), green.toInt(), blue.toInt())
+
+        updateColor(combined)
+    }
+
+    private fun updateColor(color: Int) {
+        window.statusBarColor = color
+        viewPager.setBackgroundColor(color)
+    }
+
+    class PagerAdapter(fragmentManager: FragmentManager) : FragmentPagerAdapter(fragmentManager) {
+
+        companion object {
+            val pageCount = 2
+        }
+
+        override fun getCount(): Int {
+            return pageCount
+        }
+
+        override fun getItem(position: Int): android.support.v4.app.Fragment? {
+            when (position) {
+                0 -> return ProtectDataPage()
+                1 -> return NoTracePage()
+                else -> return null
+            }
+        }
+    }
+
+    class ProtectDataPage : Fragment() {
+        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+            return inflater.inflate(R.layout.content_onboarding_protect_data, container, false)
+        }
+    }
+
+    class NoTracePage : Fragment() {
+        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+            return inflater.inflate(R.layout.content_onboarding_no_trace, container, false)
+        }
+    }
 }

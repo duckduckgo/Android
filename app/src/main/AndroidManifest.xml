@@ -21,16 +21,13 @@
             android:launchMode="singleTask"
             android:screenOrientation="fullSensor">
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
             <!-- Allows app to become default browser -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:scheme="https" />
                 <data android:scheme="http" />
             </intent-filter>
@@ -44,10 +41,16 @@
 
         </activity>
 
-        <activity android:name="com.duckduckgo.app.onboarding.OnboardingActivity"
+        <activity
+            android:name="com.duckduckgo.app.onboarding.OnboardingActivity"
             android:label="@string/privacyDashboardActivityTitle"
             android:parentActivityName="com.duckduckgo.app.home.HomeActivity"
-            android:screenOrientation="fullSensor" />
+            android:screenOrientation="fullSensor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".BrowserActivity"
