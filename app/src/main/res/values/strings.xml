@@ -86,6 +86,9 @@
     <string name="settingsMenuItemTitle">Settings</string>
     <string name="settingsVersion">Version</string>
     <string name="aboutDuckduckgo">About DuckDuckGo</string>
+    <string name="leaveFeedback">Leave Feedback</string>
+    <string name="feedbackEmailAddress">android@duckduckgo.com</string>
+    <string name="feedbackSubject">DuckDuckGo Android Feedback</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">About us</string>

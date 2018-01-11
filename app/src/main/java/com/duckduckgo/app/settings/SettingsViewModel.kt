@@ -18,11 +18,27 @@ package com.duckduckgo.app.settings
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import android.net.Uri
+import android.os.Build
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.StringResolver
+import javax.inject.Inject
 
-class SettingsViewModel : ViewModel() {
+class SettingsViewModel @Inject constructor(private val stringResolver: StringResolver) : ViewModel() {
+
+    data class ViewState(
+            val loading: Boolean = true,
+            val version: String = ""
+    )
+
+    sealed class Command {
+        class SendEmail(val emailUri: Uri) : Command()
+    }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    val command: MutableLiveData<Command> = MutableLiveData()
+
     private var currentViewState: ViewState = ViewState()
 
     init {
@@ -33,12 +49,27 @@ class SettingsViewModel : ViewModel() {
         viewState.value = currentViewState.copy(loading = false, version = obtainVersion())
     }
 
+    fun userRequestedToSendFeedback() {
+        val emailAddress = stringResolver.getString(R.string.feedbackEmailAddress)
+        val subject = encode { stringResolver.getString(R.string.feedbackSubject) }
+        val body = encode { buildEmailBody() }
+
+        val uri = "mailto:$emailAddress?&subject=$subject&body=$body"
+        command.value = Command.SendEmail(Uri.parse(uri))
+    }
+
+    private fun buildEmailBody(): String {
+        return "App Version: ${obtainVersion()}\n" +
+                "Android Version: ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})\n" +
+                "Manufacturer: ${Build.MANUFACTURER}\n" +
+                "Model: ${Build.MODEL}\n" +
+                "\n\n\n"
+    }
+
     private fun obtainVersion(): String {
         return "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
     }
 
-    data class ViewState(
-            val loading: Boolean = true,
-            val version: String = ""
-    )
+    private inline fun encode(f: () -> String): String = Uri.encode(f())
+
 }
