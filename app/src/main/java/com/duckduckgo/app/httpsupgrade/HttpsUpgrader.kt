@@ -32,12 +32,34 @@ class HttpsUpgrader @Inject constructor(private val dao: HttpsUpgradeDomainDao) 
         }
 
         val host = uri.host ?: return false
-
-        return dao.contains(host)
+        return dao.hasDomain(host) || matchesWildcard(host)
     }
 
     fun upgrade(uri: Uri): Uri {
         return uri.buildUpon().scheme(UrlScheme.https).build()
+    }
+
+    private fun matchesWildcard(host: String): Boolean {
+        val domains = mutableListOf<String>()
+        for (part in host.split(".").reversed()) {
+            if (domains.isEmpty()) {
+                domains.add(".$part")
+            } else {
+                val last = domains.last()
+                domains.add(".$part$last")
+            }
+        }
+
+        domains.removeAt(0)
+        domains.removeAt(domains.size - 1)
+
+        for (domain in domains) {
+            if (dao.hasDomain("*$domain")) {
+                return true
+            }
+        }
+
+        return false
     }
 
 }

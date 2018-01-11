@@ -54,48 +54,48 @@ class HttpsUpgradeDomainDaoTest {
     fun whenExactMatchDomainAddedAndThenAllDeletedThenDoesNotContainExactMatchDomain() {
         dao.insertAll(HttpsUpgradeDomain(exactMatchDomain))
         dao.deleteAll()
-        assertFalse(dao.contains(exactMatchDomain))
+        assertFalse(dao.hasDomain(exactMatchDomain))
     }
 
     @Test
     fun whenWildcardDomainInsertedModelThenDoesNotContainParentOfWildcardDomain() {
         dao.insertAll(HttpsUpgradeDomain(wildcardDomain))
-        assertFalse(dao.contains(parentOfWildcardDomain))
+        assertFalse(dao.hasDomain(parentOfWildcardDomain))
     }
 
     @Test
     fun whenOtherWildcardDomainInsertedThenModelDoesNotContainExampleWildcardDomain() {
         dao.insertAll(HttpsUpgradeDomain(otherWildcardDomain))
-        assertFalse(dao.contains(exampleWildcardDomain))
+        assertFalse(dao.hasDomain(exampleWildcardDomain))
     }
 
     @Test
     fun whenWildcardDomainInsertedThenModelDoesNotContainExactMatchDomain() {
         dao.insertAll(HttpsUpgradeDomain(wildcardDomain))
-        assertFalse(dao.contains(exactMatchDomain))
+        assertFalse(dao.hasDomain(exactMatchDomain))
     }
 
     @Test
     fun whenWildcardDomainInsertedThenModelContainsExampleWildcardDomain() {
         dao.insertAll(HttpsUpgradeDomain(wildcardDomain))
-        assertTrue(dao.contains(exampleWildcardDomain))
+        assertTrue(dao.hasDomain("*.$parentOfWildcardDomain"))
     }
 
     @Test
     fun whenExactMatchDomainInsertedThenModelDoesNotContainOtherDomain() {
         dao.insertAll(HttpsUpgradeDomain(exactMatchDomain))
-        assertFalse(dao.contains(otherDomain))
+        assertFalse(dao.hasDomain(otherDomain))
     }
 
     @Test
     fun whenExactMatchDomainIsInsertedThenModelContainsExactMatchDomain() {
         dao.insertAll(HttpsUpgradeDomain(exactMatchDomain))
-        assertTrue(dao.contains(exactMatchDomain))
+        assertTrue(dao.hasDomain(exactMatchDomain))
     }
 
     @Test
     fun whenModelIsEmptyThenModelDoesNotContainExactMatchDomain() {
-        assertFalse(dao.contains(exactMatchDomain))
+        assertFalse(dao.hasDomain(exactMatchDomain))
     }
 
 }

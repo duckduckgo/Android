@@ -38,7 +38,7 @@ class HttpsUpgradeListDownloader @Inject constructor(
             if (response.isSuccessful) {
                 Timber.d("Got HTTPS upgrade list from server")
 
-                val domains = response.body()!!.simpleUpgrade.top500.toTypedArray()
+                val domains = response.body()!!.toTypedArray()
                 database.runInTransaction({
                     httpsUpgradeDao.deleteAll()
                     httpsUpgradeDao.insertAll(*domains)

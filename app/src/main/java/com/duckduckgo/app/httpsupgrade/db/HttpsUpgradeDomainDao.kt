@@ -29,8 +29,8 @@ interface HttpsUpgradeDomainDao {
     fun insertAll(vararg domains: HttpsUpgradeDomain)
 
     @Language("RoomSql")
-    @Query("select count(1) > 0 from https_upgrade_domain where :host glob domain")
-    fun contains(host: String) : Boolean
+    @Query("select count(1) > 0 from https_upgrade_domain where domain = :domain")
+    fun hasDomain(domain: String) : Boolean
 
     @Query("delete from https_upgrade_domain")
     fun deleteAll()
