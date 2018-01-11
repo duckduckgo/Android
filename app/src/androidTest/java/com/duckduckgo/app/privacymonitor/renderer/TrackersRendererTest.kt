@@ -64,6 +64,24 @@ class TrackersRendererTest {
     }
 
     @Test
+    fun whenPercentNullPercentageIsBlank() {
+        val text = testee.percentage(null)
+        assertEquals("", text)
+    }
+
+    @Test
+    fun whenPercentIsRecurringFractionPercentageIsRoundNumber() {
+        val text = testee.percentage(0.333333333f)
+        assertEquals("33%", text)
+    }
+
+    @Test
+    fun whenPercentIsHalfPercentageIs50Percent() {
+        val text = testee.percentage(0.5f)
+        assertEquals("50%", text)
+    }
+
+    @Test
     fun whenNoTrackerNetworksThenNetworksTextShowsZeroBlocked() {
         val text = testee.networksText(context, 0, true)
         assertEquals("0 Tracker Networks Blocked", text)
@@ -112,20 +130,26 @@ class TrackersRendererTest {
     }
 
     @Test
-    fun whenNetworkNameSansDotsMatchesPillIconThenResourceIsReturned() {
-        val resource = testee.networkPillIcon(context, "amazon.com")
-        assertEquals(R.drawable.network_pill_amazoncom, resource)
+    fun whenNetworkNameMatchesLogoIconThenResourceIsReturned() {
+        val resource = testee.networkLogoIcon(context, "facebook")
+        assertEquals(R.drawable.network_logo_facebook, resource)
+    }
+
+    @Test
+    fun whenNetworkNameSansDotsMatchesLogoIconThenResourceIsReturned() {
+        val resource = testee.networkLogoIcon(context, "amazon.com")
+        assertEquals(R.drawable.network_logo_amazoncom, resource)
     }
 
     @Test
     fun whenNetworkNameSansSpacesMatchesPillIconThenResourceIsReturned() {
-        val resource = testee.networkPillIcon(context, "fox one stop media")
-        assertEquals(R.drawable.network_pill_foxonestopmedia, resource)
+        val resource = testee.networkLogoIcon(context, "fox one stop media")
+        assertEquals(R.drawable.network_logo_foxonestopmedia, resource)
     }
 
     @Test
-    fun whenNetworkNameDoesNotMatchPillIconThenNull() {
-        val resource = testee.networkPillIcon(context, "unknownnetwork")
+    fun whenNetworkNameDoesNotMatchLogoIconThenNull() {
+        val resource = testee.networkLogoIcon(context, "unknownnetwork")
         assertNull(resource)
     }
 

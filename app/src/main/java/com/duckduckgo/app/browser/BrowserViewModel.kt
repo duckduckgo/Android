@@ -19,7 +19,9 @@ package com.duckduckgo.app.browser
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
+
 import android.support.annotation.VisibleForTesting
+import android.net.Uri
 import android.support.annotation.AnyThread
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity.Companion.RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
@@ -28,6 +30,8 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.StringResolver
 import com.duckduckgo.app.privacymonitor.SiteMonitor
+import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
+import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.privacymonitor.model.improvedGrade
@@ -48,7 +52,7 @@ class BrowserViewModel(
         private val trackerNetworks: TrackerNetworks,
         private val privacyMonitorRepository: PrivacyMonitorRepository,
         private val stringResolver: StringResolver,
-        private val urlTypeDetector: SpecialUrlDetector,
+        private val networkLeaderboardDao: NetworkLeaderboardDao,
         appConfigurationDao: AppConfigurationDao) : WebViewClientListener, ViewModel() {
 
     data class ViewState(
@@ -175,16 +179,20 @@ class BrowserViewModel(
         onSiteMonitorChanged()
     }
 
-    private fun omnibarText(url: String): String {
-        if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url) && duckDuckGoUrlDetector.hasQuery(url)) {
-            return duckDuckGoUrlDetector.extractQuery(url) ?: url
-        }
-        return url
+    override fun trackerDetected(event: TrackingEvent) {
+        updateSiteMonitor(event)
+        updateNetworkLeaderboard(event)
     }
 
-    override fun trackerDetected(event: TrackingEvent) {
+    private fun updateSiteMonitor(event: TrackingEvent) {
         siteMonitor?.trackerDetected(event)
         onSiteMonitorChanged()
+    }
+
+    private fun updateNetworkLeaderboard(event: TrackingEvent) {
+        val networkName = event.trackerNetwork?.name ?: return
+        val domainVisited = Uri.parse(event.documentUrl).host ?: return
+        networkLeaderboardDao.insert(NetworkLeaderboardEntry(networkName, domainVisited))
     }
 
     override fun pageHasHttpResources() {

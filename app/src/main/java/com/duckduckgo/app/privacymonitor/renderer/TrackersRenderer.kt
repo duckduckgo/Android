@@ -50,7 +50,16 @@ class TrackersRenderer {
 
     @DrawableRes
     fun networkPillIcon(context: Context, networkName: String): Int? {
-        val drawable = "network_pill_$networkName"
+        return networkIcon(context, networkName, "network_pill_")
+    }
+
+    @DrawableRes
+    fun networkLogoIcon(context: Context, networkName: String): Int? {
+        return networkIcon(context, networkName, "network_logo_")
+    }
+
+    private fun networkIcon(context: Context, networkName: String, prefix: String): Int? {
+        val drawable = "$prefix$networkName"
                 .replace(" ", "")
                 .replace(".", "")
                 .toLowerCase()
@@ -58,9 +67,16 @@ class TrackersRenderer {
         return if (resource != 0) resource else null
     }
 
+    fun percentage(percent: Float?): String? {
+        percent ?: return ""
+        val to100 = (percent * 100).toInt()
+        return "$to100%"
+    }
+
     @DrawableRes
     fun successFailureIcon(count: Int): Int = when (count) {
         0 -> R.drawable.icon_success
         else -> R.drawable.icon_fail
     }
+    
 }

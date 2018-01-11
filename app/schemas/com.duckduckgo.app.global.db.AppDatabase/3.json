@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "5eb935d329cfa2ca8a2e77a0a040c71e",
+    "identityHash": "edcb0f51325e54c85c931334898d7916",
     "entities": [
       {
         "tableName": "https_upgrade_domain",
@@ -63,25 +63,26 @@
         "foreignKeys": []
       },
       {
-        "tableName": "app_configuration",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` TEXT NOT NULL, `appConfigurationDownloaded` INTEGER NOT NULL, PRIMARY KEY(`key`))",
+        "tableName": "network_leaderboard",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`networkName` TEXT NOT NULL, `domainVisited` TEXT NOT NULL, PRIMARY KEY(`networkName`, `domainVisited`))",
         "fields": [
           {
-            "fieldPath": "key",
-            "columnName": "key",
+            "fieldPath": "networkName",
+            "columnName": "networkName",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "appConfigurationDownloaded",
-            "columnName": "appConfigurationDownloaded",
-            "affinity": "INTEGER",
+            "fieldPath": "domainVisited",
+            "columnName": "domainVisited",
+            "affinity": "TEXT",
             "notNull": true
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "key"
+            "networkName",
+            "domainVisited"
           ],
           "autoGenerate": false
         },
@@ -91,7 +92,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"5eb935d329cfa2ca8a2e77a0a040c71e\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"edcb0f51325e54c85c931334898d7916\")"
     ]
   }
 }

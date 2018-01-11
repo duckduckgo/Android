@@ -16,13 +16,19 @@
 
 package com.duckduckgo.app.privacymonitor.ui
 
+import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
+import android.support.annotation.VisibleForTesting
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
+import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
+import com.duckduckgo.app.privacymonitor.db.NetworkPercent
 import com.duckduckgo.app.privacymonitor.model.*
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
 
-class PrivacyDashboardViewModel(private val settingsStore: PrivacySettingsStore) : ViewModel() {
+class PrivacyDashboardViewModel(private val settingsStore: PrivacySettingsStore,
+                                networkLeaderboardDao: NetworkLeaderboardDao) : ViewModel() {
 
     data class ViewState(
             val domain: String,
@@ -32,19 +38,55 @@ class PrivacyDashboardViewModel(private val settingsStore: PrivacySettingsStore)
             val networkCount: Int,
             val allTrackersBlocked: Boolean,
             val practices: TermsOfService.Practices,
-            val toggleEnabled: Boolean
+            val toggleEnabled: Boolean,
+            val showNetworkTrackerSummary: Boolean,
+            val networkTrackerSummaryName1: String?,
+            val networkTrackerSummaryName2: String?,
+            val networkTrackerSummaryName3: String?,
+            val networkTrackerSummaryPercent1: Float,
+            val networkTrackerSummaryPercent2: Float,
+            val networkTrackerSummaryPercent3: Float
     )
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
+
+    private val networkPercentsData: LiveData<Array<NetworkPercent>> = networkLeaderboardDao.networkPercents()
+    private val networkPercentsObserver = Observer<Array<NetworkPercent>> { onNetworkPercentsChanged(it!!) }
     private val privacyInitiallyOn = settingsStore.privacyOn
+
     private var monitor: PrivacyMonitor? = null
 
     init {
         resetViewState()
+        networkPercentsData.observeForever(networkPercentsObserver)
+    }
+
+    @VisibleForTesting
+    override public fun onCleared() {
+        super.onCleared()
+        networkPercentsData.removeObserver(networkPercentsObserver)
     }
 
     val shouldReloadPage: Boolean
         get() = privacyInitiallyOn != settingsStore.privacyOn
+
+    fun onNetworkPercentsChanged(networkPercents: Array<NetworkPercent>) {
+
+        val enoughNetworksDetected = networkPercents.size >= 3
+        val enoughDomainsVisited = enoughNetworksDetected && networkPercents[0].totalDomainsVisited > 10
+        val showSummary = enoughDomainsVisited && enoughNetworksDetected
+
+        viewState.value = viewState.value?.copy(
+                showNetworkTrackerSummary = enoughNetworksDetected && enoughDomainsVisited,
+                networkTrackerSummaryName1 = if (showSummary) networkPercents[0].networkName else null,
+                networkTrackerSummaryName2 = if (showSummary) networkPercents[1].networkName else null,
+                networkTrackerSummaryName3 = if (showSummary) networkPercents[2].networkName else null,
+                networkTrackerSummaryPercent1 = if (showSummary) networkPercents[0].percent else 0.0f,
+                networkTrackerSummaryPercent2 = if (showSummary) networkPercents[1].percent else 0.0f,
+                networkTrackerSummaryPercent3 = if (showSummary) networkPercents[2].percent else 0.0f
+        )
+
+    }
 
     fun onPrivacyMonitorChanged(monitor: PrivacyMonitor?) {
         this.monitor = monitor
@@ -63,8 +105,15 @@ class PrivacyDashboardViewModel(private val settingsStore: PrivacySettingsStore)
                 httpsStatus = HttpsStatus.SECURE,
                 networkCount = 0,
                 allTrackersBlocked = true,
+                toggleEnabled = settingsStore.privacyOn,
                 practices = TermsOfService.Practices.UNKNOWN,
-                toggleEnabled = settingsStore.privacyOn
+                showNetworkTrackerSummary = false,
+                networkTrackerSummaryName1 = null,
+                networkTrackerSummaryName2 = null,
+                networkTrackerSummaryName3 = null,
+                networkTrackerSummaryPercent1 = 0f,
+                networkTrackerSummaryPercent2 = 0f,
+                networkTrackerSummaryPercent3 = 0f
         )
     }
 
