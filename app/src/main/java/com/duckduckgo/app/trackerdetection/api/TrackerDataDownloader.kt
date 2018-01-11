@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection.api
 
+import com.duckduckgo.app.global.api.isCached
 import com.duckduckgo.app.trackerdetection.AdBlockClient
 import com.duckduckgo.app.trackerdetection.Client
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
@@ -34,10 +35,7 @@ class TrackerDataDownloader @Inject constructor(
         private val trackerDataLoader: TrackerDataLoader,
         private val trackerDataDao: TrackerDataDao) {
 
-    // this should run on every sync
     fun downloadList(clientName: Client.ClientName): Completable {
-
-        Timber.i("Downloading tracker data: ${clientName.name}")
 
         return when (clientName) {
             DISCONNECT -> disconnectDownload()
@@ -47,41 +45,51 @@ class TrackerDataDownloader @Inject constructor(
 
     private fun disconnectDownload(): Completable {
 
-        return Completable.fromAction({
+        return Completable.fromAction {
+
+            Timber.i("Downloading disconnect data")
+
             val call = trackerListService.disconnect()
             val response = call.execute()
-            if (response.isSuccessful) {
-                Timber.d("Got disconnect response from server")
-                val body = response.body()!!
 
+            if (response.isCached && trackerDataDao.count() != 0) {
+                Timber.i("Disconnect data already cached and stored")
+                return@fromAction
+            }
+
+            if (response.isSuccessful) {
+                Timber.d("Updating disconnect data from server")
+                val body = response.body()!!
                 trackerDataDao.insertAll(body.trackers)
                 trackerDataLoader.loadDisconnectData()
             } else {
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
-        })
+        }
     }
 
     private fun easyDownload(clientName: Client.ClientName): Completable {
-        return Completable.fromAction({
+        return Completable.fromAction {
+
+            Timber.i("Downloading ${clientName.name} data")
             val call = trackerListService.list(clientName.name.toLowerCase())
             val response = call.execute()
 
+            if (response.isCached && trackerDataStore.hasData(clientName)) {
+                Timber.i("${clientName.name} data already cached and stored")
+                return@fromAction
+            }
+
             if (response.isSuccessful) {
                 val bodyBytes = response.body()!!.bytes()
-
-                val cachedResponse = response.raw().cacheResponse()
-                if (cachedResponse != null) {
-                    Timber.i("Re-using tracker data from cache")
-                } else {
-                    Timber.i("Response not from cache; updating data store with new data")
-                    persistTrackerData(clientName, bodyBytes)
-                    trackerDataLoader.loadAdblockData(clientName)
-                }
+                Timber.i("Updating ${clientName.name} data store with new data")
+                persistTrackerData(clientName, bodyBytes)
+                trackerDataLoader.loadAdblockData(clientName)
+                return@fromAction
             } else {
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
-        })
+        }
     }
 
     private fun persistTrackerData(clientName: Client.ClientName, bodyBytes: ByteArray) {
