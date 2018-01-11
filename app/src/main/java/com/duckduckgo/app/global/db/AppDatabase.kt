@@ -20,16 +20,20 @@ import android.arch.persistence.room.Database
 import android.arch.persistence.room.RoomDatabase
 import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomain
 import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
+import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
+import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 
-@Database(exportSchema = true, version = 2, entities = [
+@Database(exportSchema = true, version = 3, entities = [
     HttpsUpgradeDomain::class,
-    DisconnectTracker::class
+    DisconnectTracker::class,
+    NetworkLeaderboardEntry::class
 ])
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun httpsUpgradeDomainDao(): HttpsUpgradeDomainDao
     abstract fun trackerDataDao(): TrackerDataDao
+    abstract fun networkLeaderboardDao(): NetworkLeaderboardDao
 
 }

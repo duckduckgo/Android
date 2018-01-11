@@ -17,18 +17,19 @@
 package com.duckduckgo.app.privacymonitor.ui
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
+import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Observer
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
+import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
+import com.duckduckgo.app.privacymonitor.db.NetworkPercent
 import com.duckduckgo.app.privacymonitor.model.HttpsStatus
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
-import org.junit.After
+import org.junit.*
 import org.junit.Assert.*
-import org.junit.Rule
-import org.junit.Test
 
 class PrivacyDashboardViewModelTest {
 
@@ -38,16 +39,54 @@ class PrivacyDashboardViewModelTest {
 
     private var viewStateObserver: Observer<PrivacyDashboardViewModel.ViewState> = mock()
     private var settingStore: PrivacySettingsStore = mock()
+    private var networkLeaderboard: NetworkLeaderboardDao = mock()
+    private var networkPercentsLiveData: LiveData<Array<NetworkPercent>> = mock()
 
     private val testee: PrivacyDashboardViewModel by lazy {
-        val model = PrivacyDashboardViewModel(settingStore)
+        val model = PrivacyDashboardViewModel(settingStore, networkLeaderboard)
         model.viewState.observeForever(viewStateObserver)
         model
+    }
+
+    @Before
+    fun before() {
+        whenever(networkPercentsLiveData.value).thenReturn(emptyArray())
+        whenever(networkLeaderboard.networkPercents()).thenReturn(networkPercentsLiveData)
     }
 
     @After
     fun after() {
         testee.viewState.removeObserver(viewStateObserver)
+        testee.onCleared()
+    }
+
+    @Test
+    fun whenNetworkLeaderboardDataAvailableViewStateUsesIt() {
+        testee.onNetworkPercentsChanged(arrayOf(
+                NetworkPercent("Network1", 1.0f, 20),
+                NetworkPercent("Network2", 2.0f, 20),
+                NetworkPercent("Network3", 3.0f, 20)))
+
+        val viewState = testee.viewState.value!!
+        assertEquals("Network1", viewState.networkTrackerSummaryName1)
+        assertEquals("Network2", viewState.networkTrackerSummaryName2)
+        assertEquals("Network3", viewState.networkTrackerSummaryName3)
+        assertEquals(1.0f, viewState.networkTrackerSummaryPercent1)
+        assertEquals(2.0f, viewState.networkTrackerSummaryPercent2)
+        assertEquals(3.0f, viewState.networkTrackerSummaryPercent3)
+    }
+
+    @Test
+    fun whenNoDataNetworkLeaderboardViewStateIsDefault() {
+        testee.onNetworkPercentsChanged(emptyArray())
+
+        val viewState = testee.viewState.value!!
+        assertNull(viewState.networkTrackerSummaryName1)
+        assertNull(viewState.networkTrackerSummaryName2)
+        assertNull(viewState.networkTrackerSummaryName3)
+        assertEquals(0.0f, viewState.networkTrackerSummaryPercent1)
+        assertEquals(0.0f, viewState.networkTrackerSummaryPercent2)
+        assertEquals(0.0f, viewState.networkTrackerSummaryPercent3)
     }
 
     @Test
@@ -144,4 +183,5 @@ class PrivacyDashboardViewModelTest {
         whenever(monitor.termsOfService).thenReturn(terms)
         return monitor
     }
+
 }

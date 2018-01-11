@@ -17,6 +17,8 @@
 package com.duckduckgo.app.browser
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
+import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.net.Uri
 import com.duckduckgo.app.browser.BrowserViewModel.Command
@@ -24,9 +26,13 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command.LandingPage
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.StringResolver
+import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
+import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardEntry
+import com.duckduckgo.app.privacymonitor.db.NetworkPercent
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
+import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.nhaarman.mockito_kotlin.mock
@@ -37,8 +43,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers
-import org.mockito.Mockito.never
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.*
 
 class BrowserViewModelTest {
 
@@ -46,11 +51,21 @@ class BrowserViewModelTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private lateinit var queryObserver: Observer<String>
-    private lateinit var navigationObserver: Observer<Command>
-    private lateinit var termsOfServiceStore: TermsOfServiceStore
-    private lateinit var mockStringResolver: StringResolver
-    private lateinit var testee: BrowserViewModel
+    private var lastEntry: NetworkLeaderboardEntry? = null
+
+    private val queryObserver: Observer<String> = mock()
+    private val navigationObserver: Observer<Command> = mock()
+    private val termsOfServiceStore: TermsOfServiceStore = mock()
+
+    private val testStringResolver: StringResolver = object : StringResolver {
+        override fun getString(stringId: Int): String = ""
+        override fun getString(stringId: Int, vararg formatArgs: Any): String = ""
+    }
+
+    private val testNetworkLeaderboardDao: NetworkLeaderboardDao = object : NetworkLeaderboardDao {
+        override fun insert(leaderboardEntry: NetworkLeaderboardEntry) { lastEntry = leaderboardEntry }
+        override fun networkPercents(): LiveData<Array<NetworkPercent>> { return MutableLiveData<Array<NetworkPercent>>() }
+    }
 
     private val testOmnibarConverter: OmnibarEntryConverter = object : OmnibarEntryConverter {
         override fun convertUri(input: String): String = "duckduckgo.com"
@@ -58,16 +73,18 @@ class BrowserViewModelTest {
         override fun convertQueryToUri(inputQuery: String): Uri = Uri.parse("duckduckgo.com")
     }
 
+    private lateinit var testee: BrowserViewModel
+
     @Before
     fun before() {
-        mockStringResolver = mock()
-        queryObserver = mock()
-        navigationObserver = mock()
-        termsOfServiceStore = mock()
-        testee = BrowserViewModel(testOmnibarConverter, DuckDuckGoUrlDetector(), termsOfServiceStore, TrackerNetworks(), PrivacyMonitorRepository(), object : StringResolver {
-            override fun getString(stringId: Int): String = ""
-            override fun getString(stringId: Int, vararg formatArgs: Any): String = ""
-        }, SpecialUrlDetector())
+        testee = BrowserViewModel(
+                testOmnibarConverter,
+                DuckDuckGoUrlDetector(),
+                termsOfServiceStore,
+                TrackerNetworks(),
+                PrivacyMonitorRepository(),
+                testStringResolver,
+                testNetworkLeaderboardDao)
         testee.url.observeForever(queryObserver)
         testee.command.observeForever(navigationObserver)
     }
@@ -76,6 +93,14 @@ class BrowserViewModelTest {
     fun after() {
         testee.url.removeObserver(queryObserver)
         testee.command.removeObserver(navigationObserver)
+    }
+
+    @Test
+    fun whenTrackerDetectedThenNetworkLeaderbardUpdated() {
+        testee.trackerDetected(TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", TrackerNetwork("Network1", "www.tracker.com"), false))
+        assertNotNull(lastEntry)
+        assertEquals(lastEntry!!.domainVisited, "www.example.com")
+        assertEquals(lastEntry!!.networkName, "Network1")
     }
 
     @Test

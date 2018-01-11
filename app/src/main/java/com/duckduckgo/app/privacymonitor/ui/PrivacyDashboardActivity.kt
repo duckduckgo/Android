@@ -118,6 +118,14 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         practicesIcon.setImageResource(viewState.practices.icon())
         practicesText.text = viewState.practices.text(this)
         renderToggle(viewState.toggleEnabled)
+        networkTrackerSummaryNotReady.visibility = if (viewState.showNetworkTrackerSummary) View.GONE else View.VISIBLE
+        networkTrackerSummaryHeader.visibility = if (viewState.showNetworkTrackerSummary) View.VISIBLE else View.GONE
+        networkTrackerSummaryPill1.visibility = if (viewState.showNetworkTrackerSummary) View.VISIBLE else View.GONE
+        networkTrackerSummaryPill2.visibility = if (viewState.showNetworkTrackerSummary) View.VISIBLE else View.GONE
+        networkTrackerSummaryPill3.visibility = if (viewState.showNetworkTrackerSummary) View.VISIBLE else View.GONE
+        networkTrackerSummaryPill1.render(viewState.networkTrackerSummaryName1, viewState.networkTrackerSummaryPercent1)
+        networkTrackerSummaryPill2.render(viewState.networkTrackerSummaryName2, viewState.networkTrackerSummaryPercent2)
+        networkTrackerSummaryPill3.render(viewState.networkTrackerSummaryName3, viewState.networkTrackerSummaryPercent3)
     }
 
     private fun renderToggle(enabled: Boolean) {
