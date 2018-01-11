@@ -38,18 +38,18 @@ class AdBlockClient(override val name: ClientName) : Client {
 
     fun loadBasicData(data: ByteArray) {
         val timestamp = System.currentTimeMillis()
-        Timber.d("Loading basic data")
+        Timber.d("Loading basic data for ${name.name}")
         rawDataPointer = loadBasicData(nativeClientPointer, data)
-        Timber.d("Loading completed in ${System.currentTimeMillis() - timestamp}ms")
+        Timber.d("Loading basic data for ${name.name} completed in ${System.currentTimeMillis() - timestamp}ms")
     }
 
     private external fun loadBasicData(clientPointer: Long, data: ByteArray): Long
 
     fun loadProcessedData(data: ByteArray) {
         val timestamp = System.currentTimeMillis()
-        Timber.d("Loading preprocessed data")
+        Timber.d("Loading preprocessed data for ${name.name}")
         processedDataPointer = loadProcessedData(nativeClientPointer, data)
-        Timber.d("Loading completed in ${System.currentTimeMillis() - timestamp}ms")
+        Timber.d("Loading preprocessed data for ${name.name} completed in ${System.currentTimeMillis() - timestamp}ms")
     }
 
     private external fun loadProcessedData(clientPointer: Long, data: ByteArray): Long
