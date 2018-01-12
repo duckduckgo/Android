@@ -42,7 +42,7 @@
         </activity>
 
         <activity
-            android:name="com.duckduckgo.app.onboarding.OnboardingActivity"
+            android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivity"
             android:label="@string/privacyDashboardActivityTitle"
             android:parentActivityName="com.duckduckgo.app.home.HomeActivity"
             android:screenOrientation="fullSensor">

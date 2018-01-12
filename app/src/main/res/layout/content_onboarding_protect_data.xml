@@ -24,7 +24,7 @@
     android:paddingEnd="44dp"
     android:paddingStart="44dp"
     tools:background="@color/lighMuddyGreen"
-    tools:context="com.duckduckgo.app.onboarding.OnboardingActivity">
+    tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,12 +38,14 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="80dp"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            tools:ignore="UselessParent">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:importantForAccessibility="no"
                 android:paddingTop="20dp"
                 android:src="@drawable/onboarding_image_protect_data" />
 
@@ -81,7 +83,8 @@
         android:layout_marginBottom="20dp"
         android:background="@color/muddyGreen"
         android:elevation="0dp"
-        android:text="Continue"
+        android:onClick="onContinueClicked"
+        android:text="@string/onboardingContinue"
         android:textAllCaps="false"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent" />

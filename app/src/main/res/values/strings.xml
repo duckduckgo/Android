@@ -11,6 +11,7 @@
     <string name="onboardingNoTraceTitle">Leave No Trace</string>
     <string name="onboardingNoTraceDescription1">Tap the Fire Button to erase your tabs and browsing history.</string>
     <string name="onboardingNoTraceDescription2">Your data is toast!</string>
+    <string name="onboardingContinue">Continue</string>
 
 
     <!-- Browser Activity -->

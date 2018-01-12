@@ -22,6 +22,8 @@ import com.duckduckgo.app.browser.BrowserViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.SpecialUrlDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
+import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsSharedPreferences
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
@@ -36,6 +38,7 @@ import javax.inject.Inject
 
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory @Inject constructor(
+        private val onboaringStore: OnboardingStore,
         private val queryUrlConverter: QueryUrlConverter,
         private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
         private val privacyMonitorRepository: PrivacyMonitorRepository,
@@ -49,6 +52,7 @@ class ViewModelFactory @Inject constructor(
     override fun <T : ViewModel> create(modelClass: Class<T>) =
             with(modelClass) {
                 when {
+                    isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore)
                     isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, duckDuckGoUrlDetector, termsOfServiceStore, trackerNetworks, privacyMonitorRepository, stringResolver, specialUrlDetector)
                     isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(privacySettingsStore)
                     isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)

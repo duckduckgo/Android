@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.home
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.ActivityOptionsCompat
@@ -33,6 +34,16 @@ import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
 
 class HomeActivity : AppCompatActivity() {
+
+    companion object {
+
+        private const val SETTINGS_REQUEST_CODE = 100
+
+        fun intent(context: Context): Intent {
+            return Intent(context, HomeActivity::class.java)
+        }
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,9 +118,4 @@ class HomeActivity : AppCompatActivity() {
             }
         }
     }
-
-    companion object {
-        private const val SETTINGS_REQUEST_CODE = 100
-    }
-
 }

@@ -14,26 +14,32 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboarding
+package com.duckduckgo.app.onboarding.ui
 
 import android.annotation.SuppressLint
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.annotation.ColorInt
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager.OnPageChangeListener
-import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.ColorCombiner
+import com.duckduckgo.app.home.HomeActivity
 import kotlinx.android.synthetic.main.activity_onboarding.*
+import javax.inject.Inject
 
 
-class OnboardingActivity : AppCompatActivity() {
+class OnboardingActivity : DuckDuckGoActivity() {
 
+    @Inject lateinit var viewModelFactory: ViewModelFactory
     private val colorCombiner = ColorCombiner()
 
     companion object {
@@ -45,11 +51,39 @@ class OnboardingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_onboarding)
         configurePager()
+
+        viewModel.viewState.observe(this, Observer<OnboardingViewModel.ViewState> {
+            it?.let { render(it) }
+        })
+    }
+
+    private val viewModel: OnboardingViewModel by lazy {
+        ViewModelProviders.of(this, viewModelFactory).get(OnboardingViewModel::class.java)
     }
 
     override fun onResume() {
         refreshPageColor()
         super.onResume()
+    }
+
+    private fun render(viewState: OnboardingViewModel.ViewState) {
+        if (viewState.showHome) {
+            showHome()
+        }
+    }
+
+    fun onContinueClicked(view: View) {
+        val next = viewPager.currentItem + 1
+        if (next < viewPager.adapter!!.count) {
+            viewPager.currentItem = next
+        } else {
+            viewModel.onOnboardingDone()
+        }
+    }
+
+    private fun showHome() {
+        startActivity(HomeActivity.intent(this))
+        finish()
     }
 
     private fun configurePager() {
@@ -75,7 +109,7 @@ class OnboardingActivity : AppCompatActivity() {
     @SuppressLint("NewApi")
     private fun refreshPageColor() {
         val resource = if (viewPager.currentItem == 0) firstColor else secondColor
-        updateColor(getColor(resource))
+        updateColor(resources.getColor(resource))
     }
 
     @SuppressLint("NewApi")
@@ -91,7 +125,6 @@ class OnboardingActivity : AppCompatActivity() {
     }
 
     class PagerAdapter(fragmentManager: FragmentManager) : FragmentPagerAdapter(fragmentManager) {
-
         companion object {
             val pageCount = 2
         }
@@ -101,10 +134,10 @@ class OnboardingActivity : AppCompatActivity() {
         }
 
         override fun getItem(position: Int): android.support.v4.app.Fragment? {
-            when (position) {
-                0 -> return ProtectDataPage()
-                1 -> return NoTracePage()
-                else -> return null
+            return when (position) {
+                0 -> ProtectDataPage()
+                1 -> NoTracePage()
+                else -> null
             }
         }
     }
