@@ -91,15 +91,21 @@
     </style>
 
     <style name="SettingsContentLabel">
-        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginTop">28dp</item>
+        <item name="android:layout_marginTop">24dp</item>
         <item name="android:layout_marginEnd">20dp</item>
         <item name="android:layout_marginStart">20dp</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">17sp</item>
         <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="SettingsContentLabelClickable" parent="SettingsContentLabel">
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
     <style name="SettingsContentValue">
