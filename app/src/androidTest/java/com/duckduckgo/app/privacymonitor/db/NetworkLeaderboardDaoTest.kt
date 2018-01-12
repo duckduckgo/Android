@@ -20,8 +20,10 @@ import android.arch.persistence.room.Room
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.global.db.AppDatabase
-import org.junit.*
-import org.junit.Assert.*
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Test
 
 class NetworkLeaderboardDaoTest {
 

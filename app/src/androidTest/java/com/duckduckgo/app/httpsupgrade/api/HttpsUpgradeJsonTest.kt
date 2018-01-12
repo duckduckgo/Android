@@ -16,29 +16,33 @@
 
 package com.duckduckgo.app.httpsupgrade.api
 
+import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomain
+import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import org.junit.Assert.assertEquals
 import org.junit.Test
-
 
 class HttpsUpgradeJsonTest {
 
     @Test
     fun whenGivenValidJsonThenParsesCorrectly() {
         val moshi = Moshi.Builder().add(HttpsUpgradeDomainFromStringAdapter()).build()
-        val adapter = moshi.adapter(HttpsUpgradeJson::class.java)
+        val type = Types.newParameterizedType(List::class.java, HttpsUpgradeDomain::class.java)
+        val adapter: JsonAdapter<List<HttpsUpgradeDomain>> = moshi.adapter(type)
+
         val list = adapter.fromJson(json())
-        assertEquals(5, list.simpleUpgrade.top500.count())
+        assertEquals(5, list.count())
     }
 
     private fun json() : String = """
-        { "simpleUpgrade" : { "top500": [
+        [
             "1337x.to",
             "1688.com",
             "2ch.net",
             "adobe.com",
             "alibaba.com"
-        ]}}
+        ]
     """
 
 }

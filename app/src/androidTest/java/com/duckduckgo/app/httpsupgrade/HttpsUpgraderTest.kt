@@ -19,6 +19,7 @@ package com.duckduckgo.app.httpsupgrade
 import android.net.Uri
 import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
 import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Assert.*
 import org.junit.Before
@@ -36,6 +37,20 @@ class HttpsUpgraderTest {
     }
 
     @Test
+    fun whenMixedCaseDomainIsASubdominOfAWildCardInTheDatabaseThenShouldUpgrade() {
+        whenever(mockDao.hasDomain("www.example.com")).thenReturn(false)
+        whenever(mockDao.hasDomain("*.example.com")).thenReturn(true)
+        assertTrue(testee.shouldUpgrade(Uri.parse("http://www.EXAMPLE.com")))
+        verify(mockDao).hasDomain("*.example.com")
+    }
+    
+    @Test
+    fun whenMixedCaseUriIsHttpAndInUpgradeListThenShouldUpgrade() {
+        whenever(mockDao.hasDomain("www.example.com")).thenReturn(true)
+        assertTrue(testee.shouldUpgrade(Uri.parse("http://www.EXAMPLE.com")))
+    }
+
+    @Test
     fun whenGivenUriItIsUpgradedToHttps() {
         val input = Uri.parse("http://www.example.com/some/path/to/a/file.txt")
         val expected = Uri.parse("https://www.example.com/some/path/to/a/file.txt")
@@ -43,8 +58,16 @@ class HttpsUpgraderTest {
     }
 
     @Test
+    fun whenDomainIsASubdominOfAWildCardInTheDatabaseThenShouldUpgrade() {
+        whenever(mockDao.hasDomain("www.example.com")).thenReturn(false)
+        whenever(mockDao.hasDomain("*.example.com")).thenReturn(true)
+        assertTrue(testee.shouldUpgrade(Uri.parse("http://www.example.com")))
+        verify(mockDao).hasDomain("*.example.com")
+    }
+
+    @Test
     fun whenUriIsHttpAndInUpgradeListThenShouldUpgrade() {
-        whenever(mockDao.contains("www.example.com")).thenReturn(true)
+        whenever(mockDao.hasDomain("www.example.com")).thenReturn(true)
         assertTrue(testee.shouldUpgrade(Uri.parse("http://www.example.com")))
     }
 

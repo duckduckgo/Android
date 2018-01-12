@@ -17,11 +17,12 @@
 package com.duckduckgo.app.di
 
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeDomainFromStringAdapter
-import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeJson
+import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomain
 import com.duckduckgo.app.privacymonitor.api.TermsOfServiceListAdapter
 import com.duckduckgo.app.trackerdetection.api.DisconnectListJsonAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -38,8 +39,9 @@ class JsonModule {
             .build()
 
     @Provides
-    fun httpsUpgradeDomainAdapter(moshi: Moshi): JsonAdapter<HttpsUpgradeJson> {
-        return moshi.adapter(HttpsUpgradeJson::class.java)
+    fun httpsUpgradeDomainAdapter(moshi: Moshi): JsonAdapter<List<HttpsUpgradeDomain>> {
+        val type = Types.newParameterizedType(List::class.java, HttpsUpgradeDomain::class.java)
+        return moshi.adapter(type)
     }
 
 }

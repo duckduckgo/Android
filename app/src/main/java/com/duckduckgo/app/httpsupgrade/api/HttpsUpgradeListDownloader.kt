@@ -24,7 +24,6 @@ import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 
-
 class HttpsUpgradeListDownloader @Inject constructor(
         private val service: HttpsUpgradeListService,
         private val database: AppDatabase,
@@ -46,7 +45,7 @@ class HttpsUpgradeListDownloader @Inject constructor(
 
             if (response.isSuccessful) {
                 Timber.d("Updating HTTPS upgrade list from server")
-                val domains = response.body()!!.simpleUpgrade.top500.toTypedArray()
+                val domains = response.body()!!.toTypedArray()
                 database.runInTransaction {
                     httpsUpgradeDao.deleteAll()
                     httpsUpgradeDao.insertAll(*domains)
