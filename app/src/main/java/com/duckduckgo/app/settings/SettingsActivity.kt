@@ -20,12 +20,14 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity.Companion.RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.view.launchExternalActivity
 import kotlinx.android.synthetic.main.activity_settings.*
 import kotlinx.android.synthetic.main.content_settings.*
 import javax.inject.Inject
@@ -51,12 +53,19 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         about.setOnClickListener { startActivityForResult(AboutDuckDuckGoActivity.intent(this), REQUEST_CODE_ABOUT_DDG) }
+        provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
     }
 
     private fun observeViewModel() {
         viewModel.viewState.observe(this, Observer<SettingsViewModel.ViewState> { viewState ->
             viewState?.let {
                 version.text = it.version
+            }
+        })
+
+        viewModel.command.observe(this, Observer {
+            when(it) {
+                is SettingsViewModel.Command.SendEmail -> provideEmailFeedback(it.emailUri)
             }
         })
     }
@@ -71,6 +80,12 @@ class SettingsActivity : DuckDuckGoActivity() {
             setResult(resultCode)
             finish()
         }
+    }
+
+    private fun provideEmailFeedback(emailUri: Uri) {
+        val intent = Intent(Intent.ACTION_SENDTO)
+        intent.data = emailUri
+        launchExternalActivity(intent)
     }
 
     companion object {

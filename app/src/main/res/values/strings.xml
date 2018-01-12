@@ -5,6 +5,15 @@
 
     <string name="privacyDashboard">Privacy Dashboard</string>
 
+    <!-- Onboarding Activity -->
+    <string name="onboardingProtectDataTitle">Protect Your Data</string>
+    <string name="onboardingProtectDataDescription">Tap the Privacy Grade to reveal who we caught trying to track you.\n</string>
+    <string name="onboardingNoTraceTitle">Leave No Trace</string>
+    <string name="onboardingNoTraceDescription1">Tap the Fire Button to erase your tabs and browsing history.</string>
+    <string name="onboardingNoTraceDescription2">Your data is toast!</string>
+    <string name="onboardingContinue">Continue</string>
+
+
     <!-- Browser Activity -->
     <string name="refresh">Refresh</string>
     <string name="back">Back</string>
@@ -86,6 +95,9 @@
     <string name="settingsMenuItemTitle">Settings</string>
     <string name="settingsVersion">Version</string>
     <string name="aboutDuckduckgo">About DuckDuckGo</string>
+    <string name="leaveFeedback">Leave Feedback</string>
+    <string name="feedbackEmailAddress">android@duckduckgo.com</string>
+    <string name="feedbackSubject">DuckDuckGo Android Feedback</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">About us</string>

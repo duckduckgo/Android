@@ -127,14 +127,6 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun launchExternalActivity(intent: Intent) {
-        if (intent.resolveActivity(packageManager) != null) {
-            startActivity(intent)
-        } else {
-            Toast.makeText(this, R.string.no_compatible_third_party_app_installed, Toast.LENGTH_SHORT).show()
-        }
-    }
-
     private fun consumeSharedTextExtra() {
         val sharedText = intent.getStringExtra(SHARED_TEXT_EXTRA)
         if (sharedText != null) {

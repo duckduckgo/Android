@@ -43,7 +43,6 @@ interface AppConfigurationDao {
 
 @Entity(tableName = "app_configuration")
 data class AppConfigurationEntity(
-
         @PrimaryKey val key: String = KEY,
         val appConfigurationDownloaded: Boolean
 
