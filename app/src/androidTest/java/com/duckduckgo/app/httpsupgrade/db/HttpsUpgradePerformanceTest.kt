@@ -33,6 +33,7 @@ package com.duckduckgo.app.httpsupgrade.db
  */
 
 import android.arch.persistence.room.Room
+import android.content.Context
 import android.net.Uri
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
@@ -47,15 +48,13 @@ import timber.log.Timber
 @Ignore("Can run slow due to amount of data")
 class HttpsUpgraderPerformanceTest {
 
-    val context = InstrumentationRegistry.getContext()
-
     lateinit var dao: HttpsUpgradeDomainDao
     lateinit var httpsUpgrader: HttpsUpgrader
     lateinit var db: AppDatabase
 
     @Before
     fun setup() {
-        db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java).build()
         dao = db.httpsUpgradeDomainDao()
         httpsUpgrader = HttpsUpgrader(dao)
     }
