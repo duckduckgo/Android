@@ -18,6 +18,7 @@ package com.duckduckgo.app.di
 
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.job.AppConfigurationJobService
+import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity
 import com.duckduckgo.app.privacymonitor.ui.ScorecardActivity
@@ -31,6 +32,10 @@ import dagger.android.ContributesAndroidInjector
 abstract class AndroidBindingModule {
 
     /* Activities */
+
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun onboardingActivity(): OnboardingActivity
 
     @ActivityScoped
     @ContributesAndroidInjector
