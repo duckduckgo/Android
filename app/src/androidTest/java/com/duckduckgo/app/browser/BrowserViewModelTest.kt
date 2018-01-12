@@ -23,6 +23,7 @@ import android.arch.lifecycle.Observer
 import android.arch.persistence.room.Room
 import android.net.Uri
 import android.support.test.InstrumentationRegistry
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.LandingPage
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
@@ -40,7 +41,6 @@ import com.duckduckgo.app.settings.db.AppConfigurationEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.nhaarman.mockito_kotlin.mock
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -48,8 +48,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers
+import org.mockito.Mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
+import org.mockito.MockitoAnnotations
 
 class BrowserViewModelTest {
 
@@ -73,10 +75,19 @@ class BrowserViewModelTest {
             return MutableLiveData<Array<NetworkPercent>>()
         }
     }
-    private lateinit var queryObserver: Observer<String>
-    private lateinit var navigationObserver: Observer<Command>
-    private lateinit var termsOfServiceStore: TermsOfServiceStore
-    private lateinit var mockStringResolver: StringResolver
+
+    @Mock
+    lateinit var mockQueryObserver: Observer<String>
+
+    @Mock
+    lateinit var mockNavigationObserver: Observer<Command>
+
+    @Mock
+    lateinit var mockTermsOfServiceStore: TermsOfServiceStore
+
+    @Mock
+    lateinit var mockAutoCompleteApi: AutoCompleteApi
+
     private lateinit var db: AppDatabase
     private lateinit var appConfigurationDao: AppConfigurationDao
 
@@ -90,35 +101,34 @@ class BrowserViewModelTest {
 
     @Before
     fun before() {
+        MockitoAnnotations.initMocks(this)
+
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java)
                 .allowMainThreadQueries()
                 .build()
         appConfigurationDao = db.appConfigurationDao()
 
-        mockStringResolver = mock()
-        queryObserver = mock()
-        navigationObserver = mock()
-        termsOfServiceStore = mock()
-
         testee = BrowserViewModel(
-                testOmnibarConverter,
-                DuckDuckGoUrlDetector(),
-                termsOfServiceStore,
-                TrackerNetworks(),
-                PrivacyMonitorRepository(),
-                testStringResolver,
-                testNetworkLeaderboardDao, appConfigurationDao)
+                queryUrlConverter = testOmnibarConverter,
+                duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
+                termsOfServiceStore = mockTermsOfServiceStore,
+                trackerNetworks = TrackerNetworks(),
+                privacyMonitorRepository = PrivacyMonitorRepository(),
+                stringResolver = testStringResolver,
+                networkLeaderboardDao = testNetworkLeaderboardDao,
+                autoCompleteApi = mockAutoCompleteApi,
+                appConfigurationDao = appConfigurationDao)
 
-        testee.url.observeForever(queryObserver)
-        testee.command.observeForever(navigationObserver)
+        testee.url.observeForever(mockQueryObserver)
+        testee.command.observeForever(mockNavigationObserver)
     }
 
     @After
     fun after() {
         testee.onCleared()
         db.close()
-        testee.url.removeObserver(queryObserver)
-        testee.command.removeObserver(navigationObserver)
+        testee.url.removeObserver(mockQueryObserver)
+        testee.command.removeObserver(mockNavigationObserver)
     }
 
     @Test
@@ -132,19 +142,19 @@ class BrowserViewModelTest {
     @Test
     fun whenEmptyInputQueryThenNoQueryMadeAvailableToActivity() {
         testee.onUserSubmittedQuery("")
-        verify(queryObserver, never()).onChanged(ArgumentMatchers.anyString())
+        verify(mockQueryObserver, never()).onChanged(ArgumentMatchers.anyString())
     }
 
     @Test
     fun whenBlankInputQueryThenNoQueryMadeAvailableToActivity() {
         testee.onUserSubmittedQuery("     ")
-        verify(queryObserver, never()).onChanged(ArgumentMatchers.anyString())
+        verify(mockQueryObserver, never()).onChanged(ArgumentMatchers.anyString())
     }
 
     @Test
     fun whenNonEmptyInputThenQueryMadeAvailableToActivity() {
         testee.onUserSubmittedQuery("foo")
-        verify(queryObserver).onChanged(ArgumentMatchers.anyString())
+        verify(mockQueryObserver).onChanged(ArgumentMatchers.anyString())
     }
 
     @Test
@@ -204,7 +214,7 @@ class BrowserViewModelTest {
     fun whenSharedTextReceivedThenNavigationTriggered() {
         testee.onSharedTextReceived("http://example.com")
         val captor: ArgumentCaptor<Command> = ArgumentCaptor.forClass(Command::class.java)
-        verify(navigationObserver).onChanged(captor.capture())
+        verify(mockNavigationObserver).onChanged(captor.capture())
         assertNotNull(captor.value)
         assertTrue(captor.value is Navigate)
     }
@@ -224,13 +234,13 @@ class BrowserViewModelTest {
     @Test
     fun whenUserDismissesKeyboardBeforeBrowserShownThenShouldNavigateToLandingPage() {
         testee.userDismissedKeyboard()
-        verify(navigationObserver).onChanged(ArgumentMatchers.any(LandingPage::class.java))
+        verify(mockNavigationObserver).onChanged(ArgumentMatchers.any(LandingPage::class.java))
     }
 
     @Test
     fun whenUserDismissesKeyboardAfterBrowserShownThenShouldNotNavigateToLandingPage() {
         testee.urlChanged("")
-        verify(navigationObserver, never()).onChanged(ArgumentMatchers.any(LandingPage::class.java))
+        verify(mockNavigationObserver, never()).onChanged(ArgumentMatchers.any(LandingPage::class.java))
     }
 
     @Test
