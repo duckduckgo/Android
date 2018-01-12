@@ -83,7 +83,7 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     private fun onBindHeader(holder: HeaderViewHolder, viewElement: Header) {
-        val iconResource = networkRenderer.networkPillIcon(holder.icon.context, viewElement.networkName)
+        val iconResource = networkRenderer.networkLogoIcon(holder.icon.context, viewElement.networkName)
         if (iconResource != null) {
             holder.icon.setImageResource(iconResource)
         }

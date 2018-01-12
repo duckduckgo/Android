@@ -82,6 +82,9 @@
     <string name="practicesIconContentBad">Bad Practice Icon</string>
     <string name="privacyProtectionToggle">Privacy Protection</string>
 
+    <string name="networkTrackerSummaryHeader">TRACKER NETWORK TOP OFFENDERS</string>
+    <string name="networkTrackerSummaryNotReady">We\'re still collecting data to show how many trackers we\'ve blocked.</string>
+
     <!-- Fire -->
     <string name="fireClearAll">Clear All Data</string>
     <string name="fireCancel">Cancel</string>
@@ -92,6 +95,9 @@
     <string name="settingsMenuItemTitle">Settings</string>
     <string name="settingsVersion">Version</string>
     <string name="aboutDuckduckgo">About DuckDuckGo</string>
+    <string name="leaveFeedback">Leave Feedback</string>
+    <string name="feedbackEmailAddress">android@duckduckgo.com</string>
+    <string name="feedbackSubject">DuckDuckGo Android Feedback</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">About us</string>

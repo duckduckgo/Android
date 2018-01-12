@@ -16,16 +16,20 @@
 
 package com.duckduckgo.app.job
 
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeListDownloader
+import com.duckduckgo.app.settings.db.AppConfigurationEntity
 import com.duckduckgo.app.trackerdetection.Client
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import io.reactivex.Completable
+import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import javax.inject.Inject
 
 class AppConfigurationDownloader @Inject constructor(
         private val trackerDataDownloader: TrackerDataDownloader,
-        private val httpsUpgradeListDownloader: HttpsUpgradeListDownloader
-) {
+        private val httpsUpgradeListDownloader: HttpsUpgradeListDownloader,
+        private val appDatabase: AppDatabase) {
 
     fun downloadTask(): Completable {
         val easyListDownload = trackerDataDownloader.downloadList(Client.ClientName.EASYLIST)
@@ -33,6 +37,15 @@ class AppConfigurationDownloader @Inject constructor(
         val disconnectDownload = trackerDataDownloader.downloadList(Client.ClientName.DISCONNECT)
         val httpsUpgradeDownload = httpsUpgradeListDownloader.downloadList()
 
-        return Completable.merge(mutableListOf(easyListDownload, easyPrivacyDownload, disconnectDownload, httpsUpgradeDownload))
+        return Completable.merge(listOf(
+                easyListDownload.subscribeOn(Schedulers.io()),
+                easyPrivacyDownload.subscribeOn(Schedulers.io()),
+                disconnectDownload.subscribeOn(Schedulers.io()),
+                httpsUpgradeDownload.subscribeOn(Schedulers.io())
+        )).doOnComplete {
+            Timber.i("Download task completed successfully")
+            val appConfiguration = AppConfigurationEntity(appConfigurationDownloaded = true)
+            appDatabase.appConfigurationDao().configurationDownloadSuccessful(appConfiguration)
+        }
     }
 }

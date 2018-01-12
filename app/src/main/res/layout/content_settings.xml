@@ -38,12 +38,13 @@
 
         <TextView
             android:id="@+id/about"
-            style="@style/SettingsContentLabel"
-            android:layout_width="match_parent"
-            android:paddingTop="12dp"
-            android:background="?attr/selectableItemBackground"
-            android:paddingBottom="12dp"
+            style="@style/SettingsContentLabelClickable"
             android:text="@string/aboutDuckduckgo" />
+
+        <TextView
+            android:id="@+id/provideFeedback"
+            style="@style/SettingsContentLabelClickable"
+            android:text="@string/leaveFeedback" />
 
     </LinearLayout>
 
