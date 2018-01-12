@@ -21,12 +21,12 @@ import io.reactivex.Observable
 import javax.inject.Inject
 
 
-class AutoCompleteApi @Inject constructor(
+open class AutoCompleteApi @Inject constructor(
         private val autoCompleteService: AutoCompleteService,
         private val queryUrlConverter: QueryUrlConverter
 ) {
 
-    fun autoComplete(query: String): Observable<AutoCompleteResult> {
+    fun autoComplete(query: String): Observable<AutoCompleteApi.AutoCompleteResult> {
 
         return autoCompleteService.autoComplete(query)
                 .flatMapIterable { it -> it }

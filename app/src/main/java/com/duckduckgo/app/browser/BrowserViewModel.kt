@@ -122,8 +122,7 @@ class BrowserViewModel(
                 .subscribe({ result ->
                     Timber.i("Got ac results: $result")
                     viewState.value = currentViewState().copy(autoCompleteSearchResults = result)
-                }, { t: Throwable? ->
-                    Timber.w(t, "Failed to get search results") })
+                }, { t: Throwable? -> Timber.w(t, "Failed to get search results") })
     }
 
 
