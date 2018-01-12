@@ -35,16 +35,6 @@ import kotlinx.android.synthetic.main.content_home.*
 
 class HomeActivity : AppCompatActivity() {
 
-    companion object {
-
-        private const val SETTINGS_REQUEST_CODE = 100
-
-        fun intent(context: Context): Intent {
-            return Intent(context, HomeActivity::class.java)
-        }
-
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -117,5 +107,16 @@ class HomeActivity : AppCompatActivity() {
                 startActivity(BrowserActivity.intent(this, getString(R.string.aboutUrl)))
             }
         }
+    }
+
+
+    companion object {
+
+        private const val SETTINGS_REQUEST_CODE = 100
+
+        fun intent(context: Context): Intent {
+            return Intent(context, HomeActivity::class.java)
+        }
+
     }
 }

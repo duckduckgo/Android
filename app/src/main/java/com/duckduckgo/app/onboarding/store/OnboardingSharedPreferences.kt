@@ -23,12 +23,6 @@ import javax.inject.Inject
 
 class OnboardingSharedPreferences @Inject constructor(private val context: Context) : OnboardingStore {
 
-    companion object {
-        val name = "com.duckduckgo.app.onboarding.settings"
-        val currentVersion = 1
-        val onboardingVersion = "com.duckduckgo.app.onboarding.currentVersion"
-    }
-
     override val shouldShow: Boolean
         get() = preferences.getInt(onboardingVersion, 0) < currentVersion
 
@@ -40,4 +34,12 @@ class OnboardingSharedPreferences @Inject constructor(private val context: Conte
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(name, Context.MODE_PRIVATE)
+
+
+    companion object {
+        val name = "com.duckduckgo.app.onboarding.settings"
+        val currentVersion = 1
+        val onboardingVersion = "com.duckduckgo.app.onboarding.currentVersion"
+    }
+    
 }

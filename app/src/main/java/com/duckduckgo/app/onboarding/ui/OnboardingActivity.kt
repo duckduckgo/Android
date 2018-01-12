@@ -116,16 +116,6 @@ class OnboardingActivity : DuckDuckGoActivity() {
 
         private val colorCombiner = ColorCombiner()
 
-        companion object {
-            val pageCount = 2
-
-            @ColorRes
-            val firstColor = R.color.lighMuddyGreen
-
-            @ColorRes
-            val secondColor = R.color.lightWindowsBlue
-        }
-
         override fun getCount(): Int {
             return pageCount
         }
@@ -151,6 +141,16 @@ class OnboardingActivity : DuckDuckGoActivity() {
         fun color(context: Context, currentPage: Int): Int {
             val color = if (currentPage == 0) firstColor else secondColor
             return context.resources.getColor(color)
+        }
+
+        companion object {
+            val pageCount = 2
+
+            @ColorRes
+            val firstColor = R.color.lighMuddyGreen
+
+            @ColorRes
+            val secondColor = R.color.lightWindowsBlue
         }
     }
 
