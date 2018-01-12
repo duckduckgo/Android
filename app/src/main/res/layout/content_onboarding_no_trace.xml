@@ -43,8 +43,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:paddingTop="20dp"
                 android:importantForAccessibility="no"
+                android:paddingTop="20dp"
                 android:src="@drawable/onboarding_image_no_trace" />
 
             <TextView
@@ -93,7 +93,7 @@
         android:layout_marginBottom="20dp"
         android:background="@color/windowsBlue"
         android:elevation="0dp"
-        android:onClick="onContinueClicked"
+        android:onClick="onDoneClicked"
         android:text="@string/onboardingContinue"
         android:textAllCaps="false"
         android:textColor="@color/white"

@@ -16,6 +16,17 @@
         tools:ignore="GoogleAppIndexingWarning">
 
         <activity
+            android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivity"
+            android:label="@string/appName"
+            android:parentActivityName="com.duckduckgo.app.home.HomeActivity"
+            android:screenOrientation="fullSensor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name="com.duckduckgo.app.home.HomeActivity"
             android:label="@string/appName"
             android:launchMode="singleTask"
@@ -39,17 +50,6 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
 
-        </activity>
-
-        <activity
-            android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivity"
-            android:label="@string/privacyDashboardActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.home.HomeActivity"
-            android:screenOrientation="fullSensor">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <activity

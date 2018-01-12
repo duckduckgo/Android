@@ -71,10 +71,12 @@ class OnboardingActivity : DuckDuckGoActivity() {
     fun onContinueClicked(view: View) {
         val next = viewPager.currentItem + 1
         if (next < viewPager.adapter!!.count) {
-            viewPager.currentItem = next
-        } else {
-            viewModel.onOnboardingDone()
+            viewPager.setCurrentItem(next, true)
         }
+    }
+
+    fun onDoneClicked(view: View) {
+        viewModel.onOnboardingDone()
     }
 
     private fun showHome() {
@@ -120,7 +122,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
             return pageCount
         }
 
-        override fun getItem(position: Int): android.support.v4.app.Fragment? {
+        override fun getItem(position: Int): Fragment? {
             return when (position) {
                 0 -> ProtectDataPage()
                 1 -> NoTracePage()

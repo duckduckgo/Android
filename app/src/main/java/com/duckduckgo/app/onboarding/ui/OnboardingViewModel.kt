@@ -26,7 +26,7 @@ class OnboardingViewModel(onboardingStore: OnboardingStore) : ViewModel() {
             val showHome: Boolean
     )
 
-    val viewState: MutableLiveData<OnboardingViewModel.ViewState> = MutableLiveData()
+    val viewState = MutableLiveData<OnboardingViewModel.ViewState>()
 
     init {
         viewState.value = OnboardingViewModel.ViewState(
