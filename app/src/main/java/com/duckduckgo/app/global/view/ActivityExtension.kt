@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacymonitor.db
+package com.duckduckgo.app.global.view
 
-import android.arch.persistence.room.Entity
+import android.content.Intent
+import android.support.v7.app.AppCompatActivity
+import android.widget.Toast
+import com.duckduckgo.app.browser.R
 
-@Entity(tableName = "network_leaderboard",
-        primaryKeys = ["networkName", "domainVisited"])
-data class NetworkLeaderboardEntry(
-        val networkName: String,
-        val domainVisited: String)
+fun AppCompatActivity.launchExternalActivity(intent: Intent) {
+    if (intent.resolveActivity(packageManager) != null) {
+        startActivity(intent)
+    } else {
+        Toast.makeText(this, R.string.no_compatible_third_party_app_installed, Toast.LENGTH_SHORT).show()
+    }
+}

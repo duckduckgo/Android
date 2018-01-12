@@ -61,10 +61,7 @@ class BrowserViewModelTest {
 
     private var lastEntry: NetworkLeaderboardEntry? = null
 
-    private val testStringResolver: StringResolver = object : StringResolver {
-        override fun getString(stringId: Int): String = ""
-        override fun getString(stringId: Int, vararg formatArgs: Any): String = ""
-    }
+    private val testStringResolver: StringResolver = object : StringResolver {}
 
     private val testNetworkLeaderboardDao: NetworkLeaderboardDao = object : NetworkLeaderboardDao {
         override fun insert(leaderboardEntry: NetworkLeaderboardEntry) {

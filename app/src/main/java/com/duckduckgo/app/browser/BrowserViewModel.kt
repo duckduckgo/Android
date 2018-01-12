@@ -106,7 +106,6 @@ class BrowserViewModel(
     init {
         viewState.value = ViewState()
         privacyMonitorRepository.privacyMonitor = MutableLiveData()
-
         appConfigurationObservable.observeForever(appConfigurationObserver)
 
         configureAutoComplete()

@@ -16,12 +16,13 @@
 
 package com.duckduckgo.app.httpsupgrade.api
 
+import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomain
 import retrofit2.Call
 import retrofit2.http.GET
 
 interface HttpsUpgradeListService {
 
-    @GET("/contentblocking.js?l=https")
-    fun https(): Call<HttpsUpgradeJson>
+    @GET("/contentblocking.js?l=https2")
+    fun https(): Call<List<HttpsUpgradeDomain>>
 
 }

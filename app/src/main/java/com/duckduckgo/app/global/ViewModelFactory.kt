@@ -58,7 +58,7 @@ class ViewModelFactory @Inject constructor(
                     isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                     isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                     isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
-                    isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel()
+                    isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(stringResolver)
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
             } as T
