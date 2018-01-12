@@ -87,6 +87,7 @@ ext {
     architectureComponents = "1.0.0"
     dagger = "2.14.1"
     retrofit = "2.3.0"
+    rxBinding = "2.0.0"
 }
 
 
@@ -106,6 +107,9 @@ dependencies {
     implementation "com.google.dagger:dagger-android:$dagger"
     implementation "com.google.dagger:dagger-android-support:$dagger"
     releaseImplementation 'com.faendir:acra:4.10.0'
+
+    // RxRelay
+    implementation "com.jakewharton.rxrelay2:rxrelay:2.0.0"
 
     // ViewModel and LiveData
     implementation "android.arch.lifecycle:extensions:$architectureComponents"
