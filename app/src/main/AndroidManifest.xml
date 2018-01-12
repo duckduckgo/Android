@@ -83,6 +83,12 @@
             android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme" />
 
+        <activity
+            android:name="com.duckduckgo.app.bookmarks.BookmarksActivity"
+            android:label="@string/bookmarksActivityTitle"
+            android:parentActivityName=".BrowserActivity"
+            android:screenOrientation="fullSensor" />
+
         <service
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />

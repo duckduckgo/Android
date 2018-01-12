@@ -36,8 +36,8 @@ import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.privacymonitor.model.improvedGrade
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
-import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RESULT_RELOAD
-import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RESULT_TOSDR
+import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
+import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.TOSDR_RESULT_CODE
 import com.duckduckgo.app.settings.db.AppConfigurationDao
 import com.duckduckgo.app.settings.db.AppConfigurationEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
@@ -234,8 +234,8 @@ class BrowserViewModel(
 
     fun receivedDashboardResult(resultCode: Int) {
         when (resultCode) {
-            RESULT_RELOAD -> command.value = Refresh()
-            RESULT_TOSDR -> {
+            RELOAD_RESULT_CODE -> command.value = Refresh()
+            TOSDR_RESULT_CODE -> {
                 val url = stringResolver.getString(R.string.tosdrUrl)
                 command.value = Navigate(url)
             }

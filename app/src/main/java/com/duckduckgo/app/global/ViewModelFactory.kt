@@ -18,6 +18,7 @@ package com.duckduckgo.app.global
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
+import com.duckduckgo.app.bookmarks.BookmarksViewModel
 import com.duckduckgo.app.browser.BrowserViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
@@ -57,6 +58,7 @@ class ViewModelFactory @Inject constructor(
                     isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                     isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
                     isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(stringResolver)
+                    isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel()
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
             } as T

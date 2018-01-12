@@ -32,6 +32,7 @@ import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.widget.TextView
 import android.widget.Toast
+import com.duckduckgo.app.bookmarks.BookmarksActivity
 import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
@@ -39,7 +40,6 @@ import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.renderer.icon
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
-import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.REQUEST_DASHBOARD
 import com.duckduckgo.app.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_browser.*
 import javax.inject.Inject
@@ -54,18 +54,6 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     private val viewModel: BrowserViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(BrowserViewModel::class.java)
-    }
-
-    companion object {
-
-        fun intent(context: Context, sharedText: String? = null): Intent {
-            val intent = Intent(context, BrowserActivity::class.java)
-            intent.putExtra(SHARED_TEXT_EXTRA, sharedText)
-            return intent
-        }
-
-        private const val SHARED_TEXT_EXTRA = "SHARED_TEXT_EXTRA"
-        private const val REQUEST_SETTINGS = 1001
     }
 
     private val privacyGradeMenu: MenuItem?
@@ -294,6 +282,10 @@ class BrowserActivity : DuckDuckGoActivity() {
                 webView.goForward()
                 return true
             }
+            R.id.bookmarks_menu_item -> {
+                launchBookmarksView()
+                return true
+            }
             R.id.settings_menu_item -> {
                 launchSettingsView()
                 return true
@@ -308,7 +300,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun launchPrivacyDashboard() {
-        startActivityForResult(PrivacyDashboardActivity.intent(this), REQUEST_DASHBOARD)
+        startActivityForResult(PrivacyDashboardActivity.intent(this), DASHBOARD_REQUEST_CODE)
     }
 
     private fun launchFire() {
@@ -320,13 +312,17 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun launchSettingsView() {
-        startActivityForResult(SettingsActivity.intent(this), REQUEST_SETTINGS)
+        startActivityForResult(SettingsActivity.intent(this), SETTINGS_REQUEST_CODE)
+    }
+
+    private fun launchBookmarksView() {
+        startActivityForResult(BookmarksActivity.intent(this), BOOKMARKS_REQUEST_CODE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
-            REQUEST_DASHBOARD -> viewModel.receivedDashboardResult(resultCode)
-            REQUEST_SETTINGS -> viewModel.receivedSettingsResult(resultCode)
+            DASHBOARD_REQUEST_CODE -> viewModel.receivedDashboardResult(resultCode)
+            SETTINGS_REQUEST_CODE -> viewModel.receivedSettingsResult(resultCode)
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
@@ -346,4 +342,19 @@ class BrowserActivity : DuckDuckGoActivity() {
         omnibarTextInput.hideKeyboard()
         webView.hide()
     }
+
+    companion object {
+
+        fun intent(context: Context, sharedText: String? = null): Intent {
+            val intent = Intent(context, BrowserActivity::class.java)
+            intent.putExtra(SHARED_TEXT_EXTRA, sharedText)
+            return intent
+        }
+
+        private const val SHARED_TEXT_EXTRA = "SHARED_TEXT_EXTRA"
+        private const val SETTINGS_REQUEST_CODE = 100
+        private const val DASHBOARD_REQUEST_CODE = 101
+        private const val BOOKMARKS_REQUEST_CODE = 102
+    }
+
 }

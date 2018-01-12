@@ -43,6 +43,11 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/bookmarks_menu_item"
+        android:title="@string/boomarksMenuTitle"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/settings_menu_item"
         android:title="@string/settingsMenuItemTitle"
         app:showAsAction="never" />

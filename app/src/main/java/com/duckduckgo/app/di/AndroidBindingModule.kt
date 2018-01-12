@@ -16,14 +16,19 @@
 
 package com.duckduckgo.app.di
 
+import android.arch.lifecycle.ViewModel
+import com.duckduckgo.app.bookmarks.BookmarksActivity
+import com.duckduckgo.app.bookmarks.BookmarksViewModel
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.job.AppConfigurationJobService
+import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity
 import com.duckduckgo.app.privacymonitor.ui.ScorecardActivity
 import com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import dagger.Module
+import dagger.Provides
 import dagger.android.ContributesAndroidInjector
 
 
@@ -56,6 +61,9 @@ abstract class AndroidBindingModule {
     @ContributesAndroidInjector
     abstract fun settingsActivity(): SettingsActivity
 
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun bookmarksActivity(): BookmarksActivity
 
     /* Services */
 

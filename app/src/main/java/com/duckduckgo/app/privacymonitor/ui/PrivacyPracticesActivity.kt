@@ -42,12 +42,6 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
 
     private val practicesAdapter = PrivacyPracticesAdapter()
 
-    companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, PrivacyPracticesActivity::class.java)
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_privacy_practices)
@@ -85,7 +79,17 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
     }
 
     fun onTosdrLinkClicked(view: View) {
-        setResult(PrivacyDashboardActivity.RESULT_TOSDR)
+        setResult(TOSDR_RESULT_CODE)
         finish()
     }
+
+    companion object {
+
+        val TOSDR_RESULT_CODE = 100
+
+        fun intent(context: Context): Intent {
+            return Intent(context, PrivacyPracticesActivity::class.java)
+        }
+    }
+
 }

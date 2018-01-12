@@ -40,17 +40,6 @@ import javax.inject.Inject
 
 class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
-    companion object {
-
-        val REQUEST_DASHBOARD = 1000
-        val RESULT_RELOAD = 1000
-        val RESULT_TOSDR = 1001
-
-        fun intent(context: Context): Intent {
-            return Intent(context, PrivacyDashboardActivity::class.java)
-        }
-    }
-
     @Inject lateinit var viewModelFactory: ViewModelFactory
     @Inject lateinit var repository: PrivacyMonitorRepository
     private val trackersRenderer = TrackersRenderer()
@@ -99,7 +88,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
     override fun onBackPressed() {
         if (viewModel.shouldReloadPage) {
-            setResult(RESULT_RELOAD)
+            setResult(RELOAD_RESULT_CODE)
         }
         super.onBackPressed()
     }
@@ -143,13 +132,27 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
     }
 
     fun onPracticesClicked(view: View) {
-        startActivityForResult(PrivacyPracticesActivity.intent(this), REQUEST_DASHBOARD)
+        startActivityForResult(PrivacyPracticesActivity.intent(this), REQUEST_CODE_PRIVACY_PRACTICES)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_DASHBOARD && resultCode == RESULT_TOSDR) {
-            setResult(RESULT_TOSDR)
+        if (requestCode == REQUEST_CODE_PRIVACY_PRACTICES && resultCode == PrivacyPracticesActivity.TOSDR_RESULT_CODE) {
+            setResult(TOSDR_RESULT_CODE)
             finish()
         }
     }
+
+    companion object {
+
+        private const val REQUEST_CODE_PRIVACY_PRACTICES = 100
+
+        const val RELOAD_RESULT_CODE = 100
+        const val TOSDR_RESULT_CODE = 101
+
+        fun intent(context: Context): Intent {
+            return Intent(context, PrivacyDashboardActivity::class.java)
+        }
+
+    }
+
 }

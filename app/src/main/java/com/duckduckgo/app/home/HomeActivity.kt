@@ -24,6 +24,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
+import com.duckduckgo.app.bookmarks.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.intentText
@@ -79,6 +80,10 @@ class HomeActivity : AppCompatActivity() {
                 startActivityForResult(SettingsActivity.intent(this), SETTINGS_REQUEST_CODE)
                 true
             }
+            R.id.bookmarks_menu_item -> {
+                startActivityForResult(BookmarksActivity.intent(this), BOOKMARKS_REQUEST_CODE)
+                true
+            }
             R.id.fire_menu_item -> {
                 launchFire()
                 true
@@ -110,6 +115,7 @@ class HomeActivity : AppCompatActivity() {
 
     companion object {
         private const val SETTINGS_REQUEST_CODE = 100
+        private const val BOOKMARKS_REQUEST_CODE = 101
     }
 
 }
