@@ -18,6 +18,7 @@ package com.duckduckgo.app.global
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.browser.BrowserViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
@@ -45,13 +46,14 @@ class ViewModelFactory @Inject constructor(
         private val trackerNetworks: TrackerNetworks,
         private val stringResolver: StringResolver,
         private val appDatabase: AppDatabase,
-        private val networkLeaderboardDao: NetworkLeaderboardDao
+        private val networkLeaderboardDao: NetworkLeaderboardDao,
+        private val autoCompleteApi: AutoCompleteApi
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
             with(modelClass) {
                 when {
-                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, duckDuckGoUrlDetector, termsOfServiceStore, trackerNetworks, privacyMonitorRepository, stringResolver, networkLeaderboardDao, appDatabase.appConfigurationDao())
+                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, duckDuckGoUrlDetector, termsOfServiceStore, trackerNetworks, privacyMonitorRepository, stringResolver, networkLeaderboardDao, autoCompleteApi, appDatabase.appConfigurationDao())
                     isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(privacySettingsStore, networkLeaderboardDao)
                     isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                     isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
