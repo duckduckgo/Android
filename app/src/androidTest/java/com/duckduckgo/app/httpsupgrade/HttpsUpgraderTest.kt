@@ -42,8 +42,8 @@ class HttpsUpgraderTest {
         whenever(mockDao.hasDomain("*.example.com")).thenReturn(true)
         assertTrue(testee.shouldUpgrade(Uri.parse("http://www.EXAMPLE.com")))
         verify(mockDao).hasDomain("*.example.com")
-
     }
+    
     @Test
     fun whenMixedCaseUriIsHttpAndInUpgradeListThenShouldUpgrade() {
         whenever(mockDao.hasDomain("www.example.com")).thenReturn(true)
