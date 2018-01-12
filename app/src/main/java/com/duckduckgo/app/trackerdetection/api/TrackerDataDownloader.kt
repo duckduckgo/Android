@@ -85,7 +85,6 @@ class TrackerDataDownloader @Inject constructor(
                 Timber.i("Updating ${clientName.name} data store with new data")
                 persistTrackerData(clientName, bodyBytes)
                 trackerDataLoader.loadAdblockData(clientName)
-                return@fromAction
             } else {
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
