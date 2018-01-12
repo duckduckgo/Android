@@ -18,7 +18,6 @@
         <activity
             android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivity"
             android:label="@string/appName"
-            android:parentActivityName="com.duckduckgo.app.home.HomeActivity"
             android:screenOrientation="fullSensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
