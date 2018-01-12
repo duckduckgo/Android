@@ -17,8 +17,8 @@
 package com.duckduckgo.app.onboarding
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.os.Bundle
+import android.support.annotation.ColorInt
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
@@ -28,10 +28,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.view.ColorCombiner
 import kotlinx.android.synthetic.main.activity_onboarding.*
 
 
 class OnboardingActivity : AppCompatActivity() {
+
+    private val colorCombiner = ColorCombiner()
 
     companion object {
         val firstColor = R.color.lighMuddyGreen
@@ -77,22 +80,12 @@ class OnboardingActivity : AppCompatActivity() {
 
     @SuppressLint("NewApi")
     private fun transitionToNewColor(positionOffset: Float) {
-
-        val fromRatio = 1 - positionOffset
-        val toRatio = positionOffset
         val fromColor = resources.getColor(firstColor)
         val toColor = resources.getColor(secondColor)
-
-        val alpha = Color.alpha(fromColor) * fromRatio + Color.alpha(toColor) * toRatio
-        val red = Color.red(fromColor) * fromRatio + Color.red(toColor) * toRatio
-        val green = Color.green(fromColor) * fromRatio + Color.green(toColor) * toRatio
-        val blue = Color.blue(fromColor) * fromRatio + Color.blue(toColor) * toRatio
-        val combined = Color.argb(alpha.toInt(), red.toInt(), green.toInt(), blue.toInt())
-
-        updateColor(combined)
+        updateColor(colorCombiner.combine(fromColor, toColor, positionOffset))
     }
 
-    private fun updateColor(color: Int) {
+    private fun updateColor(@ColorInt color: Int) {
         window.statusBarColor = color
         viewPager.setBackgroundColor(color)
     }
