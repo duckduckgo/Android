@@ -98,7 +98,7 @@ class HttpsUpgradeDomainDaoTest {
     }
 
     @Test
-    fun whenModelIsEmprtyThenCountIsZero() {
+    fun whenModelIsEmptyThenCountIsZero() {
         assertEquals(0, dao.count())
     }
 
