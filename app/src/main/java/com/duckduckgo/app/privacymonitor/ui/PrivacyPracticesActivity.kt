@@ -30,10 +30,9 @@ import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import com.duckduckgo.app.privacymonitor.renderer.banner
 import com.duckduckgo.app.privacymonitor.renderer.text
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
-import kotlinx.android.synthetic.main.activity_privacy_dashboard.*
+import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.content_privacy_practices.*
 import javax.inject.Inject
-
 
 class PrivacyPracticesActivity : DuckDuckGoActivity() {
 

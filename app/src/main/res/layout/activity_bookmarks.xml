@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2018 DuckDuckGo
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2017 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -18,10 +19,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.duckduckgo.app.privacymonitor.ui.ScorecardActivity">
+    tools:context="com.duckduckgo.app.bookmarks.BookmarksActivity">
 
     <include layout="@layout/include_toolbar" />
 
-    <include layout="@layout/content_privacy_scorecard" />
+    <include layout="@layout/content_bookmarks" />
 
 </android.support.design.widget.CoordinatorLayout>

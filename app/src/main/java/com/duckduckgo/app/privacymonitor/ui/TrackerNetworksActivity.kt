@@ -28,10 +28,9 @@ import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import com.duckduckgo.app.privacymonitor.renderer.TrackersRenderer
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
-import kotlinx.android.synthetic.main.activity_tracker_networks.*
+import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.content_tracker_networks.*
 import javax.inject.Inject
-
 
 class TrackerNetworksActivity : DuckDuckGoActivity() {
 
