@@ -35,4 +35,7 @@ interface HttpsUpgradeDomainDao {
     @Query("delete from https_upgrade_domain")
     fun deleteAll()
 
+    @Query("select count(1) from https_upgrade_domain")
+    fun count(): Int
+
 }

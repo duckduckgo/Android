@@ -52,18 +52,6 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
     }
-    sourceSets {
-        String sharedTestJavaDir = 'src/sharedTest/java'
-        String sharedTestResourcesDir = 'src/sharedTest/resources'
-        test {
-            java.srcDir sharedTestJavaDir
-            resources.srcDir sharedTestResourcesDir
-        }
-        androidTest {
-            java.srcDir sharedTestJavaDir
-            resources.srcDir sharedTestResourcesDir
-        }
-    }
 
     def staticConfigPath = "${System.getenv('HOME')}/jenkins_static/com.duckduckgo.mobile.android"
     def propertiesPath = "${staticConfigPath}/ddg_android_build.properties"

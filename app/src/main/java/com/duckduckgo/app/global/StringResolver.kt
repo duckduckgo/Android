@@ -23,8 +23,8 @@ import javax.inject.Inject
 
 interface StringResolver {
 
-    fun getString(@StringRes stringId: Int): String
-    fun getString(stringId: Int, vararg formatArgs: Any): String
+    fun getString(@StringRes stringId: Int): String = ""
+    fun getString(stringId: Int, vararg formatArgs: Any): String = ""
 }
 
 class AndroidStringResolver @Inject constructor(val context: Context) : StringResolver {

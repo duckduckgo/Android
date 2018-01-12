@@ -20,8 +20,7 @@ import android.arch.persistence.room.Room
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import org.junit.After
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
@@ -96,6 +95,17 @@ class HttpsUpgradeDomainDaoTest {
     @Test
     fun whenModelIsEmptyThenModelDoesNotContainExactMatchDomain() {
         assertFalse(dao.hasDomain(exactMatchDomain))
+    }
+
+    @Test
+    fun whenModelIsEmptyThenCountIsZero() {
+        assertEquals(0, dao.count())
+    }
+
+    @Test
+    fun whenModelContainsTwoItemsThenCountIsTwo() {
+        dao.insertAll(HttpsUpgradeDomain(exactMatchDomain), HttpsUpgradeDomain(otherDomain))
+        assertEquals(2, dao.count())
     }
 
 }

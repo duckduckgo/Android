@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacymonitor.db
+package com.duckduckgo.app.global.api
 
-import android.arch.persistence.room.Entity
+import retrofit2.Response
 
-@Entity(tableName = "network_leaderboard",
-        primaryKeys = ["networkName", "domainVisited"])
-data class NetworkLeaderboardEntry(
-        val networkName: String,
-        val domainVisited: String)
+val <T> Response<T>.isCached: Boolean
+    get() = raw().cacheResponse() != null
+

@@ -32,4 +32,6 @@ interface TrackerDataDao {
     @Query("Select * from disconnect_tracker")
     fun getAll() : List<DisconnectTracker>
 
+    @Query("Select count(*) from disconnect_tracker")
+    fun count(): Int
 }
