@@ -30,9 +30,12 @@ interface HttpsUpgradeDomainDao {
 
     @Language("RoomSql")
     @Query("select count(1) > 0 from https_upgrade_domain where :host glob domain")
-    fun contains(host: String) : Boolean
+    fun contains(host: String): Boolean
 
     @Query("delete from https_upgrade_domain")
     fun deleteAll()
+
+    @Query("select count(*) from https_upgrade_domain")
+    fun count(): Int
 
 }

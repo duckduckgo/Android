@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.httpsupgrade.api
 
+import com.duckduckgo.app.global.api.isCached
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
 import io.reactivex.Completable
@@ -30,22 +31,29 @@ class HttpsUpgradeListDownloader @Inject constructor(
         private val httpsUpgradeDao: HttpsUpgradeDomainDao) {
 
     fun downloadList(): Completable {
+
         Timber.i("Downloading HTTPS Upgrade data")
 
-        return Completable.fromAction({
+        return Completable.fromAction {
+
             val call = service.https()
             val response = call.execute()
-            if (response.isSuccessful) {
-                Timber.d("Got HTTPS upgrade list from server")
 
+            if (response.isCached && httpsUpgradeDao.count() != 0) {
+                Timber.i("HTTPS data already cached and stored")
+                return@fromAction
+            }
+
+            if (response.isSuccessful) {
+                Timber.d("Updating HTTPS upgrade list from server")
                 val domains = response.body()!!.simpleUpgrade.top500.toTypedArray()
-                database.runInTransaction({
+                database.runInTransaction {
                     httpsUpgradeDao.deleteAll()
                     httpsUpgradeDao.insertAll(*domains)
-                })
+                }
             } else {
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
-        })
+        }
     }
 }
