@@ -16,11 +16,12 @@
 
 package com.duckduckgo.app.onboarding.ui
 
-import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.os.Bundle
 import android.support.annotation.ColorInt
+import android.support.annotation.ColorRes
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
@@ -40,12 +41,7 @@ import javax.inject.Inject
 class OnboardingActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var viewModelFactory: ViewModelFactory
-    private val colorCombiner = ColorCombiner()
-
-    companion object {
-        val firstColor = R.color.lighMuddyGreen
-        val secondColor = R.color.lightWindowsBlue
-    }
+    private lateinit var viewPageAdapter: PagerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +58,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
     }
 
     override fun onResume() {
-        refreshPageColor()
+        updateColor(viewPageAdapter.color(this, viewPager.currentItem))
         super.onResume()
     }
 
@@ -88,16 +84,14 @@ class OnboardingActivity : DuckDuckGoActivity() {
 
     private fun configurePager() {
 
-        viewPager.adapter = PagerAdapter(supportFragmentManager)
+        viewPageAdapter = PagerAdapter(supportFragmentManager)
+        viewPager.adapter = viewPageAdapter
 
         viewPager.addOnPageChangeListener(object : OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {
             }
 
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-                if (positionOffset == 0.toFloat()) {
-                    return
-                }
                 transitionToNewColor(positionOffset)
             }
 
@@ -106,17 +100,11 @@ class OnboardingActivity : DuckDuckGoActivity() {
         })
     }
 
-    @SuppressLint("NewApi")
-    private fun refreshPageColor() {
-        val resource = if (viewPager.currentItem == 0) firstColor else secondColor
-        updateColor(resources.getColor(resource))
-    }
-
-    @SuppressLint("NewApi")
     private fun transitionToNewColor(positionOffset: Float) {
-        val fromColor = resources.getColor(firstColor)
-        val toColor = resources.getColor(secondColor)
-        updateColor(colorCombiner.combine(fromColor, toColor, positionOffset))
+        if (positionOffset == 0.toFloat()) {
+            return
+        }
+        updateColor(viewPageAdapter.offsetColor(this, positionOffset))
     }
 
     private fun updateColor(@ColorInt color: Int) {
@@ -125,8 +113,17 @@ class OnboardingActivity : DuckDuckGoActivity() {
     }
 
     class PagerAdapter(fragmentManager: FragmentManager) : FragmentPagerAdapter(fragmentManager) {
+
+        private val colorCombiner = ColorCombiner()
+
         companion object {
             val pageCount = 2
+
+            @ColorRes
+            val firstColor = R.color.lighMuddyGreen
+
+            @ColorRes
+            val secondColor = R.color.lightWindowsBlue
         }
 
         override fun getCount(): Int {
@@ -139,6 +136,21 @@ class OnboardingActivity : DuckDuckGoActivity() {
                 1 -> NoTracePage()
                 else -> null
             }
+        }
+
+        @ColorInt
+        @Suppress("deprecation")
+        fun offsetColor(context: Context, positionOffset: Float): Int {
+            val fromColor = context.resources.getColor(firstColor)
+            val toColor = context.resources.getColor(secondColor)
+            return colorCombiner.combine(fromColor, toColor, positionOffset)
+        }
+
+        @ColorInt
+        @Suppress("deprecation")
+        fun color(context: Context, currentPage: Int): Int {
+            val color = if (currentPage == 0) firstColor else secondColor
+            return context.resources.getColor(color)
         }
     }
 
