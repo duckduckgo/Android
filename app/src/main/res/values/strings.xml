@@ -100,5 +100,6 @@
     <string name="aboutMoreLink">More at duckduckgo.com/about</string>
     <string name="boomarksMenuTitle">Bookmarks</string>
     <string name="bookmarksActivityTitle">Bookmarks</string>
+    <string name="addBookmarkMenuTitle">Add Bookmark</string>
 
 </resources>

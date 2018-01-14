@@ -15,14 +15,15 @@
   ~ limitations under the License.
   -->
 
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.duckduckgo.app.bookmarks.BookmarksActivity">
+    android:orientation="vertical"
+    tools:context="com.duckduckgo.app.bookmarks.ui.BookmarksActivity">
 
     <include layout="@layout/include_toolbar" />
 
     <include layout="@layout/content_bookmarks" />
 
-</android.support.design.widget.CoordinatorLayout>
+</LinearLayout>

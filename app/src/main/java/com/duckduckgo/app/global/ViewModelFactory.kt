@@ -18,7 +18,8 @@ package com.duckduckgo.app.global
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
-import com.duckduckgo.app.bookmarks.BookmarksViewModel
+import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
 import com.duckduckgo.app.browser.BrowserViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
@@ -46,19 +47,20 @@ class ViewModelFactory @Inject constructor(
         private val trackerNetworks: TrackerNetworks,
         private val stringResolver: StringResolver,
         private val appDatabase: AppDatabase,
-        private val networkLeaderboardDao: NetworkLeaderboardDao
+        private val networkLeaderboardDao: NetworkLeaderboardDao,
+        private val bookmarksDao: BookmarksDao
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
             with(modelClass) {
                 when {
-                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, duckDuckGoUrlDetector, termsOfServiceStore, trackerNetworks, privacyMonitorRepository, stringResolver, networkLeaderboardDao, appDatabase.appConfigurationDao())
+                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, duckDuckGoUrlDetector, termsOfServiceStore, trackerNetworks, privacyMonitorRepository, stringResolver, networkLeaderboardDao, bookmarksDao, appDatabase.appConfigurationDao())
                     isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(privacySettingsStore, networkLeaderboardDao)
                     isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                     isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                     isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
                     isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(stringResolver)
-                    isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel()
+                    isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel(bookmarksDao)
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
             } as T

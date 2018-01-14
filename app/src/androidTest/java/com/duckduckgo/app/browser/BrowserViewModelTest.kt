@@ -23,6 +23,7 @@ import android.arch.lifecycle.Observer
 import android.arch.persistence.room.Room
 import android.net.Uri
 import android.support.test.InstrumentationRegistry
+import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.LandingPage
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
@@ -51,6 +52,10 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 
+// TODO test add bookmark
+
+// TODO test add bookmark menu item enabled state
+
 class BrowserViewModelTest {
 
     @get:Rule
@@ -76,6 +81,7 @@ class BrowserViewModelTest {
     private lateinit var mockStringResolver: StringResolver
     private lateinit var db: AppDatabase
     private lateinit var appConfigurationDao: AppConfigurationDao
+    private lateinit var bookmarksDao: BookmarksDao
 
     private val testOmnibarConverter: OmnibarEntryConverter = object : OmnibarEntryConverter {
         override fun convertUri(input: String): String = "duckduckgo.com"
@@ -96,6 +102,7 @@ class BrowserViewModelTest {
         queryObserver = mock()
         navigationObserver = mock()
         termsOfServiceStore = mock()
+        bookmarksDao = mock()
 
         testee = BrowserViewModel(
                 testOmnibarConverter,
@@ -104,7 +111,9 @@ class BrowserViewModelTest {
                 TrackerNetworks(),
                 PrivacyMonitorRepository(),
                 testStringResolver,
-                testNetworkLeaderboardDao, appConfigurationDao)
+                testNetworkLeaderboardDao,
+                bookmarksDao,
+                appConfigurationDao)
 
         testee.url.observeForever(queryObserver)
         testee.command.observeForever(navigationObserver)

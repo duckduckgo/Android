@@ -23,6 +23,8 @@ import android.net.Uri
 import android.support.annotation.AnyThread
 import android.support.annotation.VisibleForTesting
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity.Companion.RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE
+import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
@@ -52,6 +54,7 @@ class BrowserViewModel(
         private val privacyMonitorRepository: PrivacyMonitorRepository,
         private val stringResolver: StringResolver,
         private val networkLeaderboardDao: NetworkLeaderboardDao,
+        private val bookmarksDao: BookmarksDao,
         appConfigurationDao: AppConfigurationDao) : WebViewClientListener, ViewModel() {
 
     data class ViewState(
@@ -62,7 +65,8 @@ class BrowserViewModel(
             val browserShowing: Boolean = false,
             val showClearButton: Boolean = false,
             val showPrivacyGrade: Boolean = false,
-            val showFireButton: Boolean = true
+            val showFireButton: Boolean = true,
+            val canAddBookmarks: Boolean = false
     )
 
     sealed class Command {
@@ -94,7 +98,7 @@ class BrowserViewModel(
     private var appConfigurationDownloaded = false
 
     init {
-        viewState.value = ViewState()
+        viewState.value = ViewState(canAddBookmarks = false)
         privacyMonitorRepository.privacyMonitor = MutableLiveData()
         appConfigurationObservable.observeForever(appConfigurationObserver)
     }
@@ -159,9 +163,13 @@ class BrowserViewModel(
 
     override fun urlChanged(url: String?) {
         Timber.v("Url changed: $url")
-        if (url == null) return
+        if (url == null) {
+            viewState.value = viewState.value?.copy(canAddBookmarks = false)
+            return
+        }
 
         var newViewState = currentViewState().copy(
+                canAddBookmarks = true,
                 omnibarText = url,
                 browserShowing = true,
                 showFireButton = true,
@@ -250,6 +258,11 @@ class BrowserViewModel(
             }
         }
     }
+
+    fun addBookmark(title: String?, url: String?) {
+        bookmarksDao.insert(BookmarkEntity(title = title, url = url!!))
+    }
+
 }
 
 

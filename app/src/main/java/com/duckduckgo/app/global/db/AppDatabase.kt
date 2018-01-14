@@ -18,6 +18,8 @@ package com.duckduckgo.app.global.db
 
 import android.arch.persistence.room.Database
 import android.arch.persistence.room.RoomDatabase
+import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomain
 import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
@@ -27,11 +29,12 @@ import com.duckduckgo.app.settings.db.AppConfigurationEntity
 import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 
-@Database(exportSchema = true, version = 5, entities = [
+@Database(exportSchema = true, version = 6, entities = [
     HttpsUpgradeDomain::class,
     DisconnectTracker::class,
     NetworkLeaderboardEntry::class,
-    AppConfigurationEntity::class
+    AppConfigurationEntity::class,
+    BookmarkEntity::class
 ])
 abstract class AppDatabase : RoomDatabase() {
 
@@ -39,5 +42,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun trackerDataDao(): TrackerDataDao
     abstract fun networkLeaderboardDao(): NetworkLeaderboardDao
     abstract fun appConfigurationDao(): AppConfigurationDao
+    abstract fun bookmarksDao(): BookmarksDao
 
 }

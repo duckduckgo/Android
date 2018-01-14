@@ -84,7 +84,7 @@
             android:theme="@style/AppTheme" />
 
         <activity
-            android:name="com.duckduckgo.app.bookmarks.BookmarksActivity"
+            android:name="com.duckduckgo.app.bookmarks.ui.BookmarksActivity"
             android:label="@string/bookmarksActivityTitle"
             android:parentActivityName=".BrowserActivity"
             android:screenOrientation="fullSensor" />

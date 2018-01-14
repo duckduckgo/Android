@@ -32,7 +32,7 @@ import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.widget.TextView
 import android.widget.Toast
-import com.duckduckgo.app.bookmarks.BookmarksActivity
+import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
@@ -51,6 +51,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     @Inject lateinit var viewModelFactory: ViewModelFactory
 
     private var acceptingRenderUpdates = true
+    private var addBookmarkMenuItem: MenuItem? = null
 
     private val viewModel: BrowserViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(BrowserViewModel::class.java)
@@ -136,6 +137,7 @@ class BrowserActivity : DuckDuckGoActivity() {
             false -> pageLoadingIndicator.hide()
         }
 
+        addBookmarkMenuItem?.setEnabled(viewState.canAddBookmarks)
         if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
             omnibarTextInput.setText(viewState.omnibarText)
             appBarLayout.setExpanded(true, true)
@@ -257,6 +259,8 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_browser_activity, menu)
+        addBookmarkMenuItem = menu?.findItem(R.id.add_bookmark_menu_item)
+        addBookmarkMenuItem?.setEnabled(false)
         return true
     }
 
@@ -282,6 +286,10 @@ class BrowserActivity : DuckDuckGoActivity() {
                 webView.goForward()
                 return true
             }
+            R.id.add_bookmark_menu_item -> {
+                addBookmark()
+                return true
+            }
             R.id.bookmarks_menu_item -> {
                 launchBookmarksView()
                 return true
@@ -292,6 +300,14 @@ class BrowserActivity : DuckDuckGoActivity() {
             }
         }
         return false
+    }
+
+    private fun addBookmark() {
+        val title = webView.title
+        val url = webView.url
+        Thread({
+            viewModel.addBookmark(title, url)
+        }).start()
     }
 
     private fun finishActivityAnimated() {

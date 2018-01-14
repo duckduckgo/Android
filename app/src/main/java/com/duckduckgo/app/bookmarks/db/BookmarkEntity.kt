@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks
+package com.duckduckgo.app.bookmarks.db
 
-import android.arch.lifecycle.ViewModel
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.PrimaryKey
 
-class BookmarksViewModel: ViewModel() {
-
-
-}
+@Entity(tableName = "bookmarks")
+data class BookmarkEntity(@PrimaryKey(autoGenerate = true) var id: Int = 0, var title: String?, var url: String)

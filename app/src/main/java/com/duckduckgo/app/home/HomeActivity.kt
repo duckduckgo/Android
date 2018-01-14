@@ -24,7 +24,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
-import com.duckduckgo.app.bookmarks.BookmarksActivity
+import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.intentText

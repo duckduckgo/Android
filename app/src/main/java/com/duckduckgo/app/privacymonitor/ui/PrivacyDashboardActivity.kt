@@ -126,11 +126,12 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         startActivity(ScorecardActivity.intent(this))
     }
 
-    fun onNetworksClicked(view: View) {
+    fun onNetworksClicked(@Suppress("UNUSED_PARAMETER") view: View) {
         startActivity(TrackerNetworksActivity.intent(this))
     }
 
-    fun onPracticesClicked(view: View) {
+
+    fun onPracticesClicked(@Suppress("UNUSED_PARAMETER") view: View) {
         startActivityForResult(PrivacyPracticesActivity.intent(this), REQUEST_CODE_PRIVACY_PRACTICES)
     }
 

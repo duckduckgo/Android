@@ -18,6 +18,7 @@ package com.duckduckgo.app.di
 
 import android.arch.persistence.room.Room
 import android.content.Context
+import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.global.db.AppDatabase
 import dagger.Module
 import dagger.Provides
@@ -42,5 +43,8 @@ class DatabaseModule {
 
     @Provides
     fun providesNetworkLeaderboardDao(database: AppDatabase) = database.networkLeaderboardDao()
+
+    @Provides
+    fun providesBookmarksDao(database: AppDatabase) = database.bookmarksDao()
 
 }

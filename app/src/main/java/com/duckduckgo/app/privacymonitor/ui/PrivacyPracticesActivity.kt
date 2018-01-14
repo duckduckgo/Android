@@ -77,7 +77,7 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
         practicesAdapter.updateData(viewState.goodTerms, viewState.badTerms)
     }
 
-    fun onTosdrLinkClicked(view: View) {
+    fun onTosdrLinkClicked(@Suppress("UNUSED_PARAMETER") view: View) {
         setResult(TOSDR_RESULT_CODE)
         finish()
     }
