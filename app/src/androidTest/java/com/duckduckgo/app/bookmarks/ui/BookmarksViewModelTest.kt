@@ -21,12 +21,9 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.browser.BrowserViewModel
-import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
-import org.junit.Assert
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before

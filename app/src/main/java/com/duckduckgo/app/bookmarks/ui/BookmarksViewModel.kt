@@ -21,10 +21,11 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
 import android.support.annotation.WorkerThread
-import com.duckduckgo.app.bookmarks.db.*
-import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
+import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.ConfirmDeleteBookmark
+import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.OpenBookmark
 import com.duckduckgo.app.global.SingleLiveEvent
-import org.jetbrains.anko.doAsync
 
 class BookmarksViewModel(val dao: BookmarksDao): ViewModel() {
 

@@ -26,7 +26,6 @@ import android.support.annotation.WorkerThread
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity.Companion.RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity.Companion.OPEN_URL_RESULT_CODE
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh

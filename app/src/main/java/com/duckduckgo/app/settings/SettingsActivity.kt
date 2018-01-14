@@ -28,8 +28,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.launchExternalActivity
-import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.content_settings.*
+import kotlinx.android.synthetic.main.include_toolbar.*
 import javax.inject.Inject
 
 class SettingsActivity : DuckDuckGoActivity() {
