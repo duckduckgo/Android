@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.home
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.ActivityOptionsCompat
@@ -127,8 +128,13 @@ class HomeActivity : AppCompatActivity() {
     }
 
     companion object {
+
         private const val SETTINGS_REQUEST_CODE = 100
         private const val BOOKMARKS_REQUEST_CODE = 101
-    }
 
+        fun intent(context: Context): Intent {
+            return Intent(context, HomeActivity::class.java)
+        }
+
+    }
 }
