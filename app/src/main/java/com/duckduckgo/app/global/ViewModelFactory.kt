@@ -23,7 +23,6 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
 import com.duckduckgo.app.browser.BrowserViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
@@ -35,6 +34,7 @@ import com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesViewModel
 import com.duckduckgo.app.privacymonitor.ui.ScorecardViewModel
 import com.duckduckgo.app.privacymonitor.ui.TrackerNetworksViewModel
 import com.duckduckgo.app.settings.SettingsViewModel
+import com.duckduckgo.app.settings.db.AppConfigurationDao
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import javax.inject.Inject
 
@@ -49,7 +49,7 @@ class ViewModelFactory @Inject constructor(
         private val termsOfServiceStore: TermsOfServiceStore,
         private val trackerNetworks: TrackerNetworks,
         private val stringResolver: StringResolver,
-        private val appDatabase: AppDatabase,
+        private val appConfigurationDao: AppConfigurationDao,
         private val networkLeaderboardDao: NetworkLeaderboardDao,
         private val bookmarksDao: BookmarksDao
 ) : ViewModelProvider.NewInstanceFactory() {
@@ -58,7 +58,7 @@ class ViewModelFactory @Inject constructor(
             with(modelClass) {
                 when {
                     isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore)
-                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, duckDuckGoUrlDetector, termsOfServiceStore, trackerNetworks, privacyMonitorRepository, stringResolver, networkLeaderboardDao, bookmarksDao, appDatabase.appConfigurationDao())
+                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, duckDuckGoUrlDetector, termsOfServiceStore, trackerNetworks, privacyMonitorRepository, stringResolver, networkLeaderboardDao, bookmarksDao, appConfigurationDao)
                     isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(privacySettingsStore, networkLeaderboardDao)
                     isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                     isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()

@@ -46,4 +46,7 @@ class DatabaseModule {
     @Provides
     fun providesBookmarksDao(database: AppDatabase) = database.bookmarksDao()
 
+    @Provides
+    fun appConfigurationDao(database: AppDatabase) = database.appConfigurationDao()
+
 }
