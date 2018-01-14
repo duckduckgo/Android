@@ -98,9 +98,6 @@ dependencies {
 
     // Anko
     compile "org.jetbrains.anko:anko-commons:$ankoVersion"
-    compile "org.jetbrains.anko:anko-sdk25:$ankoVersion"
-    compile "org.jetbrains.anko:anko-appcompat-v7:$ankoVersion"
-
 
     // ViewModel and LiveData
     implementation "android.arch.lifecycle:extensions:$architectureComponents"
