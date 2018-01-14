@@ -20,13 +20,25 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
+import android.support.annotation.WorkerThread
 import com.duckduckgo.app.bookmarks.db.*
+import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
+import com.duckduckgo.app.global.SingleLiveEvent
+import org.jetbrains.anko.doAsync
 
-class BookmarksViewModel(dao: BookmarksDao): ViewModel() {
+class BookmarksViewModel(val dao: BookmarksDao): ViewModel() {
 
     data class ViewState(val bookmarks: List<BookmarkEntity> = emptyList())
 
+    sealed class Command {
+
+        class OpenBookmark(val bookmark: BookmarkEntity) : Command()
+        class ConfirmDeleteBookmark(val bookmark: BookmarkEntity) : Command()
+
+    }
+
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     private val bookmarks: LiveData<List<BookmarkEntity>> = dao.bookmarks()
     private val bookmarksObserver = Observer<List<BookmarkEntity>> { onBookmarksChanged(it!!) }
@@ -43,6 +55,19 @@ class BookmarksViewModel(dao: BookmarksDao): ViewModel() {
 
     private fun onBookmarksChanged(bookmarks: List<BookmarkEntity>) {
         viewState.value = viewState.value?.copy(bookmarks)
+    }
+
+    fun onSelected(bookmark: BookmarkEntity) {
+        command.value = OpenBookmark(bookmark)
+    }
+
+    fun onDeleteRequested(bookmark: BookmarkEntity) {
+        command.value = ConfirmDeleteBookmark(bookmark)
+    }
+
+    @WorkerThread
+    fun delete(bookmark: BookmarkEntity) {
+        dao.delete(bookmark)
     }
 
 }

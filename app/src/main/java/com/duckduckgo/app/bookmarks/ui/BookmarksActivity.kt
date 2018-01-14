@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.bookmarks.ui
 
+import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
@@ -26,7 +27,6 @@ import android.support.v7.widget.RecyclerView.ViewHolder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -34,6 +34,8 @@ import com.duckduckgo.app.global.ViewModelFactory
 import kotlinx.android.synthetic.main.content_bookmarks.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.view_bookmark_entry.view.*
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.doAsync
 import javax.inject.Inject
 
 class BookmarksActivity: DuckDuckGoActivity() {
@@ -55,7 +57,7 @@ class BookmarksActivity: DuckDuckGoActivity() {
     }
 
     private fun setupBookmarksRecycler() {
-        adapter = BookmarksAdapter(applicationContext)
+        adapter = BookmarksAdapter(applicationContext, viewModel)
         recycler.adapter = adapter
     }
 
@@ -70,15 +72,43 @@ class BookmarksActivity: DuckDuckGoActivity() {
                 adapter.bookmarks = it.bookmarks
             }
         })
+
+        viewModel.command.observe(this, Observer {
+            when(it) {
+                is BookmarksViewModel.Command.ConfirmDeleteBookmark -> confirmDeleteBookmark(it.bookmark)
+                is BookmarksViewModel.Command.OpenBookmark -> openBookmark(it.bookmark)
+            }
+         })
+    }
+
+    private fun openBookmark(bookmark: BookmarkEntity) {
+        val intent = Intent(bookmark.url)
+        setResult(OPEN_URL_RESULT_CODE, intent)
+        finish()
+    }
+
+    private fun confirmDeleteBookmark(bookmark: BookmarkEntity) {
+        alert(R.string.bookmarkDeleteConfirmMessage, R.string.bookmarkDeleteConfirmTitle) {
+            positiveButton(android.R.string.yes) { delete(bookmark) }
+            negativeButton(android.R.string.no) { }
+        }.show()
+    }
+
+    private fun delete(bookmark: BookmarkEntity) {
+        doAsync {
+            viewModel.delete(bookmark)
+        }
     }
 
     companion object {
         fun intent(context: Context): Intent {
             return Intent(context, BookmarksActivity::class.java)
         }
+
+        val OPEN_URL_RESULT_CODE = Activity.RESULT_FIRST_USER
     }
 
-    class BookmarksAdapter(var context: Context): Adapter<BookmarksViewHolder>() {
+    class BookmarksAdapter(val context: Context, val viewModel: BookmarksViewModel): Adapter<BookmarksViewHolder>() {
 
         var bookmarks: List<BookmarkEntity> = emptyList()
             set(value) {
@@ -90,7 +120,7 @@ class BookmarksActivity: DuckDuckGoActivity() {
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): BookmarksViewHolder {
             val inflater = LayoutInflater.from(context)
             val view = inflater.inflate(R.layout.view_bookmark_entry, parent, false)
-            return BookmarksViewHolder(view)
+            return BookmarksViewHolder(view, viewModel)
         }
 
         override fun onBindViewHolder(holder: BookmarksViewHolder?, position: Int) {
@@ -103,11 +133,23 @@ class BookmarksActivity: DuckDuckGoActivity() {
 
     }
 
-    class BookmarksViewHolder(itemView: View?) : ViewHolder(itemView) {
+    class BookmarksViewHolder(itemView: View?, val viewModel: BookmarksViewModel) : ViewHolder(itemView) {
+
+        lateinit var bookmark: BookmarkEntity
 
         fun update(bookmark: BookmarkEntity) {
+            this.bookmark = bookmark
+
+            itemView.delete.contentDescription = itemView.context.getString(R.string.deleteBookmarkContentDescription, bookmark.title)
             itemView.title.text = bookmark.title
-            itemView.url.text = bookmark.url
+
+            itemView.delete.setOnClickListener {
+                viewModel.onDeleteRequested(bookmark)
+            }
+
+            itemView.setOnClickListener {
+                viewModel.onSelected(bookmark)
+            }
         }
 
     }

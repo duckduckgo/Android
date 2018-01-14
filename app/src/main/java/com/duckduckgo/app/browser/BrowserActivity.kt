@@ -42,6 +42,7 @@ import com.duckduckgo.app.privacymonitor.renderer.icon
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_browser.*
+import org.jetbrains.anko.doAsync
 import javax.inject.Inject
 
 class BrowserActivity : DuckDuckGoActivity() {
@@ -305,9 +306,9 @@ class BrowserActivity : DuckDuckGoActivity() {
     private fun addBookmark() {
         val title = webView.title
         val url = webView.url
-        Thread({
+        doAsync {
             viewModel.addBookmark(title, url)
-        }).start()
+        }
     }
 
     private fun finishActivityAnimated() {
@@ -339,6 +340,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         when (requestCode) {
             DASHBOARD_REQUEST_CODE -> viewModel.receivedDashboardResult(resultCode)
             SETTINGS_REQUEST_CODE -> viewModel.receivedSettingsResult(resultCode)
+            BOOKMARKS_REQUEST_CODE -> viewModel.receivedBookmarksResult(resultCode, data?.action)
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }

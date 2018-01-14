@@ -23,7 +23,9 @@ import android.arch.lifecycle.Observer
 import android.arch.persistence.room.Room
 import android.net.Uri
 import android.support.test.InstrumentationRegistry
+import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.LandingPage
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
@@ -52,23 +54,19 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 
-// TODO test add bookmark
-
-// TODO test add bookmark menu item enabled state
-
 class BrowserViewModelTest {
 
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private var lastEntry: NetworkLeaderboardEntry? = null
+    private var lastNetworkLeaderboardEntry: NetworkLeaderboardEntry? = null
 
     private val testStringResolver: StringResolver = object : StringResolver {}
 
     private val testNetworkLeaderboardDao: NetworkLeaderboardDao = object : NetworkLeaderboardDao {
         override fun insert(leaderboardEntry: NetworkLeaderboardEntry) {
-            lastEntry = leaderboardEntry
+            lastNetworkLeaderboardEntry = leaderboardEntry
         }
 
         override fun networkPercents(): LiveData<Array<NetworkPercent>> {
@@ -128,11 +126,38 @@ class BrowserViewModelTest {
     }
 
     @Test
+    fun whenBookmarksResultCodeIsOpenUrlThenNavigate() {
+        testee.receivedBookmarksResult(BookmarksActivity.OPEN_URL_RESULT_CODE, "www.example.com")
+        val captor: ArgumentCaptor<Command> = ArgumentCaptor.forClass(Command::class.java)
+        verify(navigationObserver).onChanged(captor.capture())
+        assertNotNull(captor.value)
+        assertTrue(captor.value is Navigate)
+    }
+
+    @Test
+    fun whenUrlPresentThenAddBookmarkButtonEnabled() {
+        testee.urlChanged("www.example.com")
+        assertTrue(testee.viewState.value!!.canAddBookmarks)
+    }
+
+    @Test
+    fun whenNoUrlThenAddBookmarkButtonDisabled() {
+        testee.urlChanged(null)
+        assertFalse(testee.viewState.value!!.canAddBookmarks)
+    }
+
+    @Test
+    fun whenBookmarkAddedThenDaoIsUpdated() {
+        testee.addBookmark("A title", "www.example.com")
+        verify(bookmarksDao).insert(BookmarkEntity(title = "A title", url = "www.example.com"))
+    }
+
+    @Test
     fun whenTrackerDetectedThenNetworkLeaderbardUpdated() {
         testee.trackerDetected(TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", TrackerNetwork("Network1", "www.tracker.com"), false))
-        assertNotNull(lastEntry)
-        assertEquals(lastEntry!!.domainVisited, "www.example.com")
-        assertEquals(lastEntry!!.networkName, "Network1")
+        assertNotNull(lastNetworkLeaderboardEntry)
+        assertEquals(lastNetworkLeaderboardEntry!!.domainVisited, "www.example.com")
+        assertEquals(lastNetworkLeaderboardEntry!!.networkName, "Network1")
     }
 
     @Test

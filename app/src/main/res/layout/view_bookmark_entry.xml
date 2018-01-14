@@ -21,10 +21,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="20dp">
+    android:padding="20dp"
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true">
 
+    <!-- content description set to network name in code -->
     <ImageView
         android:id="@+id/delete"
+        android:contentDescription="@string/appName"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -46,20 +50,5 @@
         android:textStyle="bold"
         android:fontFamily="sans-serif-medium"
         tools:text="Title" />
-
-    <TextView
-        android:id="@+id/url"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-con"
-        android:textSize="14sp"
-        android:layout_marginTop="8dp"
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/title"
-        app:layout_constraintTop_toBottomOf="@+id/title"
-        tools:text="http://www.example.com" />
 
 </android.support.constraint.ConstraintLayout>

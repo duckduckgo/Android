@@ -98,8 +98,13 @@
         DuckDuckGo Privacy Browser provides all the privacy essentials you need to protect yourself as you search and browse the web, including tracker blocking, smarter encryption, and DuckDuckGo private search.\n\
         After all, the internet shouldn\'t feel so creepy, and getting the privacy you deserve online should be as simple closing the blinds.</string>
     <string name="aboutMoreLink">More at duckduckgo.com/about</string>
+
+    <!-- Bookmarks Activity -->
     <string name="boomarksMenuTitle">Bookmarks</string>
     <string name="bookmarksActivityTitle">Bookmarks</string>
     <string name="addBookmarkMenuTitle">Add Bookmark</string>
+    <string name="deleteBookmarkContentDescription">Delete bookmark for %s</string>
+    <string name="bookmarkDeleteConfirmMessage">Are you sure you want to delete this bookmark?</string>
+    <string name="bookmarkDeleteConfirmTitle">Confirm</string>
 
 </resources>

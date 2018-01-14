@@ -22,9 +22,12 @@ import android.arch.lifecycle.ViewModel
 import android.net.Uri
 import android.support.annotation.AnyThread
 import android.support.annotation.VisibleForTesting
+import android.support.annotation.WorkerThread
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity.Companion.RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
+import com.duckduckgo.app.bookmarks.ui.BookmarksActivity.Companion.OPEN_URL_RESULT_CODE
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
@@ -224,7 +227,7 @@ class BrowserViewModel(
     }
 
     fun onSharedTextReceived(input: String) {
-        command.value = Navigate(buildUrl(input))
+        openUrl(buildUrl(input))
     }
 
     /**
@@ -245,7 +248,7 @@ class BrowserViewModel(
             RELOAD_RESULT_CODE -> command.value = Refresh()
             TOSDR_RESULT_CODE -> {
                 val url = stringResolver.getString(R.string.tosdrUrl)
-                command.value = Navigate(url)
+                openUrl(url)
             }
         }
     }
@@ -254,13 +257,26 @@ class BrowserViewModel(
         when (resultCode) {
             RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE -> {
                 val url = stringResolver.getString(R.string.aboutUrl)
-                command.value = Navigate(url)
+                openUrl(url)
             }
         }
     }
 
+    @WorkerThread
     fun addBookmark(title: String?, url: String?) {
         bookmarksDao.insert(BookmarkEntity(title = title, url = url!!))
+    }
+
+    fun receivedBookmarksResult(resultCode: Int, action: String?) {
+        when (resultCode) {
+            OPEN_URL_RESULT_CODE -> {
+                openUrl(action ?: return)
+            }
+        }
+    }
+
+    private fun openUrl(url: String) {
+        command.value = Navigate(url)
     }
 
 }

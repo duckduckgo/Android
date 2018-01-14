@@ -101,16 +101,29 @@ class HomeActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             SETTINGS_REQUEST_CODE -> onHandleSettingsResult(resultCode)
+            BOOKMARKS_REQUEST_CODE -> onHandleBookmarksResult(resultCode, data)
             else -> super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
+    private fun onHandleBookmarksResult(resultCode: Int, data: Intent?) {
+        when(resultCode) {
+            BookmarksActivity.OPEN_URL_RESULT_CODE -> {
+                openUrl(data?.action ?: return)
+            }
         }
     }
 
     private fun onHandleSettingsResult(resultCode: Int) {
         when (resultCode) {
             AboutDuckDuckGoActivity.RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE -> {
-                startActivity(BrowserActivity.intent(this, getString(R.string.aboutUrl)))
+                openUrl(getString(R.string.aboutUrl))
             }
         }
+    }
+
+    private fun openUrl(url: String) {
+        startActivity(BrowserActivity.intent(this, url))
     }
 
     companion object {
