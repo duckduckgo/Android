@@ -86,6 +86,7 @@
     <string name="networkTrackerSummaryNotReady">We\'re still collecting data to show how many trackers we\'ve blocked.</string>
 
     <!-- Fire -->
+    <string name="fireMenu">Clear Data</string>
     <string name="fireClearAll">Clear All Data</string>
     <string name="fireCancel">Cancel</string>
     <string name="fireDataCleared">Data cleared</string>
