@@ -23,7 +23,6 @@ import android.support.v4.app.ActivityOptionsCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
@@ -33,6 +32,7 @@ import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
+import org.jetbrains.anko.toast
 
 class HomeActivity : AppCompatActivity() {
 
@@ -95,7 +95,7 @@ class HomeActivity : AppCompatActivity() {
 
     private fun launchFire() {
         FireDialog(this, {}, {
-            Toast.makeText(this, R.string.fireDataCleared, Toast.LENGTH_SHORT).show()
+            toast(R.string.fireDataCleared)
         }).show()
     }
 

@@ -31,7 +31,6 @@ import android.view.View
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.widget.TextView
-import android.widget.Toast
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -43,6 +42,8 @@ import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_browser.*
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.toast
+import org.jetbrains.anko.uiThread
 import javax.inject.Inject
 
 class BrowserActivity : DuckDuckGoActivity() {
@@ -308,6 +309,9 @@ class BrowserActivity : DuckDuckGoActivity() {
         val url = webView.url
         doAsync {
             viewModel.addBookmark(title, url)
+            uiThread {
+                toast(R.string.bookmarkAddedFeedback)
+            }
         }
     }
 
@@ -324,7 +328,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         FireDialog(this, {
             finishActivityAnimated()
         }, {
-            Toast.makeText(this, R.string.fireDataCleared, Toast.LENGTH_SHORT).show()
+            toast(R.string.fireDataCleared)
         }).show()
     }
 
