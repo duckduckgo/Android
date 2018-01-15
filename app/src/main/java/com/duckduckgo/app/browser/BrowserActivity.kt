@@ -328,7 +328,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         FireDialog(this, {
             finishActivityAnimated()
         }, {
-            toast(R.string.fireDataCleared)
+            applicationContext.toast(R.string.fireDataCleared)
         }).show()
     }
 
