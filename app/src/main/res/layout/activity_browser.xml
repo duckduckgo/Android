@@ -133,6 +133,7 @@
 
         </android.support.design.widget.AppBarLayout>
 
+
         <View
             android:id="@+id/focusDummy"
             android:layout_width="match_parent"
@@ -149,6 +150,15 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             tools:visibility="visible" />
 
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/autoCompleteSuggestionsList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="4dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
     </android.support.design.widget.CoordinatorLayout>
+
+
 </android.support.constraint.ConstraintLayout>
 

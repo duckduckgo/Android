@@ -23,6 +23,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.view.KeyEvent.KEYCODE_ENTER
 import android.view.Menu
@@ -38,6 +39,7 @@ import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.renderer.icon
+import com.duckduckgo.app.privacymonitor.ui.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.REQUEST_DASHBOARD
 import com.duckduckgo.app.settings.SettingsActivity
@@ -49,6 +51,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     @Inject lateinit var webViewClient: BrowserWebViewClient
     @Inject lateinit var webChromeClient: BrowserChromeClient
     @Inject lateinit var viewModelFactory: ViewModelFactory
+    @Inject lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
     private var acceptingRenderUpdates = true
 
@@ -99,7 +102,6 @@ class BrowserActivity : DuckDuckGoActivity() {
                     focusDummy.requestFocus()
                     webView.loadUrl(it.url)
                 }
-                is BrowserViewModel.Command.LandingPage -> finishActivityAnimated()
                 is BrowserViewModel.Command.DialNumber -> {
                     val intent = Intent(Intent.ACTION_DIAL)
                     intent.data = Uri.parse("tel:${it.telephoneNumber}")
@@ -121,10 +123,16 @@ class BrowserActivity : DuckDuckGoActivity() {
         configureWebView()
         configureOmnibarTextInput()
         configureDummyViewTouchHandler()
+        configureAutoCompleteSuggestionsRecycler()
 
         if (savedInstanceState == null) {
             consumeSharedTextExtra()
         }
+    }
+
+    private fun configureAutoCompleteSuggestionsRecycler() {
+        autoCompleteSuggestionsList.layoutManager = LinearLayoutManager(this)
+        autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
     private fun consumeSharedTextExtra() {
@@ -162,6 +170,15 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         privacyGradeMenu?.isVisible = viewState.showPrivacyGrade
         fireMenu?.isVisible = viewState.showFireButton
+
+        when(viewState.showAutoCompleteSuggestions) {
+            false -> autoCompleteSuggestionsList.hide()
+            true -> {
+                autoCompleteSuggestionsList.show()
+                val results = viewState.autoCompleteSearchResults.suggestions
+                autoCompleteSuggestionsAdapter.updateData(results)
+            }
+        }
     }
 
     private fun showClearButton() {

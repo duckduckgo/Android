@@ -28,6 +28,10 @@ open class AutoCompleteApi @Inject constructor(
 
     fun autoComplete(query: String): Observable<AutoCompleteApi.AutoCompleteResult> {
 
+        if (query.isBlank()) {
+            return Observable.just(AutoCompleteResult(query, emptyList()))
+        }
+
         return autoCompleteService.autoComplete(query)
                 .flatMapIterable { it -> it }
                 .map { AutoCompleteSuggestion(it.phrase, queryUrlConverter.isWebUrl(it.phrase)) }

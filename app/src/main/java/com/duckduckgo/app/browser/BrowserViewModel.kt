@@ -70,6 +70,7 @@ class BrowserViewModel(
             val showClearButton: Boolean = false,
             val showPrivacyGrade: Boolean = false,
             val showFireButton: Boolean = true,
+            val showAutoCompleteSuggestions: Boolean = false,
             val autoCompleteSearchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
     )
 
@@ -119,9 +120,17 @@ class BrowserViewModel(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ result ->
-                    Timber.i("Got ac results: $result")
-                    viewState.value = currentViewState().copy(autoCompleteSearchResults = result)
+                    onAutoCompleteResultReceived(result)
                 }, { t: Throwable? -> Timber.w(t, "Failed to get search results") })
+    }
+
+    private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
+        val isEditing = currentViewState().isEditing
+        Timber.i("Got ${result.suggestions.size} autocomplete results. Is user still editing? $isEditing - results: $result")
+
+        val results = result.suggestions.take(6)
+
+        viewState.value = currentViewState().copy(autoCompleteSearchResults = AutoCompleteResult(result.query, results))
     }
 
 
@@ -141,7 +150,10 @@ class BrowserViewModel(
             return
         }
         url.value = buildUrl(input)
-        viewState.value = currentViewState().copy(showClearButton = false, omnibarText = input)
+        viewState.value = currentViewState().copy(
+                showClearButton = false,
+                omnibarText = input,
+                showAutoCompleteSuggestions = false)
     }
 
     private fun buildUrl(input: String): String {
@@ -233,11 +245,31 @@ class BrowserViewModel(
 
     fun onOmnibarInputStateChanged(query: String, hasFocus: Boolean) {
         val showClearButton = hasFocus && query.isNotEmpty()
+
+        val currentViewState = currentViewState()
+
+        // determine if empty list to be shown, or existing search results
+        val autoCompleteSearchResults = if (query.isBlank()) {
+            AutoCompleteResult(query, emptyList())
+        } else {
+            currentViewState.autoCompleteSearchResults
+        }
+
+        val hasQueryChanged = (currentViewState.omnibarText == query).not()
+
+        if(hasQueryChanged) {
+            Timber.i("Query changed")
+        } else {
+            Timber.i("Not changed query")
+        }
+
         viewState.value = currentViewState().copy(
                 isEditing = hasFocus,
                 showClearButton = showClearButton,
                 showPrivacyGrade = appConfigurationDownloaded && !hasFocus,
-                showFireButton = !hasFocus
+                showFireButton = !hasFocus,
+                showAutoCompleteSuggestions = hasFocus && hasQueryChanged,
+                autoCompleteSearchResults = autoCompleteSearchResults
         )
 
         Timber.i("Received query [$query]")
