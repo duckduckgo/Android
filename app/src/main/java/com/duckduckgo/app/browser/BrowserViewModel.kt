@@ -22,7 +22,11 @@ import android.arch.lifecycle.ViewModel
 import android.net.Uri
 import android.support.annotation.AnyThread
 import android.support.annotation.VisibleForTesting
+import android.support.annotation.WorkerThread
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity.Companion.RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE
+import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.ui.BookmarksActivity.Companion.OPEN_URL_RESULT_CODE
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
@@ -36,8 +40,8 @@ import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.privacymonitor.model.improvedGrade
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
-import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RESULT_RELOAD
-import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RESULT_TOSDR
+import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
+import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.TOSDR_RESULT_CODE
 import com.duckduckgo.app.settings.db.AppConfigurationDao
 import com.duckduckgo.app.settings.db.AppConfigurationEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
@@ -52,6 +56,7 @@ class BrowserViewModel(
         private val privacyMonitorRepository: PrivacyMonitorRepository,
         private val stringResolver: StringResolver,
         private val networkLeaderboardDao: NetworkLeaderboardDao,
+        private val bookmarksDao: BookmarksDao,
         appConfigurationDao: AppConfigurationDao) : WebViewClientListener, ViewModel() {
 
     data class ViewState(
@@ -62,7 +67,8 @@ class BrowserViewModel(
             val browserShowing: Boolean = false,
             val showClearButton: Boolean = false,
             val showPrivacyGrade: Boolean = false,
-            val showFireButton: Boolean = true
+            val showFireButton: Boolean = true,
+            val canAddBookmarks: Boolean = false
     )
 
     sealed class Command {
@@ -94,7 +100,7 @@ class BrowserViewModel(
     private var appConfigurationDownloaded = false
 
     init {
-        viewState.value = ViewState()
+        viewState.value = ViewState(canAddBookmarks = false)
         privacyMonitorRepository.privacyMonitor = MutableLiveData()
         appConfigurationObservable.observeForever(appConfigurationObserver)
     }
@@ -159,9 +165,13 @@ class BrowserViewModel(
 
     override fun urlChanged(url: String?) {
         Timber.v("Url changed: $url")
-        if (url == null) return
+        if (url == null) {
+            viewState.value = viewState.value?.copy(canAddBookmarks = false)
+            return
+        }
 
         var newViewState = currentViewState().copy(
+                canAddBookmarks = true,
                 omnibarText = url,
                 browserShowing = true,
                 showFireButton = true,
@@ -216,7 +226,7 @@ class BrowserViewModel(
     }
 
     fun onSharedTextReceived(input: String) {
-        command.value = Navigate(buildUrl(input))
+        openUrl(buildUrl(input))
     }
 
     /**
@@ -234,10 +244,10 @@ class BrowserViewModel(
 
     fun receivedDashboardResult(resultCode: Int) {
         when (resultCode) {
-            RESULT_RELOAD -> command.value = Refresh()
-            RESULT_TOSDR -> {
+            RELOAD_RESULT_CODE -> command.value = Refresh()
+            TOSDR_RESULT_CODE -> {
                 val url = stringResolver.getString(R.string.tosdrUrl)
-                command.value = Navigate(url)
+                openUrl(url)
             }
         }
     }
@@ -246,10 +256,28 @@ class BrowserViewModel(
         when (resultCode) {
             RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE -> {
                 val url = stringResolver.getString(R.string.aboutUrl)
-                command.value = Navigate(url)
+                openUrl(url)
             }
         }
     }
+
+    @WorkerThread
+    fun addBookmark(title: String?, url: String?) {
+        bookmarksDao.insert(BookmarkEntity(title = title, url = url!!))
+    }
+
+    fun receivedBookmarksResult(resultCode: Int, action: String?) {
+        when (resultCode) {
+            OPEN_URL_RESULT_CODE -> {
+                openUrl(action ?: return)
+            }
+        }
+    }
+
+    private fun openUrl(url: String) {
+        command.value = Navigate(url)
+    }
+
 }
 
 

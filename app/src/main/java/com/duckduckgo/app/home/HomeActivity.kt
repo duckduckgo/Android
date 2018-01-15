@@ -23,8 +23,8 @@ import android.support.v4.app.ActivityOptionsCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
+import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.intentText
@@ -32,6 +32,7 @@ import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
+import org.jetbrains.anko.toast
 
 class HomeActivity : AppCompatActivity() {
 
@@ -80,6 +81,10 @@ class HomeActivity : AppCompatActivity() {
                 startActivityForResult(SettingsActivity.intent(this), SETTINGS_REQUEST_CODE)
                 true
             }
+            R.id.bookmarks_menu_item -> {
+                startActivityForResult(BookmarksActivity.intent(this), BOOKMARKS_REQUEST_CODE)
+                true
+            }
             R.id.fire_menu_item -> {
                 launchFire()
                 true
@@ -90,29 +95,42 @@ class HomeActivity : AppCompatActivity() {
 
     private fun launchFire() {
         FireDialog(this, {}, {
-            Toast.makeText(this, R.string.fireDataCleared, Toast.LENGTH_SHORT).show()
+            toast(R.string.fireDataCleared)
         }).show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             SETTINGS_REQUEST_CODE -> onHandleSettingsResult(resultCode)
+            BOOKMARKS_REQUEST_CODE -> onHandleBookmarksResult(resultCode, data)
             else -> super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
+    private fun onHandleBookmarksResult(resultCode: Int, data: Intent?) {
+        when(resultCode) {
+            BookmarksActivity.OPEN_URL_RESULT_CODE -> {
+                openUrl(data?.action ?: return)
+            }
         }
     }
 
     private fun onHandleSettingsResult(resultCode: Int) {
         when (resultCode) {
             AboutDuckDuckGoActivity.RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE -> {
-                startActivity(BrowserActivity.intent(this, getString(R.string.aboutUrl)))
+                openUrl(getString(R.string.aboutUrl))
             }
         }
     }
 
+    private fun openUrl(url: String) {
+        startActivity(BrowserActivity.intent(this, url))
+    }
 
     companion object {
 
         private const val SETTINGS_REQUEST_CODE = 100
+        private const val BOOKMARKS_REQUEST_CODE = 101
 
         fun intent(context: Context): Intent {
             return Intent(context, HomeActivity::class.java)

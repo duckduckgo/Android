@@ -21,8 +21,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.duckduckgo.app.browser.R
-import kotlinx.android.synthetic.main.activity_about_duck_duck_go.*
 import kotlinx.android.synthetic.main.content_about_duck_duck_go.*
+import kotlinx.android.synthetic.main.include_toolbar.*
 
 class AboutDuckDuckGoActivity : AppCompatActivity() {
 

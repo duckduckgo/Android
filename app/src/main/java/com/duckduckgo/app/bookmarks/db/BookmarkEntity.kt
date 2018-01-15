@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.view
+package com.duckduckgo.app.bookmarks.db
 
-import android.content.Intent
-import android.support.v7.app.AppCompatActivity
-import com.duckduckgo.app.browser.R
-import org.jetbrains.anko.toast
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.PrimaryKey
 
-fun AppCompatActivity.launchExternalActivity(intent: Intent) {
-    if (intent.resolveActivity(packageManager) != null) {
-        startActivity(intent)
-    } else {
-        toast(R.string.no_compatible_third_party_app_installed)
-    }
-}
+@Entity(tableName = "bookmarks")
+data class BookmarkEntity(@PrimaryKey(autoGenerate = true) var id: Int = 0, var title: String?, var url: String)

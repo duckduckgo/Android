@@ -33,7 +33,6 @@ package com.duckduckgo.app.httpsupgrade.db
  */
 
 import android.arch.persistence.room.Room
-import android.content.Context
 import android.net.Uri
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase

@@ -14,17 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.view
+package com.duckduckgo.app.bookmarks.db
 
-import android.content.Intent
-import android.support.v7.app.AppCompatActivity
-import com.duckduckgo.app.browser.R
-import org.jetbrains.anko.toast
+import android.arch.lifecycle.LiveData
+import android.arch.persistence.room.Dao
+import android.arch.persistence.room.Delete
+import android.arch.persistence.room.Insert
+import android.arch.persistence.room.Query
 
-fun AppCompatActivity.launchExternalActivity(intent: Intent) {
-    if (intent.resolveActivity(packageManager) != null) {
-        startActivity(intent)
-    } else {
-        toast(R.string.no_compatible_third_party_app_installed)
-    }
+@Dao
+interface BookmarksDao {
+
+    @Insert
+    fun insert(bookmark: BookmarkEntity)
+
+    @Query("select * from bookmarks")
+    fun bookmarks(): LiveData<List<BookmarkEntity>>
+
+    @Delete
+    fun delete(bookmark: BookmarkEntity)
+
 }
