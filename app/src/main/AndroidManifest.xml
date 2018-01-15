@@ -53,8 +53,8 @@
 
         <activity
             android:name=".BrowserActivity"
-            android:allowTaskReparenting="true"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTask"
             android:parentActivityName="com.duckduckgo.app.home.HomeActivity"
             android:screenOrientation="fullSensor" />
 
@@ -63,26 +63,31 @@
             android:label="@string/privacyDashboardActivityTitle"
             android:parentActivityName=".BrowserActivity"
             android:screenOrientation="fullSensor" />
+
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.ScorecardActivity"
             android:label="@string/scorecardActivityTitle"
             android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
             android:screenOrientation="fullSensor" />
+
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity"
             android:label="@string/networksActivityTitle"
             android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
             android:screenOrientation="fullSensor" />
+
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity"
             android:label="@string/privacyTermsActivityTitle"
             android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
             android:screenOrientation="fullSensor" />
+
         <activity
             android:name="com.duckduckgo.app.settings.SettingsActivity"
             android:label="@string/settingsActivityTitle"
             android:parentActivityName=".BrowserActivity"
             android:screenOrientation="fullSensor" />
+
         <activity
             android:name="com.duckduckgo.app.about.AboutDuckDuckGoActivity"
             android:label="@string/aboutActivityTitle"
