@@ -125,11 +125,7 @@ class BrowserViewModel(
     }
 
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
-        val isEditing = currentViewState().isEditing
-        Timber.i("Got ${result.suggestions.size} autocomplete results. Is user still editing? $isEditing - results: $result")
-
         val results = result.suggestions.take(6)
-
         viewState.value = currentViewState().copy(autoCompleteSearchResults = AutoCompleteResult(result.query, results))
     }
 
@@ -255,12 +251,14 @@ class BrowserViewModel(
             currentViewState.autoCompleteSearchResults
         }
 
+        val hasQueryChanged = (currentViewState.omnibarText != query)
+
         viewState.value = currentViewState().copy(
                 isEditing = hasFocus,
                 showClearButton = showClearButton,
                 showPrivacyGrade = appConfigurationDownloaded && !hasFocus,
                 showFireButton = !hasFocus,
-                showAutoCompleteSuggestions = hasFocus,
+                showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged,
                 autoCompleteSearchResults = autoCompleteSearchResults
         )
 

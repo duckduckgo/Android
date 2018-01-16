@@ -19,7 +19,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="14dp"
     android:layout_marginTop="14dp">
 
     <ImageView
@@ -32,20 +31,21 @@
         android:importantForAccessibility="no"
         android:src="@drawable/ic_search_white_24dp" />
 
-    <android.support.v7.widget.AppCompatTextView
+    <TextView
         android:id="@+id/phrase"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:layout_toEndOf="@id/phraseOrUrlIndicator"
         android:layout_toStartOf="@id/editQueryImage"
+        android:ellipsize="end"
         android:fontFamily="sans-serif"
+        android:gravity="center_vertical|start"
         android:maxLines="1"
         android:textAlignment="textStart"
         android:textColor="@color/white"
         android:textSize="16sp"
-        app:autoSizeTextType="uniform"
-        tools:text="Here is a phrase or URL suggestion" />
+        tools:text="phrase or URL suggestion" />
 
     <FrameLayout
         android:id="@+id/editQueryImage"
@@ -53,7 +53,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:layout_marginStart="24dp"
         android:padding="6dp"
         android:paddingEnd="24dp"
         android:paddingStart="24dp">
