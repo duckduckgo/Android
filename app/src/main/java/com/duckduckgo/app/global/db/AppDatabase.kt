@@ -29,7 +29,7 @@ import com.duckduckgo.app.settings.db.AppConfigurationEntity
 import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 
-@Database(exportSchema = true, version = 6, entities = [
+@Database(exportSchema = true, version = 1, entities = [
     HttpsUpgradeDomain::class,
     DisconnectTracker::class,
     NetworkLeaderboardEntry::class,
