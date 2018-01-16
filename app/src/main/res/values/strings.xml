@@ -13,6 +13,9 @@
     <string name="clearButtonContentDescription">Clear search input</string>
     <string name="no_compatible_third_party_app_installed">No compatible app installed</string>
 
+    <!-- AutoComplete Suggestions -->
+    <string name="editQueryBeforeSubmitting">Edit query before searching</string>
+
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
     <string name="privacyProtectionEnabled">PRIVACY PROTECTION ENABLED</string>

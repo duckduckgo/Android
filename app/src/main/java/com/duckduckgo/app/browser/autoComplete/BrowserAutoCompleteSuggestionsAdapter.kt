@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacymonitor.ui
+package com.duckduckgo.app.browser.autoComplete
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -22,12 +22,14 @@ import android.view.View
 import android.view.ViewGroup
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.privacymonitor.ui.BrowserAutoCompleteSuggestionsAdapter.SuggestionViewHolder
+import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter.SuggestionViewHolder
 import kotlinx.android.synthetic.main.item_autocomplete_suggestion.view.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class BrowserAutoCompleteSuggestionsAdapter @Inject constructor() : RecyclerView.Adapter<SuggestionViewHolder>() {
+class BrowserAutoCompleteSuggestionsAdapter @Inject constructor(
+        private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit) : RecyclerView.Adapter<SuggestionViewHolder>() {
 
     private val suggestions: MutableList<AutoCompleteSuggestion> = ArrayList()
 
@@ -38,7 +40,7 @@ class BrowserAutoCompleteSuggestionsAdapter @Inject constructor() : RecyclerView
 
     override fun onBindViewHolder(holder: SuggestionViewHolder, position: Int) {
         val suggestion = suggestions[position]
-        holder.bind(suggestion)
+        holder.bind(suggestion, immediateSearchClickListener, editableSearchClickListener)
     }
 
     override fun getItemCount(): Int {
@@ -56,11 +58,14 @@ class BrowserAutoCompleteSuggestionsAdapter @Inject constructor() : RecyclerView
 
     class SuggestionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        fun bind(item: AutoCompleteSuggestion) = with(itemView) {
+        fun bind(item: AutoCompleteSuggestion,
+                 immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
+                 editableSearchClickListener: (AutoCompleteSuggestion) -> Unit) = with(itemView) {
             phrase.text = item.phrase
-
-            val phraseOrUrlImage = if (item.isUrl) R.drawable.dashboard_https_good else R.drawable.dashboard_https_bad
+            val phraseOrUrlImage = if (item.isUrl) R.drawable.ic_globe_white_24dp else R.drawable.ic_search_white_24dp
             phraseOrUrlIndicator.setImageResource(phraseOrUrlImage)
+            editQueryImage.setOnClickListener { editableSearchClickListener(item) }
+            setOnClickListener { immediateSearchListener(item) }
         }
     }
 

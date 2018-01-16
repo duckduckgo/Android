@@ -14,50 +14,57 @@
   ~ limitations under the License.
   -->
 
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="14dp"
+    android:layout_marginTop="14dp">
 
     <ImageView
         android:id="@+id/phraseOrUrlIndicator"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@drawable/dashboard_https_bad"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/phrase"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="24dp"
+        android:layout_marginStart="24dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_search_white_24dp" />
 
-    <TextView
+    <android.support.v7.widget.AppCompatTextView
         android:id="@+id/phrase"
-        android:layout_width="wrap_content"
-        app:layout_constraintHorizontal_weight="1"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="DEFAULT MESSAGE - TEMP"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@id/phraseOrUrlIndicator"
+        android:layout_toStartOf="@id/editQueryImage"
+        android:fontFamily="sans-serif"
+        android:maxLines="1"
+        android:textAlignment="textStart"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/editQueryImage"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toEndOf="@+id/phraseOrUrlIndicator"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5"
-        tools:text="hi there world hi there world" />
+        android:textSize="16sp"
+        app:autoSizeTextType="uniform"
+        tools:text="Here is a phrase or URL suggestion" />
 
-    <ImageView
+    <FrameLayout
         android:id="@+id/editQueryImage"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@drawable/dashboard_https_neutral"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/phrase"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="24dp"
+        android:padding="6dp"
+        android:paddingEnd="24dp"
+        android:paddingStart="24dp">
 
-</android.support.constraint.ConstraintLayout>
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:contentDescription="@string/editQueryBeforeSubmitting"
+            android:src="@drawable/ic_add_white_24dp" />
+
+    </FrameLayout>
+
+
+</RelativeLayout>

@@ -33,17 +33,18 @@ import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.widget.TextView
 import android.widget.Toast
+import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.renderer.icon
-import com.duckduckgo.app.privacymonitor.ui.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.REQUEST_DASHBOARD
 import com.duckduckgo.app.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_browser.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class BrowserActivity : DuckDuckGoActivity() {
@@ -51,7 +52,8 @@ class BrowserActivity : DuckDuckGoActivity() {
     @Inject lateinit var webViewClient: BrowserWebViewClient
     @Inject lateinit var webChromeClient: BrowserChromeClient
     @Inject lateinit var viewModelFactory: ViewModelFactory
-    @Inject lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
+
+    private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
     private var acceptingRenderUpdates = true
 
@@ -102,6 +104,7 @@ class BrowserActivity : DuckDuckGoActivity() {
                     focusDummy.requestFocus()
                     webView.loadUrl(it.url)
                 }
+                is BrowserViewModel.Command.LandingPage -> finishActivityAnimated()
                 is BrowserViewModel.Command.DialNumber -> {
                     val intent = Intent(Intent.ACTION_DIAL)
                     intent.data = Uri.parse("tel:${it.telephoneNumber}")
@@ -123,15 +126,23 @@ class BrowserActivity : DuckDuckGoActivity() {
         configureWebView()
         configureOmnibarTextInput()
         configureDummyViewTouchHandler()
-        configureAutoCompleteSuggestionsRecycler()
+        configureAutoComplete()
 
         if (savedInstanceState == null) {
             consumeSharedTextExtra()
         }
     }
 
-    private fun configureAutoCompleteSuggestionsRecycler() {
+    private fun configureAutoComplete() {
         autoCompleteSuggestionsList.layoutManager = LinearLayoutManager(this)
+        autoCompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
+                immediateSearchClickListener = {
+                    userEnteredQuery(it.phrase)
+                },
+                editableSearchClickListener = {
+                    viewModel.onUserSelectedToEditQuery(it.phrase)
+                }
+        )
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
@@ -143,6 +154,8 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: BrowserViewModel.ViewState) {
+
+        Timber.v("Rendering view state: $viewState")
 
         if (!acceptingRenderUpdates) return
 
@@ -158,6 +171,7 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
             omnibarTextInput.setText(viewState.omnibarText)
+            omnibarTextInput.post { omnibarTextInput.setSelection(omnibarTextInput.text.length) }
             appBarLayout.setExpanded(true, true)
         }
 
@@ -171,8 +185,8 @@ class BrowserActivity : DuckDuckGoActivity() {
         privacyGradeMenu?.isVisible = viewState.showPrivacyGrade
         fireMenu?.isVisible = viewState.showFireButton
 
-        when(viewState.showAutoCompleteSuggestions) {
-            false -> autoCompleteSuggestionsList.hide()
+        when (viewState.showAutoCompleteSuggestions) {
+            false -> autoCompleteSuggestionsList.gone()
             true -> {
                 autoCompleteSuggestionsList.show()
                 val results = viewState.autoCompleteSearchResults.suggestions
@@ -227,10 +241,10 @@ class BrowserActivity : DuckDuckGoActivity() {
         clearOmnibarInputButton.setOnClickListener { omnibarTextInput.setText("") }
     }
 
-    private fun userEnteredQuery() {
-        viewModel.onUserSubmittedQuery(omnibarTextInput.text.toString())
+    private fun userEnteredQuery(query: String) {
         omnibarTextInput.hideKeyboard()
         focusDummy.requestFocus()
+        viewModel.onUserSubmittedQuery(query)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -257,7 +271,7 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         omnibarTextInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, keyEvent ->
             if (actionId == IME_ACTION_DONE || keyEvent.keyCode == KEYCODE_ENTER) {
-                userEnteredQuery()
+                userEnteredQuery(omnibarTextInput.text.toString())
                 return@OnEditorActionListener true
             }
             false

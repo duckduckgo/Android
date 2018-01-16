@@ -255,20 +255,12 @@ class BrowserViewModel(
             currentViewState.autoCompleteSearchResults
         }
 
-        val hasQueryChanged = (currentViewState.omnibarText == query).not()
-
-        if(hasQueryChanged) {
-            Timber.i("Query changed")
-        } else {
-            Timber.i("Not changed query")
-        }
-
         viewState.value = currentViewState().copy(
                 isEditing = hasFocus,
                 showClearButton = showClearButton,
                 showPrivacyGrade = appConfigurationDownloaded && !hasFocus,
                 showFireButton = !hasFocus,
-                showAutoCompleteSuggestions = hasFocus && hasQueryChanged,
+                showAutoCompleteSuggestions = hasFocus,
                 autoCompleteSearchResults = autoCompleteSearchResults
         )
 
@@ -312,6 +304,10 @@ class BrowserViewModel(
                 command.value = Navigate(url)
             }
         }
+    }
+
+    fun onUserSelectedToEditQuery(query: String) {
+        viewState.value = currentViewState().copy(isEditing = false, showAutoCompleteSuggestions = false, omnibarText = query)
     }
 }
 
