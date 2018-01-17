@@ -109,6 +109,7 @@ dependencies {
     implementation "android.arch.persistence.room:runtime:$architectureComponents"
     kapt "android.arch.persistence.room:compiler:$architectureComponents"
     testImplementation "android.arch.persistence.room:testing:$architectureComponents"
+    androidTestImplementation "android.arch.persistence.room:testing:$architectureComponents"
 
     // Dagger
     kapt "com.google.dagger:dagger-android-processor:$dagger"
