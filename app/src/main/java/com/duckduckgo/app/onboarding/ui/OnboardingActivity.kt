@@ -149,10 +149,10 @@ class OnboardingActivity : DuckDuckGoActivity() {
             val pageCount = 2
 
             @ColorRes
-            val firstColor = R.color.lighMuddyGreen
+            val firstColor = R.color.lighOliveGreen
 
             @ColorRes
-            val secondColor = R.color.lightWindowsBlue
+            val secondColor = R.color.powderBlue
         }
     }
 
