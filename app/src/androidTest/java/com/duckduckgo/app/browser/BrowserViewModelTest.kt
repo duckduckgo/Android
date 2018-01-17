@@ -38,11 +38,12 @@ import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.AppConfigurationDao
 import com.duckduckgo.app.settings.db.AppConfigurationEntity
-import com.duckduckgo.app.settings.db.AppSettingsPreferencesStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.nhaarman.mockito_kotlin.doReturn
+import com.nhaarman.mockito_kotlin.whenever
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -85,7 +86,7 @@ class BrowserViewModelTest {
     lateinit var mockTermsOfServiceStore: TermsOfServiceStore
 
     @Mock
-    lateinit var mockAppSettingsPreferencesStore: SettingsDataStore
+    lateinit var mockSettingsStore: SettingsDataStore
 
     @Mock
     lateinit var mockAutoCompleteApi: AutoCompleteApi
@@ -119,7 +120,7 @@ class BrowserViewModelTest {
                 stringResolver = testStringResolver,
                 networkLeaderboardDao = testNetworkLeaderboardDao,
                 autoCompleteApi = mockAutoCompleteApi,
-                appSettingsPreferencesStore = mockAppSettingsPreferencesStore,
+                appSettingsPreferencesStore = mockSettingsStore,
                 appConfigurationDao = appConfigurationDao)
 
         testee.url.observeForever(mockQueryObserver)
@@ -330,5 +331,33 @@ class BrowserViewModelTest {
     fun whenOmnibarInputHasFocusThenFireButtonIsNotShown() {
         testee.onOmnibarInputStateChanged("", true)
         assertFalse(testee.viewState.value!!.showFireButton)
+    }
+
+    @Test
+    fun whenEnteringQueryWithAutoCompleteEnabledThenAutoCompleteSuggestionsShown() {
+        doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+        testee.onOmnibarInputStateChanged("foo", true)
+        assertTrue(testee.viewState.value!!.showAutoCompleteSuggestions)
+    }
+
+    @Test
+    fun whenEnteringQueryWithAutoCompleteDisabledThenAutoCompleteSuggestionsNotShown() {
+        doReturn(false).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+        testee.onOmnibarInputStateChanged("foo", true)
+        assertFalse(testee.viewState.value!!.showAutoCompleteSuggestions)
+    }
+
+    @Test
+    fun whenEnteringEmptyQueryWithAutoCompleteEnabledThenAutoCompleteSuggestionsNotShown() {
+        doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+        testee.onOmnibarInputStateChanged("", true)
+        assertFalse(testee.viewState.value!!.showAutoCompleteSuggestions)
+    }
+
+    @Test
+    fun whenEnteringEmptyQueryWithAutoCompleteDisabledThenAutoCompleteSuggestionsNotShown() {
+        doReturn(false).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+        testee.onOmnibarInputStateChanged("", true)
+        assertFalse(testee.viewState.value!!.showAutoCompleteSuggestions)
     }
 }
