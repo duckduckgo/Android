@@ -28,6 +28,7 @@ import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.ResourceType
 import timber.log.Timber
+import java.util.concurrent.CountDownLatch
 import javax.inject.Inject
 
 
@@ -39,7 +40,6 @@ class BrowserWebViewClient @Inject constructor(
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
-    private var currentUrl: String? = null
 
 
     /**
@@ -82,7 +82,6 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-        currentUrl = url
         webViewClientListener?.loadingStarted()
         webViewClientListener?.urlChanged(url)
     }
@@ -105,7 +104,7 @@ class BrowserWebViewClient @Inject constructor(
             return WebResourceResponse(null, null, null)
         }
 
-        if (shouldBlock(request, currentUrl)) {
+        if (shouldBlock(request, view.urlFromWorkerThread())) {
             return WebResourceResponse(null, null, null)
         }
 
@@ -135,6 +134,18 @@ class BrowserWebViewClient @Inject constructor(
     private inline fun consume(function: () -> Unit): Boolean {
         function()
         return true
+    }
+
+    @WorkerThread
+    private fun WebView.urlFromWorkerThread(): String? {
+        val latch = CountDownLatch(1)
+        var safeUrl: String? = null
+        post {
+            safeUrl = url
+            latch.countDown()
+        }
+        latch.await()
+        return safeUrl
     }
 
 }
