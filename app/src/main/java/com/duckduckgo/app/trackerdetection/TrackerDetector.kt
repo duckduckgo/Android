@@ -48,13 +48,11 @@ class TrackerDetector @Inject constructor(private val networkTrackers: TrackerNe
 
         val matches = clients.any { it.matches(url, documentUrl, resourceType) }
         if (matches) {
-            val matchText = if (matches) "WAS" else "was not"
-            Timber.v("$documentUrl resource $url $matchText identified as a tracker")
+            Timber.v("$documentUrl resource $url WAS identified as a tracker")
             return TrackingEvent(documentUrl, url, networkTrackers.network(url), settings.privacyOn)
         }
 
         Timber.v("$documentUrl resource $url was not identified as a tracker")
-
         return null
     }
 
