@@ -18,6 +18,7 @@ package com.duckduckgo.app.di
 
 
 import android.app.Application
+import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteModule
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import dagger.BindsInstance
 import dagger.Component
@@ -35,7 +36,8 @@ import javax.inject.Singleton
     (PrivacyModule::class),
     (DatabaseModule::class),
     (JsonModule::class),
-    (StringModule::class)
+    (StringModule::class),
+    (BrowserAutoCompleteModule::class)
 ])
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 

@@ -38,6 +38,8 @@ import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.AppConfigurationDao
 import com.duckduckgo.app.settings.db.AppConfigurationEntity
+import com.duckduckgo.app.settings.db.AppSettingsPreferencesStore
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -83,6 +85,9 @@ class BrowserViewModelTest {
     lateinit var mockTermsOfServiceStore: TermsOfServiceStore
 
     @Mock
+    lateinit var mockAppSettingsPreferencesStore: SettingsDataStore
+
+    @Mock
     lateinit var mockAutoCompleteApi: AutoCompleteApi
 
     private lateinit var db: AppDatabase
@@ -114,6 +119,7 @@ class BrowserViewModelTest {
                 stringResolver = testStringResolver,
                 networkLeaderboardDao = testNetworkLeaderboardDao,
                 autoCompleteApi = mockAutoCompleteApi,
+                appSettingsPreferencesStore = mockAppSettingsPreferencesStore,
                 appConfigurationDao = appConfigurationDao)
 
         testee.url.observeForever(mockQueryObserver)

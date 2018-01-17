@@ -32,6 +32,8 @@ import com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesViewModel
 import com.duckduckgo.app.privacymonitor.ui.ScorecardViewModel
 import com.duckduckgo.app.privacymonitor.ui.TrackerNetworksViewModel
 import com.duckduckgo.app.settings.SettingsViewModel
+import com.duckduckgo.app.settings.db.AppSettingsPreferencesStore
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import javax.inject.Inject
 
@@ -47,18 +49,19 @@ class ViewModelFactory @Inject constructor(
         private val stringResolver: StringResolver,
         private val appDatabase: AppDatabase,
         private val networkLeaderboardDao: NetworkLeaderboardDao,
-        private val autoCompleteApi: AutoCompleteApi
+        private val autoCompleteApi: AutoCompleteApi,
+        private val appSettingsPreferencesStore: SettingsDataStore
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
             with(modelClass) {
                 when {
-                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, duckDuckGoUrlDetector, termsOfServiceStore, trackerNetworks, privacyMonitorRepository, stringResolver, networkLeaderboardDao, autoCompleteApi, appDatabase.appConfigurationDao())
+                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, duckDuckGoUrlDetector, termsOfServiceStore, trackerNetworks, privacyMonitorRepository, stringResolver, networkLeaderboardDao, autoCompleteApi, appSettingsPreferencesStore, appDatabase.appConfigurationDao())
                     isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(privacySettingsStore, networkLeaderboardDao)
                     isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                     isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                     isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
-                    isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(stringResolver)
+                    isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(stringResolver, appSettingsPreferencesStore)
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
             } as T

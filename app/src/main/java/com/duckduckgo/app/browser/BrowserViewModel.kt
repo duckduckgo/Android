@@ -42,6 +42,7 @@ import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.R
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RESULT_TOSDR
 import com.duckduckgo.app.settings.db.AppConfigurationDao
 import com.duckduckgo.app.settings.db.AppConfigurationEntity
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.jakewharton.rxrelay2.PublishRelay
@@ -59,6 +60,7 @@ class BrowserViewModel(
         private val stringResolver: StringResolver,
         private val networkLeaderboardDao: NetworkLeaderboardDao,
         private val autoCompleteApi: AutoCompleteApi,
+        private val appSettingsPreferencesStore: SettingsDataStore,
         appConfigurationDao: AppConfigurationDao) : WebViewClientListener, ViewModel() {
 
     data class ViewState(
@@ -258,7 +260,7 @@ class BrowserViewModel(
                 showClearButton = showClearButton,
                 showPrivacyGrade = appConfigurationDownloaded && !hasFocus,
                 showFireButton = !hasFocus,
-                showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged,
+                showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && appSettingsPreferencesStore.autoCompleteSuggestionsEnabled,
                 autoCompleteSearchResults = autoCompleteSearchResults
         )
 

@@ -125,4 +125,19 @@
         <item name="android:colorControlNormal">@color/white</item>
     </style>
 
+    <style name="SettingsContentLabel.SettingsSwitch" >
+        <item name="colorControlActivated">@color/midGreen</item>
+        <item name="colorSwitchThumbNormal">@color/white</item>
+        <item name="android:colorForeground">@color/subtleGreyTwo</item>
+        <item name="android:layout_marginEnd">0dp</item>
+        <item name="android:layout_marginStart">0dp</item>
+        <item name="android:layout_marginTop">0dp</item>
+        <item name="android:layout_marginBottom">0dp</item>
+        <item name="android:gravity">start</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingTop">12dp</item>
+    </style>
+
+
+
 </resources>

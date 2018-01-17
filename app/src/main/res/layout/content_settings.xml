@@ -27,6 +27,13 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/autocompleteEnabledSetting"
+            android:text="@string/settings_autocomplete_enabled"
+            style="@style/SettingsContentLabel"
+            app:theme="@style/SettingsContentLabel.SettingsSwitch"
+            tools:checked="true" />
+
         <TextView
             style="@style/SettingsContentLabel"
             android:text="@string/settingsVersion" />

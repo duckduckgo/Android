@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.AndroidStringResolver
 import com.duckduckgo.app.global.StringResolver
 import com.duckduckgo.app.settings.SettingsViewModel.Command
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.nhaarman.mockito_kotlin.KArgumentCaptor
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.nhaarman.mockito_kotlin.verify
@@ -52,6 +53,10 @@ class SettingsViewModelTest {
 
     @Mock
     private lateinit var commandObserver: Observer<Command>
+
+    @Mock
+    private lateinit var mockAppSettingsDataStore: SettingsDataStore
+
     private lateinit var commandCaptor: KArgumentCaptor<Command>
 
     @Before
@@ -64,7 +69,7 @@ class SettingsViewModelTest {
         commandCaptor = argumentCaptor()
 
 
-        testee = SettingsViewModel(stringResolver)
+        testee = SettingsViewModel(stringResolver, mockAppSettingsDataStore)
         testee.command.observeForever(commandObserver)
     }
 

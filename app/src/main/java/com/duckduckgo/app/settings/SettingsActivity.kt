@@ -54,12 +54,14 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun configureUiEventHandlers() {
         about.setOnClickListener { startActivityForResult(AboutDuckDuckGoActivity.intent(this), REQUEST_CODE_ABOUT_DDG) }
         provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
+        autocompleteEnabledSetting.setOnClickListener { viewModel.userRequestedToChangeAutocompleteSetting(autocompleteEnabledSetting.isChecked) }
     }
 
     private fun observeViewModel() {
         viewModel.viewState.observe(this, Observer<SettingsViewModel.ViewState> { viewState ->
             viewState?.let {
                 version.text = it.version
+                autocompleteEnabledSetting.isChecked = it.autoCompleteSuggestionsEnabled
             }
         })
 

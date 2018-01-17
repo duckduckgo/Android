@@ -23,13 +23,18 @@ import android.os.Build
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.StringResolver
+import com.duckduckgo.app.settings.db.SettingsDataStore
+import timber.log.Timber
 import javax.inject.Inject
 
-class SettingsViewModel @Inject constructor(private val stringResolver: StringResolver) : ViewModel() {
+class SettingsViewModel @Inject constructor(
+        private val stringResolver: StringResolver,
+        private val settingsDataStore: SettingsDataStore) : ViewModel() {
 
     data class ViewState(
             val loading: Boolean = true,
-            val version: String = ""
+            val version: String = "",
+            val autoCompleteSuggestionsEnabled: Boolean = true
     )
 
     sealed class Command {
@@ -46,7 +51,10 @@ class SettingsViewModel @Inject constructor(private val stringResolver: StringRe
     }
 
     fun start() {
-        viewState.value = currentViewState.copy(loading = false, version = obtainVersion())
+        val autoCompleteEnabled = settingsDataStore.autoCompleteSuggestionsEnabled
+        Timber.i("Is auto complete enabled? $autoCompleteEnabled")
+
+        viewState.value = currentViewState.copy(autoCompleteSuggestionsEnabled = autoCompleteEnabled, loading = false, version = obtainVersion())
     }
 
     fun userRequestedToSendFeedback() {
@@ -56,6 +64,11 @@ class SettingsViewModel @Inject constructor(private val stringResolver: StringRe
 
         val uri = "mailto:$emailAddress?&subject=$subject&body=$body"
         command.value = Command.SendEmail(Uri.parse(uri))
+    }
+
+    fun userRequestedToChangeAutocompleteSetting(checked: Boolean) {
+        Timber.i("User changed autocomplete setting, is now enabled: $checked")
+        settingsDataStore.autoCompleteSuggestionsEnabled = checked
     }
 
     private fun buildEmailBody(): String {
@@ -71,5 +84,6 @@ class SettingsViewModel @Inject constructor(private val stringResolver: StringRe
     }
 
     private inline fun encode(f: () -> String): String = Uri.encode(f())
+
 
 }
