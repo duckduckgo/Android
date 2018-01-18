@@ -27,7 +27,6 @@ import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAda
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter.AutoCompleteViewHolder.EmptySuggestionViewHolder
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter.AutoCompleteViewHolder.SuggestionViewHolder
 import kotlinx.android.synthetic.main.item_autocomplete_suggestion.view.*
-import timber.log.Timber
 import javax.inject.Inject
 
 class BrowserAutoCompleteSuggestionsAdapter @Inject constructor(
@@ -79,9 +78,6 @@ class BrowserAutoCompleteSuggestionsAdapter @Inject constructor(
 
     @UiThread
     fun updateData(newSuggestions: List<AutoCompleteSuggestion>) {
-
-        Timber.i("Updating autosuggestions recycler with ${newSuggestions.size} items")
-
         suggestions.clear()
         suggestions.addAll(newSuggestions)
         notifyDataSetChanged()
@@ -93,9 +89,12 @@ class BrowserAutoCompleteSuggestionsAdapter @Inject constructor(
             fun bind(item: AutoCompleteSuggestion,
                      immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
                      editableSearchClickListener: (AutoCompleteSuggestion) -> Unit) = with(itemView) {
+
                 phrase.text = item.phrase
+
                 val phraseOrUrlImage = if (item.isUrl) R.drawable.ic_globe_white_24dp else R.drawable.ic_search_white_24dp
                 phraseOrUrlIndicator.setImageResource(phraseOrUrlImage)
+
                 editQueryImage.setOnClickListener { editableSearchClickListener(item) }
                 setOnClickListener { immediateSearchListener(item) }
             }

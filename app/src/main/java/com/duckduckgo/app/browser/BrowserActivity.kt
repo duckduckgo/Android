@@ -163,6 +163,8 @@ class BrowserActivity : DuckDuckGoActivity() {
         addBookmarkMenuItem?.setEnabled(viewState.canAddBookmarks)
         if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
             omnibarTextInput.setText(viewState.omnibarText)
+
+            // ensures caret sits at the end of the query
             omnibarTextInput.post { omnibarTextInput.setSelection(omnibarTextInput.text.length) }
             appBarLayout.setExpanded(true, true)
         }

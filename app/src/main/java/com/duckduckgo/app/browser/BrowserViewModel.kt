@@ -274,8 +274,6 @@ class BrowserViewModel(
                 autoCompleteSearchResults = autoCompleteSearchResults
         )
 
-        Timber.i("Received query [$query]")
-
         autoCompletePublishSubject.accept(query.trim())
 
     }
