@@ -21,6 +21,7 @@ import android.support.annotation.WorkerThread
 import com.duckduckgo.app.global.UrlScheme
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
+import timber.log.Timber
 import javax.inject.Inject
 
 class HttpsUpgrader @Inject constructor(private val dao: HttpsUpgradeDomainDao) {
@@ -50,8 +51,8 @@ class HttpsUpgrader @Inject constructor(private val dao: HttpsUpgradeDomainDao) 
             }
         }
 
-        domains.removeAt(0)
-        domains.removeAt(domains.size - 1)
+        domains.asReversed().removeAt(0)
+        Timber.d("domains $domains")
 
         for (domain in domains) {
             if (dao.hasDomain("*$domain")) {
