@@ -264,17 +264,20 @@ class BrowserViewModel(
         }
 
         val hasQueryChanged = (currentViewState.omnibarText != query)
+        val autoCompleteSuggestionsEnabled = appSettingsPreferencesStore.autoCompleteSuggestionsEnabled
 
         viewState.value = currentViewState().copy(
                 isEditing = hasFocus,
                 showClearButton = showClearButton,
                 showPrivacyGrade = appConfigurationDownloaded && !hasFocus,
                 showFireButton = !hasFocus,
-                showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && appSettingsPreferencesStore.autoCompleteSuggestionsEnabled,
+                showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && autoCompleteSuggestionsEnabled,
                 autoCompleteSearchResults = autoCompleteSearchResults
         )
 
-        autoCompletePublishSubject.accept(query.trim())
+        if(autoCompleteSuggestionsEnabled) {
+            autoCompletePublishSubject.accept(query.trim())
+        }
 
     }
 
