@@ -22,12 +22,14 @@ import android.app.Service
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.job.AppConfigurationSyncer
+import com.duckduckgo.app.migration.LegacyMigration
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import dagger.android.HasServiceInjector
 import io.reactivex.schedulers.Schedulers
+import org.jetbrains.anko.doAsync
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -48,6 +50,9 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
     @Inject
     lateinit var appConfigurationSyncer: AppConfigurationSyncer
 
+    @Inject
+    lateinit var migration: LegacyMigration
+
     override fun onCreate() {
         super.onCreate()
 
@@ -57,6 +62,16 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
 
         loadTrackerData()
         configureDataDownloader()
+
+        migrateLegacyDb()
+    }
+
+    private fun migrateLegacyDb() {
+        doAsync {
+            migration.start { favourites, searches ->
+                Timber.d("Migrated $favourites favourites, $searches")
+            }
+        }
     }
 
     private fun loadTrackerData() {

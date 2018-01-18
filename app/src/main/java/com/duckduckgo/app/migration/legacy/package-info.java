@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
 
-import android.content.Context
-import com.duckduckgo.app.onboarding.store.OnboardingSharedPreferences
-import com.duckduckgo.app.onboarding.store.OnboardingStore
-import dagger.Module
-import dagger.Provides
-
-@Module
-class StoreModule {
-
-    @Provides
-    fun providesOnboardingStore(context: Context): OnboardingStore {
-        return OnboardingSharedPreferences(context)
-    }
-
-}
+/**
+ * @deprecated
+ *
+ * DO NOT USE THE CODE IN THIS PACKAGE.
+ *
+ * The code in this package is derived from the Search and Stories application for the purpose of
+ *  migration.
+ */
+package com.duckduckgo.app.migration.legacy;
