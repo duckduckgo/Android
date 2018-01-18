@@ -157,7 +157,8 @@ class BrowserViewModel(
         viewState.value = currentViewState().copy(
                 showClearButton = false,
                 omnibarText = input,
-                showAutoCompleteSuggestions = false)
+                showAutoCompleteSuggestions = false,
+                autoCompleteSearchResults = AutoCompleteResult("", emptyList()))
     }
 
     private fun buildUrl(input: String): String {
@@ -275,7 +276,7 @@ class BrowserViewModel(
                 autoCompleteSearchResults = autoCompleteSearchResults
         )
 
-        if(autoCompleteSuggestionsEnabled) {
+        if(hasQueryChanged && hasFocus && autoCompleteSuggestionsEnabled) {
             autoCompletePublishSubject.accept(query.trim())
         }
 
