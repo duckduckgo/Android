@@ -17,6 +17,8 @@
 package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
+import android.app.DownloadManager
+import android.app.DownloadManager.Request.*
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
@@ -31,6 +33,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.widget.TextView
+import android.widget.Toast
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -221,6 +224,15 @@ class BrowserActivity : DuckDuckGoActivity() {
             displayZoomControls = false
             mixedContentMode = MIXED_CONTENT_COMPATIBILITY_MODE
             setSupportZoom(true)
+        }
+
+        webView.setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
+            val request = DownloadManager.Request(Uri.parse(url))
+            request.allowScanningByMediaScanner()
+            request.setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED   )
+            val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            manager.enqueue(request)
+            Toast.makeText(applicationContext, getString(R.string.webviewDownload), Toast.LENGTH_LONG).show()
         }
 
         webView.setOnTouchListener { _, _ ->
