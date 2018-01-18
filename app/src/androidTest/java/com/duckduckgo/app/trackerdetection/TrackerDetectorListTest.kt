@@ -19,8 +19,7 @@ package com.duckduckgo.app.trackerdetection
 
 import android.support.test.runner.AndroidJUnit4
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
-import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYLIST
-import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYPRIVACY
+import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.model.ResourceType
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -41,7 +40,8 @@ class TrackerDetectorListTest {
         private val resourceType = ResourceType.UNKNOWN
     }
 
-    private lateinit var testee: TrackerDetector
+    private lateinit var blockingOnlyTestee: TrackerDetector
+    private lateinit var testeeWithWhitelist: TrackerDetector
     private lateinit var settingStore: PrivacySettingsStore
 
 
@@ -49,31 +49,47 @@ class TrackerDetectorListTest {
     fun before() {
         val easylistAdblock = adblockClient(EASYLIST, "binary/easylist_sample")
         val easyprivacyAdblock = adblockClient(EASYPRIVACY, "binary/easyprivacy_sample")
+
+        // re-using blocking sample as a whitelist to hammer the point home
+        val trackersWhitelistAdblocks = adblockClient(TRACKERSWHITELIST, "binary/easylist_sample")
+
         settingStore = mock()
         whenever(settingStore.privacyOn).thenReturn(true)
-        testee = TrackerDetector(TrackerNetworks(), settingStore)
-        testee.addClient(easyprivacyAdblock)
-        testee.addClient(easylistAdblock)
+
+        blockingOnlyTestee = TrackerDetector(TrackerNetworks(), settingStore)
+        blockingOnlyTestee.addClient(easyprivacyAdblock)
+        blockingOnlyTestee.addClient(easylistAdblock)
+
+        testeeWithWhitelist = TrackerDetector(TrackerNetworks(), settingStore)
+        testeeWithWhitelist.addClient(trackersWhitelistAdblocks)
+        testeeWithWhitelist.addClient(easyprivacyAdblock)
+        testeeWithWhitelist.addClient(easylistAdblock)
+    }
+
+    @Test
+    fun whenUrlIsInWhitelistThenEvaluateReturnsNull() {
+        val url = "http://imasdk.googleapis.com/js/sdkloader/ima3.js"
+        assertNull(testeeWithWhitelist.evaluate(url, documentUrl, resourceType))
     }
 
     @Test
     fun whenUrlIsInEasyListThenEvaluateReturnsTrackingEvent() {
         val url = "http://imasdk.googleapis.com/js/sdkloader/ima3.js"
         val expected = TrackingEvent(documentUrl, url, null, true)
-        assertEquals(expected, testee.evaluate(url, documentUrl, resourceType))
+        assertEquals(expected, blockingOnlyTestee.evaluate(url, documentUrl, resourceType))
     }
 
     @Test
     fun whenUrlIsInEasyPrivacyListThenEvaluateReturnsTrackingEvent() {
         val url = "http://cdn.tagcommander.com/1705/tc_catalog.css"
         val expected = TrackingEvent(documentUrl, url, null, true)
-        assertEquals(expected, testee.evaluate(url, documentUrl, resourceType))
+        assertEquals(expected, blockingOnlyTestee.evaluate(url, documentUrl, resourceType))
     }
 
     @Test
     fun whenUrlIsNotInAnyTrackerListsThenEvaluateReturnsNull() {
         val url = "https://duckduckgo.com/index.html"
-        assertNull(testee.evaluate(url, documentUrl, resourceType))
+        assertNull(blockingOnlyTestee.evaluate(url, documentUrl, resourceType))
     }
 
     private fun adblockClient(name: Client.ClientName, dataFile: String): Client {

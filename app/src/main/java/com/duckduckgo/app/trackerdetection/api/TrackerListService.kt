@@ -26,6 +26,10 @@ interface TrackerListService {
     @GET("/contentblocking.js")
     fun list(@Query("l") list: String): Call<ResponseBody>
 
+    @GET("/contentblocking/trackers-whitelist.txt")
+    fun trackersWhitelist(): Call<ResponseBody>
+
     @GET("/contentblocking.js?l=disconnect")
     fun disconnect(): Call<DisconnectListJson>
+
 }

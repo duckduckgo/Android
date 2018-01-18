@@ -24,6 +24,8 @@ import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.store.TrackerDataStore
 import io.reactivex.Completable
+import okhttp3.ResponseBody
+import retrofit2.Call
 import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
@@ -39,7 +41,8 @@ class TrackerDataDownloader @Inject constructor(
 
         return when (clientName) {
             DISCONNECT -> disconnectDownload()
-            EASYLIST, EASYPRIVACY -> easyDownload(clientName)
+            EASYLIST, EASYPRIVACY -> easyDownload(clientName, { trackerListService.list(it.name.toLowerCase()) })
+            TRACKERSWHITELIST -> easyDownload(clientName, { trackerListService.trackersWhitelist() })
         }
     }
 
@@ -68,11 +71,11 @@ class TrackerDataDownloader @Inject constructor(
         }
     }
 
-    private fun easyDownload(clientName: Client.ClientName): Completable {
+    private fun easyDownload(clientName: Client.ClientName, callFactory: (clientName: Client.ClientName) -> Call<ResponseBody>): Completable {
         return Completable.fromAction {
 
             Timber.i("Downloading ${clientName.name} data")
-            val call = trackerListService.list(clientName.name.toLowerCase())
+            val call = callFactory(clientName)
             val response = call.execute()
 
             if (response.isCached && trackerDataStore.hasData(clientName)) {
