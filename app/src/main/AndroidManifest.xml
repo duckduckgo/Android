@@ -21,8 +21,7 @@
 
         <activity
             android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivity"
-            android:label="@string/appName"
-            android:screenOrientation="fullSensor">
+            android:label="@string/appName">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -32,8 +31,7 @@
         <activity
             android:name="com.duckduckgo.app.home.HomeActivity"
             android:label="@string/appName"
-            android:launchMode="singleTask"
-            android:screenOrientation="fullSensor">
+            android:launchMode="singleTask">
 
             <!-- Allows app to become default browser -->
             <intent-filter>
@@ -59,51 +57,44 @@
             android:name=".BrowserActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask"
-            android:parentActivityName="com.duckduckgo.app.home.HomeActivity"
-            android:screenOrientation="fullSensor" />
+            android:parentActivityName="com.duckduckgo.app.home.HomeActivity" />
 
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
             android:label="@string/privacyDashboardActivityTitle"
-            android:parentActivityName=".BrowserActivity"
-            android:screenOrientation="fullSensor" />
+            android:parentActivityName=".BrowserActivity" />
 
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.ScorecardActivity"
             android:label="@string/scorecardActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
-            android:screenOrientation="fullSensor" />
+            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity" />
 
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity"
             android:label="@string/networksActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
-            android:screenOrientation="fullSensor" />
+            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity" />
 
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity"
             android:label="@string/privacyTermsActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
-            android:screenOrientation="fullSensor" />
+            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity" />
 
         <activity
             android:name="com.duckduckgo.app.settings.SettingsActivity"
             android:label="@string/settingsActivityTitle"
-            android:parentActivityName=".BrowserActivity"
-            android:screenOrientation="fullSensor" />
+            android:parentActivityName=".BrowserActivity" />
 
         <activity
             android:name="com.duckduckgo.app.about.AboutDuckDuckGoActivity"
             android:label="@string/aboutActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            android:screenOrientation="fullSensor"
+
             android:theme="@style/AppTheme" />
 
         <activity
             android:name="com.duckduckgo.app.bookmarks.ui.BookmarksActivity"
             android:label="@string/bookmarksActivityTitle"
-            android:parentActivityName=".BrowserActivity"
-            android:screenOrientation="fullSensor" />
+            android:parentActivityName=".BrowserActivity" />
 
         <service
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"
