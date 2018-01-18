@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.support.annotation.AnyThread
 import android.support.annotation.WorkerThread
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
@@ -143,7 +144,7 @@ class BrowserWebViewClient @Inject constructor(
         return true
     }
 
-    @WorkerThread
+    @AnyThread
     private fun WebView.urlFromWorkerThread(): String? {
         val latch = CountDownLatch(1)
         var safeUrl: String? = null
