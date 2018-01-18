@@ -28,10 +28,9 @@ import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.migration.legacy.LegacyDb
 import com.duckduckgo.app.migration.legacy.LegacyDbContracts
+import org.junit.After
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Test
-import org.junit.runners.Parameterized
 
 class LegacyMigrationTest {
 
@@ -42,16 +41,8 @@ class LegacyMigrationTest {
     var appDatabase: AppDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
     var bookmarksDao = MockBookmarksDao()
 
-    companion object {
-        @JvmStatic
-        @Parameterized.Parameters
-        fun data() : Collection<Array<Int>> {
-            return (1 .. LegacyDbContracts.DATABASE_VERSION).map { arrayOf(it) }
-        }
-    }
-
-    @Before
-    fun before() {
+    @After
+    fun after() {
         context.getDatabasePath(LegacyDbContracts.DATABASE_NAME).delete()
     }
 
