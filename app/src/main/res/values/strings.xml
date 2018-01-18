@@ -5,6 +5,15 @@
 
     <string name="privacyDashboard">Privacy Dashboard</string>
 
+    <!-- Onboarding Activity -->
+    <string name="onboardingProtectDataTitle">Protect Your Data</string>
+    <string name="onboardingProtectDataDescription">Tap the Privacy Grade to reveal who we caught trying to track you.\n</string>
+    <string name="onboardingNoTraceTitle">Leave No Trace</string>
+    <string name="onboardingNoTraceDescription1">Tap the Fire Button to erase your tabs and browsing history.</string>
+    <string name="onboardingNoTraceDescription2">Your data is toast!</string>
+    <string name="onboardingContinue">Continue</string>
+
+
     <!-- Browser Activity -->
     <string name="refresh">Refresh</string>
     <string name="back">Back</string>
@@ -12,6 +21,7 @@
     <string name="omnibarInputHint">Search or type URL</string>
     <string name="clearButtonContentDescription">Clear search input</string>
     <string name="no_compatible_third_party_app_installed">No compatible app installed</string>
+    <string name="addBookmarkMenuTitle">Add Bookmark</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Edit query before searching</string>
@@ -72,7 +82,7 @@
     <string name="practicesBad">"Poor Privacy Practices"</string>
     <string name="practicesUnknown">Unknown Privacy Practices</string>
     <string name="practicesOverview">Privacy practices indicate how much the personal information that you share with a website is protected.</string>
-    <string name="practicesTosdrLink">Privacy Practices results from&#160;<b><u>TOSDR</u></b></string>
+    <string name="practicesTosdrLink">Privacy Practices results from&#160;<b><u>ToS;DR</u></b></string>
     <string name="practicesIconContentGood">Good Practice Icon</string>
     <string name="practicesIconContentBad">Bad Practice Icon</string>
     <string name="privacyProtectionToggle">Privacy Protection</string>
@@ -81,6 +91,7 @@
     <string name="networkTrackerSummaryNotReady">We\'re still collecting data to show how many trackers we\'ve blocked.</string>
 
     <!-- Fire -->
+    <string name="fireMenu">Clear Data</string>
     <string name="fireClearAll">Clear All Data</string>
     <string name="fireCancel">Cancel</string>
     <string name="fireDataCleared">Data cleared</string>
@@ -103,5 +114,13 @@
         After all, the internet shouldn\'t feel so creepy, and getting the privacy you deserve online should be as simple closing the blinds.</string>
     <string name="aboutMoreLink">More at duckduckgo.com/about</string>
     <string name="no_suggestions">No Suggestions</string>
+
+    <!-- Bookmarks Activity -->
+    <string name="boomarksMenuTitle">Bookmarks</string>
+    <string name="bookmarksActivityTitle">Bookmarks</string>
+    <string name="deleteBookmarkContentDescription">Delete bookmark for %s</string>
+    <string name="bookmarkDeleteConfirmMessage">Are you sure you want to delete this bookmark?\n\n\'%s\'</string>
+    <string name="bookmarkDeleteConfirmTitle">Confirm</string>
+    <string name="bookmarkAddedFeedback">Bookmark added</string>
 
 </resources>

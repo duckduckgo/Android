@@ -16,22 +16,33 @@
         android:networkSecurityConfig="@xml/network_security_config"
         tools:ignore="GoogleAppIndexingWarning">
 
+        <meta-data
+            android:name="android.webkit.WebView.MetricsOptOut"
+            android:value="true" />
+
+        <activity
+            android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivity"
+            android:label="@string/appName"
+            android:screenOrientation="fullSensor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name="com.duckduckgo.app.home.HomeActivity"
             android:label="@string/appName"
             android:launchMode="singleTask"
             android:screenOrientation="fullSensor">
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
             <!-- Allows app to become default browser -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:scheme="https" />
                 <data android:scheme="http" />
             </intent-filter>
@@ -47,8 +58,8 @@
 
         <activity
             android:name=".BrowserActivity"
-            android:allowTaskReparenting="true"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTask"
             android:parentActivityName="com.duckduckgo.app.home.HomeActivity"
             android:screenOrientation="fullSensor" />
 
@@ -57,26 +68,31 @@
             android:label="@string/privacyDashboardActivityTitle"
             android:parentActivityName=".BrowserActivity"
             android:screenOrientation="fullSensor" />
+
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.ScorecardActivity"
             android:label="@string/scorecardActivityTitle"
             android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
             android:screenOrientation="fullSensor" />
+
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity"
             android:label="@string/networksActivityTitle"
             android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
             android:screenOrientation="fullSensor" />
+
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity"
             android:label="@string/privacyTermsActivityTitle"
             android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
             android:screenOrientation="fullSensor" />
+
         <activity
             android:name="com.duckduckgo.app.settings.SettingsActivity"
             android:label="@string/settingsActivityTitle"
             android:parentActivityName=".BrowserActivity"
             android:screenOrientation="fullSensor" />
+
         <activity
             android:name="com.duckduckgo.app.about.AboutDuckDuckGoActivity"
             android:label="@string/aboutActivityTitle"
@@ -84,9 +100,16 @@
             android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme" />
 
+        <activity
+            android:name="com.duckduckgo.app.bookmarks.ui.BookmarksActivity"
+            android:label="@string/bookmarksActivityTitle"
+            android:parentActivityName=".BrowserActivity"
+            android:screenOrientation="fullSensor" />
+
         <service
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
+
 
     </application>
 

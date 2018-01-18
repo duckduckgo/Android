@@ -6,14 +6,14 @@ apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
 
 ext {
-    VERSION_NAME = "0.9.0"
+    VERSION_NAME = "0.10.0"
 }
 
 android {
     compileSdkVersion 27
     buildToolsVersion "26.0.2"
     defaultConfig {
-        applicationId "com.duckduckgo.app"
+        applicationId "com.duckduckgo.mobile.android"
         minSdkVersion 21
         targetSdkVersion 27
         versionCode buildVersionCode()
@@ -75,7 +75,7 @@ ext {
     architectureComponents = "1.0.0"
     dagger = "2.14.1"
     retrofit = "2.3.0"
-    rxBinding = "2.0.0"
+    ankoVersion = "0.10.4"
 }
 
 
@@ -98,6 +98,10 @@ dependencies {
 
     // RxRelay
     implementation "com.jakewharton.rxrelay2:rxrelay:2.0.0"
+
+    // Anko
+    compile "org.jetbrains.anko:anko-commons:$ankoVersion"
+    compile "org.jetbrains.anko:anko-design:$ankoVersion"
 
     // ViewModel and LiveData
     implementation "android.arch.lifecycle:extensions:$architectureComponents"

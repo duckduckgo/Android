@@ -40,13 +40,16 @@ class NetworkTrackerPillView: FrameLayout {
         initLayout()
     }
 
-    fun initLayout() {
+    private fun initLayout() {
         View.inflate(context, R.layout.view_network_tracker_pill, this)
     }
 
     fun render(networkName: String?, percent: Float?) {
         icon.setImageResource(renderer.networkPillIcon(context, networkName ?: "") ?: R.drawable.network_pill_generic)
-        percentage.text = renderer.percentage(percent)
+
+        val percentText = renderer.percentage(percent)
+        icon.contentDescription = "$networkName $percentText"
+        percentage.text = percentText
     }
 
 }

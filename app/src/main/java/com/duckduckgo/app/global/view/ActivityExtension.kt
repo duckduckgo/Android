@@ -18,13 +18,13 @@ package com.duckduckgo.app.global.view
 
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
-import android.widget.Toast
 import com.duckduckgo.app.browser.R
+import org.jetbrains.anko.toast
 
 fun AppCompatActivity.launchExternalActivity(intent: Intent) {
     if (intent.resolveActivity(packageManager) != null) {
         startActivity(intent)
     } else {
-        Toast.makeText(this, R.string.no_compatible_third_party_app_installed, Toast.LENGTH_SHORT).show()
+        toast(R.string.no_compatible_third_party_app_installed)
     }
 }

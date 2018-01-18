@@ -31,11 +31,10 @@ import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import com.duckduckgo.app.privacymonitor.renderer.*
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
-import kotlinx.android.synthetic.main.activity_privacy_scorecard.*
 import kotlinx.android.synthetic.main.content_privacy_scorecard.*
 import kotlinx.android.synthetic.main.include_privacy_dashboard_header.*
+import kotlinx.android.synthetic.main.include_toolbar.*
 import javax.inject.Inject
-
 
 class ScorecardActivity : DuckDuckGoActivity() {
 

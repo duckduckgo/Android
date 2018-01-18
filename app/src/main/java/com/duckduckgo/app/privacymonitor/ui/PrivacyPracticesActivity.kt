@@ -30,10 +30,9 @@ import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import com.duckduckgo.app.privacymonitor.renderer.banner
 import com.duckduckgo.app.privacymonitor.renderer.text
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
-import kotlinx.android.synthetic.main.activity_privacy_dashboard.*
 import kotlinx.android.synthetic.main.content_privacy_practices.*
+import kotlinx.android.synthetic.main.include_toolbar.*
 import javax.inject.Inject
-
 
 class PrivacyPracticesActivity : DuckDuckGoActivity() {
 
@@ -41,12 +40,6 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
     @Inject lateinit var repository: PrivacyMonitorRepository
 
     private val practicesAdapter = PrivacyPracticesAdapter()
-
-    companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, PrivacyPracticesActivity::class.java)
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,8 +77,18 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
         practicesAdapter.updateData(viewState.goodTerms, viewState.badTerms)
     }
 
-    fun onTosdrLinkClicked(view: View) {
-        setResult(PrivacyDashboardActivity.RESULT_TOSDR)
+    fun onTosdrLinkClicked(@Suppress("UNUSED_PARAMETER") view: View) {
+        setResult(TOSDR_RESULT_CODE)
         finish()
     }
+
+    companion object {
+
+        val TOSDR_RESULT_CODE = 100
+
+        fun intent(context: Context): Intent {
+            return Intent(context, PrivacyPracticesActivity::class.java)
+        }
+    }
+
 }

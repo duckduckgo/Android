@@ -27,7 +27,7 @@
     <item
         android:id="@+id/fire_menu_item"
         android:icon="@drawable/icon_fire"
-        android:title="@string/privacyDashboard"
+        android:title="@string/fireMenu"
         android:visible="false"
         app:showAsAction="ifRoom" />
 
@@ -40,6 +40,16 @@
     <item
         android:id="@+id/refresh_menu_item"
         android:title="@string/refresh"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/bookmarks_menu_item"
+        android:title="@string/boomarksMenuTitle"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/add_bookmark_menu_item"
+        android:title="@string/addBookmarkMenuTitle"
         app:showAsAction="never" />
 
     <item

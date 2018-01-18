@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 5,
-    "identityHash": "df2202389ba5b11018b57a417457b11b",
+    "version": 1,
+    "identityHash": "cf29693b9b6c4b791ee9c6cc434e0ee6",
     "entities": [
       {
         "tableName": "https_upgrade_domain",
@@ -114,11 +114,43 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "bookmarks",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT, `url` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"df2202389ba5b11018b57a417457b11b\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"cf29693b9b6c4b791ee9c6cc434e0ee6\")"
     ]
   }
 }
