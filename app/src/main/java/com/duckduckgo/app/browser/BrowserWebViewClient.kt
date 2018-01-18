@@ -93,25 +93,25 @@ class BrowserWebViewClient @Inject constructor(
 
     @WorkerThread
     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
-        Timber.v("Intercepting resource ${request.url} on page ${view.urlFromWorkerThread()}")
+        Timber.v("Intercepting resource ${request.url} on page ${view.urlFromWorkerThread()}}")
 
         if (shouldUpgrade(request)) {
             val newUri = httpsUpgrader.upgrade(request.url)
-            view.post({ view.loadUrl(newUri.toString()) })
+            view.post { view.loadUrl(newUri.toString()) }
             return WebResourceResponse(null, null, null)
         }
 
-        view.urlFromWorkerThread()?.let {
-            if (TrustedSites.isTrusted(it)) {
-                return null
-            }
+        val documentUrl = view.urlFromWorkerThread() ?: return null
+
+        if (TrustedSites.isTrusted(documentUrl)) {
+            return null
         }
 
         if (request.url != null && request.url.isHttp) {
-            webViewClientListener?.pageHasHttpResources()
+            webViewClientListener?.pageHasHttpResources(documentUrl)
         }
 
-        if (shouldBlock(request, view.urlFromWorkerThread())) {
+        if (shouldBlock(request, documentUrl)) {
             return WebResourceResponse(null, null, null)
         }
 

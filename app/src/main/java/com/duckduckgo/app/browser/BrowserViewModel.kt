@@ -188,7 +188,9 @@ class BrowserViewModel(
     }
 
     override fun trackerDetected(event: TrackingEvent) {
-        updateSiteMonitor(event)
+        if (event.documentUrl == siteMonitor?.url) {
+            updateSiteMonitor(event)
+        }
         updateNetworkLeaderboard(event)
     }
 
@@ -203,9 +205,11 @@ class BrowserViewModel(
         networkLeaderboardDao.insert(NetworkLeaderboardEntry(networkName, domainVisited))
     }
 
-    override fun pageHasHttpResources() {
-        siteMonitor?.hasHttpResources = true
-        onSiteMonitorChanged()
+    override fun pageHasHttpResources(page: String?) {
+        if (page == siteMonitor?.url) {
+            siteMonitor?.hasHttpResources = true
+            onSiteMonitorChanged()
+        }
     }
 
     private fun onSiteMonitorChanged() {
