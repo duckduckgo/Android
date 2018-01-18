@@ -25,6 +25,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.view.KeyEvent.KEYCODE_ENTER
 import android.view.Menu
@@ -35,6 +36,7 @@ import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.widget.TextView
 import android.widget.Toast
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
+import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
@@ -47,6 +49,7 @@ import kotlinx.android.synthetic.main.activity_browser.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
+import timber.log.Timber
 import javax.inject.Inject
 
 class BrowserActivity : DuckDuckGoActivity() {
@@ -54,6 +57,8 @@ class BrowserActivity : DuckDuckGoActivity() {
     @Inject lateinit var webViewClient: BrowserWebViewClient
     @Inject lateinit var webChromeClient: BrowserChromeClient
     @Inject lateinit var viewModelFactory: ViewModelFactory
+
+    private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
     private var acceptingRenderUpdates = true
     private var addBookmarkMenuItem: MenuItem? = null
@@ -115,10 +120,24 @@ class BrowserActivity : DuckDuckGoActivity() {
         configureWebView()
         configureOmnibarTextInput()
         configureDummyViewTouchHandler()
+        configureAutoComplete()
 
         if (savedInstanceState == null) {
             consumeSharedTextExtra()
         }
+    }
+
+    private fun configureAutoComplete() {
+        autoCompleteSuggestionsList.layoutManager = LinearLayoutManager(this)
+        autoCompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
+                immediateSearchClickListener = {
+                    userEnteredQuery(it.phrase)
+                },
+                editableSearchClickListener = {
+                    viewModel.onUserSelectedToEditQuery(it.phrase)
+                }
+        )
+        autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
     private fun consumeSharedTextExtra() {
@@ -129,6 +148,8 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: BrowserViewModel.ViewState) {
+
+        Timber.v("Rendering view state: $viewState")
 
         if (!acceptingRenderUpdates) return
 
@@ -145,6 +166,9 @@ class BrowserActivity : DuckDuckGoActivity() {
         addBookmarkMenuItem?.setEnabled(viewState.canAddBookmarks)
         if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
             omnibarTextInput.setText(viewState.omnibarText)
+
+            // ensures caret sits at the end of the query
+            omnibarTextInput.post { omnibarTextInput.setSelection(omnibarTextInput.text.length) }
             appBarLayout.setExpanded(true, true)
         }
 
@@ -157,6 +181,15 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         privacyGradeMenu?.isVisible = viewState.showPrivacyGrade
         fireMenu?.isVisible = viewState.showFireButton
+
+        when (viewState.showAutoCompleteSuggestions) {
+            false -> autoCompleteSuggestionsList.gone()
+            true -> {
+                autoCompleteSuggestionsList.show()
+                val results = viewState.autoCompleteSearchResults.suggestions
+                autoCompleteSuggestionsAdapter.updateData(results)
+            }
+        }
     }
 
     private fun showClearButton() {
@@ -205,10 +238,10 @@ class BrowserActivity : DuckDuckGoActivity() {
         clearOmnibarInputButton.setOnClickListener { omnibarTextInput.setText("") }
     }
 
-    private fun userEnteredQuery() {
-        viewModel.onUserSubmittedQuery(omnibarTextInput.text.toString())
+    private fun userEnteredQuery(query: String) {
         omnibarTextInput.hideKeyboard()
         focusDummy.requestFocus()
+        viewModel.onUserSubmittedQuery(query)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -244,7 +277,7 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         omnibarTextInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, keyEvent ->
             if (actionId == IME_ACTION_DONE || keyEvent.keyCode == KEYCODE_ENTER) {
-                userEnteredQuery()
+                userEnteredQuery(omnibarTextInput.text.toString())
                 return@OnEditorActionListener true
             }
             false

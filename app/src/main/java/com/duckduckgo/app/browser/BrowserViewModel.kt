@@ -24,6 +24,8 @@ import android.support.annotation.AnyThread
 import android.support.annotation.VisibleForTesting
 import android.support.annotation.WorkerThread
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity.Companion.RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity.Companion.OPEN_URL_RESULT_CODE
@@ -44,9 +46,14 @@ import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.R
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.TOSDR_RESULT_CODE
 import com.duckduckgo.app.settings.db.AppConfigurationDao
 import com.duckduckgo.app.settings.db.AppConfigurationEntity
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.jakewharton.rxrelay2.PublishRelay
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 class BrowserViewModel(
         private val queryUrlConverter: OmnibarEntryConverter,
@@ -57,6 +64,8 @@ class BrowserViewModel(
         private val stringResolver: StringResolver,
         private val networkLeaderboardDao: NetworkLeaderboardDao,
         private val bookmarksDao: BookmarksDao,
+        private val autoCompleteApi: AutoCompleteApi,
+        private val appSettingsPreferencesStore: SettingsDataStore,
         appConfigurationDao: AppConfigurationDao) : WebViewClientListener, ViewModel() {
 
     data class ViewState(
@@ -68,7 +77,9 @@ class BrowserViewModel(
             val showClearButton: Boolean = false,
             val showPrivacyGrade: Boolean = false,
             val showFireButton: Boolean = true,
-            val canAddBookmarks: Boolean = false
+            val canAddBookmarks: Boolean = false,
+            val showAutoCompleteSuggestions: Boolean = false,
+            val autoCompleteSearchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
     )
 
     sealed class Command {
@@ -96,6 +107,8 @@ class BrowserViewModel(
     }
 
     private val appConfigurationObservable = appConfigurationDao.appConfigurationStatus()
+    private val autoCompletePublishSubject = PublishRelay.create<String>()
+
     private var siteMonitor: SiteMonitor? = null
     private var appConfigurationDownloaded = false
 
@@ -103,7 +116,27 @@ class BrowserViewModel(
         viewState.value = ViewState(canAddBookmarks = false)
         privacyMonitorRepository.privacyMonitor = MutableLiveData()
         appConfigurationObservable.observeForever(appConfigurationObserver)
+
+        configureAutoComplete()
     }
+
+    private fun configureAutoComplete() {
+        autoCompletePublishSubject
+                .debounce(300, TimeUnit.MILLISECONDS)
+                .distinctUntilChanged()
+                .switchMap { autoCompleteApi.autoComplete(it) }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ result ->
+                    onAutoCompleteResultReceived(result)
+                }, { t: Throwable? -> Timber.w(t, "Failed to get search results") })
+    }
+
+    private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
+        val results = result.suggestions.take(6)
+        viewState.value = currentViewState().copy(autoCompleteSearchResults = AutoCompleteResult(result.query, results))
+    }
+
 
     @VisibleForTesting
     public override fun onCleared() {
@@ -121,7 +154,11 @@ class BrowserViewModel(
             return
         }
         url.value = buildUrl(input)
-        viewState.value = currentViewState().copy(showClearButton = false, omnibarText = input)
+        viewState.value = currentViewState().copy(
+                showClearButton = false,
+                omnibarText = input,
+                showAutoCompleteSuggestions = false,
+                autoCompleteSearchResults = AutoCompleteResult("", emptyList()))
     }
 
     private fun buildUrl(input: String): String {
@@ -221,12 +258,32 @@ class BrowserViewModel(
 
     fun onOmnibarInputStateChanged(query: String, hasFocus: Boolean) {
         val showClearButton = hasFocus && query.isNotEmpty()
+
+        val currentViewState = currentViewState()
+
+        // determine if empty list to be shown, or existing search results
+        val autoCompleteSearchResults = if (query.isBlank()) {
+            AutoCompleteResult(query, emptyList())
+        } else {
+            currentViewState.autoCompleteSearchResults
+        }
+
+        val hasQueryChanged = (currentViewState.omnibarText != query)
+        val autoCompleteSuggestionsEnabled = appSettingsPreferencesStore.autoCompleteSuggestionsEnabled
+
         viewState.value = currentViewState().copy(
                 isEditing = hasFocus,
                 showClearButton = showClearButton,
                 showPrivacyGrade = appConfigurationDownloaded && !hasFocus,
-                showFireButton = !hasFocus
+                showFireButton = !hasFocus,
+                showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && autoCompleteSuggestionsEnabled,
+                autoCompleteSearchResults = autoCompleteSearchResults
         )
+
+        if(hasQueryChanged && hasFocus && autoCompleteSuggestionsEnabled) {
+            autoCompletePublishSubject.accept(query.trim())
+        }
+
     }
 
     fun onSharedTextReceived(input: String) {
@@ -282,6 +339,9 @@ class BrowserViewModel(
         command.value = Navigate(url)
     }
 
+    fun onUserSelectedToEditQuery(query: String) {
+        viewState.value = currentViewState().copy(isEditing = false, showAutoCompleteSuggestions = false, omnibarText = query)
+    }
 }
 
 

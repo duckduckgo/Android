@@ -95,6 +95,9 @@ dependencies {
     implementation "com.google.dagger:dagger-android-support:$dagger"
     releaseImplementation 'com.faendir:acra:4.10.0'
 
+    // RxRelay
+    implementation "com.jakewharton.rxrelay2:rxrelay:2.0.0"
+
     // Anko
     compile "org.jetbrains.anko:anko-commons:$ankoVersion"
     compile "org.jetbrains.anko:anko-design:$ankoVersion"
@@ -109,6 +112,7 @@ dependencies {
     implementation "android.arch.persistence.room:runtime:$architectureComponents"
     kapt "android.arch.persistence.room:compiler:$architectureComponents"
     testImplementation "android.arch.persistence.room:testing:$architectureComponents"
+    androidTestImplementation "android.arch.persistence.room:testing:$architectureComponents"
 
     // Dagger
     kapt "com.google.dagger:dagger-android-processor:$dagger"

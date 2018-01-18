@@ -24,6 +24,10 @@
     <string name="no_compatible_third_party_app_installed">No compatible app installed</string>
     <string name="addBookmarkMenuTitle">Add Bookmark</string>
 
+    <!-- AutoComplete Suggestions -->
+    <string name="editQueryBeforeSubmitting">Edit query before searching</string>
+    <string name="settings_autocomplete_enabled">Autcomplete Suggestions</string>
+
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
     <string name="privacyProtectionEnabled">PRIVACY PROTECTION ENABLED</string>
@@ -110,6 +114,7 @@
         DuckDuckGo Privacy Browser provides all the privacy essentials you need to protect yourself as you search and browse the web, including tracker blocking, smarter encryption, and DuckDuckGo private search.\n\
         After all, the internet shouldn\'t feel so creepy, and getting the privacy you deserve online should be as simple closing the blinds.</string>
     <string name="aboutMoreLink">More at duckduckgo.com/about</string>
+    <string name="no_suggestions">No Suggestions</string>
 
     <!-- Bookmarks Activity -->
     <string name="boomarksMenuTitle">Bookmarks</string>
