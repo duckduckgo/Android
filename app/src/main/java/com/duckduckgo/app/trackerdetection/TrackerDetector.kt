@@ -57,10 +57,11 @@ class TrackerDetector @Inject constructor(private val networkTrackers: TrackerNe
     }
 
     private fun firstParty(firstUrl: String, secondUrl: String): Boolean =
-            sameOrSubdomain(firstUrl, secondUrl) || sameOrSubdomain(secondUrl, firstUrl) || sameNetwork(firstUrl, secondUrl)
+            sameOrSubdomain(firstUrl, secondUrl) || sameOrSubdomain(secondUrl, firstUrl) || sameNetworkName(firstUrl, secondUrl)
 
-    private fun sameNetwork(firstUrl: String, secondUrl: String): Boolean =
-            networkTrackers.network(firstUrl) != null && networkTrackers.network(firstUrl) == networkTrackers.network(secondUrl)
+    private fun sameNetworkName(firstUrl: String, secondUrl: String): Boolean =
+            networkTrackers.network(firstUrl) != null && networkTrackers.network(firstUrl)?.name == networkTrackers.network(secondUrl)?.name
+
 
     val clientCount get() = clients.count()
 }
