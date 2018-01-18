@@ -37,7 +37,7 @@
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:layout_toEndOf="@id/phraseOrUrlIndicator"
-        android:layout_toStartOf="@id/editQueryImage"
+        android:layout_toStartOf="@+id/editQueryImage"
         android:ellipsize="end"
         android:fontFamily="sans-serif"
         android:gravity="center_vertical|start"
