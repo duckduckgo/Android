@@ -18,6 +18,7 @@
     <string name="refresh">Refresh</string>
     <string name="back">Back</string>
     <string name="forward">Forward</string>
+    <string name="webviewDownload">Downloading file</string>
     <string name="omnibarInputHint">Search or type URL</string>
     <string name="clearButtonContentDescription">Clear search input</string>
     <string name="no_compatible_third_party_app_installed">No compatible app installed</string>
