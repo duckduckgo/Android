@@ -20,10 +20,20 @@ import com.duckduckgo.app.trackerdetection.model.ResourceType
 
 interface Client {
 
-    enum class ClientName {
-        EASYLIST,
-        EASYPRIVACY,
-        DISCONNECT
+    enum class ClientType {
+
+        BLOCKING,
+        WHITELIST
+
+    }
+
+    enum class ClientName(val type: ClientType) {
+
+        EASYLIST(ClientType.BLOCKING),
+        EASYPRIVACY(ClientType.BLOCKING),
+        TRACKERSWHITELIST(ClientType.WHITELIST),
+        DISCONNECT(ClientType.BLOCKING)
+
     }
 
     val name: ClientName

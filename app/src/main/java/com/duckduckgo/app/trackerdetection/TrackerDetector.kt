@@ -41,12 +41,18 @@ class TrackerDetector @Inject constructor(private val networkTrackers: TrackerNe
 
     fun evaluate(url: String, documentUrl: String, resourceType: ResourceType): TrackingEvent? {
 
+        val whitelisted = clients.any { it.name.type == Client.ClientType.WHITELIST && it.matches(url, documentUrl, resourceType) }
+        if (whitelisted) {
+            Timber.v("$documentUrl resource $url is whitelisted")
+            return null
+        }
+
         if (firstParty(url, documentUrl)) {
             Timber.v("$url is a first party url")
             return null
         }
 
-        val matches = clients.any { it.matches(url, documentUrl, resourceType) }
+        val matches = clients.any { it.name.type == Client.ClientType.BLOCKING && it.matches(url, documentUrl, resourceType) }
         if (matches) {
             Timber.v("$documentUrl resource $url WAS identified as a tracker")
             return TrackingEvent(documentUrl, url, networkTrackers.network(url), settings.privacyOn)

@@ -34,12 +34,14 @@ class AppConfigurationDownloader @Inject constructor(
     fun downloadTask(): Completable {
         val easyListDownload = trackerDataDownloader.downloadList(Client.ClientName.EASYLIST)
         val easyPrivacyDownload = trackerDataDownloader.downloadList(Client.ClientName.EASYPRIVACY)
+        val trackersWhitelist = trackerDataDownloader.downloadList(Client.ClientName.TRACKERSWHITELIST)
         val disconnectDownload = trackerDataDownloader.downloadList(Client.ClientName.DISCONNECT)
         val httpsUpgradeDownload = httpsUpgradeListDownloader.downloadList()
 
         return Completable.merge(listOf(
                 easyListDownload.subscribeOn(Schedulers.io()),
                 easyPrivacyDownload.subscribeOn(Schedulers.io()),
+                trackersWhitelist.subscribeOn(Schedulers.io()),
                 disconnectDownload.subscribeOn(Schedulers.io()),
                 httpsUpgradeDownload.subscribeOn(Schedulers.io())
         )).doOnComplete {

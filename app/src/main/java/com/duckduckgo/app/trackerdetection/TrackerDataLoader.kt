@@ -37,6 +37,7 @@ class TrackerDataLoader @Inject constructor(
         // these are stored to disk, then fed to the C++ adblock module
         loadAdblockData(Client.ClientName.EASYLIST)
         loadAdblockData(Client.ClientName.EASYPRIVACY)
+        loadAdblockData(Client.ClientName.TRACKERSWHITELIST)
 
         // stored in DB, then read into memory
         loadDisconnectData()
