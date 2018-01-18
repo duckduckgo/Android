@@ -29,6 +29,7 @@ import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import dagger.android.HasServiceInjector
 import io.reactivex.schedulers.Schedulers
+import org.jetbrains.anko.doAsync
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -62,8 +63,14 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
         loadTrackerData()
         configureDataDownloader()
 
-        migration.start(this) { favourites, searches ->
-            Timber.d("Migrated $favourites favourites, $searches")
+        migrateLegacyDb()
+    }
+
+    private fun migrateLegacyDb() {
+        doAsync {
+            migration.start { favourites, searches ->
+                Timber.d("Migrated $favourites favourites, $searches")
+            }
         }
     }
 

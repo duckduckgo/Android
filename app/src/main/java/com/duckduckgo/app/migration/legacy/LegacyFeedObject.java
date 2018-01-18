@@ -16,13 +16,8 @@
 
 package com.duckduckgo.app.migration.legacy;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import android.database.sqlite.SQLiteCursor;
-
-
 public class LegacyFeedObject {
+
 	private final String feed;
 	private final String favicon;
 	private final String description;
@@ -35,45 +30,9 @@ public class LegacyFeedObject {
 	private final String type;
 	private final String articleUrl;
 	private final String html;
-	
 	private final String hidden;
 
-	/**
-	 * No argument constructor, to be called by ORM layer
-	 */
-	public LegacyFeedObject() {
-		// no-arg constructor for ORMlite
-		this.feed = "";
-		this.favicon = "";
-		this.description = "";
-		this.timestamp = "";
-		this.url = "";
-		this.title = "";
-		this.id = "";
-		this.category = "";
-		this.imageUrl = "";
-		this.type = "";
-		this.articleUrl = "";
-		this.html = "";
-		this.hidden = "T";
-	}
-	
-	public LegacyFeedObject(String id){
-		this.id = id;
-		this.feed = "";
-		this.favicon = "";
-		this.description = "";
-		this.timestamp = "";
-		this.url = "";
-		this.title = "";
-		this.category = "";
-		this.imageUrl = "";
-		this.type = "";
-		this.articleUrl = "";
-		this.html = "";
-		this.hidden = "T";
-	}
-	
+
 	public LegacyFeedObject(String id, String title, String description, String feed, String url, String imageUrl,
 							String favicon, String timestamp, String category, String type, String articleUrl, String html, String hidden) {
 		this.id = id;
@@ -90,83 +49,7 @@ public class LegacyFeedObject {
 		this.html = html;
 		this.hidden = hidden;
 	}
-	
-	public LegacyFeedObject(String title, String url) {
-		this.id = url;
-		this.title = title;
-		this.description = "";
-		this.feed = "";
-		this.url = url;
-		this.imageUrl = "";
-		this.favicon = "";
-		this.timestamp = "";
-		this.category = "";
-		this.type = "";
-		this.articleUrl = "";
-		this.html = "";
-		this.hidden = "T";
-	}
-	
-	public LegacyFeedObject(String title, String url, String imageUrl) {
-		this.id = url;
-		this.title = title;
-		this.description = "";
-		this.feed = "";
-		this.url = url;
-		if(imageUrl != null) {
-			this.imageUrl = imageUrl;
-		}
-		else {
-			this.imageUrl = "";
-		}
-		this.favicon = "";
-		this.timestamp = "";
-		this.category = "";
-		this.type = "";
-		this.articleUrl = "";
-		this.html = "";
-		this.hidden = "T";
-	}
-	
-	public LegacyFeedObject(JSONObject obj) throws JSONException {
-		this.feed = obj.getString("feed");
-		this.favicon = obj.getString("favicon");
-		this.description = obj.getString("description");
-		this.timestamp = obj.getString("timestamp");
-		this.url = obj.getString("url");
-		this.title = obj.getString("title");
-		this.id = obj.getString("id");
-		this.category = obj.getString("category");
-		this.imageUrl = obj.optString("image");
-		this.type = obj.getString("type");
-		if(obj.has("article_url"))
-			this.articleUrl = obj.getString("article_url");
-		else
-			this.articleUrl = "";
-		if(obj.has("html"))
-			this.html = obj.getString("html");
-		else
-			this.html = "";
-		this.hidden = "T";
-	}
-	
-	public LegacyFeedObject(SQLiteCursor cursor) {
-		this.id = cursor.getString(cursor.getColumnIndex("_id"));
-		this.title = cursor.getString(cursor.getColumnIndex("title"));
-		this.description = cursor.getString(cursor.getColumnIndex("description"));
-		this.feed = cursor.getString(cursor.getColumnIndex("feed"));
-		this.url = cursor.getString(cursor.getColumnIndex("url"));
-		this.imageUrl = cursor.getString(cursor.getColumnIndex("imageurl"));
-		this.favicon = cursor.getString(cursor.getColumnIndex("favicon"));
-		this.timestamp = cursor.getString(cursor.getColumnIndex("timestamp"));
-		this.category = cursor.getString(cursor.getColumnIndex("category"));
-		this.type = cursor.getString(cursor.getColumnIndex("type"));
-		this.articleUrl = cursor.getString(cursor.getColumnIndex("articleurl"));
-//		this.html = cursor.getString(cursor.getColumnIndex("html"));
-		this.html = "";
-		this.hidden = cursor.getString(cursor.getColumnIndex("hidden"));;
-	}
-	
+
 	@Override
 	public String toString() {
 		String string = "{";
@@ -235,7 +118,7 @@ public class LegacyFeedObject {
   	public String getArticleUrl() {
   		return articleUrl;
   	}
-	
+
 	public String getHidden() {
 		return hidden;
 	}

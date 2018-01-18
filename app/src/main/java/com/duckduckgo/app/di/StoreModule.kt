@@ -26,7 +26,7 @@ import dagger.Provides
 class StoreModule {
 
     @Provides
-    fun providesOnboaridngStore(context: Context): OnboardingStore {
+    fun providesOnboardingStore(context: Context): OnboardingStore {
         return OnboardingSharedPreferences(context)
     }
 

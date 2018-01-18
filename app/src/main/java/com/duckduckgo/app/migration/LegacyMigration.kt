@@ -17,15 +17,15 @@
 package com.duckduckgo.app.migration
 
 import android.content.Context
-import android.net.Uri
+import android.support.annotation.WorkerThread
 import android.webkit.URLUtil
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.migration.legacy.LegacyDB
-import com.duckduckgo.app.migration.legacy.LegacyDBContracts
-import org.jetbrains.anko.doAsync
+import com.duckduckgo.app.migration.legacy.LegacyDb
+import com.duckduckgo.app.migration.legacy.LegacyDbContracts
+import timber.log.Timber
 import javax.inject.Inject
 
 class LegacyMigration @Inject constructor(
@@ -34,71 +34,77 @@ class LegacyMigration @Inject constructor(
         val context: Context,
         val queryUrlConverter: QueryUrlConverter) {
 
-    /**
-     * Start an asynchronous migration. The completion handler will be called with the number of items migrated.
-     *
-     * @param context - a context to use, but always uses the application context
-     * @param completion - a migration handler that will be called once migration has finished
-     */
-    fun start(context: Context, completion: (favourites: Int, searches: Int) -> Unit) {
-        doAsync {
-            migrate(context.applicationContext, completion)
+    @WorkerThread
+    fun start(completion: (favourites: Int, searches: Int) -> Unit) {
+
+        LegacyDb(context.applicationContext).use {
+            migrate(it, completion)
         }
+
     }
 
-    private fun migrate(context: Context, completion: (favourites: Int, searches: Int) -> Unit) {
-        val ddgDB = LegacyDB(context)
+    private fun migrate(legacyDb:LegacyDb, completion: (favourites: Int, searches: Int) -> Unit) {
 
         var favourites = 0
         var searches = 0
-        database.runInTransaction {
-            favourites = migrateSavedFeedObjects(ddgDB)
-            searches = migrateSavedSearches(ddgDB)
-        }
 
-        ddgDB.deleteAll()
+        database.runInTransaction {
+            favourites = migrateFavourites(legacyDb)
+            searches = migrateSavedSearches(legacyDb)
+            legacyDb.deleteAll()
+        }
 
         completion(favourites, searches)
     }
 
-    private fun migrateSavedSearches(ddgDB: LegacyDB): Int {
-
-        val cursor = ddgDB.cursorSavedSearch
-        if (!cursor.moveToFirst()) {
-            return 0
-        }
-
-        val titleColumn = cursor.getColumnIndex(LegacyDBContracts.SAVED_SEARCH_TABLE.COLUMN_TITLE)
-        val queryColumn = cursor.getColumnIndex(LegacyDBContracts.SAVED_SEARCH_TABLE.COLUMN_QUERY)
+    private fun migrateSavedSearches(db: LegacyDb): Int {
 
         var count = 0
-        do {
+        db.cursorSavedSearch.use {
 
-            val title = cursor.getString(titleColumn)
-            val query = cursor.getString(queryColumn)
+            if (!it.moveToFirst()) {
+                Timber.d("No saved searches found")
+                return 0
+            }
 
-            val url = if (URLUtil.isNetworkUrl(query)) query else queryUrlConverter.convertQueryToUri(query).toString()
+            val titleColumn = it.getColumnIndex(LegacyDbContracts.SAVED_SEARCH_TABLE.COLUMN_TITLE)
+            val queryColumn = it.getColumnIndex(LegacyDbContracts.SAVED_SEARCH_TABLE.COLUMN_QUERY)
 
-            bookmarksDao.insert(BookmarkEntity(title = title, url = url))
+            do {
 
-            count += 1
-        } while (cursor.moveToNext())
+                val title = it.getString(titleColumn)
+                val query = it.getString(queryColumn)
+
+                val url = if (URLUtil.isNetworkUrl(query)) query else queryUrlConverter.convertQueryToUri(query).toString()
+
+                bookmarksDao.insert(BookmarkEntity(title = title, url = url))
+
+                count += 1
+            } while (it.moveToNext())
+        }
 
         return count
     }
 
-    private fun migrateSavedFeedObjects(ddgDB: LegacyDB) : Int {
-        val feedObjects = ddgDB.selectAll() ?: return 0
+    private fun migrateFavourites(db: LegacyDb) : Int {
+        val feedObjects = db.selectAll() ?: return 0
 
+        var count = 0
         for (feedObject in feedObjects) {
+
+            if (!db.isSaved(feedObject.id)) {
+                continue
+            }
 
             val title = feedObject.title
             val url = feedObject.url
 
             bookmarksDao.insert(BookmarkEntity(title = title, url = url))
+
+            count += 1
         }
 
-        return feedObjects.size
+        return count
     }
 
 }

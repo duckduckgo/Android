@@ -18,7 +18,7 @@ package com.duckduckgo.app.migration.legacy;
 
 import android.provider.BaseColumns;
 
-public final class LegacyDBContracts {
+public final class LegacyDbContracts {
     public static final String DATABASE_NAME = "ddg.db";
     public static final int DATABASE_VERSION = 16;
 
