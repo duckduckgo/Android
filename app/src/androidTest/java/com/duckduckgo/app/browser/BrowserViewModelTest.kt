@@ -153,7 +153,7 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenTrackerDetectedThenNetworkLeaderbardUpdated() {
+    fun whenTrackerDetectedThenNetworkLeaderboardUpdated() {
         testee.trackerDetected(TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", TrackerNetwork("Network1", "www.tracker.com"), false))
         assertNotNull(lastNetworkLeaderboardEntry)
         assertEquals(lastNetworkLeaderboardEntry!!.domainVisited, "www.example.com")
@@ -290,7 +290,7 @@ class BrowserViewModelTest {
     @Test
     fun whenTrackerDetectedThenPrivacyGradeIsUpdated() {
         testee.urlChanged("https://example.com")
-        testee.trackerDetected(TrackingEvent("", "", null, false))
+        testee.trackerDetected(TrackingEvent("https://example.com", "", null, false))
         assertEquals(PrivacyGrade.C, testee.privacyGrade.value)
     }
 

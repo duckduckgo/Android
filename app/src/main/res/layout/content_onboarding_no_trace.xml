@@ -22,7 +22,7 @@
     android:layout_height="match_parent"
     android:paddingEnd="44dp"
     android:paddingStart="44dp"
-    tools:background="@color/skyBlue"
+    tools:background="@color/powderBlue"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
     <LinearLayout
