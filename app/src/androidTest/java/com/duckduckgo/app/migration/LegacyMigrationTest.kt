@@ -43,11 +43,27 @@ class LegacyMigrationTest {
 
     @After
     fun after() {
-        context.getDatabasePath(LegacyDbContracts.DATABASE_NAME).delete()
+        deleteLegacyDb()
     }
 
     @Test
-    fun whenLegacyDbExistsThenMigrationIsSuccessful() {
+    fun whenNoLegacyDbExistsThenMigrationCompletesWithZeroMigratedItems() {
+
+        deleteLegacyDb()
+
+        val migration = LegacyMigration(appDatabase, bookmarksDao, context, urlConverter);
+
+        migration.start { favourites, searches ->
+            assertEquals(0, favourites)
+            assertEquals(0, searches)
+        }
+
+        assertEquals(0, bookmarksDao.bookmarks.size)
+
+    }
+
+    @Test
+    fun whenLegacyDbExistsThenMigrationCompletesWithCorrectNumberOfMigratedItems() {
 
         populateLegacyDB()
 
@@ -66,6 +82,10 @@ class LegacyMigrationTest {
             assertEquals(0, searches)
         }
 
+    }
+
+    private fun deleteLegacyDb() {
+        context.getDatabasePath(LegacyDbContracts.DATABASE_NAME).delete()
     }
 
     private fun populateLegacyDB() {
