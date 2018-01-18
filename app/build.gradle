@@ -32,7 +32,6 @@ android {
     }
     buildTypes {
         debug {
-            testCoverageEnabled = true
         }
         release {
             minifyEnabled false
