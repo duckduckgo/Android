@@ -94,7 +94,7 @@ class BrowserWebViewClient @Inject constructor(
 
     @WorkerThread
     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
-        Timber.v("Intercepting resource ${request.url} on page ${view.urlFromWorkerThread()}}")
+        Timber.v("Intercepting resource ${request.url} on page ${view.urlFromAnyThread()}}")
 
         if (shouldUpgrade(request)) {
             val newUri = httpsUpgrader.upgrade(request.url)
@@ -102,7 +102,7 @@ class BrowserWebViewClient @Inject constructor(
             return WebResourceResponse(null, null, null)
         }
 
-        val documentUrl = view.urlFromWorkerThread() ?: return null
+        val documentUrl = view.urlFromAnyThread() ?: return null
 
         if (TrustedSites.isTrusted(documentUrl)) {
             return null
@@ -144,8 +144,12 @@ class BrowserWebViewClient @Inject constructor(
         return true
     }
 
+    /**
+     * Access WebView.url from any thread. If you are on the main thread it is more efficient to use
+     * WebView.url directly.
+     */
     @AnyThread
-    private fun WebView.urlFromWorkerThread(): String? {
+    private fun WebView.urlFromAnyThread(): String? {
         val latch = CountDownLatch(1)
         var safeUrl: String? = null
         post {
