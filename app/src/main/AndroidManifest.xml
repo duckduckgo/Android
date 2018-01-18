@@ -15,6 +15,10 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
 
+        <meta-data
+            android:name="android.webkit.WebView.MetricsOptOut"
+            android:value="true" />
+
         <activity
             android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivity"
             android:label="@string/appName"
