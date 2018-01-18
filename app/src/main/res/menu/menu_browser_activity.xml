@@ -50,6 +50,7 @@
     <item
         android:id="@+id/add_bookmark_menu_item"
         android:title="@string/addBookmarkMenuTitle"
+        android:enabled="false"
         app:showAsAction="never" />
 
     <item

@@ -18,7 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
 import android.app.DownloadManager
-import android.app.DownloadManager.Request.*
+import android.app.DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
@@ -61,7 +61,6 @@ class BrowserActivity : DuckDuckGoActivity() {
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
     private var acceptingRenderUpdates = true
-    private var addBookmarkMenuItem: MenuItem? = null
 
     private val viewModel: BrowserViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(BrowserViewModel::class.java)
@@ -72,6 +71,10 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     private val fireMenu: MenuItem?
         get() = toolbar.menu.findItem(R.id.fire_menu_item)
+
+    private val addBookmarksMenu: MenuItem?
+        get() = toolbar.menu.findItem(R.id.add_bookmark_menu_item)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -163,7 +166,6 @@ class BrowserActivity : DuckDuckGoActivity() {
             false -> pageLoadingIndicator.hide()
         }
 
-        addBookmarkMenuItem?.setEnabled(viewState.canAddBookmarks)
         if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
             omnibarTextInput.setText(viewState.omnibarText)
 
@@ -179,6 +181,7 @@ class BrowserActivity : DuckDuckGoActivity() {
             false -> hideClearButton()
         }
 
+        addBookmarksMenu?.isEnabled = viewState.canAddBookmarks
         privacyGradeMenu?.isVisible = viewState.showPrivacyGrade
         fireMenu?.isVisible = viewState.showFireButton
 
@@ -262,7 +265,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         webView.setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
             val request = DownloadManager.Request(Uri.parse(url))
             request.allowScanningByMediaScanner()
-            request.setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED   )
+            request.setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             manager.enqueue(request)
             Toast.makeText(applicationContext, getString(R.string.webviewDownload), Toast.LENGTH_LONG).show()
@@ -306,8 +309,6 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_browser_activity, menu)
-        addBookmarkMenuItem = menu?.findItem(R.id.add_bookmark_menu_item)
-        addBookmarkMenuItem?.setEnabled(false)
         return true
     }
 
