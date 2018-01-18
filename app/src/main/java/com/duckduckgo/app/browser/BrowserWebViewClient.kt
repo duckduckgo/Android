@@ -25,6 +25,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.duckduckgo.app.global.isHttp
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
+import com.duckduckgo.app.privacymonitor.model.TrustedSites
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.ResourceType
 import timber.log.Timber
@@ -98,6 +99,12 @@ class BrowserWebViewClient @Inject constructor(
             val newUri = httpsUpgrader.upgrade(request.url)
             view.post({ view.loadUrl(newUri.toString()) })
             return WebResourceResponse(null, null, null)
+        }
+
+        view.urlFromWorkerThread()?.let {
+            if (TrustedSites.isTrusted(it)) {
+                return null
+            }
         }
 
         if (request.url != null && request.url.isHttp) {
