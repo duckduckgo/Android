@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,25 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.app.privacymonitor.model
 
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.app.global.UriString
 
-interface WebViewClientListener {
-    fun loadingStarted()
-    fun loadingFinished()
-    fun progressChanged(newProgress: Int)
-    fun urlChanged(url: String?)
-    fun trackerDetected(event: TrackingEvent)
-    fun pageHasHttpResources(page: String?)
+class TrustedSites {
 
-    fun sendEmailRequested(emailAddress: String)
-    fun sendSmsRequested(telephoneNumber: String)
-    fun dialTelephoneNumberRequested(telephoneNumber: String)
+    companion object {
+
+        private val trusted = listOf(
+                "duckduckgo.com",
+                "donttrack.us",
+                "spreadprivacy.com",
+                "duckduckhack.com",
+                "privatebrowsingmyths.com",
+                "duck.co"
+        )
+
+        fun isTrusted(url: String): Boolean {
+            return trusted.any { UriString.sameOrSubdomain(url, it) }
+        }
+    }
 }

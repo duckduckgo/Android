@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.app.privacymonitor.model
 
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Test
 
-interface WebViewClientListener {
-    fun loadingStarted()
-    fun loadingFinished()
-    fun progressChanged(newProgress: Int)
-    fun urlChanged(url: String?)
-    fun trackerDetected(event: TrackingEvent)
-    fun pageHasHttpResources(page: String?)
 
-    fun sendEmailRequested(emailAddress: String)
-    fun sendSmsRequested(telephoneNumber: String)
-    fun dialTelephoneNumberRequested(telephoneNumber: String)
+class TrustedSitesTest {
+
+    @Test
+    fun whenSiteIsInTrustedListThenIsTrustedIsTrue() {
+        assertTrue(TrustedSites.isTrusted("https://www.duckduckgo.com"))
+    }
+
+    @Test
+    fun whenSiteIsNotInTrustedListThenIsTrustedIsFalse() {
+        assertFalse(TrustedSites.isTrusted("https://www.example.com"))
+    }
 }
