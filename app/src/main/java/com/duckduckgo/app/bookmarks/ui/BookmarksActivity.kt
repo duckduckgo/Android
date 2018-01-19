@@ -98,7 +98,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
             positiveButton(android.R.string.yes) { delete(bookmark) }
             negativeButton(android.R.string.no) { }
         }.build()
-        deleteDialog.show()
+        deleteDialog?.show()
     }
 
     private fun delete(bookmark: BookmarkEntity) {
