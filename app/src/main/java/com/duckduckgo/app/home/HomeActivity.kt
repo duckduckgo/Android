@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.ActivityOptionsCompat
-import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -30,6 +29,7 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserPopupMenu
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.settings.SettingsActivity
@@ -40,7 +40,7 @@ import org.jetbrains.anko.toast
 import javax.inject.Inject
 import javax.inject.Provider
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : DuckDuckGoActivity() {
 
     private lateinit var popupMenu: BrowserPopupMenu
 
