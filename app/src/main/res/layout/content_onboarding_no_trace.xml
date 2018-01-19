@@ -25,48 +25,48 @@
     tools:background="@color/powderBlue"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
+    <ImageView
+        android:id="@+id/noTraceImage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:importantForAccessibility="no"
+        android:paddingTop="20dp"
+        android:src="@drawable/onboarding_image_no_trace"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/textContainer"
+        app:layout_constraintVertical_bias="0.5" />
+
     <LinearLayout
+        android:id="@+id/textContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toTopOf="@id/continueButton"
+        app:layout_constraintTop_toBottomOf="@id/noTraceImage">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="80dp"
-            android:gravity="center"
-            android:orientation="vertical"
-            tools:ignore="UselessParent">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:importantForAccessibility="no"
-                android:paddingTop="20dp"
-                android:src="@drawable/onboarding_image_no_trace" />
-
-            <TextView
-                android:text="@string/onboardingNoTraceTitle"
-                style="@style/OnboardingTextTitle" />
+        <TextView
+            style="@style/OnboardingTextTitle"
+            android:text="@string/onboardingNoTraceTitle" />
 
 
-            <TextView
-                android:text="@string/onboardingNoTraceDescription1"
-                style="@style/OnboardingTextSubtitle" />
+        <TextView
+            style="@style/OnboardingTextSubtitle"
+            android:text="@string/onboardingNoTraceDescription1" />
 
-            <TextView
-                android:text="@string/onboardingNoTraceDescription2"
-                style="@style/OnboardingTextSubtitle.Subtitle2" />
+        <TextView
+            style="@style/OnboardingTextSubtitle.Subtitle2"
+            android:text="@string/onboardingNoTraceDescription2" />
 
-
-        </LinearLayout>
 
     </LinearLayout>
 
-
     <Button
+        android:id="@+id/continueButton"
         style="@style/OnboardingButtonNoTrace"
         android:theme="@style/OnboardingButtonNoTrace" />
 

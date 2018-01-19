@@ -14,8 +14,8 @@
   ~ limitations under the License.
   -->
 
-
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/longDescriptionContainer"
     android:layout_width="match_parent"
@@ -25,44 +25,43 @@
     tools:background="@color/lighOliveGreen"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
+    <ImageView
+        android:id="@+id/protectDataImage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:importantForAccessibility="no"
+        android:paddingTop="20dp"
+        android:src="@drawable/onboarding_image_protect_data"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/textContainer"
+        app:layout_constraintVertical_bias="0.5" />
+
     <LinearLayout
+        android:id="@+id/textContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toTopOf="@id/continueButton"
+        app:layout_constraintTop_toBottomOf="@id/noTraceImage">
 
+        <TextView
+            style="@style/OnboardingTextTitle"
+            android:text="@string/onboardingProtectDataTitle" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="80dp"
-            android:gravity="center"
-            android:orientation="vertical"
-            tools:ignore="UselessParent">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:importantForAccessibility="no"
-                android:paddingTop="20dp"
-                android:src="@drawable/onboarding_image_protect_data" />
-
-            <TextView
-                style="@style/OnboardingTextTitle"
-                android:text="@string/onboardingProtectDataTitle" />
-
-            <TextView
-                style="@style/OnboardingTextSubtitle"
-                android:text="@string/onboardingProtectDataDescription" />
-
-        </LinearLayout>
+        <TextView
+            style="@style/OnboardingTextSubtitle"
+            android:text="@string/onboardingProtectDataDescription" />
 
     </LinearLayout>
 
     <Button
+        android:id="@+id/continueButton"
         style="@style/OnboardingButtonProtectData"
         android:theme="@style/OnboardingButtonProtectData" />
-
 
 </android.support.constraint.ConstraintLayout>
