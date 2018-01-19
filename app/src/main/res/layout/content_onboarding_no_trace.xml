@@ -68,6 +68,7 @@
     <Button
         android:id="@+id/continueButton"
         style="@style/OnboardingButtonNoTrace"
+        android:onClick="onDoneClicked"
         android:theme="@style/OnboardingButtonNoTrace" />
 
 </android.support.constraint.ConstraintLayout>
