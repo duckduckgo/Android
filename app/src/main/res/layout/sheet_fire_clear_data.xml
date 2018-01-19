@@ -40,14 +40,14 @@
         android:textSize="16sp"
         android:textStyle="normal" />
 
+    <!-- Drawable tint does not work on API 21 so we have to use a pre-colored drawable -->
     <TextView
         android:id="@+id/cancelOption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
         android:drawablePadding="24dp"
-        android:drawableStart="@drawable/ic_clear_black_24px"
-        android:drawableTint="@color/brownishGray"
+        android:drawableStart="@drawable/ic_clear_browsnish_24px"
         android:fontFamily="sans-serif"
         android:gravity="center_vertical"
         android:paddingBottom="24dp"
