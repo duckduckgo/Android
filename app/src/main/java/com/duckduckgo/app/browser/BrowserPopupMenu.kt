@@ -44,12 +44,7 @@ class BrowserPopupMenu : PopupWindow {
         anchorView.getLocationOnScreen(anchorLocation)
         val x = margin
         val y = anchorLocation[1] + margin
-
-        if (SDK_INT > 21) {
-            showAtLocation(rootView, Gravity.TOP or Gravity.END, x, y)
-        } else {
-            showAtLocation(rootView, Gravity.TOP or Gravity.END, 0, 0)
-        }
+        showAtLocation(rootView, Gravity.TOP or Gravity.END, x, y)
     }
 
     companion object {
