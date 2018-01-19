@@ -25,6 +25,7 @@ import android.support.annotation.ColorRes
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager.OnPageChangeListener
 import android.view.LayoutInflater
 import android.view.View
@@ -131,18 +132,16 @@ class OnboardingActivity : DuckDuckGoActivity() {
         }
 
         @ColorInt
-        @Suppress("deprecation")
         fun offsetColor(context: Context, positionOffset: Float): Int {
-            val fromColor = context.resources.getColor(firstColor)
-            val toColor = context.resources.getColor(secondColor)
+            val fromColor = ContextCompat.getColor(context, firstColor)
+            val toColor = ContextCompat.getColor(context, secondColor)
             return colorCombiner.combine(fromColor, toColor, positionOffset)
         }
 
         @ColorInt
-        @Suppress("deprecation")
         fun color(context: Context, currentPage: Int): Int {
             val color = if (currentPage == 0) firstColor else secondColor
-            return context.resources.getColor(color)
+            return ContextCompat.getColor(context, color)
         }
 
         companion object {

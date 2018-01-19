@@ -48,55 +48,26 @@
                 android:src="@drawable/onboarding_image_no_trace" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:gravity="center_horizontal"
-                android:paddingBottom="20dp"
-                android:paddingTop="20dp"
                 android:text="@string/onboardingNoTraceTitle"
-                android:textColor="@color/white"
-                android:textSize="21sp"
-                android:textStyle="normal" />
+                style="@style/OnboardingTextTitle" />
+
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:gravity="center_horizontal"
-                android:lineSpacingExtra="4sp"
                 android:text="@string/onboardingNoTraceDescription1"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="normal" />
+                style="@style/OnboardingTextSubtitle" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:gravity="center_horizontal"
-                android:lineSpacingExtra="6sp"
-                android:paddingTop="16dp"
                 android:text="@string/onboardingNoTraceDescription2"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="normal" />
+                style="@style/OnboardingTextSubtitle.Subtitle2" />
+
 
         </LinearLayout>
 
     </LinearLayout>
 
+
     <Button
-        style="?android:attr/borderlessButtonStyle"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginBottom="20dp"
-        android:background="@color/windowsBlue"
-        android:elevation="0dp"
-        android:onClick="onDoneClicked"
-        android:text="@string/onboardingContinue"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        style="@style/OnboardingButtonNoTrace"
+        android:theme="@style/OnboardingButtonNoTrace" />
 
 </android.support.constraint.ConstraintLayout>
