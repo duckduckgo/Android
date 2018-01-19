@@ -34,4 +34,7 @@ interface TrackerDataDao {
 
     @Query("Select count(*) from disconnect_tracker")
     fun count(): Int
+
+    @Query("DELETE FROM disconnect_tracker")
+    fun deleteAll()
 }
