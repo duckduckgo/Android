@@ -32,6 +32,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
+import android.webkit.CookieManager
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.widget.TextView
 import android.widget.Toast
@@ -52,6 +53,7 @@ import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Provider
 
 
 class BrowserActivity : DuckDuckGoActivity() {
@@ -59,6 +61,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     @Inject lateinit var webViewClient: BrowserWebViewClient
     @Inject lateinit var webChromeClient: BrowserChromeClient
     @Inject lateinit var viewModelFactory: ViewModelFactory
+    @Inject lateinit var cookieManagerProvider: Provider<CookieManager>
 
     private lateinit var popupMenu: BrowserPopupMenu
 
@@ -337,11 +340,11 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun launchFire() {
-        FireDialog(this, {
-            finishActivityAnimated()
-        }, {
-            applicationContext.toast(R.string.fireDataCleared)
-        }).show()
+        FireDialog(context = this,
+                clearStarted = { finishActivityAnimated() },
+                clearComplete = { applicationContext.toast(R.string.fireDataCleared) },
+                cookieManager = cookieManagerProvider.get()
+        ).show()
     }
 
     private fun launchPopupMenu() {

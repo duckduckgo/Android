@@ -38,6 +38,7 @@ import javax.inject.Singleton
     (DatabaseModule::class),
     (JsonModule::class),
     (StringModule::class),
+    (BrowserModule::class),
     (BrowserAutoCompleteModule::class)
 ])
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
