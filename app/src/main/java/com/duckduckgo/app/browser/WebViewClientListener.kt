@@ -24,7 +24,7 @@ interface WebViewClientListener {
     fun progressChanged(newProgress: Int)
     fun urlChanged(url: String?)
     fun trackerDetected(event: TrackingEvent)
-    fun pageHasHttpResources()
+    fun pageHasHttpResources(page: String?)
 
     fun sendEmailRequested(emailAddress: String)
     fun sendSmsRequested(telephoneNumber: String)

@@ -22,7 +22,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
-import android.view.MenuItem
 import android.view.View
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -32,24 +31,12 @@ import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import com.duckduckgo.app.privacymonitor.renderer.*
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardViewModel.ViewState
-import kotlinx.android.synthetic.main.activity_privacy_dashboard.*
 import kotlinx.android.synthetic.main.content_privacy_dashboard.*
 import kotlinx.android.synthetic.main.include_privacy_dashboard_header.*
+import kotlinx.android.synthetic.main.include_toolbar.*
 import javax.inject.Inject
 
-
 class PrivacyDashboardActivity : DuckDuckGoActivity() {
-
-    companion object {
-
-        val REQUEST_DASHBOARD = 1000
-        val RESULT_RELOAD = 1000
-        val RESULT_TOSDR = 1001
-
-        fun intent(context: Context): Intent {
-            return Intent(context, PrivacyDashboardActivity::class.java)
-        }
-    }
 
     @Inject lateinit var viewModelFactory: ViewModelFactory
     @Inject lateinit var repository: PrivacyMonitorRepository
@@ -87,19 +74,9 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                onBackPressed()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     override fun onBackPressed() {
         if (viewModel.shouldReloadPage) {
-            setResult(RESULT_RELOAD)
+            setResult(RELOAD_RESULT_CODE)
         }
         super.onBackPressed()
     }
@@ -138,18 +115,33 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         startActivity(ScorecardActivity.intent(this))
     }
 
-    fun onNetworksClicked(view: View) {
+    fun onNetworksClicked(@Suppress("UNUSED_PARAMETER") view: View) {
         startActivity(TrackerNetworksActivity.intent(this))
     }
 
-    fun onPracticesClicked(view: View) {
-        startActivityForResult(PrivacyPracticesActivity.intent(this), REQUEST_DASHBOARD)
+
+    fun onPracticesClicked(@Suppress("UNUSED_PARAMETER") view: View) {
+        startActivityForResult(PrivacyPracticesActivity.intent(this), REQUEST_CODE_PRIVACY_PRACTICES)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_DASHBOARD && resultCode == RESULT_TOSDR) {
-            setResult(RESULT_TOSDR)
+        if (requestCode == REQUEST_CODE_PRIVACY_PRACTICES && resultCode == PrivacyPracticesActivity.TOSDR_RESULT_CODE) {
+            setResult(TOSDR_RESULT_CODE)
             finish()
         }
     }
+
+    companion object {
+
+        private const val REQUEST_CODE_PRIVACY_PRACTICES = 100
+
+        const val RELOAD_RESULT_CODE = 100
+        const val TOSDR_RESULT_CODE = 101
+
+        fun intent(context: Context): Intent {
+            return Intent(context, PrivacyDashboardActivity::class.java)
+        }
+
+    }
+
 }

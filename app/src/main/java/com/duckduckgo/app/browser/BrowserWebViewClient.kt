@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.support.annotation.AnyThread
 import android.support.annotation.WorkerThread
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
@@ -25,9 +26,11 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.duckduckgo.app.global.isHttp
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
+import com.duckduckgo.app.privacymonitor.model.TrustedSites
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.ResourceType
 import timber.log.Timber
+import java.util.concurrent.CountDownLatch
 import javax.inject.Inject
 
 
@@ -39,7 +42,6 @@ class BrowserWebViewClient @Inject constructor(
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
-    private var currentUrl: String? = null
 
 
     /**
@@ -82,7 +84,6 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-        currentUrl = url
         webViewClientListener?.loadingStarted()
         webViewClientListener?.urlChanged(url)
     }
@@ -93,19 +94,25 @@ class BrowserWebViewClient @Inject constructor(
 
     @WorkerThread
     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
-        Timber.v("Intercepting resource ${request.url}")
-
-        if (request.url != null && request.url.isHttp) {
-            webViewClientListener?.pageHasHttpResources()
-        }
+        Timber.v("Intercepting resource ${request.url} on page ${view.urlFromAnyThread()}}")
 
         if (shouldUpgrade(request)) {
             val newUri = httpsUpgrader.upgrade(request.url)
-            view.post({ view.loadUrl(newUri.toString()) })
+            view.post { view.loadUrl(newUri.toString()) }
             return WebResourceResponse(null, null, null)
         }
 
-        if (shouldBlock(request, currentUrl)) {
+        val documentUrl = view.urlFromAnyThread() ?: return null
+
+        if (TrustedSites.isTrusted(documentUrl)) {
+            return null
+        }
+
+        if (request.url != null && request.url.isHttp) {
+            webViewClientListener?.pageHasHttpResources(documentUrl)
+        }
+
+        if (shouldBlock(request, documentUrl)) {
             return WebResourceResponse(null, null, null)
         }
 
@@ -135,6 +142,22 @@ class BrowserWebViewClient @Inject constructor(
     private inline fun consume(function: () -> Unit): Boolean {
         function()
         return true
+    }
+
+    /**
+     * Access WebView.url from any thread. If you are on the main thread it is more efficient to use
+     * WebView.url directly.
+     */
+    @AnyThread
+    private fun WebView.urlFromAnyThread(): String? {
+        val latch = CountDownLatch(1)
+        var safeUrl: String? = null
+        post {
+            safeUrl = url
+            latch.countDown()
+        }
+        latch.await()
+        return safeUrl
     }
 
 }

@@ -17,12 +17,15 @@
 package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
+import android.app.DownloadManager
+import android.app.DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.view.KeyEvent.KEYCODE_ENTER
 import android.view.Menu
@@ -32,6 +35,8 @@ import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.widget.TextView
 import android.widget.Toast
+import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
+import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
@@ -39,10 +44,15 @@ import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.renderer.icon
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
-import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.REQUEST_DASHBOARD
 import com.duckduckgo.app.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_browser.*
+import kotlinx.android.synthetic.main.popup_window_brower_menu.view.*
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.toast
+import org.jetbrains.anko.uiThread
+import timber.log.Timber
 import javax.inject.Inject
+
 
 class BrowserActivity : DuckDuckGoActivity() {
 
@@ -50,22 +60,14 @@ class BrowserActivity : DuckDuckGoActivity() {
     @Inject lateinit var webChromeClient: BrowserChromeClient
     @Inject lateinit var viewModelFactory: ViewModelFactory
 
+    private lateinit var popupMenu: BrowserPopupMenu
+
+    private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
+
     private var acceptingRenderUpdates = true
 
     private val viewModel: BrowserViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(BrowserViewModel::class.java)
-    }
-
-    companion object {
-
-        fun intent(context: Context, sharedText: String? = null): Intent {
-            val intent = Intent(context, BrowserActivity::class.java)
-            intent.putExtra(SHARED_TEXT_EXTRA, sharedText)
-            return intent
-        }
-
-        private const val SHARED_TEXT_EXTRA = "SHARED_TEXT_EXTRA"
-        private const val REQUEST_SETTINGS = 1001
     }
 
     private val privacyGradeMenu: MenuItem?
@@ -77,6 +79,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_browser)
+        popupMenu = BrowserPopupMenu(layoutInflater)
 
         viewModel.viewState.observe(this, Observer<BrowserViewModel.ViewState> {
             it?.let { render(it) }
@@ -121,10 +124,24 @@ class BrowserActivity : DuckDuckGoActivity() {
         configureWebView()
         configureOmnibarTextInput()
         configureDummyViewTouchHandler()
+        configureAutoComplete()
 
         if (savedInstanceState == null) {
             consumeSharedTextExtra()
         }
+    }
+
+    private fun configureAutoComplete() {
+        autoCompleteSuggestionsList.layoutManager = LinearLayoutManager(this)
+        autoCompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
+                immediateSearchClickListener = {
+                    userEnteredQuery(it.phrase)
+                },
+                editableSearchClickListener = {
+                    viewModel.onUserSelectedToEditQuery(it.phrase)
+                }
+        )
+        autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
     private fun consumeSharedTextExtra() {
@@ -135,6 +152,8 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: BrowserViewModel.ViewState) {
+
+        Timber.v("Rendering view state: $viewState")
 
         if (!acceptingRenderUpdates) return
 
@@ -150,6 +169,9 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
             omnibarTextInput.setText(viewState.omnibarText)
+
+            // ensures caret sits at the end of the query
+            omnibarTextInput.post { omnibarTextInput.setSelection(omnibarTextInput.text.length) }
             appBarLayout.setExpanded(true, true)
         }
 
@@ -162,6 +184,19 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         privacyGradeMenu?.isVisible = viewState.showPrivacyGrade
         fireMenu?.isVisible = viewState.showFireButton
+        popupMenu.contentView.backPopupMenuItem.isEnabled = viewState.browserShowing && webView.canGoBack()
+        popupMenu.contentView.forwardPopupMenuItem.isEnabled = viewState.browserShowing && webView.canGoForward()
+        popupMenu.contentView.refreshPopupMenuItem.isEnabled = viewState.browserShowing
+        popupMenu.contentView.addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
+
+        when (viewState.showAutoCompleteSuggestions) {
+            false -> autoCompleteSuggestionsList.gone()
+            true -> {
+                autoCompleteSuggestionsList.show()
+                val results = viewState.autoCompleteSearchResults.suggestions
+                autoCompleteSuggestionsAdapter.updateData(results)
+            }
+        }
     }
 
     private fun showClearButton() {
@@ -183,7 +218,6 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     private fun configureToolbar() {
         setSupportActionBar(toolbar)
-
         supportActionBar?.let {
             it.title = null
         }
@@ -210,10 +244,10 @@ class BrowserActivity : DuckDuckGoActivity() {
         clearOmnibarInputButton.setOnClickListener { omnibarTextInput.setText("") }
     }
 
-    private fun userEnteredQuery() {
-        viewModel.onUserSubmittedQuery(omnibarTextInput.text.toString())
+    private fun userEnteredQuery(query: String) {
         omnibarTextInput.hideKeyboard()
         focusDummy.requestFocus()
+        viewModel.onUserSubmittedQuery(query)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -231,6 +265,15 @@ class BrowserActivity : DuckDuckGoActivity() {
             setSupportZoom(true)
         }
 
+        webView.setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
+            val request = DownloadManager.Request(Uri.parse(url))
+            request.allowScanningByMediaScanner()
+            request.setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            manager.enqueue(request)
+            Toast.makeText(applicationContext, getString(R.string.webviewDownload), Toast.LENGTH_LONG).show()
+        }
+
         webView.setOnTouchListener { _, _ ->
             focusDummy.requestFocus()
             false
@@ -240,7 +283,7 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         omnibarTextInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, keyEvent ->
             if (actionId == IME_ACTION_DONE || keyEvent.keyCode == KEYCODE_ENTER) {
-                userEnteredQuery()
+                userEnteredQuery(omnibarTextInput.text.toString())
                 return@OnEditorActionListener true
             }
             false
@@ -282,51 +325,84 @@ class BrowserActivity : DuckDuckGoActivity() {
                 launchFire()
                 return true
             }
-            R.id.refresh_menu_item -> {
-                webView.reload()
-                return true
-            }
-            R.id.back_menu_item -> {
-                webView.goBack()
-                return true
-            }
-            R.id.forward_menu_item -> {
-                webView.goForward()
-                return true
-            }
-            R.id.settings_menu_item -> {
-                launchSettingsView()
-                return true
+            R.id.browser_popup_menu_item -> {
+                launchPopupMenu()
             }
         }
         return false
     }
 
-    private fun finishActivityAnimated() {
-        clearViewPriorToAnimation()
-        supportFinishAfterTransition()
-    }
-
     private fun launchPrivacyDashboard() {
-        startActivityForResult(PrivacyDashboardActivity.intent(this), REQUEST_DASHBOARD)
+        startActivityForResult(PrivacyDashboardActivity.intent(this), DASHBOARD_REQUEST_CODE)
     }
 
     private fun launchFire() {
         FireDialog(this, {
             finishActivityAnimated()
         }, {
-            Toast.makeText(this, R.string.fireDataCleared, Toast.LENGTH_SHORT).show()
+            applicationContext.toast(R.string.fireDataCleared)
         }).show()
     }
 
+    private fun launchPopupMenu() {
+        val anchorView = findViewById<View>(R.id.browser_popup_menu_item)
+        popupMenu.show(rootView, anchorView)
+    }
+
+    fun onGoForwardClicked(view: View) {
+        webView.goForward()
+        popupMenu.dismiss()
+    }
+
+    fun onGoBackClicked(view: View) {
+        webView.goBack()
+        popupMenu.dismiss()
+    }
+
+    fun onRefreshClicked(view: View) {
+        webView.reload()
+        popupMenu.dismiss()
+    }
+
+    fun onBookmarksClicked(view: View) {
+        launchBookmarksView()
+        popupMenu.dismiss()
+    }
+
+    fun onAddBookmarkClicked(view: View) {
+        addBookmark()
+        popupMenu.dismiss()
+    }
+
+    fun onSettingsClicked(view: View) {
+        launchSettingsView()
+        popupMenu.dismiss()
+    }
+
+    private fun addBookmark() {
+        val title = webView.title
+        val url = webView.url
+        doAsync {
+            viewModel.addBookmark(title, url)
+            uiThread {
+                toast(R.string.bookmarkAddedFeedback)
+            }
+        }
+    }
+
     private fun launchSettingsView() {
-        startActivityForResult(SettingsActivity.intent(this), REQUEST_SETTINGS)
+        startActivityForResult(SettingsActivity.intent(this), SETTINGS_REQUEST_CODE)
+    }
+
+    private fun launchBookmarksView() {
+        startActivityForResult(BookmarksActivity.intent(this), BOOKMARKS_REQUEST_CODE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
-            REQUEST_DASHBOARD -> viewModel.receivedDashboardResult(resultCode)
-            REQUEST_SETTINGS -> viewModel.receivedSettingsResult(resultCode)
+            DASHBOARD_REQUEST_CODE -> viewModel.receivedDashboardResult(resultCode)
+            SETTINGS_REQUEST_CODE -> viewModel.receivedSettingsResult(resultCode)
+            BOOKMARKS_REQUEST_CODE -> viewModel.receivedBookmarksResult(resultCode, data?.action)
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
@@ -340,10 +416,30 @@ class BrowserActivity : DuckDuckGoActivity() {
         super.onBackPressed()
     }
 
+    private fun finishActivityAnimated() {
+        clearViewPriorToAnimation()
+        supportFinishAfterTransition()
+    }
+
     private fun clearViewPriorToAnimation() {
         acceptingRenderUpdates = false
         omnibarTextInput.text.clear()
         omnibarTextInput.hideKeyboard()
         webView.hide()
     }
+
+    companion object {
+
+        fun intent(context: Context, sharedText: String? = null): Intent {
+            val intent = Intent(context, BrowserActivity::class.java)
+            intent.putExtra(SHARED_TEXT_EXTRA, sharedText)
+            return intent
+        }
+
+        private const val SHARED_TEXT_EXTRA = "SHARED_TEXT_EXTRA"
+        private const val SETTINGS_REQUEST_CODE = 100
+        private const val DASHBOARD_REQUEST_CODE = 101
+        private const val BOOKMARKS_REQUEST_CODE = 102
+    }
+
 }

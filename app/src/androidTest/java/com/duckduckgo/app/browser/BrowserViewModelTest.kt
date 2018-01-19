@@ -23,6 +23,10 @@ import android.arch.lifecycle.Observer
 import android.arch.persistence.room.Room
 import android.net.Uri
 import android.support.test.InstrumentationRegistry
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
+import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.LandingPage
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
@@ -37,10 +41,12 @@ import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.AppConfigurationDao
 import com.duckduckgo.app.settings.db.AppConfigurationEntity
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.doReturn
+import com.nhaarman.mockito_kotlin.whenever
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -48,8 +54,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers
+import org.mockito.Mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
+import org.mockito.MockitoAnnotations
 
 class BrowserViewModelTest {
 
@@ -57,23 +65,38 @@ class BrowserViewModelTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private var lastEntry: NetworkLeaderboardEntry? = null
+    private var lastNetworkLeaderboardEntry: NetworkLeaderboardEntry? = null
 
     private val testStringResolver: StringResolver = object : StringResolver {}
 
     private val testNetworkLeaderboardDao: NetworkLeaderboardDao = object : NetworkLeaderboardDao {
         override fun insert(leaderboardEntry: NetworkLeaderboardEntry) {
-            lastEntry = leaderboardEntry
+            lastNetworkLeaderboardEntry = leaderboardEntry
         }
 
         override fun networkPercents(): LiveData<Array<NetworkPercent>> {
             return MutableLiveData<Array<NetworkPercent>>()
         }
     }
-    private lateinit var queryObserver: Observer<String>
-    private lateinit var navigationObserver: Observer<Command>
-    private lateinit var termsOfServiceStore: TermsOfServiceStore
-    private lateinit var mockStringResolver: StringResolver
+
+    @Mock
+    lateinit var mockQueryObserver: Observer<String>
+
+    @Mock
+    lateinit var mockNavigationObserver: Observer<Command>
+
+    @Mock
+    lateinit var mockTermsOfServiceStore: TermsOfServiceStore
+
+    @Mock
+    lateinit var mockSettingsStore: SettingsDataStore
+
+    @Mock
+    lateinit var mockAutoCompleteApi: AutoCompleteApi
+
+    @Mock
+    private lateinit var bookmarksDao: BookmarksDao
+
     private lateinit var db: AppDatabase
     private lateinit var appConfigurationDao: AppConfigurationDao
 
@@ -87,61 +110,89 @@ class BrowserViewModelTest {
 
     @Before
     fun before() {
+        MockitoAnnotations.initMocks(this)
+
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java)
                 .allowMainThreadQueries()
                 .build()
         appConfigurationDao = db.appConfigurationDao()
 
-        mockStringResolver = mock()
-        queryObserver = mock()
-        navigationObserver = mock()
-        termsOfServiceStore = mock()
-
         testee = BrowserViewModel(
-                testOmnibarConverter,
-                DuckDuckGoUrlDetector(),
-                termsOfServiceStore,
-                TrackerNetworks(),
-                PrivacyMonitorRepository(),
-                testStringResolver,
-                testNetworkLeaderboardDao, appConfigurationDao)
+                queryUrlConverter = testOmnibarConverter,
+                duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
+                termsOfServiceStore = mockTermsOfServiceStore,
+                trackerNetworks = TrackerNetworks(),
+                privacyMonitorRepository = PrivacyMonitorRepository(),
+                stringResolver = testStringResolver,
+                networkLeaderboardDao = testNetworkLeaderboardDao,
+                autoCompleteApi = mockAutoCompleteApi,
+                appSettingsPreferencesStore = mockSettingsStore,
+                bookmarksDao = bookmarksDao,
+                appConfigurationDao = appConfigurationDao)
 
-        testee.url.observeForever(queryObserver)
-        testee.command.observeForever(navigationObserver)
+        testee.url.observeForever(mockQueryObserver)
+        testee.command.observeForever(mockNavigationObserver)
     }
 
     @After
     fun after() {
         testee.onCleared()
         db.close()
-        testee.url.removeObserver(queryObserver)
-        testee.command.removeObserver(navigationObserver)
+        testee.url.removeObserver(mockQueryObserver)
+        testee.command.removeObserver(mockNavigationObserver)
     }
 
     @Test
-    fun whenTrackerDetectedThenNetworkLeaderbardUpdated() {
+    fun whenBookmarksResultCodeIsOpenUrlThenNavigate() {
+        testee.receivedBookmarksResult(BookmarksActivity.OPEN_URL_RESULT_CODE, "www.example.com")
+        val captor: ArgumentCaptor<Command> = ArgumentCaptor.forClass(Command::class.java)
+        verify(mockNavigationObserver).onChanged(captor.capture())
+        assertNotNull(captor.value)
+        assertTrue(captor.value is Navigate)
+    }
+
+    @Test
+    fun whenUrlPresentThenAddBookmarkButtonEnabled() {
+        testee.urlChanged("www.example.com")
+        assertTrue(testee.viewState.value!!.canAddBookmarks)
+    }
+
+    @Test
+    fun whenNoUrlThenAddBookmarkButtonDisabled() {
+        testee.urlChanged(null)
+        assertFalse(testee.viewState.value!!.canAddBookmarks)
+    }
+
+    @Test
+    fun whenBookmarkAddedThenDaoIsUpdated() {
+        testee.addBookmark("A title", "www.example.com")
+        verify(bookmarksDao).insert(BookmarkEntity(title = "A title", url = "www.example.com"))
+    }
+
+    @Test
+    fun whenTrackerDetectedThenNetworkLeaderboardUpdated() {
         testee.trackerDetected(TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", TrackerNetwork("Network1", "www.tracker.com"), false))
-        assertNotNull(lastEntry)
-        assertEquals(lastEntry!!.domainVisited, "www.example.com")
-        assertEquals(lastEntry!!.networkName, "Network1")
+        assertNotNull(lastNetworkLeaderboardEntry)
+        assertEquals(lastNetworkLeaderboardEntry!!.domainVisited, "www.example.com")
+        assertEquals(lastNetworkLeaderboardEntry!!.networkName, "Network1")
     }
 
     @Test
     fun whenEmptyInputQueryThenNoQueryMadeAvailableToActivity() {
         testee.onUserSubmittedQuery("")
-        verify(queryObserver, never()).onChanged(ArgumentMatchers.anyString())
+        verify(mockQueryObserver, never()).onChanged(ArgumentMatchers.anyString())
     }
 
     @Test
     fun whenBlankInputQueryThenNoQueryMadeAvailableToActivity() {
         testee.onUserSubmittedQuery("     ")
-        verify(queryObserver, never()).onChanged(ArgumentMatchers.anyString())
+        verify(mockQueryObserver, never()).onChanged(ArgumentMatchers.anyString())
     }
 
     @Test
     fun whenNonEmptyInputThenQueryMadeAvailableToActivity() {
         testee.onUserSubmittedQuery("foo")
-        verify(queryObserver).onChanged(ArgumentMatchers.anyString())
+        verify(mockQueryObserver).onChanged(ArgumentMatchers.anyString())
     }
 
     @Test
@@ -201,7 +252,7 @@ class BrowserViewModelTest {
     fun whenSharedTextReceivedThenNavigationTriggered() {
         testee.onSharedTextReceived("http://example.com")
         val captor: ArgumentCaptor<Command> = ArgumentCaptor.forClass(Command::class.java)
-        verify(navigationObserver).onChanged(captor.capture())
+        verify(mockNavigationObserver).onChanged(captor.capture())
         assertNotNull(captor.value)
         assertTrue(captor.value is Navigate)
     }
@@ -221,13 +272,13 @@ class BrowserViewModelTest {
     @Test
     fun whenUserDismissesKeyboardBeforeBrowserShownThenShouldNavigateToLandingPage() {
         testee.userDismissedKeyboard()
-        verify(navigationObserver).onChanged(ArgumentMatchers.any(LandingPage::class.java))
+        verify(mockNavigationObserver).onChanged(ArgumentMatchers.any(LandingPage::class.java))
     }
 
     @Test
     fun whenUserDismissesKeyboardAfterBrowserShownThenShouldNotNavigateToLandingPage() {
         testee.urlChanged("")
-        verify(navigationObserver, never()).onChanged(ArgumentMatchers.any(LandingPage::class.java))
+        verify(mockNavigationObserver, never()).onChanged(ArgumentMatchers.any(LandingPage::class.java))
     }
 
     @Test
@@ -256,7 +307,7 @@ class BrowserViewModelTest {
     @Test
     fun whenTrackerDetectedThenPrivacyGradeIsUpdated() {
         testee.urlChanged("https://example.com")
-        testee.trackerDetected(TrackingEvent("", "", null, false))
+        testee.trackerDetected(TrackingEvent("https://example.com", "", null, false))
         assertEquals(PrivacyGrade.C, testee.privacyGrade.value)
     }
 
@@ -314,5 +365,33 @@ class BrowserViewModelTest {
     fun whenOmnibarInputHasFocusThenFireButtonIsNotShown() {
         testee.onOmnibarInputStateChanged("", true)
         assertFalse(testee.viewState.value!!.showFireButton)
+    }
+
+    @Test
+    fun whenEnteringQueryWithAutoCompleteEnabledThenAutoCompleteSuggestionsShown() {
+        doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+        testee.onOmnibarInputStateChanged("foo", true)
+        assertTrue(testee.viewState.value!!.showAutoCompleteSuggestions)
+    }
+
+    @Test
+    fun whenEnteringQueryWithAutoCompleteDisabledThenAutoCompleteSuggestionsNotShown() {
+        doReturn(false).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+        testee.onOmnibarInputStateChanged("foo", true)
+        assertFalse(testee.viewState.value!!.showAutoCompleteSuggestions)
+    }
+
+    @Test
+    fun whenEnteringEmptyQueryWithAutoCompleteEnabledThenAutoCompleteSuggestionsNotShown() {
+        doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+        testee.onOmnibarInputStateChanged("", true)
+        assertFalse(testee.viewState.value!!.showAutoCompleteSuggestions)
+    }
+
+    @Test
+    fun whenEnteringEmptyQueryWithAutoCompleteDisabledThenAutoCompleteSuggestionsNotShown() {
+        doReturn(false).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+        testee.onOmnibarInputStateChanged("", true)
+        assertFalse(testee.viewState.value!!.showAutoCompleteSuggestions)
     }
 }

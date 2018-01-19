@@ -6,14 +6,14 @@ apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
 
 ext {
-    VERSION_NAME = "0.10.0"
+    VERSION_NAME = "4.0.0"
 }
 
 android {
     compileSdkVersion 27
     buildToolsVersion "26.0.2"
     defaultConfig {
-        applicationId "com.duckduckgo.app"
+        applicationId "com.duckduckgo.mobile.android"
         minSdkVersion 21
         targetSdkVersion 27
         versionCode buildVersionCode()
@@ -32,7 +32,6 @@ android {
     }
     buildTypes {
         debug {
-            testCoverageEnabled = true
         }
         release {
             minifyEnabled false
@@ -75,6 +74,7 @@ ext {
     architectureComponents = "1.0.0"
     dagger = "2.14.1"
     retrofit = "2.3.0"
+    ankoVersion = "0.10.4"
 }
 
 
@@ -95,6 +95,13 @@ dependencies {
     implementation "com.google.dagger:dagger-android-support:$dagger"
     releaseImplementation 'com.faendir:acra:4.10.0'
 
+    // RxRelay
+    implementation "com.jakewharton.rxrelay2:rxrelay:2.0.0"
+
+    // Anko
+    compile "org.jetbrains.anko:anko-commons:$ankoVersion"
+    compile "org.jetbrains.anko:anko-design:$ankoVersion"
+
     // ViewModel and LiveData
     implementation "android.arch.lifecycle:extensions:$architectureComponents"
     kapt "android.arch.lifecycle:compiler:$architectureComponents"
@@ -105,6 +112,7 @@ dependencies {
     implementation "android.arch.persistence.room:runtime:$architectureComponents"
     kapt "android.arch.persistence.room:compiler:$architectureComponents"
     testImplementation "android.arch.persistence.room:testing:$architectureComponents"
+    androidTestImplementation "android.arch.persistence.room:testing:$architectureComponents"
 
     // Dagger
     kapt "com.google.dagger:dagger-android-processor:$dagger"

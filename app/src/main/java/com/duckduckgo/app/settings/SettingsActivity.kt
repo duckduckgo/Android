@@ -28,8 +28,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.launchExternalActivity
-import kotlinx.android.synthetic.main.activity_settings.*
 import kotlinx.android.synthetic.main.content_settings.*
+import kotlinx.android.synthetic.main.include_toolbar.*
 import javax.inject.Inject
 
 class SettingsActivity : DuckDuckGoActivity() {
@@ -54,12 +54,14 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun configureUiEventHandlers() {
         about.setOnClickListener { startActivityForResult(AboutDuckDuckGoActivity.intent(this), REQUEST_CODE_ABOUT_DDG) }
         provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
+        autocompleteEnabledSetting.setOnClickListener { viewModel.userRequestedToChangeAutocompleteSetting(autocompleteEnabledSetting.isChecked) }
     }
 
     private fun observeViewModel() {
         viewModel.viewState.observe(this, Observer<SettingsViewModel.ViewState> { viewState ->
             viewState?.let {
                 version.text = it.version
+                autocompleteEnabledSetting.isChecked = it.autoCompleteSuggestionsEnabled
             }
         })
 

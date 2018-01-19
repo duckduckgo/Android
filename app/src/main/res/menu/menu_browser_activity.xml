@@ -27,24 +27,14 @@
     <item
         android:id="@+id/fire_menu_item"
         android:icon="@drawable/icon_fire"
-        android:title="@string/privacyDashboard"
+        android:title="@string/fireMenu"
         android:visible="false"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/back_menu_item"
-        android:title="@string/back" />
-    <item
-        android:id="@+id/forward_menu_item"
-        android:title="@string/forward" />
-    <item
-        android:id="@+id/refresh_menu_item"
-        android:title="@string/refresh"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/settings_menu_item"
-        android:title="@string/settingsMenuItemTitle"
-        app:showAsAction="never" />
+        android:id="@+id/browser_popup_menu_item"
+        android:icon="@drawable/ic_overflow_24px"
+        android:title="@string/browserPopupMenu"
+        app:showAsAction="ifRoom" />
 
 </menu>

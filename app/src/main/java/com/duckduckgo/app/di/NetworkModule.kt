@@ -17,6 +17,7 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
+import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeListService
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
@@ -62,6 +63,10 @@ class NetworkModule {
     @Provides
     fun httpsUpgradeListService(retrofit: Retrofit): HttpsUpgradeListService =
             retrofit.create(HttpsUpgradeListService::class.java)
+
+    @Provides
+    fun autoCompleteService(retrofit: Retrofit): AutoCompleteService =
+            retrofit.create(AutoCompleteService::class.java)
 
     companion object {
         private const val CACHE_SIZE: Long = 10 * 1024 * 1024 // 10MB

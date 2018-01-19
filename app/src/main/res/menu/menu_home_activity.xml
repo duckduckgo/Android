@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2018 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,8 +24,9 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/settings_menu_item"
-        android:title="@string/settingsMenuItemTitle"
-        app:showAsAction="never" />
+        android:id="@+id/browser_popup_menu_item"
+        android:icon="@drawable/ic_overflow_24px"
+        android:title="@string/browserPopupMenu"
+        app:showAsAction="ifRoom" />
 
 </menu>

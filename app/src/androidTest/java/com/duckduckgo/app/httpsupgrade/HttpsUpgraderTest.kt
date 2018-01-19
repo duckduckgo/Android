@@ -18,9 +18,7 @@ package com.duckduckgo.app.httpsupgrade
 
 import android.net.Uri
 import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.verify
-import com.nhaarman.mockito_kotlin.whenever
+import com.nhaarman.mockito_kotlin.*
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -34,6 +32,20 @@ class HttpsUpgraderTest {
     fun before() {
         mockDao = mock()
         testee = HttpsUpgrader(mockDao)
+    }
+
+    @Test
+    fun whenHostContainsTwoPartsThenUpgradeStillChecksWildcard() {
+        whenever(mockDao.hasDomain("macpro.localhost")).thenReturn(false)
+        assertFalse(testee.shouldUpgrade(Uri.parse("http://macpro.localhost")))
+        verify(mockDao).hasDomain("*.localhost")
+    }
+
+    @Test
+    fun whenHostContainsSinglePartThenUpgradeStillChecksWildcard() {
+        whenever(mockDao.hasDomain("localhost")).thenReturn(false)
+        assertFalse(testee.shouldUpgrade(Uri.parse("http://localhost")))
+        verify(mockDao, times(1)).hasDomain(any())
     }
 
     @Test

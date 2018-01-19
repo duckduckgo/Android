@@ -18,10 +18,12 @@ package com.duckduckgo.app.global
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
+import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
 import com.duckduckgo.app.browser.BrowserViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
@@ -33,6 +35,8 @@ import com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesViewModel
 import com.duckduckgo.app.privacymonitor.ui.ScorecardViewModel
 import com.duckduckgo.app.privacymonitor.ui.TrackerNetworksViewModel
 import com.duckduckgo.app.settings.SettingsViewModel
+import com.duckduckgo.app.settings.db.AppConfigurationDao
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import javax.inject.Inject
 
@@ -47,21 +51,38 @@ class ViewModelFactory @Inject constructor(
         private val termsOfServiceStore: TermsOfServiceStore,
         private val trackerNetworks: TrackerNetworks,
         private val stringResolver: StringResolver,
-        private val appDatabase: AppDatabase,
-        private val networkLeaderboardDao: NetworkLeaderboardDao
+        private val appConfigurationDao: AppConfigurationDao,
+        private val networkLeaderboardDao: NetworkLeaderboardDao,
+        private val bookmarksDao: BookmarksDao,
+        private val autoCompleteApi: AutoCompleteApi,
+        private val appSettingsPreferencesStore: SettingsDataStore
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
             with(modelClass) {
                 when {
                     isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore)
-                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(queryUrlConverter, duckDuckGoUrlDetector, termsOfServiceStore, trackerNetworks, privacyMonitorRepository, stringResolver, networkLeaderboardDao, appDatabase.appConfigurationDao())
+                    isAssignableFrom(BrowserViewModel::class.java) -> browserViewModel()
                     isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(privacySettingsStore, networkLeaderboardDao)
                     isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                     isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                     isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
-                    isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(stringResolver)
+                    isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(stringResolver, appSettingsPreferencesStore)
+                    isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel(bookmarksDao)
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
             } as T
+
+    private fun browserViewModel(): ViewModel = BrowserViewModel(
+            queryUrlConverter = queryUrlConverter,
+            duckDuckGoUrlDetector = duckDuckGoUrlDetector,
+            termsOfServiceStore = termsOfServiceStore,
+            trackerNetworks = trackerNetworks,
+            privacyMonitorRepository = privacyMonitorRepository,
+            stringResolver = stringResolver,
+            networkLeaderboardDao = networkLeaderboardDao,
+            bookmarksDao = bookmarksDao,
+            appSettingsPreferencesStore = appSettingsPreferencesStore,
+            appConfigurationDao = appConfigurationDao,
+            autoCompleteApi = autoCompleteApi)
 }

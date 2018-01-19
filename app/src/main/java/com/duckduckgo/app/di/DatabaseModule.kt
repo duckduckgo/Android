@@ -43,4 +43,10 @@ class DatabaseModule {
     @Provides
     fun providesNetworkLeaderboardDao(database: AppDatabase) = database.networkLeaderboardDao()
 
+    @Provides
+    fun providesBookmarksDao(database: AppDatabase) = database.bookmarksDao()
+
+    @Provides
+    fun appConfigurationDao(database: AppDatabase) = database.appConfigurationDao()
+
 }

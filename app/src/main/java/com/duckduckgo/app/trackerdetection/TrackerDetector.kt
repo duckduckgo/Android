@@ -41,28 +41,33 @@ class TrackerDetector @Inject constructor(private val networkTrackers: TrackerNe
 
     fun evaluate(url: String, documentUrl: String, resourceType: ResourceType): TrackingEvent? {
 
+        val whitelisted = clients.any { it.name.type == Client.ClientType.WHITELIST && it.matches(url, documentUrl, resourceType) }
+        if (whitelisted) {
+            Timber.v("$documentUrl resource $url is whitelisted")
+            return null
+        }
+
         if (firstParty(url, documentUrl)) {
             Timber.v("$url is a first party url")
             return null
         }
 
-        val matches = clients.any { it.matches(url, documentUrl, resourceType) }
+        val matches = clients.any { it.name.type == Client.ClientType.BLOCKING && it.matches(url, documentUrl, resourceType) }
         if (matches) {
-            val matchText = if (matches) "WAS" else "was not"
-            Timber.v("$documentUrl resource $url $matchText identified as a tracker")
+            Timber.v("$documentUrl resource $url WAS identified as a tracker")
             return TrackingEvent(documentUrl, url, networkTrackers.network(url), settings.privacyOn)
         }
 
         Timber.v("$documentUrl resource $url was not identified as a tracker")
-
         return null
     }
 
     private fun firstParty(firstUrl: String, secondUrl: String): Boolean =
-            sameOrSubdomain(firstUrl, secondUrl) || sameOrSubdomain(secondUrl, firstUrl) || sameNetwork(firstUrl, secondUrl)
+            sameOrSubdomain(firstUrl, secondUrl) || sameOrSubdomain(secondUrl, firstUrl) || sameNetworkName(firstUrl, secondUrl)
 
-    private fun sameNetwork(firstUrl: String, secondUrl: String): Boolean =
-            networkTrackers.network(firstUrl) != null && networkTrackers.network(firstUrl) == networkTrackers.network(secondUrl)
+    private fun sameNetworkName(firstUrl: String, secondUrl: String): Boolean =
+            networkTrackers.network(firstUrl) != null && networkTrackers.network(firstUrl)?.name == networkTrackers.network(secondUrl)?.name
+
 
     val clientCount get() = clients.count()
 }

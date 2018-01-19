@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2018 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/colorAccent"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/backPopupMenuItem"
+            style="@style/BrowserIconMenuItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/back"
+            android:onClick="onGoBackClicked"
+            android:src="@drawable/ic_arrow_back_24px" />
+
+        <ImageButton
+            android:id="@+id/forwardPopupMenuItem"
+            style="@style/BrowserIconMenuItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/forward"
+            android:onClick="onGoForwardClicked"
+            android:src="@drawable/ic_arrow_forward_24px" />
+
+        <ImageButton
+            android:id="@+id/bookmarksPopupMenuItem"
+            style="@style/BrowserIconMenuItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/boomarksMenuTitle"
+            android:onClick="onBookmarksClicked"
+            android:src="@drawable/ic_bookmark_24px" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="20dp"
+        android:paddingTop="20dp"
+        app:layout_constraintTop_toBottomOf="@id/header">
+
+        <TextView
+            android:id="@+id/refreshPopupMenuItem"
+            style="@style/BrowserTextMenuItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="onRefreshClicked"
+            android:text="@string/refresh" />
+
+        <TextView
+            android:id="@+id/addBookmarksPopupMenuItem"
+            style="@style/BrowserTextMenuItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="onAddBookmarkClicked"
+            android:text="@string/addBookmarkMenuTitle" />
+
+        <TextView
+            android:id="@+id/settingsPopupMenuItem"
+            style="@style/BrowserTextMenuItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="onSettingsClicked"
+            android:text="@string/settingsMenuItemTitle" />
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>
