@@ -46,17 +46,21 @@ import com.duckduckgo.app.privacymonitor.renderer.icon
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_browser.*
+import kotlinx.android.synthetic.main.popup_window_brower_menu.view.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
 import timber.log.Timber
 import javax.inject.Inject
 
+
 class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var webViewClient: BrowserWebViewClient
     @Inject lateinit var webChromeClient: BrowserChromeClient
     @Inject lateinit var viewModelFactory: ViewModelFactory
+
+    private lateinit var popupMenu: BrowserPopupMenu
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
@@ -72,13 +76,10 @@ class BrowserActivity : DuckDuckGoActivity() {
     private val fireMenu: MenuItem?
         get() = toolbar.menu.findItem(R.id.fire_menu_item)
 
-    private val addBookmarksMenu: MenuItem?
-        get() = toolbar.menu.findItem(R.id.add_bookmark_menu_item)
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_browser)
+        popupMenu = BrowserPopupMenu(layoutInflater)
 
         viewModel.viewState.observe(this, Observer<BrowserViewModel.ViewState> {
             it?.let { render(it) }
@@ -181,9 +182,12 @@ class BrowserActivity : DuckDuckGoActivity() {
             false -> hideClearButton()
         }
 
-        addBookmarksMenu?.isEnabled = viewState.canAddBookmarks
         privacyGradeMenu?.isVisible = viewState.showPrivacyGrade
         fireMenu?.isVisible = viewState.showFireButton
+        popupMenu.contentView.backPopupMenuItem.isEnabled = viewState.browserShowing && webView.canGoBack()
+        popupMenu.contentView.forwardPopupMenuItem.isEnabled = viewState.browserShowing && webView.canGoForward()
+        popupMenu.contentView.refreshPopupMenuItem.isEnabled = viewState.browserShowing
+        popupMenu.contentView.addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
 
         when (viewState.showAutoCompleteSuggestions) {
             false -> autoCompleteSuggestionsList.gone()
@@ -214,7 +218,6 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     private fun configureToolbar() {
         setSupportActionBar(toolbar)
-
         supportActionBar?.let {
             it.title = null
         }
@@ -322,48 +325,11 @@ class BrowserActivity : DuckDuckGoActivity() {
                 launchFire()
                 return true
             }
-            R.id.refresh_menu_item -> {
-                webView.reload()
-                return true
-            }
-            R.id.back_menu_item -> {
-                webView.goBack()
-                return true
-            }
-            R.id.forward_menu_item -> {
-                webView.goForward()
-                return true
-            }
-            R.id.add_bookmark_menu_item -> {
-                addBookmark()
-                return true
-            }
-            R.id.bookmarks_menu_item -> {
-                launchBookmarksView()
-                return true
-            }
-            R.id.settings_menu_item -> {
-                launchSettingsView()
-                return true
+            R.id.browser_popup_menu_item -> {
+                launchPopupMenu()
             }
         }
         return false
-    }
-
-    private fun addBookmark() {
-        val title = webView.title
-        val url = webView.url
-        doAsync {
-            viewModel.addBookmark(title, url)
-            uiThread {
-                toast(R.string.bookmarkAddedFeedback)
-            }
-        }
-    }
-
-    private fun finishActivityAnimated() {
-        clearViewPriorToAnimation()
-        supportFinishAfterTransition()
     }
 
     private fun launchPrivacyDashboard() {
@@ -376,6 +342,52 @@ class BrowserActivity : DuckDuckGoActivity() {
         }, {
             applicationContext.toast(R.string.fireDataCleared)
         }).show()
+    }
+
+    private fun launchPopupMenu() {
+        val anchorView = findViewById<View>(R.id.browser_popup_menu_item)
+        popupMenu.show(rootView, anchorView)
+    }
+
+    fun onGoForwardClicked(view: View) {
+        webView.goForward()
+        popupMenu.dismiss()
+    }
+
+    fun onGoBackClicked(view: View) {
+        webView.goBack()
+        popupMenu.dismiss()
+    }
+
+    fun onRefreshClicked(view: View) {
+        webView.reload()
+        popupMenu.dismiss()
+    }
+
+    fun onBookmarksClicked(view: View) {
+        launchBookmarksView()
+        popupMenu.dismiss()
+    }
+
+    fun onAddBookmarkClicked(view: View) {
+        addBookmark()
+        popupMenu.dismiss()
+    }
+
+    fun onSettingsClicked(view: View) {
+        launchSettingsView()
+        popupMenu.dismiss()
+    }
+
+    private fun addBookmark() {
+        val title = webView.title
+        val url = webView.url
+        doAsync {
+            viewModel.addBookmark(title, url)
+            uiThread {
+                toast(R.string.bookmarkAddedFeedback)
+            }
+        }
     }
 
     private fun launchSettingsView() {
@@ -402,6 +414,11 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
         clearViewPriorToAnimation()
         super.onBackPressed()
+    }
+
+    private fun finishActivityAnimated() {
+        clearViewPriorToAnimation()
+        supportFinishAfterTransition()
     }
 
     private fun clearViewPriorToAnimation() {

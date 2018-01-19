@@ -24,7 +24,6 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
 import com.duckduckgo.app.browser.BrowserViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
@@ -36,9 +35,8 @@ import com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesViewModel
 import com.duckduckgo.app.privacymonitor.ui.ScorecardViewModel
 import com.duckduckgo.app.privacymonitor.ui.TrackerNetworksViewModel
 import com.duckduckgo.app.settings.SettingsViewModel
-import com.duckduckgo.app.settings.db.AppSettingsPreferencesStore
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.settings.db.AppConfigurationDao
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import javax.inject.Inject
 
