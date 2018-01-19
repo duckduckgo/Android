@@ -16,7 +16,6 @@
 
 
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/longDescriptionContainer"
     android:layout_width="match_parent"
@@ -50,44 +49,20 @@
                 android:src="@drawable/onboarding_image_protect_data" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:gravity="center_horizontal"
-                android:paddingBottom="20dp"
-                android:paddingTop="20dp"
-                android:text="@string/onboardingProtectDataTitle"
-                android:textColor="@color/white"
-                android:textSize="21sp"
-                android:textStyle="normal" />
+                style="@style/OnboardingTextTitle"
+                android:text="@string/onboardingProtectDataTitle" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:gravity="center_horizontal"
-                android:lineSpacingExtra="4sp"
-                android:text="@string/onboardingProtectDataDescription"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="normal" />
+                style="@style/OnboardingTextSubtitle"
+                android:text="@string/onboardingProtectDataDescription" />
 
         </LinearLayout>
 
     </LinearLayout>
 
     <Button
-        style="?android:attr/borderlessButtonStyle"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginBottom="20dp"
-        android:background="@color/muddyGreen"
-        android:elevation="0dp"
-        android:onClick="onContinueClicked"
-        android:text="@string/onboardingContinue"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        style="@style/OnboardingButtonProtectData"
+        android:theme="@style/OnboardingButtonProtectData" />
 
 
 </android.support.constraint.ConstraintLayout>
