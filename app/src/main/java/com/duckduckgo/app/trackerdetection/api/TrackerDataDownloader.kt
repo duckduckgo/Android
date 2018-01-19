@@ -17,6 +17,7 @@
 package com.duckduckgo.app.trackerdetection.api
 
 import com.duckduckgo.app.global.api.isCached
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.AdBlockClient
 import com.duckduckgo.app.trackerdetection.Client
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
@@ -35,7 +36,8 @@ class TrackerDataDownloader @Inject constructor(
         private val trackerListService: TrackerListService,
         private val trackerDataStore: TrackerDataStore,
         private val trackerDataLoader: TrackerDataLoader,
-        private val trackerDataDao: TrackerDataDao) {
+        private val trackerDataDao: TrackerDataDao,
+        private val appDatabase: AppDatabase) {
 
     fun downloadList(clientName: Client.ClientName): Completable {
 
@@ -63,8 +65,14 @@ class TrackerDataDownloader @Inject constructor(
             if (response.isSuccessful) {
                 Timber.d("Updating disconnect data from server")
                 val body = response.body()!!
-                trackerDataDao.insertAll(body.trackers)
-                trackerDataLoader.loadDisconnectData()
+
+                appDatabase.runInTransaction {
+                    trackerDataDao.deleteAll()
+                    trackerDataDao.insertAll(body.trackers)
+                    trackerDataLoader.loadDisconnectData()
+                }
+
+
             } else {
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
