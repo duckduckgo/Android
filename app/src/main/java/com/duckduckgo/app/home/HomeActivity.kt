@@ -152,6 +152,11 @@ class HomeActivity : AppCompatActivity() {
         startActivity(BrowserActivity.intent(this, url))
     }
 
+    override fun onDestroy() {
+        popupMenu.dismiss()
+        super.onDestroy()
+    }
+
     companion object {
 
         private const val SETTINGS_REQUEST_CODE = 100

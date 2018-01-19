@@ -428,6 +428,11 @@ class BrowserActivity : DuckDuckGoActivity() {
         webView.hide()
     }
 
+    override fun onDestroy() {
+        popupMenu.dismiss()
+        super.onDestroy()
+    }
+
     companion object {
 
         fun intent(context: Context, sharedText: String? = null): Intent {
