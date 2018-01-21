@@ -85,9 +85,16 @@ class PrivacyMonitorGradeExtensionTest {
     }
 
     @Test
-    fun whenTermsScoreIsNegativeThenScoreIsDecrementedByOne() {
+    fun whenTermsScoreIsNegativeThenScoreGreaterThanOneIsDecrementedByOne() {
+        // http adds +1 and tos score removes 1 so we expect default score
+        val privacyMonitor = monitor(terms = TermsOfService(score = -5), https = NONE)
+        assertEquals(defaultScore, privacyMonitor.score)
+    }
+
+    @Test
+    fun whenTermsScoreIsNegativeThenScoreOfOneIsUnchanged() {
         val privacyMonitor = monitor(terms = TermsOfService(score = -5))
-        assertEquals(defaultScore - 1, privacyMonitor.score)
+        assertEquals(defaultScore, privacyMonitor.score)
     }
 
     @Test
