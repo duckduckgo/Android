@@ -56,20 +56,10 @@ val PrivacyMonitor.improvedScore: Int
     }
 
 val PrivacyMonitor.grade: PrivacyGrade
-    get() = calculateGrade(score)
+    get() = PrivacyGrade.gradeForScore(score)
 
 val PrivacyMonitor.improvedGrade: PrivacyGrade
-    get() = calculateGrade(improvedScore)
-
-
-private fun calculateGrade(score: Int): PrivacyGrade {
-    return when {
-        score <= 0 -> PrivacyGrade.A
-        score == 1 -> PrivacyGrade.B
-        score == 2 -> PrivacyGrade.C
-        else -> PrivacyGrade.D
-    }
-}
+    get() = PrivacyGrade.gradeForScore(improvedScore)
 
 val TermsOfService.gradingScore: Int
     get() {
