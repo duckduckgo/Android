@@ -45,16 +45,20 @@ class PrivacyDashboardViewModel(private val settingsStore: PrivacySettingsStore,
             val networkTrackerSummaryName3: String?,
             val networkTrackerSummaryPercent1: Float,
             val networkTrackerSummaryPercent2: Float,
-            val networkTrackerSummaryPercent3: Float
+            val networkTrackerSummaryPercent3: Float,
+            val shouldReloadPage: Boolean
     )
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    private var monitor: PrivacyMonitor? = null
 
     private val networkPercentsData: LiveData<Array<NetworkPercent>> = networkLeaderboardDao.networkPercents()
     private val networkPercentsObserver = Observer<Array<NetworkPercent>> { onNetworkPercentsChanged(it!!) }
+
     private val privacyInitiallyOn = settingsStore.privacyOn
 
-    private var monitor: PrivacyMonitor? = null
+    private val shouldReloadPage: Boolean
+        get() = privacyInitiallyOn != settingsStore.privacyOn
 
     init {
         resetViewState()
@@ -66,9 +70,6 @@ class PrivacyDashboardViewModel(private val settingsStore: PrivacySettingsStore,
         super.onCleared()
         networkPercentsData.removeObserver(networkPercentsObserver)
     }
-
-    val shouldReloadPage: Boolean
-        get() = privacyInitiallyOn != settingsStore.privacyOn
 
     fun onNetworkPercentsChanged(networkPercents: Array<NetworkPercent>) {
 
@@ -85,7 +86,6 @@ class PrivacyDashboardViewModel(private val settingsStore: PrivacySettingsStore,
                 networkTrackerSummaryPercent2 = if (showSummary) networkPercents[1].percent else 0.0f,
                 networkTrackerSummaryPercent3 = if (showSummary) networkPercents[2].percent else 0.0f
         )
-
     }
 
     fun onPrivacyMonitorChanged(monitor: PrivacyMonitor?) {
@@ -113,7 +113,8 @@ class PrivacyDashboardViewModel(private val settingsStore: PrivacySettingsStore,
                 networkTrackerSummaryName3 = null,
                 networkTrackerSummaryPercent1 = 0f,
                 networkTrackerSummaryPercent2 = 0f,
-                networkTrackerSummaryPercent3 = 0f
+                networkTrackerSummaryPercent3 = 0f,
+                shouldReloadPage = shouldReloadPage
         )
     }
 
@@ -133,7 +134,8 @@ class PrivacyDashboardViewModel(private val settingsStore: PrivacySettingsStore,
         if (enabled != viewState.value?.toggleEnabled) {
             settingsStore.privacyOn = enabled
             viewState.value = viewState.value?.copy(
-                    toggleEnabled = enabled
+                    toggleEnabled = enabled,
+                    shouldReloadPage = shouldReloadPage
             )
         }
     }

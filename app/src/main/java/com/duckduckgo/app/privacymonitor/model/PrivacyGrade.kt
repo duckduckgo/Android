@@ -22,5 +22,18 @@ enum class PrivacyGrade {
     B,
     C,
     D,
-    UNKNOWN
+    UNKNOWN;
+
+    companion object {
+
+        fun gradeForScore(score: Int): PrivacyGrade {
+            return when (score) {
+                0 -> PrivacyGrade.A
+                1 -> PrivacyGrade.B
+                2 -> PrivacyGrade.C
+                else -> PrivacyGrade.D
+            }
+        }
+
+    }
 }
