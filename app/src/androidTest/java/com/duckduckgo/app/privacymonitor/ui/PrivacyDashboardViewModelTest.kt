@@ -109,13 +109,13 @@ class PrivacyDashboardViewModelTest {
         whenever(settingStore.privacyOn)
                 .thenReturn(true)
                 .thenReturn(false)
-        assertTrue(testee.shouldReloadPage)
+        assertTrue(testee.viewState.value!!.shouldReloadPage)
     }
 
     @Test
     fun whenPrivacyInitiallyOnAndUnchangedThenShouldReloadIsFalse() {
         whenever(settingStore.privacyOn).thenReturn(true)
-        assertFalse(testee.shouldReloadPage)
+        assertFalse(testee.viewState.value!!.shouldReloadPage)
     }
 
     @Test
@@ -123,13 +123,13 @@ class PrivacyDashboardViewModelTest {
         whenever(settingStore.privacyOn)
                 .thenReturn(false)
                 .thenReturn(true)
-        assertTrue(testee.shouldReloadPage)
+        assertTrue(testee.viewState.value!!.shouldReloadPage)
     }
 
     @Test
     fun whenPrivacyInitiallyOffAndUnchangedThenShouldReloadIsFalse() {
         whenever(settingStore.privacyOn).thenReturn(false)
-        assertFalse(testee.shouldReloadPage)
+        assertFalse(testee.viewState.value!!.shouldReloadPage)
     }
 
     @Test

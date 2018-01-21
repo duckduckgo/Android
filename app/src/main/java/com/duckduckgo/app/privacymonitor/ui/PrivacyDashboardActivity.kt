@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.privacymonitor.ui
 
+import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
@@ -43,6 +44,10 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
     private val trackersRenderer = TrackersRenderer()
     private val upgradeRenderer = PrivacyUpgradeRenderer()
 
+    private val viewModel: PrivacyDashboardViewModel by lazy {
+        ViewModelProviders.of(this, viewModelFactory).get(PrivacyDashboardViewModel::class.java)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_privacy_dashboard)
@@ -65,20 +70,9 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         }
     }
 
-    private val viewModel: PrivacyDashboardViewModel by lazy {
-        ViewModelProviders.of(this, viewModelFactory).get(PrivacyDashboardViewModel::class.java)
-    }
-
     private fun configureToolbar() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-
-    override fun onBackPressed() {
-        if (viewModel.shouldReloadPage) {
-            setResult(RELOAD_RESULT_CODE)
-        }
-        super.onBackPressed()
     }
 
     private fun render(viewState: ViewState) {
@@ -103,6 +97,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         networkTrackerSummaryPill1.render(viewState.networkTrackerSummaryName1, viewState.networkTrackerSummaryPercent1)
         networkTrackerSummaryPill2.render(viewState.networkTrackerSummaryName2, viewState.networkTrackerSummaryPercent2)
         networkTrackerSummaryPill3.render(viewState.networkTrackerSummaryName3, viewState.networkTrackerSummaryPercent3)
+        updateActivityResult(viewState.shouldReloadPage)
     }
 
     private fun renderToggle(enabled: Boolean) {
@@ -128,6 +123,14 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         if (requestCode == REQUEST_CODE_PRIVACY_PRACTICES && resultCode == PrivacyPracticesActivity.TOSDR_RESULT_CODE) {
             setResult(TOSDR_RESULT_CODE)
             finish()
+        }
+    }
+
+    private fun updateActivityResult(shouldReload: Boolean) {
+        if (shouldReload) {
+            setResult(RELOAD_RESULT_CODE)
+        } else {
+            setResult(Activity.RESULT_OK)
         }
     }
 
