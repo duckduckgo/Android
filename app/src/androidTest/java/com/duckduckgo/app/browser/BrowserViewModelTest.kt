@@ -305,9 +305,11 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenTrackerDetectedThenPrivacyGradeIsUpdated() {
+    fun whenEnoughTrackersDetectedThenPrivacyGradeIsUpdated() {
         testee.urlChanged("https://example.com")
-        testee.trackerDetected(TrackingEvent("https://example.com", "", null, false))
+        for (i in 1..10) {
+            testee.trackerDetected(TrackingEvent("https://example.com", "", null, false))
+        }
         assertEquals(PrivacyGrade.C, testee.privacyGrade.value)
     }
 

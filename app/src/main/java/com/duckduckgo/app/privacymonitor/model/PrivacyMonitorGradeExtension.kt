@@ -17,23 +17,42 @@
 package com.duckduckgo.app.privacymonitor.model
 
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
+import timber.log.Timber
 
 
 val PrivacyMonitor.score: Int
     get() {
         var score = baseScore
-        score += Math.ceil(trackerCount / 10.0).toInt()
+        score += trackerCount / 10
         if (hasTrackerFromMajorNetwork) {
             score += 1
         }
         if (hasObscureTracker) {
             score += 1
         }
+        if (score == 0 && termsOfService.classification != "A") {
+            score = 1
+        }
+        Timber.v("""Calculating score {
+            memberMajorNetworkPercentage: ${memberNetwork?.percentageOfPages}
+            https: ${https}
+            termsScore: ${termsOfService.gradingScore}
+            trackerCount: $trackerCount
+            hasTrackerFromMajorNetwork: $hasTrackerFromMajorNetwork
+            hasObscureTracker: $hasObscureTracker
+            score: $score
+            """)
         return score
     }
 
 val PrivacyMonitor.potentialScore: Int
-    get() = baseScore
+    get() {
+        var score = baseScore
+        if (score == 0 && termsOfService.classification != "A") {
+            score = 1
+        }
+        return score
+    }
 
 
 private val PrivacyMonitor.baseScore: Int
