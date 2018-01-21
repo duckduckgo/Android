@@ -103,14 +103,20 @@ class PrivacyMonitorGradeExtensionTest {
     }
 
     @Test
-    fun whenOneTrackerThenScoreIsIncrementedByOne() {
+    fun whenOneTrackerThenScoreNotIncremented() {
         val privacyMonitor = monitor(trackerCount = 1)
+        assertEquals(defaultScore, privacyMonitor.score)
+    }
+
+    @Test
+    fun whenTenTrackersThenScoreIsIncrementedByOne() {
+        val privacyMonitor = monitor(trackerCount = 10)
         assertEquals(defaultScore + 1, privacyMonitor.score)
     }
 
     @Test
-    fun whenElevenTrackersThenScoreIsIncrementedByTwo() {
-        val privacyMonitor = monitor(trackerCount = 11)
+    fun whenTwentyTrackersThenScoreIsIncrementedByTwo() {
+        val privacyMonitor = monitor(trackerCount = 20)
         assertEquals(defaultScore + 2, privacyMonitor.score)
     }
 
@@ -138,7 +144,7 @@ class PrivacyMonitorGradeExtensionTest {
                 TrackerNetwork("", "", "", 5, true),
                 TermsOfService(classification = "D"),
                 NONE,
-                5,
+                11,
                 true,
                 true)
         assertEquals(defaultScore + 6, privacyMonitor.score)

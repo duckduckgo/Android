@@ -37,18 +37,12 @@ class PrivacyGradeTest {
     }
 
     @Test
-    fun whenScoreIs3ThenGradeIsC() {
-        assertEquals(PrivacyGrade.C, PrivacyGrade.gradeForScore(3))
+    fun whenScoreIs3ThenGradeIsD() {
+        assertEquals(PrivacyGrade.D, PrivacyGrade.gradeForScore(3))
     }
 
     @Test
-    fun whenScoreIs4ThenGradeIsD() {
+    fun whenScoreIsAbove3ThenGradeIsD() {
         assertEquals(PrivacyGrade.D, PrivacyGrade.gradeForScore(4))
     }
-
-    @Test
-    fun whenScoreIsAbove4ThenGradeIsD() {
-        assertEquals(PrivacyGrade.D, PrivacyGrade.gradeForScore(5))
-    }
-
 }

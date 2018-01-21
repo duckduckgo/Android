@@ -22,7 +22,7 @@ import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 val PrivacyMonitor.score: Int
     get() {
         var score = baseScore
-        score += Math.ceil(trackerCount / 10.0).toInt()
+        score += trackerCount / 10
         if (hasTrackerFromMajorNetwork) {
             score += 1
         }

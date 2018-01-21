@@ -30,7 +30,7 @@ enum class PrivacyGrade {
             return when (score) {
                 0 -> PrivacyGrade.A
                 1 -> PrivacyGrade.B
-                2, 3 -> PrivacyGrade.C
+                2 -> PrivacyGrade.C
                 else -> PrivacyGrade.D
             }
         }
