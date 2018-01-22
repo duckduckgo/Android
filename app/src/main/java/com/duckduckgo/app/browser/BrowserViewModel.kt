@@ -153,10 +153,11 @@ class BrowserViewModel(
         if (input.isBlank()) {
             return
         }
-        url.value = buildUrl(input)
+        val trimmedInput = input.trim()
+        url.value = buildUrl(trimmedInput)
         viewState.value = currentViewState().copy(
                 showClearButton = false,
-                omnibarText = input,
+                omnibarText = trimmedInput,
                 showAutoCompleteSuggestions = false,
                 autoCompleteSearchResults = AutoCompleteResult("", emptyList()))
     }
