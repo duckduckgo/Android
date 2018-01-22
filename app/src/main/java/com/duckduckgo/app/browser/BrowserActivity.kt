@@ -260,6 +260,7 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         webView.settings.apply {
             javaScriptEnabled = true
+            domStorageEnabled = true
             loadWithOverviewMode = true
             useWideViewPort = true
             builtInZoomControls = true
