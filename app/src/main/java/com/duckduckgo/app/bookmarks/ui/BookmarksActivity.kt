@@ -17,6 +17,7 @@
 package com.duckduckgo.app.bookmarks.ui
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
@@ -24,6 +25,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.RecyclerView.Adapter
 import android.support.v7.widget.RecyclerView.ViewHolder
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,11 +40,12 @@ import org.jetbrains.anko.alert
 import org.jetbrains.anko.doAsync
 import javax.inject.Inject
 
-class BookmarksActivity: DuckDuckGoActivity() {
+class BookmarksActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     lateinit var adapter: BookmarksAdapter
+    private var deleteDialog: AlertDialog? = null
 
     private val viewModel: BookmarksViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(BookmarksViewModel::class.java)
@@ -74,11 +77,11 @@ class BookmarksActivity: DuckDuckGoActivity() {
         })
 
         viewModel.command.observe(this, Observer {
-            when(it) {
+            when (it) {
                 is BookmarksViewModel.Command.ConfirmDeleteBookmark -> confirmDeleteBookmark(it.bookmark)
                 is BookmarksViewModel.Command.OpenBookmark -> openBookmark(it.bookmark)
             }
-         })
+        })
     }
 
     private fun openBookmark(bookmark: BookmarkEntity) {
@@ -87,19 +90,26 @@ class BookmarksActivity: DuckDuckGoActivity() {
         finish()
     }
 
+    @Suppress("deprecation")
     private fun confirmDeleteBookmark(bookmark: BookmarkEntity) {
-        val message = getString(R.string.bookmarkDeleteConfirmMessage, bookmark.title)
+        val message = Html.fromHtml(getString(R.string.bookmarkDeleteConfirmMessage, bookmark.title))
         val title = getString(R.string.bookmarkDeleteConfirmTitle)
-        alert(message, title) {
+        deleteDialog = alert(message, title) {
             positiveButton(android.R.string.yes) { delete(bookmark) }
             negativeButton(android.R.string.no) { }
-        }.show()
+        }.build()
+        deleteDialog?.show()
     }
 
     private fun delete(bookmark: BookmarkEntity) {
         doAsync {
             viewModel.delete(bookmark)
         }
+    }
+
+    override fun onDestroy() {
+        deleteDialog?.dismiss()
+        super.onDestroy()
     }
 
     companion object {
@@ -110,7 +120,7 @@ class BookmarksActivity: DuckDuckGoActivity() {
         val OPEN_URL_RESULT_CODE = Activity.RESULT_FIRST_USER
     }
 
-    class BookmarksAdapter(val context: Context, val viewModel: BookmarksViewModel): Adapter<BookmarksViewHolder>() {
+    class BookmarksAdapter(val context: Context, val viewModel: BookmarksViewModel) : Adapter<BookmarksViewHolder>() {
 
         var bookmarks: List<BookmarkEntity> = emptyList()
             set(value) {

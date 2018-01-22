@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacymonitor.model
+package com.duckduckgo.app.di
 
+import android.webkit.CookieManager
+import dagger.Module
+import dagger.Provides
 
-enum class PrivacyGrade {
-    A,
-    B,
-    C,
-    D,
-    UNKNOWN;
+@Module
+class BrowserModule {
 
-    companion object {
-
-        fun gradeForScore(score: Int): PrivacyGrade {
-            return when (score) {
-                0 -> PrivacyGrade.A
-                1 -> PrivacyGrade.B
-                2 -> PrivacyGrade.C
-                else -> PrivacyGrade.D
-            }
-        }
-
-    }
+    @Provides
+    fun cookieManager(): CookieManager = CookieManager.getInstance()
 }

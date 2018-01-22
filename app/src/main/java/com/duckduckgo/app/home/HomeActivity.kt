@@ -20,15 +20,16 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.ActivityOptionsCompat
-import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.webkit.CookieManager
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserPopupMenu
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.settings.SettingsActivity
@@ -36,10 +37,15 @@ import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
 import kotlinx.android.synthetic.main.popup_window_brower_menu.view.*
 import org.jetbrains.anko.toast
+import javax.inject.Inject
+import javax.inject.Provider
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : DuckDuckGoActivity() {
 
     private lateinit var popupMenu: BrowserPopupMenu
+
+    @Inject
+    lateinit var cookieManagerProvider: Provider<CookieManager>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,9 +110,10 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun launchFire() {
-        FireDialog(this, {}, {
-            toast(R.string.fireDataCleared)
-        }).show()
+        FireDialog(context = this,
+                cookieManager = cookieManagerProvider.get(),
+                clearStarted = {},
+                clearComplete = { toast(R.string.fireDataCleared) }).show()
     }
 
     private fun launchPopupMenu() {
@@ -150,6 +157,11 @@ class HomeActivity : AppCompatActivity() {
 
     private fun openUrl(url: String) {
         startActivity(BrowserActivity.intent(this, url))
+    }
+
+    override fun onDestroy() {
+        popupMenu.dismiss()
+        super.onDestroy()
     }
 
     companion object {

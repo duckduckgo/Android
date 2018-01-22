@@ -23,7 +23,7 @@ import com.duckduckgo.app.privacymonitor.model.HttpsStatus
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class HttpsStatusRendererExtenstionTest {
+class HttpsStatusRendererExtensionTest {
 
     private val context: Context = InstrumentationRegistry.getTargetContext()
 
