@@ -279,7 +279,9 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
 
         webView.setOnTouchListener { _, _ ->
-            focusDummy.requestFocus()
+            if (omnibarTextInput.isFocused) {
+                focusDummy.requestFocus()
+            }
             false
         }
 
