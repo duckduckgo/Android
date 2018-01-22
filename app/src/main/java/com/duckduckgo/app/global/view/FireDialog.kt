@@ -25,10 +25,12 @@ import android.webkit.WebView
 import com.duckduckgo.app.browser.R
 import kotlinx.android.synthetic.main.sheet_fire_clear_data.*
 
-class FireDialog(context: Context,
+class FireDialog(
+    context: Context,
     private val cookieManager: CookieManager,
     clearStarted: (() -> Unit),
-                 clearComplete: (() -> Unit)) : BottomSheetDialog(context) {
+    clearComplete: (() -> Unit)
+) : BottomSheetDialog(context) {
 
     init {
         val contentView = View.inflate(getContext(), R.layout.sheet_fire_clear_data, null)
