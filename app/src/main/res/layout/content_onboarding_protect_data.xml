@@ -14,7 +14,6 @@
   ~ limitations under the License.
   -->
 
-
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -26,68 +25,44 @@
     tools:background="@color/lighOliveGreen"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
+    <ImageView
+        android:id="@+id/protectDataImage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:importantForAccessibility="no"
+        android:paddingTop="20dp"
+        android:src="@drawable/onboarding_image_protect_data"
+        app:layout_constraintBottom_toTopOf="@id/textContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
+
     <LinearLayout
+        android:id="@+id/textContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/continueButton"
+        app:layout_constraintTop_toBottomOf="@id/noTraceImage">
 
+        <TextView
+            style="@style/OnboardingTextTitle"
+            android:text="@string/onboardingProtectDataTitle" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="80dp"
-            android:gravity="center"
-            android:orientation="vertical"
-            tools:ignore="UselessParent">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:importantForAccessibility="no"
-                android:paddingTop="20dp"
-                android:src="@drawable/onboarding_image_protect_data" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:gravity="center_horizontal"
-                android:paddingBottom="20dp"
-                android:paddingTop="20dp"
-                android:text="@string/onboardingProtectDataTitle"
-                android:textColor="@color/white"
-                android:textSize="21sp"
-                android:textStyle="normal" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:gravity="center_horizontal"
-                android:lineSpacingExtra="4sp"
-                android:text="@string/onboardingProtectDataDescription"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="normal" />
-
-        </LinearLayout>
+        <TextView
+            style="@style/OnboardingTextSubtitle"
+            android:text="@string/onboardingProtectDataDescription" />
 
     </LinearLayout>
 
     <Button
-        style="?android:attr/borderlessButtonStyle"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginBottom="20dp"
-        android:background="@color/muddyGreen"
-        android:elevation="0dp"
+        android:id="@+id/continueButton"
+        style="@style/OnboardingButtonProtectData"
         android:onClick="onContinueClicked"
-        android:text="@string/onboardingContinue"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
+        android:theme="@style/OnboardingButtonProtectData" />
 
 </android.support.constraint.ConstraintLayout>
