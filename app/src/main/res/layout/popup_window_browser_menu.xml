@@ -36,9 +36,7 @@
             android:layout_weight="1"
             android:contentDescription="@string/back"
             android:onClick="onGoBackClicked"
-            android:src="@drawable/ic_arrow_back_24px"
-            android:tint="@color/popup_menu_buttons_tint"
-            />
+            android:src="@drawable/ic_arrow_back_24px" />
 
         <ImageButton
             android:id="@+id/forwardPopupMenuItem"
@@ -48,9 +46,7 @@
             android:layout_weight="1"
             android:contentDescription="@string/forward"
             android:onClick="onGoForwardClicked"
-            android:src="@drawable/ic_arrow_forward_24px"
-            android:tint="@color/popup_menu_buttons_tint"
-            />
+            android:src="@drawable/ic_arrow_forward_24px" />
 
         <ImageButton
             android:id="@+id/bookmarksPopupMenuItem"
@@ -60,9 +56,7 @@
             android:layout_weight="1"
             android:contentDescription="@string/boomarksMenuTitle"
             android:onClick="onBookmarksClicked"
-            android:src="@drawable/ic_bookmark_24px"
-            android:tint="@color/popup_menu_buttons_tint"
-            />
+            android:src="@drawable/ic_bookmark_24px" />
 
     </LinearLayout>
     
