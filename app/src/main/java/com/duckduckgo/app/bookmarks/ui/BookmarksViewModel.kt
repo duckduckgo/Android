@@ -23,8 +23,7 @@ import android.arch.lifecycle.ViewModel
 import android.support.annotation.WorkerThread
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.ConfirmDeleteBookmark
-import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.OpenBookmark
+import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
 import com.duckduckgo.app.global.SingleLiveEvent
 
 class BookmarksViewModel(val dao: BookmarksDao): ViewModel() {
@@ -36,6 +35,7 @@ class BookmarksViewModel(val dao: BookmarksDao): ViewModel() {
 
         class OpenBookmark(val bookmark: BookmarkEntity) : Command()
         class ConfirmDeleteBookmark(val bookmark: BookmarkEntity) : Command()
+        class ShowEditBookmark(val bookmark: BookmarkEntity) : Command()
 
     }
 
@@ -67,9 +67,18 @@ class BookmarksViewModel(val dao: BookmarksDao): ViewModel() {
         command.value = ConfirmDeleteBookmark(bookmark)
     }
 
+    fun onEditBookmarkRequested(bookmark: BookmarkEntity) {
+        command.value = ShowEditBookmark(bookmark)
+    }
+
     @WorkerThread
     fun delete(bookmark: BookmarkEntity) {
         dao.delete(bookmark)
+    }
+
+    @WorkerThread
+    fun editBookmark(id: Int, title: String, url: String) {
+        dao.update(BookmarkEntity(id, title, url))
     }
 
 }

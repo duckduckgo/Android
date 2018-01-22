@@ -130,5 +130,8 @@
     <string name="bookmarkTitleEdit">Edit Bookmark</string>
     <string name="bookmarkTitleSave">Save Bookmark</string>
     <string name="noBookmarks">No bookmarks added yet</string>
+    <string name="bookmarkOverflowContentDescription">More options for bookmark %s</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
 
 </resources>

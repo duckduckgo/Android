@@ -37,7 +37,7 @@ import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.widget.TextView
 import android.widget.Toast
 import com.duckduckgo.app.bookmarks.ui.BookmarkAddEditDialogFragment
-import com.duckduckgo.app.bookmarks.ui.BookmarkAddEditDialogFragment.BookmarkDialogListener
+import com.duckduckgo.app.bookmarks.ui.BookmarkAddEditDialogFragment.BookmarkDialogCreationListener
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
@@ -58,7 +58,7 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 
-class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogListener {
+class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
 
     @Inject lateinit var webViewClient: BrowserWebViewClient
     @Inject lateinit var webChromeClient: BrowserChromeClient
@@ -390,8 +390,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogListener {
 
     private fun addBookmark() {
 
-        val addBookmarkDialog = BookmarkAddEditDialogFragment.create(
-                isInEditMode = false,
+        val addBookmarkDialog = BookmarkAddEditDialogFragment.createDialogCreationMode(
                 existingTitle = webView.title,
                 existingUrl = webView.url
         )
@@ -442,7 +441,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogListener {
         super.onDestroy()
     }
 
-    override fun userWantsToSaveOrEditBookmark(title: String, url: String) {
+    override fun userWantsToCreateBookmark(title: String, url: String) {
         doAsync {
             viewModel.addBookmark(title, url)
             uiThread {
