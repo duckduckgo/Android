@@ -118,11 +118,16 @@
     <string name="no_suggestions">No Suggestions</string>
 
     <!-- Bookmarks Activity -->
-    <string name="boomarksMenuTitle">Bookmarks</string>
+    <string name="bookmarksMenuTitle">Bookmarks</string>
     <string name="bookmarksActivityTitle">Bookmarks</string>
     <string name="deleteBookmarkContentDescription">Delete bookmark for %s</string>
     <string name="bookmarkDeleteConfirmMessage">Are you sure you want to delete bookmark &lt;b>%s&lt;/b>?</string>
     <string name="bookmarkDeleteConfirmTitle">Confirm</string>
     <string name="bookmarkAddedFeedback">Bookmark added</string>
+    <string name="bookmarkTitleHint">Bookmark title</string>
+    <string name="bookmarkUrlHint">Bookmark URL</string>
+    <string name="bookmarkSave">Save</string>
+    <string name="bookmarkTitleEdit">Edit Bookmark</string>
+    <string name="bookmarkTitleSave">Save Bookmark</string>
 
 </resources>
