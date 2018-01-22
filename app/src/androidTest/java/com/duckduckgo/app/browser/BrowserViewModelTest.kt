@@ -24,6 +24,7 @@ import android.arch.persistence.room.Room
 import android.net.Uri
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
+import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
@@ -45,7 +46,9 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
+import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.After
 import org.junit.Assert.*
@@ -100,11 +103,7 @@ class BrowserViewModelTest {
     private lateinit var db: AppDatabase
     private lateinit var appConfigurationDao: AppConfigurationDao
 
-    private val testOmnibarConverter: OmnibarEntryConverter = object : OmnibarEntryConverter {
-        override fun convertUri(input: String): String = "duckduckgo.com"
-        override fun isWebUrl(inputQuery: String): Boolean = true
-        override fun convertQueryToUri(inputQuery: String): Uri = Uri.parse("duckduckgo.com")
-    }
+    private val mockOmnibarConverter: OmnibarEntryConverter = mock()
 
     private lateinit var testee: BrowserViewModel
 
@@ -118,7 +117,7 @@ class BrowserViewModelTest {
         appConfigurationDao = db.appConfigurationDao()
 
         testee = BrowserViewModel(
-                queryUrlConverter = testOmnibarConverter,
+                queryUrlConverter = mockOmnibarConverter,
                 duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
                 termsOfServiceStore = mockTermsOfServiceStore,
                 trackerNetworks = TrackerNetworks(),
@@ -132,6 +131,9 @@ class BrowserViewModelTest {
 
         testee.url.observeForever(mockQueryObserver)
         testee.command.observeForever(mockNavigationObserver)
+
+        whenever(mockOmnibarConverter.convertQueryToUri(any())).thenReturn(Uri.parse("duckduckgo.com"))
+
     }
 
     @After
@@ -140,6 +142,13 @@ class BrowserViewModelTest {
         db.close()
         testee.url.removeObserver(mockQueryObserver)
         testee.command.removeObserver(mockNavigationObserver)
+    }
+
+    @Test
+    fun whenSubmittedQueryHasWhitespaceItIsTrimmed() {
+        testee.onUserSubmittedQuery(" nytimes.com ")
+        verify(mockOmnibarConverter).isWebUrl("nytimes.com")
+        assertEquals("nytimes.com", testee.viewState.value!!.omnibarText)
     }
 
     @Test
