@@ -29,7 +29,8 @@ import com.duckduckgo.app.global.SingleLiveEvent
 
 class BookmarksViewModel(val dao: BookmarksDao): ViewModel() {
 
-    data class ViewState(val bookmarks: List<BookmarkEntity> = emptyList())
+    data class ViewState(val showBookmarks: Boolean = false,
+                         val bookmarks: List<BookmarkEntity> = emptyList())
 
     sealed class Command {
 
@@ -55,7 +56,7 @@ class BookmarksViewModel(val dao: BookmarksDao): ViewModel() {
     }
 
     private fun onBookmarksChanged(bookmarks: List<BookmarkEntity>) {
-        viewState.value = viewState.value?.copy(bookmarks)
+        viewState.value = viewState.value?.copy(showBookmarks = bookmarks.isNotEmpty(), bookmarks = bookmarks)
     }
 
     fun onSelected(bookmark: BookmarkEntity) {

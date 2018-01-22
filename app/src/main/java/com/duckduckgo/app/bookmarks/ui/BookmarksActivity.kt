@@ -33,6 +33,8 @@ import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.view.gone
+import com.duckduckgo.app.global.view.show
 import kotlinx.android.synthetic.main.content_bookmarks.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.view_bookmark_entry.view.*
@@ -72,6 +74,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private fun observeViewModel() {
         viewModel.viewState.observe(this, Observer<BookmarksViewModel.ViewState> { viewState ->
             viewState?.let {
+                if (it.showBookmarks) showBookmarks() else hideBookmarks()
                 adapter.bookmarks = it.bookmarks
             }
         })
@@ -82,6 +85,16 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 is BookmarksViewModel.Command.OpenBookmark -> openBookmark(it.bookmark)
             }
         })
+    }
+
+    private fun showBookmarks() {
+        recycler.show()
+        emptyBookmarks.gone()
+    }
+
+    private fun hideBookmarks() {
+        recycler.gone()
+        emptyBookmarks.show()
     }
 
     private fun openBookmark(bookmark: BookmarkEntity) {
