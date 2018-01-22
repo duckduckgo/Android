@@ -65,14 +65,12 @@
             />
 
     </LinearLayout>
-
-    <View
-        android:layout_width="0dp"
+    
+    <FrameLayout
+        android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/white_two"
-        app:layout_constraintBottom_toBottomOf="@+id/header"
-        app:layout_constraintStart_toStartOf="@id/header"
-        app:layout_constraintEnd_toEndOf="@id/header"/>
+        app:layout_constraintBottom_toBottomOf="@+id/header" />
 
     <LinearLayout
         android:layout_width="wrap_content"
