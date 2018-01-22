@@ -35,7 +35,7 @@ import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
-import kotlinx.android.synthetic.main.popup_window_brower_menu.view.*
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import org.jetbrains.anko.toast
 import javax.inject.Inject
 import javax.inject.Provider

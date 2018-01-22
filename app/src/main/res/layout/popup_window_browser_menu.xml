@@ -24,7 +24,7 @@
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="@color/colorAccent"
+        android:background="@color/white"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -36,7 +36,9 @@
             android:layout_weight="1"
             android:contentDescription="@string/back"
             android:onClick="onGoBackClicked"
-            android:src="@drawable/ic_arrow_back_24px" />
+            android:src="@drawable/ic_arrow_back_24px"
+            android:tint="@color/popup_menu_buttons_tint"
+            />
 
         <ImageButton
             android:id="@+id/forwardPopupMenuItem"
@@ -46,7 +48,9 @@
             android:layout_weight="1"
             android:contentDescription="@string/forward"
             android:onClick="onGoForwardClicked"
-            android:src="@drawable/ic_arrow_forward_24px" />
+            android:src="@drawable/ic_arrow_forward_24px"
+            android:tint="@color/popup_menu_buttons_tint"
+            />
 
         <ImageButton
             android:id="@+id/bookmarksPopupMenuItem"
@@ -56,16 +60,26 @@
             android:layout_weight="1"
             android:contentDescription="@string/boomarksMenuTitle"
             android:onClick="onBookmarksClicked"
-            android:src="@drawable/ic_bookmark_24px" />
+            android:src="@drawable/ic_bookmark_24px"
+            android:tint="@color/popup_menu_buttons_tint"
+            />
 
     </LinearLayout>
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/white_two"
+        app:layout_constraintBottom_toBottomOf="@+id/header"
+        app:layout_constraintStart_toStartOf="@id/header"
+        app:layout_constraintEnd_toEndOf="@id/header"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingBottom="20dp"
-        android:paddingTop="20dp"
+        android:paddingTop="13dp"
         app:layout_constraintTop_toBottomOf="@id/header">
 
         <TextView

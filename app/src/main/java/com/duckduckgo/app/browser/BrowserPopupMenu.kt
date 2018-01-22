@@ -30,9 +30,9 @@ class BrowserPopupMenu : PopupWindow {
     constructor(layoutInflater: LayoutInflater, view: View = BrowserPopupMenu.inflate(layoutInflater))
             : super(view, WRAP_CONTENT, WRAP_CONTENT, true) {
 
-        if (SDK_INT <= 21) {
-            // popupwindow gets stuck on the screen on API 21 without a background color.
-            // Adding it however garbles the elevation so we cannot have elevation here
+        if (SDK_INT <= 22) {
+            // popupwindow gets stuck on the screen on API 22 (tested on 23) without a background
+            // color.  Adding it however garbles the elevation so we cannot have elevation here.
             setBackgroundDrawable(ColorDrawable(Color.WHITE))
         } else {
             elevation = 6.toFloat()
@@ -54,7 +54,7 @@ class BrowserPopupMenu : PopupWindow {
         val margin = 30
 
         fun inflate(layoutInflater: LayoutInflater): View {
-            return layoutInflater.inflate(R.layout.popup_window_brower_menu, null)
+            return layoutInflater.inflate(R.layout.popup_window_browser_menu, null)
         }
 
     }
