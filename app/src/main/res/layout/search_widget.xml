@@ -17,9 +17,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/widgetContainer"
-    android:layout_width="match_parent"
+    android:layout_width="320dp"
     android:layout_height="match_parent"
-    android:padding="@dimen/widget_margin">
+    android:padding="8dp">
 
     <TextView
         android:id="@+id/searchInputBox"
@@ -29,14 +29,13 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="36dp"
         android:background="#5e6168"
-        android:drawableEnd="@drawable/ic_search_white_24dp"
+        android:drawableEnd="@drawable/mini_logo"
         android:gravity="center_vertical"
-        android:paddingEnd="16dp"
-        android:paddingStart="16dp"
+        android:paddingEnd="20dp"
+        android:paddingStart="20dp"
         android:text="@string/omnibarInputHint"
         android:textColor="#a6aab2"
         android:textSize="16sp"
-        android:transitionName="@string/transition_url_input"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
