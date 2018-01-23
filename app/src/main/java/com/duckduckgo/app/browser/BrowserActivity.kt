@@ -466,7 +466,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
         private const val DASHBOARD_REQUEST_CODE = 101
         private const val BOOKMARKS_REQUEST_CODE = 102
 
-        // Fragment Tags
         private const val ADD_BOOKMARK_FRAGMENT_TAG = "ADD_BOOKMARK"
     }
 
