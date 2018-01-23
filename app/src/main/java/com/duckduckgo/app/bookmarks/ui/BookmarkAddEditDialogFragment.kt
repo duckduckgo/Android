@@ -47,10 +47,10 @@ class BookmarkAddEditDialogFragment : DialogFragment() {
         val urlInput = rootView.find<EditText>(R.id.urlInput)
 
         val alertBuilder = AlertDialog.Builder(activity!!)
-                .setView(rootView)
-                .setPositiveButton(R.string.bookmarkSave) { _, _ ->
-                    userAcceptedDialog(titleInput, urlInput)
-                }
+            .setView(rootView)
+            .setPositiveButton(R.string.bookmarkSave) { _, _ ->
+                userAcceptedDialog(titleInput, urlInput)
+            }
 
         validateBundleArguments()
 
@@ -65,22 +65,21 @@ class BookmarkAddEditDialogFragment : DialogFragment() {
     private fun userAcceptedDialog(titleInput: EditText, urlInput: EditText) {
         if (isInEditMode()) {
             val listener = activity as BookmarkDialogEditListener
-            listener.userWantsToEditBookmark(getExistingId(),
-                    titleInput.text.toString(),
-                    urlInput.text.toString()
+            listener.userWantsToEditBookmark(
+                getExistingId(),
+                titleInput.text.toString(),
+                urlInput.text.toString()
             )
         } else {
             val listener = activity as BookmarkDialogCreationListener
             listener.userWantsToCreateBookmark(
-                    titleInput.text.toString(),
-                    urlInput.text.toString())
+                titleInput.text.toString(),
+                urlInput.text.toString()
+            )
         }
     }
 
-    private fun showKeyboard(
-            titleInput: EditText,
-            alert: AlertDialog
-    ) {
+    private fun showKeyboard(titleInput: EditText, alert: AlertDialog) {
         titleInput.setSelection(titleInput.text.length)
         titleInput.showKeyboard()
         alert.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
@@ -107,9 +106,9 @@ class BookmarkAddEditDialogFragment : DialogFragment() {
     private fun validateBundleArguments() {
         if (arguments == null) throw IllegalArgumentException("Missing arguments bundle")
         val args = arguments!!
-        if (!args.containsKey(KEY_IS_EDIT_MODE) || !args.containsKey(KEY_PREEXISTING_TITLE) || !args.containsKey(
-                        KEY_PREEXISTING_URL
-                )) {
+        if (!args.containsKey(KEY_IS_EDIT_MODE) ||
+            !args.containsKey(KEY_PREEXISTING_TITLE) ||
+            !args.containsKey(KEY_PREEXISTING_URL)) {
             throw IllegalArgumentException("Bundle arguments required [KEY_IS_EDIT_MODE, KEY_PREEXISTING_TITLE, KEY_PREEXISTING_URL]")
         }
     }
@@ -136,7 +135,9 @@ class BookmarkAddEditDialogFragment : DialogFragment() {
             return dialog
         }
 
-        fun createDialogCreationMode(existingTitle: String?, existingUrl: String?
+        fun createDialogCreationMode(
+            existingTitle: String?,
+            existingUrl: String?
         ): BookmarkAddEditDialogFragment {
 
             val dialog = BookmarkAddEditDialogFragment()
