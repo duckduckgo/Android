@@ -51,7 +51,7 @@ class AppConfigurationJobService : JobService() {
                 jobFinishedSuccessfully(params)
                 Timber.i("Successfully downloaded all data")
             }
-            .subscribe()
+            .subscribe({})
 
         return true
     }
