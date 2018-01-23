@@ -42,16 +42,12 @@ class AppConfigurationJobService : JobService() {
 
         appConfigurationDownloader.downloadTask()
             .subscribeOn(Schedulers.io())
-            .onErrorComplete() {
+            .subscribe({
+                Timber.i("Successfully downloaded all data")
+            }, {
                 Timber.w(it, "Failed to download app configuration")
                 jobFinishedFailed(params)
-                true
-            }
-            .doOnComplete {
-                jobFinishedSuccessfully(params)
-                Timber.i("Successfully downloaded all data")
-            }
-            .subscribe({})
+            })
 
         return true
     }
