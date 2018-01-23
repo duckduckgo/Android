@@ -41,19 +41,18 @@ class AppConfigurationJobService : JobService() {
         Timber.i("onStartJob")
 
         appConfigurationDownloader.downloadTask()
-                .subscribeOn(Schedulers.io())
-                .doOnComplete {
-                    Timber.i("Successfully downloaded all data")
-                    jobFinishedSuccessfully(params)
-                }
-                .doOnError({
-                    Timber.w("Failed to download all data")
-                    jobFinishedFailed(params)
-                })
-                .subscribeOn(Schedulers.io())
-                .subscribe({}, {
-                    Timber.w(it, "Failed to download app configuration")
-                })
+            .subscribeOn(Schedulers.io())
+            .onErrorComplete() {
+                Timber.w(it, "Failed to download app configuration")
+                jobFinishedFailed(params)
+                true
+            }
+            .doOnComplete {
+                jobFinishedSuccessfully(params)
+                Timber.i("Successfully downloaded all data")
+            }
+            .subscribeOn(Schedulers.io())
+            .subscribe()
 
         return true
     }
