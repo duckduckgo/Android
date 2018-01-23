@@ -24,7 +24,7 @@
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="@color/colorAccent"
+        android:background="@color/white"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -59,13 +59,19 @@
             android:src="@drawable/ic_bookmark_24px" />
 
     </LinearLayout>
+    
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/white_two"
+        app:layout_constraintBottom_toBottomOf="@+id/header" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingBottom="20dp"
-        android:paddingTop="20dp"
+        android:paddingTop="13dp"
         app:layout_constraintTop_toBottomOf="@id/header">
 
         <TextView

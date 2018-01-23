@@ -49,7 +49,7 @@ import com.duckduckgo.app.privacymonitor.renderer.icon
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_browser.*
-import kotlinx.android.synthetic.main.popup_window_brower_menu.view.*
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
@@ -266,6 +266,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
 
         webView.settings.apply {
             javaScriptEnabled = true
+            domStorageEnabled = true
             loadWithOverviewMode = true
             useWideViewPort = true
             builtInZoomControls = true
@@ -284,7 +285,9 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
         }
 
         webView.setOnTouchListener { _, _ ->
-            focusDummy.requestFocus()
+            if (omnibarTextInput.isFocused) {
+                focusDummy.requestFocus()
+            }
             false
         }
 

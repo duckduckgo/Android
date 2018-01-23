@@ -25,78 +25,50 @@
     tools:background="@color/powderBlue"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
+    <ImageView
+        android:id="@+id/noTraceImage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:importantForAccessibility="no"
+        android:paddingTop="20dp"
+        android:src="@drawable/onboarding_image_no_trace"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/textContainer"
+        app:layout_constraintVertical_bias="0.5" />
+
     <LinearLayout
+        android:id="@+id/textContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toTopOf="@id/continueButton"
+        app:layout_constraintTop_toBottomOf="@id/noTraceImage">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="80dp"
-            android:gravity="center"
-            android:orientation="vertical"
-            tools:ignore="UselessParent">
+        <TextView
+            style="@style/OnboardingTextTitle"
+            android:text="@string/onboardingNoTraceTitle" />
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:importantForAccessibility="no"
-                android:paddingTop="20dp"
-                android:src="@drawable/onboarding_image_no_trace" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:gravity="center_horizontal"
-                android:paddingBottom="20dp"
-                android:paddingTop="20dp"
-                android:text="@string/onboardingNoTraceTitle"
-                android:textColor="@color/white"
-                android:textSize="21sp"
-                android:textStyle="normal" />
+        <TextView
+            style="@style/OnboardingTextSubtitle"
+            android:text="@string/onboardingNoTraceDescription1" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:gravity="center_horizontal"
-                android:lineSpacingExtra="4sp"
-                android:text="@string/onboardingNoTraceDescription1"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="normal" />
+        <TextView
+            style="@style/OnboardingTextSubtitle.Subtitle2"
+            android:text="@string/onboardingNoTraceDescription2" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:gravity="center_horizontal"
-                android:lineSpacingExtra="6sp"
-                android:paddingTop="16dp"
-                android:text="@string/onboardingNoTraceDescription2"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="normal" />
-
-        </LinearLayout>
 
     </LinearLayout>
 
     <Button
-        style="?android:attr/borderlessButtonStyle"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginBottom="20dp"
-        android:background="@color/windowsBlue"
-        android:elevation="0dp"
+        android:id="@+id/continueButton"
+        style="@style/OnboardingButtonNoTrace"
         android:onClick="onDoneClicked"
-        android:text="@string/onboardingContinue"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:theme="@style/OnboardingButtonNoTrace" />
 
 </android.support.constraint.ConstraintLayout>
