@@ -32,7 +32,6 @@ import android.view.KeyEvent.KEYCODE_ENTER
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.View.FOCUSABLE
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.webkit.CookieManager
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
@@ -107,14 +106,14 @@ class BrowserActivity : DuckDuckGoActivity() {
         popupMenu = BrowserPopupMenu(layoutInflater)
     }
 
-    // inspired by https://stackoverflow.com/a/8011027/73479
     private fun createWebView() {
-        webView = NestedWebView(this.applicationContext)
+        webView = NestedWebView(this)
         webView.gone()
         webView.isFocusableInTouchMode = true
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            webView.focusable = FOCUSABLE
+            webView.focusable = View.FOCUSABLE
         }
+
         webViewContainer.addView(webView)
     }
 
