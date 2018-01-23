@@ -128,6 +128,9 @@ class BrowserActivity : DuckDuckGoActivity() {
                     Timber.i("Command: showing keyboard")
                     omnibarTextInput.postDelayed({omnibarTextInput.showKeyboard()}, 300)
                 }
+                is BrowserViewModel.Command.ReinitialiseWebView -> {
+                    webView.clearHistory()
+                }
             }
         })
 

@@ -89,7 +89,8 @@ class BrowserViewModel(
         class DialNumber(val telephoneNumber: String) : Command()
         class SendSms(val telephoneNumber: String) : Command()
         class SendEmail(val emailAddress: String) : Command()
-        class ShowKeyboard() : Command()
+        class ShowKeyboard : Command()
+        class ReinitialiseWebView : Command()
     }
 
     /* Observable data for Activity to subscribe to */
@@ -348,8 +349,15 @@ class BrowserViewModel(
     }
 
     fun viewRelaunched() {
+        command.value = Command.ReinitialiseWebView()
+        viewState.value = currentViewState().copy(
+                browserShowing = false,
+                omnibarText = "",
+                isEditing = false,
+                showAutoCompleteSuggestions = false,
+                autoCompleteSearchResults = AutoCompleteResult("", emptyList()),
+                isLoading = false)
         command.value = Command.ShowKeyboard()
-        viewState.value = currentViewState().copy(browserShowing = false, omnibarText = "")
     }
 }
 

@@ -56,7 +56,7 @@ class HomeActivity : DuckDuckGoActivity() {
         searchInputBox.setOnClickListener { showSearchActivity() }
 
         if (savedInstanceState == null) {
-            consumeSharedText(intent)
+            consumeIntentAction(intent)
         }
     }
 
@@ -75,11 +75,19 @@ class HomeActivity : DuckDuckGoActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        consumeSharedText(intent)
+        consumeIntentAction(intent)
     }
 
-    private fun consumeSharedText(intent: Intent?) {
-        val sharedText = intent?.intentText ?: return
+    private fun consumeIntentAction(intent: Intent?) {
+        if(intent == null) return
+
+        if(intent.hasExtra(KEY_SKIP_HOME)) {
+            startActivity(BrowserActivity.intent(this))
+            finish()
+            return
+        }
+
+        val sharedText = intent.intentText ?: return
         val browserIntent = BrowserActivity.intent(this, sharedText)
         startActivity(browserIntent)
     }
@@ -173,5 +181,12 @@ class HomeActivity : DuckDuckGoActivity() {
             return Intent(context, HomeActivity::class.java)
         }
 
+        fun launchSkipHome(context: Context) : Intent {
+            val intent = intent(context)
+            intent.putExtra(KEY_SKIP_HOME, true)
+            return intent
+        }
+
+        const val KEY_SKIP_HOME: String = "KEY_SKIP_HOME"
     }
 }
