@@ -46,7 +46,7 @@ class AppConfigurationJobService : JobService() {
                 Timber.i("Successfully downloaded all data")
                 jobFinishedSuccessfully(params)
             }, {
-                Timber.w(it, "Failed to download app configuration")
+                Timber.w("Failed to download app configuration ${it.localizedMessage}")
                 jobFinishedFailed(params)
             })
 
