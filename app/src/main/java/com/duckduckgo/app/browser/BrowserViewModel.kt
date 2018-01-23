@@ -89,6 +89,7 @@ class BrowserViewModel(
         class DialNumber(val telephoneNumber: String) : Command()
         class SendSms(val telephoneNumber: String) : Command()
         class SendEmail(val emailAddress: String) : Command()
+        class ShowKeyboard() : Command()
     }
 
     /* Observable data for Activity to subscribe to */
@@ -113,6 +114,7 @@ class BrowserViewModel(
     private var appConfigurationDownloaded = false
 
     init {
+        command.value = Command.ShowKeyboard()
         viewState.value = ViewState(canAddBookmarks = false)
         privacyMonitorRepository.privacyMonitor = MutableLiveData()
         appConfigurationObservable.observeForever(appConfigurationObserver)
@@ -153,6 +155,7 @@ class BrowserViewModel(
         if (input.isBlank()) {
             return
         }
+
         val trimmedInput = input.trim()
         url.value = buildUrl(trimmedInput)
         viewState.value = currentViewState().copy(
@@ -342,6 +345,11 @@ class BrowserViewModel(
 
     fun onUserSelectedToEditQuery(query: String) {
         viewState.value = currentViewState().copy(isEditing = false, showAutoCompleteSuggestions = false, omnibarText = query)
+    }
+
+    fun viewRelaunched() {
+        command.value = Command.ShowKeyboard()
+        viewState.value = currentViewState().copy(browserShowing = false, omnibarText = "")
     }
 }
 

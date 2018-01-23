@@ -58,10 +58,14 @@ import javax.inject.Provider
 
 class BrowserActivity : DuckDuckGoActivity() {
 
-    @Inject lateinit var webViewClient: BrowserWebViewClient
-    @Inject lateinit var webChromeClient: BrowserChromeClient
-    @Inject lateinit var viewModelFactory: ViewModelFactory
-    @Inject lateinit var cookieManagerProvider: Provider<CookieManager>
+    @Inject
+    lateinit var webViewClient: BrowserWebViewClient
+    @Inject
+    lateinit var webChromeClient: BrowserChromeClient
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    @Inject
+    lateinit var cookieManagerProvider: Provider<CookieManager>
 
     private lateinit var popupMenu: BrowserPopupMenu
 
@@ -119,6 +123,10 @@ class BrowserActivity : DuckDuckGoActivity() {
                 is BrowserViewModel.Command.SendSms -> {
                     val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${it.telephoneNumber}"))
                     startActivity(intent)
+                }
+                is BrowserViewModel.Command.ShowKeyboard -> {
+                    Timber.i("Command: showing keyboard")
+                    omnibarTextInput.postDelayed({omnibarTextInput.showKeyboard()}, 300)
                 }
             }
         })
@@ -422,6 +430,11 @@ class BrowserActivity : DuckDuckGoActivity() {
         super.onBackPressed()
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        viewModel.viewRelaunched()
+    }
+
     private fun finishActivityAnimated() {
         clearViewPriorToAnimation()
         supportFinishAfterTransition()
@@ -447,7 +460,7 @@ class BrowserActivity : DuckDuckGoActivity() {
             return intent
         }
 
-        private const val SHARED_TEXT_EXTRA = "SHARED_TEXT_EXTRA"
+        const val SHARED_TEXT_EXTRA = "SHARED_TEXT_EXTRA"
         private const val SETTINGS_REQUEST_CODE = 100
         private const val DASHBOARD_REQUEST_CODE = 101
         private const val BOOKMARKS_REQUEST_CODE = 102
