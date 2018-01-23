@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.support.v4.view.NestedScrollingChild
 import android.support.v4.view.NestedScrollingChildHelper
@@ -44,6 +45,7 @@ class NestedWebView : WebView, NestedScrollingChild {
         isNestedScrollingEnabled = true
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(ev: MotionEvent): Boolean {
         var returnValue = false
 
