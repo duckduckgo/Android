@@ -38,7 +38,7 @@ class AppConfigurationDownloader @Inject constructor(
         val disconnectDownload = trackerDataDownloader.downloadList(Client.ClientName.DISCONNECT)
         val httpsUpgradeDownload = httpsUpgradeListDownloader.downloadList()
 
-        return Completable.merge(listOf(
+        return Completable.mergeDelayError(listOf(
                 easyListDownload.subscribeOn(Schedulers.io()),
                 easyPrivacyDownload.subscribeOn(Schedulers.io()),
                 trackersWhitelist.subscribeOn(Schedulers.io()),
