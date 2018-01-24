@@ -37,6 +37,7 @@ import com.duckduckgo.app.bookmarks.ui.BookmarkAddEditDialogFragment.BookmarkDia
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.show
 import kotlinx.android.synthetic.main.content_bookmarks.*
@@ -119,7 +120,8 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
 
     @Suppress("deprecation")
     private fun confirmDeleteBookmark(bookmark: BookmarkEntity) {
-        val message = Html.fromHtml(getString(R.string.bookmarkDeleteConfirmMessage, bookmark.title))
+        val message =
+            Html.fromHtml(getString(R.string.bookmarkDeleteConfirmMessage, bookmark.title))
         val title = getString(R.string.bookmarkDeleteConfirmTitle)
         deleteDialog = alert(message, title) {
             positiveButton(android.R.string.yes) { delete(bookmark) }
@@ -139,7 +141,8 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
         super.onDestroy()
     }
 
-    class BookmarksAdapter(val context: Context, val viewModel: BookmarksViewModel) : Adapter<BookmarksViewHolder>() {
+    class BookmarksAdapter(val context: Context, val viewModel: BookmarksViewModel) :
+        Adapter<BookmarksViewHolder>() {
 
         var bookmarks: List<BookmarkEntity> = emptyList()
             set(value) {
@@ -164,23 +167,34 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
 
     }
 
-    class BookmarksViewHolder(itemView: View?, val viewModel: BookmarksViewModel) : ViewHolder(itemView) {
+    class BookmarksViewHolder(itemView: View?, val viewModel: BookmarksViewModel) :
+        ViewHolder(itemView) {
 
         lateinit var bookmark: BookmarkEntity
 
         fun update(bookmark: BookmarkEntity) {
             this.bookmark = bookmark
 
-            itemView.overflowMenu.contentDescription = itemView.context.getString(R.string.bookmarkOverflowContentDescription, bookmark.title)
+            itemView.overflowMenu.contentDescription = itemView.context.getString(
+                R.string.bookmarkOverflowContentDescription,
+                bookmark.title
+            )
 
             itemView.title.text = bookmark.title
-            itemView.url.text = Uri.parse(bookmark.url).host
+            itemView.url.text = parseDisplayUrl(bookmark.url)
 
-            itemView.overflowMenu.setOnClickListener { showOverFlowMenu(itemView.overflowMenu, bookmark) }
+            itemView.overflowMenu.setOnClickListener {
+                showOverFlowMenu(itemView.overflowMenu, bookmark)
+            }
 
             itemView.setOnClickListener {
                 viewModel.onSelected(bookmark)
             }
+        }
+
+        private fun parseDisplayUrl(urlString: String): String {
+            val uri = Uri.parse(urlString)
+            return uri.baseHost ?: return urlString
         }
 
         private fun showOverFlowMenu(overflowMenu: ImageView, bookmark: BookmarkEntity) {
