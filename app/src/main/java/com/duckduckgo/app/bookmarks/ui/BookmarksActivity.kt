@@ -33,6 +33,7 @@ import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.home.HomeActivity
 import kotlinx.android.synthetic.main.content_bookmarks.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.view_bookmark_entry.view.*
@@ -85,8 +86,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun openBookmark(bookmark: BookmarkEntity) {
-        val intent = Intent(bookmark.url)
-        setResult(OPEN_URL_RESULT_CODE, intent)
+        startActivity(HomeActivity.intent(this, bookmark.url))
         finish()
     }
 
@@ -116,8 +116,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
         fun intent(context: Context): Intent {
             return Intent(context, BookmarksActivity::class.java)
         }
-
-        val OPEN_URL_RESULT_CODE = Activity.RESULT_FIRST_USER
     }
 
     class BookmarksAdapter(val context: Context, val viewModel: BookmarksViewModel) : Adapter<BookmarksViewHolder>() {

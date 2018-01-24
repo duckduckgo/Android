@@ -56,7 +56,6 @@
         <activity
             android:name=".BrowserActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:launchMode="singleTask"
             android:parentActivityName="com.duckduckgo.app.home.HomeActivity" />
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
@@ -76,8 +75,8 @@
             android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity" />
         <activity
             android:name="com.duckduckgo.app.settings.SettingsActivity"
-            android:label="@string/settingsActivityTitle"
-            android:parentActivityName=".BrowserActivity" />
+            android:label="@string/settingsActivityTitle"/>
+
         <activity
             android:name="com.duckduckgo.app.about.AboutDuckDuckGoActivity"
             android:label="@string/aboutActivityTitle"
@@ -85,8 +84,7 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name="com.duckduckgo.app.bookmarks.ui.BookmarksActivity"
-            android:label="@string/bookmarksActivityTitle"
-            android:parentActivityName=".BrowserActivity" />
+            android:label="@string/bookmarksActivityTitle" />
 
         <service
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"

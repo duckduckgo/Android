@@ -23,17 +23,13 @@ import android.net.Uri
 import android.support.annotation.AnyThread
 import android.support.annotation.VisibleForTesting
 import android.support.annotation.WorkerThread
-import com.duckduckgo.app.about.AboutDuckDuckGoActivity.Companion.RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.ui.BookmarksActivity.Companion.OPEN_URL_RESULT_CODE
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
-import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.global.StringResolver
 import com.duckduckgo.app.privacymonitor.SiteMonitor
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardEntry
@@ -43,7 +39,6 @@ import com.duckduckgo.app.privacymonitor.model.improvedGrade
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
-import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.TOSDR_RESULT_CODE
 import com.duckduckgo.app.settings.db.AppConfigurationDao
 import com.duckduckgo.app.settings.db.AppConfigurationEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -61,7 +56,6 @@ class BrowserViewModel(
         private val termsOfServiceStore: TermsOfServiceStore,
         private val trackerNetworks: TrackerNetworks,
         private val privacyMonitorRepository: PrivacyMonitorRepository,
-        private val stringResolver: StringResolver,
         private val networkLeaderboardDao: NetworkLeaderboardDao,
         private val bookmarksDao: BookmarksDao,
         private val autoCompleteApi: AutoCompleteApi,
@@ -288,7 +282,6 @@ class BrowserViewModel(
         if(hasQueryChanged && hasFocus && autoCompleteSuggestionsEnabled) {
             autoCompletePublishSubject.accept(query.trim())
         }
-
     }
 
     fun onSharedTextReceived(input: String) {
@@ -309,55 +302,20 @@ class BrowserViewModel(
     }
 
     fun receivedDashboardResult(resultCode: Int) {
-        when (resultCode) {
-            RELOAD_RESULT_CODE -> command.value = Refresh()
-            TOSDR_RESULT_CODE -> {
-                val url = stringResolver.getString(R.string.tosdrUrl)
-                openUrl(url)
-            }
-        }
-    }
-
-    fun receivedSettingsResult(resultCode: Int) {
-        when (resultCode) {
-            RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE -> {
-                val url = stringResolver.getString(R.string.aboutUrl)
-                openUrl(url)
-            }
-        }
+        if (resultCode == RELOAD_RESULT_CODE) command.value = Command.Refresh()
     }
 
     @WorkerThread
     fun addBookmark(title: String?, url: String?) {
         bookmarksDao.insert(BookmarkEntity(title = title, url = url!!))
     }
-
-    fun receivedBookmarksResult(resultCode: Int, action: String?) {
-        when (resultCode) {
-            OPEN_URL_RESULT_CODE -> {
-                openUrl(action ?: return)
-            }
-        }
-    }
-
+    
     private fun openUrl(url: String) {
         command.value = Navigate(url)
     }
 
     fun onUserSelectedToEditQuery(query: String) {
         viewState.value = currentViewState().copy(isEditing = false, showAutoCompleteSuggestions = false, omnibarText = query)
-    }
-
-    fun viewRelaunched() {
-        command.value = Command.ReinitialiseWebView()
-        viewState.value = currentViewState().copy(
-                browserShowing = false,
-                omnibarText = "",
-                isEditing = false,
-                showAutoCompleteSuggestions = false,
-                autoCompleteSearchResults = AutoCompleteResult("", emptyList()),
-                isLoading = false)
-        command.value = Command.ShowKeyboard()
     }
 }
 

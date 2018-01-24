@@ -24,7 +24,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.webkit.CookieManager
-import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserPopupMenu
@@ -56,7 +55,7 @@ class HomeActivity : DuckDuckGoActivity() {
         searchInputBox.setOnClickListener { showSearchActivity() }
 
         if (savedInstanceState == null) {
-            consumeIntentAction(intent)
+            consumeSharedQuery(intent)
         }
     }
 
@@ -75,21 +74,21 @@ class HomeActivity : DuckDuckGoActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        consumeIntentAction(intent)
+        consumeSharedQuery(intent)
     }
 
-    private fun consumeIntentAction(intent: Intent?) {
+    private fun consumeSharedQuery(intent: Intent?) {
+
         if(intent == null) return
 
-        if(intent.hasExtra(KEY_SKIP_HOME)) {
+         if(intent.hasExtra(KEY_SKIP_HOME)) {
             startActivity(BrowserActivity.intent(this))
             finish()
             return
         }
 
-        val sharedText = intent.intentText ?: return
-        val browserIntent = BrowserActivity.intent(this, sharedText)
-        startActivity(browserIntent)
+        val query = intent.intentText ?: return
+        startActivity(BrowserActivity.intent(this, query))
     }
 
     private fun showSearchActivity() {
@@ -119,9 +118,9 @@ class HomeActivity : DuckDuckGoActivity() {
 
     private fun launchFire() {
         FireDialog(context = this,
-                cookieManager = cookieManagerProvider.get(),
-                clearStarted = {},
-                clearComplete = { toast(R.string.fireDataCleared) }).show()
+            cookieManager = cookieManagerProvider.get(),
+            clearStarted = {},
+            clearComplete = { toast(R.string.fireDataCleared) }).show()
     }
 
     private fun launchPopupMenu() {
@@ -130,41 +129,13 @@ class HomeActivity : DuckDuckGoActivity() {
     }
 
     fun onBookmarksClicked(view: View) {
-        startActivityForResult(BookmarksActivity.intent(this), BOOKMARKS_REQUEST_CODE)
+        startActivity(BookmarksActivity.intent(this))
         popupMenu.dismiss()
     }
 
     fun onSettingsClicked(view: View) {
-        startActivityForResult(SettingsActivity.intent(this), SETTINGS_REQUEST_CODE)
+        startActivity(SettingsActivity.intent(this))
         popupMenu.dismiss()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            SETTINGS_REQUEST_CODE -> onHandleSettingsResult(resultCode)
-            BOOKMARKS_REQUEST_CODE -> onHandleBookmarksResult(resultCode, data)
-            else -> super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
-
-    private fun onHandleBookmarksResult(resultCode: Int, data: Intent?) {
-        when (resultCode) {
-            BookmarksActivity.OPEN_URL_RESULT_CODE -> {
-                openUrl(data?.action ?: return)
-            }
-        }
-    }
-
-    private fun onHandleSettingsResult(resultCode: Int) {
-        when (resultCode) {
-            AboutDuckDuckGoActivity.RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE -> {
-                openUrl(getString(R.string.aboutUrl))
-            }
-        }
-    }
-
-    private fun openUrl(url: String) {
-        startActivity(BrowserActivity.intent(this, url))
     }
 
     override fun onDestroy() {
@@ -174,11 +145,12 @@ class HomeActivity : DuckDuckGoActivity() {
 
     companion object {
 
-        private const val SETTINGS_REQUEST_CODE = 100
-        private const val BOOKMARKS_REQUEST_CODE = 101
-
-        fun intent(context: Context): Intent {
-            return Intent(context, HomeActivity::class.java)
+        fun intent(context: Context, query: String? = null): Intent {
+            val intent = Intent(context, HomeActivity::class.java)
+            query?.let {
+                intent.putExtra(Intent.EXTRA_TEXT, query)
+            }
+            return intent
         }
 
         fun launchSkipHome(context: Context) : Intent {

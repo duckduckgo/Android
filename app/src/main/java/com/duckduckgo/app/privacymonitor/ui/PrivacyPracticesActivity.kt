@@ -26,6 +26,7 @@ import android.view.View
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.home.HomeActivity
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import com.duckduckgo.app.privacymonitor.renderer.banner
 import com.duckduckgo.app.privacymonitor.renderer.text
@@ -78,13 +79,11 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
     }
 
     fun onTosdrLinkClicked(@Suppress("UNUSED_PARAMETER") view: View) {
-        setResult(TOSDR_RESULT_CODE)
+        startActivity(HomeActivity.intent(this, getString(R.string.tosdrUrl)))
         finish()
     }
 
     companion object {
-
-        val TOSDR_RESULT_CODE = 100
 
         fun intent(context: Context): Intent {
             return Intent(context, PrivacyPracticesActivity::class.java)
