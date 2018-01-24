@@ -70,8 +70,6 @@ class BrowserViewModelTest {
 
     private var lastNetworkLeaderboardEntry: NetworkLeaderboardEntry? = null
 
-    private val testStringResolver: StringResolver = object : StringResolver {}
-
     private val testNetworkLeaderboardDao: NetworkLeaderboardDao = object : NetworkLeaderboardDao {
         override fun insert(leaderboardEntry: NetworkLeaderboardEntry) {
             lastNetworkLeaderboardEntry = leaderboardEntry
@@ -122,7 +120,6 @@ class BrowserViewModelTest {
                 termsOfServiceStore = mockTermsOfServiceStore,
                 trackerNetworks = TrackerNetworks(),
                 privacyMonitorRepository = PrivacyMonitorRepository(),
-                stringResolver = testStringResolver,
                 networkLeaderboardDao = testNetworkLeaderboardDao,
                 autoCompleteApi = mockAutoCompleteApi,
                 appSettingsPreferencesStore = mockSettingsStore,
@@ -149,15 +146,6 @@ class BrowserViewModelTest {
         testee.onUserSubmittedQuery(" nytimes.com ")
         verify(mockOmnibarConverter).isWebUrl("nytimes.com")
         assertEquals("nytimes.com", testee.viewState.value!!.omnibarText)
-    }
-
-    @Test
-    fun whenBookmarksResultCodeIsOpenUrlThenNavigate() {
-        testee.receivedBookmarksResult(BookmarksActivity.OPEN_URL_RESULT_CODE, "www.example.com")
-        val captor: ArgumentCaptor<Command> = ArgumentCaptor.forClass(Command::class.java)
-        verify(mockNavigationObserver).onChanged(captor.capture())
-        assertNotNull(captor.value)
-        assertTrue(captor.value is Navigate)
     }
 
     @Test

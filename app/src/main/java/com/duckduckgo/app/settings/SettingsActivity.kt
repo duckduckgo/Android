@@ -52,7 +52,7 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUiEventHandlers() {
-        about.setOnClickListener { startActivityForResult(AboutDuckDuckGoActivity.intent(this), REQUEST_CODE_ABOUT_DDG) }
+        about.setOnClickListener { startActivity(AboutDuckDuckGoActivity.intent(this)) }
         provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
         autocompleteEnabledSetting.setOnClickListener { viewModel.userRequestedToChangeAutocompleteSetting(autocompleteEnabledSetting.isChecked) }
     }
@@ -77,13 +77,6 @@ class SettingsActivity : DuckDuckGoActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if(requestCode == REQUEST_CODE_ABOUT_DDG && resultCode == RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE) {
-            setResult(resultCode)
-            finish()
-        }
-    }
-
     private fun provideEmailFeedback(emailUri: Uri) {
         val intent = Intent(Intent.ACTION_SENDTO)
         intent.data = emailUri
@@ -94,7 +87,5 @@ class SettingsActivity : DuckDuckGoActivity() {
         fun intent(context: Context): Intent {
             return Intent(context, SettingsActivity::class.java)
         }
-
-        private const val REQUEST_CODE_ABOUT_DDG = 100
     }
 }

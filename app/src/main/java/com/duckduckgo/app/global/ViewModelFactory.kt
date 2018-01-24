@@ -79,7 +79,6 @@ class ViewModelFactory @Inject constructor(
             termsOfServiceStore = termsOfServiceStore,
             trackerNetworks = trackerNetworks,
             privacyMonitorRepository = privacyMonitorRepository,
-            stringResolver = stringResolver,
             networkLeaderboardDao = networkLeaderboardDao,
             bookmarksDao = bookmarksDao,
             appSettingsPreferencesStore = appSettingsPreferencesStore,
