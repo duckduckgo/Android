@@ -122,12 +122,6 @@ class BrowserActivity : DuckDuckGoActivity() {
             it?.let { render(it) }
         })
 
-        viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
-            it?.let {
-                privacyGradeMenu?.icon = getDrawable(it.icon())
-            }
-        })
-
         viewModel.url.observe(this, Observer {
             it?.let { webView.loadUrl(it) }
         })
@@ -342,6 +336,11 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_browser_activity, menu)
+        viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
+            it?.let {
+                privacyGradeMenu?.icon = getDrawable(it.icon())
+            }
+        })
         return true
     }
 
