@@ -148,6 +148,13 @@ class BrowserActivity : DuckDuckGoActivity() {
                     val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${it.telephoneNumber}"))
                     startActivity(intent)
                 }
+                is BrowserViewModel.Command.ShowKeyboard -> {
+                    Timber.i("Command: showing keyboard")
+                    omnibarTextInput.postDelayed({omnibarTextInput.showKeyboard()}, 300)
+                }
+                is BrowserViewModel.Command.ReinitialiseWebView -> {
+                    webView.clearHistory()
+                }
             }
         })
     }
@@ -287,7 +294,7 @@ class BrowserActivity : DuckDuckGoActivity() {
             setSupportZoom(true)
         }
 
-        webView.setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
+        webView.setDownloadListener { url, _, _, _, _ ->
             val request = DownloadManager.Request(Uri.parse(url))
             request.allowScanningByMediaScanner()
             request.setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
@@ -378,31 +385,37 @@ class BrowserActivity : DuckDuckGoActivity() {
         popupMenu.show(rootView, anchorView)
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun onGoForwardClicked(view: View) {
         webView.goForward()
         popupMenu.dismiss()
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun onGoBackClicked(view: View) {
         webView.goBack()
         popupMenu.dismiss()
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun onRefreshClicked(view: View) {
         webView.reload()
         popupMenu.dismiss()
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun onBookmarksClicked(view: View) {
         launchBookmarksView()
         popupMenu.dismiss()
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun onAddBookmarkClicked(view: View) {
         addBookmark()
         popupMenu.dismiss()
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun onSettingsClicked(view: View) {
         launchSettingsView()
         popupMenu.dismiss()

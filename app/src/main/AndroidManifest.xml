@@ -15,7 +15,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />
@@ -25,10 +24,10 @@
             android:label="@string/appName">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name="com.duckduckgo.app.home.HomeActivity"
             android:label="@string/appName"
@@ -48,47 +47,41 @@
             <!-- Allows apps to consume links and text shared from other apps e.g chrome -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/plain" />
             </intent-filter>
-
         </activity>
-
         <activity
             android:name=".BrowserActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName="com.duckduckgo.app.home.HomeActivity" />
-
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
             android:label="@string/privacyDashboardActivityTitle"
             android:parentActivityName=".BrowserActivity" />
-
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.ScorecardActivity"
             android:label="@string/scorecardActivityTitle"
             android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity" />
-
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity"
             android:label="@string/networksActivityTitle"
             android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity" />
-
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity"
             android:label="@string/privacyTermsActivityTitle"
             android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity" />
-
         <activity
             android:name="com.duckduckgo.app.settings.SettingsActivity"
-            android:label="@string/settingsActivityTitle" />
+            android:label="@string/settingsActivityTitle"/>
 
         <activity
             android:name="com.duckduckgo.app.about.AboutDuckDuckGoActivity"
             android:label="@string/aboutActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             android:theme="@style/AppTheme" />
-
         <activity
             android:name="com.duckduckgo.app.bookmarks.ui.BookmarksActivity"
             android:label="@string/bookmarksActivityTitle" />
@@ -97,7 +90,15 @@
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
+        <receiver android:name="com.duckduckgo.widget.SearchWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
 
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/search_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

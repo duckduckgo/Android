@@ -78,7 +78,15 @@ class HomeActivity : DuckDuckGoActivity() {
     }
 
     private fun consumeSharedQuery(intent: Intent?) {
-        val query = intent?.intentText ?: return
+
+        if (intent == null) return
+
+        if (intent.hasExtra(KEY_SKIP_HOME)) {
+            startActivity(BrowserActivity.intent(this))
+            return
+        }
+
+        val query = intent.intentText ?: return
         startActivity(BrowserActivity.intent(this, query))
     }
 
@@ -143,5 +151,13 @@ class HomeActivity : DuckDuckGoActivity() {
             }
             return intent
         }
+
+        fun launchSkipHome(context: Context) : Intent {
+            val intent = intent(context)
+            intent.putExtra(KEY_SKIP_HOME, true)
+            return intent
+        }
+
+        const val KEY_SKIP_HOME: String = "KEY_SKIP_HOME"
     }
 }

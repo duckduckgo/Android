@@ -30,7 +30,6 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.global.StringResolver
 import com.duckduckgo.app.privacymonitor.SiteMonitor
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardEntry
@@ -84,6 +83,8 @@ class BrowserViewModel(
         class DialNumber(val telephoneNumber: String) : Command()
         class SendSms(val telephoneNumber: String) : Command()
         class SendEmail(val emailAddress: String) : Command()
+        class ShowKeyboard : Command()
+        class ReinitialiseWebView : Command()
     }
 
     /* Observable data for Activity to subscribe to */
@@ -108,6 +109,7 @@ class BrowserViewModel(
     private var appConfigurationDownloaded = false
 
     init {
+        command.value = Command.ShowKeyboard()
         viewState.value = ViewState(canAddBookmarks = false)
         privacyMonitorRepository.privacyMonitor = MutableLiveData()
         appConfigurationObservable.observeForever(appConfigurationObserver)
@@ -148,6 +150,7 @@ class BrowserViewModel(
         if (input.isBlank()) {
             return
         }
+
         val trimmedInput = input.trim()
         url.value = buildUrl(trimmedInput)
         viewState.value = currentViewState().copy(
