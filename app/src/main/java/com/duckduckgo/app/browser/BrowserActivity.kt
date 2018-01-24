@@ -130,7 +130,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         configureAutoComplete()
 
         if (savedInstanceState == null) {
-            consumeSharedTextExtra()
+            consumeSharedQuery()
         }
     }
 
@@ -147,8 +147,8 @@ class BrowserActivity : DuckDuckGoActivity() {
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
-    private fun consumeSharedTextExtra() {
-        val sharedText = intent.getStringExtra(SHARED_TEXT_EXTRA)
+    private fun consumeSharedQuery() {
+        val sharedText = intent.getStringExtra(QUERY_EXTRA)
         if (sharedText != null) {
             viewModel.onSharedTextReceived(sharedText)
         }
@@ -397,19 +397,16 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun launchSettingsView() {
-        startActivityForResult(SettingsActivity.intent(this), SETTINGS_REQUEST_CODE)
+        startActivity(SettingsActivity.intent(this))
     }
 
     private fun launchBookmarksView() {
-        startActivityForResult(BookmarksActivity.intent(this), BOOKMARKS_REQUEST_CODE)
+        startActivity(BookmarksActivity.intent(this))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            DASHBOARD_REQUEST_CODE -> viewModel.receivedDashboardResult(resultCode)
-            SETTINGS_REQUEST_CODE -> viewModel.receivedSettingsResult(resultCode)
-            BOOKMARKS_REQUEST_CODE -> viewModel.receivedBookmarksResult(resultCode, data?.action)
-            else -> super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == DASHBOARD_REQUEST_CODE ) {
+            viewModel.receivedDashboardResult(resultCode)
         }
     }
 
@@ -441,16 +438,14 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     companion object {
 
-        fun intent(context: Context, sharedText: String? = null): Intent {
+        fun intent(context: Context, queryExtra: String? = null): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
-            intent.putExtra(SHARED_TEXT_EXTRA, sharedText)
+            intent.putExtra(QUERY_EXTRA, queryExtra)
             return intent
         }
 
-        private const val SHARED_TEXT_EXTRA = "SHARED_TEXT_EXTRA"
-        private const val SETTINGS_REQUEST_CODE = 100
-        private const val DASHBOARD_REQUEST_CODE = 101
-        private const val BOOKMARKS_REQUEST_CODE = 102
+        private const val QUERY_EXTRA = "QUERY_EXTRA"
+        private const val DASHBOARD_REQUEST_CODE = 100
     }
 
 }
