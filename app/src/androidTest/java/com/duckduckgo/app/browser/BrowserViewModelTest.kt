@@ -24,15 +24,12 @@ import android.arch.persistence.room.Room
 import android.net.Uri
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
-import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.LandingPage
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
-import com.duckduckgo.app.global.StringResolver
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardEntry
@@ -46,10 +43,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.doReturn
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.whenever
+import com.nhaarman.mockito_kotlin.*
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -249,7 +243,7 @@ class BrowserViewModelTest {
     fun whenSharedTextReceivedThenNavigationTriggered() {
         testee.onSharedTextReceived("http://example.com")
         val captor: ArgumentCaptor<Command> = ArgumentCaptor.forClass(Command::class.java)
-        verify(mockNavigationObserver).onChanged(captor.capture())
+        verify(mockNavigationObserver, times(2)).onChanged(captor.capture())
         assertNotNull(captor.value)
         assertTrue(captor.value is Navigate)
     }
