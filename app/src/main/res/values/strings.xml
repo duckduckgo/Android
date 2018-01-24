@@ -125,4 +125,7 @@
     <string name="bookmarkDeleteConfirmTitle">Confirm</string>
     <string name="bookmarkAddedFeedback">Bookmark added</string>
 
+    <!-- Widget -->
+    <string name="searchWidgetTextHint">Search DuckDuckGo</string>
+
 </resources>

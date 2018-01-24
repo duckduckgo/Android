@@ -114,16 +114,8 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         startActivity(TrackerNetworksActivity.intent(this))
     }
 
-
     fun onPracticesClicked(@Suppress("UNUSED_PARAMETER") view: View) {
-        startActivityForResult(PrivacyPracticesActivity.intent(this), REQUEST_CODE_PRIVACY_PRACTICES)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_CODE_PRIVACY_PRACTICES && resultCode == PrivacyPracticesActivity.TOSDR_RESULT_CODE) {
-            setResult(TOSDR_RESULT_CODE)
-            finish()
-        }
+        startActivity(PrivacyPracticesActivity.intent(this))
     }
 
     private fun updateActivityResult(shouldReload: Boolean) {
@@ -136,10 +128,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
     companion object {
 
-        private const val REQUEST_CODE_PRIVACY_PRACTICES = 100
-
         const val RELOAD_RESULT_CODE = 100
-        const val TOSDR_RESULT_CODE = 101
 
         fun intent(context: Context): Intent {
             return Intent(context, PrivacyDashboardActivity::class.java)

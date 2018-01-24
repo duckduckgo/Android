@@ -98,7 +98,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         configureAutoComplete()
 
         if (savedInstanceState == null) {
-            consumeSharedTextExtra()
+            consumeSharedQuery()
         }
     }
 
@@ -120,12 +120,6 @@ class BrowserActivity : DuckDuckGoActivity() {
     private fun configureObservers() {
         viewModel.viewState.observe(this, Observer<BrowserViewModel.ViewState> {
             it?.let { render(it) }
-        })
-
-        viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
-            it?.let {
-                privacyGradeMenu?.icon = getDrawable(it.icon())
-            }
         })
 
         viewModel.url.observe(this, Observer {
@@ -154,6 +148,13 @@ class BrowserActivity : DuckDuckGoActivity() {
                     val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${it.telephoneNumber}"))
                     startActivity(intent)
                 }
+                is BrowserViewModel.Command.ShowKeyboard -> {
+                    Timber.i("Command: showing keyboard")
+                    omnibarTextInput.postDelayed({omnibarTextInput.showKeyboard()}, 300)
+                }
+                is BrowserViewModel.Command.ReinitialiseWebView -> {
+                    webView.clearHistory()
+                }
             }
         })
     }
@@ -171,8 +172,8 @@ class BrowserActivity : DuckDuckGoActivity() {
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
-    private fun consumeSharedTextExtra() {
-        val sharedText = intent.getStringExtra(SHARED_TEXT_EXTRA)
+    private fun consumeSharedQuery() {
+        val sharedText = intent.getStringExtra(QUERY_EXTRA)
         if (sharedText != null) {
             viewModel.onSharedTextReceived(sharedText)
         }
@@ -293,7 +294,7 @@ class BrowserActivity : DuckDuckGoActivity() {
             setSupportZoom(true)
         }
 
-        webView.setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
+        webView.setDownloadListener { url, _, _, _, _ ->
             val request = DownloadManager.Request(Uri.parse(url))
             request.allowScanningByMediaScanner()
             request.setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
@@ -342,6 +343,11 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_browser_activity, menu)
+        viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
+            it?.let {
+                privacyGradeMenu?.icon = getDrawable(it.icon())
+            }
+        })
         return true
     }
 
@@ -379,31 +385,37 @@ class BrowserActivity : DuckDuckGoActivity() {
         popupMenu.show(rootView, anchorView)
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun onGoForwardClicked(view: View) {
         webView.goForward()
         popupMenu.dismiss()
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun onGoBackClicked(view: View) {
         webView.goBack()
         popupMenu.dismiss()
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun onRefreshClicked(view: View) {
         webView.reload()
         popupMenu.dismiss()
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun onBookmarksClicked(view: View) {
         launchBookmarksView()
         popupMenu.dismiss()
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun onAddBookmarkClicked(view: View) {
         addBookmark()
         popupMenu.dismiss()
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun onSettingsClicked(view: View) {
         launchSettingsView()
         popupMenu.dismiss()
@@ -421,19 +433,16 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun launchSettingsView() {
-        startActivityForResult(SettingsActivity.intent(this), SETTINGS_REQUEST_CODE)
+        startActivity(SettingsActivity.intent(this))
     }
 
     private fun launchBookmarksView() {
-        startActivityForResult(BookmarksActivity.intent(this), BOOKMARKS_REQUEST_CODE)
+        startActivity(BookmarksActivity.intent(this))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            DASHBOARD_REQUEST_CODE -> viewModel.receivedDashboardResult(resultCode)
-            SETTINGS_REQUEST_CODE -> viewModel.receivedSettingsResult(resultCode)
-            BOOKMARKS_REQUEST_CODE -> viewModel.receivedBookmarksResult(resultCode, data?.action)
-            else -> super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == DASHBOARD_REQUEST_CODE ) {
+            viewModel.receivedDashboardResult(resultCode)
         }
     }
 
@@ -468,16 +477,14 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     companion object {
 
-        fun intent(context: Context, sharedText: String? = null): Intent {
+        fun intent(context: Context, queryExtra: String? = null): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
-            intent.putExtra(SHARED_TEXT_EXTRA, sharedText)
+            intent.putExtra(QUERY_EXTRA, queryExtra)
             return intent
         }
 
-        private const val SHARED_TEXT_EXTRA = "SHARED_TEXT_EXTRA"
-        private const val SETTINGS_REQUEST_CODE = 100
-        private const val DASHBOARD_REQUEST_CODE = 101
-        private const val BOOKMARKS_REQUEST_CODE = 102
+        private const val QUERY_EXTRA = "QUERY_EXTRA"
+        private const val DASHBOARD_REQUEST_CODE = 100
     }
 
 }
