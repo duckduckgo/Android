@@ -15,32 +15,27 @@
   -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/widgetContainer"
-    android:layout_width="320dp"
-    android:layout_height="match_parent"
-    android:padding="8dp">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/searchInputBox"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="36dp"
-        android:background="#5e6168"
+        android:layout_height="60dp"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="12dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="12dp"
+        android:background="@color/white"
         android:drawableEnd="@drawable/mini_logo"
         android:gravity="center_vertical"
-        android:paddingEnd="20dp"
+        android:paddingEnd="12dp"
         android:paddingStart="20dp"
-        android:text="@string/omnibarInputHint"
-        android:textColor="#a6aab2"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        android:text="@string/searchWidgetTextHint"
+        android:textColor="@color/warmGrey"
+        android:textSize="16sp" />
 
 
 </RelativeLayout>
