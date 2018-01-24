@@ -20,7 +20,6 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
-import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.widget.RemoteViews
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.home.HomeActivity
@@ -49,7 +48,6 @@ class SearchWidget : AppWidgetProvider() {
 
         private fun buildPendingIntent(context: Context) : PendingIntent {
             val intent = HomeActivity.launchSkipHome(context)
-            intent.flags = FLAG_ACTIVITY_CLEAR_TOP
             return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         }
     }
