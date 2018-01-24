@@ -29,7 +29,8 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.migration.legacy.LegacyDb
 import com.duckduckgo.app.migration.legacy.LegacyDbContracts
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Test
 
 class LegacyMigrationTest {
@@ -39,7 +40,7 @@ class LegacyMigrationTest {
     val urlConverter = QueryUrlConverter(DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector()))
 
     var appDatabase: AppDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
-    var bookmarksDao = MockBookmarksDao()
+    var bookmarksDao = StubBookmarksDao()
 
     @After
     fun after() {
@@ -123,9 +124,12 @@ class LegacyMigrationTest {
         return values
     }
 
-    class MockBookmarksDao(): BookmarksDao {
-
+    class StubBookmarksDao : BookmarksDao {
         var bookmarks = mutableListOf<BookmarkEntity>()
+
+        override fun update(bookmarkEntity: BookmarkEntity) {
+            throw UnsupportedOperationException()
+        }
 
         override fun insert(bookmark: BookmarkEntity) {
             bookmarks.add(bookmark)

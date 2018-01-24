@@ -324,8 +324,8 @@ class BrowserViewModel(
     }
 
     @WorkerThread
-    fun addBookmark(title: String?, url: String?) {
-        bookmarksDao.insert(BookmarkEntity(title = title, url = url!!))
+    fun addBookmark(title: String, url: String) {
+        bookmarksDao.insert(BookmarkEntity(title = title, url = url))
     }
 
     fun receivedBookmarksResult(resultCode: Int, action: String?) {

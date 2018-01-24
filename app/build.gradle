@@ -102,8 +102,8 @@ dependencies {
     implementation "com.jakewharton.rxrelay2:rxrelay:2.0.0"
 
     // Anko
-    compile "org.jetbrains.anko:anko-commons:$ankoVersion"
-    compile "org.jetbrains.anko:anko-design:$ankoVersion"
+    implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
+    implementation "org.jetbrains.anko:anko-design:$ankoVersion"
 
     // ViewModel and LiveData
     implementation "android.arch.lifecycle:extensions:$architectureComponents"
