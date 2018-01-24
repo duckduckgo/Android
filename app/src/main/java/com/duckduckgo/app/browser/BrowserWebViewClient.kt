@@ -42,7 +42,7 @@ class BrowserWebViewClient @Inject constructor(
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
-
+    var currentUrl: String? = null
 
     /**
      * This is the new method of url overriding available from API 24 onwards
@@ -84,6 +84,7 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+        currentUrl = url
         webViewClientListener?.loadingStarted()
         webViewClientListener?.urlChanged(url)
     }
@@ -94,7 +95,7 @@ class BrowserWebViewClient @Inject constructor(
 
     @WorkerThread
     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
-        Timber.v("Intercepting resource ${request.url} on page ${view.urlFromAnyThread()}}")
+        Timber.v("Intercepting resource ${request.url} on page ${currentUrl}}")
 
         if (shouldUpgrade(request)) {
             val newUri = httpsUpgrader.upgrade(request.url)
@@ -102,7 +103,7 @@ class BrowserWebViewClient @Inject constructor(
             return WebResourceResponse(null, null, null)
         }
 
-        val documentUrl = view.urlFromAnyThread() ?: return null
+        val documentUrl = currentUrl ?: return null
 
         if (TrustedSites.isTrusted(documentUrl)) {
             return null
@@ -138,26 +139,9 @@ class BrowserWebViewClient @Inject constructor(
      * Utility to function to execute a function, and then return true
      *
      * Useful to reduce clutter in repeatedly including `return true` after doing the real work.
-     */
+     */ 
     private inline fun consume(function: () -> Unit): Boolean {
         function()
         return true
     }
-
-    /**
-     * Access WebView.url from any thread. If you are on the main thread it is more efficient to use
-     * WebView.url directly.
-     */
-    @AnyThread
-    private fun WebView.urlFromAnyThread(): String? {
-        val latch = CountDownLatch(1)
-        var safeUrl: String? = null
-        post {
-            safeUrl = url
-            latch.countDown()
-        }
-        latch.await()
-        return safeUrl
-    }
-
 }

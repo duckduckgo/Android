@@ -24,6 +24,7 @@ import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.migration.LegacyMigration
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
+import com.squareup.leakcanary.LeakCanary
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
@@ -56,6 +57,8 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
     override fun onCreate() {
         super.onCreate()
 
+        if (!installLeakCanary()) return
+
         configureDependencyInjection()
         configureLogging()
         configureCrashReporting()
@@ -64,6 +67,14 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
         configureDataDownloader()
 
         migrateLegacyDb()
+    }
+
+    private fun installLeakCanary(): Boolean {
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            return false;
+        }
+        LeakCanary.install(this);
+        return true
     }
 
     private fun migrateLegacyDb() {
@@ -105,7 +116,7 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
                 .doAfterTerminate({
                     appConfigurationSyncer.scheduleRegularSync(this)
                 })
-                .subscribe({}, { Timber.w(it, "Failed to download initial app configuration") })
+                .subscribe({}, { Timber.w("Failed to download initial app configuration ${it.localizedMessage}") })
     }
 
     override fun activityInjector(): AndroidInjector<Activity> = activityInjector
