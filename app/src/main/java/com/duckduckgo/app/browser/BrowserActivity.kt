@@ -24,6 +24,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
@@ -34,6 +35,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.webkit.CookieManager
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+import android.webkit.WebView
 import android.widget.TextView
 import android.widget.Toast
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
@@ -79,11 +81,43 @@ class BrowserActivity : DuckDuckGoActivity() {
     private val fireMenu: MenuItem?
         get() = toolbar.menu.findItem(R.id.fire_menu_item)
 
+    private lateinit var webView: WebView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_browser)
-        popupMenu = BrowserPopupMenu(layoutInflater)
 
+        setContentView(R.layout.activity_browser)
+
+        createWebView()
+        createPopupMenu()
+        configureObservers()
+        configureToolbar()
+        configureWebView()
+        configureOmnibarTextInput()
+        configureDummyViewTouchHandler()
+        configureAutoComplete()
+
+        if (savedInstanceState == null) {
+            consumeSharedQuery()
+        }
+    }
+
+    private fun createPopupMenu() {
+        popupMenu = BrowserPopupMenu(layoutInflater)
+    }
+
+    private fun createWebView() {
+        webView = NestedWebView(this)
+        webView.gone()
+        webView.isFocusableInTouchMode = true
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            webView.focusable = View.FOCUSABLE
+        }
+
+        webViewContainer.addView(webView)
+    }
+
+    private fun configureObservers() {
         viewModel.viewState.observe(this, Observer<BrowserViewModel.ViewState> {
             it?.let { render(it) }
         })
@@ -122,16 +156,6 @@ class BrowserActivity : DuckDuckGoActivity() {
                 }
             }
         })
-
-        configureToolbar()
-        configureWebView()
-        configureOmnibarTextInput()
-        configureDummyViewTouchHandler()
-        configureAutoComplete()
-
-        if (savedInstanceState == null) {
-            consumeSharedQuery()
-        }
     }
 
     private fun configureAutoComplete() {
@@ -432,6 +456,9 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     override fun onDestroy() {
+        webViewContainer.removeAllViews()
+        webView.destroy()
+
         popupMenu.dismiss()
         super.onDestroy()
     }
