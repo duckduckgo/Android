@@ -79,9 +79,9 @@ class HomeActivity : DuckDuckGoActivity() {
 
     private fun consumeSharedQuery(intent: Intent?) {
 
-        if(intent == null) return
+        if (intent == null) return
 
-         if(intent.hasExtra(KEY_SKIP_HOME)) {
+        if (intent.hasExtra(KEY_SKIP_HOME)) {
             startActivity(BrowserActivity.intent(this))
             return
         }
