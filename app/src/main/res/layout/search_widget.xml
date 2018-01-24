@@ -32,7 +32,7 @@
         android:drawableEnd="@drawable/mini_logo"
         android:gravity="center_vertical"
         android:paddingEnd="12dp"
-        android:paddingStart="20dp"
+        android:paddingStart="12dp"
         android:text="@string/searchWidgetTextHint"
         android:textColor="@color/warmGrey"
         android:textSize="16sp" />
