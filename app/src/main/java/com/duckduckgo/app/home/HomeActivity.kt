@@ -83,7 +83,6 @@ class HomeActivity : DuckDuckGoActivity() {
 
          if(intent.hasExtra(KEY_SKIP_HOME)) {
             startActivity(BrowserActivity.intent(this))
-            finish()
             return
         }
 
