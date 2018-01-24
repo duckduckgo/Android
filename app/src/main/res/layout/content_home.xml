@@ -48,7 +48,7 @@
         android:transitionName="@string/transition_url_input"
         android:layout_marginTop="36dp"
         android:background="#5e6168"
-        android:drawableEnd="@drawable/ic_search_white_24dp"
+        android:drawableEnd="@drawable/ic_search_white_18dp"
         android:gravity="center_vertical"
         android:paddingEnd="16dp"
         android:paddingStart="16dp"

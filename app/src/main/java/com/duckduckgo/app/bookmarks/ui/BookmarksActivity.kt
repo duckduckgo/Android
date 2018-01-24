@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.bookmarks.ui
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
@@ -40,6 +39,7 @@ import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.show
+import com.duckduckgo.app.home.HomeActivity
 import kotlinx.android.synthetic.main.content_bookmarks.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.view_bookmark_entry.view.*
@@ -113,8 +113,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
     }
 
     private fun openBookmark(bookmark: BookmarkEntity) {
-        val intent = Intent(bookmark.url)
-        setResult(OPEN_URL_RESULT_CODE, intent)
+        startActivity(HomeActivity.intent(this, bookmark.url))
         finish()
     }
 
@@ -141,8 +140,16 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
         super.onDestroy()
     }
 
-    class BookmarksAdapter(val context: Context, val viewModel: BookmarksViewModel) :
-        Adapter<BookmarksViewHolder>() {
+    companion object {
+        fun intent(context: Context): Intent {
+            return Intent(context, BookmarksActivity::class.java)
+        }
+
+        // Fragment Tags
+        private const val EDIT_BOOKMARK_FRAGMENT_TAG = "EDIT_BOOKMARK"
+    }
+
+    class BookmarksAdapter(val context: Context, val viewModel: BookmarksViewModel) : Adapter<BookmarksViewHolder>() {
 
         var bookmarks: List<BookmarkEntity> = emptyList()
             set(value) {
@@ -216,6 +223,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
             popup.show()
         }
 
+
         private fun editBookmark(bookmark: BookmarkEntity) {
             Timber.i("Editing bookmark ${bookmark.title}")
             viewModel.onEditBookmarkRequested(bookmark)
@@ -229,16 +237,5 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
 
     override fun userWantsToEditBookmark(id: Int, title: String, url: String) {
         doAsync { viewModel.editBookmark(id, title, url) }
-    }
-
-    companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, BookmarksActivity::class.java)
-        }
-
-        val OPEN_URL_RESULT_CODE = Activity.RESULT_FIRST_USER
-
-        // Fragment Tags
-        private const val EDIT_BOOKMARK_FRAGMENT_TAG = "EDIT_BOOKMARK"
     }
 }

@@ -134,4 +134,7 @@
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
 
+    <!-- Widget -->
+    <string name="searchWidgetTextHint">Search DuckDuckGo</string>
+
 </resources>

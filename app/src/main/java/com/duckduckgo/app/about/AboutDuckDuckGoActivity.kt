@@ -21,6 +21,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.home.HomeActivity
 import kotlinx.android.synthetic.main.content_about_duck_duck_go.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 
@@ -32,7 +33,7 @@ class AboutDuckDuckGoActivity : AppCompatActivity() {
         configureActionBar()
 
         learnMoreLink.setOnClickListener {
-            setResult(RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE)
+            startActivity(HomeActivity.intent(this, getString(R.string.aboutUrl)))
             finish()
         }
     }
