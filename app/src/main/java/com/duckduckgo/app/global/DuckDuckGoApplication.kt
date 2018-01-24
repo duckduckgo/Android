@@ -116,7 +116,7 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
                 .doAfterTerminate({
                     appConfigurationSyncer.scheduleRegularSync(this)
                 })
-                .subscribe({}, { Timber.w(it, "Failed to download initial app configuration") })
+                .subscribe({}, { Timber.w("Failed to download initial app configuration ${it.localizedMessage}") })
     }
 
     override fun activityInjector(): AndroidInjector<Activity> = activityInjector
