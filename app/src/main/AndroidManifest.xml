@@ -52,6 +52,12 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
 
+            <!-- Allow app to be default assistant -->
+            <intent-filter>
+                <action android:name="android.intent.action.ASSIST" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
         </activity>
 
         <activity
