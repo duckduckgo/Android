@@ -66,7 +66,7 @@
                             android:fontFamily="sans-serif-medium"
                             android:hint="@string/omnibarInputHint"
                             android:imeOptions="flagNoExtractUi|actionDone"
-                            android:inputType="textUri|textShortMessage|textNoSuggestions"
+                            android:inputType="textUri|textNoSuggestions"
                             android:maxLines="1"
                             android:paddingBottom="4dp"
                             android:paddingEnd="40dp"

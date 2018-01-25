@@ -261,19 +261,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
 
         omnibarTextInput.addTextChangedListener(object : TextChangedWatcher() {
 
-            override fun onTextChanged(
-                charSequence: CharSequence,
-                start: Int,
-                before: Int,
-                count: Int
-            ) {
-                // some 3rd party keyboards submit \n instead of an IME action
-                if (before == 0 && count == 1 && charSequence[start] == '\n') {
-                    omnibarTextInput.text.replace(start, start + 1, "")
-                    userEnteredQuery(omnibarTextInput.text.toString())
-                }
-            }
-
             override fun afterTextChanged(editable: Editable) {
                 viewModel.onOmnibarInputStateChanged(
                         omnibarTextInput.text.toString(),
