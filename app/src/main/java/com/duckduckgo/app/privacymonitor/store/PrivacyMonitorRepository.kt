@@ -32,6 +32,6 @@ class PrivacyMonitorRepository @Inject constructor() {
      * using a guid as a key. The Browser/TabActivity could share the key
      * with the PrivacyDashboardActivity via the the intent bundle
      */
-    lateinit var privacyMonitor: MutableLiveData<PrivacyMonitor>
+    val privacyMonitor: MutableLiveData<PrivacyMonitor> = MutableLiveData()
 
 }

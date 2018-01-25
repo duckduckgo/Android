@@ -38,6 +38,8 @@ import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.webkit.WebView
 import android.widget.TextView
 import android.widget.Toast
+import com.duckduckgo.app.bookmarks.ui.BookmarkAddEditDialogFragment
+import com.duckduckgo.app.bookmarks.ui.BookmarkAddEditDialogFragment.BookmarkDialogCreationListener
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
@@ -58,7 +60,7 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 
-class BrowserActivity : DuckDuckGoActivity() {
+class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
 
     @Inject lateinit var webViewClient: BrowserWebViewClient
     @Inject lateinit var webChromeClient: BrowserChromeClient
@@ -252,13 +254,18 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun configureOmnibarTextInput() {
-        omnibarTextInput.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus: Boolean ->
-            viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), hasFocus)
-        }
+        omnibarTextInput.onFocusChangeListener =
+                View.OnFocusChangeListener { _, hasFocus: Boolean ->
+                    viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), hasFocus)
+                }
 
         omnibarTextInput.addTextChangedListener(object : TextChangedWatcher() {
+
             override fun afterTextChanged(editable: Editable) {
-                viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), omnibarTextInput.hasFocus())
+                viewModel.onOmnibarInputStateChanged(
+                        omnibarTextInput.text.toString(),
+                        omnibarTextInput.hasFocus()
+                )
             }
         })
 
@@ -268,6 +275,14 @@ class BrowserActivity : DuckDuckGoActivity() {
                 return viewModel.userDismissedKeyboard()
             }
         }
+
+        omnibarTextInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, keyEvent ->
+            if (actionId == IME_ACTION_DONE || keyEvent?.keyCode == KEYCODE_ENTER) {
+                userEnteredQuery(omnibarTextInput.text.toString())
+                return@OnEditorActionListener true
+            }
+            false
+        })
 
         clearOmnibarInputButton.setOnClickListener { omnibarTextInput.setText("") }
     }
@@ -311,14 +326,6 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
 
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
-
-        omnibarTextInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, keyEvent ->
-            if (actionId == IME_ACTION_DONE || keyEvent.keyCode == KEYCODE_ENTER) {
-                userEnteredQuery(omnibarTextInput.text.toString())
-                return@OnEditorActionListener true
-            }
-            false
-        })
     }
 
     override fun onSaveInstanceState(bundle: Bundle) {
@@ -381,8 +388,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun launchPopupMenu() {
-        val anchorView = findViewById<View>(R.id.browser_popup_menu_item)
-        popupMenu.show(rootView, anchorView)
+        popupMenu.show(rootView, toolbar)
     }
 
     @Suppress("UNUSED_PARAMETER")
@@ -422,14 +428,13 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun addBookmark() {
-        val title = webView.title
-        val url = webView.url
-        doAsync {
-            viewModel.addBookmark(title, url)
-            uiThread {
-                toast(R.string.bookmarkAddedFeedback)
-            }
-        }
+
+        val addBookmarkDialog = BookmarkAddEditDialogFragment.createDialogCreationMode(
+                existingTitle = webView.title,
+                existingUrl = webView.url
+        )
+
+        addBookmarkDialog.show(supportFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
     }
 
     private fun launchSettingsView() {
@@ -475,6 +480,15 @@ class BrowserActivity : DuckDuckGoActivity() {
         super.onDestroy()
     }
 
+    override fun userWantsToCreateBookmark(title: String, url: String) {
+        doAsync {
+            viewModel.addBookmark(title, url)
+            uiThread {
+                toast(R.string.bookmarkAddedFeedback)
+            }
+        }
+    }
+
     companion object {
 
         fun intent(context: Context, queryExtra: String? = null): Intent {
@@ -483,6 +497,7 @@ class BrowserActivity : DuckDuckGoActivity() {
             return intent
         }
 
+        private const val ADD_BOOKMARK_FRAGMENT_TAG = "ADD_BOOKMARK"
         private const val QUERY_EXTRA = "QUERY_EXTRA"
         private const val DASHBOARD_REQUEST_CODE = 100
     }

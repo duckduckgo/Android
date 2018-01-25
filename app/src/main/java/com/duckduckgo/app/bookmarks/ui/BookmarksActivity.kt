@@ -16,32 +16,39 @@
 
 package com.duckduckgo.app.bookmarks.ui
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.support.v7.widget.RecyclerView.Adapter
-import android.support.v7.widget.RecyclerView.ViewHolder
+import android.support.v7.widget.DividerItemDecoration
+import android.support.v7.widget.RecyclerView.*
 import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.PopupMenu
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import com.duckduckgo.app.bookmarks.ui.BookmarkAddEditDialogFragment.BookmarkDialogEditListener
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.app.global.view.gone
+import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.home.HomeActivity
 import kotlinx.android.synthetic.main.content_bookmarks.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.view_bookmark_entry.view.*
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.doAsync
+import timber.log.Timber
 import javax.inject.Inject
 
-class BookmarksActivity : DuckDuckGoActivity() {
+class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -63,6 +70,9 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private fun setupBookmarksRecycler() {
         adapter = BookmarksAdapter(applicationContext, viewModel)
         recycler.adapter = adapter
+
+        val separator = DividerItemDecoration(this, VERTICAL)
+        recycler.addItemDecoration(separator)
     }
 
     private fun setupActionBar() {
@@ -73,6 +83,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private fun observeViewModel() {
         viewModel.viewState.observe(this, Observer<BookmarksViewModel.ViewState> { viewState ->
             viewState?.let {
+                if (it.showBookmarks) showBookmarks() else hideBookmarks()
                 adapter.bookmarks = it.bookmarks
             }
         })
@@ -81,8 +92,24 @@ class BookmarksActivity : DuckDuckGoActivity() {
             when (it) {
                 is BookmarksViewModel.Command.ConfirmDeleteBookmark -> confirmDeleteBookmark(it.bookmark)
                 is BookmarksViewModel.Command.OpenBookmark -> openBookmark(it.bookmark)
+                is BookmarksViewModel.Command.ShowEditBookmark -> showEditBookmarkDialog(it.bookmark)
             }
         })
+    }
+
+    private fun showEditBookmarkDialog(bookmark: BookmarkEntity) {
+        val dialog = BookmarkAddEditDialogFragment.createDialogEditingMode(bookmark)
+        dialog.show(supportFragmentManager, EDIT_BOOKMARK_FRAGMENT_TAG)
+    }
+
+    private fun showBookmarks() {
+        recycler.show()
+        emptyBookmarks.gone()
+    }
+
+    private fun hideBookmarks() {
+        recycler.gone()
+        emptyBookmarks.show()
     }
 
     private fun openBookmark(bookmark: BookmarkEntity) {
@@ -92,7 +119,8 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     @Suppress("deprecation")
     private fun confirmDeleteBookmark(bookmark: BookmarkEntity) {
-        val message = Html.fromHtml(getString(R.string.bookmarkDeleteConfirmMessage, bookmark.title))
+        val message =
+            Html.fromHtml(getString(R.string.bookmarkDeleteConfirmMessage, bookmark.title))
         val title = getString(R.string.bookmarkDeleteConfirmTitle)
         deleteDialog = alert(message, title) {
             positiveButton(android.R.string.yes) { delete(bookmark) }
@@ -116,6 +144,9 @@ class BookmarksActivity : DuckDuckGoActivity() {
         fun intent(context: Context): Intent {
             return Intent(context, BookmarksActivity::class.java)
         }
+
+        // Fragment Tags
+        private const val EDIT_BOOKMARK_FRAGMENT_TAG = "EDIT_BOOKMARK"
     }
 
     class BookmarksAdapter(val context: Context, val viewModel: BookmarksViewModel) : Adapter<BookmarksViewHolder>() {
@@ -143,18 +174,24 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     }
 
-    class BookmarksViewHolder(itemView: View?, val viewModel: BookmarksViewModel) : ViewHolder(itemView) {
+    class BookmarksViewHolder(itemView: View?, val viewModel: BookmarksViewModel) :
+        ViewHolder(itemView) {
 
         lateinit var bookmark: BookmarkEntity
 
         fun update(bookmark: BookmarkEntity) {
             this.bookmark = bookmark
 
-            itemView.delete.contentDescription = itemView.context.getString(R.string.deleteBookmarkContentDescription, bookmark.title)
-            itemView.title.text = bookmark.title
+            itemView.overflowMenu.contentDescription = itemView.context.getString(
+                R.string.bookmarkOverflowContentDescription,
+                bookmark.title
+            )
 
-            itemView.delete.setOnClickListener {
-                viewModel.onDeleteRequested(bookmark)
+            itemView.title.text = bookmark.title
+            itemView.url.text = parseDisplayUrl(bookmark.url)
+
+            itemView.overflowMenu.setOnClickListener {
+                showOverFlowMenu(itemView.overflowMenu, bookmark)
             }
 
             itemView.setOnClickListener {
@@ -162,6 +199,43 @@ class BookmarksActivity : DuckDuckGoActivity() {
             }
         }
 
+        private fun parseDisplayUrl(urlString: String): String {
+            val uri = Uri.parse(urlString)
+            return uri.baseHost ?: return urlString
+        }
+
+        private fun showOverFlowMenu(overflowMenu: ImageView, bookmark: BookmarkEntity) {
+            val popup = PopupMenu(overflowMenu.context, overflowMenu)
+            popup.inflate(R.menu.bookmarks_individual_overflow_menu)
+            popup.setOnMenuItemClickListener {
+                when (it.itemId) {
+
+                    R.id.edit -> {
+                        editBookmark(bookmark); true
+                    }
+                    R.id.delete -> {
+                        deleteBookmark(bookmark); true
+                    }
+                    else -> false
+
+                }
+            }
+            popup.show()
+        }
+
+
+        private fun editBookmark(bookmark: BookmarkEntity) {
+            Timber.i("Editing bookmark ${bookmark.title}")
+            viewModel.onEditBookmarkRequested(bookmark)
+        }
+
+        private fun deleteBookmark(bookmark: BookmarkEntity) {
+            Timber.i("Deleting bookmark ${bookmark.title}")
+            viewModel.onDeleteRequested(bookmark)
+        }
     }
 
+    override fun userWantsToEditBookmark(id: Int, title: String, url: String) {
+        doAsync { viewModel.editBookmark(id, title, url) }
+    }
 }

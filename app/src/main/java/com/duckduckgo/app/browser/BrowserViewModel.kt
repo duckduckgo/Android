@@ -111,7 +111,6 @@ class BrowserViewModel(
     init {
         command.value = Command.ShowKeyboard()
         viewState.value = ViewState(canAddBookmarks = false)
-        privacyMonitorRepository.privacyMonitor = MutableLiveData()
         appConfigurationObservable.observeForever(appConfigurationObserver)
 
         configureAutoComplete()
@@ -306,8 +305,8 @@ class BrowserViewModel(
     }
 
     @WorkerThread
-    fun addBookmark(title: String?, url: String?) {
-        bookmarksDao.insert(BookmarkEntity(title = title, url = url!!))
+    fun addBookmark(title: String, url: String) {
+        bookmarksDao.insert(BookmarkEntity(title = title, url = url))
     }
     
     private fun openUrl(url: String) {
