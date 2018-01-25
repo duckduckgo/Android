@@ -260,6 +260,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
                 }
 
         omnibarTextInput.addTextChangedListener(object : TextChangedWatcher() {
+
             override fun afterTextChanged(editable: Editable) {
                 viewModel.onOmnibarInputStateChanged(
                         omnibarTextInput.text.toString(),
@@ -274,6 +275,14 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
                 return viewModel.userDismissedKeyboard()
             }
         }
+
+        omnibarTextInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, keyEvent ->
+            if (actionId == IME_ACTION_DONE || keyEvent?.keyCode == KEYCODE_ENTER) {
+                userEnteredQuery(omnibarTextInput.text.toString())
+                return@OnEditorActionListener true
+            }
+            false
+        })
 
         clearOmnibarInputButton.setOnClickListener { omnibarTextInput.setText("") }
     }
@@ -317,14 +326,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
         }
 
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
-
-        omnibarTextInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, keyEvent ->
-            if (actionId == IME_ACTION_DONE || keyEvent.keyCode == KEYCODE_ENTER) {
-                userEnteredQuery(omnibarTextInput.text.toString())
-                return@OnEditorActionListener true
-            }
-            false
-        })
     }
 
     override fun onSaveInstanceState(bundle: Bundle) {
