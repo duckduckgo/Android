@@ -55,7 +55,7 @@ class HomeActivity : DuckDuckGoActivity() {
         searchInputBox.setOnClickListener { showSearchActivity() }
 
         if (savedInstanceState == null) {
-            consumeSharedQuery(intent)
+            consumeIntentAction(intent)
         }
     }
 
@@ -76,20 +76,24 @@ class HomeActivity : DuckDuckGoActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        consumeSharedQuery(intent)
+        consumeIntentAction(intent)
     }
 
-    private fun consumeSharedQuery(intent: Intent?) {
+    private fun consumeIntentAction(intent: Intent?) {
 
         if (intent == null) return
 
-        if (intent.hasExtra(KEY_SKIP_HOME)) {
+        if (shouldSkipHomeActivity(intent)) {
             startActivity(BrowserActivity.intent(this))
             return
         }
 
         val query = intent.intentText ?: return
         startActivity(BrowserActivity.intent(this, query))
+    }
+
+    private fun shouldSkipHomeActivity(intent: Intent) : Boolean {
+        return intent.hasExtra(KEY_SKIP_HOME) || intent.action == Intent.ACTION_ASSIST
     }
 
     private fun showSearchActivity() {
