@@ -49,17 +49,17 @@
             android:src="@drawable/ic_arrow_forward_24px" />
 
         <ImageButton
-            android:id="@+id/bookmarksPopupMenuItem"
+            android:id="@+id/refreshPopupMenuItem"
             style="@style/BrowserIconMenuItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:contentDescription="@string/bookmarksMenuTitle"
-            android:onClick="onBookmarksClicked"
-            android:src="@drawable/ic_bookmark_24px" />
+            android:contentDescription="@string/refresh"
+            android:onClick="onRefreshClicked"
+            android:src="@drawable/ic_refresh_24px" />
 
     </LinearLayout>
-    
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -75,12 +75,12 @@
         app:layout_constraintTop_toBottomOf="@id/header">
 
         <TextView
-            android:id="@+id/refreshPopupMenuItem"
+            android:id="@+id/bookmarksPopupMenuItem"
             style="@style/BrowserTextMenuItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onRefreshClicked"
-            android:text="@string/refresh" />
+            android:onClick="onBookmarksClicked"
+            android:text="@string/bookmarksMenuTitle" />
 
         <TextView
             android:id="@+id/addBookmarksPopupMenuItem"
