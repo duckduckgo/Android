@@ -66,10 +66,12 @@ class HomeActivity : DuckDuckGoActivity() {
 
     private fun configurePopupMenu() {
         popupMenu = BrowserPopupMenu(layoutInflater)
-        popupMenu.contentView.backPopupMenuItem.isEnabled = false
-        popupMenu.contentView.forwardPopupMenuItem.isEnabled = false
-        popupMenu.contentView.refreshPopupMenuItem.isEnabled = false
-        popupMenu.contentView.addBookmarksPopupMenuItem.isEnabled = false
+        popupMenu.contentView.apply {
+            backPopupMenuItem.isEnabled = false
+            forwardPopupMenuItem.isEnabled = false
+            refreshPopupMenuItem.isEnabled = false
+            addBookmarksPopupMenuItem.isEnabled = false
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -123,8 +125,7 @@ class HomeActivity : DuckDuckGoActivity() {
     }
 
     private fun launchPopupMenu() {
-        val anchorView = findViewById(R.id.browser_popup_menu_item) as View
-        popupMenu.show(rootView, anchorView)
+        popupMenu.show(rootView, toolbar)
     }
 
     fun onBookmarksClicked(view: View) {

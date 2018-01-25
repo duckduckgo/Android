@@ -387,8 +387,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
     }
 
     private fun launchPopupMenu() {
-        val anchorView = findViewById<View>(R.id.browser_popup_menu_item)
-        popupMenu.show(rootView, anchorView)
+        popupMenu.show(rootView, toolbar)
     }
 
     @Suppress("UNUSED_PARAMETER")
