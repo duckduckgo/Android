@@ -28,11 +28,11 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
-import android.view.KeyEvent
+import android.view.KeyEvent.KEYCODE_ENTER
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.webkit.CookieManager
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.webkit.WebView
@@ -277,7 +277,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
         }
 
         omnibarTextInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, keyEvent ->
-            if (actionId == EditorInfo.IME_ACTION_DONE || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
+            if (actionId == IME_ACTION_DONE || keyEvent?.keyCode == KEYCODE_ENTER) {
                 userEnteredQuery(omnibarTextInput.text.toString())
                 return@OnEditorActionListener true
             }
