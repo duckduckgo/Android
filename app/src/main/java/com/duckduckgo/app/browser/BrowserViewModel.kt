@@ -111,7 +111,6 @@ class BrowserViewModel(
     init {
         command.value = Command.ShowKeyboard()
         viewState.value = ViewState(canAddBookmarks = false)
-        privacyMonitorRepository.privacyMonitor = MutableLiveData()
         appConfigurationObservable.observeForever(appConfigurationObserver)
 
         configureAutoComplete()
