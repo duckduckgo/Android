@@ -6,7 +6,7 @@ apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
 
 ext {
-    VERSION_NAME = "4.1.1"
+    VERSION_NAME = "4.1.2"
 }
 
 android {
