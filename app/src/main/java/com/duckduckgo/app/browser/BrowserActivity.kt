@@ -467,6 +467,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
 
     private fun clearViewPriorToAnimation() {
         acceptingRenderUpdates = false
+        privacyGradeMenu?.isVisible = false
         omnibarTextInput.text.clear()
         omnibarTextInput.hideKeyboard()
         webView.hide()
