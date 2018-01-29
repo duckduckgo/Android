@@ -97,22 +97,6 @@
                             app:layout_constraintTop_toTopOf="@id/omnibarTextInput"
                             tools:visibility="visible" />
 
-                        <ImageView
-                            android:id="@+id/fireButton"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_marginEnd="6dp"
-                            android:background="?selectableItemBackground"
-                            android:contentDescription="@string/clearButtonContentDescription"
-                            android:elevation="6dp"
-                            android:src="@drawable/ic_cancel_24dp"
-                            android:tint="#FFF"
-                            android:visibility="gone"
-                            app:layout_constraintBottom_toBottomOf="@id/omnibarTextInput"
-                            app:layout_constraintEnd_toEndOf="@+id/omnibarTextInput"
-                            app:layout_constraintTop_toTopOf="@id/omnibarTextInput"
-                            tools:visibility="visible" />
-
                     </android.support.constraint.ConstraintLayout>
 
                 </android.support.v7.widget.Toolbar>
