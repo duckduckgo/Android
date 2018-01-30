@@ -41,6 +41,7 @@ import android.widget.Toast
 import com.duckduckgo.app.bookmarks.ui.BookmarkAddEditDialogFragment
 import com.duckduckgo.app.bookmarks.ui.BookmarkAddEditDialogFragment.BookmarkDialogCreationListener
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
+import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -129,36 +130,43 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
         })
 
         viewModel.command.observe(this, Observer {
-            when (it) {
-                is BrowserViewModel.Command.Refresh -> webView.reload()
-                is BrowserViewModel.Command.Navigate -> {
-                    focusDummy.requestFocus()
-                    webView.loadUrl(it.url)
-                }
-                is BrowserViewModel.Command.LandingPage -> finishActivityAnimated()
-                is BrowserViewModel.Command.DialNumber -> {
-                    val intent = Intent(Intent.ACTION_DIAL)
-                    intent.data = Uri.parse("tel:${it.telephoneNumber}")
-                    launchExternalActivity(intent)
-                }
-                is BrowserViewModel.Command.SendEmail -> {
-                    val intent = Intent(Intent.ACTION_SENDTO)
-                    intent.data = Uri.parse(it.emailAddress)
-                    launchExternalActivity(intent)
-                }
-                is BrowserViewModel.Command.SendSms -> {
-                    val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${it.telephoneNumber}"))
-                    startActivity(intent)
-                }
-                is BrowserViewModel.Command.ShowKeyboard -> {
-                    Timber.i("Command: showing keyboard")
-                    omnibarTextInput.postDelayed({omnibarTextInput.showKeyboard()}, 300)
-                }
-                is BrowserViewModel.Command.ReinitialiseWebView -> {
-                    webView.clearHistory()
-                }
-            }
+            processCommand(it)
         })
+    }
+
+    private fun processCommand(it: Command?) {
+        when (it) {
+            Command.Refresh -> webView.reload()
+            is Command.Navigate -> {
+                focusDummy.requestFocus()
+                webView.loadUrl(it.url)
+            }
+            Command.LandingPage -> finishActivityAnimated()
+            is Command.DialNumber -> {
+                val intent = Intent(Intent.ACTION_DIAL)
+                intent.data = Uri.parse("tel:${it.telephoneNumber}")
+                launchExternalActivity(intent)
+            }
+            is Command.SendEmail -> {
+                val intent = Intent(Intent.ACTION_SENDTO)
+                intent.data = Uri.parse(it.emailAddress)
+                launchExternalActivity(intent)
+            }
+            is Command.SendSms -> {
+                val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${it.telephoneNumber}"))
+                startActivity(intent)
+            }
+            Command.ShowKeyboard -> {
+                omnibarTextInput.postDelayed({omnibarTextInput.showKeyboard()}, 300)
+            }
+            Command.HideKeyboard -> {
+                omnibarTextInput.hideKeyboard()
+                focusDummy.requestFocus()
+            }
+            Command.ReinitialiseWebView -> {
+                webView.clearHistory()
+            }
+        }
     }
 
     private fun configureAutoComplete() {
@@ -288,8 +296,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
     }
 
     private fun userEnteredQuery(query: String) {
-        omnibarTextInput.hideKeyboard()
-        focusDummy.requestFocus()
         viewModel.onUserSubmittedQuery(query)
     }
 
@@ -467,6 +473,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
 
     private fun clearViewPriorToAnimation() {
         acceptingRenderUpdates = false
+        privacyGradeMenu?.isVisible = false
         omnibarTextInput.text.clear()
         omnibarTextInput.hideKeyboard()
         webView.hide()

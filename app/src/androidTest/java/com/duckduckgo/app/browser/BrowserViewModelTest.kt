@@ -49,12 +49,10 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers
-import org.mockito.Mock
+import org.mockito.*
+import org.mockito.ArgumentCaptor.forClass
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
-import org.mockito.MockitoAnnotations
 
 class BrowserViewModelTest {
 
@@ -78,7 +76,7 @@ class BrowserViewModelTest {
     lateinit var mockQueryObserver: Observer<String>
 
     @Mock
-    lateinit var mockNavigationObserver: Observer<Command>
+    lateinit var mockCommandObserver: Observer<Command>
 
     @Mock
     lateinit var mockTermsOfServiceStore: TermsOfServiceStore
@@ -121,7 +119,7 @@ class BrowserViewModelTest {
                 appConfigurationDao = appConfigurationDao)
 
         testee.url.observeForever(mockQueryObserver)
-        testee.command.observeForever(mockNavigationObserver)
+        testee.command.observeForever(mockCommandObserver)
 
         whenever(mockOmnibarConverter.convertQueryToUri(any())).thenReturn(Uri.parse("duckduckgo.com"))
 
@@ -132,7 +130,7 @@ class BrowserViewModelTest {
         testee.onCleared()
         db.close()
         testee.url.removeObserver(mockQueryObserver)
-        testee.command.removeObserver(mockNavigationObserver)
+        testee.command.removeObserver(mockCommandObserver)
     }
 
     @Test
@@ -242,8 +240,8 @@ class BrowserViewModelTest {
     @Test
     fun whenSharedTextReceivedThenNavigationTriggered() {
         testee.onSharedTextReceived("http://example.com")
-        val captor: ArgumentCaptor<Command> = ArgumentCaptor.forClass(Command::class.java)
-        verify(mockNavigationObserver, times(2)).onChanged(captor.capture())
+        val captor: ArgumentCaptor<Command> = forClass(Command::class.java)
+        verify(mockCommandObserver, times(2)).onChanged(captor.capture())
         assertNotNull(captor.value)
         assertTrue(captor.value is Navigate)
     }
@@ -263,13 +261,13 @@ class BrowserViewModelTest {
     @Test
     fun whenUserDismissesKeyboardBeforeBrowserShownThenShouldNavigateToLandingPage() {
         testee.userDismissedKeyboard()
-        verify(mockNavigationObserver).onChanged(ArgumentMatchers.any(LandingPage::class.java))
+        verify(mockCommandObserver).onChanged(ArgumentMatchers.any(LandingPage::class.java))
     }
 
     @Test
     fun whenUserDismissesKeyboardAfterBrowserShownThenShouldNotNavigateToLandingPage() {
         testee.urlChanged("")
-        verify(mockNavigationObserver, never()).onChanged(ArgumentMatchers.any(LandingPage::class.java))
+        verify(mockCommandObserver, never()).onChanged(ArgumentMatchers.any(LandingPage::class.java))
     }
 
     @Test
@@ -386,5 +384,19 @@ class BrowserViewModelTest {
         doReturn(false).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.onOmnibarInputStateChanged("", true)
         assertFalse(testee.viewState.value!!.showAutoCompleteSuggestions)
+    }
+
+    @Test
+    fun whenEnteringEmptyQueryThenHideKeyboardCommandNotIssued() {
+        testee.onUserSubmittedQuery("")
+        verify(mockCommandObserver, never()).onChanged(Mockito.any(Command.HideKeyboard.javaClass))
+    }
+
+    @Test
+    fun whenEnteringNonEmptyQueryThenHideKeyboardCommandIssued() {
+        val captor = ArgumentCaptor.forClass(BrowserViewModel.Command::class.java)
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(captor.capture())
+        assertTrue(captor.value == Command.HideKeyboard)
     }
 }
