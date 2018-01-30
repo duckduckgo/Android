@@ -59,17 +59,18 @@ class WebViewRequestInterceptor @Inject constructor(
             webViewClientListener?.pageHasHttpResources(documentUrl)
         }
 
-        val surrogate = analyticsSurrogates.get(url)
-        if (surrogate.responseAvailable) {
-            Timber.i("Surrogate found for %s", url)
-            return WebResourceResponse(
-                    surrogate.mimeType,
-                    "UTF-8",
-                    surrogate.jsFunction.byteInputStream()
-            )
-        }
-
         if (shouldBlock(request, documentUrl, webViewClientListener)) {
+
+            val surrogate = analyticsSurrogates.get(url)
+            if (surrogate.responseAvailable) {
+                Timber.i("Surrogate found for %s", url)
+                return WebResourceResponse(
+                        surrogate.mimeType,
+                        "UTF-8",
+                        surrogate.jsFunction.byteInputStream()
+                )
+            }
+
             return WebResourceResponse(null, null, null)
         }
 
