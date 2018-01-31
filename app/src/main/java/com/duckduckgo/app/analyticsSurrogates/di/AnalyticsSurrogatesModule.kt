@@ -20,11 +20,13 @@ import com.duckduckgo.app.analyticsSurrogates.AnalyticsSurrogates
 import com.duckduckgo.app.analyticsSurrogates.AnalyticsSurrogatesImpl
 import dagger.Module
 import dagger.Provides
+import javax.inject.Singleton
 
 
 @Module
 class AnalyticsSurrogatesModule {
 
     @Provides
+    @Singleton
     fun analyticsSurrogates() : AnalyticsSurrogates = AnalyticsSurrogatesImpl()
 }
