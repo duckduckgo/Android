@@ -17,35 +17,37 @@
 package com.duckduckgo.app.analyticsSurrogates
 
 import android.net.Uri
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class AnalyticsSurrogates @Inject constructor() {
+interface AnalyticsSurrogates {
+    fun loadSurrogates(urls: List<SurrogateResponse>)
+    fun get(uri: Uri): SurrogateResponse
+    fun getAll(): List<SurrogateResponse>
+}
+
+class AnalyticsSurrogatesImpl : AnalyticsSurrogates {
 
     private val surrogates = mutableListOf<SurrogateResponse>()
 
-    fun loadSurrogates(urls: List<SurrogateResponse>) {
+    override fun loadSurrogates(urls: List<SurrogateResponse>) {
         surrogates.clear()
         surrogates.addAll(urls)
     }
 
-    fun get(uri: Uri): SurrogateResponse {
+    override fun get(uri: Uri): SurrogateResponse {
         val uriString = uri.toString()
 
         return surrogates.find { uriString.contains(it.name) }
                 ?: return SurrogateResponse(responseAvailable = false)
     }
 
-    fun getAll() : List<SurrogateResponse> {
+    override fun getAll(): List<SurrogateResponse> {
         return surrogates
     }
+}
 
-    data class SurrogateResponse(
+data class SurrogateResponse(
         val responseAvailable: Boolean = true,
         val name: String = "",
         val jsFunction: String = "",
         val mimeType: String = ""
-    )
-
-}
+)

@@ -23,23 +23,27 @@ import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import timber.log.Timber
 import java.util.concurrent.CopyOnWriteArrayList
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class TrackerDetector @Inject constructor(private val networkTrackers: TrackerNetworks, private val settings: PrivacySettingsStore) {
+interface TrackerDetector {
+    fun addClient(client: Client)
+    fun evaluate(url: String, documentUrl: String, resourceType: ResourceType): TrackingEvent?
+}
+
+class TrackerDetectorImpl (
+        private val networkTrackers: TrackerNetworks,
+        private val settings: PrivacySettingsStore) :TrackerDetector {
 
     private val clients = CopyOnWriteArrayList<Client>()
 
     /**
      * Adds a new client. If the client's name matches an existing client, old client is replaced
      */
-    fun addClient(client: Client) {
+    override fun addClient(client: Client) {
         clients.removeAll { client.name == it.name }
         clients.add(client)
     }
 
-    fun evaluate(url: String, documentUrl: String, resourceType: ResourceType): TrackingEvent? {
+    override fun evaluate(url: String, documentUrl: String, resourceType: ResourceType): TrackingEvent? {
 
         val whitelisted = clients.any { it.name.type == Client.ClientType.WHITELIST && it.matches(url, documentUrl, resourceType) }
         if (whitelisted) {

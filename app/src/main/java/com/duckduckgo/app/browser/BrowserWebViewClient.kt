@@ -31,7 +31,7 @@ import javax.inject.Inject
 
 
 class BrowserWebViewClient @Inject constructor(
-        private val requestRewriter: DuckDuckGoRequestRewriter,
+        private val requestRewriter: RequestRewriter,
         private var trackerDetector: TrackerDetector,
         private var httpsUpgrader: HttpsUpgrader,
         private val specialUrlDetector: SpecialUrlDetector,

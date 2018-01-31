@@ -17,7 +17,6 @@
 package com.duckduckgo.app.analyticsSurrogates
 
 import android.support.test.InstrumentationRegistry
-import com.duckduckgo.app.analyticsSurrogates.AnalyticsSurrogates.SurrogateResponse
 import com.duckduckgo.app.analyticsSurrogates.store.AnalyticsSurrogatesDataStore
 import org.junit.Assert
 import org.junit.Assert.assertEquals
@@ -32,7 +31,7 @@ class AnalyticsSurrogatesLoaderTest {
 
     @Before
     fun setup() {
-        analyticsSurrogates = AnalyticsSurrogates()
+        analyticsSurrogates = AnalyticsSurrogatesImpl()
         dataStore = AnalyticsSurrogatesDataStore(InstrumentationRegistry.getTargetContext())
         testee = AnalyticsSurrogatesLoader(analyticsSurrogates, dataStore)
     }

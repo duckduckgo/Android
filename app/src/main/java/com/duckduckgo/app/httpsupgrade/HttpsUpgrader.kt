@@ -22,22 +22,27 @@ import com.duckduckgo.app.global.UrlScheme
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
 import timber.log.Timber
-import javax.inject.Inject
 
-class HttpsUpgrader @Inject constructor(private val dao: HttpsUpgradeDomainDao) {
+interface HttpsUpgrader {
 
     @WorkerThread
-    fun shouldUpgrade(uri: Uri) : Boolean {
+    fun shouldUpgrade(uri: Uri) : Boolean
+
+    fun upgrade(uri: Uri): Uri {
+        return uri.buildUpon().scheme(UrlScheme.https).build()
+    }
+}
+
+class HttpsUpgraderImpl constructor(private val dao: HttpsUpgradeDomainDao) :HttpsUpgrader {
+
+    @WorkerThread
+    override fun shouldUpgrade(uri: Uri) : Boolean {
         if (uri.isHttps) {
             return false
         }
 
         val host = (uri.host ?: return false).toLowerCase()
         return dao.hasDomain(host) || matchesWildcard(host)
-    }
-
-    fun upgrade(uri: Uri): Uri {
-        return uri.buildUpon().scheme(UrlScheme.https).build()
     }
 
     private fun matchesWildcard(host: String): Boolean {

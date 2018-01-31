@@ -18,9 +18,14 @@ package com.duckduckgo.app.browser
 
 import android.net.Uri
 import timber.log.Timber
-import javax.inject.Inject
 
-class DuckDuckGoRequestRewriter @Inject constructor(private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector) {
+interface RequestRewriter {
+    fun shouldRewriteRequest(uri: Uri): Boolean
+    fun rewriteRequestWithCustomQueryParams(request: Uri): Uri
+    fun addCustomQueryParams(builder: Uri.Builder)
+}
+
+class DuckDuckGoRequestRewriter(private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector) : RequestRewriter {
 
     companion object {
         private const val sourceParam = "t"
@@ -28,7 +33,7 @@ class DuckDuckGoRequestRewriter @Inject constructor(private val duckDuckGoUrlDet
         private const val querySource = "ddg_android"
     }
 
-    fun rewriteRequestWithCustomQueryParams(request: Uri): Uri {
+    override fun rewriteRequestWithCustomQueryParams(request: Uri): Uri {
         val builder = Uri.Builder()
                 .authority(request.authority)
                 .scheme(request.scheme)
@@ -46,10 +51,12 @@ class DuckDuckGoRequestRewriter @Inject constructor(private val duckDuckGoUrlDet
         return newUri
     }
 
-    fun shouldRewriteRequest(uri: Uri): Boolean =
-            duckDuckGoUrlDetector.isDuckDuckGoUrl(uri) && !uri.queryParameterNames.containsAll(arrayListOf(sourceParam, appVersionParam))
+    override fun shouldRewriteRequest(uri: Uri): Boolean {
+        return duckDuckGoUrlDetector.isDuckDuckGoUrl(uri) &&
+                !uri.queryParameterNames.containsAll(arrayListOf(sourceParam, appVersionParam))
+    }
 
-    fun addCustomQueryParams(builder: Uri.Builder) {
+    override fun addCustomQueryParams(builder: Uri.Builder) {
         builder.appendQueryParameter(appVersionParam, formatAppVersion())
         builder.appendQueryParameter(sourceParam, querySource)
     }

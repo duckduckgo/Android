@@ -17,7 +17,6 @@
 package com.duckduckgo.app.analyticsSurrogates
 
 import android.support.annotation.WorkerThread
-import com.duckduckgo.app.analyticsSurrogates.AnalyticsSurrogates.SurrogateResponse
 import com.duckduckgo.app.analyticsSurrogates.store.AnalyticsSurrogatesDataStore
 import timber.log.Timber
 import java.io.ByteArrayInputStream

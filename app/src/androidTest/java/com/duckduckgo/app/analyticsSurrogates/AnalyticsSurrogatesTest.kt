@@ -17,7 +17,6 @@
 package com.duckduckgo.app.analyticsSurrogates
 
 import android.net.Uri
-import com.duckduckgo.app.analyticsSurrogates.AnalyticsSurrogates.SurrogateResponse
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -28,7 +27,7 @@ class AnalyticsSurrogatesTest {
 
     @Before
     fun setup() {
-        testee = AnalyticsSurrogates()
+        testee = AnalyticsSurrogatesImpl()
     }
 
     @Test
