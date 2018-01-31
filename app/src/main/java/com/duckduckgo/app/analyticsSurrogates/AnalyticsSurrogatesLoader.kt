@@ -85,7 +85,7 @@ class AnalyticsSurrogatesLoader @Inject constructor(
             functionBuilder.append("\n")
         }
 
-        Timber.i("Processed %d surrogates", surrogates.size)
+        Timber.d("Processed %d surrogates", surrogates.size)
         return surrogates
     }
 }

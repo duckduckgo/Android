@@ -74,7 +74,7 @@ class WebViewRequestInterceptor @Inject constructor(
 
             val surrogate = analyticsSurrogates.get(url)
             if (surrogate.responseAvailable) {
-                Timber.i("Surrogate found for %s", url)
+                Timber.v("Surrogate found for %s", url)
                 return WebResourceResponse(
                         surrogate.mimeType,
                         "UTF-8",
