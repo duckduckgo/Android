@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.analyticsSurrogates.di
+package com.duckduckgo.app.surrogates.di
 
-import com.duckduckgo.app.analyticsSurrogates.AnalyticsSurrogates
-import com.duckduckgo.app.analyticsSurrogates.AnalyticsSurrogatesImpl
+import com.duckduckgo.app.surrogates.ResourceSurrogates
+import com.duckduckgo.app.surrogates.ResourceSurrogatesImpl
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
 
 @Module
-class AnalyticsSurrogatesModule {
+class ResourceSurrogateModule {
 
     @Provides
     @Singleton
-    fun analyticsSurrogates() : AnalyticsSurrogates = AnalyticsSurrogatesImpl()
+    fun analyticsSurrogates() : ResourceSurrogates = ResourceSurrogatesImpl()
 }

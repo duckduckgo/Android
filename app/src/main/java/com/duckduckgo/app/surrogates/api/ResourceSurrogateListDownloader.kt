@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.analyticsSurrogates.api
+package com.duckduckgo.app.surrogates.api
 
-import com.duckduckgo.app.analyticsSurrogates.AnalyticsSurrogatesLoader
-import com.duckduckgo.app.analyticsSurrogates.store.AnalyticsSurrogatesDataStore
+import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
+import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
 import com.duckduckgo.app.global.api.isCached
 import io.reactivex.Completable
 import timber.log.Timber
@@ -25,10 +25,10 @@ import java.io.IOException
 import javax.inject.Inject
 
 
-class AnalyticsSurrogatesListDownloader @Inject constructor(
-    private val service: AnalyticsSurrogatesListService,
-    private val surrogatesDataStore: AnalyticsSurrogatesDataStore,
-    private val analyticsSurrogatesLoader: AnalyticsSurrogatesLoader
+class ResourceSurrogateListDownloader @Inject constructor(
+        private val service: ResourceSurrogateListService,
+        private val surrogatesDataStore: ResourceSurrogateDataStore,
+        private val resourceSurrogateLoader: ResourceSurrogateLoader
 ) {
 
     fun downloadList(): Completable {
@@ -51,7 +51,7 @@ class AnalyticsSurrogatesListDownloader @Inject constructor(
                 val bodyBytes = response.body()!!.bytes()
                 Timber.d("Updating surrogates data store with new data")
                 persistData(bodyBytes)
-                analyticsSurrogatesLoader.loadData()
+                resourceSurrogateLoader.loadData()
             } else {
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }

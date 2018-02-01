@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.analyticsSurrogates.store
+package com.duckduckgo.app.surrogates.store
 
 import android.content.Context
 import javax.inject.Inject
 
-class AnalyticsSurrogatesDataStore @Inject constructor(private val context: Context) {
+class ResourceSurrogateDataStore @Inject constructor(private val context: Context) {
 
     fun hasData(): Boolean = context.fileExists(FILENAME)
 

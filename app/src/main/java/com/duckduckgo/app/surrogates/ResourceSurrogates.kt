@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.analyticsSurrogates
+package com.duckduckgo.app.surrogates
 
 import android.net.Uri
 
-interface AnalyticsSurrogates {
+interface ResourceSurrogates {
     fun loadSurrogates(urls: List<SurrogateResponse>)
     fun get(uri: Uri): SurrogateResponse
     fun getAll(): List<SurrogateResponse>
 }
 
-class AnalyticsSurrogatesImpl : AnalyticsSurrogates {
+class ResourceSurrogatesImpl : ResourceSurrogates {
 
     private val surrogates = mutableListOf<SurrogateResponse>()
 

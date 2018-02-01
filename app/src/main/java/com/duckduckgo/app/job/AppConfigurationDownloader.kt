@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.job
 
-import com.duckduckgo.app.analyticsSurrogates.api.AnalyticsSurrogatesListDownloader
+import com.duckduckgo.app.surrogates.api.ResourceSurrogateListDownloader
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeListDownloader
 import com.duckduckgo.app.settings.db.AppConfigurationEntity
@@ -28,17 +28,17 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class AppConfigurationDownloader @Inject constructor(
-    private val trackerDataDownloader: TrackerDataDownloader,
-    private val httpsUpgradeListDownloader: HttpsUpgradeListDownloader,
-    private val analyticsSurrogatesDownloader: AnalyticsSurrogatesListDownloader,
-    private val appDatabase: AppDatabase) {
+        private val trackerDataDownloader: TrackerDataDownloader,
+        private val httpsUpgradeListDownloader: HttpsUpgradeListDownloader,
+        private val resourceSurrogateDownloader: ResourceSurrogateListDownloader,
+        private val appDatabase: AppDatabase) {
 
     fun downloadTask(): Completable {
         val easyListDownload = trackerDataDownloader.downloadList(EASYLIST)
         val easyPrivacyDownload = trackerDataDownloader.downloadList(EASYPRIVACY)
         val trackersWhitelist = trackerDataDownloader.downloadList(TRACKERSWHITELIST)
         val disconnectDownload = trackerDataDownloader.downloadList(DISCONNECT)
-        val surrogatesDownload = analyticsSurrogatesDownloader.downloadList()
+        val surrogatesDownload = resourceSurrogateDownloader.downloadList()
         val httpsUpgradeDownload = httpsUpgradeListDownloader.downloadList()
 
         return Completable.mergeDelayError(listOf(

@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.analyticsSurrogates
+package com.duckduckgo.app.surrogates
 
 import android.support.test.InstrumentationRegistry
-import com.duckduckgo.app.analyticsSurrogates.store.AnalyticsSurrogatesDataStore
+import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class AnalyticsSurrogatesLoaderTest {
+class ResourceSurrogateLoaderTest {
 
-    private lateinit var testee: AnalyticsSurrogatesLoader
-    private lateinit var dataStore: AnalyticsSurrogatesDataStore
-    private lateinit var analyticsSurrogates: AnalyticsSurrogates
+    private lateinit var testee: ResourceSurrogateLoader
+    private lateinit var dataStore: ResourceSurrogateDataStore
+    private lateinit var resourceSurrogates: ResourceSurrogates
 
     @Before
     fun setup() {
-        analyticsSurrogates = AnalyticsSurrogatesImpl()
-        dataStore = AnalyticsSurrogatesDataStore(InstrumentationRegistry.getTargetContext())
-        testee = AnalyticsSurrogatesLoader(analyticsSurrogates, dataStore)
+        resourceSurrogates = ResourceSurrogatesImpl()
+        dataStore = ResourceSurrogateDataStore(InstrumentationRegistry.getTargetContext())
+        testee = ResourceSurrogateLoader(resourceSurrogates, dataStore)
     }
 
     @Test

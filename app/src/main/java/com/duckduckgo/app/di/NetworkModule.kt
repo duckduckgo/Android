@@ -17,7 +17,7 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import com.duckduckgo.app.analyticsSurrogates.api.AnalyticsSurrogatesListService
+import com.duckduckgo.app.surrogates.api.ResourceSurrogateListService
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeListService
@@ -70,8 +70,8 @@ class NetworkModule {
             retrofit.create(AutoCompleteService::class.java)
 
     @Provides
-    fun surrogatesService(retrofit: Retrofit): AnalyticsSurrogatesListService =
-        retrofit.create(AnalyticsSurrogatesListService::class.java)
+    fun surrogatesService(retrofit: Retrofit): ResourceSurrogateListService =
+        retrofit.create(ResourceSurrogateListService::class.java)
 
     companion object {
         private const val CACHE_SIZE: Long = 10 * 1024 * 1024 // 10MB

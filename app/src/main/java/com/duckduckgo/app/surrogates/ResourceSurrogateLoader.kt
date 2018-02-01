@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.analyticsSurrogates
+package com.duckduckgo.app.surrogates
 
 import android.support.annotation.WorkerThread
-import com.duckduckgo.app.analyticsSurrogates.store.AnalyticsSurrogatesDataStore
+import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
 import timber.log.Timber
 import java.io.ByteArrayInputStream
 import javax.inject.Inject
 
 @WorkerThread
-class AnalyticsSurrogatesLoader @Inject constructor(
-    private val analyticsSurrogates: AnalyticsSurrogates,
-    private val surrogatesDataStore: AnalyticsSurrogatesDataStore
+class ResourceSurrogateLoader @Inject constructor(
+        private val resourceSurrogates: ResourceSurrogates,
+        private val surrogatesDataStore: ResourceSurrogateDataStore
 ) {
 
     fun loadData() {
         if (surrogatesDataStore.hasData()) {
             val bytes = surrogatesDataStore.loadData()
-            analyticsSurrogates.loadSurrogates(convertBytes(bytes))
+            resourceSurrogates.loadSurrogates(convertBytes(bytes))
         }
     }
 

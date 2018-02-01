@@ -18,7 +18,7 @@ package com.duckduckgo.app.di
 
 
 import android.app.Application
-import com.duckduckgo.app.analyticsSurrogates.di.AnalyticsSurrogatesModule
+import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteModule
 import com.duckduckgo.app.browser.di.BrowserModule
 import com.duckduckgo.app.global.DuckDuckGoApplication
@@ -45,7 +45,7 @@ import javax.inject.Singleton
     (BrowserModule::class),
     (BrowserAutoCompleteModule::class),
     (HttpsUpgraderModule::class),
-    (AnalyticsSurrogatesModule::class),
+    (ResourceSurrogateModule::class),
     (TrackerDetectionModule::class)
 ])
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {

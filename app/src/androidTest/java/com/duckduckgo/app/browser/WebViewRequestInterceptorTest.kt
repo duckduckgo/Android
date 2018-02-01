@@ -22,8 +22,8 @@ import android.support.test.annotation.UiThreadTest
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
-import com.duckduckgo.app.analyticsSurrogates.AnalyticsSurrogates
-import com.duckduckgo.app.analyticsSurrogates.SurrogateResponse
+import com.duckduckgo.app.surrogates.ResourceSurrogates
+import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -44,7 +44,7 @@ class WebViewRequestInterceptorTest {
     @Mock
     private lateinit var mockHttpsUpgrader: HttpsUpgrader
     @Mock
-    private lateinit var mockAnalyticsSurrogates: AnalyticsSurrogates
+    private lateinit var mockResourceSurrogates: ResourceSurrogates
     @Mock
     private lateinit var mockRequest: WebResourceRequest
 
@@ -58,7 +58,7 @@ class WebViewRequestInterceptorTest {
         testee = WebViewRequestInterceptor(
                 trackerDetector = mockTrackerDetector,
                 httpsUpgrader = mockHttpsUpgrader,
-                analyticsSurrogates = mockAnalyticsSurrogates
+                resourceSurrogates = mockResourceSurrogates
         )
 
         val context = InstrumentationRegistry.getTargetContext()
@@ -246,7 +246,7 @@ class WebViewRequestInterceptorTest {
 
     @Test
     fun whenRequestShouldBlockAndNoSurrogateThenCancellingResponseReturned() {
-        whenever(mockAnalyticsSurrogates.get(any())).thenReturn(SurrogateResponse(responseAvailable = false))
+        whenever(mockResourceSurrogates.get(any())).thenReturn(SurrogateResponse(responseAvailable = false))
 
         configureShouldNotUpgrade()
         configureShouldBlock()
@@ -265,7 +265,7 @@ class WebViewRequestInterceptorTest {
                 responseAvailable = true,
                 mimeType = "application/javascript",
                 jsFunction = "javascript replacement function goes here")
-        whenever(mockAnalyticsSurrogates.get(any())).thenReturn(availableSurrogate)
+        whenever(mockResourceSurrogates.get(any())).thenReturn(availableSurrogate)
 
         configureShouldNotUpgrade()
         configureShouldBlock()

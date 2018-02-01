@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.analyticsSurrogates.api
+package com.duckduckgo.app.surrogates.api
 
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.GET
 
 
-interface AnalyticsSurrogatesListService {
+interface ResourceSurrogateListService {
 
     @GET("/contentblocking.js?l=surrogates")
     fun https(): Call<ResponseBody>

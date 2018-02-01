@@ -19,7 +19,7 @@ package com.duckduckgo.app.global
 import android.app.Activity
 import android.app.Application
 import android.app.Service
-import com.duckduckgo.app.analyticsSurrogates.AnalyticsSurrogatesLoader
+import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.job.AppConfigurationSyncer
@@ -50,7 +50,7 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
     lateinit var trackerDataLoader: TrackerDataLoader
 
     @Inject
-    lateinit var  analyticsSurrogatesLoader: AnalyticsSurrogatesLoader
+    lateinit var resourceSurrogateLoader: ResourceSurrogateLoader
 
     @Inject
     lateinit var appConfigurationSyncer: AppConfigurationSyncer
@@ -92,7 +92,7 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
     private fun loadTrackerData() {
         doAsync {
             trackerDataLoader.loadData()
-            analyticsSurrogatesLoader.loadData()
+            resourceSurrogateLoader.loadData()
         }
     }
 

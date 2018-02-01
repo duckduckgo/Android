@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.analyticsSurrogates
+package com.duckduckgo.app.surrogates
 
 import android.net.Uri
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
-class AnalyticsSurrogatesTest {
+class ResourceSurrogatesTest {
 
-    private lateinit var testee: AnalyticsSurrogates
+    private lateinit var testee: ResourceSurrogates
 
     @Before
     fun setup() {
-        testee = AnalyticsSurrogatesImpl()
+        testee = ResourceSurrogatesImpl()
     }
 
     @Test

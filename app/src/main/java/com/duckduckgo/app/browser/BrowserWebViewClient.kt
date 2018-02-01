@@ -23,19 +23,13 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.duckduckgo.app.analyticsSurrogates.AnalyticsSurrogates
-import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
-import com.duckduckgo.app.trackerdetection.TrackerDetector
 import timber.log.Timber
 import javax.inject.Inject
 
 
 class BrowserWebViewClient @Inject constructor(
         private val requestRewriter: RequestRewriter,
-        private var trackerDetector: TrackerDetector,
-        private var httpsUpgrader: HttpsUpgrader,
         private val specialUrlDetector: SpecialUrlDetector,
-        private val analyticsSurrogates: AnalyticsSurrogates,
         private val webViewRequestInterceptor: WebViewRequestInterceptor
 ) : WebViewClient() {
 
