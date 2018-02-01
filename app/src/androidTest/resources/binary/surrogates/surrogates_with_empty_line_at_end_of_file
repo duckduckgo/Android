@@ -1,10 +1,5 @@
-# To neutralize GA scripts. The goal is to provide the minimal API
-# expected by clients of these scripts so that the end users are able
-# to wholly block GA while minimizing risks of page breakage.
-# Test cases (need way more):
-# - https://github.com/chrisaljoudi/uBlock/issues/119
-# Reference API:
-# - https://developers.google.com/analytics/devguides/collection/gajs/
+# Some comments here
+# This comment is also here
 google-analytics.com/ga.js application/javascript
 (function() {
 	alert("surrogates_1");
@@ -24,8 +19,7 @@ google-analytics.com/inpage_linkid.js application/javascript
 	alert("surrogates_3");
 })();
 
-# https://github.com/gorhill/uBlock/issues/2480
-# https://developers.google.com/analytics/devguides/collection/gajs/experiments#cxjs
+# A comment
 google-analytics.com/cx/api.js application/javascript
 (function() {
 	alert("surrogates_4");
@@ -34,9 +28,8 @@ google-analytics.com/cx/api.js application/javascript
 	alert("surrogates_4");
 })();
 
-# Ubiquitous googletagservices.com: not blocked by EasyPrivacy.
-# Tags are tiny bits of website code that let you measure traffic and
-# visitor behavior
+# A comment
+# A comment
 googletagservices.com/gpt.js application/javascript
 (function() {
 	alert("surrogates_5");
@@ -46,11 +39,7 @@ googletagservices.com/gpt.js application/javascript
 	alert("surrogates_5");
 })();
 
-# Obviously more work needs to be done, but at least for now it takes care of:
-# See related filter in assets/ublock/privacy.txt
-# Also:
-# - https://github.com/gorhill/uBlock/issues/2569
-# - https://github.com/uBlockOrigin/uAssets/issues/420
+# A comment
 googletagmanager.com/gtm.js application/javascript
 (function() {
 	alert("surrogates_6");

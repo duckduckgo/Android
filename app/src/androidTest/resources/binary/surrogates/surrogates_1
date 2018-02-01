@@ -1,10 +1,5 @@
-# To neutralize GA scripts. The goal is to provide the minimal API
-# expected by clients of these scripts so that the end users are able
-# to wholly block GA while minimizing risks of page breakage.
-# Test cases (need way more):
-# - https://github.com/chrisaljoudi/uBlock/issues/119
-# Reference API:
-# - https://developers.google.com/analytics/devguides/collection/gajs/
+# Some comments here
+# This comment is also here
 google-analytics.com/ga.js application/javascript
 (function() {
 	alert("surrogates_1");
