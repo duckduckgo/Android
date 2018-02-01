@@ -37,6 +37,7 @@ import android.net.Uri
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
+import com.duckduckgo.app.httpsupgrade.HttpsUpgraderImpl
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Before
@@ -55,7 +56,7 @@ class HttpsUpgraderPerformanceTest {
     fun setup() {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java).build()
         dao = db.httpsUpgradeDomainDao()
-        httpsUpgrader = HttpsUpgrader(dao)
+        httpsUpgrader = HttpsUpgraderImpl(dao)
     }
 
     @Test

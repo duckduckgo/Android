@@ -31,7 +31,7 @@ class HttpsUpgraderTest {
     @Before
     fun before() {
         mockDao = mock()
-        testee = HttpsUpgrader(mockDao)
+        testee = HttpsUpgraderImpl(mockDao)
     }
 
     @Test

@@ -32,7 +32,7 @@ class TrackerDataLoader @Inject constructor(
 
     fun loadData() {
 
-        Timber.i("Loading Tracker data")
+        Timber.d("Loading Tracker data")
 
         // these are stored to disk, then fed to the C++ adblock module
         loadAdblockData(Client.ClientName.EASYLIST)
@@ -44,21 +44,21 @@ class TrackerDataLoader @Inject constructor(
     }
 
     fun loadAdblockData(name: Client.ClientName) {
-        Timber.i("Looking for adblock tracker ${name.name} to load")
+        Timber.d("Looking for adblock tracker ${name.name} to load")
 
         if (trackerDataStore.hasData(name)) {
-            Timber.i("Found adblock tracker ${name.name}")
+            Timber.d("Found adblock tracker ${name.name}")
             val client = AdBlockClient(name)
             client.loadProcessedData(trackerDataStore.loadData(name))
             trackerDetector.addClient(client)
         } else {
-            Timber.i("No adblock tracker ${name.name} found")
+            Timber.d("No adblock tracker ${name.name} found")
         }
     }
 
     fun loadDisconnectData() {
         val trackers = trackerDataDao.getAll()
-        Timber.i("Loaded ${trackers.size} disconnect trackers from DB")
+        Timber.d("Loaded ${trackers.size} disconnect trackers from DB")
 
         val client = DisconnectClient(Client.ClientName.DISCONNECT, trackers)
         trackerDetector.addClient(client)

@@ -31,7 +31,7 @@ class HttpsUpgradeListDownloader @Inject constructor(
 
     fun downloadList(): Completable {
 
-        Timber.i("Downloading HTTPS Upgrade data")
+        Timber.d("Downloading HTTPS Upgrade data")
 
         return Completable.fromAction {
 
@@ -39,7 +39,7 @@ class HttpsUpgradeListDownloader @Inject constructor(
             val response = call.execute()
 
             if (response.isCached && httpsUpgradeDao.count() != 0) {
-                Timber.i("HTTPS data already cached and stored")
+                Timber.d("HTTPS data already cached and stored")
                 return@fromAction
             }
 

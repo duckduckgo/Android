@@ -52,13 +52,13 @@ class TrackerDataDownloader @Inject constructor(
 
         return Completable.fromAction {
 
-            Timber.i("Downloading disconnect data")
+            Timber.d("Downloading disconnect data")
 
             val call = trackerListService.disconnect()
             val response = call.execute()
 
             if (response.isCached && trackerDataDao.count() != 0) {
-                Timber.i("Disconnect data already cached and stored")
+                Timber.d("Disconnect data already cached and stored")
                 return@fromAction
             }
 
@@ -82,18 +82,18 @@ class TrackerDataDownloader @Inject constructor(
     private fun easyDownload(clientName: Client.ClientName, callFactory: (clientName: Client.ClientName) -> Call<ResponseBody>): Completable {
         return Completable.fromAction {
 
-            Timber.i("Downloading ${clientName.name} data")
+            Timber.d("Downloading ${clientName.name} data")
             val call = callFactory(clientName)
             val response = call.execute()
 
             if (response.isCached && trackerDataStore.hasData(clientName)) {
-                Timber.i("${clientName.name} data already cached and stored")
+                Timber.d("${clientName.name} data already cached and stored")
                 return@fromAction
             }
 
             if (response.isSuccessful) {
                 val bodyBytes = response.body()!!.bytes()
-                Timber.i("Updating ${clientName.name} data store with new data")
+                Timber.d("Updating ${clientName.name} data store with new data")
                 persistTrackerData(clientName, bodyBytes)
                 trackerDataLoader.loadAdblockData(clientName)
             } else {

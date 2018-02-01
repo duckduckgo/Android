@@ -16,10 +16,11 @@
 
 package com.duckduckgo.app.job
 
+import com.duckduckgo.app.surrogates.api.ResourceSurrogateListDownloader
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeListDownloader
 import com.duckduckgo.app.settings.db.AppConfigurationEntity
-import com.duckduckgo.app.trackerdetection.Client
+import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
@@ -29,13 +30,15 @@ import javax.inject.Inject
 class AppConfigurationDownloader @Inject constructor(
         private val trackerDataDownloader: TrackerDataDownloader,
         private val httpsUpgradeListDownloader: HttpsUpgradeListDownloader,
+        private val resourceSurrogateDownloader: ResourceSurrogateListDownloader,
         private val appDatabase: AppDatabase) {
 
     fun downloadTask(): Completable {
-        val easyListDownload = trackerDataDownloader.downloadList(Client.ClientName.EASYLIST)
-        val easyPrivacyDownload = trackerDataDownloader.downloadList(Client.ClientName.EASYPRIVACY)
-        val trackersWhitelist = trackerDataDownloader.downloadList(Client.ClientName.TRACKERSWHITELIST)
-        val disconnectDownload = trackerDataDownloader.downloadList(Client.ClientName.DISCONNECT)
+        val easyListDownload = trackerDataDownloader.downloadList(EASYLIST)
+        val easyPrivacyDownload = trackerDataDownloader.downloadList(EASYPRIVACY)
+        val trackersWhitelist = trackerDataDownloader.downloadList(TRACKERSWHITELIST)
+        val disconnectDownload = trackerDataDownloader.downloadList(DISCONNECT)
+        val surrogatesDownload = resourceSurrogateDownloader.downloadList()
         val httpsUpgradeDownload = httpsUpgradeListDownloader.downloadList()
 
         return Completable.mergeDelayError(listOf(
@@ -43,6 +46,7 @@ class AppConfigurationDownloader @Inject constructor(
                 easyPrivacyDownload.subscribeOn(Schedulers.io()),
                 trackersWhitelist.subscribeOn(Schedulers.io()),
                 disconnectDownload.subscribeOn(Schedulers.io()),
+                surrogatesDownload.subscribeOn(Schedulers.io()),
                 httpsUpgradeDownload.subscribeOn(Schedulers.io())
         )).doOnComplete {
             Timber.i("Download task completed successfully")

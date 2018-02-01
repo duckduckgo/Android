@@ -32,7 +32,7 @@ class TrackerDetectorTest {
 
     private val networkTrackers = TrackerNetworks()
     private val settingStore: PrivacySettingsStore = mock()
-    private val trackerDetector = TrackerDetector(networkTrackers, settingStore)
+    private val trackerDetector = TrackerDetectorImpl(networkTrackers, settingStore)
 
     companion object {
         private val resourceType = ResourceType.UNKNOWN
