@@ -75,8 +75,10 @@ class AnalyticsSurrogatesLoader @Inject constructor(
                         mimeType = mimeType,
                         jsFunction = functionBuilder.toString()
                     )
-
                 )
+
+                functionBuilder.setLength(0)
+
                 nextLineIsNewRule = true
                 return@forEach
             }
