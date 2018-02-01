@@ -83,7 +83,14 @@ class AnalyticsSurrogatesLoaderTest {
     fun whenLoadingSurrogateThenFunctionLengthIsPreserved() {
         val surrogates = initialiseFile("surrogates_6")
         val actualNumberOfLines = surrogates[0].jsFunction.reader().readLines().size
-        assertEquals(99, actualNumberOfLines)
+        assertEquals(3, actualNumberOfLines)
+    }
+
+    @Test
+    fun whenLoadingSurrogateThenFunctionLengthIsPreservedJavascriptCommentsArePreserved() {
+        val surrogates = initialiseFile("surrogates_6")
+        val actualNumberOfLines = surrogates[1].jsFunction.reader().readLines().size
+        assertEquals(5, actualNumberOfLines)
     }
 
     private fun initialiseFile(filename: String) : List<SurrogateResponse> {
