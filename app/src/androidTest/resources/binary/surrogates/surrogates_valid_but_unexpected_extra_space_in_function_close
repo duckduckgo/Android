@@ -1,0 +1,51 @@
+# Some comments here
+# This comment is also here
+google-analytics.com/ga.js application/javascript
+(function() {
+	alert("surrogates_1");
+}) ();
+
+google-analytics.com/analytics.js application/javascript
+(function() {
+	// random comment
+	alert("surrogates_2");
+	alert("surrogates_2");
+}) ();
+
+google-analytics.com/inpage_linkid.js application/javascript
+(function() {
+	alert("surrogates_3");
+	alert("surrogates_3");
+	alert("surrogates_3");
+}) ();
+
+# A comment
+google-analytics.com/cx/api.js application/javascript
+(function() {
+	alert("surrogates_4");
+	alert("surrogates_4");
+	alert("surrogates_4");
+	alert("surrogates_4");
+}) ();
+
+# A comment
+# A comment
+googletagservices.com/gpt.js application/javascript
+(function() {
+	alert("surrogates_5");
+	alert("surrogates_5");
+	alert("surrogates_5");
+	alert("surrogates_5");
+	alert("surrogates_5");
+}) ();
+
+# A comment
+googletagmanager.com/gtm.js application/javascript
+(function() {
+	alert("surrogates_6");
+	alert("surrogates_6");
+	alert("surrogates_6");
+	alert("surrogates_6");
+	alert("surrogates_6");
+	alert("surrogates_6");
+}) ();

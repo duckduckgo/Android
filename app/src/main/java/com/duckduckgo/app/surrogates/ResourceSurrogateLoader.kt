@@ -36,12 +36,21 @@ class ResourceSurrogateLoader @Inject constructor(
     }
 
     fun convertBytes(bytes: ByteArray): List<SurrogateResponse> {
+        return try {
+            parse(bytes)
+        } catch (e: Throwable) {
+            Timber.w(e, "Failed to parse surrogates file; file may be corrupt or badly formatted")
+            emptyList()
+        }
+    }
+
+    private fun parse(bytes: ByteArray): List<SurrogateResponse> {
         val surrogates = mutableListOf<SurrogateResponse>()
 
         val reader = ByteArrayInputStream(bytes).bufferedReader()
         val existingLines = reader.readLines().toMutableList()
 
-        if(existingLines.isNotEmpty() && existingLines.last().isNotBlank()) {
+        if (existingLines.isNotEmpty() && existingLines.last().isNotBlank()) {
             existingLines.add("")
         }
 
@@ -70,11 +79,11 @@ class ResourceSurrogateLoader @Inject constructor(
 
             if (it.isBlank()) {
                 surrogates.add(
-                    SurrogateResponse(
-                        name = ruleName,
-                        mimeType = mimeType,
-                        jsFunction = functionBuilder.toString()
-                    )
+                        SurrogateResponse(
+                                name = ruleName,
+                                mimeType = mimeType,
+                                jsFunction = functionBuilder.toString()
+                        )
                 )
 
                 functionBuilder.setLength(0)

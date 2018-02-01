@@ -93,6 +93,18 @@ class ResourceSurrogateLoaderTest {
         assertEquals(5, actualNumberOfLines)
     }
 
+    @Test
+    fun whenSurrogateFileIsMissingMimeTypeEmptyListReturned() {
+        val surrogates = initialiseFile("surrogates_invalid_format_missing_mimetypes")
+        assertEquals(0, surrogates.size)
+    }
+
+    @Test
+    fun whenSurrogateFileIsHasSpaceInFinalFunctionBlock() {
+        val surrogates = initialiseFile("surrogates_valid_but_unexpected_extra_space_in_function_close")
+        assertEquals(6, surrogates.size)
+    }
+
     private fun initialiseFile(filename: String) : List<SurrogateResponse> {
         return testee.convertBytes(readFile(filename))
     }
