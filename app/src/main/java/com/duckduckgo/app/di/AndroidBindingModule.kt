@@ -20,6 +20,7 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.home.HomeActivity
 import com.duckduckgo.app.job.AppConfigurationJobService
+import com.duckduckgo.app.launch.LaunchActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity
@@ -34,6 +35,10 @@ import dagger.android.ContributesAndroidInjector
 abstract class AndroidBindingModule {
 
     /* Activities */
+
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun launchActivity(): LaunchActivity
 
     @ActivityScoped
     @ContributesAndroidInjector

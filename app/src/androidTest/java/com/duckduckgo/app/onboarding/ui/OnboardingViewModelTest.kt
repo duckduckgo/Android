@@ -17,13 +17,10 @@
 package com.duckduckgo.app.onboarding.ui
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.arch.lifecycle.Observer
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.verify
-import com.nhaarman.mockito_kotlin.whenever
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -35,37 +32,16 @@ class OnboardingViewModelTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private var onboardingStore: OnboardingStore = mock()
-    private var viewStateObserver: Observer<OnboardingViewModel.ViewState> = mock()
 
     private val testee: OnboardingViewModel by lazy {
-        val model = OnboardingViewModel(onboardingStore)
-        model.viewState.observeForever(viewStateObserver)
-        model
+        OnboardingViewModel(onboardingStore)
     }
 
     @Test
-    fun whenStartedThenStoreNotifiedThatOnboardingShown() {
-        testee
-        verify(onboardingStore).onboardingShown()
-    }
-
-    @Test
-    fun whenOnboardingShouldShowThenShowHomeIsFalse() {
-        whenever(onboardingStore.shouldShow).thenReturn(true)
-        assertFalse(testee.viewState.value!!.showHome)
-    }
-
-    @Test
-    fun whenOnboardingShouldNotShowThenShowHomeIsTrue() {
-        whenever(onboardingStore.shouldShow).thenReturn(false)
-        assertTrue(testee.viewState.value!!.showHome)
-    }
-
-    @Test
-    fun whenOnboardingDoneThenShowHomeIsTrue() {
-        whenever(onboardingStore.shouldShow).thenReturn(true)
+    fun whenOnboardingDoneThenStoreNotifiedThatOnboardingShown() {
+        verify(onboardingStore, never()).onboardingShown()
         testee.onOnboardingDone()
-        assertTrue(testee.viewState.value!!.showHome)
+        verify(onboardingStore).onboardingShown()
     }
 
 }
