@@ -56,11 +56,11 @@ class TrackerDetectorListTest {
         settingStore = mock()
         whenever(settingStore.privacyOn).thenReturn(true)
 
-        blockingOnlyTestee = TrackerDetector(TrackerNetworks(), settingStore)
+        blockingOnlyTestee = TrackerDetectorImpl(TrackerNetworks(), settingStore)
         blockingOnlyTestee.addClient(easyprivacyAdblock)
         blockingOnlyTestee.addClient(easylistAdblock)
 
-        testeeWithWhitelist = TrackerDetector(TrackerNetworks(), settingStore)
+        testeeWithWhitelist = TrackerDetectorImpl(TrackerNetworks(), settingStore)
         testeeWithWhitelist.addClient(trackersWhitelistAdblocks)
         testeeWithWhitelist.addClient(easyprivacyAdblock)
         testeeWithWhitelist.addClient(easylistAdblock)

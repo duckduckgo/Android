@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.app.surrogates.api
 
-import android.webkit.CookieManager
-import dagger.Module
-import dagger.Provides
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.http.GET
 
-@Module
-class BrowserModule {
 
-    @Provides
-    fun cookieManager(): CookieManager = CookieManager.getInstance()
+interface ResourceSurrogateListService {
+
+    @GET("/contentblocking.js?l=surrogates")
+    fun https(): Call<ResponseBody>
 }

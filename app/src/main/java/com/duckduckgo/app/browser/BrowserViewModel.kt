@@ -77,14 +77,15 @@ class BrowserViewModel(
     )
 
     sealed class Command {
-        class LandingPage : Command()
-        class Refresh : Command()
+        object LandingPage : Command()
+        object Refresh : Command()
         class Navigate(val url: String) : Command()
         class DialNumber(val telephoneNumber: String) : Command()
         class SendSms(val telephoneNumber: String) : Command()
         class SendEmail(val emailAddress: String) : Command()
-        class ShowKeyboard : Command()
-        class ReinitialiseWebView : Command()
+        object ShowKeyboard : Command()
+        object HideKeyboard : Command()
+        object ReinitialiseWebView : Command()
     }
 
     /* Observable data for Activity to subscribe to */
@@ -109,7 +110,7 @@ class BrowserViewModel(
     private var appConfigurationDownloaded = false
 
     init {
-        command.value = Command.ShowKeyboard()
+        command.value = Command.ShowKeyboard
         viewState.value = ViewState(canAddBookmarks = false)
         appConfigurationObservable.observeForever(appConfigurationObserver)
 
@@ -149,6 +150,8 @@ class BrowserViewModel(
         if (input.isBlank()) {
             return
         }
+
+        command.value = Command.HideKeyboard
 
         val trimmedInput = input.trim()
         url.value = buildUrl(trimmedInput)
@@ -294,14 +297,14 @@ class BrowserViewModel(
      */
     fun userDismissedKeyboard(): Boolean {
         if (!currentViewState().browserShowing) {
-            command.value = Command.LandingPage()
+            command.value = Command.LandingPage
             return true
         }
         return false
     }
 
     fun receivedDashboardResult(resultCode: Int) {
-        if (resultCode == RELOAD_RESULT_CODE) command.value = Command.Refresh()
+        if (resultCode == RELOAD_RESULT_CODE) command.value = Command.Refresh
     }
 
     @WorkerThread
