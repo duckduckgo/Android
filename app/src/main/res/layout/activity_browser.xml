@@ -128,20 +128,29 @@
             android:id="@+id/webViewContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            />
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/autoCompleteSuggestionsList"
-            android:background="@color/charcoalGrey"
             android:layout_width="match_parent"
-            android:clipToPadding="false"
             android:layout_height="wrap_content"
+            android:background="@color/charcoalGrey"
+            android:clipToPadding="false"
             android:paddingBottom="14dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     </android.support.design.widget.CoordinatorLayout>
 
+    <FrameLayout
+        android:id="@+id/webViewFullScreenContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#000"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
 
