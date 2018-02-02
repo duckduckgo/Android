@@ -26,7 +26,6 @@ import javax.inject.Inject
 class BrowserChromeClient @Inject constructor() : WebChromeClient() {
 
     var webViewClientListener: WebViewClientListener? = null
-    var customViewCallback: CustomViewCallback? = null
 
     private var customView: View? = null
 
@@ -43,7 +42,6 @@ class BrowserChromeClient @Inject constructor() : WebChromeClient() {
         }
 
         customView = view
-        customViewCallback = callback
         webViewClientListener?.goFullScreen(view)
     }
 
@@ -51,7 +49,6 @@ class BrowserChromeClient @Inject constructor() : WebChromeClient() {
         Timber.i("hide custom view")
 
         webViewClientListener?.exitFullScreen()
-        customViewCallback = null
         customView = null
     }
 
