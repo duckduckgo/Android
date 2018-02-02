@@ -178,11 +178,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
         }
     }
 
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        Timber.i("Focused changed, has focus: %s", hasFocus)
-
-    }
-
     private fun configureAutoComplete() {
         autoCompleteSuggestionsList.layoutManager = LinearLayoutManager(this)
         autoCompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
