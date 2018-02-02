@@ -248,12 +248,8 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
         val immersiveMode = isImmersiveModeEnabled()
         Timber.d("Immersive mode %s", if (immersiveMode) "enabled" else "not enabled")
         when (viewState.isFullScreen) {
-            true -> {
-                if (!immersiveMode) goFullScreen()
-            }
-            false -> {
-                if (immersiveMode) exitFullScreen()
-            }
+            true -> if (!immersiveMode) goFullScreen()
+            false -> if (immersiveMode) exitFullScreen()
         }
     }
 
