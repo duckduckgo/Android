@@ -67,10 +67,13 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
 
     @Inject
     lateinit var webViewClient: BrowserWebViewClient
+
     @Inject
     lateinit var webChromeClient: BrowserChromeClient
+
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
+    
     @Inject
     lateinit var cookieManagerProvider: Provider<CookieManager>
 
