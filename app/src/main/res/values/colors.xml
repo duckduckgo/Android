@@ -33,4 +33,6 @@
 
     <color name="white_two">#e4e4e4</color>
 
+    <color name="webViewScrollbarTrackColor">#33333333</color>
+
 </resources>
