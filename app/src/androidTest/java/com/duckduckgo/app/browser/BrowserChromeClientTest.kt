@@ -61,9 +61,8 @@ class BrowserChromeClientTest {
         verify(mockCustomViewCallback, times(2)).onCustomViewHidden()
     }
 
-
     @Test
-    fun whenHideCustomViewCalledThen() {
+    fun whenHideCustomViewCalledThenListenerInstructedToExistFullScreen() {
         testee.onHideCustomView()
         verify(mockWebViewClientListener).exitFullScreen()
     }
