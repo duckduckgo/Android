@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.view.View
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 
 interface WebViewClientListener {
@@ -29,4 +30,6 @@ interface WebViewClientListener {
     fun sendEmailRequested(emailAddress: String)
     fun sendSmsRequested(telephoneNumber: String)
     fun dialTelephoneNumberRequested(telephoneNumber: String)
+    fun goFullScreen(view: View)
+    fun exitFullScreen()
 }

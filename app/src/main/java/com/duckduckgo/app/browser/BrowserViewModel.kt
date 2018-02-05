@@ -23,6 +23,7 @@ import android.net.Uri
 import android.support.annotation.AnyThread
 import android.support.annotation.VisibleForTesting
 import android.support.annotation.WorkerThread
+import android.view.View
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
@@ -73,10 +74,12 @@ class BrowserViewModel(
             val showFireButton: Boolean = true,
             val canAddBookmarks: Boolean = false,
             val showAutoCompleteSuggestions: Boolean = false,
+            val isFullScreen: Boolean = false,
             val autoCompleteSearchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
     )
 
     sealed class Command {
+
         object LandingPage : Command()
         object Refresh : Command()
         class Navigate(val url: String) : Command()
@@ -86,15 +89,14 @@ class BrowserViewModel(
         object ShowKeyboard : Command()
         object HideKeyboard : Command()
         object ReinitialiseWebView : Command()
+        class ShowFullScreen(val view: View) : Command()
     }
-
     /* Observable data for Activity to subscribe to */
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
+
     val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
     val url: SingleLiveEvent<String> = SingleLiveEvent()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
-
-
     @VisibleForTesting
     val appConfigurationObserver: Observer<AppConfigurationEntity> = Observer { appConfiguration ->
         appConfiguration?.let {
@@ -172,6 +174,15 @@ class BrowserViewModel(
     override fun progressChanged(newProgress: Int) {
         Timber.v("Loading in progress $newProgress")
         viewState.value = currentViewState().copy(progress = newProgress)
+    }
+
+    override fun goFullScreen(view: View) {
+        command.value = Command.ShowFullScreen(view)
+        viewState.value = currentViewState().copy(isFullScreen = true)
+    }
+
+    override fun exitFullScreen() {
+        viewState.value = currentViewState().copy(isFullScreen = false)
     }
 
     override fun loadingStarted() {

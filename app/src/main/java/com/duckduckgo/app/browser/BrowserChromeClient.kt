@@ -16,8 +16,10 @@
 
 package com.duckduckgo.app.browser
 
+import android.view.View
 import android.webkit.WebChromeClient
 import android.webkit.WebView
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -25,7 +27,29 @@ class BrowserChromeClient @Inject constructor() : WebChromeClient() {
 
     var webViewClientListener: WebViewClientListener? = null
 
+    private var customView: View? = null
+
     override fun onProgressChanged(view: WebView?, newProgress: Int) {
         webViewClientListener?.progressChanged(newProgress)
     }
+
+    override fun onShowCustomView(view: View, callback: CustomViewCallback?) {
+        Timber.i("on show custom view")
+
+        if(customView != null) {
+            callback?.onCustomViewHidden()
+            return
+        }
+
+        customView = view
+        webViewClientListener?.goFullScreen(view)
+    }
+
+    override fun onHideCustomView() {
+        Timber.i("hide custom view")
+
+        webViewClientListener?.exitFullScreen()
+        customView = null
+    }
+
 }
