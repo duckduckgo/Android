@@ -20,10 +20,10 @@ import android.support.annotation.WorkerThread
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
-import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.global.isHttp
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacymonitor.model.TrustedSites
+import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.ResourceType
 import timber.log.Timber
@@ -74,7 +74,7 @@ class WebViewRequestInterceptor @Inject constructor(
 
             val surrogate = resourceSurrogates.get(url)
             if (surrogate.responseAvailable) {
-                Timber.v("Surrogate found for %s", url)
+                Timber.d("Surrogate found for %s", url)
                 return WebResourceResponse(
                         surrogate.mimeType,
                         "UTF-8",
@@ -82,6 +82,7 @@ class WebViewRequestInterceptor @Inject constructor(
                 )
             }
 
+            Timber.d("Blocking request %s", url)
             return WebResourceResponse(null, null, null)
         }
 
