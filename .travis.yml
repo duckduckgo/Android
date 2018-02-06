@@ -35,7 +35,7 @@ before_script:
 
 script:
   - ./gradlew build
-  - ./gradlew connectedCheck --info
+  - ./gradlew connectedCheck -Porchestrator --info
 
 notifications:
   slack:
