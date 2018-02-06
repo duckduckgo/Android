@@ -28,11 +28,8 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
+import android.view.*
 import android.view.KeyEvent.KEYCODE_ENTER
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.webkit.CookieManager
@@ -177,6 +174,9 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
             }
             is Command.ShowFullScreen -> {
                 webViewFullScreenContainer.addView(it.view, ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT))
+            }
+            is Command.DownloadFile -> {
+                downloadFile(it.url)
             }
         }
     }
@@ -352,12 +352,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
         }
 
         webView.setDownloadListener { url, _, _, _, _ ->
-            val request = DownloadManager.Request(Uri.parse(url))
-            request.allowScanningByMediaScanner()
-            request.setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-            manager.enqueue(request)
-            Toast.makeText(applicationContext, getString(R.string.webviewDownload), Toast.LENGTH_LONG).show()
+            downloadFile(url)
         }
 
         webView.setOnTouchListener { _, _ ->
@@ -367,7 +362,18 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
             false
         }
 
+        registerForContextMenu(webView)
+
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
+    }
+
+    private fun downloadFile(url: String?) {
+        val request = DownloadManager.Request(Uri.parse(url))
+        request.allowScanningByMediaScanner()
+        request.setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+        val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        manager.enqueue(request)
+        Toast.makeText(applicationContext, getString(R.string.webviewDownload), Toast.LENGTH_LONG).show()
     }
 
     override fun onSaveInstanceState(bundle: Bundle) {
@@ -378,6 +384,23 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
     override fun onRestoreInstanceState(bundle: Bundle) {
         super.onRestoreInstanceState(bundle)
         webView.restoreState(bundle)
+    }
+
+    override fun onCreateContextMenu(menu: ContextMenu, view: View, menuInfo: ContextMenu.ContextMenuInfo?) {
+        webView.hitTestResult?.let {
+            viewModel.userLongPressedInWebView(it, menu)
+        }
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        webView.hitTestResult?.let {
+            var url = it.extra
+            if(viewModel.userSelectedItemFromLongPressMenu(url, item)) {
+                return true
+            }
+        }
+
+        return super.onContextItemSelected(item)
     }
 
     /**

@@ -23,12 +23,16 @@ import android.net.Uri
 import android.support.annotation.AnyThread
 import android.support.annotation.VisibleForTesting
 import android.support.annotation.WorkerThread
+import android.view.ContextMenu
+import android.view.MenuItem
 import android.view.View
+import android.webkit.WebView
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
+import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.privacymonitor.SiteMonitor
@@ -61,6 +65,7 @@ class BrowserViewModel(
         private val bookmarksDao: BookmarksDao,
         private val autoCompleteApi: AutoCompleteApi,
         private val appSettingsPreferencesStore: SettingsDataStore,
+        private val longPressHandler: LongPressHandler,
         appConfigurationDao: AppConfigurationDao) : WebViewClientListener, ViewModel() {
 
     data class ViewState(
@@ -90,6 +95,7 @@ class BrowserViewModel(
         object HideKeyboard : Command()
         object ReinitialiseWebView : Command()
         class ShowFullScreen(val view: View) : Command()
+        class DownloadFile(val url: String) : Command()
     }
     /* Observable data for Activity to subscribe to */
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -322,13 +328,32 @@ class BrowserViewModel(
     fun addBookmark(title: String, url: String) {
         bookmarksDao.insert(BookmarkEntity(title = title, url = url))
     }
-    
+
     private fun openUrl(url: String) {
         command.value = Navigate(url)
     }
 
     fun onUserSelectedToEditQuery(query: String) {
         viewState.value = currentViewState().copy(isEditing = false, showAutoCompleteSuggestions = false, omnibarText = query)
+    }
+
+    fun userLongPressedInWebView(target: WebView.HitTestResult, menu: ContextMenu) {
+        Timber.i("Long pressed on %s, (extra=%s)", target.type, target.extra)
+        longPressHandler.handleLongPress(target.type, menu)
+    }
+
+    fun userSelectedItemFromLongPressMenu(longPressTarget: String, item: MenuItem): Boolean {
+        val requiredAction = longPressHandler.userSelectedMenuItem(longPressTarget, item)
+
+        return when(requiredAction) {
+            is RequiredAction.DownloadFile -> {
+                command.value = Command.DownloadFile(requiredAction.url)
+                true
+            }
+            RequiredAction.None-> {
+                false
+            }
+        }
     }
 }
 

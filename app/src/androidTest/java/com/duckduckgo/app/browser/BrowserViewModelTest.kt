@@ -23,6 +23,7 @@ import android.arch.lifecycle.Observer
 import android.arch.persistence.room.Room
 import android.net.Uri
 import android.support.test.InstrumentationRegistry
+import android.view.MenuItem
 import android.view.View
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
@@ -51,7 +52,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.*
-import org.mockito.ArgumentCaptor.forClass
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 
@@ -91,10 +92,17 @@ class BrowserViewModelTest {
     @Mock
     private lateinit var bookmarksDao: BookmarksDao
 
+    @Mock
+    private lateinit var mockLongPressHandler: LongPressHandler
+
+    @Mock
+    private lateinit var mockOmnibarConverter: OmnibarEntryConverter
+
+    @Captor
+    private lateinit var commandCaptor: ArgumentCaptor<Command>
+
     private lateinit var db: AppDatabase
     private lateinit var appConfigurationDao: AppConfigurationDao
-
-    private val mockOmnibarConverter: OmnibarEntryConverter = mock()
 
     private lateinit var testee: BrowserViewModel
 
@@ -117,6 +125,7 @@ class BrowserViewModelTest {
                 autoCompleteApi = mockAutoCompleteApi,
                 appSettingsPreferencesStore = mockSettingsStore,
                 bookmarksDao = bookmarksDao,
+                longPressHandler = mockLongPressHandler,
                 appConfigurationDao = appConfigurationDao)
 
         testee.url.observeForever(mockQueryObserver)
@@ -241,10 +250,9 @@ class BrowserViewModelTest {
     @Test
     fun whenSharedTextReceivedThenNavigationTriggered() {
         testee.onSharedTextReceived("http://example.com")
-        val captor: ArgumentCaptor<Command> = forClass(Command::class.java)
-        verify(mockCommandObserver, times(2)).onChanged(captor.capture())
-        assertNotNull(captor.value)
-        assertTrue(captor.value is Navigate)
+        verify(mockCommandObserver, times(2)).onChanged(commandCaptor.capture())
+        assertNotNull(commandCaptor.value)
+        assertTrue(commandCaptor.value is Navigate)
     }
 
     @Test
@@ -395,10 +403,9 @@ class BrowserViewModelTest {
 
     @Test
     fun whenEnteringNonEmptyQueryThenHideKeyboardCommandIssued() {
-        val captor = ArgumentCaptor.forClass(BrowserViewModel.Command::class.java)
         testee.onUserSubmittedQuery("foo")
-        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(captor.capture())
-        assertTrue(captor.value == Command.HideKeyboard)
+        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.value == Command.HideKeyboard)
     }
 
     @Test
@@ -410,11 +417,10 @@ class BrowserViewModelTest {
 
     @Test
     fun whenNotifiedEnteringFullScreenThenEnterFullScreenCommandIssued() {
-        val captor = ArgumentCaptor.forClass(BrowserViewModel.Command::class.java)
         val stubView = View(InstrumentationRegistry.getTargetContext())
         testee.goFullScreen(stubView)
-        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(captor.capture())
-        assertTrue(captor.lastValue is Command.ShowFullScreen)
+        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.ShowFullScreen)
     }
 
     @Test
@@ -426,5 +432,19 @@ class BrowserViewModelTest {
     @Test
     fun whenViewModelInitialisedThenFullScreenFlagIsDisabled() {
         assertFalse(testee.viewState.value!!.isFullScreen)
+    }
+
+    @Test
+    fun whenUserSelectsDownloadImageOptionFromContextMenuThenDownloadFileCommandIssued() {
+        whenever(mockLongPressHandler.userSelectedMenuItem(anyString(), any()))
+                .thenReturn(LongPressHandler.RequiredAction.DownloadFile("example.com"))
+
+        val mockMenuItem : MenuItem = mock()
+        testee.userSelectedItemFromLongPressMenu("example.com", mockMenuItem)
+        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.DownloadFile)
+
+        val lastCommand = commandCaptor.lastValue as Command.DownloadFile
+        assertEquals("example.com", lastCommand.url)
     }
 }
