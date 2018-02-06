@@ -414,7 +414,7 @@ class BrowserViewModelTest {
         val stubView = View(InstrumentationRegistry.getTargetContext())
         testee.goFullScreen(stubView)
         verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(captor.capture())
-        assertTrue(captor.lastValue is Command.ShowFullScreen)
+        assertFalse(captor.lastValue is Command.ShowFullScreen)
     }
 
     @Test
