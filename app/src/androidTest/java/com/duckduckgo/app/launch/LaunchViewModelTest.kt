@@ -49,7 +49,7 @@ class LaunchViewModelTest {
     }
 
     @Test
-    fun whenOnboardingShouldShownThenCommandIsOnboarding() {
+    fun whenOnboardingShouldShowThenCommandIsOnboarding() {
         whenever(onboardingStore.shouldShow).thenReturn(true)
         testee.command.observeForever(mockCommandObserver)
         verify(mockCommandObserver).onChanged(any(Onboarding::class.java))
