@@ -74,7 +74,7 @@ class WebViewRequestInterceptor @Inject constructor(
 
             val surrogate = resourceSurrogates.get(url)
             if (surrogate.responseAvailable) {
-                Timber.d("Surrogate found for %s", url)
+                Timber.d("Surrogate found for $url")
                 return WebResourceResponse(
                         surrogate.mimeType,
                         "UTF-8",
@@ -82,7 +82,7 @@ class WebViewRequestInterceptor @Inject constructor(
                 )
             }
 
-            Timber.d("Blocking request %s", url)
+            Timber.d("Blocking request $url")
             return WebResourceResponse(null, null, null)
         }
 

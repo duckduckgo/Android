@@ -72,7 +72,7 @@ class ResourceSurrogateLoader @Inject constructor(
                     ruleName = this[0]
                     mimeType = this[1]
                 }
-                Timber.d("Found new surrogate rule: %s - %s", ruleName, mimeType)
+                Timber.d("Found new surrogate rule: $ruleName - $mimeType")
                 nextLineIsNewRule = false
                 return@forEach
             }
@@ -96,7 +96,7 @@ class ResourceSurrogateLoader @Inject constructor(
             functionBuilder.append("\n")
         }
 
-        Timber.d("Processed %d surrogates", surrogates.size)
+        Timber.d("Processed ${surrogates.size} surrogates")
         return surrogates
     }
 }

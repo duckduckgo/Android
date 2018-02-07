@@ -338,7 +338,7 @@ class BrowserViewModel(
     }
 
     fun userLongPressedInWebView(target: WebView.HitTestResult, menu: ContextMenu) {
-        Timber.i("Long pressed on %s, (extra=%s)", target.type, target.extra)
+        Timber.i("Long pressed on ${target.type}, (extra=${target.extra})")
         longPressHandler.handleLongPress(target.type, menu)
     }
 

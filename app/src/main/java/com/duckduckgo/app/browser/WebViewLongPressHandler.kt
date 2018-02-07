@@ -45,7 +45,7 @@ class WebViewLongPressHandler @Inject constructor() : LongPressHandler {
                 menu.setHeaderTitle(R.string.imageOptions)
                 menu.add(0, CONTEXT_MENU_ID_DOWNLOAD_IMAGE, 0, R.string.downloadImage)
             }
-            else -> Timber.v("App does not yet handle target type: %d", longPressTargetType)
+            else -> Timber.v("App does not yet handle target type: $longPressTargetType")
         }
     }
 

@@ -249,7 +249,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
         }
 
         val immersiveMode = isImmersiveModeEnabled()
-        Timber.d("Immersive mode %s", if (immersiveMode) "enabled" else "not enabled")
         when (viewState.isFullScreen) {
             true -> if (!immersiveMode) goFullScreen()
             false -> if (immersiveMode) exitFullScreen()
@@ -368,9 +367,10 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
     }
 
     private fun downloadFile(url: String?) {
-        val request = DownloadManager.Request(Uri.parse(url))
-        request.allowScanningByMediaScanner()
-        request.setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+        val request = DownloadManager.Request(Uri.parse(url)).apply {
+            allowScanningByMediaScanner()
+            setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+        }
         val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         manager.enqueue(request)
         Toast.makeText(applicationContext, getString(R.string.webviewDownload), Toast.LENGTH_LONG).show()
@@ -394,8 +394,8 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         webView.hitTestResult?.let {
-            var url = it.extra
-            if(viewModel.userSelectedItemFromLongPressMenu(url, item)) {
+            val url = it.extra
+            if (viewModel.userSelectedItemFromLongPressMenu(url, item)) {
                 return true
             }
         }
