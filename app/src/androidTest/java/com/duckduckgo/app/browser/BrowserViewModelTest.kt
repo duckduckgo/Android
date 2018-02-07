@@ -442,9 +442,9 @@ class BrowserViewModelTest {
         val mockMenuItem : MenuItem = mock()
         testee.userSelectedItemFromLongPressMenu("example.com", mockMenuItem)
         verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.lastValue is Command.DownloadFile)
+        assertTrue(commandCaptor.lastValue is Command.DownloadImage)
 
-        val lastCommand = commandCaptor.lastValue as Command.DownloadFile
+        val lastCommand = commandCaptor.lastValue as Command.DownloadImage
         assertEquals("example.com", lastCommand.url)
     }
 }

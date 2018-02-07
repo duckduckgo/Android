@@ -95,7 +95,7 @@ class BrowserViewModel(
         object HideKeyboard : Command()
         object ReinitialiseWebView : Command()
         class ShowFullScreen(val view: View) : Command()
-        class DownloadFile(val url: String) : Command()
+        class DownloadImage(val url: String) : Command()
     }
     /* Observable data for Activity to subscribe to */
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -347,7 +347,7 @@ class BrowserViewModel(
 
         return when(requiredAction) {
             is RequiredAction.DownloadFile -> {
-                command.value = Command.DownloadFile(requiredAction.url)
+                command.value = Command.DownloadImage(requiredAction.url)
                 true
             }
             RequiredAction.None-> {
