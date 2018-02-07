@@ -120,7 +120,6 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bookmarks</string>
     <string name="bookmarksActivityTitle">Bookmarks</string>
-    <string name="deleteBookmarkContentDescription">Delete bookmark for %s</string>
     <string name="bookmarkDeleteConfirmMessage">Are you sure you want to delete bookmark &lt;b>%s&lt;/b>?</string>
     <string name="bookmarkDeleteConfirmTitle">Confirm</string>
     <string name="bookmarkAddedFeedback">Bookmark added</string>
