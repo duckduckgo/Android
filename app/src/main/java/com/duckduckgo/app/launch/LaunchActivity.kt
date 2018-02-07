@@ -60,15 +60,15 @@ class LaunchActivity : DuckDuckGoActivity() {
         startActivityForResult(OnboardingActivity.intent(this), ONBOARDING_REQUEST_CODE)
     }
 
+    private fun showHome() {
+        startActivity(HomeActivity.intent(this))
+        finish()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == ONBOARDING_REQUEST_CODE) {
             viewModel.onOnboardingDone()
         }
-    }
-
-    private fun showHome() {
-        startActivity(HomeActivity.intent(this))
-        finish()
     }
 
     companion object {
