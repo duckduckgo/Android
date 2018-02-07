@@ -26,7 +26,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.support.design.widget.Snackbar
@@ -77,7 +76,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
-    
+
     @Inject
     lateinit var cookieManagerProvider: Provider<CookieManager>
 
@@ -106,8 +105,8 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_browser)
+
         createPopupMenu()
-        createWebView()
         configureObservers()
         configureToolbar()
         configureWebView()
@@ -131,17 +130,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
             enableMenuOption(view.addBookmarksPopupMenuItem) { addBookmark() }
             enableMenuOption(view.settingsPopupMenuItem) { launchSettings() }
         }
-    }
-
-    private fun createWebView() {
-        webView = NestedWebView(this)
-        webView.gone()
-        webView.isFocusableInTouchMode = true
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            webView.focusable = View.FOCUSABLE
-        }
-
-        webViewContainer.addView(webView)
     }
 
     private fun configureObservers() {
@@ -355,6 +343,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
+        webView = layoutInflater.inflate(R.layout.include_duckduckgo_browser_webview, webViewContainer, true).findViewById(R.id.browserWebView) as WebView
         webView.webViewClient = webViewClient
         webView.webChromeClient = webChromeClient
 
