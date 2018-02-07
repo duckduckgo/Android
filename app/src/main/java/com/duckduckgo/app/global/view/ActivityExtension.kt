@@ -18,6 +18,7 @@ package com.duckduckgo.app.global.view
 
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import com.duckduckgo.app.browser.R
 import org.jetbrains.anko.toast
 
@@ -27,4 +28,19 @@ fun AppCompatActivity.launchExternalActivity(intent: Intent) {
     } else {
         toast(R.string.no_compatible_third_party_app_installed)
     }
+}
+
+fun AppCompatActivity.toggleFullScreen() {
+
+    val newUiOptions = window.decorView.systemUiVisibility
+            .xor(android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
+            .xor(android.view.View.SYSTEM_UI_FLAG_FULLSCREEN)
+            .xor(android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+
+    window.decorView.systemUiVisibility = newUiOptions
+}
+
+fun AppCompatActivity.isImmersiveModeEnabled(): Boolean {
+    val uiOptions = window.decorView.systemUiVisibility
+    return uiOptions or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY == uiOptions
 }

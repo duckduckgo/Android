@@ -31,6 +31,8 @@ import android.view.KeyEvent.KEYCODE_ENTER
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.webkit.CookieManager
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
@@ -62,10 +64,17 @@ import javax.inject.Provider
 
 class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
 
-    @Inject lateinit var webViewClient: BrowserWebViewClient
-    @Inject lateinit var webChromeClient: BrowserChromeClient
-    @Inject lateinit var viewModelFactory: ViewModelFactory
-    @Inject lateinit var cookieManagerProvider: Provider<CookieManager>
+    @Inject
+    lateinit var webViewClient: BrowserWebViewClient
+
+    @Inject
+    lateinit var webChromeClient: BrowserChromeClient
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
+    @Inject
+    lateinit var cookieManagerProvider: Provider<CookieManager>
 
     private lateinit var popupMenu: BrowserPopupMenu
 
@@ -105,6 +114,15 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
 
     private fun createPopupMenu() {
         popupMenu = BrowserPopupMenu(layoutInflater)
+        val view = popupMenu.contentView
+        popupMenu.apply {
+            enableMenuOption(view.forwardPopupMenuItem) { webView.goForward() }
+            enableMenuOption(view.backPopupMenuItem) { webView.goBack() }
+            enableMenuOption(view.refreshPopupMenuItem) { webView.reload() }
+            enableMenuOption(view.bookmarksPopupMenuItem) { launchBookmarks() }
+            enableMenuOption(view.addBookmarksPopupMenuItem) { addBookmark() }
+            enableMenuOption(view.settingsPopupMenuItem) { launchSettings() }
+        }
     }
 
     private fun configureObservers() {
@@ -144,7 +162,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
                 startActivity(intent)
             }
             Command.ShowKeyboard -> {
-                omnibarTextInput.postDelayed({omnibarTextInput.showKeyboard()}, 300)
+                omnibarTextInput.postDelayed({ omnibarTextInput.showKeyboard() }, 300)
             }
             Command.HideKeyboard -> {
                 omnibarTextInput.hideKeyboard()
@@ -152,6 +170,9 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
             }
             Command.ReinitialiseWebView -> {
                 webView.clearHistory()
+            }
+            is Command.ShowFullScreen -> {
+                webViewFullScreenContainer.addView(it.view, ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT))
             }
         }
     }
@@ -222,6 +243,30 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
                 autoCompleteSuggestionsAdapter.updateData(results)
             }
         }
+
+        val immersiveMode = isImmersiveModeEnabled()
+        Timber.d("Immersive mode %s", if (immersiveMode) "enabled" else "not enabled")
+        when (viewState.isFullScreen) {
+            true -> if (!immersiveMode) goFullScreen()
+            false -> if (immersiveMode) exitFullScreen()
+        }
+    }
+
+    private fun goFullScreen() {
+        Timber.i("Entering full screen")
+
+        webViewFullScreenContainer.show()
+
+        toggleFullScreen()
+    }
+
+    private fun exitFullScreen() {
+        Timber.i("Exiting full screen")
+
+        webViewFullScreenContainer.removeAllViews()
+        webViewFullScreenContainer.gone()
+
+        this.toggleFullScreen()
     }
 
     private fun showClearButton() {
@@ -385,42 +430,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
         popupMenu.show(rootView, toolbar)
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    fun onGoForwardClicked(view: View) {
-        webView.goForward()
-        popupMenu.dismiss()
-    }
-
-    @Suppress("UNUSED_PARAMETER")
-    fun onGoBackClicked(view: View) {
-        webView.goBack()
-        popupMenu.dismiss()
-    }
-
-    @Suppress("UNUSED_PARAMETER")
-    fun onRefreshClicked(view: View) {
-        webView.reload()
-        popupMenu.dismiss()
-    }
-
-    @Suppress("UNUSED_PARAMETER")
-    fun onBookmarksClicked(view: View) {
-        launchBookmarksView()
-        popupMenu.dismiss()
-    }
-
-    @Suppress("UNUSED_PARAMETER")
-    fun onAddBookmarkClicked(view: View) {
-        addBookmark()
-        popupMenu.dismiss()
-    }
-
-    @Suppress("UNUSED_PARAMETER")
-    fun onSettingsClicked(view: View) {
-        launchSettingsView()
-        popupMenu.dismiss()
-    }
-
     private fun addBookmark() {
 
         val addBookmarkDialog = BookmarkAddEditDialogFragment.createDialogCreationMode(
@@ -431,16 +440,16 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
         addBookmarkDialog.show(supportFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
     }
 
-    private fun launchSettingsView() {
+    private fun launchSettings() {
         startActivity(SettingsActivity.intent(this))
     }
 
-    private fun launchBookmarksView() {
+    private fun launchBookmarks() {
         startActivity(BookmarksActivity.intent(this))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == DASHBOARD_REQUEST_CODE ) {
+        if (requestCode == DASHBOARD_REQUEST_CODE) {
             viewModel.receivedDashboardResult(resultCode)
         }
     }

@@ -23,6 +23,7 @@ import android.arch.lifecycle.Observer
 import android.arch.persistence.room.Room
 import android.net.Uri
 import android.support.test.InstrumentationRegistry
+import android.view.View
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
@@ -398,5 +399,32 @@ class BrowserViewModelTest {
         testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(captor.capture())
         assertTrue(captor.value == Command.HideKeyboard)
+    }
+
+    @Test
+    fun whenNotifiedEnteringFullScreenThenViewStateUpdatedWithFullScreenFlag() {
+        val stubView = View(InstrumentationRegistry.getTargetContext())
+        testee.goFullScreen(stubView)
+        assertTrue(testee.viewState.value!!.isFullScreen)
+    }
+
+    @Test
+    fun whenNotifiedEnteringFullScreenThenEnterFullScreenCommandIssued() {
+        val captor = ArgumentCaptor.forClass(BrowserViewModel.Command::class.java)
+        val stubView = View(InstrumentationRegistry.getTargetContext())
+        testee.goFullScreen(stubView)
+        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(captor.capture())
+        assertTrue(captor.lastValue is Command.ShowFullScreen)
+    }
+
+    @Test
+    fun whenNotifiedLeavingFullScreenThenViewStateUpdatedWithFullScreenFlagDisabled() {
+        testee.exitFullScreen()
+        assertFalse(testee.viewState.value!!.isFullScreen)
+    }
+
+    @Test
+    fun whenViewModelInitialisedThenFullScreenFlagIsDisabled() {
+        assertFalse(testee.viewState.value!!.isFullScreen)
     }
 }
