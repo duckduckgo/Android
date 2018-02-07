@@ -29,7 +29,7 @@
 
         <TextView
             style="@style/SettingsContentTitle"
-            android:text="GENERAL" />
+            android:text="@string/settingsHeadingGeneral" />
 
         <android.support.v7.widget.SwitchCompat
             android:id="@+id/autocompleteEnabledSetting"
@@ -45,7 +45,7 @@
 
         <TextView
             style="@style/SettingsContentTitle"
-            android:text="OTHER" />
+            android:text="@string/settingsHeadingOther" />
 
         <TextView
             android:id="@+id/about"

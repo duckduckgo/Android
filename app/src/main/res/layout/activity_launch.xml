@@ -20,7 +20,7 @@
     android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.duckduckgo.app.com.duckduckgo.app.launch.LaunchActivity">
+    tools:context="com.duckduckgo.app.launch.LaunchActivity">
 
     <ImageView
         android:id="@+id/ddgLogo"

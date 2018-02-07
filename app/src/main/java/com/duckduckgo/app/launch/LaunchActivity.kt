@@ -72,7 +72,7 @@ class LaunchActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        const val ONBOARDING_REQUEST_CODE = 100
+        private const val ONBOARDING_REQUEST_CODE = 100
     }
 
 }
