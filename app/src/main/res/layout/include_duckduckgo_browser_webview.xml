@@ -22,11 +22,12 @@
     android:fadeScrollbars="true"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    android:scrollbarSize="3dp"
-    android:scrollbarThumbVertical="@color/colorAccent"
-    android:scrollbarTrackVertical="@color/webViewScrollbarTrackColor"
-    android:scrollbarThumbHorizontal="@color/colorAccent"
+    android:scrollbarSize="4dp"
+    android:scrollbarStyle="outsideInset"
+    android:scrollbarThumbHorizontal="@color/webViewScrollbarThumbColor"
+    android:scrollbarThumbVertical="@color/webViewScrollbarThumbColor"
     android:scrollbarTrackHorizontal="@color/webViewScrollbarTrackColor"
+    android:scrollbarTrackVertical="@color/webViewScrollbarTrackColor"
     android:visibility="gone"
     tools:visibility="visible">
 
