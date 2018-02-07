@@ -22,7 +22,6 @@ import android.os.Bundle
 import android.support.v4.app.ActivityOptionsCompat
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.webkit.CookieManager
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
@@ -66,11 +65,10 @@ class HomeActivity : DuckDuckGoActivity() {
 
     private fun configurePopupMenu() {
         popupMenu = BrowserPopupMenu(layoutInflater)
-        popupMenu.contentView.apply {
-            backPopupMenuItem.isEnabled = false
-            forwardPopupMenuItem.isEnabled = false
-            refreshPopupMenuItem.isEnabled = false
-            addBookmarksPopupMenuItem.isEnabled = false
+        val view = popupMenu.contentView
+        popupMenu.apply {
+            enableMenuOption(view.bookmarksPopupMenuItem) { launchBookmarks() }
+            enableMenuOption(view.settingsPopupMenuItem) { launchSettings() }
         }
     }
 
@@ -132,14 +130,12 @@ class HomeActivity : DuckDuckGoActivity() {
         popupMenu.show(rootView, toolbar)
     }
 
-    fun onBookmarksClicked(view: View) {
+    fun launchBookmarks() {
         startActivity(BookmarksActivity.intent(this))
-        popupMenu.dismiss()
     }
 
-    fun onSettingsClicked(view: View) {
+    fun launchSettings() {
         startActivity(SettingsActivity.intent(this))
-        popupMenu.dismiss()
     }
 
     override fun onDestroy() {

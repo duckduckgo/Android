@@ -96,9 +96,8 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_browser)
-
-        createWebView()
         createPopupMenu()
+        createWebView()
         configureObservers()
         configureToolbar()
         configureWebView()
@@ -113,6 +112,15 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
 
     private fun createPopupMenu() {
         popupMenu = BrowserPopupMenu(layoutInflater)
+        val view = popupMenu.contentView
+        popupMenu.apply {
+            enableMenuOption(view.forwardPopupMenuItem) { webView.goForward() }
+            enableMenuOption(view.backPopupMenuItem) { webView.goBack() }
+            enableMenuOption(view.refreshPopupMenuItem) { webView.reload() }
+            enableMenuOption(view.bookmarksPopupMenuItem) { launchBookmarks() }
+            enableMenuOption(view.addBookmarksPopupMenuItem) { addBookmark() }
+            enableMenuOption(view.settingsPopupMenuItem) { launchSettings() }
+        }
     }
 
     private fun createWebView() {
@@ -456,42 +464,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
         popupMenu.show(rootView, toolbar)
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    fun onGoForwardClicked(view: View) {
-        webView.goForward()
-        popupMenu.dismiss()
-    }
-
-    @Suppress("UNUSED_PARAMETER")
-    fun onGoBackClicked(view: View) {
-        webView.goBack()
-        popupMenu.dismiss()
-    }
-
-    @Suppress("UNUSED_PARAMETER")
-    fun onRefreshClicked(view: View) {
-        webView.reload()
-        popupMenu.dismiss()
-    }
-
-    @Suppress("UNUSED_PARAMETER")
-    fun onBookmarksClicked(view: View) {
-        launchBookmarksView()
-        popupMenu.dismiss()
-    }
-
-    @Suppress("UNUSED_PARAMETER")
-    fun onAddBookmarkClicked(view: View) {
-        addBookmark()
-        popupMenu.dismiss()
-    }
-
-    @Suppress("UNUSED_PARAMETER")
-    fun onSettingsClicked(view: View) {
-        launchSettingsView()
-        popupMenu.dismiss()
-    }
-
     private fun addBookmark() {
 
         val addBookmarkDialog = BookmarkAddEditDialogFragment.createDialogCreationMode(
@@ -502,11 +474,11 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
         addBookmarkDialog.show(supportFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
     }
 
-    private fun launchSettingsView() {
+    private fun launchSettings() {
         startActivity(SettingsActivity.intent(this))
     }
 
-    private fun launchBookmarksView() {
+    private fun launchBookmarks() {
         startActivity(BookmarksActivity.intent(this))
     }
 

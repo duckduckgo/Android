@@ -23,7 +23,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
-import com.duckduckgo.app.about.AboutDuckDuckGoActivity.Companion.RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
@@ -66,7 +65,7 @@ class SettingsActivity : DuckDuckGoActivity() {
         })
 
         viewModel.command.observe(this, Observer {
-            when(it) {
+            when (it) {
                 is SettingsViewModel.Command.SendEmail -> provideEmailFeedback(it.emailUri)
             }
         })
