@@ -7,6 +7,7 @@ apply from: '../versioning.gradle'
 
 ext {
     VERSION_NAME = "4.2.0"
+    USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
 }
 
 android {
@@ -51,7 +52,10 @@ android {
     }
     testOptions {
         unitTests.returnDefaultValues = true
-        execution 'ANDROID_TEST_ORCHESTRATOR'
+
+        if(USE_ORCHESTRATOR) {
+            execution 'ANDROID_TEST_ORCHESTRATOR'
+        }
     }
 
     def staticConfigPath = "${System.getenv('HOME')}/jenkins_static/com.duckduckgo.mobile.android"
