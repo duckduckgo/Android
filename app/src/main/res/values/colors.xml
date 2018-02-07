@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimaryDark">@color/darkGrey</color>
-    <color name="colorPrimary">@color/charcoalGrey</color>
+    <color name="colorPrimaryDark">@color/darkGray</color>
+    <color name="colorPrimary">@color/charcoalGray</color>
     <color name="colorAccent">@color/orange</color>
 
     <color name="windowBackground">@color/charcoal</color>
     <color name="searchBackground">@color/slateGray</color>
-    <color name="divider">@color/subtleGreyTwo</color>
+    <color name="divider">@color/subtleGrayTwo</color>
 
     <color name="white">#FFFFFF</color>
     <color name="almostBlack">#333333</color>
-    <color name="darkGrey">#222325</color>
+    <color name="darkGray">#222325</color>
     <color name="charcoal">#2f3135</color>
-    <color name="charcoalGrey">#47494c</color>
+    <color name="charcoalGray">#47494c</color>
     <color name="slateGray">#5e6168</color>
     <color name="paleBrownishGray">#b0b0b0</color>
     <color name="brownishGray">#5c5c5c</color>
-    <color name="warmGrey">#939393</color>
-    <color name="warmerGrey">#777777</color>
-    <color name="subtleGrey">#f0f0f0</color>
-    <color name="subtleGreyTwo">#D8D8D8</color>
+    <color name="warmGray">#939393</color>
+    <color name="warmerGray">#777777</color>
+    <color name="subtleGray">#f0f0f0</color>
+    <color name="subtleGrayTwo">#D8D8D8</color>
 
     <color name="orange">#de5833</color>
     <color name="brickOrange">#d03a10</color>
