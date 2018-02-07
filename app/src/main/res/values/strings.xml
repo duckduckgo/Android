@@ -106,7 +106,7 @@
     <string name="settingsMenuItemTitle">Settings</string>
     <string name="settingsHeadingGeneral">General</string>
     <string name="settingsHeadingOther">Other</string>
-    <string name="settingsOnboarding">Our Features</string>
+    <string name="settingsOnboarding">Privacy Features</string>
     <string name="settingsAboutDuckduckgo">About DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Leave Feedback</string>
