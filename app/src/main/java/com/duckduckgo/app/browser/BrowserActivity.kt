@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.annotation.SuppressLint
 import android.app.DownloadManager
 import android.app.DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
@@ -23,18 +24,21 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.support.design.widget.Snackbar
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
+import android.view.*
 import android.view.KeyEvent.KEYCODE_ENTER
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.webkit.CookieManager
+import android.webkit.URLUtil
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.webkit.WebView
 import android.widget.TextView
@@ -91,6 +95,9 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
 
     private val fireMenu: MenuItem?
         get() = toolbar.menu.findItem(R.id.fire_menu_item)
+
+    // Used to represent a file to download, but might first require permission requesting
+    private var pendingFileDownload: PendingFileDownload? = null
 
     private lateinit var webView: WebView
 
@@ -174,6 +181,10 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
             is Command.ShowFullScreen -> {
                 webViewFullScreenContainer.addView(it.view, ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT))
             }
+            is Command.DownloadImage -> {
+                pendingFileDownload = PendingFileDownload(it.url, Environment.DIRECTORY_PICTURES)
+                downloadFileWithPermissionCheck()
+            }
         }
     }
 
@@ -245,7 +256,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
         }
 
         val immersiveMode = isImmersiveModeEnabled()
-        Timber.d("Immersive mode %s", if (immersiveMode) "enabled" else "not enabled")
         when (viewState.isFullScreen) {
             true -> if (!immersiveMode) goFullScreen()
             false -> if (immersiveMode) exitFullScreen()
@@ -349,12 +359,9 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
         }
 
         webView.setDownloadListener { url, _, _, _, _ ->
-            val request = DownloadManager.Request(Uri.parse(url))
-            request.allowScanningByMediaScanner()
-            request.setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-            manager.enqueue(request)
-            Toast.makeText(applicationContext, getString(R.string.webviewDownload), Toast.LENGTH_LONG).show()
+            pendingFileDownload = PendingFileDownload(url, Environment.DIRECTORY_DOWNLOADS)
+
+           downloadFileWithPermissionCheck()
         }
 
         webView.setOnTouchListener { _, _ ->
@@ -364,7 +371,61 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
             false
         }
 
+        registerForContextMenu(webView)
+
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
+    }
+
+    private fun downloadFileWithPermissionCheck() {
+        if (hasWriteStoragePermission()) {
+            downloadFile()
+        } else {
+            requestStoragePermission()
+        }
+    }
+
+    private fun downloadFile() {
+        val pending = pendingFileDownload
+        pending?.let {
+            val uri = Uri.parse(pending.url)
+            val guessedFileName = URLUtil.guessFileName(pending.url, null, null)
+            Timber.i("Guessed filename of $guessedFileName for url ${pending.url}")
+            val request = DownloadManager.Request(uri).apply {
+                allowScanningByMediaScanner()
+                setDestinationInExternalPublicDir(pending.directory, guessedFileName)
+                setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            }
+            val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            manager.enqueue(request)
+            pendingFileDownload = null
+            Toast.makeText(applicationContext, getString(R.string.webviewDownload), Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun hasWriteStoragePermission(): Boolean {
+        return ContextCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestStoragePermission() {
+        ActivityCompat.requestPermissions(this, arrayOf(WRITE_EXTERNAL_STORAGE), PERMISSION_REQUEST_EXTERNAL_STORAGE)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        when(requestCode) {
+            PERMISSION_REQUEST_EXTERNAL_STORAGE -> {
+                if((grantResults.isNotEmpty()) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Timber.i("Permission granted")
+                    downloadFile()
+                } else {
+                    Timber.i("Permission refused")
+                    Snackbar.make(toolbar, R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 
     override fun onSaveInstanceState(bundle: Bundle) {
@@ -375,6 +436,23 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
     override fun onRestoreInstanceState(bundle: Bundle) {
         super.onRestoreInstanceState(bundle)
         webView.restoreState(bundle)
+    }
+
+    override fun onCreateContextMenu(menu: ContextMenu, view: View, menuInfo: ContextMenu.ContextMenuInfo?) {
+        webView.hitTestResult?.let {
+            viewModel.userLongPressedInWebView(it, menu)
+        }
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        webView.hitTestResult?.let {
+            val url = it.extra
+            if (viewModel.userSelectedItemFromLongPressMenu(url, item)) {
+                return true
+            }
+        }
+
+        return super.onContextItemSelected(item)
     }
 
     /**
@@ -493,6 +571,11 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
         }
     }
 
+    private data class PendingFileDownload(
+            val url: String,
+            val directory: String
+        )
+
     companion object {
 
         fun intent(context: Context, queryExtra: String? = null): Intent {
@@ -504,6 +587,9 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
         private const val ADD_BOOKMARK_FRAGMENT_TAG = "ADD_BOOKMARK"
         private const val QUERY_EXTRA = "QUERY_EXTRA"
         private const val DASHBOARD_REQUEST_CODE = 100
+        private const val PERMISSION_REQUEST_EXTERNAL_STORAGE = 200
+
+
     }
 
 }
