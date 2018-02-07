@@ -16,18 +16,25 @@
 
 package com.duckduckgo.app.di
 
-import android.content.Context
 import com.duckduckgo.app.onboarding.store.OnboardingSharedPreferences
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.privacymonitor.store.PrivacySettingsSharedPreferences
+import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
+import com.duckduckgo.app.privacymonitor.store.TermsOfServiceRawStore
+import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 
 @Module
-class StoreModule {
+abstract class StoreModule {
 
-    @Provides
-    fun providesOnboardingStore(context: Context): OnboardingStore {
-        return OnboardingSharedPreferences(context)
-    }
+    @Binds
+    abstract fun bindsOnboardingStore(onboardingStore: OnboardingSharedPreferences): OnboardingStore
+
+    @Binds
+    abstract fun bindPrivacySettingsStore(privacySettingsStore: PrivacySettingsSharedPreferences): PrivacySettingsStore
+
+    @Binds
+    abstract fun bindTermsOfServiceStore(termsOfServiceStore: TermsOfServiceRawStore): TermsOfServiceStore
 
 }

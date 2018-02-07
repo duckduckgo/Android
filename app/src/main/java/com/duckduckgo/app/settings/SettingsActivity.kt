@@ -67,7 +67,7 @@ class SettingsActivity : DuckDuckGoActivity() {
         })
 
         viewModel.command.observe(this, Observer {
-            when(it) {
+            when (it) {
                 is SettingsViewModel.Command.SendEmail -> provideEmailFeedback(it.emailUri)
             }
         })

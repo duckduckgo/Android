@@ -47,10 +47,6 @@ class AboutDuckDuckGoActivity : AppCompatActivity() {
         fun intent(context: Context): Intent {
             return Intent(context, AboutDuckDuckGoActivity::class.java)
         }
-
-        const val RESULT_CODE_LOAD_ABOUT_DDG_WEB_PAGE = 100
     }
-
-
 
 }
