@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.onboarding.ui
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.annotation.ColorInt
 import android.support.annotation.ColorRes
@@ -34,39 +34,29 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.ColorCombiner
-import com.duckduckgo.app.home.HomeActivity
 import kotlinx.android.synthetic.main.activity_onboarding.*
 import javax.inject.Inject
 
 
 class OnboardingActivity : DuckDuckGoActivity() {
 
-    @Inject lateinit var viewModelFactory: ViewModelFactory
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
     private lateinit var viewPageAdapter: PagerAdapter
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_onboarding)
-        configurePager()
-
-        viewModel.viewState.observe(this, Observer<OnboardingViewModel.ViewState> {
-            it?.let { render(it) }
-        })
-    }
 
     private val viewModel: OnboardingViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(OnboardingViewModel::class.java)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_onboarding)
+        configurePager()
+    }
+
     override fun onResume() {
         updateColor(viewPageAdapter.color(this, viewPager.currentItem))
         super.onResume()
-    }
-
-    private fun render(viewState: OnboardingViewModel.ViewState) {
-        if (viewState.showHome) {
-            showHome()
-        }
     }
 
     fun onContinueClicked(view: View) {
@@ -78,10 +68,6 @@ class OnboardingActivity : DuckDuckGoActivity() {
 
     fun onDoneClicked(view: View) {
         viewModel.onOnboardingDone()
-    }
-
-    private fun showHome() {
-        startActivity(HomeActivity.intent(this))
         finish()
     }
 
@@ -113,6 +99,12 @@ class OnboardingActivity : DuckDuckGoActivity() {
     private fun updateColor(@ColorInt color: Int) {
         window.statusBarColor = color
         viewPager.setBackgroundColor(color)
+    }
+
+    companion object {
+        fun intent(context: Context): Intent {
+            return Intent(context, OnboardingActivity::class.java)
+        }
     }
 
     class PagerAdapter(fragmentManager: FragmentManager) : FragmentPagerAdapter(fragmentManager) {

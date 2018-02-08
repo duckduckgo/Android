@@ -61,7 +61,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_margin="8dp"
-                            android:background="@color/searchBackground"
+                            android:background="@drawable/search_background"
                             android:elevation="4dp"
                             android:fontFamily="sans-serif-medium"
                             android:hint="@string/omnibarInputHint"
@@ -134,7 +134,7 @@
             android:id="@+id/autoCompleteSuggestionsList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/charcoalGrey"
+            android:background="@color/charcoalGray"
             android:clipToPadding="false"
             android:paddingBottom="14dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />

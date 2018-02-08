@@ -50,7 +50,7 @@
         android:fontFamily="sans-serif"
         android:gravity="end"
         android:lineSpacingExtra="7sp"
-        android:textColor="@color/warmerGrey"
+        android:textColor="@color/warmerGray"
         android:textSize="14sp"
         android:textStyle="normal"
         android:textIsSelectable="true"

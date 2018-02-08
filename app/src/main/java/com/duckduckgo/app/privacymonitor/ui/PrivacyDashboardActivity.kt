@@ -101,7 +101,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
     }
 
     private fun renderToggle(enabled: Boolean) {
-        val backgroundColor = if (enabled) R.color.midGreen else R.color.warmerGrey
+        val backgroundColor = if (enabled) R.color.midGreen else R.color.warmerGray
         privacyToggleContainer.setBackgroundColor(ContextCompat.getColor(this, backgroundColor))
         privacyToggle.isChecked = enabled
     }

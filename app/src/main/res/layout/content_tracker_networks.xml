@@ -37,7 +37,7 @@
                 android:id="@+id/networksBannerContainer"
                 android:layout_width="match_parent"
                 android:layout_height="169dp"
-                android:background="@color/subtleGrey">
+                android:background="@color/subtleGray">
 
                 <ImageView
                     android:id="@+id/networksBanner"
@@ -74,7 +74,7 @@
                     android:gravity="center_horizontal"
                     android:letterSpacing="0.14"
                     android:textAllCaps="true"
-                    android:textColor="@color/warmGrey"
+                    android:textColor="@color/warmGray"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:textIsSelectable="false"

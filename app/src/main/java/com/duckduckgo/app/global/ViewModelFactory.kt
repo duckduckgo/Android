@@ -23,7 +23,9 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
 import com.duckduckgo.app.browser.BrowserViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.LongPressHandler
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
+import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
@@ -55,12 +57,14 @@ class ViewModelFactory @Inject constructor(
         private val networkLeaderboardDao: NetworkLeaderboardDao,
         private val bookmarksDao: BookmarksDao,
         private val autoCompleteApi: AutoCompleteApi,
-        private val appSettingsPreferencesStore: SettingsDataStore
+        private val appSettingsPreferencesStore: SettingsDataStore,
+        private val webViewLongPressHandler: LongPressHandler
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
             with(modelClass) {
                 when {
+                    isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboaringStore)
                     isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore)
                     isAssignableFrom(BrowserViewModel::class.java) -> browserViewModel()
                     isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(privacySettingsStore, networkLeaderboardDao)
@@ -83,5 +87,6 @@ class ViewModelFactory @Inject constructor(
             bookmarksDao = bookmarksDao,
             appSettingsPreferencesStore = appSettingsPreferencesStore,
             appConfigurationDao = appConfigurationDao,
+            longPressHandler = webViewLongPressHandler,
             autoCompleteApi = autoCompleteApi)
 }
