@@ -38,7 +38,7 @@
                 android:id="@+id/practicesBannerContainer"
                 android:layout_width="match_parent"
                 android:layout_height="169dp"
-                android:background="@color/subtleGrey">
+                android:background="@color/subtleGray">
 
                 <ImageView
                     android:id="@+id/practicesBanner"
@@ -76,7 +76,7 @@
                     android:letterSpacing="0.14"
                     android:text="@string/practicesMixed"
                     android:textAllCaps="true"
-                    android:textColor="@color/warmGrey"
+                    android:textColor="@color/warmGray"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     app:layout_constraintLeft_toLeftOf="parent"
