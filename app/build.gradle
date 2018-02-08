@@ -20,7 +20,6 @@ android {
         versionCode buildVersionCode()
         versionName VERSION_NAME
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        multiDexEnabled true
         archivesBaseName = "duckduckgo-$versionName"
 
         javaCompileOptions {
@@ -136,6 +135,5 @@ dependencies {
     androidTestImplementation "com.android.support.test.espresso:espresso-core:3.0.1"
     androidTestImplementation "org.mockito:mockito-android:2.13.0"
     androidTestImplementation "com.nhaarman:mockito-kotlin-kt1.1:1.5.0"
-    androidTestImplementation "com.squareup.okhttp3:mockwebserver:3.9.1"
 
 }
