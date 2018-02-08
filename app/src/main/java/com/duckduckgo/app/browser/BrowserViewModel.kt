@@ -23,11 +23,16 @@ import android.net.Uri
 import android.support.annotation.AnyThread
 import android.support.annotation.VisibleForTesting
 import android.support.annotation.WorkerThread
+import android.view.ContextMenu
+import android.view.MenuItem
+import android.view.View
+import android.webkit.WebView
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
+import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.privacymonitor.SiteMonitor
@@ -60,6 +65,7 @@ class BrowserViewModel(
         private val bookmarksDao: BookmarksDao,
         private val autoCompleteApi: AutoCompleteApi,
         private val appSettingsPreferencesStore: SettingsDataStore,
+        private val longPressHandler: LongPressHandler,
         appConfigurationDao: AppConfigurationDao) : WebViewClientListener, ViewModel() {
 
     data class ViewState(
@@ -73,10 +79,12 @@ class BrowserViewModel(
             val showFireButton: Boolean = true,
             val canAddBookmarks: Boolean = false,
             val showAutoCompleteSuggestions: Boolean = false,
+            val isFullScreen: Boolean = false,
             val autoCompleteSearchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
     )
 
     sealed class Command {
+
         object LandingPage : Command()
         object Refresh : Command()
         class Navigate(val url: String) : Command()
@@ -86,15 +94,15 @@ class BrowserViewModel(
         object ShowKeyboard : Command()
         object HideKeyboard : Command()
         object ReinitialiseWebView : Command()
+        class ShowFullScreen(val view: View) : Command()
+        class DownloadImage(val url: String) : Command()
     }
-
     /* Observable data for Activity to subscribe to */
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
+
     val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
     val url: SingleLiveEvent<String> = SingleLiveEvent()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
-
-
     @VisibleForTesting
     val appConfigurationObserver: Observer<AppConfigurationEntity> = Observer { appConfiguration ->
         appConfiguration?.let {
@@ -172,6 +180,15 @@ class BrowserViewModel(
     override fun progressChanged(newProgress: Int) {
         Timber.v("Loading in progress $newProgress")
         viewState.value = currentViewState().copy(progress = newProgress)
+    }
+
+    override fun goFullScreen(view: View) {
+        command.value = Command.ShowFullScreen(view)
+        viewState.value = currentViewState().copy(isFullScreen = true)
+    }
+
+    override fun exitFullScreen() {
+        viewState.value = currentViewState().copy(isFullScreen = false)
     }
 
     override fun loadingStarted() {
@@ -311,13 +328,32 @@ class BrowserViewModel(
     fun addBookmark(title: String, url: String) {
         bookmarksDao.insert(BookmarkEntity(title = title, url = url))
     }
-    
+
     private fun openUrl(url: String) {
         command.value = Navigate(url)
     }
 
     fun onUserSelectedToEditQuery(query: String) {
         viewState.value = currentViewState().copy(isEditing = false, showAutoCompleteSuggestions = false, omnibarText = query)
+    }
+
+    fun userLongPressedInWebView(target: WebView.HitTestResult, menu: ContextMenu) {
+        Timber.i("Long pressed on ${target.type}, (extra=${target.extra})")
+        longPressHandler.handleLongPress(target.type, menu)
+    }
+
+    fun userSelectedItemFromLongPressMenu(longPressTarget: String, item: MenuItem): Boolean {
+        val requiredAction = longPressHandler.userSelectedMenuItem(longPressTarget, item)
+
+        return when(requiredAction) {
+            is RequiredAction.DownloadFile -> {
+                command.value = Command.DownloadImage(requiredAction.url)
+                true
+            }
+            RequiredAction.None-> {
+                false
+            }
+        }
     }
 }
 

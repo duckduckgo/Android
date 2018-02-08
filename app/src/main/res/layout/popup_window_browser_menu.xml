@@ -35,7 +35,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/back"
-            android:onClick="onGoBackClicked"
             android:src="@drawable/ic_arrow_back_24px" />
 
         <ImageButton
@@ -45,7 +44,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/forward"
-            android:onClick="onGoForwardClicked"
             android:src="@drawable/ic_arrow_forward_24px" />
 
         <ImageButton
@@ -55,7 +53,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/refresh"
-            android:onClick="onRefreshClicked"
             android:src="@drawable/ic_refresh_24px" />
 
     </LinearLayout>
@@ -79,7 +76,7 @@
             style="@style/BrowserTextMenuItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onBookmarksClicked"
+            android:enabled="false"
             android:text="@string/bookmarksMenuTitle" />
 
         <TextView
@@ -87,7 +84,7 @@
             style="@style/BrowserTextMenuItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onAddBookmarkClicked"
+            android:enabled="false"
             android:text="@string/addBookmarkMenuTitle" />
 
         <TextView
@@ -95,7 +92,7 @@
             style="@style/BrowserTextMenuItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onSettingsClicked"
+            android:enabled="false"
             android:text="@string/settingsMenuItemTitle" />
 
     </LinearLayout>

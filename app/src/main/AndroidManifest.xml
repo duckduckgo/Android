@@ -5,6 +5,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name="com.duckduckgo.app.global.DuckDuckGoApplication"
@@ -20,14 +21,20 @@
             android:value="true" />
 
         <activity
-            android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivity"
+            android:name="com.duckduckgo.app.launch.LaunchActivity"
             android:label="@string/appName">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
+
+        <activity
+            android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivity"
+            android:label="@string/appName" />
+
         <activity
             android:name="com.duckduckgo.app.home.HomeActivity"
             android:label="@string/appName"
@@ -36,7 +43,6 @@
             <!-- Allows app to become default browser -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
 
@@ -47,9 +53,7 @@
             <!-- Allows apps to consume links and text shared from other apps e.g chrome -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="text/plain" />
             </intent-filter>
 
@@ -60,10 +64,12 @@
             </intent-filter>
 
         </activity>
+
         <activity
             android:name=".BrowserActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName="com.duckduckgo.app.home.HomeActivity" />
+
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
             android:label="@string/privacyDashboardActivityTitle"
@@ -82,7 +88,7 @@
             android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity" />
         <activity
             android:name="com.duckduckgo.app.settings.SettingsActivity"
-            android:label="@string/settingsActivityTitle"/>
+            android:label="@string/settingsActivityTitle" />
 
         <activity
             android:name="com.duckduckgo.app.about.AboutDuckDuckGoActivity"
@@ -106,6 +112,7 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/search_widget_info" />
         </receiver>
+
     </application>
 
 </manifest>

@@ -27,12 +27,35 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <TextView
+            style="@style/SettingsContentTitle"
+            android:text="@string/settingsHeadingGeneral" />
+
         <android.support.v7.widget.SwitchCompat
             android:id="@+id/autocompleteEnabledSetting"
-            android:text="@string/settings_autocomplete_enabled"
             style="@style/SettingsContentLabel"
+            android:text="@string/settings_autocomplete_enabled"
             app:theme="@style/SettingsContentLabel.SettingsSwitch"
             tools:checked="true" />
+
+        <TextView
+            android:id="@+id/onboarding"
+            style="@style/SettingsContentLabelClickable"
+            android:text="@string/settingsOnboarding" />
+
+        <TextView
+            style="@style/SettingsContentTitle"
+            android:text="@string/settingsHeadingOther" />
+
+        <TextView
+            android:id="@+id/about"
+            style="@style/SettingsContentLabelClickable"
+            android:text="@string/settingsAboutDuckduckgo" />
+
+        <TextView
+            android:id="@+id/provideFeedback"
+            style="@style/SettingsContentLabelClickable"
+            android:text="@string/leaveFeedback" />
 
         <TextView
             style="@style/SettingsContentLabel"
@@ -42,16 +65,6 @@
             android:id="@+id/version"
             style="@style/SettingsContentValue"
             tools:text="DuckDuckGo 123.43.5456" />
-
-        <TextView
-            android:id="@+id/about"
-            style="@style/SettingsContentLabelClickable"
-            android:text="@string/aboutDuckduckgo" />
-
-        <TextView
-            android:id="@+id/provideFeedback"
-            style="@style/SettingsContentLabelClickable"
-            android:text="@string/leaveFeedback" />
 
     </LinearLayout>
 

@@ -34,7 +34,7 @@
         android:paddingEnd="12dp"
         android:paddingStart="12dp"
         android:text="@string/searchWidgetTextHint"
-        android:textColor="@color/warmGrey"
+        android:textColor="@color/warmGray"
         android:textSize="16sp" />
 
 

@@ -17,9 +17,7 @@
 package com.duckduckgo.app.browser.di
 
 import android.webkit.CookieManager
-import com.duckduckgo.app.browser.DuckDuckGoRequestRewriter
-import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.app.browser.RequestRewriter
+import com.duckduckgo.app.browser.*
 import dagger.Module
 import dagger.Provides
 
@@ -32,5 +30,10 @@ class BrowserModule {
     @Provides
     fun duckDuckGoRequestRewriter(urlDetector: DuckDuckGoUrlDetector): RequestRewriter {
         return DuckDuckGoRequestRewriter(urlDetector)
+    }
+
+    @Provides
+    fun webViewLongPressHandler(): LongPressHandler {
+        return WebViewLongPressHandler()
     }
 }

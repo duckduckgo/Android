@@ -31,7 +31,6 @@ import android.webkit.WebView
  * Based on https://github.com/takahirom/webview-in-coordinatorlayout
  */
 class NestedWebView : WebView, NestedScrollingChild {
-
     private var lastY: Int = 0
     private val scrollOffset = IntArray(2)
     private val scrollConsumed = IntArray(2)
@@ -39,9 +38,8 @@ class NestedWebView : WebView, NestedScrollingChild {
     private var nestedScrollHelper: NestedScrollingChildHelper = NestedScrollingChildHelper(this)
 
     constructor(context: Context) : this(context, null)
-    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        nestedScrollHelper = NestedScrollingChildHelper(this)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    {
         isNestedScrollingEnabled = true
     }
 

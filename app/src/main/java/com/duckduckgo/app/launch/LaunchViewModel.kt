@@ -14,14 +14,31 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboarding.ui
+package com.duckduckgo.app.launch
 
 import android.arch.lifecycle.ViewModel
+import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 
-class OnboardingViewModel(private val onboardingStore: OnboardingStore) : ViewModel() {
+class LaunchViewModel(onboardingStore: OnboardingStore) : ViewModel() {
+
+    val command: SingleLiveEvent<Command> = SingleLiveEvent()
+
+    sealed class Command {
+        object Onboarding : Command()
+        object Home : Command()
+    }
+
+    init {
+        if (onboardingStore.shouldShow) {
+            command.value = Command.Onboarding
+        } else {
+            command.value = Command.Home
+        }
+    }
 
     fun onOnboardingDone() {
-        onboardingStore.onboardingShown()
+        command.value = Command.Home
     }
+
 }

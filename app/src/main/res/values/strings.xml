@@ -24,6 +24,9 @@
     <string name="clearButtonContentDescription">Clear search input</string>
     <string name="no_compatible_third_party_app_installed">No compatible app installed</string>
     <string name="addBookmarkMenuTitle">Add Bookmark</string>
+    <string name="downloadImage">Download Image</string>
+    <string name="imageOptions">Image Options</string>
+    <string name="permissionRequiredToDownload">Downloading requires storage permission</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Edit query before searching</string>
@@ -101,8 +104,11 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Settings</string>
     <string name="settingsMenuItemTitle">Settings</string>
+    <string name="settingsHeadingGeneral">General</string>
+    <string name="settingsHeadingOther">Other</string>
+    <string name="settingsOnboarding">Privacy Features</string>
+    <string name="settingsAboutDuckduckgo">About DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
-    <string name="aboutDuckduckgo">About DuckDuckGo</string>
     <string name="leaveFeedback">Leave Feedback</string>
     <string name="feedbackEmailAddress">android@duckduckgo.com</string>
     <string name="feedbackSubject">DuckDuckGo Android Feedback</string>
@@ -120,7 +126,6 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bookmarks</string>
     <string name="bookmarksActivityTitle">Bookmarks</string>
-    <string name="deleteBookmarkContentDescription">Delete bookmark for %s</string>
     <string name="bookmarkDeleteConfirmMessage">Are you sure you want to delete bookmark &lt;b>%s&lt;/b>?</string>
     <string name="bookmarkDeleteConfirmTitle">Confirm</string>
     <string name="bookmarkAddedFeedback">Bookmark added</string>

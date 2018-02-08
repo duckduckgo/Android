@@ -42,7 +42,7 @@
         android:layout_marginStart="5dp"
         android:layout_width="1dp"
         android:layout_height="17dp"
-        android:background="@color/subtleGrey" />
+        android:background="@color/subtleGray" />
 
     <TextView
         android:id="@+id/percentage"
