@@ -19,7 +19,7 @@ android {
         targetSdkVersion 27
         versionCode buildVersionCode()
         versionName VERSION_NAME
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.duckduckgo.app.TestRunner"
         archivesBaseName = "duckduckgo-$versionName"
 
         javaCompileOptions {
@@ -125,6 +125,8 @@ dependencies {
     // Dagger
     kapt "com.google.dagger:dagger-android-processor:$dagger"
     kapt "com.google.dagger:dagger-compiler:$dagger"
+    kaptAndroidTest "com.google.dagger:dagger-android-processor:$dagger"
+    kaptAndroidTest "com.google.dagger:dagger-compiler:$dagger"
 
     testImplementation "org.mockito:mockito-core:2.13.0"
     testImplementation "com.nhaarman:mockito-kotlin-kt1.1:1.5.0"
