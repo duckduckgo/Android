@@ -16,20 +16,26 @@
 
 package com.duckduckgo.app
 
+import com.duckduckgo.app.di.DaggerTestAppComponent
 import com.duckduckgo.app.global.DuckDuckGoApplication
-import timber.log.Timber
 
 
 class TestApplication : DuckDuckGoApplication() {
 
-    override fun onCreate() {
-        Timber.i("Test application")
-        super.onCreate()
-    }
+    /**
+     * Use TestAppComponents for android tests which lets us provide alternative test modules
+     *
+     * See [com.duckduckgo.app.di.TestAppComponent]
+     */
 
     override fun configureDependencyInjection() {
-        // when this works, use the fake component instead of calling super
-        super.configureDependencyInjection()
+        DaggerTestAppComponent.builder()
+                .application(this)
+                .create(this)
+                .inject(this)
     }
+
+    // We don't need to actually use leak canary for tests
+    override fun installLeakCanary(): Boolean = true
 
 }

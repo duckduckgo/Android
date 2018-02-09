@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,26 @@
 
 package com.duckduckgo.app.di
 
-import android.arch.persistence.room.Room
-import android.content.Context
 import com.duckduckgo.app.global.db.AppDatabase
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
 
-@Module (includes = [DaoModule::class])
-class DatabaseModule {
+@Module
+class DaoModule {
 
     @Provides
-    @Singleton
-    fun provideDatabase(context: Context): AppDatabase {
-        return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
-                .fallbackToDestructiveMigration()
-                .build()
-    }
+    fun provideHttpsUpgradeDomainDao(database: AppDatabase) = database.httpsUpgradeDomainDao()
+
+    @Provides
+    fun provideDisconnectTrackDao(database: AppDatabase) = database.trackerDataDao()
+
+    @Provides
+    fun providesNetworkLeaderboardDao(database: AppDatabase) = database.networkLeaderboardDao()
+
+    @Provides
+    fun providesBookmarksDao(database: AppDatabase) = database.bookmarksDao()
+
+    @Provides
+    fun appConfigurationDao(database: AppDatabase) = database.appConfigurationDao()
+
 }

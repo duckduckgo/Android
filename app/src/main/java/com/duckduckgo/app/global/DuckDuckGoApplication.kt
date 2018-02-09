@@ -73,11 +73,11 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Appl
         migrateLegacyDb()
     }
 
-    private fun installLeakCanary(): Boolean {
+    protected open fun installLeakCanary(): Boolean {
         if (LeakCanary.isInAnalyzerProcess(this)) {
-            return false;
+            return false
         }
-        LeakCanary.install(this);
+        LeakCanary.install(this)
         return true
     }
 

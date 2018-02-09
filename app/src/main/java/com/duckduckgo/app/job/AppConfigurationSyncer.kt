@@ -23,12 +23,11 @@ import com.duckduckgo.app.global.job.APP_CONFIGURATION_JOB_ID
 import com.duckduckgo.app.global.job.JobBuilder
 import io.reactivex.Completable
 import timber.log.Timber
-import javax.inject.Inject
 
-class AppConfigurationSyncer @Inject constructor(
+class AppConfigurationSyncer(
         private val jobBuilder: JobBuilder,
         private val jobScheduler: JobScheduler,
-        private val appConfigurationDownloader: AppConfigurationDownloader) {
+        private val appConfigurationDownloader: ConfigurationDownloader) {
 
     @CheckResult
     fun scheduleImmediateSync(): Completable {

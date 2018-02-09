@@ -16,22 +16,20 @@
 
 package com.duckduckgo.app.di
 
-import android.arch.persistence.room.Room
-import android.content.Context
-import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.job.ConfigurationDownloader
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import io.reactivex.Completable
 
-
-@Module(includes = [DatabaseModule::class])
-class FakeDatabaseModule {
+@Module
+class FakeAppConfigurationDownloadModule {
 
     @Provides
-    @Singleton
-    fun provideDatabase(context: Context): AppDatabase {
-        return Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-                .allowMainThreadQueries()
-                .build()
+    fun fakeAppConfigurationDownloader(): ConfigurationDownloader {
+        return object : ConfigurationDownloader {
+            override fun downloadTask(): Completable {
+                return Completable.complete()
+            }
+        }
     }
 }
