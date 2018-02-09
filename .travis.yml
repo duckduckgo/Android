@@ -37,6 +37,9 @@ script:
   - ./gradlew build
   - ./gradlew connectedCheck -Porchestrator --info
 
+after_failure:
+  - cat /home/travis/build/duckduckgo/Android/app/build/outputs/androidTest-results/connected/*
+
 notifications:
   slack:
     on_success: never

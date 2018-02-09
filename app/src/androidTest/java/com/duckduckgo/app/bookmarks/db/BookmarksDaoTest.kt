@@ -46,7 +46,7 @@ class BookmarksDaoTest {
     fun whenBookmarkDeleteThenItIsNoLongerInTheList() {
         val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com")
         dao.insert(bookmark)
-        dao.delete(bookmark)
+        //dao.delete(bookmark)
         val list = dao.bookmarks().blockingObserve()
         assertTrue(list!!.isEmpty())
     }
