@@ -19,7 +19,6 @@ package com.duckduckgo.app.bookmarks.ui
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
-import android.support.test.runner.AndroidJUnit4
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.nhaarman.mockito_kotlin.mock
@@ -30,10 +29,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.mockito.ArgumentCaptor
 
-@RunWith(AndroidJUnit4::class)
 class BookmarksViewModelTest {
 
     @get:Rule
