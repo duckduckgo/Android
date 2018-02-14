@@ -75,19 +75,19 @@ class BrowserViewModelTest {
     }
 
     @Mock
-    lateinit var mockQueryObserver: Observer<String>
+    private lateinit var mockQueryObserver: Observer<String>
 
     @Mock
-    lateinit var mockCommandObserver: Observer<Command>
+    private lateinit var mockCommandObserver: Observer<Command>
 
     @Mock
-    lateinit var mockTermsOfServiceStore: TermsOfServiceStore
+    private lateinit var mockTermsOfServiceStore: TermsOfServiceStore
 
     @Mock
-    lateinit var mockSettingsStore: SettingsDataStore
+    private lateinit var mockSettingsStore: SettingsDataStore
 
     @Mock
-    lateinit var mockAutoCompleteApi: AutoCompleteApi
+    private lateinit var mockAutoCompleteApi: AutoCompleteApi
 
     @Mock
     private lateinit var bookmarksDao: BookmarksDao
@@ -371,28 +371,28 @@ class BrowserViewModelTest {
     fun whenEnteringQueryWithAutoCompleteEnabledThenAutoCompleteSuggestionsShown() {
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.onOmnibarInputStateChanged("foo", true)
-        assertTrue(testee.viewState.value!!.showAutoCompleteSuggestions)
+        assertTrue(testee.viewState.value!!.autoComplete.showSuggestions)
     }
 
     @Test
     fun whenEnteringQueryWithAutoCompleteDisabledThenAutoCompleteSuggestionsNotShown() {
         doReturn(false).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.onOmnibarInputStateChanged("foo", true)
-        assertFalse(testee.viewState.value!!.showAutoCompleteSuggestions)
+        assertFalse(testee.viewState.value!!.autoComplete.showSuggestions)
     }
 
     @Test
     fun whenEnteringEmptyQueryWithAutoCompleteEnabledThenAutoCompleteSuggestionsNotShown() {
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.onOmnibarInputStateChanged("", true)
-        assertFalse(testee.viewState.value!!.showAutoCompleteSuggestions)
+        assertFalse(testee.viewState.value!!.autoComplete.showSuggestions)
     }
 
     @Test
     fun whenEnteringEmptyQueryWithAutoCompleteDisabledThenAutoCompleteSuggestionsNotShown() {
         doReturn(false).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.onOmnibarInputStateChanged("", true)
-        assertFalse(testee.viewState.value!!.showAutoCompleteSuggestions)
+        assertFalse(testee.viewState.value!!.autoComplete.showSuggestions)
     }
 
     @Test
@@ -447,4 +447,30 @@ class BrowserViewModelTest {
         val lastCommand = commandCaptor.lastValue as Command.DownloadImage
         assertEquals("example.com", lastCommand.url)
     }
+
+    @Test
+    fun whenUserTypesSearchTermThenViewStateUpdatedToDenoteUserIsFindingInPage() {
+        testee.userFindingInPage("foo")
+        assertTrue(testee.viewState.value!!.findInPage.visible)
+    }
+
+    @Test
+    fun whenUserTypesSearchTermThenViewStateUpdatedToContainSearchTerm() {
+        testee.userFindingInPage("foo")
+        assertEquals("foo", testee.viewState.value!!.findInPage.searchTerm)
+    }
+
+    @Test
+    fun whenUserDismissesFindInPageThenViewStateUpdatedToDenoteUserIsNotFindingInPage() {
+        testee.dismissFindInView()
+        assertFalse(testee.viewState.value!!.findInPage.visible)
+    }
+
+    @Test
+    fun whenUserDismissesFindInPageThenViewStateUpdatedToClearSearchTerm() {
+        testee.userFindingInPage("foo")
+        testee.dismissFindInView()
+        assertEquals("", testee.viewState.value!!.findInPage.searchTerm)
+    }
+
 }

@@ -78,9 +78,9 @@ class BrowserViewModel(
             val showPrivacyGrade: Boolean = false,
             val showFireButton: Boolean = true,
             val canAddBookmarks: Boolean = false,
-            val showAutoCompleteSuggestions: Boolean = false,
             val isFullScreen: Boolean = false,
-            val autoCompleteSearchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
+            val autoComplete: AutoCompleteViewState = AutoCompleteViewState(),
+            val findInPage: FindInPage = FindInPage()
     )
 
     sealed class Command {
@@ -139,7 +139,9 @@ class BrowserViewModel(
 
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
         val results = result.suggestions.take(6)
-        viewState.value = currentViewState().copy(autoCompleteSearchResults = AutoCompleteResult(result.query, results))
+        val currentViewState = currentViewState()
+        val searchResultViewState = currentViewState.autoComplete
+        viewState.value = currentViewState.copy(autoComplete = searchResultViewState.copy(searchResults = AutoCompleteResult(result.query, results)))
     }
 
 
@@ -166,8 +168,7 @@ class BrowserViewModel(
         viewState.value = currentViewState().copy(
                 showClearButton = false,
                 omnibarText = trimmedInput,
-                showAutoCompleteSuggestions = false,
-                autoCompleteSearchResults = AutoCompleteResult("", emptyList()))
+                autoComplete = AutoCompleteViewState(false))
     }
 
     private fun buildUrl(input: String): String {
@@ -283,19 +284,19 @@ class BrowserViewModel(
         val autoCompleteSearchResults = if (query.isBlank()) {
             AutoCompleteResult(query, emptyList())
         } else {
-            currentViewState.autoCompleteSearchResults
+            currentViewState.autoComplete.searchResults
         }
 
         val hasQueryChanged = (currentViewState.omnibarText != query)
         val autoCompleteSuggestionsEnabled = appSettingsPreferencesStore.autoCompleteSuggestionsEnabled
+        val showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && autoCompleteSuggestionsEnabled
 
         viewState.value = currentViewState().copy(
                 isEditing = hasFocus,
                 showClearButton = showClearButton,
                 showPrivacyGrade = appConfigurationDownloaded && !hasFocus,
                 showFireButton = !hasFocus,
-                showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && autoCompleteSuggestionsEnabled,
-                autoCompleteSearchResults = autoCompleteSearchResults
+                autoComplete = AutoCompleteViewState(showAutoCompleteSuggestions, autoCompleteSearchResults)
         )
 
         if(hasQueryChanged && hasFocus && autoCompleteSuggestionsEnabled) {
@@ -334,7 +335,7 @@ class BrowserViewModel(
     }
 
     fun onUserSelectedToEditQuery(query: String) {
-        viewState.value = currentViewState().copy(isEditing = false, showAutoCompleteSuggestions = false, omnibarText = query)
+        viewState.value = currentViewState().copy(isEditing = false, autoComplete = AutoCompleteViewState(showSuggestions = false), omnibarText = query)
     }
 
     fun userLongPressedInWebView(target: WebView.HitTestResult, menu: ContextMenu) {
@@ -355,6 +356,23 @@ class BrowserViewModel(
             }
         }
     }
+
+    fun userFindingInPage(searchTerm: String) {
+        viewState.value = currentViewState().copy(findInPage = FindInPage(visible = true, searchTerm = searchTerm))
+    }
+
+    fun dismissFindInView() {
+        viewState.value = currentViewState().copy(findInPage = FindInPage(visible = false, searchTerm = ""))
+    }
+
+    data class FindInPage(
+            val visible: Boolean = false,
+            val searchTerm: String = "")
+
+    data class AutoCompleteViewState(
+            val showSuggestions: Boolean = false,
+            val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
+    )
 }
 
 

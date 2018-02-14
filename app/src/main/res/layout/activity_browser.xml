@@ -117,7 +117,6 @@
 
         </android.support.design.widget.AppBarLayout>
 
-
         <View
             android:id="@+id/focusDummy"
             android:layout_width="match_parent"
@@ -140,6 +139,13 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     </android.support.design.widget.CoordinatorLayout>
+
+    <include
+        layout="@layout/include_find_in_page"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:visibility="gone"
+        tools:visibility="visible" />
 
     <FrameLayout
         android:id="@+id/webViewFullScreenContainer"
