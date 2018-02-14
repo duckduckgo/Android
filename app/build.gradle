@@ -7,6 +7,7 @@ apply from: '../versioning.gradle'
 
 ext {
     VERSION_NAME = "4.3.0"
+    USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
 }
 
 android {
@@ -18,7 +19,7 @@ android {
         targetSdkVersion 27
         versionCode buildVersionCode()
         versionName VERSION_NAME
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.duckduckgo.app.TestRunner"
         archivesBaseName = "duckduckgo-$versionName"
 
         javaCompileOptions {
@@ -50,6 +51,10 @@ android {
     }
     testOptions {
         unitTests.returnDefaultValues = true
+
+        if(USE_ORCHESTRATOR) {
+            execution 'ANDROID_TEST_ORCHESTRATOR'
+        }
     }
 
     def staticConfigPath = "${System.getenv('HOME')}/jenkins_static/com.duckduckgo.mobile.android"
@@ -79,8 +84,8 @@ ext {
 
 
 dependencies {
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.4'
-    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
@@ -120,12 +125,15 @@ dependencies {
     // Dagger
     kapt "com.google.dagger:dagger-android-processor:$dagger"
     kapt "com.google.dagger:dagger-compiler:$dagger"
+    kaptAndroidTest "com.google.dagger:dagger-android-processor:$dagger"
+    kaptAndroidTest "com.google.dagger:dagger-compiler:$dagger"
 
     testImplementation "org.mockito:mockito-core:2.13.0"
     testImplementation "com.nhaarman:mockito-kotlin-kt1.1:1.5.0"
     testImplementation "junit:junit:4.12"
 
     androidTestImplementation "com.android.support.test:runner:1.0.1"
+    androidTestUtil "com.android.support.test:orchestrator:1.0.1"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:3.0.1"
     androidTestImplementation "org.mockito:mockito-android:2.13.0"
     androidTestImplementation "com.nhaarman:mockito-kotlin-kt1.1:1.5.0"

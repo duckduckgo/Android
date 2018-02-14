@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,15 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
-@Module (includes = [DaoModule::class])
-class DatabaseModule {
+
+@Module(includes = [DaoModule::class])
+class StubDatabaseModule {
 
     @Provides
     @Singleton
     fun provideDatabase(context: Context): AppDatabase {
-        return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
-                .fallbackToDestructiveMigration()
+        return Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+                .allowMainThreadQueries()
                 .build()
     }
 }

@@ -33,7 +33,12 @@ before_script:
   - android-wait-for-emulator
   - adb shell input keyevent 82
 
-script: ./gradlew build connectedCheck
+script:
+  - ./gradlew build
+  - ./gradlew connectedCheck -Porchestrator --info
+
+after_failure:
+  - cat /home/travis/build/duckduckgo/Android/app/build/outputs/androidTest-results/connected/*
 
 notifications:
   slack:

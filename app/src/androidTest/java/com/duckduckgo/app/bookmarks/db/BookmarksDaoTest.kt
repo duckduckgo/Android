@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.bookmarks.db
 
+import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.persistence.room.Room
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.blockingObserve
@@ -23,9 +24,14 @@ import com.duckduckgo.app.global.db.AppDatabase
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 class BookmarksDaoTest {
+
+    @get:Rule
+    @Suppress("unused")
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var db: AppDatabase
     private lateinit var dao: BookmarksDao
@@ -33,6 +39,7 @@ class BookmarksDaoTest {
     @Before
     fun before() {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java)
+                .allowMainThreadQueries()
                 .build()
         dao = db.bookmarksDao()
     }

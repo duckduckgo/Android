@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.app
 
-import android.arch.persistence.room.Room
+import android.app.Application
 import android.content.Context
-import com.duckduckgo.app.global.db.AppDatabase
-import dagger.Module
-import dagger.Provides
-import javax.inject.Singleton
+import android.support.test.runner.AndroidJUnitRunner
 
-@Module (includes = [DaoModule::class])
-class DatabaseModule {
 
-    @Provides
-    @Singleton
-    fun provideDatabase(context: Context): AppDatabase {
-        return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
-                .fallbackToDestructiveMigration()
-                .build()
+class TestRunner : AndroidJUnitRunner() {
+    override fun newApplication(cl: ClassLoader, className: String, context: Context): Application {
+        return super.newApplication(cl, TestApplication::class.java.name, context)
     }
 }

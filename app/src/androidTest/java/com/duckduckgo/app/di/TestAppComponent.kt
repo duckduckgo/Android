@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,10 @@
 
 package com.duckduckgo.app.di
 
-
 import android.app.Application
+import com.duckduckgo.app.TestApplication
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteModule
 import com.duckduckgo.app.browser.di.BrowserModule
-import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.httpsupgrade.di.HttpsUpgraderModule
 import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
 import com.duckduckgo.app.trackerdetection.di.TrackerDetectionModule
@@ -30,31 +29,35 @@ import dagger.android.AndroidInjector
 import dagger.android.support.AndroidSupportInjectionModule
 import javax.inject.Singleton
 
+
 @Singleton
 @Component(modules = [
-    ApplicationModule::class,
-    JobsModule::class,
-    AndroidBindingModule::class,
-    AndroidSupportInjectionModule::class,
-    NetworkModule::class,
-    AppConfigurationDownloaderModule::class,
-    StoreModule::class,
-    DatabaseModule::class,
-    DaoModule::class,
-    JsonModule::class,
-    StringModule::class,
-    BrowserModule::class,
-    BrowserAutoCompleteModule::class,
-    HttpsUpgraderModule::class,
-    ResourceSurrogateModule::class,
-    TrackerDetectionModule::class
+
+    /* test doubled modules */
+    StubDatabaseModule::class,
+    StubJobSchedulerModule::class,
+    StubAppConfigurationDownloadModule::class,
+
+    /* real modules */
+    (ApplicationModule::class),
+    (AndroidBindingModule::class),
+    (AndroidSupportInjectionModule::class),
+    (NetworkModule::class),
+    (StoreModule::class),
+    (JsonModule::class),
+    (StringModule::class),
+    (BrowserModule::class),
+    (BrowserAutoCompleteModule::class),
+    (HttpsUpgraderModule::class),
+    (ResourceSurrogateModule::class),
+    (TrackerDetectionModule::class)
 ])
-interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
+interface TestAppComponent : AndroidInjector<TestApplication> {
 
     @Component.Builder
-    abstract class Builder : AndroidInjector.Builder<DuckDuckGoApplication>() {
+    abstract class Builder : AndroidInjector.Builder<TestApplication>() {
 
         @BindsInstance
-        abstract fun application(application: Application): AppComponent.Builder
+        abstract fun application(application: Application): TestAppComponent.Builder
     }
 }
