@@ -24,7 +24,7 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-class FakeJobSchedulerModule {
+class StubJobSchedulerModule {
 
     @Singleton
     @Provides

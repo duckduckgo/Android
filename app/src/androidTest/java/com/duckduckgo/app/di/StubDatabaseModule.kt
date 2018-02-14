@@ -25,7 +25,7 @@ import javax.inject.Singleton
 
 
 @Module(includes = [DaoModule::class])
-class TestDatabaseModule {
+class StubDatabaseModule {
 
     @Provides
     @Singleton

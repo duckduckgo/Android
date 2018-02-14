@@ -34,9 +34,9 @@ import javax.inject.Singleton
 @Component(modules = [
 
     /* test doubled modules */
-    TestDatabaseModule::class,
-    FakeJobSchedulerModule::class,
-    FakeAppConfigurationDownloadModule::class,
+    StubDatabaseModule::class,
+    StubJobSchedulerModule::class,
+    StubAppConfigurationDownloadModule::class,
 
     /* real modules */
     (ApplicationModule::class),

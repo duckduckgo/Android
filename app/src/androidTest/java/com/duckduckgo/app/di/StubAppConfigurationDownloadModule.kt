@@ -22,7 +22,7 @@ import dagger.Provides
 import io.reactivex.Completable
 
 @Module
-class FakeAppConfigurationDownloadModule {
+class StubAppConfigurationDownloadModule {
 
     @Provides
     fun fakeAppConfigurationDownloader(): ConfigurationDownloader {
