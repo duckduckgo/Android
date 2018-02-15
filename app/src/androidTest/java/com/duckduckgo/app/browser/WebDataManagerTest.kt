@@ -52,7 +52,7 @@ class WebDataManagerTest {
     }
 
     @Test
-    fun whenExternalCookiesClearedThenThenInternalCookiesRecreated() {
+    fun whenExternalCookiesClearedThenInternalCookiesRecreated() {
 
         whenever(mockCookieManager.getCookie(host)).thenReturn("da=abc; dz=zyx")
         whenever(mockCookieManager.getCookie(externalHost)).thenReturn("ea=abc; ez=zyx")
