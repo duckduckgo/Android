@@ -22,7 +22,6 @@ import android.os.Bundle
 import android.support.v4.app.ActivityOptionsCompat
 import android.view.Menu
 import android.view.MenuItem
-import android.webkit.CookieManager
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserPopupMenu
@@ -35,15 +34,10 @@ import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import org.jetbrains.anko.toast
-import javax.inject.Inject
-import javax.inject.Provider
 
 class HomeActivity : DuckDuckGoActivity() {
 
     private lateinit var popupMenu: BrowserPopupMenu
-
-    @Inject
-    lateinit var cookieManagerProvider: Provider<CookieManager>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -121,7 +115,6 @@ class HomeActivity : DuckDuckGoActivity() {
 
     private fun launchFire() {
         FireDialog(context = this,
-            cookieManager = cookieManagerProvider.get(),
             clearStarted = {},
             clearComplete = { toast(R.string.fireDataCleared) }).show()
     }

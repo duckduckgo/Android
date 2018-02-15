@@ -37,7 +37,6 @@ import android.view.*
 import android.view.KeyEvent.KEYCODE_ENTER
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
-import android.webkit.CookieManager
 import android.webkit.URLUtil
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.webkit.WebView
@@ -63,7 +62,6 @@ import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Provider
 
 
 class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
@@ -76,9 +74,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
-
-    @Inject
-    lateinit var cookieManagerProvider: Provider<CookieManager>
 
     private lateinit var popupMenu: BrowserPopupMenu
 
@@ -499,8 +494,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
     private fun launchFire() {
         FireDialog(context = this,
                 clearStarted = { finishActivityAnimated() },
-                clearComplete = { applicationContext.toast(R.string.fireDataCleared) },
-                cookieManager = cookieManagerProvider.get()
+                clearComplete = { applicationContext.toast(R.string.fireDataCleared) }
         ).show()
     }
 

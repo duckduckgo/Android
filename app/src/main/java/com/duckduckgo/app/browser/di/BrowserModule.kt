@@ -16,16 +16,12 @@
 
 package com.duckduckgo.app.browser.di
 
-import android.webkit.CookieManager
 import com.duckduckgo.app.browser.*
 import dagger.Module
 import dagger.Provides
 
 @Module
 class BrowserModule {
-
-    @Provides
-    fun cookieManager(): CookieManager = CookieManager.getInstance()
 
     @Provides
     fun duckDuckGoRequestRewriter(urlDetector: DuckDuckGoUrlDetector): RequestRewriter {
