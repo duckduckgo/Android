@@ -35,6 +35,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.view.*
 import android.view.KeyEvent.KEYCODE_ENTER
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.webkit.CookieManager
@@ -131,7 +133,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
             enableMenuOption(view.bookmarksPopupMenuItem) { launchBookmarks() }
             enableMenuOption(view.addBookmarksPopupMenuItem) { addBookmark() }
             enableMenuOption(view.settingsPopupMenuItem) { launchSettings() }
-            enableMenuOption(view.findInPageMenuItem) { viewModel.userFindingInPage("") }
+            enableMenuOption(view.findInPageMenuItem) { viewModel.userRequestingToFindInPage() }
         }
     }
 
@@ -154,6 +156,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
             Command.Refresh -> webView.reload()
             is Command.Navigate -> {
                 focusDummy.requestFocus()
+                hideFindInPage()
                 webView.loadUrl(it.url)
             }
             Command.LandingPage -> finishActivityAnimated()
@@ -188,6 +191,8 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
                 pendingFileDownload = PendingFileDownload(it.url, Environment.DIRECTORY_PICTURES)
                 downloadFileWithPermissionCheck()
             }
+            is Command.FindInPageCommand -> webView.findAllAsync(it.searchTerm)
+            Command.DismissFindInPage -> webView.findAllAsync(null)
         }
     }
 
@@ -264,23 +269,39 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
             false -> if (immersiveMode) exitFullScreen()
         }
 
-        when (viewState.findInPage.visible) {
-            true -> showFindInPageView()
+        renderFindInPageState(viewState.findInPage)
+    }
+
+    private fun renderFindInPageState(viewState: BrowserViewModel.FindInPage) {
+        when (viewState.visible) {
+            true -> showFindInPageView(viewState)
             false -> hideFindInPage()
         }
+
+        popupMenu.contentView.findInPageMenuItem?.isEnabled = viewState.canFindInPage
     }
 
     private fun hideFindInPage() {
-        focusDummy.requestFocus()
-        findInPageContainer.gone()
-        findInPageInput.hideKeyboard()
-        webView.findAllAsync(null)
+        if(findInPageContainer.visibility != GONE) {
+            focusDummy.requestFocus()
+            findInPageContainer.gone()
+            findInPageInput.hideKeyboard()
+        }
     }
 
-    private fun showFindInPageView() {
-        findInPageContainer.show()
-        findInPageInput.postDelayed({ findInPageInput.showKeyboard() }, 300)
-        webView.findAllAsync(findInPageInput.text.toString())
+    private fun showFindInPageView(viewState: BrowserViewModel.FindInPage) {
+        if(findInPageContainer.visibility != VISIBLE) {
+            findInPageContainer.show()
+            findInPageInput.postDelayed({ findInPageInput.showKeyboard() }, 300)
+        }
+
+        when(viewState.showNumberMatches) {
+            false -> findInPageMatches.hide()
+            true -> {
+                findInPageMatches.text = getString(R.string.findInPageMatches, viewState.activeMatchIndex, viewState.numberMatches)
+                findInPageMatches.show()
+            }
+        }
     }
 
     private fun goFullScreen() {
@@ -615,7 +636,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
     }
 
     override fun onFindResultReceived(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Boolean) {
-        Timber.i("Found %d matches%s", numberOfMatches, if(isDoneCounting) "" else " so far")
+        viewModel.onFindResultsReceived(activeMatchOrdinal, numberOfMatches)
     }
 
     private data class PendingFileDownload(

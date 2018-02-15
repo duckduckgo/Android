@@ -80,11 +80,10 @@ class BrowserViewModel(
             val canAddBookmarks: Boolean = false,
             val isFullScreen: Boolean = false,
             val autoComplete: AutoCompleteViewState = AutoCompleteViewState(),
-            val findInPage: FindInPage = FindInPage()
+            val findInPage: FindInPage = FindInPage(canFindInPage = false)
     )
 
     sealed class Command {
-
         object LandingPage : Command()
         object Refresh : Command()
         class Navigate(val url: String) : Command()
@@ -96,6 +95,8 @@ class BrowserViewModel(
         object ReinitialiseWebView : Command()
         class ShowFullScreen(val view: View) : Command()
         class DownloadImage(val url: String) : Command()
+        class FindInPageCommand(val searchTerm: String) : Command()
+        object DismissFindInPage : Command()
     }
     /* Observable data for Activity to subscribe to */
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -166,6 +167,7 @@ class BrowserViewModel(
         val trimmedInput = input.trim()
         url.value = buildUrl(trimmedInput)
         viewState.value = currentViewState().copy(
+                findInPage = FindInPage(visible = false, canFindInPage = true),
                 showClearButton = false,
                 omnibarText = trimmedInput,
                 autoComplete = AutoCompleteViewState(false))
@@ -222,7 +224,7 @@ class BrowserViewModel(
     override fun urlChanged(url: String?) {
         Timber.v("Url changed: $url")
         if (url == null) {
-            viewState.value = viewState.value?.copy(canAddBookmarks = false)
+            viewState.value = viewState.value?.copy(canAddBookmarks = false, findInPage = FindInPage(visible = false, canFindInPage = false))
             return
         }
 
@@ -231,7 +233,8 @@ class BrowserViewModel(
                 omnibarText = url,
                 browserShowing = true,
                 showFireButton = true,
-                showPrivacyGrade = appConfigurationDownloaded)
+                showPrivacyGrade = appConfigurationDownloaded,
+                findInPage = FindInPage(visible = false, canFindInPage = true))
 
         if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url) && duckDuckGoUrlDetector.hasQuery(url)) {
             newViewState = newViewState.copy(omnibarText = duckDuckGoUrlDetector.extractQuery(url))
@@ -357,22 +360,47 @@ class BrowserViewModel(
         }
     }
 
+
+    fun userRequestingToFindInPage() {
+        viewState.value = currentViewState().copy(findInPage = FindInPage(visible = true))
+    }
+
     fun userFindingInPage(searchTerm: String) {
-        viewState.value = currentViewState().copy(findInPage = FindInPage(visible = true, searchTerm = searchTerm))
+        var findInPage = currentViewState().findInPage.copy(visible = true, searchTerm = searchTerm)
+        if(searchTerm.isEmpty()) {
+            findInPage = findInPage.copy(showNumberMatches = false)
+        }
+        viewState.value = currentViewState().copy(findInPage = findInPage)
+        command.value = Command.FindInPageCommand(searchTerm)
     }
 
     fun dismissFindInView() {
-        viewState.value = currentViewState().copy(findInPage = FindInPage(visible = false, searchTerm = ""))
+        viewState.value = currentViewState().copy(findInPage = FindInPage(visible = false))
+        command.value = Command.DismissFindInPage
+    }
+
+    fun onFindResultsReceived(activeMatchOrdinal: Int, numberOfMatches: Int) {
+        val activeIndex = if (numberOfMatches == 0) 0 else activeMatchOrdinal + 1
+        val findInPage = currentViewState().findInPage.copy(
+                showNumberMatches = true,
+                activeMatchIndex = activeIndex,
+                numberMatches = numberOfMatches)
+        viewState.value = currentViewState().copy(findInPage = findInPage)
     }
 
     data class FindInPage(
             val visible: Boolean = false,
-            val searchTerm: String = "")
+            val showNumberMatches: Boolean = false,
+            val activeMatchIndex: Int = 0,
+            val searchTerm: String = "",
+            val numberMatches: Int = 0,
+            val canFindInPage: Boolean = true)
 
     data class AutoCompleteViewState(
             val showSuggestions: Boolean = false,
             val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
     )
+
 }
 
 

@@ -31,18 +31,31 @@
         android:layout_height="match_parent"
         android:layout_marginEnd="12dp"
         android:layout_marginStart="12dp"
-        android:imeOptions="flagNoExtractUi"
         android:hint="@string/findInPageHint"
-        android:textColor="@color/white"
-        android:selectAllOnFocus="true"
+        android:imeOptions="flagNoExtractUi"
         android:inputType="text"
+        android:selectAllOnFocus="true"
+        android:textColor="@color/white"
         android:textColorHint="@color/paleBrownishGray"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/findInPageControlButtons"
+        app:layout_constraintEnd_toStartOf="@id/findInPageMatches"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5"
         tools:text="Search term" />
+
+    <TextView
+        android:id="@+id/findInPageMatches"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/findInPageControlButtons"
+        app:layout_constraintStart_toEndOf="@id/findInPageInput"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5"
+        tools:text="1/10" />
 
 
     <android.support.constraint.ConstraintLayout
@@ -50,8 +63,8 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/findInPageInput"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/findInPageMatches"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5">
 
@@ -84,9 +97,9 @@
         <ImageView
             android:id="@+id/closeFindInPagePanel"
             android:layout_width="36dp"
-            android:padding="6dp"
             android:layout_height="match_parent"
             android:contentDescription="@string/previousSearchTermDescription"
+            android:padding="6dp"
             android:src="@drawable/ic_close_white_24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
