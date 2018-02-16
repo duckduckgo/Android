@@ -17,52 +17,37 @@
 package com.duckduckgo.app.global.view
 
 import android.content.Context
+import android.net.Uri
 import android.support.design.widget.BottomSheetDialog
 import android.view.View
 import android.webkit.CookieManager
 import android.webkit.WebStorage
 import android.webkit.WebView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.WebDataManager
 import kotlinx.android.synthetic.main.sheet_fire_clear_data.*
 
-class FireDialog(
-    context: Context,
-    private val cookieManager: CookieManager,
-    clearStarted: (() -> Unit),
-    clearComplete: (() -> Unit)
-) : BottomSheetDialog(context) {
+class FireDialog(context: Context, clearStarted: (() -> Unit), clearComplete: (() -> Unit)) :
+    BottomSheetDialog(context) {
 
     init {
+
+        val host = Uri.parse(context.getString(R.string.baseUrl)).host
+        val dataManager = WebDataManager(host)
         val contentView = View.inflate(getContext(), R.layout.sheet_fire_clear_data, null)
+
         setContentView(contentView)
+
         clearAllOption.setOnClickListener {
             clearStarted()
-            clearCache()
-            WebStorage.getInstance().deleteAllData()
-            clearCookies(clearComplete)
+            dataManager.clearData(WebView(context), WebStorage.getInstance())
+            dataManager.clearExternalCookies(CookieManager.getInstance(), clearComplete)
             dismiss()
         }
+
         cancelOption.setOnClickListener {
             dismiss()
         }
-    }
 
-    private fun clearCache() {
-        val webView = WebView(context)
-        webView.clearCache(true)
-        webView.clearHistory()
-    }
-
-    private fun clearCookies(clearAllCallback: (() -> Unit)) {
-        val ddgCookie = cookieManager.getCookie(DDG_URL)
-
-        cookieManager.removeAllCookies {
-            cookieManager.setCookie(DDG_URL, ddgCookie)
-            clearAllCallback()
-        }
-    }
-
-    companion object {
-        private const val DDG_URL = "duckduckgo.com"
     }
 }
