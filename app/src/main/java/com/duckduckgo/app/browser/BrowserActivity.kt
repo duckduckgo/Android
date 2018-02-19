@@ -435,7 +435,9 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener {
 
     override fun onCreateContextMenu(menu: ContextMenu, view: View, menuInfo: ContextMenu.ContextMenuInfo?) {
         webView.hitTestResult?.let {
-            viewModel.userLongPressedInWebView(it, menu)
+            if(URLUtil.isNetworkUrl(it.extra)) {
+                viewModel.userLongPressedInWebView(it, menu)
+            }
         }
     }
 

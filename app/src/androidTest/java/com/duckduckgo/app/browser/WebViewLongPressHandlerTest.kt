@@ -32,6 +32,9 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
+private const val HTTPS_IMAGE_URL = "https://example.com/1.img"
+private const val DATA_URI_IMAGE_URL = "data:image/png;base64,iVB23="
+
 class WebViewLongPressHandlerTest {
 
     private lateinit var testee: WebViewLongPressHandler
@@ -50,37 +53,38 @@ class WebViewLongPressHandlerTest {
 
     @Test
     fun whenLongPressedWithImageTypeThenImageOptionsHeaderAddedToMenu() {
-        testee.handleLongPress(HitTestResult.IMAGE_TYPE, mockMenu)
+        testee.handleLongPress(HitTestResult.IMAGE_TYPE, HTTPS_IMAGE_URL, mockMenu)
         verify(mockMenu).setHeaderTitle(R.string.imageOptions)
     }
 
     @Test
     fun whenLongPressedWithAnchorImageTypeThenImageOptionsHeaderAddedToMenu() {
-        testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, mockMenu)
+        testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, HTTPS_IMAGE_URL, mockMenu)
         verify(mockMenu).setHeaderTitle(R.string.imageOptions)
     }
 
     @Test
     fun whenLongPressedWithImageTypeThenDownloadImageMenuAdded() {
-        testee.handleLongPress(HitTestResult.IMAGE_TYPE, mockMenu)
+        testee.handleLongPress(HitTestResult.IMAGE_TYPE, HTTPS_IMAGE_URL, mockMenu)
         verify(mockMenu).add(anyInt(), eq(WebViewLongPressHandler.CONTEXT_MENU_ID_DOWNLOAD_IMAGE), anyInt(), eq(R.string.downloadImage))
     }
 
     @Test
     fun whenLongPressedWithAnchorImageTypeThenDownloadImageMenuAdded() {
-        testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, mockMenu)
+        testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, HTTPS_IMAGE_URL, mockMenu)
         verify(mockMenu).add(anyInt(), eq(WebViewLongPressHandler.CONTEXT_MENU_ID_DOWNLOAD_IMAGE), anyInt(), eq(R.string.downloadImage))
     }
 
     @Test
     fun whenLongPressedWithOtherImageTypeThenMenuNotAltered() {
-        testee.handleLongPress(HitTestResult.UNKNOWN_TYPE, mockMenu)
-        verify(mockMenu, never()).setHeaderTitle(anyString())
-        verify(mockMenu, never()).setHeaderTitle(anyInt())
-        verify(mockMenu, never()).add(anyInt())
-        verify(mockMenu, never()).add(anyString())
-        verify(mockMenu, never()).add(anyInt(), anyInt(), anyInt(), anyInt())
-        verify(mockMenu, never()).add(anyInt(), anyInt(), anyInt(), anyString())
+        testee.handleLongPress(HitTestResult.UNKNOWN_TYPE, HTTPS_IMAGE_URL, mockMenu)
+        verifyMenuNotAltered()
+    }
+
+    @Test
+    fun whenLongPressedWithImageTypeWhichIsADataUriThenMenuNotAltered() {
+        testee.handleLongPress(HitTestResult.IMAGE_TYPE, DATA_URI_IMAGE_URL, mockMenu)
+        verifyMenuNotAltered()
     }
 
     @Test
@@ -103,5 +107,14 @@ class WebViewLongPressHandlerTest {
         whenever(mockMenuItem.itemId).thenReturn(unknownMenuId)
         val action = testee.userSelectedMenuItem("example.com", mockMenuItem)
         assertTrue(action == LongPressHandler.RequiredAction.None)
+    }
+
+    private fun verifyMenuNotAltered() {
+        verify(mockMenu, never()).setHeaderTitle(anyString())
+        verify(mockMenu, never()).setHeaderTitle(anyInt())
+        verify(mockMenu, never()).add(anyInt())
+        verify(mockMenu, never()).add(anyString())
+        verify(mockMenu, never()).add(anyInt(), anyInt(), anyInt(), anyInt())
+        verify(mockMenu, never()).add(anyInt(), anyInt(), anyInt(), anyString())
     }
 }
