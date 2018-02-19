@@ -74,24 +74,24 @@
         <TextView
             android:id="@+id/bookmarksPopupMenuItem"
             style="@style/BrowserTextMenuItem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:enabled="false"
             android:text="@string/bookmarksMenuTitle" />
 
         <TextView
             android:id="@+id/addBookmarksPopupMenuItem"
             style="@style/BrowserTextMenuItem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:enabled="false"
             android:text="@string/addBookmarkMenuTitle" />
 
         <TextView
+            android:id="@+id/findInPageMenuItem"
+            style="@style/BrowserTextMenuItem"
+            android:enabled="false"
+            android:text="@string/find_in_page" />
+
+        <TextView
             android:id="@+id/settingsPopupMenuItem"
             style="@style/BrowserTextMenuItem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:enabled="false"
             android:text="@string/settingsMenuItemTitle" />
 
