@@ -145,8 +145,7 @@
         layout="@layout/include_find_in_page"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:visibility="gone"
-        tools:visibility="visible" />
+        android:visibility="gone" />
 
     <FrameLayout
         android:id="@+id/webViewFullScreenContainer"
