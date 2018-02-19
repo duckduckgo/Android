@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.view.ContextMenu
 import android.view.MenuItem
+import android.webkit.URLUtil
 import android.webkit.WebView
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
@@ -27,7 +28,7 @@ import javax.inject.Inject
 
 
 interface LongPressHandler {
-    fun handleLongPress(longPressTargetType: Int, menu: ContextMenu)
+    fun handleLongPress(longPressTargetType: Int, longPressTargetUrl: String, menu: ContextMenu)
     fun userSelectedMenuItem(longPressTarget: String, item: MenuItem): RequiredAction
 
     sealed class RequiredAction {
@@ -38,12 +39,14 @@ interface LongPressHandler {
 
 class WebViewLongPressHandler @Inject constructor() : LongPressHandler {
 
-    override fun handleLongPress(longPressTargetType: Int, menu: ContextMenu) {
+    override fun handleLongPress(longPressTargetType: Int, longPressTargetUrl: String, menu: ContextMenu) {
         when (longPressTargetType) {
             WebView.HitTestResult.IMAGE_TYPE,
             WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE -> {
-                menu.setHeaderTitle(R.string.imageOptions)
-                menu.add(0, CONTEXT_MENU_ID_DOWNLOAD_IMAGE, 0, R.string.downloadImage)
+                if(URLUtil.isNetworkUrl(longPressTargetUrl)) {
+                    menu.setHeaderTitle(R.string.imageOptions)
+                    menu.add(0, CONTEXT_MENU_ID_DOWNLOAD_IMAGE, 0, R.string.downloadImage)
+                }
             }
             else -> Timber.v("App does not yet handle target type: $longPressTargetType")
         }
