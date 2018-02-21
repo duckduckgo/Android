@@ -17,7 +17,7 @@
 package com.duckduckgo.app.browser.autoComplete
 
 import android.content.Context
-import com.duckduckgo.app.settings.db.AppSettingsPreferencesStore
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import dagger.Module
 import dagger.Provides
@@ -27,6 +27,6 @@ import dagger.Provides
 class BrowserAutoCompleteModule {
 
     @Provides
-    fun settingsDataStore(context: Context): SettingsDataStore = AppSettingsPreferencesStore(context)
+    fun settingsDataStore(context: Context): SettingsDataStore = SettingsSharedPreferences(context)
 
 }

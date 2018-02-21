@@ -652,8 +652,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
         private const val QUERY_EXTRA = "QUERY_EXTRA"
         private const val DASHBOARD_REQUEST_CODE = 100
         private const val PERMISSION_REQUEST_EXTERNAL_STORAGE = 200
-
-
     }
 
 }

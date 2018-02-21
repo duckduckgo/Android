@@ -24,6 +24,7 @@ import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.home.HomeActivity
@@ -37,8 +38,11 @@ import javax.inject.Inject
 
 class PrivacyPracticesActivity : DuckDuckGoActivity() {
 
-    @Inject lateinit var viewModelFactory: ViewModelFactory
-    @Inject lateinit var repository: PrivacyMonitorRepository
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
+    @Inject
+    lateinit var repository: PrivacyMonitorRepository
 
     private val practicesAdapter = PrivacyPracticesAdapter()
 
@@ -79,7 +83,7 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
     }
 
     fun onTosdrLinkClicked(@Suppress("UNUSED_PARAMETER") view: View) {
-        startActivity(HomeActivity.intent(this, getString(R.string.tosdrUrl)))
+        startActivity(HomeActivity.intent(this, Url.TOSDR))
         finish()
     }
 

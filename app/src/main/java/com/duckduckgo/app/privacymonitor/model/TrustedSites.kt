@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.privacymonitor.model
 
+import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.UriString
 
 class TrustedSites {
@@ -23,6 +24,7 @@ class TrustedSites {
     companion object {
 
         private val trusted = listOf(
+                AppUrl.Url.HOST,
                 "duckduckgo.com",
                 "donttrack.us",
                 "spreadprivacy.com",

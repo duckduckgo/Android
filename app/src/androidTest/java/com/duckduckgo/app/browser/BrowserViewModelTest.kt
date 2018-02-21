@@ -42,6 +42,7 @@ import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -73,6 +74,9 @@ class BrowserViewModelTest {
             return MutableLiveData<Array<NetworkPercent>>()
         }
     }
+
+    @Mock
+    private lateinit var mockStatisticsUpdater: StatisticsUpdater
 
     @Mock
     private lateinit var mockQueryObserver: Observer<String>
@@ -116,6 +120,7 @@ class BrowserViewModelTest {
         appConfigurationDao = db.appConfigurationDao()
 
         testee = BrowserViewModel(
+                statisticsUpdater = mockStatisticsUpdater,
                 queryUrlConverter = mockOmnibarConverter,
                 duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
                 termsOfServiceStore = mockTermsOfServiceStore,

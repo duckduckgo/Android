@@ -17,6 +17,8 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.nhaarman.mockito_kotlin.mock
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -25,11 +27,12 @@ import org.junit.Test
 class DuckDuckGoRequestRewriterTest {
 
     private lateinit var testee: DuckDuckGoRequestRewriter
+    private var mockStatisticsStore: StatisticsDataStore = mock()
     private lateinit var builder: Uri.Builder
 
     @Before
     fun before() {
-        testee = DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector())
+        testee = DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector(), mockStatisticsStore)
         builder = Uri.Builder()
     }
 

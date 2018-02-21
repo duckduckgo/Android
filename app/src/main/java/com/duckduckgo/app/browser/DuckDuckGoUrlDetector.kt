@@ -17,30 +17,32 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
+import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.global.AppUrl.ParamKey
 import javax.inject.Inject
 
 
 class DuckDuckGoUrlDetector @Inject constructor() {
 
     fun isDuckDuckGoUrl(uri: Uri): Boolean {
-        return "duckduckgo.com" == uri.host
+        return AppUrl.Url.HOST == uri.host
     }
 
     fun isDuckDuckGoUrl(uriString: String): Boolean {
         return isDuckDuckGoUrl(uriString.toUri())
     }
 
-    fun hasQuery(uriString: String): Boolean {
-        return uriString.toUri().queryParameterNames.contains(queryParameter)
+    fun isDuckDuckGoQueryUrl(uriString: String): Boolean {
+        return isDuckDuckGoUrl(uriString.toUri()) && hasQuery(uriString)
+    }
+
+    private fun hasQuery(uriString: String): Boolean {
+        return uriString.toUri().queryParameterNames.contains(ParamKey.QUERY)
     }
 
     fun extractQuery(uriString: String): String? {
         val uri = uriString.toUri()
-        return uri.getQueryParameter(queryParameter)
-    }
-
-    private companion object {
-        const val queryParameter = "q"
+        return uri.getQueryParameter(ParamKey.QUERY)
     }
 
     private fun String.toUri(): Uri {

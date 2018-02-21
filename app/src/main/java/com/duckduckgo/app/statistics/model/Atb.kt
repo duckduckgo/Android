@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.autocomplete.api
+package com.duckduckgo.app.statistics.model;
 
-import io.reactivex.Observable
-import retrofit2.http.GET
-import retrofit2.http.Query
+data class Atb(val version: String) {
 
+    val versionWithVariant: String get() = version + VARIANT
 
-interface AutoCompleteService {
+    companion object {
+        const val VARIANT = "ma"
+    }
 
-    @GET("/ac/")
-    fun autoComplete(@Query("q") query: String): Observable<List<AutoCompleteServiceRawResult>>
 }
-
-data class AutoCompleteServiceRawResult(val phrase: String)

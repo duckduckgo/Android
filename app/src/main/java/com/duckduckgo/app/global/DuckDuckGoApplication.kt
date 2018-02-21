@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.migration.LegacyMigration
+import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.squareup.leakcanary.LeakCanary
@@ -58,6 +59,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Appl
     @Inject
     lateinit var migration: LegacyMigration
 
+    @Inject
+    lateinit var statisticsUpdater: StatisticsUpdater
+
     override fun onCreate() {
         super.onCreate()
 
@@ -67,6 +71,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Appl
         configureLogging()
         configureCrashReporting()
 
+        initializeStatistics()
         loadTrackerData()
         configureDataDownloader()
 
@@ -109,6 +114,10 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Appl
 
     private fun configureCrashReporting() {
         crashReportingInitializer.init(this)
+    }
+
+    private fun initializeStatistics() {
+        statisticsUpdater.initializeAtb()
     }
 
     /**
