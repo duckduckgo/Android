@@ -83,6 +83,17 @@
             android:enabled="false"
             android:text="@string/addBookmarkMenuTitle" />
 
+            <CheckBox
+                android:id="@+id/requestDesktopSiteCheckMenuItem"
+                style="@style/BrowserTextMenuItem"
+                android:button="@null"
+                android:enabled="false"
+                android:drawablePadding="20dp"
+                android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
+                android:text="@string/requestDesktopSiteMenuTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
         <TextView
             android:id="@+id/findInPageMenuItem"
             style="@style/BrowserTextMenuItem"

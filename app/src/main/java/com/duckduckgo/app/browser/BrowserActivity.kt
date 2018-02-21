@@ -50,6 +50,7 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
+import com.duckduckgo.app.browser.userAgent.UserAgentProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
@@ -78,11 +79,16 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
+    @Inject
+    lateinit var userAgentProvider: UserAgentProvider
+
     private lateinit var popupMenu: BrowserPopupMenu
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
     private var acceptingRenderUpdates = true
+
+    private lateinit var defaultUserAgentString : String
 
     private val viewModel: BrowserViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(BrowserViewModel::class.java)
@@ -129,6 +135,14 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
             enableMenuOption(view.addBookmarksPopupMenuItem) { addBookmark() }
             enableMenuOption(view.settingsPopupMenuItem) { launchSettings() }
             enableMenuOption(view.findInPageMenuItem) { viewModel.userRequestingToFindInPage() }
+            enableMenuOption(view.requestDesktopSiteCheckMenuItem) {
+                Timber.i("here and now")
+            }
+
+            view.requestDesktopSiteCheckMenuItem.setOnCheckedChangeListener { _, isChecked ->
+                Timber.i("changed, checked = $isChecked")
+                viewModel.desktopSiteModeToggled(urlString = webView.url, desktopSiteRequested = isChecked)
+            }
         }
     }
 
@@ -185,6 +199,12 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
             is Command.DownloadImage -> {
                 pendingFileDownload = PendingFileDownload(it.url, Environment.DIRECTORY_PICTURES)
                 downloadFileWithPermissionCheck()
+            }
+            Command.DesktopMode -> {
+                webView.settings.userAgentString = userAgentProvider.getUserAgent(defaultUserAgentString, desktopSiteRequested = true)
+            }
+            Command.MobileMode -> {
+                webView.settings.userAgentString = userAgentProvider.getUserAgent(defaultUserAgentString, desktopSiteRequested = false)
             }
             is Command.FindInPageCommand -> webView.findAllAsync(it.searchTerm)
             Command.DismissFindInPage -> webView.findAllAsync(null)
@@ -401,10 +421,13 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
         webView = layoutInflater.inflate(R.layout.include_duckduckgo_browser_webview, webViewContainer, true).findViewById(R.id.browserWebView) as WebView
+        defaultUserAgentString = webView.settings.userAgentString
+
         webView.webViewClient = webViewClient
         webView.webChromeClient = webChromeClient
 
         webView.settings.apply {
+            userAgentString = userAgentProvider.getUserAgent(defaultUserAgentString)
             javaScriptEnabled = true
             domStorageEnabled = true
             loadWithOverviewMode = true

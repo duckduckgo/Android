@@ -32,6 +32,7 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.LandingPage
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.userAgent.UserAgentProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardEntry
@@ -126,6 +127,7 @@ class BrowserViewModelTest {
                 appSettingsPreferencesStore = mockSettingsStore,
                 bookmarksDao = bookmarksDao,
                 longPressHandler = mockLongPressHandler,
+                userAgentProvider = UserAgentProvider(),
                 appConfigurationDao = appConfigurationDao)
 
         testee.url.observeForever(mockQueryObserver)
@@ -473,4 +475,49 @@ class BrowserViewModelTest {
         assertEquals("", testee.viewState.value!!.findInPage.searchTerm)
     }
 
+    @Test
+    fun whenUserSelectsDesktopSiteThenDesktopModeCommandIssued() {
+        testee.desktopSiteModeToggled("http://example.com", desktopSiteRequested = true)
+        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.contains(Command.DesktopMode))
+    }
+
+    @Test
+    fun whenUserSelectsMobileSiteThenMobileModeCommandIssued() {
+        testee.desktopSiteModeToggled("http://example.com", desktopSiteRequested = false)
+        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.contains(Command.MobileMode))
+    }
+
+    @Test
+    fun whenUserSelectsDesktopSiteWhenOnMobileSpecificSiteThenUrlModified() {
+        testee.desktopSiteModeToggled("http://m.example.com", desktopSiteRequested = true)
+        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        val ultimateCommand = commandCaptor.lastValue as Navigate
+        assertEquals("http://example.com", ultimateCommand.url)
+    }
+
+    @Test
+    fun whenUserSelectsDesktopSiteWhenNotOnMobileSpecificSiteThenUrlNotModified() {
+        testee.desktopSiteModeToggled("http://example.com", desktopSiteRequested = true)
+        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        val ultimateCommand = commandCaptor.lastValue
+        assertTrue(ultimateCommand == Command.Refresh)
+    }
+
+    @Test
+    fun whenUserSelectsMobileSiteWhenOnMobileSpecificSiteThenUrlNotModified() {
+        testee.desktopSiteModeToggled("http://m.example.com", desktopSiteRequested = false)
+        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        val ultimateCommand = commandCaptor.lastValue
+        assertTrue(ultimateCommand == Command.Refresh)
+    }
+
+    @Test
+    fun whenUserSelectsMobileSiteWhenNotOnMobileSpecificSiteThenUrlNotModified() {
+        testee.desktopSiteModeToggled("http://example.com", desktopSiteRequested = false)
+        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        val ultimateCommand = commandCaptor.lastValue
+        assertTrue(ultimateCommand == Command.Refresh)
+    }
 }

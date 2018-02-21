@@ -89,6 +89,12 @@ class WebViewRequestInterceptor @Inject constructor(
         return null
     }
 
+    private fun shouldStripRequestedWithHeader(request: WebResourceRequest): Boolean {
+        if(!request.isForMainFrame) return false
+        val requestedWithHeader = request.requestHeaders["X-Requested-With"] ?: request.requestHeaders["x-requested-with"]
+        return requestedWithHeader != ""
+    }
+
     private fun shouldUpgrade(request: WebResourceRequest) =
             request.isForMainFrame && request.url != null && httpsUpgrader.shouldUpgrade(request.url)
 

@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.BrowserViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.LongPressHandler
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
+import com.duckduckgo.app.browser.userAgent.UserAgentProvider
 import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
@@ -58,6 +59,7 @@ class ViewModelFactory @Inject constructor(
         private val bookmarksDao: BookmarksDao,
         private val autoCompleteApi: AutoCompleteApi,
         private val appSettingsPreferencesStore: SettingsDataStore,
+        private val userAgentProvider: UserAgentProvider,
         private val webViewLongPressHandler: LongPressHandler
 ) : ViewModelProvider.NewInstanceFactory() {
 
@@ -88,5 +90,6 @@ class ViewModelFactory @Inject constructor(
             appSettingsPreferencesStore = appSettingsPreferencesStore,
             appConfigurationDao = appConfigurationDao,
             longPressHandler = webViewLongPressHandler,
+            userAgentProvider = userAgentProvider,
             autoCompleteApi = autoCompleteApi)
 }
