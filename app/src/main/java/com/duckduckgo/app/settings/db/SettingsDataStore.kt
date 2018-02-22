@@ -23,7 +23,6 @@ import javax.inject.Inject
 
 interface SettingsDataStore {
     var autoCompleteSuggestionsEnabled: Boolean
-    var desktopSiteRequested: Boolean
 }
 
 class AppSettingsPreferencesStore @Inject constructor(private val context: Context) : SettingsDataStore {
@@ -31,7 +30,6 @@ class AppSettingsPreferencesStore @Inject constructor(private val context: Conte
     companion object {
         const val SHARED_PREFERENCES_FILENAME = "com.duckduckgo.app.settings_activity.settings"
         const val KEY_AUTOCOMPLETE_ENABLED = "AUTOCOMPLETE_ENABLED"
-        const val KEY_DESKTOP_SITE_REQUESTED = "KEY_DESKTOP_SITE_REQUESTED"
     }
 
     override var autoCompleteSuggestionsEnabled: Boolean
@@ -41,14 +39,6 @@ class AppSettingsPreferencesStore @Inject constructor(private val context: Conte
                     .putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled)
                     .apply()
         }
-
-    override var desktopSiteRequested: Boolean
-    get() = preferences.getBoolean(KEY_DESKTOP_SITE_REQUESTED, false)
-    set(desktopSiteRequested) {
-        preferences.edit()
-                .putBoolean(KEY_DESKTOP_SITE_REQUESTED, desktopSiteRequested)
-                .apply()
-    }
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(SHARED_PREFERENCES_FILENAME, Context.MODE_PRIVATE)

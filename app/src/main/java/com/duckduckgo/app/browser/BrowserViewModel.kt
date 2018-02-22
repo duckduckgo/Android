@@ -393,18 +393,18 @@ class BrowserViewModel(
     }
 
 
-    fun desktopSiteModeToggled(urlString: String, desktopSiteRequested: Boolean) {
-        appSettingsPreferencesStore.desktopSiteRequested = desktopSiteRequested
-
-        val url = Uri.parse(urlString)
-
-        if(desktopSiteRequested) {
+    fun desktopSiteModeToggled(urlString: String?, desktopSiteRequested: Boolean) {
+        if (desktopSiteRequested) {
             command.value = BrowserViewModel.Command.DesktopMode
         } else {
             command.value = BrowserViewModel.Command.MobileMode
         }
 
-        if(desktopSiteRequested && url.isMobileSite()) {
+        if (urlString == null) {
+            return
+        }
+        val url = Uri.parse(urlString)
+        if (desktopSiteRequested && url.isMobileSite()) {
             val desktopUrl = url.toDesktopUri()
             Timber.i("Original URL $urlString - attempting $desktopUrl with desktop site UA string")
             command.value = Navigate(desktopUrl.toString())

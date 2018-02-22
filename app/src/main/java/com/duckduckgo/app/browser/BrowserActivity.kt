@@ -136,12 +136,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
             enableMenuOption(view.settingsPopupMenuItem) { launchSettings() }
             enableMenuOption(view.findInPageMenuItem) { viewModel.userRequestingToFindInPage() }
             enableMenuOption(view.requestDesktopSiteCheckMenuItem) {
-                Timber.i("here and now")
-            }
-
-            view.requestDesktopSiteCheckMenuItem.setOnCheckedChangeListener { _, isChecked ->
-                Timber.i("changed, checked = $isChecked")
-                viewModel.desktopSiteModeToggled(urlString = webView.url, desktopSiteRequested = isChecked)
+                viewModel.desktopSiteModeToggled(urlString = webView.url, desktopSiteRequested = view.requestDesktopSiteCheckMenuItem.isChecked)
             }
         }
     }
