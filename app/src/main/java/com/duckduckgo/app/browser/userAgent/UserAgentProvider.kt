@@ -56,7 +56,7 @@ class UserAgentProvider @Inject constructor() {
     fun getUserAgent(defaultUaString: String, desktopSiteRequested: Boolean = false) : String{
 
         val platform = if(desktopSiteRequested) desktopUaPrefix() else mobileUaPrefix()
-        val userAgentStringSuffix = getWebKitVersionOnwards(defaultUaString)
+        val userAgentStringSuffix = getWebKitVersionOnwards(defaultUaString, desktopSiteRequested)
 
         return "$MOZILLA_PREFIX ($platform)$userAgentStringSuffix"
     }
@@ -65,8 +65,12 @@ class UserAgentProvider @Inject constructor() {
 
     private fun desktopUaPrefix() = "X11; Linux ${System.getProperty("os.arch")}"
 
-    private fun getWebKitVersionOnwards(defaultUaString: String): String {
-        val result = WEB_KIT_REGEX.find(defaultUaString) ?: return ""
-        return " ${result.groupValues[0]}"
+    private fun getWebKitVersionOnwards(defaultUaString: String, desktopSiteRequested: Boolean): String {
+        val matches = WEB_KIT_REGEX.find(defaultUaString) ?: return ""
+        var result = matches.groupValues[0]
+        if(desktopSiteRequested) {
+            result = result.replace(" Mobile ", " ")
+        }
+        return " $result"
     }
 }

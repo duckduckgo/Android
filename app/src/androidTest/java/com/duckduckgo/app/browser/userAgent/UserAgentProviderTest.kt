@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.browser.userAgent
 
-import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -26,6 +26,13 @@ private const val CHROME_UA_MOBILE =
 // Some values will be dynamic based on OS/Architecture/Software versions, so use Regex to match around dynamic values
 private val CHROME_UA_DESKTOP_REGEX = Regex(
         "Mozilla/5.0 \\(X11; Linux .*?\\) AppleWebKit\\/[.0-9]+ \\(KHTML, like Gecko\\) Chrome\\/[.0-9]+ Safari/[.0-9]+"
+)
+private val CHROME_UA_MOBILE_REGEX = Regex(
+        "Mozilla/5.0 \\(Linux; Android .*?\\) AppleWebKit\\/[.0-9]+ \\(KHTML, like Gecko\\) Chrome\\/[.0-9]+ Mobile Safari/[.0-9]+"
+)
+
+private val CHROME_UA_MOBILE_REGEX_MISSING_APPLE_WEBKIT_DETAILS = Regex(
+        "Mozilla/5.0 \\(Linux; Android .*?\\)"
 )
 
 class UserAgentProviderTest {
@@ -40,21 +47,19 @@ class UserAgentProviderTest {
     @Test
     fun whenMobileUaRetrievedThenDeviceStrippedFromReturnedUa() {
         val actual = testee.getUserAgent(CHROME_UA_MOBILE, desktopSiteRequested = false)
-        val expected = "Mozilla/5.0 (Linux; Android 8.1.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Mobile Safari/537.36"
-        assertEquals(expected, actual)
+        assertTrue(CHROME_UA_MOBILE_REGEX.matches(actual))
     }
 
     @Test
     fun whenDesktopUaRetrievedThenDeviceStrippedFromReturnedUa() {
         val actual = testee.getUserAgent(CHROME_UA_MOBILE, desktopSiteRequested = true)
-        CHROME_UA_DESKTOP_REGEX.matches(actual)
+        assertTrue(CHROME_UA_DESKTOP_REGEX.matches(actual))
     }
 
     @Test
     fun whenMissingAppleWebKitStringThenSimplyReturnsNothing() {
         val missingAppleWebKitPart = "Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P Build/OPM3.171019.014) Chrome/64.0.3282.137 Mobile Safari/537.36"
-        val expected = "Mozilla/5.0 (Linux; Android 8.1.0)"
         val actual = testee.getUserAgent(missingAppleWebKitPart, desktopSiteRequested = false)
-        assertEquals(expected, actual)
+        assertTrue(CHROME_UA_MOBILE_REGEX_MISSING_APPLE_WEBKIT_DETAILS.matches(actual))
     }
 }
