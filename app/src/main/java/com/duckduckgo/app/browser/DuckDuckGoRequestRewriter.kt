@@ -54,6 +54,10 @@ class DuckDuckGoRequestRewriter(private val duckDuckGoUrlDetector: DuckDuckGoUrl
                 !uri.queryParameterNames.containsAll(arrayListOf(ParamKey.SOURCE, ParamKey.APP_VERSION, ParamKey.ATB))
     }
 
+    /**
+     * Applies cohort (atb) https://duck.co/help/privacy/atb, app version and
+     * and source (t) https://duck.co/help/privacy/t params to url
+     */
     override fun addCustomQueryParams(builder: Uri.Builder) {
         val atb = statisticsStore.atb
         if (atb != null) {
