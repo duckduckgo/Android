@@ -17,10 +17,11 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
+import com.duckduckgo.app.global.AppUrl.ParamKey
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockito_kotlin.mock
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import com.nhaarman.mockito_kotlin.whenever
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
@@ -40,15 +41,51 @@ class DuckDuckGoRequestRewriterTest {
     fun whenAddingCustomParamsSourceParameterIsAdded() {
         testee.addCustomQueryParams(builder)
         val uri = builder.build()
-        assertTrue(uri.queryParameterNames.contains("t"))
-        assertEquals("ddg_android", uri.getQueryParameter("t"))
+        assertTrue(uri.queryParameterNames.contains(ParamKey.SOURCE))
+        assertEquals("ddg_android", uri.getQueryParameter(ParamKey.SOURCE))
     }
 
     @Test
     fun whenAddingCustomParamsAppVersionParameterIsAdded() {
         testee.addCustomQueryParams(builder)
         val uri = builder.build()
-        assertTrue(uri.queryParameterNames.contains("tappv"))
+        assertTrue(uri.queryParameterNames.contains(ParamKey.APP_VERSION))
         assertEquals("android_${BuildConfig.VERSION_NAME.replace(".", "_")}", uri.getQueryParameter("tappv"))
     }
+
+    @Test
+    fun whenAddingCustomParamsIfStoreContainsAtbParametersThenTheyAreAdded() {
+        whenever(mockStatisticsStore.atb).thenReturn("v105-2ma")
+        whenever(mockStatisticsStore.retentionAtb).thenReturn("v105-3")
+
+        testee.addCustomQueryParams(builder)
+        val uri = builder.build()
+        assertTrue(uri.queryParameterNames.contains(ParamKey.ATB))
+        assertTrue(uri.queryParameterNames.contains(ParamKey.RETENTION_ATB))
+        assertEquals("v105-2ma", uri.getQueryParameter(ParamKey.ATB))
+        assertEquals("v105-3", uri.getQueryParameter(ParamKey.RETENTION_ATB))
+    }
+
+    @Test
+    fun whenAddingCustomParamsIfIsStoreMissingAtbThenNeitherAtbOrRetentionAtbAdded() {
+        whenever(mockStatisticsStore.atb).thenReturn(null)
+        whenever(mockStatisticsStore.retentionAtb).thenReturn("v105-3")
+
+        testee.addCustomQueryParams(builder)
+        val uri = builder.build()
+        assertFalse(uri.queryParameterNames.contains(ParamKey.ATB))
+        assertFalse(uri.queryParameterNames.contains(ParamKey.RETENTION_ATB))
+    }
+
+    @Test
+    fun whenAddingCustomParamsIfStoreMissingRetentionAtbThenNeitherAtbOrRetentionAtbAdded() {
+        whenever(mockStatisticsStore.atb).thenReturn("v105-2ma")
+        whenever(mockStatisticsStore.retentionAtb).thenReturn(null)
+
+        testee.addCustomQueryParams(builder)
+        val uri = builder.build()
+        assertFalse(uri.queryParameterNames.contains(ParamKey.ATB))
+        assertFalse(uri.queryParameterNames.contains(ParamKey.RETENTION_ATB))
+    }
+
 }

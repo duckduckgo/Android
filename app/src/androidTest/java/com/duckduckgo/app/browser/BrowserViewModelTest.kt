@@ -241,6 +241,12 @@ class BrowserViewModelTest {
     }
 
     @Test
+    fun whenUrlChangedWithDuckDuckGoUrlContainingQueryThenAtbRefreshed() {
+        testee.urlChanged("http://duckduckgo.com?q=test")
+        verify(mockStatisticsUpdater).refreshRetentionAtb()
+    }
+
+    @Test
     fun whenUrlChangedWithDuckDuckGoUrlNotContainingQueryThenFullUrlShown() {
         testee.urlChanged("http://duckduckgo.com")
         assertEquals("http://duckduckgo.com", testee.viewState.value!!.omnibarText)
