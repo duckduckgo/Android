@@ -24,20 +24,16 @@ import javax.inject.Inject
 
 class DuckDuckGoUrlDetector @Inject constructor() {
 
-    fun isDuckDuckGoUrl(uri: Uri): Boolean {
-        return AppUrl.Url.HOST == uri.host
+    fun isDuckDuckGoUrl(uri: String): Boolean {
+        return AppUrl.Url.HOST == uri.toUri().host
     }
 
-    fun isDuckDuckGoUrl(uriString: String): Boolean {
-        return isDuckDuckGoUrl(uriString.toUri())
+    fun isDuckDuckGoQueryUrl(uri: String): Boolean {
+        return isDuckDuckGoUrl(uri) && hasQuery(uri)
     }
 
-    fun isDuckDuckGoQueryUrl(uriString: String): Boolean {
-        return isDuckDuckGoUrl(uriString.toUri()) && hasQuery(uriString)
-    }
-
-    private fun hasQuery(uriString: String): Boolean {
-        return uriString.toUri().queryParameterNames.contains(ParamKey.QUERY)
+    private fun hasQuery(uri: String): Boolean {
+        return uri.toUri().queryParameterNames.contains(ParamKey.QUERY)
     }
 
     fun extractQuery(uriString: String): String? {
