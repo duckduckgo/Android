@@ -21,6 +21,7 @@ import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockito_kotlin.*
 import io.reactivex.Observable
+import okhttp3.ResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -30,6 +31,8 @@ class StatisticsRequesterTest {
 
     private var mockStatisticsStore: StatisticsDataStore = mock()
     private var mockService: StatisticsService = mock()
+    private var mockResponseBody: ResponseBody = mock()
+
     private var testee: StatisticsRequester = StatisticsRequester(mockStatisticsStore, mockService)
 
     @get:Rule
@@ -40,7 +43,7 @@ class StatisticsRequesterTest {
     fun before() {
         whenever(mockService.atb()).thenReturn(Observable.just(Atb(ATB)))
         whenever(mockService.updateAtb(any<String>(), any<String>())).thenReturn(Observable.just(Atb(NEW_ATB)))
-        whenever(mockService.exti(any<String>())).thenReturn(Observable.just(String()))
+        whenever(mockService.exti(any<String>())).thenReturn(Observable.just(mockResponseBody))
     }
 
     @Test
@@ -69,6 +72,17 @@ class StatisticsRequesterTest {
         verify(mockService).exti(ATB)
         verify(mockStatisticsStore).atb = ATB_WITH_VARIANT
         verify(mockStatisticsStore).retentionAtb = ATB
+    }
+
+    @Test
+    fun whenExitFailsThenAtbCleared() {
+        whenever(mockService.exti(any<String>())).thenReturn(Observable.error(Throwable()))
+        configureNoStoredStatistics()
+        testee.initializeAtb()
+        verify(mockStatisticsStore).atb = ATB_WITH_VARIANT
+        verify(mockStatisticsStore).retentionAtb = ATB
+        verify(mockStatisticsStore).atb = null
+        verify(mockStatisticsStore).retentionAtb = null
     }
 
     @Test

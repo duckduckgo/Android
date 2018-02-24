@@ -39,12 +39,12 @@ class StatisticsRequester(private val store: StatisticsDataStore, private val se
 
         service.atb()
             .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .map {
+            .flatMap {
                 store.atb = it.versionWithVariant
                 store.retentionAtb = it.version
                 service.exti(it.version)
             }
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 Timber.v("Atb initalization succeeded")
             }, {
