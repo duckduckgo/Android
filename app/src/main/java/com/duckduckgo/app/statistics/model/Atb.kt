@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics.model;
+package com.duckduckgo.app.statistics.model
 
 data class Atb(val version: String) {
 

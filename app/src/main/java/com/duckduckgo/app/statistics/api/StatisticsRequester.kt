@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics.api;
+package com.duckduckgo.app.statistics.api
 
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import io.reactivex.android.schedulers.AndroidSchedulers

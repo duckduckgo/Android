@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app;
+package com.duckduckgo.app
 
 
 import io.reactivex.android.plugins.RxAndroidPlugins

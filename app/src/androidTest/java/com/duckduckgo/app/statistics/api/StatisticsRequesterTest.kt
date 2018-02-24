@@ -42,8 +42,8 @@ class StatisticsRequesterTest {
     @Before
     fun before() {
         whenever(mockService.atb()).thenReturn(Observable.just(Atb(ATB)))
-        whenever(mockService.updateAtb(any<String>(), any<String>())).thenReturn(Observable.just(Atb(NEW_ATB)))
-        whenever(mockService.exti(any<String>())).thenReturn(Observable.just(mockResponseBody))
+        whenever(mockService.updateAtb(any(), any())).thenReturn(Observable.just(Atb(NEW_ATB)))
+        whenever(mockService.exti(any())).thenReturn(Observable.just(mockResponseBody))
     }
 
     @Test
@@ -76,7 +76,7 @@ class StatisticsRequesterTest {
 
     @Test
     fun whenExitFailsThenAtbCleared() {
-        whenever(mockService.exti(any<String>())).thenReturn(Observable.error(Throwable()))
+        whenever(mockService.exti(any())).thenReturn(Observable.error(Throwable()))
         configureNoStoredStatistics()
         testee.initializeAtb()
         verify(mockStatisticsStore).atb = ATB_WITH_VARIANT
