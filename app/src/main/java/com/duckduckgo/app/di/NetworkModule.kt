@@ -19,15 +19,11 @@ package com.duckduckgo.app.di
 import android.app.job.JobScheduler
 import android.content.Context
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
-import com.duckduckgo.app.global.AppUrl.*
+import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.job.JobBuilder
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeListService
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.job.ConfigurationDownloader
-import com.duckduckgo.app.statistics.api.StatisticsRequester
-import com.duckduckgo.app.statistics.api.StatisticsService
-import com.duckduckgo.app.statistics.api.StatisticsUpdater
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.api.ResourceSurrogateListService
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
 import com.squareup.moshi.Moshi
@@ -66,10 +62,6 @@ class NetworkModule {
     }
 
     @Provides
-    fun statisticsService(retrofit: Retrofit): StatisticsService =
-        retrofit.create(StatisticsService::class.java)
-
-    @Provides
     fun trackerListService(retrofit: Retrofit): TrackerListService =
             retrofit.create(TrackerListService::class.java)
 
@@ -93,10 +85,6 @@ class NetworkModule {
                                appConfigurationDownloader: ConfigurationDownloader): AppConfigurationSyncer {
         return AppConfigurationSyncer(jobBuilder, jobScheduler, appConfigurationDownloader)
     }
-
-    @Provides
-    fun statisticsUpdater(statisticsDataStore: StatisticsDataStore, statisticsService: StatisticsService) : StatisticsUpdater =
-        StatisticsRequester(statisticsDataStore, statisticsService)
 
     companion object {
         private const val CACHE_SIZE: Long = 10 * 1024 * 1024 // 10MB
