@@ -68,8 +68,8 @@
         <activity
             android:name=".BrowserActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName="com.duckduckgo.app.home.HomeActivity" />
-
+            android:windowSoftInputMode="adjustResize"
+            android:parentActivityName="com.duckduckgo.app.home.HomeActivity"/>
         <activity
             android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
             android:label="@string/privacyDashboardActivityTitle"
