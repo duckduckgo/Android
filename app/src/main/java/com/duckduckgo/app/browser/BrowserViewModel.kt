@@ -34,9 +34,9 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
-import com.duckduckgo.app.browser.useragent.isMobileSite
-import com.duckduckgo.app.browser.useragent.toDesktopUri
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.isMobileSite
+import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.privacymonitor.SiteMonitor
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardEntry
@@ -402,7 +402,7 @@ class BrowserViewModel(
             return
         }
         val url = Uri.parse(urlString)
-        if (desktopSiteRequested && url.isMobileSite()) {
+        if (desktopSiteRequested && url.isMobileSite) {
             val desktopUrl = url.toDesktopUri()
             Timber.i("Original URL $urlString - attempting $desktopUrl with desktop site UA string")
             command.value = Navigate(desktopUrl.toString())

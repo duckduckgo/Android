@@ -20,16 +20,6 @@ import android.net.Uri
 import android.os.Build
 
 
-fun Uri.isMobileSite() : Boolean = this.authority.startsWith("m.")
-
-fun Uri.toDesktopUri(): Uri {
-    return if(this.isMobileSite()) {
-        Uri.parse(toString().replaceFirst("m.", ""))
-    } else {
-        this
-    }
-}
-
 /**
  * Example Default User Agent (From Chrome):
  * Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P Build/OPM3.171019.014) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Mobile Safari/537.36
