@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.userAgent
+package com.duckduckgo.app.browser.useragent
 
 import org.junit.Assert.assertTrue
 import org.junit.Before
