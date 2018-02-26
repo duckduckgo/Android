@@ -34,7 +34,6 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
-import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.browser.useragent.isMobileSite
 import com.duckduckgo.app.browser.useragent.toDesktopUri
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -69,7 +68,6 @@ class BrowserViewModel(
         private val autoCompleteApi: AutoCompleteApi,
         private val appSettingsPreferencesStore: SettingsDataStore,
         private val longPressHandler: LongPressHandler,
-        private val userAgentProvider: UserAgentProvider,
         appConfigurationDao: AppConfigurationDao) : WebViewClientListener, ViewModel() {
 
     data class ViewState(

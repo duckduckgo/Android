@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.useragent
 
 import android.net.Uri
 import android.os.Build
-import javax.inject.Inject
 
 
 fun Uri.isMobileSite() : Boolean = this.authority.startsWith("m.")
@@ -38,13 +37,7 @@ fun Uri.toDesktopUri(): Uri {
  * Example Default Desktop User Agent (From Chrome):
  * Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Safari/537.36
  */
-class UserAgentProvider @Inject constructor() {
-
-    companion object {
-        private val WEB_KIT_REGEX = Regex("AppleWebKit/.*")
-
-        private const val MOZILLA_PREFIX = "Mozilla/5.0"
-    }
+class UserAgentProvider constructor(private val defaultUserAgent: String) {
 
     /**
      * Returns a modified UA string which omits the user's device make and model
@@ -53,10 +46,10 @@ class UserAgentProvider @Inject constructor() {
      *
      * We include everything from the original UA string from AppleWebKit onwards (omitting if missing)
      */
-    fun getUserAgent(defaultUaString: String, desktopSiteRequested: Boolean = false) : String{
+    fun getUserAgent(desktopSiteRequested: Boolean = false) : String{
 
         val platform = if(desktopSiteRequested) desktopUaPrefix() else mobileUaPrefix()
-        val userAgentStringSuffix = getWebKitVersionOnwards(defaultUaString, desktopSiteRequested)
+        val userAgentStringSuffix = getWebKitVersionOnwards(desktopSiteRequested)
 
         return "$MOZILLA_PREFIX ($platform)$userAgentStringSuffix"
     }
@@ -65,12 +58,19 @@ class UserAgentProvider @Inject constructor() {
 
     private fun desktopUaPrefix() = "X11; Linux ${System.getProperty("os.arch")}"
 
-    private fun getWebKitVersionOnwards(defaultUaString: String, desktopSiteRequested: Boolean): String {
-        val matches = WEB_KIT_REGEX.find(defaultUaString) ?: return ""
+    private fun getWebKitVersionOnwards(desktopSiteRequested: Boolean): String {
+        val matches = WEB_KIT_REGEX.find(defaultUserAgent) ?: return ""
         var result = matches.groupValues[0]
         if(desktopSiteRequested) {
             result = result.replace(" Mobile ", " ")
         }
         return " $result"
     }
+
+    companion object {
+        private val WEB_KIT_REGEX = Regex("AppleWebKit/.*")
+
+        private const val MOZILLA_PREFIX = "Mozilla/5.0"
+    }
+
 }

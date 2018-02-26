@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser.useragent
 
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Test
 
 private const val CHROME_UA_MOBILE =
@@ -39,27 +38,25 @@ class UserAgentProviderTest {
 
     private lateinit var testee: UserAgentProvider
 
-    @Before
-    fun setup() {
-        testee = UserAgentProvider()
-    }
-
     @Test
     fun whenMobileUaRetrievedThenDeviceStrippedFromReturnedUa() {
-        val actual = testee.getUserAgent(CHROME_UA_MOBILE, desktopSiteRequested = false)
+        testee = UserAgentProvider(CHROME_UA_MOBILE)
+        val actual = testee.getUserAgent(desktopSiteRequested = false)
         assertTrue(CHROME_UA_MOBILE_REGEX.matches(actual))
     }
 
     @Test
     fun whenDesktopUaRetrievedThenDeviceStrippedFromReturnedUa() {
-        val actual = testee.getUserAgent(CHROME_UA_MOBILE, desktopSiteRequested = true)
+        testee = UserAgentProvider(CHROME_UA_MOBILE)
+        val actual = testee.getUserAgent(desktopSiteRequested = true)
         assertTrue(CHROME_UA_DESKTOP_REGEX.matches(actual))
     }
 
     @Test
     fun whenMissingAppleWebKitStringThenSimplyReturnsNothing() {
         val missingAppleWebKitPart = "Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P Build/OPM3.171019.014) Chrome/64.0.3282.137 Mobile Safari/537.36"
-        val actual = testee.getUserAgent(missingAppleWebKitPart, desktopSiteRequested = false)
+        testee = UserAgentProvider(missingAppleWebKitPart)
+        val actual = testee.getUserAgent(desktopSiteRequested = false)
         assertTrue(CHROME_UA_MOBILE_REGEX_MISSING_APPLE_WEBKIT_DETAILS.matches(actual))
     }
 }

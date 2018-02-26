@@ -32,7 +32,6 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.LandingPage
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
-import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardEntry
@@ -127,7 +126,6 @@ class BrowserViewModelTest {
                 appSettingsPreferencesStore = mockSettingsStore,
                 bookmarksDao = bookmarksDao,
                 longPressHandler = mockLongPressHandler,
-                userAgentProvider = UserAgentProvider(),
                 appConfigurationDao = appConfigurationDao)
 
         testee.url.observeForever(mockQueryObserver)

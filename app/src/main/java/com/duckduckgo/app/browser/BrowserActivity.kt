@@ -79,7 +79,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
-    @Inject
     lateinit var userAgentProvider: UserAgentProvider
 
     private lateinit var popupMenu: BrowserPopupMenu
@@ -87,8 +86,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
     private var acceptingRenderUpdates = true
-
-    private lateinit var defaultUserAgentString : String
 
     private val viewModel: BrowserViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(BrowserViewModel::class.java)
@@ -196,10 +193,10 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
                 downloadFileWithPermissionCheck()
             }
             Command.DesktopMode -> {
-                webView.settings.userAgentString = userAgentProvider.getUserAgent(defaultUserAgentString, desktopSiteRequested = true)
+                webView.settings.userAgentString = userAgentProvider.getUserAgent(desktopSiteRequested = true)
             }
             Command.MobileMode -> {
-                webView.settings.userAgentString = userAgentProvider.getUserAgent(defaultUserAgentString, desktopSiteRequested = false)
+                webView.settings.userAgentString = userAgentProvider.getUserAgent(desktopSiteRequested = false)
             }
             is Command.FindInPageCommand -> webView.findAllAsync(it.searchTerm)
             Command.DismissFindInPage -> webView.findAllAsync(null)
@@ -416,13 +413,13 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
         webView = layoutInflater.inflate(R.layout.include_duckduckgo_browser_webview, webViewContainer, true).findViewById(R.id.browserWebView) as WebView
-        defaultUserAgentString = webView.settings.userAgentString
+        userAgentProvider = UserAgentProvider(webView.settings.userAgentString)
 
         webView.webViewClient = webViewClient
         webView.webChromeClient = webChromeClient
 
         webView.settings.apply {
-            userAgentString = userAgentProvider.getUserAgent(defaultUserAgentString)
+            userAgentString = userAgentProvider.getUserAgent()
             javaScriptEnabled = true
             domStorageEnabled = true
             loadWithOverviewMode = true
