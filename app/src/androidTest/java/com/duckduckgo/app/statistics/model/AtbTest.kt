@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.autocomplete.api
+package com.duckduckgo.app.statistics.model
 
-import io.reactivex.Observable
-import retrofit2.http.GET
-import retrofit2.http.Query
+import org.junit.Assert.assertEquals
+import org.junit.Test
 
+class AtbTest {
 
-interface AutoCompleteService {
-
-    @GET("/ac/")
-    fun autoComplete(@Query("q") query: String): Observable<List<AutoCompleteServiceRawResult>>
+    @Test
+    fun whenVersionWithVariantRequestedThenVersionIsReturnedWithPlatformVariant() {
+        val atb = Atb("v45-6")
+        assertEquals("v45-6ma", atb.versionWithVariant)
+    }
 }
-
-data class AutoCompleteServiceRawResult(val phrase: String)

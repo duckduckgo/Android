@@ -22,6 +22,8 @@ import com.duckduckgo.app.privacymonitor.store.PrivacySettingsSharedPreferences
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceRawStore
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
 import dagger.Binds
 import dagger.Module
 
@@ -29,7 +31,10 @@ import dagger.Module
 abstract class StoreModule {
 
     @Binds
-    abstract fun bindsOnboardingStore(onboardingStore: OnboardingSharedPreferences): OnboardingStore
+    abstract fun bindStatisticsStore(statisticsStore: StatisticsSharedPreferences): StatisticsDataStore
+
+    @Binds
+    abstract fun bindOnboardingStore(onboardingStore: OnboardingSharedPreferences): OnboardingStore
 
     @Binds
     abstract fun bindPrivacySettingsStore(privacySettingsStore: PrivacySettingsSharedPreferences): PrivacySettingsStore

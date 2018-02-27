@@ -37,6 +37,7 @@ import javax.inject.Singleton
     StubDatabaseModule::class,
     StubJobSchedulerModule::class,
     StubAppConfigurationDownloadModule::class,
+    StubStatisticsModule::class,
 
     /* real modules */
     (ApplicationModule::class),

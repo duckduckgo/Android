@@ -19,6 +19,8 @@ package com.duckduckgo.app.browser
 import android.net.Uri
 import android.support.test.runner.AndroidJUnit4
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.nhaarman.mockito_kotlin.mock
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,7 +28,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class QueryUrlConverterTest {
 
-    val testee: QueryUrlConverter = QueryUrlConverter(DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector()))
+    private var mockStatisticsStore: StatisticsDataStore = mock()
+    private val testee: QueryUrlConverter = QueryUrlConverter(DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector(), mockStatisticsStore))
 
     @Test
     fun whenUserIsPresentThenIsWebUrlIsFalse() {

@@ -14,32 +14,32 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboarding.store
+package com.duckduckgo.app.statistics.store
 
 import android.content.Context
 import android.content.SharedPreferences
 import javax.inject.Inject
 
+class StatisticsSharedPreferences @Inject constructor(private val context: Context) :
+    StatisticsDataStore {
 
-class OnboardingSharedPreferences @Inject constructor(private val context: Context) : OnboardingStore {
+    override val hasInstallationStatistics: Boolean
+        get() = preferences.contains(atb) && preferences.contains(retentionAtb)
 
-    override val shouldShow: Boolean
-        get() = preferences.getInt(KEY_VERSION, 0) < CURRENT_VERSION
+    override var atb: String?
+        get() = preferences.getString(KEY_ATB, null)
+        set(atb) = preferences.edit().putString(KEY_ATB, atb).apply()
 
-    override fun onboardingShown() {
-        val editor = preferences.edit()
-        editor.putInt(KEY_VERSION, CURRENT_VERSION)
-        editor.apply()
-    }
+    override var retentionAtb: String?
+        get() = preferences.getString(KEY_RETENTION_ATB, null)
+        set(retentionAtb) = preferences.edit().putString(KEY_RETENTION_ATB, retentionAtb).apply()
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
-
     companion object {
-        const val FILENAME = "com.duckduckgo.app.onboarding.settings"
-        const val KEY_VERSION = "com.duckduckgo.app.onboarding.currentVersion"
-        const val CURRENT_VERSION = 1
+        const val FILENAME = "com.duckduckgo.app.statistics"
+        const val KEY_ATB = "com.duckduckgo.app.statistics.atb"
+        const val KEY_RETENTION_ATB = "com.duckduckgo.app.statistics.retentionatb"
     }
-    
 }

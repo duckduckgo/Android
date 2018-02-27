@@ -19,7 +19,7 @@ package com.duckduckgo.app.di
 import android.app.job.JobScheduler
 import android.content.Context
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.job.JobBuilder
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeListService
 import com.duckduckgo.app.job.AppConfigurationSyncer
@@ -54,7 +54,7 @@ class NetworkModule {
     @Singleton
     fun retrofit(okHttpClient: OkHttpClient, moshi: Moshi, context: Context): Retrofit {
         return Retrofit.Builder()
-                .baseUrl(context.getString(R.string.baseUrl))
+                .baseUrl(Url.BASE)
                 .client(okHttpClient)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(MoshiConverterFactory.create(moshi))

@@ -25,12 +25,7 @@ interface SettingsDataStore {
     var autoCompleteSuggestionsEnabled: Boolean
 }
 
-class AppSettingsPreferencesStore @Inject constructor(private val context: Context) : SettingsDataStore {
-
-    companion object {
-        val SHARED_PREFERENCES_FILENAME = "com.duckduckgo.app.settings_activity.settings"
-        val KEY_AUTOCOMPLETE_ENABLED = "AUTOCOMPLETE_ENABLED"
-    }
+class SettingsSharedPreferences @Inject constructor(private val context: Context) : SettingsDataStore {
 
     override var autoCompleteSuggestionsEnabled: Boolean
         get() = preferences.getBoolean(KEY_AUTOCOMPLETE_ENABLED, true)
@@ -41,5 +36,10 @@ class AppSettingsPreferencesStore @Inject constructor(private val context: Conte
         }
 
     private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(SHARED_PREFERENCES_FILENAME, Context.MODE_PRIVATE)
+        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+
+    companion object {
+        const val FILENAME = "com.duckduckgo.app.settings_activity.settings"
+        const val KEY_AUTOCOMPLETE_ENABLED = "AUTOCOMPLETE_ENABLED"
+    }
 }

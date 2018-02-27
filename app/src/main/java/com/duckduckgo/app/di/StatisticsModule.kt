@@ -14,19 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.autoComplete
+package com.duckduckgo.app.di
 
-import android.content.Context
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences
-import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.api.StatisticsRequester
+import com.duckduckgo.app.statistics.api.StatisticsService
+import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import dagger.Module
 import dagger.Provides
+import retrofit2.Retrofit
 
 
 @Module
-class BrowserAutoCompleteModule {
+class StatisticsModule {
 
     @Provides
-    fun settingsDataStore(context: Context): SettingsDataStore = SettingsSharedPreferences(context)
+    fun statisticsService(retrofit: Retrofit): StatisticsService =
+        retrofit.create(StatisticsService::class.java)
+
+    @Provides
+    fun statisticsUpdater(statisticsDataStore: StatisticsDataStore, statisticsService: StatisticsService) : StatisticsUpdater =
+        StatisticsRequester(statisticsDataStore, statisticsService)
 
 }
