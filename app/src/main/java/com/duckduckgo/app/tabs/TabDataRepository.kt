@@ -42,7 +42,6 @@ class TabDataRepository @Inject constructor() {
 
     fun add(tabId: String, data: MutableLiveData<PrivacyMonitor>) {
         tabs.value!!.list[tabId] = data
-        select(tabId)
     }
 
     /**
@@ -58,7 +57,7 @@ class TabDataRepository @Inject constructor() {
         return data
     }
 
-    private fun select(tabId: String) {
+    fun select(tabId: String) {
         tabs.value!!.currentId = tabId
     }
 
