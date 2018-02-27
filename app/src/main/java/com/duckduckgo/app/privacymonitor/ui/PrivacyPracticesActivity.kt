@@ -61,7 +61,7 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
             it?.let { render(it) }
         })
 
-        repository.get(intent.tabId!!).observe(this, Observer<PrivacyMonitor> {
+        repository.retrieve(intent.tabId!!).observe(this, Observer<PrivacyMonitor> {
             viewModel.onPrivacyMonitorChanged(it)
         })
     }

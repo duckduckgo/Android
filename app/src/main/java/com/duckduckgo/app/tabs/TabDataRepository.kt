@@ -47,7 +47,7 @@ class TabDataRepository @Inject constructor() {
     /**
      * Returns existing record if it exists, otherwise creates and returns a new one
      */
-    fun get(tabId: String): MutableLiveData<PrivacyMonitor> {
+    fun retrieve(tabId: String): MutableLiveData<PrivacyMonitor> {
         val data = tabs.value!!.list[tabId]
         if (data == null) {
             val siteMonitor = MutableLiveData<PrivacyMonitor>()

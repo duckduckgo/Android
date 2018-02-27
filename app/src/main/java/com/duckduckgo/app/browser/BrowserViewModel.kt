@@ -129,7 +129,7 @@ class BrowserViewModel(
         viewState.value = ViewState(canAddBookmarks = false)
         appConfigurationObservable.observeForever(appConfigurationObserver)
         configureAutoComplete()
-        monitorLiveData = tabRepository.get(tabId)
+        monitorLiveData = tabRepository.retrieve(tabId)
     }
 
     private fun configureAutoComplete() {

@@ -42,19 +42,19 @@ class TabDataRepositoryTest {
     fun whenRecordAddedThenRecordExists() {
         val record = MutableLiveData<PrivacyMonitor>()
         testee.add(TAB_ID, record)
-        assertSame(record, testee.get(TAB_ID))
+        assertSame(record, testee.retrieve(TAB_ID))
     }
 
     @Test
-    fun whenIdExistsThenGetReturnsIt() {
+    fun whenIdExistsThenRetrieveReturnsIt() {
         val record = MutableLiveData<PrivacyMonitor>()
         testee.add(TAB_ID, record)
-        assertSame(record, testee.get(TAB_ID))
+        assertSame(record, testee.retrieve(TAB_ID))
     }
 
     @Test
-    fun whenIdDoesNotExistThenGetCreatesIt() {
-        assertNotNull(testee.get(TAB_ID))
+    fun whenIdDoesNotExistThenRetrieveCreatesIt() {
+        assertNotNull(testee.retrieve(TAB_ID))
     }
 
     @Test
