@@ -192,12 +192,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
                 pendingFileDownload = PendingFileDownload(it.url, Environment.DIRECTORY_PICTURES)
                 downloadFileWithPermissionCheck()
             }
-            Command.DesktopMode -> {
-                webView.settings.userAgentString = userAgentProvider.getUserAgent(desktopSiteRequested = true)
-            }
-            Command.MobileMode -> {
-                webView.settings.userAgentString = userAgentProvider.getUserAgent(desktopSiteRequested = false)
-            }
             is Command.FindInPageCommand -> webView.findAllAsync(it.searchTerm)
             Command.DismissFindInPage -> webView.findAllAsync(null)
         }
@@ -233,6 +227,8 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
             true -> webView.show()
             false -> webView.hide()
         }
+
+        toggleDesktopSiteMode(viewState.isDesktopBrowsingMode)
 
         when (viewState.isLoading) {
             true -> pageLoadingIndicator.show()
@@ -448,6 +444,12 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
         webView.setFindListener(this)
 
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
+    }
+
+    private fun toggleDesktopSiteMode(isDesktopSiteMode: Boolean) {
+        webView.setInitialScale(if (isDesktopSiteMode) 100 else 0)
+        webView.settings.useWideViewPort = !isDesktopSiteMode
+        webView.settings.userAgentString = userAgentProvider.getUserAgent(desktopSiteRequested = isDesktopSiteMode)
     }
 
     private fun downloadFileWithPermissionCheck() {

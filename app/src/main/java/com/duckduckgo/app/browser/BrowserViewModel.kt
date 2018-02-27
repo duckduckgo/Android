@@ -82,7 +82,9 @@ class BrowserViewModel(
             val canAddBookmarks: Boolean = false,
             val isFullScreen: Boolean = false,
             val autoComplete: AutoCompleteViewState = AutoCompleteViewState(),
-            val findInPage: FindInPage = FindInPage(canFindInPage = false)
+            val findInPage: FindInPage = FindInPage(canFindInPage = false),
+            val webViewScale: Int = 0,
+            val isDesktopBrowsingMode: Boolean = false
     )
 
     sealed class Command {
@@ -99,8 +101,6 @@ class BrowserViewModel(
         class DownloadImage(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
         object DismissFindInPage : Command()
-        object DesktopMode: Command()
-        object MobileMode: Command()
     }
     /* Observable data for Activity to subscribe to */
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -392,11 +392,7 @@ class BrowserViewModel(
 
 
     fun desktopSiteModeToggled(urlString: String?, desktopSiteRequested: Boolean) {
-        if (desktopSiteRequested) {
-            command.value = BrowserViewModel.Command.DesktopMode
-        } else {
-            command.value = BrowserViewModel.Command.MobileMode
-        }
+        viewState.value = currentViewState().copy(isDesktopBrowsingMode = desktopSiteRequested)
 
         if (urlString == null) {
             return
