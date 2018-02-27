@@ -17,7 +17,6 @@
 package com.duckduckgo.app.statistics.api
 
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
@@ -44,7 +43,6 @@ class StatisticsRequester(private val store: StatisticsDataStore, private val se
                 store.retentionAtb = it.version
                 service.exti(it.version)
             }
-            .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 Timber.v("Atb initalization succeeded")
             }, {
@@ -66,7 +64,6 @@ class StatisticsRequester(private val store: StatisticsDataStore, private val se
 
         service.updateAtb(atb, retentionAtb)
             .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 Timber.v("Atb refresh succeeded")
                 store.retentionAtb = it.version
