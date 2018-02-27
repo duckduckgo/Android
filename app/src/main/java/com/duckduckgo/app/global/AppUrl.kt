@@ -14,17 +14,27 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.autocomplete.api
-
-import io.reactivex.Observable
-import retrofit2.http.GET
-import retrofit2.http.Query
+package com.duckduckgo.app.global
 
 
-interface AutoCompleteService {
+class AppUrl {
 
-    @GET("/ac/")
-    fun autoComplete(@Query("q") query: String): Observable<List<AutoCompleteServiceRawResult>>
+    object Url {
+        const val HOST = "duckduckgo.com"
+        const val BASE = "https://$HOST"
+        const val ABOUT = "$BASE/about"
+        const val TOSDR = "https://tosdr.org"
+    }
+
+    object ParamKey {
+        const val QUERY = "q"
+        const val SOURCE = "t"
+        const val APP_VERSION = "tappv"
+        const val ATB = "atb"
+        const val RETENTION_ATB = "set_atb"
+    }
+
+    object ParamValue {
+        const val SOURCE = "ddg_android"
+    }
 }
-
-data class AutoCompleteServiceRawResult(val phrase: String)

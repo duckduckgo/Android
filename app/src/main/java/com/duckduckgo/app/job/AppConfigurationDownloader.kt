@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.job
 
+import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeListDownloader
-import com.duckduckgo.app.settings.db.AppConfigurationEntity
 import com.duckduckgo.app.surrogates.api.ResourceSurrogateListDownloader
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader

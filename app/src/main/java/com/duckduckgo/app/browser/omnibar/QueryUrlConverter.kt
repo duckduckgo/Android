@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.omnibar
 import android.net.Uri
 import android.support.v4.util.PatternsCompat
 import com.duckduckgo.app.browser.RequestRewriter
+import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.UrlScheme.Companion.http
 import com.duckduckgo.app.global.UrlScheme.Companion.https
 import com.duckduckgo.app.global.withScheme
@@ -27,7 +28,6 @@ import javax.inject.Inject
 class QueryUrlConverter @Inject constructor(private val requestRewriter: RequestRewriter) : OmnibarEntryConverter {
 
     companion object {
-        private const val baseUrl = "duckduckgo.com"
         private const val localhost = "localhost"
         private const val space = " "
         private val webUrlRegex = PatternsCompat.WEB_URL.toRegex()
@@ -54,9 +54,9 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
 
     override fun convertQueryToUri(inputQuery: String): Uri {
         val uriBuilder = Uri.Builder()
-                .scheme(https)
-                .appendQueryParameter("q", inputQuery)
-                .authority(baseUrl)
+            .scheme(https)
+            .appendQueryParameter("q", inputQuery)
+            .authority(Url.HOST)
 
         requestRewriter.addCustomQueryParams(uriBuilder)
 
@@ -66,7 +66,7 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
     override fun convertUri(input: String): String {
         val uri = Uri.parse(input).withScheme()
 
-        if (uri.host == baseUrl) {
+        if (uri.host == Url.HOST) {
             return requestRewriter.rewriteRequestWithCustomQueryParams(uri).toString()
         }
 

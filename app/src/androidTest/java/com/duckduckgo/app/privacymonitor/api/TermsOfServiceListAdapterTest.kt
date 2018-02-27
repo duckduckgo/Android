@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.privacymonitor.api
 
+import com.duckduckgo.app.FileUtilities.loadText
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonDataException
@@ -32,14 +33,14 @@ class TermsOfServiceListAdapterTest {
 
     @Test
     fun whenFormatIsValidThenDataIsCreated() {
-        val json = json("json/tosdr.json")
+        val json = loadText("json/tosdr.json")
         val terms = jsonAdapter.fromJson(json)
         assertNotNull(terms)
     }
 
     @Test
     fun whenFormatIsValidThenDataIsConvertedCorrectly() {
-        val json = json("json/tosdr.json")
+        val json = loadText("json/tosdr.json")
         val terms = jsonAdapter.fromJson(json)
 
         val firstTerm = terms.first { it.name == "example.com" }
@@ -56,11 +57,8 @@ class TermsOfServiceListAdapterTest {
     }
 
     @Test(expected = JsonDataException::class)
-    fun whenDisconnectFormatIsMismatchedThenExceptionIsThrown() {
-        val json = json("json/tosdr_mismatched.json")
+    fun whenFormatIsMismatchedThenExceptionIsThrown() {
+        val json = loadText("json/tosdr_mismatched.json")
         jsonAdapter.fromJson(json)
     }
-
-    private fun json(resourceName: String): String =
-            javaClass.classLoader.getResource(resourceName).openStream().bufferedReader().use { it.readText() }
 }

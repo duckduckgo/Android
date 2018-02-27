@@ -35,6 +35,8 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.db.AppConfigurationDao
+import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.privacymonitor.SiteMonitor
@@ -46,9 +48,8 @@ import com.duckduckgo.app.privacymonitor.model.improvedGrade
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
-import com.duckduckgo.app.settings.db.AppConfigurationDao
-import com.duckduckgo.app.settings.db.AppConfigurationEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.jakewharton.rxrelay2.PublishRelay
@@ -58,6 +59,7 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class BrowserViewModel(
+        private val statisticsUpdater: StatisticsUpdater,
         private val queryUrlConverter: OmnibarEntryConverter,
         private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
         private val termsOfServiceStore: TermsOfServiceStore,
@@ -169,6 +171,7 @@ class BrowserViewModel(
 
         val trimmedInput = input.trim()
         url.value = buildUrl(trimmedInput)
+
         viewState.value = currentViewState().copy(
                 findInPage = FindInPage(visible = false, canFindInPage = true),
                 showClearButton = false,
@@ -239,8 +242,9 @@ class BrowserViewModel(
                 showPrivacyGrade = appConfigurationDownloaded,
                 findInPage = FindInPage(visible = false, canFindInPage = true))
 
-        if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url) && duckDuckGoUrlDetector.hasQuery(url)) {
+        if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             newViewState = newViewState.copy(omnibarText = duckDuckGoUrlDetector.extractQuery(url))
+            statisticsUpdater.refreshRetentionAtb()
         }
         viewState.value = newViewState
 

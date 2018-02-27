@@ -23,19 +23,20 @@ import javax.inject.Inject
 
 class PrivacySettingsSharedPreferences @Inject constructor(private val context: Context) : PrivacySettingsStore {
 
-    companion object {
-        val name = "com.duckduckgo.app.privacymonitor.settings"
-        val privacyOnKey = "com.duckduckgo.app.privacymonitor.privacyon"
-    }
-
     override var privacyOn: Boolean
-        get() = preferences.getBoolean(privacyOnKey, true)
+        get() = preferences.getBoolean(KEY_PRIVACY_ON, true)
         set(on) {
             val editor = preferences.edit()
-            editor.putBoolean(privacyOnKey, on)
+            editor.putBoolean(KEY_PRIVACY_ON, on)
             editor.apply()
         }
 
     private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(name, MODE_PRIVATE)
+        get() = context.getSharedPreferences(FILENAME, MODE_PRIVATE)
+
+
+    companion object {
+        val FILENAME = "com.duckduckgo.app.privacymonitor.settings"
+        val KEY_PRIVACY_ON = "com.duckduckgo.app.privacymonitor.privacyon"
+    }
 }

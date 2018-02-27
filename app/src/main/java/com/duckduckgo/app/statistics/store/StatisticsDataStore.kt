@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.autocomplete.api
+package com.duckduckgo.app.statistics.store
 
-import io.reactivex.Observable
-import retrofit2.http.GET
-import retrofit2.http.Query
+interface StatisticsDataStore {
 
+    val hasInstallationStatistics: Boolean
 
-interface AutoCompleteService {
+    var atb: String?
 
-    @GET("/ac/")
-    fun autoComplete(@Query("q") query: String): Observable<List<AutoCompleteServiceRawResult>>
+    var retentionAtb: String?
 }
-
-data class AutoCompleteServiceRawResult(val phrase: String)

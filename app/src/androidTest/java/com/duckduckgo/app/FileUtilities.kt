@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.autocomplete.api
+package com.duckduckgo.app
 
-import io.reactivex.Observable
-import retrofit2.http.GET
-import retrofit2.http.Query
+object FileUtilities {
 
+    fun loadText(resourceName: String): String =
+        javaClass.classLoader.getResource(resourceName).openStream().bufferedReader().use { it.readText() }
 
-interface AutoCompleteService {
-
-    @GET("/ac/")
-    fun autoComplete(@Query("q") query: String): Observable<List<AutoCompleteServiceRawResult>>
 }
-
-data class AutoCompleteServiceRawResult(val phrase: String)

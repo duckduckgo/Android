@@ -39,9 +39,10 @@ import com.duckduckgo.app.privacymonitor.db.NetworkPercent
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
-import com.duckduckgo.app.settings.db.AppConfigurationDao
-import com.duckduckgo.app.settings.db.AppConfigurationEntity
+import com.duckduckgo.app.global.db.AppConfigurationDao
+import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -73,6 +74,9 @@ class BrowserViewModelTest {
             return MutableLiveData<Array<NetworkPercent>>()
         }
     }
+
+    @Mock
+    private lateinit var mockStatisticsUpdater: StatisticsUpdater
 
     @Mock
     private lateinit var mockQueryObserver: Observer<String>
@@ -116,6 +120,7 @@ class BrowserViewModelTest {
         appConfigurationDao = db.appConfigurationDao()
 
         testee = BrowserViewModel(
+                statisticsUpdater = mockStatisticsUpdater,
                 queryUrlConverter = mockOmnibarConverter,
                 duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
                 termsOfServiceStore = mockTermsOfServiceStore,
@@ -233,6 +238,12 @@ class BrowserViewModelTest {
     fun whenUrlChangedWithDuckDuckGoUrlContainingQueryThenUrlRewrittenToContainQuery() {
         testee.urlChanged("http://duckduckgo.com?q=test")
         assertEquals("test", testee.viewState.value!!.omnibarText)
+    }
+
+    @Test
+    fun whenUrlChangedWithDuckDuckGoUrlContainingQueryThenAtbRefreshed() {
+        testee.urlChanged("http://duckduckgo.com?q=test")
+        verify(mockStatisticsUpdater).refreshRetentionAtb()
     }
 
     @Test
