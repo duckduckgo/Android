@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.statistics.api
 
+import android.annotation.SuppressLint
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
@@ -29,6 +30,7 @@ interface StatisticsUpdater {
 class StatisticsRequester(private val store: StatisticsDataStore, private val service: StatisticsService) :
     StatisticsUpdater {
 
+    @SuppressLint("CheckResult")
     override fun initializeAtb() {
 
         if (store.hasInstallationStatistics) {
@@ -52,6 +54,7 @@ class StatisticsRequester(private val store: StatisticsDataStore, private val se
             })
     }
 
+    @SuppressLint("CheckResult")
     override fun refreshRetentionAtb() {
 
         val atb = store.atb
