@@ -554,7 +554,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
     }
 
     private fun launchPrivacyDashboard() {
-        startActivityForResult(PrivacyDashboardActivity.intent(this), DASHBOARD_REQUEST_CODE)
+        startActivityForResult(PrivacyDashboardActivity.intent(this, viewModel.tabId), DASHBOARD_REQUEST_CODE)
     }
 
     private fun launchFire() {

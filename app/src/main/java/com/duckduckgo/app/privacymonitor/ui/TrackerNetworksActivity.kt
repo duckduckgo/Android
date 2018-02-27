@@ -27,7 +27,8 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import com.duckduckgo.app.privacymonitor.renderer.TrackersRenderer
-import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
+import com.duckduckgo.app.tabs.TabDataRepository
+import com.duckduckgo.app.tabs.tabId
 import kotlinx.android.synthetic.main.content_tracker_networks.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import javax.inject.Inject
@@ -35,15 +36,12 @@ import javax.inject.Inject
 class TrackerNetworksActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var viewModelFactory: ViewModelFactory
-    @Inject lateinit var repository: PrivacyMonitorRepository
+    @Inject lateinit var repository: TabDataRepository
     private val trackersRenderer = TrackersRenderer()
     private val networksAdapter = TrackerNetworksAdapter()
 
-
-    companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, TrackerNetworksActivity::class.java)
-        }
+    private val viewModel: TrackerNetworksViewModel by lazy {
+        ViewModelProviders.of(this, viewModelFactory).get(TrackerNetworksViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,13 +54,9 @@ class TrackerNetworksActivity : DuckDuckGoActivity() {
             it?.let { render(it) }
         })
 
-        repository.privacyMonitor.observe(this, Observer<PrivacyMonitor> {
+        repository.get(intent.tabId!!).observe(this, Observer<PrivacyMonitor> {
             viewModel.onPrivacyMonitorChanged(it)
         })
-    }
-
-    private val viewModel: TrackerNetworksViewModel by lazy {
-        ViewModelProviders.of(this, viewModelFactory).get(TrackerNetworksViewModel::class.java)
     }
 
     private fun configureToolbar() {
@@ -80,5 +74,13 @@ class TrackerNetworksActivity : DuckDuckGoActivity() {
         domain.text = viewState.domain
         heading.text = trackersRenderer.networksText(this, viewState.networkCount, viewState.allTrackersBlocked)
         networksAdapter.updateData(viewState.trackingEventsByNetwork)
+    }
+
+    companion object {
+        fun intent(context: Context, tabId: String): Intent {
+            val intent = Intent(context, TrackerNetworksActivity::class.java)
+            intent.tabId = tabId
+            return intent
+        }
     }
 }

@@ -31,7 +31,8 @@ import com.duckduckgo.app.home.HomeActivity
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import com.duckduckgo.app.privacymonitor.renderer.banner
 import com.duckduckgo.app.privacymonitor.renderer.text
-import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
+import com.duckduckgo.app.tabs.TabDataRepository
+import com.duckduckgo.app.tabs.tabId
 import kotlinx.android.synthetic.main.content_privacy_practices.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import javax.inject.Inject
@@ -42,9 +43,13 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
     lateinit var viewModelFactory: ViewModelFactory
 
     @Inject
-    lateinit var repository: PrivacyMonitorRepository
+    lateinit var repository: TabDataRepository
 
     private val practicesAdapter = PrivacyPracticesAdapter()
+
+    private val viewModel: PrivacyPracticesViewModel by lazy {
+        ViewModelProviders.of(this, viewModelFactory).get(PrivacyPracticesViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,13 +61,9 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
             it?.let { render(it) }
         })
 
-        repository.privacyMonitor.observe(this, Observer<PrivacyMonitor> {
+        repository.get(intent.tabId!!).observe(this, Observer<PrivacyMonitor> {
             viewModel.onPrivacyMonitorChanged(it)
         })
-    }
-
-    private val viewModel: PrivacyPracticesViewModel by lazy {
-        ViewModelProviders.of(this, viewModelFactory).get(PrivacyPracticesViewModel::class.java)
     }
 
     private fun configureToolbar() {
@@ -89,9 +90,12 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
 
     companion object {
 
-        fun intent(context: Context): Intent {
-            return Intent(context, PrivacyPracticesActivity::class.java)
+        fun intent(context: Context, tabId: String): Intent {
+            val intent = Intent(context, PrivacyPracticesActivity::class.java)
+            intent.tabId = tabId
+            return intent
         }
+
     }
 
 }

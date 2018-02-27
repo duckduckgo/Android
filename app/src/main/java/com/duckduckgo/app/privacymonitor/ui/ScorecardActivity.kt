@@ -30,7 +30,8 @@ import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import com.duckduckgo.app.privacymonitor.renderer.*
-import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
+import com.duckduckgo.app.tabs.TabDataRepository
+import com.duckduckgo.app.tabs.tabId
 import kotlinx.android.synthetic.main.content_privacy_scorecard.*
 import kotlinx.android.synthetic.main.include_privacy_dashboard_header.*
 import kotlinx.android.synthetic.main.include_toolbar.*
@@ -39,14 +40,12 @@ import javax.inject.Inject
 class ScorecardActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var viewModelFactory: ViewModelFactory
-    @Inject lateinit var repository: PrivacyMonitorRepository
+    @Inject lateinit var repository: TabDataRepository
     private val trackersRenderer = TrackersRenderer()
     private val upgradeRenderer = PrivacyUpgradeRenderer()
 
-    companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, ScorecardActivity::class.java)
-        }
+    private val viewModel: ScorecardViewModel by lazy {
+        ViewModelProviders.of(this, viewModelFactory).get(ScorecardViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,13 +57,9 @@ class ScorecardActivity : DuckDuckGoActivity() {
             it?.let { render(it) }
         })
 
-        repository.privacyMonitor.observe(this, Observer<PrivacyMonitor> {
+        repository.get(intent.tabId!!).observe(this, Observer<PrivacyMonitor> {
             viewModel.onPrivacyMonitorChanged(it)
         })
-    }
-
-    private val viewModel: ScorecardViewModel by lazy {
-        ViewModelProviders.of(this, viewModelFactory).get(ScorecardViewModel::class.java)
     }
 
     private fun configureToolbar() {
@@ -104,6 +99,15 @@ class ScorecardActivity : DuckDuckGoActivity() {
         }
         val drawable = getDrawable(resource)
         setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null)
+    }
+
+    companion object {
+
+        fun intent(context: Context, tabId: String): Intent {
+            val intent = Intent(context, ScorecardActivity::class.java)
+            intent.tabId = tabId
+            return intent
+        }
     }
 
 }

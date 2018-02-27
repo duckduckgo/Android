@@ -29,7 +29,7 @@ import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
-import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
+import com.duckduckgo.app.tabs.TabDataRepository
 import com.duckduckgo.app.privacymonitor.store.PrivacySettingsSharedPreferences
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardViewModel
@@ -50,7 +50,7 @@ class ViewModelFactory @Inject constructor(
         private val onboaringStore: OnboardingStore,
         private val queryUrlConverter: QueryUrlConverter,
         private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-        private val privacyMonitorRepository: PrivacyMonitorRepository,
+        private val tabRepository: TabDataRepository,
         private val privacySettingsStore: PrivacySettingsSharedPreferences,
         private val termsOfServiceStore: TermsOfServiceStore,
         private val trackerNetworks: TrackerNetworks,
@@ -85,7 +85,7 @@ class ViewModelFactory @Inject constructor(
             duckDuckGoUrlDetector = duckDuckGoUrlDetector,
             termsOfServiceStore = termsOfServiceStore,
             trackerNetworks = trackerNetworks,
-            privacyMonitorRepository = privacyMonitorRepository,
+            tabRepository = tabRepository,
             networkLeaderboardDao = networkLeaderboardDao,
             bookmarksDao = bookmarksDao,
             appSettingsPreferencesStore = appSettingsPreferencesStore,

@@ -26,6 +26,7 @@ interface PrivacyMonitor {
 
     val url: String
     val uri: Uri?
+    var title: String?
     val https: HttpsStatus
     val termsOfService: TermsOfService
     val memberNetwork: TrackerNetwork?

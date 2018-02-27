@@ -30,8 +30,9 @@ import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
 import com.duckduckgo.app.privacymonitor.renderer.*
-import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
+import com.duckduckgo.app.tabs.TabDataRepository
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardViewModel.ViewState
+import com.duckduckgo.app.tabs.tabId
 import kotlinx.android.synthetic.main.content_privacy_dashboard.*
 import kotlinx.android.synthetic.main.include_privacy_dashboard_header.*
 import kotlinx.android.synthetic.main.include_toolbar.*
@@ -40,7 +41,7 @@ import javax.inject.Inject
 class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var viewModelFactory: ViewModelFactory
-    @Inject lateinit var repository: PrivacyMonitorRepository
+    @Inject lateinit var repository: TabDataRepository
     private val trackersRenderer = TrackersRenderer()
     private val upgradeRenderer = PrivacyUpgradeRenderer()
 
@@ -57,7 +58,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
             it?.let { render(it) }
         })
 
-        repository.privacyMonitor.observe(this, Observer<PrivacyMonitor> {
+        repository.get(intent.tabId!!).observe(this, Observer<PrivacyMonitor> {
             viewModel.onPrivacyMonitorChanged(it)
         })
 
@@ -107,15 +108,15 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
     }
 
     fun onScorecardClicked() {
-        startActivity(ScorecardActivity.intent(this))
+        startActivity(ScorecardActivity.intent(this, intent.tabId!!))
     }
 
     fun onNetworksClicked(@Suppress("UNUSED_PARAMETER") view: View) {
-        startActivity(TrackerNetworksActivity.intent(this))
+        startActivity(TrackerNetworksActivity.intent(this, intent.tabId!!))
     }
 
     fun onPracticesClicked(@Suppress("UNUSED_PARAMETER") view: View) {
-        startActivity(PrivacyPracticesActivity.intent(this))
+        startActivity(PrivacyPracticesActivity.intent(this, intent.tabId!!))
     }
 
     private fun updateActivityResult(shouldReload: Boolean) {
@@ -130,8 +131,10 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
         const val RELOAD_RESULT_CODE = 100
 
-        fun intent(context: Context): Intent {
-            return Intent(context, PrivacyDashboardActivity::class.java)
+        fun intent(context: Context, tabId: String): Intent {
+            val intent = Intent(context, PrivacyDashboardActivity::class.java)
+            intent.tabId = tabId
+            return intent
         }
 
     }

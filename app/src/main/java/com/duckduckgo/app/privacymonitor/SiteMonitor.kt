@@ -23,38 +23,24 @@ import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.privacymonitor.model.HttpsStatus
 import com.duckduckgo.app.privacymonitor.model.TermsOfService
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
-import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import java.util.concurrent.CopyOnWriteArrayList
 
 class SiteMonitor(override val url: String,
                   override val termsOfService: TermsOfService,
-                  private val trackerNetworks: TrackerNetworks) : PrivacyMonitor {
-
-    override var hasHttpResources = false
-
-    override val trackingEvents = CopyOnWriteArrayList<TrackingEvent>()
+                  override val memberNetwork: TrackerNetwork? = null) : PrivacyMonitor {
 
     override val uri: Uri?
         get() = Uri.parse(url)
 
+    override var title: String? = null
+
     override val https: HttpsStatus
         get() = httpsStatus()
 
-    private fun httpsStatus(): HttpsStatus {
+    override var hasHttpResources = false
 
-        val uri = uri ?: return HttpsStatus.NONE
-
-        if (uri.isHttps) {
-            return if (hasHttpResources) HttpsStatus.MIXED else HttpsStatus.SECURE
-        }
-
-        return HttpsStatus.NONE
-    }
-
-    override val memberNetwork: TrackerNetwork? by lazy {
-        trackerNetworks.network(url)
-    }
+    override val trackingEvents = CopyOnWriteArrayList<TrackingEvent>()
 
     override val trackerCount: Int
         get() = trackingEvents.size
@@ -86,6 +72,17 @@ class SiteMonitor(override val url: String,
 
     override val allTrackersBlocked: Boolean
         get() = trackingEvents.none { !it.blocked }
+
+    private fun httpsStatus(): HttpsStatus {
+
+        val uri = uri ?: return HttpsStatus.NONE
+
+        if (uri.isHttps) {
+            return if (hasHttpResources) HttpsStatus.MIXED else HttpsStatus.SECURE
+        }
+
+        return HttpsStatus.NONE
+    }
 
     override fun trackerDetected(event: TrackingEvent) {
         trackingEvents.add(event)
