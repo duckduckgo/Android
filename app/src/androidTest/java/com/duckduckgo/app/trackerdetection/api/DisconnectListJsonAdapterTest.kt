@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.trackerdetection.api
 
-import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.FileUtilities.loadText
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 import com.squareup.moshi.JsonDataException
@@ -65,6 +64,5 @@ class DisconnectListJsonAdapterTest {
         val json = loadText("json/disconnect_mismatched.json")
         jsonAdapter.fromJson(json).trackers
     }
-
 
 }

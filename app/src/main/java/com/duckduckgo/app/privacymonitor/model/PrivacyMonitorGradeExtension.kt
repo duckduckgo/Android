@@ -35,7 +35,7 @@ val PrivacyMonitor.score: Int
         }
         Timber.v("""Calculating score {
             memberMajorNetworkPercentage: ${memberNetwork?.percentageOfPages}
-            https: ${https}
+            https: $https
             termsScore: ${termsOfService.gradingScore}
             trackerCount: $trackerCount
             hasTrackerFromMajorNetwork: $hasTrackerFromMajorNetwork
