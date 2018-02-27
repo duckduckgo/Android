@@ -28,7 +28,7 @@ import javax.inject.Inject
 class AppConfigurationJobService : JobService() {
 
     @Inject
-    lateinit var appConfigurationDownloader: AppConfigurationDownloader
+    lateinit var appConfigurationDownloader: ConfigurationDownloader
 
     private var downloadTask: Disposable? = null
 

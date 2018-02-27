@@ -16,24 +16,27 @@
 
 package com.duckduckgo.app.job
 
-import com.duckduckgo.app.surrogates.api.ResourceSurrogateListDownloader
+import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeListDownloader
-import com.duckduckgo.app.settings.db.AppConfigurationEntity
+import com.duckduckgo.app.surrogates.api.ResourceSurrogateListDownloader
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
-import javax.inject.Inject
 
-class AppConfigurationDownloader @Inject constructor(
+interface ConfigurationDownloader{
+    fun downloadTask(): Completable
+}
+
+class AppConfigurationDownloader(
         private val trackerDataDownloader: TrackerDataDownloader,
         private val httpsUpgradeListDownloader: HttpsUpgradeListDownloader,
         private val resourceSurrogateDownloader: ResourceSurrogateListDownloader,
-        private val appDatabase: AppDatabase) {
+        private val appDatabase: AppDatabase) : ConfigurationDownloader {
 
-    fun downloadTask(): Completable {
+    override fun downloadTask(): Completable {
         val easyListDownload = trackerDataDownloader.downloadList(EASYLIST)
         val easyPrivacyDownload = trackerDataDownloader.downloadList(EASYPRIVACY)
         val trackersWhitelist = trackerDataDownloader.downloadList(TRACKERSWHITELIST)

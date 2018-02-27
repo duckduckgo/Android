@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.trackerdetection.api
 
+import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.app.FileUtilities.loadText
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
@@ -30,28 +32,28 @@ class DisconnectListJsonAdapterTest {
 
     @Test
     fun whenDisconnectFormatIsValidThenDataIsConverted() {
-        val json = json("json/disconnect.json")
+        val json = loadText("json/disconnect.json")
         val trackers = jsonAdapter.fromJson(json).trackers
         assertEquals(10, trackers.count())
     }
 
     @Test
     fun whenDisconnectFormatIsValidThenBasicElementsAreConvertedCorrectly() {
-        val json = json("json/disconnect.json")
+        val json = loadText("json/disconnect.json")
         val trackers = jsonAdapter.fromJson(json).trackers
         assertTrue(trackers.contains(DisconnectTracker("acontenturl.com", "Content", "Content Co", "http://acontenturl.com/")))
     }
 
     @Test
     fun whenDisconnectFormatIsValidThenElementsContainingDntEntryAreConvertedCorrectly() {
-        val json = json("json/disconnect.json")
+        val json = loadText("json/disconnect.json")
         val trackers = jsonAdapter.fromJson(json).trackers
         assertTrue(trackers.contains(DisconnectTracker("itisatracker.com", "Advertising", "ItsATracker", "https://itisatracker.com/")))
     }
 
     @Test
     fun whenDisconnectFormatIsValidThenNetworksWithMultipleTrackersAreConvertedCorrectly() {
-        val json = json("json/disconnect.json")
+        val json = loadText("json/disconnect.json")
         val trackers = jsonAdapter.fromJson(json).trackers
         assertTrue(trackers.contains(DisconnectTracker("anothersocialurl.com", "Social", "SocialNet", "http://www.anothersocialurl.com/")))
         assertTrue(trackers.contains(DisconnectTracker("55anothersocialurl.com", "Social", "SocialNet", "http://www.anothersocialurl.com/")))
@@ -60,11 +62,9 @@ class DisconnectListJsonAdapterTest {
 
     @Test(expected = JsonDataException::class)
     fun whenDisconnectFormatIsMismatchedThenExceptionIsThrown() {
-        val json = json("json/disconnect_mismatched.json")
+        val json = loadText("json/disconnect_mismatched.json")
         jsonAdapter.fromJson(json).trackers
     }
 
-    private fun json(resourceName: String): String =
-            javaClass.classLoader.getResource(resourceName).openStream().bufferedReader().use { it.readText() }
 
 }

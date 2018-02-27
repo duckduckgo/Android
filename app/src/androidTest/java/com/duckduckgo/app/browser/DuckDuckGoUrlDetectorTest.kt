@@ -46,24 +46,29 @@ class DuckDuckGoUrlDetectorTest {
 
     @Test
     fun whenDDGUrlContainsQueryThenQueryCanBeExtracted() {
-        val query = testee.extractQuery("https://duckduck.com?q=test%20search")
+        val query = testee.extractQuery("https://duckduckgo.com?q=test%20search")
         assertEquals("test search", query)
     }
 
     @Test
     fun whenDDGUrlDoesNotContainsQueryThenQueryIsNull() {
-        val query = testee.extractQuery("https://duckduck.com")
+        val query = testee.extractQuery("https://duckduckgo.com")
         assertNull(query)
     }
 
     @Test
     fun whenDDGUrlContainsQueryThenQueryDetected() {
-        assertTrue(testee.hasQuery("https://duckduck.com?q=test%20search"))
+        assertTrue(testee.isDuckDuckGoQueryUrl("https://duckduckgo.com?q=test%20search"))
     }
 
     @Test
     fun whenDDGUrlDoesNotContainsQueryThenQueryIsNotDetected() {
-        assertFalse(testee.hasQuery("https://duckduck.com"))
+        assertFalse(testee.isDuckDuckGoQueryUrl("https://duckduckgo.com"))
+    }
+
+    @Test
+    fun whenNonDDGUrlContainsQueryThenQueryIsNotDetected() {
+        assertFalse(testee.isDuckDuckGoQueryUrl("https://example.com?q=test%20search"))
     }
 }
 

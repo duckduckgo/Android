@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.browser.di
 
-import android.webkit.CookieManager
 import com.duckduckgo.app.browser.*
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import dagger.Module
 import dagger.Provides
 
@@ -25,11 +25,8 @@ import dagger.Provides
 class BrowserModule {
 
     @Provides
-    fun cookieManager(): CookieManager = CookieManager.getInstance()
-
-    @Provides
-    fun duckDuckGoRequestRewriter(urlDetector: DuckDuckGoUrlDetector): RequestRewriter {
-        return DuckDuckGoRequestRewriter(urlDetector)
+    fun duckDuckGoRequestRewriter(urlDetector: DuckDuckGoUrlDetector, statisticsStore: StatisticsDataStore): RequestRewriter {
+        return DuckDuckGoRequestRewriter(urlDetector, statisticsStore)
     }
 
     @Provides

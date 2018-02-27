@@ -32,20 +32,23 @@ import javax.inject.Singleton
 
 @Singleton
 @Component(modules = [
-    (ApplicationModule::class),
-    (JobsModule::class),
-    (AndroidBindingModule::class),
-    (AndroidSupportInjectionModule::class),
-    (NetworkModule::class),
-    (StoreModule::class),
-    (DatabaseModule::class),
-    (JsonModule::class),
-    (StringModule::class),
-    (BrowserModule::class),
-    (BrowserAutoCompleteModule::class),
-    (HttpsUpgraderModule::class),
-    (ResourceSurrogateModule::class),
-    (TrackerDetectionModule::class)
+    ApplicationModule::class,
+    JobsModule::class,
+    AndroidBindingModule::class,
+    AndroidSupportInjectionModule::class,
+    NetworkModule::class,
+    AppConfigurationDownloaderModule::class,
+    StatisticsModule::class,
+    StoreModule::class,
+    DatabaseModule::class,
+    DaoModule::class,
+    JsonModule::class,
+    StringModule::class,
+    BrowserModule::class,
+    BrowserAutoCompleteModule::class,
+    HttpsUpgraderModule::class,
+    ResourceSurrogateModule::class,
+    TrackerDetectionModule::class
 ])
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 

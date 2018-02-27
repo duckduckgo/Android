@@ -37,14 +37,16 @@ import com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesViewModel
 import com.duckduckgo.app.privacymonitor.ui.ScorecardViewModel
 import com.duckduckgo.app.privacymonitor.ui.TrackerNetworksViewModel
 import com.duckduckgo.app.settings.SettingsViewModel
-import com.duckduckgo.app.settings.db.AppConfigurationDao
+import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import javax.inject.Inject
 
 
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory @Inject constructor(
+        private val statisticsUpdater: StatisticsUpdater,
         private val onboaringStore: OnboardingStore,
         private val queryUrlConverter: QueryUrlConverter,
         private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
@@ -78,6 +80,7 @@ class ViewModelFactory @Inject constructor(
             } as T
 
     private fun browserViewModel(): ViewModel = BrowserViewModel(
+            statisticsUpdater = statisticsUpdater,
             queryUrlConverter = queryUrlConverter,
             duckDuckGoUrlDetector = duckDuckGoUrlDetector,
             termsOfServiceStore = termsOfServiceStore,

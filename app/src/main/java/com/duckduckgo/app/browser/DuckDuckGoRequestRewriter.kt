@@ -17,6 +17,9 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
+import com.duckduckgo.app.global.AppUrl.ParamKey
+import com.duckduckgo.app.global.AppUrl.ParamValue
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
 
 interface RequestRewriter {
@@ -25,24 +28,19 @@ interface RequestRewriter {
     fun addCustomQueryParams(builder: Uri.Builder)
 }
 
-class DuckDuckGoRequestRewriter(private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector) : RequestRewriter {
-
-    companion object {
-        private const val sourceParam = "t"
-        private const val appVersionParam = "tappv"
-        private const val querySource = "ddg_android"
-    }
+class DuckDuckGoRequestRewriter(private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector, private val statisticsStore: StatisticsDataStore) :
+    RequestRewriter {
 
     override fun rewriteRequestWithCustomQueryParams(request: Uri): Uri {
         val builder = Uri.Builder()
-                .authority(request.authority)
-                .scheme(request.scheme)
-                .path(request.path)
-                .fragment(request.fragment)
+            .authority(request.authority)
+            .scheme(request.scheme)
+            .path(request.path)
+            .fragment(request.fragment)
 
         request.queryParameterNames
-                .filter { it != sourceParam && it != appVersionParam }
-                .forEach { builder.appendQueryParameter(it, request.getQueryParameter(it)) }
+            .filter { it != ParamKey.SOURCE && it != ParamKey.APP_VERSION && it != ParamKey.ATB }
+            .forEach { builder.appendQueryParameter(it, request.getQueryParameter(it)) }
 
         addCustomQueryParams(builder)
         val newUri = builder.build()
@@ -52,16 +50,24 @@ class DuckDuckGoRequestRewriter(private val duckDuckGoUrlDetector: DuckDuckGoUrl
     }
 
     override fun shouldRewriteRequest(uri: Uri): Boolean {
-        return duckDuckGoUrlDetector.isDuckDuckGoUrl(uri) &&
-                !uri.queryParameterNames.containsAll(arrayListOf(sourceParam, appVersionParam))
+        return duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(uri.toString()) &&
+                !uri.queryParameterNames.containsAll(arrayListOf(ParamKey.SOURCE, ParamKey.APP_VERSION, ParamKey.ATB))
     }
 
+    /**
+     * Applies cohort (atb) https://duck.co/help/privacy/atb, app version and
+     * and source (t) https://duck.co/help/privacy/t params to url
+     */
     override fun addCustomQueryParams(builder: Uri.Builder) {
-        builder.appendQueryParameter(appVersionParam, formatAppVersion())
-        builder.appendQueryParameter(sourceParam, querySource)
+        val atb = statisticsStore.atb
+        if (atb != null) {
+            builder.appendQueryParameter(ParamKey.ATB, atb)
+        }
+        builder.appendQueryParameter(ParamKey.APP_VERSION, appVersion())
+        builder.appendQueryParameter(ParamKey.SOURCE, ParamValue.SOURCE)
     }
 
-    private fun formatAppVersion(): String {
+    private fun appVersion(): String {
         return String.format("android_%s", BuildConfig.VERSION_NAME.replace(".", "_"))
     }
 }

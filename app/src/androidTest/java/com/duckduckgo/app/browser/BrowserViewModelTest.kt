@@ -39,9 +39,10 @@ import com.duckduckgo.app.privacymonitor.db.NetworkPercent
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
-import com.duckduckgo.app.settings.db.AppConfigurationDao
-import com.duckduckgo.app.settings.db.AppConfigurationEntity
+import com.duckduckgo.app.global.db.AppConfigurationDao
+import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -75,19 +76,22 @@ class BrowserViewModelTest {
     }
 
     @Mock
-    lateinit var mockQueryObserver: Observer<String>
+    private lateinit var mockStatisticsUpdater: StatisticsUpdater
 
     @Mock
-    lateinit var mockCommandObserver: Observer<Command>
+    private lateinit var mockQueryObserver: Observer<String>
 
     @Mock
-    lateinit var mockTermsOfServiceStore: TermsOfServiceStore
+    private lateinit var mockCommandObserver: Observer<Command>
 
     @Mock
-    lateinit var mockSettingsStore: SettingsDataStore
+    private lateinit var mockTermsOfServiceStore: TermsOfServiceStore
 
     @Mock
-    lateinit var mockAutoCompleteApi: AutoCompleteApi
+    private lateinit var mockSettingsStore: SettingsDataStore
+
+    @Mock
+    private lateinit var mockAutoCompleteApi: AutoCompleteApi
 
     @Mock
     private lateinit var bookmarksDao: BookmarksDao
@@ -116,6 +120,7 @@ class BrowserViewModelTest {
         appConfigurationDao = db.appConfigurationDao()
 
         testee = BrowserViewModel(
+                statisticsUpdater = mockStatisticsUpdater,
                 queryUrlConverter = mockOmnibarConverter,
                 duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
                 termsOfServiceStore = mockTermsOfServiceStore,
@@ -233,6 +238,12 @@ class BrowserViewModelTest {
     fun whenUrlChangedWithDuckDuckGoUrlContainingQueryThenUrlRewrittenToContainQuery() {
         testee.urlChanged("http://duckduckgo.com?q=test")
         assertEquals("test", testee.viewState.value!!.omnibarText)
+    }
+
+    @Test
+    fun whenUrlChangedWithDuckDuckGoUrlContainingQueryThenAtbRefreshed() {
+        testee.urlChanged("http://duckduckgo.com?q=test")
+        verify(mockStatisticsUpdater).refreshRetentionAtb()
     }
 
     @Test
@@ -371,28 +382,28 @@ class BrowserViewModelTest {
     fun whenEnteringQueryWithAutoCompleteEnabledThenAutoCompleteSuggestionsShown() {
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.onOmnibarInputStateChanged("foo", true)
-        assertTrue(testee.viewState.value!!.showAutoCompleteSuggestions)
+        assertTrue(testee.viewState.value!!.autoComplete.showSuggestions)
     }
 
     @Test
     fun whenEnteringQueryWithAutoCompleteDisabledThenAutoCompleteSuggestionsNotShown() {
         doReturn(false).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.onOmnibarInputStateChanged("foo", true)
-        assertFalse(testee.viewState.value!!.showAutoCompleteSuggestions)
+        assertFalse(testee.viewState.value!!.autoComplete.showSuggestions)
     }
 
     @Test
     fun whenEnteringEmptyQueryWithAutoCompleteEnabledThenAutoCompleteSuggestionsNotShown() {
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.onOmnibarInputStateChanged("", true)
-        assertFalse(testee.viewState.value!!.showAutoCompleteSuggestions)
+        assertFalse(testee.viewState.value!!.autoComplete.showSuggestions)
     }
 
     @Test
     fun whenEnteringEmptyQueryWithAutoCompleteDisabledThenAutoCompleteSuggestionsNotShown() {
         doReturn(false).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.onOmnibarInputStateChanged("", true)
-        assertFalse(testee.viewState.value!!.showAutoCompleteSuggestions)
+        assertFalse(testee.viewState.value!!.autoComplete.showSuggestions)
     }
 
     @Test
@@ -447,4 +458,30 @@ class BrowserViewModelTest {
         val lastCommand = commandCaptor.lastValue as Command.DownloadImage
         assertEquals("example.com", lastCommand.url)
     }
+
+    @Test
+    fun whenUserTypesSearchTermThenViewStateUpdatedToDenoteUserIsFindingInPage() {
+        testee.userFindingInPage("foo")
+        assertTrue(testee.viewState.value!!.findInPage.visible)
+    }
+
+    @Test
+    fun whenUserTypesSearchTermThenViewStateUpdatedToContainSearchTerm() {
+        testee.userFindingInPage("foo")
+        assertEquals("foo", testee.viewState.value!!.findInPage.searchTerm)
+    }
+
+    @Test
+    fun whenUserDismissesFindInPageThenViewStateUpdatedToDenoteUserIsNotFindingInPage() {
+        testee.dismissFindInView()
+        assertFalse(testee.viewState.value!!.findInPage.visible)
+    }
+
+    @Test
+    fun whenUserDismissesFindInPageThenViewStateUpdatedToClearSearchTerm() {
+        testee.userFindingInPage("foo")
+        testee.dismissFindInView()
+        assertEquals("", testee.viewState.value!!.findInPage.searchTerm)
+    }
+
 }

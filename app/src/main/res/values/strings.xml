@@ -27,6 +27,14 @@
     <string name="downloadImage">Download Image</string>
     <string name="imageOptions">Image Options</string>
     <string name="permissionRequiredToDownload">Downloading requires storage permission</string>
+    <string name="find_in_page">Find in page</string>
+
+    <!-- Find in page -->
+    <string name="nextSearchTermDescription">Find next</string>
+    <string name="previousSearchTermDescription">Find previous</string>
+    <string name="closeFindInPageButtonDescription">Close find in page view</string>
+    <string name="findInPageHint">Find in page</string>
+    <string name="findInPageMatches">%d/%d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Edit query before searching</string>

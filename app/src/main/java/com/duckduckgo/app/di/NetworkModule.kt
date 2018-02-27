@@ -16,11 +16,15 @@
 
 package com.duckduckgo.app.di
 
+import android.app.job.JobScheduler
 import android.content.Context
-import com.duckduckgo.app.surrogates.api.ResourceSurrogateListService
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.AppUrl.Url
+import com.duckduckgo.app.global.job.JobBuilder
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeListService
+import com.duckduckgo.app.job.AppConfigurationSyncer
+import com.duckduckgo.app.job.ConfigurationDownloader
+import com.duckduckgo.app.surrogates.api.ResourceSurrogateListService
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
 import com.squareup.moshi.Moshi
 import dagger.Module
@@ -50,7 +54,7 @@ class NetworkModule {
     @Singleton
     fun retrofit(okHttpClient: OkHttpClient, moshi: Moshi, context: Context): Retrofit {
         return Retrofit.Builder()
-                .baseUrl(context.getString(R.string.baseUrl))
+                .baseUrl(Url.BASE)
                 .client(okHttpClient)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(MoshiConverterFactory.create(moshi))
@@ -72,6 +76,15 @@ class NetworkModule {
     @Provides
     fun surrogatesService(retrofit: Retrofit): ResourceSurrogateListService =
         retrofit.create(ResourceSurrogateListService::class.java)
+
+
+    @Provides
+    @Singleton
+    fun appConfigurationSyncer(jobBuilder: JobBuilder,
+                               jobScheduler: JobScheduler,
+                               appConfigurationDownloader: ConfigurationDownloader): AppConfigurationSyncer {
+        return AppConfigurationSyncer(jobBuilder, jobScheduler, appConfigurationDownloader)
+    }
 
     companion object {
         private const val CACHE_SIZE: Long = 10 * 1024 * 1024 // 10MB

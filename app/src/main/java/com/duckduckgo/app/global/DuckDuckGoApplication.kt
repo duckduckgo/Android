@@ -19,11 +19,12 @@ package com.duckduckgo.app.global
 import android.app.Activity
 import android.app.Application
 import android.app.Service
-import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.migration.LegacyMigration
+import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.squareup.leakcanary.LeakCanary
 import dagger.android.AndroidInjector
@@ -35,7 +36,7 @@ import org.jetbrains.anko.doAsync
 import timber.log.Timber
 import javax.inject.Inject
 
-class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Application() {
+open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Application() {
 
     @Inject
     lateinit var activityInjector: DispatchingAndroidInjector<Activity>
@@ -58,6 +59,9 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
     @Inject
     lateinit var migration: LegacyMigration
 
+    @Inject
+    lateinit var statisticsUpdater: StatisticsUpdater
+
     override fun onCreate() {
         super.onCreate()
 
@@ -67,17 +71,18 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
         configureLogging()
         configureCrashReporting()
 
+        initializeStatistics()
         loadTrackerData()
         configureDataDownloader()
 
         migrateLegacyDb()
     }
 
-    private fun installLeakCanary(): Boolean {
+    protected open fun installLeakCanary(): Boolean {
         if (LeakCanary.isInAnalyzerProcess(this)) {
-            return false;
+            return false
         }
-        LeakCanary.install(this);
+        LeakCanary.install(this)
         return true
     }
 
@@ -100,7 +105,7 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
         if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
     }
 
-    private fun configureDependencyInjection() {
+    protected open fun configureDependencyInjection() {
         DaggerAppComponent.builder()
                 .application(this)
                 .create(this)
@@ -109,6 +114,10 @@ class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Applicati
 
     private fun configureCrashReporting() {
         crashReportingInitializer.init(this)
+    }
+
+    private fun initializeStatistics() {
+        statisticsUpdater.initializeAtb()
     }
 
     /**

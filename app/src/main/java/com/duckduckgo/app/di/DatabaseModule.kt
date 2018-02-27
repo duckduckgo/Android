@@ -23,30 +23,13 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
-@Module
+@Module (includes = [DaoModule::class])
 class DatabaseModule {
 
     @Provides
     @Singleton
     fun provideDatabase(context: Context): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
-                .fallbackToDestructiveMigration()
                 .build()
     }
-
-    @Provides
-    fun provideHttpsUpgradeDomainDao(database: AppDatabase) = database.httpsUpgradeDomainDao()
-
-    @Provides
-    fun provideDisconnectTrackDao(database: AppDatabase) = database.trackerDataDao()
-
-    @Provides
-    fun providesNetworkLeaderboardDao(database: AppDatabase) = database.networkLeaderboardDao()
-
-    @Provides
-    fun providesBookmarksDao(database: AppDatabase) = database.bookmarksDao()
-
-    @Provides
-    fun appConfigurationDao(database: AppDatabase) = database.appConfigurationDao()
-
 }
