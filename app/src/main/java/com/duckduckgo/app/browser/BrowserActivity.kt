@@ -40,6 +40,7 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.webkit.URLUtil
+import android.webkit.WebSettings
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.webkit.WebView
 import android.widget.TextView
@@ -424,6 +425,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
             displayZoomControls = false
             mixedContentMode = MIXED_CONTENT_COMPATIBILITY_MODE
             setSupportZoom(true)
+            layoutAlgorithm =WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING
         }
 
         webView.setDownloadListener { url, _, _, _, _ ->
@@ -447,7 +449,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
     }
 
     private fun toggleDesktopSiteMode(isDesktopSiteMode: Boolean) {
-        webView.setInitialScale(if (isDesktopSiteMode) 100 else 0)
+        webView.setInitialScale(if (isDesktopSiteMode) 120 else 1)
         webView.settings.useWideViewPort = !isDesktopSiteMode
         webView.settings.userAgentString = userAgentProvider.getUserAgent(desktopSiteRequested = isDesktopSiteMode)
     }
