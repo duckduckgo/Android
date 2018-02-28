@@ -36,6 +36,8 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.privacymonitor.PrivacyMonitor
+import com.duckduckgo.app.global.isMobileSite
+import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.privacymonitor.SiteMonitor
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardEntry
@@ -84,7 +86,9 @@ class BrowserViewModel(
             val canAddBookmarks: Boolean = false,
             val isFullScreen: Boolean = false,
             val autoComplete: AutoCompleteViewState = AutoCompleteViewState(),
-            val findInPage: FindInPage = FindInPage(canFindInPage = false)
+            val findInPage: FindInPage = FindInPage(canFindInPage = false),
+            val webViewScale: Int = 0,
+            val isDesktopBrowsingMode: Boolean = false
     )
 
     sealed class Command {
@@ -394,6 +398,23 @@ class BrowserViewModel(
                 activeMatchIndex = activeIndex,
                 numberMatches = numberOfMatches)
         viewState.value = currentViewState().copy(findInPage = findInPage)
+    }
+
+
+    fun desktopSiteModeToggled(urlString: String?, desktopSiteRequested: Boolean) {
+        viewState.value = currentViewState().copy(isDesktopBrowsingMode = desktopSiteRequested)
+
+        if (urlString == null) {
+            return
+        }
+        val url = Uri.parse(urlString)
+        if (desktopSiteRequested && url.isMobileSite) {
+            val desktopUrl = url.toDesktopUri()
+            Timber.i("Original URL $urlString - attempting $desktopUrl with desktop site UA string")
+            command.value = Navigate(desktopUrl.toString())
+        } else {
+            command.value = Command.Refresh
+        }
     }
 
     data class FindInPage(
