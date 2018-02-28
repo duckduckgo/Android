@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.settings.db
+package com.duckduckgo.app.global.db
 
 import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.*
 import android.support.annotation.CheckResult
-import com.duckduckgo.app.settings.db.AppConfigurationDao.Companion.KEY
+import com.duckduckgo.app.global.db.AppConfigurationDao.Companion.KEY
 import org.intellij.lang.annotations.Language
 
 

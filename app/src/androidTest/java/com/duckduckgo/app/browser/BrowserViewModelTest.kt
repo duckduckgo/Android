@@ -39,9 +39,10 @@ import com.duckduckgo.app.privacymonitor.db.NetworkPercent
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
-import com.duckduckgo.app.settings.db.AppConfigurationDao
-import com.duckduckgo.app.settings.db.AppConfigurationEntity
+import com.duckduckgo.app.global.db.AppConfigurationDao
+import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -73,6 +74,9 @@ class BrowserViewModelTest {
             return MutableLiveData<Array<NetworkPercent>>()
         }
     }
+
+    @Mock
+    private lateinit var mockStatisticsUpdater: StatisticsUpdater
 
     @Mock
     private lateinit var mockQueryObserver: Observer<String>
@@ -116,6 +120,7 @@ class BrowserViewModelTest {
         appConfigurationDao = db.appConfigurationDao()
 
         testee = BrowserViewModel(
+                statisticsUpdater = mockStatisticsUpdater,
                 queryUrlConverter = mockOmnibarConverter,
                 duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
                 termsOfServiceStore = mockTermsOfServiceStore,
@@ -233,6 +238,12 @@ class BrowserViewModelTest {
     fun whenUrlChangedWithDuckDuckGoUrlContainingQueryThenUrlRewrittenToContainQuery() {
         testee.urlChanged("http://duckduckgo.com?q=test")
         assertEquals("test", testee.viewState.value!!.omnibarText)
+    }
+
+    @Test
+    fun whenUrlChangedWithDuckDuckGoUrlContainingQueryThenAtbRefreshed() {
+        testee.urlChanged("http://duckduckgo.com?q=test")
+        verify(mockStatisticsUpdater).refreshRetentionAtb()
     }
 
     @Test
@@ -473,4 +484,48 @@ class BrowserViewModelTest {
         assertEquals("", testee.viewState.value!!.findInPage.searchTerm)
     }
 
+    @Test
+    fun whenUserSelectsDesktopSiteThenDesktopModeStateUpdated() {
+        testee.desktopSiteModeToggled("http://example.com", desktopSiteRequested = true)
+        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(testee.viewState.value!!.isDesktopBrowsingMode)
+    }
+
+    @Test
+    fun whenUserSelectsMobileSiteThenMobileModeStateUpdated() {
+        testee.desktopSiteModeToggled("http://example.com", desktopSiteRequested = false)
+        assertFalse(testee.viewState.value!!.isDesktopBrowsingMode)
+    }
+
+    @Test
+    fun whenUserSelectsDesktopSiteWhenOnMobileSpecificSiteThenUrlModified() {
+        testee.desktopSiteModeToggled("http://m.example.com", desktopSiteRequested = true)
+        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        val ultimateCommand = commandCaptor.lastValue as Navigate
+        assertEquals("http://example.com", ultimateCommand.url)
+    }
+
+    @Test
+    fun whenUserSelectsDesktopSiteWhenNotOnMobileSpecificSiteThenUrlNotModified() {
+        testee.desktopSiteModeToggled("http://example.com", desktopSiteRequested = true)
+        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        val ultimateCommand = commandCaptor.lastValue
+        assertTrue(ultimateCommand == Command.Refresh)
+    }
+
+    @Test
+    fun whenUserSelectsMobileSiteWhenOnMobileSpecificSiteThenUrlNotModified() {
+        testee.desktopSiteModeToggled("http://m.example.com", desktopSiteRequested = false)
+        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        val ultimateCommand = commandCaptor.lastValue
+        assertTrue(ultimateCommand == Command.Refresh)
+    }
+
+    @Test
+    fun whenUserSelectsMobileSiteWhenNotOnMobileSpecificSiteThenUrlNotModified() {
+        testee.desktopSiteModeToggled("http://example.com", desktopSiteRequested = false)
+        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        val ultimateCommand = commandCaptor.lastValue
+        assertTrue(ultimateCommand == Command.Refresh)
+    }
 }

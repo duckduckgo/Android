@@ -14,17 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.autocomplete.api
+package com.duckduckgo.app.statistics.api
 
+import com.duckduckgo.app.global.AppUrl.ParamKey
+import com.duckduckgo.app.statistics.model.Atb
 import io.reactivex.Observable
+import okhttp3.ResponseBody
 import retrofit2.http.GET
 import retrofit2.http.Query
 
 
-interface AutoCompleteService {
+interface StatisticsService {
 
-    @GET("/ac/")
-    fun autoComplete(@Query("q") query: String): Observable<List<AutoCompleteServiceRawResult>>
+    @GET("/exti/")
+    fun exti(@Query(ParamKey.ATB) atb: String): Observable<ResponseBody>
+
+    @GET("/atb.js")
+    fun atb(): Observable<Atb>
+
+    @GET("/atb.js")
+    fun updateAtb(@Query(ParamKey.ATB) atb: String, @Query(ParamKey.RETENTION_ATB) retentionAtb: String): Observable<Atb>
 }
-
-data class AutoCompleteServiceRawResult(val phrase: String)

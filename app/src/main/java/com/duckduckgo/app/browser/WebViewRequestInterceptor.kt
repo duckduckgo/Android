@@ -31,9 +31,9 @@ import javax.inject.Inject
 
 
 class WebViewRequestInterceptor @Inject constructor(
-        private val resourceSurrogates: ResourceSurrogates,
-        private val trackerDetector: TrackerDetector,
-        private val httpsUpgrader: HttpsUpgrader
+    private val resourceSurrogates: ResourceSurrogates,
+    private val trackerDetector: TrackerDetector,
+    private val httpsUpgrader: HttpsUpgrader
 ) {
 
     /**
@@ -47,10 +47,10 @@ class WebViewRequestInterceptor @Inject constructor(
      */
     @WorkerThread
     fun shouldIntercept(
-            request: WebResourceRequest,
-            webView: WebView,
-            currentUrl: String?,
-            webViewClientListener: WebViewClientListener?
+        request: WebResourceRequest,
+        webView: WebView,
+        currentUrl: String?,
+        webViewClientListener: WebViewClientListener?
     ): WebResourceResponse? {
         val url = request.url
 
@@ -75,11 +75,7 @@ class WebViewRequestInterceptor @Inject constructor(
             val surrogate = resourceSurrogates.get(url)
             if (surrogate.responseAvailable) {
                 Timber.d("Surrogate found for $url")
-                return WebResourceResponse(
-                        surrogate.mimeType,
-                        "UTF-8",
-                        surrogate.jsFunction.byteInputStream()
-                )
+                return WebResourceResponse(surrogate.mimeType, "UTF-8", surrogate.jsFunction.byteInputStream())
             }
 
             Timber.d("Blocking request $url")
@@ -90,22 +86,16 @@ class WebViewRequestInterceptor @Inject constructor(
     }
 
     private fun shouldUpgrade(request: WebResourceRequest) =
-            request.isForMainFrame && request.url != null && httpsUpgrader.shouldUpgrade(request.url)
+        request.isForMainFrame && request.url != null && httpsUpgrader.shouldUpgrade(request.url)
 
-    private fun shouldBlock(
-            request: WebResourceRequest,
-            documentUrl: String?,
-            webViewClientListener: WebViewClientListener?
-    ): Boolean {
+    private fun shouldBlock(request: WebResourceRequest, documentUrl: String?, webViewClientListener: WebViewClientListener?): Boolean {
         val url = request.url.toString()
 
         if (request.isForMainFrame || documentUrl == null) {
             return false
         }
 
-        val trackingEvent =
-                trackerDetector.evaluate(url, documentUrl, ResourceType.from(request))
-                        ?: return false
+        val trackingEvent = trackerDetector.evaluate(url, documentUrl, ResourceType.from(request)) ?: return false
         webViewClientListener?.trackerDetected(trackingEvent)
         return trackingEvent.blocked
     }

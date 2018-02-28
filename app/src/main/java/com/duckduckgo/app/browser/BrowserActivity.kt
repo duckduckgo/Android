@@ -50,6 +50,7 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
+import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
@@ -77,6 +78,8 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
+
+    lateinit var userAgentProvider: UserAgentProvider
 
     private lateinit var popupMenu: BrowserPopupMenu
 
@@ -129,6 +132,9 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
             enableMenuOption(view.addBookmarksPopupMenuItem) { addBookmark() }
             enableMenuOption(view.settingsPopupMenuItem) { launchSettings() }
             enableMenuOption(view.findInPageMenuItem) { viewModel.userRequestingToFindInPage() }
+            enableMenuOption(view.requestDesktopSiteCheckMenuItem) {
+                viewModel.desktopSiteModeToggled(urlString = webView.url, desktopSiteRequested = view.requestDesktopSiteCheckMenuItem.isChecked)
+            }
         }
     }
 
@@ -221,6 +227,8 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
             true -> webView.show()
             false -> webView.hide()
         }
+
+        toggleDesktopSiteMode(viewState.isDesktopBrowsingMode)
 
         when (viewState.isLoading) {
             true -> pageLoadingIndicator.show()
@@ -401,10 +409,13 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
         webView = layoutInflater.inflate(R.layout.include_duckduckgo_browser_webview, webViewContainer, true).findViewById(R.id.browserWebView) as WebView
+        userAgentProvider = UserAgentProvider(webView.settings.userAgentString)
+
         webView.webViewClient = webViewClient
         webView.webChromeClient = webChromeClient
 
         webView.settings.apply {
+            userAgentString = userAgentProvider.getUserAgent()
             javaScriptEnabled = true
             domStorageEnabled = true
             loadWithOverviewMode = true
@@ -433,6 +444,10 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
         webView.setFindListener(this)
 
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
+    }
+
+    private fun toggleDesktopSiteMode(isDesktopSiteMode: Boolean) {
+        webView.settings.userAgentString = userAgentProvider.getUserAgent(isDesktopSiteMode)
     }
 
     private fun downloadFileWithPermissionCheck() {
@@ -652,8 +667,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
         private const val QUERY_EXTRA = "QUERY_EXTRA"
         private const val DASHBOARD_REQUEST_CODE = 100
         private const val PERMISSION_REQUEST_EXTERNAL_STORAGE = 200
-
-
     }
 
 }
