@@ -18,7 +18,7 @@ package com.duckduckgo.app.tabs
 
 
 import android.arch.lifecycle.MutableLiveData
-import com.duckduckgo.app.privacymonitor.PrivacyMonitor
+import com.duckduckgo.app.global.model.Site
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -40,19 +40,19 @@ class TabDataRepository @Inject constructor() {
         return tabs.value!!.list.isNotEmpty()
     }
 
-    fun add(tabId: String, data: MutableLiveData<PrivacyMonitor>) {
+    fun add(tabId: String, data: MutableLiveData<Site>) {
         tabs.value!!.list[tabId] = data
     }
 
     /**
      * Returns existing record if it exists, otherwise creates and returns a new one
      */
-    fun retrieve(tabId: String): MutableLiveData<PrivacyMonitor> {
+    fun retrieve(tabId: String): MutableLiveData<Site> {
         val data = tabs.value!!.list[tabId]
         if (data == null) {
-            val siteMonitor = MutableLiveData<PrivacyMonitor>()
-            add(tabId, siteMonitor)
-            return siteMonitor
+            val site = MutableLiveData<Site>()
+            add(tabId, site)
+            return site
         }
         return data
     }
@@ -63,7 +63,7 @@ class TabDataRepository @Inject constructor() {
 
     data class Tabs(
         var currentId: String? = null,
-        val list: LinkedHashMap<String, MutableLiveData<PrivacyMonitor>> = LinkedHashMap()
+        val list: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
 
     )
 }

@@ -22,10 +22,10 @@ import com.duckduckgo.app.home.HomeActivity
 import com.duckduckgo.app.job.AppConfigurationJobService
 import com.duckduckgo.app.launch.LaunchActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
-import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
-import com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity
-import com.duckduckgo.app.privacymonitor.ui.ScorecardActivity
-import com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity
+import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
+import com.duckduckgo.app.privacy.ui.PrivacyPracticesActivity
+import com.duckduckgo.app.privacy.ui.ScorecardActivity
+import com.duckduckgo.app.privacy.ui.TrackerNetworksActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector

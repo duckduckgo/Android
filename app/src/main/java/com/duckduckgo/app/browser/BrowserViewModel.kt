@@ -35,18 +35,18 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.privacymonitor.PrivacyMonitor
+import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.global.toDesktopUri
-import com.duckduckgo.app.privacymonitor.SiteMonitor
-import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
-import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardEntry
-import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
-import com.duckduckgo.app.privacymonitor.model.TermsOfService
-import com.duckduckgo.app.privacymonitor.model.improvedGrade
+import com.duckduckgo.app.global.model.SiteMonitor
+import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
+import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
+import com.duckduckgo.app.privacy.model.PrivacyGrade
+import com.duckduckgo.app.privacy.model.TermsOfService
+import com.duckduckgo.app.privacy.model.improvedGrade
 import com.duckduckgo.app.tabs.TabDataRepository
-import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
-import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
+import com.duckduckgo.app.privacy.store.TermsOfServiceStore
+import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -125,15 +125,15 @@ class BrowserViewModel(
     private var appConfigurationDownloaded = false
     private val appConfigurationObservable = appConfigurationDao.appConfigurationStatus()
     private val autoCompletePublishSubject = PublishRelay.create<String>()
-    private var monitorLiveData: MutableLiveData<PrivacyMonitor>
-    private var monitor: SiteMonitor? = null
+    private var siteLiveData: MutableLiveData<Site>
+    private var site: SiteMonitor? = null
 
     init {
         command.value = Command.ShowKeyboard
         viewState.value = ViewState(canAddBookmarks = false)
         appConfigurationObservable.observeForever(appConfigurationObserver)
         configureAutoComplete()
-        monitorLiveData = tabRepository.retrieve(tabId)
+        siteLiveData = tabRepository.retrieve(tabId)
     }
 
     private fun configureAutoComplete() {
@@ -207,8 +207,8 @@ class BrowserViewModel(
     override fun loadingStarted() {
         Timber.v("Loading started")
         viewState.value = currentViewState().copy(isLoading = true)
-        monitor = null
-        onSiteMonitorChanged()
+        site = null
+        onSiteChanged()
     }
 
     override fun loadingFinished() {
@@ -217,8 +217,8 @@ class BrowserViewModel(
     }
 
     override fun titleReceived(title: String) {
-        monitor?.title = title
-        onSiteMonitorChanged()
+        site?.title = title
+        onSiteChanged()
     }
 
     @AnyThread
@@ -259,14 +259,14 @@ class BrowserViewModel(
 
         val terms = termsOfServiceStore.retrieveTerms(url) ?: TermsOfService()
         val memberNetwork = trackerNetworks.network(url)
-        monitor = SiteMonitor(url, terms, memberNetwork)
-        onSiteMonitorChanged()
+        site = SiteMonitor(url, terms, memberNetwork)
+        onSiteChanged()
     }
 
     override fun trackerDetected(event: TrackingEvent) {
-        if (event.documentUrl == monitor?.url) {
-            monitor?.trackerDetected(event)
-            onSiteMonitorChanged()
+        if (event.documentUrl == site?.url) {
+            site?.trackerDetected(event)
+            onSiteChanged()
         }
         updateNetworkLeaderboard(event)
     }
@@ -278,15 +278,15 @@ class BrowserViewModel(
     }
 
     override fun pageHasHttpResources(page: String?) {
-        if (page == monitor?.url) {
-            monitor?.hasHttpResources = true
-            onSiteMonitorChanged()
+        if (page == site?.url) {
+            site?.hasHttpResources = true
+            onSiteChanged()
         }
     }
 
-    private fun onSiteMonitorChanged() {
-        privacyGrade.postValue(monitor?.improvedGrade)
-        monitorLiveData.postValue(monitor)
+    private fun onSiteChanged() {
+        privacyGrade.postValue(site?.improvedGrade)
+        siteLiveData.postValue(site)
     }
 
     private fun currentViewState(): ViewState = viewState.value!!

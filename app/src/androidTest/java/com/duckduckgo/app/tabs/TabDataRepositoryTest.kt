@@ -18,7 +18,7 @@ package com.duckduckgo.app.tabs
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.MutableLiveData
-import com.duckduckgo.app.privacymonitor.PrivacyMonitor
+import com.duckduckgo.app.global.model.Site
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
@@ -40,14 +40,14 @@ class TabDataRepositoryTest {
 
     @Test
     fun whenRecordAddedThenRecordExists() {
-        val record = MutableLiveData<PrivacyMonitor>()
+        val record = MutableLiveData<Site>()
         testee.add(TAB_ID, record)
         assertSame(record, testee.retrieve(TAB_ID))
     }
 
     @Test
     fun whenIdExistsThenRetrieveReturnsIt() {
-        val record = MutableLiveData<PrivacyMonitor>()
+        val record = MutableLiveData<Site>()
         testee.add(TAB_ID, record)
         assertSame(record, testee.retrieve(TAB_ID))
     }

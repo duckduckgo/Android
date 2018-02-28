@@ -18,10 +18,10 @@ package com.duckduckgo.app.di
 
 import com.duckduckgo.app.onboarding.store.OnboardingSharedPreferences
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.privacymonitor.store.PrivacySettingsSharedPreferences
-import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
-import com.duckduckgo.app.privacymonitor.store.TermsOfServiceRawStore
-import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
+import com.duckduckgo.app.privacy.store.PrivacySettingsSharedPreferences
+import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import com.duckduckgo.app.privacy.store.TermsOfServiceRawStore
+import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
 import dagger.Binds
