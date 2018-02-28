@@ -38,17 +38,17 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.global.toDesktopUri
-import com.duckduckgo.app.global.model.SiteMonitor
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.TermsOfService
-import com.duckduckgo.app.privacy.model.improvedGrade
 import com.duckduckgo.app.tabs.TabDataRepository
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
+import com.duckduckgo.app.global.model.SiteMonitor
+import com.duckduckgo.app.privacy.model.improvedGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
@@ -126,7 +126,7 @@ class BrowserViewModel(
     private val appConfigurationObservable = appConfigurationDao.appConfigurationStatus()
     private val autoCompletePublishSubject = PublishRelay.create<String>()
     private var siteLiveData: MutableLiveData<Site>
-    private var site: SiteMonitor? = null
+    private var site: Site?
 
     init {
         command.value = Command.ShowKeyboard
@@ -134,6 +134,7 @@ class BrowserViewModel(
         appConfigurationObservable.observeForever(appConfigurationObserver)
         configureAutoComplete()
         siteLiveData = tabRepository.retrieve(tabId)
+        site = siteLiveData.value
     }
 
     private fun configureAutoComplete() {
