@@ -45,3 +45,14 @@ val Uri.hasIpHost: Boolean
         val ipRegex = Regex("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
         return baseHost?.matches(ipRegex) ?: false
     }
+
+val Uri.isMobileSite: Boolean
+    get() = authority.startsWith("m.")
+
+fun Uri.toDesktopUri(): Uri {
+    return if (isMobileSite) {
+        Uri.parse(toString().replaceFirst("m.", ""))
+    } else {
+        this
+    }
+}

@@ -27,9 +27,10 @@
     <string name="downloadImage">Download Image</string>
     <string name="imageOptions">Image Options</string>
     <string name="permissionRequiredToDownload">Downloading requires storage permission</string>
-    <string name="find_in_page">Find in page</string>
+    <string name="requestDesktopSiteMenuTitle">Desktop Site</string>
 
     <!-- Find in page -->
+    <string name="find_in_page">Find in page</string>
     <string name="nextSearchTermDescription">Find next</string>
     <string name="previousSearchTermDescription">Find previous</string>
     <string name="closeFindInPageButtonDescription">Close find in page view</string>

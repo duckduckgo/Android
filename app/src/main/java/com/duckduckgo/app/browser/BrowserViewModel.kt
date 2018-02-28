@@ -35,6 +35,10 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.db.AppConfigurationDao
+import com.duckduckgo.app.global.db.AppConfigurationEntity
+import com.duckduckgo.app.global.isMobileSite
+import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.privacymonitor.SiteMonitor
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardEntry
@@ -44,8 +48,6 @@ import com.duckduckgo.app.privacymonitor.model.improvedGrade
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
 import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
-import com.duckduckgo.app.global.db.AppConfigurationDao
-import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
@@ -82,7 +84,9 @@ class BrowserViewModel(
             val canAddBookmarks: Boolean = false,
             val isFullScreen: Boolean = false,
             val autoComplete: AutoCompleteViewState = AutoCompleteViewState(),
-            val findInPage: FindInPage = FindInPage(canFindInPage = false)
+            val findInPage: FindInPage = FindInPage(canFindInPage = false),
+            val webViewScale: Int = 0,
+            val isDesktopBrowsingMode: Boolean = false
     )
 
     sealed class Command {
@@ -146,7 +150,6 @@ class BrowserViewModel(
         val searchResultViewState = currentViewState.autoComplete
         viewState.value = currentViewState.copy(autoComplete = searchResultViewState.copy(searchResults = AutoCompleteResult(result.query, results)))
     }
-
 
     @VisibleForTesting
     public override fun onCleared() {
@@ -389,6 +392,23 @@ class BrowserViewModel(
                 activeMatchIndex = activeIndex,
                 numberMatches = numberOfMatches)
         viewState.value = currentViewState().copy(findInPage = findInPage)
+    }
+
+
+    fun desktopSiteModeToggled(urlString: String?, desktopSiteRequested: Boolean) {
+        viewState.value = currentViewState().copy(isDesktopBrowsingMode = desktopSiteRequested)
+
+        if (urlString == null) {
+            return
+        }
+        val url = Uri.parse(urlString)
+        if (desktopSiteRequested && url.isMobileSite) {
+            val desktopUrl = url.toDesktopUri()
+            Timber.i("Original URL $urlString - attempting $desktopUrl with desktop site UA string")
+            command.value = Navigate(desktopUrl.toString())
+        } else {
+            command.value = Command.Refresh
+        }
     }
 
     data class FindInPage(
