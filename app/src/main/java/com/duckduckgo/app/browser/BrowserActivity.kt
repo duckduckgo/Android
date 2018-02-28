@@ -418,6 +418,8 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
             userAgentString = userAgentProvider.getUserAgent()
             javaScriptEnabled = true
             domStorageEnabled = true
+            loadWithOverviewMode = true
+            useWideViewPort = true
             builtInZoomControls = true
             displayZoomControls = false
             mixedContentMode = MIXED_CONTENT_COMPATIBILITY_MODE
@@ -445,8 +447,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
     }
 
     private fun toggleDesktopSiteMode(isDesktopSiteMode: Boolean) {
-        webView.settings.loadWithOverviewMode = isDesktopSiteMode
-        webView.settings.useWideViewPort = isDesktopSiteMode
         webView.settings.userAgentString = userAgentProvider.getUserAgent(isDesktopSiteMode)
     }
 
