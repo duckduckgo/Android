@@ -134,20 +134,22 @@ class BrowserTabFragment : Fragment(), BookmarkDialogCreationListener, FindListe
         popupMenu = BrowserPopupMenu(layoutInflater)
         val view = popupMenu.contentView
         popupMenu.apply {
-            enableMenuOption(view.forwardPopupMenuItem) { webView?.goForward() }
-            enableMenuOption(view.backPopupMenuItem) { webView?.goBack() }
-            enableMenuOption(view.refreshPopupMenuItem) { webView?.reload() }
-            enableMenuOption(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
-            enableMenuOption(view.addBookmarksPopupMenuItem) { addBookmark() }
-            enableMenuOption(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
-            enableMenuOption(view.findInPageMenuItem) { viewModel.userRequestingToFindInPage() }
-            enableMenuOption(view.requestDesktopSiteCheckMenuItem) {
+            onMenuItemClicked(view.forwardPopupMenuItem) { webView?.goForward() }
+            onMenuItemClicked(view.backPopupMenuItem) { webView?.goBack() }
+            onMenuItemClicked(view.refreshPopupMenuItem) { webView?.reload() }
+            onMenuItemClicked(view.tabsMenuItem) { browserActivity?.launchTabSwitcher() }
+            onMenuItemClicked(view.newTabPopupMenuItem) { browserActivity?.launchNewTab() }
+            onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
+            onMenuItemClicked(view.addBookmarksPopupMenuItem) { addBookmark() }
+            onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
+            onMenuItemClicked(view.findInPageMenuItem) { viewModel.userRequestingToFindInPage() }
+            onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) {
                 viewModel.desktopSiteModeToggled(
                     urlString = webView?.url,
                     desktopSiteRequested = view.requestDesktopSiteCheckMenuItem.isChecked
                 )
             }
-            enableMenuOption(view.sharePageMenuItem) { viewModel.userSharingLink(webView?.url) }
+            onMenuItemClicked(view.sharePageMenuItem) { viewModel.userSharingLink(webView?.url) }
         }
     }
 
@@ -571,7 +573,7 @@ class BrowserTabFragment : Fragment(), BookmarkDialogCreationListener, FindListe
         omnibarTextInput.postDelayed({ omnibarTextInput.showKeyboard() }, 300)
     }
 
-    fun onBackPressed() : Boolean {
+    fun onBackPressed(): Boolean {
         return when {
             webView?.canGoBack() == true -> {
                 webView?.goBack()

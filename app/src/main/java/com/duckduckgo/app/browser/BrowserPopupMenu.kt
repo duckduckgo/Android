@@ -24,7 +24,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.PopupWindow
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 
 class BrowserPopupMenu : PopupWindow {
 
@@ -38,21 +37,10 @@ class BrowserPopupMenu : PopupWindow {
         } else {
             elevation = 6.toFloat()
         }
-
-        disableButtons()
         animationStyle = android.R.style.Animation_Dialog
     }
 
-    private fun disableButtons() {
-        contentView.apply {
-            backPopupMenuItem.isEnabled = false
-            forwardPopupMenuItem.isEnabled = false
-            refreshPopupMenuItem.isEnabled = false
-        }
-    }
-
-    fun enableMenuOption(menuView: View, onClick: () -> Unit) {
-        menuView.isEnabled = true
+    fun onMenuItemClicked(menuView: View, onClick: () -> Unit) {
         menuView.setOnClickListener {
             onClick()
             dismiss()

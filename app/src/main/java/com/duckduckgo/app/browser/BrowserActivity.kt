@@ -18,7 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.app.DownloadManager
-import android.app.DownloadManager.Request.*
+import android.app.DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
@@ -44,6 +44,7 @@ import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.tabs.TabDataRepository
+import com.duckduckgo.app.tabs.TabSwitcherActivity
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import org.jetbrains.anko.toast
 import timber.log.Timber
@@ -59,8 +60,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var repository: TabDataRepository
 
-    private lateinit var tabFragment: BrowserTabFragment
-
+    private lateinit var currentTab: BrowserTabFragment
 
     private val viewModel: BrowserViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(BrowserViewModel::class.java)
@@ -72,7 +72,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_browser)
-        createTabFragment()
+        configureInitialTab()
         configureObservers()
         if (savedInstanceState == null) {
             consumeSharedQuery(intent)
@@ -88,15 +88,28 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun createTabFragment() {
+    private fun configureInitialTab() {
         val tabId = UUID.randomUUID().toString()
         val fragment = BrowserTabFragment.newInstance(tabId)
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.fragmentContainer, fragment, tabId)
         fragmentTransaction.commit()
-        tabFragment = fragment
-        viewModel.tabId = tabFragment.tabId
+        currentTab = fragment
+        viewModel.tabId = currentTab.tabId
+    }
+
+    private fun openNewTab() {
+        val tabId = UUID.randomUUID().toString()
+        val fragment = BrowserTabFragment.newInstance(tabId)
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        if (currentTab != null) {
+            fragmentTransaction.hide(currentTab)
+        }
+        fragmentTransaction.add(R.id.fragmentContainer, fragment, tabId)
+        fragmentTransaction.commit()
+        currentTab = fragment
     }
 
     private fun consumeSharedQuery(intent: Intent?) {
@@ -118,8 +131,8 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: Command?) {
         when (it) {
-            is Refresh -> tabFragment.refresh()
-            is Navigate -> tabFragment.navigate(it.url)
+            is Refresh -> currentTab.refresh()
+            is Navigate -> currentTab.navigate(it.url)
         }
     }
 
@@ -137,6 +150,14 @@ class BrowserActivity : DuckDuckGoActivity() {
             clearStarted = { resetActivityState() },
             clearComplete = { applicationContext.toast(R.string.fireDataCleared) }
         ).show()
+    }
+
+    fun launchTabSwitcher() {
+        startActivity(TabSwitcherActivity.intent(this))
+    }
+
+    fun launchNewTab() {
+        openNewTab()
     }
 
     fun launchSettings() {
@@ -210,13 +231,13 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     override fun onBackPressed() {
-        if (!tabFragment.onBackPressed()) {
+        if (!currentTab.onBackPressed()) {
             super.onBackPressed()
         }
     }
 
     private fun resetActivityState() {
-        tabFragment.resetTabState()
+        currentTab.resetTabState()
     }
 
     private data class PendingFileDownload(
@@ -237,5 +258,4 @@ class BrowserActivity : DuckDuckGoActivity() {
         private const val DASHBOARD_REQUEST_CODE = 100
         private const val PERMISSION_REQUEST_EXTERNAL_STORAGE = 200
     }
-
 }

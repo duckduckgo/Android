@@ -15,7 +15,7 @@
 
 
     <!-- Browser Activity -->
-    <string name="browserPopupMenu">Browser popup menu</string>
+    <string name="browserPopupMenu">Browser menu</string>
     <string name="refresh">Refresh</string>
     <string name="back">Back</string>
     <string name="forward">Forward</string>
@@ -45,6 +45,13 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Edit query before searching</string>
     <string name="settings_autocomplete_enabled">Autcomplete Suggestions</string>
+
+    <!-- Tabs -->
+    <string name="homeTab">DuckDuckGo</string>
+    <string name="tabActivityTitle">Tabs</string>
+    <string name="tabsMenuItem">Tabs</string>
+    <string name="newTabMenuItem">New Tab</string>
+    <string name="faviconContentDescription">Favicon</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
