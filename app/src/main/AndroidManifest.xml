@@ -67,21 +67,21 @@
         </activity>
 
         <activity
-            android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
+            android:name="com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity"
             android:label="@string/privacyDashboardActivityTitle"
             android:parentActivityName=".BrowserActivity" />
         <activity
-            android:name="com.duckduckgo.app.privacymonitor.ui.ScorecardActivity"
+            android:name="com.duckduckgo.app.privacy.ui.ScorecardActivity"
             android:label="@string/scorecardActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity" />
+            android:parentActivityName="com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity" />
         <activity
-            android:name="com.duckduckgo.app.privacymonitor.ui.TrackerNetworksActivity"
+            android:name="com.duckduckgo.app.privacy.ui.TrackerNetworksActivity"
             android:label="@string/networksActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity" />
+            android:parentActivityName="com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity" />
         <activity
-            android:name="com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesActivity"
+            android:name="com.duckduckgo.app.privacy.ui.PrivacyPracticesActivity"
             android:label="@string/privacyTermsActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity" />
+            android:parentActivityName="com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity" />
         <activity
             android:name="com.duckduckgo.app.settings.SettingsActivity"
             android:label="@string/settingsActivityTitle" />

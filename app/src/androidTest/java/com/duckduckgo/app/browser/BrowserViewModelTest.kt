@@ -34,12 +34,12 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
-import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardEntry
-import com.duckduckgo.app.privacymonitor.db.NetworkPercent
-import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
-import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
-import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
+import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
+import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
+import com.duckduckgo.app.privacy.db.NetworkPercent
+import com.duckduckgo.app.privacy.model.PrivacyGrade
+import com.duckduckgo.app.tabs.TabDataRepository
+import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
@@ -124,7 +124,7 @@ class BrowserViewModelTest {
                 duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
                 termsOfServiceStore = mockTermsOfServiceStore,
                 trackerNetworks = TrackerNetworks(),
-                privacyMonitorRepository = PrivacyMonitorRepository(),
+                tabRepository = TabDataRepository(),
                 networkLeaderboardDao = testNetworkLeaderboardDao,
                 autoCompleteApi = mockAutoCompleteApi,
                 appSettingsPreferencesStore = mockSettingsStore,

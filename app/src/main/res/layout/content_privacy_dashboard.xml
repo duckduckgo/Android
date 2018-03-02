@@ -26,7 +26,7 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
+        tools:context="com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity"
         tools:showIn="@layout/activity_privacy_dashboard">
 
         <include
@@ -171,7 +171,7 @@
                 android:fontFamily="sans-serif-medium"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <com.duckduckgo.app.privacymonitor.ui.NetworkTrackerPillView
+            <com.duckduckgo.app.privacy.ui.NetworkTrackerPillView
                 android:id="@+id/networkTrackerSummaryPill1"
                 android:layout_marginTop="13dp"
                 app:layout_constraintRight_toLeftOf="@+id/networkTrackerSummaryPill2"
@@ -180,7 +180,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <com.duckduckgo.app.privacymonitor.ui.NetworkTrackerPillView
+            <com.duckduckgo.app.privacy.ui.NetworkTrackerPillView
                 android:id="@+id/networkTrackerSummaryPill2"
                 android:layout_marginTop="13dp"
                 app:layout_constraintTop_toBottomOf="@+id/networkTrackerSummaryHeader"
@@ -189,7 +189,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <com.duckduckgo.app.privacymonitor.ui.NetworkTrackerPillView
+            <com.duckduckgo.app.privacy.ui.NetworkTrackerPillView
                 android:id="@+id/networkTrackerSummaryPill3"
                 android:layout_marginTop="13dp"
                 app:layout_constraintTop_toBottomOf="@+id/networkTrackerSummaryHeader"

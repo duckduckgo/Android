@@ -35,19 +35,20 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.global.db.AppConfigurationDao
-import com.duckduckgo.app.global.db.AppConfigurationEntity
+import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.global.toDesktopUri
-import com.duckduckgo.app.privacymonitor.SiteMonitor
-import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
-import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardEntry
-import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
-import com.duckduckgo.app.privacymonitor.model.TermsOfService
-import com.duckduckgo.app.privacymonitor.model.improvedGrade
-import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
-import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
-import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
+import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
+import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
+import com.duckduckgo.app.privacy.model.PrivacyGrade
+import com.duckduckgo.app.privacy.model.TermsOfService
+import com.duckduckgo.app.tabs.TabDataRepository
+import com.duckduckgo.app.privacy.store.TermsOfServiceStore
+import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
+import com.duckduckgo.app.global.db.AppConfigurationDao
+import com.duckduckgo.app.global.db.AppConfigurationEntity
+import com.duckduckgo.app.global.model.SiteMonitor
+import com.duckduckgo.app.privacy.model.improvedGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
@@ -56,6 +57,7 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class BrowserViewModel(
@@ -64,7 +66,7 @@ class BrowserViewModel(
         private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
         private val termsOfServiceStore: TermsOfServiceStore,
         private val trackerNetworks: TrackerNetworks,
-        private val privacyMonitorRepository: PrivacyMonitorRepository,
+        tabRepository: TabDataRepository,
         private val networkLeaderboardDao: NetworkLeaderboardDao,
         private val bookmarksDao: BookmarksDao,
         private val autoCompleteApi: AutoCompleteApi,
@@ -102,12 +104,14 @@ class BrowserViewModel(
         class FindInPageCommand(val searchTerm: String) : Command()
         object DismissFindInPage : Command()
     }
+
     /* Observable data for Activity to subscribe to */
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
-
     val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
     val url: SingleLiveEvent<String> = SingleLiveEvent()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
+    val tabId = UUID.randomUUID().toString()
+
     @VisibleForTesting
     val appConfigurationObserver: Observer<AppConfigurationEntity> = Observer { appConfiguration ->
         appConfiguration?.let {
@@ -116,18 +120,19 @@ class BrowserViewModel(
         }
     }
 
+    private var appConfigurationDownloaded = false
     private val appConfigurationObservable = appConfigurationDao.appConfigurationStatus()
     private val autoCompletePublishSubject = PublishRelay.create<String>()
-
-    private var siteMonitor: SiteMonitor? = null
-    private var appConfigurationDownloaded = false
+    private var siteLiveData: MutableLiveData<Site>
+    private var site: Site?
 
     init {
         command.value = Command.ShowKeyboard
         viewState.value = ViewState(canAddBookmarks = false)
         appConfigurationObservable.observeForever(appConfigurationObserver)
-
         configureAutoComplete()
+        siteLiveData = tabRepository.retrieve(tabId)
+        site = siteLiveData.value
     }
 
     private fun configureAutoComplete() {
@@ -202,13 +207,18 @@ class BrowserViewModel(
     override fun loadingStarted() {
         Timber.v("Loading started")
         viewState.value = currentViewState().copy(isLoading = true)
-        siteMonitor = null
-        onSiteMonitorChanged()
+        site = null
+        onSiteChanged()
     }
 
     override fun loadingFinished() {
         Timber.v("Loading finished")
         viewState.value = currentViewState().copy(isLoading = false)
+    }
+
+    override fun titleReceived(title: String) {
+        site?.title = title
+        onSiteChanged()
     }
 
     @AnyThread
@@ -247,20 +257,17 @@ class BrowserViewModel(
         viewState.value = newViewState
 
         val terms = termsOfServiceStore.retrieveTerms(url) ?: TermsOfService()
-        siteMonitor = SiteMonitor(url, terms, trackerNetworks)
-        onSiteMonitorChanged()
+        val memberNetwork = trackerNetworks.network(url)
+        site = SiteMonitor(url, terms, memberNetwork)
+        onSiteChanged()
     }
 
     override fun trackerDetected(event: TrackingEvent) {
-        if (event.documentUrl == siteMonitor?.url) {
-            updateSiteMonitor(event)
+        if (event.documentUrl == site?.url) {
+            site?.trackerDetected(event)
+            onSiteChanged()
         }
         updateNetworkLeaderboard(event)
-    }
-
-    private fun updateSiteMonitor(event: TrackingEvent) {
-        siteMonitor?.trackerDetected(event)
-        onSiteMonitorChanged()
     }
 
     private fun updateNetworkLeaderboard(event: TrackingEvent) {
@@ -270,15 +277,15 @@ class BrowserViewModel(
     }
 
     override fun pageHasHttpResources(page: String?) {
-        if (page == siteMonitor?.url) {
-            siteMonitor?.hasHttpResources = true
-            onSiteMonitorChanged()
+        if (page == site?.url) {
+            site?.hasHttpResources = true
+            onSiteChanged()
         }
     }
 
-    private fun onSiteMonitorChanged() {
-        privacyGrade.postValue(siteMonitor?.improvedGrade)
-        privacyMonitorRepository.privacyMonitor.postValue(siteMonitor)
+    private fun onSiteChanged() {
+        privacyGrade.postValue(site?.improvedGrade)
+        siteLiveData.postValue(site)
     }
 
     private fun currentViewState(): ViewState = viewState.value!!
