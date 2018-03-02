@@ -29,10 +29,6 @@ class BrowserChromeClient @Inject constructor() : WebChromeClient() {
 
     private var customView: View? = null
 
-    override fun onProgressChanged(view: WebView?, newProgress: Int) {
-        webViewClientListener?.progressChanged(newProgress)
-    }
-
     override fun onShowCustomView(view: View, callback: CustomViewCallback?) {
         Timber.i("on show custom view")
 
@@ -50,6 +46,14 @@ class BrowserChromeClient @Inject constructor() : WebChromeClient() {
 
         webViewClientListener?.exitFullScreen()
         customView = null
+    }
+
+    override fun onProgressChanged(view: WebView, newProgress: Int) {
+        webViewClientListener?.progressChanged(newProgress)
+    }
+
+    override fun onReceivedTitle(view: WebView, title: String) {
+        webViewClientListener?.titleReceived(title)
     }
 
 }

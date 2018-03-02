@@ -54,9 +54,9 @@ import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
-import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
-import com.duckduckgo.app.privacymonitor.renderer.icon
-import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity
+import com.duckduckgo.app.privacy.model.PrivacyGrade
+import com.duckduckgo.app.privacy.renderer.icon
+import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_browser.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
@@ -569,7 +569,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
     }
 
     private fun launchPrivacyDashboard() {
-        startActivityForResult(PrivacyDashboardActivity.intent(this), DASHBOARD_REQUEST_CODE)
+        startActivityForResult(PrivacyDashboardActivity.intent(this, viewModel.tabId), DASHBOARD_REQUEST_CODE)
     }
 
     private fun launchFire() {

@@ -26,7 +26,7 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context="com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardActivity"
+        tools:context="com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity"
         tools:showIn="@layout/activity_privacy_scorecard">
 
         <include

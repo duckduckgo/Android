@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection
 
-import com.duckduckgo.app.privacymonitor.store.PrivacySettingsStore
+import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYLIST
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYPRIVACY
 import com.duckduckgo.app.trackerdetection.model.*
