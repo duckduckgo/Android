@@ -24,6 +24,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.EXTRA_TEXT
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -53,6 +54,7 @@ import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAda
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
@@ -246,7 +248,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
             return
         }
 
-        val sharedText = intent.getStringExtra(QUERY_EXTRA)
+        val sharedText = intent.intentText
         if (sharedText != null) {
             viewModel.onSharedTextReceived(sharedText)
         }
@@ -668,13 +670,12 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
 
         fun intent(context: Context, queryExtra: String? = null, replaceExistingSearch: Boolean = false): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
-            intent.putExtra(QUERY_EXTRA, queryExtra)
+            intent.putExtra(EXTRA_TEXT, queryExtra)
             intent.putExtra(REPLACE_EXISTING_SEARCH_EXTRA, replaceExistingSearch)
             return intent
         }
 
         private const val ADD_BOOKMARK_FRAGMENT_TAG = "ADD_BOOKMARK"
-        private const val QUERY_EXTRA = "QUERY_EXTRA"
         private const val REPLACE_EXISTING_SEARCH_EXTRA = "REPLACE_EXISTING_SEARCH_EXTRA"
         private const val DASHBOARD_REQUEST_CODE = 100
         private const val PERMISSION_REQUEST_EXTERNAL_STORAGE = 200
