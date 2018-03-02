@@ -18,8 +18,10 @@ package com.duckduckgo.app.tabs
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.MutableLiveData
+import android.support.test.annotation.UiThreadTest
 import com.duckduckgo.app.global.model.Site
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -29,7 +31,13 @@ class TabDataRepositoryTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private val testee = TabDataRepository()
+    private lateinit var testee: TabDataRepository
+
+    @UiThreadTest
+    @Before
+    fun before() {
+        testee = TabDataRepository()
+    }
 
     @Test
     fun whenInitializedThenTabsModelIsNonNullTabsIsFalseAndCurrentIsNull() {

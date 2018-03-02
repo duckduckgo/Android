@@ -33,7 +33,7 @@ class TabDataRepository @Inject constructor() {
         get() = tabs.value!!.currentId
 
     init {
-        tabs.postValue(Tabs())
+        tabs.value = Tabs()
     }
 
     fun hasTabs(): Boolean {
