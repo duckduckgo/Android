@@ -29,9 +29,10 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.BrowserViewModel.Command
-import com.duckduckgo.app.browser.BrowserViewModel.Command.LandingPage
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.global.db.AppConfigurationDao
+import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardEntry
@@ -39,8 +40,6 @@ import com.duckduckgo.app.privacymonitor.db.NetworkPercent
 import com.duckduckgo.app.privacymonitor.model.PrivacyGrade
 import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
 import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
-import com.duckduckgo.app.global.db.AppConfigurationDao
-import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
@@ -224,8 +223,8 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenNoOmnibarTextEverEnteredThenViewStateHasNull() {
-        assertNull(testee.viewState.value!!.omnibarText)
+    fun whenNoOmnibarTextEverEnteredThenViewStateHasEmptyString() {
+        assertEquals("", testee.viewState.value!!.omnibarText)
     }
 
     @Test
@@ -279,29 +278,6 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenUserDismissesKeyboardBeforeBrowserShownThenShouldNavigateToLandingPage() {
-        testee.userDismissedKeyboard()
-        verify(mockCommandObserver).onChanged(ArgumentMatchers.any(LandingPage::class.java))
-    }
-
-    @Test
-    fun whenUserDismissesKeyboardAfterBrowserShownThenShouldNotNavigateToLandingPage() {
-        testee.urlChanged("")
-        verify(mockCommandObserver, never()).onChanged(ArgumentMatchers.any(LandingPage::class.java))
-    }
-
-    @Test
-    fun whenUserDismissesKeyboardBeforeBrowserShownThenShouldConsumeBackButtonEvent() {
-        assertTrue(testee.userDismissedKeyboard())
-    }
-
-    @Test
-    fun whenUserDismissesKeyboardAfterBrowserShownThenShouldNotConsumeBackButtonEvent() {
-        testee.urlChanged("")
-        assertFalse(testee.userDismissedKeyboard())
-    }
-
-    @Test
     fun whenLoadingStartedThenPrivacyGradeIsCleared() {
         testee.loadingStarted()
         assertNull(testee.privacyGrade.value)
@@ -342,10 +318,18 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenOmnibarInputDoesNotHaveFocusAndAppConfigDownloadedThenPrivacyGradeIsShown() {
+    fun whenOmnibarInputDoesNotHaveFocusAndAppConfigDownloadedAndBrowserShownThenPrivacyGradeIsShown() {
+        testee.onUserSubmittedQuery("foo")
         testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
-        testee.onOmnibarInputStateChanged("", false)
+        testee.onOmnibarInputStateChanged(query = "", hasFocus = false)
         assertTrue(testee.viewState.value!!.showPrivacyGrade)
+    }
+
+    @Test
+    fun whenOmnibarInputDoesNotHaveFocusAndAppConfigDownloadedButBrowserNotShownThenPrivacyGradeIsHidden() {
+        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
+        testee.onOmnibarInputStateChanged(query = "", hasFocus = false)
+        assertFalse(testee.viewState.value!!.showPrivacyGrade)
     }
 
     @Test
@@ -373,9 +357,9 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenOmnibarInputHasFocusThenFireButtonIsNotShown() {
+    fun whenOmnibarInputHasFocusThenFireButtonIsShown() {
         testee.onOmnibarInputStateChanged("", true)
-        assertFalse(testee.viewState.value!!.showFireButton)
+        assertTrue(testee.viewState.value!!.showFireButton)
     }
 
     @Test

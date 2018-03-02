@@ -20,7 +20,6 @@ import android.content.Context
 import android.graphics.Rect
 import android.support.v7.widget.AppCompatEditText
 import android.util.AttributeSet
-import android.view.KeyEvent
 import com.duckduckgo.app.global.view.showKeyboard
 
 /**
@@ -33,24 +32,6 @@ class KeyboardAwareEditText : AppCompatEditText {
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
-    var onBackKeyListener: OnBackKeyListener? = null
-
-    override fun onKeyPreIme(keyCode: Int, event: KeyEvent): Boolean {
-
-        if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP) {
-            return onBackKeyListener?.onBackKey() ?: false
-        }
-
-        return super.onKeyPreIme(keyCode, event)
-    }
-
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        super.onLayout(changed, left, top, right, bottom)
-        if (isFocused) {
-            showKeyboard()
-        }
-    }
-
     override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
         super.onFocusChanged(focused, direction, previouslyFocusedRect)
 
@@ -58,10 +39,4 @@ class KeyboardAwareEditText : AppCompatEditText {
             showKeyboard()
         }
     }
-}
-
-interface OnBackKeyListener {
-
-    fun onBackKey(): Boolean
-
 }

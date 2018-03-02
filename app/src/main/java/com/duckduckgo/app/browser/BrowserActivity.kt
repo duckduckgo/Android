@@ -42,6 +42,7 @@ import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.webkit.URLUtil
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.webkit.WebView
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import com.duckduckgo.app.bookmarks.ui.BookmarkAddEditDialogFragment
@@ -49,7 +50,6 @@ import com.duckduckgo.app.bookmarks.ui.BookmarkAddEditDialogFragment.BookmarkDia
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
-import com.duckduckgo.app.browser.omnibar.OnBackKeyListener
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
@@ -85,8 +85,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
-    private var acceptingRenderUpdates = true
-
     private val viewModel: BrowserViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(BrowserViewModel::class.java)
     }
@@ -100,7 +98,22 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
     // Used to represent a file to download, but might first require permission requesting
     private var pendingFileDownload: PendingFileDownload? = null
 
-    private lateinit var webView: WebView
+    private var webView: WebView? = null
+
+    private val findInPageTextWatcher = object: TextChangedWatcher() {
+        override fun afterTextChanged(editable: Editable) {
+            viewModel.userFindingInPage(findInPageInput.text.toString())
+        }
+    }
+
+    private val omnibarInputTextWatcher = object : TextChangedWatcher() {
+        override fun afterTextChanged(editable: Editable) {
+            viewModel.onOmnibarInputStateChanged(
+                    omnibarTextInput.text.toString(),
+                    omnibarTextInput.hasFocus()
+            )
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -111,29 +124,45 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
         configureObservers()
         configureToolbar()
         configureWebView()
+        viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
         configureFindInPage()
-        configureDummyViewTouchHandler()
         configureAutoComplete()
 
         if (savedInstanceState == null) {
-            consumeSharedQuery()
+            consumeSharedQuery(intent)
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+
+        /*
+         * Want to delay adding text changed listeners until after state has been restored
+        * Otherwise, the act of restoring the state will trigger these listeners
+        */
+        addTextChangedListeners()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        consumeSharedQuery(intent)
+    }
+
 
     private fun createPopupMenu() {
         popupMenu = BrowserPopupMenu(layoutInflater)
         val view = popupMenu.contentView
         popupMenu.apply {
-            enableMenuOption(view.forwardPopupMenuItem) { webView.goForward() }
-            enableMenuOption(view.backPopupMenuItem) { webView.goBack() }
-            enableMenuOption(view.refreshPopupMenuItem) { webView.reload() }
+            enableMenuOption(view.forwardPopupMenuItem) { webView?.goForward() }
+            enableMenuOption(view.backPopupMenuItem) { webView?.goBack() }
+            enableMenuOption(view.refreshPopupMenuItem) { webView?.reload() }
             enableMenuOption(view.bookmarksPopupMenuItem) { launchBookmarks() }
             enableMenuOption(view.addBookmarksPopupMenuItem) { addBookmark() }
             enableMenuOption(view.settingsPopupMenuItem) { launchSettings() }
             enableMenuOption(view.findInPageMenuItem) { viewModel.userRequestingToFindInPage() }
             enableMenuOption(view.requestDesktopSiteCheckMenuItem) {
-                viewModel.desktopSiteModeToggled(urlString = webView.url, desktopSiteRequested = view.requestDesktopSiteCheckMenuItem.isChecked)
+                viewModel.desktopSiteModeToggled(urlString = webView?.url, desktopSiteRequested = view.requestDesktopSiteCheckMenuItem.isChecked)
             }
         }
     }
@@ -144,7 +173,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
         })
 
         viewModel.url.observe(this, Observer {
-            it?.let { webView.loadUrl(it) }
+            it?.let { webView?.loadUrl(it) }
         })
 
         viewModel.command.observe(this, Observer {
@@ -154,13 +183,13 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
 
     private fun processCommand(it: Command?) {
         when (it) {
-            Command.Refresh -> webView.reload()
+            Command.Refresh -> webView?.reload()
             is Command.Navigate -> {
                 focusDummy.requestFocus()
                 hideFindInPage()
-                webView.loadUrl(it.url)
+                webView?.loadUrl(it.url)
             }
-            Command.LandingPage -> finishActivityAnimated()
+            Command.LandingPage -> resetActivityState()
             is Command.DialNumber -> {
                 val intent = Intent(Intent.ACTION_DIAL)
                 intent.data = Uri.parse("tel:${it.telephoneNumber}")
@@ -182,9 +211,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
                 omnibarTextInput.hideKeyboard()
                 focusDummy.requestFocus()
             }
-            Command.ReinitialiseWebView -> {
-                webView.clearHistory()
-            }
             is Command.ShowFullScreen -> {
                 webViewFullScreenContainer.addView(it.view, ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT))
             }
@@ -192,8 +218,8 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
                 pendingFileDownload = PendingFileDownload(it.url, Environment.DIRECTORY_PICTURES)
                 downloadFileWithPermissionCheck()
             }
-            is Command.FindInPageCommand -> webView.findAllAsync(it.searchTerm)
-            Command.DismissFindInPage -> webView.findAllAsync(null)
+            is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
+            Command.DismissFindInPage -> webView?.findAllAsync(null)
         }
     }
 
@@ -210,7 +236,16 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
-    private fun consumeSharedQuery() {
+    private fun consumeSharedQuery(intent: Intent?) {
+        if (intent == null) {
+            return
+        }
+
+        if (intent.getBooleanExtra(REPLACE_EXISTING_SEARCH_EXTRA, false) || intent.action == Intent.ACTION_ASSIST) {
+            resetActivityState()
+            return
+        }
+
         val sharedText = intent.getStringExtra(QUERY_EXTRA)
         if (sharedText != null) {
             viewModel.onSharedTextReceived(sharedText)
@@ -221,11 +256,9 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
 
         Timber.v("Rendering view state: $viewState")
 
-        if (!acceptingRenderUpdates) return
-
         when (viewState.browserShowing) {
-            true -> webView.show()
-            false -> webView.hide()
+            true -> webView?.show()
+            false -> webView?.hide()
         }
 
         toggleDesktopSiteMode(viewState.isDesktopBrowsingMode)
@@ -252,8 +285,8 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
 
         privacyGradeMenu?.isVisible = viewState.showPrivacyGrade
         fireMenu?.isVisible = viewState.showFireButton
-        popupMenu.contentView.backPopupMenuItem.isEnabled = viewState.browserShowing && webView.canGoBack()
-        popupMenu.contentView.forwardPopupMenuItem.isEnabled = viewState.browserShowing && webView.canGoForward()
+        popupMenu.contentView.backPopupMenuItem.isEnabled = viewState.browserShowing && webView?.canGoBack()?: false
+        popupMenu.contentView.forwardPopupMenuItem.isEnabled = viewState.browserShowing && webView?.canGoForward()?: false
         popupMenu.contentView.refreshPopupMenuItem.isEnabled = viewState.browserShowing
         popupMenu.contentView.addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
 
@@ -339,7 +372,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
     }
 
     private fun shouldUpdateOmnibarTextInput(viewState: BrowserViewModel.ViewState, omnibarInput: String?) =
-            viewState.omnibarText != null && !viewState.isEditing && omnibarTextInput.isDifferent(omnibarInput)
+            !viewState.isEditing && omnibarTextInput.isDifferent(omnibarInput)
 
     private fun configureToolbar() {
         setSupportActionBar(toolbar)
@@ -349,20 +382,14 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
     }
 
     private fun configureFindInPage() {
-        findInPageInput.addTextChangedListener(object: TextChangedWatcher() {
-            override fun afterTextChanged(editable: Editable) {
-                viewModel.userFindingInPage(findInPageInput.text.toString())
-            }
-        })
-
         findInPageInput.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus && findInPageInput.text.toString() != viewModel.viewState.value?.findInPage?.searchTerm) {
                 viewModel.userFindingInPage(findInPageInput.text.toString())
             }
         }
 
-        previousSearchTermButton.setOnClickListener { webView.findNext(false) }
-        nextSearchTermButton.setOnClickListener { webView.findNext(true) }
+        previousSearchTermButton.setOnClickListener { webView?.findNext(false) }
+        nextSearchTermButton.setOnClickListener { webView?.findNext(true) }
         closeFindInPagePanel.setOnClickListener {
             viewModel.dismissFindInView()
         }
@@ -373,23 +400,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
                 View.OnFocusChangeListener { _, hasFocus: Boolean ->
                     viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), hasFocus)
                 }
-
-        omnibarTextInput.addTextChangedListener(object : TextChangedWatcher() {
-
-            override fun afterTextChanged(editable: Editable) {
-                viewModel.onOmnibarInputStateChanged(
-                        omnibarTextInput.text.toString(),
-                        omnibarTextInput.hasFocus()
-                )
-            }
-        })
-
-        omnibarTextInput.onBackKeyListener = object : OnBackKeyListener {
-            override fun onBackKey(): Boolean {
-                focusDummy.requestFocus()
-                return viewModel.userDismissedKeyboard()
-            }
-        }
 
         omnibarTextInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, keyEvent ->
             if (actionId == IME_ACTION_DONE || keyEvent?.keyCode == KEYCODE_ENTER) {
@@ -409,45 +419,45 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
         webView = layoutInflater.inflate(R.layout.include_duckduckgo_browser_webview, webViewContainer, true).findViewById(R.id.browserWebView) as WebView
-        userAgentProvider = UserAgentProvider(webView.settings.userAgentString)
+        webView?.let {
+            userAgentProvider = UserAgentProvider(it.settings.userAgentString)
 
-        webView.webViewClient = webViewClient
-        webView.webChromeClient = webChromeClient
+            it.webViewClient = webViewClient
+            it.webChromeClient = webChromeClient
 
-        webView.settings.apply {
-            userAgentString = userAgentProvider.getUserAgent()
-            javaScriptEnabled = true
-            domStorageEnabled = true
-            loadWithOverviewMode = true
-            useWideViewPort = true
-            builtInZoomControls = true
-            displayZoomControls = false
-            mixedContentMode = MIXED_CONTENT_COMPATIBILITY_MODE
-            setSupportZoom(true)
-        }
-
-        webView.setDownloadListener { url, _, _, _, _ ->
-            pendingFileDownload = PendingFileDownload(url, Environment.DIRECTORY_DOWNLOADS)
-
-           downloadFileWithPermissionCheck()
-        }
-
-        webView.setOnTouchListener { _, _ ->
-            if (omnibarTextInput.isFocused) {
-                focusDummy.requestFocus()
+            it.settings.apply {
+                userAgentString = userAgentProvider.getUserAgent()
+                javaScriptEnabled = true
+                domStorageEnabled = true
+                loadWithOverviewMode = true
+                useWideViewPort = true
+                builtInZoomControls = true
+                displayZoomControls = false
+                mixedContentMode = MIXED_CONTENT_COMPATIBILITY_MODE
+                setSupportZoom(true)
             }
-            false
+
+            it.setDownloadListener { url, _, _, _, _ ->
+                pendingFileDownload = PendingFileDownload(url, Environment.DIRECTORY_DOWNLOADS)
+
+                downloadFileWithPermissionCheck()
+            }
+
+            it.setOnTouchListener { _, _ ->
+                if (omnibarTextInput.isFocused) {
+                    focusDummy.requestFocus()
+                }
+                false
+            }
+
+            registerForContextMenu(it)
+
+            it.setFindListener(this)
         }
-
-        registerForContextMenu(webView)
-
-        webView.setFindListener(this)
-
-        viewModel.registerWebViewListener(webViewClient, webChromeClient)
     }
 
     private fun toggleDesktopSiteMode(isDesktopSiteMode: Boolean) {
-        webView.settings.userAgentString = userAgentProvider.getUserAgent(isDesktopSiteMode)
+        webView?.settings?.userAgentString = userAgentProvider.getUserAgent(isDesktopSiteMode)
     }
 
     private fun downloadFileWithPermissionCheck() {
@@ -503,17 +513,22 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
     }
 
     override fun onSaveInstanceState(bundle: Bundle) {
-        webView.saveState(bundle)
+        webView?.saveState(bundle)
         super.onSaveInstanceState(bundle)
     }
 
     override fun onRestoreInstanceState(bundle: Bundle) {
         super.onRestoreInstanceState(bundle)
-        webView.restoreState(bundle)
+        webView?.restoreState(bundle)
+    }
+
+    private fun addTextChangedListeners() {
+        findInPageInput.replaceTextChangedListener(findInPageTextWatcher)
+        omnibarTextInput.replaceTextChangedListener(omnibarInputTextWatcher)
     }
 
     override fun onCreateContextMenu(menu: ContextMenu, view: View, menuInfo: ContextMenu.ContextMenuInfo?) {
-        webView.hitTestResult?.let {
+        webView?.hitTestResult?.let {
             if(URLUtil.isNetworkUrl(it.extra)) {
                 viewModel.userLongPressedInWebView(it, menu)
             }
@@ -521,7 +536,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
-        webView.hitTestResult?.let {
+        webView?.hitTestResult?.let {
             val url = it.extra
             if (viewModel.userSelectedItemFromLongPressMenu(url, item)) {
                 return true
@@ -529,16 +544,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
         }
 
         return super.onContextItemSelected(item)
-    }
-
-    /**
-     * Dummy view captures touches on areas outside of the toolbar, before the WebView is visible
-     */
-    private fun configureDummyViewTouchHandler() {
-        focusDummy.setOnTouchListener { _, _ ->
-            finishActivityAnimated()
-            true
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -574,7 +579,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
 
     private fun launchFire() {
         FireDialog(context = this,
-                clearStarted = { finishActivityAnimated() },
+                clearStarted = { resetActivityState() },
                 clearComplete = { applicationContext.toast(R.string.fireDataCleared) }
         ).show()
     }
@@ -586,8 +591,8 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
     private fun addBookmark() {
 
         val addBookmarkDialog = BookmarkAddEditDialogFragment.createDialogCreationMode(
-                existingTitle = webView.title,
-                existingUrl = webView.url
+                existingTitle = webView?.title,
+                existingUrl = webView?.url
         )
 
         addBookmarkDialog.show(supportFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
@@ -608,30 +613,29 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
     }
 
     override fun onBackPressed() {
-        if (webView.canGoBack()) {
-            webView.goBack()
-            return
+        when {
+            webView?.canGoBack() == true -> webView?.goBack()
+            webView?.visibility == VISIBLE -> resetActivityState()
+            else -> super.onBackPressed()
         }
-        clearViewPriorToAnimation()
-        super.onBackPressed()
     }
 
-    private fun finishActivityAnimated() {
-        clearViewPriorToAnimation()
-        supportFinishAfterTransition()
-    }
-
-    private fun clearViewPriorToAnimation() {
-        acceptingRenderUpdates = false
-        privacyGradeMenu?.isVisible = false
+    private fun resetActivityState() {
         omnibarTextInput.text.clear()
-        omnibarTextInput.hideKeyboard()
-        webView.hide()
+        viewModel.resetView()
+        destroyWebView()
+        configureWebView()
+        omnibarTextInput.postDelayed({omnibarTextInput.showKeyboard()}, 300)
+    }
+
+    private fun destroyWebView() {
+        webViewContainer.removeAllViews()
+        webView?.destroy()
+        webView = null
     }
 
     override fun onDestroy() {
-        webViewContainer.removeAllViews()
-        webView.destroy()
+        destroyWebView()
 
         popupMenu.dismiss()
         super.onDestroy()
@@ -650,21 +654,28 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
         viewModel.onFindResultsReceived(activeMatchOrdinal, numberOfMatches)
     }
 
+    private fun EditText.replaceTextChangedListener(textWatcher: TextChangedWatcher) {
+        removeTextChangedListener(textWatcher)
+        addTextChangedListener(textWatcher)
+    }
+
     private data class PendingFileDownload(
             val url: String,
             val directory: String
-        )
+    )
 
     companion object {
 
-        fun intent(context: Context, queryExtra: String? = null): Intent {
+        fun intent(context: Context, queryExtra: String? = null, replaceExistingSearch: Boolean = false): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(QUERY_EXTRA, queryExtra)
+            intent.putExtra(REPLACE_EXISTING_SEARCH_EXTRA, replaceExistingSearch)
             return intent
         }
 
         private const val ADD_BOOKMARK_FRAGMENT_TAG = "ADD_BOOKMARK"
         private const val QUERY_EXTRA = "QUERY_EXTRA"
+        private const val REPLACE_EXISTING_SEARCH_EXTRA = "REPLACE_EXISTING_SEARCH_EXTRA"
         private const val DASHBOARD_REQUEST_CODE = 100
         private const val PERMISSION_REQUEST_EXTERNAL_STORAGE = 200
     }

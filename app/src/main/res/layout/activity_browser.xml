@@ -115,7 +115,6 @@
                             android:textColor="#ffffff"
                             android:textSize="13sp"
                             android:textStyle="normal"
-                            android:transitionName="@string/transition_url_input"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             tools:text="https://duckduckgo.com/?q=henr..https://duckduckgo.com/?q=henr.." />
