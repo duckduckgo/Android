@@ -141,8 +141,8 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
 
         /*
          * Want to delay adding text changed listeners until after state has been restored
-        * Otherwise, the act of restoring the state will trigger these listeners
-        */
+         * Otherwise, the act of restoring the state will trigger these listeners
+         */
         addTextChangedListeners()
     }
 
@@ -285,12 +285,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
             false -> hideClearButton()
         }
 
-        privacyGradeMenu?.isVisible = viewState.showPrivacyGrade
-        fireMenu?.isVisible = viewState.showFireButton
-        popupMenu.contentView.backPopupMenuItem.isEnabled = viewState.browserShowing && webView?.canGoBack()?: false
-        popupMenu.contentView.forwardPopupMenuItem.isEnabled = viewState.browserShowing && webView?.canGoForward()?: false
-        popupMenu.contentView.refreshPopupMenuItem.isEnabled = viewState.browserShowing
-        popupMenu.contentView.addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
+        renderToolbarMenu(viewState)
 
         when (viewState.autoComplete.showSuggestions) {
             false -> autoCompleteSuggestionsList.gone()
@@ -308,6 +303,14 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
         }
 
         renderFindInPageState(viewState.findInPage)
+    }
+
+    private fun renderToolbarMenu(viewState: BrowserViewModel.ViewState) {
+        popupMenu.contentView.backPopupMenuItem.isEnabled = viewState.browserShowing && webView?.canGoBack()?: false
+        popupMenu.contentView.forwardPopupMenuItem.isEnabled = viewState.browserShowing && webView?.canGoForward()?: false
+        popupMenu.contentView.refreshPopupMenuItem.isEnabled = viewState.browserShowing
+        popupMenu.contentView.addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
+        invalidateOptionsMenu()
     }
 
     private fun renderFindInPageState(viewState: BrowserViewModel.FindInPage) {
@@ -556,6 +559,13 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
             }
         })
         return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        val viewState = viewModel.viewState.value!!
+        privacyGradeMenu?.isVisible = viewState.showPrivacyGrade
+        fireMenu?.isVisible = viewState.showFireButton
+        return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
