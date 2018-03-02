@@ -20,10 +20,13 @@ import android.content.Context
 import android.graphics.Rect
 import android.support.v7.widget.AppCompatEditText
 import android.util.AttributeSet
+import android.view.KeyEvent
 import com.duckduckgo.app.global.view.showKeyboard
 
 /**
- * Variant of EditText which detects when focus is gained and attempts to show the keyboard
+ * Variant of EditText which detects when the user has dismissed the soft keyboard
+ *
+ * Register as a listener using the `onBackKeyListener` property.
  */
 class KeyboardAwareEditText : AppCompatEditText {
     constructor(context: Context) : this(context, null)
@@ -37,4 +40,29 @@ class KeyboardAwareEditText : AppCompatEditText {
             showKeyboard()
         }
     }
+
+    var onBackKeyListener: OnBackKeyListener? = null
+
+    override fun onKeyPreIme(keyCode: Int, event: KeyEvent): Boolean {
+
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP) {
+            return onBackKeyListener?.onBackKey() ?: false
+        }
+
+        return super.onKeyPreIme(keyCode, event)
+    }
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+        if (isFocused) {
+            showKeyboard()
+        }
+    }
+
+    interface OnBackKeyListener {
+
+        fun onBackKey(): Boolean
+
+    }
+
 }

@@ -51,6 +51,7 @@ import com.duckduckgo.app.bookmarks.ui.BookmarkAddEditDialogFragment.BookmarkDia
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
@@ -210,8 +211,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
                 omnibarTextInput.postDelayed({ omnibarTextInput.showKeyboard() }, 300)
             }
             Command.HideKeyboard -> {
-                omnibarTextInput.hideKeyboard()
-                focusDummy.requestFocus()
+                hideKeyboard()
             }
             is Command.ShowFullScreen -> {
                 webViewFullScreenContainer.addView(it.view, ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT))
@@ -405,6 +405,14 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
                 View.OnFocusChangeListener { _, hasFocus: Boolean ->
                     viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), hasFocus)
                 }
+
+        omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
+            override fun onBackKey(): Boolean {
+                omnibarTextInput.hideKeyboard()
+                focusDummy.requestFocus()
+                return true
+            }
+        }
 
         omnibarTextInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, keyEvent ->
             if (actionId == IME_ACTION_DONE || keyEvent?.keyCode == KEYCODE_ENTER) {
@@ -669,6 +677,11 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
     private fun EditText.replaceTextChangedListener(textWatcher: TextChangedWatcher) {
         removeTextChangedListener(textWatcher)
         addTextChangedListener(textWatcher)
+    }
+
+    private fun hideKeyboard() {
+        omnibarTextInput.hideKeyboard()
+        focusDummy.requestFocus()
     }
 
     private data class PendingFileDownload(

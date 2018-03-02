@@ -127,12 +127,12 @@ class BrowserViewModel(
     private var site: Site?
 
     init {
-        command.value = Command.ShowKeyboard
         viewState.value = ViewState()
         appConfigurationObservable.observeForever(appConfigurationObserver)
         configureAutoComplete()
         siteLiveData = tabRepository.retrieve(tabId)
         site = siteLiveData.value
+        command.value = Command.ShowKeyboard
     }
 
     private fun configureAutoComplete() {
