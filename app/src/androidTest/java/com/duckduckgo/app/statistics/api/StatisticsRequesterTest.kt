@@ -51,7 +51,7 @@ class StatisticsRequesterTest {
         configureNoStoredStatistics()
         testee.initializeAtb()
         verify(mockService).atb()
-        verify(mockService).exti(ATB)
+        verify(mockService).exti(ATB_WITH_VARIANT)
         verify(mockStatisticsStore).atb = ATB_WITH_VARIANT
         verify(mockStatisticsStore).retentionAtb = ATB
     }
@@ -69,7 +69,7 @@ class StatisticsRequesterTest {
         configureNoStoredStatistics()
         testee.refreshRetentionAtb()
         verify(mockService).atb()
-        verify(mockService).exti(ATB)
+        verify(mockService).exti(ATB_WITH_VARIANT)
         verify(mockStatisticsStore).atb = ATB_WITH_VARIANT
         verify(mockStatisticsStore).retentionAtb = ATB
     }
