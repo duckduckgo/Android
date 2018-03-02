@@ -23,9 +23,7 @@ import android.util.AttributeSet
 import com.duckduckgo.app.global.view.showKeyboard
 
 /**
- * Variant of EditText which detects when the user has dismissed the soft keyboard
- *
- * Register as a listener using the `onBackKeyListener` property.
+ * Variant of EditText which detects when focus is gained and attempts to show the keyboard
  */
 class KeyboardAwareEditText : AppCompatEditText {
     constructor(context: Context) : this(context, null)
