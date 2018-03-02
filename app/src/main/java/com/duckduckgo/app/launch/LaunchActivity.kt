@@ -42,15 +42,15 @@ class LaunchActivity : DuckDuckGoActivity() {
         setContentView(R.layout.activity_launch)
         configureObservers()
 
-        if(savedInstanceState == null) {
+        if (savedInstanceState == null) {
             consumeIntentAction()
         }
     }
 
     private fun consumeIntentAction() {
-        if(intent == null) return
-        if(intent.action == Intent.ACTION_ASSIST) {
-           viewModel.launchedWithAssistant()
+        if (intent == null) return
+        if (intent.action == Intent.ACTION_ASSIST) {
+            viewModel.launchedWithAssistant()
         }
     }
 
