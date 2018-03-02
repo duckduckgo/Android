@@ -38,10 +38,10 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.NetworkPercent
 import com.duckduckgo.app.privacy.model.PrivacyGrade
-import com.duckduckgo.app.tabs.TabDataRepository
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.tabs.TabDataRepository
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
