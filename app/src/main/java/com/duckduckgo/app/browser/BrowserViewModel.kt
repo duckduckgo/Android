@@ -35,22 +35,22 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.db.AppConfigurationDao
+import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.isMobileSite
+import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.model.SiteMonitor
 import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.TermsOfService
-import com.duckduckgo.app.tabs.TabDataRepository
+import com.duckduckgo.app.privacy.model.improvedGrade
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
-import com.duckduckgo.app.global.db.AppConfigurationDao
-import com.duckduckgo.app.global.db.AppConfigurationEntity
-import com.duckduckgo.app.global.model.SiteMonitor
-import com.duckduckgo.app.privacy.model.improvedGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.tabs.TabDataRepository
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.jakewharton.rxrelay2.PublishRelay
@@ -128,7 +128,7 @@ class BrowserViewModel(
 
     init {
         command.value = Command.ShowKeyboard
-        viewState.value = ViewState(canAddBookmarks = false)
+        viewState.value = ViewState()
         appConfigurationObservable.observeForever(appConfigurationObserver)
         configureAutoComplete()
         siteLiveData = tabRepository.retrieve(tabId)
