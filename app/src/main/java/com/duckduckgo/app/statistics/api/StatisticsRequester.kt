@@ -43,7 +43,7 @@ class StatisticsRequester(private val store: StatisticsDataStore, private val se
             .flatMap {
                 store.atb = it.versionWithVariant
                 store.retentionAtb = it.version
-                service.exti(it.version)
+                service.exti(it.versionWithVariant)
             }
             .subscribe({
                 Timber.v("Atb initalization succeeded")
