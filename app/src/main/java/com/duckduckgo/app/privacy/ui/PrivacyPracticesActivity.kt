@@ -23,11 +23,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
-import com.duckduckgo.app.home.HomeActivity
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.renderer.banner
 import com.duckduckgo.app.privacy.renderer.text
@@ -84,7 +84,7 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
     }
 
     fun onTosdrLinkClicked(@Suppress("UNUSED_PARAMETER") view: View) {
-        startActivity(HomeActivity.intent(this, Url.TOSDR))
+        startActivity(BrowserActivity.intent(this, Url.TOSDR))
         finish()
     }
 

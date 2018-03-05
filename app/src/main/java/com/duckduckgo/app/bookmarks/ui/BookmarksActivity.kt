@@ -33,13 +33,13 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.ui.BookmarkAddEditDialogFragment.BookmarkDialogEditListener
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.show
-import com.duckduckgo.app.home.HomeActivity
 import kotlinx.android.synthetic.main.content_bookmarks.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.view_bookmark_entry.view.*
@@ -113,7 +113,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
     }
 
     private fun openBookmark(bookmark: BookmarkEntity) {
-        startActivity(HomeActivity.intent(this, bookmark.url))
+        startActivity(BrowserActivity.intent(this, bookmark.url))
         finish()
     }
 
