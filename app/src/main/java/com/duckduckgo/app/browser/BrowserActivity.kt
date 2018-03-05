@@ -65,6 +65,7 @@ import kotlinx.android.synthetic.main.activity_browser.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.share
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
 import timber.log.Timber
@@ -227,6 +228,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
             }
             is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
             Command.DismissFindInPage -> webView?.findAllAsync(null)
+            is Command.ShareLink -> launchSharePageChooser(it.url)
         }
     }
 
@@ -617,11 +619,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
 
     private fun launchSharePageChooser(url: String?) {
         if (url != null) {
-            val i = Intent()
-            i.action = Intent.ACTION_SEND
-            i.putExtra(Intent.EXTRA_TEXT, url)
-            i.type = "text/plain"
-            startActivity(Intent.createChooser(i, getString(R.string.shareMenuTitle)))
+            share(url, "")
         }
     }
 

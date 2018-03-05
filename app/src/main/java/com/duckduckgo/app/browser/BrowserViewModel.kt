@@ -102,6 +102,7 @@ class BrowserViewModel(
         object HideKeyboard : Command()
         class ShowFullScreen(val view: View) : Command()
         class DownloadImage(val url: String) : Command()
+        class ShareLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
         object DismissFindInPage : Command()
     }
@@ -353,6 +354,10 @@ class BrowserViewModel(
         return when(requiredAction) {
             is RequiredAction.DownloadFile -> {
                 command.value = Command.DownloadImage(requiredAction.url)
+                true
+            }
+            is RequiredAction.ShareLink -> {
+                command.value = Command.ShareLink(requiredAction.url)
                 true
             }
             RequiredAction.None-> {
