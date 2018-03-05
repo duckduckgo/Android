@@ -40,9 +40,4 @@ class LaunchViewModel(onboardingStore: OnboardingStore) : ViewModel() {
     fun onOnboardingDone() {
         command.value = Command.Home()
     }
-
-    fun launchedWithAssistant() {
-        command.value = Command.Home(replaceExistingSearch = true)
-    }
-
 }

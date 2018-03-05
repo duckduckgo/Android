@@ -131,10 +131,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
         configureOmnibarTextInput()
         configureFindInPage()
         configureAutoComplete()
-
-        if (savedInstanceState == null) {
-            consumeSharedQuery(intent)
-        }
     }
 
     override fun onResume() {
@@ -151,7 +147,6 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
         super.onNewIntent(intent)
         consumeSharedQuery(intent)
     }
-
 
     private fun createPopupMenu() {
         popupMenu = BrowserPopupMenu(layoutInflater)

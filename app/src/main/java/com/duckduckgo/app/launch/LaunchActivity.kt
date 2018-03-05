@@ -41,17 +41,6 @@ class LaunchActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
         configureObservers()
-
-        if (savedInstanceState == null) {
-            consumeIntentAction()
-        }
-    }
-
-    private fun consumeIntentAction() {
-        if (intent == null) return
-        if (intent.action == Intent.ACTION_ASSIST) {
-            viewModel.launchedWithAssistant()
-        }
     }
 
     private fun configureObservers() {
@@ -63,7 +52,7 @@ class LaunchActivity : DuckDuckGoActivity() {
     private fun processCommand(it: LaunchViewModel.Command?) {
         when (it) {
             LaunchViewModel.Command.Onboarding -> showOnboarding()
-            is LaunchViewModel.Command.Home -> showHome(it.replaceExistingSearch)
+            is LaunchViewModel.Command.Home -> showHome()
         }
     }
 
@@ -71,8 +60,8 @@ class LaunchActivity : DuckDuckGoActivity() {
         startActivityForResult(OnboardingActivity.intent(this), ONBOARDING_REQUEST_CODE)
     }
 
-    private fun showHome(replaceExistingSearch: Boolean) {
-        startActivity(BrowserActivity.intent(this, replaceExistingSearch = replaceExistingSearch))
+    private fun showHome() {
+        startActivity(BrowserActivity.intent(this))
         finish()
     }
 
