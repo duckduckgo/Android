@@ -28,6 +28,7 @@
     <string name="imageOptions">Image Options</string>
     <string name="permissionRequiredToDownload">Downloading requires storage permission</string>
     <string name="requestDesktopSiteMenuTitle">Desktop Site</string>
+    <string name="shareMenuTitle">Share…</string>
 
     <!-- Find in page -->
     <string name="find_in_page">Find in page</string>

@@ -135,6 +135,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
             enableMenuOption(view.requestDesktopSiteCheckMenuItem) {
                 viewModel.desktopSiteModeToggled(urlString = webView.url, desktopSiteRequested = view.requestDesktopSiteCheckMenuItem.isChecked)
             }
+            enableMenuOption(view.sharePageMenuItem) { launchSharePageChooser(webView.url) }
         }
     }
 
@@ -256,6 +257,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
         popupMenu.contentView.forwardPopupMenuItem.isEnabled = viewState.browserShowing && webView.canGoForward()
         popupMenu.contentView.refreshPopupMenuItem.isEnabled = viewState.browserShowing
         popupMenu.contentView.addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
+        popupMenu.contentView.sharePageMenuItem?.isEnabled = viewState.canSharePage
 
         when (viewState.autoComplete.showSuggestions) {
             false -> autoCompleteSuggestionsList.gone()
@@ -581,6 +583,16 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
 
     private fun launchPopupMenu() {
         popupMenu.show(rootView, toolbar)
+    }
+
+    private fun launchSharePageChooser(url: String?) {
+        if (url != null) {
+            val i = Intent()
+            i.action = Intent.ACTION_SEND
+            i.putExtra(Intent.EXTRA_TEXT, url)
+            i.type = "text/plain"
+            startActivity(Intent.createChooser(i, getString(R.string.shareMenuTitle)))
+        }
     }
 
     private fun addBookmark() {

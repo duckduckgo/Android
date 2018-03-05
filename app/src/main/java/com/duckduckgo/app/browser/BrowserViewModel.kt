@@ -88,7 +88,8 @@ class BrowserViewModel(
             val autoComplete: AutoCompleteViewState = AutoCompleteViewState(),
             val findInPage: FindInPage = FindInPage(canFindInPage = false),
             val webViewScale: Int = 0,
-            val isDesktopBrowsingMode: Boolean = false
+            val isDesktopBrowsingMode: Boolean = false,
+            val canSharePage: Boolean = false
     )
 
     sealed class Command {
@@ -248,6 +249,7 @@ class BrowserViewModel(
                 canAddBookmarks = true,
                 omnibarText = url,
                 browserShowing = true,
+                canSharePage = true,
                 showFireButton = true,
                 showPrivacyGrade = appConfigurationDownloaded,
                 findInPage = FindInPage(visible = false, canFindInPage = true))
