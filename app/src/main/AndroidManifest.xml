@@ -38,31 +38,32 @@
         <activity
             android:name=".BrowserActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:windowSoftInputMode="adjustResize|stateHidden"
-            android:launchMode="singleTask">
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustResize|stateHidden">
 
-        <!-- Allows app to become default browser -->
-        <intent-filter>
-            <action android:name="android.intent.action.VIEW" />
-            <category android:name="android.intent.category.BROWSABLE" />
-            <category android:name="android.intent.category.DEFAULT" />
+            <!-- Allows app to become default browser -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
 
-            <data android:scheme="https" />
-            <data android:scheme="http" />
-        </intent-filter>
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
 
-        <!-- Allows apps to consume links and text shared from other apps e.g chrome -->
-        <intent-filter>
-            <action android:name="android.intent.action.SEND" />
-            <category android:name="android.intent.category.DEFAULT" />
-            <data android:mimeType="text/plain" />
-        </intent-filter>
+                <data android:scheme="https" />
+                <data android:scheme="http" />
+            </intent-filter>
 
-        <!-- Allow app to be default assistant -->
-        <intent-filter>
-            <action android:name="android.intent.action.ASSIST" />
-            <category android:name="android.intent.category.DEFAULT" />
-        </intent-filter>
+            <!-- Allows apps to consume links and text shared from other apps e.g chrome -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+
+            <!-- Allow app to be default assistant -->
+            <intent-filter>
+                <action android:name="android.intent.action.ASSIST" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
 
         </activity>
 
