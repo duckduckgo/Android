@@ -131,6 +131,10 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
         configureOmnibarTextInput()
         configureFindInPage()
         configureAutoComplete()
+
+        if (savedInstanceState == null) {
+            consumeSharedQuery(intent)
+        }
     }
 
     override fun onResume() {
@@ -145,7 +149,12 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        consumeSharedQuery(intent)
+
+        if (shouldClearActivityState(intent)) {
+            resetActivityState()
+        } else {
+            consumeSharedQuery(intent)
+        }
     }
 
     private fun createPopupMenu() {
@@ -238,15 +247,16 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
             return
         }
 
-        if (intent.getBooleanExtra(REPLACE_EXISTING_SEARCH_EXTRA, false) || intent.action == Intent.ACTION_ASSIST) {
-            resetActivityState()
-            return
-        }
-
         val sharedText = intent.intentText
         if (sharedText != null) {
             viewModel.onSharedTextReceived(sharedText)
         }
+    }
+
+    private fun shouldClearActivityState(intent: Intent?) : Boolean{
+        if (intent == null) return false
+
+        return intent.getBooleanExtra(REPLACE_EXISTING_SEARCH_EXTRA, false) || intent.action == Intent.ACTION_ASSIST
     }
 
     private fun render(viewState: BrowserViewModel.ViewState) {
