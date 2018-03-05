@@ -112,7 +112,7 @@
                             android:paddingStart="10dp"
                             android:paddingTop="4dp"
                             android:selectAllOnFocus="true"
-                            android:textColor="#ffffff"
+                            android:textColor="@color/white"
                             android:textSize="13sp"
                             android:textStyle="normal"
                             app:layout_constraintEnd_toEndOf="parent"
