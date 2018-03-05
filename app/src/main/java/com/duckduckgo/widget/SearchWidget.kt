@@ -21,8 +21,8 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.widget.RemoteViews
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.home.HomeActivity
 
 /**
  * Implementation of App Widget functionality.
@@ -47,7 +47,7 @@ class SearchWidget : AppWidgetProvider() {
         }
 
         private fun buildPendingIntent(context: Context) : PendingIntent {
-            val intent = HomeActivity.launchSkipHome(context)
+            val intent = BrowserActivity.intent(context, replaceExistingSearch = true)
             return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         }
     }

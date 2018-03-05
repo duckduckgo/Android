@@ -20,10 +20,10 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
-import com.duckduckgo.app.home.HomeActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import javax.inject.Inject
 
@@ -52,7 +52,7 @@ class LaunchActivity : DuckDuckGoActivity() {
     private fun processCommand(it: LaunchViewModel.Command?) {
         when (it) {
             LaunchViewModel.Command.Onboarding -> showOnboarding()
-            LaunchViewModel.Command.Home -> showHome()
+            is LaunchViewModel.Command.Home -> showHome()
         }
     }
 
@@ -61,7 +61,7 @@ class LaunchActivity : DuckDuckGoActivity() {
     }
 
     private fun showHome() {
-        startActivity(HomeActivity.intent(this))
+        startActivity(BrowserActivity.intent(this))
         finish()
     }
 

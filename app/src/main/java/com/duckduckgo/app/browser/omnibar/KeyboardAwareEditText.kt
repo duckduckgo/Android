@@ -33,6 +33,14 @@ class KeyboardAwareEditText : AppCompatEditText {
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
+    override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
+        super.onFocusChanged(focused, direction, previouslyFocusedRect)
+
+        if (focused) {
+            showKeyboard()
+        }
+    }
+
     var onBackKeyListener: OnBackKeyListener? = null
 
     override fun onKeyPreIme(keyCode: Int, event: KeyEvent): Boolean {
@@ -51,17 +59,10 @@ class KeyboardAwareEditText : AppCompatEditText {
         }
     }
 
-    override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
-        super.onFocusChanged(focused, direction, previouslyFocusedRect)
+    interface OnBackKeyListener {
 
-        if (focused) {
-            showKeyboard()
-        }
+        fun onBackKey(): Boolean
+
     }
-}
-
-interface OnBackKeyListener {
-
-    fun onBackKey(): Boolean
 
 }

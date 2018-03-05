@@ -26,19 +26,18 @@ class LaunchViewModel(onboardingStore: OnboardingStore) : ViewModel() {
 
     sealed class Command {
         object Onboarding : Command()
-        object Home : Command()
+        data class Home(val replaceExistingSearch: Boolean = false) : Command()
     }
 
     init {
         if (onboardingStore.shouldShow) {
             command.value = Command.Onboarding
         } else {
-            command.value = Command.Home
+            command.value = Command.Home()
         }
     }
 
     fun onOnboardingDone() {
-        command.value = Command.Home
+        command.value = Command.Home()
     }
-
 }

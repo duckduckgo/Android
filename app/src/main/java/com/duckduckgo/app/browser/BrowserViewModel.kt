@@ -35,22 +35,22 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.db.AppConfigurationDao
+import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.isMobileSite
+import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.model.SiteMonitor
 import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.TermsOfService
-import com.duckduckgo.app.tabs.TabDataRepository
+import com.duckduckgo.app.privacy.model.improvedGrade
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
-import com.duckduckgo.app.global.db.AppConfigurationDao
-import com.duckduckgo.app.global.db.AppConfigurationEntity
-import com.duckduckgo.app.global.model.SiteMonitor
-import com.duckduckgo.app.privacy.model.improvedGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.tabs.TabDataRepository
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.jakewharton.rxrelay2.PublishRelay
@@ -77,7 +77,7 @@ class BrowserViewModel(
     data class ViewState(
             val isLoading: Boolean = false,
             val progress: Int = 0,
-            val omnibarText: String? = null,
+            val omnibarText: String = "",
             val isEditing: Boolean = false,
             val browserShowing: Boolean = false,
             val showClearButton: Boolean = false,
@@ -87,7 +87,6 @@ class BrowserViewModel(
             val isFullScreen: Boolean = false,
             val autoComplete: AutoCompleteViewState = AutoCompleteViewState(),
             val findInPage: FindInPage = FindInPage(canFindInPage = false),
-            val webViewScale: Int = 0,
             val isDesktopBrowsingMode: Boolean = false
     )
 
@@ -100,7 +99,6 @@ class BrowserViewModel(
         class SendEmail(val emailAddress: String) : Command()
         object ShowKeyboard : Command()
         object HideKeyboard : Command()
-        object ReinitialiseWebView : Command()
         class ShowFullScreen(val view: View) : Command()
         class DownloadImage(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
@@ -129,12 +127,12 @@ class BrowserViewModel(
     private var site: Site?
 
     init {
-        command.value = Command.ShowKeyboard
-        viewState.value = ViewState(canAddBookmarks = false)
+        viewState.value = ViewState()
         appConfigurationObservable.observeForever(appConfigurationObserver)
         configureAutoComplete()
         siteLiveData = tabRepository.retrieve(tabId)
         site = siteLiveData.value
+        command.value = Command.ShowKeyboard
     }
 
     private fun configureAutoComplete() {
@@ -181,6 +179,7 @@ class BrowserViewModel(
                 findInPage = FindInPage(visible = false, canFindInPage = true),
                 showClearButton = false,
                 omnibarText = trimmedInput,
+                browserShowing = true,
                 autoComplete = AutoCompleteViewState(false))
     }
 
@@ -248,12 +247,11 @@ class BrowserViewModel(
                 canAddBookmarks = true,
                 omnibarText = url,
                 browserShowing = true,
-                showFireButton = true,
                 showPrivacyGrade = appConfigurationDownloaded,
                 findInPage = FindInPage(visible = false, canFindInPage = true))
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            newViewState = newViewState.copy(omnibarText = duckDuckGoUrlDetector.extractQuery(url))
+            newViewState = newViewState.copy(omnibarText = duckDuckGoUrlDetector.extractQuery(url) ?: "")
             statisticsUpdater.refreshRetentionAtb()
         }
         viewState.value = newViewState
@@ -311,8 +309,7 @@ class BrowserViewModel(
         viewState.value = currentViewState().copy(
                 isEditing = hasFocus,
                 showClearButton = showClearButton,
-                showPrivacyGrade = appConfigurationDownloaded && !hasFocus,
-                showFireButton = !hasFocus,
+                showPrivacyGrade = appConfigurationDownloaded && !hasFocus && currentViewState.browserShowing,
                 autoComplete = AutoCompleteViewState(showAutoCompleteSuggestions, autoCompleteSearchResults)
         )
 
@@ -323,19 +320,6 @@ class BrowserViewModel(
 
     fun onSharedTextReceived(input: String) {
         openUrl(buildUrl(input))
-    }
-
-    /**
-     * Returns a boolean indicating if the back button pressed was consumed or not
-     *
-     * May also instruct the Activity to navigate to a different screen because of the back button press
-     */
-    fun userDismissedKeyboard(): Boolean {
-        if (!currentViewState().browserShowing) {
-            command.value = Command.LandingPage
-            return true
-        }
-        return false
     }
 
     fun receivedDashboardResult(resultCode: Int) {
@@ -416,6 +400,10 @@ class BrowserViewModel(
         } else {
             command.value = Command.Refresh
         }
+    }
+
+    fun resetView() {
+        viewState.value = ViewState()
     }
 
     data class FindInPage(
