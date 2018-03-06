@@ -512,4 +512,23 @@ class BrowserViewModelTest {
         val ultimateCommand = commandCaptor.lastValue
         assertTrue(ultimateCommand == Command.Refresh)
     }
+
+    @Test
+    fun whenUserSelectsToShareLinkThenShareLinkCommandSent() {
+        testee.userSharingLink("foo")
+        val command = captureCommands().value as Command.ShareLink
+        assertEquals("foo", command.url)
+    }
+
+    @Test
+    fun whenUserSelectsToShareLinkWithNullUrlThenShareLinkCommandNotSent() {
+        testee.userSharingLink(null)
+        val allCommands = captureCommands().allValues
+        assertEquals(0, allCommands.count{ it is Command.ShareLink })
+    }
+
+    private fun captureCommands() : ArgumentCaptor<Command> {
+        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        return commandCaptor
+    }
 }

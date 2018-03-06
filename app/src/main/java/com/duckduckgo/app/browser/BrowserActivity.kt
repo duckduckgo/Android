@@ -172,7 +172,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
             enableMenuOption(view.requestDesktopSiteCheckMenuItem) {
                 viewModel.desktopSiteModeToggled(urlString = webView?.url, desktopSiteRequested = view.requestDesktopSiteCheckMenuItem.isChecked)
             }
-            enableMenuOption(view.sharePageMenuItem) { launchSharePageChooser(webView?.url) }
+            enableMenuOption(view.sharePageMenuItem) { viewModel.userSharingLink(webView?.url) }
         }
     }
 
@@ -617,10 +617,8 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
         popupMenu.show(rootView, toolbar)
     }
 
-    private fun launchSharePageChooser(url: String?) {
-        if (url != null) {
-            share(url, "")
-        }
+    private fun launchSharePageChooser(url: String) {
+        share(url, "")
     }
 
     private fun addBookmark() {

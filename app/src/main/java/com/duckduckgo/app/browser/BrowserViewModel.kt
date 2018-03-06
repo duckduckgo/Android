@@ -32,6 +32,7 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
+import com.duckduckgo.app.browser.BrowserViewModel.Command.ShareLink
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -357,7 +358,7 @@ class BrowserViewModel(
                 true
             }
             is RequiredAction.ShareLink -> {
-                command.value = Command.ShareLink(requiredAction.url)
+                command.value = ShareLink(requiredAction.url)
                 true
             }
             RequiredAction.None-> {
@@ -404,7 +405,7 @@ class BrowserViewModel(
         if (desktopSiteRequested && url.isMobileSite) {
             val desktopUrl = url.toDesktopUri()
             Timber.i("Original URL $urlString - attempting $desktopUrl with desktop site UA string")
-            command.value = Navigate(desktopUrl.toString())
+            command.value = Command.Navigate(desktopUrl.toString())
         } else {
             command.value = Command.Refresh
         }
@@ -412,6 +413,12 @@ class BrowserViewModel(
 
     fun resetView() {
         viewState.value = ViewState()
+    }
+
+    fun userSharingLink(url: String?) {
+        if (url != null) {
+            command.value = Command.ShareLink(url)
+        }
     }
 
     data class FindInPage(
@@ -426,7 +433,6 @@ class BrowserViewModel(
             val showSuggestions: Boolean = false,
             val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
     )
-
 }
 
 
