@@ -26,10 +26,12 @@
     <string name="addBookmarkMenuTitle">Add Bookmark</string>
     <string name="downloadImage">Download Image</string>
     <string name="imageOptions">Image Options</string>
-    <string name="linkOptions">Link Options</string>
-    <string name="shareLink">Share Link</string>
     <string name="permissionRequiredToDownload">Downloading requires storage permission</string>
     <string name="requestDesktopSiteMenuTitle">Desktop Site</string>
+
+    <!-- Sharing options -->
+    <string name="linkOptions">Link Options</string>
+    <string name="shareLink">Share Link</string>
     <string name="shareMenuTitle">Share…</string>
 
     <!-- Find in page -->
