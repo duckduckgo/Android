@@ -18,10 +18,17 @@ package com.duckduckgo.app.browser
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
+import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
+import com.duckduckgo.app.tabs.TabDataRepository
+import com.duckduckgo.app.tabs.TabEntity
+import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
+import java.util.*
 
-class BrowserViewModel : ViewModel() {
+class BrowserViewModel(private val tabRepository: TabDataRepository) : ViewModel() {
 
     data class ViewState(
         val isFullScreen: Boolean = false,
@@ -40,14 +47,31 @@ class BrowserViewModel : ViewModel() {
 
     init {
         viewState.value = ViewState()
+        loadInitialTab()
+    }
+
+    fun loadInitialTab() {
+        val tab: TabEntity? = try {
+            Single.fromCallable { return@fromCallable tabRepository.selectedTab }
+                .subscribeOn(Schedulers.newThread())
+                .blockingGet()
+        } catch (e: Exception) {
+            null
+        }
+
+        var id = tab?.tabId ?: tabRepository.addNewAndSelect()
+        tabId = id
+        tab?.url?.let {
+            command.value = Navigate(it)
+        }
     }
 
     fun onSharedTextReceived(input: String) {
-        command.value = Command.Navigate(input)
+        command.value = Navigate(input)
     }
 
     fun receivedDashboardResult(resultCode: Int) {
-        if (resultCode == RELOAD_RESULT_CODE) command.value = Command.Refresh
+        if (resultCode == RELOAD_RESULT_CODE) command.value = Refresh
     }
 }
 

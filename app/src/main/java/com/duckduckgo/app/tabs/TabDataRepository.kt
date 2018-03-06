@@ -17,53 +17,96 @@
 package com.duckduckgo.app.tabs
 
 
+import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import android.support.annotation.WorkerThread
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.model.SiteMonitor
+import com.duckduckgo.app.privacy.model.TermsOfService
+import org.jetbrains.anko.doAsync
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
 
 @Singleton
-class TabDataRepository @Inject constructor() {
+class TabDataRepository @Inject constructor(val tabsDao: TabsDao) {
 
-    @Suppress("JoinDeclarationAndAssignment")
-    val tabs: MutableLiveData<Tabs> = MutableLiveData()
+    val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs()
 
-    val currentTabId: String?
-        get() = tabs.value!!.currentId
+    val liveSelectedTab: LiveData<SelectedTabEntity> = tabsDao.liveSelectedTab()
 
-    init {
-        tabs.value = Tabs()
+    val tabs: List<TabEntity>
+        @WorkerThread
+        get() = tabsDao.tabs()
+
+    val selectedTab: TabEntity?
+        @WorkerThread
+        get() {
+            tabsDao.selectedTab().tabId?.let {
+                return tabsDao.tab(it)
+            }
+            return null
+        }
+
+    private val data: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
+
+    fun addNewAndSelect(): String {
+        val tabId = UUID.randomUUID().toString()
+        add(tabId)
+        select(tabId)
+        return tabId
     }
 
-    fun hasTabs(): Boolean {
-        return tabs.value!!.list.isNotEmpty()
+    fun add(tabId: String, liveSiteData: MutableLiveData<Site> = MutableLiveData()) {
+        this.data[tabId] = liveSiteData
+        doAsync {
+            tabsDao.insertTab(TabEntity(tabId, liveSiteData.value?.url))
+        }
     }
 
-    fun add(tabId: String, data: MutableLiveData<Site>) {
-        tabs.value!!.list[tabId] = data
+    fun update(tabId: String) {
+        val storedData = data[tabId]
+        doAsync {
+            tabsDao.insertTab(TabEntity(tabId, storedData?.value?.url))
+        }
+    }
+
+    fun loadData(tab: TabEntity) {
+        val storedData = data[tab.tabId]
+        if (storedData != null) {
+            return
+        }
+        val data = MutableLiveData<Site>()
+        tab.url?.let {
+            val monitor = SiteMonitor(it, TermsOfService())
+            monitor.title = tab.title
+            data.value = monitor
+        }
     }
 
     /**
-     * Returns existing record if it exists, otherwise creates and returns a new one
+     * Returns record if it exists, otherwise creates and returns a new one
      */
     fun retrieve(tabId: String): MutableLiveData<Site> {
-        val data = tabs.value!!.list[tabId]
-        if (data == null) {
-            val site = MutableLiveData<Site>()
-            add(tabId, site)
-            return site
+        val storedData = data[tabId]
+        if (storedData != null) {
+            return storedData
         }
+
+        val data = MutableLiveData<Site>()
+        add(tabId, data)
         return data
     }
 
     fun select(tabId: String) {
-        tabs.value!!.currentId = tabId
+        doAsync {
+            tabsDao.updateSelectedTab(SelectedTabEntity(SELECTED_ENTITY_ID, tabId))
+        }
     }
 
-    data class Tabs(
-        var currentId: String? = null,
-        val list: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
+    companion object {
+        const val SELECTED_ENTITY_ID = 1
+    }
 
-    )
 }

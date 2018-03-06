@@ -48,7 +48,6 @@ import com.duckduckgo.app.tabs.TabSwitcherActivity
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import org.jetbrains.anko.toast
 import timber.log.Timber
-import java.util.*
 import javax.inject.Inject
 
 
@@ -89,7 +88,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun configureInitialTab() {
-        val tabId = UUID.randomUUID().toString()
+        val tabId = viewModel.tabId
         val fragment = BrowserTabFragment.newInstance(tabId)
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
@@ -99,8 +98,21 @@ class BrowserActivity : DuckDuckGoActivity() {
         viewModel.tabId = currentTab.tabId
     }
 
-    private fun openNewTab() {
-        val tabId = UUID.randomUUID().toString()
+    private fun selectTab(tabId: String) {
+        val fragmentManager = supportFragmentManager
+        val fragment = fragmentManager.findFragmentByTag(tabId) as? BrowserTabFragment
+        if (fragment == null) {
+            openNewTab(tabId)
+            return
+        }
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        fragmentTransaction.hide(currentTab)
+        fragmentTransaction.show(fragment)
+        fragmentTransaction.commit()
+        currentTab = fragment
+    }
+
+    private fun openNewTab(tabId: String) {
         val fragment = BrowserTabFragment.newInstance(tabId)
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
@@ -126,6 +138,11 @@ class BrowserActivity : DuckDuckGoActivity() {
     private fun configureObservers() {
         viewModel.command.observe(this, Observer {
             processCommand(it)
+        })
+        repository.liveSelectedTab.observe(this, Observer {
+            it?.tabId?.let {
+                selectTab(it)
+            }
         })
     }
 
@@ -157,7 +174,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchNewTab() {
-        openNewTab()
+        repository.addNewAndSelect()
     }
 
     fun launchSettings() {

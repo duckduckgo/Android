@@ -68,6 +68,7 @@ class BrowserTabFragment : Fragment(), BookmarkDialogCreationListener, FindListe
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
+
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
     lateinit var userAgentProvider: UserAgentProvider
@@ -77,9 +78,9 @@ class BrowserTabFragment : Fragment(), BookmarkDialogCreationListener, FindListe
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
     private val viewModel: BrowserTabViewModel by lazy {
-        val model = ViewModelProviders.of(this, viewModelFactory).get(BrowserTabViewModel::class.java)
-        model.registerTabId(tabId)
-        model
+        val viewModel = ViewModelProviders.of(this, viewModelFactory).get(BrowserTabViewModel::class.java)
+        viewModel.load(tabId)
+        viewModel
     }
 
     private val browserActivity
@@ -159,7 +160,7 @@ class BrowserTabFragment : Fragment(), BookmarkDialogCreationListener, FindListe
         })
 
         viewModel.url.observe(this, Observer {
-            it?.let { webView?.loadUrl(it) }
+            it?.let { navigate(it) }
         })
 
         viewModel.command.observe(this, Observer {

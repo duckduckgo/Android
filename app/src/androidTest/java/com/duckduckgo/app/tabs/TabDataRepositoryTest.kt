@@ -20,10 +20,14 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.MutableLiveData
 import android.support.test.annotation.UiThreadTest
 import com.duckduckgo.app.global.model.Site
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.verify
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
 
 class TabDataRepositoryTest {
 
@@ -31,19 +35,16 @@ class TabDataRepositoryTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
+    @Mock
+    private lateinit var mockDao: TabsDao
+
     private lateinit var testee: TabDataRepository
 
     @UiThreadTest
     @Before
     fun before() {
-        testee = TabDataRepository()
-    }
-
-    @Test
-    fun whenInitializedThenTabsModelIsNonNullTabsIsFalseAndCurrentIsNull() {
-        assertNotNull(testee.tabs)
-        assertFalse(testee.hasTabs())
-        assertNull(testee.currentTabId)
+        MockitoAnnotations.initMocks(this)
+        testee = TabDataRepository(mockDao)
     }
 
     @Test
@@ -68,7 +69,7 @@ class TabDataRepositoryTest {
     @Test
     fun whenIdSelectedThenCurrentUpdated() {
         testee.select(TAB_ID)
-        assertEquals(TAB_ID, testee.currentTabId)
+        verify(mockDao).updateSelectedTab(any())
     }
 
     companion object {

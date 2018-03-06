@@ -42,6 +42,7 @@ import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.tabs.TabDataRepository
+import com.duckduckgo.app.tabs.TabsDao
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -101,10 +102,14 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockOmnibarConverter: OmnibarEntryConverter
 
+    @Mock
+    private lateinit var tabsDao: TabsDao
+
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
 
     private lateinit var db: AppDatabase
+
     private lateinit var appConfigurationDao: AppConfigurationDao
 
     private lateinit var testee: BrowserTabViewModel
@@ -124,7 +129,7 @@ class BrowserTabViewModelTest {
                 duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
                 termsOfServiceStore = mockTermsOfServiceStore,
                 trackerNetworks = TrackerNetworks(),
-                tabRepository = TabDataRepository(),
+                tabRepository = TabDataRepository(tabsDao),
                 networkLeaderboardDao = testNetworkLeaderboardDao,
                 autoCompleteApi = mockAutoCompleteApi,
                 appSettingsPreferencesStore = mockSettingsStore,
@@ -132,6 +137,7 @@ class BrowserTabViewModelTest {
                 longPressHandler = mockLongPressHandler,
                 appConfigurationDao = appConfigurationDao)
 
+        testee.load("abc")
         testee.url.observeForever(mockQueryObserver)
         testee.command.observeForever(mockCommandObserver)
 

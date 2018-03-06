@@ -24,14 +24,19 @@ import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomain
 import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
+import com.duckduckgo.app.tabs.SelectedTabEntity
+import com.duckduckgo.app.tabs.TabEntity
+import com.duckduckgo.app.tabs.TabsDao
 import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 
-@Database(exportSchema = true, version = 1, entities = [
+@Database(exportSchema = true, version = 2, entities = [
     HttpsUpgradeDomain::class,
     DisconnectTracker::class,
     NetworkLeaderboardEntry::class,
     AppConfigurationEntity::class,
+    TabEntity::class,
+    SelectedTabEntity::class,
     BookmarkEntity::class
 ])
 abstract class AppDatabase : RoomDatabase() {
@@ -40,6 +45,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun trackerDataDao(): TrackerDataDao
     abstract fun networkLeaderboardDao(): NetworkLeaderboardDao
     abstract fun appConfigurationDao(): AppConfigurationDao
+    abstract fun tabsDao(): TabsDao
     abstract fun bookmarksDao(): BookmarksDao
 
 }

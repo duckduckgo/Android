@@ -47,7 +47,6 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.TermsOfService
 import com.duckduckgo.app.privacy.model.improvedGrade
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
-import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.tabs.TabDataRepository
@@ -125,6 +124,8 @@ class BrowserTabViewModel(
     private val autoCompletePublishSubject = PublishRelay.create<String>()
     private var siteLiveData = MutableLiveData<Site>()
     private var site: Site? = null
+    private lateinit var tabId: String
+
 
     init {
         viewState.value = ViewState()
@@ -133,9 +134,10 @@ class BrowserTabViewModel(
         command.value = Command.ShowKeyboard
     }
 
-    fun registerTabId(tabId: String) {
+    fun load(tabId: String) {
+        this.tabId = tabId
         siteLiveData = tabRepository.retrieve(tabId)
-        site = siteLiveData.value
+        site = siteLiveData?.value
     }
 
     private fun configureAutoComplete() {
@@ -294,7 +296,8 @@ class BrowserTabViewModel(
 
     private fun onSiteChanged() {
         privacyGrade.postValue(site?.improvedGrade)
-        siteLiveData.postValue(site)
+        siteLiveData?.postValue(site)
+        tabRepository.update(tabId)
     }
 
     private fun currentViewState(): ViewState = viewState.value!!

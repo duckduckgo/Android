@@ -21,6 +21,8 @@ import android.arch.lifecycle.Observer
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
+import com.duckduckgo.app.tabs.TabDataRepository
+import com.duckduckgo.app.tabs.TabsDao
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.verify
 import org.junit.After
@@ -42,6 +44,9 @@ class BrowserViewModelTest {
     @Mock
     private lateinit var mockCommandObserver: Observer<BrowserViewModel.Command>
 
+    @Mock
+    private lateinit var tabsDao: TabsDao
+
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<BrowserViewModel.Command>
 
@@ -50,7 +55,7 @@ class BrowserViewModelTest {
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        testee = BrowserViewModel()
+        testee = BrowserViewModel(TabDataRepository(tabsDao))
         testee.command.observeForever(mockCommandObserver)
     }
 

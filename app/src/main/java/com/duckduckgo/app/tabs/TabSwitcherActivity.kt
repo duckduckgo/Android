@@ -29,7 +29,7 @@ import kotlinx.android.synthetic.main.content_tabs.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import javax.inject.Inject
 
-class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.OnItemClickListener {
+class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitchedListener {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -61,19 +61,26 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.OnItemClick
     }
 
     private fun configureObservers() {
-        repository.tabs.observe(this, Observer<TabDataRepository.Tabs> {
+        repository.liveTabs.observe(this, Observer<List<TabEntity>> {
             render(it!!)
         })
     }
 
-    private fun render(tabs: TabDataRepository.Tabs) {
+    private fun render(tabs: List<TabEntity>) {
         tabsAdapter.updateData(tabs)
     }
 
-    override fun onClicked(tabId: String) {
-        val tabs = repository.tabs.value!!
-        tabs.currentId = tabId
-        repository.tabs.value = tabs
+    override fun onNew() {
+        repository.addNewAndSelect()
+    }
+
+    override fun onSelect(tab: TabEntity) {
+        repository.loadData(tab)
+        repository.select(tab.tabId)
+        finish()
+    }
+
+    override fun onDelete(tab: TabEntity) {
         finish()
     }
 

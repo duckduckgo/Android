@@ -25,10 +25,10 @@ import android.widget.TextView
 import com.duckduckgo.app.browser.R
 import kotlinx.android.synthetic.main.item_tab.view.*
 
-class TabSwitcherAdapter(private val itemClickListener: OnItemClickListener) :
+class TabSwitcherAdapter(private val itemClickListener: TabSwitchedListener) :
     RecyclerView.Adapter<TabSwitcherAdapter.TabViewHolder>() {
 
-    private var data: TabDataRepository.Tabs = TabDataRepository.Tabs()
+    private var data: List<TabEntity> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): TabViewHolder {
         var inflater = LayoutInflater.from(parent!!.context)
@@ -37,26 +37,27 @@ class TabSwitcherAdapter(private val itemClickListener: OnItemClickListener) :
     }
 
     override fun getItemCount(): Int {
-        return data.list.size
+        return data.size
     }
 
     override fun onBindViewHolder(holder: TabViewHolder, position: Int) {
-        val key = data.list.keys.elementAt(position)
-        val tab = data.list[key]!!
-        holder.title.text = tab.value?.title ?: ""
-        holder.url.text = tab.value?.url ?: ""
+        val tab = data[position]
+        holder.title.text = tab?.title ?: ""
+        holder.url.text = tab?.url ?: ""
         holder.root.setOnClickListener {
-            itemClickListener.onClicked(key)
+            itemClickListener.onSelect(tab)
         }
     }
 
-    fun updateData(data: TabDataRepository.Tabs) {
+    fun updateData(data: List<TabEntity>) {
         this.data = data
         notifyDataSetChanged()
     }
 
-    interface OnItemClickListener {
-        fun onClicked(tabId: String)
+    interface TabSwitchedListener {
+        fun onNew()
+        fun onSelect(tab: TabEntity)
+        fun onDelete(tab: TabEntity)
     }
 
     data class TabViewHolder(

@@ -16,20 +16,30 @@
 
 package com.duckduckgo.app.di
 
+import android.arch.persistence.db.SupportSQLiteDatabase
 import android.arch.persistence.room.Room
+import android.arch.persistence.room.migration.Migration
 import android.content.Context
 import com.duckduckgo.app.global.db.AppDatabase
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
-@Module (includes = [DaoModule::class])
+@Module(includes = [DaoModule::class])
 class DatabaseModule {
 
     @Provides
     @Singleton
     fun provideDatabase(context: Context): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
-                .build()
+            .addMigrations(MIGRATION_1_TO_2)
+            .build()
+    }
+
+    val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE `tabs` (`tabId` TEXT NOT NULL, `url` TEXT, `title` TEXT, PRIMARY KEY(`tabId`))")
+            database.execSQL("CREATE TABLE `selected_tab` (`id` INTEGER NOT NULL, `tabId` TEXT, PRIMARY KEY(`id`))")
+        }
     }
 }
