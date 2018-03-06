@@ -2,16 +2,16 @@
 Note: This checklist is a reminder of our shared engineering expectations. Feel free to change it, although assigning a GitHub reviewer and the items in bold are required.
 -->
 
-Task/Issue URL:
-Tech Design URL:
-CC:
+Task/Issue URL: 
+Tech Design URL: 
+CC: 
 
 **Description**:
 
 
 **Steps to test this PR**:
-1.
-1.
+1. 
+1. 
 
 
 ---
