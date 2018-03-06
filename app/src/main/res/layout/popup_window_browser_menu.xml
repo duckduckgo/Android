@@ -90,6 +90,12 @@
                 android:text="@string/addBookmarkMenuTitle" />
 
             <TextView
+                android:id="@+id/sharePageMenuItem"
+                style="@style/BrowserTextMenuItem"
+                android:enabled="false"
+                android:text="@string/shareMenuTitle" />
+
+            <TextView
                 android:id="@+id/findInPageMenuItem"
                 style="@style/BrowserTextMenuItem"
                 android:enabled="false"

@@ -21,8 +21,7 @@ import android.view.MenuItem
 import android.webkit.URLUtil
 import android.webkit.WebView
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
-import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
-import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.None
+import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -34,6 +33,7 @@ interface LongPressHandler {
     sealed class RequiredAction {
         object None : RequiredAction()
         class DownloadFile(val url: String) : RequiredAction()
+        class ShareLink(val url: String) : RequiredAction()
     }
 }
 
@@ -48,6 +48,10 @@ class WebViewLongPressHandler @Inject constructor() : LongPressHandler {
                     menu.add(0, CONTEXT_MENU_ID_DOWNLOAD_IMAGE, 0, R.string.downloadImage)
                 }
             }
+            WebView.HitTestResult.SRC_ANCHOR_TYPE -> {
+                menu.setHeaderTitle(R.string.linkOptions)
+                menu.add(0, CONTEXT_MENU_ID_SHARE_LINK, 0, R.string.shareLink)
+            }
             else -> Timber.v("App does not yet handle target type: $longPressTargetType")
         }
     }
@@ -57,6 +61,9 @@ class WebViewLongPressHandler @Inject constructor() : LongPressHandler {
             CONTEXT_MENU_ID_DOWNLOAD_IMAGE -> {
                 return DownloadFile(longPressTarget)
             }
+            CONTEXT_MENU_ID_SHARE_LINK -> {
+                return ShareLink(longPressTarget)
+            }
             else -> None
         }
     }
@@ -64,5 +71,6 @@ class WebViewLongPressHandler @Inject constructor() : LongPressHandler {
 
     companion object {
         const val CONTEXT_MENU_ID_DOWNLOAD_IMAGE = 1
+        const val CONTEXT_MENU_ID_SHARE_LINK = 2
     }
 }

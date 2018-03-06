@@ -65,6 +65,7 @@ import kotlinx.android.synthetic.main.activity_browser.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.share
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
 import timber.log.Timber
@@ -171,6 +172,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
             enableMenuOption(view.requestDesktopSiteCheckMenuItem) {
                 viewModel.desktopSiteModeToggled(urlString = webView?.url, desktopSiteRequested = view.requestDesktopSiteCheckMenuItem.isChecked)
             }
+            enableMenuOption(view.sharePageMenuItem) { viewModel.userSharingLink(webView?.url) }
         }
     }
 
@@ -226,6 +228,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
             }
             is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
             Command.DismissFindInPage -> webView?.findAllAsync(null)
+            is Command.ShareLink -> launchSharePageChooser(it.url)
         }
     }
 
@@ -315,6 +318,7 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
         popupMenu.contentView.forwardPopupMenuItem.isEnabled = viewState.browserShowing && webView?.canGoForward()?: false
         popupMenu.contentView.refreshPopupMenuItem.isEnabled = viewState.browserShowing
         popupMenu.contentView.addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
+        popupMenu.contentView.sharePageMenuItem?.isEnabled = viewState.canSharePage
         invalidateOptionsMenu()
     }
 
@@ -611,6 +615,10 @@ class BrowserActivity : DuckDuckGoActivity(), BookmarkDialogCreationListener, We
 
     private fun launchPopupMenu() {
         popupMenu.show(rootView, toolbar)
+    }
+
+    private fun launchSharePageChooser(url: String) {
+        share(url, "")
     }
 
     private fun addBookmark() {

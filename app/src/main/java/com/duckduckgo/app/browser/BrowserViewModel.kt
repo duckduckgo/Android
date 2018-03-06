@@ -32,6 +32,7 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
+import com.duckduckgo.app.browser.BrowserViewModel.Command.ShareLink
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -87,7 +88,8 @@ class BrowserViewModel(
             val isFullScreen: Boolean = false,
             val autoComplete: AutoCompleteViewState = AutoCompleteViewState(),
             val findInPage: FindInPage = FindInPage(canFindInPage = false),
-            val isDesktopBrowsingMode: Boolean = false
+            val isDesktopBrowsingMode: Boolean = false,
+            val canSharePage: Boolean = false
     )
 
     sealed class Command {
@@ -101,6 +103,7 @@ class BrowserViewModel(
         object HideKeyboard : Command()
         class ShowFullScreen(val view: View) : Command()
         class DownloadImage(val url: String) : Command()
+        class ShareLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
         object DismissFindInPage : Command()
     }
@@ -247,6 +250,8 @@ class BrowserViewModel(
                 canAddBookmarks = true,
                 omnibarText = url,
                 browserShowing = true,
+                canSharePage = true,
+                showFireButton = true,
                 showPrivacyGrade = appConfigurationDownloaded,
                 findInPage = FindInPage(visible = false, canFindInPage = true))
 
@@ -352,6 +357,10 @@ class BrowserViewModel(
                 command.value = Command.DownloadImage(requiredAction.url)
                 true
             }
+            is RequiredAction.ShareLink -> {
+                command.value = ShareLink(requiredAction.url)
+                true
+            }
             RequiredAction.None-> {
                 false
             }
@@ -396,7 +405,7 @@ class BrowserViewModel(
         if (desktopSiteRequested && url.isMobileSite) {
             val desktopUrl = url.toDesktopUri()
             Timber.i("Original URL $urlString - attempting $desktopUrl with desktop site UA string")
-            command.value = Navigate(desktopUrl.toString())
+            command.value = Command.Navigate(desktopUrl.toString())
         } else {
             command.value = Command.Refresh
         }
@@ -404,6 +413,12 @@ class BrowserViewModel(
 
     fun resetView() {
         viewState.value = ViewState()
+    }
+
+    fun userSharingLink(url: String?) {
+        if (url != null) {
+            command.value = Command.ShareLink(url)
+        }
     }
 
     data class FindInPage(
@@ -418,7 +433,6 @@ class BrowserViewModel(
             val showSuggestions: Boolean = false,
             val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
     )
-
 }
 
 
