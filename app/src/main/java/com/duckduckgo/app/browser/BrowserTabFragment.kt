@@ -171,9 +171,13 @@ class BrowserTabFragment : Fragment(), BookmarkDialogCreationListener, FindListe
         webView?.loadUrl(url)
     }
 
+    fun refresh() {
+        webView?.reload()
+    }
+
     private fun processCommand(it: Command?) {
         when (it) {
-            Command.Refresh -> webView?.reload()
+            Command.Refresh -> refresh()
             is Command.Navigate -> {
                 navigate(it.url)
             }
@@ -462,7 +466,7 @@ class BrowserTabFragment : Fragment(), BookmarkDialogCreationListener, FindListe
             }
 
             it.setDownloadListener { url, _, _, _, _ ->
-                browserActivity?.downloadFile(it.url)
+                browserActivity?.downloadFile(url)
             }
 
             it.setOnTouchListener { _, _ ->
@@ -568,16 +572,16 @@ class BrowserTabFragment : Fragment(), BookmarkDialogCreationListener, FindListe
     }
 
     fun onBackPressed() : Boolean {
-        when {
+        return when {
             webView?.canGoBack() == true -> {
                 webView?.goBack()
-                return true
+                true
             }
             webView?.visibility == VISIBLE -> {
                 resetTabState()
-                return true
+                true
             }
-            else -> return false
+            else -> false
         }
     }
 

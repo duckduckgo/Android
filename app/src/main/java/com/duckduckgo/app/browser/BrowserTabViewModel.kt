@@ -327,10 +327,6 @@ class BrowserTabViewModel(
         }
     }
 
-    fun receivedDashboardResult(resultCode: Int) {
-        if (resultCode == RELOAD_RESULT_CODE) command.value = Command.Refresh
-    }
-
     @WorkerThread
     fun addBookmark(title: String, url: String) {
         bookmarksDao.insert(BookmarkEntity(title = title, url = url))

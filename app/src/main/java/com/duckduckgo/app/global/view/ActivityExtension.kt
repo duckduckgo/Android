@@ -18,7 +18,6 @@ package com.duckduckgo.app.global.view
 
 import android.content.Intent
 import android.support.v4.app.FragmentActivity
-import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.duckduckgo.app.browser.R
 import org.jetbrains.anko.toast

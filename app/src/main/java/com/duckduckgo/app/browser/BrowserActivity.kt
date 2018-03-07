@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.app.DownloadManager
+import android.app.DownloadManager.Request.*
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
@@ -35,6 +36,7 @@ import android.widget.Toast
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
+import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.intentText
@@ -43,7 +45,6 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.tabs.TabDataRepository
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
-import kotlinx.android.synthetic.main.include_duckduckgo_browser_webview.*
 import org.jetbrains.anko.toast
 import timber.log.Timber
 import java.util.*
@@ -117,6 +118,7 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: Command?) {
         when (it) {
+            is Refresh -> tabFragment.refresh()
             is Navigate -> tabFragment.navigate(it.url)
         }
     }
@@ -172,7 +174,7 @@ class BrowserActivity : DuckDuckGoActivity() {
             val request = DownloadManager.Request(uri).apply {
                 allowScanningByMediaScanner()
                 setDestinationInExternalPublicDir(pending.directory, guessedFileName)
-                setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             }
             val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             manager.enqueue(request)
@@ -214,7 +216,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun resetActivityState() {
-        tabFragment?.resetTabState()
+        tabFragment.resetTabState()
     }
 
     private data class PendingFileDownload(
