@@ -24,7 +24,7 @@ class StatisticsSharedPreferences @Inject constructor(private val context: Conte
     StatisticsDataStore {
 
     override val hasInstallationStatistics: Boolean
-        get() = preferences.contains(atb) && preferences.contains(retentionAtb)
+        get() = preferences.contains(KEY_ATB) && preferences.contains(KEY_RETENTION_ATB)
 
     override var atb: String?
         get() = preferences.getString(KEY_ATB, null)
