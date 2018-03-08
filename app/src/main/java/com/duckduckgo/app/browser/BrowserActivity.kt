@@ -72,9 +72,9 @@ class BrowserActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_browser)
+        createTabFragment()
         configureObservers()
         if (savedInstanceState == null) {
-            createTabFragment()
             consumeSharedQuery(intent)
         }
     }
@@ -89,14 +89,17 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun createTabFragment() {
-        val tabId = UUID.randomUUID().toString()
-        val fragment = BrowserTabFragment.newInstance(tabId)
         val fragmentManager = supportFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.fragmentContainer, fragment, tabId)
-        fragmentTransaction.commit()
+        var fragment = fragmentManager.findFragmentById(R.id.fragmentContainer) as? BrowserTabFragment
+        if (fragment == null) {
+            val tabId = UUID.randomUUID().toString()
+            fragment = BrowserTabFragment.newInstance(tabId)
+            val fragmentTransaction = fragmentManager.beginTransaction()
+            fragmentTransaction.replace(R.id.fragmentContainer, fragment, tabId)
+            fragmentTransaction.commit()
+        }
         tabFragment = fragment
-        viewModel.tabId = tabFragment.tabId
+        viewModel.tabId = fragment.tabId
     }
 
     private fun consumeSharedQuery(intent: Intent?) {
