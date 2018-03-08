@@ -25,10 +25,12 @@ import android.net.Uri
 import android.support.test.InstrumentationRegistry
 import android.view.MenuItem
 import android.view.View
+import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.db.AppConfigurationDao
@@ -62,6 +64,10 @@ class BrowserTabViewModelTest {
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @get:Rule
+    @Suppress("unused")
+    val schedulers = InstantSchedulersRule()
 
     private var lastNetworkLeaderboardEntry: NetworkLeaderboardEntry? = null
 
@@ -173,9 +179,11 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBookmarkAddedThenDaoIsUpdated() {
-        testee.addBookmark("A title", "www.example.com")
+    fun whenBookmarkAddedThenDaoIsUpdatedAndUserNotified() {
+        testee.onBookmarkSaved(null, "A title", "www.example.com")
         verify(bookmarksDao).insert(BookmarkEntity(title = "A title", url = "www.example.com"))
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is DisplayMessage)
     }
 
     @Test

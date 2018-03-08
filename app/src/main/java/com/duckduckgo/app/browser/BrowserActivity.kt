@@ -88,14 +88,17 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun configureInitialTab() {
-        val tabId = viewModel.tabId
-        val fragment = BrowserTabFragment.newInstance(tabId)
         val fragmentManager = supportFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.fragmentContainer, fragment, tabId)
-        fragmentTransaction.commit()
+        var fragment = fragmentManager.findFragmentById(R.id.fragmentContainer) as? BrowserTabFragment
+        if (fragment == null) {
+            val tabId = viewModel.tabId
+            fragment = BrowserTabFragment.newInstance(tabId)
+            val fragmentTransaction = fragmentManager.beginTransaction()
+            fragmentTransaction.replace(R.id.fragmentContainer, fragment, tabId)
+            fragmentTransaction.commit()
+        }
         currentTab = fragment
-        viewModel.tabId = currentTab.tabId
+        viewModel.tabId = fragment.tabId
     }
 
     private fun selectTab(tabId: String) {

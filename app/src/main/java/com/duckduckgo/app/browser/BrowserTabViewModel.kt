@@ -22,7 +22,6 @@ import android.arch.lifecycle.ViewModel
 import android.net.Uri
 import android.support.annotation.AnyThread
 import android.support.annotation.VisibleForTesting
-import android.support.annotation.WorkerThread
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
@@ -31,6 +30,7 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment.SaveBookmarkListener
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShareLink
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
@@ -71,7 +71,7 @@ class BrowserTabViewModel(
     private val appSettingsPreferencesStore: SettingsDataStore,
     private val longPressHandler: LongPressHandler,
     appConfigurationDao: AppConfigurationDao
-) : WebViewClientListener, ViewModel() {
+) : WebViewClientListener, SaveBookmarkListener, ViewModel() {
 
     data class ViewState(
         val isLoading: Boolean = false,
@@ -103,6 +103,7 @@ class BrowserTabViewModel(
         class DownloadImage(val url: String) : Command()
         class ShareLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
+        class DisplayMessage(val messageId: Int) : Command()
         object DismissFindInPage : Command()
     }
 
@@ -330,11 +331,13 @@ class BrowserTabViewModel(
         }
     }
 
-    @WorkerThread
-    fun addBookmark(title: String, url: String) {
-        bookmarksDao.insert(BookmarkEntity(title = title, url = url))
+    override fun onBookmarkSaved(id: Int?, title: String, url: String) {
+        Schedulers.io().scheduleDirect {
+            bookmarksDao.insert(BookmarkEntity(title = title, url = url))
+        }
+        command.value = Command.DisplayMessage(R.string.bookmarkAddedFeedback)
     }
-
+ 
     fun onUserSelectedToEditQuery(query: String) {
         viewState.value = currentViewState().copy(
             isEditing = false,

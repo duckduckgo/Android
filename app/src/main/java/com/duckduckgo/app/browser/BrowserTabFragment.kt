@@ -36,8 +36,7 @@ import android.webkit.WebView.FindListener
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import com.duckduckgo.app.bookmarks.ui.BookmarkAddEditDialogFragment
-import com.duckduckgo.app.bookmarks.ui.BookmarkAddEditDialogFragment.BookmarkDialogCreationListener
+import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
@@ -50,14 +49,12 @@ import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.share
-import org.jetbrains.anko.uiThread
 import timber.log.Timber
 import javax.inject.Inject
 
 
-class BrowserTabFragment : Fragment(), BookmarkDialogCreationListener, FindListener {
+class BrowserTabFragment : Fragment(), FindListener {
 
     @Inject
     lateinit var webViewClient: BrowserWebViewClient
@@ -219,7 +216,12 @@ class BrowserTabFragment : Fragment(), BookmarkDialogCreationListener, FindListe
             is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
             Command.DismissFindInPage -> webView?.findAllAsync(null)
             is Command.ShareLink -> launchSharePageChooser(it.url)
+            is Command.DisplayMessage -> showToast(it.messageId)
         }
+    }
+
+    private fun showToast(messageId: Int) {
+        Toast.makeText(context, messageId, Toast.LENGTH_LONG).show()
     }
 
     private fun configureAutoComplete() {
@@ -522,24 +524,12 @@ class BrowserTabFragment : Fragment(), BookmarkDialogCreationListener, FindListe
     }
 
     private fun addBookmark() {
-
-        val addBookmarkDialog = BookmarkAddEditDialogFragment.createDialogCreationMode(
+        val addBookmarkDialog = SaveBookmarkDialogFragment.createDialogCreationMode(
             existingTitle = webView?.title,
             existingUrl = webView?.url
         )
-
-        activity?.let {
-            addBookmarkDialog.show(it.supportFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
-        }
-    }
-
-    override fun userWantsToCreateBookmark(title: String, url: String) {
-        doAsync {
-            viewModel.addBookmark(title, url)
-            uiThread {
-                Toast.makeText(context, R.string.bookmarkAddedFeedback, Toast.LENGTH_LONG).show()
-            }
-        }
+        addBookmarkDialog.show(childFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
+        addBookmarkDialog.listener = viewModel
     }
 
     override fun onFindResultReceived(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Boolean) {
