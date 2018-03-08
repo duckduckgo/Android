@@ -61,6 +61,6 @@ private const val faviconBaseUrlFormat = "https://icons.duckduckgo.com/ip3/%s.ic
 
 fun Uri?.faviconLocation(): Uri? {
     val host = this?.host
-    if(host.isNullOrBlank()) return null
+    if (host.isNullOrBlank()) return null
     return Uri.parse(String.format(faviconBaseUrlFormat, host))
 }
