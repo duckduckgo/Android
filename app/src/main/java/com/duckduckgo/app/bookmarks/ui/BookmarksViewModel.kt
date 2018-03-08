@@ -58,7 +58,7 @@ class BookmarksViewModel(val dao: BookmarksDao): SaveBookmarkListener, ViewModel
 
     override fun onBookmarkSaved(id: Int?, title: String, url: String) {
         id?.let {
-            editBookmark(123, title, url)
+            editBookmark(it, title, url)
         }
     }
 
