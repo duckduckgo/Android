@@ -72,9 +72,9 @@ class BrowserActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_browser)
-        createTabFragment()
         configureObservers()
         if (savedInstanceState == null) {
+            createTabFragment()
             consumeSharedQuery(intent)
         }
     }
