@@ -38,6 +38,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.app.global.faviconLocation
+import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.show
 import kotlinx.android.synthetic.main.content_bookmarks.*
@@ -149,14 +151,14 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
         private const val EDIT_BOOKMARK_FRAGMENT_TAG = "EDIT_BOOKMARK"
     }
 
-    class BookmarksAdapter(val context: Context, val viewModel: BookmarksViewModel) : Adapter<BookmarksViewHolder>() {
+    class BookmarksAdapter(private val context: Context,
+                           private val viewModel: BookmarksViewModel) : Adapter<BookmarksViewHolder>() {
 
         var bookmarks: List<BookmarkEntity> = emptyList()
             set(value) {
                 field = value
                 notifyDataSetChanged()
             }
-
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): BookmarksViewHolder {
             val inflater = LayoutInflater.from(context)
@@ -171,10 +173,9 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
         override fun getItemCount(): Int {
             return bookmarks.size
         }
-
     }
 
-    class BookmarksViewHolder(itemView: View?, val viewModel: BookmarksViewModel) :
+    class BookmarksViewHolder(itemView: View?, private val viewModel: BookmarksViewModel) :
         ViewHolder(itemView) {
 
         lateinit var bookmark: BookmarkEntity
@@ -189,6 +190,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
 
             itemView.title.text = bookmark.title
             itemView.url.text = parseDisplayUrl(bookmark.url)
+            loadFavicon(bookmark.url)
 
             itemView.overflowMenu.setOnClickListener {
                 showOverFlowMenu(itemView.overflowMenu, bookmark)
@@ -197,6 +199,16 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
             itemView.setOnClickListener {
                 viewModel.onSelected(bookmark)
             }
+        }
+
+        private fun loadFavicon(url: String) {
+            val faviconUrl = Uri.parse(url).faviconLocation()
+
+            GlideApp.with(itemView)
+                    .load(faviconUrl)
+                    .placeholder(R.drawable.ic_globe_white_24dp)
+                    .error(R.drawable.ic_globe_white_24dp)
+                    .into(itemView.favicon)
         }
 
         private fun parseDisplayUrl(urlString: String): String {
