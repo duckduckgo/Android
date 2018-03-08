@@ -53,7 +53,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@id/favicon"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Bookmark could be really long title too in which case it might go onto two lines" />
+        tools:text="Bookmark" />
 
     <TextView
         android:id="@+id/url"
