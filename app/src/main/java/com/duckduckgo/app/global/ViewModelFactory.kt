@@ -21,6 +21,7 @@ import android.arch.lifecycle.ViewModelProvider
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
+import com.duckduckgo.app.browser.BrowserTabViewModel
 import com.duckduckgo.app.browser.BrowserViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.LongPressHandler
@@ -68,7 +69,8 @@ class ViewModelFactory @Inject constructor(
                 when {
                     isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboaringStore)
                     isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore)
-                    isAssignableFrom(BrowserViewModel::class.java) -> browserViewModel()
+                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel()
+                    isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
                     isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(privacySettingsStore, networkLeaderboardDao)
                     isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                     isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
@@ -79,7 +81,7 @@ class ViewModelFactory @Inject constructor(
                 }
             } as T
 
-    private fun browserViewModel(): ViewModel = BrowserViewModel(
+    private fun browserTabViewModel(): ViewModel = BrowserTabViewModel(
             statisticsUpdater = statisticsUpdater,
             queryUrlConverter = queryUrlConverter,
             duckDuckGoUrlDetector = duckDuckGoUrlDetector,

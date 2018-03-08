@@ -44,7 +44,6 @@ class NetworkModule {
     @Singleton
     fun okHttpClient(context: Context): OkHttpClient {
         val cache = Cache(context.cacheDir, CACHE_SIZE)
-
         return OkHttpClient.Builder()
                 .cache(cache)
                 .build()
@@ -52,7 +51,7 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun retrofit(okHttpClient: OkHttpClient, moshi: Moshi, context: Context): Retrofit {
+    fun retrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit.Builder()
                 .baseUrl(Url.BASE)
                 .client(okHttpClient)
