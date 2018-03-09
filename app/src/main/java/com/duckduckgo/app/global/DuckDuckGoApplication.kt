@@ -19,6 +19,7 @@ package com.duckduckgo.app.global
 import android.app.Activity
 import android.app.Application
 import android.app.Service
+import android.support.v4.app.Fragment
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.job.AppConfigurationSyncer
@@ -27,19 +28,20 @@ import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.squareup.leakcanary.LeakCanary
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasActivityInjector
-import dagger.android.HasServiceInjector
+import dagger.android.*
+import dagger.android.support.HasSupportFragmentInjector
 import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.doAsync
 import timber.log.Timber
 import javax.inject.Inject
 
-open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Application() {
+open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasSupportFragmentInjector, Application() {
 
     @Inject
     lateinit var activityInjector: DispatchingAndroidInjector<Activity>
+
+    @Inject
+    lateinit var supportFragmentInjector: DispatchingAndroidInjector<Fragment>
 
     @Inject
     lateinit var serviceInjector: DispatchingAndroidInjector<Service>
@@ -136,6 +138,8 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, Appl
     }
 
     override fun activityInjector(): AndroidInjector<Activity> = activityInjector
+
+    override fun supportFragmentInjector(): AndroidInjector<Fragment> = supportFragmentInjector
 
     override fun serviceInjector(): AndroidInjector<Service> = serviceInjector
 }

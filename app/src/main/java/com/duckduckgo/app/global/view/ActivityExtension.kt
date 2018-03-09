@@ -17,12 +17,12 @@
 package com.duckduckgo.app.global.view
 
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
+import android.support.v4.app.FragmentActivity
 import android.view.View
 import com.duckduckgo.app.browser.R
 import org.jetbrains.anko.toast
 
-fun AppCompatActivity.launchExternalActivity(intent: Intent) {
+fun FragmentActivity.launchExternalActivity(intent: Intent) {
     if (intent.resolveActivity(packageManager) != null) {
         startActivity(intent)
     } else {
@@ -30,7 +30,7 @@ fun AppCompatActivity.launchExternalActivity(intent: Intent) {
     }
 }
 
-fun AppCompatActivity.toggleFullScreen() {
+fun FragmentActivity.toggleFullScreen() {
 
     val newUiOptions = window.decorView.systemUiVisibility
             .xor(android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
@@ -40,7 +40,7 @@ fun AppCompatActivity.toggleFullScreen() {
     window.decorView.systemUiVisibility = newUiOptions
 }
 
-fun AppCompatActivity.isImmersiveModeEnabled(): Boolean {
+fun FragmentActivity.isImmersiveModeEnabled(): Boolean {
     val uiOptions = window.decorView.systemUiVisibility
     return uiOptions or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY == uiOptions
 }

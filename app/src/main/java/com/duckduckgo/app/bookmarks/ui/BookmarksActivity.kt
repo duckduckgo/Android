@@ -32,7 +32,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupMenu
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
-import com.duckduckgo.app.bookmarks.ui.BookmarkAddEditDialogFragment.BookmarkDialogEditListener
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -46,11 +45,10 @@ import kotlinx.android.synthetic.main.content_bookmarks.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.view_bookmark_entry.view.*
 import org.jetbrains.anko.alert
-import org.jetbrains.anko.doAsync
 import timber.log.Timber
 import javax.inject.Inject
 
-class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
+class BookmarksActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -100,8 +98,9 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
     }
 
     private fun showEditBookmarkDialog(bookmark: BookmarkEntity) {
-        val dialog = BookmarkAddEditDialogFragment.createDialogEditingMode(bookmark)
+        val dialog = SaveBookmarkDialogFragment.createDialogEditingMode(bookmark)
         dialog.show(supportFragmentManager, EDIT_BOOKMARK_FRAGMENT_TAG)
+        dialog.listener = viewModel
     }
 
     private fun showBookmarks() {
@@ -132,9 +131,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
     }
 
     private fun delete(bookmark: BookmarkEntity) {
-        doAsync {
-            viewModel.delete(bookmark)
-        }
+        viewModel.delete(bookmark)
     }
 
     override fun onDestroy() {
@@ -245,9 +242,5 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
             Timber.i("Deleting bookmark ${bookmark.title}")
             viewModel.onDeleteRequested(bookmark)
         }
-    }
-
-    override fun userWantsToEditBookmark(id: Int, title: String, url: String) {
-        doAsync { viewModel.editBookmark(id, title, url) }
     }
 }

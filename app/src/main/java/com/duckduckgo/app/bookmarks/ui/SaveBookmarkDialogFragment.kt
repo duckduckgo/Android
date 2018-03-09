@@ -29,16 +29,13 @@ import com.duckduckgo.app.global.view.showKeyboard
 import org.jetbrains.anko.find
 
 
-class BookmarkAddEditDialogFragment : DialogFragment() {
+class SaveBookmarkDialogFragment : DialogFragment() {
 
-    interface BookmarkDialogCreationListener {
-        fun userWantsToCreateBookmark(title: String, url: String)
+    interface SaveBookmarkListener {
+        fun onBookmarkSaved(id: Int?, title: String, url: String)
     }
 
-    interface BookmarkDialogEditListener {
-        fun userWantsToEditBookmark(id: Int, title: String, url: String)
-    }
-
+    var listener: SaveBookmarkListener? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
@@ -63,20 +60,11 @@ class BookmarkAddEditDialogFragment : DialogFragment() {
     }
 
     private fun userAcceptedDialog(titleInput: EditText, urlInput: EditText) {
-        if (isInEditMode()) {
-            val listener = activity as BookmarkDialogEditListener
-            listener.userWantsToEditBookmark(
+        listener?.onBookmarkSaved(
                 getExistingId(),
                 titleInput.text.toString(),
                 urlInput.text.toString()
             )
-        } else {
-            val listener = activity as BookmarkDialogCreationListener
-            listener.userWantsToCreateBookmark(
-                titleInput.text.toString(),
-                urlInput.text.toString()
-            )
-        }
     }
 
     private fun showKeyboard(titleInput: EditText, alert: AlertDialog) {
@@ -99,7 +87,7 @@ class BookmarkAddEditDialogFragment : DialogFragment() {
         alertBuilder.setTitle(titleStringRes)
     }
 
-    private fun getExistingId(): Int = arguments!!.getInt(KEY_BOOKMARK_ID)
+    private fun getExistingId(): Int? = arguments!!.getInt(KEY_BOOKMARK_ID)
     private fun getExistingTitle(): String = arguments!!.getString(KEY_PREEXISTING_TITLE)
     private fun getExistingUrl(): String = arguments!!.getString(KEY_PREEXISTING_URL)
 
@@ -121,9 +109,9 @@ class BookmarkAddEditDialogFragment : DialogFragment() {
         private const val KEY_PREEXISTING_TITLE = "KEY_PREEXISTING_TITLE"
         private const val KEY_PREEXISTING_URL = "KEY_PREEXISTING_URL"
 
-        fun createDialogEditingMode(bookmark: BookmarkEntity): BookmarkAddEditDialogFragment {
+        fun createDialogEditingMode(bookmark: BookmarkEntity): SaveBookmarkDialogFragment {
 
-            val dialog = BookmarkAddEditDialogFragment()
+            val dialog = SaveBookmarkDialogFragment()
             val bundle = Bundle()
 
             bundle.putBoolean(KEY_IS_EDIT_MODE, true)
@@ -135,12 +123,9 @@ class BookmarkAddEditDialogFragment : DialogFragment() {
             return dialog
         }
 
-        fun createDialogCreationMode(
-            existingTitle: String?,
-            existingUrl: String?
-        ): BookmarkAddEditDialogFragment {
+        fun createDialogCreationMode(existingTitle: String?, existingUrl: String?): SaveBookmarkDialogFragment {
 
-            val dialog = BookmarkAddEditDialogFragment()
+            val dialog = SaveBookmarkDialogFragment()
             val bundle = Bundle()
 
             bundle.putBoolean(KEY_IS_EDIT_MODE, false)
