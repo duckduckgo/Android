@@ -110,6 +110,9 @@ dependencies {
     implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
     implementation "org.jetbrains.anko:anko-design:$ankoVersion"
 
+    // Android KTX
+    implementation 'androidx.core:core-ktx:0.2'
+
     // ViewModel and LiveData
     implementation "android.arch.lifecycle:extensions:$architectureComponents"
     kapt "android.arch.lifecycle:compiler:$architectureComponents"

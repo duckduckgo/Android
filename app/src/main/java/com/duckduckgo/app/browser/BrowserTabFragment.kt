@@ -36,6 +36,7 @@ import android.webkit.WebView.FindListener
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.view.updatePaddingRelative
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
@@ -353,14 +354,14 @@ class BrowserTabFragment : Fragment(), FindListener {
     private fun showClearButton() {
         omnibarTextInput.post {
             clearOmnibarInputButton.show()
-            omnibarTextInput.updatePadding(paddingEnd = 40.toPx())
+            omnibarTextInput.updatePaddingRelative(end = 40.toPx())
         }
     }
 
     private fun hideClearButton() {
         omnibarTextInput.post {
             clearOmnibarInputButton.hide()
-            omnibarTextInput.updatePadding(paddingEnd = 10.toPx())
+            omnibarTextInput.updatePaddingRelative(end = 10.toPx())
         }
     }
 
