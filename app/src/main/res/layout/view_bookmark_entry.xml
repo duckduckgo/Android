@@ -32,7 +32,7 @@
         android:layout_height="24dp"
         android:layout_marginStart="22dp"
         android:importantForAccessibility="no"
-        android:src="@drawable/ic_globe_white_24dp"
+        android:src="@drawable/ic_globe_white_16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
