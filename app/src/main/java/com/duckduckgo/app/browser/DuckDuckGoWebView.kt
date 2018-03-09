@@ -25,7 +25,6 @@ import android.support.v4.view.NestedScrollingChildHelper
 import android.support.v4.view.ViewCompat
 import android.util.AttributeSet
 import android.view.MotionEvent
-import android.view.inputmethod.BaseInputConnection
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import android.webkit.WebView
@@ -50,8 +49,8 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
         isNestedScrollingEnabled = true
     }
 
-    override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection {
-        val inputConnection = BaseInputConnection(this, false)
+    override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection? {
+        val inputConnection = super.onCreateInputConnection(outAttrs) ?: return null
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             addNoPersonalisedFlag(outAttrs)
@@ -63,7 +62,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
 
     @TargetApi(Build.VERSION_CODES.O)
     private fun addNoPersonalisedFlag(outAttrs: EditorInfo) {
-        outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING
+        outAttrs.imeOptions = outAttrs.imeOptions or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING
     }
 
     @SuppressLint("ClickableViewAccessibility")
