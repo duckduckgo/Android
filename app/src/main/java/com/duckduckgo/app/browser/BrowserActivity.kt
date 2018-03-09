@@ -35,8 +35,7 @@ import android.webkit.URLUtil
 import android.widget.Toast
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
-import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
-import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
+import com.duckduckgo.app.browser.BrowserViewModel.Command.*
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.intentText
@@ -59,7 +58,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var repository: TabDataRepository
 
-    private lateinit var currentTab: BrowserTabFragment
+    private var currentTab: BrowserTabFragment? = null
 
     private val viewModel: BrowserViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(BrowserViewModel::class.java)
@@ -71,71 +70,80 @@ class BrowserActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_browser)
-        configureInitialTab()
         configureObservers()
-        if (savedInstanceState == null) {
-            consumeSharedQuery(intent)
+        if (savedInstanceState == null && launchNewSearchOrQuery(intent)) {
+            return
         }
+        launchWithLastSavedTab()
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        if (shouldClearActivityState(intent)) {
-            resetActivityState()
-        } else {
-            consumeSharedQuery(intent)
-        }
+        launchNewSearchOrQuery(intent)
     }
 
-    private fun configureInitialTab() {
-        val fragmentManager = supportFragmentManager
-        var fragment = fragmentManager.findFragmentById(R.id.fragmentContainer) as? BrowserTabFragment
+    private fun launchWithLastSavedTab() {
+        var fragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer) as? BrowserTabFragment
         if (fragment == null) {
-            val tabId = viewModel.tabId
+            val tabId = viewModel.loadInitialTab()
             fragment = BrowserTabFragment.newInstance(tabId)
-            val fragmentTransaction = fragmentManager.beginTransaction()
-            fragmentTransaction.replace(R.id.fragmentContainer, fragment, tabId)
-            fragmentTransaction.commit()
+            val transaction = supportFragmentManager.beginTransaction()
+            transaction.replace(R.id.fragmentContainer, fragment, tabId)
+            transaction.commit()
         }
         currentTab = fragment
-        viewModel.tabId = fragment.tabId
+    }
+
+    private fun openNewTab(tabId: String, userQuery: String? = null) {
+        var previousFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer) as? BrowserTabFragment
+        val fragment = BrowserTabFragment.newInstance(tabId, userQuery)
+        val transaction = supportFragmentManager.beginTransaction()
+        if(previousFragment == null) {
+            transaction.replace(R.id.fragmentContainer, fragment, tabId)
+        } else {
+            transaction.hide(currentTab)
+            transaction.add(R.id.fragmentContainer, fragment, tabId)
+        }
+        transaction.commit()
+        currentTab = fragment
     }
 
     private fun selectTab(tabId: String) {
-        val fragmentManager = supportFragmentManager
-        val fragment = fragmentManager.findFragmentByTag(tabId) as? BrowserTabFragment
+
+        if (currentTab?.tabId == tabId) {
+            return
+        }
+
+        val fragment = supportFragmentManager.findFragmentByTag(tabId) as? BrowserTabFragment
         if (fragment == null) {
             openNewTab(tabId)
             return
         }
-        val fragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.hide(currentTab)
-        fragmentTransaction.show(fragment)
-        fragmentTransaction.commit()
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.hide(currentTab)
+        transaction.show(fragment)
+        transaction.commit()
         currentTab = fragment
     }
 
-    private fun openNewTab(tabId: String) {
-        val fragment = BrowserTabFragment.newInstance(tabId)
-        val fragmentManager = supportFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction()
-        if (currentTab != null) {
-            fragmentTransaction.hide(currentTab)
-        }
-        fragmentTransaction.add(R.id.fragmentContainer, fragment, tabId)
-        fragmentTransaction.commit()
-        currentTab = fragment
-    }
 
-    private fun consumeSharedQuery(intent: Intent?) {
+    private fun launchNewSearchOrQuery(intent: Intent?) : Boolean {
         if (intent == null) {
-            return
+            return false
+        }
+
+        if (launchNewSearch(intent)) {
+            viewModel.newSearchRequested()
+            return true
         }
 
         val sharedText = intent.intentText
         if (sharedText != null) {
             viewModel.onSharedTextReceived(sharedText)
+            return true
         }
+
+        return false
     }
 
     private fun configureObservers() {
@@ -151,18 +159,20 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: Command?) {
         when (it) {
-            is Refresh -> currentTab.refresh()
-            is Navigate -> currentTab.navigate(it.url)
+            is NewTab -> launchNewTab(it.query)
+            is Query -> currentTab?.submitQuery(it.query)
+            is Refresh -> currentTab?.refresh()
         }
     }
 
-    private fun shouldClearActivityState(intent: Intent?): Boolean {
-        if (intent == null) return false
-        return intent.getBooleanExtra(REPLACE_EXISTING_SEARCH_EXTRA, false) || intent.action == Intent.ACTION_ASSIST
+    private fun launchNewSearch(intent: Intent): Boolean {
+        return intent.getBooleanExtra(NEW_SEARCH_EXTRA, false) || intent.action == Intent.ACTION_ASSIST
     }
 
     fun launchPrivacyDashboard() {
-        startActivityForResult(PrivacyDashboardActivity.intent(this, viewModel.tabId), DASHBOARD_REQUEST_CODE)
+        currentTab?.tabId?.let {
+            startActivityForResult(PrivacyDashboardActivity.intent(this, it), DASHBOARD_REQUEST_CODE)
+        }
     }
 
     fun launchFire() {
@@ -176,8 +186,10 @@ class BrowserActivity : DuckDuckGoActivity() {
         startActivity(TabSwitcherActivity.intent(this))
     }
 
-    fun launchNewTab() {
-        repository.addNewAndSelect()
+    fun launchNewTab(query: String? = null) {
+        val tabId = repository.addNew()
+        openNewTab(tabId, query)
+        repository.select(tabId)
     }
 
     fun launchSettings() {
@@ -251,13 +263,13 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     override fun onBackPressed() {
-        if (!currentTab.onBackPressed()) {
+        if (!(currentTab?.onBackPressed() ?: false)) {
             super.onBackPressed()
         }
     }
 
     private fun resetActivityState() {
-        currentTab.resetTabState()
+        //TODO clear repo and all tabs
     }
 
     private data class PendingFileDownload(
@@ -267,14 +279,14 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     companion object {
 
-        fun intent(context: Context, queryExtra: String? = null, replaceExistingSearch: Boolean = false): Intent {
+        fun intent(context: Context, queryExtra: String? = null, newSearch: Boolean = false): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
-            intent.putExtra(REPLACE_EXISTING_SEARCH_EXTRA, replaceExistingSearch)
+            intent.putExtra(NEW_SEARCH_EXTRA, newSearch)
             return intent
         }
 
-        private const val REPLACE_EXISTING_SEARCH_EXTRA = "REPLACE_EXISTING_SEARCH_EXTRA"
+        private const val NEW_SEARCH_EXTRA = "NEW_SEARCH_EXTRA"
         private const val DASHBOARD_REQUEST_CODE = 100
         private const val PERMISSION_REQUEST_EXTERNAL_STORAGE = 200
     }

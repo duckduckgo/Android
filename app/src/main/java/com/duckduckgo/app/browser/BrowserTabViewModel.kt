@@ -31,7 +31,7 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment.SaveBookmarkListener
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShareLink
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -132,13 +132,18 @@ class BrowserTabViewModel(
         viewState.value = ViewState()
         appConfigurationObservable.observeForever(appConfigurationObserver)
         configureAutoComplete()
-        command.value = Command.ShowKeyboard
     }
 
     fun load(tabId: String) {
         this.tabId = tabId
         siteLiveData = tabRepository.retrieve(tabId)
         site = siteLiveData?.value
+        val url = site?.url
+        if (url != null) {
+            command.value = Navigate(url)
+        } else {
+            command.value = ShowKeyboard
+        }
     }
 
     private fun configureAutoComplete() {
@@ -176,8 +181,7 @@ class BrowserTabViewModel(
             return
         }
 
-        command.value = Command.HideKeyboard
-
+        command.value = HideKeyboard
         val trimmedInput = input.trim()
         url.value = buildUrl(trimmedInput)
 
@@ -203,7 +207,7 @@ class BrowserTabViewModel(
     }
 
     override fun goFullScreen(view: View) {
-        command.value = Command.ShowFullScreen(view)
+        command.value = ShowFullScreen(view)
         viewState.value = currentViewState().copy(isFullScreen = true)
     }
 
@@ -230,17 +234,17 @@ class BrowserTabViewModel(
 
     @AnyThread
     override fun sendEmailRequested(emailAddress: String) {
-        command.postValue(Command.SendEmail(emailAddress))
+        command.postValue(SendEmail(emailAddress))
     }
 
     @AnyThread
     override fun dialTelephoneNumberRequested(telephoneNumber: String) {
-        command.postValue(Command.DialNumber(telephoneNumber))
+        command.postValue(DialNumber(telephoneNumber))
     }
 
     @AnyThread
     override fun sendSmsRequested(telephoneNumber: String) {
-        command.postValue(Command.SendSms(telephoneNumber))
+        command.postValue(SendSms(telephoneNumber))
     }
 
     override fun urlChanged(url: String?) {
@@ -335,7 +339,7 @@ class BrowserTabViewModel(
         Schedulers.io().scheduleDirect {
             bookmarksDao.insert(BookmarkEntity(title = title, url = url))
         }
-        command.value = Command.DisplayMessage(R.string.bookmarkAddedFeedback)
+        command.value = DisplayMessage(R.string.bookmarkAddedFeedback)
     }
  
     fun onUserSelectedToEditQuery(query: String) {
@@ -356,7 +360,7 @@ class BrowserTabViewModel(
 
         return when (requiredAction) {
             is RequiredAction.DownloadFile -> {
-                command.value = Command.DownloadImage(requiredAction.url)
+                command.value = DownloadImage(requiredAction.url)
                 true
             }
             is RequiredAction.ShareLink -> {
@@ -379,12 +383,12 @@ class BrowserTabViewModel(
             findInPage = findInPage.copy(showNumberMatches = false)
         }
         viewState.value = currentViewState().copy(findInPage = findInPage)
-        command.value = Command.FindInPageCommand(searchTerm)
+        command.value = FindInPageCommand(searchTerm)
     }
 
     fun dismissFindInView() {
         viewState.value = currentViewState().copy(findInPage = FindInPage(visible = false))
-        command.value = Command.DismissFindInPage
+        command.value = DismissFindInPage
     }
 
     fun onFindResultsReceived(activeMatchOrdinal: Int, numberOfMatches: Int) {
@@ -408,9 +412,9 @@ class BrowserTabViewModel(
         if (desktopSiteRequested && url.isMobileSite) {
             val desktopUrl = url.toDesktopUri()
             Timber.i("Original URL $urlString - attempting $desktopUrl with desktop site UA string")
-            command.value = Command.Navigate(desktopUrl.toString())
+            command.value = Navigate(desktopUrl.toString())
         } else {
-            command.value = Command.Refresh
+            command.value = Refresh
         }
     }
 
@@ -420,7 +424,7 @@ class BrowserTabViewModel(
 
     fun userSharingLink(url: String?) {
         if (url != null) {
-            command.value = Command.ShareLink(url)
+            command.value = ShareLink(url)
         }
     }
 

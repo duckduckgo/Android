@@ -19,6 +19,7 @@ package com.duckduckgo.app.tabs
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.MutableLiveData
 import android.support.test.annotation.UiThreadTest
+import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.global.model.Site
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.verify
@@ -34,6 +35,10 @@ class TabDataRepositoryTest {
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @get:Rule
+    @Suppress("unused")
+    val schedulers = InstantSchedulersRule()
 
     @Mock
     private lateinit var mockDao: TabsDao

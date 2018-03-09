@@ -23,7 +23,7 @@ import android.support.annotation.WorkerThread
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteMonitor
 import com.duckduckgo.app.privacy.model.TermsOfService
-import org.jetbrains.anko.doAsync
+import io.reactivex.schedulers.Schedulers
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -47,23 +47,28 @@ class TabDataRepository @Inject constructor(val tabsDao: TabsDao) {
 
     private val data: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
 
-    fun addNewAndSelect(): String {
+    fun addNew(): String {
         val tabId = UUID.randomUUID().toString()
         add(tabId)
+        return tabId
+    }
+
+    fun addNewAndSelect(): String {
+        val tabId = addNew()
         select(tabId)
         return tabId
     }
 
     fun add(tabId: String, liveSiteData: MutableLiveData<Site> = MutableLiveData()) {
         this.data[tabId] = liveSiteData
-        doAsync {
+        Schedulers.io().scheduleDirect {
             tabsDao.insertTab(TabEntity(tabId, liveSiteData.value?.url))
         }
     }
 
     fun update(tabId: String) {
         val storedData = data[tabId]
-        doAsync {
+        Schedulers.io().scheduleDirect {
             if (tabsDao.tab(tabId) != null) {
                 tabsDao.updateTab(TabEntity(tabId, storedData?.value?.url, storedData?.value?.title))
             } else {
@@ -101,7 +106,7 @@ class TabDataRepository @Inject constructor(val tabsDao: TabsDao) {
     }
 
     fun select(tabId: String) {
-        doAsync {
+        Schedulers.io().scheduleDirect {
             tabsDao.updateSelectedTab(SelectedTabEntity(SELECTED_ENTITY_ID, tabId))
         }
     }

@@ -18,15 +18,13 @@ package com.duckduckgo.app.browser
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
-import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
+import com.duckduckgo.app.browser.BrowserViewModel.Command.*
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
 import com.duckduckgo.app.tabs.TabDataRepository
 import com.duckduckgo.app.tabs.TabEntity
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import java.util.*
 
 class BrowserViewModel(private val tabRepository: TabDataRepository) : ViewModel() {
 
@@ -37,20 +35,19 @@ class BrowserViewModel(private val tabRepository: TabDataRepository) : ViewModel
 
     sealed class Command {
         object Refresh : Command()
-        class Navigate(val url: String) : Command()
+        class NewTab(val query: String? = null) : Command()
+        class Query(val query: String) : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
-    lateinit var tabId: String
 
 
     init {
         viewState.value = ViewState()
-        loadInitialTab()
     }
 
-    fun loadInitialTab() {
+    fun loadInitialTab(): String {
         val tab: TabEntity? = try {
             Single.fromCallable { return@fromCallable tabRepository.selectedTab }
                 .subscribeOn(Schedulers.newThread())
@@ -59,15 +56,19 @@ class BrowserViewModel(private val tabRepository: TabDataRepository) : ViewModel
             null
         }
 
-        var id = tab?.tabId ?: tabRepository.addNewAndSelect()
-        tabId = id
-        tab?.url?.let {
-            command.value = Navigate(it)
+        if (tab != null) {
+            tabRepository.loadData(tab)
         }
+
+        return tab?.tabId ?: tabRepository.addNewAndSelect()
+    }
+
+    fun newSearchRequested() {
+        command.value = NewTab()
     }
 
     fun onSharedTextReceived(input: String) {
-        command.value = Navigate(input)
+        command.value = NewTab(input)
     }
 
     fun receivedDashboardResult(resultCode: Int) {

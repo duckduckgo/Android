@@ -65,7 +65,6 @@ class BrowserTabFragment : Fragment(), FindListener {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
-
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
     lateinit var userAgentProvider: UserAgentProvider
@@ -106,6 +105,11 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
     }
 
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_browser_tab, container, false)
     }
@@ -121,11 +125,12 @@ class BrowserTabFragment : Fragment(), FindListener {
         configureFindInPage()
         configureAutoComplete()
         addTextChangedListeners()
+        consumeSharedText()
     }
 
-    override fun onAttach(context: Context?) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
+    private fun consumeSharedText() {
+        val text = arguments?.getString(QUERY_EXTRA_ARG) ?: return
+        viewModel.onUserSubmittedQuery(text)
     }
 
     private fun createPopupMenu() {
@@ -165,8 +170,12 @@ class BrowserTabFragment : Fragment(), FindListener {
         })
     }
 
-    fun navigate(url: String) {
-        focusDummy.requestFocus()
+    fun submitQuery(query: String) {
+        viewModel.onUserSubmittedQuery(query)
+    }
+
+    private fun navigate(url: String) {
+        hideKeyboard()
         hideFindInPage()
         webView?.loadUrl(url)
     }
@@ -447,11 +456,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
-        webView = layoutInflater.inflate(
-            R.layout.include_duckduckgo_browser_webview,
-            webViewContainer,
-            true
-        ).findViewById(R.id.browserWebView) as WebView
+        webView = layoutInflater.inflate(R.layout.include_duckduckgo_browser_webview, webViewContainer, true).findViewById(R.id.browserWebView) as WebView
         webView?.let {
             userAgentProvider = UserAgentProvider(it.settings.userAgentString)
 
@@ -556,7 +561,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         webView?.restoreState(bundle)
     }
 
-    fun resetTabState() {
+    private fun resetTabState() {
         omnibarTextInput.text.clear()
         viewModel.resetView()
         destroyWebView()
@@ -594,11 +599,15 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         private const val TAB_ID_ARG = "TAB_ID_ARG"
         private const val ADD_BOOKMARK_FRAGMENT_TAG = "ADD_BOOKMARK"
+        private const val QUERY_EXTRA_ARG = "QUERY_EXTRA_ARG"
 
-        fun newInstance(tabId: String): BrowserTabFragment {
+        fun newInstance(tabId: String, query: String? = null): BrowserTabFragment {
             val fragment = BrowserTabFragment()
             val args = Bundle()
             args.putString(TAB_ID_ARG, tabId)
+            query.let {
+                args.putString(QUERY_EXTRA_ARG, query)
+            }
             fragment.setArguments(args)
             return fragment
         }

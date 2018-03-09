@@ -18,11 +18,12 @@ package com.duckduckgo.app.browser
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
-import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
+import com.duckduckgo.app.browser.BrowserViewModel.Command.NewTab
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.tabs.TabDataRepository
 import com.duckduckgo.app.tabs.TabsDao
+import com.nhaarman.mockito_kotlin.lastValue
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.verify
 import org.junit.After
@@ -65,11 +66,20 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenSharedTextReceivedThenNavigationTriggered() {
-        testee.onSharedTextReceived("http://example.com")
+    fun whenNewSearchRequestedThenNewTabTriggered() {
+        testee.newSearchRequested()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertNotNull(commandCaptor.value)
-        assertTrue(commandCaptor.value is Navigate)
+        assertTrue(commandCaptor.lastValue is NewTab)
+    }
+
+    @Test
+    fun whenSharedTextReceivedThenNewTabWithQueryTriggered() {
+        testee.onSharedTextReceived("example.com")
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertNotNull(commandCaptor.value)
+        val lastCommand = commandCaptor.lastValue as NewTab
+        assertEquals("example.com", lastCommand.query)
     }
 
     @Test
