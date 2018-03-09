@@ -22,11 +22,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.view.Menu
+import android.view.MenuItem
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import kotlinx.android.synthetic.main.content_tabs.*
 import kotlinx.android.synthetic.main.include_toolbar.*
+import org.jetbrains.anko.contentView
 import javax.inject.Inject
 
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitchedListener {
@@ -70,8 +73,23 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
         tabsAdapter.updateData(tabs)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_tab_switcher_activity, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.newTabMenuItem -> onNew()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onNew() {
-        repository.addNewAndSelect()
+        contentView?.post {
+            repository.addNewAndSelect()
+        }
+        finish()
     }
 
     override fun onSelect(tab: TabEntity) {
