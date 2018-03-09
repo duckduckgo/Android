@@ -17,10 +17,7 @@
 package com.duckduckgo.app.tabs
 
 import android.arch.lifecycle.LiveData
-import android.arch.persistence.room.Dao
-import android.arch.persistence.room.Insert
-import android.arch.persistence.room.OnConflictStrategy
-import android.arch.persistence.room.Query
+import android.arch.persistence.room.*
 import javax.inject.Singleton
 
 @Dao
@@ -47,6 +44,9 @@ interface TabsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTab(tab: TabEntity)
+
+    @Update
+    fun updateTab(tab: TabEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun updateSelectedTab(selectedTabEntity: SelectedTabEntity)

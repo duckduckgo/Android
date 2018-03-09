@@ -36,10 +36,6 @@ class TabDataRepository @Inject constructor(val tabsDao: TabsDao) {
 
     val liveSelectedTab: LiveData<SelectedTabEntity> = tabsDao.liveSelectedTab()
 
-    val tabs: List<TabEntity>
-        @WorkerThread
-        get() = tabsDao.tabs()
-
     val selectedTab: TabEntity?
         @WorkerThread
         get() {
@@ -68,7 +64,11 @@ class TabDataRepository @Inject constructor(val tabsDao: TabsDao) {
     fun update(tabId: String) {
         val storedData = data[tabId]
         doAsync {
-            tabsDao.insertTab(TabEntity(tabId, storedData?.value?.url))
+            if (tabsDao.tab(tabId) != null) {
+                tabsDao.updateTab(TabEntity(tabId, storedData?.value?.url, storedData?.value?.title))
+            } else {
+                tabsDao.insertTab(TabEntity(tabId, storedData?.value?.url, storedData?.value?.title))
+            }
         }
     }
 
@@ -77,11 +77,12 @@ class TabDataRepository @Inject constructor(val tabsDao: TabsDao) {
         if (storedData != null) {
             return
         }
-        val data = MutableLiveData<Site>()
+        val tabData = MutableLiveData<Site>()
         tab.url?.let {
             val monitor = SiteMonitor(it, TermsOfService())
             monitor.title = tab.title
-            data.value = monitor
+            tabData.value = monitor
+            data[tab.tabId] = tabData
         }
     }
 
