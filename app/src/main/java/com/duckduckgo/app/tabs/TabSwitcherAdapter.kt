@@ -16,17 +16,20 @@
 
 package com.duckduckgo.app.tabs
 
+import android.content.Context
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.RecyclerView.Adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.tabs.TabSwitcherAdapter.TabViewHolder
 import kotlinx.android.synthetic.main.item_tab.view.*
 
-class TabSwitcherAdapter(private val itemClickListener: TabSwitchedListener) :
-    RecyclerView.Adapter<TabSwitcherAdapter.TabViewHolder>() {
+class TabSwitcherAdapter(private val context: Context, private val itemClickListener: TabSwitchedListener) : Adapter<TabViewHolder>() {
 
     private var data: List<TabEntity> = ArrayList()
 
@@ -42,8 +45,13 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitchedListener) :
 
     override fun onBindViewHolder(holder: TabViewHolder, position: Int) {
         val tab = data[position]
-        holder.title.text = tab?.title ?: ""
-        holder.url.text = tab?.url ?: ""
+        if (tab.title == null && tab.url == null) {
+            holder.title.text = context.getText(R.string.homeTab)
+            holder.url.text = AppUrl.Url.HOME
+        } else {
+            holder.title.text = tab.title ?: ""
+            holder.url.text = tab.url ?: ""
+        }
         holder.root.setOnClickListener {
             itemClickListener.onSelect(tab)
         }

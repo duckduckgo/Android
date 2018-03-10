@@ -39,18 +39,15 @@ import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.global.model.SiteMonitor
+import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.model.PrivacyGrade
-import com.duckduckgo.app.privacy.model.TermsOfService
 import com.duckduckgo.app.privacy.model.improvedGrade
-import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.tabs.TabDataRepository
-import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -62,8 +59,7 @@ class BrowserTabViewModel(
     private val statisticsUpdater: StatisticsUpdater,
     private val queryUrlConverter: OmnibarEntryConverter,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-    private val termsOfServiceStore: TermsOfServiceStore,
-    private val trackerNetworks: TrackerNetworks,
+    private val siteFactory: SiteFactory,
     private val tabRepository: TabDataRepository,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
@@ -137,7 +133,7 @@ class BrowserTabViewModel(
     fun load(tabId: String) {
         this.tabId = tabId
         siteLiveData = tabRepository.retrieve(tabId)
-        site = siteLiveData?.value
+        site = siteLiveData.value
         val url = site?.url
         if (url != null) {
             command.value = Navigate(url)
@@ -271,10 +267,7 @@ class BrowserTabViewModel(
             statisticsUpdater.refreshRetentionAtb()
         }
         viewState.value = newViewState
-
-        val terms = termsOfServiceStore.retrieveTerms(url) ?: TermsOfService()
-        val memberNetwork = trackerNetworks.network(url)
-        site = SiteMonitor(url, terms, memberNetwork)
+        site = siteFactory.build(url)
         onSiteChanged()
     }
 
@@ -300,9 +293,9 @@ class BrowserTabViewModel(
     }
 
     private fun onSiteChanged() {
+        siteLiveData.postValue(site)
         privacyGrade.postValue(site?.improvedGrade)
-        siteLiveData?.postValue(site)
-        tabRepository.update(tabId)
+        tabRepository.update(tabId, site)
     }
 
     private fun currentViewState(): ViewState = viewState.value!!
@@ -341,7 +334,7 @@ class BrowserTabViewModel(
         }
         command.value = DisplayMessage(R.string.bookmarkAddedFeedback)
     }
- 
+
     fun onUserSelectedToEditQuery(query: String) {
         viewState.value = currentViewState().copy(
             isEditing = false,
@@ -419,6 +412,8 @@ class BrowserTabViewModel(
     }
 
     fun resetView() {
+        site = null
+        onSiteChanged()
         viewState.value = ViewState()
     }
 

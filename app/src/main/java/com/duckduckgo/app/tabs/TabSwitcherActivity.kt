@@ -43,7 +43,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     private val viewModel: TabSwitcherViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(TabSwitcherViewModel::class.java)
     }
-    private val tabsAdapter = TabSwitcherAdapter(this)
+    private val tabsAdapter = TabSwitcherAdapter(this, this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,7 +87,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
 
     override fun onNew() {
         contentView?.post {
-            repository.addNewAndSelect()
+            val tabId = repository.addNew()
+            repository.select(tabId)
         }
         finish()
     }

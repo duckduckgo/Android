@@ -39,6 +39,7 @@ import com.duckduckgo.app.privacy.ui.ScorecardViewModel
 import com.duckduckgo.app.privacy.ui.TrackerNetworksViewModel
 import com.duckduckgo.app.settings.SettingsViewModel
 import com.duckduckgo.app.global.db.AppConfigurationDao
+import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.tabs.TabSwitcherViewModel
@@ -54,8 +55,7 @@ class ViewModelFactory @Inject constructor(
         private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
         private val tabRepository: TabDataRepository,
         private val privacySettingsStore: PrivacySettingsSharedPreferences,
-        private val termsOfServiceStore: TermsOfServiceStore,
-        private val trackerNetworks: TrackerNetworks,
+        private val siteFactory: SiteFactory,
         private val stringResolver: StringResolver,
         private val appConfigurationDao: AppConfigurationDao,
         private val networkLeaderboardDao: NetworkLeaderboardDao,
@@ -87,8 +87,7 @@ class ViewModelFactory @Inject constructor(
             statisticsUpdater = statisticsUpdater,
             queryUrlConverter = queryUrlConverter,
             duckDuckGoUrlDetector = duckDuckGoUrlDetector,
-            termsOfServiceStore = termsOfServiceStore,
-            trackerNetworks = trackerNetworks,
+            siteFactory = siteFactory,
             tabRepository = tabRepository,
             networkLeaderboardDao = networkLeaderboardDao,
             bookmarksDao = bookmarksDao,

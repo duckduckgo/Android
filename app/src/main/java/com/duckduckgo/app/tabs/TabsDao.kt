@@ -40,7 +40,7 @@ interface TabsDao {
     fun selectedTab(): SelectedTabEntity
 
     @Query("select * from tabs where tabId = :tabId")
-    fun tab(tabId: String): TabEntity
+    fun tab(tabId: String): TabEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTab(tab: TabEntity)

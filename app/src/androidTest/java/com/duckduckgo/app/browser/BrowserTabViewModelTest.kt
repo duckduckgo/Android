@@ -36,6 +36,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.NetworkPercent
@@ -129,13 +130,14 @@ class BrowserTabViewModelTest {
                 .build()
         appConfigurationDao = db.appConfigurationDao()
 
+        val siteFactory = SiteFactory(mockTermsOfServiceStore, TrackerNetworks())
+
         testee = BrowserTabViewModel(
                 statisticsUpdater = mockStatisticsUpdater,
                 queryUrlConverter = mockOmnibarConverter,
                 duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
-                termsOfServiceStore = mockTermsOfServiceStore,
-                trackerNetworks = TrackerNetworks(),
-                tabRepository = TabDataRepository(tabsDao),
+                siteFactory = siteFactory,
+                tabRepository = TabDataRepository(tabsDao, siteFactory),
                 networkLeaderboardDao = testNetworkLeaderboardDao,
                 autoCompleteApi = mockAutoCompleteApi,
                 appSettingsPreferencesStore = mockSettingsStore,

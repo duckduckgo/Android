@@ -20,9 +20,12 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
 import com.duckduckgo.app.browser.BrowserViewModel.Command.NewTab
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
+import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.tabs.TabDataRepository
 import com.duckduckgo.app.tabs.TabsDao
+import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.nhaarman.mockito_kotlin.lastValue
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.verify
@@ -46,7 +49,10 @@ class BrowserViewModelTest {
     private lateinit var mockCommandObserver: Observer<BrowserViewModel.Command>
 
     @Mock
-    private lateinit var tabsDao: TabsDao
+    private lateinit var mockTabsDao: TabsDao
+
+    @Mock
+    private lateinit var mockTermsOfServiceStore: TermsOfServiceStore
 
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<BrowserViewModel.Command>
@@ -56,7 +62,8 @@ class BrowserViewModelTest {
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        testee = BrowserViewModel(TabDataRepository(tabsDao))
+        val siteFactory = SiteFactory(mockTermsOfServiceStore, TrackerNetworks())
+        testee = BrowserViewModel(TabDataRepository(mockTabsDao, siteFactory))
         testee.command.observeForever(mockCommandObserver)
     }
 

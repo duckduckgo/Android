@@ -21,8 +21,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.support.annotation.WorkerThread
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.global.model.SiteMonitor
-import com.duckduckgo.app.privacy.model.TermsOfService
+import com.duckduckgo.app.global.model.SiteFactory
 import io.reactivex.schedulers.Schedulers
 import java.util.*
 import javax.inject.Inject
@@ -30,7 +29,7 @@ import javax.inject.Singleton
 
 
 @Singleton
-class TabDataRepository @Inject constructor(val tabsDao: TabsDao) {
+class TabDataRepository @Inject constructor(val tabsDao: TabsDao, val siteFactory: SiteFactory) {
 
     val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs()
 
@@ -45,57 +44,50 @@ class TabDataRepository @Inject constructor(val tabsDao: TabsDao) {
             return null
         }
 
-    private val data: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
+    private val siteData: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
 
     fun addNew(): String {
         val tabId = UUID.randomUUID().toString()
-        add(tabId)
+        add(tabId, MutableLiveData<Site>())
         return tabId
     }
 
-    fun addNewAndSelect(): String {
-        val tabId = addNew()
-        select(tabId)
-        return tabId
-    }
-
-    fun add(tabId: String, liveSiteData: MutableLiveData<Site> = MutableLiveData()) {
-        this.data[tabId] = liveSiteData
+    fun add(tabId: String, data: MutableLiveData<Site>) {
+        siteData[tabId] = data
         Schedulers.io().scheduleDirect {
-            tabsDao.insertTab(TabEntity(tabId, liveSiteData.value?.url))
+            tabsDao.insertTab(TabEntity(tabId, data.value?.url, data.value?.title))
         }
     }
 
-    fun update(tabId: String) {
-        val storedData = data[tabId]
+    fun update(tabId: String, site: Site?) {
         Schedulers.io().scheduleDirect {
             if (tabsDao.tab(tabId) != null) {
-                tabsDao.updateTab(TabEntity(tabId, storedData?.value?.url, storedData?.value?.title))
+                tabsDao.updateTab(TabEntity(tabId, site?.url, site?.title))
             } else {
-                tabsDao.insertTab(TabEntity(tabId, storedData?.value?.url, storedData?.value?.title))
+                tabsDao.insertTab(TabEntity(tabId, site?.url, site?.title))
             }
         }
     }
 
     fun loadData(tab: TabEntity) {
-        val storedData = data[tab.tabId]
+        val storedData = siteData[tab.tabId]
         if (storedData != null) {
             return
         }
         val tabData = MutableLiveData<Site>()
-        tab.url?.let {
-            val monitor = SiteMonitor(it, TermsOfService())
-            monitor.title = tab.title
+        val url = tab.url
+        if (url != null) {
+            val monitor = siteFactory.build(url, tab.title)
             tabData.value = monitor
-            data[tab.tabId] = tabData
         }
+        siteData[tab.tabId] = tabData
     }
 
     /**
      * Returns record if it exists, otherwise creates and returns a new one
      */
     fun retrieve(tabId: String): MutableLiveData<Site> {
-        val storedData = data[tabId]
+        val storedData = siteData[tabId]
         if (storedData != null) {
             return storedData
         }
