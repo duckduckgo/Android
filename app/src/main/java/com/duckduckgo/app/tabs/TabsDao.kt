@@ -48,6 +48,9 @@ interface TabsDao {
     @Update
     fun updateTab(tab: TabEntity)
 
+    @Delete
+    fun deleteTab(tab: TabEntity)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun updateSelectedTab(selectedTabEntity: SelectedTabEntity)
 }

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.tabs
 
 import android.content.Context
+import android.net.Uri
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.LayoutInflater
@@ -36,7 +37,7 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): TabViewHolder {
         var inflater = LayoutInflater.from(parent!!.context)
         val root = inflater.inflate(R.layout.item_tab, parent, false)
-        return TabViewHolder(root, root.favicon, root.title, root.url)
+        return TabViewHolder(root, root.favicon, root.title, root.url, root.close)
     }
 
     override fun getItemCount(): Int {
@@ -49,11 +50,14 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
             holder.title.text = context.getText(R.string.homeTab)
             holder.url.text = AppUrl.Url.HOME
         } else {
-            holder.title.text = tab.title ?: ""
             holder.url.text = tab.url ?: ""
+            holder.title.text = tab.title ?: Uri.parse(tab.url).host ?: ""
         }
         holder.root.setOnClickListener {
             itemClickListener.onSelect(tab)
+        }
+        holder.close.setOnClickListener {
+            itemClickListener.onDelete(tab)
         }
     }
 
@@ -72,6 +76,7 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
         val root: View,
         val favicon: ImageView,
         val title: TextView,
-        val url: TextView
+        val url: TextView,
+        val close: ImageView
     ) : RecyclerView.ViewHolder(root)
 }

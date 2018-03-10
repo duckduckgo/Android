@@ -97,6 +97,14 @@ class TabDataRepository @Inject constructor(val tabsDao: TabsDao, val siteFactor
         return data
     }
 
+    fun delete(tab: TabEntity) {
+        Schedulers.io().scheduleDirect {
+            tabsDao.deleteTab(tab)
+        }
+        siteData.remove(tab.tabId)
+        //TODO delete fragment too
+    }
+
     fun select(tabId: String) {
         Schedulers.io().scheduleDirect {
             tabsDao.updateSelectedTab(SelectedTabEntity(SELECTED_ENTITY_ID, tabId))

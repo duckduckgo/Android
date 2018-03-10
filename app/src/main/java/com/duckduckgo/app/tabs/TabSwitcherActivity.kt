@@ -100,7 +100,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     }
 
     override fun onDelete(tab: TabEntity) {
-        finish()
+        repository.delete(tab)
     }
 
     companion object {

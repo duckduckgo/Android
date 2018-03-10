@@ -52,6 +52,8 @@
     <string name="tabsMenuItem">Tabs</string>
     <string name="newTabMenuItem">New Tab</string>
     <string name="faviconContentDescription">Favicon</string>
+    <string name="closeContentDescription">Close</string>
+
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>

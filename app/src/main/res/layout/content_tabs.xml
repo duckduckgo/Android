@@ -18,10 +18,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginBottom="10dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:ignore="Overdraw"
     tools:showIn="@layout/activity_tabs">
-
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/tabsRecycler"
