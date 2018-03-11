@@ -35,7 +35,6 @@ import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
@@ -49,6 +48,7 @@ import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
+import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
 import javax.inject.Inject
@@ -83,10 +83,10 @@ class BrowserTabFragment : Fragment(), FindListener {
         get() = activity as? BrowserActivity
 
     private val privacyGradeMenu: MenuItem?
-        get() = toolbar.menu.findItem(R.id.privacy_dashboard_menu_item)
+        get() = toolbar.menu.findItem(R.id.privacyDashboard)
 
     private val fireMenu: MenuItem?
-        get() = toolbar.menu.findItem(R.id.fire_menu_item)
+        get() = toolbar.menu.findItem(R.id.fire)
 
     private var webView: WebView? = null
 
@@ -206,7 +206,7 @@ class BrowserTabFragment : Fragment(), FindListener {
                 startActivity(intent)
             }
             Command.ShowKeyboard -> {
-                omnibarTextInput.postDelayed({ omnibarTextInput.showKeyboard() }, 300)
+                omnibarTextInput.postDelayed({ omnibarTextInput?.showKeyboard() }, 100)
             }
             Command.HideKeyboard -> {
                 hideKeyboard()
@@ -230,7 +230,7 @@ class BrowserTabFragment : Fragment(), FindListener {
     }
 
     private fun showToast(messageId: Int) {
-        Toast.makeText(context, messageId, Toast.LENGTH_LONG).show()
+        context?.applicationContext?.longToast(messageId)
     }
 
     private fun configureAutoComplete() {
@@ -267,7 +267,7 @@ class BrowserTabFragment : Fragment(), FindListener {
             omnibarTextInput.setText(viewState.omnibarText)
 
             // ensures caret sits at the end of the query
-            omnibarTextInput.post { omnibarTextInput.setSelection(omnibarTextInput.text.length) }
+            omnibarTextInput.post { omnibarTextInput?.setSelection(omnibarTextInput.text.length) }
             appBarLayout.setExpanded(true, true)
         }
 
@@ -333,7 +333,7 @@ class BrowserTabFragment : Fragment(), FindListener {
     private fun showFindInPageView(viewState: FindInPage) {
         if (findInPageContainer.visibility != View.VISIBLE) {
             findInPageContainer.show()
-            findInPageInput.postDelayed({ findInPageInput.showKeyboard() }, 300)
+            findInPageInput.postDelayed({ findInPageInput?.showKeyboard() }, 300)
         }
 
         when (viewState.showNumberMatches) {
@@ -364,15 +364,15 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private fun showClearButton() {
         omnibarTextInput.post {
-            clearOmnibarInputButton.show()
-            omnibarTextInput.updatePadding(paddingEnd = 40.toPx())
+            clearOmnibarInputButton?.show()
+            omnibarTextInput?.updatePadding(paddingEnd = 40.toPx())
         }
     }
 
     private fun hideClearButton() {
         omnibarTextInput.post {
-            clearOmnibarInputButton.hide()
-            omnibarTextInput.updatePadding(paddingEnd = 10.toPx())
+            clearOmnibarInputButton?.hide()
+            omnibarTextInput?.updatePadding(paddingEnd = 10.toPx())
         }
     }
 
@@ -384,15 +384,15 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.privacy_dashboard_menu_item -> {
+                R.id.privacyDashboard -> {
                     browserActivity?.launchPrivacyDashboard()
                     return@setOnMenuItemClickListener true
                 }
-                R.id.fire_menu_item -> {
+                R.id.fire -> {
                     browserActivity?.launchFire()
                     return@setOnMenuItemClickListener true
                 }
-                R.id.browser_popup_menu_item -> {
+                R.id.browserPopup -> {
                     launchPopupMenu()
                     return@setOnMenuItemClickListener true
                 }
@@ -561,12 +561,19 @@ class BrowserTabFragment : Fragment(), FindListener {
         webView?.restoreState(bundle)
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            viewModel.onViewVisible()
+        }
+    }
+
     private fun resetTabState() {
         omnibarTextInput.text.clear()
         viewModel.resetView()
         destroyWebView()
         configureWebView()
-        omnibarTextInput.postDelayed({ omnibarTextInput.showKeyboard() }, 300)
+        omnibarTextInput.postDelayed({ omnibarTextInput?.showKeyboard() }, 300)
     }
 
     fun onBackPressed(): Boolean {

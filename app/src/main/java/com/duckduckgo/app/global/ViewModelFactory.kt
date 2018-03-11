@@ -30,9 +30,8 @@ import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
-import com.duckduckgo.app.tabs.TabDataRepository
+import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.privacy.store.PrivacySettingsSharedPreferences
-import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel
 import com.duckduckgo.app.privacy.ui.PrivacyPracticesViewModel
 import com.duckduckgo.app.privacy.ui.ScorecardViewModel
@@ -42,27 +41,26 @@ import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
-import com.duckduckgo.app.tabs.TabSwitcherViewModel
-import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel
 import javax.inject.Inject
 
 
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory @Inject constructor(
-        private val statisticsUpdater: StatisticsUpdater,
-        private val onboaringStore: OnboardingStore,
-        private val queryUrlConverter: QueryUrlConverter,
-        private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-        private val tabRepository: TabDataRepository,
-        private val privacySettingsStore: PrivacySettingsSharedPreferences,
-        private val siteFactory: SiteFactory,
-        private val stringResolver: StringResolver,
-        private val appConfigurationDao: AppConfigurationDao,
-        private val networkLeaderboardDao: NetworkLeaderboardDao,
-        private val bookmarksDao: BookmarksDao,
-        private val autoCompleteApi: AutoCompleteApi,
-        private val appSettingsPreferencesStore: SettingsDataStore,
-        private val webViewLongPressHandler: LongPressHandler
+    private val statisticsUpdater: StatisticsUpdater,
+    private val onboaringStore: OnboardingStore,
+    private val queryUrlConverter: QueryUrlConverter,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    private val tabRepository: TabDataRepository,
+    private val privacySettingsStore: PrivacySettingsSharedPreferences,
+    private val siteFactory: SiteFactory,
+    private val stringResolver: StringResolver,
+    private val appConfigurationDao: AppConfigurationDao,
+    private val networkLeaderboardDao: NetworkLeaderboardDao,
+    private val bookmarksDao: BookmarksDao,
+    private val autoCompleteApi: AutoCompleteApi,
+    private val appSettingsPreferencesStore: SettingsDataStore,
+    private val webViewLongPressHandler: LongPressHandler
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =

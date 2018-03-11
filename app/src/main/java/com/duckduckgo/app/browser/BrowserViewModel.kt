@@ -22,8 +22,8 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command.NewTab
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
-import com.duckduckgo.app.tabs.TabDataRepository
-import com.duckduckgo.app.tabs.TabEntity
+import com.duckduckgo.app.tabs.model.TabDataRepository
+import com.duckduckgo.app.tabs.model.TabEntity
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 
@@ -43,28 +43,8 @@ class BrowserViewModel(private val tabRepository: TabDataRepository) : ViewModel
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-
     init {
         viewState.value = ViewState()
-    }
-
-    fun loadInitialTab(): String {
-        val tab: TabEntity? = try {
-            Single.fromCallable { return@fromCallable tabRepository.selectedTab }
-                .subscribeOn(Schedulers.newThread())
-                .blockingGet()
-        } catch (e: Exception) {
-            null
-        }
-
-        if (tab == null) {
-            val tabId = tabRepository.addNew()
-            tabRepository.select(tabId)
-            return tabId
-        }
-
-        tabRepository.loadData(tab)
-        return tab.tabId
     }
 
     fun newSearchRequested() {
@@ -73,6 +53,13 @@ class BrowserViewModel(private val tabRepository: TabDataRepository) : ViewModel
 
     fun onSharedTextReceived(input: String) {
         command.value = NewTab(input)
+    }
+
+    fun onTabsUpdated(tabs: List<TabEntity>?) {
+        if (tabs == null || tabs.isEmpty()) {
+            command.value = NewTab()
+            return
+        }
     }
 
     fun receivedDashboardResult(resultCode: Int) {

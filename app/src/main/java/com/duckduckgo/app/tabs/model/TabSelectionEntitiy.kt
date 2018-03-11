@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs
+package com.duckduckgo.app.tabs.model
 
 import android.arch.persistence.room.Entity
+import android.arch.persistence.room.ForeignKey
 import android.arch.persistence.room.Index
 import android.arch.persistence.room.PrimaryKey
 
 
 @Entity(
-    tableName = "tabs",
+    tableName = "tab_selection",
+    foreignKeys = [
+        ForeignKey(
+            entity = TabEntity::class,
+            parentColumns = ["tabId"],
+            childColumns = ["tabId"],
+            onDelete = ForeignKey.SET_NULL
+        )],
     indices = [
         Index("tabId")
     ]
 )
-data class TabEntity(
-    @PrimaryKey var tabId: String,
-    var url: String? = null,
-    var title: String? = null
-)
+data class TabSelectionEntity(@PrimaryKey var id: Int = 1, var tabId: String?)

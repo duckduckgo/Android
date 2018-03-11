@@ -44,8 +44,8 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
-import com.duckduckgo.app.tabs.TabDataRepository
-import com.duckduckgo.app.tabs.TabsDao
+import com.duckduckgo.app.tabs.model.TabDataRepository
+import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -159,6 +159,22 @@ class BrowserTabViewModelTest {
         db.close()
         testee.url.removeObserver(mockQueryObserver)
         testee.command.removeObserver(mockCommandObserver)
+    }
+
+    @Test
+    fun whenViewBecomesVisibleWithActiveSiteThenKeyboardHidden() {
+        testee.url.value = "http://exmaple.com"
+        testee.onViewVisible()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.HideKeyboard)
+    }
+
+    @Test
+    fun whenViewBecomesVisibleWithoutActiveSiteThenKeyboardNotHidden() {
+        testee.url.value = null
+        testee.onViewVisible()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.none { it is Command.HideKeyboard })
     }
 
     @Test

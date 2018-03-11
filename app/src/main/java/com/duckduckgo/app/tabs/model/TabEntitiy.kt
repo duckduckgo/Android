@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs
+package com.duckduckgo.app.tabs.model
 
 import android.arch.persistence.room.Entity
+import android.arch.persistence.room.Index
 import android.arch.persistence.room.PrimaryKey
 
 
-@Entity(tableName = "selected_tab")
-data class SelectedTabEntity(
-    @PrimaryKey var id: Int,
-    var tabId: String? = null
+@Entity(
+    tableName = "tabs",
+    indices = [
+        Index("tabId")
+    ]
+)
+data class TabEntity(
+    @PrimaryKey var tabId: String,
+    var url: String? = null,
+    var title: String? = null
 )

@@ -23,8 +23,8 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
-import com.duckduckgo.app.tabs.TabDataRepository
-import com.duckduckgo.app.tabs.TabsDao
+import com.duckduckgo.app.tabs.model.TabDataRepository
+import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.nhaarman.mockito_kotlin.lastValue
 import com.nhaarman.mockito_kotlin.never

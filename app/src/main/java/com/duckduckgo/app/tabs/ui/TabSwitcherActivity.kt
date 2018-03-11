@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs
+package com.duckduckgo.app.tabs.ui
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
@@ -27,9 +27,13 @@ import android.view.MenuItem
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
-import kotlinx.android.synthetic.main.content_tabs.*
+import com.duckduckgo.app.global.view.FireDialog
+import com.duckduckgo.app.tabs.model.TabDataRepository
+import com.duckduckgo.app.tabs.model.TabEntity
+import kotlinx.android.synthetic.main.content_tab_switcher.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import org.jetbrains.anko.contentView
+import org.jetbrains.anko.toast
 import javax.inject.Inject
 
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitchedListener {
@@ -47,7 +51,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_tabs)
+        setContentView(R.layout.activity_tab_switcher)
         configureToolbar()
         configureRecycler()
         configureObservers()
@@ -80,27 +84,47 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.newTabMenuItem -> onNew()
+            R.id.fire -> onFire()
+            R.id.newTab -> onNew()
         }
         return super.onOptionsItemSelected(item)
     }
 
+    private fun onFire() {
+        FireDialog(context = this,
+            clearStarted = { onDataCleared() },
+            clearComplete = { applicationContext.toast(R.string.fireDataCleared) }
+        ).show()
+    }
+
+    private fun onDataCleared() {
+        repository.deleteAll()
+        finish()
+    }
+
     override fun onNew() {
         contentView?.post {
-            val tabId = repository.addNew()
-            repository.select(tabId)
+            repository.addNew()
         }
         finish()
     }
 
     override fun onSelect(tab: TabEntity) {
-        repository.loadData(tab)
         repository.select(tab.tabId)
         finish()
     }
 
     override fun onDelete(tab: TabEntity) {
         repository.delete(tab)
+    }
+
+    override fun finish() {
+        clearObserversEarlyToStopViewUpdates()
+        super.finish()
+    }
+
+    private fun clearObserversEarlyToStopViewUpdates() {
+        repository.liveTabs.removeObservers(this)
     }
 
     companion object {

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "3bf232fd5c556d2dee82a19d5a2702c0",
+    "identityHash": "d95e3ecc049203a49fdd433255c44af0",
     "entities": [
       {
         "tableName": "https_upgrade_domain",
@@ -157,8 +157,8 @@
         "foreignKeys": []
       },
       {
-        "tableName": "selected_tab",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `tabId` TEXT, PRIMARY KEY(`id`))",
+        "tableName": "tab_selection",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `tabId` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`tabId`) REFERENCES `tabs`(`tabId`) ON UPDATE NO ACTION ON DELETE SET NULL )",
         "fields": [
           {
             "fieldPath": "id",
@@ -179,8 +179,29 @@
           ],
           "autoGenerate": false
         },
-        "indices": [],
-        "foreignKeys": []
+        "indices": [
+          {
+            "name": "index_tab_selection_tabId",
+            "unique": false,
+            "columnNames": [
+              "tabId"
+            ],
+            "createSql": "CREATE  INDEX `index_tab_selection_tabId` ON `${TABLE_NAME}` (`tabId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "tabs",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "tabId"
+            ],
+            "referencedColumns": [
+              "tabId"
+            ]
+          }
+        ]
       },
       {
         "tableName": "bookmarks",
@@ -217,7 +238,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"3bf232fd5c556d2dee82a19d5a2702c0\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"d95e3ecc049203a49fdd433255c44af0\")"
     ]
   }
 }

@@ -32,7 +32,6 @@ import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat.requestPermissions
 import android.support.v4.content.ContextCompat.checkSelfPermission
 import android.webkit.URLUtil
-import android.widget.Toast
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.*
@@ -42,9 +41,11 @@ import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
-import com.duckduckgo.app.tabs.TabDataRepository
-import com.duckduckgo.app.tabs.TabSwitcherActivity
+import com.duckduckgo.app.tabs.model.TabDataRepository
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
+import org.jetbrains.anko.longToast
 import org.jetbrains.anko.toast
 import timber.log.Timber
 import javax.inject.Inject
@@ -70,11 +71,10 @@ class BrowserActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_browser)
-        configureObservers()
-        if (savedInstanceState == null && launchNewSearchOrQuery(intent)) {
-            return
+        if (savedInstanceState == null) {
+            launchNewSearchOrQuery(intent)
         }
-        launchWithLastSavedTab()
+        configureObservers()
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -82,23 +82,11 @@ class BrowserActivity : DuckDuckGoActivity() {
         launchNewSearchOrQuery(intent)
     }
 
-    private fun launchWithLastSavedTab() {
-        var fragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer) as? BrowserTabFragment
-        if (fragment == null) {
-            val tabId = viewModel.loadInitialTab()
-            fragment = BrowserTabFragment.newInstance(tabId)
-            val transaction = supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.fragmentContainer, fragment, tabId)
-            transaction.commit()
-        }
-        currentTab = fragment
-    }
-
     private fun openNewTab(tabId: String, userQuery: String? = null) {
         var previousFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer) as? BrowserTabFragment
         val fragment = BrowserTabFragment.newInstance(tabId, userQuery)
         val transaction = supportFragmentManager.beginTransaction()
-        if(previousFragment == null) {
+        if (previousFragment == null) {
             transaction.replace(R.id.fragmentContainer, fragment, tabId)
         } else {
             transaction.hide(currentTab)
@@ -108,42 +96,46 @@ class BrowserActivity : DuckDuckGoActivity() {
         currentTab = fragment
     }
 
-    private fun selectTab(tabId: String) {
+    private fun selectTab(tab: TabEntity?) {
 
-        if (currentTab?.tabId == tabId) {
-            return
-        }
+        if (tab == null) return
 
-        val fragment = supportFragmentManager.findFragmentByTag(tabId) as? BrowserTabFragment
+        if (tab.tabId == currentTab?.tabId) return
+
+        val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
         if (fragment == null) {
-            openNewTab(tabId)
+            openNewTab(tab.tabId, tab?.url)
             return
         }
         val transaction = supportFragmentManager.beginTransaction()
-        transaction.hide(currentTab)
+        currentTab?.let {
+            transaction.hide(it)
+        }
         transaction.show(fragment)
         transaction.commit()
         currentTab = fragment
     }
 
+    private fun removeTabs(fragments: List<BrowserTabFragment>) {
+        val transaction = supportFragmentManager.beginTransaction()
+        fragments.forEach { transaction.remove(it) }
+        transaction.commit()
+    }
 
-    private fun launchNewSearchOrQuery(intent: Intent?) : Boolean {
+    private fun launchNewSearchOrQuery(intent: Intent?) {
         if (intent == null) {
-            return false
+            return
         }
 
         if (launchNewSearch(intent)) {
             viewModel.newSearchRequested()
-            return true
+            return
         }
 
         val sharedText = intent.intentText
         if (sharedText != null) {
             viewModel.onSharedTextReceived(sharedText)
-            return true
         }
-
-        return false
     }
 
     private fun configureObservers() {
@@ -151,10 +143,25 @@ class BrowserActivity : DuckDuckGoActivity() {
             processCommand(it)
         })
         repository.liveSelectedTab.observe(this, Observer {
-            it?.tabId?.let {
-                selectTab(it)
-            }
+            selectTab(it)
         })
+        repository.liveTabs.observe(this, Observer {
+            viewModel.onTabsUpdated(it)
+            clearStaleTabs(it)
+        })
+    }
+
+    private fun clearStaleTabs(tabs: List<TabEntity>?) {
+        tabs ?: return
+
+        val stale = supportFragmentManager.fragments
+            .map { it as? BrowserTabFragment }
+            .filterNotNull()
+            .filter { fragment -> tabs.none { it.tabId == fragment.tabId } }
+
+        if (stale.isNotEmpty()) {
+            removeTabs(stale)
+        }
     }
 
     private fun processCommand(it: Command?) {
@@ -177,7 +184,7 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     fun launchFire() {
         FireDialog(context = this,
-            clearStarted = { resetActivityState() },
+            clearStarted = { repository.deleteAll() },
             clearComplete = { applicationContext.toast(R.string.fireDataCleared) }
         ).show()
     }
@@ -189,7 +196,6 @@ class BrowserActivity : DuckDuckGoActivity() {
     fun launchNewTab(query: String? = null) {
         val tabId = repository.addNew()
         openNewTab(tabId, query)
-        repository.select(tabId)
     }
 
     fun launchSettings() {
@@ -232,7 +238,7 @@ class BrowserActivity : DuckDuckGoActivity() {
             val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             manager.enqueue(request)
             pendingFileDownload = null
-            Toast.makeText(applicationContext, getString(R.string.webviewDownload), Toast.LENGTH_LONG).show()
+            applicationContext.longToast(getString(R.string.webviewDownload))
         }
     }
 
@@ -266,10 +272,6 @@ class BrowserActivity : DuckDuckGoActivity() {
         if (!(currentTab?.onBackPressed() ?: false)) {
             super.onBackPressed()
         }
-    }
-
-    private fun resetActivityState() {
-        //TODO clear repo and all tabs
     }
 
     private data class PendingFileDownload(

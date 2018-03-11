@@ -47,7 +47,7 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.improvedGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
-import com.duckduckgo.app.tabs.TabDataRepository
+import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -128,18 +128,13 @@ class BrowserTabViewModel(
         viewState.value = ViewState()
         appConfigurationObservable.observeForever(appConfigurationObserver)
         configureAutoComplete()
+        command.value = ShowKeyboard
     }
 
     fun load(tabId: String) {
         this.tabId = tabId
-        siteLiveData = tabRepository.retrieve(tabId)
+        siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
-        val url = site?.url
-        if (url != null) {
-            command.value = Navigate(url)
-        } else {
-            command.value = ShowKeyboard
-        }
     }
 
     private fun configureAutoComplete() {
@@ -170,6 +165,12 @@ class BrowserTabViewModel(
     fun registerWebViewListener(browserWebViewClient: BrowserWebViewClient, browserChromeClient: BrowserChromeClient) {
         browserWebViewClient.webViewClientListener = this
         browserChromeClient.webViewClientListener = this
+    }
+
+    fun onViewVisible() {
+        if (url.value != null) {
+            command.value = HideKeyboard
+        }
     }
 
     fun onUserSubmittedQuery(input: String) {

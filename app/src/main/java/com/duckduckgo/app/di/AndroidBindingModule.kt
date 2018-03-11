@@ -27,7 +27,7 @@ import com.duckduckgo.app.privacy.ui.PrivacyPracticesActivity
 import com.duckduckgo.app.privacy.ui.ScorecardActivity
 import com.duckduckgo.app.privacy.ui.TrackerNetworksActivity
 import com.duckduckgo.app.settings.SettingsActivity
-import com.duckduckgo.app.tabs.TabSwitcherActivity
+import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 

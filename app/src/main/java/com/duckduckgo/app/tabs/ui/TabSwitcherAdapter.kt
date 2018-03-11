@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs
+package com.duckduckgo.app.tabs.ui
 
 import android.content.Context
 import android.net.Uri
@@ -27,7 +27,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.AppUrl
-import com.duckduckgo.app.tabs.TabSwitcherAdapter.TabViewHolder
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
 import kotlinx.android.synthetic.main.item_tab.view.*
 
 class TabSwitcherAdapter(private val context: Context, private val itemClickListener: TabSwitchedListener) : Adapter<TabViewHolder>() {

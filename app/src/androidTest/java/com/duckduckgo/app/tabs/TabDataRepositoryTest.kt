@@ -23,8 +23,12 @@ import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
+import com.duckduckgo.app.tabs.db.TabsDao
+import com.duckduckgo.app.tabs.model.TabDataRepository
+import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.verify
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertSame
@@ -61,28 +65,35 @@ class TabDataRepositoryTest {
     }
 
     @Test
-    fun whenRecordAddedThenRecordExists() {
-        val record = MutableLiveData<Site>()
-        testee.add(TAB_ID, record)
-        assertSame(record, testee.retrieve(TAB_ID))
+    fun whenAddNewCalledTheTabAddedSelectedInDbAndSiteDataExists() {
+        val createdId = testee.addNew()
+        verify(mockDao).addAndSelectTab(any())
+        assertNotNull(testee.retrieveSiteData(createdId))
     }
 
     @Test
-    fun whenIdExistsThenRetrieveReturnsIt() {
+    fun whenAddCalledThenSiteDataAdded() {
         val record = MutableLiveData<Site>()
         testee.add(TAB_ID, record)
-        assertSame(record, testee.retrieve(TAB_ID))
+        assertSame(record, testee.retrieveSiteData(TAB_ID))
     }
 
     @Test
-    fun whenIdDoesNotExistThenRetrieveCreatesIt() {
-        assertNotNull(testee.retrieve(TAB_ID))
+    fun whenDataExistsForTabThenRetrieveReturnsIt() {
+        val record = MutableLiveData<Site>()
+        testee.add(TAB_ID, record)
+        assertSame(record, testee.retrieveSiteData(TAB_ID))
+    }
+
+    @Test
+    fun whenDataDoesNotExistForTabThenRetrieveCreatesIt() {
+        assertNotNull(testee.retrieveSiteData(TAB_ID))
     }
 
     @Test
     fun whenIdSelectedThenCurrentUpdated() {
         testee.select(TAB_ID)
-        verify(mockDao).updateSelectedTab(any())
+        verify(mockDao).insertTabSelection(eq(TabSelectionEntity(tabId = TAB_ID)))
     }
 
     companion object {

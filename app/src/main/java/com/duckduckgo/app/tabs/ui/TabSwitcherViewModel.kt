@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs;
+package com.duckduckgo.app.tabs.ui
 
 import android.arch.lifecycle.ViewModel
 

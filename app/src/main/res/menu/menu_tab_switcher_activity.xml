@@ -18,7 +18,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/newTabMenuItem"
+        android:id="@+id/fire"
+        android:icon="@drawable/icon_fire"
+        android:title="@string/fireMenu"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/newTab"
         android:title="@string/newTabMenuItem"
         app:showAsAction="never" />
 

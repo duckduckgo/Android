@@ -13,20 +13,15 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginBottom="10dp"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:ignore="Overdraw"
-    tools:showIn="@layout/activity_tabs">
+    tools:context="com.duckduckgo.app.tabs.ui.TabSwitcherActivity">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/tabsRecycler"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+    <include layout="@layout/include_toolbar" />
 
+    <include layout="@layout/content_tab_switcher" />
 
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

@@ -67,7 +67,7 @@
         </activity>
 
         <activity
-            android:name="com.duckduckgo.app.tabs.TabSwitcherActivity"
+            android:name="com.duckduckgo.app.tabs.ui.TabSwitcherActivity"
             android:label="@string/tabActivityTitle" />
 
         <activity

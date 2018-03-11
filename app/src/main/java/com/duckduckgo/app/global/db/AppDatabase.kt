@@ -24,9 +24,9 @@ import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomain
 import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
-import com.duckduckgo.app.tabs.SelectedTabEntity
-import com.duckduckgo.app.tabs.TabEntity
-import com.duckduckgo.app.tabs.TabsDao
+import com.duckduckgo.app.tabs.db.TabsDao
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 
@@ -36,9 +36,10 @@ import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
     NetworkLeaderboardEntry::class,
     AppConfigurationEntity::class,
     TabEntity::class,
-    SelectedTabEntity::class,
+    TabSelectionEntity::class,
     BookmarkEntity::class
 ])
+
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun httpsUpgradeDomainDao(): HttpsUpgradeDomainDao

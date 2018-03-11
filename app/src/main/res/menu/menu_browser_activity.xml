@@ -18,21 +18,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/privacy_dashboard_menu_item"
+        android:id="@+id/privacyDashboard"
         android:icon="@drawable/privacygrade_icon_unknown"
         android:title="@string/privacyDashboard"
         android:visible="false"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/fire_menu_item"
+        android:id="@+id/fire"
         android:icon="@drawable/icon_fire"
         android:title="@string/fireMenu"
         android:visible="false"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/browser_popup_menu_item"
+        android:id="@+id/browserPopup"
         android:icon="@drawable/ic_overflow_24px"
         android:title="@string/browserPopupMenu"
         app:showAsAction="ifRoom" />
