@@ -21,6 +21,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_scrollFlags="scroll|enterAlways"
+    android:fitsSystemWindows="true"
     tools:context="com.duckduckgo.app.browser.BrowserActivity"
     tools:menu="menu_browser_activity">
 
@@ -30,40 +31,30 @@
         android:layout_height="match_parent">
 
         <android.support.constraint.ConstraintLayout
+            android:id="@+id/logoParent"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="?attr/actionBarSize">
+            android:animateLayoutChanges="true">
 
             <android.support.constraint.Guideline
                 android:id="@+id/guidelineTop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
                 android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.15"
-                />
+                app:layout_constraintGuide_percent="0.5" />
 
             <ImageView
                 android:id="@+id/ddgLogo"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
                 android:contentDescription="@string/duckDuckGoLogoDescription"
                 android:src="@drawable/full_logo"
-                app:layout_constraintBottom_toBottomOf="@id/guidelineBottom"
+                app:layout_constraintBottom_toBottomOf="@id/guidelineTop"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/guidelineTop" />
-
-            <android.support.constraint.Guideline
-                android:id="@+id/guidelineBottom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.75"
+                app:layout_constraintTop_toTopOf="@id/guidelineTop"
                 />
-
 
         </android.support.constraint.ConstraintLayout>
 

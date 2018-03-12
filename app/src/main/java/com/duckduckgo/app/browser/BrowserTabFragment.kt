@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.animation.LayoutTransition.CHANGING
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
@@ -120,6 +121,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         configureOmnibarTextInput()
         configureFindInPage()
         configureAutoComplete()
+        configureKeyboardAwareLogoAnimation()
         addTextChangedListeners()
     }
 
@@ -437,6 +439,10 @@ class BrowserTabFragment : Fragment(), FindListener {
         })
 
         clearOmnibarInputButton.setOnClickListener { omnibarTextInput.setText("") }
+    }
+
+    private fun configureKeyboardAwareLogoAnimation() {
+        logoParent.layoutTransition.enableTransitionType(CHANGING)
     }
 
     private fun userEnteredQuery(query: String) {
