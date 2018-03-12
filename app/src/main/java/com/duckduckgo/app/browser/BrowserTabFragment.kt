@@ -37,6 +37,8 @@ import android.webkit.WebView.FindListener
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.view.doOnLayout
+import androidx.view.postDelayed
 import androidx.view.updatePaddingRelative
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
@@ -122,12 +124,16 @@ class BrowserTabFragment : Fragment(), FindListener {
         configureFindInPage()
         configureAutoComplete()
         configureKeyboardAwareLogoAnimation()
-        addTextChangedListeners()
     }
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        addTextChangedListeners()
     }
 
     private fun createPopupMenu() {
