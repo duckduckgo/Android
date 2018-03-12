@@ -27,7 +27,7 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
-import com.duckduckgo.app.tabs.model.TabDataRepository
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
 import kotlinx.android.synthetic.main.content_tracker_networks.*
 import kotlinx.android.synthetic.main.include_toolbar.*
@@ -36,7 +36,7 @@ import javax.inject.Inject
 class TrackerNetworksActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var viewModelFactory: ViewModelFactory
-    @Inject lateinit var repository: TabDataRepository
+    @Inject lateinit var repository: TabRepository
     private val trackersRenderer = TrackersRenderer()
     private val networksAdapter = TrackerNetworksAdapter()
 

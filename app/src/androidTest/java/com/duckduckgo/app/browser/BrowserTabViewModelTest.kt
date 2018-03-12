@@ -137,7 +137,7 @@ class BrowserTabViewModelTest {
                 queryUrlConverter = mockOmnibarConverter,
                 duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
                 siteFactory = siteFactory,
-                tabRepository = TabDataRepository(tabsDao, siteFactory),
+                tabRepository = TabDataRepository(tabsDao),
                 networkLeaderboardDao = testNetworkLeaderboardDao,
                 autoCompleteApi = mockAutoCompleteApi,
                 appSettingsPreferencesStore = mockSettingsStore,

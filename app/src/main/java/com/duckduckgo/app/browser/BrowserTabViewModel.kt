@@ -21,6 +21,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
 import android.net.Uri
 import android.support.annotation.AnyThread
+import android.support.annotation.StringRes
 import android.support.annotation.VisibleForTesting
 import android.view.ContextMenu
 import android.view.MenuItem
@@ -47,7 +48,7 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.improvedGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
-import com.duckduckgo.app.tabs.model.TabDataRepository
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -60,7 +61,7 @@ class BrowserTabViewModel(
     private val queryUrlConverter: OmnibarEntryConverter,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val siteFactory: SiteFactory,
-    private val tabRepository: TabDataRepository,
+    private val tabRepository: TabRepository,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
     private val autoCompleteApi: AutoCompleteApi,
@@ -99,7 +100,7 @@ class BrowserTabViewModel(
         class DownloadImage(val url: String) : Command()
         class ShareLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
-        class DisplayMessage(val messageId: Int) : Command()
+        class DisplayMessage(@StringRes val messageId: Int) : Command()
         object DismissFindInPage : Command()
     }
 

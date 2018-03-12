@@ -16,18 +16,16 @@
 
 package com.duckduckgo.app.browser
 
-import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.ViewModel
-import com.duckduckgo.app.browser.BrowserViewModel.Command.NewTab
-import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
+import android.support.annotation.StringRes
+import com.duckduckgo.app.browser.BrowserViewModel.Command.*
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
-import com.duckduckgo.app.tabs.model.TabDataRepository
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabEntity
-import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
 
-class BrowserViewModel(private val tabRepository: TabDataRepository) : ViewModel() {
+class BrowserViewModel(private val tabRepository: TabRepository) : ViewModel() {
 
     data class ViewState(
         val isFullScreen: Boolean = false,
@@ -36,34 +34,50 @@ class BrowserViewModel(private val tabRepository: TabDataRepository) : ViewModel
 
     sealed class Command {
         object Refresh : Command()
-        class NewTab(val query: String? = null) : Command()
-        class Query(val query: String) : Command()
+        data class NewTab(val tabId: String, val query: String? = null) : Command()
+        data class Query(val query: String) : Command()
+        data class DisplayMessage(@StringRes val messageId: Int) : Command()
     }
 
-    val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
+    var selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    init {
-        viewState.value = ViewState()
+    fun onNewSearchRequested() {
+        openTab()
     }
 
-    fun newSearchRequested() {
-        command.value = NewTab()
+    fun onNewTabRequested(query: String?) {
+        openTab(query)
     }
 
     fun onSharedTextReceived(input: String) {
-        command.value = NewTab(input)
+        openTab(input)
+    }
+
+    private fun openTab(query: String? = null) {
+        val tabId = tabRepository.addNew()
+        command.value = NewTab(tabId, query)
     }
 
     fun onTabsUpdated(tabs: List<TabEntity>?) {
         if (tabs == null || tabs.isEmpty()) {
-            command.value = NewTab()
+            val tabId = tabRepository.addNew()
+            command.value = NewTab(tabId)
             return
         }
     }
 
     fun receivedDashboardResult(resultCode: Int) {
         if (resultCode == RELOAD_RESULT_CODE) command.value = Refresh
+    }
+
+    fun onClearRequested() {
+        tabRepository.deleteAll()
+    }
+
+    fun onClearComplete() {
+        command.value = DisplayMessage(R.string.fireDataCleared)
     }
 }
 

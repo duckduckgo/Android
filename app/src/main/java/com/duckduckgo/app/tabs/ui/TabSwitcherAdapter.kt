@@ -36,7 +36,7 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
     private var data: List<TabEntity> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): TabViewHolder {
-        var inflater = LayoutInflater.from(parent!!.context)
+        val inflater = LayoutInflater.from(parent!!.context)
         val root = inflater.inflate(R.layout.item_tab, parent, false)
         return TabViewHolder(root, root.favicon, root.title, root.url, root.close)
     }
@@ -55,10 +55,10 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
             holder.title.text = tab.title ?: Uri.parse(tab.url).host ?: ""
         }
         holder.root.setOnClickListener {
-            itemClickListener.onSelect(tab)
+            itemClickListener.onTabSelected(tab)
         }
         holder.close.setOnClickListener {
-            itemClickListener.onDelete(tab)
+            itemClickListener.onTabDeleted(tab)
         }
     }
 
@@ -68,9 +68,9 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
     }
 
     interface TabSwitchedListener {
-        fun onNew()
-        fun onSelect(tab: TabEntity)
-        fun onDelete(tab: TabEntity)
+        fun onNewTabRequested()
+        fun onTabSelected(tab: TabEntity)
+        fun onTabDeleted(tab: TabEntity)
     }
 
     data class TabViewHolder(

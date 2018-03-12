@@ -21,10 +21,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.support.test.annotation.UiThreadTest
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.global.model.SiteFactory
-import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.tabs.db.TabsDao
-import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.verify
@@ -49,21 +46,17 @@ class TabDataRepositoryTest {
     @Mock
     private lateinit var mockDao: TabsDao
 
-    @Mock
-    private lateinit var mockTermsOfServiceStore: TermsOfServiceStore
-
     private lateinit var testee: TabDataRepository
 
     @UiThreadTest
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        val siteFactory = SiteFactory(mockTermsOfServiceStore, TrackerNetworks())
-        testee = TabDataRepository(mockDao, siteFactory)
+        testee = TabDataRepository(mockDao)
     }
 
     @Test
-    fun whenAddNewCalledTheTabAddedSelectedInDbAndSiteDataExists() {
+    fun whenAddNewCalledTheTabAddedAndSelectedAndSiteDataCreated() {
         val createdId = testee.addNew()
         verify(mockDao).addAndSelectTab(any())
         assertNotNull(testee.retrieveSiteData(createdId))
@@ -95,7 +88,7 @@ class TabDataRepositoryTest {
     }
 
     companion object {
-        const val TAB_ID = "abcdefg"
+        const val TAB_ID = "abcd"
     }
 
 }

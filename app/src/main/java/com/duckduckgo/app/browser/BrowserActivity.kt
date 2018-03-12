@@ -41,12 +41,10 @@ import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
-import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import org.jetbrains.anko.longToast
-import org.jetbrains.anko.toast
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -55,9 +53,6 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
-
-    @Inject
-    lateinit var repository: TabDataRepository
 
     private var currentTab: BrowserTabFragment? = null
 
@@ -104,7 +99,7 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
         if (fragment == null) {
-            openNewTab(tab.tabId, tab?.url)
+            openNewTab(tab.tabId, tab.url)
             return
         }
         val transaction = supportFragmentManager.beginTransaction()
@@ -128,7 +123,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (launchNewSearch(intent)) {
-            viewModel.newSearchRequested()
+            viewModel.onNewSearchRequested()
             return
         }
 
@@ -142,10 +137,10 @@ class BrowserActivity : DuckDuckGoActivity() {
         viewModel.command.observe(this, Observer {
             processCommand(it)
         })
-        repository.liveSelectedTab.observe(this, Observer {
+        viewModel.selectedTab.observe(this, Observer {
             selectTab(it)
         })
-        repository.liveTabs.observe(this, Observer {
+        viewModel.tabs.observe(this, Observer {
             viewModel.onTabsUpdated(it)
             clearStaleTabs(it)
         })
@@ -166,9 +161,10 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: Command?) {
         when (it) {
-            is NewTab -> launchNewTab(it.query)
+            is NewTab -> openNewTab(it.tabId, it.query)
             is Query -> currentTab?.submitQuery(it.query)
             is Refresh -> currentTab?.refresh()
+            is Command.DisplayMessage -> applicationContext?.longToast(it.messageId)
         }
     }
 
@@ -184,8 +180,8 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     fun launchFire() {
         FireDialog(context = this,
-            clearStarted = { repository.deleteAll() },
-            clearComplete = { applicationContext.toast(R.string.fireDataCleared) }
+            clearStarted = { viewModel.onClearRequested() },
+            clearComplete = { viewModel.onClearComplete() }
         ).show()
     }
 
@@ -194,8 +190,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchNewTab(query: String? = null) {
-        val tabId = repository.addNew()
-        openNewTab(tabId, query)
+        viewModel.onNewTabRequested(query)
     }
 
     fun launchSettings() {

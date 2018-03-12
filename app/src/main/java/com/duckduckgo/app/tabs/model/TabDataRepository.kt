@@ -20,37 +20,35 @@ package com.duckduckgo.app.tabs.model
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.db.TabsDao
 import io.reactivex.schedulers.Schedulers
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
 @Singleton
-class TabDataRepository @Inject constructor(val tabsDao: TabsDao, val siteFactory: SiteFactory) {
+class TabDataRepository @Inject constructor(private val tabsDao: TabsDao) : TabRepository {
 
-    val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs()
+    override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs()
 
-    val liveSelectedTab: LiveData<TabEntity> = tabsDao.liveSelectedTab()
+    override val liveSelectedTab: LiveData<TabEntity> = tabsDao.liveSelectedTab()
 
     private val siteData: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
 
-    fun addNew(): String {
+    override fun addNew(): String {
         val tabId = UUID.randomUUID().toString()
         add(tabId, MutableLiveData())
         return tabId
     }
 
-    fun add(tabId: String, data: MutableLiveData<Site>) {
+    override fun add(tabId: String, data: MutableLiveData<Site>) {
         siteData[tabId] = data
         Schedulers.io().scheduleDirect {
             tabsDao.addAndSelectTab(TabEntity(tabId, data.value?.url, data.value?.title))
         }
     }
 
-    fun update(tabId: String, site: Site?) {
+    override fun update(tabId: String, site: Site?) {
         Schedulers.io().scheduleDirect {
             val tab = TabEntity(tabId, site?.url, site?.title)
             tabsDao.updateTab(tab)
@@ -60,7 +58,7 @@ class TabDataRepository @Inject constructor(val tabsDao: TabsDao, val siteFactor
     /**
      * Returns record if it exists, otherwise creates and returns a new one
      */
-    fun retrieveSiteData(tabId: String): MutableLiveData<Site> {
+    override fun retrieveSiteData(tabId: String): MutableLiveData<Site> {
         val storedData = siteData[tabId]
         if (storedData != null) {
             return storedData
@@ -71,22 +69,21 @@ class TabDataRepository @Inject constructor(val tabsDao: TabsDao, val siteFactor
         return data
     }
 
-
-    fun delete(tab: TabEntity) {
+    override fun delete(tab: TabEntity) {
         Schedulers.io().scheduleDirect {
             tabsDao.deleteTabAndUpdateSelection(tab)
         }
         siteData.remove(tab.tabId)
     }
 
-    fun deleteAll() {
+    override fun deleteAll() {
         Schedulers.newThread().scheduleDirect {
             tabsDao.deleteAllTabs()
         }
         siteData.clear()
     }
 
-    fun select(tabId: String) {
+    override fun select(tabId: String) {
         Schedulers.io().scheduleDirect {
             val selection = TabSelectionEntity(tabId = tabId)
             tabsDao.insertTabSelection(selection)

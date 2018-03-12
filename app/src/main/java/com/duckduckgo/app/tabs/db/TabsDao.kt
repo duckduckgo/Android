@@ -32,10 +32,10 @@ abstract class TabsDao {
     @Query("select * from tabs limit 1")
     abstract fun firstTab(): TabEntity?
 
-    @Query("select * from tabs inner join tab_selection ON tabs.tabId = tab_selection.tabId limit 1")
+    @Query("select tabs.tabId, url, title from tabs inner join tab_selection ON tabs.tabId = tab_selection.tabId limit 1")
     abstract fun selectedTab(): TabEntity?
 
-    @Query("select * from tabs inner join tab_selection ON tabs.tabId = tab_selection.tabId limit 1")
+    @Query("select tabs.tabId, url, title from tabs inner join tab_selection ON tabs.tabId = tab_selection.tabId limit 1")
     abstract fun liveSelectedTab(): LiveData<TabEntity>
 
     @Query("select * from tabs")

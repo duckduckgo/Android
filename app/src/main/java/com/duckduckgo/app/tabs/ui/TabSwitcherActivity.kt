@@ -28,21 +28,19 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.FireDialog
-import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DisplayMessage
 import kotlinx.android.synthetic.main.content_tab_switcher.*
 import kotlinx.android.synthetic.main.include_toolbar.*
-import org.jetbrains.anko.contentView
-import org.jetbrains.anko.toast
+import org.jetbrains.anko.longToast
 import javax.inject.Inject
 
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitchedListener {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
-
-    @Inject
-    lateinit var repository: TabDataRepository
 
     private val viewModel: TabSwitcherViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(TabSwitcherViewModel::class.java)
@@ -68,13 +66,23 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     }
 
     private fun configureObservers() {
-        repository.liveTabs.observe(this, Observer<List<TabEntity>> {
+        viewModel.tabs.observe(this, Observer<List<TabEntity>> {
             render(it!!)
+        })
+        viewModel.command.observe(this, Observer {
+            processCommand(it)
         })
     }
 
     private fun render(tabs: List<TabEntity>) {
         tabsAdapter.updateData(tabs)
+    }
+
+    private fun processCommand(command: Command?) {
+        when (command) {
+            is DisplayMessage -> applicationContext?.longToast(command.messageId)
+            is Close -> finish()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -85,37 +93,28 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.fire -> onFire()
-            R.id.newTab -> onNew()
+            R.id.newTab -> onNewTabRequested()
         }
         return super.onOptionsItemSelected(item)
     }
 
     private fun onFire() {
         FireDialog(context = this,
-            clearStarted = { onDataCleared() },
-            clearComplete = { applicationContext.toast(R.string.fireDataCleared) }
+            clearStarted = { viewModel.onClearRequested() },
+            clearComplete = { viewModel.onClearComplete() }
         ).show()
     }
 
-    private fun onDataCleared() {
-        repository.deleteAll()
-        finish()
+    override fun onNewTabRequested() {
+        viewModel.onNewTabRequested()
     }
 
-    override fun onNew() {
-        contentView?.post {
-            repository.addNew()
-        }
-        finish()
+    override fun onTabSelected(tab: TabEntity) {
+        viewModel.onTabSelected(tab)
     }
 
-    override fun onSelect(tab: TabEntity) {
-        repository.select(tab.tabId)
-        finish()
-    }
-
-    override fun onDelete(tab: TabEntity) {
-        repository.delete(tab)
+    override fun onTabDeleted(tab: TabEntity) {
+        viewModel.onTabDeleted(tab)
     }
 
     override fun finish() {
@@ -124,7 +123,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     }
 
     private fun clearObserversEarlyToStopViewUpdates() {
-        repository.liveTabs.removeObservers(this)
+        viewModel.tabs.removeObservers(this)
     }
 
     companion object {

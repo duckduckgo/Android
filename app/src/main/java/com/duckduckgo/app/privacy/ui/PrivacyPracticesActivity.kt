@@ -31,7 +31,7 @@ import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.renderer.banner
 import com.duckduckgo.app.privacy.renderer.text
-import com.duckduckgo.app.tabs.model.TabDataRepository
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
 import kotlinx.android.synthetic.main.content_privacy_practices.*
 import kotlinx.android.synthetic.main.include_toolbar.*
@@ -43,7 +43,7 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
     lateinit var viewModelFactory: ViewModelFactory
 
     @Inject
-    lateinit var repository: TabDataRepository
+    lateinit var repository: TabRepository
 
     private val practicesAdapter = PrivacyPracticesAdapter()
 

@@ -23,6 +23,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.annotation.StringRes
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
@@ -229,7 +230,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
     }
 
-    private fun showToast(messageId: Int) {
+    private fun showToast(@StringRes messageId: Int) {
         context?.applicationContext?.longToast(messageId)
     }
 

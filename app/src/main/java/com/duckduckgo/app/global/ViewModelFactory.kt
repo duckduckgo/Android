@@ -30,7 +30,6 @@ import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
-import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.privacy.store.PrivacySettingsSharedPreferences
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel
 import com.duckduckgo.app.privacy.ui.PrivacyPracticesViewModel
@@ -41,6 +40,7 @@ import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel
 import javax.inject.Inject
 
@@ -51,7 +51,7 @@ class ViewModelFactory @Inject constructor(
     private val onboaringStore: OnboardingStore,
     private val queryUrlConverter: QueryUrlConverter,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-    private val tabRepository: TabDataRepository,
+    private val tabRepository: TabRepository,
     private val privacySettingsStore: PrivacySettingsSharedPreferences,
     private val siteFactory: SiteFactory,
     private val stringResolver: StringResolver,
@@ -70,7 +70,7 @@ class ViewModelFactory @Inject constructor(
                     isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore)
                     isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository)
                     isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
-                    isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel()
+                    isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository)
                     isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(privacySettingsStore, networkLeaderboardDao)
                     isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                     isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()

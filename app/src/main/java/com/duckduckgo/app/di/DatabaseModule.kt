@@ -16,9 +16,7 @@
 
 package com.duckduckgo.app.di
 
-import android.arch.persistence.db.SupportSQLiteDatabase
 import android.arch.persistence.room.Room
-import android.arch.persistence.room.migration.Migration
 import android.content.Context
 import com.duckduckgo.app.global.db.AppDatabase
 import dagger.Module

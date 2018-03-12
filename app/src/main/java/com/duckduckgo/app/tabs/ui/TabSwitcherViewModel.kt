@@ -16,8 +16,44 @@
 
 package com.duckduckgo.app.tabs.ui
 
+import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.ViewModel
+import android.support.annotation.StringRes
+import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.model.TabEntity
 
-class TabSwitcherViewModel : ViewModel() {
+class TabSwitcherViewModel(private val tabRepository: TabRepository) : ViewModel() {
 
+    var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
+    val command: SingleLiveEvent<Command> = SingleLiveEvent()
+
+    sealed class Command {
+        data class DisplayMessage(@StringRes val messageId: Int) : Command()
+        object Close : Command()
+    }
+
+    fun onNewTabRequested() {
+        tabRepository.addNew()
+        command.value = Command.Close
+    }
+
+    fun onTabSelected(tab: TabEntity) {
+        tabRepository.select(tab.tabId)
+        command.value = Command.Close
+    }
+
+    fun onTabDeleted(tab: TabEntity) {
+        tabRepository.delete(tab)
+    }
+
+    fun onClearRequested() {
+        tabRepository.deleteAll()
+        command.value = Command.Close
+    }
+
+    fun onClearComplete() {
+        command.value = Command.DisplayMessage(R.string.fireDataCleared)
+    }
 }

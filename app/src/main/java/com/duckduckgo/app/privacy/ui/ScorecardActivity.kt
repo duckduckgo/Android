@@ -30,7 +30,7 @@ import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.renderer.*
-import com.duckduckgo.app.tabs.model.TabDataRepository
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
 import kotlinx.android.synthetic.main.content_privacy_scorecard.*
 import kotlinx.android.synthetic.main.include_privacy_dashboard_header.*
@@ -40,7 +40,7 @@ import javax.inject.Inject
 class ScorecardActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var viewModelFactory: ViewModelFactory
-    @Inject lateinit var repository: TabDataRepository
+    @Inject lateinit var repository: TabRepository
     private val trackersRenderer = TrackersRenderer()
     private val upgradeRenderer = PrivacyUpgradeRenderer()
 
