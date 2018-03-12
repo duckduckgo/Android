@@ -36,6 +36,7 @@
 
         <activity
             android:name=".BrowserActivity"
+            android:theme="@style/BrowserTheme"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize|stateHidden">
