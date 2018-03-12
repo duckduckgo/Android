@@ -29,6 +29,7 @@
         android:layout_height="wrap_content" />
 
     <TextView
+        android:id="@+id/fireText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tabsRecycler"
@@ -36,10 +37,10 @@
         android:layout_margin="16dp"
         android:fontFamily="sans-serif-medium"
         android:lineSpacingExtra="2sp"
-        android:text="@string/tabsTapFireToForget"
         android:textColor="@color/coolGray"
         android:textSize="14sp"
-        android:textStyle="normal" />
+        android:textStyle="normal"
+        tools:text="@string/tapFireToForget" />
 
 
 </RelativeLayout>

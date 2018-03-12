@@ -54,7 +54,7 @@
     <string name="openInNewTab">Open in New Tab</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Close</string>
-    <string name="tabsTapFireToForget">Tap 🔥 to forget everything</string>
+    <string name="tapFireToForget">Tap %s to forget everything</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
