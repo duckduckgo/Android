@@ -90,6 +90,7 @@ class BrowserTabViewModel(
     sealed class Command {
         object LandingPage : Command()
         object Refresh : Command()
+        class NewTab(val query: String) : Command()
         class Navigate(val url: String) : Command()
         class DialNumber(val telephoneNumber: String) : Command()
         class SendSms(val telephoneNumber: String) : Command()
@@ -351,9 +352,14 @@ class BrowserTabViewModel(
     }
 
     fun userSelectedItemFromLongPressMenu(longPressTarget: String, item: MenuItem): Boolean {
+
         val requiredAction = longPressHandler.userSelectedMenuItem(longPressTarget, item)
 
         return when (requiredAction) {
+            is RequiredAction.OpenInNewTab -> {
+                command.value = NewTab(requiredAction.url)
+                true
+            }
             is RequiredAction.DownloadFile -> {
                 command.value = DownloadImage(requiredAction.url)
                 true

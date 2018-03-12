@@ -51,6 +51,7 @@
     <string name="tabActivityTitle">Tabs</string>
     <string name="tabsMenuItem">Tabs</string>
     <string name="newTabMenuItem">New Tab</string>
+    <string name="openInNewTab">Open in New Tab</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Close</string>
     <string name="tabsTapFireToForget">Tap 🔥 to forget everything</string>

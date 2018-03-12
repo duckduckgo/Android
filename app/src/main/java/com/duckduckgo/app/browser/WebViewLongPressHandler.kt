@@ -32,6 +32,7 @@ interface LongPressHandler {
 
     sealed class RequiredAction {
         object None : RequiredAction()
+        class OpenInNewTab(val url: String) : RequiredAction()
         class DownloadFile(val url: String) : RequiredAction()
         class ShareLink(val url: String) : RequiredAction()
     }
@@ -50,6 +51,7 @@ class WebViewLongPressHandler @Inject constructor() : LongPressHandler {
             }
             WebView.HitTestResult.SRC_ANCHOR_TYPE -> {
                 menu.setHeaderTitle(R.string.linkOptions)
+                menu.add(0, CONTEXT_MENU_ID_OPEN_IN_NEW_TAB, 0, R.string.openInNewTab)
                 menu.add(0, CONTEXT_MENU_ID_SHARE_LINK, 0, R.string.shareLink)
             }
             else -> Timber.v("App does not yet handle target type: $longPressTargetType")
@@ -58,6 +60,9 @@ class WebViewLongPressHandler @Inject constructor() : LongPressHandler {
 
     override fun userSelectedMenuItem(longPressTarget: String, item: MenuItem): RequiredAction {
         return when (item.itemId) {
+            CONTEXT_MENU_ID_OPEN_IN_NEW_TAB -> {
+                return OpenInNewTab(longPressTarget)
+            }
             CONTEXT_MENU_ID_DOWNLOAD_IMAGE -> {
                 return DownloadFile(longPressTarget)
             }
@@ -70,7 +75,8 @@ class WebViewLongPressHandler @Inject constructor() : LongPressHandler {
 
 
     companion object {
-        const val CONTEXT_MENU_ID_DOWNLOAD_IMAGE = 1
-        const val CONTEXT_MENU_ID_SHARE_LINK = 2
+        const val CONTEXT_MENU_ID_OPEN_IN_NEW_TAB = 1
+        const val CONTEXT_MENU_ID_DOWNLOAD_IMAGE = 2
+        const val CONTEXT_MENU_ID_SHARE_LINK = 3
     }
 }

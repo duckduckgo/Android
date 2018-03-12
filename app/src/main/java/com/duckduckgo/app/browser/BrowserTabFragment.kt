@@ -188,6 +188,9 @@ class BrowserTabFragment : Fragment(), FindListener {
     private fun processCommand(it: Command?) {
         when (it) {
             Command.Refresh -> refresh()
+            is Command.NewTab -> {
+                browserActivity?.launchNewTab(it.query)
+            }
             is Command.Navigate -> {
                 navigate(it.url)
             }

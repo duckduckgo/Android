@@ -32,6 +32,7 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
+import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.*
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
@@ -456,7 +457,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSelectsDownloadImageOptionFromContextMenuThenDownloadFileCommandIssued() {
         whenever(mockLongPressHandler.userSelectedMenuItem(anyString(), any()))
-                .thenReturn(LongPressHandler.RequiredAction.DownloadFile("example.com"))
+                .thenReturn(DownloadFile("example.com"))
 
         val mockMenuItem : MenuItem = mock()
         testee.userSelectedItemFromLongPressMenu("example.com", mockMenuItem)
@@ -535,6 +536,15 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
         assertTrue(ultimateCommand == Command.Refresh)
+    }
+
+    @Test
+    fun whenUserSelectsOpenTabThenTabCommandSent() {
+        whenever(mockLongPressHandler.userSelectedMenuItem(any(), any())).thenReturn(OpenInNewTab("http://example.com"))
+        val mockMenItem: MenuItem = mock()
+        testee.userSelectedItemFromLongPressMenu("http://example.com", mockMenItem)
+        val command = captureCommands().value as Command.NewTab
+        assertEquals("http://example.com", command.query)
     }
 
     @Test
