@@ -131,6 +131,16 @@ class BrowserTabFragment : Fragment(), FindListener {
         super.onAttach(context)
     }
 
+    override fun onStart() {
+        super.onStart()
+
+        omnibarTextInput.doOnLayout {
+            if (omnibarTextInput.hasFocus()) {
+                omnibarTextInput.postDelayed(300) { omnibarTextInput.showKeyboard() }
+            }
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         addTextChangedListeners()
