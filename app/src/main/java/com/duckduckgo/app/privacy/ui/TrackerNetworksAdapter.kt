@@ -55,14 +55,14 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var viewData: List<ViewData> = ArrayList()
     private var networkRenderer: TrackersRenderer = TrackersRenderer()
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             HEADER -> {
-                val root = LayoutInflater.from(parent!!.context).inflate(R.layout.item_tracker_network_header, parent, false)
+                val root = LayoutInflater.from(parent.context).inflate(R.layout.item_tracker_network_header, parent, false)
                 HeaderViewHolder(root, root.network, root.icon)
             }
             else -> {
-                val root = LayoutInflater.from(parent!!.context).inflate(R.layout.item_tracker_network_element, parent, false)
+                val root = LayoutInflater.from(parent.context).inflate(R.layout.item_tracker_network_element, parent, false)
                 RowViewHolder(root, root.host, root.category)
             }
         }

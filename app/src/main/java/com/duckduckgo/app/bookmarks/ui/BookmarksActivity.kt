@@ -157,14 +157,14 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 notifyDataSetChanged()
             }
 
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): BookmarksViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookmarksViewHolder {
             val inflater = LayoutInflater.from(context)
             val view = inflater.inflate(R.layout.view_bookmark_entry, parent, false)
             return BookmarksViewHolder(view, viewModel)
         }
 
-        override fun onBindViewHolder(holder: BookmarksViewHolder?, position: Int) {
-            holder?.update(bookmarks[position])
+        override fun onBindViewHolder(holder: BookmarksViewHolder, position: Int) {
+            holder.update(bookmarks[position])
         }
 
         override fun getItemCount(): Int {
