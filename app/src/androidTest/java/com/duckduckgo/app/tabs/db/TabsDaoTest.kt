@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs
+package com.duckduckgo.app.tabs.db
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.persistence.room.Room
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.app.tabs.model.TabEntity
 import org.junit.Assert.*

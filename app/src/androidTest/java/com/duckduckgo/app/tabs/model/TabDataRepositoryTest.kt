@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs
+package com.duckduckgo.app.tabs.model
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.MutableLiveData
@@ -24,8 +24,6 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.tabs.db.TabsDao
-import com.duckduckgo.app.tabs.model.TabDataRepository
-import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
