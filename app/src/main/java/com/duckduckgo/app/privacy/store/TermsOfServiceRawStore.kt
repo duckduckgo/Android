@@ -24,7 +24,6 @@ import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import javax.inject.Singleton

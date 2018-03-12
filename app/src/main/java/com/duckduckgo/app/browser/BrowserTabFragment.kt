@@ -616,7 +616,7 @@ class BrowserTabFragment : Fragment(), FindListener {
             query.let {
                 args.putString(QUERY_EXTRA_ARG, query)
             }
-            fragment.setArguments(args)
+            fragment.arguments = args
             return fragment
         }
     }

@@ -78,7 +78,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun openNewTab(tabId: String, userQuery: String? = null) {
-        var previousFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer) as? BrowserTabFragment
+        val previousFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer) as? BrowserTabFragment
         val fragment = BrowserTabFragment.newInstance(tabId, userQuery)
         val transaction = supportFragmentManager.beginTransaction()
         if (previousFragment == null) {
@@ -149,9 +149,8 @@ class BrowserActivity : DuckDuckGoActivity() {
     private fun clearStaleTabs(tabs: List<TabEntity>?) {
         tabs ?: return
 
-        val stale = supportFragmentManager.fragments
-            .map { it as? BrowserTabFragment }
-            .filterNotNull()
+        val stale = supportFragmentManager
+            .fragments.mapNotNull { it as? BrowserTabFragment }
             .filter { fragment -> tabs.none { it.tabId == fragment.tabId } }
 
         if (stale.isNotEmpty()) {
@@ -264,7 +263,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     override fun onBackPressed() {
-        if (!(currentTab?.onBackPressed() ?: false)) {
+        if (currentTab?.onBackPressed() != true) {
             super.onBackPressed()
         }
     }
