@@ -416,6 +416,7 @@ class BrowserTabFragment : Fragment(), FindListener {
                     return@setOnMenuItemClickListener true
                 }
                 R.id.browserPopup -> {
+                    hideKeyboard()
                     launchPopupMenu()
                     return@setOnMenuItemClickListener true
                 }
