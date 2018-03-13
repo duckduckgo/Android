@@ -17,16 +17,28 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@drawable/tab_background"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginEnd="10dp"
     android:layout_marginStart="10dp"
     android:layout_marginTop="10dp"
-    android:paddingBottom="16dp"
-    android:paddingEnd="20dp"
-    android:paddingStart="20dp"
-    android:paddingTop="16dp">
+    android:background="@drawable/tab_background"
+    android:paddingStart="20dp">
+
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="16dp" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideBottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_end="16dp" />
 
     <ImageView
         android:id="@+id/favicon"
@@ -34,13 +46,13 @@
         android:layout_height="18dp"
         android:contentDescription="@string/faviconContentDescription"
         android:src="@drawable/ic_globe_gray_16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/guideBottom"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/guideTop" />
 
     <ImageView
         android:id="@+id/close"
-        android:layout_width="30dp"
+        android:layout_width="62dp"
         android:layout_height="match_parent"
         android:contentDescription="@string/closeContentDescription"
         android:scaleType="center"
@@ -54,7 +66,6 @@
         android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="12dp"
         android:layout_marginStart="12dp"
         android:fontFamily="sans-serif-medium"
         android:lines="1"
@@ -64,14 +75,13 @@
         android:textStyle="normal"
         app:layout_constraintEnd_toStartOf="@id/close"
         app:layout_constraintStart_toEndOf="@id/favicon"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guideTop"
         tools:text="Slashdot" />
 
     <TextView
         android:id="@+id/url"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="12dp"
         android:layout_marginStart="12dp"
         android:layout_marginTop="4dp"
         android:fontFamily="sans-serif"
@@ -80,7 +90,7 @@
         android:textIsSelectable="false"
         android:textSize="12sp"
         android:textStyle="normal"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/guideBottom"
         app:layout_constraintEnd_toStartOf="@id/close"
         app:layout_constraintStart_toEndOf="@id/favicon"
         app:layout_constraintTop_toBottomOf="@id/title"
