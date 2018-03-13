@@ -141,8 +141,8 @@ class BrowserActivity : DuckDuckGoActivity() {
             selectTab(it)
         })
         viewModel.tabs.observe(this, Observer {
-            viewModel.onTabsUpdated(it)
             clearStaleTabs(it)
+            viewModel.onTabsUpdated(it)
         })
     }
 
