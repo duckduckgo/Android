@@ -32,10 +32,12 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
+import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.*
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.NetworkPercent
@@ -43,7 +45,8 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
-import com.duckduckgo.app.tabs.TabDataRepository
+import com.duckduckgo.app.tabs.model.TabDataRepository
+import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -107,10 +110,14 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockOmnibarConverter: OmnibarEntryConverter
 
+    @Mock
+    private lateinit var tabsDao: TabsDao
+
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
 
     private lateinit var db: AppDatabase
+
     private lateinit var appConfigurationDao: AppConfigurationDao
 
     private lateinit var testee: BrowserTabViewModel
@@ -124,13 +131,14 @@ class BrowserTabViewModelTest {
                 .build()
         appConfigurationDao = db.appConfigurationDao()
 
+        val siteFactory = SiteFactory(mockTermsOfServiceStore, TrackerNetworks())
+
         testee = BrowserTabViewModel(
                 statisticsUpdater = mockStatisticsUpdater,
                 queryUrlConverter = mockOmnibarConverter,
                 duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
-                termsOfServiceStore = mockTermsOfServiceStore,
-                trackerNetworks = TrackerNetworks(),
-                tabRepository = TabDataRepository(),
+                siteFactory = siteFactory,
+                tabRepository = TabDataRepository(tabsDao),
                 networkLeaderboardDao = testNetworkLeaderboardDao,
                 autoCompleteApi = mockAutoCompleteApi,
                 appSettingsPreferencesStore = mockSettingsStore,
@@ -138,6 +146,7 @@ class BrowserTabViewModelTest {
                 longPressHandler = mockLongPressHandler,
                 appConfigurationDao = appConfigurationDao)
 
+        testee.load("abc")
         testee.url.observeForever(mockQueryObserver)
         testee.command.observeForever(mockCommandObserver)
 
@@ -151,6 +160,22 @@ class BrowserTabViewModelTest {
         db.close()
         testee.url.removeObserver(mockQueryObserver)
         testee.command.removeObserver(mockCommandObserver)
+    }
+
+    @Test
+    fun whenViewBecomesVisibleWithActiveSiteThenKeyboardHidden() {
+        testee.url.value = "http://exmaple.com"
+        testee.onViewVisible()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.HideKeyboard)
+    }
+
+    @Test
+    fun whenViewBecomesVisibleWithoutActiveSiteThenKeyboardNotHidden() {
+        testee.url.value = null
+        testee.onViewVisible()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.none { it is Command.HideKeyboard })
     }
 
     @Test
@@ -432,7 +457,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSelectsDownloadImageOptionFromContextMenuThenDownloadFileCommandIssued() {
         whenever(mockLongPressHandler.userSelectedMenuItem(anyString(), any()))
-                .thenReturn(LongPressHandler.RequiredAction.DownloadFile("example.com"))
+                .thenReturn(DownloadFile("example.com"))
 
         val mockMenuItem : MenuItem = mock()
         testee.userSelectedItemFromLongPressMenu("example.com", mockMenuItem)
@@ -511,6 +536,15 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
         assertTrue(ultimateCommand == Command.Refresh)
+    }
+
+    @Test
+    fun whenUserSelectsOpenTabThenTabCommandSent() {
+        whenever(mockLongPressHandler.userSelectedMenuItem(any(), any())).thenReturn(OpenInNewTab("http://example.com"))
+        val mockMenItem: MenuItem = mock()
+        testee.userSelectedItemFromLongPressMenu("http://example.com", mockMenItem)
+        val command = captureCommands().value as Command.NewTab
+        assertEquals("http://example.com", command.query)
     }
 
     @Test

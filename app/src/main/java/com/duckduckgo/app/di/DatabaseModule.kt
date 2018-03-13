@@ -23,13 +23,15 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
-@Module (includes = [DaoModule::class])
+@Module(includes = [DaoModule::class])
 class DatabaseModule {
 
     @Provides
     @Singleton
     fun provideDatabase(context: Context): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
-                .build()
+            .addMigrations(AppDatabase.MIGRATION_1_TO_2)
+            .build()
     }
+
 }

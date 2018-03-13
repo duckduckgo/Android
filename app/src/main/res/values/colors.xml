@@ -9,13 +9,17 @@
     <color name="divider">@color/subtleGrayTwo</color>
 
     <color name="white">#FFFFFF</color>
+    <color name="whiteTwo">#e4e4e4</color>
+    <color name="midnight">#161616</color>
     <color name="almostBlack">#333333</color>
     <color name="darkGray">#222325</color>
     <color name="charcoal">#2f3135</color>
     <color name="charcoalGray">#47494c</color>
     <color name="slateGray">#5e6168</color>
+    <color name="grayish">#aaaaaa</color>
     <color name="paleBrownishGray">#b0b0b0</color>
     <color name="brownishGray">#5c5c5c</color>
+    <color name="coolGray">#969799</color>
     <color name="warmGray">#939393</color>
     <color name="warmerGray">#777777</color>
     <color name="subtleGray">#f0f0f0</color>
@@ -30,8 +34,6 @@
     <color name="lighOliveGreen">#93c04d</color>
     <color name="muddyGreen">#58732e</color>
     <color name="midGreen">#3fa140</color>
-
-    <color name="white_two">#e4e4e4</color>
 
     <color name="webViewScrollbarTrackColor">#FF333333</color>
     <color name="webViewScrollbarThumbColor">#FFABABAB</color>

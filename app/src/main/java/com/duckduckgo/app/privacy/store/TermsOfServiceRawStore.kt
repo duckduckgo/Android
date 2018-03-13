@@ -24,6 +24,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -33,15 +34,21 @@ import javax.inject.Singleton
  * we'll store the content in a db rather than a raw file.
  */
 @Singleton
-class TermsOfServiceRawStore @Inject constructor(private val moshi: Moshi,
-                                                 private val context: Context,
-                                                 private val trackerNetworks: TrackerNetworks) : TermsOfServiceStore {
+class TermsOfServiceRawStore @Inject constructor(
+    moshi: Moshi,
+    context: Context,
+    private val trackerNetworks: TrackerNetworks
+) : TermsOfServiceStore {
 
-    private val data: List<TermsOfService> by lazy {
-        val json = context.resources.openRawResource(R.raw.tosdr).bufferedReader().use { it.readText() }
-        val type = Types.newParameterizedType(List::class.java, TermsOfService::class.java)
-        val adapter: JsonAdapter<List<TermsOfService>> = moshi.adapter(type)
-        adapter.fromJson(json)
+    private var data: List<TermsOfService> = ArrayList()
+
+    init {
+        Schedulers.io().scheduleDirect {
+            val json = context.resources.openRawResource(R.raw.tosdr).bufferedReader().use { it.readText() }
+            val type = Types.newParameterizedType(List::class.java, TermsOfService::class.java)
+            val adapter: JsonAdapter<List<TermsOfService>> = moshi.adapter(type)
+            data = adapter.fromJson(json)
+        }
     }
 
     override fun retrieveTerms(url: String): TermsOfService? {
