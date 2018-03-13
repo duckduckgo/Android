@@ -18,13 +18,15 @@ package com.duckduckgo.app.browser
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
-import com.duckduckgo.app.browser.BrowserViewModel.Command.Navigate
-import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
+import com.duckduckgo.app.browser.BrowserViewModel.Command
+import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
+import com.duckduckgo.app.browser.BrowserViewModel.Command.NewTab
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
-import com.nhaarman.mockito_kotlin.never
-import com.nhaarman.mockito_kotlin.verify
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
+import com.nhaarman.mockito_kotlin.*
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -32,6 +34,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import java.util.Arrays.asList
 
 class BrowserViewModelTest {
 
@@ -45,13 +48,17 @@ class BrowserViewModelTest {
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<BrowserViewModel.Command>
 
+    @Mock
+    private lateinit var mockTabRepository: TabRepository
+
     private lateinit var testee: BrowserViewModel
 
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        testee = BrowserViewModel()
+        testee = BrowserViewModel(mockTabRepository)
         testee.command.observeForever(mockCommandObserver)
+        whenever(mockTabRepository.add()).thenReturn(TAB_ID)
     }
 
     @After
@@ -60,25 +67,67 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenSharedTextReceivedThenNavigationTriggered() {
-        testee.onSharedTextReceived("http://example.com")
+    fun whenNewSearchRequestedThenNewTabTriggered() {
+        testee.onNewSearchRequested()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertNotNull(commandCaptor.value)
-        assertTrue(commandCaptor.value is Navigate)
+        assertEquals(NewTab(TAB_ID), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenNewTabRequestedThenNewTabTriggered() {
+        testee.onNewTabRequested("http://example.com")
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(NewTab(TAB_ID, "http://example.com"), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenSharedTextReceivedThenNewTabWithQueryTriggered() {
+        testee.onSharedTextReceived("a query")
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(NewTab(TAB_ID, "a query"), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenTabsUpdatedAndNoTabsThenNewTabLaunched() {
+        testee.onTabsUpdated(ArrayList())
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(NewTab(TAB_ID), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenTabsUpdatedWithTabsThenNewTabNotLaunched() {
+        testee.onTabsUpdated(asList(TabEntity(TAB_ID, "", "")))
+        verify(mockCommandObserver, never()).onChanged(any())
     }
 
     @Test
     fun whenReloadDashboardResultReceivedThenRefreshTriggered() {
         testee.receivedDashboardResult(PrivacyDashboardActivity.RELOAD_RESULT_CODE)
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertNotNull(commandCaptor.value)
-        assertTrue(commandCaptor.value is Refresh)
+        assertEquals(Command.Refresh, commandCaptor.lastValue)
     }
 
     @Test
     fun whenUnknownDashboardResultReceivedThenNoCommandTriggered() {
         testee.receivedDashboardResult(1111)
-        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
+        verify(mockCommandObserver, never()).onChanged(any())
+    }
+
+    @Test
+    fun whenClearRequestedThenDeleteAllCalledOnRepository() {
+        testee.onClearRequested()
+        verify(mockTabRepository).deleteAll()
+    }
+
+    @Test
+    fun whenClearCompleteThenMessageDisplayed() {
+        testee.onClearComplete()
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(DisplayMessage(R.string.fireDataCleared), commandCaptor.lastValue)
+    }
+
+    companion object {
+        const val TAB_ID = "TAB_ID"
     }
 
 }

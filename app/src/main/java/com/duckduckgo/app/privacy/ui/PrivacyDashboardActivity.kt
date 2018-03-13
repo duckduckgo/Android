@@ -30,7 +30,7 @@ import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.renderer.*
-import com.duckduckgo.app.tabs.TabDataRepository
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.ViewState
 import com.duckduckgo.app.tabs.tabId
 import kotlinx.android.synthetic.main.content_privacy_dashboard.*
@@ -41,7 +41,7 @@ import javax.inject.Inject
 class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var viewModelFactory: ViewModelFactory
-    @Inject lateinit var repository: TabDataRepository
+    @Inject lateinit var repository: TabRepository
     private val trackersRenderer = TrackersRenderer()
     private val upgradeRenderer = PrivacyUpgradeRenderer()
 
@@ -58,7 +58,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
             it?.let { render(it) }
         })
 
-        repository.retrieve(intent.tabId!!).observe(this, Observer<Site> {
+        repository.retrieveSiteData(intent.tabId!!).observe(this, Observer<Site> {
             viewModel.onSiteChanged(it)
         })
 

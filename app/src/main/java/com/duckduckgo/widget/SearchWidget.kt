@@ -47,7 +47,7 @@ class SearchWidget : AppWidgetProvider() {
         }
 
         private fun buildPendingIntent(context: Context) : PendingIntent {
-            val intent = BrowserActivity.intent(context, replaceExistingSearch = true)
+            val intent = BrowserActivity.intent(context, newSearch = true)
             return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         }
     }

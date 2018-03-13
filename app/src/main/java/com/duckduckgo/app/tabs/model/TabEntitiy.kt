@@ -14,29 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global
+package com.duckduckgo.app.tabs.model
+
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.Index
+import android.arch.persistence.room.PrimaryKey
 
 
-class AppUrl {
-
-    object Url {
-        const val HOST = "duckduckgo.com"
-        const val BASE = "https://$HOST"
-        const val HOME =  BASE
-        const val ABOUT = "$BASE/about"
-        const val TOSDR = "https://tosdr.org"
-    }
-
-    object ParamKey {
-        const val QUERY = "q"
-        const val SOURCE = "t"
-        const val APP_VERSION = "tappv"
-        const val ATB = "atb"
-        const val RETENTION_ATB = "set_atb"
-    }
-
-    object ParamValue {
-        const val SOURCE = "ddg_android"
-    }
-
-}
+@Entity(
+    tableName = "tabs",
+    indices = [
+        Index("tabId")
+    ]
+)
+data class TabEntity(
+    @PrimaryKey var tabId: String,
+    var url: String? = null,
+    var title: String? = null
+)

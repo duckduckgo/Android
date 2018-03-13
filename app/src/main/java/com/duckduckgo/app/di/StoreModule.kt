@@ -24,6 +24,8 @@ import com.duckduckgo.app.privacy.store.TermsOfServiceRawStore
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
+import com.duckduckgo.app.tabs.model.TabDataRepository
+import com.duckduckgo.app.tabs.model.TabRepository
 import dagger.Binds
 import dagger.Module
 
@@ -42,4 +44,6 @@ abstract class StoreModule {
     @Binds
     abstract fun bindTermsOfServiceStore(termsOfServiceStore: TermsOfServiceRawStore): TermsOfServiceStore
 
+    @Binds
+    abstract fun bindTabReposistory(tabRepository: TabDataRepository): TabRepository
 }

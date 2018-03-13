@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2017 DuckDuckGo
+  ~ Copyright (c) 2018 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -18,23 +18,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/privacyDashboard"
-        android:icon="@drawable/privacygrade_icon_unknown"
-        android:title="@string/privacyDashboard"
-        android:visible="false"
-        app:showAsAction="ifRoom" />
-
-    <item
         android:id="@+id/fire"
         android:icon="@drawable/icon_fire"
         android:title="@string/fireMenu"
-        android:visible="false"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/browserPopup"
-        android:icon="@drawable/ic_overflow_24px"
-        android:title="@string/browserPopupMenu"
+        android:id="@+id/newTab"
+        android:icon="@drawable/ic_add_white_30dp"
+        android:title="@string/newTabMenuItem"
         app:showAsAction="ifRoom" />
 
 </menu>

@@ -21,6 +21,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
 import android.net.Uri
 import android.support.annotation.AnyThread
+import android.support.annotation.StringRes
 import android.support.annotation.VisibleForTesting
 import android.view.ContextMenu
 import android.view.MenuItem
@@ -31,7 +32,7 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment.SaveBookmarkListener
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShareLink
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -39,18 +40,15 @@ import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.global.model.SiteMonitor
+import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.model.PrivacyGrade
-import com.duckduckgo.app.privacy.model.TermsOfService
 import com.duckduckgo.app.privacy.model.improvedGrade
-import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
-import com.duckduckgo.app.tabs.TabDataRepository
-import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -62,9 +60,8 @@ class BrowserTabViewModel(
     private val statisticsUpdater: StatisticsUpdater,
     private val queryUrlConverter: OmnibarEntryConverter,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-    private val termsOfServiceStore: TermsOfServiceStore,
-    private val trackerNetworks: TrackerNetworks,
-    private val tabRepository: TabDataRepository,
+    private val siteFactory: SiteFactory,
+    private val tabRepository: TabRepository,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
     private val autoCompleteApi: AutoCompleteApi,
@@ -93,6 +90,7 @@ class BrowserTabViewModel(
     sealed class Command {
         object LandingPage : Command()
         object Refresh : Command()
+        class NewTab(val query: String) : Command()
         class Navigate(val url: String) : Command()
         class DialNumber(val telephoneNumber: String) : Command()
         class SendSms(val telephoneNumber: String) : Command()
@@ -103,7 +101,7 @@ class BrowserTabViewModel(
         class DownloadImage(val url: String) : Command()
         class ShareLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
-        class DisplayMessage(val messageId: Int) : Command()
+        class DisplayMessage(@StringRes val messageId: Int) : Command()
         object DismissFindInPage : Command()
     }
 
@@ -125,16 +123,19 @@ class BrowserTabViewModel(
     private val autoCompletePublishSubject = PublishRelay.create<String>()
     private var siteLiveData = MutableLiveData<Site>()
     private var site: Site? = null
+    private lateinit var tabId: String
+
 
     init {
         viewState.value = ViewState()
         appConfigurationObservable.observeForever(appConfigurationObserver)
         configureAutoComplete()
-        command.value = Command.ShowKeyboard
+        command.value = ShowKeyboard
     }
 
-    fun registerTabId(tabId: String) {
-        siteLiveData = tabRepository.retrieve(tabId)
+    fun load(tabId: String) {
+        this.tabId = tabId
+        siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
     }
 
@@ -168,13 +169,18 @@ class BrowserTabViewModel(
         browserChromeClient.webViewClientListener = this
     }
 
+    fun onViewVisible() {
+        if (url.value != null) {
+            command.value = HideKeyboard
+        }
+    }
+
     fun onUserSubmittedQuery(input: String) {
         if (input.isBlank()) {
             return
         }
 
-        command.value = Command.HideKeyboard
-
+        command.value = HideKeyboard
         val trimmedInput = input.trim()
         url.value = buildUrl(trimmedInput)
 
@@ -200,7 +206,7 @@ class BrowserTabViewModel(
     }
 
     override fun goFullScreen(view: View) {
-        command.value = Command.ShowFullScreen(view)
+        command.value = ShowFullScreen(view)
         viewState.value = currentViewState().copy(isFullScreen = true)
     }
 
@@ -227,17 +233,17 @@ class BrowserTabViewModel(
 
     @AnyThread
     override fun sendEmailRequested(emailAddress: String) {
-        command.postValue(Command.SendEmail(emailAddress))
+        command.postValue(SendEmail(emailAddress))
     }
 
     @AnyThread
     override fun dialTelephoneNumberRequested(telephoneNumber: String) {
-        command.postValue(Command.DialNumber(telephoneNumber))
+        command.postValue(DialNumber(telephoneNumber))
     }
 
     @AnyThread
     override fun sendSmsRequested(telephoneNumber: String) {
-        command.postValue(Command.SendSms(telephoneNumber))
+        command.postValue(SendSms(telephoneNumber))
     }
 
     override fun urlChanged(url: String?) {
@@ -264,10 +270,7 @@ class BrowserTabViewModel(
             statisticsUpdater.refreshRetentionAtb()
         }
         viewState.value = newViewState
-
-        val terms = termsOfServiceStore.retrieveTerms(url) ?: TermsOfService()
-        val memberNetwork = trackerNetworks.network(url)
-        site = SiteMonitor(url, terms, memberNetwork)
+        site = siteFactory.build(url)
         onSiteChanged()
     }
 
@@ -293,8 +296,9 @@ class BrowserTabViewModel(
     }
 
     private fun onSiteChanged() {
-        privacyGrade.postValue(site?.improvedGrade)
         siteLiveData.postValue(site)
+        privacyGrade.postValue(site?.improvedGrade)
+        tabRepository.update(tabId, site)
     }
 
     private fun currentViewState(): ViewState = viewState.value!!
@@ -331,9 +335,9 @@ class BrowserTabViewModel(
         Schedulers.io().scheduleDirect {
             bookmarksDao.insert(BookmarkEntity(title = title, url = url))
         }
-        command.value = Command.DisplayMessage(R.string.bookmarkAddedFeedback)
+        command.value = DisplayMessage(R.string.bookmarkAddedFeedback)
     }
- 
+
     fun onUserSelectedToEditQuery(query: String) {
         viewState.value = currentViewState().copy(
             isEditing = false,
@@ -348,11 +352,16 @@ class BrowserTabViewModel(
     }
 
     fun userSelectedItemFromLongPressMenu(longPressTarget: String, item: MenuItem): Boolean {
+
         val requiredAction = longPressHandler.userSelectedMenuItem(longPressTarget, item)
 
         return when (requiredAction) {
+            is RequiredAction.OpenInNewTab -> {
+                command.value = NewTab(requiredAction.url)
+                true
+            }
             is RequiredAction.DownloadFile -> {
-                command.value = Command.DownloadImage(requiredAction.url)
+                command.value = DownloadImage(requiredAction.url)
                 true
             }
             is RequiredAction.ShareLink -> {
@@ -375,12 +384,12 @@ class BrowserTabViewModel(
             findInPage = findInPage.copy(showNumberMatches = false)
         }
         viewState.value = currentViewState().copy(findInPage = findInPage)
-        command.value = Command.FindInPageCommand(searchTerm)
+        command.value = FindInPageCommand(searchTerm)
     }
 
     fun dismissFindInView() {
         viewState.value = currentViewState().copy(findInPage = FindInPage(visible = false))
-        command.value = Command.DismissFindInPage
+        command.value = DismissFindInPage
     }
 
     fun onFindResultsReceived(activeMatchOrdinal: Int, numberOfMatches: Int) {
@@ -404,19 +413,21 @@ class BrowserTabViewModel(
         if (desktopSiteRequested && url.isMobileSite) {
             val desktopUrl = url.toDesktopUri()
             Timber.i("Original URL $urlString - attempting $desktopUrl with desktop site UA string")
-            command.value = Command.Navigate(desktopUrl.toString())
+            command.value = Navigate(desktopUrl.toString())
         } else {
-            command.value = Command.Refresh
+            command.value = Refresh
         }
     }
 
     fun resetView() {
+        site = null
+        onSiteChanged()
         viewState.value = ViewState()
     }
 
     fun userSharingLink(url: String?) {
         if (url != null) {
-            command.value = Command.ShareLink(url)
+            command.value = ShareLink(url)
         }
     }
 
