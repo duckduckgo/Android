@@ -56,13 +56,13 @@ class BrowserViewModel(private val tabRepository: TabRepository) : ViewModel() {
     }
 
     private fun openTab(query: String? = null) {
-        val tabId = tabRepository.addNew()
+        val tabId = tabRepository.add()
         command.value = NewTab(tabId, query)
     }
 
     fun onTabsUpdated(tabs: List<TabEntity>?) {
         if (tabs == null || tabs.isEmpty()) {
-            val tabId = tabRepository.addNew()
+            val tabId = tabRepository.add()
             command.value = NewTab(tabId)
             return
         }

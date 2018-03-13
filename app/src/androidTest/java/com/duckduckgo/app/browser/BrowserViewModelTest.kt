@@ -61,7 +61,7 @@ class BrowserViewModelTest {
         MockitoAnnotations.initMocks(this)
         testee = BrowserViewModel(mockTabRepository)
         testee.command.observeForever(mockCommandObserver)
-        whenever(mockTabRepository.addNew()).thenReturn(TAB_ID)
+        whenever(mockTabRepository.add()).thenReturn(TAB_ID)
     }
 
     @After

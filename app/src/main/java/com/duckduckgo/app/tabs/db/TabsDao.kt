@@ -26,9 +26,6 @@ import javax.inject.Singleton
 @Singleton
 abstract class TabsDao {
 
-    @Query("select count(*) from tabs")
-    abstract fun count(): Int
-
     @Query("select * from tabs limit 1")
     abstract fun firstTab(): TabEntity?
 

@@ -26,14 +26,17 @@ interface TabRepository {
 
     val liveSelectedTab: LiveData<TabEntity>
 
-    fun addNew(): String
+    /**
+     * @return tabId of new record
+     */
+    fun add(): String
 
     fun add(tabId: String, data: MutableLiveData<Site>)
 
     fun update(tabId: String, site: Site?)
 
     /**
-     * Returns record if it exists, otherwise creates and returns a new one
+     * @return record if it exists, otherwise a new one
      */
     fun retrieveSiteData(tabId: String): MutableLiveData<Site>
 

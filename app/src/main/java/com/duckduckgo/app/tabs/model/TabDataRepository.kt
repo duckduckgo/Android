@@ -35,7 +35,7 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao) : TabR
 
     private val siteData: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
 
-    override fun addNew(): String {
+    override fun add(): String {
         val tabId = UUID.randomUUID().toString()
         add(tabId, MutableLiveData())
         return tabId
@@ -55,9 +55,6 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao) : TabR
         }
     }
 
-    /**
-     * Returns record if it exists, otherwise creates and returns a new one
-     */
     override fun retrieveSiteData(tabId: String): MutableLiveData<Site> {
         val storedData = siteData[tabId]
         if (storedData != null) {
@@ -77,7 +74,7 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao) : TabR
     }
 
     override fun deleteAll() {
-        Schedulers.newThread().scheduleDirect {
+        Schedulers.io().scheduleDirect {
             tabsDao.deleteAllTabs()
         }
         siteData.clear()

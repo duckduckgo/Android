@@ -25,8 +25,7 @@ import com.duckduckgo.app.tabs.db.TabsDao
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.verify
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertSame
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -56,16 +55,17 @@ class TabDataRepositoryTest {
     }
 
     @Test
-    fun whenAddNewCalledTheTabAddedAndSelectedAndSiteDataCreated() {
-        val createdId = testee.addNew()
+    fun whenAddCalledTheTabAddedAndSelectedAndSiteDataCreated() {
+        val createdId = testee.add()
         verify(mockDao).addAndSelectTab(any())
         assertNotNull(testee.retrieveSiteData(createdId))
     }
 
     @Test
-    fun whenAddCalledThenSiteDataAdded() {
+    fun whenAddCalledThenTabAddedAndSiteDataAdded() {
         val record = MutableLiveData<Site>()
         testee.add(TAB_ID, record)
+        verify(mockDao).addAndSelectTab(any())
         assertSame(record, testee.retrieveSiteData(TAB_ID))
     }
 
@@ -79,6 +79,25 @@ class TabDataRepositoryTest {
     @Test
     fun whenDataDoesNotExistForTabThenRetrieveCreatesIt() {
         assertNotNull(testee.retrieveSiteData(TAB_ID))
+    }
+
+    @Test
+    fun whenTabDeletedThenTabAndDataCleared() {
+        val siteData = MutableLiveData<Site>()
+        testee.add(TAB_ID, siteData)
+
+        testee.delete(TabEntity(TAB_ID))
+        verify(mockDao).deleteTabAndUpdateSelection(any())
+        assertNotSame(siteData, testee.retrieveSiteData(TAB_ID))
+    }
+
+    @Test
+    fun whenAllDeletedThenTabAndDataCleared() {
+        val siteData = MutableLiveData<Site>()
+        testee.add(TAB_ID, siteData)
+        testee.deleteAll()
+        verify(mockDao).deleteAllTabs()
+        assertNotSame(siteData, testee.retrieveSiteData(TAB_ID))
     }
 
     @Test
