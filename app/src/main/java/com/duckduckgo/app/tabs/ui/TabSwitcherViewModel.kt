@@ -50,10 +50,10 @@ class TabSwitcherViewModel(private val tabRepository: TabRepository) : ViewModel
 
     fun onClearRequested() {
         tabRepository.deleteAll()
-        command.value = Command.Close
     }
 
     fun onClearComplete() {
         command.value = Command.DisplayMessage(R.string.fireDataCleared)
+        command.value = Command.Close
     }
 }
