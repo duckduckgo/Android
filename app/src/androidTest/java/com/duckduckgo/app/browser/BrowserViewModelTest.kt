@@ -24,10 +24,7 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command.NewTab
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.nhaarman.mockito_kotlin.lastValue
-import com.nhaarman.mockito_kotlin.never
-import com.nhaarman.mockito_kotlin.verify
-import com.nhaarman.mockito_kotlin.whenever
+import com.nhaarman.mockito_kotlin.*
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -73,47 +70,47 @@ class BrowserViewModelTest {
     fun whenNewSearchRequestedThenNewTabTriggered() {
         testee.onNewSearchRequested()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(commandCaptor.lastValue, NewTab(TAB_ID))
+        assertEquals(NewTab(TAB_ID), commandCaptor.lastValue)
     }
 
     @Test
     fun whenNewTabRequestedThenNewTabTriggered() {
         testee.onNewTabRequested("http://example.com")
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(commandCaptor.lastValue, NewTab(TAB_ID, "http://example.com"))
+        assertEquals(NewTab(TAB_ID, "http://example.com"), commandCaptor.lastValue)
     }
 
     @Test
     fun whenSharedTextReceivedThenNewTabWithQueryTriggered() {
         testee.onSharedTextReceived("a query")
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(commandCaptor.lastValue, NewTab(TAB_ID, "a query"))
+        assertEquals(NewTab(TAB_ID, "a query"), commandCaptor.lastValue)
     }
 
     @Test
     fun whenTabsUpdatedAndNoTabsThenNewTabLaunched() {
         testee.onTabsUpdated(ArrayList())
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(commandCaptor.lastValue, NewTab(TAB_ID))
+        assertEquals(NewTab(TAB_ID), commandCaptor.lastValue)
     }
 
     @Test
     fun whenTabsUpdatedWithTabsThenNewTabNotLaunched() {
         testee.onTabsUpdated(asList(TabEntity(TAB_ID, "", "")))
-        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
+        verify(mockCommandObserver, never()).onChanged(any())
     }
 
     @Test
     fun whenReloadDashboardResultReceivedThenRefreshTriggered() {
         testee.receivedDashboardResult(PrivacyDashboardActivity.RELOAD_RESULT_CODE)
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(commandCaptor.lastValue, Command.Refresh)
+        assertEquals(Command.Refresh, commandCaptor.lastValue)
     }
 
     @Test
     fun whenUnknownDashboardResultReceivedThenNoCommandTriggered() {
         testee.receivedDashboardResult(1111)
-        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
+        verify(mockCommandObserver, never()).onChanged(any())
     }
 
     @Test
@@ -126,7 +123,7 @@ class BrowserViewModelTest {
     fun whenClearCompleteThenMessageDisplayed() {
         testee.onClearComplete()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(commandCaptor.lastValue, DisplayMessage(R.string.fireDataCleared))
+        assertEquals(DisplayMessage(R.string.fireDataCleared), commandCaptor.lastValue)
     }
 
     companion object {

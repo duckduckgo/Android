@@ -146,12 +146,14 @@ class BrowserActivity : DuckDuckGoActivity() {
         })
     }
 
-    private fun clearStaleTabs(tabs: List<TabEntity>?) {
-        tabs ?: return
+    private fun clearStaleTabs(updatedTabs: List<TabEntity>?) {
+        if (updatedTabs == null) {
+            return
+        }
 
         val stale = supportFragmentManager
             .fragments.mapNotNull { it as? BrowserTabFragment }
-            .filter { fragment -> tabs.none { it.tabId == fragment.tabId } }
+            .filter { fragment -> updatedTabs.none { it.tabId == fragment.tabId } }
 
         if (stale.isNotEmpty()) {
             removeTabs(stale)
@@ -232,7 +234,7 @@ class BrowserActivity : DuckDuckGoActivity() {
             val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             manager.enqueue(request)
             pendingFileDownload = null
-            applicationContext.longToast(getString(R.string.webviewDownload))
+            applicationContext?.longToast(getString(R.string.webviewDownload))
         }
     }
 

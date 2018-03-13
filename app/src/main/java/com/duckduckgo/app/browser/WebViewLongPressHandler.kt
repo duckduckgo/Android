@@ -52,7 +52,7 @@ class WebViewLongPressHandler @Inject constructor() : LongPressHandler {
             WebView.HitTestResult.SRC_ANCHOR_TYPE -> {
                 menu.setHeaderTitle(R.string.linkOptions)
                 menu.add(0, CONTEXT_MENU_ID_OPEN_IN_NEW_TAB, 0, R.string.openInNewTab)
-                menu.add(0, CONTEXT_MENU_ID_SHARE_LINK, 0, R.string.shareLink)
+                menu.add(0, CONTEXT_MENU_ID_SHARE_LINK, 1, R.string.shareLink)
             }
             else -> Timber.v("App does not yet handle target type: $longPressTargetType")
         }

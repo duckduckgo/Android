@@ -23,7 +23,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.nhaarman.mockito_kotlin.*
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -62,7 +62,7 @@ class TabSwitcherViewModelTest {
         testee.onNewTabRequested()
         verify(mockTabRepository).add()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(commandCaptor.lastValue, Command.Close)
+        assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
     @Test
@@ -70,7 +70,7 @@ class TabSwitcherViewModelTest {
         testee.onTabSelected(TabEntity("abc", "", ""))
         verify(mockTabRepository).select(eq("abc"))
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(commandCaptor.lastValue, Command.Close)
+        assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
     @Test
@@ -90,8 +90,8 @@ class TabSwitcherViewModelTest {
     fun whenClearCompleteThenMessageDisplayedAndSwitcherClosed() {
         testee.onClearComplete()
         verify(mockCommandObserver, times(2)).onChanged(commandCaptor.capture())
-        assertEquals(commandCaptor.allValues[0], Command.DisplayMessage(R.string.fireDataCleared))
-        assertEquals(commandCaptor.allValues[1], Command.Close)
+        assertEquals(Command.DisplayMessage(R.string.fireDataCleared), commandCaptor.allValues[0])
+        assertEquals(Command.Close, commandCaptor.allValues[1])
     }
 
 }
