@@ -22,10 +22,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
-import com.nhaarman.mockito_kotlin.eq
-import com.nhaarman.mockito_kotlin.lastValue
-import com.nhaarman.mockito_kotlin.verify
-import com.nhaarman.mockito_kotlin.whenever
+import com.nhaarman.mockito_kotlin.*
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -84,18 +81,17 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenClearRequestedThenDeleteAllCalledOnRepositoryAndSwitcherClosed() {
+    fun whenClearRequestedThenDeleteAllCalledOnRepository() {
         testee.onClearRequested()
         verify(mockTabRepository).deleteAll()
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(commandCaptor.lastValue, Command.Close)
     }
 
     @Test
-    fun whenClearCompleteThenMessageDisplayed() {
+    fun whenClearCompleteThenMessageDisplayedAndSwitcherClosed() {
         testee.onClearComplete()
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(commandCaptor.lastValue, Command.DisplayMessage(R.string.fireDataCleared))
+        verify(mockCommandObserver, times(2)).onChanged(commandCaptor.capture())
+        assertEquals(commandCaptor.allValues[0], Command.DisplayMessage(R.string.fireDataCleared))
+        assertEquals(commandCaptor.allValues[1], Command.Close)
     }
 
 }
