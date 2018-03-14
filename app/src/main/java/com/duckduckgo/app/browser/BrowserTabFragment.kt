@@ -219,7 +219,7 @@ class BrowserTabFragment : Fragment(), FindListener {
                 startActivity(intent)
             }
             Command.ShowKeyboard -> {
-                omnibarTextInput.postDelayed({ omnibarTextInput?.showKeyboard() }, 200)
+                omnibarTextInput.postDelayed({ omnibarTextInput?.showKeyboard() }, 300)
             }
             Command.HideKeyboard -> {
                 hideKeyboard()
