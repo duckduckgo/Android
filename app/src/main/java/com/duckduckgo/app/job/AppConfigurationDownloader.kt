@@ -45,12 +45,12 @@ class AppConfigurationDownloader(
         val httpsUpgradeDownload = httpsUpgradeListDownloader.downloadList()
 
         return Completable.mergeDelayError(listOf(
-                easyListDownload.subscribeOn(Schedulers.io()),
-                easyPrivacyDownload.subscribeOn(Schedulers.io()),
-                trackersWhitelist.subscribeOn(Schedulers.io()),
-                disconnectDownload.subscribeOn(Schedulers.io()),
-                surrogatesDownload.subscribeOn(Schedulers.io()),
-                httpsUpgradeDownload.subscribeOn(Schedulers.io())
+                easyListDownload,
+                easyPrivacyDownload,
+                trackersWhitelist,
+                disconnectDownload,
+                surrogatesDownload,
+                httpsUpgradeDownload
         )).doOnComplete {
             Timber.i("Download task completed successfully")
             val appConfiguration = AppConfigurationEntity(appConfigurationDownloaded = true)
