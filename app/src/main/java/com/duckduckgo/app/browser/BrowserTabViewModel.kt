@@ -170,9 +170,7 @@ class BrowserTabViewModel(
     }
 
     fun onViewVisible() {
-        if (url.value != null) {
-            command.value = HideKeyboard
-        }
+        command.value = if (url.value == null) ShowKeyboard else HideKeyboard
     }
 
     fun onUserSubmittedQuery(input: String) {

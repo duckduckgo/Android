@@ -137,19 +137,10 @@ class BrowserTabFragment : Fragment(), FindListener {
         viewModel.onUserSubmittedQuery(text)
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        omnibarTextInput.doOnLayout {
-            if (omnibarTextInput.hasFocus()) {
-                omnibarTextInput.showKeyboard()
-            }
-        }
-    }
-
     override fun onResume() {
         super.onResume()
         addTextChangedListeners()
+        viewModel.onViewVisible()
     }
 
     private fun createPopupMenu() {
