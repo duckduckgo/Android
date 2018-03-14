@@ -35,8 +35,8 @@ class PrivacyPracticesAdapter : RecyclerView.Adapter<PrivacyPracticesAdapter.Pra
 
     private var terms: List<Pair<Int, String>> = ArrayList()
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): PracticeViewHolder {
-        val root = LayoutInflater.from(parent!!.context).inflate(R.layout.item_privacy_practice, parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PracticeViewHolder {
+        val root = LayoutInflater.from(parent.context).inflate(R.layout.item_privacy_practice, parent, false)
         return PracticeViewHolder(root, root.icon, root.description)
     }
 

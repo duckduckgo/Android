@@ -171,11 +171,11 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenViewBecomesVisibleWithoutActiveSiteThenKeyboardNotHidden() {
+    fun whenViewBecomesVisibleWithoutActiveSiteThenKeyboardShown() {
         testee.url.value = null
         testee.onViewVisible()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.allValues.none { it is Command.HideKeyboard })
+        assertTrue(commandCaptor.lastValue is Command.ShowKeyboard)
     }
 
     @Test
@@ -557,8 +557,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSelectsToShareLinkWithNullUrlThenShareLinkCommandNotSent() {
         testee.userSharingLink(null)
-        val allCommands = captureCommands().allValues
-        assertEquals(0, allCommands.count{ it is Command.ShareLink })
+        verify(mockCommandObserver, never()).onChanged(any())
     }
 
     private fun captureCommands() : ArgumentCaptor<Command> {

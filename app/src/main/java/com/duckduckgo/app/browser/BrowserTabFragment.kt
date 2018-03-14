@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.animation.LayoutTransition.CHANGING
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
@@ -36,6 +37,8 @@ import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.widget.EditText
 import android.widget.TextView
+import androidx.view.postDelayed
+import androidx.view.updatePaddingRelative
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
@@ -125,13 +128,19 @@ class BrowserTabFragment : Fragment(), FindListener {
         configureOmnibarTextInput()
         configureFindInPage()
         configureAutoComplete()
-        addTextChangedListeners()
+        configureKeyboardAwareLogoAnimation()
         consumeSharedText()
     }
 
     private fun consumeSharedText() {
         val text = arguments?.getString(QUERY_EXTRA_ARG) ?: return
         viewModel.onUserSubmittedQuery(text)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        addTextChangedListeners()
+        viewModel.onViewVisible()
     }
 
     private fun createPopupMenu() {
@@ -210,7 +219,7 @@ class BrowserTabFragment : Fragment(), FindListener {
                 startActivity(intent)
             }
             Command.ShowKeyboard -> {
-                omnibarTextInput.postDelayed({ omnibarTextInput?.showKeyboard() }, 100)
+                showKeyboard()
             }
             Command.HideKeyboard -> {
                 hideKeyboard()
@@ -337,7 +346,7 @@ class BrowserTabFragment : Fragment(), FindListener {
     private fun showFindInPageView(viewState: FindInPage) {
         if (findInPageContainer.visibility != View.VISIBLE) {
             findInPageContainer.show()
-            findInPageInput.postDelayed({ findInPageInput?.showKeyboard() }, 300)
+            findInPageInput.postDelayed(KEYBOARD_DELAY) { findInPageInput?.showKeyboard() }
         }
 
         when (viewState.showNumberMatches) {
@@ -369,14 +378,14 @@ class BrowserTabFragment : Fragment(), FindListener {
     private fun showClearButton() {
         omnibarTextInput.post {
             clearOmnibarInputButton?.show()
-            omnibarTextInput?.updatePadding(paddingEnd = 40.toPx())
+            omnibarTextInput?.updatePaddingRelative(end = 40.toPx())
         }
     }
 
     private fun hideClearButton() {
         omnibarTextInput.post {
             clearOmnibarInputButton?.hide()
-            omnibarTextInput?.updatePadding(paddingEnd = 10.toPx())
+            omnibarTextInput?.updatePaddingRelative(end = 10.toPx())
         }
     }
 
@@ -397,6 +406,7 @@ class BrowserTabFragment : Fragment(), FindListener {
                     return@setOnMenuItemClickListener true
                 }
                 R.id.browserPopup -> {
+                    hideKeyboard()
                     launchPopupMenu()
                     return@setOnMenuItemClickListener true
                 }
@@ -452,6 +462,10 @@ class BrowserTabFragment : Fragment(), FindListener {
         })
 
         clearOmnibarInputButton.setOnClickListener { omnibarTextInput.setText("") }
+    }
+
+    private fun configureKeyboardAwareLogoAnimation() {
+        logoParent.layoutTransition.enableTransitionType(CHANGING)
     }
 
     private fun userEnteredQuery(query: String) {
@@ -551,8 +565,18 @@ class BrowserTabFragment : Fragment(), FindListener {
     }
 
     private fun hideKeyboard() {
-        omnibarTextInput.hideKeyboard()
-        focusDummy.requestFocus()
+        if (!isHidden) {
+            Timber.v("Keyboard now hiding")
+            omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibarTextInput?.hideKeyboard() }
+            focusDummy.requestFocus()
+        }
+    }
+
+    private fun showKeyboard() {
+        if (!isHidden) {
+            Timber.v("Keyboard now showing")
+            omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibarTextInput?.showKeyboard() }
+        }
     }
 
     override fun onSaveInstanceState(bundle: Bundle) {
@@ -577,7 +601,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         viewModel.resetView()
         destroyWebView()
         configureWebView()
-        omnibarTextInput.postDelayed({ omnibarTextInput?.showKeyboard() }, 300)
+        showKeyboard()
     }
 
     fun onBackPressed(): Boolean {
@@ -611,6 +635,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         private const val TAB_ID_ARG = "TAB_ID_ARG"
         private const val ADD_BOOKMARK_FRAGMENT_TAG = "ADD_BOOKMARK"
         private const val QUERY_EXTRA_ARG = "QUERY_EXTRA_ARG"
+        private const val KEYBOARD_DELAY = 200L
 
         fun newInstance(tabId: String, query: String? = null): BrowserTabFragment {
             val fragment = BrowserTabFragment()

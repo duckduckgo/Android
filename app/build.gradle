@@ -77,8 +77,9 @@ android {
 }
 
 ext {
-    supportLibrary = "27.0.2"
+    supportLibrary = "27.1.0"
     architectureComponents = "1.0.0"
+    architectureComponentsExtensions = "1.1.0"
     dagger = "2.14.1"
     retrofit = "2.3.0"
     ankoVersion = "0.10.4"
@@ -113,8 +114,11 @@ dependencies {
     implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
     implementation "org.jetbrains.anko:anko-design:$ankoVersion"
 
+    // Android KTX
+    implementation 'androidx.core:core-ktx:0.2'
+
     // ViewModel and LiveData
-    implementation "android.arch.lifecycle:extensions:$architectureComponents"
+    implementation "android.arch.lifecycle:extensions:$architectureComponentsExtensions"
     kapt "android.arch.lifecycle:compiler:$architectureComponents"
     testImplementation "android.arch.core:core-testing:$architectureComponents"
     androidTestImplementation "android.arch.core:core-testing:$architectureComponents"

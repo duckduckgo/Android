@@ -130,7 +130,6 @@ class BrowserTabViewModel(
         viewState.value = ViewState()
         appConfigurationObservable.observeForever(appConfigurationObserver)
         configureAutoComplete()
-        command.value = ShowKeyboard
     }
 
     fun load(tabId: String) {
@@ -170,9 +169,7 @@ class BrowserTabViewModel(
     }
 
     fun onViewVisible() {
-        if (url.value != null) {
-            command.value = HideKeyboard
-        }
+        command.value = if (url.value == null) ShowKeyboard else Command.HideKeyboard
     }
 
     fun onUserSubmittedQuery(input: String) {

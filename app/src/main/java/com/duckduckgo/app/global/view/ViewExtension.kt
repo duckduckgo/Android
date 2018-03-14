@@ -79,17 +79,5 @@ fun View.hideKeyboard(): Boolean {
     return false
 }
 
-/**
- * Update the padding. Only specify the padding you want updated; all others will take current value
- *
- * Values are to be specified in pixels.
- */
-fun View.updatePadding(paddingStart: Int = getPaddingStart(),
-                       paddingTop: Int = getPaddingTop(),
-                       paddingEnd: Int = getPaddingEnd(),
-                       paddingBottom: Int = getPaddingBottom()) {
-    setPaddingRelative(paddingStart, paddingTop, paddingEnd, paddingBottom)
-}
-
 fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density).toInt()
 fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()

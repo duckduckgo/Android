@@ -34,8 +34,8 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
 
     private var data: List<TabEntity> = ArrayList()
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): TabViewHolder {
-        val inflater = LayoutInflater.from(parent!!.context)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TabViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
         val root = inflater.inflate(R.layout.item_tab, parent, false)
         return TabViewHolder(root, root.favicon, root.title, root.url, root.close)
     }
