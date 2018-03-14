@@ -130,7 +130,6 @@ class BrowserTabViewModel(
         viewState.value = ViewState()
         appConfigurationObservable.observeForever(appConfigurationObserver)
         configureAutoComplete()
-        command.value = ShowKeyboard
     }
 
     fun load(tabId: String) {
