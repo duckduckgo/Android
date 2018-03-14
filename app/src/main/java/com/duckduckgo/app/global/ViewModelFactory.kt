@@ -21,6 +21,7 @@ import android.arch.lifecycle.ViewModelProvider
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
+import com.duckduckgo.app.browser.BrowserTabViewModel
 import com.duckduckgo.app.browser.BrowserViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.LongPressHandler
@@ -28,39 +29,38 @@ import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
-import com.duckduckgo.app.privacymonitor.db.NetworkLeaderboardDao
-import com.duckduckgo.app.privacymonitor.store.PrivacyMonitorRepository
-import com.duckduckgo.app.privacymonitor.store.PrivacySettingsSharedPreferences
-import com.duckduckgo.app.privacymonitor.store.TermsOfServiceStore
-import com.duckduckgo.app.privacymonitor.ui.PrivacyDashboardViewModel
-import com.duckduckgo.app.privacymonitor.ui.PrivacyPracticesViewModel
-import com.duckduckgo.app.privacymonitor.ui.ScorecardViewModel
-import com.duckduckgo.app.privacymonitor.ui.TrackerNetworksViewModel
+import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
+import com.duckduckgo.app.privacy.store.PrivacySettingsSharedPreferences
+import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel
+import com.duckduckgo.app.privacy.ui.PrivacyPracticesViewModel
+import com.duckduckgo.app.privacy.ui.ScorecardViewModel
+import com.duckduckgo.app.privacy.ui.TrackerNetworksViewModel
 import com.duckduckgo.app.settings.SettingsViewModel
 import com.duckduckgo.app.global.db.AppConfigurationDao
+import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
-import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
+import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel
 import javax.inject.Inject
 
 
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory @Inject constructor(
-        private val statisticsUpdater: StatisticsUpdater,
-        private val onboaringStore: OnboardingStore,
-        private val queryUrlConverter: QueryUrlConverter,
-        private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-        private val privacyMonitorRepository: PrivacyMonitorRepository,
-        private val privacySettingsStore: PrivacySettingsSharedPreferences,
-        private val termsOfServiceStore: TermsOfServiceStore,
-        private val trackerNetworks: TrackerNetworks,
-        private val stringResolver: StringResolver,
-        private val appConfigurationDao: AppConfigurationDao,
-        private val networkLeaderboardDao: NetworkLeaderboardDao,
-        private val bookmarksDao: BookmarksDao,
-        private val autoCompleteApi: AutoCompleteApi,
-        private val appSettingsPreferencesStore: SettingsDataStore,
-        private val webViewLongPressHandler: LongPressHandler
+    private val statisticsUpdater: StatisticsUpdater,
+    private val onboaringStore: OnboardingStore,
+    private val queryUrlConverter: QueryUrlConverter,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    private val tabRepository: TabRepository,
+    private val privacySettingsStore: PrivacySettingsSharedPreferences,
+    private val siteFactory: SiteFactory,
+    private val stringResolver: StringResolver,
+    private val appConfigurationDao: AppConfigurationDao,
+    private val networkLeaderboardDao: NetworkLeaderboardDao,
+    private val bookmarksDao: BookmarksDao,
+    private val autoCompleteApi: AutoCompleteApi,
+    private val appSettingsPreferencesStore: SettingsDataStore,
+    private val webViewLongPressHandler: LongPressHandler
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -68,7 +68,9 @@ class ViewModelFactory @Inject constructor(
                 when {
                     isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboaringStore)
                     isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore)
-                    isAssignableFrom(BrowserViewModel::class.java) -> browserViewModel()
+                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository)
+                    isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
+                    isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository)
                     isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(privacySettingsStore, networkLeaderboardDao)
                     isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                     isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
@@ -79,13 +81,12 @@ class ViewModelFactory @Inject constructor(
                 }
             } as T
 
-    private fun browserViewModel(): ViewModel = BrowserViewModel(
+    private fun browserTabViewModel(): ViewModel = BrowserTabViewModel(
             statisticsUpdater = statisticsUpdater,
             queryUrlConverter = queryUrlConverter,
             duckDuckGoUrlDetector = duckDuckGoUrlDetector,
-            termsOfServiceStore = termsOfServiceStore,
-            trackerNetworks = trackerNetworks,
-            privacyMonitorRepository = privacyMonitorRepository,
+            siteFactory = siteFactory,
+            tabRepository = tabRepository,
             networkLeaderboardDao = networkLeaderboardDao,
             bookmarksDao = bookmarksDao,
             appSettingsPreferencesStore = appSettingsPreferencesStore,

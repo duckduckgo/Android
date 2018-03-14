@@ -20,13 +20,14 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
-import android.support.annotation.WorkerThread
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
+import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment.SaveBookmarkListener
 import com.duckduckgo.app.global.SingleLiveEvent
+import io.reactivex.schedulers.Schedulers
 
-class BookmarksViewModel(val dao: BookmarksDao): ViewModel() {
+class BookmarksViewModel(val dao: BookmarksDao): SaveBookmarkListener, ViewModel() {
 
     data class ViewState(val showBookmarks: Boolean = false,
                          val bookmarks: List<BookmarkEntity> = emptyList())
@@ -55,6 +56,12 @@ class BookmarksViewModel(val dao: BookmarksDao): ViewModel() {
         bookmarks.removeObserver(bookmarksObserver)
     }
 
+    override fun onBookmarkSaved(id: Int?, title: String, url: String) {
+        id?.let {
+            editBookmark(it, title, url)
+        }
+    }
+
     private fun onBookmarksChanged(bookmarks: List<BookmarkEntity>) {
         viewState.value = viewState.value?.copy(showBookmarks = bookmarks.isNotEmpty(), bookmarks = bookmarks)
     }
@@ -71,14 +78,16 @@ class BookmarksViewModel(val dao: BookmarksDao): ViewModel() {
         command.value = ShowEditBookmark(bookmark)
     }
 
-    @WorkerThread
     fun delete(bookmark: BookmarkEntity) {
-        dao.delete(bookmark)
+        Schedulers.io().scheduleDirect {
+            dao.delete(bookmark)
+        }
     }
 
-    @WorkerThread
-    fun editBookmark(id: Int, title: String, url: String) {
-        dao.update(BookmarkEntity(id, title, url))
+    private fun editBookmark(id: Int, title: String, url: String) {
+        Schedulers.io().scheduleDirect {
+            dao.update(BookmarkEntity(id, title, url))
+        }
     }
 
 }

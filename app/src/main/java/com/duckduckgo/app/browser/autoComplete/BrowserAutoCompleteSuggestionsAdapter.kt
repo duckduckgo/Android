@@ -92,7 +92,7 @@ class BrowserAutoCompleteSuggestionsAdapter @Inject constructor(
 
                 phrase.text = item.phrase
 
-                val phraseOrUrlImage = if (item.isUrl) R.drawable.ic_globe_white_24dp else R.drawable.ic_search_white_18dp
+                val phraseOrUrlImage = if (item.isUrl) R.drawable.ic_globe_white_16dp else R.drawable.ic_search_white_18dp
                 phraseOrUrlIndicator.setImageResource(phraseOrUrlImage)
 
                 editQueryImage.setOnClickListener { editableSearchClickListener(item) }

@@ -15,7 +15,7 @@
 
 
     <!-- Browser Activity -->
-    <string name="browserPopupMenu">Browser popup menu</string>
+    <string name="browserPopupMenu">Browser menu</string>
     <string name="refresh">Refresh</string>
     <string name="back">Back</string>
     <string name="forward">Forward</string>
@@ -27,9 +27,15 @@
     <string name="downloadImage">Download Image</string>
     <string name="imageOptions">Image Options</string>
     <string name="permissionRequiredToDownload">Downloading requires storage permission</string>
-    <string name="find_in_page">Find in page</string>
+    <string name="requestDesktopSiteMenuTitle">Desktop Site</string>
+
+    <!-- Sharing options -->
+    <string name="linkOptions">Link Options</string>
+    <string name="shareLink">Share Link</string>
+    <string name="shareMenuTitle">Share…</string>
 
     <!-- Find in page -->
+    <string name="find_in_page">Find in page</string>
     <string name="nextSearchTermDescription">Find next</string>
     <string name="previousSearchTermDescription">Find previous</string>
     <string name="closeFindInPageButtonDescription">Close find in page view</string>
@@ -39,6 +45,16 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Edit query before searching</string>
     <string name="settings_autocomplete_enabled">Autcomplete Suggestions</string>
+
+    <!-- Tabs -->
+    <string name="homeTab">DuckDuckGo</string>
+    <string name="tabActivityTitle">Tabs</string>
+    <string name="tabsMenuItem">Tabs</string>
+    <string name="newTabMenuItem">New Tab</string>
+    <string name="openInNewTab">Open in New Tab</string>
+    <string name="faviconContentDescription">Favicon</string>
+    <string name="closeContentDescription">Close</string>
+    <string name="tapFireToForget">Tap %s to forget everything</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
@@ -105,7 +121,7 @@
 
     <!-- Fire -->
     <string name="fireMenu">Clear Data</string>
-    <string name="fireClearAll">Clear All Data</string>
+    <string name="fireClearAll">Clear All Tabs and Data</string>
     <string name="fireCancel">Cancel</string>
     <string name="fireDataCleared">Data cleared</string>
 

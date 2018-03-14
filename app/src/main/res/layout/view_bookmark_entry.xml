@@ -22,9 +22,21 @@
     android:background="?android:attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true"
-    android:layout_marginTop="6dp"
+    android:layout_marginTop="4dp"
     android:layout_marginBottom="4dp"
 >
+
+    <ImageView
+        android:id="@+id/favicon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="22dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_globe_white_16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
 
     <TextView
         android:id="@+id/title"
@@ -39,7 +51,7 @@
         app:layout_constraintBottom_toTopOf="@+id/url"
         app:layout_constraintEnd_toStartOf="@+id/overflowMenu"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/favicon"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Bookmark" />
 
@@ -50,13 +62,13 @@
         android:fontFamily="sans-serif"
         android:layout_marginStart="22dp"
         android:paddingTop="2dp"
+        app:layout_constraintStart_toEndOf="@id/favicon"
         android:paddingBottom="4dp"
         android:textColor="@color/warmGray"
         android:textSize="12sp"
         android:textStyle="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/overflowMenu"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title"
         tools:text="Bookmark" />
 

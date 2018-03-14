@@ -18,7 +18,7 @@ package com.duckduckgo.app.di
 
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeDomainFromStringAdapter
 import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomain
-import com.duckduckgo.app.privacymonitor.api.TermsOfServiceListAdapter
+import com.duckduckgo.app.privacy.api.TermsOfServiceListAdapter
 import com.duckduckgo.app.trackerdetection.api.DisconnectListJsonAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi

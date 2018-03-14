@@ -32,23 +32,23 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupMenu
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
-import com.duckduckgo.app.bookmarks.ui.BookmarkAddEditDialogFragment.BookmarkDialogEditListener
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.app.global.faviconLocation
+import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.show
-import com.duckduckgo.app.home.HomeActivity
 import kotlinx.android.synthetic.main.content_bookmarks.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.view_bookmark_entry.view.*
 import org.jetbrains.anko.alert
-import org.jetbrains.anko.doAsync
 import timber.log.Timber
 import javax.inject.Inject
 
-class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
+class BookmarksActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -98,8 +98,9 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
     }
 
     private fun showEditBookmarkDialog(bookmark: BookmarkEntity) {
-        val dialog = BookmarkAddEditDialogFragment.createDialogEditingMode(bookmark)
+        val dialog = SaveBookmarkDialogFragment.createDialogEditingMode(bookmark)
         dialog.show(supportFragmentManager, EDIT_BOOKMARK_FRAGMENT_TAG)
+        dialog.listener = viewModel
     }
 
     private fun showBookmarks() {
@@ -113,7 +114,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
     }
 
     private fun openBookmark(bookmark: BookmarkEntity) {
-        startActivity(HomeActivity.intent(this, bookmark.url))
+        startActivity(BrowserActivity.intent(this, bookmark.url))
         finish()
     }
 
@@ -130,9 +131,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
     }
 
     private fun delete(bookmark: BookmarkEntity) {
-        doAsync {
-            viewModel.delete(bookmark)
-        }
+        viewModel.delete(bookmark)
     }
 
     override fun onDestroy() {
@@ -149,7 +148,8 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
         private const val EDIT_BOOKMARK_FRAGMENT_TAG = "EDIT_BOOKMARK"
     }
 
-    class BookmarksAdapter(val context: Context, val viewModel: BookmarksViewModel) : Adapter<BookmarksViewHolder>() {
+    class BookmarksAdapter(private val context: Context,
+                           private val viewModel: BookmarksViewModel) : Adapter<BookmarksViewHolder>() {
 
         var bookmarks: List<BookmarkEntity> = emptyList()
             set(value) {
@@ -157,24 +157,22 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
                 notifyDataSetChanged()
             }
 
-
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): BookmarksViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookmarksViewHolder {
             val inflater = LayoutInflater.from(context)
             val view = inflater.inflate(R.layout.view_bookmark_entry, parent, false)
             return BookmarksViewHolder(view, viewModel)
         }
 
-        override fun onBindViewHolder(holder: BookmarksViewHolder?, position: Int) {
-            holder?.update(bookmarks[position])
+        override fun onBindViewHolder(holder: BookmarksViewHolder, position: Int) {
+            holder.update(bookmarks[position])
         }
 
         override fun getItemCount(): Int {
             return bookmarks.size
         }
-
     }
 
-    class BookmarksViewHolder(itemView: View?, val viewModel: BookmarksViewModel) :
+    class BookmarksViewHolder(itemView: View?, private val viewModel: BookmarksViewModel) :
         ViewHolder(itemView) {
 
         lateinit var bookmark: BookmarkEntity
@@ -189,6 +187,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
 
             itemView.title.text = bookmark.title
             itemView.url.text = parseDisplayUrl(bookmark.url)
+            loadFavicon(bookmark.url)
 
             itemView.overflowMenu.setOnClickListener {
                 showOverFlowMenu(itemView.overflowMenu, bookmark)
@@ -197,6 +196,16 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
             itemView.setOnClickListener {
                 viewModel.onSelected(bookmark)
             }
+        }
+
+        private fun loadFavicon(url: String) {
+            val faviconUrl = Uri.parse(url).faviconLocation()
+
+            GlideApp.with(itemView)
+                    .load(faviconUrl)
+                    .placeholder(R.drawable.ic_globe_white_16dp)
+                    .error(R.drawable.ic_globe_white_16dp)
+                    .into(itemView.favicon)
         }
 
         private fun parseDisplayUrl(urlString: String): String {
@@ -233,9 +242,5 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarkDialogEditListener {
             Timber.i("Deleting bookmark ${bookmark.title}")
             viewModel.onDeleteRequested(bookmark)
         }
-    }
-
-    override fun userWantsToEditBookmark(id: Int, title: String, url: String) {
-        doAsync { viewModel.editBookmark(id, title, url) }
     }
 }

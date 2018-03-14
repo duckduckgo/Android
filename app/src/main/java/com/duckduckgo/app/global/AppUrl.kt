@@ -22,6 +22,7 @@ class AppUrl {
     object Url {
         const val HOST = "duckduckgo.com"
         const val BASE = "https://$HOST"
+        const val HOME =  BASE
         const val ABOUT = "$BASE/about"
         const val TOSDR = "https://tosdr.org"
     }
@@ -37,4 +38,5 @@ class AppUrl {
     object ParamValue {
         const val SOURCE = "ddg_android"
     }
+
 }

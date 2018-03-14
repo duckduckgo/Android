@@ -57,12 +57,21 @@
             android:contentDescription="@string/refresh"
             android:src="@drawable/ic_refresh_24px" />
 
+        <ImageButton
+            android:id="@+id/tabsMenuItem"
+            style="@style/BrowserIconMenuItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/tabsMenuItem"
+            android:src="@drawable/ic_tabs_24px" />
+
     </LinearLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/white_two"
+        android:background="@color/whiteTwo"
         app:layout_constraintBottom_toBottomOf="@+id/header" />
 
     <ScrollView
@@ -78,27 +87,46 @@
             android:paddingTop="13dp">
 
             <TextView
+                android:id="@+id/newTabPopupMenuItem"
+                style="@style/BrowserTextMenuItem"
+                android:text="@string/newTabMenuItem" />
+
+            <TextView
                 android:id="@+id/bookmarksPopupMenuItem"
                 style="@style/BrowserTextMenuItem"
-                android:enabled="false"
                 android:text="@string/bookmarksMenuTitle" />
 
             <TextView
                 android:id="@+id/addBookmarksPopupMenuItem"
                 style="@style/BrowserTextMenuItem"
-                android:enabled="false"
                 android:text="@string/addBookmarkMenuTitle" />
+
+            <TextView
+                android:id="@+id/sharePageMenuItem"
+                style="@style/BrowserTextMenuItem"
+                android:text="@string/shareMenuTitle" />
 
             <TextView
                 android:id="@+id/findInPageMenuItem"
                 style="@style/BrowserTextMenuItem"
-                android:enabled="false"
                 android:text="@string/find_in_page" />
+
+            <CheckBox
+                android:id="@+id/requestDesktopSiteCheckMenuItem"
+                style="@style/BrowserTextMenuItem"
+                android:button="@null"
+                android:paddingStart="30dp"
+                android:paddingEnd="0dp"
+                android:layout_marginEnd="20dp"
+                android:drawablePadding="30dp"
+                android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
+                android:text="@string/requestDesktopSiteMenuTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/settingsPopupMenuItem"
                 style="@style/BrowserTextMenuItem"
-                android:enabled="false"
                 android:text="@string/settingsMenuItemTitle" />
 
         </LinearLayout>

@@ -45,3 +45,22 @@ val Uri.hasIpHost: Boolean
         val ipRegex = Regex("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
         return baseHost?.matches(ipRegex) ?: false
     }
+
+val Uri.isMobileSite: Boolean
+    get() = authority.startsWith("m.")
+
+fun Uri.toDesktopUri(): Uri {
+    return if (isMobileSite) {
+        Uri.parse(toString().replaceFirst("m.", ""))
+    } else {
+        this
+    }
+}
+
+private const val faviconBaseUrlFormat = "https://icons.duckduckgo.com/ip3/%s.ico"
+
+fun Uri?.faviconLocation(): Uri? {
+    val host = this?.host
+    if (host.isNullOrBlank()) return null
+    return Uri.parse(String.format(faviconBaseUrlFormat, host))
+}

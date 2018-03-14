@@ -21,8 +21,7 @@ import android.view.MenuItem
 import android.webkit.URLUtil
 import android.webkit.WebView
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
-import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
-import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.None
+import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -33,7 +32,9 @@ interface LongPressHandler {
 
     sealed class RequiredAction {
         object None : RequiredAction()
+        class OpenInNewTab(val url: String) : RequiredAction()
         class DownloadFile(val url: String) : RequiredAction()
+        class ShareLink(val url: String) : RequiredAction()
     }
 }
 
@@ -48,14 +49,25 @@ class WebViewLongPressHandler @Inject constructor() : LongPressHandler {
                     menu.add(0, CONTEXT_MENU_ID_DOWNLOAD_IMAGE, 0, R.string.downloadImage)
                 }
             }
+            WebView.HitTestResult.SRC_ANCHOR_TYPE -> {
+                menu.setHeaderTitle(R.string.linkOptions)
+                menu.add(0, CONTEXT_MENU_ID_OPEN_IN_NEW_TAB, 1, R.string.openInNewTab)
+                menu.add(0, CONTEXT_MENU_ID_SHARE_LINK, 2, R.string.shareLink)
+            }
             else -> Timber.v("App does not yet handle target type: $longPressTargetType")
         }
     }
 
     override fun userSelectedMenuItem(longPressTarget: String, item: MenuItem): RequiredAction {
         return when (item.itemId) {
+            CONTEXT_MENU_ID_OPEN_IN_NEW_TAB -> {
+                return OpenInNewTab(longPressTarget)
+            }
             CONTEXT_MENU_ID_DOWNLOAD_IMAGE -> {
                 return DownloadFile(longPressTarget)
+            }
+            CONTEXT_MENU_ID_SHARE_LINK -> {
+                return ShareLink(longPressTarget)
             }
             else -> None
         }
@@ -63,6 +75,8 @@ class WebViewLongPressHandler @Inject constructor() : LongPressHandler {
 
 
     companion object {
-        const val CONTEXT_MENU_ID_DOWNLOAD_IMAGE = 1
+        const val CONTEXT_MENU_ID_OPEN_IN_NEW_TAB = 1
+        const val CONTEXT_MENU_ID_DOWNLOAD_IMAGE = 2
+        const val CONTEXT_MENU_ID_SHARE_LINK = 3
     }
 }

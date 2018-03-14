@@ -104,7 +104,7 @@ class HttpsUpgraderPerformanceTest {
             dao.insertAll(HttpsUpgradeDomain("domain$i.com"))
         }
 
-        val testDomains = Array<String>(size, {
+        val testDomains = Array(size, {
             "testdomain$it.com"
         })
 

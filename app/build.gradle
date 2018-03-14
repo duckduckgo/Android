@@ -6,7 +6,7 @@ apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
 
 ext {
-    VERSION_NAME = "4.4.2"
+    VERSION_NAME = "5.0.0"
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
 }
 
@@ -25,6 +25,9 @@ android {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
             }
+        }
+        sourceSets {
+            androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
         }
     }
     signingConfigs {
@@ -74,11 +77,13 @@ android {
 }
 
 ext {
-    supportLibrary = "27.0.2"
+    supportLibrary = "27.1.0"
     architectureComponents = "1.0.0"
+    architectureComponentsExtensions = "1.1.0"
     dagger = "2.14.1"
     retrofit = "2.3.0"
     ankoVersion = "0.10.4"
+    glide = "4.6.1"
 }
 
 
@@ -109,8 +114,11 @@ dependencies {
     implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
     implementation "org.jetbrains.anko:anko-design:$ankoVersion"
 
+    // Android KTX
+    implementation 'androidx.core:core-ktx:0.2'
+
     // ViewModel and LiveData
-    implementation "android.arch.lifecycle:extensions:$architectureComponents"
+    implementation "android.arch.lifecycle:extensions:$architectureComponentsExtensions"
     kapt "android.arch.lifecycle:compiler:$architectureComponents"
     testImplementation "android.arch.core:core-testing:$architectureComponents"
     androidTestImplementation "android.arch.core:core-testing:$architectureComponents"
@@ -126,6 +134,10 @@ dependencies {
     kapt "com.google.dagger:dagger-compiler:$dagger"
     kaptAndroidTest "com.google.dagger:dagger-android-processor:$dagger"
     kaptAndroidTest "com.google.dagger:dagger-compiler:$dagger"
+
+    // Glide
+    implementation "com.github.bumptech.glide:glide:$glide"
+    kapt "com.github.bumptech.glide:compiler:$glide"
 
     testImplementation "org.mockito:mockito-core:2.15.0"
     testImplementation "com.nhaarman:mockito-kotlin-kt1.1:1.5.0"

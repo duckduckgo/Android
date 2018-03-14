@@ -55,7 +55,7 @@ class LegacyMigrationTest {
 
         deleteLegacyDb()
 
-        val migration = LegacyMigration(appDatabase, bookmarksDao, context, urlConverter);
+        val migration = LegacyMigration(appDatabase, bookmarksDao, context, urlConverter)
 
         migration.start { favourites, searches ->
             assertEquals(0, favourites)
@@ -72,7 +72,7 @@ class LegacyMigrationTest {
         populateLegacyDB()
 
         // migrate
-        val migration = LegacyMigration(appDatabase, bookmarksDao, context, urlConverter);
+        val migration = LegacyMigration(appDatabase, bookmarksDao, context, urlConverter)
 
         migration.start { favourites, searches ->
             assertEquals(1, favourites)
