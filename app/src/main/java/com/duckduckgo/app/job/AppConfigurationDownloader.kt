@@ -23,7 +23,6 @@ import com.duckduckgo.app.surrogates.api.ResourceSurrogateListDownloader
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import io.reactivex.Completable
-import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
 interface ConfigurationDownloader{
