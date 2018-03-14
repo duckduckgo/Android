@@ -30,20 +30,18 @@ fun TabEntity.displayTitle(context: Context): String {
     if (isBlank) {
         return context.getString(R.string.homeTab)
     }
+
     return title ?: Uri.parse(resolvedUrl()).host ?: ""
 }
 
-private fun TabEntity.resolvedUrl(): String? {
-    return if (isBlank) AppUrl.Url.HOME else url
+private fun TabEntity.resolvedUrl(): String {
+    return if (isBlank) AppUrl.Url.HOME else url ?: ""
 }
 
 fun TabEntity.displayUrl(): String {
-    return resolvedUrl() ?: ""
+    return resolvedUrl()
 }
 
 fun TabEntity.favicon(): Uri? {
-    resolvedUrl()?.let {
-        return Uri.parse(resolvedUrl())?.faviconLocation()
-    }
-    return null
+    return Uri.parse(resolvedUrl())?.faviconLocation()
 }
