@@ -346,7 +346,7 @@ class BrowserTabFragment : Fragment(), FindListener {
     private fun showFindInPageView(viewState: FindInPage) {
         if (findInPageContainer.visibility != View.VISIBLE) {
             findInPageContainer.show()
-            findInPageInput.postDelayed({ findInPageInput?.showKeyboard() }, 300)
+            findInPageInput.postDelayed(KEYBOARD_DELAY) { findInPageInput?.showKeyboard() }
         }
 
         when (viewState.showNumberMatches) {
@@ -565,12 +565,18 @@ class BrowserTabFragment : Fragment(), FindListener {
     }
 
     private fun hideKeyboard() {
-        omnibarTextInput.hideKeyboard()
-        focusDummy.requestFocus()
+        if (!isHidden) {
+            Timber.v("Keyboard now hiding")
+            omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibarTextInput?.hideKeyboard() }
+            focusDummy.requestFocus()
+        }
     }
 
     private fun showKeyboard() {
-        omnibarTextInput.postDelayed(300) { omnibarTextInput?.showKeyboard() }
+        if (!isHidden) {
+            Timber.v("Keyboard now showing")
+            omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibarTextInput?.showKeyboard() }
+        }
     }
 
     override fun onSaveInstanceState(bundle: Bundle) {
@@ -629,6 +635,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         private const val TAB_ID_ARG = "TAB_ID_ARG"
         private const val ADD_BOOKMARK_FRAGMENT_TAG = "ADD_BOOKMARK"
         private const val QUERY_EXTRA_ARG = "QUERY_EXTRA_ARG"
+        private const val KEYBOARD_DELAY = 200L
 
         fun newInstance(tabId: String, query: String? = null): BrowserTabFragment {
             val fragment = BrowserTabFragment()
