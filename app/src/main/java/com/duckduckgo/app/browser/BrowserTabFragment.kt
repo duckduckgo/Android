@@ -346,7 +346,7 @@ class BrowserTabFragment : Fragment(), FindListener {
     private fun showFindInPageView(viewState: FindInPage) {
         if (findInPageContainer.visibility != View.VISIBLE) {
             findInPageContainer.show()
-            findInPageInput.postDelayed({ findInPageInput?.showKeyboard() }, 200)
+            findInPageInput.postDelayed({ findInPageInput?.showKeyboard() }, 300)
         }
 
         when (viewState.showNumberMatches) {
@@ -591,7 +591,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         viewModel.resetView()
         destroyWebView()
         configureWebView()
-        omnibarTextInput.postDelayed({ omnibarTextInput?.showKeyboard() }, 200)
+        omnibarTextInput.postDelayed({ omnibarTextInput?.showKeyboard() }, 300)
     }
 
     fun onBackPressed(): Boolean {
