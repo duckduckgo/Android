@@ -557,8 +557,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSelectsToShareLinkWithNullUrlThenShareLinkCommandNotSent() {
         testee.userSharingLink(null)
-        val allCommands = captureCommands().allValues
-        assertEquals(0, allCommands.count{ it is Command.ShareLink })
+        verify(mockCommandObserver, never()).onChanged(any())
     }
 
     private fun captureCommands() : ArgumentCaptor<Command> {
