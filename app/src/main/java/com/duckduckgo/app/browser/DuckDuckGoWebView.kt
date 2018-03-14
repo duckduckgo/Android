@@ -17,30 +17,52 @@
 package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
+import android.annotation.TargetApi
 import android.content.Context
+import android.os.Build
 import android.support.v4.view.NestedScrollingChild
 import android.support.v4.view.NestedScrollingChildHelper
 import android.support.v4.view.ViewCompat
 import android.util.AttributeSet
 import android.view.MotionEvent
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputConnection
 import android.webkit.WebView
 
 /**
- * NestedWebView which allows the WebView to hide the toolbar when placed in a CoordinatorLayout
+ * WebView subclass which allows the WebView to
+ *   - hide the toolbar when placed in a CoordinatorLayout
+ *   - add the flag so that users' typing isn't used for personalisation
  *
- * Based on https://github.com/takahirom/webview-in-coordinatorlayout
+ * Originally based on https://github.com/takahirom/webview-in-coordinatorlayout for scrolling behaviour
  */
-class NestedWebView : WebView, NestedScrollingChild {
+class DuckDuckGoWebView : WebView, NestedScrollingChild {
     private var lastY: Int = 0
     private val scrollOffset = IntArray(2)
     private val scrollConsumed = IntArray(2)
-    private var nestedOffetY: Int = 0
+    private var nestedOffsetY: Int = 0
     private var nestedScrollHelper: NestedScrollingChildHelper = NestedScrollingChildHelper(this)
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
     {
         isNestedScrollingEnabled = true
+    }
+
+    override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection? {
+        val inputConnection = super.onCreateInputConnection(outAttrs) ?: return null
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            addNoPersonalisedFlag(outAttrs)
+        }
+
+        return inputConnection
+    }
+
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private fun addNoPersonalisedFlag(outAttrs: EditorInfo) {
+        outAttrs.imeOptions = outAttrs.imeOptions or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -50,10 +72,10 @@ class NestedWebView : WebView, NestedScrollingChild {
         val event = MotionEvent.obtain(ev)
         val action = event.actionMasked
         if (action == MotionEvent.ACTION_DOWN) {
-            nestedOffetY = 0
+            nestedOffsetY = 0
         }
         val eventY = event.y.toInt()
-        event.offsetLocation(0f, nestedOffetY.toFloat())
+        event.offsetLocation(0f, nestedOffsetY.toFloat())
 
         when (action) {
             MotionEvent.ACTION_MOVE -> {
@@ -63,14 +85,14 @@ class NestedWebView : WebView, NestedScrollingChild {
                     deltaY -= scrollConsumed[1]
                     lastY = eventY - scrollOffset[1]
                     event.offsetLocation(0f, (-scrollOffset[1]).toFloat())
-                    nestedOffetY += scrollOffset[1]
+                    nestedOffsetY += scrollOffset[1]
                 }
 
                 returnValue = super.onTouchEvent(event)
 
                 if (dispatchNestedScroll(0, scrollOffset[1], 0, deltaY, scrollOffset)) {
                     event.offsetLocation(0f, scrollOffset[1].toFloat())
-                    nestedOffetY += scrollOffset[1]
+                    nestedOffsetY += scrollOffset[1]
                     lastY -= scrollOffset[1]
                 }
             }

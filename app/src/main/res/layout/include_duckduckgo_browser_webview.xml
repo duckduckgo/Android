@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<com.duckduckgo.app.browser.NestedWebView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.duckduckgo.app.browser.DuckDuckGoWebView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/browserWebView"
     android:layout_width="match_parent"
@@ -31,4 +31,4 @@
     android:visibility="gone"
     tools:visibility="visible">
 
-</com.duckduckgo.app.browser.NestedWebView>
+</com.duckduckgo.app.browser.DuckDuckGoWebView>

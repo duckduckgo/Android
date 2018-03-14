@@ -94,7 +94,7 @@
                             android:elevation="4dp"
                             android:fontFamily="sans-serif-medium"
                             android:hint="@string/omnibarInputHint"
-                            android:imeOptions="flagNoExtractUi|actionDone"
+                            android:imeOptions="flagNoExtractUi|actionDone|flagNoPersonalizedLearning"
                             android:inputType="textUri|textNoSuggestions"
                             android:maxLines="1"
                             android:paddingBottom="4dp"
