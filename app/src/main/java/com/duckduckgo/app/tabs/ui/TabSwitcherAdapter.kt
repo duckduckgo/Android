@@ -17,7 +17,6 @@
 package com.duckduckgo.app.tabs.ui
 
 import android.content.Context
-import android.net.Uri
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.LayoutInflater
@@ -26,8 +25,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.AppUrl
-import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
@@ -55,8 +52,8 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
 
         GlideApp.with(holder.root)
             .load(tab.favicon())
-            .placeholder(R.drawable.ic_globe_white_16dp)
-            .error(R.drawable.ic_globe_white_16dp)
+            .placeholder(R.drawable.ic_globe_gray_16dp)
+            .error(R.drawable.ic_globe_gray_16dp)
             .into(holder.favicon)
 
         attachClickListeners(holder, tab)
