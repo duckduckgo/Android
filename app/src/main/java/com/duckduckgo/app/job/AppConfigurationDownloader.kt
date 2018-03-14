@@ -25,7 +25,7 @@ import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import io.reactivex.Completable
 import timber.log.Timber
 
-interface ConfigurationDownloader{
+interface ConfigurationDownloader {
     fun downloadTask(): Completable
 }
 
