@@ -171,11 +171,11 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenViewBecomesVisibleWithoutActiveSiteThenKeyboardNotHidden() {
+    fun whenViewBecomesVisibleWithoutActiveSiteThenKeyboardShown() {
         testee.url.value = null
         testee.onViewVisible()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.allValues.none { it is Command.HideKeyboard })
+        assertTrue(commandCaptor.lastValue is Command.ShowKeyboard)
     }
 
     @Test
