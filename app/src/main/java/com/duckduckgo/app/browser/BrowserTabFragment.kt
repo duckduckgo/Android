@@ -38,7 +38,6 @@ import android.webkit.WebView.FindListener
 import android.widget.EditText
 import android.widget.TextView
 import androidx.view.doOnLayout
-import androidx.view.postDelayed
 import androidx.view.updatePaddingRelative
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
@@ -143,7 +142,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         omnibarTextInput.doOnLayout {
             if (omnibarTextInput.hasFocus()) {
-                omnibarTextInput.postDelayed(300) { omnibarTextInput.showKeyboard() }
+                omnibarTextInput.showKeyboard()
             }
         }
     }
