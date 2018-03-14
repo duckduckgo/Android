@@ -37,7 +37,7 @@ import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.widget.EditText
 import android.widget.TextView
-import androidx.view.doOnLayout
+import androidx.view.postDelayed
 import androidx.view.updatePaddingRelative
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
@@ -219,7 +219,7 @@ class BrowserTabFragment : Fragment(), FindListener {
                 startActivity(intent)
             }
             Command.ShowKeyboard -> {
-                omnibarTextInput.postDelayed({ omnibarTextInput?.showKeyboard() }, 300)
+                showKeyboard()
             }
             Command.HideKeyboard -> {
                 hideKeyboard()
@@ -569,6 +569,10 @@ class BrowserTabFragment : Fragment(), FindListener {
         focusDummy.requestFocus()
     }
 
+    private fun showKeyboard() {
+        omnibarTextInput.postDelayed(300) { omnibarTextInput?.showKeyboard() }
+    }
+
     override fun onSaveInstanceState(bundle: Bundle) {
         webView?.saveState(bundle)
         super.onSaveInstanceState(bundle)
@@ -591,7 +595,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         viewModel.resetView()
         destroyWebView()
         configureWebView()
-        omnibarTextInput.postDelayed({ omnibarTextInput?.showKeyboard() }, 300)
+        showKeyboard()
     }
 
     fun onBackPressed(): Boolean {
