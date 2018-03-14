@@ -23,10 +23,9 @@ import com.duckduckgo.app.surrogates.api.ResourceSurrogateListDownloader
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import io.reactivex.Completable
-import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
-interface ConfigurationDownloader{
+interface ConfigurationDownloader {
     fun downloadTask(): Completable
 }
 
@@ -45,12 +44,12 @@ class AppConfigurationDownloader(
         val httpsUpgradeDownload = httpsUpgradeListDownloader.downloadList()
 
         return Completable.mergeDelayError(listOf(
-                easyListDownload.subscribeOn(Schedulers.io()),
-                easyPrivacyDownload.subscribeOn(Schedulers.io()),
-                trackersWhitelist.subscribeOn(Schedulers.io()),
-                disconnectDownload.subscribeOn(Schedulers.io()),
-                surrogatesDownload.subscribeOn(Schedulers.io()),
-                httpsUpgradeDownload.subscribeOn(Schedulers.io())
+                easyListDownload,
+                easyPrivacyDownload,
+                trackersWhitelist,
+                disconnectDownload,
+                surrogatesDownload,
+                httpsUpgradeDownload
         )).doOnComplete {
             Timber.i("Download task completed successfully")
             val appConfiguration = AppConfigurationEntity(appConfigurationDownloaded = true)
