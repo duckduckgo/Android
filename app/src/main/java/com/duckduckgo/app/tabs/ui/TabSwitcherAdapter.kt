@@ -27,6 +27,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.global.faviconLocation
+import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
 import kotlinx.android.synthetic.main.item_tab.view.*
@@ -46,14 +48,21 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
     }
 
     override fun onBindViewHolder(holder: TabViewHolder, position: Int) {
+
         val tab = data[position]
-        if (tab.title == null && tab.url == null) {
-            holder.title.text = context.getText(R.string.homeTab)
-            holder.url.text = AppUrl.Url.HOME
-        } else {
-            holder.url.text = tab.url ?: ""
-            holder.title.text = tab.title ?: Uri.parse(tab.url).host ?: ""
-        }
+        holder.title.text = tab.displayTitle(context)
+        holder.url.text = tab.displayUrl()
+
+        GlideApp.with(holder.root)
+            .load(tab.favicon())
+            .placeholder(R.drawable.ic_globe_white_16dp)
+            .error(R.drawable.ic_globe_white_16dp)
+            .into(holder.favicon)
+
+        attachClickListeners(holder, tab)
+    }
+
+    private fun attachClickListeners(holder: TabViewHolder, tab: TabEntity) {
         holder.root.setOnClickListener {
             itemClickListener.onTabSelected(tab)
         }
