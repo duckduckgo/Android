@@ -57,15 +57,6 @@
             android:contentDescription="@string/refresh"
             android:src="@drawable/ic_refresh_24px" />
 
-        <ImageButton
-            android:id="@+id/tabsMenuItem"
-            style="@style/BrowserIconMenuItem"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:contentDescription="@string/tabsMenuItem"
-            android:src="@drawable/ic_tabs_24px" />
-
     </LinearLayout>
 
     <FrameLayout

@@ -37,12 +37,15 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.view.*
+import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.webkit.*
 import android.webkit.WebView.FindListener
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
+import androidx.view.isVisible
 import androidx.view.postDelayed
 import androidx.view.updatePaddingRelative
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
@@ -57,6 +60,7 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
+import kotlinx.android.synthetic.main.fragment_browser_tab.view.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import org.jetbrains.anko.longToast
@@ -102,8 +106,8 @@ class BrowserTabFragment : Fragment(), FindListener {
     private val browserActivity
         get() = activity as? BrowserActivity
 
-    private val privacyGradeMenu: MenuItem?
-        get() = toolbar.menu.findItem(R.id.privacyDashboard)
+    private val privacyGradeMenu: ImageButton?
+        get() = toolbar.findViewById(R.id.privacyGradeButton)
 
     private val fireMenu: MenuItem?
         get() = toolbar.menu.findItem(R.id.fire)
@@ -166,7 +170,6 @@ class BrowserTabFragment : Fragment(), FindListener {
             onMenuItemClicked(view.forwardPopupMenuItem) { webView?.goForward() }
             onMenuItemClicked(view.backPopupMenuItem) { webView?.goBack() }
             onMenuItemClicked(view.refreshPopupMenuItem) { webView?.reload() }
-            onMenuItemClicked(view.tabsMenuItem) { browserActivity?.launchTabSwitcher() }
             onMenuItemClicked(view.newTabPopupMenuItem) { browserActivity?.launchNewTab() }
             onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
             onMenuItemClicked(view.addBookmarksPopupMenuItem) { addBookmark() }
@@ -433,8 +436,8 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.privacyDashboard -> {
-                    browserActivity?.launchPrivacyDashboard()
+                R.id.tabsMenuItem -> {
+                    browserActivity?.launchTabSwitcher()
                     return@setOnMenuItemClickListener true
                 }
                 R.id.fire -> {
@@ -450,13 +453,18 @@ class BrowserTabFragment : Fragment(), FindListener {
             }
         }
 
+        toolbar.privacyGradeButton.setOnClickListener {
+            browserActivity?.launchPrivacyDashboard()
+        }
+
         viewModel.viewState.value?.let {
             renderToolbarButtons(it)
         }
 
         viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
             it?.let {
-                privacyGradeMenu?.icon = context?.getDrawable(it.icon())
+                val drawable = context?.getDrawable(it.icon()) ?: return@let
+                privacyGradeMenu?.setImageDrawable(drawable)
             }
         })
     }
