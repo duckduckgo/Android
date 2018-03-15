@@ -74,7 +74,7 @@ class PrivacyDashboardViewModel(private val settingsStore: PrivacySettingsStore,
     fun onNetworkPercentsChanged(networkPercents: Array<NetworkPercent>) {
 
         val enoughNetworksDetected = networkPercents.size >= 3
-        val enoughDomainsVisited = enoughNetworksDetected && networkPercents[0].totalDomainsVisited > 10
+        val enoughDomainsVisited = enoughNetworksDetected && networkPercents.sumBy { it.totalDomainsVisited } >= 10
         val showSummary = enoughDomainsVisited && enoughNetworksDetected
 
         viewState.value = viewState.value?.copy(
