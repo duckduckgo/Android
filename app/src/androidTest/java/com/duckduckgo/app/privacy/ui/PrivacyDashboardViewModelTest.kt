@@ -64,7 +64,7 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenNetworkLeaderboardDataAvailableViewStateUsesIt() {
+    fun whenNetworkLeaderboardDataAvailableViewStateUpdated() {
         testee.onNetworkPercentsChanged(arrayOf(
                 NetworkPercent("Network1", 1.0f, 20),
                 NetworkPercent("Network2", 2.0f, 20),
@@ -90,6 +90,32 @@ class PrivacyDashboardViewModelTest {
         assertEquals(0.0f, viewState.networkTrackerSummaryPercent1)
         assertEquals(0.0f, viewState.networkTrackerSummaryPercent2)
         assertEquals(0.0f, viewState.networkTrackerSummaryPercent3)
+    }
+
+    @Test
+    fun whenAtLeastThreeNetworksAndTenDomainsVisitedThenShowNetworkSummaryIsTrue() {
+        testee.onNetworkPercentsChanged(arrayOf(
+            NetworkPercent("Network1", 1.0f, 6),
+            NetworkPercent("Network2", 2.0f, 2),
+            NetworkPercent("Network3", 3.0f, 2)))
+        assertTrue(testee.viewState.value!!.showNetworkTrackerSummary)
+    }
+
+    @Test
+    fun whenLessThanThreeNetworksVisitedThenShowNetworkSummaryIsFalse() {
+        testee.onNetworkPercentsChanged(arrayOf(
+            NetworkPercent("Network1", 1.0f, 6),
+            NetworkPercent("Network2", 2.0f, 4)))
+        assertFalse(testee.viewState.value!!.showNetworkTrackerSummary)
+    }
+
+    @Test
+    fun whenLessThanTenNetworksVisitedThenShowNetworkSummaryIsFalse() {
+        testee.onNetworkPercentsChanged(arrayOf(
+            NetworkPercent("Network1", 1.0f, 6),
+            NetworkPercent("Network2", 2.0f, 2),
+            NetworkPercent("Network3", 3.0f, 1)))
+        assertFalse(testee.viewState.value!!.showNetworkTrackerSummary)
     }
 
     @Test
@@ -170,6 +196,8 @@ class PrivacyDashboardViewModelTest {
         testee.onSiteChanged(site(terms = terms))
         assertEquals(TermsOfService.Practices.GOOD, testee.viewState.value!!.practices)
     }
+
+
 
     private fun site(https: HttpsStatus = HttpsStatus.SECURE,
                      trackerCount: Int = 0,
