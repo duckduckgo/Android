@@ -110,7 +110,7 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenLessThanThirtyNetworksVisitedThenShowNetworkSummaryIsFalse() {
+    fun whenLessThanThirtyDomainsVisitedThenShowNetworkSummaryIsFalse() {
         testee.onNetworkPercentsChanged(arrayOf(
             NetworkPercent("Network1", 1.0f, 27),
             NetworkPercent("Network2", 2.0f, 1),
@@ -196,8 +196,6 @@ class PrivacyDashboardViewModelTest {
         testee.onSiteChanged(site(terms = terms))
         assertEquals(TermsOfService.Practices.GOOD, testee.viewState.value!!.practices)
     }
-
-
 
     private fun site(https: HttpsStatus = HttpsStatus.SECURE,
                      trackerCount: Int = 0,
