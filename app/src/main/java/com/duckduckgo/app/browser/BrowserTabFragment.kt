@@ -22,6 +22,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.support.annotation.StringRes
@@ -594,6 +595,14 @@ class BrowserTabFragment : Fragment(), FindListener {
         if (!hidden) {
             viewModel.onViewVisible()
         }
+    }
+
+    /**
+     * We don't destroy the activity on config changes like orientation, so we need to ensure we update resources which might change based on config
+     */
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        ddgLogo.setImageResource(R.drawable.full_logo)
     }
 
     private fun resetTabState() {
