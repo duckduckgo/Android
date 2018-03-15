@@ -73,12 +73,12 @@ class PrivacyDashboardViewModel(private val settingsStore: PrivacySettingsStore,
 
     fun onNetworkPercentsChanged(networkPercents: Array<NetworkPercent>) {
 
-        val enoughNetworksDetected = networkPercents.size >= 3
-        val enoughDomainsVisited = enoughNetworksDetected && networkPercents.sumBy { it.totalDomainsVisited } >= 10
-        val showSummary = enoughDomainsVisited && enoughNetworksDetected
+        val sufficientNetworks = networkPercents.size >= SUMMARY_MIN_NETWORKS
+        val sufficientDomains = networkPercents.sumBy { it.totalDomainsVisited } >= SUMMARY_MIN_DOMAINS
+        val showSummary = sufficientNetworks && sufficientDomains
 
         viewState.value = viewState.value?.copy(
-                showNetworkTrackerSummary = enoughNetworksDetected && enoughDomainsVisited,
+                showNetworkTrackerSummary = showSummary,
                 networkTrackerSummaryName1 = if (showSummary) networkPercents[0].networkName else null,
                 networkTrackerSummaryName2 = if (showSummary) networkPercents[1].networkName else null,
                 networkTrackerSummaryName3 = if (showSummary) networkPercents[2].networkName else null,
@@ -138,6 +138,11 @@ class PrivacyDashboardViewModel(private val settingsStore: PrivacySettingsStore,
                     shouldReloadPage = shouldReloadPage
             )
         }
+    }
+
+    companion object {
+        private const val SUMMARY_MIN_NETWORKS = 3
+        private const val SUMMARY_MIN_DOMAINS = 30
     }
 
 }

@@ -93,27 +93,27 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenAtLeastThreeNetworksAndTenDomainsVisitedThenShowNetworkSummaryIsTrue() {
+    fun whenAtLeastThreeNetworksAndThirtyDomainsVisitedThenShowNetworkSummaryIsTrue() {
         testee.onNetworkPercentsChanged(arrayOf(
-            NetworkPercent("Network1", 1.0f, 6),
-            NetworkPercent("Network2", 2.0f, 2),
-            NetworkPercent("Network3", 3.0f, 2)))
+            NetworkPercent("Network1", 1.0f, 28),
+            NetworkPercent("Network2", 2.0f, 1),
+            NetworkPercent("Network3", 3.0f, 1)))
         assertTrue(testee.viewState.value!!.showNetworkTrackerSummary)
     }
 
     @Test
     fun whenLessThanThreeNetworksVisitedThenShowNetworkSummaryIsFalse() {
         testee.onNetworkPercentsChanged(arrayOf(
-            NetworkPercent("Network1", 1.0f, 6),
-            NetworkPercent("Network2", 2.0f, 4)))
+            NetworkPercent("Network1", 1.0f, 29),
+            NetworkPercent("Network2", 2.0f, 1)))
         assertFalse(testee.viewState.value!!.showNetworkTrackerSummary)
     }
 
     @Test
-    fun whenLessThanTenNetworksVisitedThenShowNetworkSummaryIsFalse() {
+    fun whenLessThanThirtyNetworksVisitedThenShowNetworkSummaryIsFalse() {
         testee.onNetworkPercentsChanged(arrayOf(
-            NetworkPercent("Network1", 1.0f, 6),
-            NetworkPercent("Network2", 2.0f, 2),
+            NetworkPercent("Network1", 1.0f, 27),
+            NetworkPercent("Network2", 2.0f, 1),
             NetworkPercent("Network3", 3.0f, 1)))
         assertFalse(testee.viewState.value!!.showNetworkTrackerSummary)
     }
