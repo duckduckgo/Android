@@ -22,6 +22,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.support.annotation.StringRes
@@ -280,7 +281,11 @@ class BrowserTabFragment : Fragment(), FindListener {
             omnibarTextInput.setText(viewState.omnibarText)
 
             // ensures caret sits at the end of the query
-            omnibarTextInput.post { omnibarTextInput?.setSelection(omnibarTextInput.text.length) }
+            omnibarTextInput.post {
+                omnibarTextInput?.let {
+                    it.setSelection(it.text.length)
+                }
+            }
             appBarLayout.setExpanded(true, true)
         }
 
@@ -406,7 +411,7 @@ class BrowserTabFragment : Fragment(), FindListener {
                     return@setOnMenuItemClickListener true
                 }
                 R.id.browserPopup -> {
-                    hideKeyboard()
+                    hideKeyboardImmediately()
                     launchPopupMenu()
                     return@setOnMenuItemClickListener true
                 }
@@ -564,6 +569,14 @@ class BrowserTabFragment : Fragment(), FindListener {
         addTextChangedListener(textWatcher)
     }
 
+    private fun hideKeyboardImmediately() {
+        if (!isHidden) {
+            Timber.v("Keyboard now hiding")
+            omnibarTextInput.hideKeyboard()
+            focusDummy.requestFocus()
+        }
+    }
+
     private fun hideKeyboard() {
         if (!isHidden) {
             Timber.v("Keyboard now hiding")
@@ -591,9 +604,20 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
-        if (!hidden) {
+        if (hidden) {
+            webView?.onPause()
+        } else {
+            webView?.onResume()
             viewModel.onViewVisible()
         }
+    }
+
+    /**
+     * We don't destroy the activity on config changes like orientation, so we need to ensure we update resources which might change based on config
+     */
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        ddgLogo.setImageResource(R.drawable.full_logo)
     }
 
     private fun resetTabState() {
