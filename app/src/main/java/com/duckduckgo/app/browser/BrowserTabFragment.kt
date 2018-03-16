@@ -571,7 +571,7 @@ class BrowserTabFragment : Fragment(), FindListener {
     private fun hideKeyboardImmediately() {
         if (!isHidden) {
             Timber.v("Keyboard now hiding")
-            omnibarTextInput?.hideKeyboard()
+            omnibarTextInput.hideKeyboard()
             focusDummy.requestFocus()
         }
     }
@@ -605,8 +605,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         super.onHiddenChanged(hidden)
         if (hidden) {
             webView?.onPause()
-        }
-        else {
+        } else {
             webView?.onResume()
             viewModel.onViewVisible()
         }
