@@ -410,7 +410,7 @@ class BrowserTabFragment : Fragment(), FindListener {
                     return@setOnMenuItemClickListener true
                 }
                 R.id.browserPopup -> {
-                    hideKeyboard()
+                    hideKeyboardImmediately()
                     launchPopupMenu()
                     return@setOnMenuItemClickListener true
                 }
@@ -566,6 +566,14 @@ class BrowserTabFragment : Fragment(), FindListener {
     private fun EditText.replaceTextChangedListener(textWatcher: TextChangedWatcher) {
         removeTextChangedListener(textWatcher)
         addTextChangedListener(textWatcher)
+    }
+
+    private fun hideKeyboardImmediately() {
+        if (!isHidden) {
+            Timber.v("Keyboard now hiding")
+            omnibarTextInput?.hideKeyboard()
+            focusDummy.requestFocus()
+        }
     }
 
     private fun hideKeyboard() {
