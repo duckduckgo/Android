@@ -595,7 +595,11 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
-        if (!hidden) {
+        if (hidden) {
+            webView?.onPause()
+        }
+        else {
+            webView?.onResume()
             viewModel.onViewVisible()
         }
     }
