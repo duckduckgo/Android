@@ -280,7 +280,11 @@ class BrowserTabFragment : Fragment(), FindListener {
             omnibarTextInput.setText(viewState.omnibarText)
 
             // ensures caret sits at the end of the query
-            omnibarTextInput.post { omnibarTextInput?.setSelection(omnibarTextInput.text.length) }
+            omnibarTextInput.post {
+                omnibarTextInput?.let {
+                    it.setSelection(it.text.length)
+                }
+            }
             appBarLayout.setExpanded(true, true)
         }
 
@@ -406,7 +410,7 @@ class BrowserTabFragment : Fragment(), FindListener {
                     return@setOnMenuItemClickListener true
                 }
                 R.id.browserPopup -> {
-                    hideKeyboard()
+                    hideKeyboardImmediately()
                     launchPopupMenu()
                     return@setOnMenuItemClickListener true
                 }
@@ -564,6 +568,14 @@ class BrowserTabFragment : Fragment(), FindListener {
         addTextChangedListener(textWatcher)
     }
 
+    private fun hideKeyboardImmediately() {
+        if (!isHidden) {
+            Timber.v("Keyboard now hiding")
+            omnibarTextInput.hideKeyboard()
+            focusDummy.requestFocus()
+        }
+    }
+
     private fun hideKeyboard() {
         if (!isHidden) {
             Timber.v("Keyboard now hiding")
@@ -591,7 +603,10 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
-        if (!hidden) {
+        if (hidden) {
+            webView?.onPause()
+        } else {
+            webView?.onResume()
             viewModel.onViewVisible()
         }
     }
