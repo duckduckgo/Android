@@ -280,7 +280,11 @@ class BrowserTabFragment : Fragment(), FindListener {
             omnibarTextInput.setText(viewState.omnibarText)
 
             // ensures caret sits at the end of the query
-            omnibarTextInput.post { omnibarTextInput?.setSelection(omnibarTextInput.text.length) }
+            omnibarTextInput.post {
+                omnibarTextInput?.let {
+                    it.setSelection(it.text.length)
+                }
+            }
             appBarLayout.setExpanded(true, true)
         }
 
