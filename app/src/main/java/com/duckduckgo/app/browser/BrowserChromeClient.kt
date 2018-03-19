@@ -16,7 +16,9 @@
 
 package com.duckduckgo.app.browser
 
+import android.net.Uri
 import android.view.View
+import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import timber.log.Timber
@@ -56,4 +58,8 @@ class BrowserChromeClient @Inject constructor() : WebChromeClient() {
         webViewClientListener?.titleReceived(title)
     }
 
+    override fun onShowFileChooser(webView: WebView, filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: FileChooserParams): Boolean {
+        webViewClientListener?.showFileChooser(filePathCallback, fileChooserParams)
+        return true
+    }
 }
