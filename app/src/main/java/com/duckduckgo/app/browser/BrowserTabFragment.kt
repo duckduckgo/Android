@@ -259,20 +259,19 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if(requestCode == REQUEST_CODE_CHOOSE_FILE) {
-            if(resultCode == RESULT_OK) {
-                val result = data?.data
-
-                if(result == null) {
-                    Timber.w("Failed to retrieve chosen file information")
-                    return
-                }
-
-                val uris = arrayOf(result)
-                pendingUploadTask?.onReceiveValue(uris)
-            } else {
-                pendingUploadTask?.onReceiveValue(null)
-            }
+            handleFileUploadResult(resultCode, data)
         }
+    }
+
+    private fun handleFileUploadResult(resultCode: Int, intent: Intent?) {
+        if(resultCode != RESULT_OK || intent == null) {
+            Timber.i("Received resultCode $resultCode (or received null intent) indicating user did not select any files")
+            pendingUploadTask?.onReceiveValue(null)
+            return
+        }
+
+        val uris = fileChooserIntentBuilder.extractSelectedFileUris(intent)
+        pendingUploadTask?.onReceiveValue(uris)
     }
 
     private fun showToast(@StringRes messageId: Int) {
