@@ -26,6 +26,8 @@ import android.support.annotation.VisibleForTesting
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
@@ -103,6 +105,7 @@ class BrowserTabViewModel(
         class FindInPageCommand(val searchTerm: String) : Command()
         class DisplayMessage(@StringRes val messageId: Int) : Command()
         object DismissFindInPage : Command()
+        class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -296,6 +299,10 @@ class BrowserTabViewModel(
         siteLiveData.postValue(site)
         privacyGrade.postValue(site?.improvedGrade)
         tabRepository.update(tabId, site)
+    }
+
+    override fun showFileChooser(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams) {
+        command.value = Command.ShowFileChooser(filePathCallback, fileChooserParams)
     }
 
     private fun currentViewState(): ViewState = viewState.value!!

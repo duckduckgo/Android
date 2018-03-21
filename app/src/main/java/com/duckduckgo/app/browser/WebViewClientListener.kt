@@ -16,7 +16,10 @@
 
 package com.duckduckgo.app.browser
 
+import android.net.Uri
 import android.view.View
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 
 interface WebViewClientListener {
@@ -33,4 +36,5 @@ interface WebViewClientListener {
     fun dialTelephoneNumberRequested(telephoneNumber: String)
     fun goFullScreen(view: View)
     fun exitFullScreen()
+    fun showFileChooser(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams)
 }
