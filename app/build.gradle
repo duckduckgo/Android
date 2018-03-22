@@ -54,7 +54,7 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
 
-        if(USE_ORCHESTRATOR) {
+        if (USE_ORCHESTRATOR) {
             execution 'ANDROID_TEST_ORCHESTRATOR'
         }
     }

@@ -100,11 +100,10 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
             MotionEvent.ACTION_DOWN -> {
                 returnValue = super.onTouchEvent(event)
                 lastY = eventY
-
                 startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL)
             }
 
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+            else -> {
                 returnValue = super.onTouchEvent(event)
                 stopNestedScroll()
             }
