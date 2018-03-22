@@ -16,25 +16,30 @@
 
 package com.duckduckgo.app.browser
 
+import android.Manifest
 import android.animation.LayoutTransition.CHANGING
 import android.annotation.SuppressLint
+import android.app.Activity.RESULT_OK
+import android.app.DownloadManager
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.support.annotation.StringRes
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.view.*
 import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
-import android.webkit.URLUtil
-import android.webkit.WebSettings
-import android.webkit.WebView
+import android.webkit.*
 import android.webkit.WebView.FindListener
 import android.widget.EditText
 import android.widget.TextView
@@ -43,6 +48,7 @@ import androidx.view.updatePaddingRelative
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.global.ViewModelFactory
@@ -70,6 +76,9 @@ class BrowserTabFragment : Fragment(), FindListener {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
+    @Inject
+    lateinit var  fileChooserIntentBuilder: FileChooserIntentBuilder
+
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
     lateinit var userAgentProvider: UserAgentProvider
@@ -77,6 +86,12 @@ class BrowserTabFragment : Fragment(), FindListener {
     private lateinit var popupMenu: BrowserPopupMenu
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
+
+
+    // Used to represent a file to download, but may first require permission
+    private var pendingFileDownload: PendingFileDownload? = null
+
+    private var pendingUploadTask: ValueCallback<Array<Uri>>? = null
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProviders.of(this, viewModelFactory).get(BrowserTabViewModel::class.java)
@@ -233,14 +248,30 @@ class BrowserTabFragment : Fragment(), FindListener {
                     )
                 )
             }
-            is Command.DownloadImage -> {
-                browserActivity?.downloadImage(it.url)
-            }
+            is Command.DownloadImage -> downloadImage(it.url)
             is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
             Command.DismissFindInPage -> webView?.findAllAsync(null)
             is Command.ShareLink -> launchSharePageChooser(it.url)
             is Command.DisplayMessage -> showToast(it.messageId)
+            is Command.ShowFileChooser -> { launchFilePicker(it) }
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(requestCode == REQUEST_CODE_CHOOSE_FILE) {
+            handleFileUploadResult(resultCode, data)
+        }
+    }
+
+    private fun handleFileUploadResult(resultCode: Int, intent: Intent?) {
+        if(resultCode != RESULT_OK || intent == null) {
+            Timber.i("Received resultCode $resultCode (or received null intent) indicating user did not select any files")
+            pendingUploadTask?.onReceiveValue(null)
+            return
+        }
+
+        val uris = fileChooserIntentBuilder.extractSelectedFileUris(intent)
+        pendingUploadTask?.onReceiveValue(uris)
     }
 
     private fun showToast(@StringRes messageId: Int) {
@@ -499,7 +530,7 @@ class BrowserTabFragment : Fragment(), FindListener {
             }
 
             it.setDownloadListener { url, _, _, _, _ ->
-                browserActivity?.downloadFile(url)
+                downloadFile(url)
             }
 
             it.setOnTouchListener { _, _ ->
@@ -654,12 +685,83 @@ class BrowserTabFragment : Fragment(), FindListener {
         webView = null
     }
 
+    private fun downloadFile(url: String) {
+        pendingFileDownload = PendingFileDownload(url, Environment.DIRECTORY_DOWNLOADS)
+        downloadFileWithPermissionCheck()
+    }
+
+    fun downloadImage(url: String) {
+        pendingFileDownload = PendingFileDownload(url, Environment.DIRECTORY_PICTURES)
+        downloadFileWithPermissionCheck()
+    }
+
+    private fun downloadFileWithPermissionCheck() {
+        if (hasWriteStoragePermission()) {
+            downloadFile()
+        } else {
+            requestWriteStoragePermission()
+        }
+    }
+
+    private fun downloadFile() {
+        val pending = pendingFileDownload
+        pending?.let {
+            val uri = Uri.parse(pending.url)
+            val guessedFileName = URLUtil.guessFileName(pending.url, null, null)
+            Timber.i("Guessed filename of $guessedFileName for url ${pending.url}")
+            val request = DownloadManager.Request(uri).apply {
+                allowScanningByMediaScanner()
+                setDestinationInExternalPublicDir(pending.directory, guessedFileName)
+                setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            }
+            val manager = context?.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?
+            manager?.enqueue(request)
+            pendingFileDownload = null
+            context?.applicationContext?.longToast(getString(R.string.webviewDownload))
+        }
+    }
+
+    private fun launchFilePicker(command: Command.ShowFileChooser) {
+        pendingUploadTask = command.filePathCallback
+        val canChooseMultipleFiles = command.fileChooserParams.mode == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE
+        val intent = fileChooserIntentBuilder.intent(command.fileChooserParams.acceptTypes, canChooseMultipleFiles)
+        startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE)
+    }
+
+    private fun hasWriteStoragePermission(): Boolean {
+        return ContextCompat.checkSelfPermission(context!!, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestWriteStoragePermission() {
+        requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (requestCode == PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE) {
+            if ((grantResults.isNotEmpty()) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Timber.i("Write external storage permission granted")
+                downloadFile()
+            } else {
+                Timber.i("Write external storage permission refused")
+                Snackbar.make(toolbar, R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private data class PendingFileDownload(
+            val url: String,
+            val directory: String
+    )
+
     companion object {
 
         private const val TAB_ID_ARG = "TAB_ID_ARG"
         private const val ADD_BOOKMARK_FRAGMENT_TAG = "ADD_BOOKMARK"
         private const val QUERY_EXTRA_ARG = "QUERY_EXTRA_ARG"
         private const val KEYBOARD_DELAY = 200L
+
+        private const val REQUEST_CODE_CHOOSE_FILE = 100
+        private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
 
         fun newInstance(tabId: String, query: String? = null): BrowserTabFragment {
             val fragment = BrowserTabFragment()
