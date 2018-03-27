@@ -79,7 +79,7 @@ android {
 ext {
     supportLibrary = "27.1.0"
     architectureComponents = "1.0.0"
-    architectureComponentsExtensions = "1.1.0"
+    architectureComponentsExtensions = "1.1.1"
     dagger = "2.14.1"
     retrofit = "2.3.0"
     ankoVersion = "0.10.4"
