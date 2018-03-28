@@ -240,7 +240,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLoadingFinishedWithOutUrlThenSiteVisitedNotCalled() {
+    fun whenLoadingFinishedWithNoUrlThenSiteVisitedEntryNotAddedToLeaderboardDao() {
         testee.loadingFinished()
         verify(mockNetworkLeaderboardDao, never()).insert(SiteVisitedEntity("example.com"))
     }
@@ -249,11 +249,6 @@ class BrowserTabViewModelTest {
     fun whenTrackerDetectedThenSiteVisitedEntryAddedToLeaderboardDao() {
         testee.trackerDetected(TrackingEvent("http://example.com/abc", "http://tracker.com", TrackerNetwork("Network", "http:// netwotk.com"), true))
         verify(mockNetworkLeaderboardDao).insert(SiteVisitedEntity("example.com"))
-    }
-
-    @Test
-    fun whenLoadingFinishedWithNoUrlThenSiteVisitedEntryNotAddedToLeaderboardDao() {
-        verify(mockNetworkLeaderboardDao, never()).insert(SiteVisitedEntity("example.com"))
     }
 
     @Test

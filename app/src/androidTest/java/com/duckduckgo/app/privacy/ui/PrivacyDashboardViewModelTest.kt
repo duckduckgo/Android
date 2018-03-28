@@ -146,7 +146,7 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenNetworkCountIsAtLeastThreeAndTotalDomainsIsThirtyThenViewStateShowsSummary() {
+    fun whenNetworkCountIsAtLeastThreeAndTotalDomainsIsThirtyThenShowSummaryIsTrue() {
         val first = NetworkTally("Network1", 5)
         val second = NetworkTally("Network2", 3)
         val third = NetworkTally("Network3", 3)
@@ -165,7 +165,7 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenDomainsIsLessThanThirtyThenViewStateDoesNotShowSummary() {
+    fun whenDomainsIsLessThanThirtyThenShowSummaryIsFalse() {
         val first = NetworkTally("Network1", 5)
         val second = NetworkTally("Network2", 3)
         val third = NetworkTally("Network3", 3)
@@ -175,7 +175,7 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenNetworkLeaderboardDataAvailableViewStateUpdated() {
+    fun whenNetworkLeaderboardDataAvailableThenViewStateUpdated() {
         val first = NetworkTally("Network1", 5)
         val second = NetworkTally("Network2", 3)
         testee.onTrackerNetworkTallyChanged(listOf(first, second))
@@ -186,7 +186,7 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenNoDataNetworkLeaderboardViewStateIsDefault() {
+    fun whenNoNetworkLeaderboardDataThenDefaultValuesAreUsed() {
         testee.onTrackerNetworkTallyChanged(emptyList())
         val viewState = testee.viewState.value!!
         assertEquals(emptyList<NetworkTally>(), viewState.trackerNetworkTally)
