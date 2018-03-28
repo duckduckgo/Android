@@ -31,6 +31,7 @@ class DatabaseModule {
     fun provideDatabase(context: Context): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
             .addMigrations(AppDatabase.MIGRATION_1_TO_2)
+            .addMigrations(AppDatabase.MIGRATION_2_TO_3)
             .build()
     }
 

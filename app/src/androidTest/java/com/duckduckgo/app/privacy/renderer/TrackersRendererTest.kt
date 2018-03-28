@@ -18,6 +18,8 @@ package com.duckduckgo.app.privacy.renderer
 
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
+import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -64,20 +66,26 @@ class TrackersRendererTest {
     }
 
     @Test
-    fun whenPercentNullPercentageIsBlank() {
-        val text = testee.percentage(null)
+    fun whenTotalDomainsIsZeroThenPercentageIsBlank() {
+        val text = testee.networkPercentage(NetworkTally("", 10), 0)
         assertEquals("", text)
     }
 
     @Test
-    fun whenPercentIsRecurringFractionPercentageIsRoundNumber() {
-        val text = testee.percentage(0.333333333f)
+    fun whenDomainCountIsZeroThenPercentageIsBlank() {
+        val text = testee.networkPercentage(NetworkTally("", 0), 10)
+        assertEquals("", text)
+    }
+
+    @Test
+    fun whenPortionIsRecurringFractionThenPercentageIsRoundNumber() {
+        val text = testee.networkPercentage(NetworkTally("", 10), 30)
         assertEquals("33%", text)
     }
 
     @Test
-    fun whenPercentIsHalfPercentageIs50Percent() {
-        val text = testee.percentage(0.5f)
+    fun whenPortionIsHalfThenPercentageIs50Percent() {
+        val text = testee.networkPercentage(NetworkTally("", 10), 20)
         assertEquals("50%", text)
     }
 

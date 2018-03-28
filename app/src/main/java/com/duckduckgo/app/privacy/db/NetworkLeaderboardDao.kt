@@ -26,16 +26,21 @@ import android.arch.persistence.room.Query
 interface NetworkLeaderboardDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insert(siteVisited: SiteVisitedEntity)
+
+    @Query("select count(distinct domain) from site_visited")
+    fun domainsVisitedCount(): LiveData<Int>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(leaderboardEntry: NetworkLeaderboardEntry)
 
-    @Query("select networkName, " +
-                "(1.0 * count(*) / (select count(1) from network_leaderboard)) as percent, " +
-                "(select count(distinct domainVisited) from network_leaderboard) as totalDomainsVisited " +
-            "from network_leaderboard " +
-            "group by networkName " +
-            "order by percent desc")
-    fun networkPercents() : LiveData<Array<NetworkPercent>>
+    @Query(
+        "select networkName, count(domainVisited) as domainCount " +
+                "from network_leaderboard " +
+                "group by networkName " +
+                "order by domainCount desc"
+    )
+    fun trackerNetworkTally(): LiveData<List<NetworkTally>>
 
+    data class NetworkTally(val networkName: String, val domainCount: Int)
 }
-
-data class NetworkPercent(val networkName: String, val percent: Float, val totalDomainsVisited: Int)

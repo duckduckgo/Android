@@ -26,16 +26,18 @@ import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomain
 import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
+import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 
-@Database(exportSchema = true, version = 2, entities = [
+@Database(exportSchema = true, version = 3, entities = [
     HttpsUpgradeDomain::class,
     DisconnectTracker::class,
     NetworkLeaderboardEntry::class,
+    SiteVisitedEntity::class,
     AppConfigurationEntity::class,
     TabEntity::class,
     TabSelectionEntity::class,
@@ -58,6 +60,12 @@ abstract class AppDatabase : RoomDatabase() {
                 database.execSQL("CREATE INDEX `index_tabs_tabId` on `tabs` (tabId)")
                 database.execSQL("CREATE TABLE `tab_selection` (`id` INTEGER NOT NULL, `tabId` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`tabId`) REFERENCES `tabs`(`tabId`) ON UPDATE NO ACTION ON DELETE SET NULL)")
                 database.execSQL("CREATE INDEX `index_tab_selection_tabId` on `tab_selection` (tabId)")
+            }
+        }
+
+        val MIGRATION_2_TO_3: Migration = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE `site_visited` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
             }
         }
     }

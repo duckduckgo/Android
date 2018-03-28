@@ -20,8 +20,10 @@ import android.arch.persistence.room.Room
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao.NetworkTally
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -32,8 +34,10 @@ class NetworkLeaderboardDaoTest {
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java)
-                .build()
+        db = Room
+            .inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java)
+            .build()
+
         dao = db.networkLeaderboardDao()
     }
 
@@ -43,25 +47,31 @@ class NetworkLeaderboardDaoTest {
     }
 
     @Test
-    fun whenNetworksDetectedPercentsAreCorrect() {
-        // 2/3
+    fun whenNetworksInsertedThenAddedToTallyWithCount() {
         dao.insert(NetworkLeaderboardEntry("Network1", domainVisited = "www.example1.com"))
-        dao.insert(NetworkLeaderboardEntry("Network1", domainVisited = "www.example2.com"))
+        dao.insert(NetworkLeaderboardEntry("Network2", domainVisited = "www.example2.com"))
+        dao.insert(NetworkLeaderboardEntry("Network3", domainVisited = "www.example3.com"))
 
-        // 1/3
-        dao.insert(NetworkLeaderboardEntry("Network2", domainVisited = "www.example3.com"))
-
-        val percents: Array<NetworkPercent>? = dao.networkPercents().blockingObserve()
-
-        assertEquals(2, percents!!.size)
-        assertEquals(3, percents[0].totalDomainsVisited)
-        assertEquals(3, percents[1].totalDomainsVisited)
-
-        assertEquals(66, (percents[0].percent * 100).toInt())
-        assertEquals("Network1", percents[0].networkName)
-
-        assertEquals(33, (percents[1].percent * 100).toInt())
-        assertEquals("Network2", percents[1].networkName)
+        val data: List<NetworkTally>? = dao.trackerNetworkTally().blockingObserve()
+        assertEquals(3, data!!.size)
+        assertTrue(data.contains(NetworkTally("Network1", 1)))
+        assertTrue(data.contains(NetworkTally("Network2", 1)))
+        assertTrue(data.contains(NetworkTally("Network3", 1)))
     }
 
+    @Test
+    fun whenNetworksHaveMultipleDomainsThenAddedToTallyWithCountInDescendingOrder() {
+        dao.insert(NetworkLeaderboardEntry("Network1", domainVisited = "www.example1.com"))
+        dao.insert(NetworkLeaderboardEntry("Network2", domainVisited = "www.example1.com"))
+        dao.insert(NetworkLeaderboardEntry("Network2", domainVisited = "www.example2.com"))
+        dao.insert(NetworkLeaderboardEntry("Network2", domainVisited = "www.example3.com"))
+        dao.insert(NetworkLeaderboardEntry("Network3", domainVisited = "www.example3.com"))
+        dao.insert(NetworkLeaderboardEntry("Network3", domainVisited = "www.example4.com"))
+
+
+        val data: List<NetworkTally> = dao.trackerNetworkTally().blockingObserve()!!
+        assertEquals(NetworkTally("Network2", 3), data[0])
+        assertEquals(NetworkTally("Network3", 2), data[1])
+        assertEquals(NetworkTally("Network1", 1), data[2])
+    }
 }

@@ -27,9 +27,15 @@ class AppDatabaseTest {
     private val testHelper = MigrationTestHelper(getInstrumentation(), AppDatabase::class.qualifiedName, FrameworkSQLiteOpenHelperFactory())
 
     @Test
-    fun whenMigratingFromVersion1To2ValidationSucceeds() {
+    fun whenMigratingFromVersion1To2ThenValidationSucceeds() {
         testHelper.createDatabase(TEST_DB_NAME, 1)
         testHelper.runMigrationsAndValidate(TEST_DB_NAME, 2, true, AppDatabase.MIGRATION_1_TO_2)
+    }
+
+    @Test
+    fun whenMigratingFromVersion2To3ThenValidationSucceeds() {
+        testHelper.createDatabase(TEST_DB_NAME, 2)
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 3, true, AppDatabase.MIGRATION_2_TO_3)
     }
 
     companion object {

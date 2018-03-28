@@ -44,6 +44,7 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
+import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.improvedGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -268,7 +269,16 @@ class BrowserTabViewModel(
         }
         viewState.value = newViewState
         site = siteFactory.build(url)
+        registerSiteVist(url)
         onSiteChanged()
+    }
+
+    private fun registerSiteVist(url: String) {
+        Uri.parse(url).host?.let {
+            Schedulers.io().scheduleDirect {
+                networkLeaderboardDao.insert(SiteVisitedEntity(it))
+            }
+        }
     }
 
     override fun trackerDetected(event: TrackingEvent) {
