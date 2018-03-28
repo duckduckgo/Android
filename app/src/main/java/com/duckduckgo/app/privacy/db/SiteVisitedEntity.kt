@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacy.db;
+package com.duckduckgo.app.privacy.db
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.PrimaryKey
 
 @Entity(tableName = "site_visited")
 data class SiteVisitedEntity(

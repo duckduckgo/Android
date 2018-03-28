@@ -18,7 +18,6 @@ package com.duckduckgo.app.privacy.renderer
 
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
