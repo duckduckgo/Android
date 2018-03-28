@@ -16,22 +16,12 @@
 
 package com.duckduckgo.app.browser
 
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-import android.app.DownloadManager
-import android.app.DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
-import android.support.design.widget.Snackbar
-import android.support.v4.app.ActivityCompat.requestPermissions
-import android.support.v4.content.ContextCompat.checkSelfPermission
-import android.webkit.URLUtil
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.*
@@ -43,7 +33,6 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
-import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import org.jetbrains.anko.longToast
 import timber.log.Timber
 import javax.inject.Inject
@@ -60,9 +49,6 @@ class BrowserActivity : DuckDuckGoActivity() {
         ViewModelProviders.of(this, viewModelFactory).get(BrowserViewModel::class.java)
     }
 
-    // Used to represent a file to download, but may first require permission
-    private var pendingFileDownload: PendingFileDownload? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_browser)
@@ -78,10 +64,9 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun openNewTab(tabId: String, userQuery: String? = null) {
-        val previousFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer) as? BrowserTabFragment
         val fragment = BrowserTabFragment.newInstance(tabId, userQuery)
         val transaction = supportFragmentManager.beginTransaction()
-        if (previousFragment == null) {
+        if (currentTab == null) {
             transaction.replace(R.id.fragmentContainer, fragment, tabId)
         } else {
             transaction.hide(currentTab)
@@ -160,12 +145,13 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun processCommand(it: Command?) {
-        when (it) {
-            is NewTab -> openNewTab(it.tabId, it.query)
-            is Query -> currentTab?.submitQuery(it.query)
+    private fun processCommand(command: Command?) {
+        Timber.i("Processing command: $command")
+        when (command) {
+            is NewTab -> openNewTab(command.tabId, command.query)
+            is Query -> currentTab?.submitQuery(command.query)
             is Refresh -> currentTab?.refresh()
-            is Command.DisplayMessage -> applicationContext?.longToast(it.messageId)
+            is Command.DisplayMessage -> applicationContext?.longToast(command.messageId)
         }
     }
 
@@ -202,65 +188,12 @@ class BrowserActivity : DuckDuckGoActivity() {
         startActivity(BookmarksActivity.intent(this))
     }
 
-    fun downloadFile(url: String) {
-        pendingFileDownload = PendingFileDownload(url, Environment.DIRECTORY_DOWNLOADS)
-        downloadFileWithPermissionCheck()
-    }
-
-    fun downloadImage(url: String) {
-        pendingFileDownload = PendingFileDownload(url, Environment.DIRECTORY_PICTURES)
-        downloadFileWithPermissionCheck()
-    }
-
-    private fun downloadFileWithPermissionCheck() {
-        if (hasWriteStoragePermission()) {
-            downloadFile()
-        } else {
-            requestStoragePermission()
-        }
-    }
-
-    private fun downloadFile() {
-        val pending = pendingFileDownload
-        pending?.let {
-            val uri = Uri.parse(pending.url)
-            val guessedFileName = URLUtil.guessFileName(pending.url, null, null)
-            Timber.i("Guessed filename of $guessedFileName for url ${pending.url}")
-            val request = DownloadManager.Request(uri).apply {
-                allowScanningByMediaScanner()
-                setDestinationInExternalPublicDir(pending.directory, guessedFileName)
-                setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            }
-            val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-            manager.enqueue(request)
-            pendingFileDownload = null
-            applicationContext?.longToast(getString(R.string.webviewDownload))
-        }
-    }
-
-    private fun hasWriteStoragePermission(): Boolean {
-        return checkSelfPermission(this, WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun requestStoragePermission() {
-        requestPermissions(this, arrayOf(WRITE_EXTERNAL_STORAGE), PERMISSION_REQUEST_EXTERNAL_STORAGE)
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if (requestCode == PERMISSION_REQUEST_EXTERNAL_STORAGE) {
-            if ((grantResults.isNotEmpty()) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Timber.i("Permission granted")
-                downloadFile()
-            } else {
-                Timber.i("Permission refused")
-                Snackbar.make(toolbar, R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
-            }
-        }
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == DASHBOARD_REQUEST_CODE) {
             viewModel.receivedDashboardResult(resultCode)
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
@@ -269,11 +202,6 @@ class BrowserActivity : DuckDuckGoActivity() {
             super.onBackPressed()
         }
     }
-
-    private data class PendingFileDownload(
-        val url: String,
-        val directory: String
-    )
 
     companion object {
 
@@ -286,6 +214,5 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         private const val NEW_SEARCH_EXTRA = "NEW_SEARCH_EXTRA"
         private const val DASHBOARD_REQUEST_CODE = 100
-        private const val PERMISSION_REQUEST_EXTERNAL_STORAGE = 200
     }
 }

@@ -34,26 +34,22 @@
             android:id="@+id/logoParent"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="?attr/actionBarSize"
             android:animateLayoutChanges="true">
-
-            <android.support.constraint.Guideline
-                android:id="@+id/guidelineTop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.5" />
 
             <ImageView
                 android:id="@+id/ddgLogo"
-                android:layout_width="180dp"
-                android:layout_height="180dp"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:contentDescription="@string/duckDuckGoLogoDescription"
                 android:src="@drawable/full_logo"
-                app:layout_constraintBottom_toBottomOf="@id/guidelineTop"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_max="180dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/guidelineTop"
-                />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5"
+                app:layout_constraintWidth_max="180dp" />
 
         </android.support.constraint.ConstraintLayout>
 
@@ -94,7 +90,7 @@
                             android:elevation="4dp"
                             android:fontFamily="sans-serif-medium"
                             android:hint="@string/omnibarInputHint"
-                            android:imeOptions="flagNoExtractUi|actionDone|flagNoPersonalizedLearning"
+                            android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
                             android:inputType="textUri|textNoSuggestions"
                             android:maxLines="1"
                             android:paddingBottom="4dp"

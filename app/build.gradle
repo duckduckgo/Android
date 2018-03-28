@@ -6,7 +6,7 @@ apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
 
 ext {
-    VERSION_NAME = "5.0.0"
+    VERSION_NAME = "5.0.2"
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
 }
 
@@ -54,7 +54,7 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
 
-        if(USE_ORCHESTRATOR) {
+        if (USE_ORCHESTRATOR) {
             execution 'ANDROID_TEST_ORCHESTRATOR'
         }
     }
@@ -79,7 +79,7 @@ android {
 ext {
     supportLibrary = "27.1.0"
     architectureComponents = "1.0.0"
-    architectureComponentsExtensions = "1.1.0"
+    architectureComponentsExtensions = "1.1.1"
     dagger = "2.14.1"
     retrofit = "2.3.0"
     ankoVersion = "0.10.4"
