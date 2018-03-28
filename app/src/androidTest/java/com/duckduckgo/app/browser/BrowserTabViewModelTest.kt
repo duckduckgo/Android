@@ -233,6 +233,30 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenLoadingFinishedWithUrlThenSiteVisitedEntryAddedToLeaderboardDao() {
+        testee.url.value = "http://example.com/abc"
+        testee.loadingFinished()
+        verify(mockNetworkLeaderboardDao).insert(SiteVisitedEntity("example.com"))
+    }
+
+    @Test
+    fun whenLoadingFinishedWithOutUrlThenSiteVisitedNotCalled() {
+        testee.loadingFinished()
+        verify(mockNetworkLeaderboardDao, never()).insert(SiteVisitedEntity("example.com"))
+    }
+
+    @Test
+    fun whenTrackerDetectedThenSiteVisitedEntryAddedToLeaderboardDao() {
+        testee.trackerDetected(TrackingEvent("http://example.com/abc", "http://tracker.com", TrackerNetwork("Network", "http:// netwotk.com"), true))
+        verify(mockNetworkLeaderboardDao).insert(SiteVisitedEntity("example.com"))
+    }
+
+    @Test
+    fun whenLoadingFinishedWithNoUrlThenSiteVisitedEntryNotAddedToLeaderboardDao() {
+        verify(mockNetworkLeaderboardDao, never()).insert(SiteVisitedEntity("example.com"))
+    }
+
+    @Test
     fun whenViewModelNotifiedThatUrlGotFocusThenViewStateIsUpdated() {
         testee.onOmnibarInputStateChanged("", true)
         assertTrue(testee.viewState.value!!.isEditing)
@@ -247,12 +271,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenNoOmnibarTextEverEnteredThenViewStateHasEmptyString() {
         assertEquals("", testee.viewState.value!!.omnibarText)
-    }
-
-    @Test
-    fun whenUrlChangedThenSiteVisitedEntryAddedToLeaderboardDao() {
-        testee.urlChanged("http://example.com/abc")
-        verify(mockNetworkLeaderboardDao).insert(SiteVisitedEntity("example.com"))
     }
 
     @Test

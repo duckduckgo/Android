@@ -27,6 +27,7 @@ import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
 import android.webkit.WebView
+import androidx.net.toUri
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
@@ -222,6 +223,14 @@ class BrowserTabViewModel(
     override fun loadingFinished() {
         Timber.v("Loading finished")
         viewState.value = currentViewState().copy(isLoading = false)
+        registerSiteVisit()
+    }
+
+    private fun registerSiteVisit() {
+        val domainVisited = url.value?.toUri()?.host ?: return
+        Schedulers.io().scheduleDirect {
+            networkLeaderboardDao.insert(SiteVisitedEntity(domainVisited))
+        }
     }
 
     override fun titleReceived(title: String) {
@@ -269,16 +278,7 @@ class BrowserTabViewModel(
         }
         viewState.value = newViewState
         site = siteFactory.build(url)
-        registerSiteVist(url)
         onSiteChanged()
-    }
-
-    private fun registerSiteVist(url: String) {
-        Uri.parse(url).host?.let {
-            Schedulers.io().scheduleDirect {
-                networkLeaderboardDao.insert(SiteVisitedEntity(it))
-            }
-        }
     }
 
     override fun trackerDetected(event: TrackingEvent) {
@@ -293,6 +293,7 @@ class BrowserTabViewModel(
         val networkName = event.trackerNetwork?.name ?: return
         val domainVisited = Uri.parse(event.documentUrl).host ?: return
         networkLeaderboardDao.insert(NetworkLeaderboardEntry(networkName, domainVisited))
+        networkLeaderboardDao.insert(SiteVisitedEntity(domainVisited))
     }
 
     override fun pageHasHttpResources(page: String?) {
@@ -408,7 +409,6 @@ class BrowserTabViewModel(
         )
         viewState.value = currentViewState().copy(findInPage = findInPage)
     }
-
 
     fun desktopSiteModeToggled(urlString: String?, desktopSiteRequested: Boolean) {
         viewState.value = currentViewState().copy(isDesktopBrowsingMode = desktopSiteRequested)

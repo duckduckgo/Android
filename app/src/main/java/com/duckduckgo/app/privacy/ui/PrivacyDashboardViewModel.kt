@@ -144,8 +144,8 @@ class PrivacyDashboardViewModel(
     }
 
     private companion object {
-        internal const val LEADERBOARD_MIN_NETWORKS = 3
-        internal const val LEADERNOARD_MIN_DOMAINS = 30
+        private const val LEADERBOARD_MIN_NETWORKS = 3
+        private const val LEADERNOARD_MIN_DOMAINS = 30
     }
 }
 
