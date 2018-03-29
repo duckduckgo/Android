@@ -146,12 +146,12 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenNetworkCountIsAtLeastThreeAndTotalDomainsIsThirtyThenShowSummaryIsTrue() {
+    fun whenNetworkCountIsAtLeastThreeAndTotalDomainsIsOverThirtyThenShowSummaryIsTrue() {
         val first = NetworkTally("Network1", 5)
         val second = NetworkTally("Network2", 3)
         val third = NetworkTally("Network3", 3)
         testee.onTrackerNetworkTallyChanged(listOf(first, second, third))
-        testee.onDomainsVisitedChanged(30)
+        testee.onDomainsVisitedChanged(31)
         assertTrue(testee.viewState.value!!.showTrackerNetworkLeaderboard)
     }
 
@@ -160,17 +160,17 @@ class PrivacyDashboardViewModelTest {
         val first = NetworkTally("Network1", 5)
         val second = NetworkTally("Network2", 3)
         testee.onTrackerNetworkTallyChanged(listOf(first, second))
-        testee.onDomainsVisitedChanged(30)
+        testee.onDomainsVisitedChanged(31)
         assertFalse(testee.viewState.value!!.showTrackerNetworkLeaderboard)
     }
 
     @Test
-    fun whenDomainsIsLessThanThirtyThenShowSummaryIsFalse() {
+    fun whenDomainsIsNotOverThirtyThenShowSummaryIsFalse() {
         val first = NetworkTally("Network1", 5)
         val second = NetworkTally("Network2", 3)
         val third = NetworkTally("Network3", 3)
         testee.onTrackerNetworkTallyChanged(listOf(first, second, third))
-        testee.onDomainsVisitedChanged(29)
+        testee.onDomainsVisitedChanged(30)
         assertFalse(testee.viewState.value!!.showTrackerNetworkLeaderboard)
     }
 

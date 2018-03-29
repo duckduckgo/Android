@@ -92,7 +92,7 @@ class PrivacyDashboardViewModel(
     }
 
     private fun showTrackerNetworkLeaderboard (domainCount: Int, networkCount: Int): Boolean {
-        return domainCount >= LEADERNOARD_MIN_DOMAINS && networkCount >= LEADERBOARD_MIN_NETWORKS
+        return domainCount > LEADERNOARD_MIN_DOMAINS_EXCLUSIVE && networkCount >= LEADERBOARD_MIN_NETWORKS
     }
 
     fun onSiteChanged(site: Site?) {
@@ -145,7 +145,7 @@ class PrivacyDashboardViewModel(
 
     private companion object {
         private const val LEADERBOARD_MIN_NETWORKS = 3
-        private const val LEADERNOARD_MIN_DOMAINS = 30
+        private const val LEADERNOARD_MIN_DOMAINS_EXCLUSIVE = 30
     }
 }
 
