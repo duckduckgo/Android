@@ -36,7 +36,7 @@ import org.junit.runner.RunWith
 class TrackerDetectorListTest {
 
     companion object {
-        private val documentUrl = "http://example.com"
+        private const val documentUrl = "http://example.com"
         private val resourceType = ResourceType.UNKNOWN
     }
 

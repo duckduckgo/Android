@@ -38,8 +38,8 @@ class StatisticsSharedPreferences @Inject constructor(private val context: Conte
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
     companion object {
-        const val FILENAME = "com.duckduckgo.app.statistics"
-        const val KEY_ATB = "com.duckduckgo.app.statistics.atb"
-        const val KEY_RETENTION_ATB = "com.duckduckgo.app.statistics.retentionatb"
+        private const val FILENAME = "com.duckduckgo.app.statistics"
+        private const val KEY_ATB = "com.duckduckgo.app.statistics.atb"
+        private const val KEY_RETENTION_ATB = "com.duckduckgo.app.statistics.retentionatb"
     }
 }

@@ -26,9 +26,9 @@ import org.junit.Test
 class AdBlockClientTest {
 
     companion object {
-        private val documentUrl = "http://example.com"
-        private val trackerUrl = "http://imasdk.googleapis.com/js/sdkloader/ima3.js"
-        private val nonTrackerUrl = "http://duckduckgo.com/index.html"
+        private const val documentUrl = "http://example.com"
+        private const val trackerUrl = "http://imasdk.googleapis.com/js/sdkloader/ima3.js"
+        private const val nonTrackerUrl = "http://duckduckgo.com/index.html"
         private val resourceType = ResourceType.UNKNOWN
     }
 

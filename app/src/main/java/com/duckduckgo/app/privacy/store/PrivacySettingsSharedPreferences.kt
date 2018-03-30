@@ -36,7 +36,7 @@ class PrivacySettingsSharedPreferences @Inject constructor(private val context: 
 
 
     companion object {
-        val FILENAME = "com.duckduckgo.app.privacymonitor.settings"
-        val KEY_PRIVACY_ON = "com.duckduckgo.app.privacymonitor.privacyon"
+        private const val FILENAME = "com.duckduckgo.app.privacymonitor.settings"
+        private const val KEY_PRIVACY_ON = "com.duckduckgo.app.privacymonitor.privacyon"
     }
 }

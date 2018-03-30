@@ -17,19 +17,50 @@
 package com.duckduckgo.app.global.db
 
 import android.arch.persistence.db.framework.FrameworkSQLiteOpenHelperFactory
+import android.arch.persistence.room.Room
 import android.arch.persistence.room.testing.MigrationTestHelper
+import android.support.test.InstrumentationRegistry
 import android.support.test.InstrumentationRegistry.getInstrumentation
+import com.duckduckgo.app.blockingObserve
+import org.junit.Assert.assertTrue
+import org.junit.Rule
 import org.junit.Test
-
 
 class AppDatabaseTest {
 
-    private val testHelper = MigrationTestHelper(getInstrumentation(), AppDatabase::class.qualifiedName, FrameworkSQLiteOpenHelperFactory())
+    @get:Rule
+    val testHelper = MigrationTestHelper(getInstrumentation(), AppDatabase::class.qualifiedName, FrameworkSQLiteOpenHelperFactory())
 
     @Test
-    fun whenMigratingFromVersion1To2ValidationSucceeds() {
+    fun whenMigratingFromVersion1To2ThenValidationSucceeds() {
         testHelper.createDatabase(TEST_DB_NAME, 1)
         testHelper.runMigrationsAndValidate(TEST_DB_NAME, 2, true, AppDatabase.MIGRATION_1_TO_2)
+    }
+
+    @Test
+    fun whenMigratingFromVersion2To3ThenValidationSucceeds() {
+        testHelper.createDatabase(TEST_DB_NAME, 2)
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 3, true, AppDatabase.MIGRATION_2_TO_3)
+    }
+
+    @Test
+    fun whenMigratingFromVersion2To3ThenOldLeaderboardDataIsDeleted() {
+        val db = testHelper.createDatabase(TEST_DB_NAME, 2)
+        db.execSQL("INSERT INTO `network_leaderboard` VALUES ('Network2', 'example.com')")
+        db.close()
+        assertTrue(database().networkLeaderboardDao().trackerNetworkTally().blockingObserve()!!.isEmpty())
+    }
+
+    private fun database(): AppDatabase {
+        val database = Room
+            .databaseBuilder(InstrumentationRegistry.getTargetContext(), AppDatabase::class.java, TEST_DB_NAME)
+            .addMigrations(AppDatabase.MIGRATION_1_TO_2, AppDatabase.MIGRATION_2_TO_3)
+            .allowMainThreadQueries()
+            .build()
+
+        testHelper.closeWhenFinished(database)
+
+        return database
     }
 
     companion object {
