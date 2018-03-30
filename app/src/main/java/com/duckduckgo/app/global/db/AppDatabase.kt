@@ -66,6 +66,7 @@ abstract class AppDatabase : RoomDatabase() {
         val MIGRATION_2_TO_3: Migration = object : Migration(2, 3) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE `site_visited` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
+                database.execSQL("DELETE FROM `network_leaderboard`")
             }
         }
     }

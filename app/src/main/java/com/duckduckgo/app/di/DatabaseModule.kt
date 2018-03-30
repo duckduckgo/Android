@@ -19,6 +19,8 @@ package com.duckduckgo.app.di
 import android.arch.persistence.room.Room
 import android.content.Context
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_1_TO_2
+import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_2_TO_3
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -30,8 +32,7 @@ class DatabaseModule {
     @Singleton
     fun provideDatabase(context: Context): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
-            .addMigrations(AppDatabase.MIGRATION_1_TO_2)
-            .addMigrations(AppDatabase.MIGRATION_2_TO_3)
+            .addMigrations(MIGRATION_1_TO_2, MIGRATION_2_TO_3)
             .build()
     }
 
