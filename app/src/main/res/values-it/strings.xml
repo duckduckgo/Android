@@ -1,0 +1,169 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="appName">DuckDuckGo</string>
+    <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
+
+    <string name="privacyDashboard">Pannello della privacy</string>
+
+    <!-- Onboarding Activity -->
+    <string name="onboardingProtectDataTitle">Proteggi i tuoi dati</string>
+    <string name="onboardingProtectDataDescription">Tocca la valutazione per svelare chi abbiamo trovato mentre tentava di tracciarti.\n</string>
+    <string name="onboardingNoTraceTitle">Non lasciare tracce</string>
+    <string name="onboardingNoTraceDescription1">Tocca il fuoco per eliminare le schede e la cronologia di navigazione.</string>
+    <string name="onboardingNoTraceDescription2">Tutti i tuoi dati inceneriti!</string>
+    <string name="onboardingContinue">Continua</string>
+
+
+    <!-- Browser Activity -->
+    <string name="browserPopupMenu">Menu browser</string>
+    <string name="refresh">Ricarica</string>
+    <string name="back">Indietro</string>
+    <string name="forward">Avanti</string>
+    <string name="webviewDownload">Scaricamento file</string>
+    <string name="omnibarInputHint">Cerca o digita un URL</string>
+    <string name="clearButtonContentDescription">Svuota casella di ricerca</string>
+    <string name="no_compatible_third_party_app_installed">Nessuna app compatibile installata</string>
+    <string name="addBookmarkMenuTitle">Aggiungi segnalibro</string>
+    <string name="downloadImage">Scarica immagine</string>
+    <string name="imageOptions">Opzioni immagine</string>
+    <string name="permissionRequiredToDownload">Per scaricare serve l\'autorizzazione di archiviazione</string>
+    <string name="requestDesktopSiteMenuTitle">Sito desktop</string>
+
+    <!-- Sharing options -->
+    <string name="linkOptions">Opzioni link</string>
+    <string name="shareLink">Condividi link</string>
+    <string name="shareMenuTitle">Condividi…</string>
+
+    <!-- Find in page -->
+    <string name="find_in_page">Trova nella pagina</string>
+    <string name="nextSearchTermDescription">Trova successivo</string>
+    <string name="previousSearchTermDescription">Trova precedente</string>
+    <string name="closeFindInPageButtonDescription">Chiudi strumento ricerca</string>
+    <string name="findInPageHint">Trova nella pagina</string>
+    <string name="findInPageMatches">%d/%d</string>
+
+    <!-- AutoComplete Suggestions -->
+    <string name="editQueryBeforeSubmitting">Modifica testo prima di cercare</string>
+    <string name="settings_autocomplete_enabled">Suggerimenti autocompletamento</string>
+
+    <!-- Tabs -->
+    <string name="homeTab">DuckDuckGo</string>
+    <string name="tabActivityTitle">Schede</string>
+    <string name="tabsMenuItem">Schede</string>
+    <string name="newTabMenuItem">Nuova scheda</string>
+    <string name="openInNewTab">Apri in una nuova scheda</string>
+    <string name="faviconContentDescription">Favicon</string>
+    <string name="closeContentDescription">Chiudi</string>
+    <string name="tapFireToForget">Tocca %s per dimenticare tutto</string>
+
+    <!-- Privacy Dashboard Activities -->
+    <string name="privacyDashboardActivityTitle">Pannello della privacy</string>
+    <string name="privacyProtectionEnabled">PROTEZIONE PRIVACY ATTIVA</string>
+    <string name="privacyProtectionDisabled">PROTEZIONE PRIVACY INATTIVA</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">MIGLIORATO DA &lt;img src="%d" /> A &lt;img src="%d" /></string>
+    <string name="privacyGradeContentDescription">Valutazione privacy</string>
+
+    <string name="httpsGood">Connessione cifrata</string>
+    <string name="httpsMixed">Connessione con cifratura mista</string>
+    <string name="httpsBad">Connessione in chiaro</string>
+
+    <string name="networksActivityTitle">Reti traccianti</string>
+    <string name="networksOverview">Le reti traccianti aggregano la tua cronologia di navigazione in un profilo di dati personale. Le principali reti traccianti sono più dannose perchè possono bersagliarti oltre internet.</string>
+
+    <plurals name="trackersFound">
+        <item quantity="one">%s tracker trovato</item>
+        <item quantity="other">%s tracker trovati</item>
+    </plurals>
+
+    <plurals name="trackerBlocked">
+        <item quantity="one">%s tracker bloccato</item>
+        <item quantity="other">%s tracker bloccati</item>
+    </plurals>
+
+    <plurals name="networksBlocked">
+        <item quantity="one">%s rete tracciante bloccata</item>
+        <item quantity="other">%s reti traccianti bloccate</item>
+    </plurals>
+
+    <plurals name="networksFound">
+        <item quantity="one">%s rete tracciante trovata</item>
+        <item quantity="other">%s reti traccianti trovate</item>
+    </plurals>
+
+    <plurals name="majorNetworksFound">
+        <item quantity="one">%s rete tracciante principale trovata</item>
+        <item quantity="other">%s reti traccianti principali trovate</item>
+    </plurals>
+
+    <plurals name="majorNetworksBlocked">
+        <item quantity="one">%s rete tracciante principale bloccata</item>
+        <item quantity="other">%s reti traccianti principali bloccate</item>
+    </plurals>
+
+    <string name="scorecardActivityTitle">Valutazione privacy</string>
+    <string name="scorecardSiteIsMemberOfMajorNetwork">Il sito è rete tracciante principale</string>
+    <string name="scorecardPrivacyGrade">Valutazione privacy</string>
+    <string name="scorecardEnhancedGrade">Valutazione migliorata</string>
+
+    <string name="privacyTermsActivityTitle">Pratiche sulla privacy</string>
+    <string name="practicesGood">Buone pratiche sulla privacy</string>
+    <string name="practicesMixed">Pratiche sulla privacy miste"</string>
+    <string name="practicesBad">"Cattive pratiche sulla privacy"</string>
+    <string name="practicesUnknown">Pratiche sulla privacy sconosciute</string>
+    <string name="practicesOverview">Le pratiche sulla privacy indicano quanto sono protette le informazioni personali che condividi con un sito.</string>
+    <string name="practicesTosdrLink">Risultati delle pratiche sulla privacy da&#160;<b><u>ToS;DR</u></b></string>
+    <string name="practicesIconContentGood">Icona buona pratica</string>
+    <string name="practicesIconContentBad">Icona cattiva pratica</string>
+    <string name="privacyProtectionToggle">Protezione della privacy</string>
+
+    <string name="networkTrackerSummaryHeader">PEGGIORI RETI TRACCIANTI</string>
+    <string name="networkTrackerSummaryNotReady">Stiamo ancora raccogliendo dati per mostrare quanti tracker abbiamo bloccato.</string>
+
+    <!-- Fire -->
+    <string name="fireMenu">Elimina dati</string>
+    <string name="fireClearAll">Elimina tutte le schede e i dati</string>
+    <string name="fireCancel">Annulla</string>
+    <string name="fireDataCleared">Dati eliminati</string>
+
+    <!-- Settings Activity -->
+    <string name="settingsActivityTitle">Impostazioni</string>
+    <string name="settingsMenuItemTitle">Impostazioni</string>
+    <string name="settingsHeadingGeneral">Generale</string>
+    <string name="settingsHeadingOther">Altro</string>
+    <string name="settingsOnboarding">Funzionalità per la privacy</string>
+    <string name="settingsAboutDuckduckgo">Riguardo DuckDuckGo</string>
+    <string name="settingsVersion">Versione</string>
+    <string name="leaveFeedback">Invia un feedback</string>
+    <string name="feedbackEmailAddress">android@duckduckgo.com</string>
+    <string name="feedbackSubject">Feedback DuckDuckGo Android</string>
+
+    <!-- About Activity -->
+    <string name="aboutActivityTitle">Informazioni</string>
+    <string name="aboutHeading">Privacy, resa semplice.</string>
+    <string name="aboutDescription">
+	Noi di DuckDuckGo, stabiliamo il nuovo standard della fiducia online.\n\
+	DuckDuckGo Privacy Browser offre tutti i fondamenti della privacy che ti servono per proteggerti mentre navighi nel web, incluso il blocco dei tracker, una migliore cifratura e la ricerca privata di DuckDuckGo.\n\
+	Dopotutto, internet non dovrebbe essere così inquietante e avere la privacy che ti meriti dovrebbe essere facile come chiudere le tende.</string>
+    <string name="aboutMoreLink">Altro su duckduckgo.com/about</string>
+    <string name="no_suggestions">Nessun suggerimento</string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">Segnalibri</string>
+    <string name="bookmarksActivityTitle">Segnalibri</string>
+    <string name="bookmarkDeleteConfirmMessage">Sei sicuro di volere eliminare il segnalibro &lt;b>%s&lt;/b>?</string>
+    <string name="bookmarkDeleteConfirmTitle">Conferma</string>
+    <string name="bookmarkAddedFeedback">Segnalibro aggiunto</string>
+    <string name="bookmarkTitleHint">Titolo del segnalibro</string>
+    <string name="bookmarkUrlHint">URL del segnalibro</string>
+    <string name="bookmarkSave">Salva</string>
+    <string name="bookmarkTitleEdit">Modifica il segnalibro</string>
+    <string name="bookmarkTitleSave">Salva il segnalibro</string>
+    <string name="noBookmarks">Non ancora aggiunto alcun segnalibro</string>
+    <string name="bookmarkOverflowContentDescription">Altre opzioni per il segnalibro %s</string>
+    <string name="delete">Elimina</string>
+    <string name="edit">Modifica</string>
+
+    <!-- Widget -->
+    <string name="searchWidgetTextHint">Ricerca DuckDuckGo</string>
+
+</resources>
