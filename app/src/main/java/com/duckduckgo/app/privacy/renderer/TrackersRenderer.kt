@@ -19,6 +19,7 @@ package com.duckduckgo.app.privacy.renderer
 import android.content.Context
 import android.support.annotation.DrawableRes
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao.NetworkTally
 
 
 class TrackersRenderer {
@@ -67,9 +68,9 @@ class TrackersRenderer {
         return if (resource != 0) resource else null
     }
 
-    fun percentage(percent: Float?): String? {
-        percent ?: return ""
-        val to100 = (percent * 100).toInt()
+    fun networkPercentage(tally: NetworkTally, totalDomainsVisited: Int): String? {
+        if (totalDomainsVisited == 0 || tally.domainCount == 0) return ""
+        val to100 = ((tally.domainCount / totalDomainsVisited.toFloat()) * 100).toInt()
         return "$to100%"
     }
 

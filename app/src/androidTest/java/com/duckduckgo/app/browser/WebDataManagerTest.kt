@@ -81,8 +81,8 @@ class WebDataManagerTest {
     }
 
     companion object {
-        val host = "duckduckgo.com"
-        val externalHost = "example.com"
+        private const val host = "duckduckgo.com"
+        private const val externalHost = "example.com"
     }
 
 }

@@ -21,10 +21,11 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao.NetworkTally
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
 import kotlinx.android.synthetic.main.view_network_tracker_pill.view.*
 
-class NetworkTrackerPillView: FrameLayout {
+class TrackerNetworkLeaderboardPillView : FrameLayout {
 
     val renderer = TrackersRenderer()
 
@@ -44,11 +45,11 @@ class NetworkTrackerPillView: FrameLayout {
         View.inflate(context, R.layout.view_network_tracker_pill, this)
     }
 
-    fun render(networkName: String?, percent: Float?) {
-        icon.setImageResource(renderer.networkPillIcon(context, networkName ?: "") ?: R.drawable.network_pill_generic)
-
-        val percentText = renderer.percentage(percent)
-        icon.contentDescription = "$networkName $percentText"
+    fun render(tally: NetworkTally?, totalDomains: Int) {
+        tally ?: return
+        icon.setImageResource(renderer.networkPillIcon(context, tally.networkName) ?: R.drawable.network_pill_generic)
+        val percentText = renderer.networkPercentage(tally, totalDomains)
+        icon.contentDescription = "${tally.networkName} $percentText"
         percentage.text = percentText
     }
 

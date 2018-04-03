@@ -27,11 +27,13 @@ import android.view.View
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
-import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.view.hide
+import com.duckduckgo.app.global.view.html
+import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.privacy.renderer.*
-import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.ViewState
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
 import kotlinx.android.synthetic.main.content_privacy_dashboard.*
 import kotlinx.android.synthetic.main.include_privacy_dashboard_header.*
@@ -90,15 +92,37 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         practicesIcon.setImageResource(viewState.practices.icon())
         practicesText.text = viewState.practices.text(this)
         renderToggle(viewState.toggleEnabled)
-        networkTrackerSummaryNotReady.visibility = if (viewState.showNetworkTrackerSummary) View.GONE else View.VISIBLE
-        networkTrackerSummaryHeader.visibility = if (viewState.showNetworkTrackerSummary) View.VISIBLE else View.GONE
-        networkTrackerSummaryPill1.visibility = if (viewState.showNetworkTrackerSummary) View.VISIBLE else View.GONE
-        networkTrackerSummaryPill2.visibility = if (viewState.showNetworkTrackerSummary) View.VISIBLE else View.GONE
-        networkTrackerSummaryPill3.visibility = if (viewState.showNetworkTrackerSummary) View.VISIBLE else View.GONE
-        networkTrackerSummaryPill1.render(viewState.networkTrackerSummaryName1, viewState.networkTrackerSummaryPercent1)
-        networkTrackerSummaryPill2.render(viewState.networkTrackerSummaryName2, viewState.networkTrackerSummaryPercent2)
-        networkTrackerSummaryPill3.render(viewState.networkTrackerSummaryName3, viewState.networkTrackerSummaryPercent3)
+        renderTrackerNetworkLeaderboard(viewState)
         updateActivityResult(viewState.shouldReloadPage)
+    }
+
+    private fun renderTrackerNetworkLeaderboard(viewState: ViewState) {
+
+        if (!viewState.showTrackerNetworkLeaderboard) {
+            hideTrackerNetworkLeaderboard()
+            return
+        }
+
+        trackerNetworkPill1.render(viewState.trackerNetworkTally.elementAtOrNull(0), viewState.domainsVisited)
+        trackerNetworkPill2.render(viewState.trackerNetworkTally.elementAtOrNull(1), viewState.domainsVisited)
+        trackerNetworkPill3.render(viewState.trackerNetworkTally.elementAtOrNull(2), viewState.domainsVisited)
+        showTrackerNetworkLeaderboard()
+    }
+
+    private fun showTrackerNetworkLeaderboard() {
+        trackerNetworkLeaderboardHeader.show()
+        trackerNetworkPill1.show()
+        trackerNetworkPill2.show()
+        trackerNetworkPill3.show()
+        trackerNetworkLeaderboardNotReady.hide()
+    }
+
+    private fun hideTrackerNetworkLeaderboard() {
+        trackerNetworkLeaderboardHeader.hide()
+        trackerNetworkPill1.hide()
+        trackerNetworkPill2.hide()
+        trackerNetworkPill3.hide()
+        trackerNetworkLeaderboardNotReady.show()
     }
 
     private fun renderToggle(enabled: Boolean) {

@@ -29,6 +29,7 @@ import android.view.View
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
+import androidx.net.toUri
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
@@ -46,6 +47,7 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
+import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.improvedGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -224,6 +226,14 @@ class BrowserTabViewModel(
     override fun loadingFinished() {
         Timber.v("Loading finished")
         viewState.value = currentViewState().copy(isLoading = false)
+        registerSiteVisit()
+    }
+
+    private fun registerSiteVisit() {
+        val domainVisited = url.value?.toUri()?.host ?: return
+        Schedulers.io().scheduleDirect {
+            networkLeaderboardDao.insert(SiteVisitedEntity(domainVisited))
+        }
     }
 
     override fun titleReceived(title: String) {
@@ -286,6 +296,7 @@ class BrowserTabViewModel(
         val networkName = event.trackerNetwork?.name ?: return
         val domainVisited = Uri.parse(event.documentUrl).host ?: return
         networkLeaderboardDao.insert(NetworkLeaderboardEntry(networkName, domainVisited))
+        networkLeaderboardDao.insert(SiteVisitedEntity(domainVisited))
     }
 
     override fun pageHasHttpResources(page: String?) {
@@ -405,7 +416,6 @@ class BrowserTabViewModel(
         )
         viewState.value = currentViewState().copy(findInPage = findInPage)
     }
-
 
     fun desktopSiteModeToggled(urlString: String?, desktopSiteRequested: Boolean) {
         viewState.value = currentViewState().copy(isDesktopBrowsingMode = desktopSiteRequested)
