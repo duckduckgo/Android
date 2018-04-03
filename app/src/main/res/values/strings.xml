@@ -19,15 +19,21 @@
     <string name="refresh">Refresh</string>
     <string name="back">Back</string>
     <string name="forward">Forward</string>
-    <string name="webviewDownload">Downloading file</string>
+
     <string name="omnibarInputHint">Search or type URL</string>
     <string name="clearButtonContentDescription">Clear search input</string>
     <string name="no_compatible_third_party_app_installed">No compatible app installed</string>
     <string name="addBookmarkMenuTitle">Add Bookmark</string>
-    <string name="downloadImage">Download Image</string>
     <string name="imageOptions">Image Options</string>
-    <string name="permissionRequiredToDownload">Downloading requires storage permission</string>
     <string name="requestDesktopSiteMenuTitle">Desktop Site</string>
+
+    <!-- Downloading files -->
+    <string name="downloadImage">Download Image</string>
+    <string name="permissionRequiredToDownload">Downloading requires storage permission</string>
+    <string name="downloadComplete">Download complete.</string>
+    <string name="downloadFailed">Failed to download</string>
+    <string name="downloadInProgress">Downloading</string>
+    <string name="cannotDownloadFile">Cannot download this file type</string>
 
     <!-- Sharing options -->
     <string name="linkOptions">Link Options</string>

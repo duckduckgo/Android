@@ -27,7 +27,7 @@ import javax.inject.Inject
 
 
 interface LongPressHandler {
-    fun handleLongPress(longPressTargetType: Int, longPressTargetUrl: String, menu: ContextMenu)
+    fun handleLongPress(longPressTargetType: Int, longPressTargetUrl: String?, menu: ContextMenu)
     fun userSelectedMenuItem(longPressTarget: String, item: MenuItem): RequiredAction
 
     sealed class RequiredAction {
@@ -40,11 +40,11 @@ interface LongPressHandler {
 
 class WebViewLongPressHandler @Inject constructor() : LongPressHandler {
 
-    override fun handleLongPress(longPressTargetType: Int, longPressTargetUrl: String, menu: ContextMenu) {
+    override fun handleLongPress(longPressTargetType: Int, longPressTargetUrl: String?, menu: ContextMenu) {
         when (longPressTargetType) {
             WebView.HitTestResult.IMAGE_TYPE,
             WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE -> {
-                if(URLUtil.isNetworkUrl(longPressTargetUrl)) {
+                if(URLUtil.isNetworkUrl(longPressTargetUrl) || URLUtil.isDataUrl(longPressTargetUrl)) {
                     menu.setHeaderTitle(R.string.imageOptions)
                     menu.add(0, CONTEXT_MENU_ID_DOWNLOAD_IMAGE, 0, R.string.downloadImage)
                 }

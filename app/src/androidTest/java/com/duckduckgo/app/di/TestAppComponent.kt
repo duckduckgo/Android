@@ -40,18 +40,19 @@ import javax.inject.Singleton
     StubStatisticsModule::class,
 
     /* real modules */
-    (ApplicationModule::class),
-    (AndroidBindingModule::class),
-    (AndroidSupportInjectionModule::class),
-    (NetworkModule::class),
-    (StoreModule::class),
-    (JsonModule::class),
-    (StringModule::class),
-    (BrowserModule::class),
-    (BrowserAutoCompleteModule::class),
-    (HttpsUpgraderModule::class),
-    (ResourceSurrogateModule::class),
-    (TrackerDetectionModule::class)
+    ApplicationModule::class,
+    AndroidBindingModule::class,
+    AndroidSupportInjectionModule::class,
+    NetworkModule::class,
+    StoreModule::class,
+    JsonModule::class,
+    StringModule::class,
+    BrowserModule::class,
+    BrowserAutoCompleteModule::class,
+    HttpsUpgraderModule::class,
+    ResourceSurrogateModule::class,
+    TrackerDetectionModule::class,
+    NotificationModule::class
 ])
 interface TestAppComponent : AndroidInjector<TestApplication> {
 
