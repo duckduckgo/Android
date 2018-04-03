@@ -37,17 +37,14 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.view.*
-import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.webkit.*
 import android.webkit.WebView.FindListener
 import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.view.isVisible
 import androidx.view.postDelayed
-import androidx.view.updatePaddingRelative
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
@@ -106,11 +103,15 @@ class BrowserTabFragment : Fragment(), FindListener {
     private val browserActivity
         get() = activity as? BrowserActivity
 
-    private val privacyGradeMenu: ImageButton?
-        get() = toolbar.findViewById(R.id.privacyGradeButton)
+    private val tabsButton: MenuItem?
+        get() = toolbar.menu.findItem(R.id.tabs)
 
-    private val fireMenu: MenuItem?
+    private val fireMenuButton: MenuItem?
         get() = toolbar.menu.findItem(R.id.fire)
+
+    private val menuButton: MenuItem?
+        get() = toolbar.menu.findItem(R.id.browserPopup)
+
 
     private var webView: WebView? = null
 
@@ -324,14 +325,16 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
 
         pageLoadingIndicator.progress = viewState.progress
-
-        when (viewState.showClearButton) {
-            true -> showClearButton()
-            false -> hideClearButton()
-        }
-
         renderToolbarButtons(viewState)
         renderPopupMenu(viewState)
+
+
+        if(viewState.showEditingBackground) {
+            omniBarContainer.setBackgroundResource(R.drawable.search_background)
+        } else {
+            omniBarContainer.background = null
+
+        }
 
         when (viewState.autoComplete.showSuggestions) {
             false -> autoCompleteSuggestionsList.gone()
@@ -353,8 +356,11 @@ class BrowserTabFragment : Fragment(), FindListener {
     }
 
     private fun renderToolbarButtons(viewState: ViewState) {
-        fireMenu?.isVisible = viewState.showFireButton
-        privacyGradeMenu?.isVisible = viewState.showPrivacyGrade
+        privacyGradeButton?.isVisible = viewState.showPrivacyGrade
+        clearTextButton?.isVisible = viewState.showClearButton
+        tabsButton?.isVisible = viewState.showTabsButton
+        fireMenuButton?.isVisible = viewState.showFireButton
+        menuButton?.isVisible = viewState.showMenuButton
     }
 
     private fun renderPopupMenu(viewState: ViewState) {
@@ -414,20 +420,6 @@ class BrowserTabFragment : Fragment(), FindListener {
         activity?.toggleFullScreen()
     }
 
-    private fun showClearButton() {
-        omnibarTextInput.post {
-            clearOmnibarInputButton?.show()
-            omnibarTextInput?.updatePaddingRelative(end = 40.toPx())
-        }
-    }
-
-    private fun hideClearButton() {
-        omnibarTextInput.post {
-            clearOmnibarInputButton?.hide()
-            omnibarTextInput?.updatePaddingRelative(end = 10.toPx())
-        }
-    }
-
     private fun shouldUpdateOmnibarTextInput(viewState: ViewState, omnibarInput: String?) =
         !viewState.isEditing && omnibarTextInput.isDifferent(omnibarInput)
 
@@ -436,7 +428,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.tabsMenuItem -> {
+                R.id.tabs -> {
                     browserActivity?.launchTabSwitcher()
                     return@setOnMenuItemClickListener true
                 }
@@ -464,7 +456,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
             it?.let {
                 val drawable = context?.getDrawable(it.icon()) ?: return@let
-                privacyGradeMenu?.setImageDrawable(drawable)
+                privacyGradeButton?.setImageDrawable(drawable)
             }
         })
     }
@@ -505,7 +497,7 @@ class BrowserTabFragment : Fragment(), FindListener {
             false
         })
 
-        clearOmnibarInputButton.setOnClickListener { omnibarTextInput.setText("") }
+        clearTextButton.setOnClickListener { omnibarTextInput.setText("") }
     }
 
     private fun configureKeyboardAwareLogoAnimation() {

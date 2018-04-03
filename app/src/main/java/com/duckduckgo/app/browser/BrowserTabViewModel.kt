@@ -80,9 +80,12 @@ class BrowserTabViewModel(
         val omnibarText: String = "",
         val isEditing: Boolean = false,
         val browserShowing: Boolean = false,
-        val showClearButton: Boolean = false,
         val showPrivacyGrade: Boolean = false,
+        val showEditingBackground: Boolean = true,
+        val showClearButton: Boolean = false,
+        val showTabsButton: Boolean = true,
         val showFireButton: Boolean = true,
+        val showMenuButton: Boolean = true,
         val canAddBookmarks: Boolean = false,
         val isFullScreen: Boolean = false,
         val autoComplete: AutoCompleteViewState = AutoCompleteViewState(),
@@ -188,6 +191,7 @@ class BrowserTabViewModel(
 
         viewState.value = currentViewState().copy(
             findInPage = FindInPage(visible = false, canFindInPage = true),
+            showEditingBackground = false,
             showClearButton = false,
             omnibarText = trimmedInput,
             browserShowing = true,
@@ -336,8 +340,12 @@ class BrowserTabViewModel(
 
         viewState.value = currentViewState().copy(
             isEditing = hasFocus,
+            showPrivacyGrade = appConfigurationDownloaded && currentViewState.browserShowing,
+            showTabsButton = !hasFocus,
+            showFireButton = !hasFocus,
+            showMenuButton = !hasFocus,
+            showEditingBackground = hasFocus,
             showClearButton = showClearButton,
-            showPrivacyGrade = appConfigurationDownloaded && !hasFocus && currentViewState.browserShowing,
             autoComplete = AutoCompleteViewState(showAutoCompleteSuggestions, autoCompleteSearchResults)
         )
 

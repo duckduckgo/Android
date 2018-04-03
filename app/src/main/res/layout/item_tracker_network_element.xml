@@ -33,7 +33,7 @@
         android:fontFamily="sans-serif"
         android:letterSpacing="-0.01"
         android:lineSpacingExtra="7sp"
-        android:textColor="@color/almostBlack"
+        android:textColor="@color/almostBlackDark"
         android:textIsSelectable="true"
         android:textSize="14sp"
         android:textStyle="normal"
