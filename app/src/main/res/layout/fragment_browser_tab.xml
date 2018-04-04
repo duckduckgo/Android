@@ -80,7 +80,7 @@
                         android:id="@+id/omniBarContainer"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/search_background"
+                        android:background="@drawable/omnibar_editing_background"
                         android:layout_margin="8dp"
                         android:paddingStart="6dp"
                         android:paddingEnd="6dp">

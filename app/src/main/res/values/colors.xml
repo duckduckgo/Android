@@ -6,7 +6,7 @@
 
     <color name="windowBackground">@color/almostBlackDark</color>
     <color name="divider">@color/subtleGrayTwo</color>
-    <color name="searchEditingBackground">@color/midGray</color>
+    <color name="omnibarEditingBackground">@color/midGray</color>
 
     <color name="white">#FFFFFF</color>
     <color name="whiteTwo">#e4e4e4</color>

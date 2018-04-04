@@ -328,12 +328,9 @@ class BrowserTabFragment : Fragment(), FindListener {
         renderToolbarButtons(viewState)
         renderPopupMenu(viewState)
 
-
-        if(viewState.showEditingBackground) {
-            omniBarContainer.setBackgroundResource(R.drawable.search_background)
-        } else {
-            omniBarContainer.background = null
-
+        when (viewState.isEditing) {
+            true -> omniBarContainer.setBackgroundResource(R.drawable.omnibar_editing_background)
+            false -> omniBarContainer.background = null
         }
 
         when (viewState.autoComplete.showSuggestions) {

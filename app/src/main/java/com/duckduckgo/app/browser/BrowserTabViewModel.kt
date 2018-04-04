@@ -81,7 +81,6 @@ class BrowserTabViewModel(
         val isEditing: Boolean = false,
         val browserShowing: Boolean = false,
         val showPrivacyGrade: Boolean = false,
-        val showEditingBackground: Boolean = true,
         val showClearButton: Boolean = false,
         val showTabsButton: Boolean = true,
         val showFireButton: Boolean = true,
@@ -191,7 +190,6 @@ class BrowserTabViewModel(
 
         viewState.value = currentViewState().copy(
             findInPage = FindInPage(visible = false, canFindInPage = true),
-            showEditingBackground = false,
             showClearButton = false,
             omnibarText = trimmedInput,
             browserShowing = true,
@@ -344,7 +342,6 @@ class BrowserTabViewModel(
             showTabsButton = !hasFocus,
             showFireButton = !hasFocus,
             showMenuButton = !hasFocus,
-            showEditingBackground = hasFocus,
             showClearButton = showClearButton,
             autoComplete = AutoCompleteViewState(showAutoCompleteSuggestions, autoCompleteSearchResults)
         )
