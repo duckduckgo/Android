@@ -44,7 +44,7 @@ class WebViewLongPressHandler @Inject constructor() : LongPressHandler {
         when (longPressTargetType) {
             WebView.HitTestResult.IMAGE_TYPE,
             WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE -> {
-                if(URLUtil.isNetworkUrl(longPressTargetUrl) || URLUtil.isDataUrl(longPressTargetUrl)) {
+                if (URLUtil.isNetworkUrl(longPressTargetUrl) || URLUtil.isDataUrl(longPressTargetUrl)) {
                     menu.setHeaderTitle(R.string.imageOptions)
                     menu.add(0, CONTEXT_MENU_ID_DOWNLOAD_IMAGE, 0, R.string.downloadImage)
                 }
