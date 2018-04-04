@@ -38,21 +38,15 @@ class DataUriParserTest {
     }
 
     @Test
-    fun whenMimeTypeProvidedAsImageJpegThenJpegSuffixGenerated() {
+    fun whenMimeTypeProvidedAsImageJpegThenJpgSuffixGenerated() {
         val parsed = testee.generate("data:image/jpeg;base64,AAAA") as ParsedDataUri
-        assertEquals("jpeg", parsed.filename.fileType)
-    }
-
-    @Test
-    fun whenMimeTypeProvidedAsWildcardImageTypeThenDefaultJpgSuffixGenerated() {
-        val parsed = testee.generate("data:image/*;base64,AAAA") as ParsedDataUri
         assertEquals("jpg", parsed.filename.fileType)
     }
 
     @Test
-    fun whenMimeTypeProvidedAsArbitraryImageTypeThenSuffixGeneratedWithThatType() {
+    fun whenMimeTypeProvidedAsArbitraryImageTypeThenNoSuffixGenerated() {
         val parsed = testee.generate("data:image/foo;base64,AAAA") as ParsedDataUri
-        assertEquals("foo", parsed.filename.fileType)
+        assertEquals("", parsed.filename.fileType)
     }
 
     @Test
@@ -68,9 +62,9 @@ class DataUriParserTest {
     }
 
     @Test
-    fun whenMimeTypeProvidedAsNonImageTypeThenNoSuffixGenerated() {
+    fun whenKnownMimeTypeProvidedAsNonImageTypeThenSuffixStillGenerated() {
         val parsed = testee.generate("data:text/plain;base64,AAAA") as ParsedDataUri
-        assertEquals("", parsed.filename.fileType)
+        assertEquals("txt", parsed.filename.fileType)
     }
 
     @Test

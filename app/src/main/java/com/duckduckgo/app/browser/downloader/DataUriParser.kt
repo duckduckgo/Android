@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.browser.downloader
 
+import android.webkit.MimeTypeMap
 import com.duckduckgo.app.browser.downloader.DataUriParser.ParseResult.ParsedDataUri
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -34,30 +34,15 @@ class DataUriParser @Inject constructor() {
         val fileTypeSpecific = result.groupValues[REGEX_GROUP_FILE_TYPE_SPECIFIC]
         val data = result.groupValues[REGEX_GROUP_DATA]
 
-        val suffix = determineSuffix(fileTypeGeneral, fileTypeSpecific)
+        val suffix = determineSuffix(mimeType)
         val filename = UUID.randomUUID().toString()
         val generatedFilename = GeneratedFilename(name = filename, fileType = suffix)
 
         return ParsedDataUri(fileTypeGeneral, fileTypeSpecific, data, mimeType, generatedFilename)
     }
 
-    private fun determineSuffix(fileTypeGeneral: String, fileTypeSpecific: String): String {
-        return when (fileTypeGeneral) {
-            FILE_TYPE_IMAGE -> determineImageType(fileTypeSpecific)
-            else -> {
-                Timber.i("Cannot deduce suitable file type suffix")
-                return ""
-            }
-        }
-
-    }
-
-    private fun determineImageType(imageType: String): String {
-        if (imageType.isEmpty() || imageType == "*") {
-            return "jpg"
-        }
-
-        return imageType
+    private fun determineSuffix(mimeType: String): String {
+        return MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: ""
     }
 
     companion object {
@@ -67,8 +52,6 @@ class DataUriParser @Inject constructor() {
         private const val REGEX_GROUP_FILE_TYPE_GENERAL = 3
         private const val REGEX_GROUP_FILE_TYPE_SPECIFIC = 4
         private const val REGEX_GROUP_DATA = 5
-
-        const val FILE_TYPE_IMAGE = "image"
     }
 
 
