@@ -43,7 +43,7 @@
                     android:id="@+id/networksBanner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:contentDescription="@string/privacyGradeContentDescription"
+                    android:contentDescription="@string/networksContentDescription"
                     android:paddingBottom="12dp"
                     android:paddingTop="20dp"
                     android:src="@drawable/networks_banner_good"

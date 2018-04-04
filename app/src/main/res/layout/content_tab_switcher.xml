@@ -40,12 +40,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
-            android:text="@string/tap"
+            android:text="@string/tapFireDirective"
             android:textColor="@color/white"
             android:textSize="14sp"
             android:textStyle="normal" />
 
         <ImageView
+            android:contentDescription="@string/tapFireIconDescription"
             android:layout_width="13dp"
             android:layout_height="17dp"
             android:layout_marginEnd="6dp"
@@ -57,7 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
-            android:text="@string/toForget"
+            android:text="@string/tapFireExplanation"
             android:textColor="@color/white"
             android:textSize="14sp"
             android:textStyle="normal" />
