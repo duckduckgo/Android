@@ -51,7 +51,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tab_switcher)
         configureToolbar()
-        configureFireText()
         configureRecycler()
         configureObservers()
     }
@@ -59,15 +58,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     private fun configureToolbar() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-
-    /**
-     * We set this manually as using the unicode fire char to strings.xml crashes
-     * on Android 5.0
-     */
-    private fun configureFireText() {
-        val fireIcon = String(Character.toChars(0x1F525))
-        fireText.text = getString(R.string.tapFireToForget, fireIcon)
     }
 
     private fun configureRecycler() {
