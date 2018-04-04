@@ -48,7 +48,8 @@ import javax.inject.Singleton
     BrowserAutoCompleteModule::class,
     HttpsUpgraderModule::class,
     ResourceSurrogateModule::class,
-    TrackerDetectionModule::class
+    TrackerDetectionModule::class,
+    NotificationModule::class
 ])
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 
