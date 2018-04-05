@@ -47,8 +47,8 @@ import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.widget.EditText
 import android.widget.TextView
+import androidx.view.isVisible
 import androidx.view.postDelayed
-import androidx.view.updatePaddingRelative
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
@@ -64,6 +64,7 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
+import kotlinx.android.synthetic.main.fragment_browser_tab.view.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import org.jetbrains.anko.longToast
@@ -117,11 +118,15 @@ class BrowserTabFragment : Fragment(), FindListener {
     private val browserActivity
         get() = activity as? BrowserActivity
 
-    private val privacyGradeMenu: MenuItem?
-        get() = toolbar.menu.findItem(R.id.privacyDashboard)
+    private val tabsButton: MenuItem?
+        get() = toolbar.menu.findItem(R.id.tabs)
 
-    private val fireMenu: MenuItem?
+    private val fireMenuButton: MenuItem?
         get() = toolbar.menu.findItem(R.id.fire)
+
+    private val menuButton: MenuItem?
+        get() = toolbar.menu.findItem(R.id.browserPopup)
+
 
     private var webView: WebView? = null
 
@@ -181,7 +186,6 @@ class BrowserTabFragment : Fragment(), FindListener {
             onMenuItemClicked(view.forwardPopupMenuItem) { webView?.goForward() }
             onMenuItemClicked(view.backPopupMenuItem) { webView?.goBack() }
             onMenuItemClicked(view.refreshPopupMenuItem) { webView?.reload() }
-            onMenuItemClicked(view.tabsMenuItem) { browserActivity?.launchTabSwitcher() }
             onMenuItemClicked(view.newTabPopupMenuItem) { browserActivity?.launchNewTab() }
             onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
             onMenuItemClicked(view.addBookmarksPopupMenuItem) { addBookmark() }
@@ -338,14 +342,13 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
 
         pageLoadingIndicator.progress = viewState.progress
-
-        when (viewState.showClearButton) {
-            true -> showClearButton()
-            false -> hideClearButton()
-        }
-
         renderToolbarButtons(viewState)
         renderPopupMenu(viewState)
+
+        when (viewState.isEditing) {
+            true -> omniBarContainer.setBackgroundResource(R.drawable.omnibar_editing_background)
+            false -> omniBarContainer.background = null
+        }
 
         when (viewState.autoComplete.showSuggestions) {
             false -> autoCompleteSuggestionsList.gone()
@@ -367,8 +370,11 @@ class BrowserTabFragment : Fragment(), FindListener {
     }
 
     private fun renderToolbarButtons(viewState: ViewState) {
-        fireMenu?.isVisible = viewState.showFireButton
-        privacyGradeMenu?.isVisible = viewState.showPrivacyGrade
+        privacyGradeButton?.isVisible = viewState.showPrivacyGrade
+        clearTextButton?.isVisible = viewState.showClearButton
+        tabsButton?.isVisible = viewState.showTabsButton
+        fireMenuButton?.isVisible = viewState.showFireButton
+        menuButton?.isVisible = viewState.showMenuButton
     }
 
     private fun renderPopupMenu(viewState: ViewState) {
@@ -428,20 +434,6 @@ class BrowserTabFragment : Fragment(), FindListener {
         activity?.toggleFullScreen()
     }
 
-    private fun showClearButton() {
-        omnibarTextInput.post {
-            clearOmnibarInputButton?.show()
-            omnibarTextInput?.updatePaddingRelative(end = 40.toPx())
-        }
-    }
-
-    private fun hideClearButton() {
-        omnibarTextInput.post {
-            clearOmnibarInputButton?.hide()
-            omnibarTextInput?.updatePaddingRelative(end = 10.toPx())
-        }
-    }
-
     private fun shouldUpdateOmnibarTextInput(viewState: ViewState, omnibarInput: String?) =
             !viewState.isEditing && omnibarTextInput.isDifferent(omnibarInput)
 
@@ -450,8 +442,8 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.privacyDashboard -> {
-                    browserActivity?.launchPrivacyDashboard()
+                R.id.tabs -> {
+                    browserActivity?.launchTabSwitcher()
                     return@setOnMenuItemClickListener true
                 }
                 R.id.fire -> {
@@ -467,13 +459,18 @@ class BrowserTabFragment : Fragment(), FindListener {
             }
         }
 
+        toolbar.privacyGradeButton.setOnClickListener {
+            browserActivity?.launchPrivacyDashboard()
+        }
+
         viewModel.viewState.value?.let {
             renderToolbarButtons(it)
         }
 
         viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
             it?.let {
-                privacyGradeMenu?.icon = context?.getDrawable(it.icon())
+                val drawable = context?.getDrawable(it.icon()) ?: return@let
+                privacyGradeButton?.setImageDrawable(drawable)
             }
         })
     }
@@ -514,7 +511,7 @@ class BrowserTabFragment : Fragment(), FindListener {
             false
         })
 
-        clearOmnibarInputButton.setOnClickListener { omnibarTextInput.setText("") }
+        clearTextButton.setOnClickListener { omnibarTextInput.setText("") }
     }
 
     private fun configureKeyboardAwareLogoAnimation() {

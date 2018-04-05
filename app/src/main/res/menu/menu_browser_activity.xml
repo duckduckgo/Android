@@ -15,26 +15,26 @@
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <item
-        android:id="@+id/privacyDashboard"
-        android:icon="@drawable/privacygrade_icon_unknown"
-        android:title="@string/privacyDashboard"
-        android:visible="false"
-        app:showAsAction="ifRoom" />
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="AlwaysShowAction">
 
     <item
         android:id="@+id/fire"
-        android:icon="@drawable/icon_fire"
+        android:icon="@drawable/ic_fire_gray_24dp"
         android:title="@string/fireMenu"
-        android:visible="false"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/tabs"
+        android:icon="@drawable/ic_tabs_gray_24dp"
+        android:title="@string/tabsMenuItem"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/browserPopup"
-        android:icon="@drawable/ic_overflow_24px"
+        android:icon="@drawable/ic_overflow_gray_24dp"
         android:title="@string/browserPopupMenu"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
 </menu>

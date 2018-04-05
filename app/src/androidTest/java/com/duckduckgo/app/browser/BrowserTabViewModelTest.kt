@@ -390,9 +390,43 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOmnibarInputHasFocusThenFireButtonIsShown() {
+    fun whenOmnibarInputHasFocusThenFireButtonIsHidden() {
         testee.onOmnibarInputStateChanged("", true)
-        assertTrue(testee.viewState.value!!.showFireButton)
+        assertFalse(testee.viewState.value!!.showFireButton)
+    }
+
+    @Test
+    fun whenInitialisedThenTabsButtonIsShown() {
+        assertTrue(testee.viewState.value!!.showTabsButton)
+    }
+
+    @Test
+    fun whenOmnibarInputDoesNotHaveFocusThenTabsButtonIsShown() {
+        testee.onOmnibarInputStateChanged("", false)
+        assertTrue(testee.viewState.value!!.showTabsButton)
+    }
+
+    @Test
+    fun whenOmnibarInputHasFocusThenTabsButtonIsNotShown() {
+        testee.onOmnibarInputStateChanged("", true)
+        assertFalse(testee.viewState.value!!.showTabsButton)
+    }
+
+    @Test
+    fun whenInitialisedThenMenuButtonIsShown() {
+        assertTrue(testee.viewState.value!!.showMenuButton)
+    }
+
+    @Test
+    fun whenOmnibarInputDoesNotHaveFocusThenMenuButtonIsShown() {
+        testee.onOmnibarInputStateChanged("", false)
+        assertTrue(testee.viewState.value!!.showMenuButton)
+    }
+
+    @Test
+    fun whenOmnibarInputHasFocusThenMenuButtonIsNotShown() {
+        testee.onOmnibarInputStateChanged("", true)
+        assertFalse(testee.viewState.value!!.showMenuButton)
     }
 
     @Test

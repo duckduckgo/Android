@@ -2,7 +2,6 @@
 <lint>
     <issue id="IconColors">
         <ignore path="src/main/res/drawable*/privacygrade_icon_*" />
-        <ignore path="src/main/res/drawable*/icon_fire*" />
     </issue>
     <issue id="IconExpectedSize">
         <ignore path="src/main/res/drawable-*/privacygrade_icon_*" />

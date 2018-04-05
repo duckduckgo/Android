@@ -3,8 +3,6 @@
     <string name="appName">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
 
-    <string name="privacyDashboard">Privacy Dashboard</string>
-
     <!-- Onboarding Activity -->
     <string name="onboardingProtectDataTitle">Protect Your Data</string>
     <string name="onboardingProtectDataDescription">Tap the Privacy Grade to reveal who we caught trying to track you.\n</string>
@@ -60,7 +58,9 @@
     <string name="openInNewTab">Open in New Tab</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Close</string>
-    <string name="tapFireToForget">Tap %s to forget everything</string>
+    <string name="tapFireDirective">Tap </string>
+    <string name="tapFireIconDescription">fire</string>
+    <string name="tapFireExplanation"> to forget everything</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
@@ -74,6 +74,7 @@
     <string name="httpsBad">Unencrypted Connection</string>
 
     <string name="networksActivityTitle">Tracker Networks</string>
+    <string name="networksContentDescription">Tracker Networks</string>
     <string name="networksOverview">Tracker networks aggregate your web history into a data profile about you. Major tracker networks are more harmful because they can track and target you across more of the internet.</string>
 
     <plurals name="trackersFound">

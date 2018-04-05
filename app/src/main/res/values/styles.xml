@@ -14,6 +14,10 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="colorControlNormal">@color/grayish</item>
+    </style>
+
     <style name="SwitchTheme" parent="Widget.AppCompat.CompoundButton.Switch">
         <item name="colorControlActivated">@android:color/white</item>
     </style>
@@ -55,7 +59,7 @@
         <item name="android:paddingBottom">15dp</item>
         <item name="android:paddingTop">15dp</item>
         <item name="android:paddingEnd">22dp</item>
-        <item name="android:textColor">@color/almostBlack</item>
+        <item name="android:textColor">@color/almostBlackDark</item>
         <item name="android:textIsSelectable">false</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">normal</item>
@@ -74,7 +78,7 @@
         <item name="android:textSize">14sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textStyle">normal</item>
-        <item name="android:textColor">@color/almostBlack</item>
+        <item name="android:textColor">@color/almostBlackDark</item>
         <item name="android:paddingBottom">12dp</item>
         <item name="android:selectable">true</item>
         <item name="android:paddingTop">12dp</item>
@@ -139,10 +143,6 @@
         <item name="android:textColor">@color/warmGray</item>
         <item name="android:textSize">12sp</item>
         <item name="android:textStyle">normal</item>
-    </style>
-
-    <style name="TransparentToolbar" parent="ThemeOverlay.AppCompat.ActionBar">
-        <item name="android:colorControlNormal">@color/white</item>
     </style>
 
     <style name="SettingsContentLabel.SettingsSwitch" >
@@ -231,6 +231,7 @@
         <item name="android:paddingTop">16dp</item>
         <item name="android:lineSpacingExtra">6sp</item>
     </style>
+
 
 
 </resources>
