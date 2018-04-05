@@ -81,7 +81,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="@drawable/omnibar_editing_background"
-                        android:layout_margin="8dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"
                         android:paddingStart="6dp"
                         android:paddingEnd="6dp">
 
@@ -92,9 +95,7 @@
                             android:layout_height="wrap_content"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:src="@drawable/privacygrade_icon_a"
-                            android:padding="3dp"
-                            android:layout_marginEnd="4dp"
-                            android:layout_marginStart="4dp"
+                            android:padding="4dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
@@ -104,8 +105,8 @@
                             style="@style/Base.V7.Widget.AppCompat.EditText"
                             android:layout_width="0dp"
                             android:layout_height="0dp"
-                            android:layout_marginEnd="6dp"
-                            android:layout_marginStart="6dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginStart="8dp"
                             android:background="@android:color/transparent"
                             android:fontFamily="sans-serif-medium"
                             android:hint="@string/omnibarInputHint"
@@ -124,8 +125,6 @@
                         
                         <ImageView
                             android:padding="3dp"
-                            android:layout_marginEnd="4dp"
-                            android:layout_marginStart="4dp"
                             android:id="@+id/clearTextButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -134,9 +133,9 @@
                             android:src="@drawable/ic_close_white_24dp"
                             android:tint="@color/grayish"
                             android:visibility="gone"
-                            app:layout_constraintBottom_toBottomOf="@id/omnibarTextInput"
+                            app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="@id/omnibarTextInput"
+                            app:layout_constraintTop_toTopOf="parent"
                             tools:visibility="visible" />
 
                     </android.support.constraint.ConstraintLayout>

@@ -18,15 +18,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/tabs"
-        android:icon="@drawable/ic_tabs_gray_24dp"
-        android:title="@string/tabsMenuItem"
-        app:showAsAction="ifRoom" />
-
-    <item
         android:id="@+id/fire"
         android:icon="@drawable/ic_fire_gray_24dp"
         android:title="@string/fireMenu"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/tabs"
+        android:icon="@drawable/ic_tabs_gray_24dp"
+        android:title="@string/tabsMenuItem"
         app:showAsAction="ifRoom" />
 
     <item
