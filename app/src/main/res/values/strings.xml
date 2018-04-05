@@ -3,8 +3,6 @@
     <string name="appName">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
 
-    <string name="privacyDashboard">Privacy Dashboard</string>
-
     <!-- Onboarding Activity -->
     <string name="onboardingProtectDataTitle">Protect Your Data</string>
     <string name="onboardingProtectDataDescription">Tap the Privacy Grade to reveal who we caught trying to track you.\n</string>

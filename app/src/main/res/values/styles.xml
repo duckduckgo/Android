@@ -145,10 +145,6 @@
         <item name="android:textStyle">normal</item>
     </style>
 
-    <style name="TransparentToolbar" parent="ThemeOverlay.AppCompat.ActionBar">
-        <item name="android:colorControlNormal">@color/white</item>
-    </style>
-
     <style name="SettingsContentLabel.SettingsSwitch" >
         <item name="colorControlActivated">@color/midGreen</item>
         <item name="colorSwitchThumbNormal">@color/white</item>
