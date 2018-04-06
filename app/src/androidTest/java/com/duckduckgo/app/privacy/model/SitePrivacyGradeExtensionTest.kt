@@ -26,10 +26,6 @@ import org.junit.Test
 
 class SitePrivacyGradeExtensionTest {
 
-    companion object {
-        val defaultScore = 1
-    }
-
     @Test
     fun whenHttpsMixedThenScoreIsIncrementedByOne() {
         val site = site(https = MIXED)
@@ -200,5 +196,9 @@ class SitePrivacyGradeExtensionTest {
         whenever(site.https).thenReturn(https)
         whenever(site.allTrackersBlocked).thenReturn(allTrackerBlocked)
         return site
+    }
+
+    companion object {
+        private const val defaultScore = 1
     }
 }

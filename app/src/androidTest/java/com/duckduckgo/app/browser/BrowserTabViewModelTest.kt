@@ -17,8 +17,6 @@
 package com.duckduckgo.app.browser
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.persistence.room.Room
 import android.net.Uri
@@ -32,7 +30,8 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
-import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.*
+import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
+import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
@@ -40,13 +39,13 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
-import com.duckduckgo.app.privacy.db.NetworkPercent
+import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
-import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.db.TabsDao
+import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -71,17 +70,8 @@ class BrowserTabViewModelTest {
     @Suppress("unused")
     val schedulers = InstantSchedulersRule()
 
-    private var lastNetworkLeaderboardEntry: NetworkLeaderboardEntry? = null
-
-    private val testNetworkLeaderboardDao: NetworkLeaderboardDao = object : NetworkLeaderboardDao {
-        override fun insert(leaderboardEntry: NetworkLeaderboardEntry) {
-            lastNetworkLeaderboardEntry = leaderboardEntry
-        }
-
-        override fun networkPercents(): LiveData<Array<NetworkPercent>> {
-            return MutableLiveData<Array<NetworkPercent>>()
-        }
-    }
+    @Mock
+    private lateinit var mockNetworkLeaderboardDao: NetworkLeaderboardDao
 
     @Mock
     private lateinit var mockStatisticsUpdater: StatisticsUpdater
@@ -139,7 +129,7 @@ class BrowserTabViewModelTest {
                 duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
                 siteFactory = siteFactory,
                 tabRepository = TabDataRepository(tabsDao),
-                networkLeaderboardDao = testNetworkLeaderboardDao,
+                networkLeaderboardDao = mockNetworkLeaderboardDao,
                 autoCompleteApi = mockAutoCompleteApi,
                 appSettingsPreferencesStore = mockSettingsStore,
                 bookmarksDao = bookmarksDao,
@@ -207,10 +197,9 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenTrackerDetectedThenNetworkLeaderboardUpdated() {
-        testee.trackerDetected(TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", TrackerNetwork("Network1", "www.tracker.com"), false))
-        assertNotNull(lastNetworkLeaderboardEntry)
-        assertEquals(lastNetworkLeaderboardEntry!!.domainVisited, "www.example.com")
-        assertEquals(lastNetworkLeaderboardEntry!!.networkName, "Network1")
+        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", TrackerNetwork("Network1", "www.tracker.com"), false)
+        testee.trackerDetected(event)
+        verify(mockNetworkLeaderboardDao).insert(NetworkLeaderboardEntry("Network1", "www.example.com"))
     }
 
     @Test
@@ -241,6 +230,25 @@ class BrowserTabViewModelTest {
     fun whenViewModelNotifiedThatWebViewHasFinishedLoadingThenViewStateIsUpdated() {
         testee.loadingFinished()
         assertFalse(testee.viewState.value!!.isLoading)
+    }
+
+    @Test
+    fun whenLoadingFinishedWithUrlThenSiteVisitedEntryAddedToLeaderboardDao() {
+        testee.url.value = "http://example.com/abc"
+        testee.loadingFinished()
+        verify(mockNetworkLeaderboardDao).insert(SiteVisitedEntity("example.com"))
+    }
+
+    @Test
+    fun whenLoadingFinishedWithNoUrlThenSiteVisitedEntryNotAddedToLeaderboardDao() {
+        testee.loadingFinished()
+        verify(mockNetworkLeaderboardDao, never()).insert(SiteVisitedEntity("example.com"))
+    }
+
+    @Test
+    fun whenTrackerDetectedThenSiteVisitedEntryAddedToLeaderboardDao() {
+        testee.trackerDetected(TrackingEvent("http://example.com/abc", "http://tracker.com", TrackerNetwork("Network", "http:// netwotk.com"), true))
+        verify(mockNetworkLeaderboardDao).insert(SiteVisitedEntity("example.com"))
     }
 
     @Test
@@ -382,9 +390,43 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOmnibarInputHasFocusThenFireButtonIsShown() {
+    fun whenOmnibarInputHasFocusThenFireButtonIsHidden() {
         testee.onOmnibarInputStateChanged("", true)
-        assertTrue(testee.viewState.value!!.showFireButton)
+        assertFalse(testee.viewState.value!!.showFireButton)
+    }
+
+    @Test
+    fun whenInitialisedThenTabsButtonIsShown() {
+        assertTrue(testee.viewState.value!!.showTabsButton)
+    }
+
+    @Test
+    fun whenOmnibarInputDoesNotHaveFocusThenTabsButtonIsShown() {
+        testee.onOmnibarInputStateChanged("", false)
+        assertTrue(testee.viewState.value!!.showTabsButton)
+    }
+
+    @Test
+    fun whenOmnibarInputHasFocusThenTabsButtonIsNotShown() {
+        testee.onOmnibarInputStateChanged("", true)
+        assertFalse(testee.viewState.value!!.showTabsButton)
+    }
+
+    @Test
+    fun whenInitialisedThenMenuButtonIsShown() {
+        assertTrue(testee.viewState.value!!.showMenuButton)
+    }
+
+    @Test
+    fun whenOmnibarInputDoesNotHaveFocusThenMenuButtonIsShown() {
+        testee.onOmnibarInputStateChanged("", false)
+        assertTrue(testee.viewState.value!!.showMenuButton)
+    }
+
+    @Test
+    fun whenOmnibarInputHasFocusThenMenuButtonIsNotShown() {
+        testee.onOmnibarInputStateChanged("", true)
+        assertFalse(testee.viewState.value!!.showMenuButton)
     }
 
     @Test
@@ -459,7 +501,7 @@ class BrowserTabViewModelTest {
         whenever(mockLongPressHandler.userSelectedMenuItem(anyString(), any()))
                 .thenReturn(DownloadFile("example.com"))
 
-        val mockMenuItem : MenuItem = mock()
+        val mockMenuItem: MenuItem = mock()
         testee.userSelectedItemFromLongPressMenu("example.com", mockMenuItem)
         verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.DownloadImage)
@@ -560,7 +602,7 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, never()).onChanged(any())
     }
 
-    private fun captureCommands() : ArgumentCaptor<Command> {
+    private fun captureCommands(): ArgumentCaptor<Command> {
         verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
         return commandCaptor
     }

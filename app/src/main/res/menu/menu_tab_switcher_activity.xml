@@ -19,13 +19,13 @@
 
     <item
         android:id="@+id/fire"
-        android:icon="@drawable/icon_fire"
+        android:icon="@drawable/ic_fire_gray_24dp"
         android:title="@string/fireMenu"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/newTab"
-        android:icon="@drawable/ic_add_white_30dp"
+        android:icon="@drawable/ic_add_gray_30dp"
         android:title="@string/newTabMenuItem"
         app:showAsAction="ifRoom" />
 

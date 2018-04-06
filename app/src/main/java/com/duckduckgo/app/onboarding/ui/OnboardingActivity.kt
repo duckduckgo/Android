@@ -137,7 +137,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
         }
 
         companion object {
-            val pageCount = 2
+            const val pageCount = 2
 
             @ColorRes
             val firstColor = R.color.lighOliveGreen

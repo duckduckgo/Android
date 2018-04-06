@@ -22,13 +22,17 @@ import android.app.Service
 import android.support.v4.app.Fragment
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.DaggerAppComponent
+import com.duckduckgo.app.global.notification.NotificationRegistrar
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.migration.LegacyMigration
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.squareup.leakcanary.LeakCanary
-import dagger.android.*
+import dagger.android.AndroidInjector
+import dagger.android.DispatchingAndroidInjector
+import dagger.android.HasActivityInjector
+import dagger.android.HasServiceInjector
 import dagger.android.support.HasSupportFragmentInjector
 import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.doAsync
@@ -64,6 +68,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     @Inject
     lateinit var statisticsUpdater: StatisticsUpdater
 
+    @Inject
+    lateinit var notificationRegistrar: NotificationRegistrar
+
     override fun onCreate() {
         super.onCreate()
 
@@ -78,6 +85,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         configureDataDownloader()
 
         migrateLegacyDb()
+        notificationRegistrar.registerApp()
     }
 
     protected open fun installLeakCanary(): Boolean {

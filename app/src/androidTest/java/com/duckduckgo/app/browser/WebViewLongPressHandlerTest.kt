@@ -82,9 +82,9 @@ class WebViewLongPressHandlerTest {
     }
 
     @Test
-    fun whenLongPressedWithImageTypeWhichIsADataUriThenMenuNotAltered() {
+    fun whenLongPressedWithImageTypeWhichIsADataUriThenDownloadImageMenuAdded() {
         testee.handleLongPress(HitTestResult.IMAGE_TYPE, DATA_URI_IMAGE_URL, mockMenu)
-        verifyMenuNotAltered()
+        verify(mockMenu).add(anyInt(), eq(WebViewLongPressHandler.CONTEXT_MENU_ID_DOWNLOAD_IMAGE), anyInt(), eq(R.string.downloadImage))
     }
 
     @Test

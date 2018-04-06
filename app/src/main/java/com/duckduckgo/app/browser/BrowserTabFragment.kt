@@ -16,33 +16,46 @@
 
 package com.duckduckgo.app.browser
 
+import android.Manifest
 import android.animation.LayoutTransition.CHANGING
 import android.annotation.SuppressLint
+import android.app.Activity.RESULT_OK
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.support.annotation.AnyThread
 import android.support.annotation.StringRes
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.view.*
 import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
-import android.webkit.URLUtil
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.widget.EditText
 import android.widget.TextView
+import androidx.view.isVisible
 import androidx.view.postDelayed
-import androidx.view.updatePaddingRelative
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
+import com.duckduckgo.app.browser.downloader.FileDownloader
+import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
+import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.global.ViewModelFactory
@@ -51,12 +64,15 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
+import kotlinx.android.synthetic.main.fragment_browser_tab.view.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
+import kotlin.concurrent.thread
 
 
 class BrowserTabFragment : Fragment(), FindListener {
@@ -70,6 +86,15 @@ class BrowserTabFragment : Fragment(), FindListener {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
+    @Inject
+    lateinit var fileChooserIntentBuilder: FileChooserIntentBuilder
+
+    @Inject
+    lateinit var fileDownloader: FileDownloader
+
+    @Inject
+    lateinit var fileDownloadNotificationManager: FileDownloadNotificationManager
+
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
     lateinit var userAgentProvider: UserAgentProvider
@@ -77,6 +102,12 @@ class BrowserTabFragment : Fragment(), FindListener {
     private lateinit var popupMenu: BrowserPopupMenu
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
+
+
+    // Used to represent a file to download, but may first require permission
+    private var pendingFileDownload: PendingFileDownload? = null
+
+    private var pendingUploadTask: ValueCallback<Array<Uri>>? = null
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProviders.of(this, viewModelFactory).get(BrowserTabViewModel::class.java)
@@ -87,11 +118,15 @@ class BrowserTabFragment : Fragment(), FindListener {
     private val browserActivity
         get() = activity as? BrowserActivity
 
-    private val privacyGradeMenu: MenuItem?
-        get() = toolbar.menu.findItem(R.id.privacyDashboard)
+    private val tabsButton: MenuItem?
+        get() = toolbar.menu.findItem(R.id.tabs)
 
-    private val fireMenu: MenuItem?
+    private val fireMenuButton: MenuItem?
         get() = toolbar.menu.findItem(R.id.fire)
+
+    private val menuButton: MenuItem?
+        get() = toolbar.menu.findItem(R.id.browserPopup)
+
 
     private var webView: WebView? = null
 
@@ -104,8 +139,8 @@ class BrowserTabFragment : Fragment(), FindListener {
     private val omnibarInputTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
             viewModel.onOmnibarInputStateChanged(
-                omnibarTextInput.text.toString(),
-                omnibarTextInput.hasFocus()
+                    omnibarTextInput.text.toString(),
+                    omnibarTextInput.hasFocus()
             )
         }
     }
@@ -151,7 +186,6 @@ class BrowserTabFragment : Fragment(), FindListener {
             onMenuItemClicked(view.forwardPopupMenuItem) { webView?.goForward() }
             onMenuItemClicked(view.backPopupMenuItem) { webView?.goBack() }
             onMenuItemClicked(view.refreshPopupMenuItem) { webView?.reload() }
-            onMenuItemClicked(view.tabsMenuItem) { browserActivity?.launchTabSwitcher() }
             onMenuItemClicked(view.newTabPopupMenuItem) { browserActivity?.launchNewTab() }
             onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
             onMenuItemClicked(view.addBookmarksPopupMenuItem) { addBookmark() }
@@ -159,8 +193,8 @@ class BrowserTabFragment : Fragment(), FindListener {
             onMenuItemClicked(view.findInPageMenuItem) { viewModel.userRequestingToFindInPage() }
             onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) {
                 viewModel.desktopSiteModeToggled(
-                    urlString = webView?.url,
-                    desktopSiteRequested = view.requestDesktopSiteCheckMenuItem.isChecked
+                        urlString = webView?.url,
+                        desktopSiteRequested = view.requestDesktopSiteCheckMenuItem.isChecked
                 )
             }
             onMenuItemClicked(view.sharePageMenuItem) { viewModel.userSharingLink(webView?.url) }
@@ -227,20 +261,38 @@ class BrowserTabFragment : Fragment(), FindListener {
             }
             is Command.ShowFullScreen -> {
                 webViewFullScreenContainer.addView(
-                    it.view, ViewGroup.LayoutParams(
+                        it.view, ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT
-                    )
+                )
                 )
             }
-            is Command.DownloadImage -> {
-                browserActivity?.downloadImage(it.url)
-            }
+            is Command.DownloadImage -> requestImageDownload(it.url)
             is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
             Command.DismissFindInPage -> webView?.findAllAsync(null)
             is Command.ShareLink -> launchSharePageChooser(it.url)
             is Command.DisplayMessage -> showToast(it.messageId)
+            is Command.ShowFileChooser -> {
+                launchFilePicker(it)
+            }
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_CODE_CHOOSE_FILE) {
+            handleFileUploadResult(resultCode, data)
+        }
+    }
+
+    private fun handleFileUploadResult(resultCode: Int, intent: Intent?) {
+        if (resultCode != RESULT_OK || intent == null) {
+            Timber.i("Received resultCode $resultCode (or received null intent) indicating user did not select any files")
+            pendingUploadTask?.onReceiveValue(null)
+            return
+        }
+
+        val uris = fileChooserIntentBuilder.extractSelectedFileUris(intent)
+        pendingUploadTask?.onReceiveValue(uris)
     }
 
     private fun showToast(@StringRes messageId: Int) {
@@ -251,12 +303,12 @@ class BrowserTabFragment : Fragment(), FindListener {
         val context = context ?: return
         autoCompleteSuggestionsList.layoutManager = LinearLayoutManager(context)
         autoCompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
-            immediateSearchClickListener = {
-                userEnteredQuery(it.phrase)
-            },
-            editableSearchClickListener = {
-                viewModel.onUserSelectedToEditQuery(it.phrase)
-            }
+                immediateSearchClickListener = {
+                    userEnteredQuery(it.phrase)
+                },
+                editableSearchClickListener = {
+                    viewModel.onUserSelectedToEditQuery(it.phrase)
+                }
         )
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
@@ -290,14 +342,13 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
 
         pageLoadingIndicator.progress = viewState.progress
-
-        when (viewState.showClearButton) {
-            true -> showClearButton()
-            false -> hideClearButton()
-        }
-
         renderToolbarButtons(viewState)
         renderPopupMenu(viewState)
+
+        when (viewState.isEditing) {
+            true -> omniBarContainer.setBackgroundResource(R.drawable.omnibar_editing_background)
+            false -> omniBarContainer.background = null
+        }
 
         when (viewState.autoComplete.showSuggestions) {
             false -> autoCompleteSuggestionsList.gone()
@@ -319,8 +370,11 @@ class BrowserTabFragment : Fragment(), FindListener {
     }
 
     private fun renderToolbarButtons(viewState: ViewState) {
-        fireMenu?.isVisible = viewState.showFireButton
-        privacyGradeMenu?.isVisible = viewState.showPrivacyGrade
+        privacyGradeButton?.isVisible = viewState.showPrivacyGrade
+        clearTextButton?.isVisible = viewState.showClearButton
+        tabsButton?.isVisible = viewState.showTabsButton
+        fireMenuButton?.isVisible = viewState.showFireButton
+        menuButton?.isVisible = viewState.showMenuButton
     }
 
     private fun renderPopupMenu(viewState: ViewState) {
@@ -358,9 +412,9 @@ class BrowserTabFragment : Fragment(), FindListener {
             false -> findInPageMatches.hide()
             true -> {
                 findInPageMatches.text = getString(
-                    R.string.findInPageMatches,
-                    viewState.activeMatchIndex,
-                    viewState.numberMatches
+                        R.string.findInPageMatches,
+                        viewState.activeMatchIndex,
+                        viewState.numberMatches
                 )
                 findInPageMatches.show()
             }
@@ -380,30 +434,16 @@ class BrowserTabFragment : Fragment(), FindListener {
         activity?.toggleFullScreen()
     }
 
-    private fun showClearButton() {
-        omnibarTextInput.post {
-            clearOmnibarInputButton?.show()
-            omnibarTextInput?.updatePaddingRelative(end = 40.toPx())
-        }
-    }
-
-    private fun hideClearButton() {
-        omnibarTextInput.post {
-            clearOmnibarInputButton?.hide()
-            omnibarTextInput?.updatePaddingRelative(end = 10.toPx())
-        }
-    }
-
     private fun shouldUpdateOmnibarTextInput(viewState: ViewState, omnibarInput: String?) =
-        !viewState.isEditing && omnibarTextInput.isDifferent(omnibarInput)
+            !viewState.isEditing && omnibarTextInput.isDifferent(omnibarInput)
 
     private fun configureToolbar() {
         toolbar.inflateMenu(R.menu.menu_browser_activity)
 
         toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.privacyDashboard -> {
-                    browserActivity?.launchPrivacyDashboard()
+                R.id.tabs -> {
+                    browserActivity?.launchTabSwitcher()
                     return@setOnMenuItemClickListener true
                 }
                 R.id.fire -> {
@@ -419,13 +459,18 @@ class BrowserTabFragment : Fragment(), FindListener {
             }
         }
 
+        toolbar.privacyGradeButton.setOnClickListener {
+            browserActivity?.launchPrivacyDashboard()
+        }
+
         viewModel.viewState.value?.let {
             renderToolbarButtons(it)
         }
 
         viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
             it?.let {
-                privacyGradeMenu?.icon = context?.getDrawable(it.icon())
+                val drawable = context?.getDrawable(it.icon()) ?: return@let
+                privacyGradeButton?.setImageDrawable(drawable)
             }
         })
     }
@@ -459,14 +504,14 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
 
         omnibarTextInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, keyEvent ->
-            if (actionId == EditorInfo.IME_ACTION_DONE || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
+            if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
                 userEnteredQuery(omnibarTextInput.text.toString())
                 return@OnEditorActionListener true
             }
             false
         })
 
-        clearOmnibarInputButton.setOnClickListener { omnibarTextInput.setText("") }
+        clearTextButton.setOnClickListener { omnibarTextInput.setText("") }
     }
 
     private fun configureKeyboardAwareLogoAnimation() {
@@ -499,7 +544,7 @@ class BrowserTabFragment : Fragment(), FindListener {
             }
 
             it.setDownloadListener { url, _, _, _, _ ->
-                browserActivity?.downloadFile(url)
+                requestFileDownload(url)
             }
 
             it.setOnTouchListener { _, _ ->
@@ -526,9 +571,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     override fun onCreateContextMenu(menu: ContextMenu, view: View, menuInfo: ContextMenu.ContextMenuInfo?) {
         webView?.hitTestResult?.let {
-            if (URLUtil.isNetworkUrl(it.extra)) {
-                viewModel.userLongPressedInWebView(it, menu)
-            }
+            viewModel.userLongPressedInWebView(it, menu)
         }
     }
 
@@ -553,8 +596,8 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private fun addBookmark() {
         val addBookmarkDialog = SaveBookmarkDialogFragment.createDialogCreationMode(
-            existingTitle = webView?.title,
-            existingUrl = webView?.url
+                existingTitle = webView?.title,
+                existingUrl = webView?.url
         )
         addBookmarkDialog.show(childFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
         addBookmarkDialog.listener = viewModel
@@ -654,12 +697,90 @@ class BrowserTabFragment : Fragment(), FindListener {
         webView = null
     }
 
+    private fun requestFileDownload(url: String) {
+        pendingFileDownload = PendingFileDownload(
+                url = url,
+                subfolder = Environment.DIRECTORY_DOWNLOADS)
+
+        downloadFileWithPermissionCheck()
+    }
+
+    private fun requestImageDownload(url: String) {
+        pendingFileDownload = PendingFileDownload(
+                url = url,
+                subfolder = Environment.DIRECTORY_PICTURES)
+
+        downloadFileWithPermissionCheck()
+    }
+
+    private fun downloadFileWithPermissionCheck() {
+        if (hasWriteStoragePermission()) {
+            downloadFile()
+        } else {
+            requestWriteStoragePermission()
+        }
+    }
+
+    @AnyThread
+    private fun downloadFile() {
+        val pendingDownload = pendingFileDownload
+        pendingFileDownload = null
+        thread {
+            fileDownloader.download(pendingDownload, object : FileDownloader.FileDownloadListener {
+                override fun downloadStarted() {
+                    fileDownloadNotificationManager.showDownloadInProgressNotification()
+                }
+
+                override fun downloadFinished(file: File, mimeType: String?) {
+                    MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null, { _, uri ->
+                        fileDownloadNotificationManager.showDownloadFinishedNotification(file.name, uri, mimeType)
+                    })
+                }
+
+                override fun downloadFailed(message: String) {
+                    Timber.w("Failed to download file [$message]")
+                    fileDownloadNotificationManager.showDownloadFailedNotification()
+                }
+            })
+        }
+    }
+
+    private fun launchFilePicker(command: Command.ShowFileChooser) {
+        pendingUploadTask = command.filePathCallback
+        val canChooseMultipleFiles = command.fileChooserParams.mode == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE
+        val intent = fileChooserIntentBuilder.intent(command.fileChooserParams.acceptTypes, canChooseMultipleFiles)
+        startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE)
+    }
+
+    private fun hasWriteStoragePermission(): Boolean {
+        return ContextCompat.checkSelfPermission(context!!, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestWriteStoragePermission() {
+        requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (requestCode == PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE) {
+            if ((grantResults.isNotEmpty()) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Timber.i("Write external storage permission granted")
+                downloadFile()
+            } else {
+                Timber.i("Write external storage permission refused")
+                Snackbar.make(toolbar, R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
+            }
+        }
+    }
+
     companion object {
 
         private const val TAB_ID_ARG = "TAB_ID_ARG"
         private const val ADD_BOOKMARK_FRAGMENT_TAG = "ADD_BOOKMARK"
         private const val QUERY_EXTRA_ARG = "QUERY_EXTRA_ARG"
         private const val KEYBOARD_DELAY = 200L
+
+        private const val REQUEST_CODE_CHOOSE_FILE = 100
+        private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
 
         fun newInstance(tabId: String, query: String? = null): BrowserTabFragment {
             val fragment = BrowserTabFragment()

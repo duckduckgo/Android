@@ -28,10 +28,10 @@ import org.junit.Test
 class ResourceTypeTest {
 
     companion object {
-        private val unknownHeader = "text/plain"
-        private val imageHeader = "application/vnd.api+json, image/png"
-        private val cssHeader = "application/vnd.api+json, text/css"
-        private val scriptHeader = "application/vnd.api+json, application/javascript"
+        private const val unknownHeader = "text/plain"
+        private const val imageHeader = "application/vnd.api+json, image/png"
+        private const val cssHeader = "application/vnd.api+json, text/css"
+        private const val scriptHeader = "application/vnd.api+json, application/javascript"
 
         private val unknownUrl = Uri.parse("http://www.example.com/index.html")
         private val imageUrl = Uri.parse("http://www.example.com/a.png?param=value")

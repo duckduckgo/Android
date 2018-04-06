@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimaryDark">@color/darkGray</color>
-    <color name="colorPrimary">@color/charcoalGray</color>
+    <color name="colorPrimaryDark">@color/almostBlackDark</color>
+    <color name="colorPrimary">@color/almostBlack</color>
     <color name="colorAccent">@color/orange</color>
 
-    <color name="windowBackground">@color/charcoal</color>
-    <color name="searchBackground">@color/slateGray</color>
+    <color name="windowBackground">@color/almostBlackDark</color>
     <color name="divider">@color/subtleGrayTwo</color>
+    <color name="omnibarEditingBackground">@color/midGray</color>
 
     <color name="white">#FFFFFF</color>
     <color name="whiteTwo">#e4e4e4</color>
     <color name="midnight">#161616</color>
+
+    <color name="almostBlackDark">#222222</color>
     <color name="almostBlack">#333333</color>
-    <color name="darkGray">#222325</color>
-    <color name="charcoal">#2f3135</color>
-    <color name="charcoalGray">#47494c</color>
-    <color name="slateGray">#5e6168</color>
+    <color name="midGray">#555</color>
     <color name="grayish">#aaaaaa</color>
+
     <color name="paleBrownishGray">#b0b0b0</color>
     <color name="brownishGray">#5c5c5c</color>
     <color name="coolGray">#969799</color>

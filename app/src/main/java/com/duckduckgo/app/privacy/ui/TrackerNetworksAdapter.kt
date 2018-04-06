@@ -36,8 +36,8 @@ import kotlinx.android.synthetic.main.item_tracker_network_header.view.*
 class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
-        val HEADER = 0
-        val ROW = 1
+        const val HEADER = 0
+        const val ROW = 1
     }
 
     interface ViewData

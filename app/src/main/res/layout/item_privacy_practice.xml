@@ -42,7 +42,7 @@
         android:layout_marginStart="22dp"
         android:fontFamily="sans-serif"
         android:lineSpacingExtra="7sp"
-        android:textColor="@color/almostBlack"
+        android:textColor="@color/almostBlackDark"
         android:textIsSelectable="true"
         android:textSize="14sp"
         android:textStyle="normal"

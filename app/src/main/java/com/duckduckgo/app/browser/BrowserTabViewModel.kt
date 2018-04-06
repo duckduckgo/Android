@@ -26,7 +26,10 @@ import android.support.annotation.VisibleForTesting
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
 import android.webkit.WebView
+import androidx.net.toUri
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
@@ -44,6 +47,7 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
+import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.improvedGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -76,9 +80,11 @@ class BrowserTabViewModel(
         val omnibarText: String = "",
         val isEditing: Boolean = false,
         val browserShowing: Boolean = false,
-        val showClearButton: Boolean = false,
         val showPrivacyGrade: Boolean = false,
+        val showClearButton: Boolean = false,
+        val showTabsButton: Boolean = true,
         val showFireButton: Boolean = true,
+        val showMenuButton: Boolean = true,
         val canAddBookmarks: Boolean = false,
         val isFullScreen: Boolean = false,
         val autoComplete: AutoCompleteViewState = AutoCompleteViewState(),
@@ -103,6 +109,7 @@ class BrowserTabViewModel(
         class FindInPageCommand(val searchTerm: String) : Command()
         class DisplayMessage(@StringRes val messageId: Int) : Command()
         object DismissFindInPage : Command()
+        class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -221,6 +228,14 @@ class BrowserTabViewModel(
     override fun loadingFinished() {
         Timber.v("Loading finished")
         viewState.value = currentViewState().copy(isLoading = false)
+        registerSiteVisit()
+    }
+
+    private fun registerSiteVisit() {
+        val domainVisited = url.value?.toUri()?.host ?: return
+        Schedulers.io().scheduleDirect {
+            networkLeaderboardDao.insert(SiteVisitedEntity(domainVisited))
+        }
     }
 
     override fun titleReceived(title: String) {
@@ -283,6 +298,7 @@ class BrowserTabViewModel(
         val networkName = event.trackerNetwork?.name ?: return
         val domainVisited = Uri.parse(event.documentUrl).host ?: return
         networkLeaderboardDao.insert(NetworkLeaderboardEntry(networkName, domainVisited))
+        networkLeaderboardDao.insert(SiteVisitedEntity(domainVisited))
     }
 
     override fun pageHasHttpResources(page: String?) {
@@ -296,6 +312,10 @@ class BrowserTabViewModel(
         siteLiveData.postValue(site)
         privacyGrade.postValue(site?.improvedGrade)
         tabRepository.update(tabId, site)
+    }
+
+    override fun showFileChooser(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams) {
+        command.value = Command.ShowFileChooser(filePathCallback, fileChooserParams)
     }
 
     private fun currentViewState(): ViewState = viewState.value!!
@@ -318,8 +338,11 @@ class BrowserTabViewModel(
 
         viewState.value = currentViewState().copy(
             isEditing = hasFocus,
+            showPrivacyGrade = appConfigurationDownloaded && currentViewState.browserShowing,
+            showTabsButton = !hasFocus,
+            showFireButton = !hasFocus,
+            showMenuButton = !hasFocus,
             showClearButton = showClearButton,
-            showPrivacyGrade = appConfigurationDownloaded && !hasFocus && currentViewState.browserShowing,
             autoComplete = AutoCompleteViewState(showAutoCompleteSuggestions, autoCompleteSearchResults)
         )
 
@@ -398,7 +421,6 @@ class BrowserTabViewModel(
         )
         viewState.value = currentViewState().copy(findInPage = findInPage)
     }
-
 
     fun desktopSiteModeToggled(urlString: String?, desktopSiteRequested: Boolean) {
         viewState.value = currentViewState().copy(isDesktopBrowsingMode = desktopSiteRequested)

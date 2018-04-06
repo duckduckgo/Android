@@ -56,6 +56,7 @@
         android:layout_height="match_parent"
         android:contentDescription="@string/closeContentDescription"
         android:scaleType="center"
+        android:background="?selectableItemBackground"
         android:src="@drawable/ic_close_white_24dp"
         android:tint="@color/grayish"
         app:layout_constraintBottom_toBottomOf="parent"
