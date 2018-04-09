@@ -10,8 +10,8 @@ See [README.md] (https://github.com/duckduckgo/Android/blob/develop/README.md)
 ## Contribute Code
 
 We have labelled tasks you can help with as [help wanted]
-(https://github.com/duckduckgo/Android/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22). We are still opening up to project.
-Other than small bugfixes, we cannot yet accept PRs outside this list. If you have a great idea
+(https://github.com/duckduckgo/Android/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22).
+As we are still opening up to project, we cannot yet accept PRs outside this list. If you have a great idea
 you really want to implement, start by logging an issue for us and mention that you are interested in helping.
  If it fits with our product direction and is a good candidate for community development we may be able to bend
  the rules and work with you to develop it.
