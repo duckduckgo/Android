@@ -5,7 +5,7 @@ Thank you for taking the time to contribute to DuckDuckGo! :sparkles
 We are pleased to open up the project to you - our community. How can you contribute?
 
 ## Share feedback and bug reports
-See [README.md](https://github.com/duckduckgo/Android/blob/develop/README.md)
+See [README.md](README.md)
 
 ## Contribute Code
 
@@ -17,7 +17,7 @@ you really want to implement, start by logging an issue for us and mention that 
 
 ## Style Guide
 
-We care about clean code. Refer to our [style guide](https://github.com/duckduckgo/Android/styleguide/STYLEGUIDE.md).
+We care about clean code. Refer to our [style guide](styleguide/STYLEGUIDE.md).
 
 
 ## Commit Messages

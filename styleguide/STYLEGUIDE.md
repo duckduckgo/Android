@@ -7,7 +7,7 @@
 * Open Android Studio preferences
 * Tap on code style, select Kotlin
 * Select Set From, Predefined Style, Kotlin Style Guide
-![Setting kotlin style screenshot](https://github.com/duckduckgo/android/raw/develop/styleguide/IDE_kotlin_style.png)
+![Setting kotlin style screenshot](IDE_kotlin_style.png)
 
 ## Line breaks
 * We use a line margin of 150 rather than the default of 100 as the default causes excessive line breaks. The larger margin allows us to take advantage of modern widescreen monitors with more screen real-estate.
@@ -17,7 +17,7 @@
 * Tap on code style
 * Enter 150 into "Page margin"
 
-![Setting kotlin style screenshot](https://github.com/duckduckgo/android/raw/develop/styleguide/IDE_line_wrap.png)
+![Setting kotlin style screenshot](IDE_line_wrap.png)
 
 #### Timber
 When logging with Timber we use the new Kotlin styles strings

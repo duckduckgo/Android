@@ -1,6 +1,6 @@
 # DuckDuckGo Android
 
-Welcome to our android application. We are excited to engage the community in development, see [CONTRIBUTING.md](https://github.com/duckduckgo/Android/blob/develop/CONTRIBUTING.md).
+Welcome to our android application. We are excited to engage the community in development, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 
 ## Discuss
@@ -21,4 +21,4 @@ Email bug reports to android@duckduckgo.com
 
 
 ## License
-DuckDuckGo android is distributed under the Apache 2.0 [license](https://github.com/duckduckgo/Android/blob/develop/LICENSE).
+DuckDuckGo android is distributed under the Apache 2.0 [license](LICENSE).
