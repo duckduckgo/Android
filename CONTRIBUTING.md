@@ -1,6 +1,6 @@
 # Contributing to DuckDuckGo
 
-Thank you for taking the time to contribute to DuckDuckGo! :sparkles
+Thank you for taking the time to contribute to DuckDuckGo! :sparkles:
 
 We are pleased to open up the project to you - our community. How can you contribute?
 
