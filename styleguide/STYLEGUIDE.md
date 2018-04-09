@@ -21,14 +21,20 @@
 
 #### Timber
 When logging with Timber we use the new Kotlin styles strings
+
 ```Timber.w("Loading $url")```
+
 Rather than C style strings
+
 ```Timber.w("Loading %s", url)```
 
 Mixing the two styles within a single statement can lead to crashes so we have standardized on the more readable Kotlin style. This is slightly less efficient - should efficiency become an issue we can use proguard to optimize away log statements for releases.
 
 #### Unit test names
 We use the when then convention for test:
+
 ```when <condition> then <expected result>```
+
 For example:
+
 ```whenUrlIsNotATrackerThenMatchesIsFalse()```
