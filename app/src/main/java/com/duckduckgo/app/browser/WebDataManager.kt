@@ -16,9 +16,11 @@
 
 package com.duckduckgo.app.browser
 
+import android.os.Build
 import android.webkit.CookieManager
 import android.webkit.WebStorage
 import android.webkit.WebView
+import android.webkit.WebViewDatabase
 
 class WebDataManager(private val host: String) {
 
@@ -26,6 +28,19 @@ class WebDataManager(private val host: String) {
         webView.clearCache(true)
         webView.clearHistory()
         webStorage.deleteAllData()
+        webView.clearFormData()
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            clearFormData(WebViewDatabase.getInstance(webView.context))
+        }
+    }
+
+    /**
+     * Deprecated and not needed on Oreo or later
+     */
+    @Suppress("DEPRECATION")
+    private fun clearFormData(webViewDatabase: WebViewDatabase) {
+        webViewDatabase.clearFormData()
     }
 
     fun clearExternalCookies(cookieManager: CookieManager, clearAllCallback: (() -> Unit)) {
