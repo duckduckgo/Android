@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.content.Context
 import android.os.Build
 import android.webkit.CookieManager
 import android.webkit.WebStorage
@@ -24,14 +25,14 @@ import android.webkit.WebViewDatabase
 
 class WebDataManager(private val host: String) {
 
-    fun clearData(webView: WebView, webStorage: WebStorage) {
+    fun clearData(webView: WebView, webStorage: WebStorage, context: Context) {
         webView.clearCache(true)
         webView.clearHistory()
         webStorage.deleteAllData()
         webView.clearFormData()
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            clearFormData(WebViewDatabase.getInstance(webView.context))
+            clearFormData(WebViewDatabase.getInstance(context))
         }
     }
 
