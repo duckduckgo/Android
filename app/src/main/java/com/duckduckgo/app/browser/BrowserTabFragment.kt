@@ -62,6 +62,8 @@ import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.ui.TabIconRenderer
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.fragment_browser_tab.view.*
@@ -102,7 +104,6 @@ class BrowserTabFragment : Fragment(), FindListener {
     private lateinit var popupMenu: BrowserPopupMenu
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
-
 
     // Used to represent a file to download, but may first require permission
     private var pendingFileDownload: PendingFileDownload? = null
@@ -204,6 +205,10 @@ class BrowserTabFragment : Fragment(), FindListener {
     private fun configureObservers() {
         viewModel.viewState.observe(this, Observer<ViewState> {
             it?.let { render(it) }
+        })
+
+        viewModel.tabs.observe(this, Observer<List<TabEntity>> {
+            it?.let { renderTabIcon(it)}
         })
 
         viewModel.url.observe(this, Observer {
@@ -392,6 +397,12 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
 
         popupMenu.contentView.findInPageMenuItem?.isEnabled = viewState.canFindInPage
+    }
+
+    private fun renderTabIcon(tabs: List<TabEntity>) {
+        context?.let {
+            tabsButton?.icon = TabIconRenderer.icon(it, tabs.count())
+        }
     }
 
     private fun hideFindInPage() {
@@ -793,4 +804,6 @@ class BrowserTabFragment : Fragment(), FindListener {
             return fragment
         }
     }
+
+
 }
