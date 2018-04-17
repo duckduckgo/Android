@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.support.test.InstrumentationRegistry
 import android.webkit.CookieManager
 import android.webkit.ValueCallback
 import android.webkit.WebStorage
@@ -36,10 +37,9 @@ class WebDataManagerTest {
 
     private val testee = WebDataManager(host)
 
-
     @Test
     fun whenDataClearedThenCacheHistoryAndStorageDataCleared() {
-        testee.clearData(mockWebView, mockStorage)
+        testee.clearData(mockWebView, mockStorage, InstrumentationRegistry.getTargetContext())
         verify(mockWebView).clearHistory()
         verify(mockWebView).clearCache(true)
         verify(mockStorage).deleteAllData()

@@ -39,7 +39,7 @@ class FireDialog(context: Context, clearStarted: (() -> Unit), clearComplete: ((
 
         clearAllOption.setOnClickListener {
             clearStarted()
-            dataManager.clearData(WebView(context), WebStorage.getInstance())
+            dataManager.clearData(WebView(context), WebStorage.getInstance(), context)
             dataManager.clearExternalCookies(CookieManager.getInstance(), clearComplete)
             dismiss()
         }
