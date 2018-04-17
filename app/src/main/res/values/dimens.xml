@@ -20,4 +20,9 @@
     <dimen name="onboardingButtonPadding">10dp</dimen>
     <dimen name="onboardingTitleTextSize">21sp</dimen>
     <dimen name="onboardingSubtitleTextSize">16sp</dimen>
+
+    <dimen name="tabIconTextSize">12dp</dimen> <!-- Intentional use of dp not sp -->
+    <dimen name="tabIconXOffset">2.3dp</dimen>
+    <dimen name="tabIconYOffset">2dp</dimen>
+
 </resources>

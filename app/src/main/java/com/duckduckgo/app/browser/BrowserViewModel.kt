@@ -80,6 +80,3 @@ class BrowserViewModel(private val tabRepository: TabRepository) : ViewModel() {
         command.value = DisplayMessage(R.string.fireDataCleared)
     }
 }
-
-
-

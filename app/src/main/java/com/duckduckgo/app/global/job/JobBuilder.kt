@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.job
 
 import android.app.job.JobInfo
+import android.app.job.JobInfo.BACKOFF_POLICY_EXPONENTIAL
 import android.content.ComponentName
 import android.content.Context
 import com.duckduckgo.app.job.AppConfigurationJobService
@@ -32,6 +33,7 @@ class JobBuilder @Inject constructor(){
         return JobInfo.Builder(APP_CONFIGURATION_JOB_ID, ComponentName(context, AppConfigurationJobService::class.java))
                 .setPeriodic(TimeUnit.HOURS.toMillis(3))
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setBackoffCriteria(TimeUnit.MINUTES.toMillis(30), BACKOFF_POLICY_EXPONENTIAL)
                 .setPersisted(true)
                 .build()
     }

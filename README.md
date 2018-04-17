@@ -1,12 +1,24 @@
 # DuckDuckGo Android
 
-Welcome to our android application.  While it is still too early to accept contributions, we are excited to engage the community in development and will open up this project to contributions in the future.
+Welcome to our android application. We are excited to engage the community in development, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
-If you are trying to contribute in other ways, that happens over at [DuckDuckHack](http://duckduckhack.com) or on [GitHub](http://github.com/duckduckgo).
 
 ## Discuss
 
-Contact us at android@duckduckgo.com if you want to get more involved, have questions or want to chat.
+Contact us at android@duckduckgo.com if you have questions, feedback or want to chat.
+
+## Reporting Bugs
+
+We want our app to be as stable as possible thus your bug reports are immensely valuable. When reporting bugs let us know the:
+* App version
+* Device make and model
+* Android version
+* Steps to reproduce the bug
+* Expected behavior
+* Actual behavior
+
+Email bug reports to android@duckduckgo.com
+
 
 ## License
-DuckDuckGo android is distributed under the Apache 2.0 [license](https://github.com/duckduckgo/ios/blob/master/LICENSE).
+DuckDuckGo android is distributed under the Apache 2.0 [license](LICENSE).
