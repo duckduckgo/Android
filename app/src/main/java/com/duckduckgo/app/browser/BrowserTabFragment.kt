@@ -166,7 +166,10 @@ class BrowserTabFragment : Fragment(), FindListener {
         configureFindInPage()
         configureAutoComplete()
         configureKeyboardAwareLogoAnimation()
-        consumeSharedText()
+
+        if (savedInstanceState == null) {
+            consumeSharedText()
+        }
     }
 
     private fun consumeSharedText() {
