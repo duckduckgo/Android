@@ -324,7 +324,6 @@ class BrowserTabViewModel(
     private fun currentViewState(): ViewState = viewState.value!!
 
     fun onOmnibarInputStateChanged(query: String, hasFocus: Boolean) {
-        val showClearButton = hasFocus && query.isNotEmpty()
 
         val currentViewState = currentViewState()
 
@@ -338,13 +337,15 @@ class BrowserTabViewModel(
         val hasQueryChanged = (currentViewState.omnibarText != query)
         val autoCompleteSuggestionsEnabled = appSettingsPreferencesStore.autoCompleteSuggestionsEnabled
         val showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && autoCompleteSuggestionsEnabled
+        val showClearButton = hasFocus && query.isNotBlank()
+        val showControls = !hasFocus || query.isBlank()
 
         viewState.value = currentViewState().copy(
             isEditing = hasFocus,
             showPrivacyGrade = appConfigurationDownloaded && currentViewState.browserShowing,
-            showTabsButton = !hasFocus,
-            showFireButton = !hasFocus,
-            showMenuButton = !hasFocus,
+            showTabsButton = showControls,
+            showFireButton = showControls,
+            showMenuButton = showControls,
             showClearButton = showClearButton,
             autoComplete = AutoCompleteViewState(showAutoCompleteSuggestions, autoCompleteSearchResults)
         )
