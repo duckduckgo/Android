@@ -384,14 +384,26 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOmnibarInputDoesNotHaveFocusThenFireButtonIsShown() {
+    fun whenOmnibarInputDoesNotHaveFocusAndHasQueryThenFireButtonIsShown() {
+        testee.onOmnibarInputStateChanged("query", false)
+        assertTrue(testee.viewState.value!!.showFireButton)
+    }
+
+    @Test
+    fun whenOmnibarInputDoesNotHaveFocusOrQueryThenFireButtonIsShown() {
         testee.onOmnibarInputStateChanged("", false)
         assertTrue(testee.viewState.value!!.showFireButton)
     }
 
     @Test
-    fun whenOmnibarInputHasFocusThenFireButtonIsHidden() {
+    fun whenOmnibarInputHasFocusAndNoQueryThenFireButtonIsShown() {
         testee.onOmnibarInputStateChanged("", true)
+        assertTrue(testee.viewState.value!!.showFireButton)
+    }
+
+    @Test
+    fun whenOmnibarInputHasFocusAndQueryThenFireButtonIsHidden() {
+        testee.onOmnibarInputStateChanged("query", true)
         assertFalse(testee.viewState.value!!.showFireButton)
     }
 
@@ -401,14 +413,26 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOmnibarInputDoesNotHaveFocusThenTabsButtonIsShown() {
+    fun whenOmnibarInputDoesNotHaveFocusOrQueryThenTabsButtonIsShown() {
         testee.onOmnibarInputStateChanged("", false)
         assertTrue(testee.viewState.value!!.showTabsButton)
     }
 
     @Test
-    fun whenOmnibarInputHasFocusThenTabsButtonIsNotShown() {
+    fun whenOmnibarInputDoesNotHaveFocusAndHasQueryThenTabsButtonIsShown() {
+        testee.onOmnibarInputStateChanged("query", false)
+        assertTrue(testee.viewState.value!!.showTabsButton)
+    }
+
+    @Test
+    fun whenOmnibarInputHasFocusAndNoQueryThenTabsButtonIsShown() {
         testee.onOmnibarInputStateChanged("", true)
+        assertTrue(testee.viewState.value!!.showTabsButton)
+    }
+
+    @Test
+    fun whenOmnibarInputHasFocusAndQueryThenTabsButtonIsHidden() {
+        testee.onOmnibarInputStateChanged("query", true)
         assertFalse(testee.viewState.value!!.showTabsButton)
     }
 
@@ -418,14 +442,26 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOmnibarInputDoesNotHaveFocusThenMenuButtonIsShown() {
+    fun whenOmnibarInputDoesNotHaveFocusOrQueryThenMenuButtonIsShown() {
         testee.onOmnibarInputStateChanged("", false)
         assertTrue(testee.viewState.value!!.showMenuButton)
     }
 
     @Test
-    fun whenOmnibarInputHasFocusThenMenuButtonIsNotShown() {
+    fun whenOmnibarInputDoesNotHaveFocusAndHasQueryThenMenuButtonIsShown() {
+        testee.onOmnibarInputStateChanged("query", false)
+        assertTrue(testee.viewState.value!!.showMenuButton)
+    }
+
+    @Test
+    fun whenOmnibarInputHasFocusAndNoQueryThenMenuButtonIsShown() {
         testee.onOmnibarInputStateChanged("", true)
+        assertTrue(testee.viewState.value!!.showMenuButton)
+    }
+
+    @Test
+    fun whenOmnibarInputHasFocusAndQueryThenMenuButtonIsHidden() {
+        testee.onOmnibarInputStateChanged("query", true)
         assertFalse(testee.viewState.value!!.showMenuButton)
     }
 
