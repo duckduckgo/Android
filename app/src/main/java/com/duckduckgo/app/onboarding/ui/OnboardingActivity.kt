@@ -17,24 +17,31 @@
 package com.duckduckgo.app.onboarding.ui
 
 import android.arch.lifecycle.ViewModelProviders
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.support.annotation.ColorInt
 import android.support.annotation.ColorRes
+import android.support.annotation.RequiresApi
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.content.ContextCompat
+import android.support.v4.view.ViewPager
 import android.support.v4.view.ViewPager.OnPageChangeListener
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.ColorCombiner
 import kotlinx.android.synthetic.main.activity_onboarding.*
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -63,37 +70,107 @@ class OnboardingActivity : DuckDuckGoActivity() {
         val next = viewPager.currentItem + 1
         if (next < viewPager.adapter!!.count) {
             viewPager.setCurrentItem(next, true)
+        } else {
+            viewModel.onOnboardingDone()
+            finish()
         }
     }
 
-    fun onDoneClicked(view: View) {
-        viewModel.onOnboardingDone()
-        finish()
+    @RequiresApi(Build.VERSION_CODES.N)
+    fun onLaunchDefaultBrowserSettingsClicked(view: View) {
+        try {
+            val intent = Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS)
+            startActivity(intent)
+        }
+        catch (e: ActivityNotFoundException) {
+            val errorMessage = getString(R.string.cannotLaunchDefaultAppSettings)
+            Timber.w(e, errorMessage)
+            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun configurePager() {
 
-        viewPageAdapter = PagerAdapter(supportFragmentManager)
+        viewPageAdapter = PagerAdapter(supportFragmentManager, viewModel)
         viewPager.adapter = viewPageAdapter
 
         viewPager.addOnPageChangeListener(object : OnPageChangeListener {
+
+            var previousPosition = viewPager.currentItem
+            var previousOffset = 0.0f
+
+            var currentPosition = 0
+
+            var nextPage: OnboardingPageFragment? = null
+            var scrollDirection: ScrollDirection = ScrollDirection.None
+            var scrollState: Int = ViewPager.SCROLL_STATE_IDLE
+
             override fun onPageScrollStateChanged(state: Int) {
+                scrollState = state
             }
 
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-                transitionToNewColor(positionOffset)
+                val scrolling = positionOffset != 0f
+                val scrollingForwards = positionOffset > previousOffset
+
+                //val scrollingForwards = position == previousPosition
+                previousOffset = positionOffset
+
+                scrollDirection = if (!scrolling) {
+                    nextPage = null
+                    ScrollDirection.None
+                } else if (scrollingForwards) {
+                    ScrollDirection.Right
+                } else {
+                    ScrollDirection.Left
+                }
+
+                if(scrollState != ViewPager.SCROLL_STATE_SETTLING) {
+                    nextPage = when (scrollDirection) {
+                        ScrollDirection.Right -> viewPageAdapter.getItem(position + 1)
+                        ScrollDirection.Left -> viewPageAdapter.getItem(currentPosition - 1)
+                        ScrollDirection.None -> null
+                    }
+                }
+
+                val currentPage = viewPageAdapter.getItem(viewPager.currentItem)
+                Timber.i("onPageScrolled - scrolling $scrollDirection, current=$currentPage, nextPage=$nextPage")
+
+                val modifiedOffset = if(scrollDirection == ScrollDirection.Left) 1-positionOffset else positionOffset
+                transitionToNewColor(modifiedOffset, currentPage, nextPage)
+
             }
 
             override fun onPageSelected(position: Int) {
+                Timber.i("onPageSelected $position")
+                currentPosition = position
+                scrollDirection = ScrollDirection.None
+                previousPosition = position
+                nextPage = null
             }
         })
     }
 
-    private fun transitionToNewColor(positionOffset: Float) {
-        if (positionOffset == 0.toFloat()) {
+    sealed class ScrollDirection {
+        object Left : ScrollDirection()
+        object Right : ScrollDirection()
+        object None : ScrollDirection()
+
+        override fun toString(): String {
+            return javaClass.simpleName
+        }
+    }
+
+    private fun transitionToNewColor(positionOffset: Float, currentPage: OnboardingPageFragment?, nextPage: OnboardingPageFragment?) {
+        if(positionOffset == 0f || (currentPage == null && nextPage == null)) {
             return
         }
-        updateColor(viewPageAdapter.offsetColor(this, positionOffset))
+
+        val normalisedCurrentPage = currentPage?: nextPage!!
+        val normalisedNextPage = nextPage?: currentPage!!
+
+        val newColor = viewPageAdapter.offsetColor(this, normalisedCurrentPage, normalisedNextPage, positionOffset)
+        updateColor(newColor)
     }
 
     private fun updateColor(@ColorInt color: Int) {
@@ -107,55 +184,80 @@ class OnboardingActivity : DuckDuckGoActivity() {
         }
     }
 
-    class PagerAdapter(fragmentManager: FragmentManager) : FragmentPagerAdapter(fragmentManager) {
+    class PagerAdapter(fragmentManager: FragmentManager, private val viewModel: OnboardingViewModel) : FragmentPagerAdapter(fragmentManager) {
 
         private val colorCombiner = ColorCombiner()
 
         override fun getCount(): Int {
-            return pageCount
+            return viewModel.pageCount()
         }
 
-        override fun getItem(position: Int): Fragment? {
-            return when (position) {
-                0 -> ProtectDataPage()
-                1 -> NoTracePage()
-                else -> null
-            }
+        override fun getItem(position: Int): OnboardingPageFragment? {
+            return viewModel.getItem(position)
         }
 
         @ColorInt
-        fun offsetColor(context: Context, positionOffset: Float): Int {
-            val fromColor = ContextCompat.getColor(context, firstColor)
-            val toColor = ContextCompat.getColor(context, secondColor)
+        fun offsetColor(context: Context,
+                        currentPage: OnboardingPageFragment,
+                        nextPage: OnboardingPageFragment,
+                        positionOffset: Float) : Int {
+            val fromColor = ContextCompat.getColor(context, currentPage.backgroundColor())
+            val toColor = ContextCompat.getColor(context, nextPage.backgroundColor())
+
             return colorCombiner.combine(fromColor, toColor, positionOffset)
         }
 
         @ColorInt
         fun color(context: Context, currentPage: Int): Int {
-            val color = if (currentPage == 0) firstColor else secondColor
+            val color = getItem(currentPage)?.backgroundColor() ?: R.color.lightOliveGreen
             return ContextCompat.getColor(context, color)
-        }
-
-        companion object {
-            const val pageCount = 2
-
-            @ColorRes
-            val firstColor = R.color.lighOliveGreen
-
-            @ColorRes
-            val secondColor = R.color.powderBlue
         }
     }
 
-    class ProtectDataPage : Fragment() {
+    class ProtectDataPage : OnboardingPageFragment() {
+
+        init {
+            type = "ProtectedData"
+        }
+
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             return inflater.inflate(R.layout.content_onboarding_protect_data, container, false)
         }
+
+        override fun backgroundColor(): Int = R.color.lightOliveGreen
     }
 
-    class NoTracePage : Fragment() {
+    class NoTracePage : OnboardingPageFragment() {
+
+        init {
+            type = "NoTrace"
+        }
+
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             return inflater.inflate(R.layout.content_onboarding_no_trace, container, false)
         }
+
+        override fun backgroundColor(): Int = R.color.powderBlue
+    }
+
+    class DefaultBrowserPage : OnboardingPageFragment() {
+
+        init {
+            type = "DefaultBrowser"
+        }
+
+        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+            return inflater.inflate(R.layout.content_onboarding_default_browser, container, false)
+        }
+
+        override fun backgroundColor(): Int = R.color.eastBay
+    }
+
+    abstract class OnboardingPageFragment: Fragment() {
+
+        open lateinit var type: String
+
+        @ColorRes
+        abstract fun backgroundColor(): Int
     }
 }

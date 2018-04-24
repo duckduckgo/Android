@@ -25,7 +25,10 @@ import com.duckduckgo.app.browser.BrowserTabViewModel
 import com.duckduckgo.app.browser.BrowserViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.LongPressHandler
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultWebBrowserCapability
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
+import com.duckduckgo.app.global.db.AppConfigurationDao
+import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
@@ -36,8 +39,6 @@ import com.duckduckgo.app.privacy.ui.PrivacyPracticesViewModel
 import com.duckduckgo.app.privacy.ui.ScorecardViewModel
 import com.duckduckgo.app.privacy.ui.TrackerNetworksViewModel
 import com.duckduckgo.app.settings.SettingsViewModel
-import com.duckduckgo.app.global.db.AppConfigurationDao
-import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -60,14 +61,15 @@ class ViewModelFactory @Inject constructor(
     private val bookmarksDao: BookmarksDao,
     private val autoCompleteApi: AutoCompleteApi,
     private val appSettingsPreferencesStore: SettingsDataStore,
-    private val webViewLongPressHandler: LongPressHandler
+    private val webViewLongPressHandler: LongPressHandler,
+    private val defaultWebBrowserCapability: DefaultWebBrowserCapability
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
             with(modelClass) {
                 when {
                     isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboaringStore)
-                    isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore)
+                    isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore, defaultWebBrowserCapability)
                     isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository)
                     isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
                     isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository)

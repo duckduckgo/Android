@@ -204,6 +204,15 @@
         <item name="colorAccent">@color/windowsBlue</item>
     </style>
 
+    <style name="OnboardingButtonDefaultBrowser" parent="OnboardingButtonStyle">
+        <item name="colorAccent">@color/portGore</item>
+    </style>
+
+    <style name="OnboardingButtonDefaultBrowserLaunchSettings" parent="OnboardingButtonStyle">
+        <item name="colorAccent">@color/eastSide</item>
+        <item name="android:layout_marginBottom">10dp</item>
+    </style>
+
     <style name="OnboardingTextTitle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>

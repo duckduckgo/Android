@@ -31,9 +31,13 @@
     <color name="powderBlue">#50BFFF</color>
     <color name="windowsBlue">#3c90c0</color>
 
-    <color name="lighOliveGreen">#93c04d</color>
+    <color name="lightOliveGreen">#93c04d</color>
     <color name="muddyGreen">#58732e</color>
     <color name="midGreen">#3fa140</color>
+
+    <color name="eastBay">#4f3c76</color>
+    <color name="eastSide">#9680C5</color>
+    <color name="portGore">#2f1f51</color>
 
     <color name="webViewScrollbarTrackColor">#FF333333</color>
     <color name="webViewScrollbarThumbColor">#FFABABAB</color>

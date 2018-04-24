@@ -9,8 +9,11 @@
     <string name="onboardingNoTraceTitle">Leave No Trace</string>
     <string name="onboardingNoTraceDescription1">Tap the Fire Button to erase your tabs and browsing history.</string>
     <string name="onboardingNoTraceDescription2">Your data is toast!</string>
+    <string name="onboardingDefaultBrowserTitle">Make Us Your Default</string>
+    <string name="onboardingDefaultBrowserDescription">Make DuckDuckGo your default browser in Settings.</string>
+    <string name="onboardingDefaultBrowserGoToSettingsAction">Go to Settings</string>
     <string name="onboardingContinue">Continue</string>
-
+    <string name="cannotLaunchDefaultAppSettings">Can\'t launch default app settings screen</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Browser menu</string>

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.di
 
 import com.duckduckgo.app.browser.*
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultWebBrowserCapability
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import dagger.Module
 import dagger.Provides
@@ -32,5 +33,10 @@ class BrowserModule {
     @Provides
     fun webViewLongPressHandler(): LongPressHandler {
         return WebViewLongPressHandler()
+    }
+
+    @Provides
+    fun defaultWebBrowserCapability(): DefaultWebBrowserCapability {
+        return DefaultWebBrowserCapability()
     }
 }
