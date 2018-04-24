@@ -35,15 +35,8 @@ class TrackerDataStore @Inject constructor(private val context: Context) {
         context.deleteFile(client.name)
     }
 
-    fun clearAll() {
-        for (client: ClientName in ClientName.values()) {
-            context.deleteFile(client.name)
-        }
-    }
-
     private fun Context.fileExists(filename: String): Boolean {
         val file = getFileStreamPath(filename)
         return file != null && file.exists()
     }
-
 }
