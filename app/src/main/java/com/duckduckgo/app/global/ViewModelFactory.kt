@@ -48,22 +48,21 @@ import javax.inject.Inject
 
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory @Inject constructor(
-        private val application: DuckDuckGoApplication,
-    private val statisticsUpdater: StatisticsUpdater,
-    private val onboaringStore: OnboardingStore,
-    private val queryUrlConverter: QueryUrlConverter,
-    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-    private val tabRepository: TabRepository,
-    private val privacySettingsStore: PrivacySettingsSharedPreferences,
-    private val siteFactory: SiteFactory,
-    private val stringResolver: StringResolver,
-    private val appConfigurationDao: AppConfigurationDao,
-    private val networkLeaderboardDao: NetworkLeaderboardDao,
-    private val bookmarksDao: BookmarksDao,
-    private val autoCompleteApi: AutoCompleteApi,
-    private val appSettingsPreferencesStore: SettingsDataStore,
-    private val webViewLongPressHandler: LongPressHandler,
-    private val defaultWebBrowserCapability: DefaultWebBrowserCapability
+        private val statisticsUpdater: StatisticsUpdater,
+        private val onboaringStore: OnboardingStore,
+        private val queryUrlConverter: QueryUrlConverter,
+        private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+        private val tabRepository: TabRepository,
+        private val privacySettingsStore: PrivacySettingsSharedPreferences,
+        private val siteFactory: SiteFactory,
+        private val stringResolver: StringResolver,
+        private val appConfigurationDao: AppConfigurationDao,
+        private val networkLeaderboardDao: NetworkLeaderboardDao,
+        private val bookmarksDao: BookmarksDao,
+        private val autoCompleteApi: AutoCompleteApi,
+        private val appSettingsPreferencesStore: SettingsDataStore,
+        private val webViewLongPressHandler: LongPressHandler,
+        private val defaultWebBrowserCapability: DefaultWebBrowserCapability
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -78,7 +77,7 @@ class ViewModelFactory @Inject constructor(
                     isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                     isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                     isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
-                    isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(application, stringResolver, appSettingsPreferencesStore, defaultWebBrowserCapability)
+                    isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(stringResolver, appSettingsPreferencesStore, defaultWebBrowserCapability)
                     isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel(bookmarksDao)
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }

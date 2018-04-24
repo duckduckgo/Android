@@ -16,24 +16,22 @@
 
 package com.duckduckgo.app.settings
 
-import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.ViewModel
 import android.net.Uri
 import android.os.Build
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultWebBrowserCapability
-import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.StringResolver
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import timber.log.Timber
 import javax.inject.Inject
 
 class SettingsViewModel @Inject constructor(
-        private val application: DuckDuckGoApplication,
         private val stringResolver: StringResolver,
         private val settingsDataStore: SettingsDataStore,
-        private val defaultWebBrowserCapability: DefaultWebBrowserCapability) : AndroidViewModel(application) {
+        private val defaultWebBrowserCapability: DefaultWebBrowserCapability) : ViewModel() {
 
     data class ViewState(
             val loading: Boolean = true,
@@ -60,7 +58,7 @@ class SettingsViewModel @Inject constructor(
         val autoCompleteEnabled = settingsDataStore.autoCompleteSuggestionsEnabled
         Timber.i("Is auto complete enabled? $autoCompleteEnabled")
 
-        val defaultBrowserAlready = defaultWebBrowserCapability.isCurrentlyConfiguredAsDefaultBrowser(getApplication())
+        val defaultBrowserAlready = defaultWebBrowserCapability.isCurrentlyConfiguredAsDefaultBrowser()
         Timber.i("Is already default browser? $defaultBrowserAlready")
 
         viewState.value = currentViewState.copy(loading = false,

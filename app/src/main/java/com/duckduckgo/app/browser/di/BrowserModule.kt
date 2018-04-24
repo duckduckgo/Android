@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.di
 
+import android.content.Context
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultWebBrowserCapability
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -36,7 +37,7 @@ class BrowserModule {
     }
 
     @Provides
-    fun defaultWebBrowserCapability(): DefaultWebBrowserCapability {
-        return DefaultWebBrowserCapability()
+    fun defaultWebBrowserCapability(context: Context): DefaultWebBrowserCapability {
+        return DefaultWebBrowserCapability(context)
     }
 }

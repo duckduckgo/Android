@@ -25,15 +25,16 @@ import android.net.Uri
 import android.os.Build
 import com.duckduckgo.app.browser.BuildConfig
 import timber.log.Timber
+import javax.inject.Inject
 
 
-class DefaultWebBrowserCapability {
+class DefaultWebBrowserCapability @Inject constructor(private val context: Context){
 
     fun deviceSupportsDefaultBrowserConfiguration(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
     }
 
-    fun isCurrentlyConfiguredAsDefaultBrowser(context: Context): Boolean {
+    fun isCurrentlyConfiguredAsDefaultBrowser(): Boolean {
         val intent = Intent(ACTION_VIEW, Uri.parse("https://"))
         val resolutionInfo: ResolveInfo? = context.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
         val defaultAlready = resolutionInfo?.activityInfo?.packageName == BuildConfig.APPLICATION_ID

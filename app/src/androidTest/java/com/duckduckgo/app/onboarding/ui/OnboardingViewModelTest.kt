@@ -17,6 +17,8 @@
 package com.duckduckgo.app.onboarding.ui
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
+import android.support.test.InstrumentationRegistry
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultWebBrowserCapability
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
@@ -34,7 +36,7 @@ class OnboardingViewModelTest {
     private var onboardingStore: OnboardingStore = mock()
 
     private val testee: OnboardingViewModel by lazy {
-        OnboardingViewModel(onboardingStore)
+        OnboardingViewModel(onboardingStore, DefaultWebBrowserCapability(InstrumentationRegistry.getTargetContext()))
     }
 
     @Test

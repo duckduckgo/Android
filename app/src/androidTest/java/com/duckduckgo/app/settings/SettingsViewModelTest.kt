@@ -24,6 +24,7 @@ import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultWebBrowserCapability
 import com.duckduckgo.app.global.AndroidStringResolver
 import com.duckduckgo.app.global.StringResolver
 import com.duckduckgo.app.settings.SettingsViewModel.Command
@@ -69,7 +70,7 @@ class SettingsViewModelTest {
         commandCaptor = argumentCaptor()
 
 
-        testee = SettingsViewModel(stringResolver, mockAppSettingsDataStore)
+        testee = SettingsViewModel(stringResolver, mockAppSettingsDataStore, DefaultWebBrowserCapability(context))
         testee.command.observeForever(commandObserver)
     }
 
