@@ -16,17 +16,37 @@
 
 package com.duckduckgo.app.global.view
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.os.Build
+import android.provider.Settings
+import android.support.annotation.RequiresApi
 import android.support.v4.app.FragmentActivity
+import android.support.v7.app.AppCompatActivity
 import android.view.View
+import android.widget.Toast
 import com.duckduckgo.app.browser.R
 import org.jetbrains.anko.toast
+import timber.log.Timber
 
 fun FragmentActivity.launchExternalActivity(intent: Intent) {
     if (intent.resolveActivity(packageManager) != null) {
         startActivity(intent)
     } else {
         toast(R.string.no_compatible_third_party_app_installed)
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.N)
+fun AppCompatActivity.launchDefaultAppActivity() {
+    try {
+        val intent = Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS)
+        startActivity(intent)
+    }
+    catch (e: ActivityNotFoundException) {
+        val errorMessage = getString(R.string.cannotLaunchDefaultAppSettings)
+        Timber.w(e, errorMessage)
+        Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
     }
 }
 

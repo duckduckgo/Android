@@ -16,25 +16,31 @@
 
 package com.duckduckgo.app.settings
 
+import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import android.net.Uri
 import android.os.Build
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultWebBrowserCapability
+import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.StringResolver
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import timber.log.Timber
 import javax.inject.Inject
 
 class SettingsViewModel @Inject constructor(
+        private val application: DuckDuckGoApplication,
         private val stringResolver: StringResolver,
-        private val settingsDataStore: SettingsDataStore) : ViewModel() {
+        private val settingsDataStore: SettingsDataStore,
+        private val defaultWebBrowserCapability: DefaultWebBrowserCapability) : AndroidViewModel(application) {
 
     data class ViewState(
             val loading: Boolean = true,
             val version: String = "",
-            val autoCompleteSuggestionsEnabled: Boolean = true
+            val autoCompleteSuggestionsEnabled: Boolean = true,
+            val showDefaultBrowserSetting: Boolean = false,
+            val isAppDefaultBrowser: Boolean = false
     )
 
     sealed class Command {
@@ -44,7 +50,7 @@ class SettingsViewModel @Inject constructor(
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: MutableLiveData<Command> = MutableLiveData()
 
-    private var currentViewState: ViewState = ViewState()
+    private var currentViewState: ViewState = ViewState(showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration())
 
     init {
         viewState.value = currentViewState
@@ -54,7 +60,13 @@ class SettingsViewModel @Inject constructor(
         val autoCompleteEnabled = settingsDataStore.autoCompleteSuggestionsEnabled
         Timber.i("Is auto complete enabled? $autoCompleteEnabled")
 
-        viewState.value = currentViewState.copy(autoCompleteSuggestionsEnabled = autoCompleteEnabled, loading = false, version = obtainVersion())
+        val defaultBrowserAlready = defaultWebBrowserCapability.isCurrentlyConfiguredAsDefaultBrowser(getApplication())
+        Timber.i("Is already default browser? $defaultBrowserAlready")
+
+        viewState.value = currentViewState.copy(loading = false,
+                autoCompleteSuggestionsEnabled = autoCompleteEnabled,
+                isAppDefaultBrowser = defaultBrowserAlready,
+                version = obtainVersion())
     }
 
     fun userRequestedToSendFeedback() {
@@ -84,6 +96,5 @@ class SettingsViewModel @Inject constructor(
     }
 
     private inline fun encode(f: () -> String): String = Uri.encode(f())
-
 
 }

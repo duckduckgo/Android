@@ -17,12 +17,10 @@
 package com.duckduckgo.app.onboarding.ui
 
 import android.arch.lifecycle.ViewModelProviders
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.support.annotation.ColorInt
 import android.support.annotation.ColorRes
 import android.support.annotation.RequiresApi
@@ -35,11 +33,11 @@ import android.support.v4.view.ViewPager.OnPageChangeListener
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.ColorCombiner
+import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import kotlinx.android.synthetic.main.activity_onboarding.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -78,15 +76,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
 
     @RequiresApi(Build.VERSION_CODES.N)
     fun onLaunchDefaultBrowserSettingsClicked(view: View) {
-        try {
-            val intent = Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS)
-            startActivity(intent)
-        }
-        catch (e: ActivityNotFoundException) {
-            val errorMessage = getString(R.string.cannotLaunchDefaultAppSettings)
-            Timber.w(e, errorMessage)
-            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
-        }
+        launchDefaultAppActivity()
     }
 
     private fun configurePager() {

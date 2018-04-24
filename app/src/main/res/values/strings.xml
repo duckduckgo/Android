@@ -51,7 +51,8 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Edit query before searching</string>
-    <string name="settings_autocomplete_enabled">Autocomplete Suggestions</string>
+    <string name="settingsAutocompleteEnabled">Autocomplete Suggestions</string>
+    <string name="settingsDefaultBrowserEnabled">Set as Default Browser</string>
 
     <!-- Tabs -->
     <string name="homeTab">DuckDuckGo</string>

@@ -21,11 +21,16 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.support.v7.widget.SwitchCompat
+import android.view.View
+import android.widget.CompoundButton.OnCheckedChangeListener
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.launchExternalActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import kotlinx.android.synthetic.main.content_settings.*
@@ -41,6 +46,17 @@ class SettingsActivity : DuckDuckGoActivity() {
         ViewModelProviders.of(this, viewModelFactory).get(SettingsViewModel::class.java)
     }
 
+    private val defaultBrowserChangeListener = OnCheckedChangeListener { _, isChecked ->
+        launchDefaultAppScreen()
+
+        // prevent the switch from toggling yet; should only change reactively from default browser changing
+        setAsDefaultBrowserSetting.isChecked = !isChecked
+    }
+
+    private val autocompleteChangeListener = OnCheckedChangeListener { _, isChecked ->
+        viewModel.userRequestedToChangeAutocompleteSetting(isChecked)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
@@ -48,29 +64,56 @@ class SettingsActivity : DuckDuckGoActivity() {
 
         configureUiEventHandlers()
         observeViewModel()
+    }
+
+    override fun onStart() {
+        super.onStart()
         viewModel.start()
     }
+
 
     private fun configureUiEventHandlers() {
         onboarding.setOnClickListener { startActivity(OnboardingActivity.intent(this)) }
         about.setOnClickListener { startActivity(AboutDuckDuckGoActivity.intent(this)) }
         provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
-        autocompleteEnabledSetting.setOnClickListener { viewModel.userRequestedToChangeAutocompleteSetting(autocompleteEnabledSetting.isChecked) }
+
+        autocompleteEnabledSetting.setOnCheckedChangeListener(autocompleteChangeListener)
+        setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
     }
 
     private fun observeViewModel() {
         viewModel.viewState.observe(this, Observer<SettingsViewModel.ViewState> { viewState ->
             viewState?.let {
                 version.text = it.version
-                autocompleteEnabledSetting.isChecked = it.autoCompleteSuggestionsEnabled
+
+                autocompleteEnabledSetting.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteChangeListener)
+                setAsDefaultBrowserSetting.visibility = when (it.showDefaultBrowserSetting) {
+                    true -> {
+                        setAsDefaultBrowserSetting.quietlySetIsChecked(it.isAppDefaultBrowser, defaultBrowserChangeListener)
+                        View.VISIBLE
+                    }
+                    false -> View.GONE
+                }
             }
         })
 
         viewModel.command.observe(this, Observer {
-            when (it) {
-                is SettingsViewModel.Command.SendEmail -> provideEmailFeedback(it.emailUri)
-            }
+            processCommand(it)
         })
+    }
+
+    private fun processCommand(it: SettingsViewModel.Command?) {
+        when (it) {
+            is SettingsViewModel.Command.SendEmail -> provideEmailFeedback(it.emailUri)
+        }
+    }
+
+    private fun launchDefaultAppScreen() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            launchDefaultAppActivity()
+        } else {
+            throw IllegalStateException("Unable to launch default app activity on this OS")
+        }
     }
 
     private fun setupActionBar() {
@@ -89,4 +132,18 @@ class SettingsActivity : DuckDuckGoActivity() {
             return Intent(context, SettingsActivity::class.java)
         }
     }
+}
+
+/**
+ * Utility method to toggle a switch without broadcasting to its change listener
+ *
+ * This is useful for when setting the checked state from the view model where we want the switch state to match some value, but this act itself
+ * should not result in the checked change event handler being fired
+ *
+ * Requires the change listener to be provided explicitly as it is held privately in the super class and cannot be accessed automatically.
+ */
+private fun SwitchCompat.quietlySetIsChecked(isChecked: Boolean, changeListener: OnCheckedChangeListener?) {
+    setOnCheckedChangeListener(null)
+    this.isChecked = isChecked
+    setOnCheckedChangeListener(changeListener)
 }

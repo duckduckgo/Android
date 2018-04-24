@@ -16,12 +16,29 @@
 
 package com.duckduckgo.app.browser.defaultBrowsing
 
+import android.content.Context
+import android.content.Intent
+import android.content.Intent.ACTION_VIEW
+import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
+import android.net.Uri
 import android.os.Build
+import com.duckduckgo.app.browser.BuildConfig
+import timber.log.Timber
 
 
 class DefaultWebBrowserCapability {
 
     fun deviceSupportsDefaultBrowserConfiguration(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+    }
+
+    fun isCurrentlyConfiguredAsDefaultBrowser(context: Context): Boolean {
+        val intent = Intent(ACTION_VIEW, Uri.parse("https://"))
+        val resolutionInfo: ResolveInfo? = context.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
+        val defaultAlready = resolutionInfo?.activityInfo?.packageName == BuildConfig.APPLICATION_ID
+
+        Timber.i("Default browser identified as ${resolutionInfo?.activityInfo?.packageName}")
+        return defaultAlready
     }
 }

@@ -48,6 +48,7 @@ import javax.inject.Inject
 
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory @Inject constructor(
+        private val application: DuckDuckGoApplication,
     private val statisticsUpdater: StatisticsUpdater,
     private val onboaringStore: OnboardingStore,
     private val queryUrlConverter: QueryUrlConverter,
@@ -77,7 +78,7 @@ class ViewModelFactory @Inject constructor(
                     isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                     isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                     isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
-                    isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(stringResolver, appSettingsPreferencesStore)
+                    isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(application, stringResolver, appSettingsPreferencesStore, defaultWebBrowserCapability)
                     isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel(bookmarksDao)
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
