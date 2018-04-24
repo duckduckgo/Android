@@ -17,7 +17,7 @@
 package com.duckduckgo.app.global.api
 
 import retrofit2.Response
+import java.net.HttpURLConnection.HTTP_NOT_MODIFIED
 
 val <T> Response<T>.isCached: Boolean
-    get() = raw().cacheResponse() != null
-
+    get() = raw().cacheResponse() != null && raw().networkResponse()?.code() == HTTP_NOT_MODIFIED
