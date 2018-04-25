@@ -42,13 +42,13 @@ class TrackerDataDownloader @Inject constructor(
     fun downloadList(clientName: Client.ClientName): Completable {
 
         return when (clientName) {
-            DISCONNECT -> disconnectDownload()
-            EASYLIST, EASYPRIVACY -> easyDownload(clientName, { trackerListService.list(it.name.toLowerCase()) })
-            TRACKERSWHITELIST -> easyDownload(clientName, { trackerListService.trackersWhitelist() })
+            DISCONNECT -> downloadDisconnectList()
+            TRACKERSWHITELIST -> downloadAdblockList(clientName, { trackerListService.trackersWhitelist() })
+            EASYLIST, EASYPRIVACY -> removeLegacyList(clientName)
         }
     }
 
-    private fun disconnectDownload(): Completable {
+    private fun downloadDisconnectList(): Completable {
 
         return Completable.fromAction {
 
@@ -79,7 +79,7 @@ class TrackerDataDownloader @Inject constructor(
         }
     }
 
-    private fun easyDownload(clientName: Client.ClientName, callFactory: (clientName: Client.ClientName) -> Call<ResponseBody>): Completable {
+    private fun downloadAdblockList(clientName: Client.ClientName, callFactory: (clientName: Client.ClientName) -> Call<ResponseBody>): Completable {
         return Completable.fromAction {
 
             Timber.d("Downloading ${clientName.name} data")
@@ -106,6 +106,15 @@ class TrackerDataDownloader @Inject constructor(
         val client = AdBlockClient(clientName)
         client.loadBasicData(bodyBytes)
         trackerDataStore.saveData(clientName, client.getProcessedData())
+    }
+
+    private fun removeLegacyList(clientName: Client.ClientName): Completable {
+        return Completable.fromAction {
+            if (trackerDataStore.hasData(clientName)) {
+                trackerDataStore.clearData(clientName)
+            }
+            return@fromAction
+        }
     }
 
 }
