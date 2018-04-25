@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.global
 
+import com.duckduckgo.app.browser.BuildConfig
+
 
 class AppUrl {
 
@@ -37,6 +39,10 @@ class AppUrl {
 
     object ParamValue {
         const val SOURCE = "ddg_android"
+
+        val appVersion: String get() {
+            return String.format("android_%s", BuildConfig.VERSION_NAME.replace(".", "_"))
+        }
     }
 
 }

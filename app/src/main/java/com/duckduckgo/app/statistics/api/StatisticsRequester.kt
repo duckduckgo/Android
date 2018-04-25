@@ -17,6 +17,7 @@
 package com.duckduckgo.app.statistics.api
 
 import android.annotation.SuppressLint
+import com.duckduckgo.app.global.AppUrl.*
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
@@ -38,12 +39,12 @@ class StatisticsRequester(private val store: StatisticsDataStore, private val se
             return
         }
 
-        service.atb()
+        service.atb(ParamValue.appVersion)
             .subscribeOn(Schedulers.io())
             .flatMap {
                 store.atb = it.versionWithVariant
                 store.retentionAtb = it.version
-                service.exti(it.versionWithVariant)
+                service.exti(it.versionWithVariant, ParamValue.appVersion)
             }
             .subscribe({
                 Timber.v("Atb initalization succeeded")
@@ -65,7 +66,7 @@ class StatisticsRequester(private val store: StatisticsDataStore, private val se
             return
         }
 
-        service.updateAtb(atb, retentionAtb)
+        service.updateAtb(atb, retentionAtb, ParamValue.appVersion)
             .subscribeOn(Schedulers.io())
             .subscribe({
                 Timber.v("Atb refresh succeeded")
