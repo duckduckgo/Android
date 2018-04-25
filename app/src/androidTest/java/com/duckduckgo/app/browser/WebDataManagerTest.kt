@@ -98,7 +98,7 @@ class WebDataManagerTest {
         override fun clearCache(includeDiskFiles: Boolean) {
             super.clearCache(includeDiskFiles)
 
-            if(includeDiskFiles) {
+            if (includeDiskFiles) {
                 cacheCleared = true
             }
         }
