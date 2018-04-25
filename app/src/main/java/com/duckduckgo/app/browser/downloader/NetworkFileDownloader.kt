@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser.downloader
 import android.app.DownloadManager
 import android.content.Context
 import android.webkit.URLUtil
-import androidx.net.toUri
+import androidx.core.net.toUri
 import timber.log.Timber
 import javax.inject.Inject
 
