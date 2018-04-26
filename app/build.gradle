@@ -6,7 +6,7 @@ apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
 
 ext {
-    VERSION_NAME = "5.2.0"
+    VERSION_NAME = "5.3.0"
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
 }
 
@@ -77,13 +77,15 @@ android {
 }
 
 ext {
-    supportLibrary = "27.1.0"
+    supportLibrary = "27.1.1"
     architectureComponents = "1.0.0"
     architectureComponentsExtensions = "1.1.1"
+    androidKtx = "0.3"
     dagger = "2.14.1"
     retrofit = "2.3.0"
     ankoVersion = "0.10.4"
     glide = "4.6.1"
+    androidTestRunner = "1.0.2"
 }
 
 
@@ -92,10 +94,10 @@ dependencies {
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "com.android.support:appcompat-v7:$supportLibrary"
     implementation "com.android.support:design:$supportLibrary"
-    implementation "com.android.support.constraint:constraint-layout:1.0.2"
+    implementation "com.android.support.constraint:constraint-layout:1.1.0"
     implementation "com.squareup.okhttp3:okhttp:3.10.0"
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofit"
@@ -115,7 +117,7 @@ dependencies {
     implementation "org.jetbrains.anko:anko-design:$ankoVersion"
 
     // Android KTX
-    implementation 'androidx.core:core-ktx:0.2'
+    implementation "androidx.core:core-ktx:$androidKtx"
 
     // ViewModel and LiveData
     implementation "android.arch.lifecycle:extensions:$architectureComponentsExtensions"
@@ -143,9 +145,10 @@ dependencies {
     testImplementation "com.nhaarman:mockito-kotlin-kt1.1:1.5.0"
     testImplementation "junit:junit:4.12"
 
-    androidTestImplementation "com.android.support.test:runner:1.0.1"
-    androidTestUtil "com.android.support.test:orchestrator:1.0.1"
-    androidTestImplementation "com.android.support.test.espresso:espresso-core:3.0.1"
+    androidTestImplementation "com.android.support.test:runner:$androidTestRunner"
+    androidTestImplementation "com.android.support.test:rules:$androidTestRunner"
+    androidTestUtil "com.android.support.test:orchestrator:1.0.2"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:3.0.2"
     androidTestImplementation "org.mockito:mockito-android:2.15.0"
     androidTestImplementation "com.nhaarman:mockito-kotlin-kt1.1:1.5.0"
 

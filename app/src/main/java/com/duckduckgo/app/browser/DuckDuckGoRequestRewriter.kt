@@ -63,11 +63,7 @@ class DuckDuckGoRequestRewriter(private val duckDuckGoUrlDetector: DuckDuckGoUrl
         if (atb != null) {
             builder.appendQueryParameter(ParamKey.ATB, atb)
         }
-        builder.appendQueryParameter(ParamKey.APP_VERSION, appVersion())
+        builder.appendQueryParameter(ParamKey.APP_VERSION, ParamValue.appVersion)
         builder.appendQueryParameter(ParamKey.SOURCE, ParamValue.SOURCE)
-    }
-
-    private fun appVersion(): String {
-        return String.format("android_%s", BuildConfig.VERSION_NAME.replace(".", "_"))
     }
 }
