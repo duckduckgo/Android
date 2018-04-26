@@ -18,7 +18,8 @@ package com.duckduckgo.app.browser.di
 
 import android.content.Context
 import com.duckduckgo.app.browser.*
-import com.duckduckgo.app.browser.defaultBrowsing.DefaultWebBrowserCapability
+import com.duckduckgo.app.browser.defaultBrowsing.AndroidDefaultBrowserDetector
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import dagger.Module
 import dagger.Provides
@@ -37,7 +38,7 @@ class BrowserModule {
     }
 
     @Provides
-    fun defaultWebBrowserCapability(context: Context): DefaultWebBrowserCapability {
-        return DefaultWebBrowserCapability(context)
+    fun defaultWebBrowserCapability(context: Context): DefaultBrowserDetector {
+        return AndroidDefaultBrowserDetector(context)
     }
 }

@@ -17,11 +17,11 @@
 package com.duckduckgo.app.onboarding.ui
 
 import android.arch.lifecycle.ViewModel
-import com.duckduckgo.app.browser.defaultBrowsing.DefaultWebBrowserCapability
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 
 class OnboardingViewModel(private val onboardingStore: OnboardingStore,
-                          private val defaultWebBrowserCapability: DefaultWebBrowserCapability) : ViewModel() {
+                          private val defaultWebBrowserCapability: DefaultBrowserDetector) : ViewModel() {
 
     fun pageCount(): Int {
         return if (defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration()) 3 else 2

@@ -24,7 +24,7 @@ import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.defaultBrowsing.DefaultWebBrowserCapability
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.AndroidStringResolver
 import com.duckduckgo.app.global.StringResolver
 import com.duckduckgo.app.settings.SettingsViewModel.Command
@@ -32,8 +32,8 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.nhaarman.mockito_kotlin.KArgumentCaptor
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.nhaarman.mockito_kotlin.verify
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
+import com.nhaarman.mockito_kotlin.whenever
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -58,6 +58,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockAppSettingsDataStore: SettingsDataStore
 
+    @Mock
+    private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
+
     private lateinit var commandCaptor: KArgumentCaptor<Command>
 
     @Before
@@ -70,7 +73,7 @@ class SettingsViewModelTest {
         commandCaptor = argumentCaptor()
 
 
-        testee = SettingsViewModel(stringResolver, mockAppSettingsDataStore, DefaultWebBrowserCapability(context))
+        testee = SettingsViewModel(stringResolver, mockAppSettingsDataStore, mockDefaultBrowserDetector)
         testee.command.observeForever(commandObserver)
     }
 
@@ -78,22 +81,25 @@ class SettingsViewModelTest {
     fun whenStartNotCalledYetThenViewStateInitialisedDefaultValues() {
         assertNotNull(testee.viewState)
 
-        val value = testee.viewState.value!!
-        assertEquals(true, value.loading)
+        val value = latestViewState()
+        assertTrue(value.loading)
         assertEquals("", value.version)
+        assertTrue(value.autoCompleteSuggestionsEnabled)
+        assertFalse(value.showDefaultBrowserSetting)
+        assertFalse(value.isAppDefaultBrowser)
     }
 
     @Test
     fun whenStartCalledThenLoadingSetToFalse() {
         testee.start()
-        val value = testee.viewState.value!!
+        val value = latestViewState()
         assertEquals(false, value.loading)
     }
 
     @Test
     fun whenStartCalledThenVersionSetCorrectly() {
         testee.start()
-        val value = testee.viewState.value!!
+        val value = latestViewState()
         assertEquals("${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})", value.version)
     }
 
@@ -110,6 +116,39 @@ class SettingsViewModelTest {
         val uri = retrieveObservedUri()
         assertEquals(context.getString(R.string.feedbackSubject), uri.subject)
     }
+
+    @Test
+    fun whenDefaultBrowserAppAlreadySetToOursThenIsDefaultBrowserFlagIsTrue() {
+        whenever(mockDefaultBrowserDetector.isCurrentlyConfiguredAsDefaultBrowser()).thenReturn(true)
+        testee.start()
+        val viewState = latestViewState()
+        assertTrue(viewState.isAppDefaultBrowser)
+    }
+
+
+    @Test
+    fun whenDefaultBrowserAppNotSetToOursThenIsDefaultBrowserFlagIsFalse() {
+        whenever(mockDefaultBrowserDetector.isCurrentlyConfiguredAsDefaultBrowser()).thenReturn(false)
+        testee.start()
+        val viewState = latestViewState()
+        assertFalse(viewState.isAppDefaultBrowser)
+    }
+
+    @Test
+    fun whenBrowserDetectorIndicatesDefaultCannotBeSetThenFlagToShowSettingIsFalse() {
+        whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(false)
+        testee.start()
+        assertFalse(latestViewState().showDefaultBrowserSetting)
+    }
+
+    @Test
+    fun whenBrowserDetectorIndicatesDefaultCanBeSetThenFlagToShowSettingIsTrue() {
+        whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(true)
+        testee.start()
+        assertTrue(latestViewState().showDefaultBrowserSetting)
+    }
+
+    private fun latestViewState() = testee.viewState.value!!
 
     private fun retrieveObservedUri(): MailTo {
         testee.command.blockingObserve()

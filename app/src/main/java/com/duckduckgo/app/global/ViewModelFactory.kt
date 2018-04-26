@@ -25,7 +25,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel
 import com.duckduckgo.app.browser.BrowserViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.LongPressHandler
-import com.duckduckgo.app.browser.defaultBrowsing.DefaultWebBrowserCapability
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.model.SiteFactory
@@ -62,14 +62,14 @@ class ViewModelFactory @Inject constructor(
         private val autoCompleteApi: AutoCompleteApi,
         private val appSettingsPreferencesStore: SettingsDataStore,
         private val webViewLongPressHandler: LongPressHandler,
-        private val defaultWebBrowserCapability: DefaultWebBrowserCapability
+        private val defaultBrowserDetector: DefaultBrowserDetector
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
             with(modelClass) {
                 when {
                     isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboaringStore)
-                    isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore, defaultWebBrowserCapability)
+                    isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore, defaultBrowserDetector)
                     isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository)
                     isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
                     isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository)
@@ -77,7 +77,7 @@ class ViewModelFactory @Inject constructor(
                     isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                     isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                     isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
-                    isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(stringResolver, appSettingsPreferencesStore, defaultWebBrowserCapability)
+                    isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(stringResolver, appSettingsPreferencesStore, defaultBrowserDetector)
                     isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel(bookmarksDao)
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }

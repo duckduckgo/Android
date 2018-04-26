@@ -17,12 +17,14 @@
 package com.duckduckgo.app.onboarding.ui
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.support.test.InstrumentationRegistry
-import com.duckduckgo.app.browser.defaultBrowsing.DefaultWebBrowserCapability
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.whenever
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -35,8 +37,10 @@ class OnboardingViewModelTest {
 
     private var onboardingStore: OnboardingStore = mock()
 
+    private var mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
+
     private val testee: OnboardingViewModel by lazy {
-        OnboardingViewModel(onboardingStore, DefaultWebBrowserCapability(InstrumentationRegistry.getTargetContext()))
+        OnboardingViewModel(onboardingStore, mockDefaultBrowserDetector)
     }
 
     @Test
@@ -44,6 +48,32 @@ class OnboardingViewModelTest {
         verify(onboardingStore, never()).onboardingShown()
         testee.onOnboardingDone()
         verify(onboardingStore).onboardingShown()
+    }
+
+    @Test
+    fun whenFirstPageRequestedThenProtectDataReturned() {
+        val page = testee.getItem(0)
+        assertTrue(page is OnboardingActivity.ProtectDataPage)
+    }
+
+    @Test
+    fun whenSecondPageRequestedThenNoTracePageReturned() {
+        val page = testee.getItem(1)
+        assertTrue(page is OnboardingActivity.NoTracePage)
+    }
+
+    @Test
+    fun whenThirdPageRequestedAndDefaultBrowserCapableThenDefaultBrowserPageReturned() {
+        whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(true)
+        val page = testee.getItem(2)
+        assertTrue(page is OnboardingActivity.DefaultBrowserPage)
+    }
+
+    @Test
+    fun whenThirdPageRequestedButDefaultBrowserNotCapableThenNoPageReturned() {
+        whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(false)
+        val page = testee.getItem(2)
+        assertNull(page)
     }
 
 }

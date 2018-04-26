@@ -22,7 +22,7 @@ import android.net.Uri
 import android.os.Build
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.defaultBrowsing.DefaultWebBrowserCapability
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.StringResolver
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import timber.log.Timber
@@ -31,28 +31,27 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
         private val stringResolver: StringResolver,
         private val settingsDataStore: SettingsDataStore,
-        private val defaultWebBrowserCapability: DefaultWebBrowserCapability) : ViewModel() {
+        private val defaultWebBrowserCapability: DefaultBrowserDetector) : ViewModel() {
 
     data class ViewState(
             val loading: Boolean = true,
             val version: String = "",
             val autoCompleteSuggestionsEnabled: Boolean = true,
             val showDefaultBrowserSetting: Boolean = false,
-            val isAppDefaultBrowser: Boolean = false
-    )
+            val isAppDefaultBrowser: Boolean = false)
+
+    private lateinit var currentViewState: ViewState
 
     sealed class Command {
         class SendEmail(val emailUri: Uri) : Command()
     }
 
-    val viewState: MutableLiveData<ViewState> = MutableLiveData()
-    val command: MutableLiveData<Command> = MutableLiveData()
-
-    private var currentViewState: ViewState = ViewState(showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration())
-
-    init {
-        viewState.value = currentViewState
+    val viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().apply {
+        currentViewState = ViewState()
+        value = currentViewState
     }
+
+    val command: MutableLiveData<Command> = MutableLiveData()
 
     fun start() {
         val autoCompleteEnabled = settingsDataStore.autoCompleteSuggestionsEnabled
@@ -64,6 +63,7 @@ class SettingsViewModel @Inject constructor(
         viewState.value = currentViewState.copy(loading = false,
                 autoCompleteSuggestionsEnabled = autoCompleteEnabled,
                 isAppDefaultBrowser = defaultBrowserAlready,
+                showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
                 version = obtainVersion())
     }
 
