@@ -22,7 +22,7 @@ import android.content.ClipDescription
 import android.content.ClipDescription.MIMETYPE_TEXT_URILIST
 import android.content.Intent
 import android.net.Uri
-import androidx.net.toUri
+import androidx.core.net.toUri
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
