@@ -16,12 +16,15 @@
 
 package com.duckduckgo.app.browser
 
+import android.content.Context
 import android.support.test.InstrumentationRegistry
+import android.support.test.annotation.UiThreadTest
 import android.webkit.CookieManager
 import android.webkit.ValueCallback
 import android.webkit.WebStorage
 import android.webkit.WebView
 import com.nhaarman.mockito_kotlin.*
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.ArgumentCaptor
 
@@ -31,17 +34,18 @@ class WebDataManagerTest {
 
     private val mockCookieManager: CookieManager = mock()
 
-    private val mockWebView: WebView = mock()
-
     private val mockStorage: WebStorage = mock()
 
     private val testee = WebDataManager(host)
 
+    @UiThreadTest
     @Test
     fun whenDataClearedThenCacheHistoryAndStorageDataCleared() {
-        testee.clearData(mockWebView, mockStorage, InstrumentationRegistry.getTargetContext())
-        verify(mockWebView).clearHistory()
-        verify(mockWebView).clearCache(true)
+        val context = InstrumentationRegistry.getTargetContext()
+        val webView = TestWebView(context)
+        testee.clearData(webView, mockStorage, context)
+        assertTrue(webView.historyCleared)
+        assertTrue(webView.cacheCleared)
         verify(mockStorage).deleteAllData()
     }
 
@@ -79,6 +83,27 @@ class WebDataManagerTest {
         verify(mockCookieManager, never()).setCookie(host, "ea=abc")
         verify(mockCookieManager, never()).setCookie(host, "ez=zyx")
     }
+
+    private class TestWebView(context: Context) : WebView(context) {
+
+        var historyCleared: Boolean = false
+        var cacheCleared: Boolean = false
+
+        override fun clearHistory() {
+            super.clearHistory()
+
+            historyCleared = true
+        }
+
+        override fun clearCache(includeDiskFiles: Boolean) {
+            super.clearCache(includeDiskFiles)
+
+            if (includeDiskFiles) {
+                cacheCleared = true
+            }
+        }
+    }
+
 
     companion object {
         private const val host = "duckduckgo.com"
