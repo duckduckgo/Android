@@ -46,12 +46,7 @@ class SettingsActivity : DuckDuckGoActivity() {
         ViewModelProviders.of(this, viewModelFactory).get(SettingsViewModel::class.java)
     }
 
-    private val defaultBrowserChangeListener = OnCheckedChangeListener { _, isChecked ->
-        launchDefaultAppScreen()
-
-        // prevent the switch from toggling yet; should only change reactively from default browser changing
-        setAsDefaultBrowserSetting.isChecked = !isChecked
-    }
+    private val defaultBrowserChangeListener = OnCheckedChangeListener { _, _ -> launchDefaultAppScreen() }
 
     private val autocompleteChangeListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.userRequestedToChangeAutocompleteSetting(isChecked)
@@ -142,8 +137,8 @@ class SettingsActivity : DuckDuckGoActivity() {
  *
  * Requires the change listener to be provided explicitly as it is held privately in the super class and cannot be accessed automatically.
  */
-private fun SwitchCompat.quietlySetIsChecked(isChecked: Boolean, changeListener: OnCheckedChangeListener?) {
+private fun SwitchCompat.quietlySetIsChecked(newCheckedState: Boolean, changeListener: OnCheckedChangeListener?) {
     setOnCheckedChangeListener(null)
-    this.isChecked = isChecked
+    isChecked = newCheckedState
     setOnCheckedChangeListener(changeListener)
 }
