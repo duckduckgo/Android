@@ -26,8 +26,10 @@ import com.duckduckgo.app.browser.BrowserViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.LongPressHandler
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.global.db.AppConfigurationDao
+import com.duckduckgo.app.global.install.AppInstallSharedPreferences
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -61,8 +63,12 @@ class ViewModelFactory @Inject constructor(
         private val bookmarksDao: BookmarksDao,
         private val autoCompleteApi: AutoCompleteApi,
         private val appSettingsPreferencesStore: SettingsDataStore,
+        private val defaultBrowserNotification: DefaultBrowserNotification,
         private val webViewLongPressHandler: LongPressHandler,
-        private val defaultBrowserDetector: DefaultBrowserDetector
+        private val defaultBrowserDetector: DefaultBrowserDetector,
+
+        /* TODO remove this*/
+        private val temp: AppInstallSharedPreferences
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -92,7 +98,10 @@ class ViewModelFactory @Inject constructor(
             networkLeaderboardDao = networkLeaderboardDao,
             bookmarksDao = bookmarksDao,
             appSettingsPreferencesStore = appSettingsPreferencesStore,
+            defaultBrowserDetector = defaultBrowserDetector,
+            defaultBrowserNotification = defaultBrowserNotification,
             appConfigurationDao = appConfigurationDao,
             longPressHandler = webViewLongPressHandler,
+            appInstallSharedPreferences = temp,
             autoCompleteApi = autoCompleteApi)
 }

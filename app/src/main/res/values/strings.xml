@@ -176,5 +176,10 @@
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Search DuckDuckGo</string>
+    <string name="notificationBannerDefaultBrowserTitle">Make DuckDuckGo Your Default Browser</string>
+    <string name="notificationBannerDefaultBrowserMessage">For full-time tracking protection, make us your default</string>
+    <string name="notificationDefaultBrowserDismissButton">Dismiss notification banner</string>
+    <string name="defaultBrowserInfoTitle">Make Us Your Default Browser</string>
+    <string name="defaultBrowserInfoMessage">Make Duckduckgo the default browser in your Device Settings for full-time tracking protection.</string>
 
 </resources>

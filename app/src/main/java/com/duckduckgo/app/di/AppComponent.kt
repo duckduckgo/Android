@@ -20,6 +20,7 @@ package com.duckduckgo.app.di
 import android.app.Application
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteModule
 import com.duckduckgo.app.browser.di.BrowserModule
+import com.duckduckgo.app.browser.di.DefaultBrowserModule
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.httpsupgrade.di.HttpsUpgraderModule
 import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
@@ -49,7 +50,8 @@ import javax.inject.Singleton
     HttpsUpgraderModule::class,
     ResourceSurrogateModule::class,
     TrackerDetectionModule::class,
-    NotificationModule::class
+    NotificationModule::class,
+    DefaultBrowserModule::class
 ])
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 

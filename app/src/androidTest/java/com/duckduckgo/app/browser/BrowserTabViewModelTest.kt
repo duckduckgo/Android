@@ -32,10 +32,14 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.install.AppInstallSharedPreferences
+import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
@@ -101,6 +105,16 @@ class BrowserTabViewModelTest {
     private lateinit var mockOmnibarConverter: OmnibarEntryConverter
 
     @Mock
+    private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
+
+    @Mock
+    private lateinit var mockDefaultBrowserNotification: DefaultBrowserNotification
+
+    // TODO remove this
+    @Mock
+    private lateinit var mockAppInstallStore: AppInstallStore
+
+    @Mock
     private lateinit var tabsDao: TabsDao
 
     @Captor
@@ -133,7 +147,10 @@ class BrowserTabViewModelTest {
                 autoCompleteApi = mockAutoCompleteApi,
                 appSettingsPreferencesStore = mockSettingsStore,
                 bookmarksDao = bookmarksDao,
+                defaultBrowserNotification = mockDefaultBrowserNotification,
+                defaultBrowserDetector = mockDefaultBrowserDetector,
                 longPressHandler = mockLongPressHandler,
+                appInstallSharedPreferences = AppInstallSharedPreferences(InstrumentationRegistry.getContext()),
                 appConfigurationDao = appConfigurationDao)
 
         testee.load("abc")

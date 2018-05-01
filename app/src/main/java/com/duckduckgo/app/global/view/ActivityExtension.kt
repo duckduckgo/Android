@@ -17,12 +17,12 @@
 package com.duckduckgo.app.global.view
 
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import android.support.annotation.RequiresApi
 import android.support.v4.app.FragmentActivity
-import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Toast
 import com.duckduckgo.app.browser.R
@@ -38,7 +38,7 @@ fun FragmentActivity.launchExternalActivity(intent: Intent) {
 }
 
 @RequiresApi(Build.VERSION_CODES.N)
-fun AppCompatActivity.launchDefaultAppActivity() {
+fun Context.launchDefaultAppActivity() {
     try {
         val intent = Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS)
         startActivity(intent)

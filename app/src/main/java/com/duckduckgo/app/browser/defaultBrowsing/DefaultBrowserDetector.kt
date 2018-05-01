@@ -24,15 +24,19 @@ import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.global.install.AppInstallStore
 import timber.log.Timber
 import javax.inject.Inject
 
 interface DefaultBrowserDetector {
     fun deviceSupportsDefaultBrowserConfiguration() : Boolean
     fun isCurrentlyConfiguredAsDefaultBrowser(): Boolean
+    fun userDeclinedToSetAsDefaultBrowser(timestamp: Long = System.currentTimeMillis())
 }
 
-class AndroidDefaultBrowserDetector @Inject constructor(private val context: Context) : DefaultBrowserDetector {
+class AndroidDefaultBrowserDetector @Inject constructor(
+        private val context: Context,
+        private val appInstallStore: AppInstallStore) : DefaultBrowserDetector {
 
     override fun deviceSupportsDefaultBrowserConfiguration(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
@@ -45,5 +49,9 @@ class AndroidDefaultBrowserDetector @Inject constructor(private val context: Con
 
         Timber.i("Default browser identified as ${resolutionInfo?.activityInfo?.packageName}")
         return defaultAlready
+    }
+
+    override fun userDeclinedToSetAsDefaultBrowser(timestamp: Long) {
+        appInstallStore.recordUserDeclinedToSetDefaultBrowser(timestamp)
     }
 }
