@@ -21,6 +21,10 @@
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />
 
+        <!--
+            To protect user privacy, disable SafeBrowsing which could send URLs to Google servers
+            https://developer.android.com/reference/android/webkit/WebView
+        -->
         <meta-data
             android:name="android.webkit.WebView.EnableSafeBrowsing"
             android:value="false" />
