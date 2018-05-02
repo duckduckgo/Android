@@ -557,8 +557,8 @@ class BrowserTabFragment : Fragment(), FindListener {
                 setSupportZoom(true)
             }
 
-            it.setDownloadListener { url, _, _, _, _ ->
-                requestFileDownload(url)
+            it.setDownloadListener { url, userAgent, contentDisposition, mimeType, contentLength ->
+                requestFileDownload(url, contentDisposition, mimeType)
             }
 
             it.setOnTouchListener { _, _ ->
@@ -711,9 +711,11 @@ class BrowserTabFragment : Fragment(), FindListener {
         webView = null
     }
 
-    private fun requestFileDownload(url: String) {
+    private fun requestFileDownload(url: String, contentDisposition: String, mimeType: String) {
         pendingFileDownload = PendingFileDownload(
                 url = url,
+                contentDisposition = contentDisposition,
+                mimeType = mimeType,
                 subfolder = Environment.DIRECTORY_DOWNLOADS)
 
         downloadFileWithPermissionCheck()

@@ -37,7 +37,7 @@ class NetworkFileDownloader @Inject constructor(private val context: Context) {
     }
 
     private fun guessFileName(pending: FileDownloader.PendingFileDownload): String? {
-        val guessedFileName = URLUtil.guessFileName(pending.url, null, null)
+        val guessedFileName = URLUtil.guessFileName(pending.url, pending.contentDisposition, pending.mimeType)
         Timber.i("Guessed filename of $guessedFileName for url ${pending.url}")
         return guessedFileName
     }
