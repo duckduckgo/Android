@@ -24,7 +24,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 
 interface WebViewClientListener {
     fun loadingStarted()
-    fun loadingFinished()
+    fun loadingFinished(url: String? = null)
     fun progressChanged(newProgress: Int)
     fun titleReceived(title: String)
     fun urlChanged(url: String?)
