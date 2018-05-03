@@ -388,6 +388,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         popupMenu.contentView.backPopupMenuItem.isEnabled = viewState.browserShowing && webView?.canGoBack() ?: false
         popupMenu.contentView.forwardPopupMenuItem.isEnabled = viewState.browserShowing && webView?.canGoForward() ?: false
         popupMenu.contentView.refreshPopupMenuItem.isEnabled = viewState.browserShowing
+        popupMenu.contentView.newTabPopupMenuItem.isEnabled = viewState.browserShowing
         popupMenu.contentView.addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
         popupMenu.contentView.sharePageMenuItem?.isEnabled = viewState.canSharePage
     }
