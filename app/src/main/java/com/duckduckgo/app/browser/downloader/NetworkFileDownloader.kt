@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.downloader
 
 import android.app.DownloadManager
 import android.content.Context
+import android.webkit.CookieManager
 import android.webkit.URLUtil
 import androidx.core.net.toUri
 import timber.log.Timber
@@ -27,8 +28,10 @@ class NetworkFileDownloader @Inject constructor(private val context: Context) {
 
     fun download(pendingDownload: FileDownloader.PendingFileDownload) {
         val guessedFileName = guessFileName(pendingDownload)
+
         val request = DownloadManager.Request(pendingDownload.url.toUri()).apply {
             allowScanningByMediaScanner()
+            addRequestHeader("Cookie", CookieManager.getInstance().getCookie(pendingDownload.url))
             setDestinationInExternalPublicDir(pendingDownload.subfolder, guessedFileName)
             setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
         }
@@ -41,4 +44,5 @@ class NetworkFileDownloader @Inject constructor(private val context: Context) {
         Timber.i("Guessed filename of $guessedFileName for url ${pending.url}")
         return guessedFileName
     }
+
 }
