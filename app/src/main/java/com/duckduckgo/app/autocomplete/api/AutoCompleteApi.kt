@@ -17,6 +17,7 @@
 package com.duckduckgo.app.autocomplete.api
 
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
+import com.duckduckgo.app.global.UriString
 import io.reactivex.Observable
 import javax.inject.Inject
 
@@ -34,7 +35,7 @@ open class AutoCompleteApi @Inject constructor(
 
         return autoCompleteService.autoComplete(query)
                 .flatMapIterable { it -> it }
-                .map { AutoCompleteSuggestion(it.phrase, queryUrlConverter.isWebUrl(it.phrase)) }
+                .map { AutoCompleteSuggestion(it.phrase, UriString.isWebUrl(it.phrase)) }
                 .toList()
                 .onErrorReturn { emptyList() }
                 .map { AutoCompleteResult(query = query, suggestions = it) }

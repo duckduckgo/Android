@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
 import android.arch.persistence.room.Room
-import android.net.Uri
 import android.support.test.InstrumentationRegistry
 import android.view.MenuItem
 import android.view.View
@@ -128,7 +127,7 @@ class BrowserTabViewModelTest {
                 queryUrlConverter = mockOmnibarConverter,
                 duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
                 siteFactory = siteFactory,
-                tabRepository = TabDataRepository(tabsDao),
+                tabRepository = TabDataRepository(tabsDao, siteFactory),
                 networkLeaderboardDao = mockNetworkLeaderboardDao,
                 autoCompleteApi = mockAutoCompleteApi,
                 appSettingsPreferencesStore = mockSettingsStore,
@@ -140,7 +139,7 @@ class BrowserTabViewModelTest {
         testee.url.observeForever(mockQueryObserver)
         testee.command.observeForever(mockCommandObserver)
 
-        whenever(mockOmnibarConverter.convertQueryToUri(any())).thenReturn(Uri.parse("duckduckgo.com"))
+        whenever(mockOmnibarConverter.convertQueryToUrl(any())).thenReturn("duckduckgo.com")
 
     }
 
@@ -171,7 +170,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSubmittedQueryHasWhitespaceItIsTrimmed() {
         testee.onUserSubmittedQuery(" nytimes.com ")
-        verify(mockOmnibarConverter).isWebUrl("nytimes.com")
         assertEquals("nytimes.com", testee.viewState.value!!.omnibarText)
     }
 
@@ -621,7 +619,7 @@ class BrowserTabViewModelTest {
         whenever(mockLongPressHandler.userSelectedMenuItem(any(), any())).thenReturn(OpenInNewTab("http://example.com"))
         val mockMenItem: MenuItem = mock()
         testee.userSelectedItemFromLongPressMenu("http://example.com", mockMenItem)
-        val command = captureCommands().value as Command.NewTab
+        val command = captureCommands().value as Command.OpenInNewTab
         assertEquals("http://example.com", command.query)
     }
 

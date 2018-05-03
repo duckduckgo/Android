@@ -128,7 +128,6 @@ class BrowserTabFragment : Fragment(), FindListener {
     private val menuButton: MenuItem?
         get() = toolbar.menu.findItem(R.id.browserPopup)
 
-
     private var webView: WebView? = null
 
     private val findInPageTextWatcher = object : TextChangedWatcher() {
@@ -240,8 +239,8 @@ class BrowserTabFragment : Fragment(), FindListener {
     private fun processCommand(it: Command?) {
         when (it) {
             Command.Refresh -> refresh()
-            is Command.NewTab -> {
-                browserActivity?.launchNewTab(it.query)
+            is Command.OpenInNewTab -> {
+                browserActivity?.openInNewTab(it.query)
             }
             is Command.Navigate -> {
                 navigate(it.url)
