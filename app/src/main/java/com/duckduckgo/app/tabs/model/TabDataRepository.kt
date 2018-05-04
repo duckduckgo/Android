@@ -20,6 +20,7 @@ package com.duckduckgo.app.tabs.model
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.db.TabsDao
 import io.reactivex.schedulers.Schedulers
 import java.util.*
@@ -27,7 +28,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TabDataRepository @Inject constructor(private val tabsDao: TabsDao) : TabRepository {
+class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, private val siteFactory: SiteFactory) : TabRepository {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs()
 
@@ -35,10 +36,19 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao) : TabR
 
     private val siteData: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
 
-    override fun add(): String {
+    override fun add(url: String?): String {
         val tabId = UUID.randomUUID().toString()
-        add(tabId, MutableLiveData())
+        add(tabId, buildSiteData(url))
         return tabId
+    }
+
+    private fun buildSiteData(url: String?): MutableLiveData<Site> {
+        val data = MutableLiveData<Site>()
+        url?.let {
+            val siteMonitor = siteFactory.build(it)
+            data.value = siteMonitor
+        }
+        return data
     }
 
     override fun add(tabId: String, data: MutableLiveData<Site>) {

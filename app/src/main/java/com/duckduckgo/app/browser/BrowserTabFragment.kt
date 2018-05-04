@@ -99,6 +99,8 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
+    val initialUrl get() = arguments!![URL_EXTRA_ARG] as String?
+
     lateinit var userAgentProvider: UserAgentProvider
 
     private lateinit var popupMenu: BrowserPopupMenu
@@ -112,7 +114,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProviders.of(this, viewModelFactory).get(BrowserTabViewModel::class.java)
-        viewModel.load(tabId)
+        viewModel.loadData(tabId, initialUrl)
         viewModel
     }
 
@@ -127,7 +129,6 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private val menuButton: MenuItem?
         get() = toolbar.menu.findItem(R.id.browserPopup)
-
 
     private var webView: WebView? = null
 
@@ -168,13 +169,8 @@ class BrowserTabFragment : Fragment(), FindListener {
         configureKeyboardAwareLogoAnimation()
 
         if (savedInstanceState == null) {
-            consumeSharedText()
+            viewModel.onViewReady()
         }
-    }
-
-    private fun consumeSharedText() {
-        val text = arguments?.getString(QUERY_EXTRA_ARG) ?: return
-        viewModel.onUserSubmittedQuery(text)
     }
 
     override fun onResume() {
@@ -240,8 +236,8 @@ class BrowserTabFragment : Fragment(), FindListener {
     private fun processCommand(it: Command?) {
         when (it) {
             Command.Refresh -> refresh()
-            is Command.NewTab -> {
-                browserActivity?.launchNewTab(it.query)
+            is Command.OpenInNewTab -> {
+                browserActivity?.openInNewTab(it.query)
             }
             is Command.Navigate -> {
                 navigate(it.url)
@@ -389,6 +385,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         popupMenu.contentView.backPopupMenuItem.isEnabled = viewState.browserShowing && webView?.canGoBack() ?: false
         popupMenu.contentView.forwardPopupMenuItem.isEnabled = viewState.browserShowing && webView?.canGoForward() ?: false
         popupMenu.contentView.refreshPopupMenuItem.isEnabled = viewState.browserShowing
+        popupMenu.contentView.newTabPopupMenuItem.isEnabled = viewState.browserShowing
         popupMenu.contentView.addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
         popupMenu.contentView.sharePageMenuItem?.isEnabled = viewState.canSharePage
     }
@@ -790,7 +787,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         private const val TAB_ID_ARG = "TAB_ID_ARG"
         private const val ADD_BOOKMARK_FRAGMENT_TAG = "ADD_BOOKMARK"
-        private const val QUERY_EXTRA_ARG = "QUERY_EXTRA_ARG"
+        private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
         private const val KEYBOARD_DELAY = 200L
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
@@ -801,7 +798,7 @@ class BrowserTabFragment : Fragment(), FindListener {
             val args = Bundle()
             args.putString(TAB_ID_ARG, tabId)
             query.let {
-                args.putString(QUERY_EXTRA_ARG, query)
+                args.putString(URL_EXTRA_ARG, query)
             }
             fragment.arguments = args
             return fragment

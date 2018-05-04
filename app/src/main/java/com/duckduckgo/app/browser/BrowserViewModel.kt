@@ -19,13 +19,18 @@ package com.duckduckgo.app.browser
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.ViewModel
 import android.support.annotation.StringRes
-import com.duckduckgo.app.browser.BrowserViewModel.Command.*
+import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
+import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
+import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
-import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
 
-class BrowserViewModel(private val tabRepository: TabRepository) : ViewModel() {
+class BrowserViewModel(
+    private val tabRepository: TabRepository,
+    private val queryUrlConverter: OmnibarEntryConverter
+) : ViewModel() {
 
     data class ViewState(
         val isFullScreen: Boolean = false,
@@ -34,7 +39,6 @@ class BrowserViewModel(private val tabRepository: TabRepository) : ViewModel() {
 
     sealed class Command {
         object Refresh : Command()
-        data class NewTab(val tabId: String, val query: String? = null) : Command()
         data class Query(val query: String) : Command()
         data class DisplayMessage(@StringRes val messageId: Int) : Command()
     }
@@ -43,27 +47,17 @@ class BrowserViewModel(private val tabRepository: TabRepository) : ViewModel() {
     var selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    fun onNewSearchRequested() {
-        openTab()
+    fun onNewTabRequested() {
+        tabRepository.add()
     }
 
-    fun onNewTabRequested(query: String?) {
-        openTab(query)
-    }
-
-    fun onSharedTextReceived(input: String) {
-        openTab(input)
-    }
-
-    private fun openTab(query: String? = null) {
-        val tabId = tabRepository.add()
-        command.value = NewTab(tabId, query)
+    fun onOpenInNewTabRequested(query: String) {
+        tabRepository.add(queryUrlConverter.convertQueryToUrl(query))
     }
 
     fun onTabsUpdated(tabs: List<TabEntity>?) {
         if (tabs == null || tabs.isEmpty()) {
-            val tabId = tabRepository.add()
-            command.value = NewTab(tabId)
+            tabRepository.add()
             return
         }
     }

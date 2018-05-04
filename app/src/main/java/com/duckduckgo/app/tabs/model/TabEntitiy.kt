@@ -32,3 +32,6 @@ data class TabEntity(
     var url: String? = null,
     var title: String? = null
 )
+
+val TabEntity.isBlank: Boolean
+    get() = title == null && url == null

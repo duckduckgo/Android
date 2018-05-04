@@ -20,7 +20,7 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
-import com.duckduckgo.app.browser.BrowserViewModel.Command.NewTab
+import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -51,14 +51,18 @@ class BrowserViewModelTest {
     @Mock
     private lateinit var mockTabRepository: TabRepository
 
+    @Mock
+    private lateinit var mockOmnibarEntryConverter: OmnibarEntryConverter
+
     private lateinit var testee: BrowserViewModel
 
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        testee = BrowserViewModel(mockTabRepository)
+        testee = BrowserViewModel(mockTabRepository, mockOmnibarEntryConverter)
         testee.command.observeForever(mockCommandObserver)
         whenever(mockTabRepository.add()).thenReturn(TAB_ID)
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(any())).then { it.arguments.first() }
     }
 
     @After
@@ -67,31 +71,22 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenNewSearchRequestedThenNewTabTriggered() {
-        testee.onNewSearchRequested()
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(NewTab(TAB_ID), commandCaptor.lastValue)
+    fun whenNewTabRequestedThenTabAddedToRepository() {
+        testee.onNewTabRequested()
+        verify(mockTabRepository).add()
     }
 
     @Test
-    fun whenNewTabRequestedThenNewTabTriggered() {
-        testee.onNewTabRequested("http://example.com")
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(NewTab(TAB_ID, "http://example.com"), commandCaptor.lastValue)
+    fun whenOpenInNewTabRequestedThenTabAddedToRepository() {
+        val url = "http://example.com"
+        testee.onOpenInNewTabRequested(url)
+        verify(mockTabRepository).add(url)
     }
 
     @Test
-    fun whenSharedTextReceivedThenNewTabWithQueryTriggered() {
-        testee.onSharedTextReceived("a query")
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(NewTab(TAB_ID, "a query"), commandCaptor.lastValue)
-    }
-
-    @Test
-    fun whenTabsUpdatedAndNoTabsThenNewTabLaunched() {
+    fun whenTabsUpdatedAndNoTabsThenNewTabAddedToRepository() {
         testee.onTabsUpdated(ArrayList())
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(NewTab(TAB_ID), commandCaptor.lastValue)
+        verify(mockTabRepository).add()
     }
 
     @Test

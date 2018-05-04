@@ -18,7 +18,6 @@ package com.duckduckgo.app.migration
 
 import android.content.Context
 import android.support.annotation.WorkerThread
-import android.webkit.URLUtil
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
@@ -75,7 +74,7 @@ class LegacyMigration @Inject constructor(
                 val title = it.getString(titleColumn)
                 val query = it.getString(queryColumn)
 
-                val url = if (URLUtil.isNetworkUrl(query)) query else queryUrlConverter.convertQueryToUri(query).toString()
+                val url = queryUrlConverter.convertQueryToUrl(query)
 
                 bookmarksDao.insert(BookmarkEntity(title = title, url = url))
 

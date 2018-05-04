@@ -68,7 +68,7 @@ class ViewModelFactory @Inject constructor(
                 when {
                     isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboaringStore)
                     isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore)
-                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository)
+                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository, queryUrlConverter)
                     isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
                     isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository)
                     isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(privacySettingsStore, networkLeaderboardDao)
