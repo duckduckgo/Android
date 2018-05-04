@@ -63,8 +63,8 @@ class BrowserActivity : DuckDuckGoActivity() {
         launchNewSearchOrQuery(intent)
     }
 
-    private fun openNewTab(tabId: String, userQuery: String? = null) {
-        val fragment = BrowserTabFragment.newInstance(tabId, userQuery)
+    private fun openNewTab(tabId: String, url: String? = null) {
+        val fragment = BrowserTabFragment.newInstance(tabId, url)
         val transaction = supportFragmentManager.beginTransaction()
         if (currentTab == null) {
             transaction.replace(R.id.fragmentContainer, fragment, tabId)

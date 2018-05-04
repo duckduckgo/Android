@@ -142,10 +142,20 @@ class BrowserTabViewModel(
         configureAutoComplete()
     }
 
-    fun load(tabId: String) {
+    fun loadData(tabId: String, initialUrl: String?) {
         this.tabId = tabId
         siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
+
+        initialUrl?.let {
+            site = siteFactory.build(it)
+        }
+    }
+
+    fun onViewReady() {
+        site?.url?.let {
+            onUserSubmittedQuery(it)
+        }
     }
 
     private fun configureAutoComplete() {

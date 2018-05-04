@@ -135,7 +135,7 @@ class BrowserTabViewModelTest {
                 longPressHandler = mockLongPressHandler,
                 appConfigurationDao = appConfigurationDao)
 
-        testee.load("abc")
+        testee.loadData("abc", null)
         testee.url.observeForever(mockQueryObserver)
         testee.command.observeForever(mockCommandObserver)
 
