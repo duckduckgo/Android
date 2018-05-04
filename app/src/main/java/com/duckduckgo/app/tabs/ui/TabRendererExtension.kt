@@ -22,9 +22,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.isBlank
 
-val TabEntity.isBlank: Boolean
-    get() = title == null && url == null
 
 fun TabEntity.displayTitle(context: Context): String {
     if (isBlank) {
