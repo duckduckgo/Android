@@ -42,6 +42,10 @@ class DataUriParser @Inject constructor() {
     }
 
     private fun determineSuffix(mimeType: String): String {
+
+        // MimeTypeMap returns the wrong value for "jpeg" types on Lollipop
+        if (mimeType == "image/jpeg") return "jpg"
+
         return MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: ""
     }
 
