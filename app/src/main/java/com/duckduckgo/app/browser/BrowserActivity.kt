@@ -108,13 +108,13 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (launchNewSearch(intent)) {
-            viewModel.onNewSearchRequested()
+            viewModel.onNewTabRequested()
             return
         }
 
         val sharedText = intent.intentText
         if (sharedText != null) {
-            viewModel.onSharedTextReceived(sharedText)
+            viewModel.onOpenInNewTabRequested(sharedText)
         }
     }
 
@@ -148,7 +148,6 @@ class BrowserActivity : DuckDuckGoActivity() {
     private fun processCommand(command: Command?) {
         Timber.i("Processing command: $command")
         when (command) {
-            is NewTab -> openNewTab(command.tabId, command.query)
             is Query -> currentTab?.submitQuery(command.query)
             is Refresh -> currentTab?.refresh()
             is Command.DisplayMessage -> applicationContext?.longToast(command.messageId)
@@ -176,8 +175,12 @@ class BrowserActivity : DuckDuckGoActivity() {
         startActivity(TabSwitcherActivity.intent(this))
     }
 
-    fun launchNewTab(query: String? = null) {
-        viewModel.onNewTabRequested(query)
+    fun launchNewTab() {
+        viewModel.onNewTabRequested()
+    }
+
+    fun openInNewTab(query: String) {
+        viewModel.onOpenInNewTabRequested(query)
     }
 
     fun launchSettings() {

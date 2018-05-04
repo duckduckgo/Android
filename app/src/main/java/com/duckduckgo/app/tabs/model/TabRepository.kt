@@ -29,7 +29,7 @@ interface TabRepository {
     /**
      * @return tabId of new record
      */
-    fun add(): String
+    fun add(url: String? = null): String
 
     fun add(tabId: String, data: MutableLiveData<Site>)
 
