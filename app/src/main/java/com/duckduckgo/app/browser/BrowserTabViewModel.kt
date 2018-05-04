@@ -231,9 +231,11 @@ class BrowserTabViewModel(
         onSiteChanged()
     }
 
-    override fun loadingFinished() {
+    override fun loadingFinished(url: String?) {
         Timber.v("Loading finished")
-        viewState.value = currentViewState().copy(isLoading = false)
+        val currentState = currentViewState()
+        val currentOmnibarText = currentState.omnibarText
+        viewState.value = currentState.copy(isLoading = false, omnibarText = url ?: currentOmnibarText)
         registerSiteVisit()
     }
 
