@@ -179,7 +179,7 @@ class TabsDaoTest {
     }
 
     @Test
-    fun whenDeleteBlankCalledThenBlankElementsRemoves() {
+    fun whenDeleteBlankCalledThenBlankElementsRemoved() {
         val first = TabEntity("TAB_ID1")
         val second = TabEntity("TAB_ID2", "http://example.com")
         val third = TabEntity("TAB_ID3")
