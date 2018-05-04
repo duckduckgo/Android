@@ -33,30 +33,31 @@ class AppDatabaseTest {
 
     @Test
     fun whenMigratingFromVersion1To2ThenValidationSucceeds() {
-        testHelper.createDatabase(TEST_DB_NAME, 1)
+        testHelper.createDatabase(TEST_DB_NAME, 1).close()
         testHelper.runMigrationsAndValidate(TEST_DB_NAME, 2, true, AppDatabase.MIGRATION_1_TO_2)
     }
 
     @Test
     fun whenMigratingFromVersion2To3ThenValidationSucceeds() {
-        testHelper.createDatabase(TEST_DB_NAME, 2)
+        testHelper.createDatabase(TEST_DB_NAME, 2).close()
         testHelper.runMigrationsAndValidate(TEST_DB_NAME, 3, true, AppDatabase.MIGRATION_2_TO_3)
     }
 
     @Test
     fun whenMigratingFromVersion2To3ThenOldLeaderboardDataIsDeleted() {
-        val db = testHelper.createDatabase(TEST_DB_NAME, 2)
-        db.execSQL("INSERT INTO `network_leaderboard` VALUES ('Network2', 'example.com')")
-        db.close()
+        testHelper.createDatabase(TEST_DB_NAME, 2).use {
+            it.execSQL("INSERT INTO `network_leaderboard` VALUES ('Network2', 'example.com')")
+        }
+
         assertTrue(database().networkLeaderboardDao().trackerNetworkTally().blockingObserve()!!.isEmpty())
     }
 
     private fun database(): AppDatabase {
         val database = Room
-            .databaseBuilder(InstrumentationRegistry.getTargetContext(), AppDatabase::class.java, TEST_DB_NAME)
-            .addMigrations(AppDatabase.MIGRATION_1_TO_2, AppDatabase.MIGRATION_2_TO_3)
-            .allowMainThreadQueries()
-            .build()
+                .databaseBuilder(InstrumentationRegistry.getTargetContext(), AppDatabase::class.java, TEST_DB_NAME)
+                .addMigrations(AppDatabase.MIGRATION_1_TO_2, AppDatabase.MIGRATION_2_TO_3)
+                .allowMainThreadQueries()
+                .build()
 
         testHelper.closeWhenFinished(database)
 
