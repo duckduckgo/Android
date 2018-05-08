@@ -23,56 +23,85 @@
     android:background="@drawable/notification_info_bottom_background"
     tools:context="com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserInfoActivity">
 
-    <LinearLayout
+    <View
         android:id="@+id/titleSection"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:background="@drawable/notification_info_top_background"
-        android:orientation="vertical">
-
-        <ImageView
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_marginTop="30dp"
-            android:importantForAccessibility="no"
-            android:src="@drawable/ic_icon_smiley_face"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:text="@string/defaultBrowserInfoTitle"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:layout_marginTop="12dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/defaultBrowserInfoMessage"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:layout_marginBottom="12dp"
-            android:layout_marginStart="38dp"
-            android:layout_marginEnd="38dp"
-            android:layout_marginTop="6dp"
-            android:textAlignment="center"
-            />
-
-    </LinearLayout>
+        android:elevation="4dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@+id/description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
+        android:id="@+id/smileyFace"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_marginTop="30dp"
+        android:elevation="@dimen/defaultBrowserInfoCardTitleElevation"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_icon_smiley_face"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/titleSection" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:elevation="@dimen/defaultBrowserInfoCardTitleElevation"
+        android:text="@string/defaultBrowserInfoTitle"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="@dimen/defaultBrowserInfoTitleTextSize"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/smileyFace" />
+
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:elevation="@dimen/defaultBrowserInfoCardTitleElevation"
+        android:paddingBottom="30dp"
+        android:paddingEnd="20dp"
+        android:paddingStart="20dp"
+        android:text="@string/defaultBrowserInfoMessage"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="@dimen/defaultBrowserInfoDescriptionTextSize"
+        app:layout_constraintTop_toBottomOf="@id/title" />
+
+    <ImageView
+        android:id="@+id/dismissButton"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="14dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/dismissDefaultBrowserInfo"
+        android:elevation="4dp"
+        android:src="@drawable/ic_close_white_24dp"
+        android:tint="@color/powderBlue2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/defaultBrowserIllustration"
         android:layout_width="320dp"
         android:layout_height="0dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp"
+        android:importantForAccessibility="no"
         android:src="@drawable/icon_default_browser_illustration"
         app:layout_constraintBottom_toTopOf="@id/launchSettingsButton"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        android:importantForAccessibility="no"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/titleSection" />
 
@@ -84,9 +113,10 @@
         android:layout_marginEnd="20dp"
         android:layout_marginStart="20dp"
         android:background="@color/softBlue"
-        android:transitionName="defaultBrowserBannerTransition"
-        android:textColor="@color/white"
         android:text="@string/onboardingDefaultBrowserGoToSettingsAction"
+        android:textColor="@color/white"
+        android:textSize="@dimen/defaultBrowserInfoSettingsButtonTextSize"
+        android:transitionName="defaultBrowserBannerTransition"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

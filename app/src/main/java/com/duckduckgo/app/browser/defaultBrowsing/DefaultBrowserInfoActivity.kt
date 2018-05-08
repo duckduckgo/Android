@@ -16,21 +16,48 @@
 
 package com.duckduckgo.app.browser.defaultBrowsing
 
+import android.annotation.TargetApi
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import kotlinx.android.synthetic.main.activity_default_browser_info.*
+import javax.inject.Inject
 
-class DefaultBrowserInfoActivity : AppCompatActivity() {
+class DefaultBrowserInfoActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var defaultBrowserDetector: DefaultBrowserDetector
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_default_browser_info)
+        configureUiEventHandlers()
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    private fun configureUiEventHandlers() {
+        dismissButton.setOnClickListener { exitActivity() }
+        launchSettingsButton.setOnClickListener { launchDefaultAppActivity() }
+        defaultBrowserIllustration.setOnClickListener { launchDefaultAppActivity() }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (defaultBrowserDetector.isCurrentlyConfiguredAsDefaultBrowser()) {
+            finish()
+        }
     }
 
     override fun onBackPressed() {
+        exitActivity()
+    }
+
+    private fun exitActivity() {
         launchSettingsButton.text = ""
         finishAfterTransition()
     }

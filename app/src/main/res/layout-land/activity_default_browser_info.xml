@@ -23,87 +23,113 @@
     android:background="@drawable/notification_info_bottom_background"
     tools:context="com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserInfoActivity">
 
-    <LinearLayout
+    <View
         android:id="@+id/titleSection"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:background="@drawable/notification_info_top_background"
+        android:elevation="@dimen/defaultBrowserInfoCardTitleElevation"
         android:gravity="center_horizontal"
-        android:elevation="4dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@+id/description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_marginTop="30dp"
-            android:importantForAccessibility="no"
-            android:src="@drawable/ic_icon_smiley_face"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+    <ImageView
+        android:id="@+id/smileyFace"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_marginTop="30dp"
+        android:elevation="@dimen/defaultBrowserInfoCardTitleElevation"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_icon_smiley_face"
+        app:layout_constraintStart_toStartOf="@+id/title"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/defaultBrowserInfoTitle"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="20sp" />
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:elevation="@dimen/defaultBrowserInfoCardTitleElevation"
+        android:text="@string/defaultBrowserInfoTitle"
+        android:textColor="@color/white"
+        android:textSize="@dimen/defaultBrowserInfoTitleTextSize"
+        app:layout_constraintEnd_toStartOf="@id/textEndVerticalGuideline"
+        app:layout_constraintStart_toStartOf="@id/textStartVerticalGuideline"
+        app:layout_constraintTop_toBottomOf="@id/smileyFace" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:layout_marginEnd="38dp"
-            android:layout_marginStart="38dp"
-            android:layout_marginTop="6dp"
-            android:text="@string/defaultBrowserInfoMessage"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="14sp" />
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="38dp"
+        android:layout_marginTop="6dp"
+        android:elevation="@dimen/defaultBrowserInfoCardTitleElevation"
+        android:paddingBottom="30dp"
+        android:text="@string/defaultBrowserInfoMessage"
+        android:textColor="@color/white"
+        android:textSize="@dimen/defaultBrowserInfoDescriptionTextSize"
+        app:layout_constraintEnd_toStartOf="@id/textEndVerticalGuideline"
+        app:layout_constraintStart_toStartOf="@id/textStartVerticalGuideline"
+        app:layout_constraintTop_toBottomOf="@id/title" />
 
-    </LinearLayout>
+    <ImageView
+        android:id="@+id/defaultBrowserIllustration"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        android:elevation="6dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/icon_default_browser_illustration"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/textEndVerticalGuideline"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/dismissButton"
-        android:layout_width="12dp"
-        android:layout_height="12dp"
-        android:layout_marginTop="14dp"
-        android:layout_marginEnd="14dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="6dp"
         android:layout_marginStart="14dp"
-        android:elevation="4dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_marginTop="6dp"
+        android:background="?attr/selectableItemBackground"
         android:contentDescription="@string/dismissDefaultBrowserInfo"
-        android:src="@drawable/ic_close_white_24dp"
+        android:elevation="4dp"
+        android:padding="20dp"
+        android:scaleType="center"
+        android:src="@drawable/ic_close_white_12dp"
         android:tint="@color/powderBlue2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:layout_width="320dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="20dp"
-        android:layout_marginTop="20dp"
-        android:importantForAccessibility="no"
-        android:src="@drawable/icon_default_browser_illustration"
-        app:layout_constraintBottom_toTopOf="@id/launchSettingsButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/titleSection" />
-
     <Button
         android:id="@+id/launchSettingsButton"
-        android:layout_width="0dp"
+        android:layout_width="320dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="22dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginStart="20dp"
         android:background="@color/softBlue"
         android:text="@string/onboardingDefaultBrowserGoToSettingsAction"
         android:textColor="@color/white"
         android:transitionName="defaultBrowserBannerTransition"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@id/defaultBrowserIllustration"
+        app:layout_constraintStart_toStartOf="@id/textStartVerticalGuideline" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/textStartVerticalGuideline"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="40dp" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/textEndVerticalGuideline"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.6" />
 
 </android.support.constraint.ConstraintLayout>

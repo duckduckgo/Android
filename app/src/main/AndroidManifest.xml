@@ -120,7 +120,9 @@
                 android:resource="@xml/search_widget_info" />
         </receiver>
 
-        <activity android:name=".defaultBrowsing.DefaultBrowserInfoActivity" android:theme="@style/Theme.AppCompat.Translucent"/>
+        <activity
+            android:name=".defaultBrowsing.DefaultBrowserInfoActivity"
+            android:theme="@style/Theme.AppCompat.Translucent" />
     </application>
 
 </manifest>

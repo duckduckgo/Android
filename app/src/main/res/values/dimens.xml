@@ -24,5 +24,9 @@
     <dimen name="tabIconTextSize">12dp</dimen> <!-- Intentional use of dp not sp -->
     <dimen name="tabIconXOffset">2.3dp</dimen>
     <dimen name="tabIconYOffset">2dp</dimen>
+    <dimen name="defaultBrowserInfoTitleTextSize">20sp</dimen>
+    <dimen name="defaultBrowserInfoDescriptionTextSize">14sp</dimen>
+    <dimen name="defaultBrowserInfoSettingsButtonTextSize">15sp</dimen>
+    <dimen name="defaultBrowserInfoCardTitleElevation">4dp</dimen>
 
 </resources>

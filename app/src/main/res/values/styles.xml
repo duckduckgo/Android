@@ -250,6 +250,4 @@
         <item name="android:lineSpacingExtra">6sp</item>
     </style>
 
-
-    <color name="translucentDark">#A000</color>
 </resources>

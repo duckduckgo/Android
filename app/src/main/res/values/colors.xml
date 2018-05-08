@@ -41,6 +41,8 @@
     <color name="eastSide">#9680C5</color>
     <color name="portGore">#2f1f51</color>
 
+    <color name="translucentDark">#B000</color>
+
     <color name="webViewScrollbarTrackColor">#FF333333</color>
     <color name="webViewScrollbarThumbColor">#FFABABAB</color>
 
