@@ -37,8 +37,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.install.AppInstallSharedPreferences
-import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
@@ -109,10 +107,6 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockDefaultBrowserNotification: DefaultBrowserNotification
 
-    // TODO remove this
-    @Mock
-    private lateinit var mockAppInstallStore: AppInstallStore
-
     @Mock
     private lateinit var tabsDao: TabsDao
 
@@ -129,28 +123,31 @@ class BrowserTabViewModelTest {
     fun before() {
         MockitoAnnotations.initMocks(this)
 
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java)
-                .allowMainThreadQueries()
-                .build()
+        db = Room.inMemoryDatabaseBuilder(
+            InstrumentationRegistry.getContext(),
+            AppDatabase::class.java
+        )
+            .allowMainThreadQueries()
+            .build()
         appConfigurationDao = db.appConfigurationDao()
 
         val siteFactory = SiteFactory(mockTermsOfServiceStore, TrackerNetworks())
 
         testee = BrowserTabViewModel(
-                statisticsUpdater = mockStatisticsUpdater,
-                queryUrlConverter = mockOmnibarConverter,
-                duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
-                siteFactory = siteFactory,
-                tabRepository = TabDataRepository(tabsDao, siteFactory),
-                networkLeaderboardDao = mockNetworkLeaderboardDao,
-                autoCompleteApi = mockAutoCompleteApi,
-                appSettingsPreferencesStore = mockSettingsStore,
-                bookmarksDao = bookmarksDao,
-                defaultBrowserNotification = mockDefaultBrowserNotification,
-                defaultBrowserDetector = mockDefaultBrowserDetector,
-                longPressHandler = mockLongPressHandler,
-                appInstallSharedPreferences = AppInstallSharedPreferences(InstrumentationRegistry.getContext()),
-                appConfigurationDao = appConfigurationDao)
+            statisticsUpdater = mockStatisticsUpdater,
+            queryUrlConverter = mockOmnibarConverter,
+            duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
+            siteFactory = siteFactory,
+            tabRepository = TabDataRepository(tabsDao, siteFactory),
+            networkLeaderboardDao = mockNetworkLeaderboardDao,
+            autoCompleteApi = mockAutoCompleteApi,
+            appSettingsPreferencesStore = mockSettingsStore,
+            bookmarksDao = bookmarksDao,
+            defaultBrowserNotification = mockDefaultBrowserNotification,
+            defaultBrowserDetector = mockDefaultBrowserDetector,
+            longPressHandler = mockLongPressHandler,
+            appConfigurationDao = appConfigurationDao
+        )
 
         testee.loadData("abc", null)
         testee.url.observeForever(mockQueryObserver)
@@ -212,9 +209,19 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenTrackerDetectedThenNetworkLeaderboardUpdated() {
-        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", TrackerNetwork("Network1", "www.tracker.com"), false)
+        val event = TrackingEvent(
+            "http://www.example.com",
+            "http://www.tracker.com/tracker.js",
+            TrackerNetwork("Network1", "www.tracker.com"),
+            false
+        )
         testee.trackerDetected(event)
-        verify(mockNetworkLeaderboardDao).insert(NetworkLeaderboardEntry("Network1", "www.example.com"))
+        verify(mockNetworkLeaderboardDao).insert(
+            NetworkLeaderboardEntry(
+                "Network1",
+                "www.example.com"
+            )
+        )
     }
 
     @Test
@@ -277,7 +284,14 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenTrackerDetectedThenSiteVisitedEntryAddedToLeaderboardDao() {
-        testee.trackerDetected(TrackingEvent("http://example.com/abc", "http://tracker.com", TrackerNetwork("Network", "http:// netwotk.com"), true))
+        testee.trackerDetected(
+            TrackingEvent(
+                "http://example.com/abc",
+                "http://tracker.com",
+                TrackerNetwork("Network", "http:// netwotk.com"),
+                true
+            )
+        )
         verify(mockNetworkLeaderboardDao).insert(SiteVisitedEntity("example.com"))
     }
 
@@ -565,7 +579,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSelectsDownloadImageOptionFromContextMenuThenDownloadFileCommandIssued() {
         whenever(mockLongPressHandler.userSelectedMenuItem(anyString(), any()))
-                .thenReturn(DownloadFile("example.com"))
+            .thenReturn(DownloadFile("example.com"))
 
         val mockMenuItem: MenuItem = mock()
         testee.userSelectedItemFromLongPressMenu("example.com", mockMenuItem)
@@ -648,7 +662,12 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSelectsOpenTabThenTabCommandSent() {
-        whenever(mockLongPressHandler.userSelectedMenuItem(any(), any())).thenReturn(OpenInNewTab("http://example.com"))
+        whenever(
+            mockLongPressHandler.userSelectedMenuItem(
+                any(),
+                any()
+            )
+        ).thenReturn(OpenInNewTab("http://example.com"))
         val mockMenItem: MenuItem = mock()
         testee.userSelectedItemFromLongPressMenu("http://example.com", mockMenItem)
         val command = captureCommands().value as Command.OpenInNewTab

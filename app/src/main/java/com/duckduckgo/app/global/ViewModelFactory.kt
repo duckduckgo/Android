@@ -65,10 +65,8 @@ class ViewModelFactory @Inject constructor(
         private val appSettingsPreferencesStore: SettingsDataStore,
         private val defaultBrowserNotification: DefaultBrowserNotification,
         private val webViewLongPressHandler: LongPressHandler,
-        private val defaultBrowserDetector: DefaultBrowserDetector,
+        private val defaultBrowserDetector: DefaultBrowserDetector
 
-        /* TODO remove this*/
-        private val temp: AppInstallSharedPreferences
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -102,6 +100,5 @@ class ViewModelFactory @Inject constructor(
             defaultBrowserNotification = defaultBrowserNotification,
             appConfigurationDao = appConfigurationDao,
             longPressHandler = webViewLongPressHandler,
-            appInstallSharedPreferences = temp,
             autoCompleteApi = autoCompleteApi)
 }

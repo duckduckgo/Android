@@ -44,7 +44,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
-import com.duckduckgo.app.global.install.AppInstallSharedPreferences
 import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
@@ -78,7 +77,6 @@ class BrowserTabViewModel(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val defaultBrowserNotification: DefaultBrowserNotification,
     private val longPressHandler: LongPressHandler,
-    private val appInstallSharedPreferences: AppInstallSharedPreferences,
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, ViewModel() {
 
@@ -298,9 +296,6 @@ class BrowserTabViewModel(
         )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-
-            // TODO remove this hack
-            if(duckDuckGoUrlDetector.extractQuery(url) == "s") appInstallSharedPreferences.clearUserDeclineState()
 
             newViewState = newViewState.copy(
                     omnibarText = duckDuckGoUrlDetector.extractQuery(url) ?: "",
