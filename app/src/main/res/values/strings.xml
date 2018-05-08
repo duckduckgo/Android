@@ -22,6 +22,7 @@
     <string name="notificationBannerDefaultBrowserTitle">Make DuckDuckGo Your Default Browser</string>
     <string name="notificationBannerDefaultBrowserMessage">For full-time tracking protection, make us your default</string>
     <string name="notificationDefaultBrowserDismissButton">Dismiss notification banner</string>
+    <string name="settingsDefaultBrowserEnabled">Set as Default Browser</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Browser menu</string>
