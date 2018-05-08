@@ -105,8 +105,8 @@ class BrowserTabViewModel(
     sealed class Command {
         object LandingPage : Command()
         object Refresh : Command()
-        class NewTab(val query: String) : Command()
         class Navigate(val url: String) : Command()
+        class OpenInNewTab(val query: String) : Command()
         class DialNumber(val telephoneNumber: String) : Command()
         class SendSms(val telephoneNumber: String) : Command()
         class SendEmail(val emailAddress: String) : Command()
@@ -150,10 +150,20 @@ class BrowserTabViewModel(
         configureAutoComplete()
     }
 
-    fun load(tabId: String) {
+    fun loadData(tabId: String, initialUrl: String?) {
         this.tabId = tabId
         siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
+
+        initialUrl?.let {
+            site = siteFactory.build(it)
+        }
+    }
+
+    fun onViewReady() {
+        site?.url?.let {
+            onUserSubmittedQuery(it)
+        }
     }
 
     private fun configureAutoComplete() {
@@ -201,7 +211,7 @@ class BrowserTabViewModel(
 
         command.value = HideKeyboard
         val trimmedInput = input.trim()
-        url.value = buildUrl(trimmedInput)
+        url.value = queryUrlConverter.convertQueryToUrl(trimmedInput)
 
         viewState.value = currentViewState().copy(
             findInPage = FindInPage(visible = false, canFindInPage = true),
@@ -210,13 +220,6 @@ class BrowserTabViewModel(
             browserShowing = true,
             autoComplete = AutoCompleteViewState(false)
         )
-    }
-
-    private fun buildUrl(input: String): String {
-        if (queryUrlConverter.isWebUrl(input)) {
-            return queryUrlConverter.convertUri(input)
-        }
-        return queryUrlConverter.convertQueryToUri(input).toString()
     }
 
     override fun progressChanged(newProgress: Int) {
@@ -240,9 +243,11 @@ class BrowserTabViewModel(
         onSiteChanged()
     }
 
-    override fun loadingFinished() {
+    override fun loadingFinished(url: String?) {
         Timber.v("Loading finished")
-        viewState.value = currentViewState().copy(isLoading = false)
+        val currentState = currentViewState()
+        val currentOmnibarText = currentState.omnibarText
+        viewState.value = currentState.copy(isLoading = false, omnibarText = url ?: currentOmnibarText)
         registerSiteVisit()
     }
 
@@ -400,7 +405,7 @@ class BrowserTabViewModel(
 
         return when (requiredAction) {
             is RequiredAction.OpenInNewTab -> {
-                command.value = NewTab(requiredAction.url)
+                command.value = OpenInNewTab(requiredAction.url)
                 true
             }
             is RequiredAction.DownloadFile -> {

@@ -179,9 +179,33 @@ class TabsDaoTest {
     }
 
     @Test
-    fun whenTabAddedAndSelectedThenRecordUpdated() {
-        val tab = TabEntity("TAB_ID")
-        testee.addAndSelectTab(tab)
-        assertEquals(tab, testee.selectedTab())
+    fun whenDeleteBlankCalledThenBlankElementsRemoved() {
+        val first = TabEntity("TAB_ID1")
+        val second = TabEntity("TAB_ID2", "http://example.com")
+        val third = TabEntity("TAB_ID3")
+
+        testee.insertTab(first)
+        testee.insertTab(second)
+        testee.insertTab(third)
+
+        testee.deleteBlankTabs()
+
+        assertFalse(testee.tabs().contains(first))
+        assertTrue(testee.tabs().contains(second))
+        assertFalse(testee.tabs().contains(third))
     }
+
+    @Test
+    fun whenTabAddedAndSelectedThenRecordUpdatedAndAnyOldBlankTabsRemoved() {
+        val first = TabEntity("TAB_ID1")
+        val second = TabEntity("TAB_ID2")
+
+        testee.addAndSelectTab(first)
+        testee.addAndSelectTab(second)
+
+        assertFalse(testee.tabs().contains(first))
+        assertTrue(testee.tabs().contains(second))
+        assertEquals(second, testee.selectedTab())
+    }
+
 }

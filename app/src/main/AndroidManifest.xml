@@ -16,9 +16,18 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />
+
+        <!--
+            To protect user privacy, disable SafeBrowsing which could send URLs to Google servers
+            https://developer.android.com/reference/android/webkit/WebView
+        -->
+        <meta-data
+            android:name="android.webkit.WebView.EnableSafeBrowsing"
+            android:value="false" />
 
         <activity
             android:name="com.duckduckgo.app.launch.LaunchActivity"
