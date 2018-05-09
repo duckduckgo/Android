@@ -31,13 +31,13 @@ class OnboardingViewModel(private val onboardingStore: OnboardingStore,
         onboardingStore.onboardingShown()
     }
 
-    fun getItem(position: Int): OnboardingActivity.OnboardingPageFragment? {
+    fun getItem(position: Int): OnboardingPageFragment? {
         return when (position) {
-            0 -> OnboardingActivity.ProtectDataPage()
-            1 -> OnboardingActivity.NoTracePage()
+            0 -> OnboardingPageFragment.ProtectDataPage()
+            1 -> OnboardingPageFragment.NoTracePage()
             2 -> {
                 return if (defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration())
-                    OnboardingActivity.DefaultBrowserPage()
+                    OnboardingPageFragment.DefaultBrowserPage()
                 else null
             }
             else -> null

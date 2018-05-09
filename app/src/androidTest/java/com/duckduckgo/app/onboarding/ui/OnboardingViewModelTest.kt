@@ -53,20 +53,20 @@ class OnboardingViewModelTest {
     @Test
     fun whenFirstPageRequestedThenProtectDataReturned() {
         val page = testee.getItem(0)
-        assertTrue(page is OnboardingActivity.ProtectDataPage)
+        assertTrue(page is OnboardingPageFragment.ProtectDataPage)
     }
 
     @Test
     fun whenSecondPageRequestedThenNoTracePageReturned() {
         val page = testee.getItem(1)
-        assertTrue(page is OnboardingActivity.NoTracePage)
+        assertTrue(page is OnboardingPageFragment.NoTracePage)
     }
 
     @Test
     fun whenThirdPageRequestedAndDefaultBrowserCapableThenDefaultBrowserPageReturned() {
         whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(true)
         val page = testee.getItem(2)
-        assertTrue(page is OnboardingActivity.DefaultBrowserPage)
+        assertTrue(page is OnboardingPageFragment.DefaultBrowserPage)
     }
 
     @Test
