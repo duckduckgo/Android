@@ -18,7 +18,8 @@ package com.duckduckgo.app.launch
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
-import com.duckduckgo.app.launch.LaunchViewModel.Command.*
+import com.duckduckgo.app.launch.LaunchViewModel.Command.Home
+import com.duckduckgo.app.launch.LaunchViewModel.Command.Onboarding
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -60,15 +61,4 @@ class LaunchViewModelTest {
         testee.command.observeForever(mockCommandObserver)
         verify(mockCommandObserver).onChanged(any(Home::class.java))
     }
-
-    @Test
-    fun whenOnboardingDoneThenCommandIsHome() {
-        whenever(onboardingStore.shouldShow).thenReturn(true)
-        testee.command.observeForever(mockCommandObserver)
-        verify(mockCommandObserver).onChanged(any(Onboarding::class.java))
-
-        testee.onOnboardingDone()
-        verify(mockCommandObserver).onChanged(any(Home::class.java))
-    }
-
 }
