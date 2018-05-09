@@ -205,6 +205,11 @@
 
     </style>
 
+    <style name="AppTheme.TransparentTheme" >
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+
     <style name="OnboardingButtonProtectData" parent="OnboardingButtonStyle">
         <item name="colorAccent">@color/muddyGreen</item>
     </style>

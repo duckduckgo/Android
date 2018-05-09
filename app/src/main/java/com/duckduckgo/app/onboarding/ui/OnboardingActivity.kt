@@ -91,7 +91,6 @@ class OnboardingActivity : DuckDuckGoActivity() {
     }
 
     private fun updateColor(@ColorInt color: Int) {
-        window.statusBarColor = color
         viewPager.setBackgroundColor(color)
     }
 
