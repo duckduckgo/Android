@@ -41,7 +41,7 @@ class AppUrl {
         const val SOURCE = "ddg_android"
 
         val appVersion: String get() {
-            return String.format("android_%s", BuildConfig.VERSION_NAME.replace(".", "_"))
+            return String.format("android_%s", BuildConfig.VERSION_NAME)
         }
     }
 
