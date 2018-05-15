@@ -46,8 +46,8 @@ class ApiRequestInterceptorTest {
 
     @Test
     fun whenAPIRequestIsMadeThenUserAgentIsAdded() {
-        whenever(mockChain.request()).thenReturn(stubRequest())
-        whenever(mockChain.proceed(any())).thenReturn(stubResponse())
+        whenever(mockChain.request()).thenReturn(request())
+        whenever(mockChain.proceed(any())).thenReturn(response())
 
         val captor = ArgumentCaptor.forClass(Request::class.java)
         testee.intercept(mockChain)
@@ -58,11 +58,11 @@ class ApiRequestInterceptorTest {
         assertTrue(result.matches(regex))
     }
 
-    private fun stubRequest(): Request {
+    private fun request(): Request {
         return Request.Builder().url("http://example.com").build()
     }
 
-    private fun stubResponse(): Response {
-        return Response.Builder().request(stubRequest()).protocol(Protocol.HTTP_2).code(200).message("").build()
+    private fun response(): Response {
+        return Response.Builder().request(request()).protocol(Protocol.HTTP_2).code(200).message("").build()
     }
 }
