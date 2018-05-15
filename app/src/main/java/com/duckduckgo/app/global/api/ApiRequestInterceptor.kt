@@ -28,11 +28,11 @@ class ApiRequestInterceptor(context: Context) : Interceptor {
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        return chain.proceed(
-            chain.request()
-                .newBuilder()
-                .addHeader(Header.USER_AGENT, userAgent)
-                .build()
-        )
+        val request = chain.request()
+            .newBuilder()
+            .addHeader(Header.USER_AGENT, userAgent)
+            .build()
+
+        return chain.proceed(request)
     }
 }
