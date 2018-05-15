@@ -20,6 +20,7 @@ import android.app.job.JobScheduler
 import android.content.Context
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.global.AppUrl.Url
+import com.duckduckgo.app.global.api.ApiRequestInterceptor
 import com.duckduckgo.app.global.job.JobBuilder
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeListService
 import com.duckduckgo.app.job.AppConfigurationSyncer
@@ -42,22 +43,28 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun okHttpClient(context: Context): OkHttpClient {
+    fun okHttpClient(context: Context, apiRequestInterceptor: ApiRequestInterceptor): OkHttpClient {
         val cache = Cache(context.cacheDir, CACHE_SIZE)
         return OkHttpClient.Builder()
-                .cache(cache)
-                .build()
+            .addInterceptor(apiRequestInterceptor)
+            .cache(cache)
+            .build()
     }
 
     @Provides
     @Singleton
     fun retrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit.Builder()
-                .baseUrl(Url.BASE)
-                .client(okHttpClient)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(MoshiConverterFactory.create(moshi))
-                .build()
+            .baseUrl(Url.API)
+            .client(okHttpClient)
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+    }
+
+    @Provides
+    fun apiRequestInterceptor(context: Context): ApiRequestInterceptor {
+        return ApiRequestInterceptor(context)
     }
 
     @Provides

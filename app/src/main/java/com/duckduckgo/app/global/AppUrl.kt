@@ -23,9 +23,9 @@ class AppUrl {
 
     object Url {
         const val HOST = "duckduckgo.com"
-        const val BASE = "https://$HOST"
-        const val HOME =  BASE
-        const val ABOUT = "$BASE/about"
+        const val API = "https://$HOST"
+        const val HOME =  "https://$HOST"
+        const val ABOUT = "https://$HOST/about"
         const val TOSDR = "https://tosdr.org"
     }
 
@@ -44,5 +44,4 @@ class AppUrl {
             return String.format("android_%s", BuildConfig.VERSION_NAME)
         }
     }
-
 }
