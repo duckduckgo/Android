@@ -24,7 +24,7 @@ import okhttp3.Response
 class ApiRequestInterceptor(context: Context) : Interceptor {
 
     private val userAgent: String by lazy {
-        "DDG-Android/${BuildConfig.VERSION_NAME} (${context.applicationInfo.packageName}; Android API ${android.os.Build.VERSION.SDK_INT})"
+        "ddg_android/${BuildConfig.VERSION_NAME} (${context.applicationInfo.packageName}; Android API ${android.os.Build.VERSION.SDK_INT})"
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
