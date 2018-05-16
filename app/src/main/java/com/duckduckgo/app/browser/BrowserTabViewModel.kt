@@ -243,9 +243,8 @@ class BrowserTabViewModel(
 
     override fun loadingFinished(url: String?) {
         Timber.v("Loading finished")
-        val currentState = currentViewState()
-        val currentOmnibarText = currentState.omnibarText
-        viewState.value = currentState.copy(isLoading = false, omnibarText = url ?: currentOmnibarText)
+        val omnibarText = if (url != null) omnibarTextForUrl(url) else currentViewState().omnibarText
+        viewState.value = currentViewState().copy(isLoading = false, omnibarText = omnibarText)
         registerSiteVisit()
     }
 
@@ -288,7 +287,7 @@ class BrowserTabViewModel(
 
         var newViewState = currentViewState().copy(
             canAddBookmarks = true,
-            omnibarText = url,
+            omnibarText = omnibarTextForUrl(url),
             browserShowing = true,
             canSharePage = true,
             showPrivacyGrade = appConfigurationDownloaded,
@@ -303,9 +302,17 @@ class BrowserTabViewModel(
 
             statisticsUpdater.refreshRetentionAtb()
         }
+
         viewState.value = newViewState
         site = siteFactory.build(url)
         onSiteChanged()
+    }
+
+    private fun omnibarTextForUrl(url: String): String {
+        if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
+            return duckDuckGoUrlDetector.extractQuery(url) ?: ""
+        }
+        return url
     }
 
     override fun trackerDetected(event: TrackingEvent) {
