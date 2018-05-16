@@ -245,6 +245,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenLoadingFinishedWithQueryOmnibarTextUpdatedToShowQuery() {
+        val queryUrl = "http://duckduckgo.com?q=test"
+        testee.loadingFinished(queryUrl)
+        assertEquals("test", viewState().omnibarText)
+    }
+
+    @Test
     fun whenLoadingFinishedWithNoUrlOmnibarTextUpdatedToMatch() {
         val exampleUrl = "http://example.com/abc"
         testee.urlChanged(exampleUrl)
