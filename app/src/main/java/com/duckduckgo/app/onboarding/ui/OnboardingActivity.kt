@@ -77,7 +77,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
 
     private fun configurePager() {
 
-        viewPageAdapter = PagerAdapter(supportFragmentManager, viewModel, colorCombiner)
+        viewPageAdapter = PagerAdapter(supportFragmentManager, viewModel)
         viewPager.adapter = viewPageAdapter
         val pageListener = ColorChangingPageListener(colorCombiner, object : NewColorListener {
             override fun update(@ColorInt color: Int) = updateColor(color)

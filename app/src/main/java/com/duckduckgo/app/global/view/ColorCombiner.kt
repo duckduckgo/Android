@@ -16,18 +16,13 @@
 
 package com.duckduckgo.app.global.view
 
-import android.content.Context
 import android.graphics.Color
 import android.support.annotation.ColorInt
 
-class ColorCombiner(private val context: Context) {
+class ColorCombiner {
 
     @ColorInt
-    fun combine(
-        @ColorInt fromColor: Int,
-        @ColorInt toColor: Int,
-        ratio: Float
-    ): Int {
+    fun combine(@ColorInt fromColor: Int, @ColorInt toColor: Int, ratio: Float): Int {
 
         val fromRatio = 1 - ratio
 

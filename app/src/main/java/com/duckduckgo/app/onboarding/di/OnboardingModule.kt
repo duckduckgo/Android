@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.onboarding.di
 
-import android.content.Context
 import com.duckduckgo.app.global.view.ColorCombiner
 import dagger.Module
 import dagger.Provides
@@ -28,5 +27,5 @@ class OnboardingModule {
 
     @Provides
     @Singleton
-    fun colorCombiner(context: Context) = ColorCombiner(context)
+    fun colorCombiner() = ColorCombiner()
 }

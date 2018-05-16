@@ -209,19 +209,9 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenTrackerDetectedThenNetworkLeaderboardUpdated() {
-        val event = TrackingEvent(
-            "http://www.example.com",
-            "http://www.tracker.com/tracker.js",
-            TrackerNetwork("Network1", "www.tracker.com"),
-            false
-        )
+        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", TrackerNetwork("Network1", "www.tracker.com"), false)
         testee.trackerDetected(event)
-        verify(mockNetworkLeaderboardDao).insert(
-            NetworkLeaderboardEntry(
-                "Network1",
-                "www.example.com"
-            )
-        )
+        verify(mockNetworkLeaderboardDao).insert(NetworkLeaderboardEntry("Network1", "www.example.com"))
     }
 
     @Test
@@ -291,14 +281,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenTrackerDetectedThenSiteVisitedEntryAddedToLeaderboardDao() {
-        testee.trackerDetected(
-            TrackingEvent(
-                "http://example.com/abc",
-                "http://tracker.com",
-                TrackerNetwork("Network", "http:// netwotk.com"),
-                true
-            )
-        )
+        testee.trackerDetected(TrackingEvent("http://example.com/abc", "http://tracker.com", TrackerNetwork("Network", "http:// netwotk.com"), true))
         verify(mockNetworkLeaderboardDao).insert(SiteVisitedEntity("example.com"))
     }
 
@@ -669,12 +652,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSelectsOpenTabThenTabCommandSent() {
-        whenever(
-            mockLongPressHandler.userSelectedMenuItem(
-                any(),
-                any()
-            )
-        ).thenReturn(OpenInNewTab("http://example.com"))
+        whenever(mockLongPressHandler.userSelectedMenuItem(any(), any())).thenReturn(OpenInNewTab("http://example.com"))
         val mockMenItem: MenuItem = mock()
         testee.userSelectedItemFromLongPressMenu("http://example.com", mockMenItem)
         val command = captureCommands().value as Command.OpenInNewTab

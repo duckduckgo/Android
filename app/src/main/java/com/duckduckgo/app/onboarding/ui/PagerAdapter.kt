@@ -22,14 +22,8 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.content.ContextCompat
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.view.ColorCombiner
 
-class PagerAdapter(
-    fragmentManager: FragmentManager,
-    private val viewModel: OnboardingViewModel,
-    private val colorCombiner: ColorCombiner
-) :
-    FragmentPagerAdapter(fragmentManager) {
+class PagerAdapter(fragmentManager: FragmentManager, private val viewModel: OnboardingViewModel) : FragmentPagerAdapter(fragmentManager) {
 
     override fun getCount(): Int {
         return viewModel.pageCount()

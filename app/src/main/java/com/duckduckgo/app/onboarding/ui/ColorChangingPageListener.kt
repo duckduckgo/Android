@@ -21,14 +21,14 @@ import android.support.v4.view.ViewPager
 import com.duckduckgo.app.global.view.ColorCombiner
 
 
-class ColorChangingPageListener(
-    private val colorCombiner: ColorCombiner,
-    private val newColorListener: NewColorListener
-) : ViewPager.OnPageChangeListener {
+class ColorChangingPageListener(private val colorCombiner: ColorCombiner, private val newColorListener: NewColorListener) :
+    ViewPager.OnPageChangeListener {
 
     interface NewColorListener {
         fun update(@ColorInt color: Int)
-        @ColorInt fun getColorForPage(position: Int): Int?
+
+        @ColorInt
+        fun getColorForPage(position: Int): Int?
     }
 
     override fun onPageScrolled(

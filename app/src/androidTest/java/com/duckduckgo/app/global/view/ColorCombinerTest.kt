@@ -17,13 +17,12 @@
 package com.duckduckgo.app.global.view
 
 import android.graphics.Color
-import android.support.test.InstrumentationRegistry
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class ColorCombinerTest {
 
-    private val testee = ColorCombiner(InstrumentationRegistry.getTargetContext())
+    private val testee = ColorCombiner()
 
     @Test
     fun whenColorsCombineWithZeroRatioThenCombinedColorIsFirstColor() {
