@@ -63,7 +63,6 @@ class ExperimentationVariantManager(
             persistVariant(newVariant)
             newVariant
         } else {
-            Timber.i("Current variant is $currentVariant")
             currentVariant
         }
     }
