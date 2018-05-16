@@ -19,12 +19,17 @@ package com.duckduckgo.app.onboarding.ui
 import android.arch.lifecycle.ViewModel
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature
 
-class OnboardingViewModel(private val onboardingStore: OnboardingStore,
-                          private val defaultWebBrowserCapability: DefaultBrowserDetector) : ViewModel() {
+class OnboardingViewModel(
+    private val onboardingStore: OnboardingStore,
+    private val defaultWebBrowserCapability: DefaultBrowserDetector,
+    private val variantManager: VariantManager
+) : ViewModel() {
 
     fun pageCount(): Int {
-        return if (defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration()) 3 else 2
+        return if (shouldShowDefaultBrowserPage()) 3 else 2
     }
 
     fun onOnboardingDone() {
@@ -36,11 +41,19 @@ class OnboardingViewModel(private val onboardingStore: OnboardingStore,
             0 -> OnboardingPageFragment.ProtectDataPage()
             1 -> OnboardingPageFragment.NoTracePage()
             2 -> {
-                return if (defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration())
+                return if (shouldShowDefaultBrowserPage())
                     OnboardingPageFragment.DefaultBrowserPage()
                 else null
             }
             else -> null
         }
+    }
+
+    private fun shouldShowDefaultBrowserPage(): Boolean {
+        val deviceSupported =
+            defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration()
+        val featureEnabled = variantManager.getVariant().hasFeature(DefaultBrowserFeature.ShowInOnboarding)
+
+        return deviceSupported && featureEnabled
     }
 }

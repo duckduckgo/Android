@@ -18,6 +18,8 @@ package com.duckduckgo.app.browser.defaultBrowsing
 
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -32,7 +34,8 @@ interface DefaultBrowserNotification {
 
 class DefaultBrowserTimeBasedNotification @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
-    private val appInstallStore: AppInstallStore
+    private val appInstallStore: AppInstallStore,
+    private val variantManager: VariantManager
 ) : DefaultBrowserNotification {
 
     override fun shouldShowNotification(browserShowing: Boolean, timeNow: Long): Boolean {
@@ -42,6 +45,10 @@ class DefaultBrowserTimeBasedNotification @Inject constructor(
         }
 
         if (!isDeviceCapable()) {
+            return false
+        }
+
+        if (!isFeatureEnabled()) {
             return false
         }
 
@@ -58,6 +65,10 @@ class DefaultBrowserTimeBasedNotification @Inject constructor(
 
     private fun isDeviceCapable(): Boolean {
         return defaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration() && appInstallStore.hasInstallTimestampRecorded()
+    }
+
+    private fun isFeatureEnabled(): Boolean {
+        return variantManager.getVariant().hasFeature(DefaultBrowserFeature.ShowTimedReminder)
     }
 
     private fun isAlreadyDefaultBrowser(): Boolean {

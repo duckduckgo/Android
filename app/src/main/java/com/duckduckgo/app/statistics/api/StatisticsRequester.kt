@@ -17,7 +17,8 @@
 package com.duckduckgo.app.statistics.api
 
 import android.annotation.SuppressLint
-import com.duckduckgo.app.global.AppUrl.*
+import com.duckduckgo.app.global.AppUrl.ParamValue
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
@@ -28,7 +29,11 @@ interface StatisticsUpdater {
     fun refreshRetentionAtb()
 }
 
-class StatisticsRequester(private val store: StatisticsDataStore, private val service: StatisticsService) :
+class StatisticsRequester(
+    private val store: StatisticsDataStore,
+    private val service: StatisticsService,
+    private val variantManager: VariantManager
+) :
     StatisticsUpdater {
 
     @SuppressLint("CheckResult")
@@ -39,19 +44,20 @@ class StatisticsRequester(private val store: StatisticsDataStore, private val se
             return
         }
 
+        val variant = variantManager.getVariant()
+
         service.atb(ParamValue.appVersion)
             .subscribeOn(Schedulers.io())
             .flatMap {
-                store.atb = it.versionWithVariant
-                store.retentionAtb = it.version
-                service.exti(it.versionWithVariant, ParamValue.appVersion)
+                val fullAtb = it.version + variant.key
+                store.saveAtb(fullAtb, it.version)
+                service.exti(fullAtb, ParamValue.appVersion)
             }
             .subscribe({
-                Timber.v("Atb initalization succeeded")
+                Timber.v("Atb initialization succeeded")
             }, {
-                store.atb = null
-                store.retentionAtb = null
-                Timber.w("Atb initalization failed ${it.localizedMessage}")
+                store.clearAtb()
+                Timber.w("Atb initialization failed ${it.localizedMessage}")
             })
     }
 

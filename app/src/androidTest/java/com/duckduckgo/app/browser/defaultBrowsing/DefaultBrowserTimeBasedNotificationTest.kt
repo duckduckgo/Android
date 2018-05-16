@@ -17,6 +17,9 @@
 package com.duckduckgo.app.browser.defaultBrowsing
 
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.statistics.Variant
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowTimedReminder
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Assert.assertFalse
@@ -31,47 +34,58 @@ class DefaultBrowserTimeBasedNotificationTest {
 
     private val mockDetector: DefaultBrowserDetector = mock()
     private val appInstallStore: AppInstallStore = mock()
+    private val variantManager: VariantManager = mock()
 
     @Before
     fun setup() {
-        testee = DefaultBrowserTimeBasedNotification(mockDetector, appInstallStore)
+        testee = DefaultBrowserTimeBasedNotification(mockDetector, appInstallStore, variantManager)
     }
 
     @Test
     fun whenDeviceNotSupportingDefaultBrowserThenNotificationNotShown() {
-        configureEnvironment(false, true, false)
+        configureEnvironment(false, true,true, false)
+        assertFalse(testee.shouldShowNotification(browserShowing = true))
+    }
+
+    @Test
+    fun whenDefaultBrowserFeatureNotSupportedThenNotificationNotShown() {
+        configureEnvironment(true, false,true, false)
         assertFalse(testee.shouldShowNotification(browserShowing = true))
     }
 
     @Test
     fun whenNoAppInstallTimeRecordedThenNotificationNotShown() {
-        configureEnvironment(true, false, false)
+        configureEnvironment(true, true,false, false)
         assertFalse(testee.shouldShowNotification(browserShowing = true))
     }
 
     @Test
     fun whenUserDeclinedPreviouslyThenNotificationNotShown() {
-        configureEnvironment(true, true, true)
+        configureEnvironment(true, true,true, true)
         assertFalse(testee.shouldShowNotification(browserShowing = true))
     }
 
     @Test
     fun whenNotEnoughTimeHasPassedSinceInstallThenNotificationNotShown() {
-        configureEnvironment(true, true, false)
+        configureEnvironment(true, true,true, false)
         whenever(appInstallStore.installTimestamp).thenReturn(0)
         assertFalse(testee.shouldShowNotification(browserShowing = true, timeNow = TimeUnit.SECONDS.toMillis(10)))
     }
 
     @Test
     fun whenEnoughTimeHasPassedSinceInstallThenNotificationShown() {
-        configureEnvironment(true, true, false)
+        configureEnvironment(true, true,true, false)
         whenever(appInstallStore.installTimestamp).thenReturn(0)
         assertTrue(testee.shouldShowNotification(browserShowing = true, timeNow = TimeUnit.DAYS.toMillis(100)))
     }
 
-    private fun configureEnvironment(supported: Boolean, timestampRecorded: Boolean, previousDecline: Boolean) {
-        whenever(mockDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(supported)
+    private fun configureEnvironment(deviceSupported: Boolean, featureEnabled: Boolean, timestampRecorded: Boolean, previousDecline: Boolean) {
+        whenever(mockDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(deviceSupported)
+        whenever(variantManager.getVariant()).thenReturn(if (featureEnabled) variantWithFeatureEnabled() else variantWithFeatureDisabled())
         whenever(appInstallStore.hasInstallTimestampRecorded()).thenReturn(timestampRecorded)
         whenever(appInstallStore.hasUserDeclinedDefaultBrowserPreviously()).thenReturn(previousDecline)
     }
+
+    private fun variantWithFeatureEnabled() = Variant("", 0.0, listOf(ShowTimedReminder))
+    private fun variantWithFeatureDisabled() = Variant("", 0.0, listOf())
 }

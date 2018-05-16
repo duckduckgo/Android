@@ -29,7 +29,6 @@ import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.global.db.AppConfigurationDao
-import com.duckduckgo.app.global.install.AppInstallSharedPreferences
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -42,6 +41,7 @@ import com.duckduckgo.app.privacy.ui.ScorecardViewModel
 import com.duckduckgo.app.privacy.ui.TrackerNetworksViewModel
 import com.duckduckgo.app.settings.SettingsViewModel
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel
@@ -65,7 +65,8 @@ class ViewModelFactory @Inject constructor(
         private val appSettingsPreferencesStore: SettingsDataStore,
         private val defaultBrowserNotification: DefaultBrowserNotification,
         private val webViewLongPressHandler: LongPressHandler,
-        private val defaultBrowserDetector: DefaultBrowserDetector
+        private val defaultBrowserDetector: DefaultBrowserDetector,
+        private val variantManager: VariantManager
 
 ) : ViewModelProvider.NewInstanceFactory() {
 
@@ -73,7 +74,7 @@ class ViewModelFactory @Inject constructor(
             with(modelClass) {
                 when {
                     isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboaringStore)
-                    isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore, defaultBrowserDetector)
+                    isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore, defaultBrowserDetector, variantManager)
                     isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository, queryUrlConverter)
                     isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
                     isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository)

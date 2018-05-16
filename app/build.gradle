@@ -141,6 +141,9 @@ dependencies {
     implementation "com.github.bumptech.glide:glide:$glide"
     kapt "com.github.bumptech.glide:compiler:$glide"
 
+    // Apache commons
+    implementation 'org.apache.commons:commons-math3:3.6.1'
+
     testImplementation "org.mockito:mockito-core:2.15.0"
     testImplementation "com.nhaarman:mockito-kotlin-kt1.1:1.5.0"
     testImplementation "junit:junit:4.12"

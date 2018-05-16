@@ -16,12 +16,4 @@
 
 package com.duckduckgo.app.statistics.model
 
-data class Atb(val version: String) {
-
-    val versionWithVariant: String get() = version + VARIANT
-
-    companion object {
-        const val VARIANT = "ma"
-    }
-
-}
+data class Atb(val version: String)

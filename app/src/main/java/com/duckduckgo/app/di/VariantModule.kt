@@ -16,25 +16,20 @@
 
 package com.duckduckgo.app.di
 
+import com.duckduckgo.app.statistics.ExperimentationVariantManager
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.api.StatisticsRequester
-import com.duckduckgo.app.statistics.api.StatisticsService
-import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.WeightedRandomizer
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import dagger.Module
 import dagger.Provides
-import retrofit2.Retrofit
 
 
 @Module
-class StatisticsModule {
+class VariantModule {
 
     @Provides
-    fun statisticsService(retrofit: Retrofit): StatisticsService =
-        retrofit.create(StatisticsService::class.java)
+    fun variantManager(statisticsDataStore: StatisticsDataStore, weightedRandomizer: WeightedRandomizer): VariantManager = ExperimentationVariantManager(statisticsDataStore, weightedRandomizer)
 
     @Provides
-    fun statisticsUpdater(statisticsDataStore: StatisticsDataStore, statisticsService: StatisticsService, variantManager: VariantManager) : StatisticsUpdater =
-        StatisticsRequester(statisticsDataStore, statisticsService, variantManager)
-
+    fun weightedRandomizer() = WeightedRandomizer()
 }
