@@ -30,7 +30,7 @@ import android.view.View
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
-import androidx.net.toUri
+import androidx.core.net.toUri
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
@@ -98,8 +98,8 @@ class BrowserTabViewModel(
     sealed class Command {
         object LandingPage : Command()
         object Refresh : Command()
-        class NewTab(val query: String) : Command()
         class Navigate(val url: String) : Command()
+        class OpenInNewTab(val query: String) : Command()
         class DialNumber(val telephoneNumber: String) : Command()
         class SendSms(val telephoneNumber: String) : Command()
         class SendEmail(val emailAddress: String) : Command()
@@ -142,10 +142,20 @@ class BrowserTabViewModel(
         configureAutoComplete()
     }
 
-    fun load(tabId: String) {
+    fun loadData(tabId: String, initialUrl: String?) {
         this.tabId = tabId
         siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
+
+        initialUrl?.let {
+            site = siteFactory.build(it)
+        }
+    }
+
+    fun onViewReady() {
+        site?.url?.let {
+            onUserSubmittedQuery(it)
+        }
     }
 
     private fun configureAutoComplete() {
@@ -189,7 +199,7 @@ class BrowserTabViewModel(
 
         command.value = HideKeyboard
         val trimmedInput = input.trim()
-        url.value = buildUrl(trimmedInput)
+        url.value = queryUrlConverter.convertQueryToUrl(trimmedInput)
 
         viewState.value = currentViewState().copy(
             findInPage = FindInPage(visible = false, canFindInPage = true),
@@ -198,13 +208,6 @@ class BrowserTabViewModel(
             browserShowing = true,
             autoComplete = AutoCompleteViewState(false)
         )
-    }
-
-    private fun buildUrl(input: String): String {
-        if (queryUrlConverter.isWebUrl(input)) {
-            return queryUrlConverter.convertUri(input)
-        }
-        return queryUrlConverter.convertQueryToUri(input).toString()
     }
 
     override fun progressChanged(newProgress: Int) {
@@ -228,9 +231,10 @@ class BrowserTabViewModel(
         onSiteChanged()
     }
 
-    override fun loadingFinished() {
+    override fun loadingFinished(url: String?) {
         Timber.v("Loading finished")
-        viewState.value = currentViewState().copy(isLoading = false)
+        val omnibarText = if (url != null) omnibarTextForUrl(url) else currentViewState().omnibarText
+        viewState.value = currentViewState().copy(isLoading = false, omnibarText = omnibarText)
         registerSiteVisit()
     }
 
@@ -273,7 +277,7 @@ class BrowserTabViewModel(
 
         var newViewState = currentViewState().copy(
             canAddBookmarks = true,
-            omnibarText = url,
+            omnibarText = omnibarTextForUrl(url),
             browserShowing = true,
             canSharePage = true,
             showPrivacyGrade = appConfigurationDownloaded,
@@ -281,12 +285,19 @@ class BrowserTabViewModel(
         )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            newViewState = newViewState.copy(omnibarText = duckDuckGoUrlDetector.extractQuery(url) ?: "")
             statisticsUpdater.refreshRetentionAtb()
         }
+
         viewState.value = newViewState
         site = siteFactory.build(url)
         onSiteChanged()
+    }
+
+    private fun omnibarTextForUrl(url: String): String {
+        if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
+            return duckDuckGoUrlDetector.extractQuery(url) ?: ""
+        }
+        return url
     }
 
     override fun trackerDetected(event: TrackingEvent) {
@@ -381,7 +392,7 @@ class BrowserTabViewModel(
 
         return when (requiredAction) {
             is RequiredAction.OpenInNewTab -> {
-                command.value = NewTab(requiredAction.url)
+                command.value = OpenInNewTab(requiredAction.url)
                 true
             }
             is RequiredAction.DownloadFile -> {

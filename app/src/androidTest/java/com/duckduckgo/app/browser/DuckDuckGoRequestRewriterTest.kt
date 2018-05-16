@@ -50,7 +50,7 @@ class DuckDuckGoRequestRewriterTest {
         testee.addCustomQueryParams(builder)
         val uri = builder.build()
         assertTrue(uri.queryParameterNames.contains(ParamKey.APP_VERSION))
-        assertEquals("android_${BuildConfig.VERSION_NAME.replace(".", "_")}", uri.getQueryParameter("tappv"))
+        assertEquals("android_${BuildConfig.VERSION_NAME}", uri.getQueryParameter("tappv"))
     }
 
     @Test

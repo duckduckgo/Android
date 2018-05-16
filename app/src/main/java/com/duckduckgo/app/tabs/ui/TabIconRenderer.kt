@@ -20,8 +20,8 @@ import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.support.v4.content.ContextCompat
-import androidx.graphics.drawable.toBitmap
-import androidx.graphics.drawable.toDrawable
+import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.drawable.toDrawable
 import com.duckduckgo.app.browser.R
 
 class TabIconRenderer {

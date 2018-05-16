@@ -21,7 +21,10 @@ import android.arch.lifecycle.MutableLiveData
 import android.support.test.annotation.UiThreadTest
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.tabs.db.TabsDao
+import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.verify
@@ -45,24 +48,36 @@ class TabDataRepositoryTest {
     @Mock
     private lateinit var mockDao: TabsDao
 
+    @Mock
+    private lateinit var mockTermsOfServiceStore: TermsOfServiceStore
+
     private lateinit var testee: TabDataRepository
 
     @UiThreadTest
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        testee = TabDataRepository(mockDao)
+        testee = TabDataRepository(mockDao, SiteFactory(mockTermsOfServiceStore, TrackerNetworks()))
     }
 
     @Test
-    fun whenAddCalledTheTabAddedAndSelectedAndSiteDataCreated() {
+    fun whenAddCalledThenTabAddedAndSelectedAndBlankSiteDataCreated() {
         val createdId = testee.add()
         verify(mockDao).addAndSelectTab(any())
         assertNotNull(testee.retrieveSiteData(createdId))
     }
 
     @Test
-    fun whenAddCalledThenTabAddedAndSiteDataAdded() {
+    fun whenAddCalledWithUrlThenTabAddedAndSelectedAndUrlSiteDataCreated() {
+        val url = "http://example.com"
+        val createdId = testee.add(url)
+        verify(mockDao).addAndSelectTab(any())
+        assertNotNull(testee.retrieveSiteData(createdId))
+        assertEquals(url, testee.retrieveSiteData(createdId).value!!.url)
+    }
+
+    @Test
+    fun whenAddRecordCalledThenTabAddedAndSiteDataAdded() {
         val record = MutableLiveData<Site>()
         testee.add(TAB_ID, record)
         verify(mockDao).addAndSelectTab(any())

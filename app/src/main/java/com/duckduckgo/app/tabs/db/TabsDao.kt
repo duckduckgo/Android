@@ -56,8 +56,12 @@ abstract class TabsDao {
     @Query("delete from tabs")
     abstract fun deleteAllTabs()
 
+    @Query("delete from tabs where url IS null")
+    abstract fun deleteBlankTabs()
+
     @Transaction
     open fun addAndSelectTab(tab: TabEntity) {
+        deleteBlankTabs()
         insertTab(tab)
         insertTabSelection(TabSelectionEntity(tabId = tab.tabId))
     }

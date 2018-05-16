@@ -26,7 +26,9 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/tabsRecycler"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        tools:itemCount="3"
+        tools:listitem="@layout/item_tab" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -46,11 +48,11 @@
             android:textStyle="normal" />
 
         <ImageView
-            android:contentDescription="@string/tapFireIconDescription"
             android:layout_width="13dp"
             android:layout_height="17dp"
             android:layout_marginEnd="6dp"
             android:layout_marginStart="6dp"
+            android:contentDescription="@string/tapFireIconDescription"
             android:src="@drawable/ic_fire_gray_24dp"
             android:tint="@color/white" />
 

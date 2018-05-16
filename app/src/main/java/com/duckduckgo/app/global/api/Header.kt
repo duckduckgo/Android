@@ -14,24 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs.model
+package com.duckduckgo.app.global.api
 
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.Index
-import android.arch.persistence.room.PrimaryKey
-
-
-@Entity(
-    tableName = "tabs",
-    indices = [
-        Index("tabId")
-    ]
-)
-data class TabEntity(
-    @PrimaryKey var tabId: String,
-    var url: String? = null,
-    var title: String? = null
-)
-
-val TabEntity.isBlank: Boolean
-    get() = title == null && url == null
+object Header {
+    val USER_AGENT = "User-Agent"
+}

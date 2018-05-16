@@ -16,12 +16,7 @@
 
 package com.duckduckgo.app.browser.omnibar
 
-import android.net.Uri
-
-
 interface OmnibarEntryConverter {
 
-    fun isWebUrl(inputQuery: String): Boolean
-    fun convertQueryToUri(inputQuery: String): Uri
-    fun convertUri(input: String): String
+    fun convertQueryToUrl(searchQuery: String): String
 }

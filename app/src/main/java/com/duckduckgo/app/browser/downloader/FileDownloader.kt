@@ -42,6 +42,8 @@ class FileDownloader @Inject constructor(
 
     data class PendingFileDownload(
             val url: String,
+            val contentDisposition: String?  = null,
+            val mimeType: String? = null,
             val subfolder: String,
             val directory: File = Environment.getExternalStoragePublicDirectory(subfolder)
     )

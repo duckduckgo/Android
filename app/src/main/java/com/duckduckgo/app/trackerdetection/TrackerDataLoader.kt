@@ -34,9 +34,7 @@ class TrackerDataLoader @Inject constructor(
 
         Timber.d("Loading Tracker data")
 
-        // these are stored to disk, then fed to the C++ adblock module
-        loadAdblockData(Client.ClientName.EASYLIST)
-        loadAdblockData(Client.ClientName.EASYPRIVACY)
+        // this is stored to disk, then fed to the C++ adblock module
         loadAdblockData(Client.ClientName.TRACKERSWHITELIST)
 
         // stored in DB, then read into memory
