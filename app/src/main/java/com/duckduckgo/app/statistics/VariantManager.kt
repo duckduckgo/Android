@@ -36,7 +36,7 @@ interface VariantManager {
     companion object {
 
         // there must always be at least one active variant defined here
-        private val ACTIVE_VARIANTS = listOf(
+        val ACTIVE_VARIANTS = listOf(
             Variant(key = "mw", weight = 25.0, features = listOf(ShowInOnboarding)),
             Variant(key = "mx", weight = 25.0, features = listOf(ShowInOnboarding, ShowTimedReminder)),
             Variant(key = "my", weight = 50.0, features = emptyList())
