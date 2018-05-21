@@ -41,9 +41,9 @@ class OnboardingViewModel(
             0 -> OnboardingPageFragment.ProtectDataPage()
             1 -> OnboardingPageFragment.NoTracePage()
             2 -> {
-                return if (shouldShowDefaultBrowserPage())
+                return if (shouldShowDefaultBrowserPage()) {
                     OnboardingPageFragment.DefaultBrowserPage()
-                else null
+                } else null
             }
             else -> null
         }

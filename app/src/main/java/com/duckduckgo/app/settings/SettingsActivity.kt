@@ -82,13 +82,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                 version.text = it.version
 
                 autocompleteEnabledSetting.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteChangeListener)
-                setAsDefaultBrowserSetting.visibility = when (it.showDefaultBrowserSetting) {
-                    true -> {
-                        setAsDefaultBrowserSetting.quietlySetIsChecked(it.isAppDefaultBrowser, defaultBrowserChangeListener)
-                        View.VISIBLE
-                    }
-                    false -> View.GONE
-                }
+                updateDefaultBrowserViewVisibility(it)
             }
         })
 
@@ -100,6 +94,15 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun processCommand(it: SettingsViewModel.Command?) {
         when (it) {
             is SettingsViewModel.Command.SendEmail -> provideEmailFeedback(it.emailUri)
+        }
+    }
+
+    private fun updateDefaultBrowserViewVisibility(it: SettingsViewModel.ViewState) {
+        if (it.showDefaultBrowserSetting) {
+            setAsDefaultBrowserSetting.quietlySetIsChecked(it.isAppDefaultBrowser, defaultBrowserChangeListener)
+            setAsDefaultBrowserSetting.visibility = View.VISIBLE
+        } else {
+            setAsDefaultBrowserSetting.visibility = View.GONE
         }
     }
 

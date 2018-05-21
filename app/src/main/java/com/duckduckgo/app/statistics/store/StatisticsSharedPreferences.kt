@@ -26,8 +26,7 @@ class StatisticsSharedPreferences @Inject constructor(private val context: Conte
 
     override var variant: String?
         get() = preferences.getString(KEY_VARIANT, null)
-        set(value) =
-            preferences.edit { putString(KEY_VARIANT, value) }
+        set(value) = preferences.edit { putString(KEY_VARIANT, value) }
 
     override val hasInstallationStatistics: Boolean
         get() = preferences.contains(KEY_ATB) && preferences.contains(KEY_RETENTION_ATB)

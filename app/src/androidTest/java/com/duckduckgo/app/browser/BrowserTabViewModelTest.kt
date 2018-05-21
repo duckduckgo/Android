@@ -123,10 +123,7 @@ class BrowserTabViewModelTest {
     fun before() {
         MockitoAnnotations.initMocks(this)
 
-        db = Room.inMemoryDatabaseBuilder(
-            InstrumentationRegistry.getContext(),
-            AppDatabase::class.java
-        )
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         appConfigurationDao = db.appConfigurationDao()
