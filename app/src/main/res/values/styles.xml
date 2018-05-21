@@ -40,10 +40,6 @@
         <item name="behavior_peekHeight">512dp</item>
     </style>
 
-    <style name="CrashReportingDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="android:padding">4dp</item>
-    </style>
-
     <style name="DashboardHeader">
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:letterSpacing">0.14</item>
