@@ -25,6 +25,6 @@ interface StatisticsDataStore {
     var retentionAtb: String?
     var variant: String?
 
-    fun saveAtb(fullAtb: String, retentionAtb: String)
+    fun saveAtb(atb: String)
     fun clearAtb()
 }

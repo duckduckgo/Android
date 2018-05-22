@@ -19,6 +19,7 @@ package com.duckduckgo.app.statistics
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockito_kotlin.*
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -55,11 +56,21 @@ class ExperimentationVariantManagerTest {
         verify(mockRandomizer, never()).random(any())
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun whenNoVariantsAvailableThen() {
+    @Test
+    fun whenNoVariantsAvailableThenDefaultVariantHasEmptyStringForKey() {
         whenever(mockStore.variant).thenReturn("foo")
 
-        assertEquals("foo", testee.getVariant(activeVariants).key)
+        val defaultVariant = testee.getVariant(activeVariants)
+        assertEquals("", defaultVariant.key)
+        assertTrue(defaultVariant.features.isEmpty())
+    }
+
+    @Test
+    fun whenNoVariantsAvailableThenDefaultVariantHasNoExperimentalFeaturesEnabled() {
+        whenever(mockStore.variant).thenReturn("foo")
+
+        val defaultVariant = testee.getVariant(activeVariants)
+        assertTrue(defaultVariant.features.isEmpty())
     }
 
     @Test

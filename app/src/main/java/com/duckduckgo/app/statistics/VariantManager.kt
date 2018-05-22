@@ -35,7 +35,9 @@ interface VariantManager {
 
     companion object {
 
-        // there must always be at least one active variant defined here
+        // this will be returned when there are no other active experiments
+        val DEFAULT_VARIANT = Variant(key = "", features = emptyList())
+
         val ACTIVE_VARIANTS = listOf(
             Variant(key = "mw", weight = 25.0, features = listOf(ShowInOnboarding)),
             Variant(key = "mx", weight = 25.0, features = listOf(ShowInOnboarding, ShowTimedReminder)),
@@ -52,7 +54,7 @@ class ExperimentationVariantManager(
 ) : VariantManager {
 
     override fun getVariant(activeVariants: List<Variant>): Variant {
-        if (activeVariants.isEmpty()) throw IllegalArgumentException("There needs to be at least one active variant")
+        if (activeVariants.isEmpty()) return VariantManager.DEFAULT_VARIANT
 
         val currentVariantKey = store.variant
         val currentVariant = lookupVariant(currentVariantKey, activeVariants)
@@ -88,7 +90,7 @@ class ExperimentationVariantManager(
  */
 data class Variant(
     val key: String,
-    override val weight: Double,
+    override val weight: Double = 0.0,
     val features: List<VariantManager.VariantFeature> = emptyList()
 ) : Probabilistic {
 

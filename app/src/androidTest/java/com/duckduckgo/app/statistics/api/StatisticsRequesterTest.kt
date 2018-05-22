@@ -56,7 +56,7 @@ class StatisticsRequesterTest {
         testee.initializeAtb()
         verify(mockService).atb(any())
         verify(mockService).exti(eq(ATB_WITH_VARIANT), any())
-        verify(mockStatisticsStore).saveAtb(ATB_WITH_VARIANT, ATB)
+        verify(mockStatisticsStore).saveAtb(ATB)
     }
 
     @Test
@@ -73,7 +73,7 @@ class StatisticsRequesterTest {
         testee.refreshRetentionAtb()
         verify(mockService).atb(any())
         verify(mockService).exti(eq(ATB_WITH_VARIANT), any())
-        verify(mockStatisticsStore).saveAtb(ATB_WITH_VARIANT, ATB)
+        verify(mockStatisticsStore).saveAtb(ATB)
     }
 
     @Test
@@ -81,7 +81,7 @@ class StatisticsRequesterTest {
         whenever(mockService.exti(any(), any())).thenReturn(Observable.error(Throwable()))
         configureNoStoredStatistics()
         testee.initializeAtb()
-        verify(mockStatisticsStore).saveAtb(ATB_WITH_VARIANT, ATB)
+        verify(mockStatisticsStore).saveAtb(ATB)
         verify(mockStatisticsStore).clearAtb()
     }
 
@@ -101,7 +101,7 @@ class StatisticsRequesterTest {
 
     private fun configureStoredStatistics() {
         whenever(mockStatisticsStore.hasInstallationStatistics).thenReturn(true)
-        whenever(mockStatisticsStore.atb).thenReturn(ATB_WITH_VARIANT)
+        whenever(mockStatisticsStore.atb).thenReturn(ATB)
         whenever(mockStatisticsStore.retentionAtb).thenReturn(ATB)
     }
 

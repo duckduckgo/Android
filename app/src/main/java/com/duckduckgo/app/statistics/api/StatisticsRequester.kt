@@ -18,6 +18,7 @@ package com.duckduckgo.app.statistics.api
 
 import android.annotation.SuppressLint
 import com.duckduckgo.app.global.AppUrl.ParamValue
+import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import io.reactivex.schedulers.Schedulers
@@ -44,13 +45,11 @@ class StatisticsRequester(
             return
         }
 
-        val variant = variantManager.getVariant()
-
         service.atb(ParamValue.appVersion)
             .subscribeOn(Schedulers.io())
             .flatMap {
-                val fullAtb = it.version + variant.key
-                store.saveAtb(fullAtb, it.version)
+                store.saveAtb(it.version)
+                val fullAtb = formatAtbWithVariant(it.version, variantManager.getVariant())
                 service.exti(fullAtb, ParamValue.appVersion)
             }
             .subscribe({
@@ -72,7 +71,9 @@ class StatisticsRequester(
             return
         }
 
-        service.updateAtb(atb, retentionAtb, ParamValue.appVersion)
+        val fullAtb = formatAtbWithVariant(atb, variantManager.getVariant())
+
+        service.updateAtb(fullAtb, retentionAtb, ParamValue.appVersion)
             .subscribeOn(Schedulers.io())
             .subscribe({
                 Timber.v("Atb refresh succeeded")
@@ -80,6 +81,10 @@ class StatisticsRequester(
             }, {
                 Timber.v("Atb refresh failed with error ${it.localizedMessage}")
             })
+    }
+
+    private fun formatAtbWithVariant(atb: String, variant: Variant): String {
+        return atb + variant.key
     }
 
 }
