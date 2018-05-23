@@ -38,6 +38,8 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment.SaveBookmarkListener
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.db.AppConfigurationDao
@@ -72,6 +74,8 @@ class BrowserTabViewModel(
     private val bookmarksDao: BookmarksDao,
     private val autoCompleteApi: AutoCompleteApi,
     private val appSettingsPreferencesStore: SettingsDataStore,
+    private val defaultBrowserDetector: DefaultBrowserDetector,
+    private val defaultBrowserNotification: DefaultBrowserNotification,
     private val longPressHandler: LongPressHandler,
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, ViewModel() {
@@ -92,7 +96,8 @@ class BrowserTabViewModel(
         val autoComplete: AutoCompleteViewState = AutoCompleteViewState(),
         val findInPage: FindInPage = FindInPage(canFindInPage = false),
         val isDesktopBrowsingMode: Boolean = false,
-        val canSharePage: Boolean = false
+        val canSharePage: Boolean = false,
+        val showDefaultBrowserBanner: Boolean = false
     )
 
     sealed class Command {
@@ -112,6 +117,7 @@ class BrowserTabViewModel(
         class DisplayMessage(@StringRes val messageId: Int) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
+        object LaunchDefaultAppSystemSettings : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -190,6 +196,10 @@ class BrowserTabViewModel(
 
     fun onViewVisible() {
         command.value = if (url.value == null) ShowKeyboard else Command.HideKeyboard
+
+        val currentViewState = currentViewState()
+        val showBanner = defaultBrowserNotification.shouldShowNotification(currentViewState.browserShowing)
+        viewState.value = currentViewState.copy(showDefaultBrowserBanner = showBanner)
     }
 
     fun onUserSubmittedQuery(input: String) {
@@ -285,6 +295,11 @@ class BrowserTabViewModel(
         )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
+
+            newViewState = newViewState.copy(
+                showDefaultBrowserBanner = defaultBrowserNotification.shouldShowNotification(newViewState.browserShowing)
+            )
+
             statisticsUpdater.refreshRetentionAtb()
         }
 
@@ -463,6 +478,15 @@ class BrowserTabViewModel(
         if (url != null) {
             command.value = ShareLink(url)
         }
+    }
+
+    fun userDeclinedToSetAsDefaultBrowser() {
+        defaultBrowserDetector.userDeclinedToSetAsDefaultBrowser()
+        viewState.value = currentViewState().copy(showDefaultBrowserBanner = false)
+    }
+
+    fun userAcceptedToSetAsDefaultBrowser() {
+        command.value = LaunchDefaultAppSystemSettings
     }
 
     data class FindInPage(

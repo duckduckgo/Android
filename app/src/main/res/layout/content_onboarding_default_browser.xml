@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2018 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/longDescriptionContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingEnd="44dp"
+    android:paddingStart="44dp"
+    android:tag="onboardingDefaultBrowser"
+    tools:background="@color/eastBay"
+    tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
+
+    <ImageView
+        android:id="@+id/defaultBrowserImage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:importantForAccessibility="no"
+        android:paddingTop="20dp"
+        android:src="@drawable/onboarding_image_default_browser"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/textContainer"
+        app:layout_constraintVertical_bias="0.5" />
+
+    <LinearLayout
+        android:id="@+id/textContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/launchSettingsButton"
+        app:layout_constraintTop_toBottomOf="@id/defaultBrowserImage">
+
+        <TextView
+            style="@style/OnboardingTextTitle"
+            android:text="@string/onboardingDefaultBrowserTitle" />
+
+
+        <TextView
+            style="@style/OnboardingTextSubtitle"
+            android:text="@string/onboardingDefaultBrowserDescription" />
+
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/launchSettingsButton"
+        style="@style/OnboardingButtonDefaultBrowserLaunchSettings"
+        app:layout_constraintBottom_toTopOf="@+id/continueButton"
+        android:text="@string/onboardingDefaultBrowserGoToSettingsAction"
+        android:onClick="onLaunchDefaultBrowserSettingsClicked"
+        android:theme="@style/OnboardingButtonDefaultBrowserLaunchSettings" />
+
+    <Button
+        android:id="@+id/continueButton"
+        style="@style/OnboardingButtonDefaultBrowser"
+        android:onClick="onContinueClicked"
+        android:theme="@style/OnboardingButtonDefaultBrowser" />
+
+</android.support.constraint.ConstraintLayout>

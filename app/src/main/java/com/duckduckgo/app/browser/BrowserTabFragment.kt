@@ -20,6 +20,7 @@ import android.Manifest
 import android.animation.LayoutTransition.CHANGING
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
+import android.app.ActivityOptions
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
@@ -52,6 +53,7 @@ import androidx.core.view.postDelayed
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserInfoActivity
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
@@ -66,8 +68,10 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabIconRenderer
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
-import kotlinx.android.synthetic.main.fragment_browser_tab.view.*
+import kotlinx.android.synthetic.main.include_banner_notification.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
@@ -161,6 +165,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         createPopupMenu()
         configureObservers()
         configureToolbar()
+        configureBannerNotification()
         configureWebView()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
@@ -279,6 +284,7 @@ class BrowserTabFragment : Fragment(), FindListener {
             is Command.ShowFileChooser -> {
                 launchFilePicker(it)
             }
+            is Command.LaunchDefaultAppSystemSettings -> { launchDefaultAppSystemSettings() }
         }
     }
 
@@ -371,6 +377,11 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
 
         renderFindInPageState(viewState.findInPage)
+
+        when(viewState.showDefaultBrowserBanner) {
+            true -> bannerNotification.show()
+            false -> bannerNotification.gone()
+        }
     }
 
     private fun renderToolbarButtons(viewState: ViewState) {
@@ -485,6 +496,16 @@ class BrowserTabFragment : Fragment(), FindListener {
             }
         })
     }
+
+    private fun configureBannerNotification() {
+        dismissBannerButton.setOnClickListener {
+            viewModel.userDeclinedToSetAsDefaultBrowser()
+        }
+        bannerNotification.setOnClickListener {
+            viewModel.userAcceptedToSetAsDefaultBrowser()
+        }
+    }
+
 
     private fun configureFindInPage() {
         findInPageInput.setOnFocusChangeListener { _, hasFocus ->
@@ -603,6 +624,14 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private fun launchSharePageChooser(url: String) {
         activity?.share(url, "")
+    }
+
+    private fun launchDefaultAppSystemSettings() {
+        activity?.let {
+            val options = ActivityOptions.makeSceneTransitionAnimation(it, bannerNotification, "defaultBrowserBannerTransition")
+            val intent = DefaultBrowserInfoActivity.intent(it)
+            startActivity(intent, options.toBundle())
+        }
     }
 
     private fun addBookmark() {

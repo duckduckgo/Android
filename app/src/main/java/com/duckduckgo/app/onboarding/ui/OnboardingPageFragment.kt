@@ -1,0 +1,56 @@
+/*
+ * Copyright (c) 2018 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.app.onboarding.ui
+
+import android.os.Bundle
+import android.support.annotation.ColorRes
+import android.support.annotation.LayoutRes
+import android.support.v4.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import com.duckduckgo.app.browser.R
+
+sealed class OnboardingPageFragment : Fragment() {
+
+    @ColorRes
+    abstract fun backgroundColor(): Int
+
+    @LayoutRes
+    abstract fun layoutResource(): Int
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? = inflater.inflate(layoutResource(), container, false)
+
+    class ProtectDataPage : OnboardingPageFragment() {
+        override fun layoutResource(): Int = R.layout.content_onboarding_protect_data
+        override fun backgroundColor(): Int = R.color.lightOliveGreen
+    }
+
+    class NoTracePage : OnboardingPageFragment() {
+        override fun layoutResource(): Int = R.layout.content_onboarding_no_trace
+        override fun backgroundColor(): Int = R.color.powderBlue
+    }
+
+    class DefaultBrowserPage : OnboardingPageFragment() {
+        override fun layoutResource(): Int = R.layout.content_onboarding_default_browser
+        override fun backgroundColor(): Int = R.color.eastBay
+    }
+}

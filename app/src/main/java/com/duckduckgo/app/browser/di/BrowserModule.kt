@@ -16,7 +16,11 @@
 
 package com.duckduckgo.app.browser.di
 
+import android.content.Context
 import com.duckduckgo.app.browser.*
+import com.duckduckgo.app.browser.defaultBrowsing.AndroidDefaultBrowserDetector
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import dagger.Module
 import dagger.Provides
@@ -32,5 +36,10 @@ class BrowserModule {
     @Provides
     fun webViewLongPressHandler(): LongPressHandler {
         return WebViewLongPressHandler()
+    }
+
+    @Provides
+    fun defaultWebBrowserCapability(context: Context, appInstallStore: AppInstallStore): DefaultBrowserDetector {
+        return AndroidDefaultBrowserDetector(context, appInstallStore)
     }
 }

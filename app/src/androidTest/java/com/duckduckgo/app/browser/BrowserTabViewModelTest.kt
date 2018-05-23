@@ -31,6 +31,8 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
@@ -100,6 +102,12 @@ class BrowserTabViewModelTest {
     private lateinit var mockOmnibarConverter: OmnibarEntryConverter
 
     @Mock
+    private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
+
+    @Mock
+    private lateinit var mockDefaultBrowserNotification: DefaultBrowserNotification
+
+    @Mock
     private lateinit var tabsDao: TabsDao
 
     @Captor
@@ -116,24 +124,27 @@ class BrowserTabViewModelTest {
         MockitoAnnotations.initMocks(this)
 
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java)
-                .allowMainThreadQueries()
-                .build()
+            .allowMainThreadQueries()
+            .build()
         appConfigurationDao = db.appConfigurationDao()
 
         val siteFactory = SiteFactory(mockTermsOfServiceStore, TrackerNetworks())
 
         testee = BrowserTabViewModel(
-                statisticsUpdater = mockStatisticsUpdater,
-                queryUrlConverter = mockOmnibarConverter,
-                duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
-                siteFactory = siteFactory,
-                tabRepository = TabDataRepository(tabsDao, siteFactory),
-                networkLeaderboardDao = mockNetworkLeaderboardDao,
-                autoCompleteApi = mockAutoCompleteApi,
-                appSettingsPreferencesStore = mockSettingsStore,
-                bookmarksDao = bookmarksDao,
-                longPressHandler = mockLongPressHandler,
-                appConfigurationDao = appConfigurationDao)
+            statisticsUpdater = mockStatisticsUpdater,
+            queryUrlConverter = mockOmnibarConverter,
+            duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
+            siteFactory = siteFactory,
+            tabRepository = TabDataRepository(tabsDao, siteFactory),
+            networkLeaderboardDao = mockNetworkLeaderboardDao,
+            autoCompleteApi = mockAutoCompleteApi,
+            appSettingsPreferencesStore = mockSettingsStore,
+            bookmarksDao = bookmarksDao,
+            defaultBrowserNotification = mockDefaultBrowserNotification,
+            defaultBrowserDetector = mockDefaultBrowserDetector,
+            longPressHandler = mockLongPressHandler,
+            appConfigurationDao = appConfigurationDao
+        )
 
         testee.loadData("abc", null)
         testee.url.observeForever(mockQueryObserver)
@@ -555,7 +566,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSelectsDownloadImageOptionFromContextMenuThenDownloadFileCommandIssued() {
         whenever(mockLongPressHandler.userSelectedMenuItem(anyString(), any()))
-                .thenReturn(DownloadFile("example.com"))
+            .thenReturn(DownloadFile("example.com"))
 
         val mockMenuItem: MenuItem = mock()
         testee.userSelectedItemFromLongPressMenu("example.com", mockMenuItem)

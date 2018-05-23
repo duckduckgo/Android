@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics.model
+package com.duckduckgo.app.onboarding.di
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import com.duckduckgo.app.global.view.ColorCombiner
+import dagger.Module
+import dagger.Provides
+import javax.inject.Singleton
 
-class AtbTest {
 
-    @Test
-    fun whenVersionWithVariantRequestedThenVersionIsReturnedWithPlatformVariant() {
-        val atb = Atb("v45-6")
-        assertEquals("v45-6ma", atb.versionWithVariant)
-    }
+@Module
+class OnboardingModule {
+
+    @Provides
+    @Singleton
+    fun colorCombiner() = ColorCombiner()
 }

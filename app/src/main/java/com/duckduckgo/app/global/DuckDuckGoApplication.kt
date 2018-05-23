@@ -22,6 +22,7 @@ import android.app.Service
 import android.support.v4.app.Fragment
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.DaggerAppComponent
+import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.notification.NotificationRegistrar
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.migration.LegacyMigration
@@ -66,6 +67,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     lateinit var statisticsUpdater: StatisticsUpdater
 
     @Inject
+    lateinit var appInstallStore: AppInstallStore
+
+    @Inject
     lateinit var notificationRegistrar: NotificationRegistrar
 
     override fun onCreate() {
@@ -79,9 +83,16 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         initializeStatistics()
         loadTrackerData()
         configureDataDownloader()
+        recordInstallationTimestamp()
 
         migrateLegacyDb()
         notificationRegistrar.registerApp()
+    }
+
+    private fun recordInstallationTimestamp() {
+        if (!appInstallStore.hasInstallTimestampRecorded()) {
+            appInstallStore.installTimestamp = System.currentTimeMillis()
+        }
     }
 
     protected open fun installLeakCanary(): Boolean {
