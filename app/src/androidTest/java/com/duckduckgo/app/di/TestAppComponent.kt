@@ -48,7 +48,6 @@ import javax.inject.Singleton
     NetworkModule::class,
     StoreModule::class,
     JsonModule::class,
-    StringModule::class,
     BrowserModule::class,
     BrowserAutoCompleteModule::class,
     HttpsUpgraderModule::class,

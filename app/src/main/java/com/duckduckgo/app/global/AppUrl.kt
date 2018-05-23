@@ -26,6 +26,7 @@ class AppUrl {
         const val API = "https://$HOST"
         const val HOME =  "https://$HOST"
         const val ABOUT = "https://$HOST/about"
+        const val FEEDBACK = "https://$HOST/feedback"
         const val TOSDR = "https://tosdr.org"
     }
 

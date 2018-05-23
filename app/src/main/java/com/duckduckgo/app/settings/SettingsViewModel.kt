@@ -18,19 +18,13 @@ package com.duckduckgo.app.settings
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import android.net.Uri
-import android.os.Build
 import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.global.StringResolver
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import timber.log.Timber
 import javax.inject.Inject
 
-class SettingsViewModel @Inject constructor(
-        private val stringResolver: StringResolver,
-        private val settingsDataStore: SettingsDataStore,
+class SettingsViewModel @Inject constructor(private val settingsDataStore: SettingsDataStore,
         private val defaultWebBrowserCapability: DefaultBrowserDetector) : ViewModel() {
 
     data class ViewState(
@@ -43,7 +37,7 @@ class SettingsViewModel @Inject constructor(
     private lateinit var currentViewState: ViewState
 
     sealed class Command {
-        class SendEmail(val emailUri: Uri) : Command()
+        object LaunchFeedback : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().apply {
@@ -68,31 +62,14 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun userRequestedToSendFeedback() {
-        val emailAddress = stringResolver.getString(R.string.feedbackEmailAddress)
-        val subject = encode { stringResolver.getString(R.string.feedbackSubject) }
-        val body = encode { buildEmailBody() }
-
-        val uri = "mailto:$emailAddress?&subject=$subject&body=$body"
-        command.value = Command.SendEmail(Uri.parse(uri))
+        command.value = Command.LaunchFeedback
     }
 
     fun userRequestedToChangeAutocompleteSetting(checked: Boolean) {
         Timber.i("User changed autocomplete setting, is now enabled: $checked")
         settingsDataStore.autoCompleteSuggestionsEnabled = checked
     }
-
-    private fun buildEmailBody(): String {
-        return "App Version: ${obtainVersion()}\n" +
-                "Android Version: ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})\n" +
-                "Manufacturer: ${Build.MANUFACTURER}\n" +
-                "Model: ${Build.MODEL}\n" +
-                "\n\n\n"
-    }
-
     private fun obtainVersion(): String {
         return "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
     }
-
-    private inline fun encode(f: () -> String): String = Uri.encode(f())
-
 }

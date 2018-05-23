@@ -20,18 +20,18 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.support.v7.widget.SwitchCompat
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
-import com.duckduckgo.app.global.view.launchExternalActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import kotlinx.android.synthetic.main.content_settings.*
 import kotlinx.android.synthetic.main.include_toolbar.*
@@ -93,7 +93,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: SettingsViewModel.Command?) {
         when (it) {
-            is SettingsViewModel.Command.SendEmail -> provideEmailFeedback(it.emailUri)
+            is SettingsViewModel.Command.LaunchFeedback -> launchFeedback()
         }
     }
 
@@ -119,10 +119,9 @@ class SettingsActivity : DuckDuckGoActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
-    private fun provideEmailFeedback(emailUri: Uri) {
-        val intent = Intent(Intent.ACTION_SENDTO)
-        intent.data = emailUri
-        launchExternalActivity(intent)
+    private fun launchFeedback() {
+        startActivity(BrowserActivity.intent(this, AppUrl.Url.FEEDBACK))
+        finish()
     }
 
     companion object {
