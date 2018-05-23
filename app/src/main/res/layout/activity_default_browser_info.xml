@@ -79,15 +79,16 @@
 
     <ImageView
         android:id="@+id/dismissButton"
-        android:layout_width="12dp"
-        android:layout_height="12dp"
-        android:layout_marginEnd="14dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="4dp"
         android:layout_marginStart="14dp"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="4dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/dismissDefaultBrowserInfo"
-        android:elevation="4dp"
-        android:src="@drawable/ic_close_white_24dp"
+        android:elevation="7dp"
+        android:scaleType="center"
+        android:src="@drawable/ic_close_white_18dp"
         android:tint="@color/powderBlue2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

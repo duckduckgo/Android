@@ -91,17 +91,17 @@
 
     <ImageView
         android:id="@+id/dismissButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:layout_marginEnd="6dp"
         android:layout_marginStart="14dp"
         android:layout_marginTop="6dp"
         android:background="?attr/selectableItemBackground"
         android:contentDescription="@string/dismissDefaultBrowserInfo"
-        android:elevation="4dp"
+        android:elevation="7dp"
         android:padding="20dp"
         android:scaleType="center"
-        android:src="@drawable/ic_close_white_12dp"
+        android:src="@drawable/ic_close_white_18dp"
         android:tint="@color/powderBlue2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
