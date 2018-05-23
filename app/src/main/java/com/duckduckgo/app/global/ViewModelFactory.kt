@@ -54,7 +54,6 @@ class ViewModelFactory @Inject constructor(
     private val tabRepository: TabRepository,
     private val privacySettingsStore: PrivacySettingsSharedPreferences,
     private val siteFactory: SiteFactory,
-    private val stringResolver: StringResolver,
     private val appConfigurationDao: AppConfigurationDao,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
@@ -75,7 +74,7 @@ class ViewModelFactory @Inject constructor(
                     isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                     isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                     isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
-                    isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(stringResolver, appSettingsPreferencesStore)
+                    isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(appSettingsPreferencesStore)
                     isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel(bookmarksDao)
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
