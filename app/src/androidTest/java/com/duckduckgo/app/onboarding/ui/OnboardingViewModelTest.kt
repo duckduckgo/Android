@@ -74,7 +74,7 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun whenThirdPageRequestedWithFeatureDisabledAndDefaultBrowserCapableThenDefaultBrowserPageReturned() {
+    fun whenThirdPageRequestedWithFeatureDisabledAndDefaultBrowserCapableThenNoPageReturned() {
         whenever(variantManager.getVariant()).thenReturn(variantWithOnboardingDisabled())
         whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(true)
         val page = testee.getItem(2)

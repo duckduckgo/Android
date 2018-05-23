@@ -36,12 +36,12 @@ class AppInstallSharedPreferencesTest {
     }
 
     @Test
-    fun whenInitialisedThenUserHasNotBeenMarkedAsPreviouslyDeclining() {
+    fun whenInitializedThenUserHasNotBeenMarkedAsHavingPreviouslyDeclined() {
         assertFalse(testee.hasUserDeclinedDefaultBrowserPreviously())
     }
 
     @Test
-    fun whenInitialisedThenInstallTimestampNotYetRecorded() {
+    fun whenInitializedThenInstallTimestampNotYetRecorded() {
         assertFalse(testee.hasInstallTimestampRecorded())
     }
 

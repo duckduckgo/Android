@@ -101,8 +101,7 @@ class DefaultBrowserTimeBasedNotification @Inject constructor(
         private val ELAPSED_TIME_THRESHOLD_PRODUCTION = TimeUnit.DAYS.toMillis(3)
         private val ELAPSED_TIME_THRESHOLD_DEBUG = TimeUnit.SECONDS.toMillis(20)
 
-        private val ELAPSED_TIME_THRESHOLD_MS =
-            if (BuildConfig.DEBUG) ELAPSED_TIME_THRESHOLD_DEBUG else ELAPSED_TIME_THRESHOLD_PRODUCTION
+        private val ELAPSED_TIME_THRESHOLD_MS = if (BuildConfig.DEBUG) ELAPSED_TIME_THRESHOLD_DEBUG else ELAPSED_TIME_THRESHOLD_PRODUCTION
     }
 
 }

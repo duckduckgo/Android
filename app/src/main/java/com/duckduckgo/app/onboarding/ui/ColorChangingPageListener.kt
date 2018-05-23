@@ -45,11 +45,7 @@ class ColorChangingPageListener(private val colorCombiner: ColorCombiner, privat
         transitionToNewColor(positionOffset, leftPageColor, rightPage)
     }
 
-    private fun transitionToNewColor(
-        positionOffset: Float,
-        @ColorInt leftPageColor: Int?,
-        @ColorInt rightPageColor: Int?
-    ) {
+    private fun transitionToNewColor(positionOffset: Float, @ColorInt leftPageColor: Int?, @ColorInt rightPageColor: Int?) {
         if (positionOffset == 0f || leftPageColor == null || rightPageColor == null) {
             return
         }

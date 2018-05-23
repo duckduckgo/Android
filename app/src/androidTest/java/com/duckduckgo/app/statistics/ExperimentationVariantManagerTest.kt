@@ -74,13 +74,11 @@ class ExperimentationVariantManagerTest {
     }
 
     @Test
-    fun whenVariantPersistedIsNotFoundInActiveVariantListThenNewVariantAllocated() {
+    fun whenVariantPersistedIsNotFoundInActiveVariantListThenRestoredToDefaultVariant() {
         activeVariants.add(Variant("foo", 100.0))
-
         whenever(mockStore.variant).thenReturn("bar")
-        testee.getVariant(activeVariants)
 
-        verify(mockRandomizer).random(any())
+        assertEquals(VariantManager.DEFAULT_VARIANT, testee.getVariant(activeVariants))
     }
 
     @Test
@@ -90,7 +88,7 @@ class ExperimentationVariantManagerTest {
         whenever(mockStore.variant).thenReturn("bar")
         testee.getVariant(activeVariants)
 
-        verify(mockStore).variant = "foo"
+        verify(mockStore).variant = VariantManager.DEFAULT_VARIANT.key
     }
 
 
@@ -104,7 +102,7 @@ class ExperimentationVariantManagerTest {
     }
 
     @Test
-    fun whenNoVariantPersistedThenNewVariantIsPersisted() {
+    fun whenNoVariantPersistedThenNewVariantKeyIsAllocatedAndPersisted() {
         activeVariants.add(Variant("foo", 100.0))
 
         testee.getVariant(activeVariants)

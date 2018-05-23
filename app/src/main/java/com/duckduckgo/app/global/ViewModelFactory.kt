@@ -50,56 +50,61 @@ import javax.inject.Inject
 
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory @Inject constructor(
-        private val statisticsUpdater: StatisticsUpdater,
-        private val onboaringStore: OnboardingStore,
-        private val queryUrlConverter: QueryUrlConverter,
-        private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-        private val tabRepository: TabRepository,
-        private val privacySettingsStore: PrivacySettingsSharedPreferences,
-        private val siteFactory: SiteFactory,
-        private val stringResolver: StringResolver,
-        private val appConfigurationDao: AppConfigurationDao,
-        private val networkLeaderboardDao: NetworkLeaderboardDao,
-        private val bookmarksDao: BookmarksDao,
-        private val autoCompleteApi: AutoCompleteApi,
-        private val appSettingsPreferencesStore: SettingsDataStore,
-        private val defaultBrowserNotification: DefaultBrowserNotification,
-        private val webViewLongPressHandler: LongPressHandler,
-        private val defaultBrowserDetector: DefaultBrowserDetector,
-        private val variantManager: VariantManager
+    private val statisticsUpdater: StatisticsUpdater,
+    private val onboaringStore: OnboardingStore,
+    private val queryUrlConverter: QueryUrlConverter,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    private val tabRepository: TabRepository,
+    private val privacySettingsStore: PrivacySettingsSharedPreferences,
+    private val siteFactory: SiteFactory,
+    private val stringResolver: StringResolver,
+    private val appConfigurationDao: AppConfigurationDao,
+    private val networkLeaderboardDao: NetworkLeaderboardDao,
+    private val bookmarksDao: BookmarksDao,
+    private val autoCompleteApi: AutoCompleteApi,
+    private val appSettingsPreferencesStore: SettingsDataStore,
+    private val defaultBrowserNotification: DefaultBrowserNotification,
+    private val webViewLongPressHandler: LongPressHandler,
+    private val defaultBrowserDetector: DefaultBrowserDetector,
+    private val variantManager: VariantManager
 
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
-            with(modelClass) {
-                when {
-                    isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboaringStore)
-                    isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore, defaultBrowserDetector, variantManager)
-                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository, queryUrlConverter)
-                    isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
-                    isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository)
-                    isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(privacySettingsStore, networkLeaderboardDao)
-                    isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
-                    isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
-                    isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
-                    isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(stringResolver, appSettingsPreferencesStore, defaultBrowserDetector)
-                    isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel(bookmarksDao)
-                    else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
-                }
-            } as T
+        with(modelClass) {
+            when {
+                isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboaringStore)
+                isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore, defaultBrowserDetector, variantManager)
+                isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository, queryUrlConverter)
+                isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
+                isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository)
+                isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(privacySettingsStore, networkLeaderboardDao)
+                isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
+                isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
+                isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
+                isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(
+                    stringResolver,
+                    appSettingsPreferencesStore,
+                    defaultBrowserDetector
+                )
+                isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel(bookmarksDao)
+                else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
+            }
+        } as T
 
     private fun browserTabViewModel(): ViewModel = BrowserTabViewModel(
-            statisticsUpdater = statisticsUpdater,
-            queryUrlConverter = queryUrlConverter,
-            duckDuckGoUrlDetector = duckDuckGoUrlDetector,
-            siteFactory = siteFactory,
-            tabRepository = tabRepository,
-            networkLeaderboardDao = networkLeaderboardDao,
-            bookmarksDao = bookmarksDao,
-            appSettingsPreferencesStore = appSettingsPreferencesStore,
-            defaultBrowserDetector = defaultBrowserDetector,
-            defaultBrowserNotification = defaultBrowserNotification,
-            appConfigurationDao = appConfigurationDao,
-            longPressHandler = webViewLongPressHandler,
-            autoCompleteApi = autoCompleteApi)
+        statisticsUpdater = statisticsUpdater,
+        queryUrlConverter = queryUrlConverter,
+        duckDuckGoUrlDetector = duckDuckGoUrlDetector,
+        siteFactory = siteFactory,
+        tabRepository = tabRepository,
+        networkLeaderboardDao = networkLeaderboardDao,
+        bookmarksDao = bookmarksDao,
+        appSettingsPreferencesStore = appSettingsPreferencesStore,
+        defaultBrowserDetector = defaultBrowserDetector,
+        defaultBrowserNotification = defaultBrowserNotification,
+        appConfigurationDao = appConfigurationDao,
+        longPressHandler = webViewLongPressHandler,
+        autoCompleteApi = autoCompleteApi
+    )
 }

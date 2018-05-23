@@ -50,15 +50,19 @@ class LaunchActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: LaunchViewModel.Command?) {
         when (it) {
-            LaunchViewModel.Command.Onboarding -> { showHome(showOnboarding = true) }
-            is LaunchViewModel.Command.Home -> { showHome(showOnboarding = false) }
+            LaunchViewModel.Command.Onboarding -> {
+                showHome(showOnboarding = true)
+            }
+            is LaunchViewModel.Command.Home -> {
+                showHome(showOnboarding = false)
+            }
         }
     }
 
     private fun showHome(showOnboarding: Boolean) {
         startActivity(BrowserActivity.intent(this))
 
-        if(showOnboarding) {
+        if (showOnboarding) {
             startActivity(OnboardingActivity.intent(this))
         }
 

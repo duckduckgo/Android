@@ -57,16 +57,22 @@ class ExperimentationVariantManager(
         if (activeVariants.isEmpty()) return VariantManager.DEFAULT_VARIANT
 
         val currentVariantKey = store.variant
-        val currentVariant = lookupVariant(currentVariantKey, activeVariants)
-
-        return if (currentVariant == null) {
+        if (currentVariantKey == null) {
             val newVariant = generateVariant(activeVariants)
             Timber.i("Current variant is null; allocating new one $newVariant")
             persistVariant(newVariant)
-            newVariant
-        } else {
-            currentVariant
+            return newVariant
         }
+
+        val currentVariant = lookupVariant(currentVariantKey, activeVariants)
+        if (currentVariant == null) {
+            Timber.i("Variant $currentVariantKey no longer an active variant; user will now use default variant")
+            val newVariant = VariantManager.DEFAULT_VARIANT
+            persistVariant(newVariant)
+            return newVariant
+        }
+
+        return currentVariant
     }
 
     private fun lookupVariant(key: String?, activeVariants: List<Variant>): Variant? =

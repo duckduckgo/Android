@@ -297,8 +297,8 @@ class BrowserTabViewModel(
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
 
             newViewState = newViewState.copy(
-                    omnibarText = duckDuckGoUrlDetector.extractQuery(url) ?: "",
-                    showDefaultBrowserBanner = defaultBrowserNotification.shouldShowNotification(newViewState.browserShowing))
+                showDefaultBrowserBanner = defaultBrowserNotification.shouldShowNotification(newViewState.browserShowing)
+            )
 
             statisticsUpdater.refreshRetentionAtb()
         }
