@@ -29,14 +29,13 @@ import timber.log.Timber
 import javax.inject.Inject
 
 interface DefaultBrowserDetector {
-    fun deviceSupportsDefaultBrowserConfiguration() : Boolean
+    fun deviceSupportsDefaultBrowserConfiguration(): Boolean
     fun isCurrentlyConfiguredAsDefaultBrowser(): Boolean
     fun userDeclinedToSetAsDefaultBrowser(timestamp: Long = System.currentTimeMillis())
 }
 
-class AndroidDefaultBrowserDetector @Inject constructor(
-        private val context: Context,
-        private val appInstallStore: AppInstallStore) : DefaultBrowserDetector {
+class AndroidDefaultBrowserDetector @Inject constructor(private val context: Context, private val appInstallStore: AppInstallStore) :
+    DefaultBrowserDetector {
 
     override fun deviceSupportsDefaultBrowserConfiguration(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
