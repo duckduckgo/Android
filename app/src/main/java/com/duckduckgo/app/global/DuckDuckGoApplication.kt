@@ -52,9 +52,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     lateinit var serviceInjector: DispatchingAndroidInjector<Service>
 
     @Inject
-    lateinit var crashReportingInitializer: CrashReportingInitializer
-
-    @Inject
     lateinit var trackerDataLoader: TrackerDataLoader
 
     @Inject
@@ -82,7 +79,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
         configureDependencyInjection()
         configureLogging()
-        configureCrashReporting()
 
         initializeStatistics()
         loadTrackerData()
@@ -131,10 +127,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
                 .application(this)
                 .create(this)
                 .inject(this)
-    }
-
-    private fun configureCrashReporting() {
-        crashReportingInitializer.init(this)
     }
 
     private fun initializeStatistics() {
