@@ -42,6 +42,13 @@ class StatisticsRequester(
 
         if (store.hasInstallationStatistics) {
             Timber.v("Atb already initialized")
+
+            val storedAtb = store.atb
+            if (storedAtbFormatNeedsCorrecting(storedAtb)) {
+                Timber.d("Previous app version stored hardcoded `ma` variant in ATB param; we want to correct this behaviour")
+                store.atb = storedAtb!!.removeSuffix(PREVIOUS_ATB_FORMAT_SUFFIX)
+                store.variant = VariantManager.DEFAULT_VARIANT.key
+            }
             return
         }
 
@@ -60,6 +67,10 @@ class StatisticsRequester(
             })
     }
 
+    private fun storedAtbFormatNeedsCorrecting(storedAtb: String?): Boolean {
+        return storedAtb != null && storedAtb.endsWith(PREVIOUS_ATB_FORMAT_SUFFIX)
+    }
+
     @SuppressLint("CheckResult")
     override fun refreshRetentionAtb() {
 
@@ -70,6 +81,7 @@ class StatisticsRequester(
             initializeAtb()
             return
         }
+
 
         val fullAtb = formatAtbWithVariant(atb, variantManager.getVariant())
 
@@ -85,6 +97,10 @@ class StatisticsRequester(
 
     private fun formatAtbWithVariant(atb: String, variant: Variant): String {
         return atb + variant.key
+    }
+
+    companion object {
+        private const val PREVIOUS_ATB_FORMAT_SUFFIX = "ma"
     }
 
 }

@@ -57,6 +57,11 @@ class ExperimentationVariantManager(
         if (activeVariants.isEmpty()) return VariantManager.DEFAULT_VARIANT
 
         val currentVariantKey = store.variant
+
+        if (currentVariantKey == VariantManager.DEFAULT_VARIANT.key) {
+            return VariantManager.DEFAULT_VARIANT
+        }
+
         if (currentVariantKey == null) {
             val newVariant = generateVariant(activeVariants)
             Timber.i("Current variant is null; allocating new one $newVariant")
