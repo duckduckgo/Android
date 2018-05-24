@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.global
 
-import com.duckduckgo.app.browser.BuildConfig
-
 
 class AppUrl {
 
@@ -33,16 +31,11 @@ class AppUrl {
     object ParamKey {
         const val QUERY = "q"
         const val SOURCE = "t"
-        const val APP_VERSION = "tappv"
         const val ATB = "atb"
         const val RETENTION_ATB = "set_atb"
     }
 
     object ParamValue {
         const val SOURCE = "ddg_android"
-
-        val appVersion: String get() {
-            return String.format("android_%s", BuildConfig.VERSION_NAME)
-        }
     }
 }
