@@ -19,13 +19,9 @@ package com.duckduckgo.app.settings
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
 import android.content.Context
-import android.net.MailTo
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.AndroidStringResolver
-import com.duckduckgo.app.global.StringResolver
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.nhaarman.mockito_kotlin.KArgumentCaptor
@@ -47,8 +43,6 @@ class SettingsViewModelTest {
 
     private lateinit var testee: SettingsViewModel
 
-    private lateinit var stringResolver: StringResolver
-
     private lateinit var context: Context
 
     @Mock
@@ -64,12 +58,10 @@ class SettingsViewModelTest {
         MockitoAnnotations.initMocks(this)
 
         context = InstrumentationRegistry.getTargetContext()
-
-        stringResolver = AndroidStringResolver(context)
         commandCaptor = argumentCaptor()
 
 
-        testee = SettingsViewModel(stringResolver, mockAppSettingsDataStore)
+        testee = SettingsViewModel(mockAppSettingsDataStore)
         testee.command.observeForever(commandObserver)
     }
 
@@ -97,24 +89,10 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenLeaveFeedBackRequestedThenUriContainsCorrectEmail() {
+    fun whenLeaveFeedBackRequestedThenCommandIsLaunchFeedback() {
         testee.userRequestedToSendFeedback()
-        val uri = retrieveObservedUri()
-        assertEquals("android@duckduckgo.com", uri.to)
-    }
-
-    @Test
-    fun whenLeaveFeedBackRequestedThenUriContainsCorrectSubject() {
-        testee.userRequestedToSendFeedback()
-        val uri = retrieveObservedUri()
-        assertEquals(context.getString(R.string.feedbackSubject), uri.subject)
-    }
-
-    private fun retrieveObservedUri(): MailTo {
         testee.command.blockingObserve()
         verify(commandObserver).onChanged(commandCaptor.capture())
-
-        val capturedCommand = commandCaptor.firstValue as Command.SendEmail
-        return MailTo.parse(capturedCommand.emailUri.toString())
+        assertEquals(Command.LaunchFeedback, commandCaptor.firstValue)
     }
 }

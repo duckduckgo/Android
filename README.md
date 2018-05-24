@@ -5,7 +5,7 @@ Welcome to our android application. We are excited to engage the community in de
 
 ## Discuss
 
-Contact us at android@duckduckgo.com if you have questions, feedback or want to chat.
+Contact us at https://duckduckgo.com/feedback if you have feedback, questions or want to chat.
 
 ## Reporting Bugs
 
@@ -16,9 +16,6 @@ We want our app to be as stable as possible thus your bug reports are immensely 
 * Steps to reproduce the bug
 * Expected behavior
 * Actual behavior
-
-Email bug reports to android@duckduckgo.com
-
 
 ## License
 DuckDuckGo android is distributed under the Apache 2.0 [license](LICENSE).

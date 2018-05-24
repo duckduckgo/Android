@@ -31,7 +31,6 @@
     <string name="downloadComplete">Download complete.</string>
     <string name="downloadFailed">Failed to download</string>
     <string name="downloadInProgress">Downloading</string>
-    <string name="cannotDownloadFile">Cannot download this file type</string>
 
     <!-- Sharing options -->
     <string name="linkOptions">Link Options</string>
@@ -141,8 +140,6 @@
     <string name="settingsAboutDuckduckgo">About DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Leave Feedback</string>
-    <string name="feedbackEmailAddress">android@duckduckgo.com</string>
-    <string name="feedbackSubject">DuckDuckGo Android Feedback</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">About us</string>
