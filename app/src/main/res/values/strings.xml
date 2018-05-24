@@ -10,14 +10,14 @@
     <string name="onboardingNoTraceDescription1">Tap the Fire Button to erase your tabs and browsing history.</string>
     <string name="onboardingNoTraceDescription2">Your data is toast!</string>
     <string name="onboardingDefaultBrowserTitle">Make Us Your Default</string>
-    <string name="onboardingDefaultBrowserDescription">Make DuckDuckGo your default browser in Settings.</string>
+    <string name="onboardingDefaultBrowserDescription">Make DuckDuckGo your default Browser App in settings.</string>
     <string name="onboardingDefaultBrowserGoToSettingsAction">Go to Settings</string>
     <string name="onboardingContinue">Continue</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Can\'t launch default app settings screen</string>
     <string name="defaultBrowserInfoTitle">Make Us Your Default Browser</string>
-    <string name="defaultBrowserInfoMessage">Make Duckduckgo the default browser in your Device Settings for full-time tracking protection.</string>
+    <string name="defaultBrowserInfoMessage">Make DuckDuckGo the default browser in your Device Settings for full-time tracking protection.</string>
     <string name="dismissDefaultBrowserInfo">Dismiss default browser info</string>
     <string name="notificationBannerDefaultBrowserTitle">Make DuckDuckGo Your Default Browser</string>
     <string name="notificationBannerDefaultBrowserMessage">For full-time tracking protection, make us your default</string>
