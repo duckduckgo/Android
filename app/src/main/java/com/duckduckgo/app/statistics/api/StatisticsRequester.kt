@@ -17,8 +17,8 @@
 package com.duckduckgo.app.statistics.api
 
 import android.annotation.SuppressLint
-import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
@@ -33,8 +33,7 @@ class StatisticsRequester(
     private val store: StatisticsDataStore,
     private val service: StatisticsService,
     private val variantManager: VariantManager
-) :
-    StatisticsUpdater {
+) : StatisticsUpdater {
 
     @SuppressLint("CheckResult")
     override fun initializeAtb() {
@@ -43,9 +42,9 @@ class StatisticsRequester(
             Timber.v("Atb already initialized")
 
             val storedAtb = store.atb
-            if (storedAtbFormatNeedsCorrecting(storedAtb)) {
+            if (storedAtb != null && storedAtbFormatNeedsCorrecting(storedAtb)) {
                 Timber.d("Previous app version stored hardcoded `ma` variant in ATB param; we want to correct this behaviour")
-                store.atb = storedAtb!!.removeSuffix(PREVIOUS_ATB_FORMAT_SUFFIX)
+                store.atb = Atb(storedAtb.version.removeSuffix(LEGACY_ATB_FORMAT_SUFFIX))
                 store.variant = VariantManager.DEFAULT_VARIANT.key
             }
             return
@@ -54,9 +53,10 @@ class StatisticsRequester(
         service.atb()
             .subscribeOn(Schedulers.io())
             .flatMap {
-                store.saveAtb(it.version)
-                val fullAtb = formatAtbWithVariant(it.version, variantManager.getVariant())
-                service.exti(fullAtb)
+                val atb = Atb(it.version)
+                store.saveAtb(atb)
+                val atbWithVariant = atb.formatWithVariant(variantManager.getVariant())
+                service.exti(atbWithVariant)
             }
             .subscribe({
                 Timber.v("Atb initialization succeeded")
@@ -66,9 +66,7 @@ class StatisticsRequester(
             })
     }
 
-    private fun storedAtbFormatNeedsCorrecting(storedAtb: String?): Boolean {
-        return storedAtb != null && storedAtb.endsWith(PREVIOUS_ATB_FORMAT_SUFFIX)
-    }
+    private fun storedAtbFormatNeedsCorrecting(storedAtb: Atb): Boolean = storedAtb.version.endsWith(LEGACY_ATB_FORMAT_SUFFIX)
 
     @SuppressLint("CheckResult")
     override fun refreshRetentionAtb() {
@@ -82,7 +80,7 @@ class StatisticsRequester(
         }
 
 
-        val fullAtb = formatAtbWithVariant(atb, variantManager.getVariant())
+        val fullAtb = atb.formatWithVariant(variantManager.getVariant())
 
         service.updateAtb(fullAtb, retentionAtb)
             .subscribeOn(Schedulers.io())
@@ -94,12 +92,8 @@ class StatisticsRequester(
             })
     }
 
-    private fun formatAtbWithVariant(atb: String, variant: Variant): String {
-        return atb + variant.key
-    }
-
     companion object {
-        private const val PREVIOUS_ATB_FORMAT_SUFFIX = "ma"
+        private const val LEGACY_ATB_FORMAT_SUFFIX = "ma"
     }
 
 }

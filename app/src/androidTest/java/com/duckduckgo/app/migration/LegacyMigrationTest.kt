@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.migration.legacy.LegacyDb
 import com.duckduckgo.app.migration.legacy.LegacyDbContracts
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockito_kotlin.mock
 import org.junit.After
@@ -40,7 +41,8 @@ class LegacyMigrationTest {
     // target context else we can't write a db file
     private val context = InstrumentationRegistry.getTargetContext()
     private var mockStatisticsStore: StatisticsDataStore = mock()
-    private val urlConverter = QueryUrlConverter(DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector(), mockStatisticsStore))
+    private val mockVariantManager: VariantManager = mock()
+    private val urlConverter = QueryUrlConverter(DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector(), mockStatisticsStore, mockVariantManager))
 
     private var appDatabase: AppDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
     private var bookmarksDao = StubBookmarksDao()

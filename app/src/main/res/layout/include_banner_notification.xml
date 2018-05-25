@@ -26,10 +26,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/softBlue"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
         android:transitionName="defaultBrowserBannerTransition"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:foreground="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintTop_toBottomOf="@id/appBarLayout"
         app:layout_scrollFlags="scroll|enterAlways"
         tools:visibility="visible">
@@ -61,39 +61,44 @@
             android:layout_height="18dp"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_icon_smiley_face"
+            app:layout_constraintBottom_toBottomOf="@id/title"
             app:layout_constraintStart_toEndOf="@id/leftGuideline"
-            app:layout_constraintTop_toBottomOf="@id/topGuideline" />
+            app:layout_constraintTop_toBottomOf="@id/topGuideline"
+            app:layout_constraintTop_toTopOf="@id/title" />
 
         <TextView
+            android:id="@+id/title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="40dp"
             android:layout_marginStart="10dp"
             android:text="@string/notificationBannerDefaultBrowserTitle"
             android:textColor="@color/white"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toStartOf="@id/dismissBannerButton"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/smileyFace"
             app:layout_constraintTop_toBottomOf="@id/topGuideline" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="40dp"
             android:layout_marginTop="4dp"
             android:text="@string/notificationBannerDefaultBrowserMessage"
             android:textColor="@color/white"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="@id/bottomGuideline"
-            app:layout_constraintEnd_toStartOf="@id/dismissBannerButton"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/leftGuideline"
-            app:layout_constraintTop_toBottomOf="@id/smileyFace" />
+            app:layout_constraintTop_toBottomOf="@id/title" />
 
         <ImageView
             android:id="@+id/dismissBannerButton"
-            android:layout_width="62dp"
+            android:layout_width="52dp"
             android:layout_height="0dp"
-            android:scaleType="center"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/notificationDefaultBrowserDismissButton"
+            android:scaleType="center"
             android:src="@drawable/ic_close_white_24dp"
             android:tint="@color/powderBlue2"
             app:layout_constraintBottom_toBottomOf="parent"

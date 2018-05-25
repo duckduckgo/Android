@@ -45,7 +45,7 @@ class StatisticsRequesterTest {
     @Before
     fun before() {
         whenever(mockVariantManager.getVariant()).thenReturn(Variant("ma", 100.0))
-        whenever(mockService.atb()).thenReturn(Observable.just(Atb(ATB)))
+        whenever(mockService.atb()).thenReturn(Observable.just(ATB))
         whenever(mockService.updateAtb(any(), any())).thenReturn(Observable.just(Atb(NEW_ATB)))
         whenever(mockService.exti(any())).thenReturn(Observable.just(mockResponseBody))
     }
@@ -64,7 +64,7 @@ class StatisticsRequesterTest {
         configureStoredStatistics()
         testee.initializeAtb()
         verify(mockService, never()).atb()
-        verify(mockService, never()).exti(eq(ATB))
+        verify(mockService, never()).exti(eq(ATB.version))
     }
 
     @Test
@@ -89,7 +89,7 @@ class StatisticsRequesterTest {
     fun whenStatisticsStoredThenRefreshUpdatesAtb() {
         configureStoredStatistics()
         testee.refreshRetentionAtb()
-        verify(mockService).updateAtb(eq(ATB_WITH_VARIANT), eq(ATB))
+        verify(mockService).updateAtb(eq(ATB_WITH_VARIANT), eq(ATB.version))
         verify(mockStatisticsStore).retentionAtb = NEW_ATB
     }
 
@@ -102,11 +102,11 @@ class StatisticsRequesterTest {
     private fun configureStoredStatistics() {
         whenever(mockStatisticsStore.hasInstallationStatistics).thenReturn(true)
         whenever(mockStatisticsStore.atb).thenReturn(ATB)
-        whenever(mockStatisticsStore.retentionAtb).thenReturn(ATB)
+        whenever(mockStatisticsStore.retentionAtb).thenReturn(ATB.version)
     }
 
     companion object {
-        private const val ATB = "v105-2"
+        private val ATB = Atb("v105-2")
         private const val ATB_WITH_VARIANT = "v105-2ma"
         private const val NEW_ATB = "v105-4"
     }
