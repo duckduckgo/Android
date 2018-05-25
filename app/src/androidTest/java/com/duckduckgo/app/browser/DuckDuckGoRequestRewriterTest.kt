@@ -46,14 +46,6 @@ class DuckDuckGoRequestRewriterTest {
     }
 
     @Test
-    fun whenAddingCustomParamsAppVersionParameterIsAdded() {
-        testee.addCustomQueryParams(builder)
-        val uri = builder.build()
-        assertTrue(uri.queryParameterNames.contains(ParamKey.APP_VERSION))
-        assertEquals("android_${BuildConfig.VERSION_NAME}", uri.getQueryParameter("tappv"))
-    }
-
-    @Test
     fun whenAddingCustomParamsIfStoreContainsAtbIsAdded() {
         whenever(mockStatisticsStore.atb).thenReturn("v105-2ma")
         testee.addCustomQueryParams(builder)
