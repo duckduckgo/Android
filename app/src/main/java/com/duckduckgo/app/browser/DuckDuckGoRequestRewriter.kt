@@ -43,7 +43,7 @@ class DuckDuckGoRequestRewriter(
             .fragment(request.fragment)
 
         request.queryParameterNames
-            .filter { it != ParamKey.SOURCE && it != ParamKey.APP_VERSION && it != ParamKey.ATB }
+            .filter { it != ParamKey.SOURCE && it != ParamKey.ATB }
             .forEach { builder.appendQueryParameter(it, request.getQueryParameter(it)) }
 
         addCustomQueryParams(builder)
@@ -55,19 +55,18 @@ class DuckDuckGoRequestRewriter(
 
     override fun shouldRewriteRequest(uri: Uri): Boolean {
         return duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(uri.toString()) &&
-                !uri.queryParameterNames.containsAll(arrayListOf(ParamKey.SOURCE, ParamKey.APP_VERSION, ParamKey.ATB))
+                !uri.queryParameterNames.containsAll(arrayListOf(ParamKey.SOURCE, ParamKey.ATB))
     }
 
     /**
-     * Applies cohort (atb) https://duck.co/help/privacy/atb, app version and
-     * and source (t) https://duck.co/help/privacy/t params to url
+     * Applies cohort (atb) https://duck.co/help/privacy/atb and
+     * source (t) https://duck.co/help/privacy/t params to url
      */
     override fun addCustomQueryParams(builder: Uri.Builder) {
         val atb = statisticsStore.atb
         if (atb != null) {
             builder.appendQueryParameter(ParamKey.ATB, atb.formatWithVariant(variantManager.getVariant()))
         }
-        builder.appendQueryParameter(ParamKey.APP_VERSION, ParamValue.appVersion)
         builder.appendQueryParameter(ParamKey.SOURCE, ParamValue.SOURCE)
     }
 }

@@ -17,7 +17,6 @@
 package com.duckduckgo.app.statistics.api
 
 import android.annotation.SuppressLint
-import com.duckduckgo.app.global.AppUrl.ParamValue
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -51,13 +50,13 @@ class StatisticsRequester(
             return
         }
 
-        service.atb(ParamValue.appVersion)
+        service.atb()
             .subscribeOn(Schedulers.io())
             .flatMap {
                 val atb = Atb(it.version)
                 store.saveAtb(atb)
                 val atbWithVariant = atb.formatWithVariant(variantManager.getVariant())
-                service.exti(atbWithVariant, ParamValue.appVersion)
+                service.exti(atbWithVariant)
             }
             .subscribe({
                 Timber.v("Atb initialization succeeded")
@@ -83,7 +82,7 @@ class StatisticsRequester(
 
         val fullAtb = atb.formatWithVariant(variantManager.getVariant())
 
-        service.updateAtb(fullAtb, retentionAtb, ParamValue.appVersion)
+        service.updateAtb(fullAtb, retentionAtb)
             .subscribeOn(Schedulers.io())
             .subscribe({
                 Timber.v("Atb refresh succeeded")

@@ -81,7 +81,5 @@ class QueryUrlConverterTest {
         assertEquals("", uri.path)
         assertEquals("ddg_android", uri.getQueryParameter("t"))
         assertTrue("Query string doesn't match. Expected `q=$query` somewhere in query ${uri.encodedQuery}", uri.encodedQuery.contains("q=$query"))
-
-        assertEquals("android_${BuildConfig.VERSION_NAME}", uri.getQueryParameter("tappv"))
     }
 }
