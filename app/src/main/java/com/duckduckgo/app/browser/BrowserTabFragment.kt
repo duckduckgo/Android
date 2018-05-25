@@ -167,7 +167,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         configureToolbar()
         configureBannerNotification()
         configureWebView()
-        viewModel.registerWebViewListener(webViewClient, webChromeClient)b
+        viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
         configureFindInPage()
         configureAutoComplete()
