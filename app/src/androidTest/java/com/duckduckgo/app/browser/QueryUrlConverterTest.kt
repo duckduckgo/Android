@@ -19,9 +19,11 @@ package com.duckduckgo.app.browser
 import android.net.Uri
 import android.support.test.runner.AndroidJUnit4
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockito_kotlin.mock
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -29,7 +31,9 @@ import org.junit.runner.RunWith
 class QueryUrlConverterTest {
 
     private var mockStatisticsStore: StatisticsDataStore = mock()
-    private val testee: QueryUrlConverter = QueryUrlConverter(DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector(), mockStatisticsStore))
+    private val variantManager: VariantManager = mock()
+    private val requestRewriter = DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector(), mockStatisticsStore, variantManager)
+    private val testee: QueryUrlConverter = QueryUrlConverter(requestRewriter)
 
     @Test
     fun whenSingleWordThenSearchQueryBuilt() {

@@ -19,6 +19,7 @@ package com.duckduckgo.app.statistics.store
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.app.statistics.model.Atb
 import javax.inject.Inject
 
 class StatisticsSharedPreferences @Inject constructor(private val context: Context) :
@@ -31,18 +32,21 @@ class StatisticsSharedPreferences @Inject constructor(private val context: Conte
     override val hasInstallationStatistics: Boolean
         get() = preferences.contains(KEY_ATB) && preferences.contains(KEY_RETENTION_ATB)
 
-    override var atb: String?
-        get() = preferences.getString(KEY_ATB, null)
-        set(atb) = preferences.edit { putString(KEY_ATB, atb) }
+    override var atb: Atb?
+        get() {
+            val atbString = preferences.getString(KEY_ATB, null) ?: return null
+            return Atb(atbString)
+        }
+        set(atb) = preferences.edit { putString(KEY_ATB, atb?.version) }
 
     override var retentionAtb: String?
         get() = preferences.getString(KEY_RETENTION_ATB, null)
         set(value) = preferences.edit { putString(KEY_RETENTION_ATB, value) }
 
-    override fun saveAtb(atb: String) {
+    override fun saveAtb(atb: Atb) {
         preferences.edit {
-            putString(KEY_ATB, atb)
-            putString(KEY_RETENTION_ATB, atb)
+            putString(KEY_ATB, atb.version)
+            putString(KEY_RETENTION_ATB, atb.version)
         }
     }
 

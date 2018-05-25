@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import android.net.Uri
 import com.duckduckgo.app.global.AppUrl.ParamKey
 import com.duckduckgo.app.global.AppUrl.ParamValue
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
 
@@ -28,8 +29,11 @@ interface RequestRewriter {
     fun addCustomQueryParams(builder: Uri.Builder)
 }
 
-class DuckDuckGoRequestRewriter(private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector, private val statisticsStore: StatisticsDataStore) :
-    RequestRewriter {
+class DuckDuckGoRequestRewriter(
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    private val statisticsStore: StatisticsDataStore,
+    private val variantManager: VariantManager
+) : RequestRewriter {
 
     override fun rewriteRequestWithCustomQueryParams(request: Uri): Uri {
         val builder = Uri.Builder()
@@ -61,7 +65,7 @@ class DuckDuckGoRequestRewriter(private val duckDuckGoUrlDetector: DuckDuckGoUrl
     override fun addCustomQueryParams(builder: Uri.Builder) {
         val atb = statisticsStore.atb
         if (atb != null) {
-            builder.appendQueryParameter(ParamKey.ATB, atb)
+            builder.appendQueryParameter(ParamKey.ATB, atb.formatWithVariant(variantManager.getVariant()))
         }
         builder.appendQueryParameter(ParamKey.APP_VERSION, ParamValue.appVersion)
         builder.appendQueryParameter(ParamKey.SOURCE, ParamValue.SOURCE)

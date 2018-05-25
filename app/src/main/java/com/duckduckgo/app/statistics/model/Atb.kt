@@ -16,4 +16,11 @@
 
 package com.duckduckgo.app.statistics.model
 
-data class Atb(val version: String)
+import com.duckduckgo.app.statistics.Variant
+
+data class Atb(val version: String) {
+
+    fun formatWithVariant(variant: Variant): String {
+        return version + variant.key
+    }
+}
