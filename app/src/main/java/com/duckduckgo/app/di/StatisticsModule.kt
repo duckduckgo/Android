@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.di
 
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsRequester
 import com.duckduckgo.app.statistics.api.StatisticsService
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -33,7 +34,7 @@ class StatisticsModule {
         retrofit.create(StatisticsService::class.java)
 
     @Provides
-    fun statisticsUpdater(statisticsDataStore: StatisticsDataStore, statisticsService: StatisticsService) : StatisticsUpdater =
-        StatisticsRequester(statisticsDataStore, statisticsService)
+    fun statisticsUpdater(statisticsDataStore: StatisticsDataStore, statisticsService: StatisticsService, variantManager: VariantManager) : StatisticsUpdater =
+        StatisticsRequester(statisticsDataStore, statisticsService, variantManager)
 
 }

@@ -17,6 +17,8 @@
 package com.duckduckgo.app.statistics.api
 
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.statistics.Variant
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockito_kotlin.*
@@ -32,8 +34,9 @@ class StatisticsRequesterTest {
     private var mockStatisticsStore: StatisticsDataStore = mock()
     private var mockService: StatisticsService = mock()
     private var mockResponseBody: ResponseBody = mock()
+    private var mockVariantManager: VariantManager = mock()
 
-    private var testee: StatisticsRequester = StatisticsRequester(mockStatisticsStore, mockService)
+    private var testee: StatisticsRequester = StatisticsRequester(mockStatisticsStore, mockService, mockVariantManager)
 
     @get:Rule
     @Suppress("unused")
@@ -41,55 +44,52 @@ class StatisticsRequesterTest {
 
     @Before
     fun before() {
-        whenever(mockService.atb(any())).thenReturn(Observable.just(Atb(ATB)))
-        whenever(mockService.updateAtb(any(), any(), any())).thenReturn(Observable.just(Atb(NEW_ATB)))
-        whenever(mockService.exti(any(), any())).thenReturn(Observable.just(mockResponseBody))
+        whenever(mockVariantManager.getVariant()).thenReturn(Variant("ma", 100.0))
+        whenever(mockService.atb()).thenReturn(Observable.just(ATB))
+        whenever(mockService.updateAtb(any(), any())).thenReturn(Observable.just(Atb(NEW_ATB)))
+        whenever(mockService.exti(any())).thenReturn(Observable.just(mockResponseBody))
     }
 
     @Test
-    fun whenNoStatisticsStoredThenInitializeAtbRetrievesAtbAndInvokesExti() {
+    fun whenNoStatisticsStoredThenInitializeAtbInvokesExti() {
         configureNoStoredStatistics()
         testee.initializeAtb()
-        verify(mockService).atb(any())
-        verify(mockService).exti(eq(ATB_WITH_VARIANT), any())
-        verify(mockStatisticsStore).atb = ATB_WITH_VARIANT
-        verify(mockStatisticsStore).retentionAtb = ATB
+        verify(mockService).atb()
+        verify(mockService).exti(eq(ATB_WITH_VARIANT))
+        verify(mockStatisticsStore).saveAtb(ATB)
     }
 
     @Test
     fun whenStatisticsStoredThenInitializeAtbDoesNothing() {
         configureStoredStatistics()
         testee.initializeAtb()
-        verify(mockService, never()).atb(any())
-        verify(mockService, never()).exti(eq(ATB), any())
+        verify(mockService, never()).atb()
+        verify(mockService, never()).exti(eq(ATB.version))
     }
 
     @Test
     fun whenNoStatisticsStoredThenRefreshRetrievesAtbAndInvokesExti() {
         configureNoStoredStatistics()
         testee.refreshRetentionAtb()
-        verify(mockService).atb(any())
-        verify(mockService).exti(eq(ATB_WITH_VARIANT), any())
-        verify(mockStatisticsStore).atb = ATB_WITH_VARIANT
-        verify(mockStatisticsStore).retentionAtb = ATB
+        verify(mockService).atb()
+        verify(mockService).exti(eq(ATB_WITH_VARIANT))
+        verify(mockStatisticsStore).saveAtb(ATB)
     }
 
     @Test
     fun whenExitFailsThenAtbCleared() {
-        whenever(mockService.exti(any(), any())).thenReturn(Observable.error(Throwable()))
+        whenever(mockService.exti(any())).thenReturn(Observable.error(Throwable()))
         configureNoStoredStatistics()
         testee.initializeAtb()
-        verify(mockStatisticsStore).atb = ATB_WITH_VARIANT
-        verify(mockStatisticsStore).retentionAtb = ATB
-        verify(mockStatisticsStore).atb = null
-        verify(mockStatisticsStore).retentionAtb = null
+        verify(mockStatisticsStore).saveAtb(ATB)
+        verify(mockStatisticsStore).clearAtb()
     }
 
     @Test
     fun whenStatisticsStoredThenRefreshUpdatesAtb() {
         configureStoredStatistics()
         testee.refreshRetentionAtb()
-        verify(mockService).updateAtb(eq(ATB_WITH_VARIANT), eq(ATB), any())
+        verify(mockService).updateAtb(eq(ATB_WITH_VARIANT), eq(ATB.version))
         verify(mockStatisticsStore).retentionAtb = NEW_ATB
     }
 
@@ -101,12 +101,12 @@ class StatisticsRequesterTest {
 
     private fun configureStoredStatistics() {
         whenever(mockStatisticsStore.hasInstallationStatistics).thenReturn(true)
-        whenever(mockStatisticsStore.atb).thenReturn(ATB_WITH_VARIANT)
-        whenever(mockStatisticsStore.retentionAtb).thenReturn(ATB)
+        whenever(mockStatisticsStore.atb).thenReturn(ATB)
+        whenever(mockStatisticsStore.retentionAtb).thenReturn(ATB.version)
     }
 
     companion object {
-        private const val ATB = "v105-2"
+        private val ATB = Atb("v105-2")
         private const val ATB_WITH_VARIANT = "v105-2ma"
         private const val NEW_ATB = "v105-4"
     }

@@ -33,5 +33,4 @@ class ColorCombiner {
 
         return Color.argb(alpha.toInt(), red.toInt(), green.toInt(), blue.toInt())
     }
-
 }

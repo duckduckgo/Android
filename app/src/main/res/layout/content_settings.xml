@@ -34,9 +34,15 @@
         <android.support.v7.widget.SwitchCompat
             android:id="@+id/autocompleteEnabledSetting"
             style="@style/SettingsContentLabel"
-            android:text="@string/settings_autocomplete_enabled"
+            android:text="@string/settingsAutocompleteEnabled"
             app:theme="@style/SettingsContentLabel.SettingsSwitch"
             tools:checked="true" />
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/setAsDefaultBrowserSetting"
+            style="@style/SettingsContentLabel"
+            android:text="@string/settingsDefaultBrowserEnabled"
+            app:theme="@style/SettingsContentLabel.SettingsSwitch" />
 
         <TextView
             android:id="@+id/onboarding"

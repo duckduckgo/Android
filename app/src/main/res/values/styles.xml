@@ -8,11 +8,20 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
+        <item name="android:windowActivityTransitions">true</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="Theme.AppCompat.Translucent" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@color/translucentDark</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+    </style>
 
     <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="colorControlNormal">@color/grayish</item>
@@ -192,12 +201,26 @@
 
     </style>
 
+    <style name="AppTheme.TransparentTheme" >
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+
     <style name="OnboardingButtonProtectData" parent="OnboardingButtonStyle">
         <item name="colorAccent">@color/muddyGreen</item>
     </style>
 
     <style name="OnboardingButtonNoTrace" parent="OnboardingButtonStyle">
         <item name="colorAccent">@color/windowsBlue</item>
+    </style>
+
+    <style name="OnboardingButtonDefaultBrowser" parent="OnboardingButtonStyle">
+        <item name="colorAccent">@color/portGore</item>
+    </style>
+
+    <style name="OnboardingButtonDefaultBrowserLaunchSettings" parent="OnboardingButtonStyle">
+        <item name="colorAccent">@color/eastSide</item>
+        <item name="android:layout_marginBottom">10dp</item>
     </style>
 
     <style name="OnboardingTextTitle">
@@ -227,7 +250,5 @@
         <item name="android:paddingTop">16dp</item>
         <item name="android:lineSpacingExtra">6sp</item>
     </style>
-
-
 
 </resources>

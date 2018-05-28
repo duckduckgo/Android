@@ -24,7 +24,8 @@ import android.content.Intent.EXTRA_TEXT
 import android.os.Bundle
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
-import com.duckduckgo.app.browser.BrowserViewModel.Command.*
+import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
+import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.intentText

@@ -27,15 +27,14 @@ import retrofit2.http.Query
 interface StatisticsService {
 
     @GET("/exti/")
-    fun exti(@Query(ParamKey.ATB) atb: String, @Query(ParamKey.APP_VERSION) version: String): Observable<ResponseBody>
+    fun exti(@Query(ParamKey.ATB) atb: String): Observable<ResponseBody>
 
     @GET("/atb.js")
-    fun atb(@Query(ParamKey.APP_VERSION) version: String): Observable<Atb>
+    fun atb(): Observable<Atb>
 
     @GET("/atb.js")
     fun updateAtb(
         @Query(ParamKey.ATB) atb: String,
-        @Query(ParamKey.RETENTION_ATB) retentionAtb: String,
-        @Query(ParamKey.APP_VERSION) version: String
+        @Query(ParamKey.RETENTION_ATB) retentionAtb: String
     ): Observable<Atb>
 }

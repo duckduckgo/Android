@@ -36,8 +36,4 @@ class LaunchViewModel(onboardingStore: OnboardingStore) : ViewModel() {
             command.value = Command.Home()
         }
     }
-
-    fun onOnboardingDone() {
-        command.value = Command.Home()
-    }
 }

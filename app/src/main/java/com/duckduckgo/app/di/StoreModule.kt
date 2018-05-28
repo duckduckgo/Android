@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.di
 
+import com.duckduckgo.app.global.install.AppInstallSharedPreferences
+import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingSharedPreferences
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.privacy.store.PrivacySettingsSharedPreferences
@@ -46,4 +48,7 @@ abstract class StoreModule {
 
     @Binds
     abstract fun bindTabReposistory(tabRepository: TabDataRepository): TabRepository
+
+    @Binds
+    abstract fun bindAppInstallStore(store: AppInstallSharedPreferences): AppInstallStore
 }

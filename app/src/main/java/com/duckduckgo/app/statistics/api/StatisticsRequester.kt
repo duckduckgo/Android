@@ -17,7 +17,8 @@
 package com.duckduckgo.app.statistics.api
 
 import android.annotation.SuppressLint
-import com.duckduckgo.app.global.AppUrl.*
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
@@ -28,32 +29,44 @@ interface StatisticsUpdater {
     fun refreshRetentionAtb()
 }
 
-class StatisticsRequester(private val store: StatisticsDataStore, private val service: StatisticsService) :
-    StatisticsUpdater {
+class StatisticsRequester(
+    private val store: StatisticsDataStore,
+    private val service: StatisticsService,
+    private val variantManager: VariantManager
+) : StatisticsUpdater {
 
     @SuppressLint("CheckResult")
     override fun initializeAtb() {
 
         if (store.hasInstallationStatistics) {
             Timber.v("Atb already initialized")
+
+            val storedAtb = store.atb
+            if (storedAtb != null && storedAtbFormatNeedsCorrecting(storedAtb)) {
+                Timber.d("Previous app version stored hardcoded `ma` variant in ATB param; we want to correct this behaviour")
+                store.atb = Atb(storedAtb.version.removeSuffix(LEGACY_ATB_FORMAT_SUFFIX))
+                store.variant = VariantManager.DEFAULT_VARIANT.key
+            }
             return
         }
 
-        service.atb(ParamValue.appVersion)
+        service.atb()
             .subscribeOn(Schedulers.io())
             .flatMap {
-                store.atb = it.versionWithVariant
-                store.retentionAtb = it.version
-                service.exti(it.versionWithVariant, ParamValue.appVersion)
+                val atb = Atb(it.version)
+                store.saveAtb(atb)
+                val atbWithVariant = atb.formatWithVariant(variantManager.getVariant())
+                service.exti(atbWithVariant)
             }
             .subscribe({
-                Timber.v("Atb initalization succeeded")
+                Timber.v("Atb initialization succeeded")
             }, {
-                store.atb = null
-                store.retentionAtb = null
-                Timber.w("Atb initalization failed ${it.localizedMessage}")
+                store.clearAtb()
+                Timber.w("Atb initialization failed ${it.localizedMessage}")
             })
     }
+
+    private fun storedAtbFormatNeedsCorrecting(storedAtb: Atb): Boolean = storedAtb.version.endsWith(LEGACY_ATB_FORMAT_SUFFIX)
 
     @SuppressLint("CheckResult")
     override fun refreshRetentionAtb() {
@@ -66,7 +79,10 @@ class StatisticsRequester(private val store: StatisticsDataStore, private val se
             return
         }
 
-        service.updateAtb(atb, retentionAtb, ParamValue.appVersion)
+
+        val fullAtb = atb.formatWithVariant(variantManager.getVariant())
+
+        service.updateAtb(fullAtb, retentionAtb)
             .subscribeOn(Schedulers.io())
             .subscribe({
                 Timber.v("Atb refresh succeeded")
@@ -74,6 +90,10 @@ class StatisticsRequester(private val store: StatisticsDataStore, private val se
             }, {
                 Timber.v("Atb refresh failed with error ${it.localizedMessage}")
             })
+    }
+
+    companion object {
+        private const val LEGACY_ATB_FORMAT_SUFFIX = "ma"
     }
 
 }
