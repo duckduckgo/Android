@@ -1,0 +1,153 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="appName">DuckDuckGo</string>
+    <string name="duckDuckGoLogoDescription">DuckDuckGo logotipas</string>
+
+    <!-- Onboarding Activity -->
+    <string name="onboardingProtectDataTitle">Apsaugokite savo duomenis</string>
+    <string name="onboardingProtectDataDescription">Privatumo Lygis parodo kas jus bandė sekti</string>
+    <string name="onboardingNoTraceTitle">Nepalikti pėdų</string>
+    <string name="onboardingNoTraceDescription1">Norėdami ištrinti visas korteles ir su jomis susijusius duomenis spauskite Liepsnelę.</string>
+    <string name="onboardingNoTraceDescription2">Duomenys sunaikinti!</string>
+    <string name="onboardingContinue">Tęsti</string>
+
+
+    <!-- Browser Activity -->
+    <string name="browserPopupMenu">Naršyklės meniu</string>
+    <string name="refresh">Atnaujinti</string>
+    <string name="back">Atgal</string>
+    <string name="forward">Pirmyn</string>
+
+    <string name="omnibarInputHint">Paieškos frazė arba puslapio adresas</string>
+    <string name="clearButtonContentDescription">Ištrinti paieškos laukelį</string>
+    <string name="no_compatible_third_party_app_installed">Nėra tinkamos programėlės</string>
+    <string name="addBookmarkMenuTitle">Pridėti žymeklį</string>
+    <string name="imageOptions">Paveikslėlio parinktys</string>
+    <string name="requestDesktopSiteMenuTitle">Pilnas puslapis (Desktop)</string>
+
+    <!-- Downloading files -->
+    <string name="downloadImage">Parsiųsti paveikslėlį</string>
+    <string name="permissionRequiredToDownload">Failų parsisiuntimui reikalingas leidimas</string>
+    <string name="downloadComplete">Siuntimas baigtas.</string>
+    <string name="downloadFailed">Nepavyko parsiųsti.</string>
+    <string name="downloadInProgress">Siunčiama</string>
+    <string name="cannotDownloadFile">Negalima parsiųsti šio tipo failų</string>
+
+    <!-- Sharing options -->
+    <string name="linkOptions">Nuorodos parinktys</string>
+    <string name="shareLink">Dalintis nuoroda</string>
+    <string name="shareMenuTitle">Dalintis...</string>
+
+    <!-- Find in page -->
+    <string name="find_in_page">Rasti puslapyje</string>
+    <string name="nextSearchTermDescription">Rasti kitą</string>
+    <string name="previousSearchTermDescription">Rasti buvusį</string>
+    <string name="closeFindInPageButtonDescription">Uždaryti paiešką</string>
+    <string name="findInPageHint">Rasti puslapyje</string>
+    <string name="findInPageMatches">%d/%d</string>
+
+    <!-- AutoComplete Suggestions -->
+    <string name="editQueryBeforeSubmitting">Redaguoti užklausą prieš ieškant</string>
+    <string name="settings_autocomplete_enabled">Automatinio užbaigimo pasiūlymai</string>
+
+    <!-- Tabs -->
+    <string name="homeTab">DuckDuckGo</string>
+    <string name="tabActivityTitle">Kortelės</string>
+    <string name="tabsMenuItem">Kortelės</string>
+    <string name="newTabMenuItem">Nauja kortelė</string>
+    <string name="openInNewTab">Atidaryti naujoje kortelėje</string>
+    <string name="faviconContentDescription">Ikona</string>
+    <string name="closeContentDescription">Uždaryti</string>
+    <string name="tapFireDirective">Paspausti</string>
+    <string name="tapFireIconDescription">ugnis</string>
+    <string name="tapFireExplanation">viską pamiršti</string>
+
+    <!-- Privacy Dashboard Activities -->
+    <string name="privacyDashboardActivityTitle">Privatumo Santrauka</string>
+    <string name="privacyProtectionEnabled">PRIVATUMO APSAUGA ĮJUNGTA</string>
+    <string name="privacyProtectionDisabled">PRIVATUMO APSAUGA IŠJUNGTA</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ENHANCED FROM &lt;img src="%d" /> TO &lt;img src="%d" /></string>
+    <string name="privacyGradeContentDescription">Privatumo Lygis</string>
+
+    <string name="httpsGood">Koduotas prisijungimas</string>
+    <string name="httpsMixed">Maišyto kodavimo prisijungimas</string>
+    <string name="httpsBad">Nekoduotas prisijungimas</string>
+
+    <string name="networksActivityTitle">Sekimo tinklai</string>
+    <string name="networksContentDescription">Sekimo tinkai</string>
+    <string name="networksOverview">Sekimo tinkai renka Jūsų naršymo istoriją ir kuria Jūsų pomėgių profilį. Dideli tinkai pavojingesni tuo, kad gali Jus sekti didžiojoje dalyje interneto.</string>
+
+
+
+
+
+
+
+    <string name="scorecardActivityTitle">Privatumo Lygis</string>
+    <string name="scorecardSiteIsMemberOfMajorNetwork">Šis puslapis yra didelis sekimo tinkas</string>
+    <string name="scorecardPrivacyGrade">Privatumo Lygis</string>
+    <string name="scorecardEnhancedGrade">Sustiprintas Lygis</string>
+
+    <string name="privacyTermsActivityTitle">Privatumo Įpročiai</string>
+    <string name="practicesGood">"Geri privatumo įpročiai"</string>
+    <string name="practicesMixed">"Mišrūs privatumo įpročiai"</string>
+    <string name="practicesBad">"Blogi privatumo įpročiai"</string>
+    <string name="practicesUnknown">Nežinomi privatumo įpročiai</string>
+    <string name="practicesOverview">Privatumo įpročiai parodo kiek asmeninės informacijos, kurią dalinamės su puslapiais, yra apsaugota.</string>
+    <string name="practicesTosdrLink">Privatumo įpročių rezultatai iš <b ><u >ToS;DR</u></b></string>
+    <string name="practicesIconContentGood">Good Practice Icon</string>
+    <string name="practicesIconContentBad">Bad Practice Icon</string>
+    <string name="privacyProtectionToggle">Privatumo Apsauga</string>
+
+    <string name="networkTrackerSummaryHeader">Didžiausi sekimo nusižengėliai</string>
+    <string name="networkTrackerSummaryNotReady">Apdorojami duomenys kiek sekimo tinklų užblokuota</string>
+
+    <!-- Fire -->
+    <string name="fireMenu">Ištrinti duomenis</string>
+    <string name="fireClearAll">Uždaryti korteles ir ištrinti duomenis</string>
+    <string name="fireCancel">Atšaukti</string>
+    <string name="fireDataCleared">Duomenys ištrinti</string>
+
+    <!-- Settings Activity -->
+    <string name="settingsActivityTitle">Nustatymai</string>
+    <string name="settingsMenuItemTitle">Nustatymai</string>
+    <string name="settingsHeadingGeneral">Bendri nustatymai</string>
+    <string name="settingsHeadingOther">Kita</string>
+    <string name="settingsOnboarding">Privatumo Ypatybės</string>
+    <string name="settingsAboutDuckduckgo">Apie DuckDuckGo</string>
+    <string name="settingsVersion">Versija</string>
+    <string name="leaveFeedback">Palikti atsiliepimą</string>
+    <string name="feedbackEmailAddress">android@duckduckgo.com</string>
+    <string name="feedbackSubject">DuckDuckGo Android atsiliepimas</string>
+
+    <!-- About Activity -->
+    <string name="aboutActivityTitle">Apie mus</string>
+    <string name="aboutHeading">Privatumas. Paprastai.</string>
+    <string name="aboutDescription">Mes kuriame naują pasitikėjimo standartą internete.\n
+ \\\n
+ 	DuckDuckGo Privati Naršyklė suteikia visas galimybes apsaugoti savo privačius duomenis ieškant ir naršant internete, įskaitant sekančių programų blokavimą, išmanią kriptografiją ir DuckDuckGo privačią paiešką. \n
+ \\\n
+ 	Mes tikime, kad internetas neturėtų gąsdinti. Išsaugoti savo privatumą turėtų būti paprasta kaip du kart du.</string>
+    <string name="aboutMoreLink">Daugiau rasite duckduckgo.com/about</string>
+    <string name="no_suggestions">Pasiūlymų nėra</string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">Žymekliai</string>
+    <string name="bookmarksActivityTitle">Žymekliai</string>
+    <string name="bookmarkDeleteConfirmMessage">Ar tikrai norite ištrinti žymeklį <b>%s</b>?</string>
+    <string name="bookmarkDeleteConfirmTitle">Patvirtinti</string>
+    <string name="bookmarkAddedFeedback">Žymeklis pridėtas</string>
+    <string name="bookmarkTitleHint">Žymeklio pavadinimas</string>
+    <string name="bookmarkUrlHint">Žymeklio adresas (URL)</string>
+    <string name="bookmarkSave">Išsaugoti</string>
+    <string name="bookmarkTitleEdit">Redaguoti žymeklį</string>
+    <string name="bookmarkTitleSave">Išsaugoti Žymeklį</string>
+    <string name="noBookmarks">Žymeklių nėra</string>
+    <string name="bookmarkOverflowContentDescription">Daugiau žymeklio nustatymų %s</string>
+    <string name="delete">Ištrinti</string>
+    <string name="edit">Redaguoti</string>
+
+    <!-- Widget -->
+    <string name="searchWidgetTextHint">DuckDuckGo paieška</string>
+
+</resources>

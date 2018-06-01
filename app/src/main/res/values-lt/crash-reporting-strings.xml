@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2017 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="crash_toast_text">Programinė klaida! Klaidos duomenys bus surinkti ir pranešti po Jūsų patvirtinimo.</string>
+    <string name="crash_dialog_text">Įvyko nenumatyta klaida\n
+ \n
+ Padėkite ją išspręsti nusiųsdami klaidos aprašymą paspaudę OK.\n
+ \n
+ Mes gausime šiuos duomenis:\n
+ \n
+  • Programėlės versija\n
+  • Android versija\n
+  • Įrenginio gamintojas ir modelis\n
+  • Sistemos duomenys ir klaidos aprašymas         \n
+  • Likusios atminties kiekis</string>
+    <string name="crash_dialog_comment_prompt">Daugiau duomenų (pasirinktinai)</string>
+    <string name="crash_dialog_ok_toast">Dėkui Jums už Jūsų pagalbą!</string>
+</resources>
