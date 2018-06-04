@@ -25,9 +25,10 @@ import java.io.IOException
 import javax.inject.Inject
 
 class HttpsUpgradeListDownloader @Inject constructor(
-        private val service: HttpsUpgradeListService,
-        private val database: AppDatabase,
-        private val httpsUpgradeDao: HttpsUpgradeDomainDao) {
+    private val service: HttpsUpgradeListService,
+    private val database: AppDatabase,
+    private val httpsUpgradeDao: HttpsUpgradeDomainDao
+) {
 
     fun downloadList(): Completable {
 
@@ -45,14 +46,35 @@ class HttpsUpgradeListDownloader @Inject constructor(
 
             if (response.isSuccessful) {
                 Timber.d("Updating HTTPS upgrade list from server")
-                val domains = response.body()!!.toTypedArray()
-                database.runInTransaction {
-                    httpsUpgradeDao.deleteAll()
-                    httpsUpgradeDao.insertAll(*domains)
+
+                val domains = response.body()
+                if (domains == null) {
+                    Timber.w("Failed to obtain HTTPS upgrade list")
+                    return@fromAction
                 }
+
+                val startTime = System.currentTimeMillis()
+                httpsUpgradeDao.deleteAll()
+                Timber.i("Took ${System.currentTimeMillis() - startTime}ms to delete existing records")
+
+                val chunks = domains.chunked(INSERTION_CHUNK_SIZE)
+                Timber.i("Received ${domains.size} HTTPS domains; chunking by $INSERTION_CHUNK_SIZE into ${chunks.size} separate DB transactions")
+
+                chunks.forEach {
+                    database.runInTransaction {
+                        httpsUpgradeDao.insertAll(it)
+                    }
+                }
+
+                Timber.i("Total insertion time is ${System.currentTimeMillis() - startTime}ms")
+
             } else {
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
         }
+    }
+
+    companion object {
+        private const val INSERTION_CHUNK_SIZE = 1_000
     }
 }

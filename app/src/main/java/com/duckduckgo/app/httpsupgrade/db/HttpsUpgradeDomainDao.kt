@@ -26,7 +26,7 @@ import org.intellij.lang.annotations.Language
 interface HttpsUpgradeDomainDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(vararg domains: HttpsUpgradeDomain)
+    fun insertAll(domains: List<HttpsUpgradeDomain>)
 
     @Language("RoomSql")
     @Query("select count(1) > 0 from https_upgrade_domain where domain = :domain")
