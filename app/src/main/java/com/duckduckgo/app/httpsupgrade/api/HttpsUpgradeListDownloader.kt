@@ -30,7 +30,7 @@ class HttpsUpgradeListDownloader @Inject constructor(
     private val httpsUpgradeDao: HttpsUpgradeDomainDao
 ) {
 
-    fun downloadList(): Completable {
+    fun downloadList(chunkSize: Int = INSERTION_CHUNK_SIZE): Completable {
 
         Timber.d("Downloading HTTPS Upgrade data")
 
@@ -57,7 +57,7 @@ class HttpsUpgradeListDownloader @Inject constructor(
                 httpsUpgradeDao.deleteAll()
                 Timber.i("Took ${System.currentTimeMillis() - startTime}ms to delete existing records")
 
-                val chunks = domains.chunked(INSERTION_CHUNK_SIZE)
+                val chunks = domains.chunked(chunkSize)
                 Timber.i("Received ${domains.size} HTTPS domains; chunking by $INSERTION_CHUNK_SIZE into ${chunks.size} separate DB transactions")
 
                 chunks.forEach {
