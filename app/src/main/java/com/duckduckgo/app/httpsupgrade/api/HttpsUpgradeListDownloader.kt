@@ -59,11 +59,7 @@ class HttpsUpgradeListDownloader @Inject constructor(
             if (response.isSuccessful) {
                 Timber.d("Updating HTTPS upgrade list from server")
 
-                val domains = response.body()
-                if (domains == null) {
-                    Timber.w("Failed to obtain HTTPS upgrade list")
-                    return@fromAction
-                }
+                val domains = response.body() ?: throw IllegalStateException("Failed to obtain HTTPS upgrade list")
 
                 val startTime = System.currentTimeMillis()
 
