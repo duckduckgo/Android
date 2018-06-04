@@ -18,16 +18,28 @@ package com.duckduckgo.app.httpsupgrade.api
 
 import com.duckduckgo.app.global.api.isCached
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDbWriteStatusStore
 import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
 import io.reactivex.Completable
 import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 
+/**
+ * For performance reasons, we can't insert all the HTTPS rows in a single transaction as it blocks other DB writes from happening for a while
+ * To avoid the performance problem of a single transaction, we can chunk the data and perform many smaller transactions.
+ * However, if we don't use a single transaction, there is the risk the process could die or exception be thrown while iterating through the HTTPS inserts, leaving the DB in a bad state.
+ * The network cache could therefore deliver the cached value and we could skip writing to the DB thinking we'd already successfully written it all.
+ *
+ * To counter this, we need an external mechanism to track whether the write completed successfully or not.
+ * Using this, we can detect if the write failed when we next download the data. We'll only skip the DB inserts if cache returns the list and the write flag is set such that it finished writing successfully.
+ * @see HttpsUpgradeDbWriteStatusStore for how this status flag is stored.
+ */
 class HttpsUpgradeListDownloader @Inject constructor(
     private val service: HttpsUpgradeListService,
     private val database: AppDatabase,
-    private val httpsUpgradeDao: HttpsUpgradeDomainDao
+    private val httpsUpgradeDao: HttpsUpgradeDomainDao,
+    private val dbWriteStatusStore: HttpsUpgradeDbWriteStatusStore
 ) {
 
     fun downloadList(chunkSize: Int = INSERTION_CHUNK_SIZE): Completable {
@@ -39,7 +51,7 @@ class HttpsUpgradeListDownloader @Inject constructor(
             val call = service.https()
             val response = call.execute()
 
-            if (response.isCached && httpsUpgradeDao.count() != 0) {
+            if (response.isCached && dbWriteStatusStore.hasWriteCompleted() && httpsUpgradeDao.count() != 0) {
                 Timber.d("HTTPS data already cached and stored")
                 return@fromAction
             }
@@ -54,24 +66,33 @@ class HttpsUpgradeListDownloader @Inject constructor(
                 }
 
                 val startTime = System.currentTimeMillis()
-                httpsUpgradeDao.deleteAll()
-                Timber.i("Took ${System.currentTimeMillis() - startTime}ms to delete existing records")
 
-                val chunks = domains.chunked(chunkSize)
-                Timber.i("Received ${domains.size} HTTPS domains; chunking by $INSERTION_CHUNK_SIZE into ${chunks.size} separate DB transactions")
+                modifyHttpsDatabase {
+                    httpsUpgradeDao.deleteAll()
+                    Timber.v("Took ${System.currentTimeMillis() - startTime}ms to delete existing records")
 
-                chunks.forEach {
-                    database.runInTransaction {
-                        httpsUpgradeDao.insertAll(it)
+                    val chunks = domains.chunked(chunkSize)
+                    Timber.i("Received ${domains.size} HTTPS domains; chunking by $chunkSize into ${chunks.size} separate DB transactions")
+
+                    chunks.forEach {
+                        database.runInTransaction {
+                            httpsUpgradeDao.insertAll(it)
+                        }
                     }
-                }
 
-                Timber.i("Total insertion time is ${System.currentTimeMillis() - startTime}ms")
+                    Timber.i("Successfully wrote HTTPS data; took ${System.currentTimeMillis() - startTime}ms")
+                }
 
             } else {
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
         }
+    }
+
+    private inline fun modifyHttpsDatabase(function: () -> Unit) {
+        dbWriteStatusStore.updateStatus(false)
+        function()
+        dbWriteStatusStore.updateStatus(true)
     }
 
     companion object {
