@@ -1,0 +1,127 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="appName">DuckDuckGo</string>
+    <string name="duckDuckGoLogoDescription">DuckDuckGo logosu</string>
+
+    <!-- Onboarding Activity -->
+    <string name="onboardingProtectDataTitle">Verilerinizi Koruyun</string>
+    <string name="onboardingNoTraceDescription1">Sekmelerinizi ve göz atma geçmişinizi silmek için Ateş düğmesine dokunun.</string>
+    <string name="onboardingDefaultBrowserTitle">Varsayılan Yap</string>
+    <string name="onboardingDefaultBrowserGoToSettingsAction">Ayarlara git</string>
+
+    <!-- Default Browser -->
+    <string name="defaultBrowserInfoTitle">Varsayılan Tarayıcınız Yapın</string>
+    <string name="defaultBrowserInfoMessage">DuckDuckGo\'yu tam zamanlı izleme koruması için Cihaz Ayarları\'nızda varsayılan tarayıcı yapın.</string>
+    <string name="dismissDefaultBrowserInfo">Varsayılan tarayıcı bilgisini reddet</string>
+    <string name="notificationBannerDefaultBrowserTitle">DuckDuckGo\'yu Varsayılan Tarayıcı Yap</string>
+    <string name="notificationBannerDefaultBrowserMessage">Tam zamanlı izleme koruması için varsayılanınız yapın</string>
+    <string name="settingsDefaultBrowserEnabled">Varsayılan tarayıcı olarak ayarla</string>
+
+    <!-- Browser Activity -->
+    <string name="browserPopupMenu">Tarayıcı menüsü</string>
+    <string name="refresh">Yenile</string>
+    <string name="back">Geri</string>
+    <string name="forward">İleri</string>
+
+    <string name="clearButtonContentDescription">Arama girişini temizle</string>
+    <string name="no_compatible_third_party_app_installed">Uyumlu uygulama yüklü değil</string>
+    <string name="addBookmarkMenuTitle">Yer imi ekle</string>
+    <string name="imageOptions">Görüntü seçenekleri</string>
+    <string name="requestDesktopSiteMenuTitle">Masaüstü Sitesi</string>
+
+    <!-- Downloading files -->
+    <string name="downloadImage">İmajı İndir</string>
+    <string name="downloadComplete">İndirme tamamlandı.</string>
+    <string name="downloadFailed">İndirme başarısız</string>
+    <string name="downloadInProgress">İndiriliyor</string>
+
+    <!-- Sharing options -->
+    <string name="linkOptions">Bağlantı Seçenekleri</string>
+    <string name="shareLink">Linki paylaş</string>
+    <string name="shareMenuTitle">Paylaş...</string>
+
+    <!-- Find in page -->
+    <string name="find_in_page">Sayfada bul</string>
+    <string name="nextSearchTermDescription">Sonrakini Bul</string>
+    <string name="previousSearchTermDescription">Öncekini bul</string>
+    <string name="findInPageHint">Sayfada bul</string>
+    <string name="findInPageMatches">%d/%d</string>
+
+    <!-- AutoComplete Suggestions -->
+    <string name="editQueryBeforeSubmitting">Aramadan önce sorguyu düzenle</string>
+    <string name="settingsAutocompleteEnabled">Otomatik Tamamlama Önerileri</string>
+
+    <!-- Tabs -->
+    <string name="homeTab">DuckDuckGo</string>
+    <string name="tabActivityTitle">Sekmeler</string>
+    <string name="tabsMenuItem">Sekmeler</string>
+    <string name="newTabMenuItem">Yeni sekme</string>
+    <string name="openInNewTab">Yeni sekmede aç</string>
+    <string name="faviconContentDescription">Favicon</string>
+    <string name="closeContentDescription">Kapat</string>
+    <string name="tapFireDirective">Sekme</string>
+    <string name="tapFireIconDescription">Ateş</string>
+
+    <!-- Privacy Dashboard Activities -->
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ENHANCED FROM &lt;img src="%d" /> TO &lt;img src="%d" /></string>
+
+    <string name="httpsGood">Şifrelenmiş Bağlantı</string>
+    <string name="httpsMixed">Karışık Şifreleme bağlantısı</string>
+    <string name="httpsBad">Şifrelenmemiş Bağlantı</string>
+
+
+
+
+
+
+
+
+
+    <string name="privacyProtectionToggle">Gizlilik koruması</string>
+
+
+    <!-- Fire -->
+    <string name="fireMenu">Verileri temizle</string>
+    <string name="fireClearAll">Tüm Sekmeleri ve Verileri Temizle</string>
+    <string name="fireCancel">İptal</string>
+    <string name="fireDataCleared">Veri temizlendi</string>
+
+    <!-- Settings Activity -->
+    <string name="settingsActivityTitle">Ayarlar</string>
+    <string name="settingsMenuItemTitle">Ayarlar</string>
+    <string name="settingsHeadingGeneral">Genel</string>
+    <string name="settingsHeadingOther">Diğer</string>
+    <string name="settingsAboutDuckduckgo">DuckDuckGo Hakkında</string>
+    <string name="settingsVersion">Versiyon</string>
+    <string name="leaveFeedback">Geri bildirim bırakın</string>
+
+    <!-- About Activity -->
+    <string name="aboutActivityTitle">Hakkımızda</string>
+    <string name="aboutHeading">Gizlilik, basitleştirilmiş.</string>
+    <string name="aboutDescription">DuckDuckGo\'da, yeni güven standardı ayarlıyoruz.\n
+  \\\n
+          DuckDuckGo Gizlilik Tarayıcı, izleyici engelleme, daha akıllı şifreleme ve DuckDuckGo özel arama dahil olmak üzere, web\'de arama yaparken ve web\'de gezinirken kendinizi korumak için ihtiyacınız olan tüm gizlilik esaslarını sağlar.\n
+  \\\n
+          Sonuçta, internet çok ürkütücü hissetmemeli ve çevrimiçi hakettiğiniz mahremiyeti elde etmek, panjurları kapatmak kadar basit olmalı.</string>
+    <string name="aboutMoreLink">duckduckgo.com/about adresinde daha fazla bilgi</string>
+    <string name="no_suggestions">Öneri yok</string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">Yer imleri</string>
+    <string name="bookmarksActivityTitle">Yer imleri</string>
+    <string name="bookmarkDeleteConfirmMessage"><b>%s</b> işaretini silmek istediğinizden emin misiniz?</string>
+    <string name="bookmarkDeleteConfirmTitle">Onayla</string>
+    <string name="bookmarkAddedFeedback">Yer imi eklendi</string>
+    <string name="bookmarkTitleHint">Yer imi başlığı</string>
+    <string name="bookmarkSave">Kaydet</string>
+    <string name="bookmarkTitleEdit">Yer imini Düzenle</string>
+    <string name="bookmarkTitleSave">Yer imini Kaydet</string>
+    <string name="noBookmarks">Henüz yer işareti eklenmedi</string>
+    <string name="bookmarkOverflowContentDescription">%s yer imi için daha fazla seçenek</string>
+    <string name="delete">Sil</string>
+    <string name="edit">Düzenle</string>
+
+    <!-- Widget -->
+    <string name="searchWidgetTextHint">DuckDuckGo\'da ara</string>
+
+</resources>
