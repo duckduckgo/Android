@@ -116,6 +116,11 @@
                 android:layout_height="wrap_content" />
 
             <TextView
+                android:id="@+id/feedbackPopupMenuItem"
+                style="@style/BrowserTextMenuItem"
+                android:text="@string/feedbackMenuItemTitle" />
+
+            <TextView
                 android:id="@+id/settingsPopupMenuItem"
                 style="@style/BrowserTextMenuItem"
                 android:text="@string/settingsMenuItemTitle" />

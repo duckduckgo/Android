@@ -21,7 +21,7 @@
     <dimen name="onboardingButtonPadding">30dp</dimen>
     <dimen name="onboardingTitleTextSize">32sp</dimen>
     <dimen name="onboardingSubtitleTextSize">20sp</dimen>
-    <dimen name="defaultBrowserInfoTitleTextSize">30sp</dimen>
-    <dimen name="defaultBrowserInfoDescriptionTextSize">20sp</dimen>
+    <dimen name="modalCardTitleTextSize">30sp</dimen>
+    <dimen name="modalCardDescriptionTextSize">20sp</dimen>
     <dimen name="defaultBrowserInfoSettingsButtonTextSize">20sp</dimen>
 </resources>

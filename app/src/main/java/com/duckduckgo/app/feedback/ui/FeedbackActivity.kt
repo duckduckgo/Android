@@ -16,3 +16,49 @@
 
 package com.duckduckgo.app.feedback.ui
 
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
+import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.ViewModelFactory
+import kotlinx.android.synthetic.main.include_toolbar.*
+import javax.inject.Inject
+
+
+class FeedbackActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
+
+    private val viewModel: FeedbackViewModel by lazy {
+        ViewModelProviders.of(this, viewModelFactory).get(FeedbackViewModel::class.java)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_feedback)
+        configureToolbar()
+
+        viewModel.viewState.observe(this, Observer<FeedbackViewModel.ViewState> {
+            it?.let { render(it) }
+        })
+    }
+
+    private fun configureToolbar() {
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    private fun render(viewState: FeedbackViewModel.ViewState) {
+    }
+
+    companion object {
+        fun intent(context: Context): Intent {
+            return Intent(context, FeedbackActivity::class.java)
+        }
+    }
+}

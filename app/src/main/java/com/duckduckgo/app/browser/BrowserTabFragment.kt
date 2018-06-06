@@ -194,8 +194,9 @@ class BrowserTabFragment : Fragment(), FindListener {
             onMenuItemClicked(view.newTabPopupMenuItem) { browserActivity?.launchNewTab() }
             onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
             onMenuItemClicked(view.addBookmarksPopupMenuItem) { addBookmark() }
-            onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
             onMenuItemClicked(view.findInPageMenuItem) { viewModel.userRequestingToFindInPage() }
+            onMenuItemClicked(view.feedbackPopupMenuItem) { browserActivity?.launchFeedback() }
+            onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
             onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) {
                 viewModel.desktopSiteModeToggled(
                         urlString = webView?.url,

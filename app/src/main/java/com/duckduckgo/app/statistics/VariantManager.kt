@@ -39,9 +39,7 @@ interface VariantManager {
         val DEFAULT_VARIANT = Variant(key = "", features = emptyList())
 
         val ACTIVE_VARIANTS = listOf(
-            Variant(key = "mw", weight = 25.0, features = listOf(ShowInOnboarding)),
-            Variant(key = "mx", weight = 25.0, features = listOf(ShowInOnboarding, ShowTimedReminder)),
-            Variant(key = "my", weight = 50.0, features = emptyList())
+            Variant(key = "mx", weight = 25.0, features = listOf(ShowInOnboarding, ShowTimedReminder))
         )
     }
 

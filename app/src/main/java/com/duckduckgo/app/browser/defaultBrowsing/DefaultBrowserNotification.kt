@@ -68,7 +68,7 @@ class DefaultBrowserTimeBasedNotification @Inject constructor(
     }
 
     private fun isFeatureEnabled(): Boolean {
-        return variantManager.getVariant().hasFeature(DefaultBrowserFeature.ShowTimedReminder)
+        return true
     }
 
     private fun isAlreadyDefaultBrowser(): Boolean {
@@ -80,15 +80,7 @@ class DefaultBrowserTimeBasedNotification @Inject constructor(
     }
 
     private fun hasEnoughTimeElapsed(now: Long): Boolean {
-        val elapsed = calculateElapsedTime(now)
-
-        return if (elapsed >= ELAPSED_TIME_THRESHOLD_MS) {
-            Timber.v("Enough time has elapsed to show banner")
-            true
-        } else {
-            Timber.v("Not enough time has elapsed to show banner")
-            false
-        }
+       return true
     }
 
     private fun calculateElapsedTime(now: Long): Long {

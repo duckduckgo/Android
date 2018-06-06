@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2018 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    tools:context="com.duckduckgo.app.feedback.ui.FeedbackActivity">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/notification_info_bottom_background">
+
+            <View
+                android:id="@+id/titleSection"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@drawable/notification_info_top_background"
+                android:elevation="4dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="@+id/description"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="30dp"
+                android:elevation="@dimen/modalCardHeaderElevation"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_icon_heart_26dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/titleSection" />
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:elevation="@dimen/modalCardHeaderElevation"
+                android:text="@string/feedbackHeading"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="@dimen/modalCardTitleTextSize"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/icon" />
+
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="3dp"
+                android:elevation="@dimen/modalCardHeaderElevation"
+                android:lineSpacingExtra="4sp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="30dp"
+                android:text="@string/feedbackModalDescription"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="@dimen/modalCardDescriptionTextSize"
+                app:layout_constraintTop_toBottomOf="@id/title" />
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/brokenSiteSwitch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="13dp"
+                android:fontFamily="sans-serif-medium"
+                android:padding="16dp"
+                android:text="@string/feedbackReportBrokenSite"
+                android:textColor="@color/warmerGray"
+                android:textSize="15sp"
+                android:textStyle="normal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/description"
+                tools:checked="true" />
+
+            <TextView
+                android:id="@+id/brokenSiteConfirmation"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center_horizontal"
+                android:lineSpacingExtra="5sp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/feedbackDomainAdded"
+                android:textColor="@color/mediumGreen"
+                android:textSize="14sp"
+                android:textStyle="normal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/brokenSiteSwitch"
+                app:layout_goneMarginBottom="6dp" />
+
+            <EditText
+                android:id="@+id/brokenSiteUrl"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:hint="@string/feedbackUrlHint"
+                android:imeOptions="flagNoExtractUi"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/brokenSiteConfirmation" />
+
+            <EditText
+                android:id="@+id/feedbackDescriptionEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:hint="@string/feedbackMessageHint"
+                android:minHeight="120dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/brokenSiteUrl" />
+
+            <Button
+                android:id="@+id/submitButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/modal_card_rounded_button_bg"
+                android:text="@string/feedbackSubmitButton"
+                android:textColor="@color/white"
+                android:textSize="@dimen/defaultBrowserInfoSettingsButtonTextSize"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/feedbackDescriptionEditText" />
+
+            <TextView
+                android:id="@+id/anonymousText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center_horizontal"
+                android:paddingBottom="30dp"
+                android:text="@string/feedbackIsAnonymousLink"
+                android:textColor="@color/twilightBlue"
+                android:textStyle="normal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/submitButton" />
+
+        </android.support.constraint.ConstraintLayout>
+
+    </LinearLayout>
+
+</ScrollView>
+
