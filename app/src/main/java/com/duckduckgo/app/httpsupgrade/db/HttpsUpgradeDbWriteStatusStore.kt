@@ -24,18 +24,19 @@ import javax.inject.Inject
 
 interface HttpsUpgradeDbWriteStatusStore {
 
-    fun updateStatus(writeComplete: Boolean)
-    fun hasWriteCompleted(): Boolean
+    fun saveETag(eTag: String?)
+    fun isMatchingETag(eTag: String?): Boolean
 }
 
 class HttpsUpgradeDbWriteStatusSharedPreferences @Inject constructor(private val context: Context) : HttpsUpgradeDbWriteStatusStore {
 
-    override fun updateStatus(writeComplete: Boolean) {
-        preferences.edit { putBoolean(KEY_WRITE_COMPLETED, writeComplete) }
+    override fun saveETag(eTag: String?) {
+        preferences.edit { putString(KEY_ETAG_OF_LAST_FULL_WRITE, eTag) }
     }
 
-    override fun hasWriteCompleted(): Boolean {
-        return preferences.getBoolean(KEY_WRITE_COMPLETED, false)
+    override fun isMatchingETag(eTag: String?): Boolean {
+        val existingETag = preferences.getString(KEY_ETAG_OF_LAST_FULL_WRITE, null)
+        return eTag == existingETag
     }
 
     private val preferences: SharedPreferences
@@ -45,6 +46,6 @@ class HttpsUpgradeDbWriteStatusSharedPreferences @Inject constructor(private val
 
         @VisibleForTesting
         const val FILENAME = "com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDbWriteStatus"
-        const val KEY_WRITE_COMPLETED = "KEY_WRITE_COMPLETED"
+        const val KEY_ETAG_OF_LAST_FULL_WRITE = "KEY_ETAG_OF_LAST_FULL_WRITE"
     }
 }

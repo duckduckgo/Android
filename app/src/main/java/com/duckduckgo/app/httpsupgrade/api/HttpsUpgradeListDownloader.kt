@@ -32,7 +32,8 @@ import javax.inject.Inject
  * The network cache could therefore deliver the cached value and we could skip writing to the DB thinking we'd already successfully written it all.
  *
  * To counter this, we need an external mechanism to track whether the write completed successfully or not.
- * Using this, we can detect if the write failed when we next download the data. We'll only skip the DB inserts if cache returns the list and the write flag is set such that it finished writing successfully.
+ * Using this, we can detect if the write failed when we next download the data. We'll only skip the DB inserts if cache returns the list and the
+ * the eTag received in the response headers matches the eTag we stored on last successful write, indicating that it finished writing successfully.
  * @see HttpsUpgradeDbWriteStatusStore for how this status flag is stored.
  */
 class HttpsUpgradeListDownloader @Inject constructor(
@@ -50,8 +51,9 @@ class HttpsUpgradeListDownloader @Inject constructor(
 
             val call = service.https()
             val response = call.execute()
+            val eTag = response.headers().get("etag")
 
-            if (response.isCached && dbWriteStatusStore.hasWriteCompleted() && httpsUpgradeDao.count() != 0) {
+            if (response.isCached && dbWriteStatusStore.isMatchingETag(eTag)) {
                 Timber.d("HTTPS data already cached and stored")
                 return@fromAction
             }
@@ -63,32 +65,25 @@ class HttpsUpgradeListDownloader @Inject constructor(
 
                 val startTime = System.currentTimeMillis()
 
-                modifyHttpsDatabase {
-                    httpsUpgradeDao.deleteAll()
-                    Timber.v("Took ${System.currentTimeMillis() - startTime}ms to delete existing records")
+                httpsUpgradeDao.deleteAll()
+                Timber.v("Took ${System.currentTimeMillis() - startTime}ms to delete existing records")
 
-                    val chunks = domains.chunked(chunkSize)
-                    Timber.i("Received ${domains.size} HTTPS domains; chunking by $chunkSize into ${chunks.size} separate DB transactions")
+                val chunks = domains.chunked(chunkSize)
+                Timber.i("Received ${domains.size} HTTPS domains; chunking by $chunkSize into ${chunks.size} separate DB transactions")
 
-                    chunks.forEach {
-                        database.runInTransaction {
-                            httpsUpgradeDao.insertAll(it)
-                        }
+                chunks.forEach {
+                    database.runInTransaction {
+                        httpsUpgradeDao.insertAll(it)
                     }
-
-                    Timber.i("Successfully wrote HTTPS data; took ${System.currentTimeMillis() - startTime}ms")
                 }
+
+                dbWriteStatusStore.saveETag(eTag)
+                Timber.i("Successfully wrote HTTPS data; took ${System.currentTimeMillis() - startTime}ms")
 
             } else {
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
         }
-    }
-
-    private inline fun modifyHttpsDatabase(function: () -> Unit) {
-        dbWriteStatusStore.updateStatus(false)
-        function()
-        dbWriteStatusStore.updateStatus(true)
     }
 
     companion object {
