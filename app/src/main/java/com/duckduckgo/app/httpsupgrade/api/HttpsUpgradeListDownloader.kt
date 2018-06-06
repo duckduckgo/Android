@@ -51,7 +51,7 @@ class HttpsUpgradeListDownloader @Inject constructor(
 
             val call = service.https()
             val response = call.execute()
-            val eTag = response.headers().get("etag")
+            val eTag = response.headers().get(HEADER_ETAG)
 
             if (response.isCached && dbWriteStatusStore.isMatchingETag(eTag)) {
                 Timber.d("HTTPS data already cached and stored")
@@ -88,5 +88,6 @@ class HttpsUpgradeListDownloader @Inject constructor(
 
     companion object {
         private const val INSERTION_CHUNK_SIZE = 1_000
+        private const val HEADER_ETAG = "etag"
     }
 }
