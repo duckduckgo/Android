@@ -101,7 +101,7 @@ class HttpsUpgraderPerformanceTest {
     private fun ingest(size: Int): Array<String> {
         val start = System.currentTimeMillis()
         for (i in 0 .. size) {
-            dao.insertAll(HttpsUpgradeDomain("domain$i.com"))
+            dao.insertAll(listOf(HttpsUpgradeDomain("domain$i.com")))
         }
 
         val testDomains = Array(size, {

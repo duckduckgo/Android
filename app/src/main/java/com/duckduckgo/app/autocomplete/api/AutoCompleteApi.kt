@@ -16,16 +16,12 @@
 
 package com.duckduckgo.app.autocomplete.api
 
-import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.global.UriString
 import io.reactivex.Observable
 import javax.inject.Inject
 
 
-open class AutoCompleteApi @Inject constructor(
-        private val autoCompleteService: AutoCompleteService,
-        private val queryUrlConverter: QueryUrlConverter
-) {
+open class AutoCompleteApi @Inject constructor(private val autoCompleteService: AutoCompleteService) {
 
     fun autoComplete(query: String): Observable<AutoCompleteApi.AutoCompleteResult> {
 
@@ -34,16 +30,18 @@ open class AutoCompleteApi @Inject constructor(
         }
 
         return autoCompleteService.autoComplete(query)
-                .flatMapIterable { it -> it }
-                .map { AutoCompleteSuggestion(it.phrase, UriString.isWebUrl(it.phrase)) }
-                .toList()
-                .onErrorReturn { emptyList() }
-                .map { AutoCompleteResult(query = query, suggestions = it) }
-                .toObservable()
+            .flatMapIterable { it -> it }
+            .map { AutoCompleteSuggestion(it.phrase, UriString.isWebUrl(it.phrase)) }
+            .toList()
+            .onErrorReturn { emptyList() }
+            .map { AutoCompleteResult(query = query, suggestions = it) }
+            .toObservable()
     }
 
-    data class AutoCompleteResult(val query: String,
-                                  val suggestions: List<AutoCompleteSuggestion>)
+    data class AutoCompleteResult(
+        val query: String,
+        val suggestions: List<AutoCompleteSuggestion>
+    )
 
     data class AutoCompleteSuggestion(val phrase: String, val isUrl: Boolean)
 
