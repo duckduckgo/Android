@@ -51,44 +51,44 @@ class HttpsUpgradeDomainDaoTest {
 
     @Test
     fun whenExactMatchDomainAddedAndThenAllDeletedThenDoesNotContainExactMatchDomain() {
-        dao.insertAll(HttpsUpgradeDomain(exactMatchDomain))
+        dao.insertAll(listOf(HttpsUpgradeDomain(exactMatchDomain)))
         dao.deleteAll()
         assertFalse(dao.hasDomain(exactMatchDomain))
     }
 
     @Test
     fun whenWildcardDomainInsertedModelThenDoesNotContainParentOfWildcardDomain() {
-        dao.insertAll(HttpsUpgradeDomain(wildcardDomain))
+        dao.insertAll(listOf(HttpsUpgradeDomain(wildcardDomain)))
         assertFalse(dao.hasDomain(parentOfWildcardDomain))
     }
 
     @Test
     fun whenOtherWildcardDomainInsertedThenModelDoesNotContainExampleWildcardDomain() {
-        dao.insertAll(HttpsUpgradeDomain(otherWildcardDomain))
+        dao.insertAll(listOf(HttpsUpgradeDomain(otherWildcardDomain)))
         assertFalse(dao.hasDomain(exampleWildcardDomain))
     }
 
     @Test
     fun whenWildcardDomainInsertedThenModelDoesNotContainExactMatchDomain() {
-        dao.insertAll(HttpsUpgradeDomain(wildcardDomain))
+        dao.insertAll(listOf(HttpsUpgradeDomain(wildcardDomain)))
         assertFalse(dao.hasDomain(exactMatchDomain))
     }
 
     @Test
     fun whenWildcardDomainInsertedThenModelContainsExampleWildcardDomain() {
-        dao.insertAll(HttpsUpgradeDomain(wildcardDomain))
+        dao.insertAll(listOf(HttpsUpgradeDomain(wildcardDomain)))
         assertTrue(dao.hasDomain("*.$parentOfWildcardDomain"))
     }
 
     @Test
     fun whenExactMatchDomainInsertedThenModelDoesNotContainOtherDomain() {
-        dao.insertAll(HttpsUpgradeDomain(exactMatchDomain))
+        dao.insertAll(listOf(HttpsUpgradeDomain(exactMatchDomain)))
         assertFalse(dao.hasDomain(otherDomain))
     }
 
     @Test
     fun whenExactMatchDomainIsInsertedThenModelContainsExactMatchDomain() {
-        dao.insertAll(HttpsUpgradeDomain(exactMatchDomain))
+        dao.insertAll(listOf(HttpsUpgradeDomain(exactMatchDomain)))
         assertTrue(dao.hasDomain(exactMatchDomain))
     }
 
@@ -104,7 +104,7 @@ class HttpsUpgradeDomainDaoTest {
 
     @Test
     fun whenModelContainsTwoItemsThenCountIsTwo() {
-        dao.insertAll(HttpsUpgradeDomain(exactMatchDomain), HttpsUpgradeDomain(otherDomain))
+        dao.insertAll(listOf(HttpsUpgradeDomain(exactMatchDomain), HttpsUpgradeDomain(otherDomain)))
         assertEquals(2, dao.count())
     }
 
