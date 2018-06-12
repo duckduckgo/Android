@@ -181,19 +181,19 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSubmittedQueryHasWhitespaceItIsTrimmed() {
         testee.onUserSubmittedQuery(" nytimes.com ")
-        assertEquals("nytimes.com", viewState().omnibarText)
+        assertEquals("nytimes.com", viewState().omnibarViewState.omnibarText)
     }
 
     @Test
     fun whenUrlPresentThenAddBookmarkButtonEnabled() {
         testee.urlChanged("www.example.com")
-        assertTrue(viewState().canAddBookmarks)
+        assertTrue(viewState().menuViewState.canAddBookmarks)
     }
 
     @Test
     fun whenNoUrlThenAddBookmarkButtonDisabled() {
         testee.urlChanged(null)
-        assertFalse(viewState().canAddBookmarks)
+        assertFalse(viewState().menuViewState.canAddBookmarks)
     }
 
     @Test
@@ -232,13 +232,13 @@ class BrowserTabViewModelTest {
     @Test
     fun whenViewModelNotifiedThatWebViewIsLoadingThenViewStateIsUpdated() {
         testee.loadingStarted()
-        assertTrue(viewState().isLoading)
+        assertTrue(viewState().loadingViewState.isLoading)
     }
 
     @Test
     fun whenViewModelNotifiedThatWebViewHasFinishedLoadingThenViewStateIsUpdated() {
         testee.loadingFinished()
-        assertFalse(viewState().isLoading)
+        assertFalse(viewState().loadingViewState.isLoading)
     }
 
     @Test
@@ -252,14 +252,14 @@ class BrowserTabViewModelTest {
     fun whenLoadingFinishedWithUrlThenOmnibarTextUpdatedToMatch() {
         val exampleUrl = "http://example.com/abc"
         testee.loadingFinished(exampleUrl)
-        assertEquals(exampleUrl, viewState().omnibarText)
+        assertEquals(exampleUrl, viewState().omnibarViewState.omnibarText)
     }
 
     @Test
     fun whenLoadingFinishedWithQueryUrlThenOmnibarTextUpdatedToShowQuery() {
         val queryUrl = "http://duckduckgo.com?q=test"
         testee.loadingFinished(queryUrl)
-        assertEquals("test", viewState().omnibarText)
+        assertEquals("test", viewState().omnibarViewState.omnibarText)
     }
 
     @Test
@@ -267,7 +267,7 @@ class BrowserTabViewModelTest {
         val exampleUrl = "http://example.com/abc"
         testee.urlChanged(exampleUrl)
         testee.loadingFinished(null)
-        assertEquals(exampleUrl, viewState().omnibarText)
+        assertEquals(exampleUrl, viewState().omnibarViewState.omnibarText)
     }
 
     @Test
@@ -285,30 +285,30 @@ class BrowserTabViewModelTest {
     @Test
     fun whenViewModelNotifiedThatUrlGotFocusThenViewStateIsUpdated() {
         testee.onOmnibarInputStateChanged("", true)
-        assertTrue(viewState().isEditing)
+        assertTrue(viewState().omnibarViewState.isEditing)
     }
 
     @Test
     fun whenViewModelNotifiedThatUrlLostFocusThenViewStateIsUpdated() {
         testee.onOmnibarInputStateChanged("", false)
-        assertFalse(viewState().isEditing)
+        assertFalse(viewState().omnibarViewState.isEditing)
     }
 
     @Test
     fun whenNoOmnibarTextEverEnteredThenViewStateHasEmptyString() {
-        assertEquals("", viewState().omnibarText)
+        assertEquals("", viewState().omnibarViewState.omnibarText)
     }
 
     @Test
     fun whenUrlChangedThenViewStateIsUpdated() {
         testee.urlChanged("duckduckgo.com")
-        assertEquals("duckduckgo.com", viewState().omnibarText)
+        assertEquals("duckduckgo.com", viewState().omnibarViewState.omnibarText)
     }
 
     @Test
     fun whenUrlChangedWithDuckDuckGoUrlContainingQueryThenUrlRewrittenToContainQuery() {
         testee.urlChanged("http://duckduckgo.com?q=test")
-        assertEquals("test", viewState().omnibarText)
+        assertEquals("test", viewState().omnibarViewState.omnibarText)
     }
 
     @Test
@@ -320,25 +320,25 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUrlChangedWithDuckDuckGoUrlNotContainingQueryThenFullUrlShown() {
         testee.urlChanged("http://duckduckgo.com")
-        assertEquals("http://duckduckgo.com", viewState().omnibarText)
+        assertEquals("http://duckduckgo.com", viewState().omnibarViewState.omnibarText)
     }
 
     @Test
     fun whenUrlChangedWithNonDuckDuckGoUrlThenFullUrlShown() {
         testee.urlChanged("http://example.com")
-        assertEquals("http://example.com", viewState().omnibarText)
+        assertEquals("http://example.com", viewState().omnibarViewState.omnibarText)
     }
 
     @Test
     fun whenViewModelGetsProgressUpdateThenViewStateIsUpdated() {
         testee.progressChanged(0)
-        assertEquals(0, viewState().progress)
+        assertEquals(0, viewState().loadingViewState.progress)
 
         testee.progressChanged(50)
-        assertEquals(50, viewState().progress)
+        assertEquals(50, viewState().loadingViewState.progress)
 
         testee.progressChanged(100)
-        assertEquals(100, viewState().progress)
+        assertEquals(100, viewState().loadingViewState.progress)
     }
 
     @Test
@@ -364,21 +364,21 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenInitialisedThenPrivacyGradeIsNotShown() {
-        assertFalse(viewState().showPrivacyGrade)
+        assertFalse(viewState().menuViewState.showPrivacyGrade)
     }
 
     @Test
     fun whenUrlUpdatedAfterConfigDownloadThenPrivacyGradeIsShown() {
         testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
         testee.urlChanged((""))
-        assertTrue(viewState().showPrivacyGrade)
+        assertTrue(viewState().menuViewState.showPrivacyGrade)
     }
 
     @Test
     fun whenUrlUpdatedBeforeConfigDownloadThenPrivacyGradeIsShown() {
         testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = false))
         testee.urlChanged((""))
-        assertFalse(viewState().showPrivacyGrade)
+        assertFalse(viewState().menuViewState.showPrivacyGrade)
     }
 
     @Test
@@ -386,114 +386,114 @@ class BrowserTabViewModelTest {
         testee.onUserSubmittedQuery("foo")
         testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false)
-        assertTrue(viewState().showPrivacyGrade)
+        assertTrue(viewState().menuViewState.showPrivacyGrade)
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusAndAppConfigDownloadedButBrowserNotShownThenPrivacyGradeIsHidden() {
         testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false)
-        assertFalse(viewState().showPrivacyGrade)
+        assertFalse(viewState().menuViewState.showPrivacyGrade)
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusAndAppConfigNotDownloadedThenPrivacyGradeIsNotShown() {
         testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = false))
         testee.onOmnibarInputStateChanged("", false)
-        assertFalse(viewState().showPrivacyGrade)
+        assertFalse(viewState().menuViewState.showPrivacyGrade)
     }
 
     @Test
     fun whenOmnibarInputHasFocusThenPrivacyGradeIsNotShown() {
         testee.onOmnibarInputStateChanged("", true)
-        assertFalse(viewState().showPrivacyGrade)
+        assertFalse(viewState().menuViewState.showPrivacyGrade)
     }
 
     @Test
     fun whenInitialisedThenFireButtonIsShown() {
-        assertTrue(viewState().showFireButton)
+        assertTrue(viewState().menuViewState.showFireButton)
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusAndHasQueryThenFireButtonIsShown() {
         testee.onOmnibarInputStateChanged("query", false)
-        assertTrue(viewState().showFireButton)
+        assertTrue(viewState().menuViewState.showFireButton)
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusOrQueryThenFireButtonIsShown() {
         testee.onOmnibarInputStateChanged("", false)
-        assertTrue(viewState().showFireButton)
+        assertTrue(viewState().menuViewState.showFireButton)
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndNoQueryThenFireButtonIsShown() {
         testee.onOmnibarInputStateChanged("", true)
-        assertTrue(viewState().showFireButton)
+        assertTrue(viewState().menuViewState.showFireButton)
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndQueryThenFireButtonIsHidden() {
         testee.onOmnibarInputStateChanged("query", true)
-        assertFalse(viewState().showFireButton)
+        assertFalse(viewState().menuViewState.showFireButton)
     }
 
     @Test
     fun whenInitialisedThenTabsButtonIsShown() {
-        assertTrue(viewState().showTabsButton)
+        assertTrue(viewState().menuViewState.showTabsButton)
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusOrQueryThenTabsButtonIsShown() {
         testee.onOmnibarInputStateChanged("", false)
-        assertTrue(viewState().showTabsButton)
+        assertTrue(viewState().menuViewState.showTabsButton)
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusAndHasQueryThenTabsButtonIsShown() {
         testee.onOmnibarInputStateChanged("query", false)
-        assertTrue(viewState().showTabsButton)
+        assertTrue(viewState().menuViewState.showTabsButton)
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndNoQueryThenTabsButtonIsShown() {
         testee.onOmnibarInputStateChanged("", true)
-        assertTrue(viewState().showTabsButton)
+        assertTrue(viewState().menuViewState.showTabsButton)
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndQueryThenTabsButtonIsHidden() {
         testee.onOmnibarInputStateChanged("query", true)
-        assertFalse(viewState().showTabsButton)
+        assertFalse(viewState().menuViewState.showTabsButton)
     }
 
     @Test
     fun whenInitialisedThenMenuButtonIsShown() {
-        assertTrue(viewState().showMenuButton)
+        assertTrue(viewState().menuViewState.showMenuButton)
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusOrQueryThenMenuButtonIsShown() {
         testee.onOmnibarInputStateChanged("", false)
-        assertTrue(viewState().showMenuButton)
+        assertTrue(viewState().menuViewState.showMenuButton)
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusAndHasQueryThenMenuButtonIsShown() {
         testee.onOmnibarInputStateChanged("query", false)
-        assertTrue(viewState().showMenuButton)
+        assertTrue(viewState().menuViewState.showMenuButton)
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndNoQueryThenMenuButtonIsShown() {
         testee.onOmnibarInputStateChanged("", true)
-        assertTrue(viewState().showMenuButton)
+        assertTrue(viewState().menuViewState.showMenuButton)
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndQueryThenMenuButtonIsHidden() {
         testee.onOmnibarInputStateChanged("query", true)
-        assertFalse(viewState().showMenuButton)
+        assertFalse(viewState().menuViewState.showMenuButton)
     }
 
     @Test
@@ -541,7 +541,7 @@ class BrowserTabViewModelTest {
     fun whenNotifiedEnteringFullScreenThenViewStateUpdatedWithFullScreenFlag() {
         val stubView = View(InstrumentationRegistry.getTargetContext())
         testee.goFullScreen(stubView)
-        assertTrue(viewState().isFullScreen)
+        assertTrue(viewState().browserViewState.isFullScreen)
     }
 
     @Test
@@ -555,12 +555,12 @@ class BrowserTabViewModelTest {
     @Test
     fun whenNotifiedLeavingFullScreenThenViewStateUpdatedWithFullScreenFlagDisabled() {
         testee.exitFullScreen()
-        assertFalse(viewState().isFullScreen)
+        assertFalse(viewState().browserViewState.isFullScreen)
     }
 
     @Test
     fun whenViewModelInitialisedThenFullScreenFlagIsDisabled() {
-        assertFalse(viewState().isFullScreen)
+        assertFalse(viewState().browserViewState.isFullScreen)
     }
 
     @Test
