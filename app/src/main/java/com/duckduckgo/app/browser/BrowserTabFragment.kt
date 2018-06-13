@@ -726,8 +726,6 @@ class BrowserTabFragment : Fragment(), FindListener {
             renderFindInPageState(viewState.findInPage)
             renderDefaultBrowserBanner(viewState.defaultBrowserViewState)
 
-            toggleDesktopSiteMode(viewState.isDesktopBrowsingMode)
-
             lastSeenViewState = viewState
         }
 
@@ -813,6 +811,8 @@ class BrowserTabFragment : Fragment(), FindListener {
             } else {
                 browserTabFragment.webView?.hide()
             }
+
+            toggleDesktopSiteMode(viewState.isDesktopBrowsingMode)
         }
 
         fun renderToolbarButtons(viewState: MenuViewState) {

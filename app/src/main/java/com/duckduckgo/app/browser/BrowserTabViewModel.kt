@@ -83,8 +83,6 @@ class BrowserTabViewModel(
     data class ViewState(
         val autoComplete: AutoCompleteViewState = AutoCompleteViewState(),
         val findInPage: FindInPage = FindInPage(canFindInPage = false),
-        val isDesktopBrowsingMode: Boolean = false,
-
         val browserViewState: BrowserViewState = BrowserViewState(),
         val omnibarViewState: OmnibarViewState = OmnibarViewState(),
         val loadingViewState: LoadingViewState = LoadingViewState(),
@@ -94,7 +92,8 @@ class BrowserTabViewModel(
 
     data class BrowserViewState(
         val browserShowing: Boolean = false,
-        val isFullScreen: Boolean = false
+        val isFullScreen: Boolean = false,
+        val isDesktopBrowsingMode: Boolean = false
     )
 
     data class OmnibarViewState(
@@ -510,7 +509,8 @@ class BrowserTabViewModel(
     }
 
     fun desktopSiteModeToggled(urlString: String?, desktopSiteRequested: Boolean) {
-        viewState.value = currentViewState().copy(isDesktopBrowsingMode = desktopSiteRequested)
+        val browserViewState = currentViewState().browserViewState
+        viewState.value = currentViewState().copy(browserViewState = browserViewState.copy(isDesktopBrowsingMode = desktopSiteRequested))
 
         if (urlString == null) {
             return

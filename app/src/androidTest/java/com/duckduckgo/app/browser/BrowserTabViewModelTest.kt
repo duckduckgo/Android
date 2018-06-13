@@ -606,13 +606,13 @@ class BrowserTabViewModelTest {
     fun whenUserSelectsDesktopSiteThenDesktopModeStateUpdated() {
         testee.desktopSiteModeToggled("http://example.com", desktopSiteRequested = true)
         verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(viewState().isDesktopBrowsingMode)
+        assertTrue(viewState().browserViewState.isDesktopBrowsingMode)
     }
 
     @Test
     fun whenUserSelectsMobileSiteThenMobileModeStateUpdated() {
         testee.desktopSiteModeToggled("http://example.com", desktopSiteRequested = false)
-        assertFalse(viewState().isDesktopBrowsingMode)
+        assertFalse(viewState().browserViewState.isDesktopBrowsingMode)
     }
 
     @Test
