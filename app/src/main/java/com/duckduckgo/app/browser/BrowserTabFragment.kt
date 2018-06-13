@@ -709,16 +709,13 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         fun render(viewState: ViewState) {
 
-            val startTime = System.currentTimeMillis()
             Timber.v("Rendering view state: $viewState")
 
             if (viewState == lastSeenViewState) {
                 Timber.d("Whole view state is identical so no further rendering required")
-                logTimeTaken(startTime)
                 return
             }
 
-            // rendering
             renderBrowser(viewState.browserViewState)
             renderLoadingIndicator(viewState.loadingViewState)
             renderToolbarButtons(viewState.menuViewState)
@@ -732,22 +729,10 @@ class BrowserTabFragment : Fragment(), FindListener {
             toggleDesktopSiteMode(viewState.isDesktopBrowsingMode)
 
             lastSeenViewState = viewState
-
-            logTimeTaken(startTime)
-        }
-
-        // TODO remove this method
-        private fun logTimeTaken(startTime: Long) {
-            val renderTime = System.currentTimeMillis() - startTime
-            if (renderTime >= 16) {
-                Timber.w("Rendering took ${System.currentTimeMillis() - startTime}ms")
-            } else {
-                Timber.i("Rendering took ${System.currentTimeMillis() - startTime}ms")
-            }
         }
 
         private fun renderDefaultBrowserBanner(viewState: DefaultBrowserViewState) {
-            if(viewState == lastSeenViewState?.defaultBrowserViewState) {
+            if (viewState == lastSeenViewState?.defaultBrowserViewState) {
                 return
             }
 
@@ -759,103 +744,112 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
 
         private fun renderFullScreenView(viewState: BrowserViewState) {
-            if(viewState == lastSeenViewState?.browserViewState) {
+            if (viewState == lastSeenViewState?.browserViewState) {
                 return
             }
 
             browserTabFragment.activity?.isImmersiveModeEnabled()?.let {
-                when (viewState.isFullScreen) {
-                    true -> if (!it) goFullScreen()
-                    false -> if (it) exitFullScreen()
+                if (viewState.isFullScreen) {
+                    if (!it) goFullScreen()
+                } else {
+                    if (it) exitFullScreen()
                 }
             }
         }
 
         private fun renderAutocomplete(viewState: AutoCompleteViewState) {
-            if(viewState == lastSeenViewState?.autoComplete) {
+            if (viewState == lastSeenViewState?.autoComplete) {
                 return
             }
 
-            when (viewState.showSuggestions) {
-                false -> browserTabFragment.autoCompleteSuggestionsList.gone()
-                true -> {
-                    browserTabFragment.autoCompleteSuggestionsList.show()
+            browserTabFragment.apply {
+                if (viewState.showSuggestions) {
+                    autoCompleteSuggestionsList.show()
                     val results = viewState.searchResults.suggestions
-                    browserTabFragment.autoCompleteSuggestionsAdapter.updateData(results)
+                    autoCompleteSuggestionsAdapter.updateData(results)
+                } else {
+                    autoCompleteSuggestionsList.gone()
                 }
             }
         }
 
         private fun renderOmnibar(viewState: OmnibarViewState) {
-            if(viewState == lastSeenViewState?.omnibarViewState) {
+            if (viewState == lastSeenViewState?.omnibarViewState) {
                 return
             }
 
-            when (viewState.isEditing) {
-                true -> browserTabFragment.omniBarContainer.setBackgroundResource(R.drawable.omnibar_editing_background)
-                false -> browserTabFragment.omniBarContainer.background = null
-            }
+            browserTabFragment.apply {
+                if (viewState.isEditing) {
+                    omniBarContainer.setBackgroundResource(R.drawable.omnibar_editing_background)
+                } else {
+                    omniBarContainer.background = null
+                }
 
-            if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
-                browserTabFragment.omnibarTextInput.setText(viewState.omnibarText)
-                browserTabFragment.appBarLayout.setExpanded(true, true)
+                if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
+                    omnibarTextInput.setText(viewState.omnibarText)
+                    appBarLayout.setExpanded(true, true)
+                }
             }
         }
 
         private fun renderLoadingIndicator(viewState: LoadingViewState) {
-            if(viewState == lastSeenViewState?.loadingViewState) {
+            if (viewState == lastSeenViewState?.loadingViewState) {
                 return
             }
 
-            when (viewState.isLoading) {
-                true -> browserTabFragment.pageLoadingIndicator.show()
-                false -> browserTabFragment.pageLoadingIndicator.hide()
+            browserTabFragment.pageLoadingIndicator.apply {
+                if (viewState.isLoading) show() else hide()
+                progress = viewState.progress
             }
-            browserTabFragment.pageLoadingIndicator.progress = viewState.progress
         }
 
         private fun renderBrowser(viewState: BrowserViewState) {
-            if(viewState == lastSeenViewState?.browserViewState) {
+            if (viewState == lastSeenViewState?.browserViewState) {
                 return
             }
 
-            when (viewState.browserShowing) {
-                true -> browserTabFragment.webView?.show()
-                false -> browserTabFragment.webView?.hide()
+            if (viewState.browserShowing) {
+                browserTabFragment.webView?.show()
+            } else {
+                browserTabFragment.webView?.hide()
             }
         }
 
         fun renderToolbarButtons(viewState: MenuViewState) {
-            if(viewState == lastSeenViewState?.menuViewState) {
+            if (viewState == lastSeenViewState?.menuViewState) {
                 return
             }
 
-            browserTabFragment.privacyGradeButton?.isVisible = viewState.showPrivacyGrade
-            browserTabFragment.clearTextButton?.isVisible = viewState.showClearButton
-            browserTabFragment.tabsButton?.isVisible = viewState.showTabsButton
-            browserTabFragment.fireMenuButton?.isVisible = viewState.showFireButton
-            browserTabFragment.menuButton?.isVisible = viewState.showMenuButton
+            browserTabFragment.apply {
+                privacyGradeButton?.isVisible = viewState.showPrivacyGrade
+                clearTextButton?.isVisible = viewState.showClearButton
+                tabsButton?.isVisible = viewState.showTabsButton
+                fireMenuButton?.isVisible = viewState.showFireButton
+                menuButton?.isVisible = viewState.showMenuButton
+            }
         }
 
         private fun renderPopupMenu(viewState: MenuViewState, browserShowing: Boolean) {
-            if(viewState == lastSeenViewState?.menuViewState) {
+            if (viewState == lastSeenViewState?.menuViewState) {
                 return
             }
 
-            browserTabFragment.popupMenu.contentView.backPopupMenuItem.isEnabled = browserShowing && browserTabFragment.webView?.canGoBack() ?: false
-            browserTabFragment.popupMenu.contentView.forwardPopupMenuItem.isEnabled = browserShowing && browserTabFragment.webView?.canGoForward() ?: false
-            browserTabFragment.popupMenu.contentView.refreshPopupMenuItem.isEnabled = browserShowing
-            browserTabFragment.popupMenu.contentView.newTabPopupMenuItem.isEnabled = browserShowing
-            browserTabFragment.popupMenu.contentView.addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
-            browserTabFragment.popupMenu.contentView.sharePageMenuItem?.isEnabled = viewState.canSharePage
+            browserTabFragment.popupMenu.contentView.apply {
+                backPopupMenuItem.isEnabled = browserShowing && browserTabFragment.webView?.canGoBack() ?: false
+                forwardPopupMenuItem.isEnabled = browserShowing && browserTabFragment.webView?.canGoForward() ?: false
+                refreshPopupMenuItem.isEnabled = browserShowing
+                newTabPopupMenuItem.isEnabled = browserShowing
+                addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
+                sharePageMenuItem?.isEnabled = viewState.canSharePage
+            }
         }
 
         private fun renderFindInPageState(viewState: FindInPage) {
-            if(viewState == lastSeenViewState?.findInPage) {
+            if (viewState == lastSeenViewState?.findInPage) {
                 return
             }
 
-            if(viewState.visible) {
+            if (viewState.visible) {
                 showFindInPageView(viewState)
             } else {
                 hideFindInPage()
@@ -871,30 +865,30 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
 
         fun hideFindInPage() {
-            if (browserTabFragment.findInPageContainer.visibility != View.GONE) {
-                browserTabFragment.focusDummy.requestFocus()
-                browserTabFragment.findInPageContainer.gone()
-                browserTabFragment.findInPageInput.hideKeyboard()
+            browserTabFragment.apply {
+                if (findInPageContainer.visibility != View.GONE) {
+                    focusDummy.requestFocus()
+                    findInPageContainer.gone()
+                    findInPageInput.hideKeyboard()
+                }
             }
         }
 
         private fun showFindInPageView(viewState: FindInPage) {
-            if (browserTabFragment.findInPageContainer.visibility != View.VISIBLE) {
-                browserTabFragment.findInPageContainer.show()
-                browserTabFragment.findInPageInput.postDelayed(KEYBOARD_DELAY) {
-                    browserTabFragment.findInPageInput?.showKeyboard()
-                }
-            }
+            browserTabFragment.apply {
 
-            when (viewState.showNumberMatches) {
-                false -> browserTabFragment.findInPageMatches.hide()
-                true -> {
-                    browserTabFragment.findInPageMatches.text = browserTabFragment.getString(
-                        R.string.findInPageMatches,
-                        viewState.activeMatchIndex,
-                        viewState.numberMatches
-                    )
-                    browserTabFragment.findInPageMatches.show()
+                if (findInPageContainer.visibility != View.VISIBLE) {
+                    findInPageContainer.show()
+                    findInPageInput.postDelayed(KEYBOARD_DELAY) {
+                        findInPageInput?.showKeyboard()
+                    }
+                }
+
+                if (viewState.showNumberMatches) {
+                    findInPageMatches.text = getString(R.string.findInPageMatches, viewState.activeMatchIndex, viewState.numberMatches)
+                    findInPageMatches.show()
+                } else {
+                    findInPageMatches.hide()
                 }
             }
         }
@@ -911,14 +905,15 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         private fun exitFullScreen() {
             Timber.i("Exiting full screen")
-            browserTabFragment.webViewFullScreenContainer.removeAllViews()
-            browserTabFragment.webViewFullScreenContainer.gone()
-            browserTabFragment.activity?.toggleFullScreen()
+            browserTabFragment.apply {
+                webViewFullScreenContainer.removeAllViews()
+                webViewFullScreenContainer.gone()
+                activity?.toggleFullScreen()
+            }
         }
 
         private fun shouldUpdateOmnibarTextInput(viewState: OmnibarViewState, omnibarInput: String?) =
             !viewState.isEditing && browserTabFragment.omnibarTextInput.isDifferent(omnibarInput)
-
     }
 
 }
