@@ -19,8 +19,16 @@ package com.duckduckgo.app.global
 import android.app.Activity
 import android.app.Application
 import android.app.Service
+import android.content.Intent
+import android.content.pm.ShortcutManager
+import android.os.Build
+import android.support.annotation.RequiresApi
 import android.support.v4.app.Fragment
+import android.support.v4.content.pm.ShortcutInfoCompat
+import android.support.v4.graphics.drawable.IconCompat
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.notification.NotificationRegistrar
@@ -80,6 +88,10 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         configureDependencyInjection()
         configureLogging()
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            configureAppShortcuts()
+        }
+
         initializeStatistics()
         loadTrackerData()
         configureDataDownloader()
@@ -93,6 +105,34 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         if (!appInstallStore.hasInstallTimestampRecorded()) {
             appInstallStore.installTimestamp = System.currentTimeMillis()
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N_MR1)
+    private fun configureAppShortcuts() {
+        val shortcutInfoNewTab= ShortcutInfoCompat.Builder(this,"newTab")
+            .setShortLabel("New tab")
+            .setIcon(IconCompat.createWithResource(this, R.drawable.ic_tabs_gray_24dp))
+            .setIntent(
+                Intent(this, BrowserActivity::class.java).also {
+                    it.action = Intent.ACTION_VIEW
+                    it.putExtra(BrowserActivity.NEW_SEARCH_EXTRA, true)
+                })
+            .build()
+
+        val shortcutInfoFire= ShortcutInfoCompat.Builder(this,"fire")
+            .setShortLabel("Fire")
+            .setIcon(IconCompat.createWithResource(this, R.drawable.icon_fire_glyph))
+            .setIntent(
+                Intent(this, BrowserActivity::class.java).also {
+                    it.action = Intent.ACTION_VIEW
+                    it.putExtra(BrowserActivity.PERFORM_FIRE_ON_ENTRY_EXTRA, true)
+                })
+            .build()
+
+        val shortcutManager= getSystemService(ShortcutManager::class.java)
+
+        shortcutManager.dynamicShortcuts = listOf(shortcutInfoNewTab.toShortcutInfo(), shortcutInfoFire.toShortcutInfo())
+
     }
 
     protected open fun installLeakCanary(): Boolean {
