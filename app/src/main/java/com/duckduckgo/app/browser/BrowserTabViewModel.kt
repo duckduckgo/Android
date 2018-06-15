@@ -20,6 +20,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
+import android.graphics.Bitmap
 import android.net.Uri
 import android.support.annotation.AnyThread
 import android.support.annotation.StringRes
@@ -40,10 +41,12 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
+import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
+import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
@@ -67,6 +70,7 @@ import java.util.concurrent.TimeUnit
 class BrowserTabViewModel(
     private val statisticsUpdater: StatisticsUpdater,
     private val queryUrlConverter: OmnibarEntryConverter,
+    private val faviconDownloader: FaviconDownloader,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val siteFactory: SiteFactory,
     private val tabRepository: TabRepository,
@@ -118,6 +122,7 @@ class BrowserTabViewModel(
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         object LaunchDefaultAppSystemSettings : Command()
+        class AddHomeShortcut(val title: String, val icon: Bitmap? = null) : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -466,6 +471,27 @@ class BrowserTabViewModel(
         } else {
             command.value = Refresh
         }
+    }
+
+    fun addToHomeScreen(query: String) {
+
+        val faviconUrl = query.toUri().faviconLocation()
+        if (faviconUrl == null) {
+            command.value = AddHomeShortcut(query)
+            return
+        }
+
+        faviconDownloader.download(faviconUrl)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                Timber.i("Successfully got favicon")
+                command.value = AddHomeShortcut(title = query, icon = it)
+            }, { throwable ->
+                Timber.w(throwable, "Failed to obtain favicon")
+                command.value = AddHomeShortcut(query)
+            })
+
     }
 
     fun resetView() {

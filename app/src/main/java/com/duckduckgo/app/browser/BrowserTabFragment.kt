@@ -36,6 +36,9 @@ import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
+import android.support.v4.content.pm.ShortcutInfoCompat
+import android.support.v4.content.pm.ShortcutManagerCompat
+import android.support.v4.graphics.drawable.IconCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.view.*
@@ -48,6 +51,7 @@ import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
@@ -77,6 +81,7 @@ import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
 import java.io.File
+import java.util.*
 import javax.inject.Inject
 import kotlin.concurrent.thread
 
@@ -196,13 +201,25 @@ class BrowserTabFragment : Fragment(), FindListener {
             onMenuItemClicked(view.addBookmarksPopupMenuItem) { addBookmark() }
             onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
             onMenuItemClicked(view.findInPageMenuItem) { viewModel.userRequestingToFindInPage() }
+            onMenuItemClicked(view.addToHome) {
+                context?.let {
+                    if (!ShortcutManagerCompat.isRequestPinShortcutSupported(it)) {
+                        Toast.makeText(it, "Pinning not supported", Toast.LENGTH_SHORT).show()
+                        return@let
+                    }
+
+                    viewModel.addToHomeScreen(omnibarTextInput.text.toString())
+                }
+            }
             onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) {
                 viewModel.desktopSiteModeToggled(
-                        urlString = webView?.url,
-                        desktopSiteRequested = view.requestDesktopSiteCheckMenuItem.isChecked
+                    urlString = webView?.url,
+                    desktopSiteRequested = view.requestDesktopSiteCheckMenuItem.isChecked
                 )
             }
-            onMenuItemClicked(view.sharePageMenuItem) { viewModel.userSharingLink(webView?.url) }
+            onMenuItemClicked(view.sharePageMenuItem) {
+                viewModel.userSharingLink(webView?.url)
+            }
         }
     }
 
@@ -285,6 +302,11 @@ class BrowserTabFragment : Fragment(), FindListener {
                 launchFilePicker(it)
             }
             is Command.LaunchDefaultAppSystemSettings -> { launchDefaultAppSystemSettings() }
+            is Command.AddHomeShortcut -> {
+                context?.let { context ->
+                   addHomeShortcut(it, context)
+               }
+            }
         }
     }
 
@@ -392,6 +414,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         popupMenu.contentView.newTabPopupMenuItem.isEnabled = viewState.browserShowing
         popupMenu.contentView.addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
         popupMenu.contentView.sharePageMenuItem?.isEnabled = viewState.canSharePage
+        popupMenu.contentView.addToHome.isEnabled = true
     }
 
     private fun renderFindInPageState(viewState: FindInPage) {
@@ -634,6 +657,28 @@ class BrowserTabFragment : Fragment(), FindListener {
         )
         addBookmarkDialog.show(childFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
         addBookmarkDialog.listener = viewModel
+    }
+
+    private fun addHomeShortcut(homeShortcut: Command.AddHomeShortcut, context: Context) {
+        val intent = Intent(context, BrowserActivity::class.java)
+        intent.action = Intent.ACTION_VIEW
+        intent.putExtra(Intent.EXTRA_TEXT, homeShortcut.title)
+
+        val icon =
+            if (homeShortcut.icon != null) {
+                IconCompat.createWithBitmap(homeShortcut.icon)
+            } else {
+                IconCompat.createWithResource(context, R.drawable.ic_icon_smiley_face)
+            }
+
+        val shortcutInfo = ShortcutInfoCompat.Builder(context, UUID.randomUUID().toString())
+            .setShortLabel(homeShortcut.title)
+            .setIntent(intent)
+            .setIcon(icon)
+            .build()
+
+        ShortcutManagerCompat.requestPinShortcut(context, shortcutInfo, null)
+
     }
 
     override fun onFindResultReceived(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Boolean) {
