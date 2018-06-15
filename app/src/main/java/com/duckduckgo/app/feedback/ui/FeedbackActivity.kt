@@ -21,10 +21,14 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
-import kotlinx.android.synthetic.main.include_toolbar.*
+import com.duckduckgo.app.global.view.TextChangedWatcher
+import kotlinx.android.synthetic.main.activity_feedback.*
 import javax.inject.Inject
 
 
@@ -41,19 +45,43 @@ class FeedbackActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_feedback)
-        configureToolbar()
+        configureListeners()
 
         viewModel.viewState.observe(this, Observer<FeedbackViewModel.ViewState> {
             it?.let { render(it) }
         })
     }
 
-    private fun configureToolbar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    private fun configureListeners() {
+        brokenSiteSwitch.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.onBrokenSiteChanged(isChecked)
+        }
+        feedbackMessage.addTextChangedListener(object : TextChangedWatcher() {
+            override fun afterTextChanged(editable: Editable) {
+                viewModel.onFeedbackMessageChanged(editable.toString())
+            }
+        })
+        brokenSiteUrl.addTextChangedListener(object : TextChangedWatcher() {
+            override fun afterTextChanged(editable: Editable) {
+                viewModel.onBrokenSiteUrlChanged(editable.toString())
+            }
+        })
+        submitButton.setOnClickListener {  _ ->
+            viewModel.onSubmitPressed()
+            finish()
+        }
     }
 
     private fun render(viewState: FeedbackViewModel.ViewState) {
+        val brokenSiteInitiallyHidden = !brokenSiteUrl.isVisible
+        brokenSiteSwitch.isActivated = viewState.isBrokenSite
+        brokenSiteUrl.isVisible = viewState.showUrl
+        brokenSiteConfirmation.isVisible = viewState.showDomainAdded
+        submitButton.isEnabled = viewState.submitAllowed
+
+        if(brokenSiteInitiallyHidden && brokenSiteUrl.isVisible) {
+            brokenSiteUrl.requestFocus()
+        }
     }
 
     companion object {

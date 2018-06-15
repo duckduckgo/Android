@@ -22,10 +22,58 @@ import android.arch.lifecycle.ViewModel
 
 class FeedbackViewModel : ViewModel() {
 
-
     data class ViewState(
-        val temp: String
+        val isBrokenSite: Boolean = false,
+        val url: String? = null,
+        val showUrl: Boolean = false,
+        val showDomainAdded: Boolean = false,
+        val message: String? = null,
+        val submitAllowed: Boolean = false
     )
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
+
+    val viewValue: ViewState get() = viewState!!.value!!
+
+    init {
+        viewState.value = ViewState()
+    }
+
+    fun onBrokenSiteChanged(isBroken: Boolean) {
+        if (isBroken == viewState.value?.isBrokenSite) {
+            return
+        }
+
+        val brokenUrl = viewState?.value?.url
+        viewState.value = viewState.value?.copy(
+            isBrokenSite = isBroken,
+            showUrl = isBroken,
+            showDomainAdded = isBroken && brokenUrl != null,
+            submitAllowed = canSubmit(isBroken, viewValue.url, viewValue.message)
+        )
+    }
+
+    fun onFeedbackMessageChanged(newMessage: String?) {
+        viewState.value = viewState.value?.copy(
+            message = newMessage,
+            submitAllowed = canSubmit(viewValue.isBrokenSite, viewValue.url, newMessage)
+        )
+    }
+
+    fun onBrokenSiteUrlChanged(newUrl: String?) {
+        viewState.value = viewState.value?.copy(
+            url = newUrl,
+            submitAllowed = canSubmit(viewValue.isBrokenSite, newUrl, viewValue.message)
+        )
+    }
+
+    private fun canSubmit(isBrokenSite: Boolean, url: String?, feedbackMessage: String?): Boolean {
+        return (isBrokenSite && !url.isNullOrBlank()) || (!isBrokenSite && !feedbackMessage.isNullOrBlank())
+    }
+
+    fun onSubmitPressed() {
+        //TODO
+    }
+
+
 }

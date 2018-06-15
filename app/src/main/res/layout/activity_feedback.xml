@@ -29,10 +29,11 @@
         <android.support.constraint.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
+            android:paddingBottom="30dp"
             android:background="@drawable/notification_info_bottom_background">
 
             <View
@@ -78,13 +79,13 @@
                 android:id="@+id/description"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
                 android:layout_marginBottom="3dp"
+                android:layout_marginTop="6dp"
                 android:elevation="@dimen/modalCardHeaderElevation"
                 android:lineSpacingExtra="4sp"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
                 android:paddingBottom="30dp"
+                android:paddingEnd="20dp"
+                android:paddingStart="20dp"
                 android:text="@string/feedbackModalDescription"
                 android:textAlignment="center"
                 android:textColor="@color/white"
@@ -115,12 +116,13 @@
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center_horizontal"
                 android:lineSpacingExtra="5sp"
-                android:paddingStart="16dp"
                 android:paddingEnd="16dp"
+                android:paddingStart="16dp"
                 android:text="@string/feedbackDomainAdded"
                 android:textColor="@color/mediumGreen"
                 android:textSize="14sp"
                 android:textStyle="normal"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/brokenSiteSwitch"
@@ -133,12 +135,13 @@
                 android:layout_margin="16dp"
                 android:hint="@string/feedbackUrlHint"
                 android:imeOptions="flagNoExtractUi"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/brokenSiteConfirmation" />
 
             <EditText
-                android:id="@+id/feedbackDescriptionEditText"
+                android:id="@+id/feedbackMessage"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
@@ -152,32 +155,17 @@
                 android:id="@+id/submitButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:layout_marginEnd="20dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="30dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginBottom="24dp"
                 android:background="@drawable/modal_card_rounded_button_bg"
                 android:text="@string/feedbackSubmitButton"
                 android:textColor="@color/white"
                 android:textSize="@dimen/defaultBrowserInfoSettingsButtonTextSize"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/feedbackDescriptionEditText" />
-
-            <TextView
-                android:id="@+id/anonymousText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:fontFamily="sans-serif-medium"
-                android:gravity="center_horizontal"
-                android:paddingBottom="30dp"
-                android:text="@string/feedbackIsAnonymousLink"
-                android:textColor="@color/twilightBlue"
-                android:textStyle="normal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/submitButton" />
+                app:layout_constraintTop_toBottomOf="@id/feedbackMessage" />
 
         </android.support.constraint.ConstraintLayout>
 
