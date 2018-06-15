@@ -20,6 +20,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import com.bumptech.glide.Glide
+import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.view.toPx
 import io.reactivex.Single
 import java.util.concurrent.TimeUnit
@@ -27,20 +28,21 @@ import javax.inject.Inject
 
 interface FaviconDownloader {
 
-    fun download(url: Uri): Single<Bitmap>
+    fun download(currentPageUrl: Uri): Single<Bitmap>
 }
 
 class GlideFaviconDownloader @Inject constructor(private val context: Context) : FaviconDownloader {
 
-    override fun download(url: Uri): Single<Bitmap> {
+    override fun download(currentPageUrl: Uri): Single<Bitmap> {
 
         return Single.fromCallable {
 
+            val faviconUrl = currentPageUrl.faviconLocation() ?: throw IllegalArgumentException("Invalid favicon currentPageUrl")
             val desiredImageSizePx = DESIRED_IMAGE_SIZE_DP.toPx()
 
             Glide.with(context)
                 .asBitmap()
-                .load(url)
+                .load(faviconUrl)
                 .submit(desiredImageSizePx, desiredImageSizePx)
                 .get(TIMEOUT_PERIOD_SECONDS, TimeUnit.SECONDS)
 

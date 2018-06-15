@@ -414,7 +414,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         popupMenu.contentView.newTabPopupMenuItem.isEnabled = viewState.browserShowing
         popupMenu.contentView.addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
         popupMenu.contentView.sharePageMenuItem?.isEnabled = viewState.canSharePage
-        popupMenu.contentView.addToHome.isEnabled = true
+        popupMenu.contentView.addToHome.isEnabled = viewState.canAddToHome
     }
 
     private fun renderFindInPageState(viewState: FindInPage) {
@@ -662,7 +662,7 @@ class BrowserTabFragment : Fragment(), FindListener {
     private fun addHomeShortcut(homeShortcut: Command.AddHomeShortcut, context: Context) {
         val intent = Intent(context, BrowserActivity::class.java)
         intent.action = Intent.ACTION_VIEW
-        intent.putExtra(Intent.EXTRA_TEXT, homeShortcut.title)
+        intent.putExtra(Intent.EXTRA_TEXT, homeShortcut.url)
 
         val icon =
             if (homeShortcut.icon != null) {

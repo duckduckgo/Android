@@ -44,9 +44,9 @@ import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
-import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
@@ -101,7 +101,8 @@ class BrowserTabViewModel(
         val findInPage: FindInPage = FindInPage(canFindInPage = false),
         val isDesktopBrowsingMode: Boolean = false,
         val canSharePage: Boolean = false,
-        val showDefaultBrowserBanner: Boolean = false
+        val showDefaultBrowserBanner: Boolean = false,
+        val canAddToHome: Boolean = false
     )
 
     sealed class Command {
@@ -122,7 +123,7 @@ class BrowserTabViewModel(
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         object LaunchDefaultAppSystemSettings : Command()
-        class AddHomeShortcut(val title: String, val icon: Bitmap? = null) : Command()
+        class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap? = null) : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -285,6 +286,7 @@ class BrowserTabViewModel(
         if (url == null) {
             viewState.value = viewState.value?.copy(
                 canAddBookmarks = false,
+                canAddToHome = false,
                 findInPage = FindInPage(visible = false, canFindInPage = false)
             )
             return
@@ -295,6 +297,7 @@ class BrowserTabViewModel(
             omnibarText = omnibarTextForUrl(url),
             browserShowing = true,
             canSharePage = true,
+            canAddToHome = true,
             showPrivacyGrade = appConfigurationDownloaded,
             findInPage = FindInPage(visible = false, canFindInPage = true)
         )
@@ -473,23 +476,24 @@ class BrowserTabViewModel(
         }
     }
 
-    fun addToHomeScreen(query: String) {
+    fun addToHomeScreen(currentPage: String) {
 
-        val faviconUrl = query.toUri().faviconLocation()
-        if (faviconUrl == null) {
-            command.value = AddHomeShortcut(query)
-            return
-        }
+        val title =
+            if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentPage)) {
+                duckDuckGoUrlDetector.extractQuery(currentPage) ?: currentPage
+            } else {
+                currentPage.toUri().baseHost ?: currentPage
+            }
 
-        faviconDownloader.download(faviconUrl)
+        faviconDownloader.download(currentPage.toUri())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 Timber.i("Successfully got favicon")
-                command.value = AddHomeShortcut(title = query, icon = it)
+                command.value = AddHomeShortcut(title, currentPage, it)
             }, { throwable ->
                 Timber.w(throwable, "Failed to obtain favicon")
-                command.value = AddHomeShortcut(query)
+                command.value = AddHomeShortcut(title, currentPage)
             })
 
     }
