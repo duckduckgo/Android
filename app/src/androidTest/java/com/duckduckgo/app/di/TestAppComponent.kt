@@ -56,6 +56,7 @@ import javax.inject.Singleton
     NotificationModule::class,
     DefaultBrowserModule::class,
     OnboardingModule::class,
+    FaviconModule::class,
     VariantModule::class
 ])
 interface TestAppComponent : AndroidInjector<TestApplication> {
