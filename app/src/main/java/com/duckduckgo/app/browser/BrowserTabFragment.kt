@@ -229,7 +229,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
         thread.start()
     }
-    g
+
     override fun onResume() {
         super.onResume()
         addTextChangedListeners()
