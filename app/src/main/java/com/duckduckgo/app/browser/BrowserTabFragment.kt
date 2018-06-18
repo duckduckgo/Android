@@ -21,6 +21,7 @@ import android.animation.LayoutTransition.CHANGING
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
+import android.app.PictureInPictureParams
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
@@ -29,6 +30,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
 import android.net.Uri
+import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Environment
 import android.support.annotation.AnyThread
@@ -47,6 +49,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.widget.EditText
+import android.widget.ListView
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -72,6 +75,7 @@ import kotlinx.android.synthetic.main.include_banner_notification.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
+import kotlinx.android.synthetic.main.include_swipe_to_refresh.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
@@ -136,6 +140,12 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private var webView: WebView? = null
 
+    private var mSwipeToRefreshListView: ListView? = null
+
+    private var mSwipeRefresh: RefreshLayoutExtension? = null
+
+    var isWebPageCurrentlyLoading = false
+
     private val findInPageTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
             viewModel.userFindingInPage(findInPageInput.text.toString())
@@ -172,9 +182,72 @@ class BrowserTabFragment : Fragment(), FindListener {
         configureFindInPage()
         configureAutoComplete()
         configureKeyboardAwareLogoAnimation()
+        configureSwipeToRefresh()
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
+        }
+    }
+
+    private fun configureSwipeToRefresh() {
+        mSwipeRefresh = swipeRefresh.findViewById(R.id.swipeRefresh) as RefreshLayoutExtension
+        mSwipeRefresh?.setWebView(webView)
+        mSwipeToRefreshListView = swipeToRefreshListView?.findViewById(R.id.swipeToRefreshListView) as ListView
+
+        mSwipeRefresh!!.setOnRefreshListener{
+            if(omnibarTextInput.length()==0){
+                mSwipeRefresh?.isRefreshing = false
+            }else{
+                refresh()
+                startTimeoutThread()
+            }
+        }
+
+        mSwipeToRefreshListView!!.setOnTouchListener { view, me ->
+            webViewContainer.dispatchTouchEvent(me)
+            false
+        }
+    }
+
+    private fun startTimeoutThread(){
+        var secondsElapsed = 0
+        var thread = object : Thread() {
+            override fun run() {
+                try {
+                    isWebPageCurrentlyLoading = true
+                    while(secondsElapsed<10){
+                        Thread.sleep(1000)
+                        secondsElapsed++
+                        if(!isWebPageCurrentlyLoading) break
+                    }
+                } catch (e: InterruptedException) {
+                    e.printStackTrace()
+                } finally {
+                    mSwipeRefresh?.isRefreshing = false
+                }
+            }
+        }
+        thread.start()
+    }
+
+    inner class RefreshAsyncTask : AsyncTask<Void, String, String>() {
+        var secondsElapsed = 0
+        override fun onPreExecute() {
+            isWebPageCurrentlyLoading = true
+            refresh()
+        }
+
+        override fun doInBackground(vararg params: Void?): String? {
+            while(secondsElapsed<10){
+                Thread.sleep(1000)
+                secondsElapsed++
+                if(!isWebPageCurrentlyLoading) return "Stopped loading before timeout"
+            }
+            return "Timed out"
+        }
+
+        override fun onPostExecute(result: String) {
+            mSwipeRefresh?.isRefreshing = false
         }
     }
 
@@ -336,7 +409,8 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         when (viewState.isLoading) {
             true -> pageLoadingIndicator.show()
-            false -> pageLoadingIndicator.hide()
+            false -> {pageLoadingIndicator.hide()
+                isWebPageCurrentlyLoading = false}
         }
 
         if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {

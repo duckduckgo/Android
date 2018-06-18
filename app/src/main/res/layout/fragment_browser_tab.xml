@@ -72,6 +72,14 @@
             tools:background="#4F00" />
 
         <include
+            layout="@layout/include_swipe_to_refresh"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bannerNotification"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <include
             layout="@layout/include_banner_notification"
             app:layout_constraintTop_toTopOf="parent" />
 
