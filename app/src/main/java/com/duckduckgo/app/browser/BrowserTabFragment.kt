@@ -229,28 +229,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
         thread.start()
     }
-
-    inner class RefreshAsyncTask : AsyncTask<Void, String, String>() {
-        var secondsElapsed = 0
-        override fun onPreExecute() {
-            isWebPageCurrentlyLoading = true
-            refresh()
-        }
-
-        override fun doInBackground(vararg params: Void?): String? {
-            while(secondsElapsed<10){
-                Thread.sleep(1000)
-                secondsElapsed++
-                if(!isWebPageCurrentlyLoading) return "Stopped loading before timeout"
-            }
-            return "Timed out"
-        }
-
-        override fun onPostExecute(result: String) {
-            mSwipeRefresh?.isRefreshing = false
-        }
-    }
-
+    g
     override fun onResume() {
         super.onResume()
         addTextChangedListeners()
