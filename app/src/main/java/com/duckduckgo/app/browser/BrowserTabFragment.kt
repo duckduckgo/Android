@@ -21,7 +21,6 @@ import android.animation.LayoutTransition.CHANGING
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
-import android.app.PictureInPictureParams
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
@@ -30,11 +29,11 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Environment
 import android.support.annotation.AnyThread
 import android.support.annotation.StringRes
+import android.support.design.widget.AppBarLayout
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
@@ -77,6 +76,7 @@ import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.include_swipe_to_refresh.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
+import org.jetbrains.anko.find
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
@@ -140,11 +140,14 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private var webView: WebView? = null
 
+    lateinit var mAppBarLayout: AppBarLayout
+
     private var mSwipeToRefreshListView: ListView? = null
 
     private var mSwipeRefresh: RefreshLayoutExtension? = null
 
     var isWebPageCurrentlyLoading = false
+
 
     private val findInPageTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
@@ -191,9 +194,18 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private fun configureSwipeToRefresh() {
         mSwipeRefresh = swipeRefresh.findViewById(R.id.swipeRefresh) as RefreshLayoutExtension
+        mAppBarLayout = appBarLayout.find(R.id.appBarLayout) as AppBarLayout
+        mAppBarLayout.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
+            override fun onOffsetChanged(appBarLayout: AppBarLayout, verticalOffset: Int) {
+                if (verticalOffset==0) {
+                    swipeRefresh.setIsAppBarDocked(true)
+                }else{
+                    swipeRefresh.setIsAppBarDocked(false)
+                }
+            }
+        })
         mSwipeRefresh?.setWebView(webView)
         mSwipeToRefreshListView = swipeToRefreshListView?.findViewById(R.id.swipeToRefreshListView) as ListView
-
         mSwipeRefresh!!.setOnRefreshListener{
             if(omnibarTextInput.length()==0){
                 mSwipeRefresh?.isRefreshing = false
