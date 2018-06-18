@@ -26,7 +26,6 @@ class FeedbackViewModel : ViewModel() {
         val isBrokenSite: Boolean = false,
         val url: String? = null,
         val showUrl: Boolean = false,
-        val showDomainAdded: Boolean = false,
         val message: String? = null,
         val submitAllowed: Boolean = false
     )
@@ -48,7 +47,6 @@ class FeedbackViewModel : ViewModel() {
         viewState.value = viewState.value?.copy(
             isBrokenSite = isBroken,
             showUrl = isBroken,
-            showDomainAdded = isBroken && brokenUrl != null,
             submitAllowed = canSubmit(isBroken, viewValue.url, viewValue.message)
         )
     }

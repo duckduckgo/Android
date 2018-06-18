@@ -76,7 +76,6 @@ class FeedbackActivity : DuckDuckGoActivity() {
         val brokenSiteInitiallyHidden = !brokenSiteUrl.isVisible
         brokenSiteSwitch.isActivated = viewState.isBrokenSite
         brokenSiteUrl.isVisible = viewState.showUrl
-        brokenSiteConfirmation.isVisible = viewState.showDomainAdded
         submitButton.isEnabled = viewState.submitAllowed
 
         if(brokenSiteInitiallyHidden && brokenSiteUrl.isVisible) {
