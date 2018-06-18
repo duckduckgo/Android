@@ -32,7 +32,8 @@
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_scrollFlags="scroll|enterAlways">
+            app:layout_scrollFlags="scroll|enterAlways"
+            android:id="@+id/clay">
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"

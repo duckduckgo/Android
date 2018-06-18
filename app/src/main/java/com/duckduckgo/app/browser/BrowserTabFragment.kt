@@ -33,6 +33,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.support.annotation.AnyThread
 import android.support.annotation.StringRes
+import android.support.design.widget.AppBarLayout
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
@@ -47,6 +48,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.widget.EditText
+import android.widget.ListView
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -72,7 +74,9 @@ import kotlinx.android.synthetic.main.include_banner_notification.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
+import kotlinx.android.synthetic.main.include_swipe_to_refresh.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
+import org.jetbrains.anko.find
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
@@ -136,6 +140,15 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private var webView: WebView? = null
 
+    lateinit var mAppBarLayout: AppBarLayout
+
+    private var mSwipeToRefreshListView: ListView? = null
+
+    private var mSwipeRefresh: RefreshLayoutExtension? = null
+
+    var isWebPageCurrentlyLoading = false
+
+
     private val findInPageTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
             viewModel.userFindingInPage(findInPageInput.text.toString())
@@ -172,10 +185,61 @@ class BrowserTabFragment : Fragment(), FindListener {
         configureFindInPage()
         configureAutoComplete()
         configureKeyboardAwareLogoAnimation()
+        configureSwipeToRefresh()
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
         }
+    }
+
+    private fun configureSwipeToRefresh() {
+        mSwipeRefresh = swipeRefresh.findViewById(R.id.swipeRefresh) as RefreshLayoutExtension
+        mAppBarLayout = appBarLayout.find(R.id.appBarLayout) as AppBarLayout
+        mAppBarLayout.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
+            override fun onOffsetChanged(appBarLayout: AppBarLayout, verticalOffset: Int) {
+                if (verticalOffset==0) {
+                    swipeRefresh.setIsAppBarDocked(true)
+                }else{
+                    swipeRefresh.setIsAppBarDocked(false)
+                }
+            }
+        })
+        mSwipeRefresh?.setWebView(webView)
+        mSwipeToRefreshListView = swipeToRefreshListView?.findViewById(R.id.swipeToRefreshListView) as ListView
+        mSwipeRefresh!!.setOnRefreshListener{
+            if(omnibarTextInput.length()==0){
+                mSwipeRefresh?.isRefreshing = false
+            }else{
+                refresh()
+                startTimeoutThread()
+            }
+        }
+
+        mSwipeToRefreshListView!!.setOnTouchListener { view, me ->
+            webViewContainer.dispatchTouchEvent(me)
+            false
+        }
+    }
+
+    private fun startTimeoutThread(){
+        var secondsElapsed = 0
+        var thread = object : Thread() {
+            override fun run() {
+                try {
+                    isWebPageCurrentlyLoading = true
+                    while(secondsElapsed<10){
+                        Thread.sleep(1000)
+                        secondsElapsed++
+                        if(!isWebPageCurrentlyLoading) break
+                    }
+                } catch (e: InterruptedException) {
+                    e.printStackTrace()
+                } finally {
+                    mSwipeRefresh?.isRefreshing = false
+                }
+            }
+        }
+        thread.start()
     }
 
     override fun onResume() {
@@ -336,7 +400,8 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         when (viewState.isLoading) {
             true -> pageLoadingIndicator.show()
-            false -> pageLoadingIndicator.hide()
+            false -> {pageLoadingIndicator.hide()
+                isWebPageCurrentlyLoading = false}
         }
 
         if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
