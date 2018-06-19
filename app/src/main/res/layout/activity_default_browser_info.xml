@@ -116,7 +116,7 @@
         android:background="@drawable/modal_card_button_bg"
         android:text="@string/onboardingDefaultBrowserGoToSettingsAction"
         android:textColor="@color/white"
-        android:textSize="@dimen/defaultBrowserInfoSettingsButtonTextSize"
+        android:textSize="@dimen/modalCardMajorButtonTextSize"
         android:transitionName="defaultBrowserBannerTransition"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

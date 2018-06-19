@@ -25,9 +25,17 @@
     <dimen name="tabIconTextSize">12dp</dimen> <!-- Intentional use of dp not sp -->
     <dimen name="tabIconXOffset">2.3dp</dimen>
     <dimen name="tabIconYOffset">2dp</dimen>
+
     <dimen name="modalCardTitleTextSize">20sp</dimen>
     <dimen name="modalCardDescriptionTextSize">14sp</dimen>
-    <dimen name="defaultBrowserInfoSettingsButtonTextSize">15sp</dimen>
+    <dimen name="modalCardSwitchTextSize">16sp</dimen>
+    <dimen name="modalCardEditTextSize">14sp</dimen>
     <dimen name="modalCardHeaderElevation">4dp</dimen>
+    <dimen name="modalCardMajorButtonTextSize">15sp</dimen>
+
+    <dimen name="feedbackCardVerticalMargin">16dp</dimen>
+    <dimen name="feedbackFormFieldsMargin">16dp</dimen>
+    <dimen name="feedbackCardHorizontalMargin">16dp</dimen>
+
 
 </resources>

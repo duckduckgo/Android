@@ -29,12 +29,12 @@
         <android.support.constraint.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:paddingBottom="30dp"
-            android:background="@drawable/notification_info_bottom_background">
+            android:layout_marginBottom="@dimen/feedbackCardVerticalMargin"
+            android:layout_marginEnd="@dimen/feedbackCardHorizontalMargin"
+            android:layout_marginStart="@dimen/feedbackCardHorizontalMargin"
+            android:layout_marginTop="@dimen/feedbackCardVerticalMargin"
+            android:background="@drawable/notification_info_bottom_background"
+            android:paddingBottom="30dp">
 
             <View
                 android:id="@+id/titleSection"
@@ -79,7 +79,7 @@
                 android:id="@+id/description"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="3dp"
+                android:layout_marginBottom="19dp"
                 android:layout_marginTop="6dp"
                 android:elevation="@dimen/modalCardHeaderElevation"
                 android:lineSpacingExtra="4sp"
@@ -96,26 +96,30 @@
                 android:id="@+id/brokenSiteSwitch"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="13dp"
+                android:layout_margin="@dimen/feedbackFormFieldsMargin"
                 android:fontFamily="sans-serif-medium"
-                android:padding="16dp"
                 android:text="@string/feedbackReportBrokenSite"
                 android:textColor="@color/warmerGray"
-                android:textSize="15sp"
+                android:textSize="@dimen/modalCardSwitchTextSize"
                 android:textStyle="normal"
+                android:paddingStart="3dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/description"
                 tools:checked="true" />
 
-
             <EditText
                 android:id="@+id/brokenSiteUrl"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
+                android:layout_margin="@dimen/feedbackFormFieldsMargin"
                 android:hint="@string/feedbackUrlHint"
                 android:imeOptions="flagNoExtractUi"
+                android:lineSpacingExtra="5sp"
+                android:minHeight="46dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:textSize="@dimen/modalCardEditTextSize"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -123,11 +127,16 @@
 
             <EditText
                 android:id="@+id/feedbackMessage"
+                style="@style/Base.V7.Widget.AppCompat.EditText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
+                android:layout_margin="@dimen/feedbackFormFieldsMargin"
                 android:hint="@string/feedbackMessageHint"
-                android:minHeight="120dp"
+                android:lineSpacingExtra="5sp"
+                android:minHeight="96dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:textSize="@dimen/modalCardEditTextSize"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/brokenSiteUrl" />
@@ -143,7 +152,7 @@
                 android:background="@drawable/modal_card_button_bg"
                 android:text="@string/feedbackSubmitButton"
                 android:textColor="@color/white"
-                android:textSize="@dimen/defaultBrowserInfoSettingsButtonTextSize"
+                android:textSize="@dimen/modalCardMajorButtonTextSize"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/feedbackMessage" />
