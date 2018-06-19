@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (c) 2018 DuckDuckGo
   ~
@@ -14,11 +15,7 @@
   ~ limitations under the License.
   -->
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/cornflowerBlue" />
-    <stroke
-        android:width="1dp"
-        android:color="@color/cornflowerBlue" />
-    <corners
-        android:radius="3dp"/>
-</shape>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+  <item android:state_enabled="false" android:color="@color/subtleGrayTwo" />
+  <item android:color="@color/cornflowerBlue"/>
+</selector>
