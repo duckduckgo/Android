@@ -18,6 +18,7 @@ package com.duckduckgo.app.feedback.api
 
 import android.annotation.SuppressLint
 import android.os.Build
+import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.feedback.api.FeedbackService.Platform
 import com.duckduckgo.app.feedback.api.FeedbackService.Reason
 import com.duckduckgo.app.statistics.VariantManager
@@ -27,7 +28,7 @@ import timber.log.Timber
 
 interface FeedbackSender {
     fun submitGeneralFeedback(comment: String)
-    fun submitBrokenSiteFeedback(comment: String, url: String)
+    fun submitBrokenSiteFeedback(comment: String?, url: String)
 }
 
 class FeedbackSubmitter(
@@ -41,8 +42,8 @@ class FeedbackSubmitter(
         submitFeedback(Reason.GENERAL, comment, "")
     }
 
-    override fun submitBrokenSiteFeedback(comment: String, url: String) {
-        submitFeedback(Reason.BROKEN_SITE, comment, url)
+    override fun submitBrokenSiteFeedback(comment: String?, url: String) {
+        submitFeedback(Reason.BROKEN_SITE, comment ?: "", url)
     }
 
     private fun submitFeedback(type: String, comment: String, url: String) {
@@ -54,7 +55,7 @@ class FeedbackSubmitter(
             Build.VERSION.SDK_INT,
             Build.MANUFACTURER,
             Build.MODEL,
-            Build.VERSION.RELEASE,
+            BuildConfig.VERSION_NAME,
             atbWithVariant()
         )
             .subscribeOn(Schedulers.io())

@@ -2,6 +2,8 @@ package com.duckduckgo.app.feedback.ui
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.feedback.api.FeedbackSender
+import com.nhaarman.mockito_kotlin.*
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -17,6 +19,8 @@ class FeedbackViewModelTest {
     @Suppress("unused")
     val schedulers = InstantSchedulersRule()
 
+    private var mockFedbackSender: FeedbackSender = mock()
+
     private lateinit var testee: FeedbackViewModel
 
     private val viewState: FeedbackViewModel.ViewState
@@ -24,7 +28,7 @@ class FeedbackViewModelTest {
 
     @Before
     fun before() {
-        testee = FeedbackViewModel()
+        testee = FeedbackViewModel(mockFedbackSender)
     }
 
     @Test
@@ -72,6 +76,39 @@ class FeedbackViewModelTest {
         testee.onBrokenSiteChanged(false)
         testee.onFeedbackMessageChanged(" ")
         assertFalse(viewState.submitAllowed)
+    }
+
+    @Test
+    fun whenCanSubmitBrokenUrlAndSubmitPressedThenFeedbackSubmitted() {
+        val url = "http://example.com"
+        testee.onBrokenSiteChanged(true)
+        testee.onBrokenSiteUrlChanged(url)
+        testee.onSubmitPressed()
+
+        verify(mockFedbackSender).submitBrokenSiteFeedback(null, url)
+    }
+
+    @Test
+    fun whenCannotSubmitBrokenUrlAndSubmitPressedThenFeedbackNotSubmitted() {
+        testee.onBrokenSiteChanged(true)
+        testee.onSubmitPressed()
+        verify(mockFedbackSender, never()).submitBrokenSiteFeedback(any(), any())
+    }
+
+    @Test
+    fun whenCanSubmitMessageAndSubmitPressedThenFeedbackSubmitted() {
+        val message = "Message"
+        testee.onBrokenSiteChanged(false)
+        testee.onFeedbackMessageChanged(message)
+        testee.onSubmitPressed()
+        verify(mockFedbackSender).submitGeneralFeedback(message)
+    }
+
+    @Test
+    fun whenCannotSubmitMessageAndSubmitPressedThenFeedbackNotSubmitted() {
+        testee.onBrokenSiteChanged(false)
+        testee.onSubmitPressed()
+        verify(mockFedbackSender, never()).submitGeneralFeedback(any())
     }
 
 }

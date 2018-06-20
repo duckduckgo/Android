@@ -18,9 +18,10 @@ package com.duckduckgo.app.feedback.ui
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import com.duckduckgo.app.feedback.api.FeedbackSender
 
 
-class FeedbackViewModel : ViewModel() {
+class FeedbackViewModel(private val feedbackSender: FeedbackSender) : ViewModel() {
 
     data class ViewState(
         val isBrokenSite: Boolean = false,
@@ -70,7 +71,13 @@ class FeedbackViewModel : ViewModel() {
     }
 
     fun onSubmitPressed() {
-        //TODO
+        if (viewValue.isBrokenSite) {
+            val url = viewValue.url ?: return
+            feedbackSender.submitBrokenSiteFeedback(viewValue.message, url)
+        } else {
+            val message = viewValue.message ?: return
+            feedbackSender.submitGeneralFeedback(message)
+        }
     }
 
 

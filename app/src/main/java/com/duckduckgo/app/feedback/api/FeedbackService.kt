@@ -19,6 +19,7 @@ package com.duckduckgo.app.feedback.api
 import io.reactivex.Observable
 import okhttp3.ResponseBody
 import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
 interface FeedbackService {
@@ -32,6 +33,7 @@ interface FeedbackService {
         const val GENERAL = "general"
     }
 
+    @FormUrlEncoded
     @POST("/feedback.js?type=app-feedback")
     fun feedback(
         @Field("reason") reason: String,
