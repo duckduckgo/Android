@@ -137,7 +137,7 @@
                 android:imeOptions="flagNoExtractUi"
                 android:lineSpacingExtra="5sp"
                 android:minHeight="96dp"
-                android:inputType="text"
+                android:inputType="textMultiLine"
                 android:paddingBottom="16dp"
                 android:paddingTop="16dp"
                 android:textSize="@dimen/modalCardEditTextSize"
