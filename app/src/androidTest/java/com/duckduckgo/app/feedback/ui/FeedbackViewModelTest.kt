@@ -110,7 +110,7 @@ class FeedbackViewModelTest {
         testee.onSubmitPressed()
 
         verify(mockFeedbackSender).submitBrokenSiteFeedback(null, url)
-        verify(mockCommandObserver).onChanged(Command.Finish)
+        verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
 
     @Test
@@ -118,7 +118,7 @@ class FeedbackViewModelTest {
         testee.onBrokenSiteChanged(true)
         testee.onSubmitPressed()
         verify(mockFeedbackSender, never()).submitBrokenSiteFeedback(any(), any())
-        verify(mockCommandObserver, never()).onChanged(Command.Finish)
+        verify(mockCommandObserver, never()).onChanged(Command.ConfirmAndFinish)
     }
 
     @Test
@@ -128,16 +128,15 @@ class FeedbackViewModelTest {
         testee.onFeedbackMessageChanged(message)
         testee.onSubmitPressed()
         verify(mockFeedbackSender).submitGeneralFeedback(message)
-        verify(mockCommandObserver).onChanged(Command.Finish)
+        verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
-
 
     @Test
     fun whenCannotSubmitMessageAndSubmitPressedThenFeedbackNotSubmitted() {
         testee.onBrokenSiteChanged(false)
         testee.onSubmitPressed()
         verify(mockFeedbackSender, never()).submitGeneralFeedback(any())
-        verify(mockCommandObserver, never()).onChanged(Command.Finish)
+        verify(mockCommandObserver, never()).onChanged(Command.ConfirmAndFinish)
     }
 
 }

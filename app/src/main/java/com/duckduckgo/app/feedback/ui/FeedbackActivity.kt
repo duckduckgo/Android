@@ -31,6 +31,7 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import kotlinx.android.synthetic.main.activity_feedback.*
+import org.jetbrains.anko.longToast
 import javax.inject.Inject
 
 
@@ -94,8 +95,13 @@ class FeedbackActivity : DuckDuckGoActivity() {
         when (command) {
             Command.FocusUrl -> brokenSiteUrl.requestFocus()
             Command.FocusMessage -> feedbackMessage.requestFocus()
-            Command.Finish -> finish()
+            Command.ConfirmAndFinish -> confirmAndFinish()
         }
+    }
+
+    private fun confirmAndFinish() {
+        longToast(R.string.feedbackSubmitted)
+        finish()
     }
 
     private fun render(viewState: ViewState) {

@@ -35,7 +35,7 @@ class FeedbackViewModel(private val feedbackSender: FeedbackSender) : ViewModel(
     sealed class Command {
         object FocusUrl : Command()
         object FocusMessage : Command()
-        object Finish : Command()
+        object ConfirmAndFinish : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -98,7 +98,7 @@ class FeedbackViewModel(private val feedbackSender: FeedbackSender) : ViewModel(
             feedbackSender.submitGeneralFeedback(message)
         }
 
-        command.value = Command.Finish
+        command.value = Command.ConfirmAndFinish
     }
 
 }
