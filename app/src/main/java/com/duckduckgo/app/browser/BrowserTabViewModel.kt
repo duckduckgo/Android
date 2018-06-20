@@ -80,20 +80,17 @@ class BrowserTabViewModel(
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, ViewModel() {
 
-    data class ViewState(
-        val autoComplete: AutoCompleteViewState = AutoCompleteViewState(),
-        val findInPage: FindInPage = FindInPage(canFindInPage = false),
-        val browserViewState: BrowserViewState = BrowserViewState(),
-        val omnibarViewState: OmnibarViewState = OmnibarViewState(),
-        val loadingViewState: LoadingViewState = LoadingViewState(),
-        val menuViewState: MenuViewState = MenuViewState(),
-        val defaultBrowserViewState: DefaultBrowserViewState = DefaultBrowserViewState()
-    )
-
     data class BrowserViewState(
         val browserShowing: Boolean = false,
         val isFullScreen: Boolean = false,
-        val isDesktopBrowsingMode: Boolean = false
+        val isDesktopBrowsingMode: Boolean = false,
+        val showPrivacyGrade: Boolean = false,
+        val showClearButton: Boolean = false,
+        val showTabsButton: Boolean = true,
+        val showFireButton: Boolean = true,
+        val showMenuButton: Boolean = true,
+        val canSharePage: Boolean = false,
+        val canAddBookmarks: Boolean = false
     )
 
     data class OmnibarViewState(
@@ -106,14 +103,18 @@ class BrowserTabViewModel(
         val progress: Int = 0
     )
 
-    data class MenuViewState(
-        val showPrivacyGrade: Boolean = false,
-        val showClearButton: Boolean = false,
-        val showTabsButton: Boolean = true,
-        val showFireButton: Boolean = true,
-        val showMenuButton: Boolean = true,
-        val canSharePage: Boolean = false,
-        val canAddBookmarks: Boolean = false
+    data class FindInPageViewState(
+        val visible: Boolean = false,
+        val showNumberMatches: Boolean = false,
+        val activeMatchIndex: Int = 0,
+        val searchTerm: String = "",
+        val numberMatches: Int = 0,
+        val canFindInPage: Boolean = false
+    )
+
+    data class AutoCompleteViewState(
+        val showSuggestions: Boolean = false,
+        val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
     )
 
     data class DefaultBrowserViewState(
@@ -140,7 +141,13 @@ class BrowserTabViewModel(
         object LaunchDefaultAppSystemSettings : Command()
     }
 
-    val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
+    val browserViewState: MutableLiveData<BrowserViewState> = MutableLiveData()
+    val loadingViewState: MutableLiveData<LoadingViewState> = MutableLiveData()
+    val omnibarViewState: MutableLiveData<OmnibarViewState> = MutableLiveData()
+    val defaultBrowserViewState: MutableLiveData<DefaultBrowserViewState> = MutableLiveData()
+    val findInPageViewState: MutableLiveData<FindInPageViewState> = MutableLiveData()
+
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
     val url: SingleLiveEvent<String> = SingleLiveEvent()
@@ -163,7 +170,8 @@ class BrowserTabViewModel(
 
 
     init {
-        viewState.value = ViewState()
+        initializeViewStates()
+
         appConfigurationObservable.observeForever(appConfigurationObserver)
         configureAutoComplete()
     }
@@ -198,9 +206,8 @@ class BrowserTabViewModel(
 
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
         val results = result.suggestions.take(6)
-        val currentViewState = currentViewState()
-        val searchResultViewState = currentViewState.autoComplete
-        viewState.value = currentViewState.copy(autoComplete = searchResultViewState.copy(searchResults = AutoCompleteResult(result.query, results)))
+        val currentViewState = currentAutoCompleteViewState()
+        autoCompleteViewState.value = currentViewState.copy(searchResults = AutoCompleteResult(result.query, results))
     }
 
     @VisibleForTesting
@@ -217,10 +224,8 @@ class BrowserTabViewModel(
     fun onViewVisible() {
         command.value = if (url.value == null) ShowKeyboard else Command.HideKeyboard
 
-        val currentViewState = currentViewState()
-        val showBanner = defaultBrowserNotification.shouldShowNotification(currentViewState.browserViewState.browserShowing)
-        viewState.value = currentViewState.copy(
-            defaultBrowserViewState = DefaultBrowserViewState(showBanner))
+        val showBanner = defaultBrowserNotification.shouldShowNotification(currentBrowserViewState().browserShowing)
+        defaultBrowserViewState.value = DefaultBrowserViewState(showBanner)
     }
 
     fun onUserSubmittedQuery(input: String) {
@@ -232,43 +237,35 @@ class BrowserTabViewModel(
         val trimmedInput = input.trim()
         url.value = queryUrlConverter.convertQueryToUrl(trimmedInput)
 
-        val currentState = currentViewState()
-        val menuViewState = currentState.menuViewState
-        val omnibarViewState = currentState.omnibarViewState
-        val browserViewState = currentState.browserViewState
-
-        viewState.value = currentState.copy(
-            findInPage = FindInPage(visible = false, canFindInPage = true),
-            menuViewState = menuViewState.copy(showClearButton = false),
-            omnibarViewState = omnibarViewState.copy(omnibarText = trimmedInput),
-            browserViewState = browserViewState.copy(browserShowing = true),
-            autoComplete = AutoCompleteViewState(false)
-        )
+        findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
+        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = trimmedInput)
+        browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
+        autoCompleteViewState.value = AutoCompleteViewState(false)
     }
 
     override fun progressChanged(newProgress: Int) {
         Timber.v("Loading in progress $newProgress")
 
-        val progress = currentViewState().loadingViewState
-        viewState.value = currentViewState().copy(loadingViewState = progress.copy(progress = newProgress))
+        val progress = currentLoadingViewState()
+        loadingViewState.value = progress.copy(progress = newProgress)
     }
 
     override fun goFullScreen(view: View) {
         command.value = ShowFullScreen(view)
 
-        val browserViewState = currentViewState().browserViewState
-        viewState.value = currentViewState().copy(browserViewState = browserViewState.copy(isFullScreen = true))
+        val currentState = currentBrowserViewState()
+        browserViewState.value = currentState.copy(isFullScreen = true)
     }
 
     override fun exitFullScreen() {
-        val browserViewState = currentViewState().browserViewState
-        viewState.value = currentViewState().copy(browserViewState = browserViewState.copy(isFullScreen = false))
+        val currentState = currentBrowserViewState()
+        browserViewState.value = currentState.copy(isFullScreen = false)
     }
 
     override fun loadingStarted() {
         Timber.v("Loading started")
-        val progress = currentViewState().loadingViewState
-        viewState.value = currentViewState().copy(loadingViewState = progress.copy(isLoading = true))
+        val progress = currentLoadingViewState()
+        loadingViewState.value = progress.copy(isLoading = true)
         site = null
         onSiteChanged()
     }
@@ -276,16 +273,13 @@ class BrowserTabViewModel(
     override fun loadingFinished(url: String?) {
         Timber.v("Loading finished")
 
-        val currentViewState = currentViewState()
-        val omnibarViewState = currentViewState.omnibarViewState
-        val loadingViewState = currentViewState.loadingViewState
+        val currentOmnibarViewState = currentOmnibarViewState()
+        val currentLoadingViewState = currentLoadingViewState()
 
-        val omnibarText = if (url != null) omnibarTextForUrl(url) else currentViewState.omnibarViewState.omnibarText
+        val omnibarText = if (url != null) omnibarTextForUrl(url) else currentOmnibarViewState.omnibarText
 
-        viewState.value = currentViewState().copy(
-            loadingViewState = loadingViewState.copy(isLoading = false),
-            omnibarViewState = omnibarViewState.copy(omnibarText = omnibarText)
-        )
+        loadingViewState.value = currentLoadingViewState.copy(isLoading = false)
+        omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarText)
         registerSiteVisit()
     }
 
@@ -319,43 +313,33 @@ class BrowserTabViewModel(
     override fun urlChanged(url: String?) {
         Timber.v("Url changed: $url")
 
-        val currentViewState = currentViewState()
-        val menuViewState = currentViewState.menuViewState
-
         if (url == null) {
-            viewState.value = viewState.value?.copy(
-                menuViewState = menuViewState.copy(
-                canAddBookmarks = false),
-                findInPage = FindInPage(visible = false, canFindInPage = false))
+            findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = false)
+
+            val currentBrowserViewState = currentBrowserViewState()
+            browserViewState.value = currentBrowserViewState.copy(canAddBookmarks = false)
+
             return
         }
 
-        val browserViewState = currentViewState.browserViewState
-        val omnibarViewState = currentViewState.omnibarViewState
 
-        var newViewState = currentViewState.copy(
-            menuViewState = menuViewState.copy(
-                canAddBookmarks = true,
-                canSharePage = true,
-                showPrivacyGrade = appConfigurationDownloaded
-            ),
-            browserViewState = browserViewState.copy(browserShowing = true),
-            findInPage = FindInPage(visible = false, canFindInPage = true),
-            omnibarViewState = omnibarViewState.copy(omnibarText = omnibarTextForUrl(url))
+        val currentBrowserViewState = currentBrowserViewState()
+        val currentOmnibarViewState = currentOmnibarViewState()
+
+        omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url))
+        findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
+        browserViewState.value = currentBrowserViewState.copy(
+            browserShowing = true,
+            canAddBookmarks = true,
+            canSharePage = true,
+            showPrivacyGrade = appConfigurationDownloaded
         )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-
-            newViewState = newViewState.copy(
-                defaultBrowserViewState = newViewState.defaultBrowserViewState.copy(
-                    showDefaultBrowserBanner = defaultBrowserNotification.shouldShowNotification(newViewState.browserViewState.browserShowing)
-                )
-            )
-
+            defaultBrowserViewState.value = currentDefaultBrowserViewState().copy(showDefaultBrowserBanner = defaultBrowserNotification.shouldShowNotification(currentBrowserViewState.browserShowing))
             statisticsUpdater.refreshRetentionAtb()
         }
 
-        viewState.value = newViewState
         site = siteFactory.build(url)
         onSiteChanged()
     }
@@ -399,38 +383,41 @@ class BrowserTabViewModel(
         command.value = Command.ShowFileChooser(filePathCallback, fileChooserParams)
     }
 
-    private fun currentViewState(): ViewState = viewState.value!!
+    private fun currentAutoCompleteViewState(): AutoCompleteViewState = autoCompleteViewState.value!!
+    private fun currentBrowserViewState(): BrowserViewState = browserViewState.value!!
+    private fun currentFindInPageViewState(): FindInPageViewState = findInPageViewState.value!!
+    private fun currentOmnibarViewState(): OmnibarViewState = omnibarViewState.value!!
+    private fun currentLoadingViewState(): LoadingViewState = loadingViewState.value!!
+    private fun currentDefaultBrowserViewState(): DefaultBrowserViewState = defaultBrowserViewState.value!!
 
     fun onOmnibarInputStateChanged(query: String, hasFocus: Boolean) {
-
-        val currentViewState = currentViewState()
 
         // determine if empty list to be shown, or existing search results
         val autoCompleteSearchResults = if (query.isBlank()) {
             AutoCompleteResult(query, emptyList())
         } else {
-            currentViewState.autoComplete.searchResults
+            currentAutoCompleteViewState().searchResults
         }
 
-        val hasQueryChanged = (currentViewState.omnibarViewState.omnibarText != query)
+        val currentOmnibarViewState = currentOmnibarViewState()
+        val hasQueryChanged = (currentOmnibarViewState.omnibarText != query)
         val autoCompleteSuggestionsEnabled = appSettingsPreferencesStore.autoCompleteSuggestionsEnabled
         val showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && autoCompleteSuggestionsEnabled
         val showClearButton = hasFocus && query.isNotBlank()
         val showControls = !hasFocus || query.isBlank()
 
-        val omnibarViewState = currentViewState.omnibarViewState
-        val menuViewState = currentViewState.menuViewState
-        viewState.value = currentViewState().copy(
-            omnibarViewState = omnibarViewState.copy(isEditing = hasFocus),
-            menuViewState = menuViewState.copy(
-                showPrivacyGrade = appConfigurationDownloaded && currentViewState.browserViewState.browserShowing,
-                showTabsButton = showControls,
-                showFireButton = showControls,
-                showMenuButton = showControls,
-                showClearButton = showClearButton
-            ),
-            autoComplete = AutoCompleteViewState(showAutoCompleteSuggestions, autoCompleteSearchResults)
+        omnibarViewState.value = currentOmnibarViewState.copy(isEditing = hasFocus)
+
+        val currentBrowserViewState = currentBrowserViewState()
+        browserViewState.value = currentBrowserViewState.copy(
+            showPrivacyGrade = appConfigurationDownloaded && currentBrowserViewState.browserShowing,
+            showTabsButton = showControls,
+            showFireButton = showControls,
+            showMenuButton = showControls,
+            showClearButton = showClearButton
         )
+
+        autoCompleteViewState.value = AutoCompleteViewState(showAutoCompleteSuggestions, autoCompleteSearchResults)
 
         if (hasQueryChanged && hasFocus && autoCompleteSuggestionsEnabled) {
             autoCompletePublishSubject.accept(query.trim())
@@ -445,11 +432,8 @@ class BrowserTabViewModel(
     }
 
     fun onUserSelectedToEditQuery(query: String) {
-        val omnibarViewState = currentViewState().omnibarViewState
-        viewState.value = currentViewState().copy(
-            omnibarViewState = omnibarViewState.copy(isEditing = false, omnibarText = query),
-            autoComplete = AutoCompleteViewState(showSuggestions = false)
-        )
+        omnibarViewState.value = currentOmnibarViewState().copy(isEditing = false, omnibarText = query)
+        autoCompleteViewState.value = AutoCompleteViewState(showSuggestions = false)
     }
 
     fun userLongPressedInWebView(target: WebView.HitTestResult, menu: ContextMenu) {
@@ -481,36 +465,35 @@ class BrowserTabViewModel(
     }
 
     fun userRequestingToFindInPage() {
-        viewState.value = currentViewState().copy(findInPage = FindInPage(visible = true))
+        findInPageViewState.value = FindInPageViewState(visible = true, canFindInPage = true)
     }
 
     fun userFindingInPage(searchTerm: String) {
-        var findInPage = currentViewState().findInPage.copy(visible = true, searchTerm = searchTerm)
+        val currentViewState = currentFindInPageViewState()
+        var findInPage = currentViewState.copy(visible = true, searchTerm = searchTerm)
         if (searchTerm.isEmpty()) {
             findInPage = findInPage.copy(showNumberMatches = false)
         }
-        viewState.value = currentViewState().copy(findInPage = findInPage)
+        findInPageViewState.value = findInPage
         command.value = FindInPageCommand(searchTerm)
     }
 
     fun dismissFindInView() {
-        viewState.value = currentViewState().copy(findInPage = FindInPage(visible = false))
+        findInPageViewState.value = currentFindInPageViewState().copy(visible = false, searchTerm = "")
         command.value = DismissFindInPage
     }
 
     fun onFindResultsReceived(activeMatchOrdinal: Int, numberOfMatches: Int) {
         val activeIndex = if (numberOfMatches == 0) 0 else activeMatchOrdinal + 1
-        val findInPage = currentViewState().findInPage.copy(
-            showNumberMatches = true,
-            activeMatchIndex = activeIndex,
-            numberMatches = numberOfMatches
-        )
-        viewState.value = currentViewState().copy(findInPage = findInPage)
+        val currentViewState = currentFindInPageViewState()
+        findInPageViewState.value = currentViewState.copy(showNumberMatches = true,
+        activeMatchIndex = activeIndex,
+        numberMatches = numberOfMatches)
     }
 
     fun desktopSiteModeToggled(urlString: String?, desktopSiteRequested: Boolean) {
-        val browserViewState = currentViewState().browserViewState
-        viewState.value = currentViewState().copy(browserViewState = browserViewState.copy(isDesktopBrowsingMode = desktopSiteRequested))
+        val currentBrowserViewState = currentBrowserViewState()
+        browserViewState.value = currentBrowserViewState.copy(isDesktopBrowsingMode = desktopSiteRequested)
 
         if (urlString == null) {
             return
@@ -528,7 +511,16 @@ class BrowserTabViewModel(
     fun resetView() {
         site = null
         onSiteChanged()
-        viewState.value = ViewState()
+        initializeViewStates()
+    }
+
+    private fun initializeViewStates() {
+        defaultBrowserViewState.value = DefaultBrowserViewState()
+        browserViewState.value = BrowserViewState()
+        loadingViewState.value = LoadingViewState()
+        autoCompleteViewState.value = AutoCompleteViewState()
+        omnibarViewState.value = OmnibarViewState()
+        findInPageViewState.value = FindInPageViewState()
     }
 
     fun userSharingLink(url: String?) {
@@ -539,27 +531,14 @@ class BrowserTabViewModel(
 
     fun userDeclinedToSetAsDefaultBrowser() {
         defaultBrowserDetector.userDeclinedToSetAsDefaultBrowser()
-        val defaultBrowserViewState = currentViewState().defaultBrowserViewState
-        viewState.value = currentViewState().copy(defaultBrowserViewState = defaultBrowserViewState.copy(showDefaultBrowserBanner = false))
+        val currentDefaultBrowserViewState = currentDefaultBrowserViewState()
+        defaultBrowserViewState.value = currentDefaultBrowserViewState.copy(showDefaultBrowserBanner = false)
     }
 
     fun userAcceptedToSetAsDefaultBrowser() {
         command.value = LaunchDefaultAppSystemSettings
     }
 
-    data class FindInPage(
-        val visible: Boolean = false,
-        val showNumberMatches: Boolean = false,
-        val activeMatchIndex: Int = 0,
-        val searchTerm: String = "",
-        val numberMatches: Int = 0,
-        val canFindInPage: Boolean = true
-    )
-
-    data class AutoCompleteViewState(
-        val showSuggestions: Boolean = false,
-        val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
-    )
 }
 
 
