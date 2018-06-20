@@ -1,13 +1,17 @@
 package com.duckduckgo.app.feedback.ui
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
+import android.arch.lifecycle.Observer
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.feedback.api.FeedbackSender
+import com.duckduckgo.app.feedback.ui.FeedbackViewModel.*
 import com.nhaarman.mockito_kotlin.*
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
 
 class FeedbackViewModelTest {
 
@@ -19,7 +23,11 @@ class FeedbackViewModelTest {
     @Suppress("unused")
     val schedulers = InstantSchedulersRule()
 
-    private var mockFedbackSender: FeedbackSender = mock()
+    @Mock
+    private lateinit var mockFeedbackSender: FeedbackSender
+
+    @Mock
+    private lateinit var mockCommandObserver: Observer<FeedbackViewModel.Command>
 
     private lateinit var testee: FeedbackViewModel
 
@@ -28,12 +36,28 @@ class FeedbackViewModelTest {
 
     @Before
     fun before() {
-        testee = FeedbackViewModel(mockFedbackSender)
+        MockitoAnnotations.initMocks(this)
+        testee = FeedbackViewModel(mockFeedbackSender)
+        testee.command.observeForever(mockCommandObserver)
     }
 
     @Test
     fun whenInitializedThenCannotSubmit() {
         assertFalse(viewState.submitAllowed)
+    }
+
+    @Test
+    fun whenBrokenUrlSwitchedOnWithNoUrlThenUrlFocused() {
+        testee.onBrokenSiteUrlChanged(null)
+        testee.onBrokenSiteChanged(true)
+        verify(mockCommandObserver).onChanged(Command.FocusUrl)
+    }
+
+    @Test
+    fun whenBrokenUrlSwitchedOnWithUrlThenMessageFocused() {
+        testee.onBrokenSiteUrlChanged("http://example.com")
+        testee.onBrokenSiteChanged(true)
+        verify(mockCommandObserver).onChanged(Command.FocusMessage)
     }
 
     @Test
@@ -85,14 +109,16 @@ class FeedbackViewModelTest {
         testee.onBrokenSiteUrlChanged(url)
         testee.onSubmitPressed()
 
-        verify(mockFedbackSender).submitBrokenSiteFeedback(null, url)
+        verify(mockFeedbackSender).submitBrokenSiteFeedback(null, url)
+        verify(mockCommandObserver).onChanged(Command.Finish)
     }
 
     @Test
     fun whenCannotSubmitBrokenUrlAndSubmitPressedThenFeedbackNotSubmitted() {
         testee.onBrokenSiteChanged(true)
         testee.onSubmitPressed()
-        verify(mockFedbackSender, never()).submitBrokenSiteFeedback(any(), any())
+        verify(mockFeedbackSender, never()).submitBrokenSiteFeedback(any(), any())
+        verify(mockCommandObserver, never()).onChanged(Command.Finish)
     }
 
     @Test
@@ -101,14 +127,17 @@ class FeedbackViewModelTest {
         testee.onBrokenSiteChanged(false)
         testee.onFeedbackMessageChanged(message)
         testee.onSubmitPressed()
-        verify(mockFedbackSender).submitGeneralFeedback(message)
+        verify(mockFeedbackSender).submitGeneralFeedback(message)
+        verify(mockCommandObserver).onChanged(Command.Finish)
     }
+
 
     @Test
     fun whenCannotSubmitMessageAndSubmitPressedThenFeedbackNotSubmitted() {
         testee.onBrokenSiteChanged(false)
         testee.onSubmitPressed()
-        verify(mockFedbackSender, never()).submitGeneralFeedback(any())
+        verify(mockFeedbackSender, never()).submitGeneralFeedback(any())
+        verify(mockCommandObserver, never()).onChanged(Command.Finish)
     }
 
 }

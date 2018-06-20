@@ -165,7 +165,7 @@
 
     <!-- Feedback Activity -->
     <string name="feedbackActivityTitle">Feedback</string>
-    <string name="feedbackMenuItemTitle">Leave feedback</string>
+    <string name="feedbackReportBrokenSiteMenuItem">Report a broken site</string>
     <string name="feedbackHeading">Share your Feedback</string>
     <string name="feedbackModalDescription">Anonymously share your feedback to help us improve the DuckDuckGo Privacy Browser</string>
     <string name="feedbackReportBrokenSite">Report a broken site</string>

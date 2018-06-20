@@ -185,8 +185,8 @@ class BrowserActivity : DuckDuckGoActivity() {
         viewModel.onOpenInNewTabRequested(query)
     }
 
-    fun launchFeedback() {
-        startActivity(FeedbackActivity.intent(this))
+    fun launchBrokenSiteFeedback(url: String?) {
+        startActivity(FeedbackActivity.intent(this, true, url))
     }
 
     fun launchSettings() {
@@ -196,7 +196,6 @@ class BrowserActivity : DuckDuckGoActivity() {
     fun launchBookmarks() {
         startActivity(BookmarksActivity.intent(this))
     }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == DASHBOARD_REQUEST_CODE) {

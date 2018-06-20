@@ -470,6 +470,7 @@ class BrowserTabViewModel(
 
     fun resetView() {
         site = null
+        url.value = null
         onSiteChanged()
         viewState.value = ViewState()
     }

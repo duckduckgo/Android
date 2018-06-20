@@ -116,9 +116,9 @@
                 android:layout_height="wrap_content" />
 
             <TextView
-                android:id="@+id/feedbackPopupMenuItem"
+                android:id="@+id/brokenSitePopupMenuItem"
                 style="@style/BrowserTextMenuItem"
-                android:text="@string/feedbackMenuItemTitle" />
+                android:text="@string/feedbackReportBrokenSiteMenuItem" />
 
             <TextView
                 android:id="@+id/settingsPopupMenuItem"

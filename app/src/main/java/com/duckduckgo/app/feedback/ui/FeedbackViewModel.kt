@@ -19,6 +19,7 @@ package com.duckduckgo.app.feedback.ui
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.duckduckgo.app.feedback.api.FeedbackSender
+import com.duckduckgo.app.global.SingleLiveEvent
 
 
 class FeedbackViewModel(private val feedbackSender: FeedbackSender) : ViewModel() {
@@ -31,12 +32,23 @@ class FeedbackViewModel(private val feedbackSender: FeedbackSender) : ViewModel(
         val submitAllowed: Boolean = false
     )
 
-    val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    sealed class Command {
+        object FocusUrl : Command()
+        object FocusMessage : Command()
+        object Finish : Command()
+    }
 
+    val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val viewValue: ViewState get() = viewState!!.value!!
+    val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     init {
         viewState.value = ViewState()
+    }
+
+    fun setInitialBrokenSite(url: String?) {
+        onBrokenSiteUrlChanged(url)
+        onBrokenSiteChanged(true)
     }
 
     fun onBrokenSiteChanged(isBroken: Boolean) {
@@ -44,11 +56,23 @@ class FeedbackViewModel(private val feedbackSender: FeedbackSender) : ViewModel(
             return
         }
 
-        val brokenUrl = viewState?.value?.url
         viewState.value = viewState.value?.copy(
             isBrokenSite = isBroken,
             showUrl = isBroken,
             submitAllowed = canSubmit(isBroken, viewValue.url, viewValue.message)
+        )
+
+        if (isBroken && viewValue.url.isNullOrBlank()) {
+            command.value = Command.FocusUrl
+        } else {
+            command.value = Command.FocusMessage
+        }
+    }
+
+    fun onBrokenSiteUrlChanged(newUrl: String?) {
+        viewState.value = viewState.value?.copy(
+            url = newUrl,
+            submitAllowed = canSubmit(viewValue.isBrokenSite, newUrl, viewValue.message)
         )
     }
 
@@ -59,12 +83,6 @@ class FeedbackViewModel(private val feedbackSender: FeedbackSender) : ViewModel(
         )
     }
 
-    fun onBrokenSiteUrlChanged(newUrl: String?) {
-        viewState.value = viewState.value?.copy(
-            url = newUrl,
-            submitAllowed = canSubmit(viewValue.isBrokenSite, newUrl, viewValue.message)
-        )
-    }
 
     private fun canSubmit(isBrokenSite: Boolean, url: String?, feedbackMessage: String?): Boolean {
         return (isBrokenSite && !url.isNullOrBlank()) || (!isBrokenSite && !feedbackMessage.isNullOrBlank())
@@ -78,7 +96,8 @@ class FeedbackViewModel(private val feedbackSender: FeedbackSender) : ViewModel(
             val message = viewValue.message ?: return
             feedbackSender.submitGeneralFeedback(message)
         }
-    }
 
+        command.value = Command.Finish
+    }
 
 }

@@ -128,7 +128,6 @@
 
             <EditText
                 android:id="@+id/feedbackMessage"
-                style="@style/Base.V7.Widget.AppCompat.EditText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/feedbackFormFieldsMargin"

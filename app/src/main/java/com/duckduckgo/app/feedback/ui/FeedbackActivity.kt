@@ -22,8 +22,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
+import android.widget.EditText
 import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.feedback.ui.FeedbackViewModel.Command
+import com.duckduckgo.app.feedback.ui.FeedbackViewModel.ViewState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.TextChangedWatcher
@@ -36,7 +39,6 @@ class FeedbackActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
-
     private val viewModel: FeedbackViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(FeedbackViewModel::class.java)
     }
@@ -45,10 +47,19 @@ class FeedbackActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_feedback)
         configureListeners()
+        configureObservers()
 
-        viewModel.viewState.observe(this, Observer<FeedbackViewModel.ViewState> {
-            it?.let { render(it) }
-        })
+        if (savedInstanceState == null) {
+            consumeIntentExtra()
+        }
+    }
+
+    private fun consumeIntentExtra() {
+        val brokenSite = intent.getBooleanExtra(BROKEN_SITE_EXTRA, false)
+        if (brokenSite) {
+            val url = intent.getStringExtra(URL_EXTRA)
+            viewModel.setInitialBrokenSite(url)
+        }
     }
 
     private fun configureListeners() {
@@ -65,26 +76,54 @@ class FeedbackActivity : DuckDuckGoActivity() {
                 viewModel.onBrokenSiteUrlChanged(editable.toString())
             }
         })
-        submitButton.setOnClickListener {  _ ->
+        submitButton.setOnClickListener { _ ->
             viewModel.onSubmitPressed()
-            finish()
         }
     }
 
-    private fun render(viewState: FeedbackViewModel.ViewState) {
-        val brokenSiteInitiallyHidden = !brokenSiteUrl.isVisible
-        brokenSiteSwitch.isActivated = viewState.isBrokenSite
-        brokenSiteUrl.isVisible = viewState.showUrl
-        submitButton.isEnabled = viewState.submitAllowed
+    private fun configureObservers() {
+        viewModel.command.observe(this, Observer<Command> {
+            it?.let { processCommand(it) }
+        })
+        viewModel.viewState.observe(this, Observer<ViewState> {
+            it?.let { render(it) }
+        })
+    }
 
-        if(brokenSiteInitiallyHidden && brokenSiteUrl.isVisible) {
-            brokenSiteUrl.requestFocus()
+    private fun processCommand(command: Command) {
+        when (command) {
+            Command.FocusUrl -> brokenSiteUrl.requestFocus()
+            Command.FocusMessage -> feedbackMessage.requestFocus()
+            Command.Finish -> finish()
+        }
+    }
+
+    private fun render(viewState: ViewState) {
+        brokenSiteSwitch.isChecked = viewState.isBrokenSite
+        brokenSiteUrl.isVisible = viewState.showUrl
+        brokenSiteUrl.updateText(viewState.url ?: "")
+        submitButton.isEnabled = viewState.submitAllowed
+    }
+
+    private fun EditText.updateText(newText: String) {
+        if (text.toString() != newText) {
+            setText(newText)
         }
     }
 
     companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, FeedbackActivity::class.java)
+
+        private const val BROKEN_SITE_EXTRA = "BROKEN_SITE_EXTRA"
+        private const val URL_EXTRA = "URL_EXTRA"
+
+        fun intent(context: Context, brokenSite: Boolean = false, url: String? = null): Intent {
+            val intent = Intent(context, FeedbackActivity::class.java)
+            intent.putExtra(BROKEN_SITE_EXTRA, brokenSite)
+            if (url != null) {
+                intent.putExtra(URL_EXTRA, url)
+            }
+            return intent
         }
+
     }
 }
