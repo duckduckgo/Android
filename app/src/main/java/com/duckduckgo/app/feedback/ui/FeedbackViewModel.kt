@@ -39,7 +39,7 @@ class FeedbackViewModel(private val feedbackSender: FeedbackSender) : ViewModel(
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
-    val viewValue: ViewState get() = viewState!!.value!!
+    private val viewValue: ViewState get() = viewState.value!!
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     init {

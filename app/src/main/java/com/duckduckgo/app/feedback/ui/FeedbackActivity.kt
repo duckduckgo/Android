@@ -82,7 +82,7 @@ class FeedbackActivity : DuckDuckGoActivity() {
     }
 
     private fun configureObservers() {
-        viewModel.command.observe(this, Observer<Command> {
+        viewModel.command.observe(this, Observer {
             it?.let { processCommand(it) }
         })
         viewModel.viewState.observe(this, Observer<ViewState> {
