@@ -50,7 +50,7 @@
     <string name="shareMenuTitle">Share…</string>
 
     <!-- Find in page -->
-    <string name="find_in_page">Find in page</string>
+    <string name="findInPageMenuTitle">Find in Page</string>
     <string name="nextSearchTermDescription">Find next</string>
     <string name="previousSearchTermDescription">Find previous</string>
     <string name="closeFindInPageButtonDescription">Close find in page view</string>
@@ -165,12 +165,12 @@
 
     <!-- Feedback Activity -->
     <string name="feedbackActivityTitle">Feedback</string>
-    <string name="feedbackReportBrokenSiteMenuItem">Report broken site</string>
-    <string name="feedbackHeading">Share your Feedback</string>
+    <string name="feedbackReportBrokenSiteMenuItem">Report Broken Site</string>
+    <string name="feedbackHeading">Share Your Feedback</string>
     <string name="feedbackModalDescription">Anonymously share your feedback to help us improve the DuckDuckGo Privacy Browser</string>
     <string name="feedbackReportBrokenSite">Report a broken site</string>
     <string name="feedbackDomainAdded">Domain Added to Feedback Report</string>
-    <string name="feedbackUrlHint">Enter url</string>
+    <string name="feedbackUrlHint">Enter URL</string>
     <string name="feedbackMessageHint">How can the app be improved? What do you love? What\'s breaking? Please be as specific as possible.</string>
     <string name="feedbackSubmitButton">Submit Feedback</string>
     <string name="feedbackIsAnonymousLink">Your feedback is completely anonymous</string>
@@ -193,6 +193,5 @@
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Search DuckDuckGo</string>
-
 
 </resources>
