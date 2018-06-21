@@ -68,6 +68,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/header">
 
         <LinearLayout
@@ -100,7 +101,7 @@
             <TextView
                 android:id="@+id/findInPageMenuItem"
                 style="@style/BrowserTextMenuItem"
-                android:text="@string/find_in_page" />
+                android:text="@string/findInPageMenuTitle" />
 
             <CheckBox
                 android:id="@+id/requestDesktopSiteCheckMenuItem"
@@ -114,6 +115,11 @@
                 android:text="@string/requestDesktopSiteMenuTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/brokenSitePopupMenuItem"
+                style="@style/BrowserTextMenuItem"
+                android:text="@string/feedbackReportBrokenSiteMenuItem" />
 
             <TextView
                 android:id="@+id/settingsPopupMenuItem"
