@@ -99,6 +99,10 @@
             android:name="com.duckduckgo.app.settings.SettingsActivity"
             android:label="@string/settingsActivityTitle" />
         <activity
+            android:name="com.duckduckgo.app.feedback.ui.FeedbackActivity"
+            android:label="@string/feedbackActivityTitle"
+            android:theme="@style/ModalCardTheme" />
+        <activity
             android:name="com.duckduckgo.app.about.AboutDuckDuckGoActivity"
             android:label="@string/aboutActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
@@ -123,7 +127,7 @@
 
         <activity
             android:name=".defaultBrowsing.DefaultBrowserInfoActivity"
-            android:theme="@style/Theme.AppCompat.Translucent" />
+            android:theme="@style/ModalCardTheme" />
     </application>
 
 </manifest>
