@@ -171,6 +171,7 @@
     <string name="feedbackReportBrokenSite">Report a broken site</string>
     <string name="feedbackUrlHint">Enter URL</string>
     <string name="feedbackMessageHint">How can the app be improved? What do you love? What\'s breaking? Please be as specific as possible.</string>
+    <string name="feedbackBrokenSiteHint">Which website content or functionality is breaking? Please be as specific as possible.</string>
     <string name="feedbackSubmitButton">Submit Feedback</string>
     <string name="feedbackIsAnonymousLink">Your feedback is completely anonymous</string>
     <string name="feedbackSubmitted">Thank you! Feedback submitted</string>
