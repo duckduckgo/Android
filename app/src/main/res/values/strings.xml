@@ -169,7 +169,6 @@
     <string name="feedbackHeading">Share Your Feedback</string>
     <string name="feedbackModalDescription">Anonymously share your feedback to help us improve the DuckDuckGo Privacy Browser</string>
     <string name="feedbackReportBrokenSite">Report a broken site</string>
-    <string name="feedbackDomainAdded">Domain Added to Feedback Report</string>
     <string name="feedbackUrlHint">Enter URL</string>
     <string name="feedbackMessageHint">How can the app be improved? What do you love? What\'s breaking? Please be as specific as possible.</string>
     <string name="feedbackSubmitButton">Submit Feedback</string>

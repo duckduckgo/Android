@@ -28,7 +28,7 @@ import timber.log.Timber
 
 interface FeedbackSender {
     fun submitGeneralFeedback(comment: String)
-    fun submitBrokenSiteFeedback(comment: String?, url: String)
+    fun submitBrokenSiteFeedback(comment: String, url: String)
 }
 
 class FeedbackSubmitter(
@@ -42,8 +42,8 @@ class FeedbackSubmitter(
         submitFeedback(Reason.GENERAL, comment, "")
     }
 
-    override fun submitBrokenSiteFeedback(comment: String?, url: String) {
-        submitFeedback(Reason.BROKEN_SITE, comment ?: "", url)
+    override fun submitBrokenSiteFeedback(comment: String, url: String) {
+        submitFeedback(Reason.BROKEN_SITE, comment, url)
     }
 
     private fun submitFeedback(type: String, comment: String, url: String) {

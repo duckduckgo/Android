@@ -55,15 +55,16 @@ class FeedbackViewModelTest {
 
     @Test
     fun whenBrokenUrlSwitchedOnWithUrlThenMessageFocused() {
-        testee.onBrokenSiteUrlChanged("http://example.com")
+        testee.onBrokenSiteUrlChanged(Constants.url)
         testee.onBrokenSiteChanged(true)
         verify(mockCommandObserver).onChanged(Command.FocusMessage)
     }
 
     @Test
-    fun whenBrokenUrlOnWithUrlThenCanSubmit() {
+    fun whenBrokenUrlOnWithUrlAndMessageThenCanSubmit() {
         testee.onBrokenSiteChanged(true)
-        testee.onBrokenSiteUrlChanged("http://example.com")
+        testee.onBrokenSiteUrlChanged(Constants.url)
+        testee.onFeedbackMessageChanged(Constants.message)
         assertTrue(viewState.submitAllowed)
     }
 
@@ -71,6 +72,15 @@ class FeedbackViewModelTest {
     fun whenBrokenUrlOnWithNullUrlThenCannotSubmit() {
         testee.onBrokenSiteChanged(true)
         testee.onBrokenSiteUrlChanged(null)
+        testee.onFeedbackMessageChanged(Constants.message)
+        assertFalse(viewState.submitAllowed)
+    }
+
+    @Test
+    fun whenBrokenUrlOnWithNullMessageThenCannotSubmit() {
+        testee.onBrokenSiteChanged(true)
+        testee.onBrokenSiteUrlChanged(Constants.url)
+        testee.onFeedbackMessageChanged(null)
         assertFalse(viewState.submitAllowed)
     }
 
@@ -78,13 +88,22 @@ class FeedbackViewModelTest {
     fun whenBrokenUrlOnWithBlankUrlThenCannotSubmit() {
         testee.onBrokenSiteChanged(true)
         testee.onBrokenSiteUrlChanged(" ")
+        testee.onFeedbackMessageChanged(Constants.message)
+        assertFalse(viewState.submitAllowed)
+    }
+
+    @Test
+    fun whenBrokenUrlOnWithBlankMessageThenCannotSubmit() {
+        testee.onBrokenSiteChanged(true)
+        testee.onBrokenSiteUrlChanged(Constants.url)
+        testee.onFeedbackMessageChanged(" ")
         assertFalse(viewState.submitAllowed)
     }
 
     @Test
     fun whenBrokenUrlOffWithMessageThenCanSubmit() {
         testee.onBrokenSiteChanged(false)
-        testee.onFeedbackMessageChanged("Feedback message")
+        testee.onFeedbackMessageChanged(Constants.message)
         assertTrue(viewState.submitAllowed)
     }
 
@@ -103,18 +122,18 @@ class FeedbackViewModelTest {
     }
 
     @Test
-    fun whenCanSubmitBrokenUrlAndSubmitPressedThenFeedbackSubmitted() {
-        val url = "http://example.com"
+    fun whenCanSubmitBrokenSiteAndSubmitPressedThenFeedbackSubmitted() {
         testee.onBrokenSiteChanged(true)
-        testee.onBrokenSiteUrlChanged(url)
+        testee.onBrokenSiteUrlChanged(Constants.url)
+        testee.onFeedbackMessageChanged(Constants.message)
         testee.onSubmitPressed()
 
-        verify(mockFeedbackSender).submitBrokenSiteFeedback(null, url)
+        verify(mockFeedbackSender).submitBrokenSiteFeedback(Constants.message, Constants.url)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
 
     @Test
-    fun whenCannotSubmitBrokenUrlAndSubmitPressedThenFeedbackNotSubmitted() {
+    fun whenCannotSubmitBrokenSiteAndSubmitPressedThenFeedbackNotSubmitted() {
         testee.onBrokenSiteChanged(true)
         testee.onSubmitPressed()
         verify(mockFeedbackSender, never()).submitBrokenSiteFeedback(any(), any())
@@ -123,11 +142,10 @@ class FeedbackViewModelTest {
 
     @Test
     fun whenCanSubmitMessageAndSubmitPressedThenFeedbackSubmitted() {
-        val message = "Message"
         testee.onBrokenSiteChanged(false)
-        testee.onFeedbackMessageChanged(message)
+        testee.onFeedbackMessageChanged(Constants.message)
         testee.onSubmitPressed()
-        verify(mockFeedbackSender).submitGeneralFeedback(message)
+        verify(mockFeedbackSender).submitGeneralFeedback(Constants.message)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
 
@@ -137,6 +155,11 @@ class FeedbackViewModelTest {
         testee.onSubmitPressed()
         verify(mockFeedbackSender, never()).submitGeneralFeedback(any())
         verify(mockCommandObserver, never()).onChanged(Command.ConfirmAndFinish)
+    }
+
+    companion object Constants {
+        private const val url = "http://example.com"
+        private const val message = "Feedback message"
     }
 
 }
