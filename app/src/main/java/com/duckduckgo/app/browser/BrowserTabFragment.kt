@@ -593,6 +593,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         destroyWebView()
         configureWebView()
         showKeyboard()
+        appBarLayout.setExpanded(true)
     }
 
     fun onBackPressed(): Boolean {
