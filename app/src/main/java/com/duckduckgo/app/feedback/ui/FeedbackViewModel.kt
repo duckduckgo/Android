@@ -84,17 +84,27 @@ class FeedbackViewModel(private val feedbackSender: FeedbackSender) : ViewModel(
         )
     }
 
-
     private fun canSubmit(isBrokenSite: Boolean, url: String?, feedbackMessage: String?): Boolean {
-        return (isBrokenSite && !url.isNullOrBlank()) || (!isBrokenSite && !feedbackMessage.isNullOrBlank())
+
+        if (feedbackMessage.isNullOrBlank()) {
+            return false
+        }
+
+        if (isBrokenSite && url.isNullOrBlank()) {
+            return false
+        }
+
+        return true
     }
 
     fun onSubmitPressed() {
+
+        val message = viewValue.message ?: return
+
         if (viewValue.isBrokenSite) {
             val url = viewValue.url ?: return
-            feedbackSender.submitBrokenSiteFeedback(viewValue.message, url)
+            feedbackSender.submitBrokenSiteFeedback(message, url)
         } else {
-            val message = viewValue.message ?: return
             feedbackSender.submitGeneralFeedback(message)
         }
 
