@@ -135,6 +135,7 @@ class BrowserTabViewModel(
         class DownloadImage(val url: String) : Command()
         class ShareLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
+        class BrokenSiteFeedback(val url: String?) : Command()
         class DisplayMessage(@StringRes val messageId: Int) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
@@ -429,6 +430,10 @@ class BrowserTabViewModel(
             bookmarksDao.insert(BookmarkEntity(title = title, url = url))
         }
         command.value = DisplayMessage(R.string.bookmarkAddedFeedback)
+    }
+
+    fun onBrokenSiteSelected() {
+        command.value = BrokenSiteFeedback(site?.url)
     }
 
     fun onUserSelectedToEditQuery(query: String) {

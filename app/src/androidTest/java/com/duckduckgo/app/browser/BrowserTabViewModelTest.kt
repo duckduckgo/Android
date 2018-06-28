@@ -664,6 +664,21 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserOnSiteSelectsBrokenSiteThenBrokenSiteFeedbackCommandSentWithUrl() {
+        testee.urlChanged("foo.com")
+        testee.onBrokenSiteSelected()
+        val command = captureCommands().value as Command.BrokenSiteFeedback
+        assertEquals("foo.com", command.url)
+    }
+
+    @Test
+    fun whenUserNotOnSiteSelectsBrokenSiteThenBrokenSiteFeedbackCommandSentWithNoUrl() {
+        testee.onBrokenSiteSelected()
+        val command = captureCommands().value as Command.BrokenSiteFeedback
+        assertEquals(null, command.url)
+    }
+
+    @Test
     fun whenUserSelectsToShareLinkWithNullUrlThenShareLinkCommandNotSent() {
         testee.userSharingLink(null)
         verify(mockCommandObserver, never()).onChanged(any())
