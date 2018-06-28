@@ -105,9 +105,11 @@ class FeedbackActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: ViewState) {
+        val messageHint = if (viewState.isBrokenSite) R.string.feedbackBrokenSiteHint else  R.string.feedbackMessageHint
         brokenSiteSwitch.isChecked = viewState.isBrokenSite
         brokenSiteUrl.isVisible = viewState.showUrl
         brokenSiteUrl.updateText(viewState.url ?: "")
+        feedbackMessage.setHint(messageHint)
         submitButton.isEnabled = viewState.submitAllowed
     }
 
