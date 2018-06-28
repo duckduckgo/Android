@@ -664,7 +664,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserOnSiteSelectsBrokenSiteThenBrokenSiteFeedbackCommandSentWithUrl() {
+    fun whenOnSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithUrl() {
         testee.urlChanged("foo.com")
         testee.onBrokenSiteSelected()
         val command = captureCommands().value as Command.BrokenSiteFeedback
@@ -672,10 +672,10 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserNotOnSiteSelectsBrokenSiteThenBrokenSiteFeedbackCommandSentWithNoUrl() {
+    fun whenNoSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithoutUrl() {
         testee.onBrokenSiteSelected()
         val command = captureCommands().value as Command.BrokenSiteFeedback
-        assertEquals(null, command.url)
+        assertNull(command.url)
     }
 
     @Test
