@@ -237,28 +237,28 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewModelNotifiedThatWebViewHasFinishedLoadingThenViewStateIsUpdated() {
-        testee.loadingFinished()
+        testee.loadingFinished(null, false, false)
         assertFalse(loadingViewState().isLoading)
     }
 
     @Test
     fun whenLoadingFinishedWithUrlThenSiteVisitedEntryAddedToLeaderboardDao() {
         testee.url.value = "http://example.com/abc"
-        testee.loadingFinished()
+        testee.loadingFinished(null, false, false)
         verify(mockNetworkLeaderboardDao).insert(SiteVisitedEntity("example.com"))
     }
 
     @Test
     fun whenLoadingFinishedWithUrlThenOmnibarTextUpdatedToMatch() {
         val exampleUrl = "http://example.com/abc"
-        testee.loadingFinished(exampleUrl)
+        testee.loadingFinished(exampleUrl, false, false)
         assertEquals(exampleUrl, omnibarViewState().omnibarText)
     }
 
     @Test
     fun whenLoadingFinishedWithQueryUrlThenOmnibarTextUpdatedToShowQuery() {
         val queryUrl = "http://duckduckgo.com?q=test"
-        testee.loadingFinished(queryUrl)
+        testee.loadingFinished(queryUrl, false, false)
         assertEquals("test", omnibarViewState().omnibarText)
     }
 
@@ -266,13 +266,13 @@ class BrowserTabViewModelTest {
     fun whenLoadingFinishedWithNoUrlThenOmnibarTextUpdatedToMatch() {
         val exampleUrl = "http://example.com/abc"
         testee.urlChanged(exampleUrl)
-        testee.loadingFinished(null)
+        testee.loadingFinished(null, false, false)
         assertEquals(exampleUrl, omnibarViewState().omnibarText)
     }
 
     @Test
     fun whenLoadingFinishedWithNoUrlThenSiteVisitedEntryNotAddedToLeaderboardDao() {
-        testee.loadingFinished()
+        testee.loadingFinished(null, false, false)
         verify(mockNetworkLeaderboardDao, never()).insert(SiteVisitedEntity("example.com"))
     }
 
@@ -331,13 +331,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewModelGetsProgressUpdateThenViewStateIsUpdated() {
-        testee.progressChanged(0)
+        testee.progressChanged(0, false, false)
         assertEquals(0, loadingViewState().progress)
 
-        testee.progressChanged(50)
+        testee.progressChanged(50, false, false)
         assertEquals(50, loadingViewState().progress)
 
-        testee.progressChanged(100)
+        testee.progressChanged(100, false, false)
         assertEquals(100, loadingViewState().progress)
     }
 
