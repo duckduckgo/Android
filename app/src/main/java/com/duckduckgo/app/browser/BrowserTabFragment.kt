@@ -219,6 +219,10 @@ class BrowserTabFragment : Fragment(), FindListener {
             it?.let { renderer.renderAutocomplete(it) }
         })
 
+        viewModel.globalLayoutState.observe(this, Observer<GlobalLayoutViewState> {
+            it?.let { renderer.renderGlobalViewState(it) }
+        })
+
         viewModel.browserViewState.observe(this, Observer<BrowserViewState> {
             it?.let { renderer.renderBrowserViewState(it) }
         })
@@ -438,7 +442,7 @@ class BrowserTabFragment : Fragment(), FindListener {
     }
 
     private fun configureKeyboardAwareLogoAnimation() {
-        logoParent.layoutTransition.enableTransitionType(CHANGING)
+        newTabLayout.layoutTransition.enableTransitionType(CHANGING)
     }
 
     private fun userEnteredQuery(query: String) {
@@ -730,6 +734,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         private var lastSeenLoadingViewState: LoadingViewState? = null
         private var lastSeenFindInPageViewState: FindInPageViewState? = null
         private var lastSeenBrowserViewState: BrowserViewState? = null
+        private var lastSeenGlobalViewState: GlobalLayoutViewState? = null
         private var lastSeenDefaultBrowserViewState: DefaultBrowserViewState? = null
         private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
 
@@ -783,6 +788,18 @@ class BrowserTabFragment : Fragment(), FindListener {
                 pageLoadingIndicator.apply {
                     if (viewState.isLoading) show() else hide()
                     progress = viewState.progress
+                }
+            }
+        }
+
+        fun renderGlobalViewState(viewState: GlobalLayoutViewState) {
+            renderIfChanged(viewState, lastSeenGlobalViewState) {
+                if (viewState.isNewTabState) {
+                    newTabLayout.show()
+                    browserLayout.hide()
+                } else {
+                    newTabLayout.hide()
+                    browserLayout.show()
                 }
             }
         }

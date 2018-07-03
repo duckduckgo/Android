@@ -80,6 +80,10 @@ class BrowserTabViewModel(
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, ViewModel() {
 
+    data class GlobalLayoutViewState(
+        val isNewTabState: Boolean = true
+    )
+
     data class BrowserViewState(
         val browserShowing: Boolean = false,
         val isFullScreen: Boolean = false,
@@ -144,6 +148,7 @@ class BrowserTabViewModel(
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
     val browserViewState: MutableLiveData<BrowserViewState> = MutableLiveData()
+    val globalLayoutState: MutableLiveData<GlobalLayoutViewState> = MutableLiveData()
     val loadingViewState: MutableLiveData<LoadingViewState> = MutableLiveData()
     val omnibarViewState: MutableLiveData<OmnibarViewState> = MutableLiveData()
     val defaultBrowserViewState: MutableLiveData<DefaultBrowserViewState> = MutableLiveData()
@@ -238,6 +243,7 @@ class BrowserTabViewModel(
         val trimmedInput = input.trim()
         url.value = queryUrlConverter.convertQueryToUrl(trimmedInput)
 
+        globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
         findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
         omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = trimmedInput)
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
@@ -521,6 +527,7 @@ class BrowserTabViewModel(
     }
 
     private fun initializeViewStates() {
+        globalLayoutState.value = GlobalLayoutViewState()
         defaultBrowserViewState.value = DefaultBrowserViewState()
         browserViewState.value = BrowserViewState()
         loadingViewState.value = LoadingViewState()
