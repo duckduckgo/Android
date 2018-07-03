@@ -26,9 +26,8 @@ import android.support.v7.widget.SwitchCompat
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
-import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.feedback.ui.FeedbackActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
@@ -120,8 +119,7 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun launchFeedback() {
-        startActivity(BrowserActivity.intent(this, AppUrl.Url.FEEDBACK))
-        finish()
+        startActivity(Intent(FeedbackActivity.intent(this)))
     }
 
     companion object {

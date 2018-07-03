@@ -26,6 +26,7 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
+import com.duckduckgo.app.feedback.ui.FeedbackActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.intentText
@@ -184,6 +185,10 @@ class BrowserActivity : DuckDuckGoActivity() {
         viewModel.onOpenInNewTabRequested(query)
     }
 
+    fun launchBrokenSiteFeedback(url: String?) {
+        startActivity(FeedbackActivity.intent(this, true, url))
+    }
+
     fun launchSettings() {
         startActivity(SettingsActivity.intent(this))
     }
@@ -191,7 +196,6 @@ class BrowserActivity : DuckDuckGoActivity() {
     fun launchBookmarks() {
         startActivity(BookmarksActivity.intent(this))
     }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == DASHBOARD_REQUEST_CODE) {

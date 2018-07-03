@@ -27,8 +27,9 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.LongPressHandler
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
-import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
+import com.duckduckgo.app.feedback.api.FeedbackSender
+import com.duckduckgo.app.feedback.ui.FeedbackViewModel
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.launch.LaunchViewModel
@@ -66,8 +67,8 @@ class ViewModelFactory @Inject constructor(
     private val defaultBrowserNotification: DefaultBrowserNotification,
     private val webViewLongPressHandler: LongPressHandler,
     private val defaultBrowserDetector: DefaultBrowserDetector,
-    private val faviconDownloader: FaviconDownloader,
-    private val variantManager: VariantManager
+    private val variantManager: VariantManager,
+    private val feedbackSender: FeedbackSender
 
 ) : ViewModelProvider.NewInstanceFactory() {
 
@@ -83,6 +84,7 @@ class ViewModelFactory @Inject constructor(
                     isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                     isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                     isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
+                    isAssignableFrom(FeedbackViewModel::class.java) -> FeedbackViewModel(feedbackSender)
                     isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel( appSettingsPreferencesStore, defaultBrowserDetector)
                     isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel(bookmarksDao)
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
@@ -102,7 +104,6 @@ class ViewModelFactory @Inject constructor(
         defaultBrowserNotification = defaultBrowserNotification,
         appConfigurationDao = appConfigurationDao,
         longPressHandler = webViewLongPressHandler,
-        autoCompleteApi = autoCompleteApi,
-        faviconDownloader = faviconDownloader
+        autoCompleteApi = autoCompleteApi
     )
 }

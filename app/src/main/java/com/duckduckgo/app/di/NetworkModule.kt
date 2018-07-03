@@ -19,12 +19,17 @@ package com.duckduckgo.app.di
 import android.app.job.JobScheduler
 import android.content.Context
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
+import com.duckduckgo.app.feedback.api.FeedbackSender
+import com.duckduckgo.app.feedback.api.FeedbackService
+import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.api.ApiRequestInterceptor
 import com.duckduckgo.app.global.job.JobBuilder
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeListService
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.job.ConfigurationDownloader
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.api.ResourceSurrogateListService
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
 import com.squareup.moshi.Moshi
@@ -83,6 +88,13 @@ class NetworkModule {
     fun surrogatesService(retrofit: Retrofit): ResourceSurrogateListService =
         retrofit.create(ResourceSurrogateListService::class.java)
 
+    @Provides
+    fun feedbackService(retrofit: Retrofit): FeedbackService =
+        retrofit.create(FeedbackService::class.java)
+
+    @Provides
+    fun feedbackSender(statisticsStore: StatisticsDataStore, variantManager: VariantManager, feedbackSerice: FeedbackService): FeedbackSender =
+        FeedbackSubmitter(statisticsStore, variantManager, feedbackSerice)
 
     @Provides
     @Singleton
