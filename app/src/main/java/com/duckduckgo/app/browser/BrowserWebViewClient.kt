@@ -75,14 +75,17 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+    override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
         currentUrl = url
         webViewClientListener?.loadingStarted()
         webViewClientListener?.urlChanged(url)
     }
 
-    override fun onPageFinished(view: WebView?, url: String?) {
-        webViewClientListener?.loadingFinished(url)
+    override fun onPageFinished(webView: WebView, url: String?) {
+        val canGoBack = webView.canGoBack()
+        val canGoForward = webView.canGoForward()
+
+        webViewClientListener?.loadingFinished(url, canGoBack, canGoForward)
     }
 
     @WorkerThread

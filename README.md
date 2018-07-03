@@ -2,6 +2,8 @@
 
 Welcome to our android application. We are excited to engage the community in development, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
+## We are hiring!
+Are you a talented cross-platform mobile developer? We are looking for a Senior Cross-Platform or iOS Engineer to help shape our mobile apps. We embrace diverse perspectives, and seek out passionate, self-motivated people, committed to our shared vision of raising the standard of trust online. Visit our [careers](https://duckduckgo.com/hiring/#open) page to find out more!
 
 ## Discuss
 

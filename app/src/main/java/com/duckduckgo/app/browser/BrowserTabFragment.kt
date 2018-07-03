@@ -817,8 +817,8 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         private fun renderPopupMenus(browserShowing: Boolean, viewState: BrowserViewState) {
             popupMenu.contentView.apply {
-                backPopupMenuItem.isEnabled = browserShowing && webView?.canGoBack() ?: false
-                forwardPopupMenuItem.isEnabled = browserShowing && webView?.canGoForward() ?: false
+                backPopupMenuItem.isEnabled = browserShowing && viewState.canGoBack
+                forwardPopupMenuItem.isEnabled = browserShowing && viewState.canGoForward
                 refreshPopupMenuItem.isEnabled = browserShowing
                 newTabPopupMenuItem.isEnabled = browserShowing
                 addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
