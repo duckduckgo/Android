@@ -90,7 +90,9 @@ class BrowserTabViewModel(
         val showFireButton: Boolean = true,
         val showMenuButton: Boolean = true,
         val canSharePage: Boolean = false,
-        val canAddBookmarks: Boolean = false
+        val canAddBookmarks: Boolean = false,
+        val canGoBack: Boolean = false,
+        val canGoForward: Boolean = false
     )
 
     data class OmnibarViewState(
@@ -244,11 +246,12 @@ class BrowserTabViewModel(
         autoCompleteViewState.value = AutoCompleteViewState(false)
     }
 
-    override fun progressChanged(newProgress: Int) {
+    override fun progressChanged(newProgress: Int, canGoBack: Boolean, canGoForward: Boolean) {
         Timber.v("Loading in progress $newProgress")
 
         val progress = currentLoadingViewState()
         loadingViewState.value = progress.copy(progress = newProgress)
+        browserViewState.value = currentBrowserViewState().copy(canGoBack = canGoBack, canGoForward = canGoForward)
     }
 
     override fun goFullScreen(view: View) {
@@ -271,7 +274,7 @@ class BrowserTabViewModel(
         onSiteChanged()
     }
 
-    override fun loadingFinished(url: String?) {
+    override fun loadingFinished(url: String?, canGoBack: Boolean, canGoForward: Boolean) {
         Timber.v("Loading finished")
 
         val currentOmnibarViewState = currentOmnibarViewState()
@@ -281,6 +284,7 @@ class BrowserTabViewModel(
 
         loadingViewState.value = currentLoadingViewState.copy(isLoading = false)
         omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarText)
+        browserViewState.value = currentBrowserViewState().copy(canGoBack = canGoBack, canGoForward = canGoForward)
         registerSiteVisit()
     }
 
