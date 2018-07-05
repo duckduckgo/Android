@@ -46,7 +46,7 @@ sealed class OnboardingPageFragment : Fragment() {
 
     class NoTracePage : OnboardingPageFragment() {
         override fun layoutResource(): Int = R.layout.content_onboarding_no_trace
-        override fun backgroundColor(): Int = R.color.powderBlue
+        override fun backgroundColor(): Int = R.color.cornflowerBlue
     }
 
     class DefaultBrowserPage : OnboardingPageFragment() {
