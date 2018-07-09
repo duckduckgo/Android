@@ -147,7 +147,6 @@ class BrowserTabViewModelTest {
             defaultBrowserNotification = mockDefaultBrowserNotification,
             defaultBrowserDetector = mockDefaultBrowserDetector,
             longPressHandler = mockLongPressHandler,
-            faviconDownloader = mockFaviconDownloader,
             appConfigurationDao = appConfigurationDao
         )
 

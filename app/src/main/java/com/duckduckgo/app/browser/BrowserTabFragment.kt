@@ -70,6 +70,7 @@ import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_banner_notification.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
+import kotlinx.android.synthetic.main.include_home_screen_default_browser_call_to_action.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
@@ -173,6 +174,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         configureObservers()
         configureToolbar()
         configureBannerNotification()
+        configureCallToActionButton()
         configureWebView()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
@@ -319,7 +321,6 @@ class BrowserTabFragment : Fragment(), FindListener {
             is Command.ShowFileChooser -> {
                 launchFilePicker(it)
             }
-            is Command.LaunchDefaultAppSystemSettings -> { launchDefaultAppSystemSettings() }
         }
     }
 
@@ -397,10 +398,15 @@ class BrowserTabFragment : Fragment(), FindListener {
             viewModel.userDeclinedToSetAsDefaultBrowser()
         }
         bannerNotification.setOnClickListener {
-            viewModel.userAcceptedToSetAsDefaultBrowser()
+            launchDefaultAppSystemSettingsFromBanner()
         }
     }
 
+    private fun configureCallToActionButton() {
+        homeScreenCallToActionContainer.setOnClickListener {
+            launchDefaultAppSystemSettingsFromCallToActionButton()
+        }
+    }
 
     private fun configureFindInPage() {
         findInPageInput.setOnFocusChangeListener { _, hasFocus ->
@@ -517,11 +523,18 @@ class BrowserTabFragment : Fragment(), FindListener {
         activity?.share(url, "")
     }
 
-    private fun launchDefaultAppSystemSettings() {
+    private fun launchDefaultAppSystemSettingsFromBanner() {
         activity?.let {
             val options = ActivityOptions.makeSceneTransitionAnimation(it, bannerNotification, "defaultBrowserBannerTransition")
             val intent = DefaultBrowserInfoActivity.intent(it)
             startActivity(intent, options.toBundle())
+        }
+    }
+
+    private fun launchDefaultAppSystemSettingsFromCallToActionButton() {
+        activity?.let {
+            val intent = DefaultBrowserInfoActivity.intent(it)
+            startActivity(intent)
         }
     }
 

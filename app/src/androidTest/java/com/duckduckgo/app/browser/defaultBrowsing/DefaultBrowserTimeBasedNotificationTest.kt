@@ -44,39 +44,39 @@ class DefaultBrowserTimeBasedNotificationTest {
     @Test
     fun whenDefaultBrowserNotSupportedByDeviceThenNotificationNotShown() {
         configureEnvironment(false, true, true, false)
-        assertFalse(testee.shouldShowNotification(browserShowing = true))
+        assertFalse(testee.shouldShowBanner(browserShowing = true))
     }
 
     @Test
     fun whenDefaultBrowserFeatureNotSupportedThenNotificationNotShown() {
         configureEnvironment(true, false, true, false)
-        assertFalse(testee.shouldShowNotification(browserShowing = true))
+        assertFalse(testee.shouldShowBanner(browserShowing = true))
     }
 
     @Test
     fun whenNoAppInstallTimeRecordedThenNotificationNotShown() {
         configureEnvironment(true, true, false, false)
-        assertFalse(testee.shouldShowNotification(browserShowing = true))
+        assertFalse(testee.shouldShowBanner(browserShowing = true))
     }
 
     @Test
     fun whenUserDeclinedPreviouslyThenNotificationNotShown() {
         configureEnvironment(true, true, true, true)
-        assertFalse(testee.shouldShowNotification(browserShowing = true))
+        assertFalse(testee.shouldShowBanner(browserShowing = true))
     }
 
     @Test
     fun whenNotEnoughTimeHasPassedSinceInstallThenNotificationNotShown() {
         configureEnvironment(true, true, true, false)
         whenever(appInstallStore.installTimestamp).thenReturn(0)
-        assertFalse(testee.shouldShowNotification(browserShowing = true, timeNow = TimeUnit.SECONDS.toMillis(10)))
+        assertFalse(testee.shouldShowBanner(browserShowing = true, timeNow = TimeUnit.SECONDS.toMillis(10)))
     }
 
     @Test
     fun whenEnoughTimeHasPassedSinceInstallThenNotificationShown() {
         configureEnvironment(true, true, true, false)
         whenever(appInstallStore.installTimestamp).thenReturn(0)
-        assertTrue(testee.shouldShowNotification(browserShowing = true, timeNow = TimeUnit.DAYS.toMillis(100)))
+        assertTrue(testee.shouldShowBanner(browserShowing = true, timeNow = TimeUnit.DAYS.toMillis(100)))
     }
 
     private fun configureEnvironment(deviceSupported: Boolean, featureEnabled: Boolean, timestampRecorded: Boolean, previousDecline: Boolean) {

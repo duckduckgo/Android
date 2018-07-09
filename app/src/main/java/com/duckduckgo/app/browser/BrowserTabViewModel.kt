@@ -124,7 +124,8 @@ class BrowserTabViewModel(
     )
 
     data class DefaultBrowserViewState(
-        val showDefaultBrowserBanner: Boolean = false
+        val showDefaultBrowserBanner: Boolean = false,
+        val showHomeScreenCallToActionButton: Boolean = false
     )
 
     sealed class Command {
@@ -145,7 +146,7 @@ class BrowserTabViewModel(
         class DisplayMessage(@StringRes val messageId: Int) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
-        object LaunchDefaultAppSystemSettings : Command()
+        object LaunchDefaultAppSystemSettingsFromBanner : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -232,8 +233,10 @@ class BrowserTabViewModel(
     fun onViewVisible() {
         command.value = if (url.value == null) ShowKeyboard else Command.HideKeyboard
 
-        val showBanner = defaultBrowserNotification.shouldShowNotification(currentBrowserViewState().browserShowing)
-        defaultBrowserViewState.value = DefaultBrowserViewState(showBanner)
+        val browserShowing = currentBrowserViewState().browserShowing
+        val showBanner = defaultBrowserNotification.shouldShowBanner(browserShowing)
+        val showCallToActionButton = defaultBrowserNotification.shouldShowCallToActionButton(browserShowing)
+        defaultBrowserViewState.value = DefaultBrowserViewState(showBanner, showCallToActionButton)
     }
 
     fun onUserSubmittedQuery(input: String) {
@@ -347,7 +350,7 @@ class BrowserTabViewModel(
         )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            defaultBrowserViewState.value = currentDefaultBrowserViewState().copy(showDefaultBrowserBanner = defaultBrowserNotification.shouldShowNotification(currentBrowserViewState.browserShowing))
+            defaultBrowserViewState.value = currentDefaultBrowserViewState().copy(showDefaultBrowserBanner = defaultBrowserNotification.shouldShowBanner(currentBrowserViewState.browserShowing))
             statisticsUpdater.refreshRetentionAtb()
         }
 
@@ -551,11 +554,6 @@ class BrowserTabViewModel(
         val currentDefaultBrowserViewState = currentDefaultBrowserViewState()
         defaultBrowserViewState.value = currentDefaultBrowserViewState.copy(showDefaultBrowserBanner = false)
     }
-
-    fun userAcceptedToSetAsDefaultBrowser() {
-        command.value = LaunchDefaultAppSystemSettings
-    }
-
 }
 
 

@@ -92,7 +92,7 @@
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
         tools:context="com.duckduckgo.app.browser.BrowserActivity"
-        tools:menu="menu_browser_activity">
+        tools:menu="@menu/menu_browser_activity">
 
     <ImageView
         android:id="@+id/ddgLogo"
@@ -108,12 +108,7 @@
         app:layout_constraintVertical_bias="0.5"
         app:layout_constraintWidth_max="180dp" />
 
-        <Button
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content" />
+       <include layout="@layout/include_home_screen_default_browser_call_to_action" />
 
     </android.support.constraint.ConstraintLayout>
 

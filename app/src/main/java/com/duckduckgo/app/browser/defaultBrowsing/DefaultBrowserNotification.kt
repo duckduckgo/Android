@@ -26,7 +26,12 @@ import javax.inject.Inject
 
 
 interface DefaultBrowserNotification {
-    fun shouldShowNotification(
+    fun shouldShowBanner(
+        browserShowing: Boolean,
+        timeNow: Long = System.currentTimeMillis()
+    ): Boolean
+
+    fun shouldShowCallToActionButton(
         browserShowing: Boolean,
         timeNow: Long = System.currentTimeMillis()
     ): Boolean
@@ -38,12 +43,23 @@ class DefaultBrowserTimeBasedNotification @Inject constructor(
     private val variantManager: VariantManager
 ) : DefaultBrowserNotification {
 
-    override fun shouldShowNotification(browserShowing: Boolean, timeNow: Long): Boolean {
-
+    override fun shouldShowBanner(browserShowing: Boolean, timeNow: Long): Boolean {
         if (!browserShowing) {
             return false
         }
 
+        return conditionsAllowShowingNotification(timeNow)
+    }
+
+    override fun shouldShowCallToActionButton(browserShowing: Boolean, timeNow: Long): Boolean {
+        if (browserShowing) {
+            return false
+        }
+
+        return conditionsAllowShowingNotification(timeNow)
+    }
+
+    private fun conditionsAllowShowingNotification(timeNow: Long): Boolean {
         if (!isDeviceCapable()) {
             return false
         }
