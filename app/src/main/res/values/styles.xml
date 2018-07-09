@@ -214,7 +214,7 @@
     </style>
 
     <style name="OnboardingButtonNoTrace" parent="OnboardingButtonStyle">
-        <item name="colorAccent">@color/windowsBlue</item>
+        <item name="colorAccent">@color/denimBlue</item>
     </style>
 
     <style name="OnboardingButtonDefaultBrowser" parent="OnboardingButtonStyle">
