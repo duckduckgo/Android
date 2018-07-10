@@ -26,5 +26,5 @@ import dagger.Module
 abstract class DefaultBrowserModule {
 
     @Binds
-    abstract fun defaultBrowserNotification(defaultBrowserNotificationFeatureAnalyzer: DefaultBrowserTimeBasedNotification): DefaultBrowserNotification
+    abstract fun defaultBrowserNotification(defaultBrowserNotification: DefaultBrowserTimeBasedNotification): DefaultBrowserNotification
 }
