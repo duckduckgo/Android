@@ -28,7 +28,7 @@ import org.junit.Before
 import org.junit.Test
 import java.util.concurrent.TimeUnit
 
-class DefaultBrowseBannerNotificationTest {
+class DefaultBrowserBannerNotificationTest {
 
     private lateinit var testee: DefaultBrowserTimeBasedNotification
 
@@ -82,7 +82,7 @@ class DefaultBrowseBannerNotificationTest {
     @Test
     fun whenUserDeclinedHomeScreenCallToActionPreviouslyThenNotificationStillShown() {
         configureEnvironment(true, true, true, false)
-        //whenever(appInstallStore.hasUserDeclinedDefaultBrowserHomeScreenCallToActionPreviously()).thenReturn(true)
+        whenever(appInstallStore.hasUserDeclinedDefaultBrowserHomeScreenCallToActionPreviously()).thenReturn(true)
         assertTrue(testee.shouldShowBannerNotification(browserShowing = true))
     }
 
