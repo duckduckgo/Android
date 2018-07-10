@@ -30,6 +30,7 @@ interface VariantManager {
         sealed class DefaultBrowserFeature : VariantFeature() {
             object ShowInOnboarding : DefaultBrowserFeature()
             object ShowTimedReminder : DefaultBrowserFeature()
+            object ShowHomeScreenCallToAction : DefaultBrowserFeature()
         }
     }
 

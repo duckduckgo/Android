@@ -19,7 +19,9 @@ package com.duckduckgo.app.browser.defaultBrowsing
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToAction
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowTimedReminder
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -48,6 +50,10 @@ class DefaultBrowserNotificationFeatureAnalyzer @Inject constructor(
             return false
         }
 
+        if (!isFeatureEnabled(ShowTimedReminder)) {
+            return false
+        }
+
         return conditionsAllowShowingNotification(timeNow)
     }
 
@@ -56,15 +62,15 @@ class DefaultBrowserNotificationFeatureAnalyzer @Inject constructor(
             return false
         }
 
+        if (!isFeatureEnabled(ShowHomeScreenCallToAction)) {
+            return false
+        }
+
         return conditionsAllowShowingNotification(timeNow)
     }
 
     private fun conditionsAllowShowingNotification(timeNow: Long): Boolean {
         if (!isDeviceCapable()) {
-            return false
-        }
-
-        if (!isFeatureEnabled()) {
             return false
         }
 
@@ -83,8 +89,8 @@ class DefaultBrowserNotificationFeatureAnalyzer @Inject constructor(
         return defaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration() && appInstallStore.hasInstallTimestampRecorded()
     }
 
-    private fun isFeatureEnabled(): Boolean {
-        return variantManager.getVariant().hasFeature(DefaultBrowserFeature.ShowTimedReminder)
+    private fun isFeatureEnabled(feature: VariantFeature.DefaultBrowserFeature): Boolean {
+        return variantManager.getVariant().hasFeature(feature)
     }
 
     private fun isAlreadyDefaultBrowser(): Boolean {
