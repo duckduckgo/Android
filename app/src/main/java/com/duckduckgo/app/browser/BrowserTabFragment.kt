@@ -537,8 +537,9 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private fun launchDefaultAppSystemSettingsFromCallToActionButton() {
         activity?.let {
+            val options = ActivityOptions.makeSceneTransitionAnimation(it, ddgLogo, "defaultBrowserCallToActionTransition")
             val intent = DefaultBrowserInfoActivity.intent(it)
-            startActivity(intent)
+            startActivity(intent, options.toBundle())
         }
     }
 
