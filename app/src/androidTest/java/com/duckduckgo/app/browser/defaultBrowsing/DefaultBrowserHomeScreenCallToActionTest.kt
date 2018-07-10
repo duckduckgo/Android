@@ -19,18 +19,17 @@ package com.duckduckgo.app.browser.defaultBrowsing
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowTimedReminder
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToAction
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import java.util.concurrent.TimeUnit
 
-class DefaultBrowserTimeBasedNotificationTest {
+class DefaultBrowserHomeScreenCallToActionTest {
 
-    private lateinit var testee: DefaultBrowserNotificationFeatureAnalyzer
+    private lateinit var testee: DefaultBrowserTimeBasedNotification
 
     private val mockDetector: DefaultBrowserDetector = mock()
     private val appInstallStore: AppInstallStore = mock()
@@ -38,54 +37,47 @@ class DefaultBrowserTimeBasedNotificationTest {
 
     @Before
     fun setup() {
-        testee = DefaultBrowserNotificationFeatureAnalyzer(mockDetector, appInstallStore, variantManager)
+        testee = DefaultBrowserTimeBasedNotification(mockDetector, appInstallStore, variantManager)
     }
 
     @Test
-    fun whenDefaultBrowserNotSupportedByDeviceThenNotificationNotShown() {
+    fun whenDefaultBrowserNotSupportedByDeviceThenCallToActionNotShown() {
         configureEnvironment(false, true, true, false)
-        assertFalse(testee.shouldShowBanner(browserShowing = true))
+        assertFalse(testee.shouldShowHomeScreenCallToActionNotification())
     }
 
     @Test
-    fun whenDefaultBrowserFeatureNotSupportedThenNotificationNotShown() {
+    fun whenDefaultBrowserFeatureNotSupportedThenCallToActionNotShown() {
         configureEnvironment(true, false, true, false)
-        assertFalse(testee.shouldShowBanner(browserShowing = true))
+        assertFalse(testee.shouldShowHomeScreenCallToActionNotification( ))
     }
 
     @Test
-    fun whenNoAppInstallTimeRecordedThenNotificationNotShown() {
+    fun whenNoAppInstallTimeRecordedThenCallToActionNotShown() {
         configureEnvironment(true, true, false, false)
-        assertFalse(testee.shouldShowBanner(browserShowing = true))
+        assertFalse(testee.shouldShowHomeScreenCallToActionNotification( ))
     }
 
     @Test
-    fun whenUserDeclinedPreviouslyThenNotificationNotShown() {
+    fun whenUserDeclinedPreviouslyThenCallToActionNotShown() {
         configureEnvironment(true, true, true, true)
-        assertFalse(testee.shouldShowBanner(browserShowing = true))
+        assertFalse(testee.shouldShowHomeScreenCallToActionNotification( ))
     }
 
     @Test
-    fun whenNotEnoughTimeHasPassedSinceInstallThenNotificationNotShown() {
+    fun whenAllOtherConditionsPassThenCallToActionShown() {
         configureEnvironment(true, true, true, false)
         whenever(appInstallStore.installTimestamp).thenReturn(0)
-        assertFalse(testee.shouldShowBanner(browserShowing = true, timeNow = TimeUnit.SECONDS.toMillis(10)))
-    }
-
-    @Test
-    fun whenEnoughTimeHasPassedSinceInstallThenNotificationShown() {
-        configureEnvironment(true, true, true, false)
-        whenever(appInstallStore.installTimestamp).thenReturn(0)
-        assertTrue(testee.shouldShowBanner(browserShowing = true, timeNow = TimeUnit.DAYS.toMillis(100)))
+        assertTrue(testee.shouldShowHomeScreenCallToActionNotification())
     }
 
     private fun configureEnvironment(deviceSupported: Boolean, featureEnabled: Boolean, timestampRecorded: Boolean, previousDecline: Boolean) {
         whenever(mockDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(deviceSupported)
         whenever(variantManager.getVariant()).thenReturn(if (featureEnabled) variantWithFeatureEnabled() else variantWithFeatureDisabled())
         whenever(appInstallStore.hasInstallTimestampRecorded()).thenReturn(timestampRecorded)
-        whenever(appInstallStore.hasUserDeclinedDefaultBrowserPreviously()).thenReturn(previousDecline)
+        whenever(appInstallStore.hasUserDeclinedDefaultBrowserHomeScreenCallToActionPreviously()).thenReturn(previousDecline)
     }
 
-    private fun variantWithFeatureEnabled() = Variant("", 0.0, listOf(ShowTimedReminder))
+    private fun variantWithFeatureEnabled() = Variant("", 0.0, listOf(ShowHomeScreenCallToAction))
     private fun variantWithFeatureDisabled() = Variant("", 0.0, listOf())
 }

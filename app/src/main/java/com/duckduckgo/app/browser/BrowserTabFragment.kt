@@ -395,7 +395,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private fun configureBannerNotification() {
         dismissBannerButton.setOnClickListener {
-            viewModel.userDeclinedToSetAsDefaultBrowser()
+            viewModel.userDeclinedBannerToSetAsDefaultBrowser()
         }
         bannerNotification.setOnClickListener {
             launchDefaultAppSystemSettingsFromBanner()
@@ -405,6 +405,10 @@ class BrowserTabFragment : Fragment(), FindListener {
     private fun configureCallToActionButton() {
         homeScreenCallToActionContainer.setOnClickListener {
             launchDefaultAppSystemSettingsFromCallToActionButton()
+        }
+
+        homeScreenCallToActionDismissButton.setOnClickListener {
+            viewModel.userDeclinedHomeScreenCallToActionToSetAsDefaultBrowser()
         }
     }
 
@@ -759,6 +763,12 @@ class BrowserTabFragment : Fragment(), FindListener {
                     bannerNotification.show()
                 } else {
                     bannerNotification.gone()
+                }
+
+                if (viewState.showHomeScreenCallToActionButton) {
+                    homeScreenCallToActionContainer.show()
+                } else {
+                    homeScreenCallToActionContainer.hide()
                 }
             }
         }

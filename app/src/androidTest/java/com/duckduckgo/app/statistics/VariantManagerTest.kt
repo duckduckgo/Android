@@ -33,15 +33,15 @@ class VariantManagerTest {
     }
 
     @Test
-    fun whenChanceOfOnboardingOnlyVariantCalculatedThenOddsAreOneInFour() {
-        val variant = variants.firstOrNull { it.key == "mw" }
+    fun whenChanceOfHomeScreenCallToActionOnlyVariantCalculatedThenOddsAreOneInFour() {
+        val variant = variants.firstOrNull { it.key == "mu" }
         assertNotNull(variant)
         assertEqualsDouble( 0.25, variant!!.weight / totalWeight)
     }
 
     @Test
-    fun whenChanceOfOnboardingAndReminderVariantCalculatedThenOddsAreOneInFour() {
-        val variant = variants.firstOrNull { it.key == "mx" }
+    fun whenChanceOfCallToActionAndTimedReminderVariantCalculatedThenOddsAreOneInFour() {
+        val variant = variants.firstOrNull { it.key == "mv" }
         assertNotNull(variant)
         assertEqualsDouble( 0.25, variant!!.weight / totalWeight)
     }

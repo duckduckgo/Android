@@ -22,6 +22,7 @@
     android:layout_height="56dp"
     android:layout_marginStart="15dp"
     android:layout_marginEnd="15dp"
+    android:animateLayoutChanges="false"
     android:layout_marginBottom="15dp"
     android:background="@drawable/new_tab_set_default_browser_button_background"
     app:layout_constraintBottom_toBottomOf="parent"
@@ -54,7 +55,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/dismissButton"
+        android:id="@+id/homeScreenCallToActionDismissButton"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginStart="14dp"
