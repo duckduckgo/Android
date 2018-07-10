@@ -57,9 +57,6 @@
     <string name="findInPageHint">Find in page</string>
     <string name="findInPageMatches">%d/%d</string>
 
-    <!-- Add to home -->
-    <string name="addToHome">Add to Home</string>
-
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Edit query before searching</string>
     <string name="settingsAutocompleteEnabled">Autocomplete Suggestions</string>

@@ -33,7 +33,6 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
-import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
@@ -98,9 +97,6 @@ class BrowserTabViewModelTest {
 
     @Mock
     private lateinit var mockLongPressHandler: LongPressHandler
-
-    @Mock
-    private lateinit var mockFaviconDownloader: FaviconDownloader
 
     @Mock
     private lateinit var mockOmnibarConverter: OmnibarEntryConverter
