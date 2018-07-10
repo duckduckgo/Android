@@ -31,7 +31,6 @@ interface AppInstallStore {
     fun recordUserDeclinedHomeScreenCallToActionToSetDefaultBrowser(timestamp: Long = System.currentTimeMillis())
     fun hasUserDeclinedDefaultBrowserBannerPreviously(): Boolean
     fun hasUserDeclinedDefaultBrowserHomeScreenCallToActionPreviously(): Boolean
-    fun clearUserDeclineState()
 }
 
 class AppInstallSharedPreferences @Inject constructor(private val context: Context) : AppInstallStore {
@@ -59,10 +58,6 @@ class AppInstallSharedPreferences @Inject constructor(private val context: Conte
 
     override fun hasUserDeclinedDefaultBrowserHomeScreenCallToActionPreviously(): Boolean {
         return preferences.contains(KEY_TIMESTAMP_USER_DECLINED_CALL_TO_ACTION_DEFAULT_BROWSER)
-    }
-
-    override fun clearUserDeclineState() {
-        preferences.edit { remove(KEY_TIMESTAMP_USER_DECLINED_BANNER_DEFAULT_BROWSER) }
     }
 
     private val preferences: SharedPreferences
