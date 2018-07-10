@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit
 
 class DefaultBrowserTimeBasedNotificationTest {
 
-    private lateinit var testee: DefaultBrowserTimeBasedNotification
+    private lateinit var testee: DefaultBrowserNotificationFeatureAnalyzer
 
     private val mockDetector: DefaultBrowserDetector = mock()
     private val appInstallStore: AppInstallStore = mock()
@@ -38,7 +38,7 @@ class DefaultBrowserTimeBasedNotificationTest {
 
     @Before
     fun setup() {
-        testee = DefaultBrowserTimeBasedNotification(mockDetector, appInstallStore, variantManager)
+        testee = DefaultBrowserNotificationFeatureAnalyzer(mockDetector, appInstallStore, variantManager)
     }
 
     @Test

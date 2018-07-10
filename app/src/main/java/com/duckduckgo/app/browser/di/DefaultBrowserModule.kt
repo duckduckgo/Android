@@ -17,7 +17,7 @@
 package com.duckduckgo.app.browser.di
 
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
-import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserTimeBasedNotification
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotificationFeatureAnalyzer
 import dagger.Binds
 import dagger.Module
 
@@ -26,5 +26,5 @@ import dagger.Module
 abstract class DefaultBrowserModule {
 
     @Binds
-    abstract fun defaultBrowserNotification(defaultBrowserNotification: DefaultBrowserTimeBasedNotification): DefaultBrowserNotification
+    abstract fun defaultBrowserNotification(defaultBrowserNotificationFeatureAnalyzer: DefaultBrowserNotificationFeatureAnalyzer): DefaultBrowserNotification
 }

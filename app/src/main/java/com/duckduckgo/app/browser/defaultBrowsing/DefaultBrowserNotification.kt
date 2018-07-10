@@ -37,7 +37,7 @@ interface DefaultBrowserNotification {
     ): Boolean
 }
 
-class DefaultBrowserTimeBasedNotification @Inject constructor(
+class DefaultBrowserNotificationFeatureAnalyzer @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val appInstallStore: AppInstallStore,
     private val variantManager: VariantManager
