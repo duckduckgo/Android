@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.statistics
 
+import android.os.Build
+import android.support.test.filters.SdkSuppress
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockito_kotlin.*
 import org.junit.Assert.assertEquals
@@ -93,7 +95,8 @@ class ExperimentationVariantManagerTest {
 
 
     @Test
-    fun whenNoVariantPersistedThenNewVariantAllocated() {
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.N)
+    fun whenNougatOrLaterAndNoVariantPersistedThenNewVariantAllocated() {
         activeVariants.add(Variant("foo", 100.0))
 
         testee.getVariant(activeVariants)
@@ -102,11 +105,30 @@ class ExperimentationVariantManagerTest {
     }
 
     @Test
-    fun whenNoVariantPersistedThenNewVariantKeyIsAllocatedAndPersisted() {
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.N)
+    fun whenNougatOrLaterAndNoVariantPersistedThenNewVariantKeyIsAllocatedAndPersisted() {
         activeVariants.add(Variant("foo", 100.0))
 
         testee.getVariant(activeVariants)
 
         verify(mockStore).variant = "foo"
+    }
+
+    @Test
+    @SdkSuppress(maxSdkVersion = Build.VERSION_CODES.M)
+    fun whenMarshmallowOrEarlierAndNoVariantPersistedThenDefaultVariantAllocated() {
+        activeVariants.add(Variant("foo", 100.0))
+
+        assertEquals(VariantManager.DEFAULT_VARIANT, testee.getVariant(activeVariants))
+    }
+
+    @Test
+    @SdkSuppress(maxSdkVersion = Build.VERSION_CODES.M)
+    fun whenMarshmallowOrEarlierAndNoVariantPersistedThenDefaultVariantKeyIsAllocatedAndPersisted() {
+        activeVariants.add(Variant("foo", 100.0))
+
+        testee.getVariant(activeVariants)
+
+        verify(mockStore).variant = VariantManager.DEFAULT_VARIANT.key
     }
 }

@@ -16,7 +16,9 @@
 
 package com.duckduckgo.app.statistics
 
+import android.os.Build
 import android.support.annotation.WorkerThread
+import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowBanner
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToAction
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -57,12 +59,12 @@ class ExperimentationVariantManager(
 ) : VariantManager {
 
     override fun getVariant(activeVariants: List<Variant>): Variant {
-        if (activeVariants.isEmpty()) return VariantManager.DEFAULT_VARIANT
+        if (activeVariants.isEmpty()) return DEFAULT_VARIANT
 
         val currentVariantKey = store.variant
 
-        if (currentVariantKey == VariantManager.DEFAULT_VARIANT.key) {
-            return VariantManager.DEFAULT_VARIANT
+        if (currentVariantKey == DEFAULT_VARIANT.key) {
+            return DEFAULT_VARIANT
         }
 
         if (currentVariantKey == null) {
@@ -75,7 +77,7 @@ class ExperimentationVariantManager(
         val currentVariant = lookupVariant(currentVariantKey, activeVariants)
         if (currentVariant == null) {
             Timber.i("Variant $currentVariantKey no longer an active variant; user will now use default variant")
-            val newVariant = VariantManager.DEFAULT_VARIANT
+            val newVariant = DEFAULT_VARIANT
             persistVariant(newVariant)
             return newVariant
         }
@@ -91,6 +93,11 @@ class ExperimentationVariantManager(
     }
 
     private fun generateVariant(activeVariants: List<Variant>): Variant {
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
+            Timber.i("No variants available for pre-Nougat devices")
+            return DEFAULT_VARIANT
+        }
+
         val randomizedIndex = indexRandomizer.random(activeVariants)
         return activeVariants[randomizedIndex]
 
