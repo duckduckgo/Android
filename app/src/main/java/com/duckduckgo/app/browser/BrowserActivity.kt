@@ -33,6 +33,7 @@ import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import org.jetbrains.anko.longToast
@@ -44,6 +45,9 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
+
+    @Inject
+    lateinit var pixel: Pixel
 
     private var currentTab: BrowserTabFragment? = null
 
@@ -168,8 +172,9 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     fun launchFire() {
         FireDialog(context = this,
-            clearStarted = { viewModel.onClearRequested() },
-            clearComplete = { viewModel.onClearComplete() }
+                pixel = pixel,
+                clearStarted = { viewModel.onClearRequested() },
+                clearComplete = { viewModel.onClearComplete() }
         ).show()
     }
 

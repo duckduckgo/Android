@@ -26,6 +26,9 @@ class AppUrl {
         const val ABOUT = "https://$HOST/about"
         const val FEEDBACK = "https://$HOST/feedback"
         const val TOSDR = "https://tosdr.org"
+
+        // TODO change to new domain
+        const val PIXEL = "https://duckduckgo.com"
     }
 
     object ParamKey {

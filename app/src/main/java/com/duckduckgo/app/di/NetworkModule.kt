@@ -48,23 +48,23 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun okHttpClient(context: Context, apiRequestInterceptor: ApiRequestInterceptor): OkHttpClient {
+    fun apiOkHttpClient(context: Context, apiRequestInterceptor: ApiRequestInterceptor): OkHttpClient {
         val cache = Cache(context.cacheDir, CACHE_SIZE)
         return OkHttpClient.Builder()
-            .addInterceptor(apiRequestInterceptor)
-            .cache(cache)
-            .build()
+                .addInterceptor(apiRequestInterceptor)
+                .cache(cache)
+                .build()
     }
 
     @Provides
     @Singleton
-    fun retrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+    fun apiRetrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(Url.API)
-            .client(okHttpClient)
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .build()
+                .baseUrl(Url.API)
+                .client(okHttpClient)
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(MoshiConverterFactory.create(moshi))
+                .build()
     }
 
     @Provides

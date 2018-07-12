@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.FireDialog
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
@@ -41,6 +42,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
+
+    @Inject
+    lateinit var pixel: Pixel
 
     private val viewModel: TabSwitcherViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(TabSwitcherViewModel::class.java)
@@ -100,8 +104,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
 
     private fun onFire() {
         FireDialog(context = this,
-            clearStarted = { viewModel.onClearRequested() },
-            clearComplete = { viewModel.onClearComplete() }
+                pixel = pixel,
+                clearStarted = { viewModel.onClearRequested() },
+                clearComplete = { viewModel.onClearComplete() }
         ).show()
     }
 
