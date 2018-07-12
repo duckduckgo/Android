@@ -22,38 +22,39 @@
     android:layout_height="56dp"
     android:layout_marginStart="15dp"
     android:layout_marginEnd="15dp"
-    android:animateLayoutChanges="false"
     android:layout_marginBottom="15dp"
-    android:foreground="@drawable/ripple_light"
+    android:animateLayoutChanges="false"
     android:background="@drawable/new_tab_set_default_browser_button_background"
+    android:foreground="@drawable/ripple_light"
     app:layout_constraintBottom_toBottomOf="parent"
     tools:showIn="@layout/fragment_browser_tab">
 
-    <ImageView
-        android:id="@+id/defaultBrowserCallToActionIcon"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="14dp"
-        android:importantForAccessibility="no"
-        android:src="@drawable/ic_default_browser_home_screen_button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/addDefaultBrowserButtonText"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/addDefaultBrowserButtonText"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:gravity="center_vertical"
-        android:text="@string/defaultBrowserInfoTitle"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        tools:ignore="UseCompoundDrawables">
+
+        <ImageView
+            android:id="@+id/defaultBrowserCallToActionIcon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="14dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_default_browser_home_screen_button" />
+
+        <TextView
+            android:id="@+id/addDefaultBrowserButtonText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/defaultBrowserInfoTitle"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="15sp" />
+
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/homeScreenCallToActionDismissButton"
