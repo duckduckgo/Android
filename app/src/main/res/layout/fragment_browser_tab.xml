@@ -61,7 +61,7 @@
         android:animateLayoutChanges="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context="com.duckduckgo.app.browser.BrowserActivity"
-        tools:menu="menu_browser_activity">
+        tools:menu="@menu/menu_browser_activity">
 
         <FrameLayout
             android:id="@+id/webViewContainer"
