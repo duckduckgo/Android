@@ -71,7 +71,7 @@ class ApiBasedPixelTest {
     }
 
     @Test
-    fun whenPixelFiredThenPixelServiceCalledWithCorrectPixelName() {
+    fun whenPixelFiredWithNoAtbThenPixelServiceCalledWithCorrectPixelNameAndNoAtb() {
         whenever(mockPixelService.fire(any(), any())).thenReturn(Completable.complete())
 
         val pixel = ApiBasedPixel(mockPixelService, mockStatisticsDataStore, mockVariantManager)
