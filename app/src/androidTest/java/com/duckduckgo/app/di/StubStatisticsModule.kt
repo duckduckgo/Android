@@ -18,6 +18,7 @@ package com.duckduckgo.app.di
 
 import com.duckduckgo.app.statistics.api.StatisticsService
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
@@ -36,6 +37,14 @@ class StubStatisticsModule {
             }
 
             override fun initializeAtb() {
+            }
+        }
+    }
+
+    @Provides
+    fun stubPixel() : Pixel {
+        return object: Pixel {
+            override fun fire(pixel: Pixel.PixelDefinition) {
             }
         }
     }
