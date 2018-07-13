@@ -183,6 +183,8 @@ class BrowserTabFragment : Fragment(), FindListener {
         configureAutoComplete()
         configureKeyboardAwareLogoAnimation()
 
+        rootView.addOnLayoutChangeListener(LogoHidingLayoutChangeListener(ddgLogo))
+
         if (savedInstanceState == null) {
             viewModel.onViewReady()
         }
