@@ -35,9 +35,6 @@ class LaunchActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
-    @Inject
-    lateinit var pixel: Pixel
-
     private val viewModel: LaunchViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(LaunchViewModel::class.java)
     }
@@ -46,12 +43,6 @@ class LaunchActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
         configureObservers()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        Timber.d("LaunchActivity onStart")
-        pixel.fire(APP_LAUNCH)
     }
 
     private fun configureObservers() {

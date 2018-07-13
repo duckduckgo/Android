@@ -41,7 +41,7 @@ class FireDialog(context: Context, pixel: Pixel, clearStarted: (() -> Unit), cle
 
         clearAllOption.setOnClickListener {
             clearStarted()
-            pixel.fire(FIRE_BUTTON_PRESSED)
+            pixel.fire(FORGET_ALL_EXECUTED)
             dataManager.clearData(WebView(context), WebStorage.getInstance(), context)
             dataManager.clearExternalCookies(CookieManager.getInstance(), clearComplete)
             dismiss()

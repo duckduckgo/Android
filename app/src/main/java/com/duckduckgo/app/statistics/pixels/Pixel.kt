@@ -30,7 +30,7 @@ interface Pixel {
         // TODO Q: does BrowserActivity launchNewSearchOrQuery only get executed when launched externally?
         // ie can I rely on that being a form of "app launch" ?
         APP_LAUNCH("ml"),
-        FIRE_BUTTON_PRESSED("mb"),
+        FORGET_ALL_EXECUTED("mf"),
         PRIVACY_DASHBOARD_OPENED("mp")
 
     }
