@@ -40,6 +40,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
+import javax.inject.Named
 import javax.inject.Singleton
 
 
@@ -48,6 +49,7 @@ class NetworkModule {
 
     @Provides
     @Singleton
+    @Named("api")
     fun apiOkHttpClient(context: Context, apiRequestInterceptor: ApiRequestInterceptor): OkHttpClient {
         val cache = Cache(context.cacheDir, CACHE_SIZE)
         return OkHttpClient.Builder()
@@ -58,7 +60,17 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun apiRetrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+    @Named("pixel")
+    fun pixelOkHttpClient(apiRequestInterceptor: ApiRequestInterceptor): OkHttpClient {
+        return OkHttpClient.Builder()
+                .addInterceptor(apiRequestInterceptor)
+                .build()
+    }
+
+    @Provides
+    @Singleton
+    @Named("api")
+    fun apiRetrofit(@Named("api") okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit.Builder()
                 .baseUrl(Url.API)
                 .client(okHttpClient)
@@ -68,28 +80,39 @@ class NetworkModule {
     }
 
     @Provides
+    @Singleton
+    @Named("pixel")
+    fun pixelRetrofit(@Named("pixel") okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+                .baseUrl(Url.PIXEL)
+                .client(okHttpClient)
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build()
+    }
+
+    @Provides
     fun apiRequestInterceptor(context: Context): ApiRequestInterceptor {
         return ApiRequestInterceptor(context)
     }
 
     @Provides
-    fun trackerListService(retrofit: Retrofit): TrackerListService =
+    fun trackerListService(@Named("api") retrofit: Retrofit): TrackerListService =
             retrofit.create(TrackerListService::class.java)
 
     @Provides
-    fun httpsUpgradeListService(retrofit: Retrofit): HttpsUpgradeListService =
+    fun httpsUpgradeListService(@Named("api") retrofit: Retrofit): HttpsUpgradeListService =
             retrofit.create(HttpsUpgradeListService::class.java)
 
     @Provides
-    fun autoCompleteService(retrofit: Retrofit): AutoCompleteService =
+    fun autoCompleteService(@Named("api") retrofit: Retrofit): AutoCompleteService =
             retrofit.create(AutoCompleteService::class.java)
 
     @Provides
-    fun surrogatesService(retrofit: Retrofit): ResourceSurrogateListService =
+    fun surrogatesService(@Named("api") retrofit: Retrofit): ResourceSurrogateListService =
         retrofit.create(ResourceSurrogateListService::class.java)
 
     @Provides
-    fun feedbackService(retrofit: Retrofit): FeedbackService =
+    fun feedbackService(@Named("api") retrofit: Retrofit): FeedbackService =
         retrofit.create(FeedbackService::class.java)
 
     @Provides

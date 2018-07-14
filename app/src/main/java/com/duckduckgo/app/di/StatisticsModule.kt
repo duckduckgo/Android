@@ -31,32 +31,21 @@ import dagger.Provides
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import javax.inject.Named
 
 
 @Module
 class StatisticsModule {
 
     @Provides
-    fun statisticsService(retrofit: Retrofit): StatisticsService = retrofit.create(StatisticsService::class.java)
+    fun statisticsService(@Named("api") retrofit: Retrofit): StatisticsService = retrofit.create(StatisticsService::class.java)
 
     @Provides
     fun statisticsUpdater(statisticsDataStore: StatisticsDataStore, statisticsService: StatisticsService, variantManager: VariantManager) : StatisticsUpdater =
         StatisticsRequester(statisticsDataStore, statisticsService, variantManager)
 
     @Provides
-    fun pixelService(apiRequestInterceptor: ApiRequestInterceptor) : PixelService {
-
-        // ideally these would be injected but @Named parameters seem to break dagger
-        val okHttpClient = OkHttpClient.Builder()
-                .addInterceptor(apiRequestInterceptor)
-                .build()
-
-        val retrofit = Retrofit.Builder()
-                .baseUrl(AppUrl.Url.PIXEL)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .client(okHttpClient)
-                .build()
-
+    fun pixelService(@Named("pixel") okHttpClient: OkHttpClient, @Named("pixel") retrofit: Retrofit) : PixelService {
         return retrofit.create(PixelService::class.java)
     }
 
