@@ -18,23 +18,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/homeScreenCallToActionContainer"
-    android:layout_width="match_parent"
-    android:layout_height="56dp"
-    android:layout_marginStart="15dp"
-    android:layout_marginEnd="15dp"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
     android:layout_marginBottom="15dp"
     android:animateLayoutChanges="false"
     android:background="@drawable/new_tab_set_default_browser_button_background"
     android:foreground="@drawable/ripple_light"
+    android:minHeight="56dp"
     app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintWidth_percent="@dimen/defaultBrowserHomeScreenCallToActionButtonWidthPercentage"
     tools:showIn="@layout/fragment_browser_tab">
 
     <LinearLayout
+        android:id="@+id/buttonContents"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"
         android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:ignore="UseCompoundDrawables">
 
         <ImageView
@@ -52,7 +59,8 @@
             android:text="@string/defaultBrowserInfoTitle"
             android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="15sp" />
+            android:textSize="@dimen/defaultBrowserHomeScreenCallToActionTextSize"
+            app:autoSizeTextType="uniform" />
 
     </LinearLayout>
 

@@ -183,8 +183,6 @@ class BrowserTabFragment : Fragment(), FindListener {
         configureAutoComplete()
         configureKeyboardAwareLogoAnimation()
 
-        rootView.addOnLayoutChangeListener(LogoHidingLayoutChangeListener(ddgLogo))
-
         if (savedInstanceState == null) {
             viewModel.onViewReady()
         }
@@ -456,6 +454,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private fun configureKeyboardAwareLogoAnimation() {
         newTabLayout.layoutTransition.enableTransitionType(CHANGING)
+        rootView.addOnLayoutChangeListener(LogoHidingLayoutChangeListener(ddgLogo))
     }
 
     private fun userEnteredQuery(query: String) {
