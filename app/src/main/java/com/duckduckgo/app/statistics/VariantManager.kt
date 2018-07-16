@@ -58,6 +58,7 @@ class ExperimentationVariantManager(
     private val indexRandomizer: IndexRandomizer
 ) : VariantManager {
 
+    @Synchronized
     override fun getVariant(activeVariants: List<Variant>): Variant {
         if (activeVariants.isEmpty()) return DEFAULT_VARIANT
 
