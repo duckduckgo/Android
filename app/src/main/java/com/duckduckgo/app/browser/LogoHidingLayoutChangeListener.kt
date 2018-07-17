@@ -46,8 +46,11 @@ class LogoHidingLayoutChangeListener(private val ddgLogoView: View, private val 
     }
 
     private fun enoughRoomForLogo(heightDp: Int): Boolean {
-        val minimumHeight =
-            if (callToActionButton.isVisible) MINIMUM_HEIGHT_REQUIRED_CALL_TO_ACTION_SHOWING else MINIMUM_HEIGHT_REQUIRED_CALL_TO_ACTION_HIDDEN
+        val minimumHeight = if (callToActionButton.isVisible) {
+            MINIMUM_HEIGHT_REQUIRED_CALL_TO_ACTION_SHOWING
+        } else {
+            MINIMUM_HEIGHT_REQUIRED_CALL_TO_ACTION_HIDDEN
+        }
         return heightDp >= minimumHeight
     }
 
