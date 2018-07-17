@@ -18,20 +18,25 @@ package com.duckduckgo.app.browser
 
 import android.graphics.Rect
 import android.view.View
+import androidx.core.view.isVisible
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.global.view.toDp
 import timber.log.Timber
 
 
-class LogoHidingLayoutChangeListener(private val ddgLogoView: View) : View.OnLayoutChangeListener {
+class LogoHidingLayoutChangeListener(private val ddgLogoView: View, private val callToActionButton: View) : View.OnLayoutChangeListener {
 
     override fun onLayoutChange(view: View, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
+        update()
+    }
+
+    fun update() {
         val r = Rect()
-        view.getWindowVisibleDisplayFrame(r)
+        ddgLogoView.getWindowVisibleDisplayFrame(r)
         val heightDp = r.height().toDp()
 
-        Timber.v("App height now: ${r.height()} px, $heightDp dp")
+        Timber.v("App height now: ${r.height()} px, $heightDp dp, call to action button showing: ${callToActionButton.isVisible}")
 
         if (enoughRoomForLogo(heightDp)) {
             ddgLogoView.show()
@@ -41,11 +46,14 @@ class LogoHidingLayoutChangeListener(private val ddgLogoView: View) : View.OnLay
     }
 
     private fun enoughRoomForLogo(heightDp: Int): Boolean {
-        return heightDp >= MINIMUM_HEIGHT_REQUIRED_FOR_LOGO_DP
+        val minimumHeight =
+            if (callToActionButton.isVisible) MINIMUM_HEIGHT_REQUIRED_CALL_TO_ACTION_SHOWING else MINIMUM_HEIGHT_REQUIRED_CALL_TO_ACTION_HIDDEN
+        return heightDp >= minimumHeight
     }
 
     companion object {
-        private const val MINIMUM_HEIGHT_REQUIRED_FOR_LOGO_DP = 230
+        private const val MINIMUM_HEIGHT_REQUIRED_CALL_TO_ACTION_SHOWING = 230
+        private const val MINIMUM_HEIGHT_REQUIRED_CALL_TO_ACTION_HIDDEN = 150
     }
 
 }

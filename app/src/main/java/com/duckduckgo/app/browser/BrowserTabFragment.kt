@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.Manifest
 import android.animation.LayoutTransition.CHANGING
+import android.animation.LayoutTransition.DISAPPEARING
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
@@ -154,6 +155,8 @@ class BrowserTabFragment : Fragment(), FindListener {
             )
         }
     }
+
+    private val logoHidingLayoutChangeListener by lazy { LogoHidingLayoutChangeListener(ddgLogo, homeScreenCallToActionContainer) }
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
@@ -453,8 +456,9 @@ class BrowserTabFragment : Fragment(), FindListener {
     }
 
     private fun configureKeyboardAwareLogoAnimation() {
-        newTabLayout.layoutTransition.enableTransitionType(CHANGING)
-        rootView.addOnLayoutChangeListener(LogoHidingLayoutChangeListener(ddgLogo))
+        newTabLayout.layoutTransition?.enableTransitionType(CHANGING)
+        newTabLayout.layoutTransition?.disableTransitionType(DISAPPEARING)
+        rootView.addOnLayoutChangeListener(logoHidingLayoutChangeListener)
     }
 
     private fun userEnteredQuery(query: String) {
@@ -539,9 +543,13 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private fun launchDefaultAppSystemSettingsFromCallToActionButton() {
         activity?.let {
-            val options = ActivityOptions.makeSceneTransitionAnimation(it, ddgLogo, "defaultBrowserCallToActionTransition")
+            val options = if (ddgLogo.isVisible) {
+                ActivityOptions.makeSceneTransitionAnimation(it, ddgLogo, "defaultBrowserCallToActionTransition")
+            } else {
+                null
+            }
             val intent = DefaultBrowserInfoActivity.intent(it)
-            startActivity(intent, options.toBundle())
+            startActivity(intent, options?.toBundle())
         }
     }
 
@@ -771,8 +779,10 @@ class BrowserTabFragment : Fragment(), FindListener {
                 if (viewState.showHomeScreenCallToActionButton) {
                     homeScreenCallToActionContainer.show()
                 } else {
-                    homeScreenCallToActionContainer.hide()
+                    homeScreenCallToActionContainer.gone()
                 }
+
+                logoHidingLayoutChangeListener.update()
             }
         }
 
