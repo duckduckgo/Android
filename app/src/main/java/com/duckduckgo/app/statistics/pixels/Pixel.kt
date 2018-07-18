@@ -26,23 +26,21 @@ import javax.inject.Inject
 
 interface Pixel {
 
-    enum class PixelDefinition(val pixelName: String) {
+    enum class PixelName(val pixelName: String) {
 
-        // TODO Q: does BrowserActivity launchNewSearchOrQuery only get executed when launched externally?
-        // ie can I rely on that being a form of "app launch" ?
         APP_LAUNCH("ml"),
         FORGET_ALL_EXECUTED("mf"),
         PRIVACY_DASHBOARD_OPENED("mp")
 
     }
 
-    fun fire(pixel: PixelDefinition)
+    fun fire(pixel: PixelName)
 
 }
 
 class ApiBasedPixel @Inject constructor(private val api: PixelService, private val statisticsDataStore: StatisticsDataStore, private val variantManager: VariantManager) : Pixel {
 
-    override fun fire(pixel: Pixel.PixelDefinition) {
+    override fun fire(pixel: Pixel.PixelName) {
 
         val atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
 

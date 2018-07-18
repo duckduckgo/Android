@@ -32,7 +32,7 @@ import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.migration.LegacyMigration
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelDefinition.*
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.squareup.leakcanary.LeakCanary

@@ -26,7 +26,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelDefinition.*
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import kotlinx.android.synthetic.main.sheet_fire_clear_data.*
 
 class FireDialog(context: Context, pixel: Pixel, clearStarted: (() -> Unit), clearComplete: (() -> Unit)) :

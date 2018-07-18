@@ -24,9 +24,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelDefinition.*
-import timber.log.Timber
 import javax.inject.Inject
 
 

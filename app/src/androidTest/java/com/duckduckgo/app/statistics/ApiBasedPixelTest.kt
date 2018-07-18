@@ -20,7 +20,7 @@ import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.statistics.api.PixelService
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.ApiBasedPixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelDefinition.*
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
