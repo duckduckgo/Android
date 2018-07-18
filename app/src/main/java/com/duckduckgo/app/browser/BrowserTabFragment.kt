@@ -456,8 +456,10 @@ class BrowserTabFragment : Fragment(), FindListener {
     }
 
     private fun configureKeyboardAwareLogoAnimation() {
+        // we want layout transitions for when the size changes; we don't want them when items disappear (can cause glitch on call to action button)
         newTabLayout.layoutTransition?.enableTransitionType(CHANGING)
         newTabLayout.layoutTransition?.disableTransitionType(DISAPPEARING)
+        
         rootView.addOnLayoutChangeListener(logoHidingLayoutChangeListener)
     }
 
