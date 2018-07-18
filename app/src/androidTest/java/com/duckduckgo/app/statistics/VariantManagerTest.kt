@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.statistics
 
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.fail
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.*
+import org.junit.Assert.*
 import org.junit.Test
 
 class VariantManagerTest {
@@ -26,24 +26,43 @@ class VariantManagerTest {
     private val totalWeight = variants.sumByDouble { it.weight }
 
     @Test
-    fun whenChanceOfControlVariantCalculatedThenOddsAreOneInTwo() {
-        val variant = variants.firstOrNull { it.key == "my" }
-        assertNotNull(variant)
-        assertEqualsDouble( 0.5, variant!!.weight / totalWeight)
+    fun onboardingOnlyVariantConfiguredCorrectly() {
+        val variant = variants.firstOrNull { it.key == "ms" }
+        assertEqualsDouble( 0.20, variant!!.weight / totalWeight)
+        assertTrue(variant.hasFeature(ShowInOnboarding))
+        assertEquals(1, variant.features.size)
     }
 
     @Test
-    fun whenChanceOfHomeScreenCallToActionOnlyVariantCalculatedThenOddsAreOneInFour() {
+    fun homeScreenCallToActionVariantConfiguredCorrectly() {
+        val variant = variants.firstOrNull { it.key == "mt" }
+        assertEqualsDouble( 0.20, variant!!.weight / totalWeight)
+        assertTrue(variant.hasFeature(ShowHomeScreenCallToAction))
+        assertEquals(1, variant.features.size)
+    }
+
+    @Test
+    fun showBannerVariantConfiguredCorrectly() {
         val variant = variants.firstOrNull { it.key == "mu" }
-        assertNotNull(variant)
-        assertEqualsDouble( 0.25, variant!!.weight / totalWeight)
+        assertEqualsDouble( 0.20, variant!!.weight / totalWeight)
+        assertTrue(variant.hasFeature(ShowBanner))
+        assertEquals(1, variant.features.size)
     }
 
     @Test
-    fun whenChanceOfCallToActionAndTimedReminderVariantCalculatedThenOddsAreOneInFour() {
+    fun showBannerAndShowHomeScreenCallToActionVariantConfiguredCorrectly() {
         val variant = variants.firstOrNull { it.key == "mv" }
-        assertNotNull(variant)
-        assertEqualsDouble( 0.25, variant!!.weight / totalWeight)
+        assertEqualsDouble( 0.20, variant!!.weight / totalWeight)
+        assertTrue(variant.hasFeature(ShowBanner))
+        assertTrue(variant.hasFeature(ShowHomeScreenCallToAction))
+        assertEquals(2, variant.features.size)
+    }
+
+    @Test
+    fun controlVariantConfiguredCorrectly() {
+        val variant = variants.firstOrNull { it.key == "my" }
+        assertEqualsDouble( 0.2, variant!!.weight / totalWeight)
+        assertEquals(0, variant.features.size)
     }
 
     private fun assertEqualsDouble(expected: Double, actual: Double) {

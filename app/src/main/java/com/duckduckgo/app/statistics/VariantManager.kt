@@ -19,8 +19,7 @@ package com.duckduckgo.app.statistics
 import android.os.Build
 import android.support.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowBanner
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToAction
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.*
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
 
@@ -42,11 +41,13 @@ interface VariantManager {
         val DEFAULT_VARIANT = Variant(key = "", features = emptyList())
 
         val ACTIVE_VARIANTS = listOf(
-            Variant(key = "mu", weight = 25.0, features = listOf(ShowHomeScreenCallToAction)),
-            Variant(key = "mv", weight = 25.0, features = listOf(ShowBanner, ShowHomeScreenCallToAction)),
+            Variant(key = "ms", weight = 20.0, features = listOf(ShowInOnboarding)),
+            Variant(key = "mt", weight = 20.0, features = listOf(ShowHomeScreenCallToAction)),
+            Variant(key = "mu", weight = 20.0, features = listOf(ShowBanner)),
+            Variant(key = "mv", weight = 20.0, features = listOf(ShowBanner, ShowHomeScreenCallToAction)),
 
             // control group
-            Variant(key = "my", weight = 50.0, features = emptyList())
+            Variant(key = "my", weight = 20.0, features = emptyList())
         )
     }
 
