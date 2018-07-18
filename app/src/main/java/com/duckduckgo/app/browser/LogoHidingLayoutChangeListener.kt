@@ -32,17 +32,21 @@ class LogoHidingLayoutChangeListener(private val ddgLogoView: View, private val 
     }
 
     fun update() {
-        val r = Rect()
-        ddgLogoView.getWindowVisibleDisplayFrame(r)
-        val heightDp = r.height().toDp()
+        val heightDp = getHeightDp()
 
-        Timber.v("App height now: ${r.height()} px, $heightDp dp, call to action button showing: ${callToActionButton.isVisible}")
+        Timber.v("App height now: $heightDp dp, call to action button showing: ${callToActionButton.isVisible}")
 
         if (enoughRoomForLogo(heightDp)) {
             ddgLogoView.show()
         } else {
             ddgLogoView.gone()
         }
+    }
+
+    private fun getHeightDp(): Int {
+        val r = Rect()
+        ddgLogoView.getWindowVisibleDisplayFrame(r)
+        return r.height().toDp()
     }
 
     private fun enoughRoomForLogo(heightDp: Int): Boolean {
