@@ -14,15 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.surrogates.api
+package com.duckduckgo.app.httpsupgrade.api
 
+import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
+import com.duckduckgo.app.httpsupgrade.model.HttpsWhitelistedDomain
+import io.reactivex.Observable
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.GET
 
+interface HttpsUpgradeService {
 
-interface ResourceSurrogateListService {
+    // TODO final url
+    @GET("https://staticcdn.duckduckgo.com/https/https-whitelist-test.json")
+    fun whitelist(): Call<List<HttpsWhitelistedDomain>>
 
-    @GET("/contentblocking.js?l=surrogates")
-    fun surrogates(): Call<ResponseBody>
+    // TODO final url
+    @GET("http://192.168.86.132:8000/response.json")
+    fun httpsBloomFilterSpec(): Observable<HttpsBloomFilterSpec>
+
+    // TODO final url
+    @GET("http://192.168.86.132:8000/https_bloom_filter.bin")
+    fun httpsBloomFilter(): Call<ResponseBody>
 }

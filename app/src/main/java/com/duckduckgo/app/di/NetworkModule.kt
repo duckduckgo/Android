@@ -25,7 +25,7 @@ import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.api.ApiRequestInterceptor
 import com.duckduckgo.app.global.job.JobBuilder
-import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeListService
+import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeService
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.job.ConfigurationDownloader
 import com.duckduckgo.app.statistics.VariantManager
@@ -100,8 +100,8 @@ class NetworkModule {
         retrofit.create(TrackerListService::class.java)
 
     @Provides
-    fun httpsUpgradeListService(@Named("api") retrofit: Retrofit): HttpsUpgradeListService =
-        retrofit.create(HttpsUpgradeListService::class.java)
+    fun httpsUpgradeService(retrofit: Retrofit): HttpsUpgradeService =
+        retrofit.create(HttpsUpgradeService::class.java)
 
     @Provides
     fun autoCompleteService(@Named("api") retrofit: Retrofit): AutoCompleteService =

@@ -26,6 +26,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
+
 class AppDatabaseTest {
 
     @get:Rule
@@ -48,16 +49,21 @@ class AppDatabaseTest {
         testHelper.createDatabase(TEST_DB_NAME, 2).use {
             it.execSQL("INSERT INTO `network_leaderboard` VALUES ('Network2', 'example.com')")
         }
-
         assertTrue(database().networkLeaderboardDao().trackerNetworkTally().blockingObserve()!!.isEmpty())
+    }
+
+    @Test
+    fun whenMigratingFromVersion3To4ThenValidationSucceeds() {
+        testHelper.createDatabase(TEST_DB_NAME, 3).close()
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 4, true, AppDatabase.MIGRATION_3_TO_4)
     }
 
     private fun database(): AppDatabase {
         val database = Room
-                .databaseBuilder(InstrumentationRegistry.getTargetContext(), AppDatabase::class.java, TEST_DB_NAME)
-                .addMigrations(AppDatabase.MIGRATION_1_TO_2, AppDatabase.MIGRATION_2_TO_3)
-                .allowMainThreadQueries()
-                .build()
+            .databaseBuilder(InstrumentationRegistry.getTargetContext(), AppDatabase::class.java, TEST_DB_NAME)
+            .addMigrations(AppDatabase.MIGRATION_1_TO_2, AppDatabase.MIGRATION_2_TO_3, AppDatabase.MIGRATION_3_TO_4)
+            .allowMainThreadQueries()
+            .build()
 
         testHelper.closeWhenFinished(database)
 

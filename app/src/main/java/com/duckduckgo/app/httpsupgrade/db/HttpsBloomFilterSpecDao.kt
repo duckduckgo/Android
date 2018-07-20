@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.app.httpsupgrade.db
 
-import com.duckduckgo.app.httpsupgrade.api.HttpsWhitelistJsonAdapter
-import com.duckduckgo.app.privacy.api.TermsOfServiceListAdapter
-import com.duckduckgo.app.trackerdetection.api.DisconnectListJsonAdapter
-import com.squareup.moshi.Moshi
-import dagger.Module
-import dagger.Provides
+import android.arch.persistence.room.Dao
+import android.arch.persistence.room.Insert
+import android.arch.persistence.room.OnConflictStrategy
+import android.arch.persistence.room.Query
+import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import javax.inject.Singleton
 
-@Module
-class JsonModule {
+@Dao
+@Singleton
+interface HttpsBloomFilterSpecDao {
 
-    @Provides
-    @Singleton
-    fun moshi(): Moshi = Moshi.Builder()
-        .add(HttpsWhitelistJsonAdapter())
-        .add(DisconnectListJsonAdapter())
-            .add(TermsOfServiceListAdapter())
-            .build()
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(specification: HttpsBloomFilterSpec)
+
+    @Query("select * from https_bloom_filter_spec limit 1")
+    fun get(): HttpsBloomFilterSpec?
 }

@@ -23,7 +23,7 @@ import com.duckduckgo.app.trackerdetection.Client
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
-import com.duckduckgo.app.trackerdetection.store.TrackerDataStore
+import com.duckduckgo.app.global.store.BinaryDataStore
 import io.reactivex.Completable
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -33,11 +33,11 @@ import javax.inject.Inject
 
 
 class TrackerDataDownloader @Inject constructor(
-        private val trackerListService: TrackerListService,
-        private val trackerDataStore: TrackerDataStore,
-        private val trackerDataLoader: TrackerDataLoader,
-        private val trackerDataDao: TrackerDataDao,
-        private val appDatabase: AppDatabase) {
+    private val trackerListService: TrackerListService,
+    private val binaryDataStore: BinaryDataStore,
+    private val trackerDataLoader: TrackerDataLoader,
+    private val trackerDataDao: TrackerDataDao,
+    private val appDatabase: AppDatabase) {
 
     fun downloadList(clientName: Client.ClientName): Completable {
 
@@ -86,7 +86,7 @@ class TrackerDataDownloader @Inject constructor(
             val call = callFactory(clientName)
             val response = call.execute()
 
-            if (response.isCached && trackerDataStore.hasData(clientName)) {
+            if (response.isCached && binaryDataStore.hasData(clientName.name)) {
                 Timber.d("${clientName.name} data already cached and stored")
                 return@fromAction
             }
@@ -105,13 +105,13 @@ class TrackerDataDownloader @Inject constructor(
     private fun persistTrackerData(clientName: Client.ClientName, bodyBytes: ByteArray) {
         val client = AdBlockClient(clientName)
         client.loadBasicData(bodyBytes)
-        trackerDataStore.saveData(clientName, client.getProcessedData())
+        binaryDataStore.saveData(clientName.name, client.getProcessedData())
     }
 
     private fun removeLegacyList(clientName: Client.ClientName): Completable {
         return Completable.fromAction {
-            if (trackerDataStore.hasData(clientName)) {
-                trackerDataStore.clearData(clientName)
+            if (binaryDataStore.hasData(clientName.name)) {
+                binaryDataStore.clearData(clientName.name)
             }
             return@fromAction
         }

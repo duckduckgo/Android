@@ -20,52 +20,56 @@ import android.net.Uri
 import android.support.annotation.WorkerThread
 import com.duckduckgo.app.global.UrlScheme
 import com.duckduckgo.app.global.isHttps
-import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
+import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
+import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import timber.log.Timber
 
 interface HttpsUpgrader {
 
     @WorkerThread
-    fun shouldUpgrade(uri: Uri) : Boolean
+    fun shouldUpgrade(uri: Uri): Boolean
 
     fun upgrade(uri: Uri): Uri {
         return uri.buildUpon().scheme(UrlScheme.https).build()
     }
+
+    fun reloadData()
 }
 
-class HttpsUpgraderImpl constructor(private val dao: HttpsUpgradeDomainDao) :HttpsUpgrader {
+class HttpsUpgraderImpl(
+    private val whitelistedDao: HttpsWhitelistDao,
+    private val bloomFactory: HttpsBloomFilterFactory
+) : HttpsUpgrader {
+
+    private var httpsBloomFilter: BloomFilter? = null
+
+    init {
+        reloadData()
+    }
 
     @WorkerThread
-    override fun shouldUpgrade(uri: Uri) : Boolean {
+    override fun shouldUpgrade(uri: Uri): Boolean {
+
         if (uri.isHttps) {
             return false
         }
 
-        val host = (uri.host ?: return false).toLowerCase()
-        return dao.hasDomain(host) || matchesWildcard(host)
-    }
-
-    private fun matchesWildcard(host: String): Boolean {
-        val domains = mutableListOf<String>()
-        for (part in host.split(".").reversed()) {
-            if (domains.isEmpty()) {
-                domains.add(".$part")
-            } else {
-                val last = domains.last()
-                domains.add(".$part$last")
-            }
+        if (whitelistedDao.contains(uri.host)) {
+            Timber.d("${uri.host} is in whitelist and so not upgradable")
+            return false
         }
 
-        domains.asReversed().removeAt(0)
-        Timber.d("domains $domains")
-
-        for (domain in domains) {
-            if (dao.hasDomain("*$domain")) {
-                return true
-            }
+        httpsBloomFilter?.let {
+            val shouldUpgrade = it.contains(uri.host)
+            Timber.d("${uri.host} ${if (shouldUpgrade) "is" else "is not"} upgradable")
+            return shouldUpgrade
         }
 
         return false
+    }
+
+    override fun reloadData() {
+        httpsBloomFilter = bloomFactory.create()
     }
 
 }

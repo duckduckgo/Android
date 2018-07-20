@@ -17,7 +17,7 @@
 package com.duckduckgo.app.di
 
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeListDownloader
+import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeDataDownloader
 import com.duckduckgo.app.job.AppConfigurationDownloader
 import com.duckduckgo.app.job.ConfigurationDownloader
 import com.duckduckgo.app.surrogates.api.ResourceSurrogateListDownloader
@@ -30,9 +30,9 @@ open class AppConfigurationDownloaderModule {
 
     @Provides
     open fun appConfigurationDownloader(trackerDataDownloader: TrackerDataDownloader,
-                                   httpsUpgradeListDownloader: HttpsUpgradeListDownloader,
+                                   httpsUpgradeDataDownloader: HttpsUpgradeDataDownloader,
                                    resourceSurrogateDownloader: ResourceSurrogateListDownloader,
                                    appDatabase: AppDatabase) : ConfigurationDownloader {
-        return AppConfigurationDownloader(trackerDataDownloader, httpsUpgradeListDownloader, resourceSurrogateDownloader, appDatabase)
+        return AppConfigurationDownloader(trackerDataDownloader, httpsUpgradeDataDownloader, resourceSurrogateDownloader, appDatabase)
     }
 }

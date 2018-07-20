@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,29 @@
 
 package com.duckduckgo.app.httpsupgrade.api
 
-import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomain
-import com.squareup.moshi.JsonAdapter
+import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class HttpsUpgradeJsonTest {
+class HttpsBloomFilterSpecJsonTest {
 
     @Test
     fun whenGivenValidJsonThenParsesCorrectly() {
-        val moshi = Moshi.Builder().add(HttpsUpgradeDomainFromStringAdapter()).build()
-        val type = Types.newParameterizedType(List::class.java, HttpsUpgradeDomain::class.java)
-        val adapter: JsonAdapter<List<HttpsUpgradeDomain>> = moshi.adapter(type)
-
-        val list = adapter.fromJson(json())
-        assertEquals(5, list.count())
+        val moshi = Moshi.Builder().build()
+        val jsonAdapter = moshi.adapter(HttpsBloomFilterSpec::class.java)
+        val result = jsonAdapter.fromJson(json())
+        assertEquals(2858372, result.totalEntries)
+        assertEquals(0.0001, result.errorRate, 0.00001)
+        assertEquals("932ae1481fc33d94320a3b072638c0df8005482506933897e35feb1294693c84", result.sha256)
     }
 
-    private fun json() : String = """
-        [
-            "1337x.to",
-            "1688.com",
-            "2ch.net",
-            "adobe.com",
-            "alibaba.com"
-        ]
-    """
+    private fun json(): String = """
+        {
+          "totalEntries":2858372,
+          "errorRate" : 0.0001,
+          "sha256" : "932ae1481fc33d94320a3b072638c0df8005482506933897e35feb1294693c84"
+        }
+        """
 
 }
