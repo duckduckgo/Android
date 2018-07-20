@@ -80,6 +80,10 @@ class BrowserTabViewModel(
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, ViewModel() {
 
+    data class GlobalLayoutViewState(
+        val isNewTabState: Boolean = true
+    )
+
     data class BrowserViewState(
         val browserShowing: Boolean = false,
         val isFullScreen: Boolean = false,
@@ -120,7 +124,8 @@ class BrowserTabViewModel(
     )
 
     data class DefaultBrowserViewState(
-        val showDefaultBrowserBanner: Boolean = false
+        val showDefaultBrowserBanner: Boolean = false,
+        val showHomeScreenCallToActionButton: Boolean = false
     )
 
     sealed class Command {
@@ -141,11 +146,11 @@ class BrowserTabViewModel(
         class DisplayMessage(@StringRes val messageId: Int) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
-        object LaunchDefaultAppSystemSettings : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
     val browserViewState: MutableLiveData<BrowserViewState> = MutableLiveData()
+    val globalLayoutState: MutableLiveData<GlobalLayoutViewState> = MutableLiveData()
     val loadingViewState: MutableLiveData<LoadingViewState> = MutableLiveData()
     val omnibarViewState: MutableLiveData<OmnibarViewState> = MutableLiveData()
     val defaultBrowserViewState: MutableLiveData<DefaultBrowserViewState> = MutableLiveData()
@@ -227,8 +232,9 @@ class BrowserTabViewModel(
     fun onViewVisible() {
         command.value = if (url.value == null) ShowKeyboard else Command.HideKeyboard
 
-        val showBanner = defaultBrowserNotification.shouldShowNotification(currentBrowserViewState().browserShowing)
-        defaultBrowserViewState.value = DefaultBrowserViewState(showBanner)
+        val showBanner = defaultBrowserNotification.shouldShowBannerNotification(currentBrowserViewState().browserShowing)
+        val showCallToActionButton = defaultBrowserNotification.shouldShowHomeScreenCallToActionNotification()
+        defaultBrowserViewState.value = DefaultBrowserViewState(showBanner, showCallToActionButton)
     }
 
     fun onUserSubmittedQuery(input: String) {
@@ -240,6 +246,7 @@ class BrowserTabViewModel(
         val trimmedInput = input.trim()
         url.value = queryUrlConverter.convertQueryToUrl(trimmedInput)
 
+        globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
         findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
         omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = trimmedInput)
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
@@ -341,7 +348,8 @@ class BrowserTabViewModel(
         )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            defaultBrowserViewState.value = currentDefaultBrowserViewState().copy(showDefaultBrowserBanner = defaultBrowserNotification.shouldShowNotification(currentBrowserViewState.browserShowing))
+            val shouldShowBanner = defaultBrowserNotification.shouldShowBannerNotification(currentBrowserViewState.browserShowing)
+            defaultBrowserViewState.value = currentDefaultBrowserViewState().copy(showDefaultBrowserBanner = shouldShowBanner)
             statisticsUpdater.refreshRetentionAtb()
         }
 
@@ -525,7 +533,8 @@ class BrowserTabViewModel(
     }
 
     private fun initializeViewStates() {
-        defaultBrowserViewState.value = DefaultBrowserViewState()
+        globalLayoutState.value = GlobalLayoutViewState()
+        defaultBrowserViewState.value = DefaultBrowserViewState(showHomeScreenCallToActionButton = defaultBrowserNotification.shouldShowHomeScreenCallToActionNotification())
         browserViewState.value = BrowserViewState()
         loadingViewState.value = LoadingViewState()
         autoCompleteViewState.value = AutoCompleteViewState()
@@ -539,16 +548,17 @@ class BrowserTabViewModel(
         }
     }
 
-    fun userDeclinedToSetAsDefaultBrowser() {
-        defaultBrowserDetector.userDeclinedToSetAsDefaultBrowser()
+    fun userDeclinedBannerToSetAsDefaultBrowser() {
+        defaultBrowserDetector.userDeclinedBannerToSetAsDefaultBrowser()
         val currentDefaultBrowserViewState = currentDefaultBrowserViewState()
         defaultBrowserViewState.value = currentDefaultBrowserViewState.copy(showDefaultBrowserBanner = false)
     }
 
-    fun userAcceptedToSetAsDefaultBrowser() {
-        command.value = LaunchDefaultAppSystemSettings
+    fun userDeclinedHomeScreenCallToActionToSetAsDefaultBrowser() {
+        defaultBrowserDetector.userDeclinedHomeScreenCallToActionToSetAsDefaultBrowser()
+        val currentDefaultBrowserViewState = currentDefaultBrowserViewState()
+        defaultBrowserViewState.value = currentDefaultBrowserViewState.copy(showHomeScreenCallToActionButton = false)
     }
-
 }
 
 

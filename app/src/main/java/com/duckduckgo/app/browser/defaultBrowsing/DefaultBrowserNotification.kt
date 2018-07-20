@@ -20,16 +20,19 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature
-import timber.log.Timber
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowBanner
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToAction
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
 interface DefaultBrowserNotification {
-    fun shouldShowNotification(
+    fun shouldShowBannerNotification(
         browserShowing: Boolean,
         timeNow: Long = System.currentTimeMillis()
     ): Boolean
+
+    fun shouldShowHomeScreenCallToActionNotification(): Boolean
 }
 
 class DefaultBrowserTimeBasedNotification @Inject constructor(
@@ -38,7 +41,7 @@ class DefaultBrowserTimeBasedNotification @Inject constructor(
     private val variantManager: VariantManager
 ) : DefaultBrowserNotification {
 
-    override fun shouldShowNotification(browserShowing: Boolean, timeNow: Long): Boolean {
+    override fun shouldShowBannerNotification(browserShowing: Boolean, timeNow: Long): Boolean {
 
         if (!browserShowing) {
             return false
@@ -48,7 +51,7 @@ class DefaultBrowserTimeBasedNotification @Inject constructor(
             return false
         }
 
-        if (!isFeatureEnabled()) {
+        if (!isFeatureEnabled(ShowBanner)) {
             return false
         }
 
@@ -56,39 +59,50 @@ class DefaultBrowserTimeBasedNotification @Inject constructor(
             return false
         }
 
-        if (hasUserDeclinedPreviously()) {
+        if (appInstallStore.hasUserDeclinedDefaultBrowserBannerPreviously()) {
             return false
         }
 
         return hasEnoughTimeElapsed(timeNow)
     }
 
+    override fun shouldShowHomeScreenCallToActionNotification(): Boolean {
+
+        if (!isDeviceCapable()) {
+            return false
+        }
+
+        if (!isFeatureEnabled(ShowHomeScreenCallToAction)) {
+            return false
+        }
+
+        if (isAlreadyDefaultBrowser()) {
+            return false
+        }
+
+        if (appInstallStore.hasUserDeclinedDefaultBrowserHomeScreenCallToActionPreviously()) {
+            return false
+        }
+
+        return true
+    }
+
     private fun isDeviceCapable(): Boolean {
         return defaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration() && appInstallStore.hasInstallTimestampRecorded()
     }
 
-    private fun isFeatureEnabled(): Boolean {
-        return variantManager.getVariant().hasFeature(DefaultBrowserFeature.ShowTimedReminder)
+    private fun isFeatureEnabled(feature: DefaultBrowserFeature): Boolean {
+        return variantManager.getVariant().hasFeature(feature)
     }
 
     private fun isAlreadyDefaultBrowser(): Boolean {
         return defaultBrowserDetector.isCurrentlyConfiguredAsDefaultBrowser()
     }
 
-    private fun hasUserDeclinedPreviously(): Boolean {
-        return appInstallStore.hasUserDeclinedDefaultBrowserPreviously()
-    }
-
     private fun hasEnoughTimeElapsed(now: Long): Boolean {
         val elapsed = calculateElapsedTime(now)
 
-        return if (elapsed >= ELAPSED_TIME_THRESHOLD_MS) {
-            Timber.v("Enough time has elapsed to show banner")
-            true
-        } else {
-            Timber.v("Not enough time has elapsed to show banner")
-            false
-        }
+        return elapsed >= ELAPSED_TIME_THRESHOLD_MS
     }
 
     private fun calculateElapsedTime(now: Long): Long {

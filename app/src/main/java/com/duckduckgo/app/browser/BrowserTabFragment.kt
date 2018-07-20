@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.Manifest
 import android.animation.LayoutTransition.CHANGING
+import android.animation.LayoutTransition.DISAPPEARING
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
@@ -70,6 +71,8 @@ import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_banner_notification.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
+import kotlinx.android.synthetic.main.include_home_screen_default_browser_call_to_action.*
+import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
@@ -153,6 +156,8 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
     }
 
+    private val logoHidingLayoutChangeListener by lazy { LogoHidingLayoutChangeListener(ddgLogo, homeScreenCallToActionContainer) }
+
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
@@ -173,6 +178,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         configureObservers()
         configureToolbar()
         configureBannerNotification()
+        configureCallToActionButton()
         configureWebView()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
@@ -217,6 +223,10 @@ class BrowserTabFragment : Fragment(), FindListener {
     private fun configureObservers() {
         viewModel.autoCompleteViewState.observe(this, Observer<AutoCompleteViewState> {
             it?.let { renderer.renderAutocomplete(it) }
+        })
+
+        viewModel.globalLayoutState.observe(this, Observer<GlobalLayoutViewState> {
+            it?.let { renderer.renderGlobalViewState(it) }
         })
 
         viewModel.browserViewState.observe(this, Observer<BrowserViewState> {
@@ -315,7 +325,6 @@ class BrowserTabFragment : Fragment(), FindListener {
             is Command.ShowFileChooser -> {
                 launchFilePicker(it)
             }
-            is Command.LaunchDefaultAppSystemSettings -> { launchDefaultAppSystemSettings() }
         }
     }
 
@@ -390,13 +399,22 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private fun configureBannerNotification() {
         dismissBannerButton.setOnClickListener {
-            viewModel.userDeclinedToSetAsDefaultBrowser()
+            viewModel.userDeclinedBannerToSetAsDefaultBrowser()
         }
         bannerNotification.setOnClickListener {
-            viewModel.userAcceptedToSetAsDefaultBrowser()
+            launchDefaultAppSystemSettingsFromBanner()
         }
     }
 
+    private fun configureCallToActionButton() {
+        homeScreenCallToActionContainer.setOnClickListener {
+            launchDefaultAppSystemSettingsFromCallToActionButton()
+        }
+
+        homeScreenCallToActionDismissButton.setOnClickListener {
+            viewModel.userDeclinedHomeScreenCallToActionToSetAsDefaultBrowser()
+        }
+    }
 
     private fun configureFindInPage() {
         findInPageInput.setOnFocusChangeListener { _, hasFocus ->
@@ -438,7 +456,11 @@ class BrowserTabFragment : Fragment(), FindListener {
     }
 
     private fun configureKeyboardAwareLogoAnimation() {
-        logoParent.layoutTransition.enableTransitionType(CHANGING)
+        // we want layout transitions for when the size changes; we don't want them when items disappear (can cause glitch on call to action button)
+        newTabLayout.layoutTransition?.enableTransitionType(CHANGING)
+        newTabLayout.layoutTransition?.disableTransitionType(DISAPPEARING)
+        
+        rootView.addOnLayoutChangeListener(logoHidingLayoutChangeListener)
     }
 
     private fun userEnteredQuery(query: String) {
@@ -513,11 +535,18 @@ class BrowserTabFragment : Fragment(), FindListener {
         activity?.share(url, "")
     }
 
-    private fun launchDefaultAppSystemSettings() {
+    private fun launchDefaultAppSystemSettingsFromBanner() {
         activity?.let {
             val options = ActivityOptions.makeSceneTransitionAnimation(it, bannerNotification, "defaultBrowserBannerTransition")
             val intent = DefaultBrowserInfoActivity.intent(it)
             startActivity(intent, options.toBundle())
+        }
+    }
+
+    private fun launchDefaultAppSystemSettingsFromCallToActionButton() {
+        activity?.let {
+            val intent = DefaultBrowserInfoActivity.intent(it)
+            startActivity(intent)
         }
     }
 
@@ -730,6 +759,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         private var lastSeenLoadingViewState: LoadingViewState? = null
         private var lastSeenFindInPageViewState: FindInPageViewState? = null
         private var lastSeenBrowserViewState: BrowserViewState? = null
+        private var lastSeenGlobalViewState: GlobalLayoutViewState? = null
         private var lastSeenDefaultBrowserViewState: DefaultBrowserViewState? = null
         private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
 
@@ -742,6 +772,14 @@ class BrowserTabFragment : Fragment(), FindListener {
                 } else {
                     bannerNotification.gone()
                 }
+
+                if (viewState.showHomeScreenCallToActionButton) {
+                    homeScreenCallToActionContainer.show()
+                } else {
+                    homeScreenCallToActionContainer.gone()
+                }
+
+                logoHidingLayoutChangeListener.update()
             }
         }
 
@@ -783,6 +821,18 @@ class BrowserTabFragment : Fragment(), FindListener {
                 pageLoadingIndicator.apply {
                     if (viewState.isLoading) show() else hide()
                     progress = viewState.progress
+                }
+            }
+        }
+
+        fun renderGlobalViewState(viewState: GlobalLayoutViewState) {
+            renderIfChanged(viewState, lastSeenGlobalViewState) {
+                if (viewState.isNewTabState) {
+                    newTabLayout.show()
+                    browserLayout.hide()
+                } else {
+                    newTabLayout.hide()
+                    browserLayout.show()
                 }
             }
         }
