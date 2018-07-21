@@ -469,11 +469,12 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
-        webView = layoutInflater.inflate(R.layout.include_duckduckgo_browser_webview, webViewContainer, true).findViewById(R.id.browserWebView) as WebView
+        val view = layoutInflater.inflate(R.layout.include_duckduckgo_browser_webview, webViewContainer, true)
+        webView = view.findViewById(R.id.browserWebView) as WebView
         webView?.let {
             userAgentProvider = UserAgentProvider(it.settings.userAgentString)
-
-            it.webViewClient = webViewClient
+            val swipeToRefreshLayout = view.findViewById<DuckDuckGoSwipeToRefreshLayout>(R.id.swipeToRefreshLayout)
+            it.webViewClient = swipeToRefreshLayout.wrapWebViewClient(webViewClient)
             it.webChromeClient = webChromeClient
 
             it.settings.apply {
