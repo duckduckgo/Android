@@ -170,7 +170,8 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchFire() {
-        FireDialog(context = this, webDataManager = webDataManager,
+        FireDialog(context = this,
+            webDataManager = webDataManager,
             clearStarted = { viewModel.onClearRequested() },
             clearComplete = { viewModel.onClearComplete() }
         ).show()

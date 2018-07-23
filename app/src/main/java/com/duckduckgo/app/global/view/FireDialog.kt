@@ -31,16 +31,16 @@ class FireDialog(
     webDataManager: WebDataManager,
     clearStarted: (() -> Unit),
     clearComplete: (() -> Unit)
-) : BottomSheetDialog(context) {
-
+) :
+    BottomSheetDialog(context) {
     init {
         val contentView = View.inflate(getContext(), R.layout.sheet_fire_clear_data, null)
         setContentView(contentView)
         clearAllOption.setOnClickListener {
             clearStarted()
             webDataManager.clearData(WebView(context), WebStorage.getInstance(), context)
-            webDataManager.clearExternalCookies(CookieManager.getInstance(), clearComplete)
             webDataManager.clearWebViewSessions()
+            webDataManager.clearExternalCookies(CookieManager.getInstance(), clearComplete)
             dismiss()
         }
         cancelOption.setOnClickListener {

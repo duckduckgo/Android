@@ -103,10 +103,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     }
 
     private fun onFire() {
-        FireDialog(context = this, webDataManager = webDataManager,
+        FireDialog(
+            context = this,
+            webDataManager = webDataManager,
             clearStarted = { viewModel.onClearRequested() },
-            clearComplete = { viewModel.onClearComplete() }
-        ).show()
+            clearComplete = { viewModel.onClearComplete() }).show()
     }
 
     override fun onNewTabRequested() {
