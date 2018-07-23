@@ -20,11 +20,15 @@ import android.content.Context
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.defaultBrowsing.AndroidDefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
+import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import dagger.Module
 import dagger.Provides
+import javax.inject.Singleton
 
 @Module
 class BrowserModule {
@@ -47,4 +51,12 @@ class BrowserModule {
     fun defaultWebBrowserCapability(context: Context, appInstallStore: AppInstallStore): DefaultBrowserDetector {
         return AndroidDefaultBrowserDetector(context, appInstallStore)
     }
+
+    @Singleton
+    @Provides
+    fun webViewSessionStorage(): WebViewSessionStorage = WebViewSessionInMemoryStorage()
+
+    @Singleton
+    @Provides
+    fun webDataManager(webViewSessionStorage: WebViewSessionStorage) = WebDataManager(AppUrl.Url.HOST, webViewSessionStorage)
 }

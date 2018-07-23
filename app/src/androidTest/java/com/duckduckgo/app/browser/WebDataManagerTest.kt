@@ -23,6 +23,7 @@ import android.webkit.CookieManager
 import android.webkit.ValueCallback
 import android.webkit.WebStorage
 import android.webkit.WebView
+import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.nhaarman.mockito_kotlin.*
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -36,7 +37,7 @@ class WebDataManagerTest {
 
     private val mockStorage: WebStorage = mock()
 
-    private val testee = WebDataManager(host)
+    private val testee = WebDataManager(host, WebViewSessionInMemoryStorage())
 
     @UiThreadTest
     @Test
@@ -60,7 +61,7 @@ class WebDataManagerTest {
 
         whenever(mockCookieManager.getCookie(host)).thenReturn("da=abc; dz=zyx")
         whenever(mockCookieManager.getCookie(externalHost)).thenReturn("ea=abc; ez=zyx")
-        testee.clearExternalCookies(mockCookieManager, {})
+        testee.clearExternalCookies(mockCookieManager) {}
 
         val captor = argumentCaptor<ValueCallback<Boolean>>()
         verify(mockCookieManager).removeAllCookies(captor.capture())

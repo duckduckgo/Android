@@ -45,6 +45,9 @@ class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
+    @Inject
+    lateinit var webDataManager: WebDataManager
+
     private var currentTab: BrowserTabFragment? = null
 
     private val viewModel: BrowserViewModel by lazy {
@@ -167,7 +170,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchFire() {
-        FireDialog(context = this,
+        FireDialog(context = this, webDataManager = webDataManager,
             clearStarted = { viewModel.onClearRequested() },
             clearComplete = { viewModel.onClearComplete() }
         ).show()

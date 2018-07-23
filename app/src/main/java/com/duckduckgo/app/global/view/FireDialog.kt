@@ -24,29 +24,28 @@ import android.webkit.WebStorage
 import android.webkit.WebView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.WebDataManager
-import com.duckduckgo.app.global.AppUrl.Url
 import kotlinx.android.synthetic.main.sheet_fire_clear_data.*
 
-class FireDialog(context: Context, clearStarted: (() -> Unit), clearComplete: (() -> Unit)) :
-    BottomSheetDialog(context) {
+class FireDialog(
+    context: Context,
+    webDataManager: WebDataManager,
+    clearStarted: (() -> Unit),
+    clearComplete: (() -> Unit)
+) : BottomSheetDialog(context) {
 
     init {
-
-        val dataManager = WebDataManager(Url.HOST)
         val contentView = View.inflate(getContext(), R.layout.sheet_fire_clear_data, null)
-
         setContentView(contentView)
-
         clearAllOption.setOnClickListener {
             clearStarted()
-            dataManager.clearData(WebView(context), WebStorage.getInstance(), context)
-            dataManager.clearExternalCookies(CookieManager.getInstance(), clearComplete)
+            webDataManager.clearData(WebView(context), WebStorage.getInstance(), context)
+            webDataManager.clearExternalCookies(CookieManager.getInstance(), clearComplete)
+            webDataManager.clearWebViewSessions()
             dismiss()
         }
-
         cancelOption.setOnClickListener {
             dismiss()
         }
-
     }
+
 }

@@ -34,6 +34,7 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
@@ -110,6 +111,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var tabsDao: TabsDao
 
+    @Mock
+    private lateinit var webViewSessionStorage: WebViewSessionStorage
+
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
 
@@ -143,7 +147,8 @@ class BrowserTabViewModelTest {
             defaultBrowserNotification = mockDefaultBrowserNotification,
             defaultBrowserDetector = mockDefaultBrowserDetector,
             longPressHandler = mockLongPressHandler,
-            appConfigurationDao = appConfigurationDao
+            appConfigurationDao = appConfigurationDao,
+            webViewSessionStorage = webViewSessionStorage
         )
 
         testee.loadData("abc", null)
@@ -684,6 +689,40 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, never()).onChanged(any())
     }
 
+    @Test
+    fun whenWebSessionRestoredThenGlobalLayoutSwitchedToShowingBrowser() {
+        testee.onWebSessionRestored()
+        assertFalse(globalLayoutViewState().isNewTabState)
+    }
+
+    @Test
+    fun whenWebViewSessionIsToBeSavedThenUnderlyingSessionStoredCalled() {
+        testee.saveWebViewState(null, "")
+        verify(webViewSessionStorage).saveSession(anyOrNull(), anyString())
+    }
+
+    @Test
+    fun whenRestoringWebViewSessionNotRestorableThenPreviousUrlLoaded() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo.com")).thenReturn("foo.com")
+        whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(false)
+        testee.restoreWebViewState(null, "foo.com")
+        assertEquals("foo.com", testee.url.value)
+    }
+
+    @Test
+    fun whenRestoringWebViewSessionNotRestorableAndNoPreviousUrlThenNoUrlLoaded() {
+        whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(false)
+        testee.restoreWebViewState(null, "")
+        assertNull(testee.url.value)
+    }
+
+    @Test
+    fun whenWebViewSessionRestorableThenSessionRestored() {
+        whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(true)
+        testee.restoreWebViewState(null, "")
+        assertFalse(globalLayoutViewState().isNewTabState)
+    }
+
     private fun captureCommands(): ArgumentCaptor<Command> {
         verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
         return commandCaptor
@@ -694,4 +733,5 @@ class BrowserTabViewModelTest {
     private fun loadingViewState() = testee.loadingViewState.value!!
     private fun autoCompleteViewState() = testee.autoCompleteViewState.value!!
     private fun findInPageViewState() = testee.findInPageViewState.value!!
+    private fun globalLayoutViewState() = testee.globalLayoutState.value!!
 }

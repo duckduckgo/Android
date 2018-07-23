@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.LongPressHandler
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
+import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.feedback.api.FeedbackSender
 import com.duckduckgo.app.feedback.ui.FeedbackViewModel
 import com.duckduckgo.app.global.db.AppConfigurationDao
@@ -68,7 +69,8 @@ class ViewModelFactory @Inject constructor(
     private val webViewLongPressHandler: LongPressHandler,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val variantManager: VariantManager,
-    private val feedbackSender: FeedbackSender
+    private val feedbackSender: FeedbackSender,
+    private val webViewSessionStorage: WebViewSessionStorage
 
 ) : ViewModelProvider.NewInstanceFactory() {
 
@@ -79,7 +81,7 @@ class ViewModelFactory @Inject constructor(
                     isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore, defaultBrowserDetector, variantManager)
                     isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository, queryUrlConverter)
                     isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
-                    isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository)
+                    isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository, webViewSessionStorage)
                     isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(privacySettingsStore, networkLeaderboardDao)
                     isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                     isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
@@ -104,6 +106,7 @@ class ViewModelFactory @Inject constructor(
         defaultBrowserNotification = defaultBrowserNotification,
         appConfigurationDao = appConfigurationDao,
         longPressHandler = webViewLongPressHandler,
+        webViewSessionStorage = webViewSessionStorage,
         autoCompleteApi = autoCompleteApi
     )
 }
