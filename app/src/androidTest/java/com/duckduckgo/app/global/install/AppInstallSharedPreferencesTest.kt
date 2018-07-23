@@ -36,8 +36,13 @@ class AppInstallSharedPreferencesTest {
     }
 
     @Test
-    fun whenInitializedThenUserHasNotBeenMarkedAsHavingPreviouslyDeclined() {
-        assertFalse(testee.hasUserDeclinedDefaultBrowserPreviously())
+    fun whenInitializedThenUserHasNotBeenMarkedAsHavingPreviouslyDeclinedBanner() {
+        assertFalse(testee.hasUserDeclinedDefaultBrowserBannerPreviously())
+    }
+
+    @Test
+    fun whenInitializedThenUserHasNotBeenMarkedAsHavingPreviouslyDeclinedHomeScreenCallToAction() {
+        assertFalse(testee.hasUserDeclinedDefaultBrowserHomeScreenCallToActionPreviously())
     }
 
     @Test
@@ -60,15 +65,17 @@ class AppInstallSharedPreferencesTest {
     }
 
     @Test
-    fun whenUserPreviouslyDeclinedThenThatIsReturnedWhenQueried() {
+    fun whenUserPreviouslyDeclinedBannerThenThatIsReturnedWhenQueried() {
         val timestamp = 1L
-        testee.recordUserDeclinedToSetDefaultBrowser(timestamp)
-        assertTrue(testee.hasUserDeclinedDefaultBrowserPreviously())
+        testee.recordUserDeclinedBannerToSetDefaultBrowser(timestamp)
+        assertTrue(testee.hasUserDeclinedDefaultBrowserBannerPreviously())
     }
 
     @Test
-    fun whenUserNotPreviouslyDeclinedThenThatIsReturnedWhenQueried() {
-        assertFalse(testee.hasUserDeclinedDefaultBrowserPreviously())
+    fun whenUserPreviouslyDeclinedHomeScreenCallToActionThenThatIsReturnedWhenQueried() {
+        val timestamp = 1L
+        testee.recordUserDeclinedHomeScreenCallToActionToSetDefaultBrowser(timestamp)
+        assertTrue(testee.hasUserDeclinedDefaultBrowserHomeScreenCallToActionPreviously())
     }
 
 }

@@ -23,7 +23,7 @@
     android:paddingEnd="44dp"
     android:paddingStart="44dp"
     android:tag="onboardingNoTrace"
-    tools:background="@color/powderBlue"
+    tools:background="@color/cornflowerBlue"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
     <ImageView
@@ -53,7 +53,6 @@
         <TextView
             style="@style/OnboardingTextTitle"
             android:text="@string/onboardingNoTraceTitle" />
-
 
         <TextView
             style="@style/OnboardingTextSubtitle"
