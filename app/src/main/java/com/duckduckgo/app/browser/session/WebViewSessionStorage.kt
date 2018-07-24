@@ -32,7 +32,7 @@ interface WebViewSessionStorage {
 
 class WebViewSessionInMemoryStorage : WebViewSessionStorage {
 
-    private val map = object : LruCache<String, Bundle>(CACHE_SIZE_BYTES) {
+    private val cache = object : LruCache<String, Bundle>(CACHE_SIZE_BYTES) {
 
         /**
          * We can calculate this however we choose, but it should match up with the value we use for cache size.
@@ -60,7 +60,7 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
         val bundle = Bundle()
         bundle.putBundle(CACHE_KEY_WEBVIEW, webViewBundle)
         bundle.putInt(CACHE_KEY_SCROLL_POSITION, webView.scrollY)
-        map.put(tabId, bundle)
+        cache.put(tabId, bundle)
 
         Timber.d("Stored ${bundle.sizeInBytes()} bytes for WebView $webView")
         logCacheSize()
@@ -80,7 +80,7 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
 
         Timber.i("Restoring WebView session for $tabId")
 
-        val bundle = map[tabId]
+        val bundle = cache[tabId]
         if (bundle == null) {
             Timber.v("No saved bundle for tab $tabId")
             return false
@@ -89,7 +89,7 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
         val webViewBundle = bundle.getBundle(CACHE_KEY_WEBVIEW)
         webView.restoreState(webViewBundle)
         webView.scrollY = bundle.getInt(CACHE_KEY_SCROLL_POSITION)
-        map.remove(tabId)
+        cache.remove(tabId)
 
         logCacheSize()
 
@@ -97,15 +97,15 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
     }
 
     override fun deleteSession(tabId: String) {
-        map.remove(tabId)
+        cache.remove(tabId)
         Timber.i("Deleted web session for $tabId")
         logCacheSize()
     }
 
-    override fun deleteAllSessions() = map.evictAll()
+    override fun deleteAllSessions() = cache.evictAll()
 
     private fun logCacheSize() {
-        Timber.v("Cache size is now ~${map.size()} bytes out of a max size of ${map.maxSize()} bytes")
+        Timber.v("Cache size is now ~${cache.size()} bytes out of a max size of ${cache.maxSize()} bytes")
     }
 
     private fun Bundle.sizeInBytes(): Int {
