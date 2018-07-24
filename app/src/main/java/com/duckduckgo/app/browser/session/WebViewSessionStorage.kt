@@ -35,8 +35,8 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
     private val cache = object : LruCache<String, Bundle>(CACHE_SIZE_BYTES) {
 
         /**
-         * We can calculate this however we choose, but it should match up with the value we use for cache size.
-         * i.e., we specify the max cache size in bytes, so we need to calculate an approximate size of the cache entry in bytes.
+         * Size (in bytes) of a single entry in the cache for the given key.
+         * We specify the max cache size in bytes, so we need to calculate an approximate size of the cache entry in bytes.
          */
         override fun sizeOf(key: String, bundle: Bundle) = bundle.sizeInBytes()
 
