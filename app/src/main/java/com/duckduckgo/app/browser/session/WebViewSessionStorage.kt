@@ -32,11 +32,11 @@ interface WebViewSessionStorage {
 
 class WebViewSessionInMemoryStorage : WebViewSessionStorage {
 
-    private val map = object: LruCache<String, Bundle>(CACHE_SIZE) {
+    private val map = object : LruCache<String, Bundle>(CACHE_SIZE_BYTES) {
 
         /**
          * We can calculate this however we choose, but it should match up with the value we use for cache size.
-         * i.e., if we specify max cache size in bytes, we should calculate an approximate size of the cache entry in bytes.
+         * i.e., we specify the max cache size in bytes, so we need to calculate an approximate size of the cache entry in bytes.
          */
         override fun sizeOf(key: String, bundle: Bundle) = bundle.sizeInBytes()
 
@@ -119,7 +119,7 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
     }
 
     companion object {
-        private const val CACHE_SIZE = 10 * 1024 * 1024 // 10 MB
+        private const val CACHE_SIZE_BYTES = 10 * 1024 * 1024 // 10 MiB
 
         private const val CACHE_KEY_WEBVIEW = "webview"
         private const val CACHE_KEY_SCROLL_POSITION = "scroll-position"
