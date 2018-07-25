@@ -41,6 +41,7 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
@@ -77,6 +78,7 @@ class BrowserTabViewModel(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val defaultBrowserNotification: DefaultBrowserNotification,
     private val longPressHandler: LongPressHandler,
+    private val webViewSessionStorage: WebViewSessionStorage,
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, ViewModel() {
 
@@ -508,6 +510,10 @@ class BrowserTabViewModel(
         numberMatches = numberOfMatches)
     }
 
+    fun onWebSessionRestored() {
+        globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
+    }
+
     fun desktopSiteModeToggled(urlString: String?, desktopSiteRequested: Boolean) {
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(isDesktopBrowsingMode = desktopSiteRequested)
@@ -558,6 +564,23 @@ class BrowserTabViewModel(
         defaultBrowserDetector.userDeclinedHomeScreenCallToActionToSetAsDefaultBrowser()
         val currentDefaultBrowserViewState = currentDefaultBrowserViewState()
         defaultBrowserViewState.value = currentDefaultBrowserViewState.copy(showHomeScreenCallToActionButton = false)
+    }
+
+    fun saveWebViewState(webView: WebView?, tabId: String) {
+        webViewSessionStorage.saveSession(webView, tabId)
+    }
+
+    fun restoreWebViewState(webView: WebView?, lastUrl: String) {
+        val sessionRestored = webViewSessionStorage.restoreSession(webView, tabId)
+        if (sessionRestored) {
+            Timber.v("Successfully restored session")
+            onWebSessionRestored()
+        } else {
+            if (lastUrl.isNotBlank()) {
+                Timber.w("Restoring last url but page history has been lost - url=[$lastUrl]")
+                onUserSubmittedQuery(lastUrl)
+            }
+        }
     }
 }
 

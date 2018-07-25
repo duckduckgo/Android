@@ -25,6 +25,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.FireDialog
@@ -41,6 +42,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
+
+    @Inject
+    lateinit var webDataManager: WebDataManager
 
     private val viewModel: TabSwitcherViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(TabSwitcherViewModel::class.java)
@@ -99,10 +103,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     }
 
     private fun onFire() {
-        FireDialog(context = this,
+        FireDialog(
+            context = this,
+            webDataManager = webDataManager,
             clearStarted = { viewModel.onClearRequested() },
-            clearComplete = { viewModel.onClearComplete() }
-        ).show()
+            clearComplete = { viewModel.onClearComplete() }).show()
     }
 
     override fun onNewTabRequested() {

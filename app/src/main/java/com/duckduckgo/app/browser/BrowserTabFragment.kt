@@ -60,6 +60,7 @@ import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
+import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
@@ -103,6 +104,9 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     @Inject
     lateinit var fileDownloadNotificationManager: FileDownloadNotificationManager
+
+    @Inject
+    lateinit var webViewSessionStorage: WebViewSessionStorage
 
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
@@ -591,14 +595,19 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
     }
 
+    /**
+     * Attempting to save the WebView's state can result in a TransactionTooLargeException being thrown.
+     * This will only happen if the bundle size is too large - but the exact size is undefined.
+     * Instead of saving using normal Android state mechanism - use our own implementation instead.
+     */
     override fun onSaveInstanceState(bundle: Bundle) {
-        webView?.saveState(bundle)
+        viewModel.saveWebViewState(webView, tabId)
         super.onSaveInstanceState(bundle)
     }
 
     override fun onViewStateRestored(bundle: Bundle?) {
+        viewModel.restoreWebViewState(webView, omnibarTextInput.text.toString())
         super.onViewStateRestored(bundle)
-        webView?.restoreState(bundle)
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -827,6 +836,8 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {
             renderIfChanged(viewState, lastSeenGlobalViewState) {
+                lastSeenGlobalViewState = viewState
+
                 if (viewState.isNewTabState) {
                     newTabLayout.show()
                     browserLayout.hide()
