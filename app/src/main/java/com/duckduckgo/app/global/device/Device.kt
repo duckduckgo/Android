@@ -17,9 +17,10 @@
 package com.duckduckgo.app.global.device
 
 import android.content.Context
-import com.duckduckgo.app.browser.R
-import org.jetbrains.anko.displayMetrics
 import javax.inject.Inject
+import android.util.TypedValue
+
+
 
 interface DeviceInfo {
 
@@ -37,8 +38,10 @@ interface DeviceInfo {
 class ContextDeviceInfo @Inject constructor (private val context: Context) : DeviceInfo {
 
     override fun formFactor(): DeviceInfo.FormFactor {
-        val isTablet = context.resources.getBoolean(R.bool.isTablet)
-        return if (isTablet) DeviceInfo.FormFactor.TABLET else DeviceInfo.FormFactor.PHONE
+        val metrics = context.resources.displayMetrics
+        val smallestSize = Math.min(metrics.widthPixels, metrics.heightPixels)
+        val tabletSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 600f, context.resources.displayMetrics).toInt()
+        return if (smallestSize >= tabletSize) DeviceInfo.FormFactor.TABLET else DeviceInfo.FormFactor.PHONE
     }
 
 }
