@@ -22,13 +22,16 @@ import com.duckduckgo.app.statistics.WeightedRandomizer
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import dagger.Module
 import dagger.Provides
+import javax.inject.Singleton
 
 
 @Module
 class VariantModule {
 
     @Provides
-    fun variantManager(statisticsDataStore: StatisticsDataStore, weightedRandomizer: WeightedRandomizer): VariantManager = ExperimentationVariantManager(statisticsDataStore, weightedRandomizer)
+    @Singleton
+    fun variantManager(statisticsDataStore: StatisticsDataStore, weightedRandomizer: WeightedRandomizer): VariantManager =
+        ExperimentationVariantManager(statisticsDataStore, weightedRandomizer)
 
     @Provides
     fun weightedRandomizer() = WeightedRandomizer()
