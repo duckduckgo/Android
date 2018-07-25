@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.statistics.pixels
 
+import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.PixelService
 import com.duckduckgo.app.statistics.model.Atb
@@ -38,13 +39,13 @@ interface Pixel {
 
 }
 
-class ApiBasedPixel @Inject constructor(private val api: PixelService, private val statisticsDataStore: StatisticsDataStore, private val variantManager: VariantManager) : Pixel {
+class ApiBasedPixel @Inject constructor(private val api: PixelService, private val statisticsDataStore: StatisticsDataStore, private val variantManager: VariantManager, private val deviceInfo: DeviceInfo) : Pixel {
 
     override fun fire(pixel: Pixel.PixelName) {
 
         val atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
 
-        api.fire(pixel.pixelName, atb)
+        api.fire(pixel.pixelName, atb, deviceInfo.formFactor().description)
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     Timber.v("Pixel sent: ${pixel.pixelName}")

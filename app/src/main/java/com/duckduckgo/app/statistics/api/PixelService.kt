@@ -26,7 +26,7 @@ import retrofit2.http.Query
 interface PixelService {
 
     // We don't have tablet specific UI at all on Android yet, so form factor is irrelevant, thus default to phone
-    @GET("/t/{pixelName}?p=android&f=phone")
-    fun fire(@Path("pixelName") pixelName: String, @Query(AppUrl.ParamKey.ATB) atb: String) : Completable
+    @GET("/t/{pixelName}?p=android")
+    fun fire(@Path("pixelName") pixelName: String, @Query(AppUrl.ParamKey.ATB) atb: String,  @Query(AppUrl.ParamKey.FORM_FACTOR) formFactor: String) : Completable
 
 }

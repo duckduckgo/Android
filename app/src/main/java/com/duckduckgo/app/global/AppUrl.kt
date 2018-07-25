@@ -33,6 +33,7 @@ class AppUrl {
         const val SOURCE = "t"
         const val ATB = "atb"
         const val RETENTION_ATB = "set_atb"
+        const val FORM_FACTOR = "f"
     }
 
     object ParamValue {

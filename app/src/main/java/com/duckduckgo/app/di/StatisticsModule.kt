@@ -16,8 +16,11 @@
 
 package com.duckduckgo.app.di
 
+import android.content.Context
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.api.ApiRequestInterceptor
+import com.duckduckgo.app.global.device.ContextDeviceInfo
+import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.PixelService
 import com.duckduckgo.app.statistics.api.StatisticsRequester
@@ -50,6 +53,9 @@ class StatisticsModule {
     }
 
     @Provides
-    fun pixel(pixelService: PixelService, statisticsDataStore: StatisticsDataStore, variantManager: VariantManager) : Pixel = ApiBasedPixel(pixelService, statisticsDataStore, variantManager)
+    fun deviceInfo(context: Context) : DeviceInfo = ContextDeviceInfo(context)
+
+    @Provides
+    fun pixel(pixelService: PixelService, statisticsDataStore: StatisticsDataStore, variantManager: VariantManager, deviceInfo: DeviceInfo) : Pixel = ApiBasedPixel(pixelService, statisticsDataStore, variantManager, deviceInfo)
 
 }

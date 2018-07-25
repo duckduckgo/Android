@@ -18,6 +18,7 @@ package com.duckduckgo.app.di
 
 import android.app.Application
 import android.content.Context
+import com.duckduckgo.app.global.device.DeviceInfo
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton
