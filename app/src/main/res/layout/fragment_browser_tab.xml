@@ -53,6 +53,8 @@
         tools:listitem="@layout/item_autocomplete_suggestion"
         tools:visibility="visible" />
 
+    <include layout="@layout/include_new_browser_tab" />
+
     <android.support.constraint.ConstraintLayout
         android:id="@+id/browserLayout"
         android:layout_width="match_parent"
@@ -84,7 +86,5 @@
             android:focusableInTouchMode="true" />
 
     </android.support.constraint.ConstraintLayout>
-
-    <include layout="@layout/include_new_browser_tab" />
 
 </android.support.design.widget.CoordinatorLayout>

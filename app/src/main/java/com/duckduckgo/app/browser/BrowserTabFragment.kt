@@ -839,10 +839,8 @@ class BrowserTabFragment : Fragment(), FindListener {
                 lastSeenGlobalViewState = viewState
 
                 if (viewState.isNewTabState) {
-                    newTabLayout.show()
                     browserLayout.hide()
                 } else {
-                    newTabLayout.hide()
                     browserLayout.show()
                 }
             }
