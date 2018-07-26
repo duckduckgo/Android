@@ -1,5 +1,5 @@
 #include <jni.h>
-#include "ad-block/ad_block_client.h"
+#include "third-party/ad-block/ad_block_client.h"
 
 extern "C"
 JNIEXPORT jlong

@@ -1,5 +1,5 @@
 #include <jni.h>
-#include "https/BloomFilter.hpp"
+#include "third-party/bloom_cpp/src/BloomFilter.hpp"
 
 extern "C"
 JNIEXPORT long
