@@ -23,12 +23,11 @@ import org.junit.Test
 class VariantManagerTest {
 
     private val variants = VariantManager.ACTIVE_VARIANTS
-    private val totalWeight = variants.sumByDouble { it.weight }
 
     @Test
     fun onboardingOnlyVariantConfiguredCorrectly() {
         val variant = variants.firstOrNull { it.key == "ms" }
-        assertEqualsDouble( 0.20, variant!!.weight / totalWeight)
+        assertEqualsDouble( 1.0, variant!!.weight)
         assertTrue(variant.hasFeature(ShowInOnboarding))
         assertEquals(1, variant.features.size)
     }
@@ -36,7 +35,7 @@ class VariantManagerTest {
     @Test
     fun homeScreenCallToActionVariantConfiguredCorrectly() {
         val variant = variants.firstOrNull { it.key == "mt" }
-        assertEqualsDouble( 0.20, variant!!.weight / totalWeight)
+        assertEqualsDouble( 1.0, variant!!.weight)
         assertTrue(variant.hasFeature(ShowHomeScreenCallToAction))
         assertEquals(1, variant.features.size)
     }
@@ -44,7 +43,7 @@ class VariantManagerTest {
     @Test
     fun showBannerVariantConfiguredCorrectly() {
         val variant = variants.firstOrNull { it.key == "mu" }
-        assertEqualsDouble( 0.20, variant!!.weight / totalWeight)
+        assertEqualsDouble( 1.0, variant!!.weight)
         assertTrue(variant.hasFeature(ShowBanner))
         assertEquals(1, variant.features.size)
     }
@@ -52,7 +51,7 @@ class VariantManagerTest {
     @Test
     fun showBannerAndShowHomeScreenCallToActionVariantConfiguredCorrectly() {
         val variant = variants.firstOrNull { it.key == "mv" }
-        assertEqualsDouble( 0.20, variant!!.weight / totalWeight)
+        assertEqualsDouble( 1.0, variant!!.weight)
         assertTrue(variant.hasFeature(ShowBanner))
         assertTrue(variant.hasFeature(ShowHomeScreenCallToAction))
         assertEquals(2, variant.features.size)
@@ -61,7 +60,21 @@ class VariantManagerTest {
     @Test
     fun controlVariantConfiguredCorrectly() {
         val variant = variants.firstOrNull { it.key == "my" }
-        assertEqualsDouble( 0.2, variant!!.weight / totalWeight)
+        assertEqualsDouble( 1.0, variant!!.weight)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun serpVariantAConfiguredCorrectly() {
+        val variant = variants.firstOrNull { it.key == "sa" }
+        assertEqualsDouble( 1.0, variant!!.weight)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun serpVariantBConfiguredCorrectly() {
+        val variant = variants.firstOrNull { it.key == "sb" }
+        assertEqualsDouble( 1.0, variant!!.weight)
         assertEquals(0, variant.features.size)
     }
 
