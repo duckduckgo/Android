@@ -91,8 +91,8 @@ class PrivacyDashboardViewModelTest {
     @Test
     fun whenPrivacyInitiallyOnAndSwitchedOffThenShouldReloadIsTrue() {
         whenever(settingStore.privacyOn)
-                .thenReturn(true)
-                .thenReturn(false)
+            .thenReturn(true)
+            .thenReturn(false)
         assertTrue(testee.viewState.value!!.shouldReloadPage)
     }
 
@@ -105,8 +105,8 @@ class PrivacyDashboardViewModelTest {
     @Test
     fun whenPrivacyInitiallyOffAndSwitchedOnThenShouldReloadIsTrue() {
         whenever(settingStore.privacyOn)
-                .thenReturn(false)
-                .thenReturn(true)
+            .thenReturn(false)
+            .thenReturn(true)
         assertTrue(testee.viewState.value!!.shouldReloadPage)
     }
 
@@ -203,12 +203,14 @@ class PrivacyDashboardViewModelTest {
         assertFalse(viewState.showTrackerNetworkLeaderboard)
     }
 
-    private fun site(https: HttpsStatus = HttpsStatus.SECURE,
-                     trackerCount: Int = 0,
-                     networkCount: Int = 0,
-                     hasTrackerFromMajorNetwork: Boolean = false,
-                     allTrackersBlocked: Boolean = true,
-                     terms: TermsOfService = TermsOfService()): Site {
+    private fun site(
+        https: HttpsStatus = HttpsStatus.SECURE,
+        trackerCount: Int = 0,
+        networkCount: Int = 0,
+        hasTrackerFromMajorNetwork: Boolean = false,
+        allTrackersBlocked: Boolean = true,
+        terms: TermsOfService = TermsOfService()
+    ): Site {
         val site: Site = mock()
         whenever(site.https).thenReturn(https)
         whenever(site.trackerCount).thenReturn(trackerCount)

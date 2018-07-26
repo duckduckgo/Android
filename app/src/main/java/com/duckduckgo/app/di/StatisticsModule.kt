@@ -44,18 +44,23 @@ class StatisticsModule {
     fun statisticsService(@Named("api") retrofit: Retrofit): StatisticsService = retrofit.create(StatisticsService::class.java)
 
     @Provides
-    fun statisticsUpdater(statisticsDataStore: StatisticsDataStore, statisticsService: StatisticsService, variantManager: VariantManager) : StatisticsUpdater =
+    fun statisticsUpdater(
+        statisticsDataStore: StatisticsDataStore,
+        statisticsService: StatisticsService,
+        variantManager: VariantManager
+    ): StatisticsUpdater =
         StatisticsRequester(statisticsDataStore, statisticsService, variantManager)
 
     @Provides
-    fun pixelService(@Named("pixel") okHttpClient: OkHttpClient, @Named("pixel") retrofit: Retrofit) : PixelService {
+    fun pixelService(@Named("pixel") okHttpClient: OkHttpClient, @Named("pixel") retrofit: Retrofit): PixelService {
         return retrofit.create(PixelService::class.java)
     }
 
     @Provides
-    fun deviceInfo(context: Context) : DeviceInfo = ContextDeviceInfo(context)
+    fun deviceInfo(context: Context): DeviceInfo = ContextDeviceInfo(context)
 
     @Provides
-    fun pixel(pixelService: PixelService, statisticsDataStore: StatisticsDataStore, variantManager: VariantManager, deviceInfo: DeviceInfo) : Pixel = ApiBasedPixel(pixelService, statisticsDataStore, variantManager, deviceInfo)
+    fun pixel(pixelService: PixelService, statisticsDataStore: StatisticsDataStore, variantManager: VariantManager, deviceInfo: DeviceInfo): Pixel =
+        ApiBasedPixel(pixelService, statisticsDataStore, variantManager, deviceInfo)
 
 }

@@ -21,7 +21,6 @@ import javax.inject.Inject
 import android.util.TypedValue
 
 
-
 interface DeviceInfo {
 
     enum class FormFactor(val description: String) {
@@ -31,11 +30,11 @@ interface DeviceInfo {
 
     }
 
-    fun formFactor() : FormFactor
+    fun formFactor(): FormFactor
 
 }
 
-class ContextDeviceInfo @Inject constructor (private val context: Context) : DeviceInfo {
+class ContextDeviceInfo @Inject constructor(private val context: Context) : DeviceInfo {
 
     override fun formFactor(): DeviceInfo.FormFactor {
         val metrics = context.resources.displayMetrics

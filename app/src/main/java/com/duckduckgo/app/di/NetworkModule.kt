@@ -53,9 +53,9 @@ class NetworkModule {
     fun apiOkHttpClient(context: Context, apiRequestInterceptor: ApiRequestInterceptor): OkHttpClient {
         val cache = Cache(context.cacheDir, CACHE_SIZE)
         return OkHttpClient.Builder()
-                .addInterceptor(apiRequestInterceptor)
-                .cache(cache)
-                .build()
+            .addInterceptor(apiRequestInterceptor)
+            .cache(cache)
+            .build()
     }
 
     @Provides
@@ -63,8 +63,8 @@ class NetworkModule {
     @Named("pixel")
     fun pixelOkHttpClient(apiRequestInterceptor: ApiRequestInterceptor): OkHttpClient {
         return OkHttpClient.Builder()
-                .addInterceptor(apiRequestInterceptor)
-                .build()
+            .addInterceptor(apiRequestInterceptor)
+            .build()
     }
 
     @Provides
@@ -72,11 +72,11 @@ class NetworkModule {
     @Named("api")
     fun apiRetrofit(@Named("api") okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit.Builder()
-                .baseUrl(Url.API)
-                .client(okHttpClient)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(MoshiConverterFactory.create(moshi))
-                .build()
+            .baseUrl(Url.API)
+            .client(okHttpClient)
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
     }
 
     @Provides
@@ -84,10 +84,10 @@ class NetworkModule {
     @Named("pixel")
     fun pixelRetrofit(@Named("pixel") okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-                .baseUrl(Url.PIXEL)
-                .client(okHttpClient)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build()
+            .baseUrl(Url.PIXEL)
+            .client(okHttpClient)
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .build()
     }
 
     @Provides
@@ -97,15 +97,15 @@ class NetworkModule {
 
     @Provides
     fun trackerListService(@Named("api") retrofit: Retrofit): TrackerListService =
-            retrofit.create(TrackerListService::class.java)
+        retrofit.create(TrackerListService::class.java)
 
     @Provides
     fun httpsUpgradeListService(@Named("api") retrofit: Retrofit): HttpsUpgradeListService =
-            retrofit.create(HttpsUpgradeListService::class.java)
+        retrofit.create(HttpsUpgradeListService::class.java)
 
     @Provides
     fun autoCompleteService(@Named("api") retrofit: Retrofit): AutoCompleteService =
-            retrofit.create(AutoCompleteService::class.java)
+        retrofit.create(AutoCompleteService::class.java)
 
     @Provides
     fun surrogatesService(@Named("api") retrofit: Retrofit): ResourceSurrogateListService =
@@ -121,9 +121,11 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun appConfigurationSyncer(jobBuilder: JobBuilder,
-                               jobScheduler: JobScheduler,
-                               appConfigurationDownloader: ConfigurationDownloader): AppConfigurationSyncer {
+    fun appConfigurationSyncer(
+        jobBuilder: JobBuilder,
+        jobScheduler: JobScheduler,
+        appConfigurationDownloader: ConfigurationDownloader
+    ): AppConfigurationSyncer {
         return AppConfigurationSyncer(jobBuilder, jobScheduler, appConfigurationDownloader)
     }
 
