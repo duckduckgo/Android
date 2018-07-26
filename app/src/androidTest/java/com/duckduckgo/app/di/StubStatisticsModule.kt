@@ -42,8 +42,8 @@ class StubStatisticsModule {
     }
 
     @Provides
-    fun stubPixel() : Pixel {
-        return object: Pixel {
+    fun stubPixel(): Pixel {
+        return object : Pixel {
             override fun fire(pixel: Pixel.PixelName) {
             }
         }

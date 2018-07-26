@@ -38,19 +38,24 @@ interface Pixel {
 
 }
 
-class ApiBasedPixel @Inject constructor(private val api: PixelService, private val statisticsDataStore: StatisticsDataStore, private val variantManager: VariantManager, private val deviceInfo: DeviceInfo) : Pixel {
+class ApiBasedPixel @Inject constructor(
+    private val api: PixelService,
+    private val statisticsDataStore: StatisticsDataStore,
+    private val variantManager: VariantManager,
+    private val deviceInfo: DeviceInfo
+) : Pixel {
 
     override fun fire(pixel: Pixel.PixelName) {
 
         val atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
 
         api.fire(pixel.pixelName, deviceInfo.formFactor().description, atb)
-                .subscribeOn(Schedulers.io())
-                .subscribe({
-                    Timber.v("Pixel sent: ${pixel.pixelName}")
-                }, {
-                    Timber.w("Pixel failed: ${pixel.pixelName}", it)
-                })
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                Timber.v("Pixel sent: ${pixel.pixelName}")
+            }, {
+                Timber.w("Pixel failed: ${pixel.pixelName}", it)
+            })
 
     }
 

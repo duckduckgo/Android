@@ -134,9 +134,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     protected open fun configureDependencyInjection() {
         DaggerAppComponent.builder()
-                .application(this)
-                .create(this)
-                .inject(this)
+            .application(this)
+            .create(this)
+            .inject(this)
     }
 
     private fun initializeStatistics() {
@@ -151,11 +151,11 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
      */
     private fun configureDataDownloader() {
         appConfigurationSyncer.scheduleImmediateSync()
-                .subscribeOn(Schedulers.io())
-                .doAfterTerminate({
-                    appConfigurationSyncer.scheduleRegularSync(this)
-                })
-                .subscribe({}, { Timber.w("Failed to download initial app configuration ${it.localizedMessage}") })
+            .subscribeOn(Schedulers.io())
+            .doAfterTerminate({
+                appConfigurationSyncer.scheduleRegularSync(this)
+            })
+            .subscribe({}, { Timber.w("Failed to download initial app configuration ${it.localizedMessage}") })
     }
 
     override fun activityInjector(): AndroidInjector<Activity> = activityInjector

@@ -95,7 +95,7 @@ class PrivacyDashboardViewModel(
         )
     }
 
-    private fun showTrackerNetworkLeaderboard (domainCount: Int, networkCount: Int): Boolean {
+    private fun showTrackerNetworkLeaderboard(domainCount: Int, networkCount: Int): Boolean {
         return domainCount > LEADERNOARD_MIN_DOMAINS_EXCLUSIVE && networkCount >= LEADERBOARD_MIN_NETWORKS
     }
 
@@ -110,30 +110,30 @@ class PrivacyDashboardViewModel(
 
     private fun resetViewState() {
         viewState.value = ViewState(
-                domain = "",
-                beforeGrade = PrivacyGrade.UNKNOWN,
-                afterGrade = PrivacyGrade.UNKNOWN,
-                httpsStatus = HttpsStatus.SECURE,
-                networkCount = 0,
-                allTrackersBlocked = true,
-                toggleEnabled = settingsStore.privacyOn,
-                practices = TermsOfService.Practices.UNKNOWN,
-                showTrackerNetworkLeaderboard = false,
-                domainsVisited = 0,
-                trackerNetworkTally = emptyList(),
-                shouldReloadPage = shouldReloadPage
+            domain = "",
+            beforeGrade = PrivacyGrade.UNKNOWN,
+            afterGrade = PrivacyGrade.UNKNOWN,
+            httpsStatus = HttpsStatus.SECURE,
+            networkCount = 0,
+            allTrackersBlocked = true,
+            toggleEnabled = settingsStore.privacyOn,
+            practices = TermsOfService.Practices.UNKNOWN,
+            showTrackerNetworkLeaderboard = false,
+            domainsVisited = 0,
+            trackerNetworkTally = emptyList(),
+            shouldReloadPage = shouldReloadPage
         )
     }
 
     private fun updateSite(site: Site) {
         viewState.value = viewState.value?.copy(
-                domain = site.uri?.host ?: "",
-                beforeGrade = site.grade,
-                afterGrade = site.improvedGrade,
-                httpsStatus = site.https,
-                networkCount = site.networkCount,
-                allTrackersBlocked = site.allTrackersBlocked,
-                practices = site.termsOfService.practices
+            domain = site.uri?.host ?: "",
+            beforeGrade = site.grade,
+            afterGrade = site.improvedGrade,
+            httpsStatus = site.https,
+            networkCount = site.networkCount,
+            allTrackersBlocked = site.allTrackersBlocked,
+            practices = site.termsOfService.practices
         )
     }
 
@@ -141,8 +141,8 @@ class PrivacyDashboardViewModel(
         if (enabled != viewState.value?.toggleEnabled) {
             settingsStore.privacyOn = enabled
             viewState.value = viewState.value?.copy(
-                    toggleEnabled = enabled,
-                    shouldReloadPage = shouldReloadPage
+                toggleEnabled = enabled,
+                shouldReloadPage = shouldReloadPage
             )
         }
     }
