@@ -19,7 +19,6 @@ package com.duckduckgo.app.statistics.pixels
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.PixelService
-import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
@@ -45,7 +44,7 @@ class ApiBasedPixel @Inject constructor(private val api: PixelService, private v
 
         val atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
 
-        api.fire(pixel.pixelName, atb, deviceInfo.formFactor().description)
+        api.fire(pixel.pixelName, deviceInfo.formFactor().description, atb)
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     Timber.v("Pixel sent: ${pixel.pixelName}")

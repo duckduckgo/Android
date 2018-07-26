@@ -60,7 +60,7 @@ class ApiBasedPixelTest {
         val pixel = ApiBasedPixel(mockPixelService, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo)
         pixel.fire(PRIVACY_DASHBOARD_OPENED)
 
-        verify(mockPixelService).fire("mp", "atbvariant", "phone")
+        verify(mockPixelService).fire("mp", "phone", "atbvariant")
     }
 
     @Test
@@ -73,7 +73,7 @@ class ApiBasedPixelTest {
         val pixel = ApiBasedPixel(mockPixelService, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo)
         pixel.fire(FORGET_ALL_EXECUTED)
 
-        verify(mockPixelService).fire("mf", "atb", "phone")
+        verify(mockPixelService).fire("mf", "phone", "atb")
     }
 
     @Test
@@ -84,7 +84,7 @@ class ApiBasedPixelTest {
         val pixel = ApiBasedPixel(mockPixelService, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo)
         pixel.fire(APP_LAUNCH)
 
-        verify(mockPixelService).fire("ml", "", "tablet")
+        verify(mockPixelService).fire("ml", "tablet", "")
     }
 
     @Test
@@ -95,7 +95,7 @@ class ApiBasedPixelTest {
         val pixel = ApiBasedPixel(mockPixelService, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo)
         pixel.fire(APP_LAUNCH)
 
-        verify(mockPixelService).fire("ml", "", "phone")
+        verify(mockPixelService).fire("ml", "phone", "")
     }
 
 }

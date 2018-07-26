@@ -18,7 +18,6 @@ package com.duckduckgo.app.statistics.api
 
 import com.duckduckgo.app.global.AppUrl
 import io.reactivex.Completable
-import okhttp3.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -26,7 +25,7 @@ import retrofit2.http.Query
 interface PixelService {
 
     // We don't have tablet specific UI at all on Android yet, so form factor is irrelevant, thus default to phone
-    @GET("/t/{pixelName}?p=android")
-    fun fire(@Path("pixelName") pixelName: String, @Query(AppUrl.ParamKey.ATB) atb: String,  @Query(AppUrl.ParamKey.FORM_FACTOR) formFactor: String) : Completable
+    @GET("/t/{pixelName}_android_{formFactor}")
+    fun fire(@Path("pixelName") pixelName: String, @Path("formFactor") formFactor: String, @Query(AppUrl.ParamKey.ATB) atb: String) : Completable
 
 }
