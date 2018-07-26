@@ -33,8 +33,6 @@ import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.privacy.renderer.*
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.ViewState
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
 import kotlinx.android.synthetic.main.content_privacy_dashboard.*
@@ -44,9 +42,10 @@ import javax.inject.Inject
 
 class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
-    @Inject lateinit var viewModelFactory: ViewModelFactory
-    @Inject lateinit var repository: TabRepository
-    @Inject lateinit var pixel: Pixel
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    @Inject
+    lateinit var repository: TabRepository
     private val trackersRenderer = TrackersRenderer()
     private val upgradeRenderer = PrivacyUpgradeRenderer()
 
@@ -57,7 +56,6 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_privacy_dashboard)
-        pixel.fire(PRIVACY_DASHBOARD_OPENED)
         configureToolbar()
 
         viewModel.viewState.observe(this, Observer<ViewState> {

@@ -26,10 +26,13 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao.NetworkTally
 import com.duckduckgo.app.privacy.model.*
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 
 class PrivacyDashboardViewModel(
     private val settingsStore: PrivacySettingsStore,
-    networkLeaderboardDao: NetworkLeaderboardDao
+    networkLeaderboardDao: NetworkLeaderboardDao,
+    pixel: Pixel
 ) : ViewModel() {
 
     data class ViewState(
@@ -61,6 +64,7 @@ class PrivacyDashboardViewModel(
         get() = privacyInitiallyOn != settingsStore.privacyOn
 
     init {
+        pixel.fire(PRIVACY_DASHBOARD_OPENED)
         resetViewState()
         domainsVisited.observeForever(domainsVisitedObserver)
         trackerNetworkTally.observeForever(trackerNetworkActivityObserver)

@@ -46,6 +46,7 @@ import com.duckduckgo.app.settings.SettingsViewModel
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel
 import javax.inject.Inject
@@ -70,9 +71,10 @@ class ViewModelFactory @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val variantManager: VariantManager,
     private val feedbackSender: FeedbackSender,
-    private val webViewSessionStorage: WebViewSessionStorage
+    private val webViewSessionStorage: WebViewSessionStorage,
+    private val pixel: Pixel
 
-) : ViewModelProvider.NewInstanceFactory() {
+    ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
             with(modelClass) {
@@ -82,7 +84,7 @@ class ViewModelFactory @Inject constructor(
                     isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository, queryUrlConverter)
                     isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
                     isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository, webViewSessionStorage)
-                    isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(privacySettingsStore, networkLeaderboardDao)
+                    isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(privacySettingsStore, networkLeaderboardDao, pixel)
                     isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                     isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                     isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
