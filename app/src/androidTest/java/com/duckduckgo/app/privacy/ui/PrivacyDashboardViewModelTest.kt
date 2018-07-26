@@ -26,7 +26,10 @@ import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.TermsOfService
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.After
 import org.junit.Assert.*
@@ -45,9 +48,10 @@ class PrivacyDashboardViewModelTest {
     private var networkLeaderboard: NetworkLeaderboardDao = mock()
     private var networkTallyLiveData: LiveData<List<NetworkTally>> = mock()
     private var domainsVisitedLiveData: LiveData<Int> = mock()
+    private var mockPixel: Pixel = mock()
 
     private val testee: PrivacyDashboardViewModel by lazy {
-        val model = PrivacyDashboardViewModel(settingStore, networkLeaderboard)
+        val model = PrivacyDashboardViewModel(settingStore, networkLeaderboard, mockPixel)
         model.viewState.observeForever(viewStateObserver)
         model
     }
@@ -64,6 +68,12 @@ class PrivacyDashboardViewModelTest {
     fun after() {
         testee.viewState.removeObserver(viewStateObserver)
         testee.onCleared()
+    }
+
+    @Test
+    fun whenViewModelInitialisedThenPixelIsFired() {
+        testee // init
+        verify(mockPixel).fire(PRIVACY_DASHBOARD_OPENED)
     }
 
     @Test
