@@ -27,13 +27,13 @@ class BloomFilterTest {
     private lateinit var testee: BloomFilter
 
     @Test
-    fun whenBloomFilterEmptyContainsIsFalse() {
+    fun whenBloomFilterEmptyThenContainsIsFalse() {
         testee = BloomFilter(1000, TARGET_FALSE_POSITIVE_RATE)
         assertFalse(testee.contains("abc"))
     }
 
     @Test
-    fun whenBloomFilterContainsElementContainsIsTrue() {
+    fun whenBloomFilterContainsElementThenContainsIsTrue() {
         testee = BloomFilter(1000, TARGET_FALSE_POSITIVE_RATE)
         testee.add("abc")
         assertTrue(testee.contains("abc"))
