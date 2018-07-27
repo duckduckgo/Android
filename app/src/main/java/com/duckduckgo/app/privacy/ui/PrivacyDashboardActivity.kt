@@ -42,8 +42,10 @@ import javax.inject.Inject
 
 class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
-    @Inject lateinit var viewModelFactory: ViewModelFactory
-    @Inject lateinit var repository: TabRepository
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    @Inject
+    lateinit var repository: TabRepository
     private val trackersRenderer = TrackersRenderer()
     private val upgradeRenderer = PrivacyUpgradeRenderer()
 

@@ -24,10 +24,13 @@ import android.webkit.WebStorage
 import android.webkit.WebView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.WebDataManager
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import kotlinx.android.synthetic.main.sheet_fire_clear_data.*
 
 class FireDialog(
     context: Context,
+    pixel: Pixel,
     webDataManager: WebDataManager,
     clearStarted: (() -> Unit),
     clearComplete: (() -> Unit)
@@ -38,6 +41,7 @@ class FireDialog(
         setContentView(contentView)
         clearAllOption.setOnClickListener {
             clearStarted()
+            pixel.fire(FORGET_ALL_EXECUTED)
             webDataManager.clearData(WebView(context), WebStorage.getInstance(), context)
             webDataManager.clearWebViewSessions()
             webDataManager.clearExternalCookies(CookieManager.getInstance(), clearComplete)

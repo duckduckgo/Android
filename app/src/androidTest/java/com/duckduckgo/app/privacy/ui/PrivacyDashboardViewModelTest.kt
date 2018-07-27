@@ -26,7 +26,10 @@ import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.TermsOfService
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.After
 import org.junit.Assert.*
@@ -45,9 +48,10 @@ class PrivacyDashboardViewModelTest {
     private var networkLeaderboard: NetworkLeaderboardDao = mock()
     private var networkTallyLiveData: LiveData<List<NetworkTally>> = mock()
     private var domainsVisitedLiveData: LiveData<Int> = mock()
+    private var mockPixel: Pixel = mock()
 
     private val testee: PrivacyDashboardViewModel by lazy {
-        val model = PrivacyDashboardViewModel(settingStore, networkLeaderboard)
+        val model = PrivacyDashboardViewModel(settingStore, networkLeaderboard, mockPixel)
         model.viewState.observeForever(viewStateObserver)
         model
     }
@@ -67,6 +71,12 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
+    fun whenViewModelInitialisedThenPixelIsFired() {
+        testee // init
+        verify(mockPixel).fire(PRIVACY_DASHBOARD_OPENED)
+    }
+
+    @Test
     fun whenNoDataThenDefaultValuesAreUsed() {
         val viewState = testee.viewState.value!!
         assertEquals("", viewState.domain)
@@ -81,8 +91,8 @@ class PrivacyDashboardViewModelTest {
     @Test
     fun whenPrivacyInitiallyOnAndSwitchedOffThenShouldReloadIsTrue() {
         whenever(settingStore.privacyOn)
-                .thenReturn(true)
-                .thenReturn(false)
+            .thenReturn(true)
+            .thenReturn(false)
         assertTrue(testee.viewState.value!!.shouldReloadPage)
     }
 
@@ -95,8 +105,8 @@ class PrivacyDashboardViewModelTest {
     @Test
     fun whenPrivacyInitiallyOffAndSwitchedOnThenShouldReloadIsTrue() {
         whenever(settingStore.privacyOn)
-                .thenReturn(false)
-                .thenReturn(true)
+            .thenReturn(false)
+            .thenReturn(true)
         assertTrue(testee.viewState.value!!.shouldReloadPage)
     }
 
@@ -193,12 +203,14 @@ class PrivacyDashboardViewModelTest {
         assertFalse(viewState.showTrackerNetworkLeaderboard)
     }
 
-    private fun site(https: HttpsStatus = HttpsStatus.SECURE,
-                     trackerCount: Int = 0,
-                     networkCount: Int = 0,
-                     hasTrackerFromMajorNetwork: Boolean = false,
-                     allTrackersBlocked: Boolean = true,
-                     terms: TermsOfService = TermsOfService()): Site {
+    private fun site(
+        https: HttpsStatus = HttpsStatus.SECURE,
+        trackerCount: Int = 0,
+        networkCount: Int = 0,
+        hasTrackerFromMajorNetwork: Boolean = false,
+        allTrackersBlocked: Boolean = true,
+        terms: TermsOfService = TermsOfService()
+    ): Site {
         val site: Site = mock()
         whenever(site.https).thenReturn(https)
         whenever(site.trackerCount).thenReturn(trackerCount)
