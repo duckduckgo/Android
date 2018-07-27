@@ -23,17 +23,18 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.GET
 
+// TODO update to final urls
 interface HttpsUpgradeService {
 
-    // TODO final url
-    @GET("https://staticcdn.duckduckgo.com/https/https-whitelist-test.json")
+    //@GET("https://staticcdn.duckduckgo.com/https/https-mobile-whitelist.json")
+    @GET("http://192.168.86.132:8000/https-mobile-whitelist.json")
     fun whitelist(): Call<List<HttpsWhitelistedDomain>>
 
-    // TODO final url
-    @GET("http://192.168.86.132:8000/response.json")
+    //@GET("https://staticcdn.duckduckgo.com/https/https-mobile-bloom-spec.json")
+    @GET("http://192.168.86.132:8000/https-mobile-bloom-spec.json")
     fun httpsBloomFilterSpec(): Observable<HttpsBloomFilterSpec>
 
-    // TODO final url
-    @GET("http://192.168.86.132:8000/https_bloom_filter.bin")
+    //@GET("https://staticcdn.duckduckgo.com/https/https-mobile-bloom.bin")
+    @GET("http://192.168.86.132:8000/https-mobile-bloom.bin")
     fun httpsBloomFilter(): Call<ResponseBody>
 }
