@@ -27,7 +27,7 @@ class VariantManagerTest {
     @Test
     fun onboardingOnlyVariantConfiguredCorrectly() {
         val variant = variants.firstOrNull { it.key == "ms" }
-        assertEqualsDouble( 1.0, variant!!.weight)
+        assertEqualsDouble(1.0, variant!!.weight)
         assertTrue(variant.hasFeature(ShowInOnboarding))
         assertEquals(1, variant.features.size)
     }
@@ -35,7 +35,7 @@ class VariantManagerTest {
     @Test
     fun homeScreenCallToActionVariantConfiguredCorrectly() {
         val variant = variants.firstOrNull { it.key == "mt" }
-        assertEqualsDouble( 1.0, variant!!.weight)
+        assertEqualsDouble(1.0, variant!!.weight)
         assertTrue(variant.hasFeature(ShowHomeScreenCallToAction))
         assertEquals(1, variant.features.size)
     }
@@ -43,7 +43,7 @@ class VariantManagerTest {
     @Test
     fun showBannerVariantConfiguredCorrectly() {
         val variant = variants.firstOrNull { it.key == "mu" }
-        assertEqualsDouble( 1.0, variant!!.weight)
+        assertEqualsDouble(1.0, variant!!.weight)
         assertTrue(variant.hasFeature(ShowBanner))
         assertEquals(1, variant.features.size)
     }
@@ -51,7 +51,7 @@ class VariantManagerTest {
     @Test
     fun showBannerAndShowHomeScreenCallToActionVariantConfiguredCorrectly() {
         val variant = variants.firstOrNull { it.key == "mv" }
-        assertEqualsDouble( 1.0, variant!!.weight)
+        assertEqualsDouble(1.0, variant!!.weight)
         assertTrue(variant.hasFeature(ShowBanner))
         assertTrue(variant.hasFeature(ShowHomeScreenCallToAction))
         assertEquals(2, variant.features.size)
@@ -60,27 +60,27 @@ class VariantManagerTest {
     @Test
     fun controlVariantConfiguredCorrectly() {
         val variant = variants.firstOrNull { it.key == "my" }
-        assertEqualsDouble( 1.0, variant!!.weight)
+        assertEqualsDouble(1.0, variant!!.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
     fun serpVariantAConfiguredCorrectly() {
         val variant = variants.firstOrNull { it.key == "sa" }
-        assertEqualsDouble( 1.0, variant!!.weight)
+        assertEqualsDouble(1.0, variant!!.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
     fun serpVariantBConfiguredCorrectly() {
         val variant = variants.firstOrNull { it.key == "sb" }
-        assertEqualsDouble( 1.0, variant!!.weight)
+        assertEqualsDouble(1.0, variant!!.weight)
         assertEquals(0, variant.features.size)
     }
 
     private fun assertEqualsDouble(expected: Double, actual: Double) {
         val comparison = expected.compareTo(actual)
-        if(comparison != 0) {
+        if (comparison != 0) {
             fail("Doubles are not equal. Expected $expected but was $actual")
         }
     }
