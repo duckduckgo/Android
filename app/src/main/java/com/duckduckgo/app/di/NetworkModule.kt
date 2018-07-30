@@ -100,7 +100,7 @@ class NetworkModule {
         retrofit.create(TrackerListService::class.java)
 
     @Provides
-    fun httpsUpgradeService(retrofit: Retrofit): HttpsUpgradeService =
+    fun httpsUpgradeService(@Named("api") retrofit: Retrofit): HttpsUpgradeService =
         retrofit.create(HttpsUpgradeService::class.java)
 
     @Provides

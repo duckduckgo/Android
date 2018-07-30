@@ -24,13 +24,13 @@ import dagger.Provides
 class DaoModule {
 
     @Provides
-    fun provideHttpsWhitelistDao(database: AppDatabase) = database.httpsWhitelistedDao()
+    fun providesHttpsWhitelistDao(database: AppDatabase) = database.httpsWhitelistedDao()
 
     @Provides
     fun provideHttpsBloomFilterSpecDao(database: AppDatabase) = database.httpsBloomFilterSpecDao()
 
     @Provides
-    fun provideDisconnectTrackDao(database: AppDatabase) = database.trackerDataDao()
+    fun providesDisconnectTrackDao(database: AppDatabase) = database.trackerDataDao()
 
     @Provides
     fun providesNetworkLeaderboardDao(database: AppDatabase) = database.networkLeaderboardDao()
