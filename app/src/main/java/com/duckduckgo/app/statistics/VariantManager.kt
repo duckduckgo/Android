@@ -43,11 +43,15 @@ interface VariantManager {
         val DEFAULT_VARIANT = Variant(key = "", features = emptyList())
 
         val ACTIVE_VARIANTS = listOf(
-            Variant(key = "mq", weight = 1.0, features = listOf(ShowHomeScreenCallToActionSimpleButton)),
             Variant(key = "mp", weight = 1.0, features = listOf(ShowHomeScreenCallToActionBottomSheet)),
+            Variant(key = "mq", weight = 1.0, features = listOf(ShowHomeScreenCallToActionSimpleButton)),
 
             // control group
-            Variant(key = "mr", weight = 1.0, features = emptyList())
+            Variant(key = "mr", weight = 1.0, features = emptyList()),
+
+            // SERP variants - do not remove
+            Variant(key = "sa", weight = 1.0, features = emptyList()),
+            Variant(key = "sb", weight = 1.0, features = emptyList())
         )
     }
 

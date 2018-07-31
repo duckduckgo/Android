@@ -33,6 +33,8 @@ import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import org.jetbrains.anko.longToast
@@ -46,6 +48,9 @@ class BrowserActivity : DuckDuckGoActivity() {
     lateinit var viewModelFactory: ViewModelFactory
 
     @Inject
+    lateinit var pixel: Pixel
+
+    @Inject
     lateinit var webDataManager: WebDataManager
 
     private var currentTab: BrowserTabFragment? = null
@@ -57,9 +62,11 @@ class BrowserActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_browser)
+
         if (savedInstanceState == null) {
             launchNewSearchOrQuery(intent)
         }
+
         configureObservers()
     }
 
@@ -171,9 +178,10 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     fun launchFire() {
         FireDialog(context = this,
-            webDataManager = webDataManager,
-            clearStarted = { viewModel.onClearRequested() },
-            clearComplete = { viewModel.onClearComplete() }
+                pixel = pixel,
+                webDataManager = webDataManager,
+                clearStarted = { viewModel.onClearRequested() },
+                clearComplete = { viewModel.onClearComplete() }
         ).show()
     }
 
@@ -227,4 +235,5 @@ class BrowserActivity : DuckDuckGoActivity() {
         private const val NEW_SEARCH_EXTRA = "NEW_SEARCH_EXTRA"
         private const val DASHBOARD_REQUEST_CODE = 100
     }
+
 }

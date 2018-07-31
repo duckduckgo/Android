@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.app.statistics.api
 
-import android.app.Application
-import android.content.Context
-import com.duckduckgo.app.global.device.DeviceInfo
-import dagger.Binds
-import dagger.Module
-import javax.inject.Singleton
+import com.duckduckgo.app.global.AppUrl
+import io.reactivex.Completable
+import retrofit2.http.GET
+import retrofit2.http.Path
+import retrofit2.http.Query
 
+interface PixelService {
 
-@Module
-abstract class ApplicationModule {
-
-    @Singleton
-    @Binds
-    abstract fun bindContext(application: Application): Context
+    @GET("/t/{pixelName}_android_{formFactor}")
+    fun fire(@Path("pixelName") pixelName: String, @Path("formFactor") formFactor: String, @Query(AppUrl.ParamKey.ATB) atb: String): Completable
 
 }
