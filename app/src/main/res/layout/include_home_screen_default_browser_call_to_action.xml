@@ -24,7 +24,6 @@
     android:background="@drawable/new_tab_set_default_browser_button_background"
     android:foreground="@drawable/ripple_light"
     android:minHeight="56dp"
-    android:visibility="gone"
     android:clickable="true"
     android:focusable="true"
     app:layout_constraintBottom_toBottomOf="parent"
