@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser.defaultBrowsing
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToAction
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToActionSimpleButton
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Assert.assertFalse
@@ -78,6 +78,6 @@ class DefaultBrowserHomeScreenCallToActionTest {
         whenever(appInstallStore.hasUserDeclinedDefaultBrowserHomeScreenCallToActionPreviously()).thenReturn(previousDecline)
     }
 
-    private fun variantWithFeatureEnabled() = Variant("", 0.0, listOf(ShowHomeScreenCallToAction))
+    private fun variantWithFeatureEnabled() = Variant("", 0.0, listOf(ShowHomeScreenCallToActionSimpleButton))
     private fun variantWithFeatureDisabled() = Variant("", 0.0, listOf())
 }

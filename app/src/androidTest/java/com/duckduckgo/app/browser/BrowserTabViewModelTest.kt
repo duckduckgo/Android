@@ -45,6 +45,7 @@ import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabDataRepository
@@ -114,6 +115,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var webViewSessionStorage: WebViewSessionStorage
 
+    @Mock
+    private lateinit var variantManager: VariantManager
+
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
 
@@ -148,7 +152,8 @@ class BrowserTabViewModelTest {
             defaultBrowserDetector = mockDefaultBrowserDetector,
             longPressHandler = mockLongPressHandler,
             appConfigurationDao = appConfigurationDao,
-            webViewSessionStorage = webViewSessionStorage
+            webViewSessionStorage = webViewSessionStorage,
+            variantManager = variantManager
         )
 
         testee.loadData("abc", null)
