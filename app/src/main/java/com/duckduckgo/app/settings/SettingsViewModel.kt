@@ -21,11 +21,15 @@ import android.arch.lifecycle.ViewModel
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import timber.log.Timber
 import javax.inject.Inject
 
-class SettingsViewModel @Inject constructor(private val settingsDataStore: SettingsDataStore,
-        private val defaultWebBrowserCapability: DefaultBrowserDetector) : ViewModel() {
+class SettingsViewModel @Inject constructor(
+    private val settingsDataStore: SettingsDataStore,
+    private val defaultWebBrowserCapability: DefaultBrowserDetector,
+    private val variantManager: VariantManager
+) : ViewModel() {
 
     data class ViewState(
             val loading: Boolean = true,
@@ -54,11 +58,13 @@ class SettingsViewModel @Inject constructor(private val settingsDataStore: Setti
         val defaultBrowserAlready = defaultWebBrowserCapability.isCurrentlyConfiguredAsDefaultBrowser()
         Timber.i("Is already default browser? $defaultBrowserAlready")
 
+        val variantKey = variantManager.getVariant().key
+
         viewState.value = currentViewState.copy(loading = false,
                 autoCompleteSuggestionsEnabled = autoCompleteEnabled,
                 isAppDefaultBrowser = defaultBrowserAlready,
                 showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
-                version = obtainVersion())
+                version = obtainVersion(variantKey))
     }
 
     fun userRequestedToSendFeedback() {
@@ -69,7 +75,8 @@ class SettingsViewModel @Inject constructor(private val settingsDataStore: Setti
         Timber.i("User changed autocomplete setting, is now enabled: $checked")
         settingsDataStore.autoCompleteSuggestionsEnabled = checked
     }
-    private fun obtainVersion(): String {
-        return "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+    private fun obtainVersion(variantKey: String): String {
+        val version = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+        return "$version variant=($variantKey)"
     }
 }
