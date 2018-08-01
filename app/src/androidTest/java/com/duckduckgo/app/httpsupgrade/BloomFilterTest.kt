@@ -28,13 +28,13 @@ class BloomFilterTest {
 
     @Test
     fun whenBloomFilterEmptyThenContainsIsFalse() {
-        testee = BloomFilter(1000, TARGET_FALSE_POSITIVE_RATE)
+        testee = BloomFilter(FILTER_ELEMENT_COUNT, TARGET_FALSE_POSITIVE_RATE)
         assertFalse(testee.contains("abc"))
     }
 
     @Test
     fun whenBloomFilterContainsElementThenContainsIsTrue() {
-        testee = BloomFilter(1000, TARGET_FALSE_POSITIVE_RATE)
+        testee = BloomFilter(FILTER_ELEMENT_COUNT, TARGET_FALSE_POSITIVE_RATE)
         testee.add("abc")
         assertTrue(testee.contains("abc"))
     }
@@ -42,8 +42,8 @@ class BloomFilterTest {
     @Test
     fun whenBloomFilterContainsItemsThenLookupResultsAreWithinRange() {
 
-        val bloomData = createRandomStrings(1000)
-        val testData = bloomData + createRandomStrings(9000)
+        val bloomData = createRandomStrings(FILTER_ELEMENT_COUNT)
+        val testData = bloomData + createRandomStrings(ADDITIONAL_TEST_DATA_ELEMENT_COUNT)
 
         testee = BloomFilter(bloomData.size, TARGET_FALSE_POSITIVE_RATE)
         bloomData.forEach { testee.add(it) }
@@ -55,7 +55,7 @@ class BloomFilterTest {
                 bloomData.contains(element) && !result -> falseNegatives++
                 !bloomData.contains(element) && result -> falsePositives++
                 !bloomData.contains(element) && !result -> trueNegatives++
-                bloomData.contains(element) && result == true -> truePositives++
+                bloomData.contains(element) && result -> truePositives++
             }
         }
 
@@ -63,7 +63,7 @@ class BloomFilterTest {
         assertEquals(0, falseNegatives)
         assertEquals(bloomData.size, truePositives)
         assertTrue(trueNegatives <= testData.size - bloomData.size)
-        assertTrue(falsePositiveRate < ACCEPTABLE_FALSE_POSITIVE_RATE)
+        assertTrue(falsePositiveRate <= ACCEPTABLE_FALSE_POSITIVE_RATE)
     }
 
     private fun createRandomStrings(items: Int): ArrayList<String> {
@@ -73,6 +73,8 @@ class BloomFilterTest {
     }
 
     companion object {
+        const val FILTER_ELEMENT_COUNT = 1000
+        const val ADDITIONAL_TEST_DATA_ELEMENT_COUNT = 9000
         const val TARGET_FALSE_POSITIVE_RATE = 0.001
         const val ACCEPTABLE_FALSE_POSITIVE_RATE = TARGET_FALSE_POSITIVE_RATE * 1.1
     }
