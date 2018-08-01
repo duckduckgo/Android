@@ -19,12 +19,17 @@ package com.duckduckgo.app.di
 import android.app.job.JobScheduler
 import android.content.Context
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
+import com.duckduckgo.app.feedback.api.FeedbackSender
+import com.duckduckgo.app.feedback.api.FeedbackService
+import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.api.ApiRequestInterceptor
 import com.duckduckgo.app.global.job.JobBuilder
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeListService
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.job.ConfigurationDownloader
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.api.ResourceSurrogateListService
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
 import com.squareup.moshi.Moshi
@@ -35,6 +40,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
+import javax.inject.Named
 import javax.inject.Singleton
 
 
@@ -43,7 +49,8 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun okHttpClient(context: Context, apiRequestInterceptor: ApiRequestInterceptor): OkHttpClient {
+    @Named("api")
+    fun apiOkHttpClient(context: Context, apiRequestInterceptor: ApiRequestInterceptor): OkHttpClient {
         val cache = Cache(context.cacheDir, CACHE_SIZE)
         return OkHttpClient.Builder()
             .addInterceptor(apiRequestInterceptor)
@@ -53,7 +60,17 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun retrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+    @Named("pixel")
+    fun pixelOkHttpClient(apiRequestInterceptor: ApiRequestInterceptor): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(apiRequestInterceptor)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @Named("api")
+    fun apiRetrofit(@Named("api") okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Url.API)
             .client(okHttpClient)
@@ -63,32 +80,52 @@ class NetworkModule {
     }
 
     @Provides
+    @Singleton
+    @Named("pixel")
+    fun pixelRetrofit(@Named("pixel") okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(Url.PIXEL)
+            .client(okHttpClient)
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .build()
+    }
+
+    @Provides
     fun apiRequestInterceptor(context: Context): ApiRequestInterceptor {
         return ApiRequestInterceptor(context)
     }
 
     @Provides
-    fun trackerListService(retrofit: Retrofit): TrackerListService =
-            retrofit.create(TrackerListService::class.java)
+    fun trackerListService(@Named("api") retrofit: Retrofit): TrackerListService =
+        retrofit.create(TrackerListService::class.java)
 
     @Provides
-    fun httpsUpgradeListService(retrofit: Retrofit): HttpsUpgradeListService =
-            retrofit.create(HttpsUpgradeListService::class.java)
+    fun httpsUpgradeListService(@Named("api") retrofit: Retrofit): HttpsUpgradeListService =
+        retrofit.create(HttpsUpgradeListService::class.java)
 
     @Provides
-    fun autoCompleteService(retrofit: Retrofit): AutoCompleteService =
-            retrofit.create(AutoCompleteService::class.java)
+    fun autoCompleteService(@Named("api") retrofit: Retrofit): AutoCompleteService =
+        retrofit.create(AutoCompleteService::class.java)
 
     @Provides
-    fun surrogatesService(retrofit: Retrofit): ResourceSurrogateListService =
+    fun surrogatesService(@Named("api") retrofit: Retrofit): ResourceSurrogateListService =
         retrofit.create(ResourceSurrogateListService::class.java)
 
+    @Provides
+    fun feedbackService(@Named("api") retrofit: Retrofit): FeedbackService =
+        retrofit.create(FeedbackService::class.java)
+
+    @Provides
+    fun feedbackSender(statisticsStore: StatisticsDataStore, variantManager: VariantManager, feedbackSerice: FeedbackService): FeedbackSender =
+        FeedbackSubmitter(statisticsStore, variantManager, feedbackSerice)
 
     @Provides
     @Singleton
-    fun appConfigurationSyncer(jobBuilder: JobBuilder,
-                               jobScheduler: JobScheduler,
-                               appConfigurationDownloader: ConfigurationDownloader): AppConfigurationSyncer {
+    fun appConfigurationSyncer(
+        jobBuilder: JobBuilder,
+        jobScheduler: JobScheduler,
+        appConfigurationDownloader: ConfigurationDownloader
+    ): AppConfigurationSyncer {
         return AppConfigurationSyncer(jobBuilder, jobScheduler, appConfigurationDownloader)
     }
 

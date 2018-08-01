@@ -27,6 +27,7 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
+import com.duckduckgo.app.feedback.ui.FeedbackActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.intentText
@@ -34,6 +35,7 @@ import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import org.jetbrains.anko.longToast
@@ -49,6 +51,9 @@ class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
 
+    @Inject
+    lateinit var pixel: Pixel
+
     private var currentTab: BrowserTabFragment? = null
 
     private val viewModel: BrowserViewModel by lazy {
@@ -58,9 +63,11 @@ class BrowserActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_browser)
+
         if (savedInstanceState == null) {
             launchNewSearchOrQuery(intent)
         }
+
         configureObservers()
     }
 
@@ -179,7 +186,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchFire() {
-        val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction)
+        val dialog = FireDialog(context = this, pixel = pixel, clearPersonalDataAction = clearPersonalDataAction)
         dialog.clearStarted = {viewModel.onClearRequested()}
         dialog.clearComplete = { viewModel.onClearComplete()}
         dialog.show()
@@ -197,6 +204,10 @@ class BrowserActivity : DuckDuckGoActivity() {
         viewModel.onOpenInNewTabRequested(query)
     }
 
+    fun launchBrokenSiteFeedback(url: String?) {
+        startActivity(FeedbackActivity.intent(this, true, url))
+    }
+
     fun launchSettings() {
         startActivity(SettingsActivity.intent(this))
     }
@@ -204,7 +215,6 @@ class BrowserActivity : DuckDuckGoActivity() {
     fun launchBookmarks() {
         startActivity(BookmarksActivity.intent(this))
     }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == DASHBOARD_REQUEST_CODE) {
@@ -233,4 +243,5 @@ class BrowserActivity : DuckDuckGoActivity() {
         const val PERFORM_FIRE_ON_ENTRY_EXTRA = "PERFORM_FIRE_ON_ENTRY_EXTRA"
         private const val DASHBOARD_REQUEST_CODE = 100
     }
+
 }

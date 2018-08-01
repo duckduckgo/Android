@@ -28,6 +28,9 @@ import com.duckduckgo.app.browser.LongPressHandler
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
+import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.feedback.api.FeedbackSender
+import com.duckduckgo.app.feedback.ui.FeedbackViewModel
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.launch.LaunchViewModel
@@ -43,6 +46,7 @@ import com.duckduckgo.app.settings.SettingsViewModel
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel
 import javax.inject.Inject
@@ -65,27 +69,35 @@ class ViewModelFactory @Inject constructor(
     private val defaultBrowserNotification: DefaultBrowserNotification,
     private val webViewLongPressHandler: LongPressHandler,
     private val defaultBrowserDetector: DefaultBrowserDetector,
-    private val variantManager: VariantManager
+    private val variantManager: VariantManager,
+    private val feedbackSender: FeedbackSender,
+    private val webViewSessionStorage: WebViewSessionStorage,
+    private val pixel: Pixel
 
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
-            with(modelClass) {
-                when {
-                    isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboaringStore)
-                    isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore, defaultBrowserDetector, variantManager)
-                    isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository, queryUrlConverter)
-                    isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
-                    isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository)
-                    isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(privacySettingsStore, networkLeaderboardDao)
-                    isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
-                    isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
-                    isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
-                    isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel( appSettingsPreferencesStore, defaultBrowserDetector)
-                    isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel(bookmarksDao)
-                    else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
-                }
-            } as T
+        with(modelClass) {
+            when {
+                isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboaringStore)
+                isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore, defaultBrowserDetector, variantManager)
+                isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository, queryUrlConverter)
+                isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
+                isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository, webViewSessionStorage)
+                isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(
+                    privacySettingsStore,
+                    networkLeaderboardDao,
+                    pixel
+                )
+                isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
+                isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
+                isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
+                isAssignableFrom(FeedbackViewModel::class.java) -> FeedbackViewModel(feedbackSender)
+                isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(appSettingsPreferencesStore, defaultBrowserDetector)
+                isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel(bookmarksDao)
+                else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
+            }
+        } as T
 
     private fun browserTabViewModel(): ViewModel = BrowserTabViewModel(
         statisticsUpdater = statisticsUpdater,
@@ -100,6 +112,7 @@ class ViewModelFactory @Inject constructor(
         defaultBrowserNotification = defaultBrowserNotification,
         appConfigurationDao = appConfigurationDao,
         longPressHandler = webViewLongPressHandler,
+        webViewSessionStorage = webViewSessionStorage,
         autoCompleteApi = autoCompleteApi
     )
 }

@@ -15,14 +15,6 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="Theme.AppCompat.Translucent" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">@color/translucentDark</item>
-        <item name="android:colorBackgroundCacheHint">@null</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowAnimationStyle">@android:style/Animation</item>
-    </style>
-
     <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="colorControlNormal">@color/grayish</item>
     </style>
@@ -33,6 +25,17 @@
 
     <style name="BrowserTheme" parent="AppTheme">
         <item name="android:actionButtonStyle">@style/BrowserActionButtonStyle</item>
+    </style>
+
+    <style name="ModalCardTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/midGreen</item>
+        <item name="android:windowBackground">@color/translucentDark</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
     </style>
 
     <style name="BrowserActionButtonStyle" parent="@android:style/Widget.Holo.Light.ActionButton">
@@ -211,7 +214,7 @@
     </style>
 
     <style name="OnboardingButtonNoTrace" parent="OnboardingButtonStyle">
-        <item name="colorAccent">@color/windowsBlue</item>
+        <item name="colorAccent">@color/denimBlue</item>
     </style>
 
     <style name="OnboardingButtonDefaultBrowser" parent="OnboardingButtonStyle">

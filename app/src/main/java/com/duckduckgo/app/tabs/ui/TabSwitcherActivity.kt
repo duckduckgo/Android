@@ -25,10 +25,12 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.global.view.FireDialog
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
@@ -45,6 +47,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
 
     @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
+
+    @Inject
+    lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var webDataManager: WebDataManager
 
     private val viewModel: TabSwitcherViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(TabSwitcherViewModel::class.java)
@@ -103,7 +111,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     }
 
     private fun onFire() {
-        val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction)
+        val dialog = FireDialog(context = this, pixel = pixel, clearPersonalDataAction = clearPersonalDataAction)
         dialog.clearStarted = { viewModel.onClearRequested() }
         dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.show()

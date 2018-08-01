@@ -16,9 +16,10 @@
 
 package com.duckduckgo.app.statistics
 
+import android.os.Build
 import android.support.annotation.WorkerThread
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowInOnboarding
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowTimedReminder
+import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.*
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
 
@@ -29,7 +30,8 @@ interface VariantManager {
 
         sealed class DefaultBrowserFeature : VariantFeature() {
             object ShowInOnboarding : DefaultBrowserFeature()
-            object ShowTimedReminder : DefaultBrowserFeature()
+            object ShowBanner : DefaultBrowserFeature()
+            object ShowHomeScreenCallToAction : DefaultBrowserFeature()
         }
     }
 
@@ -39,9 +41,17 @@ interface VariantManager {
         val DEFAULT_VARIANT = Variant(key = "", features = emptyList())
 
         val ACTIVE_VARIANTS = listOf(
-            Variant(key = "mw", weight = 25.0, features = listOf(ShowInOnboarding)),
-            Variant(key = "mx", weight = 25.0, features = listOf(ShowInOnboarding, ShowTimedReminder)),
-            Variant(key = "my", weight = 50.0, features = emptyList())
+            Variant(key = "ms", weight = 1.0, features = listOf(ShowInOnboarding)),
+            Variant(key = "mt", weight = 1.0, features = listOf(ShowHomeScreenCallToAction)),
+            Variant(key = "mu", weight = 1.0, features = listOf(ShowBanner)),
+            Variant(key = "mv", weight = 1.0, features = listOf(ShowBanner, ShowHomeScreenCallToAction)),
+
+            // control group
+            Variant(key = "my", weight = 1.0, features = emptyList()),
+
+            // SERP variants - do not remove
+            Variant(key = "sa", weight = 1.0, features = emptyList()),
+            Variant(key = "sb", weight = 1.0, features = emptyList())
         )
     }
 
@@ -53,13 +63,14 @@ class ExperimentationVariantManager(
     private val indexRandomizer: IndexRandomizer
 ) : VariantManager {
 
+    @Synchronized
     override fun getVariant(activeVariants: List<Variant>): Variant {
-        if (activeVariants.isEmpty()) return VariantManager.DEFAULT_VARIANT
+        if (activeVariants.isEmpty()) return DEFAULT_VARIANT
 
         val currentVariantKey = store.variant
 
-        if (currentVariantKey == VariantManager.DEFAULT_VARIANT.key) {
-            return VariantManager.DEFAULT_VARIANT
+        if (currentVariantKey == DEFAULT_VARIANT.key) {
+            return DEFAULT_VARIANT
         }
 
         if (currentVariantKey == null) {
@@ -72,7 +83,7 @@ class ExperimentationVariantManager(
         val currentVariant = lookupVariant(currentVariantKey, activeVariants)
         if (currentVariant == null) {
             Timber.i("Variant $currentVariantKey no longer an active variant; user will now use default variant")
-            val newVariant = VariantManager.DEFAULT_VARIANT
+            val newVariant = DEFAULT_VARIANT
             persistVariant(newVariant)
             return newVariant
         }
@@ -88,6 +99,11 @@ class ExperimentationVariantManager(
     }
 
     private fun generateVariant(activeVariants: List<Variant>): Variant {
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
+            Timber.i("No variants available for pre-Nougat devices")
+            return DEFAULT_VARIANT
+        }
+
         val randomizedIndex = indexRandomizer.random(activeVariants)
         return activeVariants[randomizedIndex]
 

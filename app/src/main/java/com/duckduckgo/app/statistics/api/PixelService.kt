@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.app.statistics.api
 
-import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.global.AppUrl
-import dagger.Module
-import dagger.Provides
+import io.reactivex.Completable
+import retrofit2.http.GET
+import retrofit2.http.Path
+import retrofit2.http.Query
 
+interface PixelService {
 
-@Module
-class DataRemoverModule {
+    @GET("/t/{pixelName}_android_{formFactor}")
+    fun fire(@Path("pixelName") pixelName: String, @Path("formFactor") formFactor: String, @Query(AppUrl.ParamKey.ATB) atb: String): Completable
 
-    @Provides
-    fun webDataManager(): WebDataManager {
-        return WebDataManager(AppUrl.Url.HOST)
-    }
 }

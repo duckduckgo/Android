@@ -24,8 +24,8 @@ class AppUrl {
         const val API = "https://$HOST"
         const val HOME =  "https://$HOST"
         const val ABOUT = "https://$HOST/about"
-        const val FEEDBACK = "https://$HOST/feedback"
         const val TOSDR = "https://tosdr.org"
+        const val PIXEL = "https://improving.duckduckgo.com"
     }
 
     object ParamKey {
@@ -33,6 +33,7 @@ class AppUrl {
         const val SOURCE = "t"
         const val ATB = "atb"
         const val RETENTION_ATB = "set_atb"
+        const val FORM_FACTOR = "f"
     }
 
     object ParamValue {

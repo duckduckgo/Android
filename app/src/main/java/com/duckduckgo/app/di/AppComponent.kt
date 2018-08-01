@@ -53,8 +53,7 @@ import javax.inject.Singleton
     NotificationModule::class,
     DefaultBrowserModule::class,
     OnboardingModule::class,
-    VariantModule::class,
-    DataRemoverModule::class
+    VariantModule::class
 ])
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 

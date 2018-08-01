@@ -16,25 +16,51 @@
 
 package com.duckduckgo.app.di
 
+import android.content.Context
+import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.global.api.ApiRequestInterceptor
+import com.duckduckgo.app.global.device.ContextDeviceInfo
+import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.api.PixelService
 import com.duckduckgo.app.statistics.api.StatisticsRequester
 import com.duckduckgo.app.statistics.api.StatisticsService
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.pixels.ApiBasedPixel
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import dagger.Module
 import dagger.Provides
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import javax.inject.Named
 
 
 @Module
 class StatisticsModule {
 
     @Provides
-    fun statisticsService(retrofit: Retrofit): StatisticsService =
-        retrofit.create(StatisticsService::class.java)
+    fun statisticsService(@Named("api") retrofit: Retrofit): StatisticsService = retrofit.create(StatisticsService::class.java)
 
     @Provides
-    fun statisticsUpdater(statisticsDataStore: StatisticsDataStore, statisticsService: StatisticsService, variantManager: VariantManager) : StatisticsUpdater =
+    fun statisticsUpdater(
+        statisticsDataStore: StatisticsDataStore,
+        statisticsService: StatisticsService,
+        variantManager: VariantManager
+    ): StatisticsUpdater =
         StatisticsRequester(statisticsDataStore, statisticsService, variantManager)
+
+    @Provides
+    fun pixelService(@Named("pixel") okHttpClient: OkHttpClient, @Named("pixel") retrofit: Retrofit): PixelService {
+        return retrofit.create(PixelService::class.java)
+    }
+
+    @Provides
+    fun deviceInfo(context: Context): DeviceInfo = ContextDeviceInfo(context)
+
+    @Provides
+    fun pixel(pixelService: PixelService, statisticsDataStore: StatisticsDataStore, variantManager: VariantManager, deviceInfo: DeviceInfo): Pixel =
+        ApiBasedPixel(pixelService, statisticsDataStore, variantManager, deviceInfo)
 
 }

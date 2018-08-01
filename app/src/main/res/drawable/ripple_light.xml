@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (c) 2018 DuckDuckGo
   ~
@@ -14,11 +15,13 @@
   ~ limitations under the License.
   -->
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/softBlue" />
-    <stroke
-        android:width="1dp"
-        android:color="@color/softBlue" />
-    <corners
-        android:radius="3dp"/>
-</shape>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/brownishGray" >
+    <item
+        android:id="@android:id/mask"
+        android:gravity="center">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/white"/>
+        </shape>
+    </item>
+</ripple>

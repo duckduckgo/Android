@@ -31,7 +31,8 @@ import javax.inject.Inject
 interface DefaultBrowserDetector {
     fun deviceSupportsDefaultBrowserConfiguration(): Boolean
     fun isCurrentlyConfiguredAsDefaultBrowser(): Boolean
-    fun userDeclinedToSetAsDefaultBrowser(timestamp: Long = System.currentTimeMillis())
+    fun userDeclinedBannerToSetAsDefaultBrowser(timestamp: Long = System.currentTimeMillis())
+    fun userDeclinedHomeScreenCallToActionToSetAsDefaultBrowser(timestamp: Long = System.currentTimeMillis())
 }
 
 class AndroidDefaultBrowserDetector @Inject constructor(private val context: Context, private val appInstallStore: AppInstallStore) :
@@ -50,7 +51,11 @@ class AndroidDefaultBrowserDetector @Inject constructor(private val context: Con
         return defaultAlready
     }
 
-    override fun userDeclinedToSetAsDefaultBrowser(timestamp: Long) {
-        appInstallStore.recordUserDeclinedToSetDefaultBrowser(timestamp)
+    override fun userDeclinedBannerToSetAsDefaultBrowser(timestamp: Long) {
+        appInstallStore.recordUserDeclinedBannerToSetDefaultBrowser(timestamp)
+    }
+
+    override fun userDeclinedHomeScreenCallToActionToSetAsDefaultBrowser(timestamp: Long) {
+        appInstallStore.recordUserDeclinedHomeScreenCallToActionToSetDefaultBrowser(timestamp)
     }
 }

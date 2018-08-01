@@ -29,10 +29,8 @@ class ClearPersonalDataAction @Inject constructor(
 ) {
 
     fun clear(clearComplete: (() -> Unit)) {
-        dataManager.clearData(
-            WebView(context),
-            WebStorage.getInstance(), context
-        )
+        dataManager.clearData(WebView(context), WebStorage.getInstance(), context)
+        dataManager.clearWebViewSessions()
         dataManager.clearExternalCookies(CookieManager.getInstance(), clearComplete)
     }
 }

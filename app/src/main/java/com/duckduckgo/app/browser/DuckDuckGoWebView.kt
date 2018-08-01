@@ -17,9 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
-import android.annotation.TargetApi
 import android.content.Context
-import android.os.Build
 import android.support.v4.view.NestedScrollingChild
 import android.support.v4.view.NestedScrollingChildHelper
 import android.support.v4.view.ViewCompat
@@ -44,25 +42,21 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
     private var nestedScrollHelper: NestedScrollingChildHelper = NestedScrollingChildHelper(this)
 
     constructor(context: Context) : this(context, null)
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    {
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
         isNestedScrollingEnabled = true
     }
 
     override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection? {
         val inputConnection = super.onCreateInputConnection(outAttrs) ?: return null
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            addNoPersonalisedFlag(outAttrs)
-        }
+        addNoPersonalisedFlag(outAttrs)
 
         return inputConnection
     }
 
 
-    @TargetApi(Build.VERSION_CODES.O)
     private fun addNoPersonalisedFlag(outAttrs: EditorInfo) {
-        outAttrs.imeOptions = outAttrs.imeOptions or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING
+        outAttrs.imeOptions = outAttrs.imeOptions or IME_FLAG_NO_PERSONALIZED_LEARNING
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -127,14 +121,23 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
     override fun hasNestedScrollingParent(): Boolean = nestedScrollHelper.hasNestedScrollingParent()
 
     override fun dispatchNestedScroll(dxConsumed: Int, dyConsumed: Int, dxUnconsumed: Int, dyUnconsumed: Int, offsetInWindow: IntArray?): Boolean =
-            nestedScrollHelper.dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, offsetInWindow)
+        nestedScrollHelper.dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, offsetInWindow)
 
     override fun dispatchNestedPreScroll(dx: Int, dy: Int, consumed: IntArray?, offsetInWindow: IntArray?): Boolean =
-            nestedScrollHelper.dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow)
+        nestedScrollHelper.dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow)
 
     override fun dispatchNestedFling(velocityX: Float, velocityY: Float, consumed: Boolean): Boolean =
-            nestedScrollHelper.dispatchNestedFling(velocityX, velocityY, consumed)
+        nestedScrollHelper.dispatchNestedFling(velocityX, velocityY, consumed)
 
     override fun dispatchNestedPreFling(velocityX: Float, velocityY: Float): Boolean =
-            nestedScrollHelper.dispatchNestedPreFling(velocityX, velocityY)
+        nestedScrollHelper.dispatchNestedPreFling(velocityX, velocityY)
+
+    companion object {
+
+        /*
+         * Taken from EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING
+         * We can't use that value directly as it was only added on Oreo, but we can apply the value anyway.
+         */
+        private const val IME_FLAG_NO_PERSONALIZED_LEARNING = 0x1000000
+    }
 }

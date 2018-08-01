@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2018 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    tools:context="com.duckduckgo.app.feedback.ui.FeedbackActivity">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/feedbackCardVerticalMargin"
+            android:layout_marginEnd="@dimen/feedbackCardHorizontalMargin"
+            android:layout_marginStart="@dimen/feedbackCardHorizontalMargin"
+            android:layout_marginTop="@dimen/feedbackCardVerticalMargin"
+            android:background="@drawable/notification_info_bottom_background"
+            android:paddingBottom="30dp">
+
+            <View
+                android:id="@+id/titleSection"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@drawable/notification_info_top_background"
+                android:elevation="4dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="@+id/description"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="30dp"
+                android:elevation="@dimen/modalCardHeaderElevation"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_icon_heart_26dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/titleSection" />
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:elevation="@dimen/modalCardHeaderElevation"
+                android:text="@string/feedbackHeading"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="@dimen/modalCardTitleTextSize"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/icon" />
+
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="19dp"
+                android:layout_marginTop="6dp"
+                android:elevation="@dimen/modalCardHeaderElevation"
+                android:lineSpacingExtra="4sp"
+                android:paddingBottom="30dp"
+                android:paddingEnd="20dp"
+                android:paddingStart="20dp"
+                android:text="@string/feedbackModalDescription"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="@dimen/modalCardDescriptionTextSize"
+                app:layout_constraintTop_toBottomOf="@id/title" />
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/brokenSiteSwitch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/feedbackFormFieldsMargin"
+                android:fontFamily="sans-serif-medium"
+                android:paddingStart="3dp"
+                android:paddingEnd="0dp"
+                android:text="@string/feedbackReportBrokenSite"
+                android:textColor="@color/warmerGray"
+                android:textSize="@dimen/modalCardSwitchTextSize"
+                android:textStyle="normal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/description"
+                tools:checked="true" />
+
+            <EditText
+                android:id="@+id/brokenSiteUrl"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/feedbackFormFieldsMargin"
+                android:hint="@string/feedbackUrlHint"
+                android:imeOptions="flagNoExtractUi"
+                android:inputType="textUri"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:singleLine="true"
+                android:textSize="@dimen/modalCardEditTextSize"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/brokenSiteSwitch"
+                tools:visibility="visible" />
+
+            <EditText
+                android:id="@+id/feedbackMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/feedbackFormFieldsMargin"
+                android:hint="@string/feedbackMessageHint"
+                android:imeOptions="flagNoExtractUi"
+                android:inputType="textMultiLine"
+                android:lineSpacingExtra="5sp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:textSize="@dimen/modalCardEditTextSize"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/brokenSiteUrl" />
+
+            <Button
+                android:id="@+id/submitButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/modal_card_button_bg"
+                android:text="@string/feedbackSubmitButton"
+                android:textColor="@color/white"
+                android:textSize="@dimen/modalCardMajorButtonTextSize"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/feedbackMessage" />
+
+        </android.support.constraint.ConstraintLayout>
+
+    </LinearLayout>
+
+</ScrollView>
+

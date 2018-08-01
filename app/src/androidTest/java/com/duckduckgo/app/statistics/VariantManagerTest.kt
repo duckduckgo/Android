@@ -16,39 +16,71 @@
 
 package com.duckduckgo.app.statistics
 
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.fail
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.*
+import org.junit.Assert.*
 import org.junit.Test
 
 class VariantManagerTest {
 
     private val variants = VariantManager.ACTIVE_VARIANTS
-    private val totalWeight = variants.sumByDouble { it.weight }
 
     @Test
-    fun whenChanceOfControlVariantCalculatedThenOddsAreOneInTwo() {
+    fun onboardingOnlyVariantConfiguredCorrectly() {
+        val variant = variants.firstOrNull { it.key == "ms" }
+        assertEqualsDouble(1.0, variant!!.weight)
+        assertTrue(variant.hasFeature(ShowInOnboarding))
+        assertEquals(1, variant.features.size)
+    }
+
+    @Test
+    fun homeScreenCallToActionVariantConfiguredCorrectly() {
+        val variant = variants.firstOrNull { it.key == "mt" }
+        assertEqualsDouble(1.0, variant!!.weight)
+        assertTrue(variant.hasFeature(ShowHomeScreenCallToAction))
+        assertEquals(1, variant.features.size)
+    }
+
+    @Test
+    fun showBannerVariantConfiguredCorrectly() {
+        val variant = variants.firstOrNull { it.key == "mu" }
+        assertEqualsDouble(1.0, variant!!.weight)
+        assertTrue(variant.hasFeature(ShowBanner))
+        assertEquals(1, variant.features.size)
+    }
+
+    @Test
+    fun showBannerAndShowHomeScreenCallToActionVariantConfiguredCorrectly() {
+        val variant = variants.firstOrNull { it.key == "mv" }
+        assertEqualsDouble(1.0, variant!!.weight)
+        assertTrue(variant.hasFeature(ShowBanner))
+        assertTrue(variant.hasFeature(ShowHomeScreenCallToAction))
+        assertEquals(2, variant.features.size)
+    }
+
+    @Test
+    fun controlVariantConfiguredCorrectly() {
         val variant = variants.firstOrNull { it.key == "my" }
-        assertNotNull(variant)
-        assertEqualsDouble( 0.5, variant!!.weight / totalWeight)
+        assertEqualsDouble(1.0, variant!!.weight)
+        assertEquals(0, variant.features.size)
     }
 
     @Test
-    fun whenChanceOfOnboardingOnlyVariantCalculatedThenOddsAreOneInFour() {
-        val variant = variants.firstOrNull { it.key == "mw" }
-        assertNotNull(variant)
-        assertEqualsDouble( 0.25, variant!!.weight / totalWeight)
+    fun serpVariantAConfiguredCorrectly() {
+        val variant = variants.firstOrNull { it.key == "sa" }
+        assertEqualsDouble(1.0, variant!!.weight)
+        assertEquals(0, variant.features.size)
     }
 
     @Test
-    fun whenChanceOfOnboardingAndReminderVariantCalculatedThenOddsAreOneInFour() {
-        val variant = variants.firstOrNull { it.key == "mx" }
-        assertNotNull(variant)
-        assertEqualsDouble( 0.25, variant!!.weight / totalWeight)
+    fun serpVariantBConfiguredCorrectly() {
+        val variant = variants.firstOrNull { it.key == "sb" }
+        assertEqualsDouble(1.0, variant!!.weight)
+        assertEquals(0, variant.features.size)
     }
 
     private fun assertEqualsDouble(expected: Double, actual: Double) {
         val comparison = expected.compareTo(actual)
-        if(comparison != 0) {
+        if (comparison != 0) {
             fail("Doubles are not equal. Expected $expected but was $actual")
         }
     }
