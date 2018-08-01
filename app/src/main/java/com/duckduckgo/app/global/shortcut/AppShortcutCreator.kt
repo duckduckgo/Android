@@ -35,7 +35,6 @@ class AppShortcutCreator @Inject constructor() {
     fun configureAppShortcuts(context: Context) {
         val shortcutList = mutableListOf<ShortcutInfo>()
 
-
         shortcutList.add(buildNewTabShortcut(context))
         shortcutList.add(buildClearDataShortcut(context))
 
