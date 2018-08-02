@@ -591,13 +591,11 @@ class BrowserTabViewModel(
     }
 
     fun userRequestedToPinPageToHome(currentPage: String) {
-
-        val title =
-            if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentPage)) {
-                duckDuckGoUrlDetector.extractQuery(currentPage) ?: currentPage
-            } else {
-                currentPage.toUri().baseHost ?: currentPage
-            }
+        val title = if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentPage)) {
+            duckDuckGoUrlDetector.extractQuery(currentPage) ?: currentPage
+        } else {
+            currentPage.toUri().baseHost ?: currentPage
+        }
 
         faviconDownloader.download(currentPage.toUri())
             .subscribeOn(Schedulers.io())
@@ -609,8 +607,6 @@ class BrowserTabViewModel(
                 Timber.w(throwable, "Failed to obtain favicon")
                 command.value = AddHomeShortcut(title, currentPage)
             })
-
-
     }
 }
 
