@@ -20,6 +20,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
+import android.graphics.Bitmap
 import android.net.Uri
 import android.support.annotation.AnyThread
 import android.support.annotation.StringRes
@@ -101,7 +102,8 @@ class BrowserTabViewModel(
         val canSharePage: Boolean = false,
         val canAddBookmarks: Boolean = false,
         val canGoBack: Boolean = false,
-        val canGoForward: Boolean = false
+        val canGoForward: Boolean = false,
+        val canAddToHome: Boolean = false
     )
 
     data class OmnibarViewState(
@@ -151,6 +153,7 @@ class BrowserTabViewModel(
         class DisplayMessage(@StringRes val messageId: Int) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
+        class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap?= null) : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -334,7 +337,7 @@ class BrowserTabViewModel(
             findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = false)
 
             val currentBrowserViewState = currentBrowserViewState()
-            browserViewState.value = currentBrowserViewState.copy(canAddBookmarks = false)
+            browserViewState.value = currentBrowserViewState.copy(canAddBookmarks = false, canAddToHome = false)
 
             return
         }
@@ -348,6 +351,7 @@ class BrowserTabViewModel(
         browserViewState.value = currentBrowserViewState.copy(
             browserShowing = true,
             canAddBookmarks = true,
+            canAddToHome = true,
             canSharePage = true,
             showPrivacyGrade = appConfigurationDownloaded
         )
@@ -584,6 +588,29 @@ class BrowserTabViewModel(
                 onUserSubmittedQuery(lastUrl)
             }
         }
+    }
+
+    fun userRequestedToPinPageToHome(currentPage: String) {
+
+        val title =
+            if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentPage)) {
+                duckDuckGoUrlDetector.extractQuery(currentPage) ?: currentPage
+            } else {
+                currentPage.toUri().baseHost ?: currentPage
+            }
+
+        faviconDownloader.download(currentPage.toUri())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                Timber.i("Successfully got favicon")
+                command.value = AddHomeShortcut(title, currentPage, it)
+            }, { throwable ->
+                Timber.w(throwable, "Failed to obtain favicon")
+                command.value = AddHomeShortcut(title, currentPage)
+            })
+
+
     }
 }
 
