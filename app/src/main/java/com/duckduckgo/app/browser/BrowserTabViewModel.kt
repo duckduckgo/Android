@@ -40,9 +40,11 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
+import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.isMobileSite
@@ -79,6 +81,7 @@ class BrowserTabViewModel(
     private val defaultBrowserNotification: DefaultBrowserNotification,
     private val longPressHandler: LongPressHandler,
     private val webViewSessionStorage: WebViewSessionStorage,
+    private val faviconDownloader: FaviconDownloader,
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, ViewModel() {
 

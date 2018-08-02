@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.LongPressHandler
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
+import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.feedback.api.FeedbackSender
@@ -72,6 +73,7 @@ class ViewModelFactory @Inject constructor(
     private val variantManager: VariantManager,
     private val feedbackSender: FeedbackSender,
     private val webViewSessionStorage: WebViewSessionStorage,
+    private val faviconDownloader: FaviconDownloader,
     private val pixel: Pixel
 
 ) : ViewModelProvider.NewInstanceFactory() {
@@ -113,6 +115,7 @@ class ViewModelFactory @Inject constructor(
         appConfigurationDao = appConfigurationDao,
         longPressHandler = webViewLongPressHandler,
         webViewSessionStorage = webViewSessionStorage,
-        autoCompleteApi = autoCompleteApi
+        autoCompleteApi = autoCompleteApi,
+        faviconDownloader = faviconDownloader
     )
 }
