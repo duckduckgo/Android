@@ -103,6 +103,11 @@
                 style="@style/BrowserTextMenuItem"
                 android:text="@string/findInPageMenuTitle" />
 
+            <TextView
+                android:id="@+id/addToHome"
+                style="@style/BrowserTextMenuItem"
+                android:text="@string/addToHome" />
+
             <CheckBox
                 android:id="@+id/requestDesktopSiteCheckMenuItem"
                 style="@style/BrowserTextMenuItem"
