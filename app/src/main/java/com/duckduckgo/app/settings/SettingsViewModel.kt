@@ -75,8 +75,9 @@ class SettingsViewModel @Inject constructor(
         Timber.i("User changed autocomplete setting, is now enabled: $checked")
         settingsDataStore.autoCompleteSuggestionsEnabled = checked
     }
+
     private fun obtainVersion(variantKey: String): String {
-        val version = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
-        return "$version variant=($variantKey)"
+        val formattedVariantKey = if (variantKey.isBlank()) " " else " $variantKey "
+        return "${BuildConfig.VERSION_NAME}$formattedVariantKey(${BuildConfig.VERSION_CODE})"
     }
 }
