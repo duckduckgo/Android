@@ -102,7 +102,10 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
         logCacheSize()
     }
 
-    override fun deleteAllSessions() = cache.evictAll()
+    override fun deleteAllSessions() {
+        cache.evictAll()
+        logCacheSize()
+    }
 
     private fun logCacheSize() {
         Timber.v("Cache size is now ~${cache.size()} bytes out of a max size of ${cache.maxSize()} bytes")
