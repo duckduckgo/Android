@@ -55,7 +55,7 @@
     <string name="previousSearchTermDescription">Find previous</string>
     <string name="closeFindInPageButtonDescription">Close find in page view</string>
     <string name="findInPageHint">Find in page</string>
-    <string name="findInPageMatches">%d/%d</string>
+    <string name="findInPageMatches">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Edit query before searching</string>
@@ -77,7 +77,7 @@
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
     <string name="privacyProtectionEnabled">PRIVACY PROTECTION ENABLED</string>
     <string name="privacyProtectionDisabled">PRIVACY PROTECTION DISABLED</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ENHANCED FROM &lt;img src="%d" /> TO &lt;img src="%d" /></string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ENHANCED FROM &lt;img src="%1$d" /> TO &lt;img src="%2$d" /></string>
     <string name="privacyGradeContentDescription">Privacy Grade</string>
 
     <string name="httpsGood">Encrypted Connection</string>
