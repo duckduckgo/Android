@@ -144,14 +144,16 @@ class SettingsViewModelTest {
     @Test
     fun whenVariantIsEmptyThenEmptyVariantIncludedInSettings() {
         testee.start()
-        assertTrue(latestViewState().version.contains("variant=()"))
+        val expectedStartString = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+        assertEquals(expectedStartString, latestViewState().version)
     }
 
     @Test
     fun whenVariantIsSetThenVariantKeyIncludedInSettings() {
         whenever(mockVariantManager.getVariant()).thenReturn(Variant("ab"))
         testee.start()
-        assertTrue(latestViewState().version.contains("variant=(ab)"))
+        val expectedStartString = "${BuildConfig.VERSION_NAME} ab (${BuildConfig.VERSION_CODE})"
+        assertEquals(expectedStartString, latestViewState().version)
     }
 
 
