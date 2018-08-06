@@ -37,6 +37,7 @@ import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.view.*
@@ -49,6 +50,7 @@ import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
@@ -328,6 +330,41 @@ class BrowserTabFragment : Fragment(), FindListener {
             is Command.DisplayMessage -> showToast(it.messageId)
             is Command.ShowFileChooser -> {
                 launchFilePicker(it)
+            }
+            is Command.HandleExternalAppLink -> { externalAppLinkClicked(it) }
+        }
+    }
+
+    private fun externalAppLinkClicked(appLinkCommand: Command.HandleExternalAppLink) {
+        context?.let {
+            val pm = it.packageManager
+            val intent = appLinkCommand.appLink.intent
+            val activities = pm.queryIntentActivities(intent, 0)
+
+            Timber.i("Found ${activities.size} that could consume ${appLinkCommand.appLink.url}")
+
+            when(activities.size) {
+                0 -> {
+                    Toast.makeText(it, "Unable to open this type of link", Toast.LENGTH_LONG).show()
+                    return
+                }
+                1 -> {
+                    val activity = activities.first()
+                    val appTitle = activity.loadLabel(pm)
+                    Timber.i("Exactly one app available for intent: $appTitle")
+
+                    AlertDialog.Builder(it)
+                        .setTitle(R.string.launchingExternalApp)
+                        .setMessage(getString(R.string.confirmOpenExternalApp))
+                        .setPositiveButton(R.string.openExternalApp) { _, _ -> it.startActivity(intent) }
+                        .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
+                        .show()
+                }
+                else -> {
+                    val title = getString(R.string.openExternalApp)
+                    val intentChooser = Intent.createChooser(intent, title)
+                    it.startActivity(intentChooser)
+                }
             }
         }
     }

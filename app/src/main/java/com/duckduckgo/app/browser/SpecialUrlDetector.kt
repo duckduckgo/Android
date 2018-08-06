@@ -16,7 +16,10 @@
 
 package com.duckduckgo.app.browser
 
+import android.content.Intent
 import android.net.Uri
+import timber.log.Timber
+import java.net.URISyntaxException
 import javax.inject.Inject
 
 
@@ -27,18 +30,22 @@ class SpecialUrlDetector @Inject constructor() {
         class Telephone(val telephoneNumber: String) : UrlType()
         class Email(val emailAddress: String) : UrlType()
         class Sms(val telephoneNumber: String) : UrlType()
+        class IntentType(val url: String,  val intent: Intent) : UrlType()
+        class Unknown(val url: String) : UrlType()
     }
 
     fun determineType(uri: Uri): UrlType {
         val uriString = uri.toString()
+        val scheme = uri.scheme
 
-        return when (uri.scheme) {
+        return when (scheme) {
             TEL_SCHEME -> buildTelephone(uriString)
             TELPROMPT_SCHEME -> buildTelephonePrompt(uriString)
             MAILTO_SCHEME -> buildEmail(uriString)
             SMS_SCHEME -> buildSms(uriString)
             SMSTO_SCHEME -> buildSmsTo(uriString)
-            else -> UrlType.Web(uriString)
+            HTTP_SCHEME, HTTPS_SCHEME -> UrlType.Web(uriString)
+            else -> buildIntent(uriString)
         }
     }
 
@@ -58,6 +65,16 @@ class SpecialUrlDetector @Inject constructor() {
     private fun buildSmsTo(uriString: String) =
             UrlType.Sms(uriString.removePrefix("$SMSTO_SCHEME:"))
 
+    private fun buildIntent(uriString: String): UrlType {
+        return try {
+            val intent = Intent.parseUri(uriString, 0)
+            UrlType.IntentType(url = uriString, intent = intent)
+        } catch (e: URISyntaxException) {
+            Timber.w(e, "Failed to parse uri $uriString")
+            return UrlType.Unknown(uriString)
+        }
+    }
+
     fun determineType(uriString: String?): UrlType {
         if (uriString == null) return UrlType.Web("")
 
@@ -70,5 +87,7 @@ class SpecialUrlDetector @Inject constructor() {
         private const val MAILTO_SCHEME = "mailto"
         private const val SMS_SCHEME = "sms"
         private const val SMSTO_SCHEME = "smsto"
+        private const val HTTP_SCHEME = "http"
+        private const val HTTPS_SCHEME = "https"
     }
 }

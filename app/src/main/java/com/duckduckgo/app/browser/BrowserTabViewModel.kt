@@ -148,6 +148,7 @@ class BrowserTabViewModel(
         class DisplayMessage(@StringRes val messageId: Int) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
+        class HandleExternalAppLink(val appLink: SpecialUrlDetector.UrlType.IntentType) : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -581,6 +582,10 @@ class BrowserTabViewModel(
                 onUserSubmittedQuery(lastUrl)
             }
         }
+    }
+
+    override fun externalAppLinkClicked(appLink: SpecialUrlDetector.UrlType.IntentType) {
+        command.value = HandleExternalAppLink(appLink)
     }
 }
 
