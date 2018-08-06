@@ -20,6 +20,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
+import android.graphics.Bitmap
 import android.net.Uri
 import android.support.annotation.AnyThread
 import android.support.annotation.StringRes
@@ -40,9 +41,11 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
+import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.isMobileSite
@@ -83,6 +86,7 @@ class BrowserTabViewModel(
     private val longPressHandler: LongPressHandler,
     private val webViewSessionStorage: WebViewSessionStorage,
     private val variantManager: VariantManager,
+    private val faviconDownloader: FaviconDownloader,
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, ViewModel() {
 
@@ -102,7 +106,8 @@ class BrowserTabViewModel(
         val canSharePage: Boolean = false,
         val canAddBookmarks: Boolean = false,
         val canGoBack: Boolean = false,
-        val canGoForward: Boolean = false
+        val canGoForward: Boolean = false,
+        val canAddToHome: Boolean = false
     )
 
     data class OmnibarViewState(
@@ -152,6 +157,7 @@ class BrowserTabViewModel(
         class DisplayMessage(@StringRes val messageId: Int) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
+        class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap?= null) : Command()
         object InflateCallToActionBottomSheet : Command()
         object InflateCallToActionSimpleButton : Command()
     }
@@ -347,7 +353,7 @@ class BrowserTabViewModel(
             findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = false)
 
             val currentBrowserViewState = currentBrowserViewState()
-            browserViewState.value = currentBrowserViewState.copy(canAddBookmarks = false)
+            browserViewState.value = currentBrowserViewState.copy(canAddBookmarks = false, canAddToHome = false)
 
             return
         }
@@ -361,6 +367,7 @@ class BrowserTabViewModel(
         browserViewState.value = currentBrowserViewState.copy(
             browserShowing = true,
             canAddBookmarks = true,
+            canAddToHome = true,
             canSharePage = true,
             showPrivacyGrade = appConfigurationDownloaded
         )
@@ -597,6 +604,25 @@ class BrowserTabViewModel(
                 onUserSubmittedQuery(lastUrl)
             }
         }
+    }
+
+    fun userRequestedToPinPageToHome(currentPage: String) {
+        val title = if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentPage)) {
+            duckDuckGoUrlDetector.extractQuery(currentPage) ?: currentPage
+        } else {
+            currentPage.toUri().baseHost ?: currentPage
+        }
+
+        faviconDownloader.download(currentPage.toUri())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                Timber.i("Successfully got favicon")
+                command.value = AddHomeShortcut(title, currentPage, it)
+            }, { throwable ->
+                Timber.w(throwable, "Failed to obtain favicon")
+                command.value = AddHomeShortcut(title, currentPage)
+            })
     }
 }
 

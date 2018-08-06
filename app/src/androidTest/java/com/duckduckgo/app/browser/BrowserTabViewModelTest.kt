@@ -33,6 +33,7 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
+import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.global.db.AppConfigurationDao
@@ -118,6 +119,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var variantManager: VariantManager
 
+    @Mock
+    private lateinit var mockFaviconDownloader: FaviconDownloader
+
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
 
@@ -153,6 +157,7 @@ class BrowserTabViewModelTest {
             longPressHandler = mockLongPressHandler,
             appConfigurationDao = appConfigurationDao,
             webViewSessionStorage = webViewSessionStorage,
+            faviconDownloader = mockFaviconDownloader,
             variantManager = variantManager
         )
 

@@ -38,6 +38,7 @@ import android.support.constraint.ConstraintSet
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
+import android.support.v4.content.pm.ShortcutManagerCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.view.*
@@ -62,6 +63,7 @@ import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
@@ -111,6 +113,9 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     @Inject
     lateinit var webViewSessionStorage: WebViewSessionStorage
+
+    @Inject
+    lateinit var shortcutBuilder: ShortcutBuilder
 
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
@@ -226,7 +231,18 @@ class BrowserTabFragment : Fragment(), FindListener {
                 )
             }
             onMenuItemClicked(view.sharePageMenuItem) { viewModel.userSharingLink(webView?.url) }
+            onMenuItemClicked(view.addToHome) {
+                context?.let {
+                    val url = webView?.url ?: return@let
+                    viewModel.userRequestedToPinPageToHome(url)
+                }
+            }
         }
+    }
+
+    private fun addHomeShortcut(homeShortcut: Command.AddHomeShortcut, context: Context) {
+        val shortcutInfo = shortcutBuilder.buildPinnedPageShortcut(context, homeShortcut)
+        ShortcutManagerCompat.requestPinShortcut(context, shortcutInfo, null)
     }
 
     private fun configureObservers() {
@@ -333,6 +349,11 @@ class BrowserTabFragment : Fragment(), FindListener {
             is Command.DisplayMessage -> showToast(it.messageId)
             is Command.ShowFileChooser -> {
                 launchFilePicker(it)
+            }
+            is Command.AddHomeShortcut -> {
+                context?.let { context ->
+                    addHomeShortcut(it, context)
+                }
             }
             is Command.InflateCallToActionBottomSheet -> {
             callToActionConfigurator.configureBottomSheetCallToAction()
@@ -883,6 +904,7 @@ class BrowserTabFragment : Fragment(), FindListener {
                 newTabPopupMenuItem.isEnabled = browserShowing
                 addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
                 sharePageMenuItem?.isEnabled = viewState.canSharePage
+                addToHome?.isEnabled = viewState.canAddToHome
             }
         }
 

@@ -199,4 +199,7 @@
     <!-- Widget -->
     <string name="searchWidgetTextHint">Search DuckDuckGo</string>
 
+    <!-- Home Screen Shortcuts -->
+    <string name="addToHome">Add to Home</string>
+
 </resources>
