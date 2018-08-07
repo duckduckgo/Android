@@ -22,6 +22,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
 import android.os.Bundle
+import android.widget.Toast
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
@@ -30,11 +31,11 @@ import com.duckduckgo.app.feedback.ui.FeedbackActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.intentText
+import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import org.jetbrains.anko.longToast
@@ -48,10 +49,10 @@ class BrowserActivity : DuckDuckGoActivity() {
     lateinit var viewModelFactory: ViewModelFactory
 
     @Inject
-    lateinit var pixel: Pixel
+    lateinit var clearPersonalDataAction: ClearPersonalDataAction
 
     @Inject
-    lateinit var webDataManager: WebDataManager
+    lateinit var pixel: Pixel
 
     private var currentTab: BrowserTabFragment? = null
 
@@ -119,6 +120,14 @@ class BrowserActivity : DuckDuckGoActivity() {
             return
         }
 
+        if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false) ) {
+            viewModel.onClearRequested()
+            clearPersonalDataAction.clear { viewModel.onClearComplete() }
+            Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
+
         if (launchNewSearch(intent)) {
             viewModel.onNewTabRequested()
             return
@@ -177,12 +186,10 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchFire() {
-        FireDialog(context = this,
-                pixel = pixel,
-                webDataManager = webDataManager,
-                clearStarted = { viewModel.onClearRequested() },
-                clearComplete = { viewModel.onClearComplete() }
-        ).show()
+        val dialog = FireDialog(context = this, pixel = pixel, clearPersonalDataAction = clearPersonalDataAction)
+        dialog.clearStarted = {viewModel.onClearRequested()}
+        dialog.clearComplete = { viewModel.onClearComplete()}
+        dialog.show()
     }
 
     fun launchTabSwitcher() {
@@ -232,7 +239,8 @@ class BrowserActivity : DuckDuckGoActivity() {
             return intent
         }
 
-        private const val NEW_SEARCH_EXTRA = "NEW_SEARCH_EXTRA"
+        const val NEW_SEARCH_EXTRA = "NEW_SEARCH_EXTRA"
+        const val PERFORM_FIRE_ON_ENTRY_EXTRA = "PERFORM_FIRE_ON_ENTRY_EXTRA"
         private const val DASHBOARD_REQUEST_CODE = 100
     }
 

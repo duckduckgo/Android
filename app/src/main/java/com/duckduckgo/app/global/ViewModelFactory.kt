@@ -24,6 +24,7 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
+import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.feedback.api.FeedbackSender
@@ -70,6 +71,7 @@ class ViewModelFactory @Inject constructor(
     private val feedbackSender: FeedbackSender,
     private val webViewSessionStorage: WebViewSessionStorage,
     private val specialUrlDetector: SpecialUrlDetector,
+    private val faviconDownloader: FaviconDownloader,
     private val pixel: Pixel
 
 ) : ViewModelProvider.NewInstanceFactory() {
@@ -91,7 +93,7 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                 isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
                 isAssignableFrom(FeedbackViewModel::class.java) -> FeedbackViewModel(feedbackSender)
-                isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(appSettingsPreferencesStore, defaultBrowserDetector)
+                isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(appSettingsPreferencesStore, defaultBrowserDetector, variantManager)
                 isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel(bookmarksDao)
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
@@ -112,6 +114,7 @@ class ViewModelFactory @Inject constructor(
         longPressHandler = webViewLongPressHandler,
         webViewSessionStorage = webViewSessionStorage,
         autoCompleteApi = autoCompleteApi,
-        specialUrlDetector = specialUrlDetector
+        specialUrlDetector = specialUrlDetector,
+        faviconDownloader = faviconDownloader
     )
 }

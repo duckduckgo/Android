@@ -17,11 +17,9 @@
 package com.duckduckgo.app.global.view
 
 import android.content.Context
+import android.os.Bundle
 import android.support.design.widget.BottomSheetDialog
 import android.view.View
-import android.webkit.CookieManager
-import android.webkit.WebStorage
-import android.webkit.WebView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -30,26 +28,36 @@ import kotlinx.android.synthetic.main.sheet_fire_clear_data.*
 
 class FireDialog(
     context: Context,
-    pixel: Pixel,
-    webDataManager: WebDataManager,
-    clearStarted: (() -> Unit),
-    clearComplete: (() -> Unit)
+    private val pixel: Pixel,
+    private val clearPersonalDataAction: ClearPersonalDataAction
 ) :
     BottomSheetDialog(context) {
+
+    var clearStarted: (() -> Unit) = {}
+    var clearComplete: (() -> Unit) = {}
+
     init {
-        val contentView = View.inflate(getContext(), R.layout.sheet_fire_clear_data, null)
+        val contentView = View.inflate(context, R.layout.sheet_fire_clear_data, null)
         setContentView(contentView)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
         clearAllOption.setOnClickListener {
             clearStarted()
             pixel.fire(FORGET_ALL_EXECUTED)
-            webDataManager.clearData(WebView(context), WebStorage.getInstance(), context)
-            webDataManager.clearWebViewSessions()
-            webDataManager.clearExternalCookies(CookieManager.getInstance(), clearComplete)
+            performClear(clearComplete)
             dismiss()
         }
+
         cancelOption.setOnClickListener {
             dismiss()
         }
+    }
+
+    fun performClear(clearComplete: () -> Unit) {
+        clearPersonalDataAction.clear(clearComplete)
     }
 
 }

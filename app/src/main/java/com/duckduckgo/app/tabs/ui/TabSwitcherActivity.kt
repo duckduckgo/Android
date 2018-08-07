@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -43,6 +44,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
+
+    @Inject
+    lateinit var clearPersonalDataAction: ClearPersonalDataAction
 
     @Inject
     lateinit var pixel: Pixel
@@ -107,12 +111,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     }
 
     private fun onFire() {
-        FireDialog(context = this,
-                pixel = pixel,
-                webDataManager = webDataManager,
-                clearStarted = { viewModel.onClearRequested() },
-                clearComplete = { viewModel.onClearComplete() }
-        ).show()
+        val dialog = FireDialog(context = this, pixel = pixel, clearPersonalDataAction = clearPersonalDataAction)
+        dialog.clearStarted = { viewModel.onClearRequested() }
+        dialog.clearComplete = { viewModel.onClearComplete() }
+        dialog.show()
     }
 
     override fun onNewTabRequested() {
