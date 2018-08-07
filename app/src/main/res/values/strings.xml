@@ -65,6 +65,7 @@
     <string name="openExternalApp">Open External App</string>
     <string name="launchingExternalApp">Open in Another App</string>
     <string name="confirmOpenExternalApp">Would you like to leave DuckDuckGo to view this content?</string>
+    <string name="unableToOpenLink">Unable to open this type of link</string>
 
     <!-- Tabs -->
     <string name="homeTab">DuckDuckGo</string>

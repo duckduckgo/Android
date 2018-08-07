@@ -37,8 +37,8 @@ import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
-import android.support.v7.app.AlertDialog
 import android.support.v4.content.pm.ShortcutManagerCompat
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.view.*
@@ -51,7 +51,6 @@ import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
@@ -364,9 +363,9 @@ class BrowserTabFragment : Fragment(), FindListener {
 
             Timber.i("Found ${activities.size} that could consume ${appLinkCommand.appLink.url}")
 
-            when(activities.size) {
+            when (activities.size) {
                 0 -> {
-                    Toast.makeText(it, "Unable to open this type of link", Toast.LENGTH_LONG).show()
+                    showToast(R.string.unableToOpenLink)
                     return
                 }
                 1 -> {
