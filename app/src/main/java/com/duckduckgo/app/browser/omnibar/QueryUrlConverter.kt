@@ -26,14 +26,14 @@ import javax.inject.Inject
 
 class QueryUrlConverter @Inject constructor(private val requestRewriter: RequestRewriter) : OmnibarEntryConverter {
 
-    override fun convertQueryToUrl(query: String): String {
-        if (UriString.isWebUrl(query)) {
-            return convertUri(query)
+    override fun convertQueryToUrl(searchQuery: String): String {
+        if (UriString.isWebUrl(searchQuery)) {
+            return convertUri(searchQuery)
         }
 
         val uriBuilder = Uri.Builder()
             .scheme(https)
-            .appendQueryParameter("q", query)
+            .appendQueryParameter("q", searchQuery)
             .authority(Url.HOST)
 
         requestRewriter.addCustomQueryParams(uriBuilder)

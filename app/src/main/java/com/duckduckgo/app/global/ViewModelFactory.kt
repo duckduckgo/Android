@@ -21,10 +21,7 @@ import android.arch.lifecycle.ViewModelProvider
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
-import com.duckduckgo.app.browser.BrowserTabViewModel
-import com.duckduckgo.app.browser.BrowserViewModel
-import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.app.browser.LongPressHandler
+import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
@@ -72,6 +69,7 @@ class ViewModelFactory @Inject constructor(
     private val variantManager: VariantManager,
     private val feedbackSender: FeedbackSender,
     private val webViewSessionStorage: WebViewSessionStorage,
+    private val specialUrlDetector: SpecialUrlDetector,
     private val pixel: Pixel
 
 ) : ViewModelProvider.NewInstanceFactory() {
@@ -113,6 +111,7 @@ class ViewModelFactory @Inject constructor(
         appConfigurationDao = appConfigurationDao,
         longPressHandler = webViewLongPressHandler,
         webViewSessionStorage = webViewSessionStorage,
-        autoCompleteApi = autoCompleteApi
+        autoCompleteApi = autoCompleteApi,
+        specialUrlDetector = specialUrlDetector
     )
 }

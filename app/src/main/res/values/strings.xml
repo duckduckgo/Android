@@ -63,8 +63,8 @@
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Open External App</string>
-    <string name="launchingExternalApp">Opening external app</string>
-    <string name="confirmOpenExternalApp">Are you sure you want to open this link inside another app?</string>
+    <string name="launchingExternalApp">Open in Another App</string>
+    <string name="confirmOpenExternalApp">Would you like to leave DuckDuckGo to view this content?</string>
 
     <!-- Tabs -->
     <string name="homeTab">DuckDuckGo</string>

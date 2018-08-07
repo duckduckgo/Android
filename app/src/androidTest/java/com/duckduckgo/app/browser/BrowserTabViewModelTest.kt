@@ -148,7 +148,8 @@ class BrowserTabViewModelTest {
             defaultBrowserDetector = mockDefaultBrowserDetector,
             longPressHandler = mockLongPressHandler,
             appConfigurationDao = appConfigurationDao,
-            webViewSessionStorage = webViewSessionStorage
+            webViewSessionStorage = webViewSessionStorage,
+            specialUrlDetector = SpecialUrlDetector()
         )
 
         testee.loadData("abc", null)

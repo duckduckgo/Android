@@ -71,6 +71,7 @@ class BrowserWebViewClient @Inject constructor(
             is SpecialUrlDetector.UrlType.Unknown -> consume {
                 Timber.w("Unable to process link type for ${urlType.url}")
             }
+            is SpecialUrlDetector.UrlType.SearchQuery -> return false
             is SpecialUrlDetector.UrlType.Web -> {
                 if (requestRewriter.shouldRewriteRequest(url)) {
                     val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(url)

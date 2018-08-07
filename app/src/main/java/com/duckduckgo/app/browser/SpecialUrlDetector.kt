@@ -30,7 +30,8 @@ class SpecialUrlDetector @Inject constructor() {
         class Telephone(val telephoneNumber: String) : UrlType()
         class Email(val emailAddress: String) : UrlType()
         class Sms(val telephoneNumber: String) : UrlType()
-        class IntentType(val url: String,  val intent: Intent) : UrlType()
+        class IntentType(val url: String, val intent: Intent) : UrlType()
+        class SearchQuery(val query: String) : UrlType()
         class Unknown(val url: String) : UrlType()
     }
 
@@ -45,25 +46,20 @@ class SpecialUrlDetector @Inject constructor() {
             SMS_SCHEME -> buildSms(uriString)
             SMSTO_SCHEME -> buildSmsTo(uriString)
             HTTP_SCHEME, HTTPS_SCHEME -> UrlType.Web(uriString)
+            null -> UrlType.SearchQuery(uriString)
             else -> buildIntent(uriString)
         }
     }
 
-    private fun buildTelephone(uriString: String) =
-            UrlType.Telephone(uriString.removePrefix("$TEL_SCHEME:"))
+    private fun buildTelephone(uriString: String) = UrlType.Telephone(uriString.removePrefix("$TEL_SCHEME:"))
 
-    private fun buildTelephonePrompt(uriString: String): UrlType =
-            UrlType.Telephone(uriString.removePrefix("$TELPROMPT_SCHEME:"))
+    private fun buildTelephonePrompt(uriString: String): UrlType = UrlType.Telephone(uriString.removePrefix("$TELPROMPT_SCHEME:"))
 
-    private fun buildEmail(uriString: String): UrlType {
-        return UrlType.Email(uriString)
-    }
+    private fun buildEmail(uriString: String): UrlType = UrlType.Email(uriString)
 
-    private fun buildSms(uriString: String) =
-            UrlType.Sms(uriString.removePrefix("$SMS_SCHEME:"))
+    private fun buildSms(uriString: String) = UrlType.Sms(uriString.removePrefix("$SMS_SCHEME:"))
 
-    private fun buildSmsTo(uriString: String) =
-            UrlType.Sms(uriString.removePrefix("$SMSTO_SCHEME:"))
+    private fun buildSmsTo(uriString: String) = UrlType.Sms(uriString.removePrefix("$SMSTO_SCHEME:"))
 
     private fun buildIntent(uriString: String): UrlType {
         return try {

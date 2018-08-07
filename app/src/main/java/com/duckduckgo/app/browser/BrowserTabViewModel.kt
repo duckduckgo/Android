@@ -38,6 +38,7 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment.SaveBookmarkListener
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
+import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
@@ -79,6 +80,7 @@ class BrowserTabViewModel(
     private val defaultBrowserNotification: DefaultBrowserNotification,
     private val longPressHandler: LongPressHandler,
     private val webViewSessionStorage: WebViewSessionStorage,
+    private val specialUrlDetector: SpecialUrlDetector,
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, ViewModel() {
 
@@ -148,7 +150,7 @@ class BrowserTabViewModel(
         class DisplayMessage(@StringRes val messageId: Int) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
-        class HandleExternalAppLink(val appLink: SpecialUrlDetector.UrlType.IntentType) : Command()
+        class HandleExternalAppLink(val appLink: IntentType) : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -247,7 +249,16 @@ class BrowserTabViewModel(
 
         command.value = HideKeyboard
         val trimmedInput = input.trim()
-        url.value = queryUrlConverter.convertQueryToUrl(trimmedInput)
+
+        val type = specialUrlDetector.determineType(trimmedInput)
+        when (type) {
+            is IntentType -> {
+                externalAppLinkClicked(type)
+            }
+            else -> {
+                url.value = queryUrlConverter.convertQueryToUrl(trimmedInput)
+            }
+        }
 
         globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
         findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
@@ -584,7 +595,7 @@ class BrowserTabViewModel(
         }
     }
 
-    override fun externalAppLinkClicked(appLink: SpecialUrlDetector.UrlType.IntentType) {
+    override fun externalAppLinkClicked(appLink: IntentType) {
         command.value = HandleExternalAppLink(appLink)
     }
 }
