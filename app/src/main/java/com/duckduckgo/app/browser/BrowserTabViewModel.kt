@@ -257,13 +257,10 @@ class BrowserTabViewModel(
         val trimmedInput = input.trim()
 
         val type = specialUrlDetector.determineType(trimmedInput)
-        when (type) {
-            is IntentType -> {
-                externalAppLinkClicked(type)
-            }
-            else -> {
-                url.value = queryUrlConverter.convertQueryToUrl(trimmedInput)
-            }
+        if (type is IntentType) {
+            externalAppLinkClicked(type)
+        } else {
+            url.value = queryUrlConverter.convertQueryToUrl(trimmedInput)
         }
 
         globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
