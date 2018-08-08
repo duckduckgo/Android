@@ -365,7 +365,11 @@ class BrowserTabFragment : Fragment(), FindListener {
 
             when (activities.size) {
                 0 -> {
-                    showToast(R.string.unableToOpenLink)
+                    if (appLinkCommand.appLink.fallbackUrl != null) {
+                        webView?.loadUrl(appLinkCommand.appLink.fallbackUrl)
+                    } else {
+                        showToast(R.string.unableToOpenLink)
+                    }
                     return
                 }
                 1 -> {

@@ -30,7 +30,7 @@ class SpecialUrlDetector @Inject constructor() {
         class Telephone(val telephoneNumber: String) : UrlType()
         class Email(val emailAddress: String) : UrlType()
         class Sms(val telephoneNumber: String) : UrlType()
-        class IntentType(val url: String, val intent: Intent) : UrlType()
+        class IntentType(val url: String, val intent: Intent, val fallbackUrl: String?) : UrlType()
         class SearchQuery(val query: String) : UrlType()
         class Unknown(val url: String) : UrlType()
     }
@@ -64,7 +64,8 @@ class SpecialUrlDetector @Inject constructor() {
     private fun buildIntent(uriString: String): UrlType {
         return try {
             val intent = Intent.parseUri(uriString, 0)
-            UrlType.IntentType(url = uriString, intent = intent)
+            val fallbackUrl = intent.getStringExtra(EXTRA_FALLBACK_URL)
+            UrlType.IntentType(url = uriString, intent = intent, fallbackUrl = fallbackUrl)
         } catch (e: URISyntaxException) {
             Timber.w(e, "Failed to parse uri $uriString")
             return UrlType.Unknown(uriString)
@@ -85,5 +86,7 @@ class SpecialUrlDetector @Inject constructor() {
         private const val SMSTO_SCHEME = "smsto"
         private const val HTTP_SCHEME = "http"
         private const val HTTPS_SCHEME = "https"
+
+        private const val EXTRA_FALLBACK_URL = "browser_fallback_url"
     }
 }
