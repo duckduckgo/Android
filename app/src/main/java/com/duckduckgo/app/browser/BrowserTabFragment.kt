@@ -34,6 +34,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.support.annotation.AnyThread
 import android.support.annotation.StringRes
+import android.support.constraint.ConstraintSet
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
@@ -85,6 +86,9 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import kotlin.concurrent.thread
+import kotlinx.android.synthetic.main.include_home_screen_default_browser_call_to_action_bottom_sheet.homeScreenCallToActionContainer as bottomSheetExperimentContainer
+import kotlinx.android.synthetic.main.include_home_screen_default_browser_call_to_action_bottom_sheet.homeScreenCallToActionDismissButton as bottomSheetExperimentDismissButton
+import kotlinx.android.synthetic.main.include_home_screen_default_browser_call_to_action_bottom_sheet.launchSettingsButton as bottomSheetExperimentLaunchSettingsButton
 
 
 class BrowserTabFragment : Fragment(), FindListener {
@@ -165,7 +169,9 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
     }
 
-    private val logoHidingLayoutChangeListener by lazy { LogoHidingLayoutChangeListener(ddgLogo, homeScreenCallToActionContainer) }
+    private val logoHidingLayoutChangeListener by lazy { LogoHidingLayoutChangeListener(ddgLogo) }
+
+    private val callToActionConfigurator = CallToActionConfigurator()
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
@@ -187,7 +193,6 @@ class BrowserTabFragment : Fragment(), FindListener {
         configureObservers()
         configureToolbar()
         configureBannerNotification()
-        configureCallToActionButton()
         configureWebView()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
@@ -350,6 +355,12 @@ class BrowserTabFragment : Fragment(), FindListener {
                     addHomeShortcut(it, context)
                 }
             }
+            is Command.InflateCallToActionBottomSheet -> {
+            callToActionConfigurator.configureBottomSheetCallToAction()
+        }
+            is Command.InflateCallToActionSimpleButton -> {
+                callToActionConfigurator.configureButtonCallToAction()
+            }
         }
     }
 
@@ -428,16 +439,6 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
         bannerNotification.setOnClickListener {
             launchDefaultAppSystemSettingsFromBanner()
-        }
-    }
-
-    private fun configureCallToActionButton() {
-        homeScreenCallToActionContainer.setOnClickListener {
-            launchDefaultAppSystemSettingsFromCallToActionButton()
-        }
-
-        homeScreenCallToActionDismissButton.setOnClickListener {
-            viewModel.userDeclinedHomeScreenCallToActionToSetAsDefaultBrowser()
         }
     }
 
@@ -804,9 +805,9 @@ class BrowserTabFragment : Fragment(), FindListener {
                 }
 
                 if (viewState.showHomeScreenCallToActionButton) {
-                    homeScreenCallToActionContainer.show()
+                    homeScreenCallToActionContainer?.show()
                 } else {
-                    homeScreenCallToActionContainer.gone()
+                    homeScreenCallToActionContainer?.gone()
                 }
 
                 logoHidingLayoutChangeListener.update()
@@ -994,4 +995,51 @@ class BrowserTabFragment : Fragment(), FindListener {
             !viewState.isEditing && omnibarTextInput.isDifferent(omnibarInput)
     }
 
+    private inner class CallToActionConfigurator {
+
+        fun configureBottomSheetCallToAction() {
+            if (callToActionStub == null) return
+
+            callToActionStub.layoutResource = R.layout.include_home_screen_default_browser_call_to_action_bottom_sheet
+            val container = callToActionStub.inflate()
+
+            adjustLogoConstraintsForCallToAction(container)
+
+            bottomSheetExperimentLaunchSettingsButton.setOnClickListener { launchDefaultAppSystemSettingsFromCallToActionButton() }
+            bottomSheetExperimentDismissButton.setOnClickListener { viewModel.userDeclinedHomeScreenCallToActionToSetAsDefaultBrowser() }
+        }
+
+        fun configureButtonCallToAction() {
+            if (callToActionStub == null) return
+
+            callToActionStub.layoutResource = R.layout.include_home_screen_default_browser_call_to_action
+            val container = callToActionStub.inflate()
+
+            adjustLogoConstraintsForCallToAction(container)
+
+            val set = ConstraintSet()
+            set.clone(newTabLayout)
+            set.constrainPercentWidth(container.id, 0.9f)
+            set.connect(container.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 10.toPx())
+            set.applyTo(newTabLayout)
+
+            homeScreenCallToActionContainer.setOnClickListener { launchDefaultAppSystemSettingsFromCallToActionButton() }
+            homeScreenCallToActionDismissButton.setOnClickListener { viewModel.userDeclinedHomeScreenCallToActionToSetAsDefaultBrowser() }
+        }
+
+        /**
+         * We want to center logo in space available above call to action, but c2a isn't in original view hierarchy.
+         * After appropriate c2a is loaded, we programmatically apply ConstraintLayout constraints to position logo
+         */
+        private fun adjustLogoConstraintsForCallToAction(callToActionContainer: View) {
+
+            logoHidingLayoutChangeListener.callToActionButton = callToActionContainer
+
+            ConstraintSet().also {
+                it.clone(newTabLayout)
+                it.connect(ddgLogo.id, ConstraintSet.BOTTOM, callToActionContainer.id, ConstraintSet.TOP, 0)
+                it.applyTo(newTabLayout)
+            }
+        }
+    }
 }

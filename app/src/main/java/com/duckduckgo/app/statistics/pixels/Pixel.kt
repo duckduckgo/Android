@@ -30,8 +30,11 @@ interface Pixel {
 
         APP_LAUNCH("ml"),
         FORGET_ALL_EXECUTED("mf"),
-        PRIVACY_DASHBOARD_OPENED("mp")
+        PRIVACY_DASHBOARD_OPENED("mp"),
 
+        DEFAULT_BROWSER_INFO_VIEWED("mdb_v"),
+        DEFAULT_BROWSER_SET("mdb_s"),
+        DEFAULT_BROWSER_NOT_SET("mdb_n")
     }
 
     fun fire(pixel: PixelName)

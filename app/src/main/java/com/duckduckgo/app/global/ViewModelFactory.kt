@@ -115,6 +115,7 @@ class ViewModelFactory @Inject constructor(
         appConfigurationDao = appConfigurationDao,
         longPressHandler = webViewLongPressHandler,
         webViewSessionStorage = webViewSessionStorage,
+        variantManager = variantManager,
         autoCompleteApi = autoCompleteApi,
         faviconDownloader = faviconDownloader
     )

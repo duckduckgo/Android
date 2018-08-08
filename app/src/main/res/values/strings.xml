@@ -24,6 +24,10 @@
     <string name="notificationDefaultBrowserDismissButton">Dismiss notification banner</string>
     <string name="settingsDefaultBrowserEnabled">Set as Default Browser</string>
 
+    <string name="homeScreenCallToActionTitle_Exp2">Make Us Your Default Browser!</string>
+    <string name="homeScreenCallToActionSubtitle_Exp2">For Full-Time Tracking Protection</string>
+    <string name="homeScreenCallToActionButtonText_Exp2">Show Me</string>
+
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Browser menu</string>
     <string name="refresh">Refresh</string>
