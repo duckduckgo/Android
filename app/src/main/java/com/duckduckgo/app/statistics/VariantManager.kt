@@ -19,7 +19,8 @@ package com.duckduckgo.app.statistics
 import android.os.Build
 import android.support.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.*
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToActionBottomSheet
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToActionSimpleButton
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
 
@@ -31,7 +32,8 @@ interface VariantManager {
         sealed class DefaultBrowserFeature : VariantFeature() {
             object ShowInOnboarding : DefaultBrowserFeature()
             object ShowBanner : DefaultBrowserFeature()
-            object ShowHomeScreenCallToAction : DefaultBrowserFeature()
+            object ShowHomeScreenCallToActionSimpleButton : DefaultBrowserFeature()
+            object ShowHomeScreenCallToActionBottomSheet : DefaultBrowserFeature()
         }
     }
 
@@ -41,13 +43,11 @@ interface VariantManager {
         val DEFAULT_VARIANT = Variant(key = "", features = emptyList())
 
         val ACTIVE_VARIANTS = listOf(
-            Variant(key = "ms", weight = 1.0, features = listOf(ShowInOnboarding)),
-            Variant(key = "mt", weight = 1.0, features = listOf(ShowHomeScreenCallToAction)),
-            Variant(key = "mu", weight = 1.0, features = listOf(ShowBanner)),
-            Variant(key = "mv", weight = 1.0, features = listOf(ShowBanner, ShowHomeScreenCallToAction)),
+            Variant(key = "mp", weight = 1.0, features = listOf(ShowHomeScreenCallToActionBottomSheet)),
+            Variant(key = "mq", weight = 1.0, features = listOf(ShowHomeScreenCallToActionSimpleButton)),
 
             // control group
-            Variant(key = "my", weight = 1.0, features = emptyList()),
+            Variant(key = "mr", weight = 1.0, features = emptyList()),
 
             // SERP variants - do not remove
             Variant(key = "sa", weight = 1.0, features = emptyList()),

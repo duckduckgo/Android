@@ -23,16 +23,18 @@ import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
 import android.arch.lifecycle.ProcessLifecycleOwner
+import android.os.Build
 import android.support.v4.app.Fragment
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.notification.NotificationRegistrar
+import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.migration.LegacyMigration
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_LAUNCH
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.squareup.leakcanary.LeakCanary
@@ -81,6 +83,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     @Inject
     lateinit var pixel: Pixel
 
+    @Inject
+    lateinit var appShortcutCreator: AppShortcutCreator
+
     override fun onCreate() {
         super.onCreate()
 
@@ -89,6 +94,10 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         configureDependencyInjection()
         configureLogging()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            appShortcutCreator.configureAppShortcuts(this)
+        }
 
         initializeStatistics()
         loadTrackerData()

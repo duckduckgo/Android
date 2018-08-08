@@ -20,6 +20,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
+import android.graphics.Bitmap
 import android.net.Uri
 import android.support.annotation.AnyThread
 import android.support.annotation.StringRes
@@ -38,11 +39,14 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment.SaveBookmarkListener
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
+import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
+import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.isMobileSite
@@ -55,6 +59,9 @@ import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.improvedGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToActionBottomSheet
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToActionSimpleButton
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -79,6 +86,9 @@ class BrowserTabViewModel(
     private val defaultBrowserNotification: DefaultBrowserNotification,
     private val longPressHandler: LongPressHandler,
     private val webViewSessionStorage: WebViewSessionStorage,
+    private val specialUrlDetector: SpecialUrlDetector,
+    private val variantManager: VariantManager,
+    private val faviconDownloader: FaviconDownloader,
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, ViewModel() {
 
@@ -98,7 +108,8 @@ class BrowserTabViewModel(
         val canSharePage: Boolean = false,
         val canAddBookmarks: Boolean = false,
         val canGoBack: Boolean = false,
-        val canGoForward: Boolean = false
+        val canGoForward: Boolean = false,
+        val canAddToHome: Boolean = false
     )
 
     data class OmnibarViewState(
@@ -148,6 +159,10 @@ class BrowserTabViewModel(
         class DisplayMessage(@StringRes val messageId: Int) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
+        class HandleExternalAppLink(val appLink: IntentType) : Command()
+        class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap?= null) : Command()
+        object InflateCallToActionBottomSheet : Command()
+        object InflateCallToActionSimpleButton : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -235,8 +250,18 @@ class BrowserTabViewModel(
         command.value = if (url.value == null) ShowKeyboard else Command.HideKeyboard
 
         val showBanner = defaultBrowserNotification.shouldShowBannerNotification(currentBrowserViewState().browserShowing)
-        val showCallToActionButton = defaultBrowserNotification.shouldShowHomeScreenCallToActionNotification()
-        defaultBrowserViewState.value = DefaultBrowserViewState(showBanner, showCallToActionButton)
+        val showCallToAction = defaultBrowserNotification.shouldShowHomeScreenCallToActionNotification()
+
+        if (showCallToAction) {
+            val variant = variantManager.getVariant()
+            if (variant.hasFeature(ShowHomeScreenCallToActionBottomSheet)) {
+                command.value = InflateCallToActionBottomSheet
+            } else if (variant.hasFeature(ShowHomeScreenCallToActionSimpleButton)) {
+                command.value = InflateCallToActionSimpleButton
+            }
+        }
+
+        defaultBrowserViewState.value = DefaultBrowserViewState(showBanner, showCallToAction)
     }
 
     fun onUserSubmittedQuery(input: String) {
@@ -246,7 +271,13 @@ class BrowserTabViewModel(
 
         command.value = HideKeyboard
         val trimmedInput = input.trim()
-        url.value = queryUrlConverter.convertQueryToUrl(trimmedInput)
+
+        val type = specialUrlDetector.determineType(trimmedInput)
+        if (type is IntentType) {
+            externalAppLinkClicked(type)
+        } else {
+            url.value = queryUrlConverter.convertQueryToUrl(trimmedInput)
+        }
 
         globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
         findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
@@ -331,7 +362,7 @@ class BrowserTabViewModel(
             findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = false)
 
             val currentBrowserViewState = currentBrowserViewState()
-            browserViewState.value = currentBrowserViewState.copy(canAddBookmarks = false)
+            browserViewState.value = currentBrowserViewState.copy(canAddBookmarks = false, canAddToHome = false)
 
             return
         }
@@ -345,6 +376,7 @@ class BrowserTabViewModel(
         browserViewState.value = currentBrowserViewState.copy(
             browserShowing = true,
             canAddBookmarks = true,
+            canAddToHome = true,
             canSharePage = true,
             showPrivacyGrade = appConfigurationDownloaded
         )
@@ -581,6 +613,29 @@ class BrowserTabViewModel(
                 onUserSubmittedQuery(lastUrl)
             }
         }
+    }
+
+    fun userRequestedToPinPageToHome(currentPage: String) {
+        val title = if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentPage)) {
+            duckDuckGoUrlDetector.extractQuery(currentPage) ?: currentPage
+        } else {
+            currentPage.toUri().baseHost ?: currentPage
+        }
+
+        faviconDownloader.download(currentPage.toUri())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                Timber.i("Successfully got favicon")
+                command.value = AddHomeShortcut(title, currentPage, it)
+            }, { throwable ->
+                Timber.w(throwable, "Failed to obtain favicon")
+                command.value = AddHomeShortcut(title, currentPage)
+            })
+    }
+
+    override fun externalAppLinkClicked(appLink: IntentType) {
+        command.value = HandleExternalAppLink(appLink)
     }
 }
 

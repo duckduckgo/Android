@@ -25,6 +25,8 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.Variant
+import com.duckduckgo.app.statistics.VariantManager
 import com.nhaarman.mockito_kotlin.KArgumentCaptor
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.nhaarman.mockito_kotlin.verify
@@ -55,6 +57,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
 
+    @Mock
+    private lateinit var mockVariantManager: VariantManager
+
     private lateinit var commandCaptor: KArgumentCaptor<Command>
 
     @Before
@@ -64,9 +69,10 @@ class SettingsViewModelTest {
         context = InstrumentationRegistry.getTargetContext()
         commandCaptor = argumentCaptor()
 
-
-        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector)
+        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager)
         testee.command.observeForever(commandObserver)
+
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
     }
 
     @Test
@@ -92,7 +98,8 @@ class SettingsViewModelTest {
     fun whenStartCalledThenVersionSetCorrectly() {
         testee.start()
         val value = latestViewState()
-        assertEquals("${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})", value.version)
+        val expectedStartString = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+        assertTrue(value.version.startsWith(expectedStartString))
     }
 
     @Test
@@ -133,6 +140,22 @@ class SettingsViewModelTest {
         testee.start()
         assertTrue(latestViewState().showDefaultBrowserSetting)
     }
+
+    @Test
+    fun whenVariantIsEmptyThenEmptyVariantIncludedInSettings() {
+        testee.start()
+        val expectedStartString = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+        assertEquals(expectedStartString, latestViewState().version)
+    }
+
+    @Test
+    fun whenVariantIsSetThenVariantKeyIncludedInSettings() {
+        whenever(mockVariantManager.getVariant()).thenReturn(Variant("ab"))
+        testee.start()
+        val expectedStartString = "${BuildConfig.VERSION_NAME} ab (${BuildConfig.VERSION_CODE})"
+        assertEquals(expectedStartString, latestViewState().version)
+    }
+
 
     private fun latestViewState() = testee.viewState.value!!
 }

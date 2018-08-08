@@ -33,6 +33,7 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
+import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.global.db.AppConfigurationDao
@@ -45,6 +46,7 @@ import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabDataRepository
@@ -114,6 +116,12 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var webViewSessionStorage: WebViewSessionStorage
 
+    @Mock
+    private lateinit var variantManager: VariantManager
+
+    @Mock
+    private lateinit var mockFaviconDownloader: FaviconDownloader
+
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
 
@@ -148,7 +156,10 @@ class BrowserTabViewModelTest {
             defaultBrowserDetector = mockDefaultBrowserDetector,
             longPressHandler = mockLongPressHandler,
             appConfigurationDao = appConfigurationDao,
-            webViewSessionStorage = webViewSessionStorage
+            webViewSessionStorage = webViewSessionStorage,
+            specialUrlDetector = SpecialUrlDetector(),
+            faviconDownloader = mockFaviconDownloader,
+            variantManager = variantManager
         )
 
         testee.loadData("abc", null)

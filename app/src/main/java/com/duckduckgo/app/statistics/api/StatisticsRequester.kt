@@ -54,6 +54,7 @@ class StatisticsRequester(
             .subscribeOn(Schedulers.io())
             .flatMap {
                 val atb = Atb(it.version)
+                Timber.i("$atb")
                 store.saveAtb(atb)
                 val atbWithVariant = atb.formatWithVariant(variantManager.getVariant())
                 service.exti(atbWithVariant)
