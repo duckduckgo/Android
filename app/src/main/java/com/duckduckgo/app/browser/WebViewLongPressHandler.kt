@@ -40,7 +40,7 @@ interface LongPressHandler {
     }
 }
 
-class WebViewLongPressHandler @Inject constructor(val pixel: Pixel) : LongPressHandler {
+class WebViewLongPressHandler @Inject constructor(private val pixel: Pixel) : LongPressHandler {
 
     override fun handleLongPress(longPressTargetType: Int, longPressTargetUrl: String?, menu: ContextMenu) {
         var menuShown = true
