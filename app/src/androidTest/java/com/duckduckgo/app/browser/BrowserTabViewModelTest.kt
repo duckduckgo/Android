@@ -46,6 +46,7 @@ import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabDataRepository
@@ -116,6 +117,9 @@ class BrowserTabViewModelTest {
     private lateinit var webViewSessionStorage: WebViewSessionStorage
 
     @Mock
+    private lateinit var variantManager: VariantManager
+
+    @Mock
     private lateinit var mockFaviconDownloader: FaviconDownloader
 
     @Captor
@@ -154,7 +158,8 @@ class BrowserTabViewModelTest {
             appConfigurationDao = appConfigurationDao,
             webViewSessionStorage = webViewSessionStorage,
             specialUrlDetector = SpecialUrlDetector(),
-            faviconDownloader = mockFaviconDownloader
+            faviconDownloader = mockFaviconDownloader,
+            variantManager = variantManager
         )
 
         testee.loadData("abc", null)

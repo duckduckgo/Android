@@ -21,7 +21,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowBanner
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToAction
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToActionSimpleButton
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -72,7 +72,7 @@ class DefaultBrowserTimeBasedNotification @Inject constructor(
             return false
         }
 
-        if (!isFeatureEnabled(ShowHomeScreenCallToAction)) {
+        if (!isFeatureEnabled(ShowHomeScreenCallToActionSimpleButton) && !isFeatureEnabled(DefaultBrowserFeature.ShowHomeScreenCallToActionBottomSheet)) {
             return false
         }
 

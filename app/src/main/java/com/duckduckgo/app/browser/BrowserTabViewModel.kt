@@ -59,6 +59,9 @@ import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.improvedGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToActionBottomSheet
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToActionSimpleButton
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -84,6 +87,7 @@ class BrowserTabViewModel(
     private val longPressHandler: LongPressHandler,
     private val webViewSessionStorage: WebViewSessionStorage,
     private val specialUrlDetector: SpecialUrlDetector,
+    private val variantManager: VariantManager,
     private val faviconDownloader: FaviconDownloader,
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, ViewModel() {
@@ -157,6 +161,8 @@ class BrowserTabViewModel(
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         class HandleExternalAppLink(val appLink: IntentType) : Command()
         class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap?= null) : Command()
+        object InflateCallToActionBottomSheet : Command()
+        object InflateCallToActionSimpleButton : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -244,8 +250,18 @@ class BrowserTabViewModel(
         command.value = if (url.value == null) ShowKeyboard else Command.HideKeyboard
 
         val showBanner = defaultBrowserNotification.shouldShowBannerNotification(currentBrowserViewState().browserShowing)
-        val showCallToActionButton = defaultBrowserNotification.shouldShowHomeScreenCallToActionNotification()
-        defaultBrowserViewState.value = DefaultBrowserViewState(showBanner, showCallToActionButton)
+        val showCallToAction = defaultBrowserNotification.shouldShowHomeScreenCallToActionNotification()
+
+        if (showCallToAction) {
+            val variant = variantManager.getVariant()
+            if (variant.hasFeature(ShowHomeScreenCallToActionBottomSheet)) {
+                command.value = InflateCallToActionBottomSheet
+            } else if (variant.hasFeature(ShowHomeScreenCallToActionSimpleButton)) {
+                command.value = InflateCallToActionSimpleButton
+            }
+        }
+
+        defaultBrowserViewState.value = DefaultBrowserViewState(showBanner, showCallToAction)
     }
 
     fun onUserSubmittedQuery(input: String) {

@@ -16,7 +16,8 @@
 
 package com.duckduckgo.app.statistics
 
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.*
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToActionBottomSheet
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToActionSimpleButton
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -25,41 +26,24 @@ class VariantManagerTest {
     private val variants = VariantManager.ACTIVE_VARIANTS
 
     @Test
-    fun onboardingOnlyVariantConfiguredCorrectly() {
-        val variant = variants.firstOrNull { it.key == "ms" }
+    fun homeScreenCallToActionButtonVariantConfiguredCorrectly() {
+        val variant = variants.firstOrNull { it.key == "mq" }
         assertEqualsDouble(1.0, variant!!.weight)
-        assertTrue(variant.hasFeature(ShowInOnboarding))
+        assertTrue(variant.hasFeature(ShowHomeScreenCallToActionSimpleButton))
         assertEquals(1, variant.features.size)
     }
 
     @Test
-    fun homeScreenCallToActionVariantConfiguredCorrectly() {
-        val variant = variants.firstOrNull { it.key == "mt" }
+    fun homeScreenCallToActionBottomSheetVariantConfiguredCorrectly() {
+        val variant = variants.firstOrNull { it.key == "mp" }
         assertEqualsDouble(1.0, variant!!.weight)
-        assertTrue(variant.hasFeature(ShowHomeScreenCallToAction))
+        assertTrue(variant.hasFeature(ShowHomeScreenCallToActionBottomSheet))
         assertEquals(1, variant.features.size)
-    }
-
-    @Test
-    fun showBannerVariantConfiguredCorrectly() {
-        val variant = variants.firstOrNull { it.key == "mu" }
-        assertEqualsDouble(1.0, variant!!.weight)
-        assertTrue(variant.hasFeature(ShowBanner))
-        assertEquals(1, variant.features.size)
-    }
-
-    @Test
-    fun showBannerAndShowHomeScreenCallToActionVariantConfiguredCorrectly() {
-        val variant = variants.firstOrNull { it.key == "mv" }
-        assertEqualsDouble(1.0, variant!!.weight)
-        assertTrue(variant.hasFeature(ShowBanner))
-        assertTrue(variant.hasFeature(ShowHomeScreenCallToAction))
-        assertEquals(2, variant.features.size)
     }
 
     @Test
     fun controlVariantConfiguredCorrectly() {
-        val variant = variants.firstOrNull { it.key == "my" }
+        val variant = variants.firstOrNull { it.key == "mr" }
         assertEqualsDouble(1.0, variant!!.weight)
         assertEquals(0, variant.features.size)
     }
