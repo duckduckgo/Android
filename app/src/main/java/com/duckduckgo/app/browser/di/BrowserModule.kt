@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import dagger.Module
 import dagger.Provides
@@ -43,8 +44,8 @@ class BrowserModule {
     }
 
     @Provides
-    fun webViewLongPressHandler(): LongPressHandler {
-        return WebViewLongPressHandler()
+    fun webViewLongPressHandler(pixel: Pixel): LongPressHandler {
+        return WebViewLongPressHandler(pixel)
     }
 
     @Provides

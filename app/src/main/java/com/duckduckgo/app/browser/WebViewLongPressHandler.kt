@@ -22,6 +22,8 @@ import android.webkit.URLUtil
 import android.webkit.WebView
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.*
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -38,9 +40,10 @@ interface LongPressHandler {
     }
 }
 
-class WebViewLongPressHandler @Inject constructor() : LongPressHandler {
+class WebViewLongPressHandler @Inject constructor(val pixel: Pixel) : LongPressHandler {
 
     override fun handleLongPress(longPressTargetType: Int, longPressTargetUrl: String?, menu: ContextMenu) {
+        var menuShown = true
         when (longPressTargetType) {
             WebView.HitTestResult.IMAGE_TYPE,
             WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE -> {
@@ -54,19 +57,30 @@ class WebViewLongPressHandler @Inject constructor() : LongPressHandler {
                 menu.add(0, CONTEXT_MENU_ID_OPEN_IN_NEW_TAB, 1, R.string.openInNewTab)
                 menu.add(0, CONTEXT_MENU_ID_SHARE_LINK, 2, R.string.shareLink)
             }
-            else -> Timber.v("App does not yet handle target type: $longPressTargetType")
+            else -> {
+                Timber.v("App does not yet handle target type: $longPressTargetType")
+                menuShown = false
+            }
         }
+
+        if (menuShown) {
+            pixel.fire(LONG_PRESS)
+        }
+
     }
 
     override fun userSelectedMenuItem(longPressTarget: String, item: MenuItem): RequiredAction {
         return when (item.itemId) {
             CONTEXT_MENU_ID_OPEN_IN_NEW_TAB -> {
+                pixel.fire(LONG_PRESS_NEW_TAB)
                 return OpenInNewTab(longPressTarget)
             }
             CONTEXT_MENU_ID_DOWNLOAD_IMAGE -> {
+                pixel.fire(LONG_PRESS_DOWNLOAD_IMAGE)
                 return DownloadFile(longPressTarget)
             }
             CONTEXT_MENU_ID_SHARE_LINK -> {
+                pixel.fire(LONG_PRESS_SHARE)
                 return ShareLink(longPressTarget)
             }
             else -> None

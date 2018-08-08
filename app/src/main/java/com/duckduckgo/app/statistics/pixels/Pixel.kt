@@ -30,11 +30,22 @@ interface Pixel {
 
         APP_LAUNCH("ml"),
         FORGET_ALL_EXECUTED("mf"),
+
         PRIVACY_DASHBOARD_OPENED("mp"),
+        PRIVACY_DASHBOARD_SCORECARD("mp_c"),
+        PRIVACY_DASHBOARD_ENCRYPTION("mp_e"),
+        PRIVACY_DASHBOARD_GLOBAL_STATS("mp_s"),
+        PRIVACY_DASHBOARD_PRIVACY_PRACTICES("mp_p"),
+        PRIVACY_DASHBOARD_NETWORKS("mp_n"),
 
         DEFAULT_BROWSER_INFO_VIEWED("mdb_v"),
         DEFAULT_BROWSER_SET("mdb_s"),
-        DEFAULT_BROWSER_NOT_SET("mdb_n")
+        DEFAULT_BROWSER_NOT_SET("mdb_n"),
+
+        LONG_PRESS("mlp"),
+        LONG_PRESS_DOWNLOAD_IMAGE("mlp_i"),
+        LONG_PRESS_NEW_TAB("mlp_t"),
+        LONG_PRESS_SHARE("mlp_s")
     }
 
     fun fire(pixel: PixelName)

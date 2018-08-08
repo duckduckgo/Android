@@ -149,7 +149,7 @@ class PrivacyDashboardViewModel(
 
     private companion object {
         private const val LEADERBOARD_MIN_NETWORKS = 3
-        private const val LEADERNOARD_MIN_DOMAINS_EXCLUSIVE = 30
+        private const val LEADERNOARD_MIN_DOMAINS_EXCLUSIVE = 5
     }
 }
 
