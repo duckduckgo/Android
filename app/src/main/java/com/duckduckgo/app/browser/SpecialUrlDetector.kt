@@ -46,6 +46,7 @@ class SpecialUrlDetector @Inject constructor() {
             SMS_SCHEME -> buildSms(uriString)
             SMSTO_SCHEME -> buildSmsTo(uriString)
             HTTP_SCHEME, HTTPS_SCHEME -> UrlType.Web(uriString)
+            ABOUT_SCHEME -> UrlType.Unknown(uriString)
             null -> UrlType.SearchQuery(uriString)
             else -> buildIntent(uriString)
         }
@@ -86,6 +87,7 @@ class SpecialUrlDetector @Inject constructor() {
         private const val SMSTO_SCHEME = "smsto"
         private const val HTTP_SCHEME = "http"
         private const val HTTPS_SCHEME = "https"
+        private const val ABOUT_SCHEME = "about"
 
         private const val EXTRA_FALLBACK_URL = "browser_fallback_url"
     }

@@ -68,8 +68,10 @@ class BrowserWebViewClient @Inject constructor(
                 Timber.i("Found intent type link for $urlType.url")
                 launchExternalApp(urlType)
             }
-            is SpecialUrlDetector.UrlType.Unknown -> consume {
+            is SpecialUrlDetector.UrlType.Unknown -> {
                 Timber.w("Unable to process link type for ${urlType.url}")
+                webView.loadUrl(webView.originalUrl)
+                return false
             }
             is SpecialUrlDetector.UrlType.SearchQuery -> return false
             is SpecialUrlDetector.UrlType.Web -> {
