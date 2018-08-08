@@ -39,6 +39,7 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment.SaveBookmarkListener
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
+import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
@@ -85,6 +86,7 @@ class BrowserTabViewModel(
     private val defaultBrowserNotification: DefaultBrowserNotification,
     private val longPressHandler: LongPressHandler,
     private val webViewSessionStorage: WebViewSessionStorage,
+    private val specialUrlDetector: SpecialUrlDetector,
     private val variantManager: VariantManager,
     private val faviconDownloader: FaviconDownloader,
     appConfigurationDao: AppConfigurationDao
@@ -157,6 +159,7 @@ class BrowserTabViewModel(
         class DisplayMessage(@StringRes val messageId: Int) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
+        class HandleExternalAppLink(val appLink: IntentType) : Command()
         class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap?= null) : Command()
         object InflateCallToActionBottomSheet : Command()
         object InflateCallToActionSimpleButton : Command()
@@ -268,7 +271,13 @@ class BrowserTabViewModel(
 
         command.value = HideKeyboard
         val trimmedInput = input.trim()
-        url.value = queryUrlConverter.convertQueryToUrl(trimmedInput)
+
+        val type = specialUrlDetector.determineType(trimmedInput)
+        if (type is IntentType) {
+            externalAppLinkClicked(type)
+        } else {
+            url.value = queryUrlConverter.convertQueryToUrl(trimmedInput)
+        }
 
         globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
         findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
@@ -623,6 +632,10 @@ class BrowserTabViewModel(
                 Timber.w(throwable, "Failed to obtain favicon")
                 command.value = AddHomeShortcut(title, currentPage)
             })
+    }
+
+    override fun externalAppLinkClicked(appLink: IntentType) {
+        command.value = HandleExternalAppLink(appLink)
     }
 }
 

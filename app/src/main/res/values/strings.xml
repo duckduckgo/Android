@@ -65,6 +65,12 @@
     <string name="editQueryBeforeSubmitting">Edit query before searching</string>
     <string name="settingsAutocompleteEnabled">Autocomplete Suggestions</string>
 
+    <!-- Opening external apps -->
+    <string name="openExternalApp">Open External App</string>
+    <string name="launchingExternalApp">Open in Another App</string>
+    <string name="confirmOpenExternalApp">Would you like to leave DuckDuckGo to view this content?</string>
+    <string name="unableToOpenLink">Unable to open this type of link</string>
+
     <!-- Tabs -->
     <string name="homeTab">DuckDuckGo</string>
     <string name="tabActivityTitle">Tabs</string>

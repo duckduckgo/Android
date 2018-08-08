@@ -37,4 +37,5 @@ interface WebViewClientListener {
     fun goFullScreen(view: View)
     fun exitFullScreen()
     fun showFileChooser(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams)
+    fun externalAppLinkClicked(appLink: SpecialUrlDetector.UrlType.IntentType)
 }

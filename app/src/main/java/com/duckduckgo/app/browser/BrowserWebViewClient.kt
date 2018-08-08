@@ -56,7 +56,7 @@ class BrowserWebViewClient @Inject constructor(
     /**
      * API-agnostic implementation of deciding whether to override url or not
      */
-    private fun shouldOverride(view: WebView, url: Uri): Boolean {
+    private fun shouldOverride(webView: WebView, url: Uri): Boolean {
 
         val urlType = specialUrlDetector.determineType(url)
 
@@ -64,15 +64,29 @@ class BrowserWebViewClient @Inject constructor(
             is SpecialUrlDetector.UrlType.Email -> consume { webViewClientListener?.sendEmailRequested(urlType.emailAddress) }
             is SpecialUrlDetector.UrlType.Telephone -> consume { webViewClientListener?.dialTelephoneNumberRequested(urlType.telephoneNumber) }
             is SpecialUrlDetector.UrlType.Sms -> consume { webViewClientListener?.sendSmsRequested(urlType.telephoneNumber) }
+            is SpecialUrlDetector.UrlType.IntentType -> consume {
+                Timber.i("Found intent type link for $urlType.url")
+                launchExternalApp(urlType)
+            }
+            is SpecialUrlDetector.UrlType.Unknown -> {
+                Timber.w("Unable to process link type for ${urlType.url}")
+                webView.loadUrl(webView.originalUrl)
+                return false
+            }
+            is SpecialUrlDetector.UrlType.SearchQuery -> return false
             is SpecialUrlDetector.UrlType.Web -> {
                 if (requestRewriter.shouldRewriteRequest(url)) {
                     val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(url)
-                    view.loadUrl(newUri.toString())
+                    webView.loadUrl(newUri.toString())
                     return true
                 }
                 return false
             }
         }
+    }
+
+    private fun launchExternalApp(urlType: SpecialUrlDetector.UrlType.IntentType) {
+        webViewClientListener?.externalAppLinkClicked(urlType)
     }
 
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
