@@ -19,10 +19,8 @@ package com.duckduckgo.app.browser
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.webkit.WebView.HitTestResult
-import com.nhaarman.mockito_kotlin.eq
-import com.nhaarman.mockito_kotlin.never
-import com.nhaarman.mockito_kotlin.verify
-import com.nhaarman.mockito_kotlin.whenever
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.nhaarman.mockito_kotlin.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -45,10 +43,31 @@ class WebViewLongPressHandlerTest {
     @Mock
     private lateinit var mockMenuItem: MenuItem
 
+    @Mock
+    private lateinit var mockPixel: Pixel
+
     @Before
     fun setup() {
         MockitoAnnotations.initMocks(this)
-        testee = WebViewLongPressHandler()
+        testee = WebViewLongPressHandler(mockPixel)
+    }
+
+    @Test
+    fun whenLongPressedWithImageTypeThenPixelFired() {
+        testee.handleLongPress(HitTestResult.IMAGE_TYPE, HTTPS_IMAGE_URL, mockMenu)
+        verify(mockPixel).fire(Pixel.PixelName.LONG_PRESS)
+    }
+
+    @Test
+    fun whenLongPressedWithAnchorImageTypeThenPixelFired() {
+        testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, HTTPS_IMAGE_URL, mockMenu)
+        verify(mockPixel).fire(Pixel.PixelName.LONG_PRESS)
+    }
+
+    @Test
+    fun whenLongPressedWithUnknownTypeThenPixelNotFired() {
+        testee.handleLongPress(HitTestResult.UNKNOWN_TYPE, HTTPS_IMAGE_URL, mockMenu)
+        verify(mockPixel, never()).fire(any())
     }
 
     @Test
