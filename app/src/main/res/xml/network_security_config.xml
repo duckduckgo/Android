@@ -22,4 +22,8 @@
             <certificates src="user" />
         </trust-anchors>
     </debug-overrides>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">duckduckgo.com</domain>
+    </domain-config>
+    <base-config cleartextTrafficPermitted="true" />
 </network-security-config>
