@@ -16,58 +16,55 @@
 
 package com.duckduckgo.app.statistics
 
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.*
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToActionBottomSheet
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToActionSimpleButton
 import org.junit.Assert.*
 import org.junit.Test
 
 class VariantManagerTest {
 
     private val variants = VariantManager.ACTIVE_VARIANTS
-    private val totalWeight = variants.sumByDouble { it.weight }
 
     @Test
-    fun onboardingOnlyVariantConfiguredCorrectly() {
-        val variant = variants.firstOrNull { it.key == "ms" }
-        assertEqualsDouble( 0.20, variant!!.weight / totalWeight)
-        assertTrue(variant.hasFeature(ShowInOnboarding))
+    fun homeScreenCallToActionButtonVariantConfiguredCorrectly() {
+        val variant = variants.firstOrNull { it.key == "mq" }
+        assertEqualsDouble(1.0, variant!!.weight)
+        assertTrue(variant.hasFeature(ShowHomeScreenCallToActionSimpleButton))
         assertEquals(1, variant.features.size)
     }
 
     @Test
-    fun homeScreenCallToActionVariantConfiguredCorrectly() {
-        val variant = variants.firstOrNull { it.key == "mt" }
-        assertEqualsDouble( 0.20, variant!!.weight / totalWeight)
-        assertTrue(variant.hasFeature(ShowHomeScreenCallToAction))
+    fun homeScreenCallToActionBottomSheetVariantConfiguredCorrectly() {
+        val variant = variants.firstOrNull { it.key == "mp" }
+        assertEqualsDouble(1.0, variant!!.weight)
+        assertTrue(variant.hasFeature(ShowHomeScreenCallToActionBottomSheet))
         assertEquals(1, variant.features.size)
-    }
-
-    @Test
-    fun showBannerVariantConfiguredCorrectly() {
-        val variant = variants.firstOrNull { it.key == "mu" }
-        assertEqualsDouble( 0.20, variant!!.weight / totalWeight)
-        assertTrue(variant.hasFeature(ShowBanner))
-        assertEquals(1, variant.features.size)
-    }
-
-    @Test
-    fun showBannerAndShowHomeScreenCallToActionVariantConfiguredCorrectly() {
-        val variant = variants.firstOrNull { it.key == "mv" }
-        assertEqualsDouble( 0.20, variant!!.weight / totalWeight)
-        assertTrue(variant.hasFeature(ShowBanner))
-        assertTrue(variant.hasFeature(ShowHomeScreenCallToAction))
-        assertEquals(2, variant.features.size)
     }
 
     @Test
     fun controlVariantConfiguredCorrectly() {
-        val variant = variants.firstOrNull { it.key == "my" }
-        assertEqualsDouble( 0.2, variant!!.weight / totalWeight)
+        val variant = variants.firstOrNull { it.key == "mr" }
+        assertEqualsDouble(1.0, variant!!.weight)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun serpVariantAConfiguredCorrectly() {
+        val variant = variants.firstOrNull { it.key == "sa" }
+        assertEqualsDouble(1.0, variant!!.weight)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun serpVariantBConfiguredCorrectly() {
+        val variant = variants.firstOrNull { it.key == "sb" }
+        assertEqualsDouble(1.0, variant!!.weight)
         assertEquals(0, variant.features.size)
     }
 
     private fun assertEqualsDouble(expected: Double, actual: Double) {
         val comparison = expected.compareTo(actual)
-        if(comparison != 0) {
+        if (comparison != 0) {
             fail("Doubles are not equal. Expected $expected but was $actual")
         }
     }

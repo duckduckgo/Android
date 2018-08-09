@@ -33,6 +33,8 @@ import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.privacy.renderer.*
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.ViewState
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
 import kotlinx.android.synthetic.main.content_privacy_dashboard.*
@@ -42,8 +44,13 @@ import javax.inject.Inject
 
 class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
-    @Inject lateinit var viewModelFactory: ViewModelFactory
-    @Inject lateinit var repository: TabRepository
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    @Inject
+    lateinit var repository: TabRepository
+    @Inject
+    lateinit var pixel: Pixel
+
     private val trackersRenderer = TrackersRenderer()
     private val upgradeRenderer = PrivacyUpgradeRenderer()
 
@@ -132,15 +139,26 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
     }
 
     fun onScorecardClicked() {
+        pixel.fire(PRIVACY_DASHBOARD_SCORECARD)
         startActivity(ScorecardActivity.intent(this, intent.tabId!!))
     }
 
+    fun onEncryptionClicked(@Suppress("UNUSED_PARAMETER") view: View) {
+        pixel.fire(PRIVACY_DASHBOARD_ENCRYPTION)
+    }
+
     fun onNetworksClicked(@Suppress("UNUSED_PARAMETER") view: View) {
+        pixel.fire(PRIVACY_DASHBOARD_NETWORKS)
         startActivity(TrackerNetworksActivity.intent(this, intent.tabId!!))
     }
 
     fun onPracticesClicked(@Suppress("UNUSED_PARAMETER") view: View) {
+        pixel.fire(PRIVACY_DASHBOARD_PRIVACY_PRACTICES)
         startActivity(PrivacyPracticesActivity.intent(this, intent.tabId!!))
+    }
+
+    fun onLeaderboardClick(@Suppress("UNUSED_PARAMETER") view: View) {
+        pixel.fire(PRIVACY_DASHBOARD_GLOBAL_STATS)
     }
 
     private fun updateActivityResult(shouldReload: Boolean) {

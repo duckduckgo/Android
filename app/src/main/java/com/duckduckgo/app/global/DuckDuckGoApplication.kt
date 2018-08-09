@@ -19,14 +19,22 @@ package com.duckduckgo.app.global
 import android.app.Activity
 import android.app.Application
 import android.app.Service
+import android.arch.lifecycle.Lifecycle
+import android.arch.lifecycle.LifecycleObserver
+import android.arch.lifecycle.OnLifecycleEvent
+import android.arch.lifecycle.ProcessLifecycleOwner
+import android.os.Build
 import android.support.v4.app.Fragment
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.notification.NotificationRegistrar
+import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.migration.LegacyMigration
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_LAUNCH
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.squareup.leakcanary.LeakCanary
@@ -40,7 +48,7 @@ import org.jetbrains.anko.doAsync
 import timber.log.Timber
 import javax.inject.Inject
 
-open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasSupportFragmentInjector, Application() {
+open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasSupportFragmentInjector, Application(), LifecycleObserver {
 
     @Inject
     lateinit var activityInjector: DispatchingAndroidInjector<Activity>
@@ -72,13 +80,24 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     @Inject
     lateinit var notificationRegistrar: NotificationRegistrar
 
+    @Inject
+    lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var appShortcutCreator: AppShortcutCreator
+
     override fun onCreate() {
         super.onCreate()
 
         if (!installLeakCanary()) return
 
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         configureDependencyInjection()
         configureLogging()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            appShortcutCreator.configureAppShortcuts(this)
+        }
 
         initializeStatistics()
         loadTrackerData()
@@ -124,9 +143,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     protected open fun configureDependencyInjection() {
         DaggerAppComponent.builder()
-                .application(this)
-                .create(this)
-                .inject(this)
+            .application(this)
+            .create(this)
+            .inject(this)
     }
 
     private fun initializeStatistics() {
@@ -141,11 +160,11 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
      */
     private fun configureDataDownloader() {
         appConfigurationSyncer.scheduleImmediateSync()
-                .subscribeOn(Schedulers.io())
-                .doAfterTerminate({
-                    appConfigurationSyncer.scheduleRegularSync(this)
-                })
-                .subscribe({}, { Timber.w("Failed to download initial app configuration ${it.localizedMessage}") })
+            .subscribeOn(Schedulers.io())
+            .doAfterTerminate({
+                appConfigurationSyncer.scheduleRegularSync(this)
+            })
+            .subscribe({}, { Timber.w("Failed to download initial app configuration ${it.localizedMessage}") })
     }
 
     override fun activityInjector(): AndroidInjector<Activity> = activityInjector
@@ -153,4 +172,11 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     override fun supportFragmentInjector(): AndroidInjector<Fragment> = supportFragmentInjector
 
     override fun serviceInjector(): AndroidInjector<Service> = serviceInjector
+
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun onAppForegrounded() {
+        pixel.fire(APP_LAUNCH)
+    }
+
 }

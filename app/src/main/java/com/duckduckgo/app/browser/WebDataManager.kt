@@ -23,8 +23,9 @@ import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewDatabase
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import javax.inject.Inject
 
-class WebDataManager(private val host: String, private val webViewSessionStorage: WebViewSessionStorage) {
+class WebDataManager @Inject constructor(private val host: String, private val webViewSessionStorage: WebViewSessionStorage) {
 
     fun clearData(webView: WebView, webStorage: WebStorage, context: Context) {
         webView.clearCache(true)

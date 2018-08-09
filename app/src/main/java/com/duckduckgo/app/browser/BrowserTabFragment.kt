@@ -34,9 +34,12 @@ import android.os.Bundle
 import android.os.Environment
 import android.support.annotation.AnyThread
 import android.support.annotation.StringRes
+import android.support.constraint.ConstraintSet
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
+import android.support.v4.content.pm.ShortcutManagerCompat
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.view.*
@@ -61,6 +64,7 @@ import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
@@ -83,6 +87,9 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import kotlin.concurrent.thread
+import kotlinx.android.synthetic.main.include_home_screen_default_browser_call_to_action_bottom_sheet.homeScreenCallToActionContainer as bottomSheetExperimentContainer
+import kotlinx.android.synthetic.main.include_home_screen_default_browser_call_to_action_bottom_sheet.homeScreenCallToActionDismissButton as bottomSheetExperimentDismissButton
+import kotlinx.android.synthetic.main.include_home_screen_default_browser_call_to_action_bottom_sheet.launchSettingsButton as bottomSheetExperimentLaunchSettingsButton
 
 
 class BrowserTabFragment : Fragment(), FindListener {
@@ -107,6 +114,9 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     @Inject
     lateinit var webViewSessionStorage: WebViewSessionStorage
+
+    @Inject
+    lateinit var shortcutBuilder: ShortcutBuilder
 
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
@@ -160,7 +170,9 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
     }
 
-    private val logoHidingLayoutChangeListener by lazy { LogoHidingLayoutChangeListener(ddgLogo, homeScreenCallToActionContainer) }
+    private val logoHidingLayoutChangeListener by lazy { LogoHidingLayoutChangeListener(ddgLogo) }
+
+    private val callToActionConfigurator = CallToActionConfigurator()
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
@@ -182,7 +194,6 @@ class BrowserTabFragment : Fragment(), FindListener {
         configureObservers()
         configureToolbar()
         configureBannerNotification()
-        configureCallToActionButton()
         configureWebView()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
@@ -221,7 +232,18 @@ class BrowserTabFragment : Fragment(), FindListener {
                 )
             }
             onMenuItemClicked(view.sharePageMenuItem) { viewModel.userSharingLink(webView?.url) }
+            onMenuItemClicked(view.addToHome) {
+                context?.let {
+                    val url = webView?.url ?: return@let
+                    viewModel.userRequestedToPinPageToHome(url)
+                }
+            }
         }
+    }
+
+    private fun addHomeShortcut(homeShortcut: Command.AddHomeShortcut, context: Context) {
+        val shortcutInfo = shortcutBuilder.buildPinnedPageShortcut(context, homeShortcut)
+        ShortcutManagerCompat.requestPinShortcut(context, shortcutInfo, null)
     }
 
     private fun configureObservers() {
@@ -329,6 +351,57 @@ class BrowserTabFragment : Fragment(), FindListener {
             is Command.ShowFileChooser -> {
                 launchFilePicker(it)
             }
+            is Command.AddHomeShortcut -> {
+                context?.let { context ->
+                    addHomeShortcut(it, context)
+                }
+            }
+            is Command.InflateCallToActionBottomSheet -> {
+                callToActionConfigurator.configureBottomSheetCallToAction()
+            }
+            is Command.InflateCallToActionSimpleButton -> {
+                callToActionConfigurator.configureButtonCallToAction()
+            }
+            is Command.HandleExternalAppLink -> { externalAppLinkClicked(it) }
+        }
+    }
+
+    private fun externalAppLinkClicked(appLinkCommand: Command.HandleExternalAppLink) {
+        context?.let {
+            val pm = it.packageManager
+            val intent = appLinkCommand.appLink.intent
+            val activities = pm.queryIntentActivities(intent, 0)
+
+            Timber.i("Found ${activities.size} that could consume ${appLinkCommand.appLink.url}")
+
+            when (activities.size) {
+                0 -> {
+                    if (appLinkCommand.appLink.fallbackUrl != null) {
+                        webView?.loadUrl(appLinkCommand.appLink.fallbackUrl)
+                    } else {
+                        showToast(R.string.unableToOpenLink)
+                    }
+                    return
+                }
+                1 -> {
+                    val activity = activities.first()
+                    val appTitle = activity.loadLabel(pm)
+                    Timber.i("Exactly one app available for intent: $appTitle")
+
+                    AlertDialog.Builder(it)
+                        .setTitle(R.string.launchingExternalApp)
+                        .setMessage(getString(R.string.confirmOpenExternalApp))
+                        .setPositiveButton(R.string.openExternalApp) { _, _ -> it.startActivity(intent) }
+                        .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
+                        .show()
+                }
+                else -> {
+                    val title = getString(R.string.openExternalApp)
+                    val intentChooser = Intent.createChooser(intent, title)
+                    it.startActivity(intentChooser)
+                }
+            }
+
         }
     }
 
@@ -407,16 +480,6 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
         bannerNotification.setOnClickListener {
             launchDefaultAppSystemSettingsFromBanner()
-        }
-    }
-
-    private fun configureCallToActionButton() {
-        homeScreenCallToActionContainer.setOnClickListener {
-            launchDefaultAppSystemSettingsFromCallToActionButton()
-        }
-
-        homeScreenCallToActionDismissButton.setOnClickListener {
-            viewModel.userDeclinedHomeScreenCallToActionToSetAsDefaultBrowser()
         }
     }
 
@@ -783,9 +846,9 @@ class BrowserTabFragment : Fragment(), FindListener {
                 }
 
                 if (viewState.showHomeScreenCallToActionButton) {
-                    homeScreenCallToActionContainer.show()
+                    homeScreenCallToActionContainer?.show()
                 } else {
-                    homeScreenCallToActionContainer.gone()
+                    homeScreenCallToActionContainer?.gone()
                 }
 
                 logoHidingLayoutChangeListener.update()
@@ -839,10 +902,8 @@ class BrowserTabFragment : Fragment(), FindListener {
                 lastSeenGlobalViewState = viewState
 
                 if (viewState.isNewTabState) {
-                    newTabLayout.show()
                     browserLayout.hide()
                 } else {
-                    newTabLayout.hide()
                     browserLayout.show()
                 }
             }
@@ -884,6 +945,7 @@ class BrowserTabFragment : Fragment(), FindListener {
                 newTabPopupMenuItem.isEnabled = browserShowing
                 addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
                 sharePageMenuItem?.isEnabled = viewState.canSharePage
+                addToHome?.isEnabled = viewState.canAddToHome
             }
         }
 
@@ -974,4 +1036,51 @@ class BrowserTabFragment : Fragment(), FindListener {
             !viewState.isEditing && omnibarTextInput.isDifferent(omnibarInput)
     }
 
+    private inner class CallToActionConfigurator {
+
+        fun configureBottomSheetCallToAction() {
+            if (callToActionStub == null) return
+
+            callToActionStub.layoutResource = R.layout.include_home_screen_default_browser_call_to_action_bottom_sheet
+            val container = callToActionStub.inflate()
+
+            adjustLogoConstraintsForCallToAction(container)
+
+            bottomSheetExperimentLaunchSettingsButton.setOnClickListener { launchDefaultAppSystemSettingsFromCallToActionButton() }
+            bottomSheetExperimentDismissButton.setOnClickListener { viewModel.userDeclinedHomeScreenCallToActionToSetAsDefaultBrowser() }
+        }
+
+        fun configureButtonCallToAction() {
+            if (callToActionStub == null) return
+
+            callToActionStub.layoutResource = R.layout.include_home_screen_default_browser_call_to_action
+            val container = callToActionStub.inflate()
+
+            adjustLogoConstraintsForCallToAction(container)
+
+            val set = ConstraintSet()
+            set.clone(newTabLayout)
+            set.constrainPercentWidth(container.id, 0.9f)
+            set.connect(container.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 10.toPx())
+            set.applyTo(newTabLayout)
+
+            homeScreenCallToActionContainer.setOnClickListener { launchDefaultAppSystemSettingsFromCallToActionButton() }
+            homeScreenCallToActionDismissButton.setOnClickListener { viewModel.userDeclinedHomeScreenCallToActionToSetAsDefaultBrowser() }
+        }
+
+        /**
+         * We want to center logo in space available above call to action, but c2a isn't in original view hierarchy.
+         * After appropriate c2a is loaded, we programmatically apply ConstraintLayout constraints to position logo
+         */
+        private fun adjustLogoConstraintsForCallToAction(callToActionContainer: View) {
+
+            logoHidingLayoutChangeListener.callToActionButton = callToActionContainer
+
+            ConstraintSet().also {
+                it.clone(newTabLayout)
+                it.connect(ddgLogo.id, ConstraintSet.BOTTOM, callToActionContainer.id, ConstraintSet.TOP, 0)
+                it.applyTo(newTabLayout)
+            }
+        }
+    }
 }

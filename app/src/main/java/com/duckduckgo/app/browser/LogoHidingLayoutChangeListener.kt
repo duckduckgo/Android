@@ -19,13 +19,13 @@ package com.duckduckgo.app.browser
 import android.graphics.Rect
 import android.view.View
 import androidx.core.view.isVisible
-import com.duckduckgo.app.global.view.gone
-import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.global.view.toDp
 import timber.log.Timber
 
 
-class LogoHidingLayoutChangeListener(private val ddgLogoView: View, private val callToActionButton: View) : View.OnLayoutChangeListener {
+class LogoHidingLayoutChangeListener(var ddgLogoView: View) : View.OnLayoutChangeListener {
+
+    var callToActionButton: View? = null
 
     override fun onLayoutChange(view: View, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
         update()
@@ -34,12 +34,21 @@ class LogoHidingLayoutChangeListener(private val ddgLogoView: View, private val 
     fun update() {
         val heightDp = getHeightDp()
 
-        Timber.v("App height now: $heightDp dp, call to action button showing: ${callToActionButton.isVisible}")
+        Timber.v("App height now: $heightDp dp, call to action button showing: ${callToActionButton?.isVisible}")
 
         if (enoughRoomForLogo(heightDp)) {
-            ddgLogoView.show()
+
+            val callToActionView = callToActionButton
+            if (callToActionView != null) {
+                if (callToActionView.isVisible) {
+                    ddgLogoView.alpha = 0.1f
+                } else {
+                    ddgLogoView.alpha = 1.0f
+                }
+            }
+
         } else {
-            ddgLogoView.gone()
+            ddgLogoView.alpha = 0f
         }
     }
 
@@ -50,17 +59,19 @@ class LogoHidingLayoutChangeListener(private val ddgLogoView: View, private val 
     }
 
     private fun enoughRoomForLogo(heightDp: Int): Boolean {
-        val minimumHeight = if (callToActionButton.isVisible) {
-            MINIMUM_HEIGHT_REQUIRED_CALL_TO_ACTION_SHOWING
-        } else {
-            MINIMUM_HEIGHT_REQUIRED_CALL_TO_ACTION_HIDDEN
+
+        val callToActionButtonHeightDp = callToActionButton?.measuredHeight?.toDp() ?: 0
+        val heightMinusCallToAction = heightDp - callToActionButtonHeightDp
+
+        if (heightMinusCallToAction >= MINIMUM_AVAILABLE_HEIGHT_REQUIRED_TO_SHOW_LOGO) {
+            return true
         }
-        return heightDp >= minimumHeight
+
+        return false
     }
 
     companion object {
-        private const val MINIMUM_HEIGHT_REQUIRED_CALL_TO_ACTION_SHOWING = 230
-        private const val MINIMUM_HEIGHT_REQUIRED_CALL_TO_ACTION_HIDDEN = 150
+        private const val MINIMUM_AVAILABLE_HEIGHT_REQUIRED_TO_SHOW_LOGO = 160
     }
 
 }
