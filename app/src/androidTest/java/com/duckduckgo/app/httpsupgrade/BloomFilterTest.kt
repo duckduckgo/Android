@@ -59,11 +59,11 @@ class BloomFilterTest {
             }
         }
 
-        val falsePositiveRate = falsePositives / testData.size
+        val errorRate = falsePositives / testData.size
         assertEquals(0, falseNegatives)
         assertEquals(bloomData.size, truePositives)
         assertTrue(trueNegatives <= testData.size - bloomData.size)
-        assertTrue(falsePositiveRate <= ACCEPTABLE_FALSE_POSITIVE_RATE)
+        assertTrue(errorRate <= ACCEPTABLE_ERROR_RATE)
     }
 
     private fun createRandomStrings(items: Int): ArrayList<String> {
@@ -76,6 +76,6 @@ class BloomFilterTest {
         const val FILTER_ELEMENT_COUNT = 1000
         const val ADDITIONAL_TEST_DATA_ELEMENT_COUNT = 9000
         const val TARGET_FALSE_POSITIVE_RATE = 0.001
-        const val ACCEPTABLE_FALSE_POSITIVE_RATE = TARGET_FALSE_POSITIVE_RATE * 1.1
+        const val ACCEPTABLE_ERROR_RATE = TARGET_FALSE_POSITIVE_RATE * 1.1
     }
 }
