@@ -1,4 +1,3 @@
 [submodule "app/src/main/cpp/third-party/bloom_cpp"]
 	path = app/src/main/cpp/third-party/bloom_cpp
 	url = https://github.com/duckduckgo/bloom_cpp.git
-	branch = feature/initial_filter
