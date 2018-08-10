@@ -75,7 +75,6 @@ class HttpsUpgradeDataDownloader @Inject constructor(
             Timber.d("Updating https bloom data store with new data")
             httpsBloomSpecDao.insert(specification)
             binaryDataStore.saveData(fileName, bytes)
-            whitelistDao.deleteAll()
             httpsUpgrader.reloadData()
         }
     }
