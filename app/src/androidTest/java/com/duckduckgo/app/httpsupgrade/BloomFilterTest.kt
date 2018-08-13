@@ -28,13 +28,13 @@ class BloomFilterTest {
 
     @Test
     fun whenBloomFilterEmptyThenContainsIsFalse() {
-        testee = BloomFilter(FILTER_ELEMENT_COUNT, TARGET_FALSE_POSITIVE_RATE)
+        testee = BloomFilter(FILTER_ELEMENT_COUNT, TARGET_ERROR_RATE)
         assertFalse(testee.contains("abc"))
     }
 
     @Test
     fun whenBloomFilterContainsElementThenContainsIsTrue() {
-        testee = BloomFilter(FILTER_ELEMENT_COUNT, TARGET_FALSE_POSITIVE_RATE)
+        testee = BloomFilter(FILTER_ELEMENT_COUNT, TARGET_ERROR_RATE)
         testee.add("abc")
         assertTrue(testee.contains("abc"))
     }
@@ -45,7 +45,7 @@ class BloomFilterTest {
         val bloomData = createRandomStrings(FILTER_ELEMENT_COUNT)
         val testData = bloomData + createRandomStrings(ADDITIONAL_TEST_DATA_ELEMENT_COUNT)
 
-        testee = BloomFilter(bloomData.size, TARGET_FALSE_POSITIVE_RATE)
+        testee = BloomFilter(bloomData.size, TARGET_ERROR_RATE)
         bloomData.forEach { testee.add(it) }
 
         var (falsePositives, truePositives, falseNegatives, trueNegatives) = arrayOf(0, 0, 0, 0)
@@ -75,7 +75,7 @@ class BloomFilterTest {
     companion object {
         const val FILTER_ELEMENT_COUNT = 1000
         const val ADDITIONAL_TEST_DATA_ELEMENT_COUNT = 9000
-        const val TARGET_FALSE_POSITIVE_RATE = 0.001
-        const val ACCEPTABLE_ERROR_RATE = TARGET_FALSE_POSITIVE_RATE * 1.1
+        const val TARGET_ERROR_RATE = 0.001
+        const val ACCEPTABLE_ERROR_RATE = TARGET_ERROR_RATE * 1.1
     }
 }
