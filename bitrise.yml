@@ -10,7 +10,9 @@ trigger_map:
 workflows:
   primary:
     steps:
-    - avd-manager@0.9.2: {}
+    - avd-manager@0.9.2:
+        inputs:
+        - version: '27'
     - activate-ssh-key@3.1.1:
         run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
     - git-clone@4.0.11: {}
