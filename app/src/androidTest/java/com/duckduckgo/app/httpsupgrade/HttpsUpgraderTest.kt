@@ -16,7 +16,9 @@
 
 package com.duckduckgo.app.httpsupgrade
 
+import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.net.Uri
+import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.nhaarman.mockito_kotlin.mock
@@ -24,9 +26,18 @@ import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 class HttpsUpgraderTest {
+
+    @get:Rule
+    @Suppress("unused")
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @get:Rule
+    @Suppress("unused")
+    val schedulers = InstantSchedulersRule()
 
     lateinit var testee: HttpsUpgrader
 

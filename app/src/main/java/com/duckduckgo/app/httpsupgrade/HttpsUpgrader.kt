@@ -22,6 +22,7 @@ import com.duckduckgo.app.global.UrlScheme
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
 interface HttpsUpgrader {
@@ -54,14 +55,19 @@ class HttpsUpgraderImpl(
             return false
         }
 
-        if (whitelistedDao.contains(uri.host)) {
-            Timber.d("${uri.host} is in whitelist and so not upgradable")
+        val host = uri.host
+        if (whitelistedDao.contains(host)) {
+            Timber.d("${host} is in whitelist and so not upgradable")
             return false
         }
 
         httpsBloomFilter?.let {
-            val shouldUpgrade = it.contains(uri.host)
-            Timber.d("${uri.host} ${if (shouldUpgrade) "is" else "is not"} upgradable")
+
+            val initialTime = System.nanoTime()
+            val shouldUpgrade = it.contains(host)
+            val totalTime = System.nanoTime() - initialTime
+            Timber.d("${host} ${if (shouldUpgrade) "is" else "is not"} upgradable, lookup in ${totalTime/NANO_TO_MILLIS_DIVISOR}ms")
+
             return shouldUpgrade
         }
 
@@ -69,7 +75,13 @@ class HttpsUpgraderImpl(
     }
 
     override fun reloadData() {
-        httpsBloomFilter = bloomFactory.create()
+        Schedulers.io().scheduleDirect {
+            httpsBloomFilter = bloomFactory.create()
+        }
+    }
+
+    companion object {
+        const val NANO_TO_MILLIS_DIVISOR = 1_000_000.0
     }
 
 }

@@ -16,34 +16,27 @@
 
 package com.duckduckgo.app.httpsupgrade.api
 
+import android.support.annotation.WorkerThread
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.httpsupgrade.BloomFilter
 import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec.Companion.HTTPS_BINARY_FILE
-import io.reactivex.Observable
-import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
 
 interface HttpsBloomFilterFactory {
     fun create(): BloomFilter?
 }
 
-class OptionalWrapper<out T>(val value: T?)
 
 class HttpsBloomFilterFactoryImpl @Inject constructor(private val dao: HttpsBloomFilterSpecDao, private val binaryDataStore: BinaryDataStore) :
     HttpsBloomFilterFactory {
 
+    @WorkerThread
     override fun create(): BloomFilter? {
 
-        val specificationWrapper = Observable.just(dao)
-            .observeOn(Schedulers.io())
-            .map {
-                OptionalWrapper(dao.get())
-            }
-            .blockingSingle()
-
-        val specification = specificationWrapper.value
+        val specification = dao.get()
         val dataPath = binaryDataStore.dataFilePath(HTTPS_BINARY_FILE)
 
         if (dataPath == null || specification == null) {
@@ -51,8 +44,11 @@ class HttpsBloomFilterFactoryImpl @Inject constructor(private val dao: HttpsBloo
             return null
         }
 
+        val initialTimestamp = Date().time
         Timber.d("Found https data at $dataPath, building filter")
-        return BloomFilter(dataPath, specification.totalEntries)
+        var bloomFilter = BloomFilter(dataPath, specification.totalEntries)
+        Timber.v("Loading took ${Date().time - initialTimestamp}ms")
 
+        return bloomFilter
     }
 }
