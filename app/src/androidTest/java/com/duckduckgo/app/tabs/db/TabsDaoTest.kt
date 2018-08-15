@@ -208,4 +208,29 @@ class TabsDaoTest {
         assertEquals(second, testee.selectedTab())
     }
 
+    @Test
+    fun whenTabInsertedAtPositionThenOtherTabsReordered() {
+
+        testee.insertTab(TabEntity("TAB_ID1", position = 0))
+        testee.insertTab(TabEntity("TAB_ID2", position = 1))
+        testee.insertTab(TabEntity("TAB_ID3", position = 2))
+
+        testee.insertTabAtPosition(TabEntity("TAB_ID4", position = 0))
+
+        val tabs = testee.tabs()
+
+        assertEquals(0, tabs[0].position)
+        assertEquals("TAB_ID4", tabs[0].tabId)
+
+        assertEquals(1, tabs[1].position)
+        assertEquals("TAB_ID1", tabs[1].tabId)
+
+        assertEquals(2, tabs[2].position)
+        assertEquals("TAB_ID2", tabs[2].tabId)
+
+        assertEquals(3, tabs[3].position)
+        assertEquals("TAB_ID3", tabs[3].tabId)
+
+    }
+
 }

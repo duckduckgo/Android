@@ -86,8 +86,8 @@ abstract class TabsDao {
     abstract fun insertTabSelection(tabSelectionEntity: TabSelectionEntity)
 
     @Transaction
-    open fun insertTabAtPosition(tab: TabEntity, position: Int) {
-        incrementPositionStartingAt(position)
+    open fun insertTabAtPosition(tab: TabEntity) {
+        incrementPositionStartingAt(tab.position)
         insertTab(tab)
     }
 

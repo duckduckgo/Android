@@ -25,13 +25,12 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
-import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.eq
-import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.*
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.ArgumentCaptor
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
@@ -58,6 +57,31 @@ class TabDataRepositoryTest {
     fun before() {
         MockitoAnnotations.initMocks(this)
         testee = TabDataRepository(mockDao, SiteFactory(mockTermsOfServiceStore, TrackerNetworks()))
+    }
+
+    @Test
+    fun whenNewTabAddedAfterNonExistingTabThenTitleUrlPositionOfNewTabAreCorrect() {
+        testee.addNewTabAfterExistingTab("http://www.example.com", "tabid")
+
+        val captor = argumentCaptor<TabEntity>()
+        verify(mockDao).insertTabAtPosition(captor.capture())
+        assertNotNull(captor.firstValue.tabId)
+        assertEquals(0, captor.firstValue.position)
+    }
+
+    @Test
+    fun whenNewTabAddedAfterExistingTabThenTitleUrlPositionOfNewTabAreCorrect() {
+        val tab = TabEntity("tabid", position = 3)
+        whenever(mockDao.tab(any())).thenReturn(tab)
+
+        testee.addNewTabAfterExistingTab("http://www.example.com", "tabid")
+
+        val captor = argumentCaptor<TabEntity>()
+        verify(mockDao).insertTabAtPosition(captor.capture())
+        assertNotNull(captor.firstValue.tabId)
+        assertEquals("http://www.example.com", captor.firstValue.url)
+        assertEquals("example.com", captor.firstValue.title)
+        assertEquals(4, captor.firstValue.position)
     }
 
     @Test

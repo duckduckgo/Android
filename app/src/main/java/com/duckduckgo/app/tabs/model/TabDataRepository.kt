@@ -65,12 +65,12 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
 
     override fun addNewTabAfterExistingTab(url: String?, tabId: String) {
         Schedulers.io().scheduleDirect {
-            val position = tabsDao.tab(tabId)?.position ?: 0
+            val position = tabsDao.tab(tabId)?.position ?: -1
             val uri = Uri.parse(url)
             val host = uri.host
             val title = host.dropPrefix("www.")
             val tab = TabEntity(generateTabId(), url, title, position + 1)
-            tabsDao.insertTabAtPosition(tab, position + 1)
+            tabsDao.insertTabAtPosition(tab)
         }
     }
 
