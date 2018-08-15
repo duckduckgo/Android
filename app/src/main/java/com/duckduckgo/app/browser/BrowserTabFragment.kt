@@ -17,6 +17,8 @@
 package com.duckduckgo.app.browser
 
 import android.Manifest
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.LayoutTransition.CHANGING
 import android.animation.LayoutTransition.DISAPPEARING
 import android.annotation.SuppressLint
@@ -42,6 +44,7 @@ import android.support.v4.content.pm.ShortcutManagerCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
+import android.text.Layout
 import android.view.*
 import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
@@ -51,9 +54,11 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
@@ -145,6 +150,9 @@ class BrowserTabFragment : Fragment(), FindListener {
         get() = activity as? BrowserActivity
 
     private val tabsButton: MenuItem?
+        get() = toolbar.menu.findItem(R.id.tabs)
+
+    private val tabsAnim: MenuItem?
         get() = toolbar.menu.findItem(R.id.tabs)
 
     private val fireMenuButton: MenuItem?
@@ -309,7 +317,7 @@ class BrowserTabFragment : Fragment(), FindListener {
                 browserActivity?.openInNewTab(it.query)
             }
             is Command.OpenInNewBackgroundTab -> {
-                browserActivity?.openInNewBackgroundTab()
+                openInNewBackgroundTab()
             }
             is Command.Navigate -> {
                 navigate(it.url)
@@ -367,6 +375,24 @@ class BrowserTabFragment : Fragment(), FindListener {
             }
             is Command.HandleExternalAppLink -> { externalAppLinkClicked(it) }
         }
+    }
+
+    private fun openInNewBackgroundTab() {
+        val dp = 36.toPx()
+
+        val anim = LottieAnimationView(context)
+        anim.layoutParams = ViewGroup.LayoutParams(dp, dp)
+        anim.setAnimation(R.raw.new_tab)
+        anim.speed = 3.0f
+
+        anim.addAnimatorListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                tabsButton?.actionView = null
+            }
+        })
+
+        tabsButton?.actionView = anim
+        anim.playAnimation()
     }
 
     private fun externalAppLinkClicked(appLinkCommand: Command.HandleExternalAppLink) {
