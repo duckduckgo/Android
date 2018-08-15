@@ -33,7 +33,7 @@ import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 
-@Database(exportSchema = true, version = 3, entities = [
+@Database(exportSchema = true, version = 4, entities = [
     HttpsUpgradeDomain::class,
     DisconnectTracker::class,
     NetworkLeaderboardEntry::class,
@@ -67,6 +67,26 @@ abstract class AppDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE `site_visited` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
                 database.execSQL("DELETE FROM `network_leaderboard`")
+            }
+        }
+
+        val MIGRATION_3_TO_4: Migration = object : Migration(3, 4) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+
+                database.execSQL("ALTER TABLE `tabs` ADD COLUMN `position` INTEGER NOT NULL DEFAULT 0")
+
+                database.query("SELECT `tabId` from `tabs`").use {
+                    if (it.moveToFirst()) {
+                        var index = 0
+                        do {
+                            val tabId = it.getString(it.getColumnIndex("tabId"))
+                            database.execSQL("UPDATE `tabs` SET position=$index where `tabId` = \"$tabId\"")
+                            index += 1
+
+                        } while (it.moveToNext())
+                    }
+                }
+
             }
         }
     }

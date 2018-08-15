@@ -22,6 +22,7 @@ import android.arch.persistence.room.testing.MigrationTestHelper
 import android.support.test.InstrumentationRegistry
 import android.support.test.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.blockingObserve
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -52,10 +53,22 @@ class AppDatabaseTest {
         assertTrue(database().networkLeaderboardDao().trackerNetworkTally().blockingObserve()!!.isEmpty())
     }
 
+    @Test
+    fun whenMigratingFromVersion3To4ThenUpdatePositionsOfStoredTabs() {
+
+        testHelper.createDatabase(TEST_DB_NAME, 3).use {
+            it.execSQL("INSERT INTO `tabs` values ('tabid1', 'url', 'title') ")
+            it.execSQL("INSERT INTO `tabs` values ('tabid2', 'url', 'title') ")
+        }
+
+        assertEquals(0, database().tabsDao().tabs()[0].position)
+        assertEquals(1, database().tabsDao().tabs()[1].position)
+    }
+
     private fun database(): AppDatabase {
         val database = Room
                 .databaseBuilder(InstrumentationRegistry.getTargetContext(), AppDatabase::class.java, TEST_DB_NAME)
-                .addMigrations(AppDatabase.MIGRATION_1_TO_2, AppDatabase.MIGRATION_2_TO_3)
+                .addMigrations(AppDatabase.MIGRATION_1_TO_2, AppDatabase.MIGRATION_2_TO_3, AppDatabase.MIGRATION_3_TO_4)
                 .allowMainThreadQueries()
                 .build()
 

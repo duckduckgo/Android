@@ -101,7 +101,7 @@ class TabDataRepositoryTest {
         val siteData = MutableLiveData<Site>()
         testee.add(TAB_ID, siteData)
 
-        testee.delete(TabEntity(TAB_ID))
+        testee.delete(TabEntity(TAB_ID, position = 0))
         verify(mockDao).deleteTabAndUpdateSelection(any())
         assertNotSame(siteData, testee.retrieveSiteData(TAB_ID))
     }

@@ -58,7 +58,7 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
     override fun add(tabId: String, data: MutableLiveData<Site>) {
         siteData[tabId] = data
         Schedulers.io().scheduleDirect {
-            val position = tabsDao.tabs().last().position + 1
+            val position = tabsDao.lastTab()?.position ?: 0
             tabsDao.addAndSelectTab(TabEntity(tabId, data.value?.url, data.value?.title, position))
         }
     }
