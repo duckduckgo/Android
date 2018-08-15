@@ -78,6 +78,14 @@ class HttpsWhitelistDaoTest {
     }
 
     @Test
+    fun whenAllUpdatedThenPreviousValuesAreReplaced() {
+        dao.insertAll(listOf(HttpsWhitelistedDomain(domain)))
+        dao.updateAll(listOf(HttpsWhitelistedDomain(anotherDomain)))
+        assertEquals(1, dao.count())
+        assertTrue(dao.contains(anotherDomain))
+    }
+
+    @Test
     fun whenhAllDeletedThenContainsDomainIsFalse() {
         dao.insertAll(listOf(HttpsWhitelistedDomain(domain)))
         dao.deleteAll()

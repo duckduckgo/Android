@@ -95,8 +95,7 @@ class HttpsUpgradeDataDownloader @Inject constructor(
             if (response.isSuccessful) {
                 val whitelist = response.body()!!
                 Timber.d("Updating https whitelist with new data")
-                whitelistDao.deleteAll()
-                whitelistDao.insertAll(whitelist)
+                whitelistDao.updateAll(whitelist)
             } else {
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }

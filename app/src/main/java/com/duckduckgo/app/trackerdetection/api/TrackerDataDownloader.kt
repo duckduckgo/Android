@@ -67,11 +67,9 @@ class TrackerDataDownloader @Inject constructor(
                 val body = response.body()!!
 
                 appDatabase.runInTransaction {
-                    trackerDataDao.deleteAll()
-                    trackerDataDao.insertAll(body.trackers)
+                    trackerDataDao.updateAll(body.trackers)
                     trackerDataLoader.loadDisconnectData()
                 }
-
 
             } else {
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")

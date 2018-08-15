@@ -16,25 +16,28 @@
 
 package com.duckduckgo.app.trackerdetection.db
 
-import android.arch.persistence.room.Dao
-import android.arch.persistence.room.Insert
-import android.arch.persistence.room.OnConflictStrategy
-import android.arch.persistence.room.Query
+import android.arch.persistence.room.*
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 
 
 @Dao
-interface TrackerDataDao {
+abstract class TrackerDataDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(trackers: List<DisconnectTracker>)
+    abstract fun insertAll(trackers: List<DisconnectTracker>)
+
+    @Transaction
+    open fun updateAll(trackers: List<DisconnectTracker>) {
+        deleteAll()
+        insertAll(trackers)
+    }
 
     @Query("Select * from disconnect_tracker")
-    fun getAll() : List<DisconnectTracker>
+    abstract fun getAll() : List<DisconnectTracker>
 
     @Query("Select count(*) from disconnect_tracker")
-    fun count(): Int
+    abstract fun count(): Int
 
     @Query("DELETE FROM disconnect_tracker")
-    fun deleteAll()
+    abstract fun deleteAll()
 }

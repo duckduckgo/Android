@@ -16,26 +16,29 @@
 
 package com.duckduckgo.app.httpsupgrade.db
 
-import android.arch.persistence.room.Dao
-import android.arch.persistence.room.Insert
-import android.arch.persistence.room.OnConflictStrategy
-import android.arch.persistence.room.Query
+import android.arch.persistence.room.*
 import com.duckduckgo.app.httpsupgrade.model.HttpsWhitelistedDomain
 import javax.inject.Singleton
 
 @Dao
 @Singleton
-interface HttpsWhitelistDao {
+abstract class HttpsWhitelistDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(domains: List<HttpsWhitelistedDomain>)
+    abstract fun insertAll(domains: List<HttpsWhitelistedDomain>)
+
+    @Transaction
+    open fun updateAll(domains: List<HttpsWhitelistedDomain>) {
+        deleteAll()
+        insertAll(domains)
+    }
 
     @Query("select count(1) > 0 from https_whitelisted_domain where domain = :domain")
-    fun contains(domain: String): Boolean
+    abstract fun contains(domain: String): Boolean
 
     @Query("delete from https_whitelisted_domain")
-    fun deleteAll()
+    abstract fun deleteAll()
 
     @Query("select count(1) from https_whitelisted_domain")
-    fun count(): Int
+    abstract fun count(): Int
 }
