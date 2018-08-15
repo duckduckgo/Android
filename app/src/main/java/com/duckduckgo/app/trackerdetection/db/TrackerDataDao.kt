@@ -38,6 +38,6 @@ abstract class TrackerDataDao {
     @Query("select count(*) from disconnect_tracker")
     abstract fun count(): Int
 
-    @Query("delete FROM disconnect_tracker")
+    @Query("delete from disconnect_tracker")
     abstract fun deleteAll()
 }
