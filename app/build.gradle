@@ -78,7 +78,7 @@ android {
 
 ext {
     supportLibrary = "27.1.1"
-    architectureComponents = "1.1.0"
+    architectureComponents = "1.1.1"
     architectureComponentsExtensions = "1.1.1"
     androidKtx = "0.3"
     dagger = "2.14.1"
