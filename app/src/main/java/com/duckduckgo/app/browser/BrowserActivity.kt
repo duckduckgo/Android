@@ -204,6 +204,10 @@ class BrowserActivity : DuckDuckGoActivity() {
         viewModel.onOpenInNewTabRequested(query)
     }
 
+    fun openInNewBackgroundTab() {
+        // TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     fun launchBrokenSiteFeedback(url: String?) {
         startActivity(FeedbackActivity.intent(this, true, url))
     }

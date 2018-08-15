@@ -308,6 +308,9 @@ class BrowserTabFragment : Fragment(), FindListener {
             is Command.OpenInNewTab -> {
                 browserActivity?.openInNewTab(it.query)
             }
+            is Command.OpenInNewBackgroundTab -> {
+                browserActivity?.openInNewBackgroundTab()
+            }
             is Command.Navigate -> {
                 navigate(it.url)
             }

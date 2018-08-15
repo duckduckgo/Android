@@ -146,6 +146,7 @@ class BrowserTabViewModel(
         object Refresh : Command()
         class Navigate(val url: String) : Command()
         class OpenInNewTab(val query: String) : Command()
+        class OpenInNewBackgroundTab(val query: String) : Command()
         class DialNumber(val telephoneNumber: String) : Command()
         class SendSms(val telephoneNumber: String) : Command()
         class SendEmail(val emailAddress: String) : Command()
@@ -501,6 +502,10 @@ class BrowserTabViewModel(
                 command.value = OpenInNewTab(requiredAction.url)
                 true
             }
+            is RequiredAction.OpenInNewBackgroundTab -> {
+                openInNewBackgroundTab(requiredAction.url)
+                true
+            }
             is RequiredAction.DownloadFile -> {
                 command.value = DownloadImage(requiredAction.url)
                 true
@@ -513,6 +518,11 @@ class BrowserTabViewModel(
                 false
             }
         }
+    }
+
+    fun openInNewBackgroundTab(url: String) {
+        tabRepository.addNewTabAfterExistingTab(url, tabId)
+        command.value = OpenInNewBackgroundTab(url)
     }
 
     fun userRequestingToFindInPage() {

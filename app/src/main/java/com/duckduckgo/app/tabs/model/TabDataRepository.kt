@@ -19,10 +19,12 @@ package com.duckduckgo.app.tabs.model
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import android.net.Uri
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.db.TabsDao
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -37,10 +39,12 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
     private val siteData: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
 
     override fun add(url: String?): String {
-        val tabId = UUID.randomUUID().toString()
+        val tabId = generateTabId()
         add(tabId, buildSiteData(url))
         return tabId
     }
+
+    private fun generateTabId() = UUID.randomUUID().toString()
 
     private fun buildSiteData(url: String?): MutableLiveData<Site> {
         val data = MutableLiveData<Site>()
@@ -54,13 +58,26 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
     override fun add(tabId: String, data: MutableLiveData<Site>) {
         siteData[tabId] = data
         Schedulers.io().scheduleDirect {
-            tabsDao.addAndSelectTab(TabEntity(tabId, data.value?.url, data.value?.title))
+            val position = tabsDao.tabs().last().position + 1
+            tabsDao.addAndSelectTab(TabEntity(tabId, data.value?.url, data.value?.title, position))
+        }
+    }
+
+    override fun addNewTabAfterExistingTab(url: String?, tabId: String) {
+        Schedulers.io().scheduleDirect {
+            val position = tabsDao.tab(tabId)?.position ?: 0
+            val uri = Uri.parse(url)
+            val host = uri.host
+            val title = host.dropPrefix("www.")
+            val tab = TabEntity(generateTabId(), url, title, position + 1)
+            tabsDao.insertTabAtPosition(tab, position + 1)
         }
     }
 
     override fun update(tabId: String, site: Site?) {
         Schedulers.io().scheduleDirect {
-            val tab = TabEntity(tabId, site?.url, site?.title)
+            val position = tabsDao.tab(tabId)?.position ?: 0
+            val tab = TabEntity(tabId, site?.url, site?.title, position)
             tabsDao.updateTab(tab)
         }
     }
@@ -96,4 +113,8 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
             tabsDao.insertTabSelection(selection)
         }
     }
+}
+
+fun String.dropPrefix(prefix: String): String {
+    return if (startsWith(prefix)) drop(prefix.length) else this
 }
