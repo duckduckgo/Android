@@ -60,13 +60,33 @@ class TabDataRepositoryTest {
     }
 
     @Test
-    fun whenNewTabAddedAfterNonExistingTabThenTitleUrlPositionOfNewTabAreCorrect() {
+    fun whenTabAddDirectlyThenViewedIsTrue() {
+        testee.add("http://www.example.com")
+
+        val captor = argumentCaptor<TabEntity>()
+        verify(mockDao).addAndSelectTab(captor.capture())
+        assertTrue(captor.firstValue.viewed)
+    }
+
+    @Test
+    fun whenTabUpdatedAfterOpenInBackgroundThenViewedIsTrue() {
+        testee.addNewTabAfterExistingTab("http://www.example.com", "tabid")
+        testee.update("tabid", null)
+
+        val captor = argumentCaptor<TabEntity>()
+        verify(mockDao).updateTab(captor.capture())
+        assertTrue(captor.firstValue.viewed)
+    }
+
+    @Test
+    fun whenNewTabAddedAfterNonExistingTabThenTitleUrlPositionOfNewTabAreCorrectAndTabIsNotViewed() {
         testee.addNewTabAfterExistingTab("http://www.example.com", "tabid")
 
         val captor = argumentCaptor<TabEntity>()
         verify(mockDao).insertTabAtPosition(captor.capture())
         assertNotNull(captor.firstValue.tabId)
         assertEquals(0, captor.firstValue.position)
+        assertFalse(captor.firstValue.viewed)
     }
 
     @Test

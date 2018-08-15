@@ -51,9 +51,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     @Inject
     lateinit var pixel: Pixel
 
-    @Inject
-    lateinit var webDataManager: WebDataManager
-
     private val viewModel: TabSwitcherViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(TabSwitcherViewModel::class.java)
     }

@@ -37,7 +37,7 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TabViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val root = inflater.inflate(R.layout.item_tab, parent, false)
-        return TabViewHolder(root, root.favicon, root.title, root.url, root.close)
+        return TabViewHolder(root, root.favicon, root.title, root.url, root.close, root.tabUnread)
     }
 
     override fun getItemCount(): Int {
@@ -49,6 +49,7 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
         val tab = data[position]
         holder.title.text = tab.displayTitle(context)
         holder.url.text = tab.displayUrl()
+        holder.tabUnread.visibility =  if (tab.viewed) View.INVISIBLE else View.VISIBLE
 
         GlideApp.with(holder.root)
             .load(tab.favicon())
@@ -84,6 +85,7 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
         val favicon: ImageView,
         val title: TextView,
         val url: TextView,
-        val close: ImageView
+        val close: ImageView,
+        val tabUnread: View
     ) : RecyclerView.ViewHolder(root)
 }

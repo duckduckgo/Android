@@ -59,7 +59,7 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
         siteData[tabId] = data
         Schedulers.io().scheduleDirect {
             val position = tabsDao.lastTab()?.position ?: 0
-            tabsDao.addAndSelectTab(TabEntity(tabId, data.value?.url, data.value?.title, position))
+            tabsDao.addAndSelectTab(TabEntity(tabId, data.value?.url, data.value?.title, true, position))
         }
     }
 
@@ -69,7 +69,7 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
             val uri = Uri.parse(url)
             val host = uri.host
             val title = host.dropPrefix("www.")
-            val tab = TabEntity(generateTabId(), url, title, position + 1)
+            val tab = TabEntity(generateTabId(), url, title, false, position + 1)
             tabsDao.insertTabAtPosition(tab)
         }
     }
@@ -77,7 +77,7 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
     override fun update(tabId: String, site: Site?) {
         Schedulers.io().scheduleDirect {
             val position = tabsDao.tab(tabId)?.position ?: 0
-            val tab = TabEntity(tabId, site?.url, site?.title, position)
+            val tab = TabEntity(tabId, site?.url, site?.title, true, position)
             tabsDao.updateTab(tab)
         }
     }

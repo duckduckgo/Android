@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "8b574d39a198efc4b494229000bfc860",
+    "identityHash": "61ef130abbfbe6e186dc8af4c13c8b79",
     "entities": [
       {
         "tableName": "https_upgrade_domain",
@@ -137,7 +137,7 @@
       },
       {
         "tableName": "tabs",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`tabId` TEXT NOT NULL, `url` TEXT, `title` TEXT, `position` INTEGER NOT NULL, PRIMARY KEY(`tabId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`tabId` TEXT NOT NULL, `url` TEXT, `title` TEXT, `viewed` INTEGER NOT NULL, `position` INTEGER NOT NULL, PRIMARY KEY(`tabId`))",
         "fields": [
           {
             "fieldPath": "tabId",
@@ -156,6 +156,12 @@
             "columnName": "title",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "viewed",
+            "columnName": "viewed",
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
             "fieldPath": "position",
@@ -264,7 +270,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"8b574d39a198efc4b494229000bfc860\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"61ef130abbfbe6e186dc8af4c13c8b79\")"
     ]
   }
 }
