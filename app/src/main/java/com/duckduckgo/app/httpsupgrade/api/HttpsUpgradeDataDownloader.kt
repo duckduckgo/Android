@@ -59,13 +59,12 @@ class HttpsUpgradeDataDownloader @Inject constructor(
             Timber.d("Downloading https bloom filter binary")
 
             if (specification == httpsBloomSpecDao.get() && binaryDataStore.verifyCheckSum(HTTPS_BINARY_FILE, specification.sha256)) {
-                Timber.d("Https bloom filter binary already stored")
+                Timber.d("Https bloom data already stored for this spec")
                 return@fromAction
             }
 
             val call = service.httpsBloomFilter()
             val response = call.execute()
-
             if (!response.isSuccessful) {
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
