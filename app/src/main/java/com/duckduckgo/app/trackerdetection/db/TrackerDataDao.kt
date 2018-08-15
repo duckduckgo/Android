@@ -32,12 +32,12 @@ abstract class TrackerDataDao {
         insertAll(trackers)
     }
 
-    @Query("Select * from disconnect_tracker")
+    @Query("select * from disconnect_tracker")
     abstract fun getAll() : List<DisconnectTracker>
 
-    @Query("Select count(*) from disconnect_tracker")
+    @Query("select count(*) from disconnect_tracker")
     abstract fun count(): Int
 
-    @Query("DELETE FROM disconnect_tracker")
+    @Query("delete FROM disconnect_tracker")
     abstract fun deleteAll()
 }
