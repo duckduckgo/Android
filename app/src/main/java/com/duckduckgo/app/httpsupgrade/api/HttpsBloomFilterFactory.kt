@@ -22,7 +22,6 @@ import com.duckduckgo.app.httpsupgrade.BloomFilter
 import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec.Companion.HTTPS_BINARY_FILE
 import timber.log.Timber
-import java.util.*
 import javax.inject.Inject
 
 interface HttpsBloomFilterFactory {
@@ -44,10 +43,10 @@ class HttpsBloomFilterFactoryImpl @Inject constructor(private val dao: HttpsBloo
             return null
         }
 
-        val initialTimestamp = Date().time
+        val initialTimestamp = System.currentTimeMillis()
         Timber.d("Found https data at $dataPath, building filter")
         var bloomFilter = BloomFilter(dataPath, specification.totalEntries)
-        Timber.v("Loading took ${Date().time - initialTimestamp}ms")
+        Timber.v("Loading took ${System.currentTimeMillis() - initialTimestamp}ms")
 
         return bloomFilter
     }
