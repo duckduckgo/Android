@@ -18,7 +18,7 @@ package com.duckduckgo.app.job
 
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeListDownloader
+import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeDataDownloader
 import com.duckduckgo.app.surrogates.api.ResourceSurrogateListDownloader
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
@@ -31,7 +31,7 @@ interface ConfigurationDownloader {
 
 class AppConfigurationDownloader(
         private val trackerDataDownloader: TrackerDataDownloader,
-        private val httpsUpgradeListDownloader: HttpsUpgradeListDownloader,
+        private val httpsUpgradeDataDownloader: HttpsUpgradeDataDownloader,
         private val resourceSurrogateDownloader: ResourceSurrogateListDownloader,
         private val appDatabase: AppDatabase) : ConfigurationDownloader {
 
@@ -41,7 +41,7 @@ class AppConfigurationDownloader(
         val trackersWhitelist = trackerDataDownloader.downloadList(TRACKERSWHITELIST)
         val disconnectDownload = trackerDataDownloader.downloadList(DISCONNECT)
         val surrogatesDownload = resourceSurrogateDownloader.downloadList()
-        val httpsUpgradeDownload = httpsUpgradeListDownloader.downloadList()
+        val httpsUpgradeDownload = httpsUpgradeDataDownloader.download()
 
         return Completable.mergeDelayError(listOf(
                 easyListDownload,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,31 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.db
+package com.duckduckgo.app.httpsupgrade.db
 
 import android.arch.persistence.room.*
-import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
-
+import com.duckduckgo.app.httpsupgrade.model.HttpsWhitelistedDomain
+import javax.inject.Singleton
 
 @Dao
-abstract class TrackerDataDao {
+@Singleton
+abstract class HttpsWhitelistDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertAll(trackers: List<DisconnectTracker>)
+    abstract fun insertAll(domains: List<HttpsWhitelistedDomain>)
 
     @Transaction
-    open fun updateAll(trackers: List<DisconnectTracker>) {
+    open fun updateAll(domains: List<HttpsWhitelistedDomain>) {
         deleteAll()
-        insertAll(trackers)
+        insertAll(domains)
     }
 
-    @Query("select * from disconnect_tracker")
-    abstract fun getAll() : List<DisconnectTracker>
+    @Query("select count(1) > 0 from https_whitelisted_domain where domain = :domain")
+    abstract fun contains(domain: String): Boolean
 
-    @Query("select count(*) from disconnect_tracker")
-    abstract fun count(): Int
-
-    @Query("delete from disconnect_tracker")
+    @Query("delete from https_whitelisted_domain")
     abstract fun deleteAll()
+
+    @Query("select count(1) from https_whitelisted_domain")
+    abstract fun count(): Int
 }

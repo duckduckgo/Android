@@ -16,12 +16,13 @@
 
 package com.duckduckgo.app.httpsupgrade.di
 
-import android.content.Context
+import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.httpsupgrade.HttpsUpgraderImpl
-import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDbWriteStatusSharedPreferences
-import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDbWriteStatusStore
-import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
+import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
+import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactoryImpl
+import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
+import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -29,14 +30,14 @@ import javax.inject.Singleton
 @Module
 class HttpsUpgraderModule {
 
+    @Singleton
     @Provides
-    fun httpsUpgrader(dao: HttpsUpgradeDomainDao): HttpsUpgrader {
-        return HttpsUpgraderImpl(dao)
+    fun httpsUpgrader(whitelistDao: HttpsWhitelistDao, bloomFilterFactory: HttpsBloomFilterFactory): HttpsUpgrader {
+        return HttpsUpgraderImpl(whitelistDao, bloomFilterFactory)
     }
 
     @Provides
-    @Singleton
-    fun httpsUpgradeDbWriteStatusStore(context: Context): HttpsUpgradeDbWriteStatusStore {
-        return HttpsUpgradeDbWriteStatusSharedPreferences(context)
+    fun bloomFilterFactory(specificationDao: HttpsBloomFilterSpecDao, binaryDataStore: BinaryDataStore): HttpsBloomFilterFactory {
+        return HttpsBloomFilterFactoryImpl(specificationDao, binaryDataStore)
     }
 }

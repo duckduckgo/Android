@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,20 +20,16 @@ import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
+import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
+import javax.inject.Singleton
 
 @Dao
-interface HttpsUpgradeDomainDao {
+@Singleton
+interface HttpsBloomFilterSpecDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(domains: List<HttpsUpgradeDomain>)
+    fun insert(specification: HttpsBloomFilterSpec)
 
-    @Query("select count(1) > 0 from https_upgrade_domain where domain = :domain")
-    fun hasDomain(domain: String) : Boolean
-
-    @Query("delete from https_upgrade_domain")
-    fun deleteAll()
-
-    @Query("select count(1) from https_upgrade_domain")
-    fun count(): Int
-
+    @Query("select * from https_bloom_filter_spec limit 1")
+    fun get(): HttpsBloomFilterSpec?
 }

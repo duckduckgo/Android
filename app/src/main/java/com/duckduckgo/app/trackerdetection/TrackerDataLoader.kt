@@ -19,16 +19,16 @@ package com.duckduckgo.app.trackerdetection
 import android.support.annotation.WorkerThread
 import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
-import com.duckduckgo.app.trackerdetection.store.TrackerDataStore
+import com.duckduckgo.app.global.store.BinaryDataStore
 import timber.log.Timber
 import javax.inject.Inject
 
 @WorkerThread
 class TrackerDataLoader @Inject constructor(
-        private val trackerDetector: TrackerDetector,
-        private val trackerDataStore: TrackerDataStore,
-        private val trackerDataDao: TrackerDataDao,
-        private val networkTrackers: TrackerNetworks) {
+    private val trackerDetector: TrackerDetector,
+    private val binaryDataStore: BinaryDataStore,
+    private val trackerDataDao: TrackerDataDao,
+    private val networkTrackers: TrackerNetworks) {
 
     fun loadData() {
 
@@ -44,10 +44,10 @@ class TrackerDataLoader @Inject constructor(
     fun loadAdblockData(name: Client.ClientName) {
         Timber.d("Looking for adblock tracker ${name.name} to load")
 
-        if (trackerDataStore.hasData(name)) {
+        if (binaryDataStore.hasData(name.name)) {
             Timber.d("Found adblock tracker ${name.name}")
             val client = AdBlockClient(name)
-            client.loadProcessedData(trackerDataStore.loadData(name))
+            client.loadProcessedData(binaryDataStore.loadData(name.name))
             trackerDetector.addClient(client)
         } else {
             Timber.d("No adblock tracker ${name.name} found")

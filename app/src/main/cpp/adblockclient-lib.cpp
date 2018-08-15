@@ -1,11 +1,11 @@
 #include <jni.h>
-#include "ad-block/ad_block_client.h"
+#include "third-party/ad-block/ad_block_client.h"
 
 extern "C"
 JNIEXPORT jlong
 JNICALL
 Java_com_duckduckgo_app_trackerdetection_AdBlockClient_createClient(JNIEnv *env,
-                                                                  jobject /* this */) {
+                                                                    jobject) {
     AdBlockClient *client = new AdBlockClient();
     return (long) client;
 }
@@ -14,7 +14,7 @@ extern "C"
 JNIEXPORT void
 JNICALL
 Java_com_duckduckgo_app_trackerdetection_AdBlockClient_releaseClient(JNIEnv *env,
-                                                                   jobject /* this */,
+                                                                   jobject,
                                                                    jlong clientPointer,
                                                                    jlong rawDataPointer,
                                                                    jlong processedDataPointer) {
@@ -33,9 +33,9 @@ extern "C"
 JNIEXPORT jlong
 JNICALL
 Java_com_duckduckgo_app_trackerdetection_AdBlockClient_loadBasicData(JNIEnv *env,
-                                                                   jobject /* this */,
-                                                                   jlong clientPointer,
-                                                                   jbyteArray data) {
+                                                                     jobject,
+                                                                     jlong clientPointer,
+                                                                     jbyteArray data) {
 
     int dataLength = env->GetArrayLength(data);
     char *dataChars = new char[dataLength];

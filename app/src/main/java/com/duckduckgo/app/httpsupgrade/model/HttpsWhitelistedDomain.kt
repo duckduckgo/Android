@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.surrogates.api
+package com.duckduckgo.app.httpsupgrade.model
 
-import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.http.GET
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.PrimaryKey
 
-
-interface ResourceSurrogateListService {
-
-    @GET("/contentblocking.js?l=surrogates")
-    fun surrogates(): Call<ResponseBody>
-}
+@Entity(tableName = "https_whitelisted_domain")
+data class HttpsWhitelistedDomain(
+    @PrimaryKey var domain: String
+)
