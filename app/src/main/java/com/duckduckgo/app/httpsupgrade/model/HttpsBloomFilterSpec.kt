@@ -21,7 +21,7 @@ import android.arch.persistence.room.PrimaryKey
 
 
 @Entity(tableName = "https_bloom_filter_spec")
-class HttpsBloomFilterSpec(
+data class HttpsBloomFilterSpec(
     @PrimaryKey val id: Int = 1,
     val errorRate: Double,
     val totalEntries: Int,
