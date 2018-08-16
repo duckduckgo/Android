@@ -48,4 +48,6 @@
     <color name="webViewScrollbarTrackColor">#FF333333</color>
     <color name="webViewScrollbarThumbColor">#FFABABAB</color>
 
+    <color name="black_overlay">#66000000</color>
+
 </resources>

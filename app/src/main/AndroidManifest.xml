@@ -17,7 +17,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />
@@ -37,13 +36,13 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-
         </activity>
         <activity
             android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivity"
-            android:theme="@style/AppTheme.TransparentTheme"
-            android:label="@string/appName" />
+            android:label="@string/appName"
+            android:theme="@style/AppTheme.TransparentTheme" />
         <activity
             android:name=".BrowserActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -130,6 +129,12 @@
         <activity
             android:name=".defaultBrowsing.DefaultBrowserInfoActivity"
             android:theme="@style/ModalCardTheme" />
+
+        <activity
+            android:name="com.duckduckgo.app.fire.FireActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_fire"
+            android:process=":fire" />
     </application>
 
 </manifest>

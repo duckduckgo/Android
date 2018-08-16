@@ -123,7 +123,7 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false) ) {
             viewModel.onClearRequested()
-            clearPersonalDataAction.clear { viewModel.onClearComplete() }
+            clearPersonalDataAction.clear()
             Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
             finish()
             return

@@ -443,8 +443,8 @@ class BrowserTabFragment : Fragment(), FindListener {
     private fun configureToolbar() {
         toolbar.inflateMenu(R.menu.menu_browser_activity)
 
-        toolbar.setOnMenuItemClickListener {
-            when (it.itemId) {
+        toolbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
                 R.id.tabs -> {
                     browserActivity?.launchTabSwitcher()
                     return@setOnMenuItemClickListener true

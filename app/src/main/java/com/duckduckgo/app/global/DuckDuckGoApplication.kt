@@ -37,6 +37,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_LAUNCH
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
+import com.jakewharton.processphoenix.ProcessPhoenix
 import com.squareup.leakcanary.LeakCanary
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -90,6 +91,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         super.onCreate()
 
         if (!installLeakCanary()) return
+        if (ProcessPhoenix.isPhoenixProcess(this)) return
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         configureDependencyInjection()
