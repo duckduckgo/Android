@@ -22,7 +22,6 @@ import com.duckduckgo.app.global.UrlScheme
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
-import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
 interface HttpsUpgrader {
@@ -43,16 +42,18 @@ class HttpsUpgraderImpl(
 ) : HttpsUpgrader {
 
     private var httpsBloomFilter: BloomFilter? = null
+    private var dataLoaded = false
 
-    init {
-        reloadData()
-    }
 
     @WorkerThread
     override fun shouldUpgrade(uri: Uri): Boolean {
 
         if (uri.isHttps) {
             return false
+        }
+
+        if (!dataLoaded) {
+            reloadData()
         }
 
         val host = uri.host
@@ -75,9 +76,8 @@ class HttpsUpgraderImpl(
     }
 
     override fun reloadData() {
-        Schedulers.io().scheduleDirect {
-            httpsBloomFilter = bloomFactory.create()
-        }
+        dataLoaded = true
+        httpsBloomFilter = bloomFactory.create()
     }
 
     companion object {
