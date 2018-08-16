@@ -172,7 +172,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         }
     }
 
-    class BookmarksViewHolder(itemView: View?, private val viewModel: BookmarksViewModel) :
+    class BookmarksViewHolder(itemView: View, private val viewModel: BookmarksViewModel) :
         ViewHolder(itemView) {
 
         lateinit var bookmark: BookmarkEntity

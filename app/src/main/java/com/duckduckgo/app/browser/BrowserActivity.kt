@@ -79,10 +79,11 @@ class BrowserActivity : DuckDuckGoActivity() {
     private fun openNewTab(tabId: String, url: String? = null) {
         val fragment = BrowserTabFragment.newInstance(tabId, url)
         val transaction = supportFragmentManager.beginTransaction()
-        if (currentTab == null) {
+        val tab = currentTab
+        if (tab == null) {
             transaction.replace(R.id.fragmentContainer, fragment, tabId)
         } else {
-            transaction.hide(currentTab)
+            transaction.hide(tab)
             transaction.add(R.id.fragmentContainer, fragment, tabId)
         }
         transaction.commit()

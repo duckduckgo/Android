@@ -692,7 +692,7 @@ class BrowserTabFragment : Fragment(), FindListener {
     }
 
     private fun resetTabState() {
-        omnibarTextInput.text.clear()
+        omnibarTextInput.text?.clear()
         viewModel.resetView()
         destroyWebView()
         configureWebView()
