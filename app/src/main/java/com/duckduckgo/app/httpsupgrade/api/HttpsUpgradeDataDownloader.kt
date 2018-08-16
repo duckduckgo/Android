@@ -17,6 +17,7 @@
 package com.duckduckgo.app.httpsupgrade.api
 
 import com.duckduckgo.app.global.api.isCached
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
@@ -34,7 +35,8 @@ class HttpsUpgradeDataDownloader @Inject constructor(
     private val httpsUpgrader: HttpsUpgrader,
     private val httpsBloomSpecDao: HttpsBloomFilterSpecDao,
     private val whitelistDao: HttpsWhitelistDao,
-    private val binaryDataStore: BinaryDataStore
+    private val binaryDataStore: BinaryDataStore,
+    private val appDatabase: AppDatabase
 ) {
 
     fun download(): Completable {
@@ -53,29 +55,31 @@ class HttpsUpgradeDataDownloader @Inject constructor(
 
     private fun downloadBloomFilter(specification: HttpsBloomFilterSpec): Completable {
         return fromAction {
-            Timber.d("Downloading https bloom filter binary")
-            val call = service.httpsBloomFilter()
-            val response = call.execute()
-            val fileName = HTTPS_BINARY_FILE
 
-            if (response.isCached && binaryDataStore.verifyCheckSum(fileName, specification.sha256)) {
-                Timber.d("Https bloom data already cached and stored for this spec")
+            Timber.d("Downloading https bloom filter binary")
+
+            if (specification == httpsBloomSpecDao.get() && binaryDataStore.verifyCheckSum(HTTPS_BINARY_FILE, specification.sha256)) {
+                Timber.d("Https bloom data already stored for this spec")
                 return@fromAction
             }
 
+            val call = service.httpsBloomFilter()
+            val response = call.execute()
             if (!response.isSuccessful) {
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
 
             val bytes = response.body()!!.bytes()
             if (!binaryDataStore.verifyCheckSum(bytes, specification.sha256)) {
-                throw IOException("Https binary has incorrect checksum, throwisng away file")
+                throw IOException("Https binary has incorrect checksum, throwing away file")
             }
 
             Timber.d("Updating https bloom data store with new data")
-            httpsBloomSpecDao.insert(specification)
-            binaryDataStore.saveData(fileName, bytes)
-            httpsUpgrader.reloadData()
+            appDatabase.runInTransaction {
+                httpsBloomSpecDao.insert(specification)
+                binaryDataStore.saveData(HTTPS_BINARY_FILE, bytes)
+                httpsUpgrader.reloadData()
+            }
         }
     }
 
