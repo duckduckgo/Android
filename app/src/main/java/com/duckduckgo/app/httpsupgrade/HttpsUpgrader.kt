@@ -88,6 +88,7 @@ class HttpsUpgraderImpl(
         }
     }
 
+    @WorkerThread
     override fun reloadData() {
         dataReloadLock.lock()
         httpsBloomFilter = bloomFactory.create()
