@@ -44,7 +44,7 @@ class HttpsUpgraderImpl(
 ) : HttpsUpgrader {
 
     private var httpsBloomFilter: BloomFilter? = null
-    private val reloadLock = ReentrantLock()
+    private val dataReloadLock = ReentrantLock()
 
     init {
         thread {
@@ -82,16 +82,16 @@ class HttpsUpgraderImpl(
 
     private fun waitForAnyReloadsToComplete() {
         // wait for lock (by locking and unlocking) before continuing
-        if (reloadLock.isLocked) {
-            reloadLock.lock()
-            reloadLock.unlock()
+        if (dataReloadLock.isLocked) {
+            dataReloadLock.lock()
+            dataReloadLock.unlock()
         }
     }
 
     override fun reloadData() {
-        reloadLock.lock()
+        dataReloadLock.lock()
         httpsBloomFilter = bloomFactory.create()
-        reloadLock.unlock()
+        dataReloadLock.unlock()
     }
 
     companion object {
