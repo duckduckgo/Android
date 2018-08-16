@@ -24,6 +24,7 @@ Java_com_duckduckgo_app_httpsupgrade_BloomFilter_createBloomFilterFromFile(JNIEn
     const char *pathChars = env->GetStringUTFChars(path, &isElementCopy);
 
     BloomFilter* filter = new BloomFilter(pathChars, maxItems);
+    env->ReleaseStringUTFChars(path, pathChars);
     return (long) filter;
 }
 
@@ -50,6 +51,8 @@ Java_com_duckduckgo_app_httpsupgrade_BloomFilter_add(JNIEnv *env,
 
     BloomFilter *filter = (BloomFilter *) pointer;
     filter->add(elementChars);
+
+    env->ReleaseStringUTFChars(element, elementChars);
 }
 
 extern "C"
@@ -63,5 +66,7 @@ Java_com_duckduckgo_app_httpsupgrade_BloomFilter_contains(JNIEnv *env,
     const char *elementChars = env->GetStringUTFChars(element, &isElementCopy);
 
     BloomFilter *filter = (BloomFilter *) pointer;
-    return filter->contains(elementChars);
+    bool containsElement = filter->contains(elementChars);
+    env->ReleaseStringUTFChars(element, elementChars);
+    return containsElement;
 }
