@@ -16,81 +16,68 @@
 
 package com.duckduckgo.app.httpsupgrade
 
+import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.net.Uri
-import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
-import com.nhaarman.mockito_kotlin.*
-import org.junit.Assert.*
+import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
+import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.whenever
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 class HttpsUpgraderTest {
 
+    @get:Rule
+    @Suppress("unused")
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @get:Rule
+    @Suppress("unused")
+    val schedulers = InstantSchedulersRule()
+
     lateinit var testee: HttpsUpgrader
-    lateinit var mockDao: HttpsUpgradeDomainDao
+
+    private var mockHttpsBloomFilterFactory: HttpsBloomFilterFactory = mock()
+    private var mockWhitelistDao: HttpsWhitelistDao = mock()
+    private var bloomFilter = BloomFilter(100, 0.01)
 
     @Before
     fun before() {
-        mockDao = mock()
-        testee = HttpsUpgraderImpl(mockDao)
-    }
-
-    @Test
-    fun whenHostContainsTwoPartsThenUpgradeStillChecksWildcard() {
-        whenever(mockDao.hasDomain("macpro.localhost")).thenReturn(false)
-        assertFalse(testee.shouldUpgrade(Uri.parse("http://macpro.localhost")))
-        verify(mockDao).hasDomain("*.localhost")
-    }
-
-    @Test
-    fun whenHostContainsSinglePartThenUpgradeStillChecksWildcard() {
-        whenever(mockDao.hasDomain("localhost")).thenReturn(false)
-        assertFalse(testee.shouldUpgrade(Uri.parse("http://localhost")))
-        verify(mockDao, times(1)).hasDomain(any())
-    }
-
-    @Test
-    fun whenMixedCaseDomainIsASubdominOfAWildCardInTheDatabaseThenShouldUpgrade() {
-        whenever(mockDao.hasDomain("www.example.com")).thenReturn(false)
-        whenever(mockDao.hasDomain("*.example.com")).thenReturn(true)
-        assertTrue(testee.shouldUpgrade(Uri.parse("http://www.EXAMPLE.com")))
-        verify(mockDao).hasDomain("*.example.com")
-    }
-    
-    @Test
-    fun whenMixedCaseUriIsHttpAndInUpgradeListThenShouldUpgrade() {
-        whenever(mockDao.hasDomain("www.example.com")).thenReturn(true)
-        assertTrue(testee.shouldUpgrade(Uri.parse("http://www.EXAMPLE.com")))
-    }
-
-    @Test
-    fun whenGivenUriItIsUpgradedToHttps() {
-        val input = Uri.parse("http://www.example.com/some/path/to/a/file.txt")
-        val expected = Uri.parse("https://www.example.com/some/path/to/a/file.txt")
-        assertEquals(expected, testee.upgrade(input))
-    }
-
-    @Test
-    fun whenDomainIsASubdominOfAWildCardInTheDatabaseThenShouldUpgrade() {
-        whenever(mockDao.hasDomain("www.example.com")).thenReturn(false)
-        whenever(mockDao.hasDomain("*.example.com")).thenReturn(true)
-        assertTrue(testee.shouldUpgrade(Uri.parse("http://www.example.com")))
-        verify(mockDao).hasDomain("*.example.com")
-    }
-
-    @Test
-    fun whenUriIsHttpAndInUpgradeListThenShouldUpgrade() {
-        whenever(mockDao.hasDomain("www.example.com")).thenReturn(true)
-        assertTrue(testee.shouldUpgrade(Uri.parse("http://www.example.com")))
-    }
-
-    @Test
-    fun whenUriIsHttpAndIsNotInUpgradeListThenShouldNotUpgrade() {
-        assertFalse(testee.shouldUpgrade(Uri.parse("http://www.example.com")))
+        whenever(mockHttpsBloomFilterFactory.create()).thenReturn(bloomFilter)
+        testee = HttpsUpgraderImpl(mockWhitelistDao, mockHttpsBloomFilterFactory)
     }
 
     @Test
     fun whenUriIsHttpsThenShouldNotUpgrade() {
         assertFalse(testee.shouldUpgrade(Uri.parse("https://www.example.com")))
+    }
+
+    @Test
+    fun whenHttpUriIsNotInBloomFilterThenShouldNotUpgrade() {
+        assertFalse(testee.shouldUpgrade(Uri.parse("http://www.example.com")))
+    }
+
+    @Test
+    fun whenHttpUriIsInBloomFilterThenShouldUpgrade() {
+        bloomFilter.add("www.example.com")
+        assertTrue(testee.shouldUpgrade(Uri.parse("http://www.example.com")))
+    }
+
+    @Test
+    fun whenHttpUriHasOnlyPartDomainInBloomFilterThenShouldNotUpgrade() {
+        bloomFilter.add("example.com")
+        assertFalse(testee.shouldUpgrade(Uri.parse("http://www.example.com")))
+    }
+
+    @Test
+    fun whenHttpUriIsInBloomFilterAndInWhitelistThenShouldNotUpgrade() {
+        bloomFilter.add("www.example.com")
+        whenever(mockWhitelistDao.contains("www.example.com")).thenReturn(true)
+        assertFalse(testee.shouldUpgrade(Uri.parse("http://www.example.com")))
     }
 
 }

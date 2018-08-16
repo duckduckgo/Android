@@ -55,7 +55,7 @@ class FeedbackViewModelTest {
 
     @Test
     fun whenBrokenUrlSwitchedOnWithUrlThenMessageFocused() {
-        testee.onBrokenSiteUrlChanged(Constants.url)
+        testee.onBrokenSiteUrlChanged(url)
         testee.onBrokenSiteChanged(true)
         verify(mockCommandObserver).onChanged(Command.FocusMessage)
     }
@@ -63,8 +63,8 @@ class FeedbackViewModelTest {
     @Test
     fun whenBrokenUrlOnWithUrlAndMessageThenCanSubmit() {
         testee.onBrokenSiteChanged(true)
-        testee.onBrokenSiteUrlChanged(Constants.url)
-        testee.onFeedbackMessageChanged(Constants.message)
+        testee.onBrokenSiteUrlChanged(url)
+        testee.onFeedbackMessageChanged(message)
         assertTrue(viewState.submitAllowed)
     }
 
@@ -72,14 +72,14 @@ class FeedbackViewModelTest {
     fun whenBrokenUrlOnWithNullUrlThenCannotSubmit() {
         testee.onBrokenSiteChanged(true)
         testee.onBrokenSiteUrlChanged(null)
-        testee.onFeedbackMessageChanged(Constants.message)
+        testee.onFeedbackMessageChanged(message)
         assertFalse(viewState.submitAllowed)
     }
 
     @Test
     fun whenBrokenUrlOnWithNullMessageThenCannotSubmit() {
         testee.onBrokenSiteChanged(true)
-        testee.onBrokenSiteUrlChanged(Constants.url)
+        testee.onBrokenSiteUrlChanged(url)
         testee.onFeedbackMessageChanged(null)
         assertFalse(viewState.submitAllowed)
     }
@@ -88,14 +88,14 @@ class FeedbackViewModelTest {
     fun whenBrokenUrlOnWithBlankUrlThenCannotSubmit() {
         testee.onBrokenSiteChanged(true)
         testee.onBrokenSiteUrlChanged(" ")
-        testee.onFeedbackMessageChanged(Constants.message)
+        testee.onFeedbackMessageChanged(message)
         assertFalse(viewState.submitAllowed)
     }
 
     @Test
     fun whenBrokenUrlOnWithBlankMessageThenCannotSubmit() {
         testee.onBrokenSiteChanged(true)
-        testee.onBrokenSiteUrlChanged(Constants.url)
+        testee.onBrokenSiteUrlChanged(url)
         testee.onFeedbackMessageChanged(" ")
         assertFalse(viewState.submitAllowed)
     }
@@ -103,7 +103,7 @@ class FeedbackViewModelTest {
     @Test
     fun whenBrokenUrlOffWithMessageThenCanSubmit() {
         testee.onBrokenSiteChanged(false)
-        testee.onFeedbackMessageChanged(Constants.message)
+        testee.onFeedbackMessageChanged(message)
         assertTrue(viewState.submitAllowed)
     }
 
@@ -124,11 +124,11 @@ class FeedbackViewModelTest {
     @Test
     fun whenCanSubmitBrokenSiteAndSubmitPressedThenFeedbackSubmitted() {
         testee.onBrokenSiteChanged(true)
-        testee.onBrokenSiteUrlChanged(Constants.url)
-        testee.onFeedbackMessageChanged(Constants.message)
+        testee.onBrokenSiteUrlChanged(url)
+        testee.onFeedbackMessageChanged(message)
         testee.onSubmitPressed()
 
-        verify(mockFeedbackSender).submitBrokenSiteFeedback(Constants.message, Constants.url)
+        verify(mockFeedbackSender).submitBrokenSiteFeedback(message, url)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
 
@@ -143,9 +143,9 @@ class FeedbackViewModelTest {
     @Test
     fun whenCanSubmitMessageAndSubmitPressedThenFeedbackSubmitted() {
         testee.onBrokenSiteChanged(false)
-        testee.onFeedbackMessageChanged(Constants.message)
+        testee.onFeedbackMessageChanged(message)
         testee.onSubmitPressed()
-        verify(mockFeedbackSender).submitGeneralFeedback(Constants.message)
+        verify(mockFeedbackSender).submitGeneralFeedback(message)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
 

@@ -37,7 +37,7 @@ class ResourceSurrogateListDownloader @Inject constructor(
 
             Timber.d("Downloading Google Analytics Surrogates data")
 
-            val call = service.https()
+            val call = service.surrogates()
             val response = call.execute()
 
             Timber.d("Response received, success=${response.isSuccessful}")

@@ -21,4 +21,8 @@ object FileUtilities {
     fun loadText(resourceName: String): String =
         javaClass.classLoader.getResource(resourceName).openStream().bufferedReader().use { it.readText() }
 
+
+    fun loadLines(resourceName: String): List<String> =
+        javaClass.classLoader.getResource(resourceName).openStream().bufferedReader().use { it.readLines() }
+
 }

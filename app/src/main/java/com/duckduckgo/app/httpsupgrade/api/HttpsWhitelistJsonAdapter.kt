@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.httpsupgrade.db
+package com.duckduckgo.app.httpsupgrade.api
 
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.PrimaryKey
+import com.duckduckgo.app.httpsupgrade.model.HttpsWhitelistedDomain
+import com.squareup.moshi.FromJson
 
-@Entity(tableName = "https_upgrade_domain")
-data class HttpsUpgradeDomain(@PrimaryKey var domain: String)
+class HttpsWhitelistJsonAdapter {
+
+    @FromJson
+    fun adapt(data: Map<String, List<String>>): List<HttpsWhitelistedDomain> {
+        return data.getValue("data").map { HttpsWhitelistedDomain(it) }
+    }
+
+}
