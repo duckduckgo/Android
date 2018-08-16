@@ -23,6 +23,8 @@ import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import timber.log.Timber
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.thread
 
 interface HttpsUpgrader {
 
@@ -42,8 +44,13 @@ class HttpsUpgraderImpl(
 ) : HttpsUpgrader {
 
     private var httpsBloomFilter: BloomFilter? = null
-    private var dataLoaded = false
+    private val reloadLock = ReentrantLock()
 
+    init {
+        thread {
+            reloadData()
+        }
+    }
 
     @WorkerThread
     override fun shouldUpgrade(uri: Uri): Boolean {
@@ -52,9 +59,7 @@ class HttpsUpgraderImpl(
             return false
         }
 
-        if (!dataLoaded) {
-            reloadData()
-        }
+        waitForAnyReloadsToComplete()
 
         val host = uri.host
         if (whitelistedDao.contains(host)) {
@@ -75,9 +80,18 @@ class HttpsUpgraderImpl(
         return false
     }
 
+    private fun waitForAnyReloadsToComplete() {
+        // wait for lock (by locking and unlocking) before continuing
+        if (reloadLock.isLocked) {
+            reloadLock.lock()
+            reloadLock.unlock()
+        }
+    }
+
     override fun reloadData() {
-        dataLoaded = true
+        reloadLock.lock()
         httpsBloomFilter = bloomFactory.create()
+        reloadLock.unlock()
     }
 
     companion object {
