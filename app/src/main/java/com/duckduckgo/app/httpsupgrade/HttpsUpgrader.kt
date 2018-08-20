@@ -22,8 +22,9 @@ import com.duckduckgo.app.global.UrlScheme
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
-import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.thread
 
 interface HttpsUpgrader {
 
@@ -43,9 +44,12 @@ class HttpsUpgraderImpl(
 ) : HttpsUpgrader {
 
     private var httpsBloomFilter: BloomFilter? = null
+    private val dataReloadLock = ReentrantLock()
 
     init {
-        reloadData()
+        thread {
+            reloadData()
+        }
     }
 
     @WorkerThread
@@ -54,6 +58,8 @@ class HttpsUpgraderImpl(
         if (uri.isHttps) {
             return false
         }
+
+        waitForAnyReloadsToComplete()
 
         val host = uri.host
         if (whitelistedDao.contains(host)) {
@@ -74,10 +80,19 @@ class HttpsUpgraderImpl(
         return false
     }
 
-    override fun reloadData() {
-        Schedulers.io().scheduleDirect {
-            httpsBloomFilter = bloomFactory.create()
+    private fun waitForAnyReloadsToComplete() {
+        // wait for lock (by locking and unlocking) before continuing
+        if (dataReloadLock.isLocked) {
+            dataReloadLock.lock()
+            dataReloadLock.unlock()
         }
+    }
+
+    @WorkerThread
+    override fun reloadData() {
+        dataReloadLock.lock()
+        httpsBloomFilter = bloomFactory.create()
+        dataReloadLock.unlock()
     }
 
     companion object {
