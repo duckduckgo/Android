@@ -37,27 +37,7 @@
         android:paddingEnd="24dp"
         android:paddingStart="24dp"
         android:paddingTop="24dp"
-        android:text="kill process (splash screen impl)"
-        android:textColor="@color/brickOrange"
-        android:textSize="16sp"
-        android:textStyle="normal" />
-
-    <TextView
-        android:id="@+id/clearAllOptionNewActivity"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:drawablePadding="24dp"
-        android:drawableStart="@drawable/icon_fire_glyph_24dp"
-        android:fontFamily="sans-serif"
-        app:layout_constraintTop_toBottomOf="@id/clearAllOption"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:paddingBottom="17dp"
-        android:paddingEnd="24dp"
-        android:paddingStart="24dp"
-        android:paddingTop="24dp"
-        android:text="kill process (new activity impl)"
+        android:text="@string/fireClearAll"
         android:textColor="@color/brickOrange"
         android:textSize="16sp"
         android:textStyle="normal" />
@@ -79,7 +59,7 @@
         android:paddingTop="17dp"
         android:text="@string/fireCancel"
         android:textColor="@color/brownishGray"
-        app:layout_constraintTop_toBottomOf="@id/clearAllOptionNewActivity"
+        app:layout_constraintTop_toBottomOf="@id/clearAllOption"
         android:textSize="16sp"
         android:textStyle="normal"
         tools:ignore="UnusedAttribute" />

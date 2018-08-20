@@ -50,13 +50,6 @@ class FireDialog(
             dismiss()
         }
 
-        clearAllOptionNewActivity.setOnClickListener {
-            clearStarted()
-            pixel.fire(FORGET_ALL_EXECUTED)
-            clearPersonalDataAction.clear2()
-            dismiss()
-        }
-
         cancelOption.setOnClickListener {
             dismiss()
         }
