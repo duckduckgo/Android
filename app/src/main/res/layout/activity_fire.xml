@@ -22,14 +22,14 @@
     tools:context="com.duckduckgo.app.fire.FireActivity">
 
     <ImageView
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:importantForAccessibility="no"
-        android:src="@drawable/icon_fire_glyph"
+        android:src="@drawable/icon_default_browser_illustration"
         />
 
 

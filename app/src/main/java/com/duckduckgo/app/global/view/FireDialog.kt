@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.support.design.widget.BottomSheetDialog
 import android.view.View
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FORGET_ALL_EXECUTED
 import kotlinx.android.synthetic.main.sheet_fire_clear_data.*
@@ -48,6 +47,13 @@ class FireDialog(
             clearStarted()
             pixel.fire(FORGET_ALL_EXECUTED)
             clearPersonalDataAction.clear()
+            dismiss()
+        }
+
+        clearAllOptionNewActivity.setOnClickListener {
+            clearStarted()
+            pixel.fire(FORGET_ALL_EXECUTED)
+            clearPersonalDataAction.clear2()
             dismiss()
         }
 

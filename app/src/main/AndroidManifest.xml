@@ -36,7 +36,6 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
@@ -131,9 +130,17 @@
             android:theme="@style/ModalCardTheme" />
 
         <activity
-            android:name="com.duckduckgo.app.fire.FireActivity"
+        android:name="com.duckduckgo.app.fire.FireActivity"
+        android:configChanges="orientation|keyboardHidden|screenSize"
+        android:label="@string/title_activity_fire"
+        android:theme="@style/AppTheme"
+        android:process=":fire" />
+
+        <activity
+            android:name="com.duckduckgo.app.fire.FireSplashActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_fire"
+            android:theme="@style/SplashTheme"
             android:process=":fire" />
     </application>
 

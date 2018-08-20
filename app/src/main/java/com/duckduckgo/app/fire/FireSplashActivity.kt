@@ -17,26 +17,32 @@
 package com.duckduckgo.app.fire
 
 import android.app.Activity
+import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.os.Process
 import androidx.core.os.postDelayed
 import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import timber.log.Timber
 
-class FireActivity : DuckDuckGoActivity() {
+/**
+ * Activity which is responsible for killing the main process and restarting it. This Activity will automatically finish itself after a brief time.
+ *
+ * This Activity runs in a separate process so that it can seamlessly restart the main app process without much in the way of a jarring UX.
+ *
+ * The correct way to invoke this Activity is through its `triggerRebirth(context)` method.
+ *
+ * This Activity was largely inspired by https://github.com/JakeWharton/ProcessPhoenix
+ */
+class FireSplashActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_fire)
-    }
 
-    override fun onStart() {
-        super.onStart()
-
-        Handler().postDelayed(ACTIVITY_FINISH_DELAY_MS){
+        Handler().postDelayed(ACTIVITY_FINISH_DELAY_MS) {
             val intent = intent.getParcelableExtra<Intent>(KEY_RESTART_INTENTS)
             startActivity(intent)
             finish()
@@ -49,7 +55,6 @@ class FireActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-
         private const val ACTIVITY_FINISH_DELAY_MS = 600L
         private const val KEY_RESTART_INTENTS = "KEY_RESTART_INTENTS"
 
@@ -58,43 +63,36 @@ class FireActivity : DuckDuckGoActivity() {
         }
 
         private fun triggerRebirth(context: Context, nextIntent: Intent) {
-            val intent = Intent(context, FireActivity::class.java)
+            val intent = Intent(context, FireSplashActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // In case we are called with non-Activity context.
             intent.putExtra(KEY_RESTART_INTENTS, nextIntent)
             context.startActivity(intent)
             if (context is Activity) {
                 context.finish()
             }
-            killProcess() // Kill kill kill!
+            killProcess()
         }
 
         private fun getRestartIntent(context: Context): Intent {
-
             val intent = BrowserActivity.intent(context)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             return intent
-
-//            val defaultIntent = Intent(Intent.ACTION_MAIN, null)
-//            defaultIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-//            defaultIntent.addCategory(Intent.CATEGORY_DEFAULT)
-//
-//            val packageName = context.packageName
-//            val packageManager = context.packageManager
-//            for (resolveInfo in packageManager.queryIntentActivities(defaultIntent, 0)) {
-//                val activityInfo = resolveInfo.activityInfo
-//                if (activityInfo.packageName == packageName) {
-//                    defaultIntent.component = ComponentName(packageName, activityInfo.name)
-//                    return defaultIntent
-//                }
-//            }
-//
-//            throw IllegalStateException("Unable to determine default activity for $packageName. Does an activity specify the DEFAULT category in its intent filter?")
         }
 
         private fun killProcess() {
             Runtime.getRuntime().exit(0)
         }
+
+        fun appRestarting(context: Context): Boolean {
+            val currentProcessId = Process.myPid()
+            val activityManager: ActivityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            activityManager.runningAppProcesses?.forEach {
+                if(it.pid == currentProcessId && it.processName.endsWith(":fire")) {
+                    Timber.e("Process ID $currentProcessId is fire process")
+                    return true
+                }
+            }
+            return false
+        }
     }
-
-
 }
