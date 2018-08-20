@@ -134,7 +134,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_fire"
             android:theme="@style/SplashTheme"
-            android:process=":fire" />
+            android:process="@string/fireProcessName" />
     </application>
 
 </manifest>

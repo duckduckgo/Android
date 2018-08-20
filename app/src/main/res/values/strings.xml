@@ -152,6 +152,7 @@
     <string name="fireClearAll">Clear All Tabs and Data</string>
     <string name="fireCancel">Cancel</string>
     <string name="fireDataCleared">Data cleared</string>
+    <string name="fireProcessName">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Settings</string>

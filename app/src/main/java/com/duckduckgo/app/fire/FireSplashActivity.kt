@@ -25,6 +25,7 @@ import android.os.Handler
 import android.os.Process
 import androidx.core.os.postDelayed
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import timber.log.Timber
 
@@ -87,8 +88,8 @@ class FireSplashActivity : DuckDuckGoActivity() {
             val currentProcessId = Process.myPid()
             val activityManager: ActivityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
             activityManager.runningAppProcesses?.forEach {
-                if(it.pid == currentProcessId && it.processName.endsWith(":fire")) {
-                    Timber.e("Process ID $currentProcessId is fire process")
+                if (it.pid == currentProcessId && it.processName.endsWith(context.getString(R.string.fireProcessName))) {
+                    Timber.i("Process ID $currentProcessId is fire process")
                     return true
                 }
             }
