@@ -17,6 +17,7 @@
 package com.duckduckgo.app.tabs.ui
 
 import android.content.Context
+import android.support.annotation.DrawableRes
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.RecyclerView.Adapter
 import android.view.LayoutInflater
@@ -33,6 +34,7 @@ import kotlinx.android.synthetic.main.item_tab.view.*
 class TabSwitcherAdapter(private val context: Context, private val itemClickListener: TabSwitchedListener) : Adapter<TabViewHolder>() {
 
     private var data: List<TabEntity> = ArrayList()
+    private var selectedTab: TabEntity? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TabViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -50,6 +52,8 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
         holder.title.text = tab.displayTitle(context)
         holder.url.text = tab.displayUrl()
         holder.tabUnread.visibility =  if (tab.viewed) View.INVISIBLE else View.VISIBLE
+        holder.root.setBackgroundResource(if (tab.tabId == selectedTab?.tabId) backgroundSelected else backgroundDefault)
+        holder.root.alpha = if (tab.tabId == selectedTab?.tabId) alphaSelected else alphaDefault
 
         GlideApp.with(holder.root)
             .load(tab.favicon())
@@ -69,8 +73,13 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
         }
     }
 
-    fun updateData(data: List<TabEntity>) {
+    fun updateData(data: List<TabEntity>?, selectedTab: TabEntity?) {
+
+        data ?: return
+        selectedTab ?: return
+
         this.data = data
+        this.selectedTab = selectedTab
         notifyDataSetChanged()
     }
 
@@ -88,4 +97,15 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
         val close: ImageView,
         val tabUnread: View
     ) : RecyclerView.ViewHolder(root)
+
+    companion object {
+
+        @DrawableRes val backgroundSelected = R.drawable.tab_background_selected
+        @DrawableRes val backgroundDefault = R.drawable.tab_background
+
+        val alphaSelected = 1.0f
+        val alphaDefault = 0.77f
+
+    }
+
 }
