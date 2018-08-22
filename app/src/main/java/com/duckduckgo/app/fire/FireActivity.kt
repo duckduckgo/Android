@@ -24,11 +24,11 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Process
 import android.support.v4.app.ActivityOptionsCompat
+import android.support.v7.app.AppCompatActivity
 import androidx.core.os.postDelayed
 import androidx.core.view.doOnPreDraw
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.DuckDuckGoActivity
 import kotlinx.android.synthetic.main.activity_fire.*
 import timber.log.Timber
 
@@ -41,7 +41,7 @@ import timber.log.Timber
  *
  * This Activity was largely inspired by https://github.com/JakeWharton/ProcessPhoenix
  */
-class FireActivity : DuckDuckGoActivity() {
+class FireActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,7 +103,7 @@ class FireActivity : DuckDuckGoActivity() {
             return false
         }
 
-        private fun activityFadeOptions(context: Context) : Bundle? {
+        private fun activityFadeOptions(context: Context): Bundle? {
             val config = ActivityOptionsCompat.makeCustomAnimation(context, android.R.anim.fade_in, android.R.anim.fade_out)
             return config.toBundle()
         }
