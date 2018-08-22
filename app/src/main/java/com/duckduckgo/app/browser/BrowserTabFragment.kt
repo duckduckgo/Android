@@ -76,7 +76,6 @@ import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.tabs.model.TabEntity
-import com.duckduckgo.app.tabs.ui.TabIconRenderer
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_banner_notification.*
@@ -152,9 +151,6 @@ class BrowserTabFragment : Fragment(), FindListener {
     private val tabsButton: MenuItem?
         get() = toolbar.menu.findItem(R.id.tabs)
 
-    private val tabsAnim: MenuItem?
-        get() = toolbar.menu.findItem(R.id.tabs)
-
     private val fireMenuButton: MenuItem?
         get() = toolbar.menu.findItem(R.id.fire)
 
@@ -208,9 +204,16 @@ class BrowserTabFragment : Fragment(), FindListener {
         configureFindInPage()
         configureAutoComplete()
         configureKeyboardAwareLogoAnimation()
+        configureShowTabSwitcherListener()
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
+        }
+    }
+
+    private fun configureShowTabSwitcherListener() {
+        tabsButton?.actionView?.setOnClickListener {
+            browserActivity?.launchTabSwitcher()
         }
     }
 
@@ -283,16 +286,21 @@ class BrowserTabFragment : Fragment(), FindListener {
             it?.let { renderer.renderFindInPageState(it) }
         })
 
-        viewModel.tabs.observe(this, Observer<List<TabEntity>> {
-            it?.let { renderer.renderTabIcon(it) }
-        })
-
         viewModel.url.observe(this, Observer {
             it?.let { navigate(it) }
         })
 
         viewModel.command.observe(this, Observer {
             processCommand(it)
+        })
+
+        addTabsObserver()
+
+    }
+
+    private fun addTabsObserver() {
+        viewModel.tabs.observe(this, Observer<List<TabEntity>> {
+            it?.let { renderer.renderTabIcon(it) }
         })
     }
 
@@ -378,21 +386,11 @@ class BrowserTabFragment : Fragment(), FindListener {
     }
 
     private fun openInNewBackgroundTab() {
-        val dp = 36.toPx()
-
-        val anim = LottieAnimationView(context)
-        anim.layoutParams = ViewGroup.LayoutParams(dp, dp)
-        anim.setAnimation(R.raw.new_tab)
-        anim.speed = 3.0f
-
-        anim.addAnimatorListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                tabsButton?.actionView = null
-            }
-        })
-
-        tabsButton?.actionView = anim
-        anim.playAnimation()
+        viewModel.tabs.removeObservers(this)
+        val view = tabsButton?.actionView as TabSwitcherButton
+        view.increment {
+            addTabsObserver()
+        }
     }
 
     private fun externalAppLinkClicked(appLinkCommand: Command.HandleExternalAppLink) {
@@ -474,10 +472,6 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.tabs -> {
-                    browserActivity?.launchTabSwitcher()
-                    return@setOnMenuItemClickListener true
-                }
                 R.id.fire -> {
                     browserActivity?.launchFire()
                     return@setOnMenuItemClickListener true
@@ -1004,7 +998,9 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         fun renderTabIcon(tabs: List<TabEntity>) {
             context?.let {
-                tabsButton?.icon = TabIconRenderer.icon(it, tabs.count())
+                val button = tabsButton?.actionView as TabSwitcherButton
+                button.count = tabs.count()
+                button.hasUnread = tabs.firstOrNull { !it.viewed } != null
             }
         }
 
