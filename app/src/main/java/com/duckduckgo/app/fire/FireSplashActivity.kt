@@ -23,10 +23,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Process
+import android.support.v4.app.ActivityOptionsCompat
 import androidx.core.os.postDelayed
+import androidx.core.view.doOnPreDraw
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import kotlinx.android.synthetic.main.activity_fire.*
 import timber.log.Timber
 
 /**
@@ -42,12 +45,15 @@ class FireSplashActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_fire)
 
-        Handler().postDelayed(ACTIVITY_FINISH_DELAY_MS) {
-            val intent = intent.getParcelableExtra<Intent>(KEY_RESTART_INTENTS)
-            startActivity(intent)
-            finish()
-            killProcess()
+        root.doOnPreDraw {
+            Handler().postDelayed(ACTIVITY_FINISH_DELAY_MS) {
+                val intent = intent.getParcelableExtra<Intent>(KEY_RESTART_INTENTS)
+                startActivity(intent, activityFadeOptions(this))
+                finish()
+                killProcess()
+            }
         }
     }
 
@@ -56,7 +62,7 @@ class FireSplashActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        private const val ACTIVITY_FINISH_DELAY_MS = 600L
+        private const val ACTIVITY_FINISH_DELAY_MS = 1200L
         private const val KEY_RESTART_INTENTS = "KEY_RESTART_INTENTS"
 
         fun triggerRebirth(context: Context) {
@@ -65,9 +71,10 @@ class FireSplashActivity : DuckDuckGoActivity() {
 
         private fun triggerRebirth(context: Context, nextIntent: Intent) {
             val intent = Intent(context, FireSplashActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // In case we are called with non-Activity context.
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.putExtra(KEY_RESTART_INTENTS, nextIntent)
-            context.startActivity(intent)
+
+            context.startActivity(intent, activityFadeOptions(context))
             if (context is Activity) {
                 context.finish()
             }
@@ -75,7 +82,7 @@ class FireSplashActivity : DuckDuckGoActivity() {
         }
 
         private fun getRestartIntent(context: Context): Intent {
-            val intent = BrowserActivity.intent(context)
+            val intent = BrowserActivity.intent(context, launchedFromFireAction = true)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             return intent
         }
@@ -94,6 +101,11 @@ class FireSplashActivity : DuckDuckGoActivity() {
                 }
             }
             return false
+        }
+
+        private fun activityFadeOptions(context: Context) : Bundle? {
+            val config = ActivityOptionsCompat.makeCustomAnimation(context, android.R.anim.fade_in, android.R.anim.fade_out)
+            return config.toBundle()
         }
     }
 }
