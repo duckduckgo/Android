@@ -18,7 +18,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="24dp"
     android:layout_height="24dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/anim"
@@ -34,10 +35,11 @@
         android:layout_height="wrap_content"
         android:textAlignment="center"
         android:textSize="12sp"
-        android:textColor="@color/colorPrimary"
+        android:textColor="@color/grayish"
         android:typeface="normal"
         android:textStyle="bold"
         android:layout_centerInParent="true"
+        tools:text="66"
         />
 
     <FrameLayout
