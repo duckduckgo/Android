@@ -22,4 +22,5 @@
             <certificates src="user" />
         </trust-anchors>
     </debug-overrides>
+    <base-config cleartextTrafficPermitted="true" />
 </network-security-config>

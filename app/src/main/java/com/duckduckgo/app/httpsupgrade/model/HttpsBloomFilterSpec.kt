@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.surrogates.api
+package com.duckduckgo.app.httpsupgrade.model
 
-import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.http.GET
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.PrimaryKey
 
 
-interface ResourceSurrogateListService {
-
-    @GET("/contentblocking.js?l=surrogates")
-    fun surrogates(): Call<ResponseBody>
+@Entity(tableName = "https_bloom_filter_spec")
+data class HttpsBloomFilterSpec(
+    @PrimaryKey val id: Int = 1,
+    val errorRate: Double,
+    val totalEntries: Int,
+    val sha256: String
+) {
+    companion object {
+        const val HTTPS_BINARY_FILE = "HTTPS_BINARY_FILE"
+    }
 }

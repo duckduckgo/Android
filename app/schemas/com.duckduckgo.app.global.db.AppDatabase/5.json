@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 4,
-    "identityHash": "a80686f1ea7760530a37dec6214a19f4",
+    "version": 5,
+    "identityHash": "7760fef82ff9656e970a428d1ac2c9e7",
     "entities": [
       {
         "tableName": "disconnect_tracker",
@@ -175,7 +175,7 @@
       },
       {
         "tableName": "tabs",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`tabId` TEXT NOT NULL, `url` TEXT, `title` TEXT, PRIMARY KEY(`tabId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`tabId` TEXT NOT NULL, `url` TEXT, `title` TEXT, `viewed` INTEGER NOT NULL, `position` INTEGER NOT NULL, PRIMARY KEY(`tabId`))",
         "fields": [
           {
             "fieldPath": "tabId",
@@ -194,6 +194,18 @@
             "columnName": "title",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "viewed",
+            "columnName": "viewed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -296,7 +308,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"a80686f1ea7760530a37dec6214a19f4\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"7760fef82ff9656e970a428d1ac2c9e7\")"
     ]
   }
 }

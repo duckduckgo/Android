@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.httpsupgrade.api
+package com.duckduckgo.app.global
 
-import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomain
-import com.squareup.moshi.FromJson
+import java.math.BigInteger
+import java.security.MessageDigest
 
-class HttpsUpgradeDomainFromStringAdapter {
 
-    @FromJson fun adapt(domain: String) = HttpsUpgradeDomain(domain)
+val ByteArray.sha256: String
+    get() {
+        val md = MessageDigest.getInstance("SHA-256")
+        md.reset()
+        val digest = md.digest(this)
+        return String.format("%0" + digest.size * 2 + "x", BigInteger(1, digest))
+    }
 
+fun ByteArray.verifySha256(sha256: String): Boolean {
+    return this.sha256 == sha256
 }

@@ -22,8 +22,10 @@ import android.arch.persistence.room.RoomDatabase
 import android.arch.persistence.room.migration.Migration
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomain
-import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
+import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
+import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
+import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
+import com.duckduckgo.app.httpsupgrade.model.HttpsWhitelistedDomain
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.SiteVisitedEntity
@@ -33,9 +35,10 @@ import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 
-@Database(exportSchema = true, version = 4, entities = [
-    HttpsUpgradeDomain::class,
+@Database(exportSchema = true, version = 5, entities = [
     DisconnectTracker::class,
+    HttpsBloomFilterSpec::class,
+    HttpsWhitelistedDomain::class,
     NetworkLeaderboardEntry::class,
     SiteVisitedEntity::class,
     AppConfigurationEntity::class,
@@ -46,8 +49,9 @@ import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 
 abstract class AppDatabase : RoomDatabase() {
 
-    abstract fun httpsUpgradeDomainDao(): HttpsUpgradeDomainDao
     abstract fun trackerDataDao(): TrackerDataDao
+    abstract fun httpsWhitelistedDao(): HttpsWhitelistDao
+    abstract fun httpsBloomFilterSpecDao(): HttpsBloomFilterSpecDao
     abstract fun networkLeaderboardDao(): NetworkLeaderboardDao
     abstract fun appConfigurationDao(): AppConfigurationDao
     abstract fun tabsDao(): TabsDao
@@ -72,7 +76,14 @@ abstract class AppDatabase : RoomDatabase() {
 
         val MIGRATION_3_TO_4: Migration = object : Migration(3, 4) {
             override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DROP TABLE https_upgrade_domain")
+                database.execSQL("CREATE TABLE `https_bloom_filter_spec` (`id` INTEGER NOT NULL, `errorRate` REAL NOT NULL, `totalEntries` INTEGER NOT NULL, `sha256` TEXT NOT NULL, PRIMARY KEY(`id`))")
+                database.execSQL("CREATE TABLE `https_whitelisted_domain` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
+            }
+        }
 
+        val MIGRATION_4_TO_5: Migration = object : Migration(4, 5) {
+            override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE `tabs` ADD COLUMN `viewed` INTEGER NOT NULL DEFAULT 0")
                 database.execSQL("ALTER TABLE `tabs` ADD COLUMN `position` INTEGER NOT NULL DEFAULT 0")
 
@@ -87,7 +98,6 @@ abstract class AppDatabase : RoomDatabase() {
                         } while (it.moveToNext())
                     }
                 }
-
             }
         }
     }

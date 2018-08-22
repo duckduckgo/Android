@@ -18,12 +18,23 @@ add_library( # Sets the name of the library.
 
              # Provides a relative path to your source file(s).
              src/main/cpp/adblockclient-lib.cpp
-             src/main/cpp/ad-block/ad_block_client.cc
-             src/main/cpp/ad-block/cosmetic_filter.cc
-             src/main/cpp/ad-block/filter.cc
-             src/main/cpp/bloom-filter-cpp/BloomFilter.cpp
-             src/main/cpp/bloom-filter-cpp/hashFn.cpp
-             src/main/cpp/hashset-cpp/HashSet.cpp
+             src/main/cpp/third-party/ad-block/ad_block_client.cc
+             src/main/cpp/third-party/ad-block/cosmetic_filter.cc
+             src/main/cpp/third-party/ad-block/filter.cc
+             src/main/cpp/third-party/bloom-filter-cpp/BloomFilter.cpp
+             src/main/cpp/third-party/bloom-filter-cpp/hashFn.cpp
+             src/main/cpp/third-party/hashset-cpp/HashSet.cpp
+            )
+
+add_library( # Sets the name of the library.
+             https-bloom-lib
+
+             # Sets the library as a shared library.
+             SHARED
+
+             # Provides a relative path to your source file(s).
+             src/main/cpp/https-bloom-lib.cpp
+             src/main/cpp/third-party/bloom_cpp/src/BloomFilter.cpp
             )
 
 # Searches for a specified prebuilt library and stores the path as a

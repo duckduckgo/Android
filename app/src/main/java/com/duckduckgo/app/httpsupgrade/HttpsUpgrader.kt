@@ -20,52 +20,83 @@ import android.net.Uri
 import android.support.annotation.WorkerThread
 import com.duckduckgo.app.global.UrlScheme
 import com.duckduckgo.app.global.isHttps
-import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomainDao
+import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
+import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import timber.log.Timber
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.thread
 
 interface HttpsUpgrader {
 
     @WorkerThread
-    fun shouldUpgrade(uri: Uri) : Boolean
+    fun shouldUpgrade(uri: Uri): Boolean
 
     fun upgrade(uri: Uri): Uri {
         return uri.buildUpon().scheme(UrlScheme.https).build()
     }
+
+    fun reloadData()
 }
 
-class HttpsUpgraderImpl constructor(private val dao: HttpsUpgradeDomainDao) :HttpsUpgrader {
+class HttpsUpgraderImpl(
+    private val whitelistedDao: HttpsWhitelistDao,
+    private val bloomFactory: HttpsBloomFilterFactory
+) : HttpsUpgrader {
+
+    private var httpsBloomFilter: BloomFilter? = null
+    private val dataReloadLock = ReentrantLock()
+
+    init {
+        thread {
+            reloadData()
+        }
+    }
 
     @WorkerThread
-    override fun shouldUpgrade(uri: Uri) : Boolean {
+    override fun shouldUpgrade(uri: Uri): Boolean {
+
         if (uri.isHttps) {
             return false
         }
 
-        val host = (uri.host ?: return false).toLowerCase()
-        return dao.hasDomain(host) || matchesWildcard(host)
-    }
+        waitForAnyReloadsToComplete()
 
-    private fun matchesWildcard(host: String): Boolean {
-        val domains = mutableListOf<String>()
-        for (part in host.split(".").reversed()) {
-            if (domains.isEmpty()) {
-                domains.add(".$part")
-            } else {
-                val last = domains.last()
-                domains.add(".$part$last")
-            }
+        val host = uri.host
+        if (whitelistedDao.contains(host)) {
+            Timber.d("${host} is in whitelist and so not upgradable")
+            return false
         }
 
-        domains.asReversed().removeAt(0)
-        Timber.d("domains $domains")
+        httpsBloomFilter?.let {
 
-        for (domain in domains) {
-            if (dao.hasDomain("*$domain")) {
-                return true
-            }
+            val initialTime = System.nanoTime()
+            val shouldUpgrade = it.contains(host)
+            val totalTime = System.nanoTime() - initialTime
+            Timber.d("${host} ${if (shouldUpgrade) "is" else "is not"} upgradable, lookup in ${totalTime/NANO_TO_MILLIS_DIVISOR}ms")
+
+            return shouldUpgrade
         }
 
         return false
+    }
+
+    private fun waitForAnyReloadsToComplete() {
+        // wait for lock (by locking and unlocking) before continuing
+        if (dataReloadLock.isLocked) {
+            dataReloadLock.lock()
+            dataReloadLock.unlock()
+        }
+    }
+
+    @WorkerThread
+    override fun reloadData() {
+        dataReloadLock.lock()
+        httpsBloomFilter = bloomFactory.create()
+        dataReloadLock.unlock()
+    }
+
+    companion object {
+        const val NANO_TO_MILLIS_DIVISOR = 1_000_000.0
     }
 
 }

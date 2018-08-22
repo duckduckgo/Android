@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.httpsupgrade.api
+package com.duckduckgo.app.httpsupgrade.model
 
-import com.duckduckgo.app.httpsupgrade.db.HttpsUpgradeDomain
-import retrofit2.Call
-import retrofit2.http.GET
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.PrimaryKey
 
-interface HttpsUpgradeListService {
-
-    @GET("/contentblocking.js?l=https2")
-    fun https(): Call<List<HttpsUpgradeDomain>>
-
-}
+@Entity(tableName = "https_whitelisted_domain")
+data class HttpsWhitelistedDomain(
+    @PrimaryKey var domain: String
+)

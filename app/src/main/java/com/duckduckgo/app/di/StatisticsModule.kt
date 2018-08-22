@@ -17,8 +17,6 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import com.duckduckgo.app.global.AppUrl
-import com.duckduckgo.app.global.api.ApiRequestInterceptor
 import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.VariantManager
@@ -33,7 +31,6 @@ import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import javax.inject.Named
 
 
