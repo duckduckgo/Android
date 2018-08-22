@@ -21,7 +21,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/windowBackground"
-    tools:context="com.duckduckgo.app.fire.FireSplashActivity">
+    tools:context="com.duckduckgo.app.fire.FireActivity">
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/fireAnimationView"

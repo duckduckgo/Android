@@ -41,7 +41,7 @@ import timber.log.Timber
  *
  * This Activity was largely inspired by https://github.com/JakeWharton/ProcessPhoenix
  */
-class FireSplashActivity : DuckDuckGoActivity() {
+class FireActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +70,7 @@ class FireSplashActivity : DuckDuckGoActivity() {
         }
 
         private fun triggerRebirth(context: Context, nextIntent: Intent) {
-            val intent = Intent(context, FireSplashActivity::class.java)
+            val intent = Intent(context, FireActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.putExtra(KEY_RESTART_INTENTS, nextIntent)
 
