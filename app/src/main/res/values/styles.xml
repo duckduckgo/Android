@@ -267,8 +267,7 @@
     </style>
 
     <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="android:windowBackground">@drawable/fire_splash_activity</item>
-        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowBackground">@color/windowBackground</item>
     </style>
 
 </resources>
