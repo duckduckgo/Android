@@ -129,6 +129,11 @@ class BrowserActivity : DuckDuckGoActivity() {
             return
         }
 
+        if(intent.getBooleanExtra(LAUNCHED_FROM_FIRE_EXTRA, false)) {
+            Timber.i("Launched from fire")
+            Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
+        }
+
         if (launchNewSearch(intent)) {
             viewModel.onNewTabRequested()
             return
@@ -233,15 +238,17 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     companion object {
 
-        fun intent(context: Context, queryExtra: String? = null, newSearch: Boolean = false): Intent {
+        fun intent(context: Context, queryExtra: String? = null, newSearch: Boolean = false, launchedFromFireAction: Boolean = false): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
             intent.putExtra(NEW_SEARCH_EXTRA, newSearch)
+            intent.putExtra(LAUNCHED_FROM_FIRE_EXTRA, launchedFromFireAction)
             return intent
         }
 
         const val NEW_SEARCH_EXTRA = "NEW_SEARCH_EXTRA"
         const val PERFORM_FIRE_ON_ENTRY_EXTRA = "PERFORM_FIRE_ON_ENTRY_EXTRA"
+        const val LAUNCHED_FROM_FIRE_EXTRA = "LAUNCHED_FROM_FIRE_EXTRA"
         private const val DASHBOARD_REQUEST_CODE = 100
     }
 
