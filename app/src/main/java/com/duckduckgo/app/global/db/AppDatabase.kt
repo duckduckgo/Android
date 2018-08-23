@@ -76,7 +76,7 @@ abstract class AppDatabase : RoomDatabase() {
 
         val MIGRATION_3_TO_4: Migration = object : Migration(3, 4) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("DROP TABLE https_upgrade_domain")
+                database.execSQL("DROP TABLE `https_upgrade_domain`")
                 database.execSQL("CREATE TABLE `https_bloom_filter_spec` (`id` INTEGER NOT NULL, `errorRate` REAL NOT NULL, `totalEntries` INTEGER NOT NULL, `sha256` TEXT NOT NULL, PRIMARY KEY(`id`))")
                 database.execSQL("CREATE TABLE `https_whitelisted_domain` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
             }
