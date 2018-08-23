@@ -42,9 +42,10 @@
 
     <FrameLayout
         android:id="@+id/clickZone"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
         android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_centerInParent="true"
         android:clickable="true"
         android:focusable="true" />
 
