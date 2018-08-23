@@ -23,7 +23,7 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import kotlinx.android.synthetic.main.view_tab_switcher_button.view.*
 
-class TabSwitcherButton(context: Context?) : FrameLayout(context) {
+class TabSwitcherButton(context: Context) : FrameLayout(context) {
 
     var count = 0
         set(value) {
@@ -39,12 +39,11 @@ class TabSwitcherButton(context: Context?) : FrameLayout(context) {
         }
 
     init {
-        LayoutInflater.from(context!!).inflate(R.layout.view_tab_switcher_button, this, true)
+        LayoutInflater.from(context).inflate(R.layout.view_tab_switcher_button, this, true)
 
         clickZone.setOnClickListener {
             super.callOnClick()
         }
-
     }
 
     fun increment(callback: () -> Unit) {

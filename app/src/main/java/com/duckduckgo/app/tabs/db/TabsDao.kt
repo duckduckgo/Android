@@ -92,8 +92,7 @@ abstract class TabsDao {
     }
 
     fun lastTab(): TabEntity? {
-        val tabs = tabs()
-        return if (tabs.isEmpty()) null else tabs.last()
+        return tabs().lastOrNull()
     }
 
 }

@@ -60,6 +60,17 @@ class TabDataRepositoryTest {
     }
 
     @Test
+    fun whenAddNewTabAfterExistingTabWithUrlWithNoHostThenUsesUrlAsTitle() {
+
+        val badUrl = "//bad/url"
+        testee.addNewTabAfterExistingTab(badUrl, "tabid")
+        val captor = argumentCaptor<TabEntity>()
+        verify(mockDao).insertTabAtPosition(captor.capture())
+        assertEquals(badUrl, captor.firstValue.url)
+
+    }
+
+    @Test
     fun whenTabAddDirectlyThenViewedIsTrue() {
         testee.add("http://www.example.com")
 

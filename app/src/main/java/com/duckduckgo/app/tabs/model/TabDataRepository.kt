@@ -68,7 +68,7 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
             val position = tabsDao.tab(tabId)?.position ?: -1
             val uri = Uri.parse(url)
             val host = uri.host
-            val title = host.dropPrefix("www.")
+            val title = if (host == null) url else host.removePrefix("www.")
             val tab = TabEntity(generateTabId(), url, title, false, position + 1)
             tabsDao.insertTabAtPosition(tab)
         }
@@ -113,8 +113,4 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
             tabsDao.insertTabSelection(selection)
         }
     }
-}
-
-fun String.dropPrefix(prefix: String): String {
-    return if (startsWith(prefix)) drop(prefix.length) else this
 }

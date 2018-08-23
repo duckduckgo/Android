@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2018 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,32 +15,30 @@
   -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="36dp"
-    android:layout_height="36dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="36dp"
+    android:layout_height="36dp">
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/anim"
         android:layout_width="28dp"
         android:layout_height="28dp"
-        app:lottie_rawRes="@raw/new_tab"
-        android:clickable="false"
         android:layout_centerInParent="true"
-        />
+        android:clickable="false"
+        app:lottie_rawRes="@raw/new_tab" />
 
     <TextView
         android:id="@+id/tabCount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:textSize="12sp"
-        android:textColor="@color/grayish"
-        android:typeface="normal"
-        android:textStyle="bold"
         android:layout_centerInParent="true"
-        tools:text="66"
-        />
+        android:textAlignment="center"
+        android:textColor="@color/grayish"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:typeface="normal"
+        tools:text="66" />
 
     <FrameLayout
         android:id="@+id/clickZone"

@@ -51,15 +51,15 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
         val tab = data[position]
         holder.title.text = tab.displayTitle(context)
         holder.url.text = tab.displayUrl()
-        holder.tabUnread.visibility =  if (tab.viewed) View.INVISIBLE else View.VISIBLE
-        holder.root.setBackgroundResource(if (tab.tabId == selectedTab?.tabId) backgroundSelected else backgroundDefault)
-        holder.root.alpha = if (tab.tabId == selectedTab?.tabId) alphaSelected else alphaDefault
+        holder.tabUnread.visibility = if (tab.viewed) View.INVISIBLE else View.VISIBLE
+        holder.root.setBackgroundResource(if (tab.tabId == selectedTab?.tabId) SELECTED_BACKGROUND else DEFAULT_BACKGROUND)
+        holder.root.alpha = if (tab.tabId == selectedTab?.tabId) SELECTED_ALPHA else DEFAULT_ALPHA
 
         GlideApp.with(holder.root)
-            .load(tab.favicon())
-            .placeholder(R.drawable.ic_globe_gray_16dp)
-            .error(R.drawable.ic_globe_gray_16dp)
-            .into(holder.favicon)
+                .load(tab.favicon())
+                .placeholder(R.drawable.ic_globe_gray_16dp)
+                .error(R.drawable.ic_globe_gray_16dp)
+                .into(holder.favicon)
 
         attachClickListeners(holder, tab)
     }
@@ -90,21 +90,23 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
     }
 
     data class TabViewHolder(
-        val root: View,
-        val favicon: ImageView,
-        val title: TextView,
-        val url: TextView,
-        val close: ImageView,
-        val tabUnread: View
+            val root: View,
+            val favicon: ImageView,
+            val title: TextView,
+            val url: TextView,
+            val close: ImageView,
+            val tabUnread: View
     ) : RecyclerView.ViewHolder(root)
 
     companion object {
 
-        @DrawableRes val backgroundSelected = R.drawable.tab_background_selected
-        @DrawableRes val backgroundDefault = R.drawable.tab_background
+        @DrawableRes
+        private const val SELECTED_BACKGROUND = R.drawable.tab_background_selected
+        @DrawableRes
+        private const val DEFAULT_BACKGROUND = R.drawable.tab_background
 
-        val alphaSelected = 1.0f
-        val alphaDefault = 0.77f
+        private const val SELECTED_ALPHA = 1.0f
+        private const val DEFAULT_ALPHA = 0.77f
 
     }
 
