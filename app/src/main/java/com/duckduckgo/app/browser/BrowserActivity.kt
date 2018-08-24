@@ -121,7 +121,7 @@ class BrowserActivity : DuckDuckGoActivity() {
             return
         }
 
-        if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false) ) {
+        if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
             viewModel.onClearRequested()
             clearPersonalDataAction.clear()
             Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
@@ -129,7 +129,7 @@ class BrowserActivity : DuckDuckGoActivity() {
             return
         }
 
-        if(intent.getBooleanExtra(LAUNCHED_FROM_FIRE_EXTRA, false)) {
+        if (intent.getBooleanExtra(LAUNCHED_FROM_FIRE_EXTRA, false)) {
             Timber.i("Launched from fire")
             Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
         }
