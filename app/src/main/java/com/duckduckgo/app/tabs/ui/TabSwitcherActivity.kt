@@ -51,9 +51,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     @Inject
     lateinit var pixel: Pixel
 
-    @Inject
-    lateinit var webDataManager: WebDataManager
-
     private val viewModel: TabSwitcherViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(TabSwitcherViewModel::class.java)
     }
@@ -79,15 +76,18 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
 
     private fun configureObservers() {
         viewModel.tabs.observe(this, Observer<List<TabEntity>> {
-            render(it!!)
+            render()
+        })
+        viewModel.selectedTab.observe(this, Observer<TabEntity> {
+            render()
         })
         viewModel.command.observe(this, Observer {
             processCommand(it)
         })
     }
 
-    private fun render(tabs: List<TabEntity>) {
-        tabsAdapter.updateData(tabs)
+    private fun render() {
+        tabsAdapter.updateData(viewModel.tabs.value, viewModel.selectedTab.value)
     }
 
     private fun processCommand(command: Command?) {

@@ -45,6 +45,7 @@ interface Pixel {
         LONG_PRESS("mlp"),
         LONG_PRESS_DOWNLOAD_IMAGE("mlp_i"),
         LONG_PRESS_NEW_TAB("mlp_t"),
+        LONG_PRESS_NEW_BACKGROUND_TAB("mlp_b"),
         LONG_PRESS_SHARE("mlp_s")
     }
 

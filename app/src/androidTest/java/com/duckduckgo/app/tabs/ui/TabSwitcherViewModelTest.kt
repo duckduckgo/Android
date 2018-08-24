@@ -68,7 +68,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenTabSelectedThenRepositoryNotifiedAndSwitcherClosed() {
-        testee.onTabSelected(TabEntity("abc", "", ""))
+        testee.onTabSelected(TabEntity("abc", "", "", position = 0))
         verify(mockTabRepository).select(eq("abc"))
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.Close, commandCaptor.lastValue)
@@ -76,7 +76,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenTabDeletedThenRepositoryNotified() {
-        val entity = TabEntity("abc", "", "")
+        val entity = TabEntity("abc", "", "", position = 0)
         testee.onTabDeleted(entity)
         verify(mockTabRepository).delete(entity)
     }
