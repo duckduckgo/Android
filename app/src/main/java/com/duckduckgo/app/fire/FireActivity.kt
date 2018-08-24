@@ -17,6 +17,7 @@
 package com.duckduckgo.app.fire
 
 import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.app.Activity
 import android.app.ActivityManager
 import android.arch.lifecycle.Observer
@@ -60,8 +61,8 @@ class FireActivity : DuckDuckGoActivity() {
         setContentView(R.layout.activity_fire)
         if (savedInstanceState == null) {
 
-            fireAnimationView.addAnimatorListener(object : LottieAnimationListener() {
-                override fun onAnimationStart(p0: Animator?) {
+            fireAnimationView.addAnimatorListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationStart(animator: Animator?) {
                     viewModel.startDeathClock()
                 }
             })
