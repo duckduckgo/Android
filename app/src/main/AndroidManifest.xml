@@ -131,9 +131,8 @@
 
         <activity
             android:name="com.duckduckgo.app.fire.FireActivity"
-            android:label="@string/title_activity_fire"
-            android:theme="@style/SplashTheme"
-            android:process="@string/fireProcessName" />
+            android:process="@string/fireProcessName"
+            android:theme="@style/SplashTheme" />
     </application>
 
 </manifest>
