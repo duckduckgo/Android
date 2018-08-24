@@ -36,6 +36,7 @@ import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FORGET_ALL_EXECUTED
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import org.jetbrains.anko.longToast
@@ -132,6 +133,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         if (intent.getBooleanExtra(LAUNCHED_FROM_FIRE_EXTRA, false)) {
             Timber.i("Launched from fire")
             Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
+            pixel.fire(FORGET_ALL_EXECUTED)
         }
 
         if (launchNewSearch(intent)) {
