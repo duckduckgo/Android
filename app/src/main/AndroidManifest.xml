@@ -131,7 +131,6 @@
 
         <activity
             android:name="com.duckduckgo.app.fire.FireActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_fire"
             android:theme="@style/SplashTheme"
             android:process="@string/fireProcessName" />

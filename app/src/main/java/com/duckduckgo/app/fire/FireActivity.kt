@@ -16,21 +16,22 @@
 
 package com.duckduckgo.app.fire
 
+import android.animation.Animator
 import android.app.Activity
 import android.app.ActivityManager
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.os.Process
 import android.support.v4.app.ActivityOptionsCompat
-import android.support.v7.app.AppCompatActivity
-import androidx.core.os.postDelayed
-import androidx.core.view.doOnPreDraw
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.ViewModelFactory
 import kotlinx.android.synthetic.main.activity_fire.*
-import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Activity which is responsible for killing the main process and restarting it. This Activity will automatically finish itself after a brief time.
@@ -40,21 +41,61 @@ import timber.log.Timber
  * The correct way to invoke this Activity is through its `triggerRebirth(context)` method.
  *
  * This Activity was largely inspired by https://github.com/JakeWharton/ProcessPhoenix
+ *
+ * We need to detect the user leaving this activity and possibly returning to it:
+ *     if the user left our app to do something else, restarting our browser activity would feel wrong
+ *     if the user left our app but came back, we should restart the browser activity
  */
-class FireActivity : AppCompatActivity() {
+class FireActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
+    private val viewModel: FireViewModel by lazy {
+        ViewModelProviders.of(this, viewModelFactory).get(FireViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_fire)
+        if (savedInstanceState == null) {
 
-        root.doOnPreDraw {
-            Handler().postDelayed(ACTIVITY_FINISH_DELAY_MS) {
-                val intent = intent.getParcelableExtra<Intent>(KEY_RESTART_INTENTS)
-                startActivity(intent, activityFadeOptions(this))
-                finish()
-                killProcess()
-            }
+            fireAnimationView.addAnimatorListener(object : LottieAnimationListener() {
+                override fun onAnimationStart(p0: Animator?) {
+                    viewModel.startDeathClock()
+                }
+            })
         }
+
+        viewModel.viewState.observe(this, Observer<FireViewModel.ViewState> {
+            it?.let { viewState ->
+                if (!viewState.animate) {
+
+                    if (viewState.autoStart) {
+                        val intent = intent.getParcelableExtra<Intent>(KEY_RESTART_INTENTS)
+                        startActivity(intent, activityFadeOptions(this))
+                    }
+
+
+                    viewModel.viewState.removeObservers(this)
+                    finish()
+                    killProcess()
+                }
+            }
+        })
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        if (!isChangingConfigurations) {
+            viewModel.onViewStopped()
+        }
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        viewModel.onViewRestarted()
     }
 
     override fun onBackPressed() {
@@ -62,7 +103,6 @@ class FireActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val ACTIVITY_FINISH_DELAY_MS = 1200L
         private const val KEY_RESTART_INTENTS = "KEY_RESTART_INTENTS"
 
         fun triggerRebirth(context: Context) {
@@ -96,7 +136,6 @@ class FireActivity : AppCompatActivity() {
             val activityManager: ActivityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
             activityManager.runningAppProcesses?.forEach {
                 if (it.pid == currentProcessId && it.processName.endsWith(context.getString(R.string.fireProcessName))) {
-                    Timber.i("Process ID $currentProcessId is fire process")
                     return true
                 }
             }

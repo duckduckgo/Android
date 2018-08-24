@@ -25,8 +25,8 @@
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/fireAnimationView"
-        android:layout_width="0dp"
-        android:layout_height="300dp"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:importantForAccessibility="no"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -34,7 +34,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
-        app:lottie_rawRes="@raw/flame_v2" />
+        app:lottie_rawRes="@raw/flame_v2"
+        tools:background="#F00" />
 
 
 </android.support.constraint.ConstraintLayout>
