@@ -35,7 +35,7 @@ class ClearPersonalDataAction @Inject constructor(
         dataManager.clearWebViewSessions()
         dataManager.clearExternalCookies(CookieManager.getInstance()) {
             Timber.i("Finished clearing everything; restarting process")
-            FireActivity.triggerRebirth(context)
+            FireActivity.triggerRestart(context)
         }
     }
 }

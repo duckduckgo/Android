@@ -38,7 +38,7 @@ import javax.inject.Inject
  *
  * This Activity runs in a separate process so that it can seamlessly restart the main app process without much in the way of a jarring UX.
  *
- * The correct way to invoke this Activity is through its `triggerRebirth(context)` method.
+ * The correct way to invoke this Activity is through its `triggerRestart(context)` method.
  *
  * This Activity was largely inspired by https://github.com/JakeWharton/ProcessPhoenix
  *
@@ -105,11 +105,11 @@ class FireActivity : DuckDuckGoActivity() {
     companion object {
         private const val KEY_RESTART_INTENTS = "KEY_RESTART_INTENTS"
 
-        fun triggerRebirth(context: Context) {
-            triggerRebirth(context, getRestartIntent(context))
+        fun triggerRestart(context: Context) {
+            triggerRestart(context, getRestartIntent(context))
         }
 
-        private fun triggerRebirth(context: Context, nextIntent: Intent) {
+        private fun triggerRestart(context: Context, nextIntent: Intent) {
             val intent = Intent(context, FireActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.putExtra(KEY_RESTART_INTENTS, nextIntent)
