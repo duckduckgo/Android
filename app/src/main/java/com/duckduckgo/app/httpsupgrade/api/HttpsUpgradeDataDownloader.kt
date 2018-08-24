@@ -78,8 +78,8 @@ class HttpsUpgradeDataDownloader @Inject constructor(
             appDatabase.runInTransaction {
                 httpsBloomSpecDao.insert(specification)
                 binaryDataStore.saveData(HTTPS_BINARY_FILE, bytes)
-                httpsUpgrader.reloadData()
             }
+            httpsUpgrader.reloadData()
         }
     }
 
