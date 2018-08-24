@@ -95,7 +95,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         configureLogging()
         configureDependencyInjection()
 
-        if(appIsRestarting()) return
+        if (appIsRestarting()) return
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
