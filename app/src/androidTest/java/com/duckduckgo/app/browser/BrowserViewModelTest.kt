@@ -91,7 +91,7 @@ class BrowserViewModelTest {
 
     @Test
     fun whenTabsUpdatedWithTabsThenNewTabNotLaunched() {
-        testee.onTabsUpdated(asList(TabEntity(TAB_ID, "", "")))
+        testee.onTabsUpdated(asList(TabEntity(TAB_ID, "", "", true, 0)))
         verify(mockCommandObserver, never()).onChanged(any())
     }
 

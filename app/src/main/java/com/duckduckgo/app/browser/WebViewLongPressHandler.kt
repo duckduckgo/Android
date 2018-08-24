@@ -35,6 +35,7 @@ interface LongPressHandler {
     sealed class RequiredAction {
         object None : RequiredAction()
         class OpenInNewTab(val url: String) : RequiredAction()
+        class OpenInNewBackgroundTab(val url: String) : RequiredAction()
         class DownloadFile(val url: String) : RequiredAction()
         class ShareLink(val url: String) : RequiredAction()
     }
@@ -55,7 +56,8 @@ class WebViewLongPressHandler @Inject constructor(private val pixel: Pixel) : Lo
             WebView.HitTestResult.SRC_ANCHOR_TYPE -> {
                 menu.setHeaderTitle(R.string.linkOptions)
                 menu.add(0, CONTEXT_MENU_ID_OPEN_IN_NEW_TAB, 1, R.string.openInNewTab)
-                menu.add(0, CONTEXT_MENU_ID_SHARE_LINK, 2, R.string.shareLink)
+                menu.add(0, CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB, 2, R.string.openInNewBackgroundTab)
+                menu.add(0, CONTEXT_MENU_ID_SHARE_LINK, 3, R.string.shareLink)
             }
             else -> {
                 Timber.v("App does not yet handle target type: $longPressTargetType")
@@ -75,6 +77,10 @@ class WebViewLongPressHandler @Inject constructor(private val pixel: Pixel) : Lo
                 pixel.fire(LONG_PRESS_NEW_TAB)
                 return OpenInNewTab(longPressTarget)
             }
+            CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB -> {
+                pixel.fire(LONG_PRESS_NEW_BACKGROUND_TAB)
+                return OpenInNewBackgroundTab(longPressTarget)
+            }
             CONTEXT_MENU_ID_DOWNLOAD_IMAGE -> {
                 pixel.fire(LONG_PRESS_DOWNLOAD_IMAGE)
                 return DownloadFile(longPressTarget)
@@ -92,5 +98,6 @@ class WebViewLongPressHandler @Inject constructor(private val pixel: Pixel) : Lo
         const val CONTEXT_MENU_ID_OPEN_IN_NEW_TAB = 1
         const val CONTEXT_MENU_ID_DOWNLOAD_IMAGE = 2
         const val CONTEXT_MENU_ID_SHARE_LINK = 3
+        const val CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB = 4
     }
 }

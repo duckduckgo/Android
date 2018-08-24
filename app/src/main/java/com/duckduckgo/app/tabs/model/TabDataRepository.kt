@@ -19,6 +19,7 @@ package com.duckduckgo.app.tabs.model
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import android.net.Uri
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.db.TabsDao
@@ -37,10 +38,12 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
     private val siteData: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
 
     override fun add(url: String?): String {
-        val tabId = UUID.randomUUID().toString()
+        val tabId = generateTabId()
         add(tabId, buildSiteData(url))
         return tabId
     }
+
+    private fun generateTabId() = UUID.randomUUID().toString()
 
     private fun buildSiteData(url: String?): MutableLiveData<Site> {
         val data = MutableLiveData<Site>()
@@ -54,13 +57,25 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
     override fun add(tabId: String, data: MutableLiveData<Site>) {
         siteData[tabId] = data
         Schedulers.io().scheduleDirect {
-            tabsDao.addAndSelectTab(TabEntity(tabId, data.value?.url, data.value?.title))
+            val position = tabsDao.lastTab()?.position ?: 0
+            tabsDao.addAndSelectTab(TabEntity(tabId, data.value?.url, data.value?.title, true, position))
+        }
+    }
+
+    override fun addNewTabAfterExistingTab(url: String?, tabId: String) {
+        Schedulers.io().scheduleDirect {
+            val position = tabsDao.tab(tabId)?.position ?: -1
+            val uri = Uri.parse(url)
+            val title = uri.host?.removePrefix("www.") ?: url
+            val tab = TabEntity(generateTabId(), url, title, false, position + 1)
+            tabsDao.insertTabAtPosition(tab)
         }
     }
 
     override fun update(tabId: String, site: Site?) {
         Schedulers.io().scheduleDirect {
-            val tab = TabEntity(tabId, site?.url, site?.title)
+            val position = tabsDao.tab(tabId)?.position ?: 0
+            val tab = TabEntity(tabId, site?.url, site?.title, true, position)
             tabsDao.updateTab(tab)
         }
     }
