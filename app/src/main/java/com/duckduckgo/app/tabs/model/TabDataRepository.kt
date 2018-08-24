@@ -24,7 +24,6 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.db.TabsDao
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -67,8 +66,7 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
         Schedulers.io().scheduleDirect {
             val position = tabsDao.tab(tabId)?.position ?: -1
             val uri = Uri.parse(url)
-            val host = uri.host
-            val title = if (host == null) url else host.removePrefix("www.")
+            val title = uri.host?.removePrefix("www.") ?: url
             val tab = TabEntity(generateTabId(), url, title, false, position + 1)
             tabsDao.insertTabAtPosition(tab)
         }
