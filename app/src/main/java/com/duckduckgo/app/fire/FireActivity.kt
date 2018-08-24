@@ -71,11 +71,11 @@ class FireActivity : DuckDuckGoActivity() {
             it?.let { viewState ->
                 if (!viewState.animate) {
 
+                    // restart the app only if the user hasn't navigated away during the fire animation
                     if (viewState.autoStart) {
                         val intent = intent.getParcelableExtra<Intent>(KEY_RESTART_INTENTS)
                         startActivity(intent, activityFadeOptions(this))
                     }
-
 
                     viewModel.viewState.removeObservers(this)
                     finish()
