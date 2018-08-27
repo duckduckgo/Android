@@ -469,8 +469,8 @@ class BrowserTabFragment : Fragment(), FindListener {
     private fun configureToolbar() {
         toolbar.inflateMenu(R.menu.menu_browser_activity)
 
-        toolbar.setOnMenuItemClickListener {
-            when (it.itemId) {
+        toolbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
                 R.id.fire -> {
                     browserActivity?.launchFire()
                     return@setOnMenuItemClickListener true
@@ -714,7 +714,7 @@ class BrowserTabFragment : Fragment(), FindListener {
     }
 
     private fun resetTabState() {
-        omnibarTextInput.text.clear()
+        omnibarTextInput.text?.clear()
         viewModel.resetView()
         destroyWebView()
         configureWebView()

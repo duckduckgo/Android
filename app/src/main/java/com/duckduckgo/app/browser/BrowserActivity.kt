@@ -36,6 +36,7 @@ import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FORGET_ALL_EXECUTED
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import org.jetbrains.anko.longToast
@@ -79,10 +80,11 @@ class BrowserActivity : DuckDuckGoActivity() {
     private fun openNewTab(tabId: String, url: String? = null) {
         val fragment = BrowserTabFragment.newInstance(tabId, url)
         val transaction = supportFragmentManager.beginTransaction()
-        if (currentTab == null) {
+        val tab = currentTab
+        if (tab == null) {
             transaction.replace(R.id.fragmentContainer, fragment, tabId)
         } else {
-            transaction.hide(currentTab)
+            transaction.hide(tab)
             transaction.add(R.id.fragmentContainer, fragment, tabId)
         }
         transaction.commit()
@@ -120,12 +122,18 @@ class BrowserActivity : DuckDuckGoActivity() {
             return
         }
 
-        if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false) ) {
+        if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
             viewModel.onClearRequested()
-            clearPersonalDataAction.clear { viewModel.onClearComplete() }
+            clearPersonalDataAction.clear()
             Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
             finish()
             return
+        }
+
+        if (intent.getBooleanExtra(LAUNCHED_FROM_FIRE_EXTRA, false)) {
+            Timber.i("Launched from fire")
+            Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
+            pixel.fire(FORGET_ALL_EXECUTED)
         }
 
         if (launchNewSearch(intent)) {
@@ -232,15 +240,17 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     companion object {
 
-        fun intent(context: Context, queryExtra: String? = null, newSearch: Boolean = false): Intent {
+        fun intent(context: Context, queryExtra: String? = null, newSearch: Boolean = false, launchedFromFireAction: Boolean = false): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
             intent.putExtra(NEW_SEARCH_EXTRA, newSearch)
+            intent.putExtra(LAUNCHED_FROM_FIRE_EXTRA, launchedFromFireAction)
             return intent
         }
 
         const val NEW_SEARCH_EXTRA = "NEW_SEARCH_EXTRA"
         const val PERFORM_FIRE_ON_ENTRY_EXTRA = "PERFORM_FIRE_ON_ENTRY_EXTRA"
+        const val LAUNCHED_FROM_FIRE_EXTRA = "LAUNCHED_FROM_FIRE_EXTRA"
         private const val DASHBOARD_REQUEST_CODE = 100
     }
 

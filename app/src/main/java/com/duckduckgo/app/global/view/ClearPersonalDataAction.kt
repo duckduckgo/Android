@@ -21,6 +21,8 @@ import android.webkit.CookieManager
 import android.webkit.WebStorage
 import android.webkit.WebView
 import com.duckduckgo.app.browser.WebDataManager
+import com.duckduckgo.app.fire.FireActivity
+import timber.log.Timber
 import javax.inject.Inject
 
 class ClearPersonalDataAction @Inject constructor(
@@ -28,9 +30,12 @@ class ClearPersonalDataAction @Inject constructor(
     private val dataManager: WebDataManager
 ) {
 
-    fun clear(clearComplete: (() -> Unit)) {
+    fun clear() {
         dataManager.clearData(WebView(context), WebStorage.getInstance(), context)
         dataManager.clearWebViewSessions()
-        dataManager.clearExternalCookies(CookieManager.getInstance(), clearComplete)
+        dataManager.clearExternalCookies(CookieManager.getInstance()) {
+            Timber.i("Finished clearing everything; restarting process")
+            FireActivity.triggerRestart(context)
+        }
     }
 }
