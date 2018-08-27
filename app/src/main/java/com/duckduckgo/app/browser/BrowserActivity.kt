@@ -125,8 +125,6 @@ class BrowserActivity : DuckDuckGoActivity() {
         if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
             viewModel.onClearRequested()
             clearPersonalDataAction.clear()
-            Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
-            finish()
             return
         }
 
@@ -195,8 +193,8 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     fun launchFire() {
         val dialog = FireDialog(context = this, pixel = pixel, clearPersonalDataAction = clearPersonalDataAction)
-        dialog.clearStarted = {viewModel.onClearRequested()}
-        dialog.clearComplete = { viewModel.onClearComplete()}
+        dialog.clearStarted = { viewModel.onClearRequested() }
+        dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.show()
     }
 
