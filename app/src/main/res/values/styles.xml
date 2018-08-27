@@ -153,7 +153,7 @@
         <item name="android:textStyle">normal</item>
     </style>
 
-    <style name="SettingsContentLabel.SettingsSwitch" >
+    <style name="SettingsContentLabel.SettingsSwitch">
         <item name="colorControlActivated">@color/midGreen</item>
         <item name="colorSwitchThumbNormal">@color/white</item>
         <item name="android:colorForeground">@color/subtleGrayTwo</item>
@@ -204,7 +204,7 @@
 
     </style>
 
-    <style name="AppTheme.TransparentTheme" >
+    <style name="AppTheme.TransparentTheme">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
@@ -252,6 +252,10 @@
     <style name="OnboardingTextSubtitle.Subtitle2">
         <item name="android:paddingTop">16dp</item>
         <item name="android:lineSpacingExtra">6sp</item>
+    </style>
+
+    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@color/windowBackground</item>
     </style>
 
 </resources>

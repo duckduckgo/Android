@@ -15,12 +15,6 @@
   ~ limitations under the License.
   -->
 
-<network-security-config>
-    <debug-overrides>
-        <trust-anchors>
-            <certificates src="system" />
-            <certificates src="user" />
-        </trust-anchors>
-    </debug-overrides>
-    <base-config cleartextTrafficPermitted="true" />
-</network-security-config>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="#678FFF" />
+</shape>

@@ -17,6 +17,8 @@
 package com.duckduckgo.app.browser
 
 import android.Manifest
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.LayoutTransition.CHANGING
 import android.animation.LayoutTransition.DISAPPEARING
 import android.annotation.SuppressLint
@@ -42,6 +44,7 @@ import android.support.v4.content.pm.ShortcutManagerCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
+import android.text.Layout
 import android.view.*
 import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
@@ -51,6 +54,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -71,7 +75,6 @@ import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.tabs.model.TabEntity
-import com.duckduckgo.app.tabs.ui.TabIconRenderer
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_banner_notification.*
@@ -200,9 +203,16 @@ class BrowserTabFragment : Fragment(), FindListener {
         configureFindInPage()
         configureAutoComplete()
         configureKeyboardAwareLogoAnimation()
+        configureShowTabSwitcherListener()
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
+        }
+    }
+
+    private fun configureShowTabSwitcherListener() {
+        tabsButton?.actionView?.setOnClickListener {
+            browserActivity?.launchTabSwitcher()
         }
     }
 
@@ -275,16 +285,21 @@ class BrowserTabFragment : Fragment(), FindListener {
             it?.let { renderer.renderFindInPageState(it) }
         })
 
-        viewModel.tabs.observe(this, Observer<List<TabEntity>> {
-            it?.let { renderer.renderTabIcon(it) }
-        })
-
         viewModel.url.observe(this, Observer {
             it?.let { navigate(it) }
         })
 
         viewModel.command.observe(this, Observer {
             processCommand(it)
+        })
+
+        addTabsObserver()
+
+    }
+
+    private fun addTabsObserver() {
+        viewModel.tabs.observe(this, Observer<List<TabEntity>> {
+            it?.let { renderer.renderTabIcon(it) }
         })
     }
 
@@ -307,6 +322,9 @@ class BrowserTabFragment : Fragment(), FindListener {
             Command.Refresh -> refresh()
             is Command.OpenInNewTab -> {
                 browserActivity?.openInNewTab(it.query)
+            }
+            is Command.OpenInNewBackgroundTab -> {
+                openInNewBackgroundTab()
             }
             is Command.Navigate -> {
                 navigate(it.url)
@@ -363,6 +381,14 @@ class BrowserTabFragment : Fragment(), FindListener {
                 callToActionConfigurator.configureButtonCallToAction()
             }
             is Command.HandleExternalAppLink -> { externalAppLinkClicked(it) }
+        }
+    }
+
+    private fun openInNewBackgroundTab() {
+        viewModel.tabs.removeObservers(this)
+        val view = tabsButton?.actionView as TabSwitcherButton
+        view.increment {
+            addTabsObserver()
         }
     }
 
@@ -443,12 +469,8 @@ class BrowserTabFragment : Fragment(), FindListener {
     private fun configureToolbar() {
         toolbar.inflateMenu(R.menu.menu_browser_activity)
 
-        toolbar.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.tabs -> {
-                    browserActivity?.launchTabSwitcher()
-                    return@setOnMenuItemClickListener true
-                }
+        toolbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
                 R.id.fire -> {
                     browserActivity?.launchFire()
                     return@setOnMenuItemClickListener true
@@ -692,7 +714,7 @@ class BrowserTabFragment : Fragment(), FindListener {
     }
 
     private fun resetTabState() {
-        omnibarTextInput.text.clear()
+        omnibarTextInput.text?.clear()
         viewModel.resetView()
         destroyWebView()
         configureWebView()
@@ -975,7 +997,9 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         fun renderTabIcon(tabs: List<TabEntity>) {
             context?.let {
-                tabsButton?.icon = TabIconRenderer.icon(it, tabs.count())
+                val button = tabsButton?.actionView as TabSwitcherButton
+                button.count = tabs.count()
+                button.hasUnread = tabs.firstOrNull { !it.viewed } != null
             }
         }
 

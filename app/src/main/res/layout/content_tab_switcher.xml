@@ -13,7 +13,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -23,48 +23,56 @@
     tools:ignore="Overdraw"
     tools:showIn="@layout/activity_tab_switcher">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/tabsRecycler"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:itemCount="3"
-        tools:listitem="@layout/item_tab" />
-
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tabsRecycler"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="16dp"
-        android:orientation="horizontal">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <TextView
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/tabsRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:itemCount="3"
+            tools:listitem="@layout/item_tab" />
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:text="@string/tapFireDirective"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:textStyle="normal" />
+            android:layout_gravity="center"
+            android:layout_margin="16dp"
+            android:orientation="horizontal">
 
-        <ImageView
-            android:layout_width="13dp"
-            android:layout_height="17dp"
-            android:layout_marginEnd="6dp"
-            android:layout_marginStart="6dp"
-            android:contentDescription="@string/tapFireIconDescription"
-            android:src="@drawable/ic_fire_gray_24dp"
-            android:tint="@color/white" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:text="@string/tapFireDirective"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="normal" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:text="@string/tapFireExplanation"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:textStyle="normal" />
+            <ImageView
+                android:layout_width="13dp"
+                android:layout_height="17dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:contentDescription="@string/tapFireIconDescription"
+                android:src="@drawable/ic_fire_gray_24dp"
+                android:tint="@color/white" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:text="@string/tapFireExplanation"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="normal" />
+
+        </LinearLayout>
+
 
     </LinearLayout>
 
-</RelativeLayout>
+</android.support.v4.widget.NestedScrollView>

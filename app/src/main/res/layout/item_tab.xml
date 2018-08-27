@@ -22,9 +22,18 @@
     android:layout_marginEnd="10dp"
     android:layout_marginStart="10dp"
     android:layout_marginTop="10dp"
-    android:background="@drawable/tab_background"
-    android:paddingStart="20dp">
+    android:background="@drawable/tab_background">
 
+    <ImageView
+        android:id="@+id/tabUnread"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/tab_unread"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <android.support.constraint.Guideline
         android:id="@+id/guideTop"
@@ -48,7 +57,8 @@
         android:src="@drawable/ic_globe_gray_16dp"
         app:layout_constraintBottom_toBottomOf="@id/guideBottom"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/guideTop" />
+        app:layout_constraintTop_toTopOf="@id/guideTop"
+        android:layout_marginStart="20dp"/>
 
     <ImageView
         android:id="@+id/close"

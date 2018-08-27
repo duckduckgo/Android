@@ -27,6 +27,7 @@ import android.os.Build
 import android.support.v4.app.Fragment
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.DaggerAppComponent
+import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.notification.NotificationRegistrar
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
@@ -91,9 +92,12 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
         if (!installLeakCanary()) return
 
-        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-        configureDependencyInjection()
         configureLogging()
+        configureDependencyInjection()
+
+        if (appIsRestarting()) return
+
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             appShortcutCreator.configureAppShortcuts(this)
@@ -120,6 +124,14 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         }
         LeakCanary.install(this)
         return true
+    }
+
+    private fun appIsRestarting(): Boolean {
+        if (FireActivity.appRestarting(this)) {
+            Timber.i("App restarting")
+            return true
+        }
+        return false
     }
 
     private fun migrateLegacyDb() {

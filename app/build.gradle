@@ -6,16 +6,16 @@ apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
 
 ext {
-    VERSION_NAME = "5.9.1"
+    VERSION_NAME = "5.10.0"
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
 }
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     defaultConfig {
         applicationId "com.duckduckgo.mobile.android"
         minSdkVersion 21
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode buildVersionCode()
         versionName VERSION_NAME
         testInstrumentationRunner "com.duckduckgo.app.TestRunner"
@@ -77,7 +77,7 @@ android {
 }
 
 ext {
-    supportLibrary = "27.1.1"
+    supportLibrary = "28.0.0-rc01"
     architectureComponents = "1.1.1"
     architectureComponentsExtensions = "1.1.1"
     androidKtx = "0.3"
@@ -86,10 +86,12 @@ ext {
     ankoVersion = "0.10.4"
     glide = "4.6.1"
     androidTestRunner = "1.0.2"
+    lottieVersion = "2.6.0-beta19"
 }
 
 
 dependencies {
+    implementation "com.android.support:support-v4:$supportLibrary"
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
 
@@ -139,6 +141,9 @@ dependencies {
     // Glide
     implementation "com.github.bumptech.glide:glide:$glide"
     kapt "com.github.bumptech.glide:compiler:$glide"
+
+    // Lottie
+    implementation "com.airbnb.android:lottie:$lottieVersion"
 
     // Apache commons
     implementation 'org.apache.commons:commons-math3:3.6.1'

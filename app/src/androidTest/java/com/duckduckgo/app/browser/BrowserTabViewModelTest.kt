@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.persistence.room.Room
 import android.support.test.InstrumentationRegistry
@@ -48,8 +49,7 @@ import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
-import com.duckduckgo.app.tabs.db.TabsDao
-import com.duckduckgo.app.tabs.model.TabDataRepository
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -111,7 +111,7 @@ class BrowserTabViewModelTest {
     private lateinit var mockDefaultBrowserNotification: DefaultBrowserNotification
 
     @Mock
-    private lateinit var tabsDao: TabsDao
+    private lateinit var mockTabsRepository: TabRepository
 
     @Mock
     private lateinit var webViewSessionStorage: WebViewSessionStorage
@@ -142,12 +142,14 @@ class BrowserTabViewModelTest {
 
         val siteFactory = SiteFactory(mockTermsOfServiceStore, TrackerNetworks())
 
+        whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
+
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
             queryUrlConverter = mockOmnibarConverter,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
             siteFactory = siteFactory,
-            tabRepository = TabDataRepository(tabsDao, siteFactory),
+            tabRepository = mockTabsRepository,
             networkLeaderboardDao = mockNetworkLeaderboardDao,
             autoCompleteApi = mockAutoCompleteApi,
             appSettingsPreferencesStore = mockSettingsStore,
@@ -176,6 +178,17 @@ class BrowserTabViewModelTest {
         db.close()
         testee.url.removeObserver(mockQueryObserver)
         testee.command.removeObserver(mockCommandObserver)
+    }
+
+    @Test
+    fun whenOpenInNewBackgroundRequestedThenTabRepositoryUpdatedAndCommandIssued() {
+        val url = "http://www.example.com"
+        testee.openInNewBackgroundTab(url)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.OpenInNewBackgroundTab)
+
+        verify(mockTabsRepository).addNewTabAfterExistingTab(url, "abc")
     }
 
     @Test

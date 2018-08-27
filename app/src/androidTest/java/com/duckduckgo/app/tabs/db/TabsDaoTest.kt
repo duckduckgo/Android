@@ -60,8 +60,8 @@ class TabsDaoTest {
 
     @Test
     fun whenMultipleTabsThenFirstReturnsFirst() {
-        val first = TabEntity("TAB_ID1")
-        val second = TabEntity("TAB_ID2")
+        val first = TabEntity("TAB_ID1", position = 0)
+        val second = TabEntity("TAB_ID2", position = 1)
         testee.insertTab(first)
         testee.insertTab(second)
         assertEquals(first, testee.firstTab())
@@ -69,7 +69,7 @@ class TabsDaoTest {
 
     @Test
     fun whenTabThatExistsRetrievedThenTabReturned() {
-        val tab = TabEntity("TAB_ID")
+        val tab = TabEntity("TAB_ID", position = 0)
         testee.insertTab(tab)
         assertEquals(tab, testee.tab("TAB_ID"))
     }
@@ -81,15 +81,15 @@ class TabsDaoTest {
 
     @Test
     fun whenTabInsertedThenItExistsInTabsList() {
-        val entity = TabEntity("TAB_ID")
+        val entity = TabEntity("TAB_ID", position = 0)
         testee.insertTab(entity)
         assertTrue(testee.tabs().contains(entity))
     }
 
     @Test
     fun whenTabInsertedTwiceThenSecondRecordOverwritesFirst() {
-        val initial = TabEntity("TAB_ID", "http//example.com")
-        val updated = TabEntity("TAB_ID", "http//updatedexample.com")
+        val initial = TabEntity("TAB_ID", "http//example.com", position = 0)
+        val updated = TabEntity("TAB_ID", "http//updatedexample.com", position = 1)
         testee.insertTab(initial)
         testee.insertTab(updated)
         assertEquals("http//updatedexample.com", testee.tab("TAB_ID")?.url)
@@ -102,7 +102,7 @@ class TabsDaoTest {
 
     @Test
     fun whenTabSelectionInsertedWithForeignKeyThatExistsThenRecordIsUpdated() {
-        val tab = TabEntity("TAB_ID")
+        val tab = TabEntity("TAB_ID", position = 0)
         val tabSelection = TabSelectionEntity(1, "TAB_ID")
         testee.insertTab(tab)
         testee.insertTabSelection(tabSelection)
@@ -117,8 +117,8 @@ class TabsDaoTest {
 
     @Test
     fun whenTabIsUpdatedThenExistingRecordIsUpdated() {
-        val initial = TabEntity("TAB_ID", "http//example.com")
-        val updated = TabEntity("TAB_ID", "http//updatedexample.com")
+        val initial = TabEntity("TAB_ID", "http//example.com", position = 0)
+        val updated = TabEntity("TAB_ID", "http//updatedexample.com", position = 1)
         testee.insertTab(initial)
         testee.updateTab(updated)
         assertEquals("http//updatedexample.com", testee.tab("TAB_ID")?.url)
@@ -126,14 +126,14 @@ class TabsDaoTest {
 
     @Test
     fun whenUnknownTabIsUpdatedThenNothingHappens() {
-        val tab = TabEntity("TAB_ID", "http//updatedexample.com")
+        val tab = TabEntity("TAB_ID", "http//updatedexample.com", position = 0)
         testee.updateTab(tab)
         assertNull(testee.tab("TAB_ID"))
     }
 
     @Test
     fun whenTabThatWasSelectedDeletedThenSelectedTabIsNull() {
-        val tab = TabEntity("TAB_ID")
+        val tab = TabEntity("TAB_ID", position = 0)
         val tabSelection = TabSelectionEntity(1, "TAB_ID")
 
         testee.insertTab(tab)
@@ -145,8 +145,8 @@ class TabsDaoTest {
 
     @Test
     fun whenTabThatExistsIsDeletedThenItIsRemovedFromListAndOtherElementsRemain() {
-        val first = TabEntity("TAB_ID1")
-        val second = TabEntity("TAB_ID2")
+        val first = TabEntity("TAB_ID1", position = 0)
+        val second = TabEntity("TAB_ID2", position = 1)
 
         testee.insertTab(first)
         testee.insertTab(second)
@@ -158,8 +158,8 @@ class TabsDaoTest {
 
     @Test
     fun whenTabThatDoesNotExistIsDeletedThenListIsUnchanged() {
-        val first = TabEntity("TAB_ID1")
-        val second = TabEntity("TAB_ID2")
+        val first = TabEntity("TAB_ID1", position = 0)
+        val second = TabEntity("TAB_ID2", position = 1)
         testee.insertTab(first)
         testee.deleteTab(second)
         assertTrue(testee.tabs().contains(first))
@@ -167,8 +167,8 @@ class TabsDaoTest {
 
     @Test
     fun whenDeleteAllCalledThenAllElementsRemoves() {
-        val first = TabEntity("TAB_ID1")
-        val second = TabEntity("TAB_ID2")
+        val first = TabEntity("TAB_ID1", position = 0)
+        val second = TabEntity("TAB_ID2", position = 1)
 
         testee.insertTab(first)
         testee.insertTab(second)
@@ -180,9 +180,9 @@ class TabsDaoTest {
 
     @Test
     fun whenDeleteBlankCalledThenBlankElementsRemoved() {
-        val first = TabEntity("TAB_ID1")
-        val second = TabEntity("TAB_ID2", "http://example.com")
-        val third = TabEntity("TAB_ID3")
+        val first = TabEntity("TAB_ID1", position = 0)
+        val second = TabEntity("TAB_ID2", "http://example.com", position = 1)
+        val third = TabEntity("TAB_ID3", position = 2)
 
         testee.insertTab(first)
         testee.insertTab(second)
@@ -197,8 +197,8 @@ class TabsDaoTest {
 
     @Test
     fun whenTabAddedAndSelectedThenRecordUpdatedAndAnyOldBlankTabsRemoved() {
-        val first = TabEntity("TAB_ID1")
-        val second = TabEntity("TAB_ID2")
+        val first = TabEntity("TAB_ID1", position = 1)
+        val second = TabEntity("TAB_ID2", position = 2)
 
         testee.addAndSelectTab(first)
         testee.addAndSelectTab(second)
@@ -206,6 +206,31 @@ class TabsDaoTest {
         assertFalse(testee.tabs().contains(first))
         assertTrue(testee.tabs().contains(second))
         assertEquals(second, testee.selectedTab())
+    }
+
+    @Test
+    fun whenTabInsertedAtPositionThenOtherTabsReordered() {
+
+        testee.insertTab(TabEntity("TAB_ID1", position = 0))
+        testee.insertTab(TabEntity("TAB_ID2", position = 1))
+        testee.insertTab(TabEntity("TAB_ID3", position = 2))
+
+        testee.insertTabAtPosition(TabEntity("TAB_ID4", position = 0))
+
+        val tabs = testee.tabs()
+
+        assertEquals(0, tabs[0].position)
+        assertEquals("TAB_ID4", tabs[0].tabId)
+
+        assertEquals(1, tabs[1].position)
+        assertEquals("TAB_ID1", tabs[1].tabId)
+
+        assertEquals(2, tabs[2].position)
+        assertEquals("TAB_ID2", tabs[2].tabId)
+
+        assertEquals(3, tabs[3].position)
+        assertEquals("TAB_ID3", tabs[3].tabId)
+
     }
 
 }

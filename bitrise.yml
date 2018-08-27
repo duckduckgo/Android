@@ -2,13 +2,27 @@
 format_version: '5'
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 project_type: android
-trigger_map:
-- push_branch: "*"
-  workflow: primary
-- pull_request_source_branch: "*"
-  workflow: primary
 workflows:
-  primary:
+  vdt:
+    steps:
+    - activate-ssh-key:
+        run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
+    - git-clone@4.0.11: {}
+    - cache-pull@2.0.1: {}
+    - install-missing-android-tools@2.2.0: {}
+    - gradle-runner@1.8.3:
+        inputs:
+        - gradle_task: assembleDebug assembleDebugAndroidTest
+        title: Build APK
+    - virtual-device-testing-for-android@1.0.2:
+        inputs:
+        - test_devices: |-
+            NexusLowRes,26,en,portrait
+            Nexus4,21,en,portrait
+        - test_type: instrumentation
+    - deploy-to-bitrise-io: {}
+    - cache-push@2.0.5: {}
+  primary-backup:
     steps:
     - avd-manager@0.9.2:
         inputs:
@@ -59,3 +73,8 @@ app:
   - opts:
       is_expand: false
     TEST_VARIANT: Debug
+trigger_map:
+- push_branch: feature/*
+  workflow: vdt
+- pull_request_source_branch: "*"
+  workflow: vdt

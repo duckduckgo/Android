@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2017 DuckDuckGo
+  ~ Copyright (c) 2018 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -18,16 +17,25 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_scrollFlags="scroll|enterAlways"
-    tools:context="com.duckduckgo.app.browser.BrowserActivity"
-    tools:menu="@menu/menu_browser_activity">
+    android:background="@color/windowBackground"
+    tools:context="com.duckduckgo.app.fire.FireActivity">
 
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/fireAnimationView"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:importantForAccessibility="no"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/flame_v2"
+        tools:background="#F00" />
 
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/fragmentContainer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
 </android.support.constraint.ConstraintLayout>

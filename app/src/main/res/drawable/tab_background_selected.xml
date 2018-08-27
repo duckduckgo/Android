@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (c) 2018 DuckDuckGo
   ~
@@ -15,12 +14,10 @@
   ~ limitations under the License.
   -->
 
-<network-security-config>
-    <debug-overrides>
-        <trust-anchors>
-            <certificates src="system" />
-            <certificates src="user" />
-        </trust-anchors>
-    </debug-overrides>
-    <base-config cleartextTrafficPermitted="true" />
-</network-security-config>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/white" />
+    <stroke
+        android:width="2dp"
+        android:color="@color/skyBlue" />
+    <corners android:radius="2dp" />
+</shape>

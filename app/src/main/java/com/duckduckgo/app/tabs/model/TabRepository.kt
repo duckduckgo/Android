@@ -31,6 +31,8 @@ interface TabRepository {
      */
     fun add(url: String? = null): String
 
+    fun addNewTabAfterExistingTab(url: String? = null, tabId: String)
+
     fun add(tabId: String, data: MutableLiveData<Site>)
 
     fun update(tabId: String, site: Site?)
