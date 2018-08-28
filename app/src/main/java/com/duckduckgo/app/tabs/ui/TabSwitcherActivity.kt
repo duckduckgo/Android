@@ -25,7 +25,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
@@ -106,6 +105,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
         when (item.itemId) {
             R.id.fire -> onFire()
             R.id.newTab -> onNewTabRequested()
+            R.id.closeAllTabs -> closeAllTabs()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -127,6 +127,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
 
     override fun onTabDeleted(tab: TabEntity) {
         viewModel.onTabDeleted(tab)
+    }
+
+    private fun closeAllTabs() {
+        viewModel.tabs.value?.forEach {
+            viewModel.onTabDeleted(it)
+        }
     }
 
     override fun finish() {

@@ -76,7 +76,6 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
     fun updateData(data: List<TabEntity>?, selectedTab: TabEntity?) {
 
         data ?: return
-        selectedTab ?: return
 
         this.data = data
         this.selectedTab = selectedTab

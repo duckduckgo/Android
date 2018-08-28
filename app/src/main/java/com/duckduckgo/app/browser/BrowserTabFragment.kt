@@ -17,8 +17,6 @@
 package com.duckduckgo.app.browser
 
 import android.Manifest
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.animation.LayoutTransition.CHANGING
 import android.animation.LayoutTransition.DISAPPEARING
 import android.annotation.SuppressLint
@@ -44,7 +42,6 @@ import android.support.v4.content.pm.ShortcutManagerCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
-import android.text.Layout
 import android.view.*
 import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
@@ -54,7 +51,6 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.widget.EditText
-import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -385,6 +381,7 @@ class BrowserTabFragment : Fragment(), FindListener {
     }
 
     private fun openInNewBackgroundTab() {
+        appBarLayout.setExpanded(true, true)
         viewModel.tabs.removeObservers(this)
         val view = tabsButton?.actionView as TabSwitcherButton
         view.increment {
