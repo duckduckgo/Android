@@ -17,24 +17,16 @@
 package com.duckduckgo.app.launch
 
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
-import javax.inject.Inject
 
 
 class LaunchActivity : DuckDuckGoActivity() {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
-
-    private val viewModel: LaunchViewModel by lazy {
-        ViewModelProviders.of(this, viewModelFactory).get(LaunchViewModel::class.java)
-    }
+    private val viewModel: LaunchViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
