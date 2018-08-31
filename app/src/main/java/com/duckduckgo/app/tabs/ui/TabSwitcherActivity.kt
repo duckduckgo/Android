@@ -29,6 +29,7 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.global.view.FireDialog
+import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
@@ -104,8 +105,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.fire -> onFire()
-            R.id.newTab -> onNewTabRequested()
+            R.id.newTab, R.id.newTabOverflow -> onNewTabRequested()
             R.id.closeAllTabs -> closeAllTabs()
+            R.id.settings -> showSettings()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -133,6 +135,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
         viewModel.tabs.value?.forEach {
             viewModel.onTabDeleted(it)
         }
+    }
+
+    private fun showSettings() {
+        startActivity(SettingsActivity.intent(this))
     }
 
     override fun finish() {

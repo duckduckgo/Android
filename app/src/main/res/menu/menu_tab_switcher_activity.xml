@@ -32,8 +32,18 @@
         app:showAsAction="always" />
 
     <item
+        android:id="@+id/newTabOverflow"
+        android:title="@string/newTabMenuItem"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/closeAllTabs"
         android:title="@string/closeAllTabsMenuItem"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/settings"
+        android:title="@string/settingsMenuItemTitle"
         app:showAsAction="never" />
 
 </menu>
