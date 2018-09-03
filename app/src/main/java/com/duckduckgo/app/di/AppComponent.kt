@@ -20,7 +20,6 @@ package com.duckduckgo.app.di
 import android.app.Application
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteModule
 import com.duckduckgo.app.browser.di.BrowserModule
-import com.duckduckgo.app.browser.di.DefaultBrowserModule
 import com.duckduckgo.app.browser.favicon.FaviconModule
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.httpsupgrade.di.HttpsUpgraderModule
@@ -52,7 +51,6 @@ import javax.inject.Singleton
     ResourceSurrogateModule::class,
     TrackerDetectionModule::class,
     NotificationModule::class,
-    DefaultBrowserModule::class,
     OnboardingModule::class,
     VariantModule::class,
     FaviconModule::class

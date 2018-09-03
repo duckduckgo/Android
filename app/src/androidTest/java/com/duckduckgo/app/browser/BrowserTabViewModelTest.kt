@@ -32,8 +32,6 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
-import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -47,7 +45,6 @@ import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
@@ -105,19 +102,10 @@ class BrowserTabViewModelTest {
     private lateinit var mockOmnibarConverter: OmnibarEntryConverter
 
     @Mock
-    private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
-
-    @Mock
-    private lateinit var mockDefaultBrowserNotification: DefaultBrowserNotification
-
-    @Mock
     private lateinit var mockTabsRepository: TabRepository
 
     @Mock
     private lateinit var webViewSessionStorage: WebViewSessionStorage
-
-    @Mock
-    private lateinit var variantManager: VariantManager
 
     @Mock
     private lateinit var mockFaviconDownloader: FaviconDownloader
@@ -154,14 +142,11 @@ class BrowserTabViewModelTest {
             autoCompleteApi = mockAutoCompleteApi,
             appSettingsPreferencesStore = mockSettingsStore,
             bookmarksDao = bookmarksDao,
-            defaultBrowserNotification = mockDefaultBrowserNotification,
-            defaultBrowserDetector = mockDefaultBrowserDetector,
             longPressHandler = mockLongPressHandler,
             appConfigurationDao = appConfigurationDao,
             webViewSessionStorage = webViewSessionStorage,
             specialUrlDetector = SpecialUrlDetector(),
-            faviconDownloader = mockFaviconDownloader,
-            variantManager = variantManager
+            faviconDownloader = mockFaviconDownloader
         )
 
         testee.loadData("abc", null)
