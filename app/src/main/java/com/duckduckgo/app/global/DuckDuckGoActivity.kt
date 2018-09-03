@@ -16,13 +16,19 @@
 
 package com.duckduckgo.app.global
 
+import android.arch.lifecycle.ViewModel
+import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import dagger.android.AndroidInjection
+import javax.inject.Inject
 
 
 abstract class DuckDuckGoActivity : AppCompatActivity() {
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
@@ -38,4 +44,6 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
+
+    protected inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProviders.of(this, viewModelFactory).get(V::class.java) }
 }

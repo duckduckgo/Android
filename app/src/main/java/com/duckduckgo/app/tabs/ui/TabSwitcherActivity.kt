@@ -17,7 +17,6 @@
 package com.duckduckgo.app.tabs.ui
 
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -26,7 +25,6 @@ import android.view.Menu
 import android.view.MenuItem
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -42,17 +40,13 @@ import javax.inject.Inject
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitchedListener {
 
     @Inject
-    lateinit var viewModelFactory: ViewModelFactory
-
-    @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
 
     @Inject
     lateinit var pixel: Pixel
 
-    private val viewModel: TabSwitcherViewModel by lazy {
-        ViewModelProviders.of(this, viewModelFactory).get(TabSwitcherViewModel::class.java)
-    }
+    private val viewModel: TabSwitcherViewModel by bindViewModel()
+    
     private val tabsAdapter = TabSwitcherAdapter(this, this)
 
     override fun onCreate(savedInstanceState: Bundle?) {

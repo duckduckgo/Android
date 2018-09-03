@@ -17,14 +17,12 @@
 package com.duckduckgo.app.privacy.ui
 
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -35,14 +33,11 @@ import javax.inject.Inject
 
 class TrackerNetworksActivity : DuckDuckGoActivity() {
 
-    @Inject lateinit var viewModelFactory: ViewModelFactory
     @Inject lateinit var repository: TabRepository
     private val trackersRenderer = TrackersRenderer()
     private val networksAdapter = TrackerNetworksAdapter()
 
-    private val viewModel: TrackerNetworksViewModel by lazy {
-        ViewModelProviders.of(this, viewModelFactory).get(TrackerNetworksViewModel::class.java)
-    }
+    private val viewModel: TrackerNetworksViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

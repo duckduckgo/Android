@@ -18,7 +18,6 @@ package com.duckduckgo.app.privacy.ui
 
 import android.app.Activity
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -26,7 +25,6 @@ import android.support.v4.content.ContextCompat
 import android.view.View
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.view.hide
 import com.duckduckgo.app.global.view.html
@@ -45,8 +43,6 @@ import javax.inject.Inject
 class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
     @Inject
-    lateinit var viewModelFactory: ViewModelFactory
-    @Inject
     lateinit var repository: TabRepository
     @Inject
     lateinit var pixel: Pixel
@@ -54,9 +50,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
     private val trackersRenderer = TrackersRenderer()
     private val upgradeRenderer = PrivacyUpgradeRenderer()
 
-    private val viewModel: PrivacyDashboardViewModel by lazy {
-        ViewModelProviders.of(this, viewModelFactory).get(PrivacyDashboardViewModel::class.java)
-    }
+    private val viewModel: PrivacyDashboardViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

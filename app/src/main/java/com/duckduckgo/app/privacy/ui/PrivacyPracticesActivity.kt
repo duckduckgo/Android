@@ -17,7 +17,6 @@
 package com.duckduckgo.app.privacy.ui
 
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -27,7 +26,6 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.renderer.banner
 import com.duckduckgo.app.privacy.renderer.text
@@ -40,16 +38,11 @@ import javax.inject.Inject
 class PrivacyPracticesActivity : DuckDuckGoActivity() {
 
     @Inject
-    lateinit var viewModelFactory: ViewModelFactory
-
-    @Inject
     lateinit var repository: TabRepository
 
     private val practicesAdapter = PrivacyPracticesAdapter()
 
-    private val viewModel: PrivacyPracticesViewModel by lazy {
-        ViewModelProviders.of(this, viewModelFactory).get(PrivacyPracticesViewModel::class.java)
-    }
+    private val viewModel: PrivacyPracticesViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
