@@ -30,7 +30,6 @@ interface VariantManager {
     sealed class VariantFeature {
 
         sealed class DefaultBrowserFeature : VariantFeature() {
-            object ShowInOnboarding : DefaultBrowserFeature()
             object ShowBanner : DefaultBrowserFeature()
             object ShowHomeScreenCallToActionSimpleButton : DefaultBrowserFeature()
             object ShowHomeScreenCallToActionBottomSheet : DefaultBrowserFeature()
