@@ -23,7 +23,6 @@ import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.global.AppUrl
-import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -49,8 +48,8 @@ class BrowserModule {
     }
 
     @Provides
-    fun defaultWebBrowserCapability(context: Context, appInstallStore: AppInstallStore): DefaultBrowserDetector {
-        return AndroidDefaultBrowserDetector(context, appInstallStore)
+    fun defaultWebBrowserCapability(context: Context): DefaultBrowserDetector {
+        return AndroidDefaultBrowserDetector(context)
     }
 
     @Singleton

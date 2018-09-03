@@ -21,7 +21,6 @@ import android.animation.LayoutTransition.CHANGING
 import android.animation.LayoutTransition.DISAPPEARING
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
-import android.app.ActivityOptions
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
@@ -34,7 +33,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.support.annotation.AnyThread
 import android.support.annotation.StringRes
-import android.support.constraint.ConstraintSet
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
@@ -57,7 +55,6 @@ import androidx.core.view.postDelayed
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
-import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserInfoActivity
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
@@ -73,9 +70,7 @@ import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.tabs.model.TabEntity
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
-import kotlinx.android.synthetic.main.include_banner_notification.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
-import kotlinx.android.synthetic.main.include_home_screen_default_browser_call_to_action.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
@@ -86,9 +81,6 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import kotlin.concurrent.thread
-import kotlinx.android.synthetic.main.include_home_screen_default_browser_call_to_action_bottom_sheet.homeScreenCallToActionContainer as bottomSheetExperimentContainer
-import kotlinx.android.synthetic.main.include_home_screen_default_browser_call_to_action_bottom_sheet.homeScreenCallToActionDismissButton as bottomSheetExperimentDismissButton
-import kotlinx.android.synthetic.main.include_home_screen_default_browser_call_to_action_bottom_sheet.launchSettingsButton as bottomSheetExperimentLaunchSettingsButton
 
 
 class BrowserTabFragment : Fragment(), FindListener {
@@ -171,8 +163,6 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private val logoHidingLayoutChangeListener by lazy { LogoHidingLayoutChangeListener(ddgLogo) }
 
-    private val callToActionConfigurator = CallToActionConfigurator()
-
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
@@ -192,7 +182,6 @@ class BrowserTabFragment : Fragment(), FindListener {
         createPopupMenu()
         configureObservers()
         configureToolbar()
-        configureBannerNotification()
         configureWebView()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
@@ -263,10 +252,6 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         viewModel.browserViewState.observe(this, Observer<BrowserViewState> {
             it?.let { renderer.renderBrowserViewState(it) }
-        })
-
-        viewModel.defaultBrowserViewState.observe(this, Observer<DefaultBrowserViewState> {
-            it?.let { renderer.renderDefaultBrowserBanner(it) }
         })
 
         viewModel.loadingViewState.observe(this, Observer<LoadingViewState> {
@@ -369,12 +354,6 @@ class BrowserTabFragment : Fragment(), FindListener {
                 context?.let { context ->
                     addHomeShortcut(it, context)
                 }
-            }
-            is Command.InflateCallToActionBottomSheet -> {
-                callToActionConfigurator.configureBottomSheetCallToAction()
-            }
-            is Command.InflateCallToActionSimpleButton -> {
-                callToActionConfigurator.configureButtonCallToAction()
             }
             is Command.HandleExternalAppLink -> { externalAppLinkClicked(it) }
         }
@@ -491,15 +470,6 @@ class BrowserTabFragment : Fragment(), FindListener {
                 privacyGradeButton?.setImageDrawable(drawable)
             }
         })
-    }
-
-    private fun configureBannerNotification() {
-        dismissBannerButton.setOnClickListener {
-            viewModel.userDeclinedBannerToSetAsDefaultBrowser()
-        }
-        bannerNotification.setOnClickListener {
-            launchDefaultAppSystemSettingsFromBanner()
-        }
     }
 
     private fun configureFindInPage() {
@@ -619,21 +589,6 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private fun launchSharePageChooser(url: String) {
         activity?.share(url, "")
-    }
-
-    private fun launchDefaultAppSystemSettingsFromBanner() {
-        activity?.let {
-            val options = ActivityOptions.makeSceneTransitionAnimation(it, bannerNotification, "defaultBrowserBannerTransition")
-            val intent = DefaultBrowserInfoActivity.intent(it)
-            startActivity(intent, options.toBundle())
-        }
-    }
-
-    private fun launchDefaultAppSystemSettingsFromCallToActionButton() {
-        activity?.let {
-            val intent = DefaultBrowserInfoActivity.intent(it)
-            startActivity(intent)
-        }
     }
 
     private fun addBookmark() {
@@ -851,28 +806,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         private var lastSeenFindInPageViewState: FindInPageViewState? = null
         private var lastSeenBrowserViewState: BrowserViewState? = null
         private var lastSeenGlobalViewState: GlobalLayoutViewState? = null
-        private var lastSeenDefaultBrowserViewState: DefaultBrowserViewState? = null
         private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
-
-        fun renderDefaultBrowserBanner(viewState: DefaultBrowserViewState) {
-            renderIfChanged(viewState, lastSeenDefaultBrowserViewState) {
-                lastSeenDefaultBrowserViewState = viewState
-
-                if (viewState.showDefaultBrowserBanner) {
-                    bannerNotification.show()
-                } else {
-                    bannerNotification.gone()
-                }
-
-                if (viewState.showHomeScreenCallToActionButton) {
-                    homeScreenCallToActionContainer?.show()
-                } else {
-                    homeScreenCallToActionContainer?.gone()
-                }
-
-                logoHidingLayoutChangeListener.update()
-            }
-        }
 
         fun renderAutocomplete(viewState: AutoCompleteViewState) {
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
@@ -1055,53 +989,5 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         private fun shouldUpdateOmnibarTextInput(viewState: OmnibarViewState, omnibarInput: String?) =
             !viewState.isEditing && omnibarTextInput.isDifferent(omnibarInput)
-    }
-
-    private inner class CallToActionConfigurator {
-
-        fun configureBottomSheetCallToAction() {
-            if (callToActionStub == null) return
-
-            callToActionStub.layoutResource = R.layout.include_home_screen_default_browser_call_to_action_bottom_sheet
-            val container = callToActionStub.inflate()
-
-            adjustLogoConstraintsForCallToAction(container)
-
-            bottomSheetExperimentLaunchSettingsButton.setOnClickListener { launchDefaultAppSystemSettingsFromCallToActionButton() }
-            bottomSheetExperimentDismissButton.setOnClickListener { viewModel.userDeclinedHomeScreenCallToActionToSetAsDefaultBrowser() }
-        }
-
-        fun configureButtonCallToAction() {
-            if (callToActionStub == null) return
-
-            callToActionStub.layoutResource = R.layout.include_home_screen_default_browser_call_to_action
-            val container = callToActionStub.inflate()
-
-            adjustLogoConstraintsForCallToAction(container)
-
-            val set = ConstraintSet()
-            set.clone(newTabLayout)
-            set.constrainPercentWidth(container.id, 0.9f)
-            set.connect(container.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 10.toPx())
-            set.applyTo(newTabLayout)
-
-            homeScreenCallToActionContainer.setOnClickListener { launchDefaultAppSystemSettingsFromCallToActionButton() }
-            homeScreenCallToActionDismissButton.setOnClickListener { viewModel.userDeclinedHomeScreenCallToActionToSetAsDefaultBrowser() }
-        }
-
-        /**
-         * We want to center logo in space available above call to action, but c2a isn't in original view hierarchy.
-         * After appropriate c2a is loaded, we programmatically apply ConstraintLayout constraints to position logo
-         */
-        private fun adjustLogoConstraintsForCallToAction(callToActionContainer: View) {
-
-            logoHidingLayoutChangeListener.callToActionButton = callToActionContainer
-
-            ConstraintSet().also {
-                it.clone(newTabLayout)
-                it.connect(ddgLogo.id, ConstraintSet.BOTTOM, callToActionContainer.id, ConstraintSet.TOP, 0)
-                it.applyTo(newTabLayout)
-            }
-        }
     }
 }
