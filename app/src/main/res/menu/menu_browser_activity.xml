@@ -30,8 +30,7 @@
         android:icon="@drawable/ic_tabs_gray_24dp"
         android:title="@string/tabsMenuItem"
         app:showAsAction="always"
-        app:actionViewClass="com.duckduckgo.app.browser.TabSwitcherButton"
-        />
+        app:actionViewClass="com.duckduckgo.app.browser.TabSwitcherButton" />
 
     <item
         android:id="@+id/browserPopup"

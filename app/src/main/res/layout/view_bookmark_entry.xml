@@ -23,8 +23,7 @@
     android:clickable="true"
     android:focusable="true"
     android:layout_marginTop="4dp"
-    android:layout_marginBottom="4dp"
->
+    android:layout_marginBottom="4dp">
 
     <ImageView
         android:id="@+id/favicon"
@@ -35,8 +34,7 @@
         android:src="@drawable/ic_globe_white_16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <TextView
         android:id="@+id/title"

@@ -58,7 +58,7 @@
         app:layout_constraintBottom_toBottomOf="@id/guideBottom"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/guideTop"
-        android:layout_marginStart="20dp"/>
+        android:layout_marginStart="20dp" />
 
     <ImageView
         android:id="@+id/close"
