@@ -33,31 +33,33 @@ import javax.inject.Singleton
 
 
 @Singleton
-@Component(modules = [
+@Component(
+    modules = [
 
-    /* test doubled modules */
-    StubDatabaseModule::class,
-    StubJobSchedulerModule::class,
-    StubAppConfigurationDownloadModule::class,
-    StubStatisticsModule::class,
+        /* test doubled modules */
+        StubDatabaseModule::class,
+        StubJobSchedulerModule::class,
+        StubAppConfigurationDownloadModule::class,
+        StubStatisticsModule::class,
 
-    /* real modules */
-    ApplicationModule::class,
-    AndroidBindingModule::class,
-    AndroidSupportInjectionModule::class,
-    NetworkModule::class,
-    StoreModule::class,
-    JsonModule::class,
-    BrowserModule::class,
-    BrowserAutoCompleteModule::class,
-    HttpsUpgraderModule::class,
-    ResourceSurrogateModule::class,
-    TrackerDetectionModule::class,
-    NotificationModule::class,
-    OnboardingModule::class,
-    VariantModule::class,
-    FaviconModule::class
-])
+        /* real modules */
+        ApplicationModule::class,
+        AndroidBindingModule::class,
+        AndroidSupportInjectionModule::class,
+        NetworkModule::class,
+        StoreModule::class,
+        JsonModule::class,
+        BrowserModule::class,
+        BrowserAutoCompleteModule::class,
+        HttpsUpgraderModule::class,
+        ResourceSurrogateModule::class,
+        TrackerDetectionModule::class,
+        NotificationModule::class,
+        OnboardingModule::class,
+        VariantModule::class,
+        FaviconModule::class
+    ]
+)
 interface TestAppComponent : AndroidInjector<TestApplication> {
 
     @Component.Builder
