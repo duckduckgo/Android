@@ -46,18 +46,24 @@ class WebViewLongPressHandler @Inject constructor(private val pixel: Pixel) : Lo
     override fun handleLongPress(longPressTargetType: Int, longPressTargetUrl: String?, menu: ContextMenu) {
         var menuShown = true
         when (longPressTargetType) {
-            WebView.HitTestResult.IMAGE_TYPE,
-            WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE -> {
-                if (URLUtil.isNetworkUrl(longPressTargetUrl) || URLUtil.isDataUrl(longPressTargetUrl)) {
+            WebView.HitTestResult.IMAGE_TYPE -> {
+                if (isLinkSupported(longPressTargetUrl)) {
                     menu.setHeaderTitle(R.string.imageOptions)
-                    menu.add(0, CONTEXT_MENU_ID_DOWNLOAD_IMAGE, 0, R.string.downloadImage)
+                    addImageMenuOptions(menu)
+                }
+            }
+            WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE -> {
+                if (isLinkSupported(longPressTargetUrl)) {
+                    menu.setHeaderTitle(R.string.imageOptions)
+                    addImageMenuOptions(menu)
+                    addLinkMenuOptions(menu)
                 }
             }
             WebView.HitTestResult.SRC_ANCHOR_TYPE -> {
-                menu.setHeaderTitle(R.string.linkOptions)
-                menu.add(0, CONTEXT_MENU_ID_OPEN_IN_NEW_TAB, 1, R.string.openInNewTab)
-                menu.add(0, CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB, 2, R.string.openInNewBackgroundTab)
-                menu.add(0, CONTEXT_MENU_ID_SHARE_LINK, 3, R.string.shareLink)
+                if (isLinkSupported(longPressTargetUrl)) {
+                    menu.setHeaderTitle(R.string.linkOptions)
+                    addLinkMenuOptions(menu)
+                }
             }
             else -> {
                 Timber.v("App does not yet handle target type: $longPressTargetType")
@@ -70,6 +76,18 @@ class WebViewLongPressHandler @Inject constructor(private val pixel: Pixel) : Lo
         }
 
     }
+
+    private fun addImageMenuOptions(menu: ContextMenu) {
+        menu.add(0, CONTEXT_MENU_ID_DOWNLOAD_IMAGE, 0, R.string.downloadImage)
+    }
+
+    private fun addLinkMenuOptions(menu: ContextMenu) {
+        menu.add(0, CONTEXT_MENU_ID_OPEN_IN_NEW_TAB, 1, R.string.openInNewTab)
+        menu.add(0, CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB, 2, R.string.openInNewBackgroundTab)
+        menu.add(0, CONTEXT_MENU_ID_SHARE_LINK, 3, R.string.shareLink)
+    }
+
+    private fun isLinkSupported(longPressTargetUrl: String?) = URLUtil.isNetworkUrl(longPressTargetUrl) || URLUtil.isDataUrl(longPressTargetUrl)
 
     override fun userSelectedMenuItem(longPressTarget: String, item: MenuItem): RequiredAction {
         return when (item.itemId) {
