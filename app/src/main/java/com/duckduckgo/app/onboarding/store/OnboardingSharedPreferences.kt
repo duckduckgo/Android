@@ -41,5 +41,5 @@ class OnboardingSharedPreferences @Inject constructor(private val context: Conte
         const val KEY_VERSION = "com.duckduckgo.app.onboarding.currentVersion"
         const val CURRENT_VERSION = 1
     }
-    
+
 }

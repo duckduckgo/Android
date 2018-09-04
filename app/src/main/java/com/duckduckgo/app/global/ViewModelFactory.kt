@@ -92,7 +92,11 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                 isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
                 isAssignableFrom(FeedbackViewModel::class.java) -> FeedbackViewModel(feedbackSender)
-                isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(appSettingsPreferencesStore, defaultBrowserDetector, variantManager)
+                isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(
+                    appSettingsPreferencesStore,
+                    defaultBrowserDetector,
+                    variantManager
+                )
                 isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel(bookmarksDao)
                 isAssignableFrom(FireViewModel::class.java) -> FireViewModel()
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")

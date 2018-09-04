@@ -33,7 +33,8 @@ val Site.score: Int
         if (score == 0 && termsOfService.classification != "A") {
             score = 1
         }
-        Timber.v("""Calculating score {
+        Timber.v(
+            """Calculating score {
             memberMajorNetworkPercentage: ${memberNetwork?.percentageOfPages}
             https: $https
             termsScore: ${termsOfService.gradingScore}
@@ -41,7 +42,8 @@ val Site.score: Int
             hasTrackerFromMajorNetwork: $hasTrackerFromMajorNetwork
             hasObscureTracker: $hasObscureTracker
             score: $score
-            """)
+            """
+        )
         return score
     }
 

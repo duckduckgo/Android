@@ -24,8 +24,8 @@ class DisconnectClient(override val name: Client.ClientName, private val tracker
 
     override fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean {
         return trackers
-                .filter { bannedCategories().contains(it.category) }
-                .any { sameOrSubdomain(url, it.url) }
+            .filter { bannedCategories().contains(it.category) }
+            .any { sameOrSubdomain(url, it.url) }
     }
 
     private fun bannedCategories(): List<String> = listOf("Analytics", "Advertising", "Social")

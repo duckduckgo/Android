@@ -21,7 +21,8 @@ import android.arch.persistence.room.PrimaryKey
 
 @Entity(tableName = "disconnect_tracker")
 data class DisconnectTracker(
-        @PrimaryKey val url: String,
-        val category: String,
-        val networkName: String,
-        val networkUrl: String)
+    @PrimaryKey val url: String,
+    val category: String,
+    val networkName: String,
+    val networkUrl: String
+)

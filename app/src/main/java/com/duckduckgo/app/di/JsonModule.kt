@@ -32,6 +32,6 @@ class JsonModule {
     fun moshi(): Moshi = Moshi.Builder()
         .add(HttpsWhitelistJsonAdapter())
         .add(DisconnectListJsonAdapter())
-            .add(TermsOfServiceListAdapter())
-            .build()
+        .add(TermsOfServiceListAdapter())
+        .build()
 }

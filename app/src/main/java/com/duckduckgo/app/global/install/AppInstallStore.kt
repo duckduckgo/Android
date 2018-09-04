@@ -26,7 +26,7 @@ import javax.inject.Inject
 interface AppInstallStore {
     var installTimestamp: Long
 
-    fun hasInstallTimestampRecorded() : Boolean
+    fun hasInstallTimestampRecorded(): Boolean
 }
 
 class AppInstallSharedPreferences @Inject constructor(private val context: Context) : AppInstallStore {
@@ -37,12 +37,12 @@ class AppInstallSharedPreferences @Inject constructor(private val context: Conte
     override fun hasInstallTimestampRecorded(): Boolean = preferences.contains(KEY_TIMESTAMP_UTC)
 
     private val preferences: SharedPreferences
-            get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
-        companion object {
+    companion object {
 
-            @VisibleForTesting
-            const val FILENAME = "com.duckduckgo.app.install.settings"
-            const val KEY_TIMESTAMP_UTC = "INSTALL_TIMESTAMP_UTC"
-        }
+        @VisibleForTesting
+        const val FILENAME = "com.duckduckgo.app.install.settings"
+        const val KEY_TIMESTAMP_UTC = "INSTALL_TIMESTAMP_UTC"
+    }
 }

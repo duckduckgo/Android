@@ -31,8 +31,8 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         get() = preferences.getBoolean(KEY_AUTOCOMPLETE_ENABLED, true)
         set(enabled) {
             preferences.edit()
-                    .putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled)
-                    .apply()
+                .putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled)
+                .apply()
         }
 
     private val preferences: SharedPreferences

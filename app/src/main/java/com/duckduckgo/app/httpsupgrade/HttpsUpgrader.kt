@@ -72,7 +72,7 @@ class HttpsUpgraderImpl(
             val initialTime = System.nanoTime()
             val shouldUpgrade = it.contains(host)
             val totalTime = System.nanoTime() - initialTime
-            Timber.d("${host} ${if (shouldUpgrade) "is" else "is not"} upgradable, lookup in ${totalTime/NANO_TO_MILLIS_DIVISOR}ms")
+            Timber.d("${host} ${if (shouldUpgrade) "is" else "is not"} upgradable, lookup in ${totalTime / NANO_TO_MILLIS_DIVISOR}ms")
 
             return shouldUpgrade
         }

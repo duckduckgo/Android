@@ -33,7 +33,8 @@ import javax.inject.Inject
 
 class TrackerNetworksActivity : DuckDuckGoActivity() {
 
-    @Inject lateinit var repository: TabRepository
+    @Inject
+    lateinit var repository: TabRepository
     private val trackersRenderer = TrackersRenderer()
     private val networksAdapter = TrackerNetworksAdapter()
 

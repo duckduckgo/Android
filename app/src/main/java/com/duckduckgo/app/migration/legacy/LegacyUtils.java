@@ -16,9 +16,10 @@
 
 package com.duckduckgo.app.migration.legacy;
 
-import java.util.LinkedList;
 import android.content.SharedPreferences;
 import android.net.Uri;
+
+import java.util.LinkedList;
 
 /**
  * This class contains utility static methods, such as loading preferences as an array or decoding bitmaps.
@@ -28,7 +29,7 @@ public final class LegacyUtils {
     public static LinkedList<String> loadList(SharedPreferences prefs, String listName) {
         int size = prefs.getInt(listName + "_size", 0);
         LinkedList<String> list = new LinkedList<String>();
-        for(int i=0;i<size;i++)  {
+        for (int i = 0; i < size; i++) {
             list.add(prefs.getString(listName + "_" + i, null));
         }
         return list;
@@ -42,20 +43,20 @@ public final class LegacyUtils {
      * @return
      */
     static public String getQueryIfSerp(String url) {
-        if(!isSerpUrl(url)) {
+        if (!isSerpUrl(url)) {
             return null;
         }
 
         Uri uri = Uri.parse(url);
         String query = uri.getQueryParameter("q");
-        if(query != null)
+        if (query != null)
             return query;
 
         String lastPath = uri.getLastPathSegment();
-        if(lastPath == null)
+        if (lastPath == null)
             return null;
 
-        if(!lastPath.contains(".html")) {
+        if (!lastPath.contains(".html")) {
             return lastPath.replace("_", " ");
         }
 

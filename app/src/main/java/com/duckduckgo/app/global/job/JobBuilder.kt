@@ -26,15 +26,15 @@ import javax.inject.Inject
 
 const val APP_CONFIGURATION_JOB_ID = 1
 
-class JobBuilder @Inject constructor(){
+class JobBuilder @Inject constructor() {
 
     fun appConfigurationJob(context: Context): JobInfo {
 
         return JobInfo.Builder(APP_CONFIGURATION_JOB_ID, ComponentName(context, AppConfigurationJobService::class.java))
-                .setPeriodic(TimeUnit.HOURS.toMillis(3))
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setBackoffCriteria(TimeUnit.MINUTES.toMillis(30), BACKOFF_POLICY_EXPONENTIAL)
-                .setPersisted(true)
-                .build()
+            .setPeriodic(TimeUnit.HOURS.toMillis(3))
+            .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+            .setBackoffCriteria(TimeUnit.MINUTES.toMillis(30), BACKOFF_POLICY_EXPONENTIAL)
+            .setPersisted(true)
+            .build()
     }
 }

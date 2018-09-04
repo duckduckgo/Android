@@ -28,16 +28,16 @@ class TrackerNetworks @Inject constructor() : Serializable {
 
     companion object {
         var majorNetworks = arrayOf(
-                TrackerNetwork(name = "Google", url = "google.com", percentageOfPages = 84, isMajor = true),
-                TrackerNetwork(name = "Facebook", url = "facebook.com", percentageOfPages = 36, isMajor = true),
-                TrackerNetwork(name = "Twitter", url = "twitter.com", percentageOfPages = 16, isMajor = true),
-                TrackerNetwork(name = "Amazon.com", url = "amazon.com", percentageOfPages = 14, isMajor = true),
-                TrackerNetwork(name = "AppNexus", url = "appnexus.com", percentageOfPages = 10, isMajor = true),
-                TrackerNetwork(name = "Oracle", url = "oracle.com", percentageOfPages = 10, isMajor = true),
-                TrackerNetwork(name = "MediaMath", url = "mediamath.com", percentageOfPages = 9, isMajor = true),
-                TrackerNetwork(name = "Yahoo!", url = "yahoo.com", percentageOfPages = 9, isMajor = true),
-                TrackerNetwork(name = "StackPath", url = "stackpath.com", percentageOfPages = 7, isMajor = true),
-                TrackerNetwork(name = "Automattic", url = "automattic.com", percentageOfPages = 7, isMajor = true)
+            TrackerNetwork(name = "Google", url = "google.com", percentageOfPages = 84, isMajor = true),
+            TrackerNetwork(name = "Facebook", url = "facebook.com", percentageOfPages = 36, isMajor = true),
+            TrackerNetwork(name = "Twitter", url = "twitter.com", percentageOfPages = 16, isMajor = true),
+            TrackerNetwork(name = "Amazon.com", url = "amazon.com", percentageOfPages = 14, isMajor = true),
+            TrackerNetwork(name = "AppNexus", url = "appnexus.com", percentageOfPages = 10, isMajor = true),
+            TrackerNetwork(name = "Oracle", url = "oracle.com", percentageOfPages = 10, isMajor = true),
+            TrackerNetwork(name = "MediaMath", url = "mediamath.com", percentageOfPages = 9, isMajor = true),
+            TrackerNetwork(name = "Yahoo!", url = "yahoo.com", percentageOfPages = 9, isMajor = true),
+            TrackerNetwork(name = "StackPath", url = "stackpath.com", percentageOfPages = 7, isMajor = true),
+            TrackerNetwork(name = "Automattic", url = "automattic.com", percentageOfPages = 7, isMajor = true)
         )
     }
 
@@ -51,11 +51,12 @@ class TrackerNetworks @Inject constructor() : Serializable {
         val disconnectEntry = data.find { sameOrSubdomain(url, it.url) || sameOrSubdomain(url, it.networkUrl) } ?: return null
         val majorEntry = majorNetwork(disconnectEntry.networkName)
         return TrackerNetwork(
-                name = disconnectEntry.networkName,
-                url = disconnectEntry.networkUrl,
-                category = disconnectEntry.category,
-                percentageOfPages = majorEntry?.percentageOfPages,
-                isMajor = majorEntry != null)
+            name = disconnectEntry.networkName,
+            url = disconnectEntry.networkUrl,
+            category = disconnectEntry.category,
+            percentageOfPages = majorEntry?.percentageOfPages,
+            isMajor = majorEntry != null
+        )
     }
 
     private fun majorNetwork(networkName: String): TrackerNetwork? {

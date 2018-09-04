@@ -28,9 +28,9 @@ import javax.inject.Inject
 
 
 class BrowserWebViewClient @Inject constructor(
-        private val requestRewriter: RequestRewriter,
-        private val specialUrlDetector: SpecialUrlDetector,
-        private val webViewRequestInterceptor: WebViewRequestInterceptor
+    private val requestRewriter: RequestRewriter,
+    private val specialUrlDetector: SpecialUrlDetector,
+    private val webViewRequestInterceptor: WebViewRequestInterceptor
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -112,7 +112,7 @@ class BrowserWebViewClient @Inject constructor(
      * Utility to function to execute a function, and then return true
      *
      * Useful to reduce clutter in repeatedly including `return true` after doing the real work.
-     */ 
+     */
     private inline fun consume(function: () -> Unit): Boolean {
         function()
         return true

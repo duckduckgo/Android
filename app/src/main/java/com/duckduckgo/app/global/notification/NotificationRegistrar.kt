@@ -42,10 +42,12 @@ class NotificationRegistrar @Inject constructor(private val notificationManager:
 
         // downloaded notification
         val fileDownloadedChannel = NotificationChannel(FILE_DOWNLOADED_CHANNEL_ID, FILE_DOWNLOAD_CHANNEL_NAME, importance)
-        notificationManager.createNotificationChannels(listOf(
+        notificationManager.createNotificationChannels(
+            listOf(
                 fileDownloadedChannel,
                 fileDownloadingChannel
-        ))
+            )
+        )
     }
 
     companion object {
