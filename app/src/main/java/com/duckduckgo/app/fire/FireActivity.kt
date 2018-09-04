@@ -21,7 +21,6 @@ import android.animation.AnimatorListenerAdapter
 import android.app.Activity
 import android.app.ActivityManager
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -30,9 +29,7 @@ import android.support.v4.app.ActivityOptionsCompat
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.ViewModelFactory
 import kotlinx.android.synthetic.main.activity_fire.*
-import javax.inject.Inject
 
 /**
  * Activity which is responsible for killing the main process and restarting it. This Activity will automatically finish itself after a brief time.
@@ -49,12 +46,7 @@ import javax.inject.Inject
  */
 class FireActivity : DuckDuckGoActivity() {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
-
-    private val viewModel: FireViewModel by lazy {
-        ViewModelProviders.of(this, viewModelFactory).get(FireViewModel::class.java)
-    }
+    private val viewModel: FireViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

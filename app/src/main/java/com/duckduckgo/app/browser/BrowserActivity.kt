@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser
 
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
@@ -29,7 +28,6 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.feedback.ui.FeedbackActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.global.view.FireDialog
@@ -47,9 +45,6 @@ import javax.inject.Inject
 class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
-    lateinit var viewModelFactory: ViewModelFactory
-
-    @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
 
     @Inject
@@ -57,9 +52,7 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     private var currentTab: BrowserTabFragment? = null
 
-    private val viewModel: BrowserViewModel by lazy {
-        ViewModelProviders.of(this, viewModelFactory).get(BrowserViewModel::class.java)
-    }
+    private val viewModel: BrowserViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -125,8 +118,6 @@ class BrowserActivity : DuckDuckGoActivity() {
         if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
             viewModel.onClearRequested()
             clearPersonalDataAction.clear()
-            Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
-            finish()
             return
         }
 
@@ -195,8 +186,8 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     fun launchFire() {
         val dialog = FireDialog(context = this, pixel = pixel, clearPersonalDataAction = clearPersonalDataAction)
-        dialog.clearStarted = {viewModel.onClearRequested()}
-        dialog.clearComplete = { viewModel.onClearComplete()}
+        dialog.clearStarted = { viewModel.onClearRequested() }
+        dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.show()
     }
 

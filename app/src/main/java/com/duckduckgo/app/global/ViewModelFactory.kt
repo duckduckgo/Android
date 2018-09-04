@@ -23,7 +23,6 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -65,7 +64,6 @@ class ViewModelFactory @Inject constructor(
     private val bookmarksDao: BookmarksDao,
     private val autoCompleteApi: AutoCompleteApi,
     private val appSettingsPreferencesStore: SettingsDataStore,
-    private val defaultBrowserNotification: DefaultBrowserNotification,
     private val webViewLongPressHandler: LongPressHandler,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val variantManager: VariantManager,
@@ -81,7 +79,7 @@ class ViewModelFactory @Inject constructor(
         with(modelClass) {
             when {
                 isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboaringStore)
-                isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore, defaultBrowserDetector, variantManager)
+                isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore, defaultBrowserDetector)
                 isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository, queryUrlConverter)
                 isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
                 isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository, webViewSessionStorage)
@@ -110,12 +108,9 @@ class ViewModelFactory @Inject constructor(
         networkLeaderboardDao = networkLeaderboardDao,
         bookmarksDao = bookmarksDao,
         appSettingsPreferencesStore = appSettingsPreferencesStore,
-        defaultBrowserDetector = defaultBrowserDetector,
-        defaultBrowserNotification = defaultBrowserNotification,
         appConfigurationDao = appConfigurationDao,
         longPressHandler = webViewLongPressHandler,
         webViewSessionStorage = webViewSessionStorage,
-        variantManager = variantManager,
         autoCompleteApi = autoCompleteApi,
         specialUrlDetector = specialUrlDetector,
         faviconDownloader = faviconDownloader
