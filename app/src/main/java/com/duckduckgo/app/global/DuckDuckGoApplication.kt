@@ -116,7 +116,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         migrateLegacyDb()
         notificationRegistrar.registerApp()
 
-        thread { httpsUpgrader.reloadData() }
+        initializeHttpsUpgrader()
 
     }
 
@@ -170,6 +170,10 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     private fun initializeStatistics() {
         statisticsUpdater.initializeAtb()
+    }
+
+    private fun initializeHttpsUpgrader() {
+        thread { httpsUpgrader.reloadData() }
     }
 
     /**
