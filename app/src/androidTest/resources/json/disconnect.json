@@ -10,8 +10,8 @@
       },
       {
         "ItsATracker": {
-            "dnt": "eff",
-            "https://itisatracker.com/": [
+          "dnt": "eff",
+          "https://itisatracker.com/": [
             "itisatracker.com"
           ]
         }
