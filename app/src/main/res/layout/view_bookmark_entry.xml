@@ -19,11 +19,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
     android:background="?android:attr/selectableItemBackground"
     android:clickable="true"
-    android:focusable="true"
-    android:layout_marginTop="4dp"
-    android:layout_marginBottom="4dp">
+    android:focusable="true">
 
     <ImageView
         android:id="@+id/favicon"
@@ -32,18 +32,18 @@
         android:layout_marginStart="22dp"
         android:importantForAccessibility="no"
         android:src="@drawable/ic_globe_white_16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif"
         android:layout_marginStart="22dp"
-        android:textColor="@color/white"
+        android:fontFamily="sans-serif"
         android:paddingTop="4dp"
+        android:textColor="@color/white"
         android:textSize="16sp"
         android:textStyle="normal"
         app:layout_constraintBottom_toTopOf="@+id/url"
@@ -57,16 +57,16 @@
         android:id="@+id/url"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif"
         android:layout_marginStart="22dp"
+        android:fontFamily="sans-serif"
         android:paddingTop="2dp"
-        app:layout_constraintStart_toEndOf="@id/favicon"
         android:paddingBottom="4dp"
         android:textColor="@color/warmGray"
         android:textSize="12sp"
         android:textStyle="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/overflowMenu"
+        app:layout_constraintStart_toEndOf="@id/favicon"
         app:layout_constraintTop_toBottomOf="@id/title"
         tools:text="Bookmark" />
 
@@ -74,10 +74,10 @@
         android:id="@+id/overflowMenu"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:scaleType="center"
-        android:paddingEnd="14dp"
-        android:paddingStart="14dp"
         android:background="?android:attr/selectableItemBackground"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:scaleType="center"
         android:src="@drawable/ic_overflow_white_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

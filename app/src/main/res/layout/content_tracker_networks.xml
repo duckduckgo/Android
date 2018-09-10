@@ -44,8 +44,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/networksContentDescription"
-                    android:paddingBottom="12dp"
                     android:paddingTop="20dp"
+                    android:paddingBottom="12dp"
                     android:src="@drawable/networks_banner_good"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent" />
@@ -68,20 +68,20 @@
                     android:id="@+id/heading"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
                     android:layout_marginTop="5dp"
+                    android:layout_marginBottom="16dp"
                     android:fontFamily="sans-serif"
                     android:gravity="center_horizontal"
                     android:letterSpacing="0.14"
                     android:textAllCaps="true"
                     android:textColor="@color/warmGray"
+                    android:textIsSelectable="false"
                     android:textSize="12sp"
                     android:textStyle="bold"
-                    android:textIsSelectable="false"
-                    tools:text="8 TRACKERS BLOCKED"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/domain" />
+                    app:layout_constraintTop_toBottomOf="@id/domain"
+                    tools:text="8 TRACKERS BLOCKED" />
 
             </android.support.constraint.ConstraintLayout>
 
@@ -93,8 +93,8 @@
                 android:fontFamily="sans-serif"
                 android:gravity="center_horizontal"
                 android:lineSpacingExtra="6sp"
-                android:paddingEnd="20dp"
                 android:paddingStart="20dp"
+                android:paddingEnd="20dp"
                 android:text="@string/networksOverview"
                 android:textColor="@color/almostBlackDark"
                 android:textSize="14sp"
@@ -105,9 +105,9 @@
                 android:id="@+id/topDivider"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginEnd="20dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="22dp"
+                android:layout_marginEnd="20dp"
                 android:background="@color/divider"
                 app:layout_constraintTop_toBottomOf="@id/networksOverview" />
 
@@ -117,8 +117,8 @@
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
                 android:paddingBottom="26dp"
-                app:layout_constraintTop_toBottomOf="@id/topDivider"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/topDivider" />
 
         </android.support.constraint.ConstraintLayout>
 

@@ -25,8 +25,8 @@
         android:layout_width="18dp"
         android:layout_height="18dp"
         android:layout_centerVertical="true"
-        android:layout_marginEnd="24dp"
         android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
         android:importantForAccessibility="no"
         android:src="@drawable/ic_search_white_18dp" />
 
@@ -35,8 +35,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
-        android:layout_toEndOf="@id/phraseOrUrlIndicator"
         android:layout_toStartOf="@+id/editQueryImage"
+        android:layout_toEndOf="@id/phraseOrUrlIndicator"
         android:ellipsize="end"
         android:fontFamily="sans-serif"
         android:gravity="center_vertical|start"
@@ -53,8 +53,8 @@
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:padding="6dp"
-        android:paddingEnd="24dp"
-        android:paddingStart="24dp">
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp">
 
         <ImageView
             android:layout_width="18dp"
