@@ -21,11 +21,12 @@ import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-class TrackerDataDaoTest  {
+class TrackerDataDaoTest {
 
     private lateinit var db: AppDatabase
     private lateinit var dao: TrackerDataDao
@@ -93,7 +94,7 @@ class TrackerDataDaoTest  {
     }
 
     fun createTracker(url: String): DisconnectTracker {
-        return DisconnectTracker(url, "","", "")
+        return DisconnectTracker(url, "", "", "")
     }
 
     companion object {

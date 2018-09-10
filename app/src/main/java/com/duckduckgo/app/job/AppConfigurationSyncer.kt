@@ -25,9 +25,10 @@ import io.reactivex.Completable
 import timber.log.Timber
 
 class AppConfigurationSyncer(
-        private val jobBuilder: JobBuilder,
-        private val jobScheduler: JobScheduler,
-        private val appConfigurationDownloader: ConfigurationDownloader) {
+    private val jobBuilder: JobBuilder,
+    private val jobScheduler: JobScheduler,
+    private val appConfigurationDownloader: ConfigurationDownloader
+) {
 
     @CheckResult
     fun scheduleImmediateSync(): Completable {
@@ -42,8 +43,8 @@ class AppConfigurationSyncer(
      */
     fun jobScheduled(): Boolean {
         return jobScheduler.allPendingJobs
-                .filter { APP_CONFIGURATION_JOB_ID == it.id }
-                .count() > 0
+            .filter { APP_CONFIGURATION_JOB_ID == it.id }
+            .count() > 0
     }
 
     fun scheduleRegularSync(context: Context) {

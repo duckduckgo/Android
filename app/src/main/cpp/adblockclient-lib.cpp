@@ -14,10 +14,10 @@ extern "C"
 JNIEXPORT void
 JNICALL
 Java_com_duckduckgo_app_trackerdetection_AdBlockClient_releaseClient(JNIEnv *env,
-                                                                   jobject,
-                                                                   jlong clientPointer,
-                                                                   jlong rawDataPointer,
-                                                                   jlong processedDataPointer) {
+                                                                     jobject,
+                                                                     jlong clientPointer,
+                                                                     jlong rawDataPointer,
+                                                                     jlong processedDataPointer) {
     AdBlockClient *client = (AdBlockClient *) clientPointer;
     delete client;
 
@@ -51,9 +51,9 @@ extern "C"
 JNIEXPORT jlong
 JNICALL
 Java_com_duckduckgo_app_trackerdetection_AdBlockClient_loadProcessedData(JNIEnv *env,
-                                                                       jobject /* this */,
-                                                                       jlong clientPointer,
-                                                                       jbyteArray data) {
+                                                                         jobject /* this */,
+                                                                         jlong clientPointer,
+                                                                         jbyteArray data) {
 
     int dataLength = env->GetArrayLength(data);
     char *dataChars = new char[dataLength];
@@ -73,8 +73,8 @@ extern "C"
 JNIEXPORT jbyteArray
 JNICALL
 Java_com_duckduckgo_app_trackerdetection_AdBlockClient_getProcessedData(JNIEnv *env,
-                                                                      jobject /* this */,
-                                                                      jlong clientPointer) {
+                                                                        jobject /* this */,
+                                                                        jlong clientPointer) {
 
     AdBlockClient *client = (AdBlockClient *) clientPointer;
 
@@ -92,11 +92,11 @@ extern "C"
 JNIEXPORT jboolean
 JNICALL
 Java_com_duckduckgo_app_trackerdetection_AdBlockClient_matches(JNIEnv *env,
-                                                             jobject /* this */,
-                                                             jlong clientPointer,
-                                                             jstring url,
-                                                             jstring documentUrl,
-                                                             jint filterOption) {
+                                                               jobject /* this */,
+                                                               jlong clientPointer,
+                                                               jstring url,
+                                                               jstring documentUrl,
+                                                               jint filterOption) {
     jboolean isUrlCopy;
     const char *urlChars = env->GetStringUTFChars(url, &isUrlCopy);
 

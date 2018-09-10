@@ -35,17 +35,19 @@ import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 
-@Database(exportSchema = true, version = 5, entities = [
-    DisconnectTracker::class,
-    HttpsBloomFilterSpec::class,
-    HttpsWhitelistedDomain::class,
-    NetworkLeaderboardEntry::class,
-    SiteVisitedEntity::class,
-    AppConfigurationEntity::class,
-    TabEntity::class,
-    TabSelectionEntity::class,
-    BookmarkEntity::class
-])
+@Database(
+    exportSchema = true, version = 5, entities = [
+        DisconnectTracker::class,
+        HttpsBloomFilterSpec::class,
+        HttpsWhitelistedDomain::class,
+        NetworkLeaderboardEntry::class,
+        SiteVisitedEntity::class,
+        AppConfigurationEntity::class,
+        TabEntity::class,
+        TabSelectionEntity::class,
+        BookmarkEntity::class
+    ]
+)
 
 abstract class AppDatabase : RoomDatabase() {
 

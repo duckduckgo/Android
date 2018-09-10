@@ -32,11 +32,12 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class ViewState(
-            val loading: Boolean = true,
-            val version: String = "",
-            val autoCompleteSuggestionsEnabled: Boolean = true,
-            val showDefaultBrowserSetting: Boolean = false,
-            val isAppDefaultBrowser: Boolean = false)
+        val loading: Boolean = true,
+        val version: String = "",
+        val autoCompleteSuggestionsEnabled: Boolean = true,
+        val showDefaultBrowserSetting: Boolean = false,
+        val isAppDefaultBrowser: Boolean = false
+    )
 
     private lateinit var currentViewState: ViewState
 
@@ -60,11 +61,13 @@ class SettingsViewModel @Inject constructor(
 
         val variantKey = variantManager.getVariant().key
 
-        viewState.value = currentViewState.copy(loading = false,
-                autoCompleteSuggestionsEnabled = autoCompleteEnabled,
-                isAppDefaultBrowser = defaultBrowserAlready,
-                showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
-                version = obtainVersion(variantKey))
+        viewState.value = currentViewState.copy(
+            loading = false,
+            autoCompleteSuggestionsEnabled = autoCompleteEnabled,
+            isAppDefaultBrowser = defaultBrowserAlready,
+            showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
+            version = obtainVersion(variantKey)
+        )
     }
 
     fun userRequestedToSendFeedback() {

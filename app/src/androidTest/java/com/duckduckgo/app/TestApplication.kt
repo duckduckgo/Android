@@ -30,9 +30,9 @@ class TestApplication : DuckDuckGoApplication() {
 
     override fun configureDependencyInjection() {
         DaggerTestAppComponent.builder()
-                .application(this)
-                .create(this)
-                .inject(this)
+            .application(this)
+            .create(this)
+            .inject(this)
     }
 
     // We don't need to actually use leak canary for tests

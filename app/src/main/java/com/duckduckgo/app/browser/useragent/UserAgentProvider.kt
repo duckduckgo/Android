@@ -35,9 +35,9 @@ class UserAgentProvider constructor(private val defaultUserAgent: String) {
      *
      * We include everything from the original UA string from AppleWebKit onwards (omitting if missing)
      */
-    fun getUserAgent(desktopSiteRequested: Boolean = false) : String{
+    fun getUserAgent(desktopSiteRequested: Boolean = false): String {
 
-        val platform = if(desktopSiteRequested) desktopUaPrefix() else mobileUaPrefix()
+        val platform = if (desktopSiteRequested) desktopUaPrefix() else mobileUaPrefix()
         val userAgentStringSuffix = getWebKitVersionOnwards(desktopSiteRequested)
 
         return "$MOZILLA_PREFIX ($platform)$userAgentStringSuffix"
@@ -50,7 +50,7 @@ class UserAgentProvider constructor(private val defaultUserAgent: String) {
     private fun getWebKitVersionOnwards(desktopSiteRequested: Boolean): String {
         val matches = WEB_KIT_REGEX.find(defaultUserAgent) ?: return ""
         var result = matches.groupValues[0]
-        if(desktopSiteRequested) {
+        if (desktopSiteRequested) {
             result = result.replace(" Mobile ", " ")
         }
         return " $result"

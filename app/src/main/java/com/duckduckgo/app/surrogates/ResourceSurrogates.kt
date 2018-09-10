@@ -46,8 +46,8 @@ class ResourceSurrogatesImpl : ResourceSurrogates {
 }
 
 data class SurrogateResponse(
-        val responseAvailable: Boolean = true,
-        val name: String = "",
-        val jsFunction: String = "",
-        val mimeType: String = ""
+    val responseAvailable: Boolean = true,
+    val name: String = "",
+    val jsFunction: String = "",
+    val mimeType: String = ""
 )

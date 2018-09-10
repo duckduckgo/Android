@@ -59,7 +59,7 @@ class AdBlockClient(override val name: ClientName) : Client {
     private external fun getProcessedData(clientPointer: Long): ByteArray
 
     override fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean =
-            matches(nativeClientPointer, url, documentUrl, resourceType.filterOption)
+        matches(nativeClientPointer, url, documentUrl, resourceType.filterOption)
 
     private external fun matches(clientPointer: Long, url: String, documentUrl: String, filterOption: Int): Boolean
 

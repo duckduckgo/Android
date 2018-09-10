@@ -44,13 +44,17 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     data class Header(val networkName: String) : ViewData
     data class Row(val tracker: TrackingEvent) : ViewData
 
-    class HeaderViewHolder(val root: View,
-                           val network: TextView,
-                           val icon: ImageView) : RecyclerView.ViewHolder(root)
+    class HeaderViewHolder(
+        val root: View,
+        val network: TextView,
+        val icon: ImageView
+    ) : RecyclerView.ViewHolder(root)
 
-    class RowViewHolder(val root: View,
-                        val host: TextView,
-                        val category: TextView) : RecyclerView.ViewHolder(root)
+    class RowViewHolder(
+        val root: View,
+        val host: TextView,
+        val category: TextView
+    ) : RecyclerView.ViewHolder(root)
 
     private var viewData: List<ViewData> = ArrayList()
     private var networkRenderer: TrackersRenderer = TrackersRenderer()

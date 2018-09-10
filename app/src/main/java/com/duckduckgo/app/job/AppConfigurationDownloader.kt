@@ -30,10 +30,11 @@ interface ConfigurationDownloader {
 }
 
 class AppConfigurationDownloader(
-        private val trackerDataDownloader: TrackerDataDownloader,
-        private val httpsUpgradeDataDownloader: HttpsUpgradeDataDownloader,
-        private val resourceSurrogateDownloader: ResourceSurrogateListDownloader,
-        private val appDatabase: AppDatabase) : ConfigurationDownloader {
+    private val trackerDataDownloader: TrackerDataDownloader,
+    private val httpsUpgradeDataDownloader: HttpsUpgradeDataDownloader,
+    private val resourceSurrogateDownloader: ResourceSurrogateListDownloader,
+    private val appDatabase: AppDatabase
+) : ConfigurationDownloader {
 
     override fun downloadTask(): Completable {
         val easyListDownload = trackerDataDownloader.downloadList(EASYLIST)
@@ -43,14 +44,16 @@ class AppConfigurationDownloader(
         val surrogatesDownload = resourceSurrogateDownloader.downloadList()
         val httpsUpgradeDownload = httpsUpgradeDataDownloader.download()
 
-        return Completable.mergeDelayError(listOf(
+        return Completable.mergeDelayError(
+            listOf(
                 easyListDownload,
                 easyPrivacyDownload,
                 trackersWhitelist,
                 disconnectDownload,
                 surrogatesDownload,
                 httpsUpgradeDownload
-        )).doOnComplete {
+            )
+        ).doOnComplete {
             Timber.i("Download task completed successfully")
             val appConfiguration = AppConfigurationEntity(appConfigurationDownloaded = true)
             appDatabase.appConfigurationDao().configurationDownloadSuccessful(appConfiguration)

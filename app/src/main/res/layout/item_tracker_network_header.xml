@@ -19,9 +19,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingEnd="24dp"
     android:paddingStart="24dp"
     android:paddingTop="26dp"
+    android:paddingEnd="24dp"
     android:paddingBottom="6dp"
     tools:background="@android:color/white">
 

@@ -47,7 +47,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     lateinit var pixel: Pixel
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
-    
+
     private val tabsAdapter = TabSwitcherAdapter(this, this)
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -26,9 +26,11 @@ import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import java.util.concurrent.CopyOnWriteArrayList
 
-class SiteMonitor(override val url: String,
-                  override val termsOfService: TermsOfService,
-                  override val memberNetwork: TrackerNetwork? = null) : Site {
+class SiteMonitor(
+    override val url: String,
+    override val termsOfService: TermsOfService,
+    override val memberNetwork: TrackerNetwork? = null
+) : Site {
 
     override val uri: Uri?
         get() = Uri.parse(url)
@@ -61,7 +63,7 @@ class SiteMonitor(override val url: String,
         get() = distinctTrackersByNetwork.count()
 
     override val majorNetworkCount: Int
-        get() = trackingEvents.distinctBy { it.trackerNetwork?.url }.count { it.trackerNetwork?.isMajor ?: false}
+        get() = trackingEvents.distinctBy { it.trackerNetwork?.url }.count { it.trackerNetwork?.isMajor ?: false }
 
     override val hasTrackerFromMajorNetwork: Boolean
         get() = trackingEvents.any { it.trackerNetwork?.isMajor ?: false }

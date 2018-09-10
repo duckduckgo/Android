@@ -20,18 +20,18 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 private const val CHROME_UA_MOBILE =
-        "Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P Build/OPM3.171019.014) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Mobile Safari/537.36"
+    "Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P Build/OPM3.171019.014) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Mobile Safari/537.36"
 
 // Some values will be dynamic based on OS/Architecture/Software versions, so use Regex to match around dynamic values
 private val CHROME_UA_DESKTOP_REGEX = Regex(
-        "Mozilla/5.0 \\(X11; Linux .*?\\) AppleWebKit\\/[.0-9]+ \\(KHTML, like Gecko\\) Chrome\\/[.0-9]+ Safari/[.0-9]+"
+    "Mozilla/5.0 \\(X11; Linux .*?\\) AppleWebKit\\/[.0-9]+ \\(KHTML, like Gecko\\) Chrome\\/[.0-9]+ Safari/[.0-9]+"
 )
 private val CHROME_UA_MOBILE_REGEX = Regex(
-        "Mozilla/5.0 \\(Linux; Android .*?\\) AppleWebKit\\/[.0-9]+ \\(KHTML, like Gecko\\) Chrome\\/[.0-9]+ Mobile Safari/[.0-9]+"
+    "Mozilla/5.0 \\(Linux; Android .*?\\) AppleWebKit\\/[.0-9]+ \\(KHTML, like Gecko\\) Chrome\\/[.0-9]+ Mobile Safari/[.0-9]+"
 )
 
 private val CHROME_UA_MOBILE_REGEX_MISSING_APPLE_WEBKIT_DETAILS = Regex(
-        "Mozilla/5.0 \\(Linux; Android .*?\\)"
+    "Mozilla/5.0 \\(Linux; Android .*?\\)"
 )
 
 class UserAgentProviderTest {

@@ -16,11 +16,9 @@
 
 
 /**
- * @deprecated
- *
- * DO NOT USE THE CODE IN THIS PACKAGE.
- *
+ * @deprecated DO NOT USE THE CODE IN THIS PACKAGE.
+ * <p>
  * The code in this package is derived from the Search and Stories application for the purpose of
- *  migration.
+ * migration.
  */
 package com.duckduckgo.app.migration.legacy;

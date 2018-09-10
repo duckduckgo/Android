@@ -97,6 +97,14 @@ public class LegacyDb implements Closeable {
         return out;
     }
 
+    public void close() {
+        db.close();
+    }
+
+    public SQLiteDatabase getSQLiteDB() {
+        return db;
+    }
+
     private static class OpenHelper extends SQLiteOpenHelper {
 
         private final Context appContext;
@@ -300,14 +308,6 @@ public class LegacyDb implements Closeable {
                 onCreate(db);
             }
         }
-    }
-
-    public void close() {
-        db.close();
-    }
-
-    public SQLiteDatabase getSQLiteDB() {
-        return db;
     }
 
 }

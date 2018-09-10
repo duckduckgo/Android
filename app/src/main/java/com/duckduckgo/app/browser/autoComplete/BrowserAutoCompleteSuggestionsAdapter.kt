@@ -30,8 +30,9 @@ import kotlinx.android.synthetic.main.item_autocomplete_suggestion.view.*
 import javax.inject.Inject
 
 class BrowserAutoCompleteSuggestionsAdapter @Inject constructor(
-        private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-        private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
+    private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+    private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
+) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
 
     private val suggestions: MutableList<AutoCompleteSuggestion> = ArrayList()
 
@@ -48,7 +49,7 @@ class BrowserAutoCompleteSuggestionsAdapter @Inject constructor(
     }
 
     override fun getItemViewType(position: Int): Int {
-        if(suggestions.isEmpty()) {
+        if (suggestions.isEmpty()) {
             return EMPTY_TYPE
         }
 
@@ -86,9 +87,11 @@ class BrowserAutoCompleteSuggestionsAdapter @Inject constructor(
     sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         class SuggestionViewHolder(itemView: View) : AutoCompleteViewHolder(itemView) {
-            fun bind(item: AutoCompleteSuggestion,
-                     immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
-                     editableSearchClickListener: (AutoCompleteSuggestion) -> Unit) = with(itemView) {
+            fun bind(
+                item: AutoCompleteSuggestion,
+                immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
+                editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
+            ) = with(itemView) {
 
                 phrase.text = item.phrase
 

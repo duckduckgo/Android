@@ -24,8 +24,8 @@ import javax.inject.Inject
 
 @WorkerThread
 class ResourceSurrogateLoader @Inject constructor(
-        private val resourceSurrogates: ResourceSurrogates,
-        private val surrogatesDataStore: ResourceSurrogateDataStore
+    private val resourceSurrogates: ResourceSurrogates,
+    private val surrogatesDataStore: ResourceSurrogateDataStore
 ) {
 
     fun loadData() {
@@ -79,11 +79,11 @@ class ResourceSurrogateLoader @Inject constructor(
 
             if (it.isBlank()) {
                 surrogates.add(
-                        SurrogateResponse(
-                                name = ruleName,
-                                mimeType = mimeType,
-                                jsFunction = functionBuilder.toString()
-                        )
+                    SurrogateResponse(
+                        name = ruleName,
+                        mimeType = mimeType,
+                        jsFunction = functionBuilder.toString()
+                    )
                 )
 
                 functionBuilder.setLength(0)

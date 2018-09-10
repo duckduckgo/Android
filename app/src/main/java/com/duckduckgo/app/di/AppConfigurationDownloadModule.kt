@@ -29,10 +29,12 @@ import dagger.Provides
 open class AppConfigurationDownloaderModule {
 
     @Provides
-    open fun appConfigurationDownloader(trackerDataDownloader: TrackerDataDownloader,
-                                   httpsUpgradeDataDownloader: HttpsUpgradeDataDownloader,
-                                   resourceSurrogateDownloader: ResourceSurrogateListDownloader,
-                                   appDatabase: AppDatabase) : ConfigurationDownloader {
+    open fun appConfigurationDownloader(
+        trackerDataDownloader: TrackerDataDownloader,
+        httpsUpgradeDataDownloader: HttpsUpgradeDataDownloader,
+        resourceSurrogateDownloader: ResourceSurrogateListDownloader,
+        appDatabase: AppDatabase
+    ): ConfigurationDownloader {
         return AppConfigurationDownloader(trackerDataDownloader, httpsUpgradeDataDownloader, resourceSurrogateDownloader, appDatabase)
     }
 }

@@ -27,10 +27,12 @@ import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment.SaveBookmarkLi
 import com.duckduckgo.app.global.SingleLiveEvent
 import io.reactivex.schedulers.Schedulers
 
-class BookmarksViewModel(val dao: BookmarksDao): SaveBookmarkListener, ViewModel() {
+class BookmarksViewModel(val dao: BookmarksDao) : SaveBookmarkListener, ViewModel() {
 
-    data class ViewState(val showBookmarks: Boolean = false,
-                         val bookmarks: List<BookmarkEntity> = emptyList())
+    data class ViewState(
+        val showBookmarks: Boolean = false,
+        val bookmarks: List<BookmarkEntity> = emptyList()
+    )
 
     sealed class Command {
 

@@ -37,9 +37,9 @@
             android:id="@+id/review"
             android:layout_width="match_parent"
             android:layout_height="169dp"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp"
             android:background="@android:color/white"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
             app:layout_constraintTop_toBottomOf="@id/privacyGrade"
             tools:ignore="SelectableText,UseCompoundDrawables">
 
@@ -112,8 +112,8 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@color/midGreen"
-            android:paddingEnd="20dp"
             android:paddingStart="20dp"
+            android:paddingEnd="20dp"
             app:layout_constraintTop_toBottomOf="@id/review">
 
             <TextView
@@ -143,62 +143,62 @@
             android:id="@+id/trackerNetworkLeaderboard"
             android:layout_width="match_parent"
             android:layout_height="108dp"
-            android:paddingEnd="20dp"
-            android:paddingStart="20dp"
             android:onClick="onLeaderboardClick"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
             app:layout_constraintTop_toBottomOf="@id/privacyToggleContainer">
 
             <TextView
                 android:id="@+id/trackerNetworkLeaderboardHeader"
+                style="@style/DashboardHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="22dp"
+                android:elegantTextHeight="true"
                 android:gravity="center_horizontal"
                 android:text="@string/networkTrackerSummaryHeader"
-                android:elegantTextHeight="true"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                style="@style/DashboardHeader" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/trackerNetworkLeaderboardNotReady"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/networkTrackerSummaryNotReady"
-                android:textAlignment="center"
-                android:layout_marginTop="22dp"
                 android:layout_marginStart="40dp"
+                android:layout_marginTop="22dp"
                 android:layout_marginEnd="40dp"
                 android:fontFamily="sans-serif-medium"
+                android:text="@string/networkTrackerSummaryNotReady"
+                android:textAlignment="center"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.duckduckgo.app.privacy.ui.TrackerNetworkLeaderboardPillView
                 android:id="@+id/trackerNetworkPill1"
-                android:layout_marginTop="13dp"
-                app:layout_constraintRight_toLeftOf="@+id/trackerNetworkPill2"
-                app:layout_constraintTop_toBottomOf="@+id/trackerNetworkLeaderboardHeader"
-                android:layout_marginEnd="12dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="13dp"
+                android:layout_marginEnd="12dp"
+                app:layout_constraintRight_toLeftOf="@+id/trackerNetworkPill2"
+                app:layout_constraintTop_toBottomOf="@+id/trackerNetworkLeaderboardHeader" />
 
             <com.duckduckgo.app.privacy.ui.TrackerNetworkLeaderboardPillView
                 android:id="@+id/trackerNetworkPill2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="13dp"
-                app:layout_constraintTop_toBottomOf="@+id/trackerNetworkLeaderboardHeader"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                app:layout_constraintTop_toBottomOf="@+id/trackerNetworkLeaderboardHeader" />
 
             <com.duckduckgo.app.privacy.ui.TrackerNetworkLeaderboardPillView
                 android:id="@+id/trackerNetworkPill3"
-                android:layout_marginTop="13dp"
-                app:layout_constraintTop_toBottomOf="@+id/trackerNetworkLeaderboardHeader"
-                app:layout_constraintLeft_toRightOf="@+id/trackerNetworkPill2"
-                android:layout_marginStart="12dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="13dp"
+                app:layout_constraintLeft_toRightOf="@+id/trackerNetworkPill2"
+                app:layout_constraintTop_toBottomOf="@+id/trackerNetworkLeaderboardHeader" />
 
         </android.support.constraint.ConstraintLayout>
 
