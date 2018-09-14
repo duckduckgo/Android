@@ -77,12 +77,21 @@ class StatisticsRequesterTest {
     }
 
     @Test
-    fun whenExitFailsThenAtbCleared() {
+    fun whenExtiFailsThenAtbCleared() {
         whenever(mockService.exti(any())).thenReturn(Observable.error(Throwable()))
         configureNoStoredStatistics()
         testee.initializeAtb()
         verify(mockStatisticsStore).saveAtb(ATB)
         verify(mockStatisticsStore).clearAtb()
+    }
+
+    @Test
+    fun whenStatisticsStoredThenRefreshIncludesRefreshedAtb() {
+        configureStoredStatistics()
+        val retentionAtb = "foo"
+        whenever(mockStatisticsStore.retentionAtb).thenReturn(retentionAtb)
+        testee.refreshRetentionAtb()
+        verify(mockService).updateAtb(eq(ATB_WITH_VARIANT), eq(retentionAtb))
     }
 
     @Test
