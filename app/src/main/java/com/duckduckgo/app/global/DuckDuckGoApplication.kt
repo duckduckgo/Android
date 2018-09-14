@@ -26,6 +26,7 @@ import android.arch.lifecycle.ProcessLifecycleOwner
 import android.os.Build
 import android.support.v4.app.Fragment
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -91,6 +92,8 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     @Inject
     lateinit var httpsUpgrader: HttpsUpgrader
+
+    lateinit var daggerAppComponent: AppComponent
 
     override fun onCreate() {
         super.onCreate()
@@ -162,10 +165,10 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     }
 
     protected open fun configureDependencyInjection() {
-        DaggerAppComponent.builder()
+        daggerAppComponent = DaggerAppComponent.builder()
             .application(this)
-            .create(this)
-            .inject(this)
+            .build()
+        daggerAppComponent.inject(this)
     }
 
     private fun initializeStatistics() {
