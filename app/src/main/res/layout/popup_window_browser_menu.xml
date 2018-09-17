@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/back"
-            android:src="@drawable/ic_arrow_back_24px" />
+            android:src="@drawable/ic_arrow_back_24dp" />
 
         <ImageButton
             android:id="@+id/forwardPopupMenuItem"
@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/forward"
-            android:src="@drawable/ic_arrow_forward_24px" />
+            android:src="@drawable/ic_arrow_forward_24dp" />
 
         <ImageButton
             android:id="@+id/refreshPopupMenuItem"

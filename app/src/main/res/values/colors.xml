@@ -1,38 +1,68 @@
-<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2017 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources>
-    <color name="colorPrimaryDark">@color/almostBlackDark</color>
-    <color name="colorPrimary">@color/almostBlack</color>
-    <color name="colorAccent">@color/orange</color>
 
-    <color name="windowBackground">@color/almostBlackDark</color>
+    <!-- Dark theme primary colors -->
+    <color name="darkPrimaryDark">@color/almostBlackDark</color>
+    <color name="darkPrimary">@color/almostBlack</color>
+    <color name="darkAccent">@color/orange</color>
+
+    <!-- Light theme primary colors -->
+    <color name="lightThemePrimaryDark">@color/whiteThree</color>
+    <color name="lightThemePrimary">@color/whiteFive</color>
+    <color name="lightThemeAccent">@color/orange</color>
+    <color name="lightThemeLegacyStausBar">@color/almostBlackDark</color>
+
+    <!-- Widget colors -->
     <color name="divider">@color/subtleGrayTwo</color>
-    <color name="omnibarEditingBackground">@color/midGray</color>
+    <color name="webViewScrollbarTrackColor">#ff333333</color>
+    <color name="webViewScrollbarThumbColor">#ffababab</color>
 
-    <color name="white">#FFFFFF</color>
+    <!-- Universal -->
+    <color name="white">#ffffff</color>
     <color name="whiteTwo">#e4e4e4</color>
+    <color name="whiteThree">#f5f5f5</color>
+    <color name="whiteFour">#f1f1f1</color>
+    <color name="whiteFive">#fafafa</color>
     <color name="midnight">#161616</color>
-
     <color name="almostBlackDark">#222222</color>
     <color name="almostBlack">#333333</color>
+
+    <color name="grayishBrown">#494949</color>
+    <color name="greyishBrownTwo">#444444</color>
     <color name="midGray">#555</color>
     <color name="grayish">#aaaaaa</color>
-
+    <color name="grayishTwo">#939393</color>
+    <color name="warmGray">#999999</color>
+    <color name="warmerGray">#777777</color>
     <color name="paleBrownishGray">#b0b0b0</color>
     <color name="brownishGray">#5c5c5c</color>
     <color name="coolGray">#969799</color>
-    <color name="warmGray">#939393</color>
-    <color name="warmerGray">#777777</color>
     <color name="subtleGray">#f0f0f0</color>
-    <color name="subtleGrayTwo">#D8D8D8</color>
-    <color name="pinkishGrey">#CCCCCC</color>
+    <color name="subtleGrayTwo">#d8d8d8</color>
 
+    <color name="pinkishGrey">#cccccc</color>
     <color name="orange">#de5833</color>
     <color name="brickOrange">#d03a10</color>
 
-    <color name="powderBlue">#50BFFF</color>
-    <color name="powderBlue2">#B2D6F3</color>
+    <color name="powderBlue">#50bfff</color>
+    <color name="powderBlue2">#b2d6f3</color>
     <color name="denimBlue">#3d5599</color>
-    <color name="cornflowerBlue">#678FFF</color>
+    <color name="cornflowerBlue">#678fff</color>
     <color name="skyBlue">#42bffe</color>
 
     <color name="lightOliveGreen">#93c04d</color>
@@ -44,9 +74,6 @@
     <color name="eastSide">#9680C5</color>
     <color name="portGore">#2f1f51</color>
 
-    <color name="translucentDark">#B000</color>
-
-    <color name="webViewScrollbarTrackColor">#FF333333</color>
-    <color name="webViewScrollbarThumbColor">#FFABABAB</color>
+    <color name="translucentDark">#b000</color>
 
 </resources>

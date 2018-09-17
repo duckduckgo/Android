@@ -31,7 +31,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:contentDescription="@string/duckDuckGoLogoDescription"
-        android:src="@drawable/full_logo"
+        android:src="@drawable/logo_full"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/callToActionStub"
         app:layout_constraintEnd_toEndOf="parent"

@@ -31,7 +31,7 @@
         android:layout_height="24dp"
         android:layout_marginStart="22dp"
         android:importantForAccessibility="no"
-        android:src="@drawable/ic_globe_white_16dp"
+        android:src="@drawable/ic_globe_gray_16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -61,7 +61,7 @@
         android:fontFamily="sans-serif"
         android:paddingTop="2dp"
         android:paddingBottom="4dp"
-        android:textColor="@color/warmGray"
+        android:textColor="@color/grayishTwo"
         android:textSize="12sp"
         android:textStyle="normal"
         app:layout_constraintBottom_toBottomOf="parent"

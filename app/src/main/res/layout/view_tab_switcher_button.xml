@@ -25,6 +25,7 @@
         android:layout_width="28dp"
         android:layout_height="28dp"
         android:layout_centerInParent="true"
+        app:lottie_colorFilter="?attr/toolbarIconColor"
         android:clickable="false"
         app:lottie_rawRes="@raw/new_tab" />
 
@@ -34,7 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:textAlignment="center"
-        android:textColor="@color/grayish"
+        android:textColor="?attr/toolbarIconColor"
         android:textSize="12sp"
         android:textStyle="bold"
         android:typeface="normal"

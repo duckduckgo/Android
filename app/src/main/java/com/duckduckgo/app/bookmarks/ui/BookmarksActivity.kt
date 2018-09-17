@@ -198,8 +198,8 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
             GlideApp.with(itemView)
                 .load(faviconUrl)
-                .placeholder(R.drawable.ic_globe_white_16dp)
-                .error(R.drawable.ic_globe_white_16dp)
+                .placeholder(R.drawable.ic_globe_gray_16dp)
+                .error(R.drawable.ic_globe_gray_16dp)
                 .into(itemView.favicon)
         }
 

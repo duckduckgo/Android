@@ -67,7 +67,7 @@
         android:background="?selectableItemBackground"
         android:contentDescription="@string/closeContentDescription"
         android:scaleType="center"
-        android:src="@drawable/ic_close_white_24dp"
+        android:src="@drawable/ic_close_24dp"
         android:tint="@color/grayish"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

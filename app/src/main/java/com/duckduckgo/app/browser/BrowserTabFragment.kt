@@ -668,7 +668,7 @@ class BrowserTabFragment : Fragment(), FindListener {
      */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        ddgLogo.setImageResource(R.drawable.full_logo)
+        ddgLogo.setImageResource(R.drawable.logo_full)
     }
 
     private fun resetTabState() {

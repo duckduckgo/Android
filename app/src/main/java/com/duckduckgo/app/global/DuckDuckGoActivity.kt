@@ -21,6 +21,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
+import com.duckduckgo.app.them.applyTheme
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
@@ -32,6 +33,7 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
+        applyTheme()
         super.onCreate(savedInstanceState)
     }
 

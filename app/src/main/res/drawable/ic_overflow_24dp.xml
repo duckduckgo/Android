@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2017 DuckDuckGo
+  ~ Copyright (c) 2018 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,16 +15,11 @@
   -->
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="22dp"
-    android:height="22dp"
-    android:viewportWidth="22.0"
-    android:viewportHeight="22.0">
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24.0"
+    android:viewportHeight="24.0">
     <path
         android:fillColor="?attr/toolbarIconColor"
-        android:fillType="nonZero"
-        android:pathData="M9.74,12.305h2.52l-1.25,-3.74z" />
-    <path
-        android:fillColor="?attr/toolbarIconColor"
-        android:fillType="nonZero"
-        android:pathData="M11,0C4.925,0 0,4.925 0,11s4.925,11 11,11 11,-4.925 11,-11A11,11 0,0 0,11 0zM13.45,15.965l-0.5,-1.43L9.045,14.535l-0.5,1.43L5.65,15.965l3.735,-9.93h3.23l3.735,9.93h-2.9z" />
+        android:pathData="M12,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,10c-1.1,0 -2,0.9 -2,2s0.9,2 2,2 2,-0.9 2,-2 -0.9,-2 -2,-2zM12,16c-1.1,0 -2,0.9 -2,2s0.9,2 2,2 2,-0.9 2,-2 -0.9,-2 -2,-2z" />
 </vector>

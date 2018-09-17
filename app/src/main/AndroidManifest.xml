@@ -38,15 +38,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivity"
             android:label="@string/appName"
-            android:theme="@style/AppTheme.TransparentTheme" />
+            android:theme="@style/AppTheme.Dark.Transparent" />
+
         <activity
             android:name=".BrowserActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask"
-            android:theme="@style/BrowserTheme"
             android:windowSoftInputMode="adjustResize|stateHidden">
 
             <!-- Allows app to become default browser -->
@@ -105,8 +106,7 @@
         <activity
             android:name="com.duckduckgo.app.about.AboutDuckDuckGoActivity"
             android:label="@string/aboutActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            android:theme="@style/AppTheme" />
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
             android:name="com.duckduckgo.app.bookmarks.ui.BookmarksActivity"
             android:label="@string/bookmarksActivityTitle" />

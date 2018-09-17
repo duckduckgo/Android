@@ -17,9 +17,19 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
-    android:viewportWidth="24.0"
-    android:viewportHeight="24.0">
+    android:viewportWidth="24"
+    android:viewportHeight="24">
     <path
-        android:fillColor="#FFF"
-        android:pathData="M7.41,7.84L12,12.42l4.59,-4.58L18,9.25l-6,6 -6,-6z" />
+        android:fillColor="#00000000"
+        android:pathData="M12,12m-6.25,0a6.25,6.25 0,1 1,12.5 0a6.25,6.25 0,1 1,-12.5 0"
+        android:strokeWidth="1.5"
+        android:strokeColor="?attr/toolbarIconColor" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M9.75,12a2.25,6.25 0,1 0,4.5 0a2.25,6.25 0,1 0,-4.5 0z"
+        android:strokeWidth="1.5"
+        android:strokeColor="?attr/toolbarIconColor" />
+    <path
+        android:fillColor="?attr/toolbarIconColor"
+        android:pathData="M6,11h12v2H6z" />
 </vector>
