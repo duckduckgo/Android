@@ -16,37 +16,13 @@
 
 package com.duckduckgo.app.statistics
 
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToActionBottomSheet
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToActionSimpleButton
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.fail
 import org.junit.Test
 
 class VariantManagerTest {
 
     private val variants = VariantManager.ACTIVE_VARIANTS
-
-    @Test
-    fun homeScreenCallToActionButtonVariantConfiguredCorrectly() {
-        val variant = variants.firstOrNull { it.key == "mq" }
-        assertEqualsDouble(1.0, variant!!.weight)
-        assertTrue(variant.hasFeature(ShowHomeScreenCallToActionSimpleButton))
-        assertEquals(1, variant.features.size)
-    }
-
-    @Test
-    fun homeScreenCallToActionBottomSheetVariantConfiguredCorrectly() {
-        val variant = variants.firstOrNull { it.key == "mp" }
-        assertEqualsDouble(1.0, variant!!.weight)
-        assertTrue(variant.hasFeature(ShowHomeScreenCallToActionBottomSheet))
-        assertEquals(1, variant.features.size)
-    }
-
-    @Test
-    fun controlVariantConfiguredCorrectly() {
-        val variant = variants.firstOrNull { it.key == "mr" }
-        assertEqualsDouble(1.0, variant!!.weight)
-        assertEquals(0, variant.features.size)
-    }
 
     @Test
     fun serpVariantAConfiguredCorrectly() {

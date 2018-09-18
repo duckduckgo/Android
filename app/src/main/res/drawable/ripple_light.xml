@@ -16,12 +16,12 @@
   -->
 
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="@color/brownishGray" >
+    android:color="@color/brownishGray">
     <item
         android:id="@android:id/mask"
         android:gravity="center">
         <shape android:shape="rectangle">
-            <solid android:color="@color/white"/>
+            <solid android:color="@color/white" />
         </shape>
     </item>
 </ripple>

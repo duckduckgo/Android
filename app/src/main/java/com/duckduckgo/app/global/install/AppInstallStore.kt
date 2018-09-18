@@ -26,11 +26,7 @@ import javax.inject.Inject
 interface AppInstallStore {
     var installTimestamp: Long
 
-    fun hasInstallTimestampRecorded() : Boolean
-    fun recordUserDeclinedBannerToSetDefaultBrowser(timestamp: Long = System.currentTimeMillis())
-    fun recordUserDeclinedHomeScreenCallToActionToSetDefaultBrowser(timestamp: Long = System.currentTimeMillis())
-    fun hasUserDeclinedDefaultBrowserBannerPreviously(): Boolean
-    fun hasUserDeclinedDefaultBrowserHomeScreenCallToActionPreviously(): Boolean
+    fun hasInstallTimestampRecorded(): Boolean
 }
 
 class AppInstallSharedPreferences @Inject constructor(private val context: Context) : AppInstallStore {
@@ -40,35 +36,13 @@ class AppInstallSharedPreferences @Inject constructor(private val context: Conte
 
     override fun hasInstallTimestampRecorded(): Boolean = preferences.contains(KEY_TIMESTAMP_UTC)
 
-    override fun recordUserDeclinedBannerToSetDefaultBrowser(timestamp: Long) {
-        preferences.edit {
-            putLong(KEY_TIMESTAMP_USER_DECLINED_BANNER_DEFAULT_BROWSER, timestamp)
-        }
-    }
-
-    override fun recordUserDeclinedHomeScreenCallToActionToSetDefaultBrowser(timestamp: Long) {
-        preferences.edit {
-            putLong(KEY_TIMESTAMP_USER_DECLINED_CALL_TO_ACTION_DEFAULT_BROWSER, timestamp)
-        }
-    }
-
-    override fun hasUserDeclinedDefaultBrowserBannerPreviously(): Boolean {
-        return preferences.contains(KEY_TIMESTAMP_USER_DECLINED_BANNER_DEFAULT_BROWSER)
-    }
-
-    override fun hasUserDeclinedDefaultBrowserHomeScreenCallToActionPreviously(): Boolean {
-        return preferences.contains(KEY_TIMESTAMP_USER_DECLINED_CALL_TO_ACTION_DEFAULT_BROWSER)
-    }
-
     private val preferences: SharedPreferences
-            get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
-        companion object {
+    companion object {
 
-            @VisibleForTesting
-            const val FILENAME = "com.duckduckgo.app.install.settings"
-            const val KEY_TIMESTAMP_UTC = "INSTALL_TIMESTAMP_UTC"
-            const val KEY_TIMESTAMP_USER_DECLINED_BANNER_DEFAULT_BROWSER = "USER_DECLINED_DEFAULT_BROWSER_TIMESTAMP_UTC"
-            const val KEY_TIMESTAMP_USER_DECLINED_CALL_TO_ACTION_DEFAULT_BROWSER = "USER_DECLINED_DEFAULT_BROWSER_CALL_TO_ACTION_TIMESTAMP_UTC"
-        }
+        @VisibleForTesting
+        const val FILENAME = "com.duckduckgo.app.install.settings"
+        const val KEY_TIMESTAMP_UTC = "INSTALL_TIMESTAMP_UTC"
+    }
 }

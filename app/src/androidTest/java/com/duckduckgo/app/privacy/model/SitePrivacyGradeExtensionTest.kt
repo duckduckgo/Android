@@ -144,12 +144,13 @@ class SitePrivacyGradeExtensionTest {
     @Test
     fun whenPotentialScoreThenTrackerMetricsIgnored() {
         val site = site(
-                TrackerNetwork("", "", "", 5, true),
-                TermsOfService(classification = "D"),
-                NONE,
-                11,
-                true,
-                true)
+            TrackerNetwork("", "", "", 5, true),
+            TermsOfService(classification = "D"),
+            NONE,
+            11,
+            true,
+            true
+        )
         assertEquals(defaultScore + 6, site.score)
         assertEquals(defaultScore + 3, site.potentialScore)
     }
@@ -157,36 +158,40 @@ class SitePrivacyGradeExtensionTest {
     @Test
     fun whenAllTrackersBlockedThenImprovedScoreIsEqualToPotentialScore() {
         val site = site(
-                TrackerNetwork("", "", "", 5, true),
-                TermsOfService(classification = "D"),
-                NONE,
-                5,
-                true,
-                true,
-                allTrackerBlocked = true)
+            TrackerNetwork("", "", "", 5, true),
+            TermsOfService(classification = "D"),
+            NONE,
+            5,
+            true,
+            true,
+            allTrackerBlocked = true
+        )
         assertEquals(site.potentialScore, site.improvedScore)
     }
 
     @Test
     fun whenNotAllTrackersBlockedThenImprovedScoreIsEqualToScore() {
         val site = site(
-                TrackerNetwork("", "", "", 5, true),
-                TermsOfService(classification = "D"),
-                NONE,
-                5,
-                true,
-                true,
-                allTrackerBlocked = false)
+            TrackerNetwork("", "", "", 5, true),
+            TermsOfService(classification = "D"),
+            NONE,
+            5,
+            true,
+            true,
+            allTrackerBlocked = false
+        )
         assertEquals(site.score, site.improvedScore)
     }
 
-    private fun site(memberNetwork: TrackerNetwork? = null,
-                        terms: TermsOfService = TermsOfService(),
-                        https: HttpsStatus = SECURE,
-                        trackerCount: Int = 0,
-                        hasTrackerFromMajorNetwork: Boolean = false,
-                        hasObscureTracker: Boolean = false,
-                        allTrackerBlocked: Boolean = true): Site {
+    private fun site(
+        memberNetwork: TrackerNetwork? = null,
+        terms: TermsOfService = TermsOfService(),
+        https: HttpsStatus = SECURE,
+        trackerCount: Int = 0,
+        hasTrackerFromMajorNetwork: Boolean = false,
+        hasObscureTracker: Boolean = false,
+        allTrackerBlocked: Boolean = true
+    ): Site {
         val site: Site = mock()
         whenever(site.memberNetwork).thenReturn(memberNetwork)
         whenever(site.termsOfService).thenReturn(terms)

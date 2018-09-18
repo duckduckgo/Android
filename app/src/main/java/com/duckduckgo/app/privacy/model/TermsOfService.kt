@@ -16,11 +16,13 @@
 
 package com.duckduckgo.app.privacy.model
 
-data class TermsOfService(val name: String? = null,
-                          val score: Int = 0,
-                          val classification: String? = null,
-                          val goodPrivacyTerms: List<String> = ArrayList(),
-                          val badPrivacyTerms: List<String> = ArrayList()) {
+data class TermsOfService(
+    val name: String? = null,
+    val score: Int = 0,
+    val classification: String? = null,
+    val goodPrivacyTerms: List<String> = ArrayList(),
+    val badPrivacyTerms: List<String> = ArrayList()
+) {
 
     enum class Practices {
         POOR,

@@ -31,17 +31,18 @@ import javax.inject.Inject
 
 @AnyThread
 class FileDownloadNotificationManager @Inject constructor(
-        private val notificationManager: NotificationManager,
-        private val applicationContext: Context) {
+    private val notificationManager: NotificationManager,
+    private val applicationContext: Context
+) {
 
     fun showDownloadInProgressNotification() {
         applicationContext.runOnUiThread {
             applicationContext.longToast(getString(R.string.downloadInProgress))
 
             val notification = NotificationCompat.Builder(applicationContext, NotificationRegistrar.FILE_DOWNLOADING_CHANNEL_ID)
-                    .setContentTitle(applicationContext.getString(R.string.downloadInProgress))
-                    .setSmallIcon(R.drawable.ic_file_download_white_24dp)
-                    .build()
+                .setContentTitle(applicationContext.getString(R.string.downloadInProgress))
+                .setSmallIcon(R.drawable.ic_file_download_white_24dp)
+                .build()
 
             notificationManager.notify(NOTIFICATION_ID, notification)
         }
@@ -56,12 +57,12 @@ class FileDownloadNotificationManager @Inject constructor(
             i.setDataAndType(uri, mimeType)
 
             val notification = NotificationCompat.Builder(applicationContext, NotificationRegistrar.FILE_DOWNLOADED_CHANNEL_ID)
-                    .setContentTitle(filename)
-                    .setContentText(applicationContext.getString(R.string.downloadComplete))
-                    .setContentIntent(PendingIntent.getActivity(applicationContext, 0, i, PendingIntent.FLAG_UPDATE_CURRENT))
-                    .setAutoCancel(true)
-                    .setSmallIcon(R.drawable.ic_file_download_white_24dp)
-                    .build()
+                .setContentTitle(filename)
+                .setContentText(applicationContext.getString(R.string.downloadComplete))
+                .setContentIntent(PendingIntent.getActivity(applicationContext, 0, i, PendingIntent.FLAG_UPDATE_CURRENT))
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.ic_file_download_white_24dp)
+                .build()
 
             notificationManager.notify(NOTIFICATION_ID, notification)
         }
@@ -72,9 +73,9 @@ class FileDownloadNotificationManager @Inject constructor(
             applicationContext.longToast(getString(R.string.downloadFailed))
 
             val notification = NotificationCompat.Builder(applicationContext, NotificationRegistrar.FILE_DOWNLOADED_CHANNEL_ID)
-                    .setContentTitle(applicationContext.getString(R.string.downloadFailed))
-                    .setSmallIcon(R.drawable.ic_file_download_white_24dp)
-                    .build()
+                .setContentTitle(applicationContext.getString(R.string.downloadFailed))
+                .setSmallIcon(R.drawable.ic_file_download_white_24dp)
+                .build()
 
             notificationManager.notify(NOTIFICATION_ID, notification)
         }

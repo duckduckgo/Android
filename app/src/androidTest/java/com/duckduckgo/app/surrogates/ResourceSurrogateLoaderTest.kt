@@ -105,7 +105,7 @@ class ResourceSurrogateLoaderTest {
         assertEquals(6, surrogates.size)
     }
 
-    private fun initialiseFile(filename: String) : List<SurrogateResponse> {
+    private fun initialiseFile(filename: String): List<SurrogateResponse> {
         return testee.convertBytes(readFile(filename))
     }
 

@@ -75,8 +75,8 @@ class FileChooserIntentBuilder @Inject constructor() {
         val acceptedMimeTypes = mutableSetOf<String>()
 
         acceptTypes
-                .filter { it.isNotBlank() }
-                .forEach { acceptedMimeTypes.add(it.toLowerCase()) }
+            .filter { it.isNotBlank() }
+            .forEach { acceptedMimeTypes.add(it.toLowerCase()) }
 
         if (acceptedMimeTypes.isNotEmpty()) {
             Timber.d("Selectable file types limited to $acceptedMimeTypes")

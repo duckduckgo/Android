@@ -40,8 +40,6 @@ import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment.SaveBookmarkLi
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
-import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserNotification
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -59,9 +57,6 @@ import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.improvedGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToActionBottomSheet
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DefaultBrowserFeature.ShowHomeScreenCallToActionSimpleButton
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -82,12 +77,9 @@ class BrowserTabViewModel(
     private val bookmarksDao: BookmarksDao,
     private val autoCompleteApi: AutoCompleteApi,
     private val appSettingsPreferencesStore: SettingsDataStore,
-    private val defaultBrowserDetector: DefaultBrowserDetector,
-    private val defaultBrowserNotification: DefaultBrowserNotification,
     private val longPressHandler: LongPressHandler,
     private val webViewSessionStorage: WebViewSessionStorage,
     private val specialUrlDetector: SpecialUrlDetector,
-    private val variantManager: VariantManager,
     private val faviconDownloader: FaviconDownloader,
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, ViewModel() {
@@ -136,11 +128,6 @@ class BrowserTabViewModel(
         val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
     )
 
-    data class DefaultBrowserViewState(
-        val showDefaultBrowserBanner: Boolean = false,
-        val showHomeScreenCallToActionButton: Boolean = false
-    )
-
     sealed class Command {
         object LandingPage : Command()
         object Refresh : Command()
@@ -161,9 +148,7 @@ class BrowserTabViewModel(
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         class HandleExternalAppLink(val appLink: IntentType) : Command()
-        class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap?= null) : Command()
-        object InflateCallToActionBottomSheet : Command()
-        object InflateCallToActionSimpleButton : Command()
+        class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap? = null) : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -171,7 +156,6 @@ class BrowserTabViewModel(
     val globalLayoutState: MutableLiveData<GlobalLayoutViewState> = MutableLiveData()
     val loadingViewState: MutableLiveData<LoadingViewState> = MutableLiveData()
     val omnibarViewState: MutableLiveData<OmnibarViewState> = MutableLiveData()
-    val defaultBrowserViewState: MutableLiveData<DefaultBrowserViewState> = MutableLiveData()
     val findInPageViewState: MutableLiveData<FindInPageViewState> = MutableLiveData()
 
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
@@ -249,20 +233,6 @@ class BrowserTabViewModel(
 
     fun onViewVisible() {
         command.value = if (url.value == null) ShowKeyboard else Command.HideKeyboard
-
-        val showBanner = defaultBrowserNotification.shouldShowBannerNotification(currentBrowserViewState().browserShowing)
-        val showCallToAction = defaultBrowserNotification.shouldShowHomeScreenCallToActionNotification()
-
-        if (showCallToAction) {
-            val variant = variantManager.getVariant()
-            if (variant.hasFeature(ShowHomeScreenCallToActionBottomSheet)) {
-                command.value = InflateCallToActionBottomSheet
-            } else if (variant.hasFeature(ShowHomeScreenCallToActionSimpleButton)) {
-                command.value = InflateCallToActionSimpleButton
-            }
-        }
-
-        defaultBrowserViewState.value = DefaultBrowserViewState(showBanner, showCallToAction)
     }
 
     fun onUserSubmittedQuery(input: String) {
@@ -383,8 +353,6 @@ class BrowserTabViewModel(
         )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            val shouldShowBanner = defaultBrowserNotification.shouldShowBannerNotification(currentBrowserViewState.browserShowing)
-            defaultBrowserViewState.value = currentDefaultBrowserViewState().copy(showDefaultBrowserBanner = shouldShowBanner)
             statisticsUpdater.refreshRetentionAtb()
         }
 
@@ -436,7 +404,6 @@ class BrowserTabViewModel(
     private fun currentFindInPageViewState(): FindInPageViewState = findInPageViewState.value!!
     private fun currentOmnibarViewState(): OmnibarViewState = omnibarViewState.value!!
     private fun currentLoadingViewState(): LoadingViewState = loadingViewState.value!!
-    private fun currentDefaultBrowserViewState(): DefaultBrowserViewState = defaultBrowserViewState.value!!
 
     fun onOmnibarInputStateChanged(query: String, hasFocus: Boolean) {
 
@@ -547,9 +514,11 @@ class BrowserTabViewModel(
     fun onFindResultsReceived(activeMatchOrdinal: Int, numberOfMatches: Int) {
         val activeIndex = if (numberOfMatches == 0) 0 else activeMatchOrdinal + 1
         val currentViewState = currentFindInPageViewState()
-        findInPageViewState.value = currentViewState.copy(showNumberMatches = true,
-        activeMatchIndex = activeIndex,
-        numberMatches = numberOfMatches)
+        findInPageViewState.value = currentViewState.copy(
+            showNumberMatches = true,
+            activeMatchIndex = activeIndex,
+            numberMatches = numberOfMatches
+        )
     }
 
     fun onWebSessionRestored() {
@@ -582,7 +551,6 @@ class BrowserTabViewModel(
 
     private fun initializeViewStates() {
         globalLayoutState.value = GlobalLayoutViewState()
-        defaultBrowserViewState.value = DefaultBrowserViewState(showHomeScreenCallToActionButton = defaultBrowserNotification.shouldShowHomeScreenCallToActionNotification())
         browserViewState.value = BrowserViewState()
         loadingViewState.value = LoadingViewState()
         autoCompleteViewState.value = AutoCompleteViewState()
@@ -594,18 +562,6 @@ class BrowserTabViewModel(
         if (url != null) {
             command.value = ShareLink(url)
         }
-    }
-
-    fun userDeclinedBannerToSetAsDefaultBrowser() {
-        defaultBrowserDetector.userDeclinedBannerToSetAsDefaultBrowser()
-        val currentDefaultBrowserViewState = currentDefaultBrowserViewState()
-        defaultBrowserViewState.value = currentDefaultBrowserViewState.copy(showDefaultBrowserBanner = false)
-    }
-
-    fun userDeclinedHomeScreenCallToActionToSetAsDefaultBrowser() {
-        defaultBrowserDetector.userDeclinedHomeScreenCallToActionToSetAsDefaultBrowser()
-        val currentDefaultBrowserViewState = currentDefaultBrowserViewState()
-        defaultBrowserViewState.value = currentDefaultBrowserViewState.copy(showHomeScreenCallToActionButton = false)
     }
 
     fun saveWebViewState(webView: WebView?, tabId: String) {

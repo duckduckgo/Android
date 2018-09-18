@@ -31,6 +31,7 @@ import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.notification.NotificationRegistrar
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
+import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.migration.LegacyMigration
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -48,6 +49,7 @@ import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.doAsync
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.concurrent.thread
 
 open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasSupportFragmentInjector, Application(), LifecycleObserver {
 
@@ -87,6 +89,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     @Inject
     lateinit var appShortcutCreator: AppShortcutCreator
 
+    @Inject
+    lateinit var httpsUpgrader: HttpsUpgrader
+
     override fun onCreate() {
         super.onCreate()
 
@@ -110,6 +115,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
         migrateLegacyDb()
         notificationRegistrar.registerApp()
+
+        initializeHttpsUpgrader()
+
     }
 
     private fun recordInstallationTimestamp() {
@@ -162,6 +170,10 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     private fun initializeStatistics() {
         statisticsUpdater.initializeAtb()
+    }
+
+    private fun initializeHttpsUpgrader() {
+        thread { httpsUpgrader.reloadData() }
     }
 
     /**

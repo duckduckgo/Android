@@ -15,8 +15,8 @@
   -->
 
 <com.duckduckgo.app.browser.DuckDuckGoWebView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/browserWebView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -24,13 +24,13 @@
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:scrollbarSize="4dp"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:scrollbarStyle="outsideInset"
     android:scrollbarThumbHorizontal="@color/webViewScrollbarThumbColor"
     android:scrollbarThumbVertical="@color/webViewScrollbarThumbColor"
     android:scrollbarTrackHorizontal="@color/webViewScrollbarTrackColor"
     android:scrollbarTrackVertical="@color/webViewScrollbarTrackColor"
     android:visibility="gone"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:visibility="visible">
 
 </com.duckduckgo.app.browser.DuckDuckGoWebView>

@@ -18,10 +18,12 @@ package com.duckduckgo.app.privacy.api
 
 import com.squareup.moshi.Json
 
-data class TermsOfServiceJson(val score: Int,
-                              @field:Json(name = "class")
-                              val classification: Any,
-                              val match: Match) {
+data class TermsOfServiceJson(
+    val score: Int,
+    @field:Json(name = "class")
+    val classification: Any,
+    val match: Match
+) {
 
     data class Match(val good: List<String>, val bad: List<String>)
 }

@@ -25,17 +25,17 @@ import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 class ScorecardViewModel(private val settingsStore: PrivacySettingsStore) : ViewModel() {
 
     data class ViewState(
-            val domain: String,
-            val beforeGrade: PrivacyGrade,
-            val afterGrade: PrivacyGrade,
-            val httpsStatus: HttpsStatus,
-            val trackerCount: Int,
-            val majorNetworkCount: Int,
-            val allTrackersBlocked: Boolean,
-            val practices: TermsOfService.Practices,
-            val privacyOn: Boolean,
-            val showIsMemberOfMajorNetwork: Boolean,
-            val showEnhancedGrade: Boolean
+        val domain: String,
+        val beforeGrade: PrivacyGrade,
+        val afterGrade: PrivacyGrade,
+        val httpsStatus: HttpsStatus,
+        val trackerCount: Int,
+        val majorNetworkCount: Int,
+        val allTrackersBlocked: Boolean,
+        val practices: TermsOfService.Practices,
+        val privacyOn: Boolean,
+        val showIsMemberOfMajorNetwork: Boolean,
+        val showEnhancedGrade: Boolean
     )
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -56,32 +56,32 @@ class ScorecardViewModel(private val settingsStore: PrivacySettingsStore) : View
 
     private fun resetViewState() {
         viewState.value = ViewState(
-                domain = "",
-                beforeGrade = PrivacyGrade.UNKNOWN,
-                afterGrade = PrivacyGrade.UNKNOWN,
-                httpsStatus = HttpsStatus.SECURE,
-                trackerCount = 0,
-                majorNetworkCount = 0,
-                allTrackersBlocked = true,
-                practices = TermsOfService.Practices.UNKNOWN,
-                privacyOn = settingsStore.privacyOn,
-                showIsMemberOfMajorNetwork = false,
-                showEnhancedGrade = false
+            domain = "",
+            beforeGrade = PrivacyGrade.UNKNOWN,
+            afterGrade = PrivacyGrade.UNKNOWN,
+            httpsStatus = HttpsStatus.SECURE,
+            trackerCount = 0,
+            majorNetworkCount = 0,
+            allTrackersBlocked = true,
+            practices = TermsOfService.Practices.UNKNOWN,
+            privacyOn = settingsStore.privacyOn,
+            showIsMemberOfMajorNetwork = false,
+            showEnhancedGrade = false
         )
     }
 
     private fun updateSite(site: Site) {
         viewState.value = viewState.value?.copy(
-                domain = site.uri?.host ?: "",
-                beforeGrade = site.grade,
-                afterGrade = site.improvedGrade,
-                trackerCount = site.trackerCount,
-                majorNetworkCount = site.majorNetworkCount,
-                httpsStatus = site.https,
-                allTrackersBlocked = site.allTrackersBlocked,
-                practices = site.termsOfService.practices,
-                showIsMemberOfMajorNetwork = site.memberNetwork?.isMajor ?: false,
-                showEnhancedGrade = site.grade != site.improvedGrade
+            domain = site.uri?.host ?: "",
+            beforeGrade = site.grade,
+            afterGrade = site.improvedGrade,
+            trackerCount = site.trackerCount,
+            majorNetworkCount = site.majorNetworkCount,
+            httpsStatus = site.https,
+            allTrackersBlocked = site.allTrackersBlocked,
+            practices = site.termsOfService.practices,
+            showIsMemberOfMajorNetwork = site.memberNetwork?.isMajor ?: false,
+            showEnhancedGrade = site.grade != site.improvedGrade
         )
     }
 }

@@ -29,16 +29,16 @@ class StubJobSchedulerModule {
     @Singleton
     @Provides
     fun providesJobScheduler(): JobScheduler {
-        return object: JobScheduler() {
+        return object : JobScheduler() {
             override fun enqueue(job: JobInfo?, work: JobWorkItem?): Int = JobScheduler.RESULT_SUCCESS
 
-            override fun schedule(job: JobInfo?): Int  = JobScheduler.RESULT_SUCCESS
+            override fun schedule(job: JobInfo?): Int = JobScheduler.RESULT_SUCCESS
 
             override fun cancel(jobId: Int) {}
 
             override fun cancelAll() {}
 
-            override fun getAllPendingJobs(): MutableList<JobInfo>  = mutableListOf()
+            override fun getAllPendingJobs(): MutableList<JobInfo> = mutableListOf()
 
             override fun getPendingJob(jobId: Int): JobInfo? = null
 

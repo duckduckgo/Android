@@ -17,8 +17,8 @@
 package com.duckduckgo.app.browser.autoComplete
 
 import android.content.Context
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences
 import dagger.Module
 import dagger.Provides
 

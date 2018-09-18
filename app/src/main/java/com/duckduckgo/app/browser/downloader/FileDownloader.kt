@@ -23,8 +23,9 @@ import java.io.File
 import javax.inject.Inject
 
 class FileDownloader @Inject constructor(
-        private val dataUriDownloader: DataUriDownloader,
-        private val networkDownloader: NetworkFileDownloader) {
+    private val dataUriDownloader: DataUriDownloader,
+    private val networkDownloader: NetworkFileDownloader
+) {
 
     @WorkerThread
     fun download(pending: PendingFileDownload?, callback: FileDownloadListener?) {
@@ -41,11 +42,11 @@ class FileDownloader @Inject constructor(
     }
 
     data class PendingFileDownload(
-            val url: String,
-            val contentDisposition: String?  = null,
-            val mimeType: String? = null,
-            val subfolder: String,
-            val directory: File = Environment.getExternalStoragePublicDirectory(subfolder)
+        val url: String,
+        val contentDisposition: String? = null,
+        val mimeType: String? = null,
+        val subfolder: String,
+        val directory: File = Environment.getExternalStoragePublicDirectory(subfolder)
     )
 
     interface FileDownloadListener {

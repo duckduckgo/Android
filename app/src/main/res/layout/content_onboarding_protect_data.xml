@@ -20,9 +20,9 @@
     android:id="@+id/longDescriptionContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingStart="44dp"
     android:paddingEnd="44dp"
     android:tag="onboardingProtect"
-    android:paddingStart="44dp"
     tools:background="@color/lightOliveGreen"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 

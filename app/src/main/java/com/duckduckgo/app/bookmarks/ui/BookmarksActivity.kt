@@ -18,7 +18,6 @@ package com.duckduckgo.app.bookmarks.ui
 
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -35,7 +34,6 @@ import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
@@ -46,18 +44,13 @@ import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.view_bookmark_entry.view.*
 import org.jetbrains.anko.alert
 import timber.log.Timber
-import javax.inject.Inject
 
 class BookmarksActivity : DuckDuckGoActivity() {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
     lateinit var adapter: BookmarksAdapter
     private var deleteDialog: AlertDialog? = null
 
-    private val viewModel: BookmarksViewModel by lazy {
-        ViewModelProviders.of(this, viewModelFactory).get(BookmarksViewModel::class.java)
-    }
+    private val viewModel: BookmarksViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -148,8 +141,10 @@ class BookmarksActivity : DuckDuckGoActivity() {
         private const val EDIT_BOOKMARK_FRAGMENT_TAG = "EDIT_BOOKMARK"
     }
 
-    class BookmarksAdapter(private val context: Context,
-                           private val viewModel: BookmarksViewModel) : Adapter<BookmarksViewHolder>() {
+    class BookmarksAdapter(
+        private val context: Context,
+        private val viewModel: BookmarksViewModel
+    ) : Adapter<BookmarksViewHolder>() {
 
         var bookmarks: List<BookmarkEntity> = emptyList()
             set(value) {
@@ -202,10 +197,10 @@ class BookmarksActivity : DuckDuckGoActivity() {
             val faviconUrl = Uri.parse(url).faviconLocation()
 
             GlideApp.with(itemView)
-                    .load(faviconUrl)
-                    .placeholder(R.drawable.ic_globe_white_16dp)
-                    .error(R.drawable.ic_globe_white_16dp)
-                    .into(itemView.favicon)
+                .load(faviconUrl)
+                .placeholder(R.drawable.ic_globe_white_16dp)
+                .error(R.drawable.ic_globe_white_16dp)
+                .into(itemView.favicon)
         }
 
         private fun parseDisplayUrl(urlString: String): String {

@@ -56,10 +56,10 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
         holder.root.alpha = if (tab.tabId == selectedTab?.tabId) SELECTED_ALPHA else DEFAULT_ALPHA
 
         GlideApp.with(holder.root)
-                .load(tab.favicon())
-                .placeholder(R.drawable.ic_globe_gray_16dp)
-                .error(R.drawable.ic_globe_gray_16dp)
-                .into(holder.favicon)
+            .load(tab.favicon())
+            .placeholder(R.drawable.ic_globe_gray_16dp)
+            .error(R.drawable.ic_globe_gray_16dp)
+            .into(holder.favicon)
 
         attachClickListeners(holder, tab)
     }
@@ -89,12 +89,12 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
     }
 
     data class TabViewHolder(
-            val root: View,
-            val favicon: ImageView,
-            val title: TextView,
-            val url: TextView,
-            val close: ImageView,
-            val tabUnread: View
+        val root: View,
+        val favicon: ImageView,
+        val title: TextView,
+        val url: TextView,
+        val close: ImageView,
+        val tabUnread: View
     ) : RecyclerView.ViewHolder(root)
 
     companion object {

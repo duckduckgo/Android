@@ -45,8 +45,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/privacyGradeContentDescription"
-                    android:paddingBottom="12dp"
                     android:paddingTop="20dp"
+                    android:paddingBottom="12dp"
                     android:src="@drawable/practices_banner_neutral"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent" />
@@ -69,8 +69,8 @@
                     android:id="@+id/heading"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
                     android:layout_marginTop="5dp"
+                    android:layout_marginBottom="16dp"
                     android:fontFamily="sans-serif"
                     android:gravity="center_horizontal"
                     android:letterSpacing="0.14"
@@ -93,8 +93,8 @@
                 android:fontFamily="sans-serif"
                 android:gravity="center_horizontal"
                 android:lineSpacingExtra="6sp"
-                android:paddingEnd="20dp"
                 android:paddingStart="20dp"
+                android:paddingEnd="20dp"
                 android:text="@string/practicesOverview"
                 android:textColor="@color/almostBlackDark"
                 android:textSize="14sp"
@@ -105,9 +105,9 @@
                 android:id="@+id/topDivider"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginEnd="20dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="22dp"
+                android:layout_marginEnd="20dp"
                 android:background="@color/divider"
                 app:layout_constraintTop_toBottomOf="@id/practicesOverview" />
 
@@ -115,8 +115,8 @@
                 android:id="@+id/practicesList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="22dp"
                 android:layout_marginTop="22dp"
+                android:layout_marginBottom="22dp"
                 app:layout_constraintTop_toBottomOf="@id/topDivider" />
 
         </android.support.constraint.ConstraintLayout>
@@ -128,8 +128,8 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_above="@id/tosdrLink"
-        android:layout_marginEnd="20dp"
         android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         android:background="@color/divider" />
 
     <TextView
@@ -141,8 +141,8 @@
         android:gravity="center_horizontal"
         android:lineSpacingExtra="4sp"
         android:onClick="onTosdrLinkClicked"
-        android:paddingBottom="22dp"
         android:paddingTop="22dp"
+        android:paddingBottom="22dp"
         android:text="@string/practicesTosdrLink"
         android:textColor="@color/almostBlackDark"
         android:textIsSelectable="false"

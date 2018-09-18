@@ -24,13 +24,13 @@ class TrustedSites {
     companion object {
 
         private val trusted = listOf(
-                AppUrl.Url.HOST,
-                "duckduckgo.com",
-                "donttrack.us",
-                "spreadprivacy.com",
-                "duckduckhack.com",
-                "privatebrowsingmyths.com",
-                "duck.co"
+            AppUrl.Url.HOST,
+            "duckduckgo.com",
+            "donttrack.us",
+            "spreadprivacy.com",
+            "duckduckhack.com",
+            "privatebrowsingmyths.com",
+            "duck.co"
         )
 
         fun isTrusted(url: String): Boolean {

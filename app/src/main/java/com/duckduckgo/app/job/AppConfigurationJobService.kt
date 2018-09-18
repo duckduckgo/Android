@@ -40,7 +40,7 @@ class AppConfigurationJobService : JobService() {
     override fun onStartJob(params: JobParameters?): Boolean {
         Timber.i("onStartJob")
 
-        downloadTask= appConfigurationDownloader.downloadTask()
+        downloadTask = appConfigurationDownloader.downloadTask()
             .subscribeOn(Schedulers.io())
             .subscribe({
                 Timber.i("Successfully downloaded all data")

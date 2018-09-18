@@ -20,8 +20,8 @@
     android:id="@+id/longDescriptionContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingEnd="44dp"
     android:paddingStart="44dp"
+    android:paddingEnd="44dp"
     android:tag="onboardingDefaultBrowser"
     tools:background="@color/eastBay"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
@@ -33,20 +33,20 @@
         android:importantForAccessibility="no"
         android:paddingTop="20dp"
         android:src="@drawable/onboarding_image_default_browser"
+        app:layout_constraintBottom_toTopOf="@id/textContainer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/textContainer"
         app:layout_constraintVertical_bias="0.5" />
 
     <LinearLayout
         android:id="@+id/textContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
         android:gravity="center"
         android:orientation="vertical"
-        android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toTopOf="@+id/launchSettingsButton"
         app:layout_constraintTop_toBottomOf="@id/defaultBrowserImage">
 
@@ -65,10 +65,10 @@
     <Button
         android:id="@+id/launchSettingsButton"
         style="@style/OnboardingButtonDefaultBrowserLaunchSettings"
-        app:layout_constraintBottom_toTopOf="@+id/continueButton"
-        android:text="@string/onboardingDefaultBrowserGoToSettingsAction"
         android:onClick="onLaunchDefaultBrowserSettingsClicked"
-        android:theme="@style/OnboardingButtonDefaultBrowserLaunchSettings" />
+        android:text="@string/onboardingDefaultBrowserGoToSettingsAction"
+        android:theme="@style/OnboardingButtonDefaultBrowserLaunchSettings"
+        app:layout_constraintBottom_toTopOf="@+id/continueButton" />
 
     <Button
         android:id="@+id/continueButton"

@@ -26,7 +26,8 @@ import java.io.IOException
 import javax.inject.Inject
 
 class DataUriDownloader @Inject constructor(
-        private val dataUriParser: DataUriParser) {
+    private val dataUriParser: DataUriParser
+) {
 
     @WorkerThread
     fun download(pending: FileDownloader.PendingFileDownload, callback: FileDownloader.FileDownloadListener?) {

@@ -123,7 +123,7 @@ class TrackerDetectorTest {
     @Test
     fun whenTrackerIsPartOfNetworkThenEvaluateReturnsTrackingEventWithNetwork() {
         val networks = arrayListOf(
-                DisconnectTracker("thirdparty.com", "category", network, "http://network.com")
+            DisconnectTracker("thirdparty.com", "category", network, "http://network.com")
         )
         whenever(settingStore.privacyOn).thenReturn(true)
         networkTrackers.updateData(networks)
@@ -172,8 +172,8 @@ class TrackerDetectorTest {
     @Test
     fun whenUrlSharesSameNetworkNameAsDocumentThenEvaluateReturnsNull() {
         val networks = arrayListOf(
-                DisconnectTracker("thirdparty.com", "Social", network, "http://network.com"),
-                DisconnectTracker("example.com", "Advertising", network, "http://network.com")
+            DisconnectTracker("thirdparty.com", "Social", network, "http://network.com"),
+            DisconnectTracker("example.com", "Advertising", network, "http://network.com")
         )
         networkTrackers.updateData(networks)
         trackerDetector.addClient(alwaysMatchingClient(EASYLIST))

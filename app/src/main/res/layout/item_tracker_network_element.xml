@@ -19,10 +19,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="4dp"
-    android:paddingEnd="24dp"
     android:paddingStart="24dp"
     android:paddingTop="3dp"
+    android:paddingEnd="24dp"
+    android:paddingBottom="4dp"
     tools:background="@android:color/white">
 
     <TextView
@@ -51,9 +51,9 @@
         android:gravity="end"
         android:lineSpacingExtra="7sp"
         android:textColor="@color/warmerGray"
+        android:textIsSelectable="true"
         android:textSize="14sp"
         android:textStyle="normal"
-        android:textIsSelectable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

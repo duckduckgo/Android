@@ -146,13 +146,15 @@ class ScorecardViewModelTest {
         assertFalse(testee.viewState.value!!.showEnhancedGrade)
     }
 
-    private fun site(https: HttpsStatus = HttpsStatus.SECURE,
-                     trackerCount: Int = 0,
-                     majorNetworkCount: Int = 0,
-                     hasTrackerFromMajorNetwork: Boolean = false,
-                     allTrackersBlocked: Boolean = true,
-                     terms: TermsOfService = TermsOfService(),
-                     memberNetwork: TrackerNetwork? = null): Site {
+    private fun site(
+        https: HttpsStatus = HttpsStatus.SECURE,
+        trackerCount: Int = 0,
+        majorNetworkCount: Int = 0,
+        hasTrackerFromMajorNetwork: Boolean = false,
+        allTrackersBlocked: Boolean = true,
+        terms: TermsOfService = TermsOfService(),
+        memberNetwork: TrackerNetwork? = null
+    ): Site {
         val site: Site = mock()
         whenever(site.https).thenReturn(https)
         whenever(site.memberNetwork).thenReturn(memberNetwork)

@@ -39,8 +39,8 @@ class BookmarksDaoTest {
     @Before
     fun before() {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java)
-                .allowMainThreadQueries()
-                .build()
+            .allowMainThreadQueries()
+            .build()
         dao = db.bookmarksDao()
     }
 
