@@ -102,6 +102,16 @@ class StatisticsRequesterTest {
         verify(mockStatisticsStore).retentionAtb = NEW_ATB
     }
 
+    @Test
+    fun whenAlreadyInitializedWithLegacyAtbThenInitializationRemovesLegacyVariant() {
+        configureStoredStatistics()
+        whenever(mockStatisticsStore.atb).thenReturn(Atb("v123ma"))
+        testee.initializeAtb()
+        verify(mockStatisticsStore).atb = Atb("v123")
+        verify(mockStatisticsStore).variant = ""
+    }
+
+
     private fun configureNoStoredStatistics() {
         whenever(mockStatisticsStore.hasInstallationStatistics).thenReturn(false)
         whenever(mockStatisticsStore.atb).thenReturn(null)
