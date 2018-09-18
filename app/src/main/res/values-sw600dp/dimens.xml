@@ -32,7 +32,4 @@
     <dimen name="feedbackFormFieldsMargin">32dp</dimen>
     <dimen name="feedbackCardHorizontalMargin">48dp</dimen>
 
-    <dimen name="defaultBrowserHomeScreenCallToActionTextSize">20sp</dimen>
-    <dimen name="defaultBrowserHomeScreenCallToActionButtonWidthPercentage">0.5</dimen>
-
 </resources>

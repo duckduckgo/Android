@@ -25,7 +25,6 @@
     <color name="lightThemePrimaryDark">@color/whiteThree</color>
     <color name="lightThemePrimary">@color/whiteFive</color>
     <color name="lightThemeAccent">@color/orange</color>
-    <color name="lightThemeLegacyStausBar">@color/almostBlackDark</color>
 
     <!-- Widget colors -->
     <color name="divider">@color/subtleGrayTwo</color>
@@ -55,7 +54,6 @@
     <color name="subtleGray">#f0f0f0</color>
     <color name="subtleGrayTwo">#d8d8d8</color>
 
-    <color name="pinkishGrey">#cccccc</color>
     <color name="orange">#de5833</color>
     <color name="brickOrange">#d03a10</color>
 
@@ -68,7 +66,6 @@
     <color name="lightOliveGreen">#93c04d</color>
     <color name="muddyGreen">#58732e</color>
     <color name="midGreen">#3fa140</color>
-    <color name="mediumGreen">#3b9c37</color>
 
     <color name="eastBay">#4f3c76</color>
     <color name="eastSide">#9680C5</color>
