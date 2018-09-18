@@ -25,8 +25,8 @@
         android:layout_width="28dp"
         android:layout_height="28dp"
         android:layout_centerInParent="true"
-        app:lottie_colorFilter="?attr/toolbarIconColor"
         android:clickable="false"
+        app:lottie_colorFilter="?attr/toolbarIconColor"
         app:lottie_rawRes="@raw/new_tab" />
 
     <TextView
