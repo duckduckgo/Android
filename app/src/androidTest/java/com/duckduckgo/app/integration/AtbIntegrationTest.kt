@@ -35,10 +35,10 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * These tests communicate with the server and can therefore take a while to complete.
+ * These tests communicate with the server and therefore will be slowed down if there is slow internet access.
  * Additionally, this makes them susceptible to failing if the device running tests has no internet access.
  *
- * Would normally have separate tests for each assertion, but these tests are expensive to run.
+ * Would normally have separate tests for each assertion, but these tests are relatively expensive to run.
  */
 @LargeTest
 class AtbIntegrationTest {
@@ -63,7 +63,7 @@ class AtbIntegrationTest {
     }
 
     @Test
-    fun whenNoStatisticsStoreThenAtbInitializationSuccessfullyStoresAtbAndRetentionAtb() {
+    fun whenNoStatisticsStoredThenAtbInitializationSuccessfullyStoresAtbAndRetentionAtb() {
         testee.initializeAtb()
         assertTrue(statisticsStore.hasInstallationStatistics)
         val atb = statisticsStore.atb
@@ -75,7 +75,7 @@ class AtbIntegrationTest {
     }
 
     @Test
-    fun whenStatisticsStoredThenRefreshSuccessfullyUpdatesRetentionAtbOnly() {
+    fun whenStatisticsAlreadyStoredThenRefreshSuccessfullyUpdatesRetentionAtbOnly() {
         statisticsStore.saveAtb(Atb("v100-1"))
         testee.refreshRetentionAtb()
         assertTrue(statisticsStore.hasInstallationStatistics)
