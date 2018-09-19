@@ -201,6 +201,27 @@ class StatisticsRequesterJsonTest {
         assertTestParameterSent(testParam)
     }
 
+    @Test
+    fun whenAlreadyInitializedRefreshCallSendsCorrectAtb() {
+        statisticsStore.saveAtb(Atb("100-1"))
+        queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
+        testee.refreshRetentionAtb()
+        val refreshRequest = server.takeRequest()
+        val atbParam = refreshRequest.requestUrl.queryParameter(ParamKey.ATB)
+        assertEquals("100-1ma", atbParam)
+    }
+
+    @Test
+    fun whenAlreadyInitializedRefreshCallSendsCorrectRetentionAtb() {
+        statisticsStore.saveAtb(Atb("100-1"))
+        statisticsStore.retentionAtb = "101-3"
+        queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
+        testee.refreshRetentionAtb()
+        val refreshRequest = server.takeRequest()
+        val atbParam = refreshRequest.requestUrl.queryParameter(ParamKey.RETENTION_ATB)
+        assertEquals("101-3", atbParam)
+    }
+
     private fun assertTestParameterSent(testParam: String?) {
         assertNotNull(testParam)
         assertEquals("1", testParam)
