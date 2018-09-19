@@ -28,48 +28,48 @@
         android:orientation="vertical">
 
         <TextView
-            style="@style/SettingsContentTitle"
+            style="@style/SettingsSectionTitle"
             android:text="@string/settingsHeadingGeneral" />
 
         <android.support.v7.widget.SwitchCompat
             android:id="@+id/autocompleteEnabledSetting"
-            style="@style/SettingsContentLabel"
+            style="@style/SettingsItem"
             android:text="@string/settingsAutocompleteEnabled"
-            app:theme="@style/SettingsContentLabel.SettingsSwitch"
+            app:theme="@style/SettingsItem.SettingsSwitch"
             tools:checked="true" />
 
         <android.support.v7.widget.SwitchCompat
             android:id="@+id/setAsDefaultBrowserSetting"
-            style="@style/SettingsContentLabel"
+            style="@style/SettingsItem"
             android:text="@string/settingsDefaultBrowserEnabled"
-            app:theme="@style/SettingsContentLabel.SettingsSwitch" />
+            app:theme="@style/SettingsItem.SettingsSwitch" />
 
         <TextView
             android:id="@+id/onboarding"
-            style="@style/SettingsContentLabelClickable"
+            style="@style/SettingsItemClickable"
             android:text="@string/settingsOnboarding" />
 
         <TextView
-            style="@style/SettingsContentTitle"
+            style="@style/SettingsSectionTitle"
             android:text="@string/settingsHeadingOther" />
 
         <TextView
             android:id="@+id/about"
-            style="@style/SettingsContentLabelClickable"
+            style="@style/SettingsItemClickable"
             android:text="@string/settingsAboutDuckduckgo" />
 
         <TextView
             android:id="@+id/provideFeedback"
-            style="@style/SettingsContentLabelClickable"
+            style="@style/SettingsItemClickable"
             android:text="@string/leaveFeedback" />
 
         <TextView
-            style="@style/SettingsContentLabel"
+            style="@style/SettingsItem"
             android:text="@string/settingsVersion" />
 
         <TextView
             android:id="@+id/version"
-            style="@style/SettingsContentValue"
+            style="@style/SettingsMinorText"
             tools:text="DuckDuckGo 123.43.5456" />
 
     </LinearLayout>

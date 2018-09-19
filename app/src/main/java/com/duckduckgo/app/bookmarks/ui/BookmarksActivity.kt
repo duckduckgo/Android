@@ -153,7 +153,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
             }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookmarksViewHolder {
-            val inflater = LayoutInflater.from(context)
+            val inflater = LayoutInflater.from(parent.context)
             val view = inflater.inflate(R.layout.view_bookmark_entry, parent, false)
             return BookmarksViewHolder(view, viewModel)
         }

@@ -43,7 +43,7 @@
         android:layout_marginStart="22dp"
         android:fontFamily="sans-serif"
         android:paddingTop="4dp"
-        android:textColor="@color/white"
+        android:textColor="?attr/bookmarkTitleTextColor"
         android:textSize="16sp"
         android:textStyle="normal"
         app:layout_constraintBottom_toTopOf="@+id/url"
@@ -61,7 +61,7 @@
         android:fontFamily="sans-serif"
         android:paddingTop="2dp"
         android:paddingBottom="4dp"
-        android:textColor="@color/grayishTwo"
+        android:textColor="?attr/bookmarkSubtitleTextColor"
         android:textSize="12sp"
         android:textStyle="normal"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -78,12 +78,11 @@
         android:paddingStart="14dp"
         android:paddingEnd="14dp"
         android:scaleType="center"
-        android:src="@drawable/ic_overflow_white_24dp"
+        android:src="@drawable/ic_overflow_bookmarks_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5"
         tools:ignore="ContentDescription" />
-
 
 </android.support.constraint.ConstraintLayout>

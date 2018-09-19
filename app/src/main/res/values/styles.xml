@@ -17,7 +17,7 @@
 <resources>
 
     <!-- Activity Themes -->
-    <style name="AppTheme" parent="Theme.AppCompat">
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
         <item name="android:windowBackground">?attr/colorPrimaryDark</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -30,38 +30,58 @@
         <item name="colorPrimaryDark">@color/darkPrimaryDark</item>
         <item name="colorAccent">@color/darkAccent</item>
         <item name="daxLogoTextColor">@color/white</item>
+        <item name="normalTextColor">@color/white</item>
         <item name="toolbarIconColor">@color/grayish</item>
         <item name="toolbarTextColor">@color/grayish</item>
         <item name="omnibarEditingBackgroundColor">@color/midGray</item>
         <item name="omnibarTextColor">@color/white</item>
         <item name="omnibarHintColor">@color/grayishTwo</item>
-
         <item name="autoCompleteTextColor">@color/white</item>
-
-    </style>
-
-    <style name="AppTheme.BaseLight">
-        <item name="colorPrimary">@color/lightThemePrimary</item>
-        <item name="colorPrimaryDark">@color/lightThemePrimaryDark</item>
-        <item name="colorAccent">@color/lightThemeAccent</item>
-
-        <item name="daxLogoTextColor">@color/greyishBrownTwo</item>
-        <item name="toolbarIconColor">@color/grayishBrown</item>
-        <item name="toolbarTextColor">@color/grayishBrown</item>
-
-        <item name="omnibarEditingBackgroundColor">@color/whiteFour</item>
-        <item name="omnibarTextColor">@color/grayishBrown</item>
-        <item name="omnibarHintColor">@color/warmGray</item>
-
-        <item name="autoCompleteTextColor">@color/grayishBrown</item>
-
+        <item name="tabsBackgroundColor">?attr/colorPrimary</item>
+        <item name="tabTitleTextColor">@color/midnight</item>
+        <item name="tabSubtitleTextColor">@color/coolGray</item>
+        <item name="bookmarkIconColor">@color/white</item>
+        <item name="bookmarkTitleTextColor">@color/white</item>
+        <item name="bookmarkSubtitleTextColor">@color/grayishTwo</item>
+        <item name="settingsSectionTextColor">@color/grayishTwo</item>
+        <item name="settingsItemTextColor">@color/white</item>
+        <item name="settingsMinorTextColor">@color/grayishTwo</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
 
+
+    <!-- To create a new color theme copy the following:
+         * AppTheme.BaseLight
+         * AppTheme.Light
+         * AppTheme.Light in values-v23/styles.xml
+    -->
+    <style name="AppTheme.BaseLight">
+        <item name="colorPrimary">@color/lightThemePrimary</item>
+        <item name="colorPrimaryDark">@color/lightThemePrimaryDark</item>
+        <item name="colorAccent">@color/lightThemeAccent</item>
+        <item name="daxLogoTextColor">@color/greyishBrownTwo</item>
+        <item name="normalTextColor">@color/grayishBrown</item>
+        <item name="toolbarIconColor">@color/grayishBrown</item>
+        <item name="toolbarTextColor">@color/grayishBrown</item>
+        <item name="omnibarEditingBackgroundColor">@color/whiteFour</item>
+        <item name="omnibarTextColor">@color/brownishGrayTwo</item>
+        <item name="omnibarHintColor">@color/warmGray</item>
+        <item name="autoCompleteTextColor">@color/grayishBrown</item>
+        <item name="tabsBackgroundColor">@color/greyishBrownTwo</item>
+        <item name="tabTitleTextColor">@color/almostBlack</item>
+        <item name="tabSubtitleTextColor">@color/warmerGray</item>
+        <item name="bookmarkIconColor">@color/grayishBrown</item>
+        <item name="bookmarkTitleTextColor">@color/almostBlack</item>
+        <item name="bookmarkSubtitleTextColor">@color/warmerGray</item>
+        <item name="settingsSectionTextColor">@color/warmerGray</item>
+        <item name="settingsItemTextColor">@color/grayishBrown</item>
+        <item name="settingsMinorTextColor">@color/warmerGray</item>
+    </style>
+
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
-        <!-- The status bar must always be dark pre API 23 as the text
-             is light and cannot be changed
+        <!-- The status bar must always be dark prior to API 23 as the text
+             is light and cannot be changed.
         -->
         <item name="android:statusBarColor">@color/almostBlack</item>
     </style>
@@ -160,7 +180,7 @@
         <item name="android:paddingStart">20dp</item>
     </style>
 
-    <style name="SettingsContentTitle">
+    <style name="SettingsSectionTitle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingTop">32dp</item>
@@ -168,14 +188,14 @@
         <item name="android:layout_marginEnd">20dp</item>
         <item name="android:layout_marginStart">20dp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/grayishTwo</item>
+        <item name="android:textColor">?attr/settingsSectionTextColor</item>
         <item name="android:textSize">12sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:selectable">false</item>
     </style>
 
-    <style name="SettingsContentLabel">
+    <style name="SettingsItem">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingTop">10dp</item>
@@ -183,19 +203,19 @@
         <item name="android:layout_marginEnd">20dp</item>
         <item name="android:layout_marginStart">20dp</item>
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">?attr/settingsItemTextColor</item>
         <item name="android:textSize">17sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:selectable">false</item>
     </style>
 
-    <style name="SettingsContentLabelClickable" parent="SettingsContentLabel">
+    <style name="SettingsItemClickable" parent="SettingsItem">
         <item name="android:paddingTop">10dp</item>
         <item name="android:paddingBottom">10dp</item>
         <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
-    <style name="SettingsContentValue">
+    <style name="SettingsMinorText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginEnd">20dp</item>
@@ -203,13 +223,12 @@
         <item name="android:paddingTop">-4dp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:lineSpacingExtra">4sp</item>
-        <item name="android:textColor">@color/grayishTwo</item>
+        <item name="android:textColor">?attr/settingsMinorTextColor</item>
         <item name="android:textSize">12sp</item>
         <item name="android:textStyle">normal</item>
     </style>
 
-    <style name="SettingsContentLabel.SettingsSwitch">
-        <item name="colorControlActivated">@color/midGreen</item>
+    <style name="SettingsItem.SettingsSwitch">
         <item name="colorSwitchThumbNormal">@color/white</item>
         <item name="android:colorForeground">@color/subtleGrayTwo</item>
         <item name="android:layout_marginEnd">0dp</item>
