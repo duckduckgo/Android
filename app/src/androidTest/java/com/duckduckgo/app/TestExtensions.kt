@@ -18,6 +18,8 @@ package com.duckduckgo.app
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Observer
+import android.support.test.InstrumentationRegistry
+import com.duckduckgo.app.di.TestAppComponent
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -32,4 +34,12 @@ fun <T> LiveData<T>.blockingObserve(): T? {
     observeForever(innerObserver)
     latch.await(2, TimeUnit.SECONDS)
     return value
+}
+
+fun getApp() : TestApplication {
+    return InstrumentationRegistry.getTargetContext().applicationContext as TestApplication
+}
+
+fun getDaggerComponent() : TestAppComponent {
+    return getApp().daggerAppComponent as TestAppComponent
 }

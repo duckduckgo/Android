@@ -93,7 +93,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     @Inject
     lateinit var httpsUpgrader: HttpsUpgrader
 
-    lateinit var daggerAppComponent: AppComponent
+    open lateinit var daggerAppComponent: AppComponent
 
     override fun onCreate() {
         super.onCreate()

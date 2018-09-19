@@ -27,6 +27,8 @@ import com.duckduckgo.app.trackerdetection.di.TrackerDetectionModule
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.support.AndroidSupportInjectionModule
+import retrofit2.Retrofit
+import javax.inject.Named
 import javax.inject.Singleton
 
 
@@ -68,4 +70,7 @@ interface TestAppComponent : AppComponent {
 
         fun build(): TestAppComponent
     }
+
+    @Named("api")
+    fun retrofit(): Retrofit
 }
