@@ -34,6 +34,7 @@ class SettingsViewModel @Inject constructor(
     data class ViewState(
         val loading: Boolean = true,
         val version: String = "",
+        val lightThemeEnabled: Boolean = false,
         val autoCompleteSuggestionsEnabled: Boolean = true,
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false
@@ -43,6 +44,7 @@ class SettingsViewModel @Inject constructor(
 
     sealed class Command {
         object LaunchFeedback : Command()
+        object ThemeChangedBroadcast : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().apply {
@@ -53,8 +55,6 @@ class SettingsViewModel @Inject constructor(
     val command: MutableLiveData<Command> = MutableLiveData()
 
     fun start() {
-        val autoCompleteEnabled = settingsDataStore.autoCompleteSuggestionsEnabled
-        Timber.i("Is auto complete enabled? $autoCompleteEnabled")
 
         val defaultBrowserAlready = defaultWebBrowserCapability.isCurrentlyConfiguredAsDefaultBrowser()
         Timber.i("Is already default browser? $defaultBrowserAlready")
@@ -63,7 +63,8 @@ class SettingsViewModel @Inject constructor(
 
         viewState.value = currentViewState.copy(
             loading = false,
-            autoCompleteSuggestionsEnabled = autoCompleteEnabled,
+            lightThemeEnabled = settingsDataStore.lightThemeEnabled,
+            autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
             isAppDefaultBrowser = defaultBrowserAlready,
             showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
             version = obtainVersion(variantKey)
@@ -74,9 +75,16 @@ class SettingsViewModel @Inject constructor(
         command.value = Command.LaunchFeedback
     }
 
-    fun userRequestedToChangeAutocompleteSetting(checked: Boolean) {
-        Timber.i("User changed autocomplete setting, is now enabled: $checked")
-        settingsDataStore.autoCompleteSuggestionsEnabled = checked
+    fun onLightThemeToggled(enabled: Boolean) {
+        Timber.i("User toggled light theme, is now enabled: $enabled")
+        settingsDataStore.lightThemeEnabled = enabled
+        command.value = Command.ThemeChangedBroadcast
+        command.value = null
+    }
+
+    fun onAutocompleteSettingChanged(enabled: Boolean) {
+        Timber.i("User changed autocomplete setting, is now enabled: $enabled")
+        settingsDataStore.autoCompleteSuggestionsEnabled = enabled
     }
 
     private fun obtainVersion(variantKey: String): String {

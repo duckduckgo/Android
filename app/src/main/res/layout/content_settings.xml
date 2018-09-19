@@ -32,7 +32,14 @@
             android:text="@string/settingsHeadingGeneral" />
 
         <android.support.v7.widget.SwitchCompat
-            android:id="@+id/autocompleteEnabledSetting"
+            android:id="@+id/lightThemeToggle"
+            style="@style/SettingsItem"
+            android:text="Light Theme"
+            app:theme="@style/SettingsItem.SettingsSwitch"
+            tools:checked="true" />
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/autocompleteToggle"
             style="@style/SettingsItem"
             android:text="@string/settingsAutocompleteEnabled"
             app:theme="@style/SettingsItem.SettingsSwitch"

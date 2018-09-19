@@ -14,28 +14,57 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.them
+package com.duckduckgo.app.global
 
 import android.app.Activity
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.support.v4.content.LocalBroadcastManager
+import com.duckduckgo.app.global.ThemingConstants.BROADCAST_THEME_CHANGED
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.settings.db.SettingsDataStore
 
-
-fun Activity.applyTheme() {
-    val theme = themeId
-    setTheme(theme)
+fun Activity.applyTheme(settingsDataStore: SettingsDataStore): BroadcastReceiver? {
+    if (!isThemeConfigurable()) {
+        return null
+    }
+    setTheme(themeId(settingsDataStore))
+    return registerForThemeChangedBroadcast()
 }
 
-private val Activity.manifestThemeId: Int
-    get() {
-        return packageManager.getActivityInfo(componentName, 0).themeResource
-    }
-
-private val Activity.themeId: Int
-    get() {
-        val defaultTheme = manifestThemeId
-        if (defaultTheme == R.style.AppTheme) {
-            return R.style.AppTheme_Light
+private fun Activity.registerForThemeChangedBroadcast(): BroadcastReceiver {
+    val manager = LocalBroadcastManager.getInstance(applicationContext)
+    val receiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            recreate()
         }
-        return defaultTheme
     }
+    manager.registerReceiver(receiver, IntentFilter(BROADCAST_THEME_CHANGED))
+    return receiver
+}
 
+fun Activity.sendThemeChangedBroadcast() {
+    val manager = LocalBroadcastManager.getInstance(applicationContext)
+    manager.sendBroadcast(Intent(BROADCAST_THEME_CHANGED))
+}
+
+private fun themeId(settingsDataStore: SettingsDataStore): Int {
+    return when (settingsDataStore.lightThemeEnabled) {
+        true -> R.style.AppTheme_Light
+        false -> R.style.AppTheme_Dark
+    }
+}
+
+private fun Activity.isThemeConfigurable(): Boolean {
+    return manifestThemeId() == R.style.AppTheme_Dark || manifestThemeId() == R.style.AppTheme_Light
+}
+
+private fun Activity.manifestThemeId(): Int {
+    return packageManager.getActivityInfo(componentName, 0).themeResource
+}
+
+object ThemingConstants {
+    const val BROADCAST_THEME_CHANGED = "BROADCAST_THEME_CHANGED"
+}

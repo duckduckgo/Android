@@ -22,24 +22,26 @@ import javax.inject.Inject
 
 
 interface SettingsDataStore {
+    var lightThemeEnabled: Boolean
     var autoCompleteSuggestionsEnabled: Boolean
 }
 
 class SettingsSharedPreferences @Inject constructor(private val context: Context) : SettingsDataStore {
 
+    override var lightThemeEnabled: Boolean
+        get() = preferences.getBoolean(KEY_LIGHT_THEME_ENABLED, true)
+        set(enabled) = preferences.edit().putBoolean(KEY_LIGHT_THEME_ENABLED, enabled).apply()
+
     override var autoCompleteSuggestionsEnabled: Boolean
         get() = preferences.getBoolean(KEY_AUTOCOMPLETE_ENABLED, true)
-        set(enabled) {
-            preferences.edit()
-                .putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled)
-                .apply()
-        }
+        set(enabled) = preferences.edit().putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled).apply()
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.settings_activity.settings"
+        const val KEY_LIGHT_THEME_ENABLED = "LIGHT_THEME_ENABLED"
         const val KEY_AUTOCOMPLETE_ENABLED = "AUTOCOMPLETE_ENABLED"
     }
 }

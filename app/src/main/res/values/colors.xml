@@ -17,9 +17,9 @@
 <resources>
 
     <!-- Dark theme primary colors -->
-    <color name="darkPrimaryDark">@color/almostBlackDark</color>
-    <color name="darkPrimary">@color/almostBlack</color>
-    <color name="darkAccent">@color/orange</color>
+    <color name="darkThemePrimaryDark">@color/almostBlackDark</color>
+    <color name="darkThemePrimary">@color/almostBlack</color>
+    <color name="darkThemeAccent">@color/orange</color>
 
     <!-- Light theme primary colors -->
     <color name="lightThemePrimaryDark">@color/whiteThree</color>

@@ -15,9 +15,9 @@
   -->
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="?attr/colorPrimaryDark" />
+    <solid android:color="@color/darkThemePrimaryDark" />
     <stroke
         android:width="1dp"
-        android:color="?attr/colorPrimaryDark" />
+        android:color="@color/darkThemePrimaryDark" />
     <corners android:radius="40dp" />
 </shape>

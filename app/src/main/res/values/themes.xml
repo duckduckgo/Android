@@ -1,0 +1,120 @@
+<!--
+  ~ Copyright (c) 2018 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
+        <item name="android:windowBackground">?attr/colorPrimaryDark</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
+        <item name="android:windowActivityTransitions">true</item>
+    </style>
+
+    <style name="AppTheme.BaseDark">
+        <item name="colorPrimary">@color/darkThemePrimary</item>
+        <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
+        <item name="colorAccent">@color/darkThemeAccent</item>
+        <item name="daxLogoTextColor">@color/white</item>
+        <item name="normalTextColor">@color/white</item>
+        <item name="toolbarIconColor">@color/grayish</item>
+        <item name="toolbarTextColor">@color/grayish</item>
+        <item name="omnibarEditingBackgroundColor">@color/midGray</item>
+        <item name="omnibarTextColor">@color/white</item>
+        <item name="omnibarHintColor">@color/grayishTwo</item>
+        <item name="autoCompleteTextColor">@color/white</item>
+        <item name="tabsBackgroundColor">?attr/colorPrimary</item>
+        <item name="tabTitleTextColor">@color/midnight</item>
+        <item name="tabSubtitleTextColor">@color/coolGray</item>
+        <item name="bookmarkIconColor">@color/white</item>
+        <item name="bookmarkTitleTextColor">@color/white</item>
+        <item name="bookmarkSubtitleTextColor">@color/grayishTwo</item>
+        <item name="settingsSectionTextColor">@color/grayishTwo</item>
+        <item name="settingsItemTextColor">@color/white</item>
+        <item name="settingsMinorTextColor">@color/grayishTwo</item>
+    </style>
+
+    <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
+
+    <style name="AppTheme.Dark.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.Dark.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="AppTheme.Dark.Transparent">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+
+    <!-- To create a new color theme, copy this light one and update the suffix as appropriate.
+         Include:
+          * AppTheme.BaseLight
+          * AppTheme.Light
+          * AppTheme.Light in values-v23/themes.xml
+          * SplashTheme.Light
+    -->
+    <style name="AppTheme.BaseLight">
+        <item name="colorPrimary">@color/lightThemePrimary</item>
+        <item name="colorPrimaryDark">@color/lightThemePrimaryDark</item>
+        <item name="colorAccent">@color/lightThemeAccent</item>
+        <item name="daxLogoTextColor">@color/greyishBrownTwo</item>
+        <item name="normalTextColor">@color/grayishBrown</item>
+        <item name="toolbarIconColor">@color/grayishBrown</item>
+        <item name="toolbarTextColor">@color/grayishBrown</item>
+        <item name="omnibarEditingBackgroundColor">@color/whiteFour</item>
+        <item name="omnibarTextColor">@color/brownishGrayTwo</item>
+        <item name="omnibarHintColor">@color/warmGray</item>
+        <item name="autoCompleteTextColor">@color/grayishBrown</item>
+        <item name="tabsBackgroundColor">@color/greyishBrownTwo</item>
+        <item name="tabTitleTextColor">@color/almostBlack</item>
+        <item name="tabSubtitleTextColor">@color/warmerGray</item>
+        <item name="bookmarkIconColor">@color/grayishBrown</item>
+        <item name="bookmarkTitleTextColor">@color/almostBlack</item>
+        <item name="bookmarkSubtitleTextColor">@color/warmerGray</item>
+        <item name="settingsSectionTextColor">@color/warmerGray</item>
+        <item name="settingsItemTextColor">@color/grayishBrown</item>
+        <item name="settingsMinorTextColor">@color/warmerGray</item>
+    </style>
+
+    <style name="AppTheme.Light" parent="AppTheme.BaseLight">
+        <!-- The status bar must always be dark prior to API 23 as the light text cannot be changed -->
+        <item name="android:statusBarColor">@color/almostBlack</item>
+    </style>
+
+    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">?attr/colorPrimaryDark</item>
+    </style>
+
+    <style name="ModalCardTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/darkThemePrimary</item>
+        <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
+        <item name="colorAccent">@color/midGreen</item>
+        <item name="android:windowBackground">@color/translucentDark</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+    </style>
+
+    <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="colorControlNormal">?attr/toolbarIconColor</item>
+        <item name="android:textColorPrimary">?attr/toolbarTextColor</item>
+    </style>
+
+    <style name="SwitchTheme" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="colorControlActivated">@android:color/white</item>
+    </style>
+
+</resources>
