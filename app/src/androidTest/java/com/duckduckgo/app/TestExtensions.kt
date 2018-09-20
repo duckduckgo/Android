@@ -36,10 +36,10 @@ fun <T> LiveData<T>.blockingObserve(): T? {
     return value
 }
 
-fun getApp() : TestApplication {
+fun getApp(): TestApplication {
     return InstrumentationRegistry.getTargetContext().applicationContext as TestApplication
 }
 
-fun getDaggerComponent() : TestAppComponent {
+fun getDaggerComponent(): TestAppComponent {
     return getApp().daggerAppComponent as TestAppComponent
 }

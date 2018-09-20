@@ -64,6 +64,7 @@ interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 
         @BindsInstance
         fun application(application: Application): AppComponent.Builder
+
         fun build(): AppComponent
     }
 }
