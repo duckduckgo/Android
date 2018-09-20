@@ -23,7 +23,7 @@ platform :android do
     props = property_file_read(file: "app/version/version.properties")
     version = props["VERSION"]
     releaseNotes = File.read("../app/version/release-notes")
-    apkPath = ENV["APK_PATH"]
+    apkPath = "app/build/outputs/apk/release/duckduckgo-#{version}-release.apk"
     token = ENV["GITHUB_UPLOAD_TOKEN"]
 
     UI.message ("Releasing new app version\nVersion: #{version}\nRelease Notes:\n=====\n#{releaseNotes}\n=====\n")
