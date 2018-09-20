@@ -16,23 +16,20 @@
 default_platform(:android)
 
 platform :android do
-  desc "Runs all the tests"
-  lane :test do
-    gradle(task: "test")
-  end
 
-  desc "Submit a new Beta Build to Crashlytics Beta"
-  lane :beta do
-    gradle(task: "clean assembleRelease")
-    crashlytics
-  
-    # sh "your_script.sh"
-    # You can also use other beta testing services here
-  end
+  desc "Release"
+  lane :deploy_github do
 
-  desc "Deploy a new version to the Google Play"
-  lane :deploy do
-    gradle(task: "clean assembleRelease")
-    upload_to_play_store
-  end
+    props = property_file_read(file: "app/version/version.properties")
+    version = props["VERSION"]
+    releaseNotes = File.read("../app/version/release-notes")
+    apkPath = ENV["APK_PATH"]
+    token = ENV["GITHUB_UPLOAD_TOKEN"]
+
+    UI.message ("Releasing new app version\nVersion: #{version}\nRelease Notes:\n=====\n#{releaseNotes}\n=====\n")
+    UI.message ("APK Path: #{apkPath}")
+
+    UI.header ("Uploading #{version} APK to GitHub")
+
+    end
 end
