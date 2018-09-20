@@ -60,9 +60,11 @@ import javax.inject.Singleton
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 
     @Component.Builder
-    abstract class Builder : AndroidInjector.Builder<DuckDuckGoApplication>() {
+    interface Builder {
 
         @BindsInstance
-        abstract fun application(application: Application): AppComponent.Builder
+        fun application(application: Application): AppComponent.Builder
+
+        fun build(): AppComponent
     }
 }

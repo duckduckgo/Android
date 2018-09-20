@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.statistics.api
 
+import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.global.AppUrl.ParamKey
 import com.duckduckgo.app.statistics.model.Atb
 import io.reactivex.Observable
@@ -27,14 +28,18 @@ import retrofit2.http.Query
 interface StatisticsService {
 
     @GET("/exti/")
-    fun exti(@Query(ParamKey.ATB) atb: String): Observable<ResponseBody>
+    fun exti(
+        @Query(ParamKey.ATB) atb: String,
+        @Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null
+    ): Observable<ResponseBody>
 
     @GET("/atb.js")
-    fun atb(): Observable<Atb>
+    fun atb(@Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null): Observable<Atb>
 
     @GET("/atb.js")
     fun updateAtb(
         @Query(ParamKey.ATB) atb: String,
-        @Query(ParamKey.RETENTION_ATB) retentionAtb: String
+        @Query(ParamKey.RETENTION_ATB) retentionAtb: String,
+        @Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null
     ): Observable<Atb>
 }
