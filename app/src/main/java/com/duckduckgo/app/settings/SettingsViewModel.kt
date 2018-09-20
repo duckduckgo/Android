@@ -44,7 +44,7 @@ class SettingsViewModel @Inject constructor(
 
     sealed class Command {
         object LaunchFeedback : Command()
-        object ThemeChangedBroadcast : Command()
+        object UpdateTheme : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().apply {
@@ -78,7 +78,7 @@ class SettingsViewModel @Inject constructor(
     fun onLightThemeToggled(enabled: Boolean) {
         Timber.i("User toggled light theme, is now enabled: $enabled")
         settingsDataStore.lightThemeEnabled = enabled
-        command.value = Command.ThemeChangedBroadcast
+        command.value = Command.UpdateTheme
         command.value = null
     }
 

@@ -22,8 +22,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.support.v4.content.LocalBroadcastManager
-import com.duckduckgo.app.global.ThemingConstants.BROADCAST_THEME_CHANGED
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.ThemingConstants.BROADCAST_THEME_CHANGED
 import com.duckduckgo.app.settings.db.SettingsDataStore
 
 fun Activity.applyTheme(settingsDataStore: SettingsDataStore): BroadcastReceiver? {
@@ -31,10 +31,10 @@ fun Activity.applyTheme(settingsDataStore: SettingsDataStore): BroadcastReceiver
         return null
     }
     setTheme(themeId(settingsDataStore))
-    return registerForThemeChangedBroadcast()
+    return registerForThemeChangeBroadcast()
 }
 
-private fun Activity.registerForThemeChangedBroadcast(): BroadcastReceiver {
+private fun Activity.registerForThemeChangeBroadcast(): BroadcastReceiver {
     val manager = LocalBroadcastManager.getInstance(applicationContext)
     val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {

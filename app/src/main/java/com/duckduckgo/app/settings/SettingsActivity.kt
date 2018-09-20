@@ -28,9 +28,9 @@ import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.FeedbackActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.sendThemeChangedBroadcast
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
-import com.duckduckgo.app.global.sendThemeChangedBroadcast
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import kotlinx.android.synthetic.main.content_settings.*
 import kotlinx.android.synthetic.main.include_toolbar.*
@@ -90,7 +90,7 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun processCommand(it: Command?) {
         when (it) {
             is Command.LaunchFeedback -> launchFeedback()
-            is Command.ThemeChangedBroadcast -> sendThemeChangedBroadcast()
+            is Command.UpdateTheme -> sendThemeChangedBroadcast()
         }
     }
 

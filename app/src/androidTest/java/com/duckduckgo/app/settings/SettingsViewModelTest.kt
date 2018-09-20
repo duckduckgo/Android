@@ -27,10 +27,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
-import com.nhaarman.mockito_kotlin.KArgumentCaptor
-import com.nhaarman.mockito_kotlin.argumentCaptor
-import com.nhaarman.mockito_kotlin.verify
-import com.nhaarman.mockito_kotlin.whenever
+import com.nhaarman.mockito_kotlin.*
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -103,6 +100,38 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun whenLightThemeToggledOnThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() {
+        testee.onLightThemeToggled(true)
+        verify(mockAppSettingsDataStore).lightThemeEnabled = true
+
+        testee.command.blockingObserve()
+        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.UpdateTheme, commandCaptor.firstValue)
+    }
+
+    @Test
+    fun whenLightThemeTogglesOffThenDataStoreIsUpdated() {
+        testee.onLightThemeToggled(false)
+        verify(mockAppSettingsDataStore).lightThemeEnabled = false
+
+        testee.command.blockingObserve()
+        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.UpdateTheme, commandCaptor.firstValue)
+    }
+
+    @Test
+    fun whenAutocompleteSwitchedOnThenDataStoreIsUpdated() {
+        testee.onAutocompleteSettingChanged(true)
+        verify(mockAppSettingsDataStore).autoCompleteSuggestionsEnabled = true
+    }
+
+    @Test
+    fun whenAutocompleteSwitchedOffThenDataStoreIsUpdated() {
+        testee.onAutocompleteSettingChanged(false)
+        verify(mockAppSettingsDataStore).autoCompleteSuggestionsEnabled = false
+    }
+
+    @Test
     fun whenLeaveFeedBackRequestedThenCommandIsLaunchFeedback() {
         testee.userRequestedToSendFeedback()
         testee.command.blockingObserve()
@@ -117,7 +146,6 @@ class SettingsViewModelTest {
         val viewState = latestViewState()
         assertTrue(viewState.isAppDefaultBrowser)
     }
-
 
     @Test
     fun whenDefaultBrowserAppNotSetToOursThenIsDefaultBrowserFlagIsFalse() {
