@@ -29,7 +29,7 @@ interface SettingsDataStore {
 class SettingsSharedPreferences @Inject constructor(private val context: Context) : SettingsDataStore {
 
     override var lightThemeEnabled: Boolean
-        get() = preferences.getBoolean(KEY_LIGHT_THEME_ENABLED, true)
+        get() = preferences.getBoolean(KEY_LIGHT_THEME_ENABLED, false)
         set(enabled) = preferences.edit().putBoolean(KEY_LIGHT_THEME_ENABLED, enabled).apply()
 
     override var autoCompleteSuggestionsEnabled: Boolean
