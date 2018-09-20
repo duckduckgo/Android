@@ -6,7 +6,6 @@ apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
 
 ext {
-    VERSION_NAME = "5.10.3"
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
 }
 
@@ -17,7 +16,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
         versionCode buildVersionCode()
-        versionName VERSION_NAME
+        versionName buildVersionName()
         testInstrumentationRunner "com.duckduckgo.app.TestRunner"
         archivesBaseName = "duckduckgo-$versionName"
 
