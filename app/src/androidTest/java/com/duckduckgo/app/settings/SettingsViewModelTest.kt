@@ -110,7 +110,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenLightThemeTogglesOffThenDataStoreIsUpdated() {
+    fun whenLightThemeTogglesOffThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() {
         testee.onLightThemeToggled(false)
         verify(mockAppSettingsDataStore).lightThemeEnabled = false
 
