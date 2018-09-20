@@ -31,5 +31,15 @@ platform :android do
 
     UI.header ("Uploading #{version} APK to GitHub")
 
+    set_github_release(
+        repository_name: "CDRussell/Android",
+        api_token: token,
+        name: version,
+        tag_name: version,
+        description: releaseNotes,
+        upload_assets: [apkPath],
+        is_draft: false,
+        is_prerelease: false)
+
     end
 end
