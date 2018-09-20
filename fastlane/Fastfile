@@ -26,13 +26,10 @@ platform :android do
     apkPath = "app/build/outputs/apk/release/duckduckgo-#{version}-release.apk"
     token = ENV["GITHUB_UPLOAD_TOKEN"]
 
-    UI.message ("Releasing new app version\nVersion: #{version}\nRelease Notes:\n=====\n#{releaseNotes}\n=====\n")
-    UI.message ("APK Path: #{apkPath}")
-
-    UI.header ("Uploading #{version} APK to GitHub")
+    UI.message ("Upload new app version to GitHub\nVersion: #{version}\nRelease Notes:\n=====\n#{releaseNotes}\n=====\n")
 
     set_github_release(
-        repository_name: "CDRussell/Android",
+        repository_name: "DuckDuckGo/Android",
         api_token: token,
         name: version,
         tag_name: version,
