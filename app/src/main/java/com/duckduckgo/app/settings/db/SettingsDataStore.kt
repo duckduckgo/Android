@@ -18,6 +18,7 @@ package com.duckduckgo.app.settings.db
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import javax.inject.Inject
 
 
@@ -30,11 +31,11 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
 
     override var lightThemeEnabled: Boolean
         get() = preferences.getBoolean(KEY_LIGHT_THEME_ENABLED, false)
-        set(enabled) = preferences.edit().putBoolean(KEY_LIGHT_THEME_ENABLED, enabled).apply()
+        set(enabled) = preferences.edit { putBoolean(KEY_LIGHT_THEME_ENABLED, enabled) }
 
     override var autoCompleteSuggestionsEnabled: Boolean
         get() = preferences.getBoolean(KEY_AUTOCOMPLETE_ENABLED, true)
-        set(enabled) = preferences.edit().putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled).apply()
+        set(enabled) = preferences.edit { putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled) }
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
