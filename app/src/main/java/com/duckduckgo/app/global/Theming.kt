@@ -26,7 +26,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.ThemingConstants.BROADCAST_THEME_CHANGED
 import com.duckduckgo.app.settings.db.SettingsDataStore
 
-fun Activity.applyTheme(settingsDataStore: SettingsDataStore): BroadcastReceiver? {
+
+fun DuckDuckGoActivity.applyTheme(settingsDataStore: SettingsDataStore): BroadcastReceiver? {
     if (!isThemeConfigurable()) {
         return null
     }
@@ -34,7 +35,7 @@ fun Activity.applyTheme(settingsDataStore: SettingsDataStore): BroadcastReceiver
     return registerForThemeChangeBroadcast()
 }
 
-private fun Activity.registerForThemeChangeBroadcast(): BroadcastReceiver {
+private fun DuckDuckGoActivity.registerForThemeChangeBroadcast(): BroadcastReceiver {
     val manager = LocalBroadcastManager.getInstance(applicationContext)
     val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -45,7 +46,7 @@ private fun Activity.registerForThemeChangeBroadcast(): BroadcastReceiver {
     return receiver
 }
 
-fun Activity.sendThemeChangedBroadcast() {
+fun DuckDuckGoActivity.sendThemeChangedBroadcast() {
     val manager = LocalBroadcastManager.getInstance(applicationContext)
     manager.sendBroadcast(Intent(BROADCAST_THEME_CHANGED))
 }
@@ -57,11 +58,11 @@ private fun themeId(settingsDataStore: SettingsDataStore): Int {
     }
 }
 
-private fun Activity.isThemeConfigurable(): Boolean {
+private fun DuckDuckGoActivity.isThemeConfigurable(): Boolean {
     return manifestThemeId() == R.style.AppTheme_Dark || manifestThemeId() == R.style.AppTheme_Light
 }
 
-private fun Activity.manifestThemeId(): Int {
+private fun DuckDuckGoActivity.manifestThemeId(): Int {
     return packageManager.getActivityInfo(componentName, 0).themeResource
 }
 
