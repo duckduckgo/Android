@@ -20,6 +20,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import timber.log.Timber
@@ -52,7 +53,7 @@ class SettingsViewModel @Inject constructor(
         value = currentViewState
     }
 
-    val command: MutableLiveData<Command> = MutableLiveData()
+    val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     fun start() {
 
@@ -79,7 +80,6 @@ class SettingsViewModel @Inject constructor(
         Timber.i("User toggled light theme, is now enabled: $enabled")
         settingsDataStore.lightThemeEnabled = enabled
         command.value = Command.UpdateTheme
-        command.value = null
     }
 
     fun onAutocompleteSettingChanged(enabled: Boolean) {
