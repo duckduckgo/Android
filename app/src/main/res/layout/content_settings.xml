@@ -34,7 +34,7 @@
         <android.support.v7.widget.SwitchCompat
             android:id="@+id/lightThemeToggle"
             style="@style/SettingsItem"
-            android:text="Light Theme"
+            android:text="@string/settingsLightTheme"
             app:theme="@style/SettingsItem.SettingsSwitch"
             tools:checked="true" />
 
