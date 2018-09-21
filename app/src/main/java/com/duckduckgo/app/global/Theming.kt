@@ -25,13 +25,25 @@ import android.support.v4.content.LocalBroadcastManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.ThemingConstants.BROADCAST_THEME_CHANGED
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.Variant
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ThemeFeature.LightThemeAsDefault
 
 
-fun DuckDuckGoActivity.applyTheme(settingsDataStore: SettingsDataStore): BroadcastReceiver? {
+enum class DuckDuckGoTheme {
+    DARK,
+    LIGHT;
+}
+
+fun DuckDuckGoActivity.applyTheme(settingsDataStore: SettingsDataStore, variant: Variant): BroadcastReceiver? {
+
+    if (settingsDataStore.theme == null ) {
+        settingsDataStore.theme = defaultApplicationTheme(variant)
+    }
+
     if (!isThemeConfigurable()) {
         return null
     }
-    setTheme(themeId(settingsDataStore))
+    setTheme(themeId(settingsDataStore, variant))
     return registerForThemeChangeBroadcast()
 }
 
@@ -51,10 +63,11 @@ fun DuckDuckGoActivity.sendThemeChangedBroadcast() {
     manager.sendBroadcast(Intent(BROADCAST_THEME_CHANGED))
 }
 
-private fun themeId(settingsDataStore: SettingsDataStore): Int {
-    return when (settingsDataStore.lightThemeEnabled) {
-        true -> R.style.AppTheme_Light
-        false -> R.style.AppTheme_Dark
+private fun themeId(settingsDataStore: SettingsDataStore, variant: Variant): Int {
+    val theme = settingsDataStore.theme ?: defaultApplicationTheme(variant)
+    return when (theme) {
+        DuckDuckGoTheme.LIGHT -> R.style.AppTheme_Light
+        DuckDuckGoTheme.DARK -> R.style.AppTheme_Dark
     }
 }
 
@@ -64,6 +77,10 @@ private fun DuckDuckGoActivity.isThemeConfigurable(): Boolean {
 
 private fun DuckDuckGoActivity.manifestThemeId(): Int {
     return packageManager.getActivityInfo(componentName, 0).themeResource
+}
+
+private fun defaultApplicationTheme(variant: Variant): DuckDuckGoTheme {
+    return if (variant.hasFeature(LightThemeAsDefault)) DuckDuckGoTheme.LIGHT else DuckDuckGoTheme.DARK
 }
 
 object ThemingConstants {

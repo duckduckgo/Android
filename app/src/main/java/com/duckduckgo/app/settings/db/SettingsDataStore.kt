@@ -19,19 +19,19 @@ package com.duckduckgo.app.settings.db
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.app.global.DuckDuckGoTheme
 import javax.inject.Inject
 
-
 interface SettingsDataStore {
-    var lightThemeEnabled: Boolean
+    var theme: DuckDuckGoTheme?
     var autoCompleteSuggestionsEnabled: Boolean
 }
 
 class SettingsSharedPreferences @Inject constructor(private val context: Context) : SettingsDataStore {
 
-    override var lightThemeEnabled: Boolean
-        get() = preferences.getBoolean(KEY_LIGHT_THEME_ENABLED, false)
-        set(enabled) = preferences.edit { putBoolean(KEY_LIGHT_THEME_ENABLED, enabled) }
+    override var theme: DuckDuckGoTheme?
+        get() = preferences.getString(KEY_THEME, null)?.let { DuckDuckGoTheme.valueOf(it) }
+        set(theme) = preferences.edit { putString(KEY_THEME, theme.toString()) }
 
     override var autoCompleteSuggestionsEnabled: Boolean
         get() = preferences.getBoolean(KEY_AUTOCOMPLETE_ENABLED, true)
@@ -42,7 +42,7 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.settings_activity.settings"
-        const val KEY_LIGHT_THEME_ENABLED = "LIGHT_THEME_ENABLED"
+        const val KEY_THEME = "THEME"
         const val KEY_AUTOCOMPLETE_ENABLED = "AUTOCOMPLETE_ENABLED"
     }
 }
