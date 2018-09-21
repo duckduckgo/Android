@@ -153,7 +153,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
             }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookmarksViewHolder {
-            val inflater = LayoutInflater.from(context)
+            val inflater = LayoutInflater.from(parent.context)
             val view = inflater.inflate(R.layout.view_bookmark_entry, parent, false)
             return BookmarksViewHolder(view, viewModel)
         }
@@ -198,8 +198,8 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
             GlideApp.with(itemView)
                 .load(faviconUrl)
-                .placeholder(R.drawable.ic_globe_white_16dp)
-                .error(R.drawable.ic_globe_white_16dp)
+                .placeholder(R.drawable.ic_globe_gray_16dp)
+                .error(R.drawable.ic_globe_gray_16dp)
                 .into(itemView.favicon)
         }
 

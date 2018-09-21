@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="80dp"
         android:contentDescription="@string/duckDuckGoLogoDescription"
-        android:src="@drawable/full_logo"
+        android:src="@drawable/logo_full"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

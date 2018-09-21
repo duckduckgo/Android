@@ -28,7 +28,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-
         <android.support.v7.widget.RecyclerView
             android:id="@+id/tabsRecycler"
             android:layout_width="match_parent"
@@ -58,7 +57,7 @@
                 android:layout_marginStart="6dp"
                 android:layout_marginEnd="6dp"
                 android:contentDescription="@string/tapFireIconDescription"
-                android:src="@drawable/ic_fire_gray_24dp"
+                android:src="@drawable/ic_fire_24dp"
                 android:tint="@color/white" />
 
             <TextView
@@ -71,7 +70,6 @@
                 android:textStyle="normal" />
 
         </LinearLayout>
-
 
     </LinearLayout>
 

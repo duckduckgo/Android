@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.di
 
+import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
@@ -91,6 +92,10 @@ abstract class AndroidBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector
     abstract fun fireActivity(): FireActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun aboutDuckDuckGoActivity(): AboutDuckDuckGoActivity
 
     /* Fragments */
 

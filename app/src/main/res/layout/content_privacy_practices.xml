@@ -76,7 +76,7 @@
                     android:letterSpacing="0.14"
                     android:text="@string/practicesMixed"
                     android:textAllCaps="true"
-                    android:textColor="@color/warmGray"
+                    android:textColor="@color/grayishTwo"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     app:layout_constraintLeft_toLeftOf="parent"

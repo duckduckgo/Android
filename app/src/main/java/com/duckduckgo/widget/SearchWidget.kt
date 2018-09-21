@@ -38,10 +38,7 @@ class SearchWidget : AppWidgetProvider() {
 
     companion object {
 
-        internal fun updateAppWidget(
-            context: Context, appWidgetManager: AppWidgetManager,
-            appWidgetId: Int
-        ) {
+        internal fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
 
             val views = RemoteViews(context.packageName, R.layout.search_widget)
             views.setOnClickPendingIntent(R.id.widgetContainer, buildPendingIntent(context))

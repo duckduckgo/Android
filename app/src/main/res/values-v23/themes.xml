@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!--
   ~ Copyright (c) 2018 DuckDuckGo
   ~
@@ -15,13 +16,14 @@
   ~ limitations under the License.
   -->
 
-<ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="@color/brownishGray">
-    <item
-        android:id="@android:id/mask"
-        android:gravity="center">
-        <shape android:shape="rectangle">
-            <solid android:color="@color/white" />
-        </shape>
-    </item>
-</ripple>
+<resources>
+
+    <style name="AppTheme.Dark" parent="AppTheme.BaseDark">
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="AppTheme.Light" parent="AppTheme.BaseLight">
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+</resources>
