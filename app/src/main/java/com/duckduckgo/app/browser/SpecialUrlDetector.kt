@@ -48,7 +48,8 @@ class SpecialUrlDetector @Inject constructor() {
             HTTP_SCHEME, HTTPS_SCHEME -> UrlType.Web(uriString)
             ABOUT_SCHEME -> UrlType.Unknown(uriString)
             null -> UrlType.SearchQuery(uriString)
-            else -> buildIntent(uriString)
+            SCHEME_REGEX.matchEntire(scheme)?.value -> buildIntent(uriString)
+            else -> UrlType.SearchQuery(uriString)
         }
     }
 
@@ -90,5 +91,7 @@ class SpecialUrlDetector @Inject constructor() {
         private const val ABOUT_SCHEME = "about"
 
         private const val EXTRA_FALLBACK_URL = "browser_fallback_url"
+
+        private val SCHEME_REGEX = Regex("[a-z][a-z0-9+.-]*")
     }
 }
