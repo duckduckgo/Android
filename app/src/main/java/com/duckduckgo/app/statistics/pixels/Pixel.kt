@@ -46,10 +46,18 @@ interface Pixel {
         LONG_PRESS_DOWNLOAD_IMAGE("mlp_i"),
         LONG_PRESS_NEW_TAB("mlp_t"),
         LONG_PRESS_NEW_BACKGROUND_TAB("mlp_b"),
-        LONG_PRESS_SHARE("mlp_s")
+        LONG_PRESS_SHARE("mlp_s"),
+
+        HTTPS_UPGRADE_SITE_ERROR("ehd")
     }
 
-    fun fire(pixel: PixelName)
+    object PixelParameter {
+        const val URL = "url"
+        const val STATUS_CODE = "status_code"
+        const val ERROR_CODE = "error_code"
+    }
+
+    fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap())
 
 }
 
@@ -60,18 +68,17 @@ class ApiBasedPixel @Inject constructor(
     private val deviceInfo: DeviceInfo
 ) : Pixel {
 
-    override fun fire(pixel: Pixel.PixelName) {
+    override fun fire(pixel: Pixel.PixelName, parameters: Map<String, String?>) {
 
         val atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
 
-        api.fire(pixel.pixelName, deviceInfo.formFactor().description, atb)
+        api.fire(pixel.pixelName, deviceInfo.formFactor().description, atb, parameters)
             .subscribeOn(Schedulers.io())
             .subscribe({
                 Timber.v("Pixel sent: ${pixel.pixelName}")
             }, {
                 Timber.w("Pixel failed: ${pixel.pixelName}", it)
             })
-
     }
 
 }
