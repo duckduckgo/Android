@@ -67,7 +67,7 @@ class WebViewLongPressHandlerTest {
     @Test
     fun whenLongPressedWithUnknownTypeThenPixelNotFired() {
         testee.handleLongPress(HitTestResult.UNKNOWN_TYPE, HTTPS_IMAGE_URL, mockMenu)
-        verify(mockPixel, never()).fire(any())
+        verify(mockPixel, never()).fire(Pixel.PixelName.LONG_PRESS)
     }
 
     @Test

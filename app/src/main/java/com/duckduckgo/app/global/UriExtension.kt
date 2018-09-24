@@ -34,6 +34,19 @@ fun Uri.withScheme(): Uri {
 val Uri.baseHost: String?
     get() = withScheme().host?.removePrefix("www.")
 
+/**
+ * Return a simple url with scheme, domain and path. Other elements such as username or
+ * query parameters are omitted
+ */
+val Uri.simpleUrl: String
+    get() {
+        var string = ""
+        scheme?.let { string += "$scheme://" }
+        host?.let { string += host }
+        path?.let { string += "$path" }
+        return string
+    }
+
 val Uri.isHttp: Boolean
     get() = scheme?.equals(UrlScheme.http, true) ?: false
 
