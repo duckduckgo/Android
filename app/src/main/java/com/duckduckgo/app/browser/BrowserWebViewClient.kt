@@ -119,7 +119,10 @@ class BrowserWebViewClient @Inject constructor(
 
     @Suppress("OverridingDeprecatedMember")
     override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
-        reportHttpsUpgradeSiteError(failingUrl.toUri(), statusCode = null, error = "WEB_RESOURCE_ERROR_$errorCode")
+        val url = failingUrl.toUri()
+        if (isHttpsUpgradeSite(url)) {
+            reportHttpsUpgradeSiteError(url, statusCode = null, error = "WEB_RESOURCE_ERROR_$errorCode")
+        }
         super.onReceivedError(view, errorCode, description, failingUrl)
     }
 
