@@ -24,8 +24,8 @@ import android.os.Build
 import android.support.annotation.WorkerThread
 import android.webkit.*
 import androidx.core.net.toUri
-import com.duckduckgo.app.global.simpleUrl
 import com.duckduckgo.app.global.isHttps
+import com.duckduckgo.app.global.simpleUrl
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.HTTPS_UPGRADE_SITE_ERROR
@@ -119,9 +119,11 @@ class BrowserWebViewClient @Inject constructor(
 
     @Suppress("OverridingDeprecatedMember")
     override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
-        val url = failingUrl.toUri()
-        if (isHttpsUpgradeSite(url)) {
-            reportHttpsUpgradeSiteError(url, statusCode = null, error = "WEB_RESOURCE_ERROR_$errorCode")
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            val url = failingUrl.toUri()
+            if (isHttpsUpgradeSite(url)) {
+                reportHttpsUpgradeSiteError(url, statusCode = null, error = "WEB_RESOURCE_ERROR_$errorCode")
+            }
         }
         super.onReceivedError(view, errorCode, description, failingUrl)
     }
