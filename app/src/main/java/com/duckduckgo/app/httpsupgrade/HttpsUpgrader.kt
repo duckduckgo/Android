@@ -30,6 +30,9 @@ interface HttpsUpgrader {
     @WorkerThread
     fun shouldUpgrade(uri: Uri): Boolean
 
+    @WorkerThread
+    fun isInUpgradeList(uri: Uri): Boolean
+
     fun upgrade(uri: Uri): Uri {
         return uri.buildUpon().scheme(UrlScheme.https).build()
     }
@@ -52,6 +55,12 @@ class HttpsUpgraderImpl(
         if (uri.isHttps) {
             return false
         }
+
+        return isInUpgradeList(uri)
+    }
+
+    @WorkerThread
+    override fun isInUpgradeList(uri: Uri): Boolean {
 
         val host = uri.host ?: return false
 
