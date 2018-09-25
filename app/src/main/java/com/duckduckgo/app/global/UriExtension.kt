@@ -43,7 +43,7 @@ val Uri.simpleUrl: String
         var string = ""
         scheme?.let { string += "$scheme://" }
         host?.let { string += host }
-        path?.let { string += "$path" }
+        path?.let { string += path }
         return string
     }
 

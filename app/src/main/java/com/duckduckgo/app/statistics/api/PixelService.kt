@@ -30,6 +30,6 @@ interface PixelService {
         @Path("pixelName") pixelName: String,
         @Path("formFactor") formFactor: String,
         @Query(AppUrl.ParamKey.ATB) atb: String,
-        @QueryMap additionalQueryParams: Map<String, String?>? = null
+        @QueryMap additionalQueryParams: Map<String, String?> = emptyMap()
     ): Completable
 }

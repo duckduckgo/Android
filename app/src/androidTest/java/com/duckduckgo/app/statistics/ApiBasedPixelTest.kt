@@ -109,7 +109,7 @@ class ApiBasedPixelTest {
     }
 
     @Test
-    fun whenPixelFiredWithoutAdditionalParametersThenPixelServiceCalledWithNoParamaeters() {
+    fun whenPixelFiredWithoutAdditionalParametersThenPixelServiceCalledWithNoParameters() {
         whenever(mockPixelService.fire(any(), any(), any(), any())).thenReturn(Completable.complete())
         whenever(mockStatisticsDataStore.atb).thenReturn(Atb("atb"))
         whenever(mockVariantManager.getVariant()).thenReturn(Variant("variant"))
