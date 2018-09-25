@@ -120,6 +120,7 @@ class BrowserWebViewClient @Inject constructor(
         return webViewRequestInterceptor.shouldIntercept(request, webView, currentUrl, webViewClientListener)
     }
 
+    @UiThread
     @Suppress("OverridingDeprecatedMember")
     override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
@@ -129,6 +130,7 @@ class BrowserWebViewClient @Inject constructor(
         super.onReceivedError(view, errorCode, description, failingUrl)
     }
 
+    @UiThread
     @TargetApi(Build.VERSION_CODES.M)
     override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
         if (request.isForMainFrame) {
@@ -137,6 +139,7 @@ class BrowserWebViewClient @Inject constructor(
         super.onReceivedError(view, request, error)
     }
 
+    @UiThread
     override fun onReceivedHttpError(view: WebView, request: WebResourceRequest, errorResponse: WebResourceResponse) {
         if (request.isForMainFrame) {
             reportHttpsErrorIfInUpgradeList(request.url, errorResponse.statusCode, error = null)
