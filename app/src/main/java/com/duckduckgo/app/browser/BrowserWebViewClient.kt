@@ -161,7 +161,7 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     private fun isHttpsUpgradeSite(url: Uri): Boolean {
-        return url.isHttps && httpsUpgrader.shouldUpgrade(url)
+        return url.isHttps && httpsUpgrader.isInUpgradeList(url)
     }
 
     /**
