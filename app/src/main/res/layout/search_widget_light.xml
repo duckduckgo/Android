@@ -27,14 +27,14 @@
         android:layout_marginStart="2dp"
         android:layout_marginEnd="2dp"
         android:background="@drawable/search_widget_background"
-        android:backgroundTint="@color/almostBlackDark"
+        android:backgroundTint="@color/whiteFive"
         android:drawableEnd="@drawable/logo_mini"
         android:fontFamily="sans-serif-medium"
         android:gravity="center_vertical"
         android:paddingStart="24dp"
         android:paddingEnd="16dp"
         android:text="@string/searchWidgetTextHint"
-        android:textColor="@color/whiteTwo"
+        android:textColor="@color/warmGray"
         android:textSize="15sp" />
 
 </RelativeLayout>

@@ -16,21 +16,33 @@
 
 package com.duckduckgo.app.browser
 
+import android.annotation.TargetApi
 import android.graphics.Bitmap
 import android.net.Uri
+import android.net.http.SslError
+import android.os.Build
+import android.support.annotation.AnyThread
+import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
-import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.*
+import androidx.core.net.toUri
+import com.duckduckgo.app.global.isHttps
+import com.duckduckgo.app.global.simpleUrl
+import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.HTTPS_UPGRADE_SITE_ERROR
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.concurrent.thread
 
 
 class BrowserWebViewClient @Inject constructor(
     private val requestRewriter: RequestRewriter,
     private val specialUrlDetector: SpecialUrlDetector,
-    private val webViewRequestInterceptor: WebViewRequestInterceptor
+    private val webViewRequestInterceptor: WebViewRequestInterceptor,
+    private val httpsUpgrader: HttpsUpgrader,
+    private val pixel: Pixel
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -106,6 +118,61 @@ class BrowserWebViewClient @Inject constructor(
     override fun shouldInterceptRequest(webView: WebView, request: WebResourceRequest): WebResourceResponse? {
         Timber.v("Intercepting resource ${request.url} on page $currentUrl")
         return webViewRequestInterceptor.shouldIntercept(request, webView, currentUrl, webViewClientListener)
+    }
+
+    @UiThread
+    @Suppress("OverridingDeprecatedMember")
+    override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            val url = failingUrl.toUri()
+            reportHttpsErrorIfInUpgradeList(url, statusCode = null, error = "WEB_RESOURCE_ERROR_$errorCode")
+        }
+        super.onReceivedError(view, errorCode, description, failingUrl)
+    }
+
+    @UiThread
+    @TargetApi(Build.VERSION_CODES.M)
+    override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+        if (request.isForMainFrame) {
+            reportHttpsErrorIfInUpgradeList(request.url, statusCode = null, error = "WEB_RESOURCE_ERROR_${error.errorCode}")
+        }
+        super.onReceivedError(view, request, error)
+    }
+
+    @UiThread
+    override fun onReceivedHttpError(view: WebView, request: WebResourceRequest, errorResponse: WebResourceResponse) {
+        if (request.isForMainFrame) {
+            reportHttpsErrorIfInUpgradeList(request.url, errorResponse.statusCode, error = null)
+        }
+        super.onReceivedHttpError(view, request, errorResponse)
+    }
+
+    @UiThread
+    override fun onReceivedSslError(view: WebView, handler: SslErrorHandler, error: SslError) {
+        val uri = error.url.toUri()
+        reportHttpsErrorIfInUpgradeList(uri, null, "SSL_ERROR_${error.primaryError}")
+        super.onReceivedSslError(view, handler, error)
+    }
+
+    @AnyThread
+    private fun reportHttpsErrorIfInUpgradeList(url: Uri, statusCode: Int?, error: String?) {
+
+        if (!url.isHttps) return
+
+        thread {
+            if (httpsUpgrader.isInUpgradeList(url)) {
+                reportHttpsUpgradeSiteError(url, statusCode, error)
+            }
+        }
+    }
+
+    private fun reportHttpsUpgradeSiteError(url: Uri, statusCode: Int?, error: String?) {
+        val params = mapOf(
+            PixelParameter.URL to url.simpleUrl,
+            PixelParameter.ERROR_CODE to error,
+            PixelParameter.STATUS_CODE to statusCode.toString()
+        )
+        pixel.fire(HTTPS_UPGRADE_SITE_ERROR, params)
     }
 
     /**

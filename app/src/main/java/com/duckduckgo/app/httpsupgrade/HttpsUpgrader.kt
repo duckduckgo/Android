@@ -30,6 +30,9 @@ interface HttpsUpgrader {
     @WorkerThread
     fun shouldUpgrade(uri: Uri): Boolean
 
+    @WorkerThread
+    fun isInUpgradeList(uri: Uri): Boolean
+
     fun upgrade(uri: Uri): Uri {
         return uri.buildUpon().scheme(UrlScheme.https).build()
     }
@@ -53,11 +56,18 @@ class HttpsUpgraderImpl(
             return false
         }
 
+        return isInUpgradeList(uri)
+    }
+
+    @WorkerThread
+    override fun isInUpgradeList(uri: Uri): Boolean {
+
+        val host = uri.host ?: return false
+
         waitForAnyReloadsToComplete()
 
-        val host = uri.host
         if (whitelistedDao.contains(host)) {
-            Timber.d("${host} is in whitelist and so not upgradable")
+            Timber.d("$host is in whitelist and so not upgradable")
             return false
         }
 
@@ -66,7 +76,7 @@ class HttpsUpgraderImpl(
             val initialTime = System.nanoTime()
             val shouldUpgrade = it.contains(host)
             val totalTime = System.nanoTime() - initialTime
-            Timber.d("${host} ${if (shouldUpgrade) "is" else "is not"} upgradable, lookup in ${totalTime / NANO_TO_MILLIS_DIVISOR}ms")
+            Timber.d("$host ${if (shouldUpgrade) "is" else "is not"} upgradable, lookup in ${totalTime / NANO_TO_MILLIS_DIVISOR}ms")
 
             return shouldUpgrade
         }
