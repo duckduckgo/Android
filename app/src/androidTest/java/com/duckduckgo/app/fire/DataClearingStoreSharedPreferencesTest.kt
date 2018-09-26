@@ -17,6 +17,7 @@
 package com.duckduckgo.app.fire
 
 import android.support.test.InstrumentationRegistry
+import androidx.core.content.edit
 import com.duckduckgo.app.fire.DataClearingStoreSharedPreferences.Companion.FILENAME
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -30,7 +31,7 @@ class DataClearingStoreSharedPreferencesTest {
     @Before
     fun setup() {
         testee = DataClearingStoreSharedPreferences(InstrumentationRegistry.getTargetContext())
-        InstrumentationRegistry.getTargetContext().deleteSharedPreferences(FILENAME)
+        InstrumentationRegistry.getTargetContext().getSharedPreferences(FILENAME, 0).edit { clear() }
     }
 
     @Test
