@@ -53,7 +53,6 @@ interface Pixel {
 
     object PixelParameter {
         const val URL = "url"
-        const val STATUS_CODE = "status_code"
         const val ERROR_CODE = "error_code"
     }
 

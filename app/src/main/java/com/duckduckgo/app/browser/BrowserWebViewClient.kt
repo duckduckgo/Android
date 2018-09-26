@@ -125,7 +125,7 @@ class BrowserWebViewClient @Inject constructor(
     override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             val url = failingUrl.toUri()
-            reportHttpsErrorIfInUpgradeList(url, statusCode = null, error = "WEB_RESOURCE_ERROR_$errorCode")
+            reportHttpsErrorIfInUpgradeList(url, error = "WEB_RESOURCE_ERROR_$errorCode")
         }
         super.onReceivedError(view, errorCode, description, failingUrl)
     }
@@ -134,7 +134,7 @@ class BrowserWebViewClient @Inject constructor(
     @TargetApi(Build.VERSION_CODES.M)
     override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
         if (request.isForMainFrame) {
-            reportHttpsErrorIfInUpgradeList(request.url, statusCode = null, error = "WEB_RESOURCE_ERROR_${error.errorCode}")
+            reportHttpsErrorIfInUpgradeList(request.url, error = "WEB_RESOURCE_ERROR_${error.errorCode}")
         }
         super.onReceivedError(view, request, error)
     }
@@ -142,7 +142,7 @@ class BrowserWebViewClient @Inject constructor(
     @UiThread
     override fun onReceivedHttpError(view: WebView, request: WebResourceRequest, errorResponse: WebResourceResponse) {
         if (request.isForMainFrame) {
-            reportHttpsErrorIfInUpgradeList(request.url, errorResponse.statusCode, error = null)
+            reportHttpsErrorIfInUpgradeList(request.url, "HTTP_STATUS_${errorResponse.statusCode}")
         }
         super.onReceivedHttpError(view, request, errorResponse)
     }
@@ -150,27 +150,26 @@ class BrowserWebViewClient @Inject constructor(
     @UiThread
     override fun onReceivedSslError(view: WebView, handler: SslErrorHandler, error: SslError) {
         val uri = error.url.toUri()
-        reportHttpsErrorIfInUpgradeList(uri, null, "SSL_ERROR_${error.primaryError}")
+        reportHttpsErrorIfInUpgradeList(uri, "SSL_ERROR_${error.primaryError}")
         super.onReceivedSslError(view, handler, error)
     }
 
     @AnyThread
-    private fun reportHttpsErrorIfInUpgradeList(url: Uri, statusCode: Int?, error: String?) {
+    private fun reportHttpsErrorIfInUpgradeList(url: Uri, error: String?) {
 
         if (!url.isHttps) return
 
         thread {
             if (httpsUpgrader.isInUpgradeList(url)) {
-                reportHttpsUpgradeSiteError(url, statusCode, error)
+                reportHttpsUpgradeSiteError(url, error)
             }
         }
     }
 
-    private fun reportHttpsUpgradeSiteError(url: Uri, statusCode: Int?, error: String?) {
+    private fun reportHttpsUpgradeSiteError(url: Uri, error: String?) {
         val params = mapOf(
             PixelParameter.URL to url.simpleUrl,
-            PixelParameter.ERROR_CODE to error,
-            PixelParameter.STATUS_CODE to statusCode.toString()
+            PixelParameter.ERROR_CODE to error
         )
         pixel.fire(HTTPS_UPGRADE_SITE_ERROR, params)
     }
