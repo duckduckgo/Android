@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.di
 
+import com.duckduckgo.app.fire.DataClearingStore
+import com.duckduckgo.app.fire.DataClearingStoreSharedPreferences
 import com.duckduckgo.app.global.install.AppInstallSharedPreferences
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingSharedPreferences
@@ -51,4 +53,7 @@ abstract class StoreModule {
 
     @Binds
     abstract fun bindAppInstallStore(store: AppInstallSharedPreferences): AppInstallStore
+
+    @Binds
+    abstract fun bindDataClearingStore(store: DataClearingStoreSharedPreferences): DataClearingStore
 }

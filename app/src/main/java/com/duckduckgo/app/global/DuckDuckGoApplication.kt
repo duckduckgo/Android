@@ -28,6 +28,7 @@ import android.support.v4.app.Fragment
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.DaggerAppComponent
+import com.duckduckgo.app.fire.DataClearingStore
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.notification.NotificationRegistrar
@@ -93,6 +94,11 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     @Inject
     lateinit var httpsUpgrader: HttpsUpgrader
 
+    @Inject
+    lateinit var dataClearingStore: DataClearingStore
+
+    private var launchedByFireAction: Boolean = false
+
     open lateinit var daggerAppComponent: AppComponent
 
     override fun onCreate() {
@@ -120,7 +126,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         notificationRegistrar.registerApp()
 
         initializeHttpsUpgrader()
-
+        submitUnsentFirePixels()
     }
 
     private fun recordInstallationTimestamp() {
@@ -179,6 +185,22 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         thread { httpsUpgrader.reloadData() }
     }
 
+    private fun submitUnsentFirePixels() {
+        val count = dataClearingStore.pendingPixelCountClearData
+        Timber.i("Found $count unsent clear data pixels")
+        if (count > 0) {
+            val timeDifferenceMillis = System.currentTimeMillis() - dataClearingStore.lastClearTimestamp
+            if (timeDifferenceMillis <= APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD) {
+                Timber.i("The app was re-launched as a result of the fire action being triggered (happened ${timeDifferenceMillis}ms ago)")
+                launchedByFireAction = true
+            }
+            for (i in 1..count) {
+                pixel.fire(Pixel.PixelName.FORGET_ALL_EXECUTED)
+            }
+            dataClearingStore.resetCount()
+        }
+    }
+
     /**
      * Immediately syncs data. Upon completion (successful or error),
      * it will schedule a recurring job to keep the data in sync.
@@ -200,10 +222,17 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     override fun serviceInjector(): AndroidInjector<Service> = serviceInjector
 
-
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onAppForegrounded() {
+        if (launchedByFireAction) {
+            launchedByFireAction = false
+            Timber.i("Suppressing app launch pixel")
+            return
+        }
         pixel.fire(APP_LAUNCH)
     }
 
+    companion object {
+        private const val APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD: Long = 10_000L
+    }
 }
