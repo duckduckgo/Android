@@ -20,6 +20,7 @@ import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.PixelService
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
@@ -48,15 +49,20 @@ interface Pixel {
         LONG_PRESS_NEW_BACKGROUND_TAB("mlp_b"),
         LONG_PRESS_SHARE("mlp_s"),
 
-        HTTPS_UPGRADE_SITE_ERROR("ehd")
+        HTTPS_UPGRADE_SITE_ERROR("ehd"),
+        HTTPS_UPGRADE_SITE_SUMMARY("ehs")
     }
 
     object PixelParameter {
         const val URL = "url"
         const val ERROR_CODE = "error_code"
+        const val TOTAL_COUNT = "total"
+        const val FAILURE_COUNT = "failures"
     }
 
     fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap())
+
+    fun fireCompletable(pixel: Pixel.PixelName, parameters: Map<String, String?>): Completable
 
 }
 
@@ -68,16 +74,18 @@ class ApiBasedPixel @Inject constructor(
 ) : Pixel {
 
     override fun fire(pixel: Pixel.PixelName, parameters: Map<String, String?>) {
-
-        val atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
-
-        api.fire(pixel.pixelName, deviceInfo.formFactor().description, atb, parameters)
+        fireCompletable(pixel, parameters)
             .subscribeOn(Schedulers.io())
             .subscribe({
                 Timber.v("Pixel sent: ${pixel.pixelName}")
             }, {
                 Timber.w("Pixel failed: ${pixel.pixelName}", it)
             })
+    }
+
+    override fun fireCompletable(pixel: Pixel.PixelName, parameters: Map<String, String?>): Completable {
+        val atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
+        return api.fire(pixel.pixelName, deviceInfo.formFactor().description, atb, parameters)
     }
 
 }

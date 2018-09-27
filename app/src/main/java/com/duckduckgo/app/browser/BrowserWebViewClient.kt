@@ -32,6 +32,7 @@ import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.HTTPS_UPGRADE_SITE_ERROR
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.concurrent.thread
@@ -42,6 +43,7 @@ class BrowserWebViewClient @Inject constructor(
     private val specialUrlDetector: SpecialUrlDetector,
     private val webViewRequestInterceptor: WebViewRequestInterceptor,
     private val httpsUpgrader: HttpsUpgrader,
+    private val statisticsDataStore: StatisticsDataStore,
     private val pixel: Pixel
 ) : WebViewClient() {
 
@@ -105,6 +107,11 @@ class BrowserWebViewClient @Inject constructor(
         currentUrl = url
         webViewClientListener?.loadingStarted()
         webViewClientListener?.urlChanged(url)
+
+        val uri = if (url != null) Uri.parse(url) else null
+        if (uri != null) {
+            reportHttpsIfInUpgradeList(uri)
+        }
     }
 
     override fun onPageFinished(webView: WebView, url: String?) {
@@ -150,18 +157,30 @@ class BrowserWebViewClient @Inject constructor(
     @UiThread
     override fun onReceivedSslError(view: WebView, handler: SslErrorHandler, error: SslError) {
         val uri = error.url.toUri()
-        reportHttpsErrorIfInUpgradeList(uri, "SSL_ERROR_${error.primaryError}")
+        val isMainFrameRequest = currentUrl == uri.toString()
+        if (isMainFrameRequest) {
+            reportHttpsErrorIfInUpgradeList(uri, "SSL_ERROR_${error.primaryError}")
+        }
         super.onReceivedSslError(view, handler, error)
     }
 
     @AnyThread
     private fun reportHttpsErrorIfInUpgradeList(url: Uri, error: String?) {
-
         if (!url.isHttps) return
-
         thread {
             if (httpsUpgrader.isInUpgradeList(url)) {
                 reportHttpsUpgradeSiteError(url, error)
+                statisticsDataStore.httpsUpgradesFailures += 1
+            }
+        }
+    }
+
+    @AnyThread
+    private fun reportHttpsIfInUpgradeList(url: Uri) {
+        if (!url.isHttps) return
+        thread {
+            if (httpsUpgrader.isInUpgradeList(url)) {
+                statisticsDataStore.httpsUpgradesTotal += 1
             }
         }
     }
