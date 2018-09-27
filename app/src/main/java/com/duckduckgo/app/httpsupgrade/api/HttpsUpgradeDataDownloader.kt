@@ -24,8 +24,12 @@ import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec.Companion.HTTPS_BINARY_FILE
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FAILURE_COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.TOTAL_COUNT
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import io.reactivex.Completable
-import io.reactivex.Completable.fromAction
+import io.reactivex.Completable.*
 import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
@@ -36,7 +40,9 @@ class HttpsUpgradeDataDownloader @Inject constructor(
     private val httpsBloomSpecDao: HttpsBloomFilterSpecDao,
     private val whitelistDao: HttpsWhitelistDao,
     private val binaryDataStore: BinaryDataStore,
-    private val appDatabase: AppDatabase
+    private val appDatabase: AppDatabase,
+    private val statisticsDataStore: StatisticsDataStore,
+    private val pixel: Pixel
 ) {
 
     fun download(): Completable {
@@ -105,6 +111,25 @@ class HttpsUpgradeDataDownloader @Inject constructor(
             }
         }
 
+    }
+
+    fun reportUpgradeStatistics(): Completable {
+        return defer {
+
+            if (statisticsDataStore.httpsUpgradesTotal == 0) {
+                return@defer complete()
+            }
+            val params = mapOf(
+                TOTAL_COUNT to statisticsDataStore.httpsUpgradesTotal.toString(),
+                FAILURE_COUNT to statisticsDataStore.httpsUpgradesFailures.toString()
+            )
+
+            pixel.fireCompletable(Pixel.PixelName.HTTPS_UPGRADE_SITE_SUMMARY, params).andThen {
+                Timber.v("Sent https statistics")
+                statisticsDataStore.httpsUpgradesTotal = 0
+                statisticsDataStore.httpsUpgradesFailures = 0
+            }
+        }
     }
 
 }

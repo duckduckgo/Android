@@ -43,6 +43,7 @@ class AppConfigurationDownloader(
         val disconnectDownload = trackerDataDownloader.downloadList(DISCONNECT)
         val surrogatesDownload = resourceSurrogateDownloader.downloadList()
         val httpsUpgradeDownload = httpsUpgradeDataDownloader.download()
+        val httpStatisticsReport = httpsUpgradeDataDownloader.reportUpgradeStatistics()
 
         return Completable.mergeDelayError(
             listOf(
@@ -51,7 +52,8 @@ class AppConfigurationDownloader(
                 trackersWhitelist,
                 disconnectDownload,
                 surrogatesDownload,
-                httpsUpgradeDownload
+                httpsUpgradeDownload,
+                httpStatisticsReport
             )
         ).doOnComplete {
             Timber.i("Download task completed successfully")
@@ -59,4 +61,6 @@ class AppConfigurationDownloader(
             appDatabase.appConfigurationDao().configurationDownloadSuccessful(appConfiguration)
         }
     }
+
+
 }
