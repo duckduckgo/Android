@@ -89,24 +89,6 @@ class HttpsUpgradeDataDownloader @Inject constructor(
         }
     }
 
-    fun reportUpgradeStatistics(): Completable {
-        return fromAction {
-
-            if (statisticsDataStore.httpsUpgradesTotal == 0) {
-                return@fromAction
-            }
-            val params = mapOf(
-                TOTAL_COUNT to statisticsDataStore.httpsUpgradesTotal.toString(),
-                FAILURE_COUNT to statisticsDataStore.httpsUpgradesFailures.toString()
-            )
-
-            pixel.fireCompletable(Pixel.PixelName.HTTPS_UPGRADE_SITE_SUMMARY, params).blockingGet()
-            Timber.v("Sent https statistics")
-            statisticsDataStore.httpsUpgradesTotal = 0
-            statisticsDataStore.httpsUpgradesFailures = 0
-        }
-    }
-
     private fun downloadWhitelist(): Completable {
 
         Timber.d("Downloading HTTPS whitelist")
@@ -129,6 +111,24 @@ class HttpsUpgradeDataDownloader @Inject constructor(
             }
         }
 
+    }
+
+    fun reportUpgradeStatistics(): Completable {
+        return fromAction {
+
+            if (statisticsDataStore.httpsUpgradesTotal == 0) {
+                return@fromAction
+            }
+            val params = mapOf(
+                TOTAL_COUNT to statisticsDataStore.httpsUpgradesTotal.toString(),
+                FAILURE_COUNT to statisticsDataStore.httpsUpgradesFailures.toString()
+            )
+
+            pixel.fireCompletable(Pixel.PixelName.HTTPS_UPGRADE_SITE_SUMMARY, params).blockingGet()
+            Timber.v("Sent https statistics")
+            statisticsDataStore.httpsUpgradesTotal = 0
+            statisticsDataStore.httpsUpgradesFailures = 0
+        }
     }
 
 }
