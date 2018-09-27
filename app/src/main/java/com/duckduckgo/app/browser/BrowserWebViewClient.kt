@@ -147,14 +147,6 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     @UiThread
-    override fun onReceivedHttpError(view: WebView, request: WebResourceRequest, errorResponse: WebResourceResponse) {
-        if (request.isForMainFrame) {
-            reportHttpsErrorIfInUpgradeList(request.url, "HTTP_STATUS_${errorResponse.statusCode}")
-        }
-        super.onReceivedHttpError(view, request, errorResponse)
-    }
-
-    @UiThread
     override fun onReceivedSslError(view: WebView, handler: SslErrorHandler, error: SslError) {
         val uri = error.url.toUri()
         val isMainFrameRequest = currentUrl == uri.toString()
