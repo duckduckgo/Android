@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.httpsupgrade.api
 
+import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.global.api.isCached
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.store.BinaryDataStore
@@ -25,6 +26,7 @@ import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec.Companion.HTTPS_BINARY_FILE
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.APP_VERSION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FAILURE_COUNT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.TOTAL_COUNT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -120,6 +122,7 @@ class HttpsUpgradeDataDownloader @Inject constructor(
                 return@defer complete()
             }
             val params = mapOf(
+                APP_VERSION to "${BuildConfig.VERSION_NAME}",
                 TOTAL_COUNT to statisticsDataStore.httpsUpgradesTotal.toString(),
                 FAILURE_COUNT to statisticsDataStore.httpsUpgradesFailures.toString()
             )
