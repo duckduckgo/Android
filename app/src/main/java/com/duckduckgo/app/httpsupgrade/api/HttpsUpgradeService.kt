@@ -25,12 +25,12 @@ import retrofit2.http.GET
 
 interface HttpsUpgradeService {
 
-    @GET("https://staticcdn.duckduckgo.com/https/https-mobile-whitelist.json")
+    @GET("https://staticcdn.duckduckgo.com/https/https-mobile-whitelist.json?cache_version=1")
     fun whitelist(): Call<List<HttpsWhitelistedDomain>>
 
-    @GET("https://staticcdn.duckduckgo.com/https/https-mobile-bloom-spec.json")
+    @GET("https://staticcdn.duckduckgo.com/https/https-mobile-bloom-spec.json?cache_version=1")
     fun httpsBloomFilterSpec(): Observable<HttpsBloomFilterSpec>
 
-    @GET("https://staticcdn.duckduckgo.com/https/https-mobile-bloom.bin")
+    @GET("https://staticcdn.duckduckgo.com/https/https-mobile-bloom.bin?cache_version=1")
     fun httpsBloomFilter(): Call<ResponseBody>
 }
