@@ -31,7 +31,9 @@ import com.duckduckgo.app.global.simpleUrl
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.HTTPS_UPGRADE_SITE_ERROR
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.APP_VERSION
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.ERROR_CODE
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.URL
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
 import javax.inject.Inject
@@ -179,8 +181,9 @@ class BrowserWebViewClient @Inject constructor(
 
     private fun reportHttpsUpgradeSiteError(url: Uri, error: String?) {
         val params = mapOf(
-            PixelParameter.URL to url.simpleUrl,
-            PixelParameter.ERROR_CODE to error
+            APP_VERSION to "${BuildConfig.VERSION_NAME}",
+            URL to url.simpleUrl,
+            ERROR_CODE to error
         )
         pixel.fire(HTTPS_UPGRADE_SITE_ERROR, params)
     }

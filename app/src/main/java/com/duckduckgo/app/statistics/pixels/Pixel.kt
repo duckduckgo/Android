@@ -58,6 +58,7 @@ interface Pixel {
         const val ERROR_CODE = "error_code"
         const val TOTAL_COUNT = "total"
         const val FAILURE_COUNT = "failures"
+        const val APP_VERSION = "app_version"
     }
 
     fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap())
