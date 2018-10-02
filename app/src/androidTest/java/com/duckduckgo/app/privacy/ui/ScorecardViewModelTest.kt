@@ -113,14 +113,14 @@ class ScorecardViewModelTest {
 
     @Test
     fun whenIsMemberOfMajorNetworkThenShowIsMemberOfMajorNetworkIsTrue() {
-        val site = site(memberNetwork = TrackerNetwork("", "", "", 5, true))
+        val site = site(memberNetwork = TrackerNetwork("", "", "",true))
         testee.onSiteChanged(site)
         assertTrue(testee.viewState.value!!.showIsMemberOfMajorNetwork)
     }
 
     @Test
     fun whenIsNotMemberOfMajorNetworkThenShowIsMemberOfMajorNetworkIsFalse() {
-        val site = site(memberNetwork = TrackerNetwork("", "", "", null, false))
+        val site = site(memberNetwork = TrackerNetwork("", "", "", false))
         testee.onSiteChanged(site)
         assertFalse(testee.viewState.value!!.showIsMemberOfMajorNetwork)
     }

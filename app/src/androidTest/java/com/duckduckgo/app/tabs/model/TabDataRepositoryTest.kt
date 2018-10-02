@@ -22,6 +22,7 @@ import android.support.test.annotation.UiThreadTest
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
@@ -49,13 +50,16 @@ class TabDataRepositoryTest {
     @Mock
     private lateinit var mockTermsOfServiceStore: TermsOfServiceStore
 
+    @Mock
+    private lateinit var mockPrevalenceStore: PrevalenceStore
+
     private lateinit var testee: TabDataRepository
 
     @UiThreadTest
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        testee = TabDataRepository(mockDao, SiteFactory(mockTermsOfServiceStore, TrackerNetworks()))
+        testee = TabDataRepository(mockDao, SiteFactory(mockTermsOfServiceStore, TrackerNetworks(prevalenceStore = mockPrevalenceStore), prevalenceStore = mockPrevalenceStore))
     }
 
     @Test

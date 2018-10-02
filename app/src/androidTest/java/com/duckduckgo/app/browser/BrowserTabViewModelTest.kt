@@ -43,6 +43,7 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyGrade
+import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -70,6 +71,9 @@ class BrowserTabViewModelTest {
     @get:Rule
     @Suppress("unused")
     val schedulers = InstantSchedulersRule()
+
+    @Mock
+    private lateinit var mockPrevalenceStore: PrevalenceStore
 
     @Mock
     private lateinit var mockNetworkLeaderboardDao: NetworkLeaderboardDao
@@ -128,7 +132,7 @@ class BrowserTabViewModelTest {
             .build()
         appConfigurationDao = db.appConfigurationDao()
 
-        val siteFactory = SiteFactory(mockTermsOfServiceStore, TrackerNetworks())
+        val siteFactory = SiteFactory(mockTermsOfServiceStore, TrackerNetworks(prevalenceStore = mockPrevalenceStore), prevalenceStore = mockPrevalenceStore)
 
         whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
 
@@ -363,17 +367,19 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUrlChangedThenPrivacyGradeIsReset() {
+        val grade = testee.privacyGrade.value
         testee.urlChanged("https://example.com")
-        assertEquals(PrivacyGrade.B, testee.privacyGrade.value)
+        assertNotEquals(grade, testee.privacyGrade.value)
     }
 
     @Test
     fun whenEnoughTrackersDetectedThenPrivacyGradeIsUpdated() {
+        val grade = testee.privacyGrade.value
         testee.urlChanged("https://example.com")
         for (i in 1..10) {
             testee.trackerDetected(TrackingEvent("https://example.com", "", null, false))
         }
-        assertEquals(PrivacyGrade.C, testee.privacyGrade.value)
+        assertNotEquals(grade, testee.privacyGrade.value)
     }
 
     @Test

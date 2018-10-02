@@ -17,11 +17,15 @@
 package com.duckduckgo.app.global.model
 
 import android.net.Uri
+import com.duckduckgo.app.global.UriString.Companion.host
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.hasIpHost
 import com.duckduckgo.app.global.isHttps
+import com.duckduckgo.app.privacy.model.Grade
 import com.duckduckgo.app.privacy.model.HttpsStatus
+import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.TermsOfService
+import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import java.util.concurrent.CopyOnWriteArrayList
@@ -29,8 +33,21 @@ import java.util.concurrent.CopyOnWriteArrayList
 class SiteMonitor(
     override val url: String,
     override val termsOfService: TermsOfService,
-    override val memberNetwork: TrackerNetwork? = null
+    override val memberNetwork: TrackerNetwork? = null,
+    val prevalenceStore: PrevalenceStore
 ) : Site {
+
+    private val gradeCalculator = Grade()
+
+    init {
+        gradeCalculator.https = uri?.isHttps ?: false
+        gradeCalculator.httpsAutoUpgrade = gradeCalculator.https // not support yet, don't penalise sites for now
+        gradeCalculator.privacyScore = termsOfService.score // TODO
+
+        memberNetwork?.let {
+            gradeCalculator.setParentEntityAndPrevalence(it.name, prevalenceStore.findPrevalenceOf(it.name))
+        }
+    }
 
     override val uri: Uri?
         get() = Uri.parse(url)
@@ -88,5 +105,33 @@ class SiteMonitor(
 
     override fun trackerDetected(event: TrackingEvent) {
         trackingEvents.add(event)
+
+        val entity = event.entity
+        val prevalence = prevalenceStore.findPrevalenceOf(entity)
+        if (event.blocked) {
+            gradeCalculator.addEntityBlocked(entity, prevalence)
+        } else {
+            gradeCalculator.addEntityNotBlocked(entity, prevalence)
+        }
     }
+
+    override val grade: PrivacyGrade
+        get() = privacyGrade(gradeCalculator.scores.site.grade)
+
+    override val improvedGrade: PrivacyGrade
+        get() = privacyGrade(gradeCalculator.scores.enhanced.grade)
+
+    private fun privacyGrade(grade: Grade.Grading): PrivacyGrade {
+        // TODO privacy grade needs to support B+ and C+
+        when(grade) {
+            Grade.Grading.A -> return PrivacyGrade.A
+            Grade.Grading.B_PLUS -> return PrivacyGrade.B
+            Grade.Grading.B -> return PrivacyGrade.B
+            Grade.Grading.C_PLUS -> return PrivacyGrade.C
+            Grade.Grading.C -> return PrivacyGrade.C
+            Grade.Grading.D -> return PrivacyGrade.D
+            Grade.Grading.D_MINUS -> return PrivacyGrade.D
+        }
+    }
+
 }

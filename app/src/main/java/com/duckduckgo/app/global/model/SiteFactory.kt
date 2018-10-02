@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.model
 
 import com.duckduckgo.app.privacy.model.TermsOfService
+import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import javax.inject.Inject
@@ -24,12 +25,12 @@ import javax.inject.Singleton
 
 
 @Singleton
-class SiteFactory @Inject constructor(private var termsOfServiceStore: TermsOfServiceStore, private var trackerNetworks: TrackerNetworks) {
+class SiteFactory @Inject constructor(private val termsOfServiceStore: TermsOfServiceStore, private val trackerNetworks: TrackerNetworks, private val prevalenceStore: PrevalenceStore) {
 
     fun build(url: String, title: String? = null): Site {
         val terms = termsOfServiceStore.retrieveTerms(url) ?: TermsOfService()
         val memberNetwork = trackerNetworks.network(url)
-        val site = SiteMonitor(url, terms, memberNetwork)
+        val site = SiteMonitor(url, terms, memberNetwork, prevalenceStore)
         title?.let {
             site.title = it
         }

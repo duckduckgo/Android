@@ -18,6 +18,7 @@ package com.duckduckgo.app.trackerdetection
 
 
 import android.support.test.runner.AndroidJUnit4
+import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.model.ResourceType
@@ -30,6 +31,7 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
 
 
 @RunWith(AndroidJUnit4::class)
@@ -40,6 +42,7 @@ class TrackerDetectorListTest {
         private val resourceType = ResourceType.UNKNOWN
     }
 
+    private lateinit var mockPrevalenceStore: PrevalenceStore
     private lateinit var blockingOnlyTestee: TrackerDetector
     private lateinit var testeeWithWhitelist: TrackerDetector
     private lateinit var settingStore: PrivacySettingsStore
@@ -53,14 +56,15 @@ class TrackerDetectorListTest {
         // re-using blocking sample as a whitelist to hammer the point home
         val trackersWhitelistAdblocks = adblockClient(TRACKERSWHITELIST, "binary/easylist_sample")
 
+        mockPrevalenceStore = mock()
         settingStore = mock()
         whenever(settingStore.privacyOn).thenReturn(true)
 
-        blockingOnlyTestee = TrackerDetectorImpl(TrackerNetworks(), settingStore)
+        blockingOnlyTestee = TrackerDetectorImpl(TrackerNetworks(prevalenceStore = mockPrevalenceStore), settingStore)
         blockingOnlyTestee.addClient(easyprivacyAdblock)
         blockingOnlyTestee.addClient(easylistAdblock)
 
-        testeeWithWhitelist = TrackerDetectorImpl(TrackerNetworks(), settingStore)
+        testeeWithWhitelist = TrackerDetectorImpl(TrackerNetworks(prevalenceStore = mockPrevalenceStore), settingStore)
         testeeWithWhitelist.addClient(trackersWhitelistAdblocks)
         testeeWithWhitelist.addClient(easyprivacyAdblock)
         testeeWithWhitelist.addClient(easylistAdblock)

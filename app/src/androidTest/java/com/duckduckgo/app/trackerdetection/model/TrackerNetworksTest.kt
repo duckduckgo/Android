@@ -16,8 +16,12 @@
 
 package com.duckduckgo.app.trackerdetection.model
 
+import com.duckduckgo.app.privacy.store.PrevalenceStore
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Before
 import org.junit.Test
 
 class TrackerNetworksTest {
@@ -31,7 +35,15 @@ class TrackerNetworksTest {
         private const val majorNetworkPercentage = 84
     }
 
-    private val testee = TrackerNetworks()
+    private var mockPrevalenceStore: PrevalenceStore = mock()
+
+    private val testee: TrackerNetworks by lazy {
+        TrackerNetworks(mockPrevalenceStore)
+    }
+
+    @Before
+    fun setUp() {
+    }
 
     @Test
     fun whenUrlMatchesTrackerUrlThenNetworkIsReturned() {
@@ -88,9 +100,11 @@ class TrackerNetworksTest {
 
     @Test
     fun whenUrlMatchesTrackerInMajorNetworkThenMajorNetworkIsReturned() {
+        whenever(mockPrevalenceStore.findPrevalenceOf(majorNetworkName)).thenReturn(100.0)
+
         val data = listOf(DisconnectTracker("tracker.com", category, majorNetworkName, majorNetworkUrl))
         testee.updateData(data)
-        val expected = TrackerNetwork(majorNetworkName, majorNetworkUrl, category, majorNetworkPercentage, true)
+        val expected = TrackerNetwork(majorNetworkName, majorNetworkUrl, category,true)
         assertEquals(expected, testee.network("http://tracker.com/script.js"))
     }
 }

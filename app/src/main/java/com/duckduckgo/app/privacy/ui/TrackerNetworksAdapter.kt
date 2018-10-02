@@ -103,7 +103,7 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     fun updateData(data: Map<String, List<TrackingEvent>>) {
-        val majorNetworkKeys = TrackerNetworks.majorNetworks.map { it.name }.filter { data.containsKey(it) }
+        val majorNetworkKeys = emptyArray<String>().asList() // TODO TrackerNetworks.majorNetworks.map { it.name }.filter { data.containsKey(it) }
         val otherKeys = data.keys.filter { !majorNetworkKeys.contains(it) }.sorted()
 
         val oldViewData = viewData

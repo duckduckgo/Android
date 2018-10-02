@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYLIST
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYPRIVACY
@@ -30,7 +31,8 @@ import org.mockito.ArgumentMatchers.anyString
 
 class TrackerDetectorTest {
 
-    private val networkTrackers = TrackerNetworks()
+    private val mockPrevalenceStore: PrevalenceStore = mock()
+    private val networkTrackers = TrackerNetworks(prevalenceStore = mockPrevalenceStore)
     private val settingStore: PrivacySettingsStore = mock()
     private val trackerDetector = TrackerDetectorImpl(networkTrackers, settingStore)
 

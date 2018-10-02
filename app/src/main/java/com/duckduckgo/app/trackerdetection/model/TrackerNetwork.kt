@@ -16,10 +16,11 @@
 
 package com.duckduckgo.app.trackerdetection.model
 
+import com.duckduckgo.app.global.UriString
+
 data class TrackerNetwork(
     val name: String,
     val url: String,
     val category: String? = null,
-    val percentageOfPages: Int? = null,
     val isMajor: Boolean = false
 )

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,6 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.model
+package com.duckduckgo.app.privacy.api
 
-import com.duckduckgo.app.global.UriString.Companion.host
-
-data class TrackingEvent(
-    val documentUrl: String,
-    val trackerUrl: String,
-    val trackerNetwork: TrackerNetwork?,
-    val blocked: Boolean,
-    val entity: String = trackerNetwork?.name ?: host(trackerUrl) ?: trackerUrl
-)
+data class PrevalenceJson(val data: Map<String, Double>)
