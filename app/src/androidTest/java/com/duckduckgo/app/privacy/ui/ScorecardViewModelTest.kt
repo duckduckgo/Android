@@ -67,8 +67,8 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenSiteHasTrackersThenViewModelGradesAreUpdated() {
-        val site = site(allTrackersBlocked = true, trackerCount = 1000)
+    fun whenSiteGradesAreUpdatedThenViewModelGradesAreUpdated() {
+        val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)
         testee.onSiteChanged(site)
         assertEquals(PrivacyGrade.D, testee.viewState.value?.beforeGrade)
         assertEquals(PrivacyGrade.B, testee.viewState.value?.afterGrade)
@@ -134,7 +134,7 @@ class ScorecardViewModelTest {
 
     @Test
     fun whenSiteHasDifferentBeforeAndImprovedGradeThenShowEnhancedGradeIsTrue() {
-        val site = site(allTrackersBlocked = true, trackerCount = 10)
+        val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.A)
         testee.onSiteChanged(site)
         assertTrue(testee.viewState.value!!.showEnhancedGrade)
     }
@@ -153,7 +153,9 @@ class ScorecardViewModelTest {
         hasTrackerFromMajorNetwork: Boolean = false,
         allTrackersBlocked: Boolean = true,
         terms: TermsOfService = TermsOfService(),
-        memberNetwork: TrackerNetwork? = null
+        memberNetwork: TrackerNetwork? = null,
+        grade: PrivacyGrade = PrivacyGrade.UNKNOWN,
+        improvedGrade: PrivacyGrade = PrivacyGrade.UNKNOWN
     ): Site {
         val site: Site = mock()
         whenever(site.https).thenReturn(https)
@@ -163,6 +165,8 @@ class ScorecardViewModelTest {
         whenever(site.hasTrackerFromMajorNetwork).thenReturn(hasTrackerFromMajorNetwork)
         whenever(site.allTrackersBlocked).thenReturn(allTrackersBlocked)
         whenever(site.termsOfService).thenReturn(terms)
+        whenever(site.grade).thenReturn(grade)
+        whenever(site.improvedGrade).thenReturn(improvedGrade)
         return site
     }
 }

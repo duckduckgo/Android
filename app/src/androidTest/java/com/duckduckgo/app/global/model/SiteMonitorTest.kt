@@ -26,6 +26,8 @@ import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Test
 
+// TODO test that scores are recalulated when trackers are detected
+
 class SiteMonitorTest {
 
     companion object {
