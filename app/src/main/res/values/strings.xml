@@ -42,9 +42,10 @@
     <string name="downloadInProgress">Downloading</string>
 
     <!-- Sharing options -->
-    <string name="linkOptions">Link Options</string>
+    <string name="options">Options</string>
     <string name="shareLink">Share Link</string>
     <string name="shareMenuTitle">Share…</string>
+    <string name="copyUrl">Copy link address</string>
 
     <!-- Find in page -->
     <string name="findInPageMenuTitle">Find in Page</string>

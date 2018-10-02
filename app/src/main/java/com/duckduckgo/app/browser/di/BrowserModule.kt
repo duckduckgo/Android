@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.di
 
+import android.content.ClipboardManager
 import android.content.Context
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.defaultBrowsing.AndroidDefaultBrowserDetector
@@ -43,8 +44,8 @@ class BrowserModule {
     }
 
     @Provides
-    fun webViewLongPressHandler(pixel: Pixel): LongPressHandler {
-        return WebViewLongPressHandler(pixel)
+    fun webViewLongPressHandler(context: Context, pixel: Pixel): LongPressHandler {
+        return WebViewLongPressHandler(context, pixel)
     }
 
     @Provides
@@ -59,4 +60,9 @@ class BrowserModule {
     @Singleton
     @Provides
     fun webDataManager(webViewSessionStorage: WebViewSessionStorage) = WebDataManager(AppUrl.Url.HOST, webViewSessionStorage)
+
+    @Provides
+    fun clipboardManager(context: Context) : ClipboardManager {
+        return context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    }
 }

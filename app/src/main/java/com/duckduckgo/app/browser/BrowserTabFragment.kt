@@ -23,6 +23,8 @@ import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -108,6 +110,9 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     @Inject
     lateinit var shortcutBuilder: ShortcutBuilder
+
+    @Inject
+    lateinit var  clipboardManager: ClipboardManager
 
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
@@ -346,6 +351,9 @@ class BrowserTabFragment : Fragment(), FindListener {
             is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
             Command.DismissFindInPage -> webView?.findAllAsync(null)
             is Command.ShareLink -> launchSharePageChooser(it.url)
+            is Command.CopyLink -> {
+                clipboardManager.primaryClip = ClipData.newPlainText(null, it.url)
+            }
             is Command.DisplayMessage -> showToast(it.messageId)
             is Command.ShowFileChooser -> {
                 launchFilePicker(it)

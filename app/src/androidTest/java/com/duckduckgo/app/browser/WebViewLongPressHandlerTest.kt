@@ -16,11 +16,15 @@
 
 package com.duckduckgo.app.browser
 
+import android.support.test.InstrumentationRegistry
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.webkit.WebView.HitTestResult
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockito_kotlin.eq
+import com.nhaarman.mockito_kotlin.never
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -46,10 +50,12 @@ class WebViewLongPressHandlerTest {
     @Mock
     private lateinit var mockPixel: Pixel
 
+    private var context = InstrumentationRegistry.getTargetContext()
+
     @Before
     fun setup() {
         MockitoAnnotations.initMocks(this)
-        testee = WebViewLongPressHandler(mockPixel)
+        testee = WebViewLongPressHandler(context, mockPixel)
     }
 
     @Test
@@ -71,15 +77,15 @@ class WebViewLongPressHandlerTest {
     }
 
     @Test
-    fun whenLongPressedWithImageTypeThenImageOptionsHeaderAddedToMenu() {
+    fun whenLongPressedWithImageTypeThenUrlHeaderAddedToMenu() {
         testee.handleLongPress(HitTestResult.IMAGE_TYPE, HTTPS_IMAGE_URL, mockMenu)
-        verify(mockMenu).setHeaderTitle(R.string.imageOptions)
+        verify(mockMenu).setHeaderTitle(HTTPS_IMAGE_URL)
     }
 
     @Test
-    fun whenLongPressedWithAnchorImageTypeThenImageOptionsHeaderAddedToMenu() {
+    fun whenLongPressedWithAnchorImageTypeThenUrlHeaderAddedToMenu() {
         testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, HTTPS_IMAGE_URL, mockMenu)
-        verify(mockMenu).setHeaderTitle(R.string.imageOptions)
+        verify(mockMenu).setHeaderTitle(HTTPS_IMAGE_URL)
     }
 
     @Test
@@ -153,8 +159,6 @@ class WebViewLongPressHandlerTest {
     }
 
     private fun verifyMenuNotAltered() {
-        verify(mockMenu, never()).setHeaderTitle(anyString())
-        verify(mockMenu, never()).setHeaderTitle(anyInt())
         verify(mockMenu, never()).add(anyInt())
         verify(mockMenu, never()).add(anyString())
         verify(mockMenu, never()).add(anyInt(), anyInt(), anyInt(), anyInt())
