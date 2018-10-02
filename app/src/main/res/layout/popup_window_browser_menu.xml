@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/back"
-            android:src="@drawable/ic_arrow_back_24px" />
+            android:src="@drawable/ic_arrow_back_24dp" />
 
         <ImageButton
             android:id="@+id/forwardPopupMenuItem"
@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/forward"
-            android:src="@drawable/ic_arrow_forward_24px" />
+            android:src="@drawable/ic_arrow_forward_24dp" />
 
         <ImageButton
             android:id="@+id/refreshPopupMenuItem"
@@ -75,8 +75,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="20dp"
-            android:paddingTop="13dp">
+            android:paddingTop="13dp"
+            android:paddingBottom="20dp">
 
             <TextView
                 android:id="@+id/newTabPopupMenuItem"
@@ -111,15 +111,15 @@
             <CheckBox
                 android:id="@+id/requestDesktopSiteCheckMenuItem"
                 style="@style/BrowserTextMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
                 android:button="@null"
+                android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
+                android:drawablePadding="30dp"
                 android:paddingStart="30dp"
                 android:paddingEnd="0dp"
-                android:layout_marginEnd="20dp"
-                android:drawablePadding="30dp"
-                android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
-                android:text="@string/requestDesktopSiteMenuTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:text="@string/requestDesktopSiteMenuTitle" />
 
             <TextView
                 android:id="@+id/brokenSitePopupMenuItem"

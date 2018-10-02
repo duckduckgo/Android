@@ -37,7 +37,8 @@ import javax.inject.Inject
 
 class ScorecardActivity : DuckDuckGoActivity() {
 
-    @Inject lateinit var repository: TabRepository
+    @Inject
+    lateinit var repository: TabRepository
     private val trackersRenderer = TrackersRenderer()
     private val upgradeRenderer = PrivacyUpgradeRenderer()
 

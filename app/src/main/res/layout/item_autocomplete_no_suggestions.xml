@@ -17,16 +17,16 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:paddingTop="14dp"
-    android:paddingBottom="4dp"
-    android:layout_height="wrap_content">
+    android:paddingBottom="4dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="@string/no_suggestions"
         android:textAlignment="center"
-        android:textColor="@color/warmGray"
+        android:textColor="@color/grayishTwo"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"

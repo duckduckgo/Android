@@ -6,7 +6,6 @@ apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
 
 ext {
-    VERSION_NAME = "5.10.2"
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
 }
 
@@ -17,7 +16,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
         versionCode buildVersionCode()
-        versionName VERSION_NAME
+        versionName buildVersionName()
         testInstrumentationRunner "com.duckduckgo.app.TestRunner"
         archivesBaseName = "duckduckgo-$versionName"
 
@@ -87,6 +86,7 @@ ext {
     glide = "4.6.1"
     androidTestRunner = "1.0.2"
     lottieVersion = "2.6.0-beta19"
+    okHttp = "3.10.0"
 }
 
 
@@ -100,7 +100,7 @@ dependencies {
     implementation "com.android.support:appcompat-v7:$supportLibrary"
     implementation "com.android.support:design:$supportLibrary"
     implementation "com.android.support.constraint:constraint-layout:1.1.0"
-    implementation "com.squareup.okhttp3:okhttp:3.10.0"
+    implementation "com.squareup.okhttp3:okhttp:$okHttp"
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofit"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit"
@@ -157,6 +157,7 @@ dependencies {
     androidTestUtil "com.android.support.test:orchestrator:1.0.2"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:3.0.2"
     androidTestImplementation "org.mockito:mockito-android:2.15.0"
+    androidTestImplementation "com.squareup.okhttp3:mockwebserver:$okHttp"
     androidTestImplementation "com.nhaarman:mockito-kotlin-kt1.1:1.5.0"
 
 }

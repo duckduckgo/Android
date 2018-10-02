@@ -4,9 +4,12 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.feedback.api.FeedbackSender
-import com.duckduckgo.app.feedback.ui.FeedbackViewModel.*
-import com.nhaarman.mockito_kotlin.*
-import org.junit.Assert.*
+import com.duckduckgo.app.feedback.ui.FeedbackViewModel.Command
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.never
+import com.nhaarman.mockito_kotlin.verify
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

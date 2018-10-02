@@ -17,12 +17,12 @@
   ~ limitations under the License.
   -->
 
-<android.support.design.widget.AppBarLayout xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:theme="@style/AppTheme.AppBarOverlay"
+    android:theme="@style/AppTheme.Dark.AppBarOverlay"
     tools:showIn="@layout/activity_tracker_networks">
 
     <android.support.v7.widget.Toolbar
@@ -31,7 +31,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:theme="@style/ToolbarTheme"
-        app:popupTheme="@style/AppTheme.PopupOverlay" />
+        app:popupTheme="@style/AppTheme.Dark.PopupOverlay" />
 
 </android.support.design.widget.AppBarLayout>
 

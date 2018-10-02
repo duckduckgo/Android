@@ -21,10 +21,15 @@ import io.reactivex.Completable
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.QueryMap
 
 interface PixelService {
 
     @GET("/t/{pixelName}_android_{formFactor}")
-    fun fire(@Path("pixelName") pixelName: String, @Path("formFactor") formFactor: String, @Query(AppUrl.ParamKey.ATB) atb: String): Completable
-
+    fun fire(
+        @Path("pixelName") pixelName: String,
+        @Path("formFactor") formFactor: String,
+        @Query(AppUrl.ParamKey.ATB) atb: String,
+        @QueryMap additionalQueryParams: Map<String, String?> = emptyMap()
+    ): Completable
 }

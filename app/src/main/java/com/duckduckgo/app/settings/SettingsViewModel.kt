@@ -20,6 +20,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import timber.log.Timber
@@ -32,16 +33,19 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class ViewState(
-            val loading: Boolean = true,
-            val version: String = "",
-            val autoCompleteSuggestionsEnabled: Boolean = true,
-            val showDefaultBrowserSetting: Boolean = false,
-            val isAppDefaultBrowser: Boolean = false)
+        val loading: Boolean = true,
+        val version: String = "",
+        val lightThemeEnabled: Boolean = false,
+        val autoCompleteSuggestionsEnabled: Boolean = true,
+        val showDefaultBrowserSetting: Boolean = false,
+        val isAppDefaultBrowser: Boolean = false
+    )
 
     private lateinit var currentViewState: ViewState
 
     sealed class Command {
         object LaunchFeedback : Command()
+        object UpdateTheme : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().apply {
@@ -49,31 +53,38 @@ class SettingsViewModel @Inject constructor(
         value = currentViewState
     }
 
-    val command: MutableLiveData<Command> = MutableLiveData()
+    val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     fun start() {
-        val autoCompleteEnabled = settingsDataStore.autoCompleteSuggestionsEnabled
-        Timber.i("Is auto complete enabled? $autoCompleteEnabled")
 
         val defaultBrowserAlready = defaultWebBrowserCapability.isCurrentlyConfiguredAsDefaultBrowser()
         Timber.i("Is already default browser? $defaultBrowserAlready")
 
         val variantKey = variantManager.getVariant().key
 
-        viewState.value = currentViewState.copy(loading = false,
-                autoCompleteSuggestionsEnabled = autoCompleteEnabled,
-                isAppDefaultBrowser = defaultBrowserAlready,
-                showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
-                version = obtainVersion(variantKey))
+        viewState.value = currentViewState.copy(
+            loading = false,
+            lightThemeEnabled = settingsDataStore.lightThemeEnabled,
+            autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
+            isAppDefaultBrowser = defaultBrowserAlready,
+            showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
+            version = obtainVersion(variantKey)
+        )
     }
 
     fun userRequestedToSendFeedback() {
         command.value = Command.LaunchFeedback
     }
 
-    fun userRequestedToChangeAutocompleteSetting(checked: Boolean) {
-        Timber.i("User changed autocomplete setting, is now enabled: $checked")
-        settingsDataStore.autoCompleteSuggestionsEnabled = checked
+    fun onLightThemeToggled(enabled: Boolean) {
+        Timber.i("User toggled light theme, is now enabled: $enabled")
+        settingsDataStore.lightThemeEnabled = enabled
+        command.value = Command.UpdateTheme
+    }
+
+    fun onAutocompleteSettingChanged(enabled: Boolean) {
+        Timber.i("User changed autocomplete setting, is now enabled: $enabled")
+        settingsDataStore.autoCompleteSuggestionsEnabled = enabled
     }
 
     private fun obtainVersion(variantKey: String): String {

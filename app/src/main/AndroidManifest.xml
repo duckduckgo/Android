@@ -15,7 +15,7 @@
         android:label="@string/appName"
         android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
+        android:theme="@style/AppTheme.Dark"
         tools:ignore="GoogleAppIndexingWarning">
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
@@ -38,15 +38,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivity"
             android:label="@string/appName"
-            android:theme="@style/AppTheme.TransparentTheme" />
+            android:theme="@style/AppTheme.Dark.Transparent" />
+
         <activity
             android:name=".BrowserActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask"
-            android:theme="@style/BrowserTheme"
             android:windowSoftInputMode="adjustResize|stateHidden">
 
             <!-- Allows app to become default browser -->
@@ -97,7 +98,8 @@
             android:parentActivityName="com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity" />
         <activity
             android:name="com.duckduckgo.app.settings.SettingsActivity"
-            android:label="@string/settingsActivityTitle" />
+            android:label="@string/settingsActivityTitle"
+            android:parentActivityName=".BrowserActivity" />
         <activity
             android:name="com.duckduckgo.app.feedback.ui.FeedbackActivity"
             android:label="@string/feedbackActivityTitle"
@@ -105,11 +107,17 @@
         <activity
             android:name="com.duckduckgo.app.about.AboutDuckDuckGoActivity"
             android:label="@string/aboutActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            android:theme="@style/AppTheme" />
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
             android:name="com.duckduckgo.app.bookmarks.ui.BookmarksActivity"
             android:label="@string/bookmarksActivityTitle" />
+        <activity
+            android:name=".defaultBrowsing.DefaultBrowserInfoActivity"
+            android:theme="@style/ModalCardTheme" />
+        <activity
+            android:name="com.duckduckgo.app.fire.FireActivity"
+            android:process="@string/fireProcessName"
+            android:theme="@style/SplashTheme" />
 
         <service
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"
@@ -119,20 +127,21 @@
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
-
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/search_widget_info" />
         </receiver>
 
-        <activity
-            android:name=".defaultBrowsing.DefaultBrowserInfoActivity"
-            android:theme="@style/ModalCardTheme" />
+        <receiver android:name="com.duckduckgo.widget.SearchWidgetLight">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/search_widget_info_light" />
+        </receiver>
 
-        <activity
-            android:name="com.duckduckgo.app.fire.FireActivity"
-            android:process="@string/fireProcessName"
-            android:theme="@style/SplashTheme" />
+
     </application>
 
 </manifest>

@@ -141,8 +141,10 @@ class BookmarksActivity : DuckDuckGoActivity() {
         private const val EDIT_BOOKMARK_FRAGMENT_TAG = "EDIT_BOOKMARK"
     }
 
-    class BookmarksAdapter(private val context: Context,
-                           private val viewModel: BookmarksViewModel) : Adapter<BookmarksViewHolder>() {
+    class BookmarksAdapter(
+        private val context: Context,
+        private val viewModel: BookmarksViewModel
+    ) : Adapter<BookmarksViewHolder>() {
 
         var bookmarks: List<BookmarkEntity> = emptyList()
             set(value) {
@@ -151,7 +153,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
             }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookmarksViewHolder {
-            val inflater = LayoutInflater.from(context)
+            val inflater = LayoutInflater.from(parent.context)
             val view = inflater.inflate(R.layout.view_bookmark_entry, parent, false)
             return BookmarksViewHolder(view, viewModel)
         }
@@ -195,10 +197,10 @@ class BookmarksActivity : DuckDuckGoActivity() {
             val faviconUrl = Uri.parse(url).faviconLocation()
 
             GlideApp.with(itemView)
-                    .load(faviconUrl)
-                    .placeholder(R.drawable.ic_globe_white_16dp)
-                    .error(R.drawable.ic_globe_white_16dp)
-                    .into(itemView.favicon)
+                .load(faviconUrl)
+                .placeholder(R.drawable.ic_globe_gray_16dp)
+                .error(R.drawable.ic_globe_gray_16dp)
+                .into(itemView.favicon)
         }
 
         private fun parseDisplayUrl(urlString: String): String {

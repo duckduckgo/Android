@@ -31,7 +31,7 @@ class StubDatabaseModule {
     @Singleton
     fun provideDatabase(context: Context): AppDatabase {
         return Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-                .allowMainThreadQueries()
-                .build()
+            .allowMainThreadQueries()
+            .build()
     }
 }

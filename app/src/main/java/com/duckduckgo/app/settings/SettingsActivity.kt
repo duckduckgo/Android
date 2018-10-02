@@ -28,8 +28,10 @@ import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.FeedbackActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.sendThemeChangedBroadcast
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
+import com.duckduckgo.app.settings.SettingsViewModel.Command
 import kotlinx.android.synthetic.main.content_settings.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 
@@ -39,8 +41,12 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private val defaultBrowserChangeListener = OnCheckedChangeListener { _, _ -> launchDefaultAppScreen() }
 
-    private val autocompleteChangeListener = OnCheckedChangeListener { _, isChecked ->
-        viewModel.userRequestedToChangeAutocompleteSetting(isChecked)
+    private val lightThemeToggleListener = OnCheckedChangeListener { _, isChecked ->
+        viewModel.onLightThemeToggled(isChecked)
+    }
+
+    private val autocompleteToggleListener = OnCheckedChangeListener { _, isChecked ->
+        viewModel.onAutocompleteSettingChanged(isChecked)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,13 +63,12 @@ class SettingsActivity : DuckDuckGoActivity() {
         viewModel.start()
     }
 
-
     private fun configureUiEventHandlers() {
         onboarding.setOnClickListener { startActivity(OnboardingActivity.intent(this)) }
         about.setOnClickListener { startActivity(AboutDuckDuckGoActivity.intent(this)) }
         provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
-
-        autocompleteEnabledSetting.setOnCheckedChangeListener(autocompleteChangeListener)
+        lightThemeToggle.setOnCheckedChangeListener(lightThemeToggleListener)
+        autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
         setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
     }
 
@@ -71,8 +76,8 @@ class SettingsActivity : DuckDuckGoActivity() {
         viewModel.viewState.observe(this, Observer<SettingsViewModel.ViewState> { viewState ->
             viewState?.let {
                 version.text = it.version
-
-                autocompleteEnabledSetting.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteChangeListener)
+                lightThemeToggle.quietlySetIsChecked(it.lightThemeEnabled, lightThemeToggleListener)
+                autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
                 updateDefaultBrowserViewVisibility(it)
             }
         })
@@ -82,9 +87,10 @@ class SettingsActivity : DuckDuckGoActivity() {
         })
     }
 
-    private fun processCommand(it: SettingsViewModel.Command?) {
+    private fun processCommand(it: Command?) {
         when (it) {
-            is SettingsViewModel.Command.LaunchFeedback -> launchFeedback()
+            is Command.LaunchFeedback -> launchFeedback()
+            is Command.UpdateTheme -> sendThemeChangedBroadcast()
         }
     }
 

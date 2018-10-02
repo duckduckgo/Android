@@ -24,10 +24,10 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 class TrackerNetworksViewModel : ViewModel() {
 
     data class ViewState(
-            val domain: String,
-            val allTrackersBlocked: Boolean,
-            val networkCount: Int,
-            val trackingEventsByNetwork: Map<String, List<TrackingEvent>>
+        val domain: String,
+        val allTrackersBlocked: Boolean,
+        val networkCount: Int,
+        val trackingEventsByNetwork: Map<String, List<TrackingEvent>>
     )
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -38,10 +38,10 @@ class TrackerNetworksViewModel : ViewModel() {
 
     private fun resetViewState() {
         viewState.value = ViewState(
-                domain = "",
-                networkCount = 0,
-                allTrackersBlocked = true,
-                trackingEventsByNetwork = HashMap()
+            domain = "",
+            networkCount = 0,
+            allTrackersBlocked = true,
+            trackingEventsByNetwork = HashMap()
         )
     }
 
@@ -51,10 +51,10 @@ class TrackerNetworksViewModel : ViewModel() {
             return
         }
         viewState.value = viewState.value?.copy(
-                domain = site.uri?.host ?: "",
-                networkCount = site.networkCount,
-                allTrackersBlocked = site.allTrackersBlocked,
-                trackingEventsByNetwork = site.distinctTrackersByNetwork
+            domain = site.uri?.host ?: "",
+            networkCount = site.networkCount,
+            allTrackersBlocked = site.allTrackersBlocked,
+            trackingEventsByNetwork = site.distinctTrackersByNetwork
         )
     }
 }

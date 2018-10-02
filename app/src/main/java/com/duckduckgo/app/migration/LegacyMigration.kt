@@ -28,10 +28,11 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class LegacyMigration @Inject constructor(
-        val database: AppDatabase,
-        val bookmarksDao: BookmarksDao,
-        val context: Context,
-        val queryUrlConverter: QueryUrlConverter) {
+    val database: AppDatabase,
+    val bookmarksDao: BookmarksDao,
+    val context: Context,
+    val queryUrlConverter: QueryUrlConverter
+) {
 
     @WorkerThread
     fun start(completion: (favourites: Int, searches: Int) -> Unit) {
@@ -42,7 +43,7 @@ class LegacyMigration @Inject constructor(
 
     }
 
-    private fun migrate(legacyDb:LegacyDb, completion: (favourites: Int, searches: Int) -> Unit) {
+    private fun migrate(legacyDb: LegacyDb, completion: (favourites: Int, searches: Int) -> Unit) {
 
         var favourites = 0
         var searches = 0
@@ -85,7 +86,7 @@ class LegacyMigration @Inject constructor(
         return count
     }
 
-    private fun migrateFavourites(db: LegacyDb) : Int {
+    private fun migrateFavourites(db: LegacyDb): Int {
         val feedObjects = db.selectAll() ?: return 0
 
         var count = 0

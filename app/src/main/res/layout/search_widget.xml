@@ -24,16 +24,17 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_centerInParent="true"
-        android:layout_marginEnd="2dp"
         android:layout_marginStart="2dp"
+        android:layout_marginEnd="2dp"
         android:background="@drawable/search_widget_background"
-        android:drawableEnd="@drawable/mini_logo"
+        android:backgroundTint="@color/almostBlackDark"
+        android:drawableEnd="@drawable/logo_mini"
+        android:fontFamily="sans-serif-medium"
         android:gravity="center_vertical"
-        android:paddingEnd="16dp"
         android:paddingStart="24dp"
+        android:paddingEnd="16dp"
         android:text="@string/searchWidgetTextHint"
         android:textColor="@color/whiteTwo"
-        android:fontFamily="sans-serif-medium"
         android:textSize="15sp" />
 
 </RelativeLayout>

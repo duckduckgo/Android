@@ -34,7 +34,7 @@ class BrowserChromeClient @Inject constructor() : WebChromeClient() {
     override fun onShowCustomView(view: View, callback: CustomViewCallback?) {
         Timber.i("on show custom view")
 
-        if(customView != null) {
+        if (customView != null) {
             callback?.onCustomViewHidden()
             return
         }

@@ -16,29 +16,29 @@
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:layout_height="match_parent">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="18dp"
         android:paddingTop="18dp"
-        tools:listItem="@layout/view_bookmark_entry"
-        app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+        android:paddingBottom="18dp"
+        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+        tools:listItem="@layout/view_bookmark_entry" />
 
     <TextView
         android:id="@+id/emptyBookmarks"
-        android:text="@string/noBookmarks"
-        android:textSize="16sp"
-        android:textAlignment="center"
-        android:textColor="@color/white"
         android:layout_width="match_parent"
-        android:layout_marginTop="40dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
+        android:layout_marginTop="40dp"
         android:layout_marginEnd="10dp"
-        android:layout_height="wrap_content" />
+        android:text="@string/noBookmarks"
+        android:textAlignment="center"
+        android:textColor="?attr/bookmarkTitleTextColor"
+        android:textSize="16sp" />
 
 </FrameLayout>

@@ -105,12 +105,12 @@ class ResourceSurrogateLoaderTest {
         assertEquals(6, surrogates.size)
     }
 
-    private fun initialiseFile(filename: String) : List<SurrogateResponse> {
+    private fun initialiseFile(filename: String): List<SurrogateResponse> {
         return testee.convertBytes(readFile(filename))
     }
 
     private fun readFile(filename: String): ByteArray {
-        return javaClass.classLoader.getResource("binary/surrogates/$filename").readBytes()
+        return javaClass.classLoader!!.getResource("binary/surrogates/$filename").readBytes()
     }
 
 }

@@ -22,7 +22,7 @@ class AppUrl {
     object Url {
         const val HOST = "duckduckgo.com"
         const val API = "https://$HOST"
-        const val HOME =  "https://$HOST"
+        const val HOME = "https://$HOST"
         const val ABOUT = "https://$HOST/about"
         const val TOSDR = "https://tosdr.org"
         const val PIXEL = "https://improving.duckduckgo.com"
@@ -33,6 +33,7 @@ class AppUrl {
         const val SOURCE = "t"
         const val ATB = "atb"
         const val RETENTION_ATB = "set_atb"
+        const val DEV_MODE = "test"
         const val FORM_FACTOR = "f"
     }
 

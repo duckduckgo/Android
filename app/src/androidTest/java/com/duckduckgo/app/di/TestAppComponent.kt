@@ -17,7 +17,6 @@
 package com.duckduckgo.app.di
 
 import android.app.Application
-import com.duckduckgo.app.TestApplication
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteModule
 import com.duckduckgo.app.browser.di.BrowserModule
 import com.duckduckgo.app.browser.favicon.FaviconModule
@@ -27,43 +26,51 @@ import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
 import com.duckduckgo.app.trackerdetection.di.TrackerDetectionModule
 import dagger.BindsInstance
 import dagger.Component
-import dagger.android.AndroidInjector
 import dagger.android.support.AndroidSupportInjectionModule
+import retrofit2.Retrofit
+import javax.inject.Named
 import javax.inject.Singleton
 
 
 @Singleton
-@Component(modules = [
+@Component(
+    modules = [
 
-    /* test doubled modules */
-    StubDatabaseModule::class,
-    StubJobSchedulerModule::class,
-    StubAppConfigurationDownloadModule::class,
-    StubStatisticsModule::class,
+        /* test doubled modules */
+        StubDatabaseModule::class,
+        StubJobSchedulerModule::class,
+        StubAppConfigurationDownloadModule::class,
+        StubStatisticsModule::class,
 
-    /* real modules */
-    ApplicationModule::class,
-    AndroidBindingModule::class,
-    AndroidSupportInjectionModule::class,
-    NetworkModule::class,
-    StoreModule::class,
-    JsonModule::class,
-    BrowserModule::class,
-    BrowserAutoCompleteModule::class,
-    HttpsUpgraderModule::class,
-    ResourceSurrogateModule::class,
-    TrackerDetectionModule::class,
-    NotificationModule::class,
-    OnboardingModule::class,
-    VariantModule::class,
-    FaviconModule::class
-])
-interface TestAppComponent : AndroidInjector<TestApplication> {
+        /* real modules */
+        ApplicationModule::class,
+        AndroidBindingModule::class,
+        AndroidSupportInjectionModule::class,
+        NetworkModule::class,
+        StoreModule::class,
+        JsonModule::class,
+        BrowserModule::class,
+        BrowserAutoCompleteModule::class,
+        HttpsUpgraderModule::class,
+        ResourceSurrogateModule::class,
+        TrackerDetectionModule::class,
+        NotificationModule::class,
+        OnboardingModule::class,
+        VariantModule::class,
+        FaviconModule::class
+    ]
+)
+interface TestAppComponent : AppComponent {
 
     @Component.Builder
-    abstract class Builder : AndroidInjector.Builder<TestApplication>() {
+    interface Builder {
 
         @BindsInstance
-        abstract fun application(application: Application): TestAppComponent.Builder
+        fun application(application: Application): TestAppComponent.Builder
+
+        fun build(): TestAppComponent
     }
+
+    @Named("api")
+    fun retrofit(): Retrofit
 }

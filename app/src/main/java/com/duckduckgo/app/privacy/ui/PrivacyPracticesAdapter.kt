@@ -57,9 +57,11 @@ class PrivacyPracticesAdapter : RecyclerView.Adapter<PrivacyPracticesAdapter.Pra
         notifyDataSetChanged()
     }
 
-    class PracticeViewHolder(val root: View,
-                             val icon: ImageView,
-                             val description: TextView) : RecyclerView.ViewHolder(root)
+    class PracticeViewHolder(
+        val root: View,
+        val icon: ImageView,
+        val description: TextView
+    ) : RecyclerView.ViewHolder(root)
 
 }
 

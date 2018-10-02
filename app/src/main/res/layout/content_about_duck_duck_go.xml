@@ -30,8 +30,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="30dp"
         android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
         android:orientation="vertical"
         android:paddingBottom="10dp"
         tools:ignore="UseCompoundDrawables">
@@ -43,18 +43,18 @@
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
             android:contentDescription="@string/duckDuckGoLogoDescription"
-            android:src="@drawable/full_logo" />
+            android:src="@drawable/logo_full" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
             android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
             android:fontFamily="sans-serif"
             android:lineSpacingExtra="6sp"
             android:text="@string/aboutHeading"
             android:textAlignment="center"
-            android:textColor="@color/white"
+            android:textColor="?attr/normalTextColor"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -66,7 +66,7 @@
             android:lineSpacingExtra="6sp"
             android:text="@string/aboutDescription"
             android:textAlignment="center"
-            android:textColor="@color/white"
+            android:textColor="?attr/normalTextColor"
             android:textSize="16sp"
             android:textStyle="normal"
             tools:text="Long description would go here\n\nLots and lots of words" />
@@ -75,8 +75,8 @@
             android:id="@+id/learnMoreLink"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:fontFamily="sans-serif"
             android:lineSpacingExtra="6sp"
             android:text="@string/aboutMoreLink"

@@ -19,9 +19,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginEnd="10dp"
     android:layout_marginStart="10dp"
     android:layout_marginTop="10dp"
+    android:layout_marginEnd="10dp"
     android:background="@drawable/tab_background">
 
     <ImageView
@@ -53,21 +53,21 @@
         android:id="@+id/favicon"
         android:layout_width="18dp"
         android:layout_height="18dp"
+        android:layout_marginStart="20dp"
         android:contentDescription="@string/faviconContentDescription"
         android:src="@drawable/ic_globe_gray_16dp"
         app:layout_constraintBottom_toBottomOf="@id/guideBottom"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/guideTop"
-        android:layout_marginStart="20dp"/>
+        app:layout_constraintTop_toTopOf="@id/guideTop" />
 
     <ImageView
         android:id="@+id/close"
         android:layout_width="62dp"
         android:layout_height="0dp"
+        android:background="?selectableItemBackground"
         android:contentDescription="@string/closeContentDescription"
         android:scaleType="center"
-        android:background="?selectableItemBackground"
-        android:src="@drawable/ic_close_white_24dp"
+        android:src="@drawable/ic_close_24dp"
         android:tint="@color/grayish"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -80,7 +80,7 @@
         android:layout_marginStart="12dp"
         android:fontFamily="sans-serif-medium"
         android:lines="1"
-        android:textColor="@color/midnight"
+        android:textColor="?attr/tabTitleTextColor"
         android:textIsSelectable="false"
         android:textSize="16sp"
         android:textStyle="normal"
@@ -97,7 +97,7 @@
         android:layout_marginTop="4dp"
         android:fontFamily="sans-serif"
         android:lines="1"
-        android:textColor="@color/coolGray"
+        android:textColor="?attr/tabSubtitleTextColor"
         android:textIsSelectable="false"
         android:textSize="12sp"
         android:textStyle="normal"

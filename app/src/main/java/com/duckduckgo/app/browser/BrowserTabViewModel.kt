@@ -148,7 +148,7 @@ class BrowserTabViewModel(
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         class HandleExternalAppLink(val appLink: IntentType) : Command()
-        class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap?= null) : Command()
+        class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap? = null) : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -514,9 +514,11 @@ class BrowserTabViewModel(
     fun onFindResultsReceived(activeMatchOrdinal: Int, numberOfMatches: Int) {
         val activeIndex = if (numberOfMatches == 0) 0 else activeMatchOrdinal + 1
         val currentViewState = currentFindInPageViewState()
-        findInPageViewState.value = currentViewState.copy(showNumberMatches = true,
-        activeMatchIndex = activeIndex,
-        numberMatches = numberOfMatches)
+        findInPageViewState.value = currentViewState.copy(
+            showNumberMatches = true,
+            activeMatchIndex = activeIndex,
+            numberMatches = numberOfMatches
+        )
     }
 
     fun onWebSessionRestored() {

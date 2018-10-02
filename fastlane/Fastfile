@@ -1,0 +1,42 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:android)
+
+platform :android do
+
+  desc "Release"
+  lane :deploy_github do
+
+    props = property_file_read(file: "app/version/version.properties")
+    version = props["VERSION"]
+    releaseNotes = File.read("../app/version/release-notes")
+    apkPath = "app/build/outputs/apk/release/duckduckgo-#{version}-release.apk"
+    token = ENV["GITHUB_UPLOAD_TOKEN"]
+
+    UI.message ("Upload new app version to GitHub\nVersion: #{version}\nRelease Notes:\n=====\n#{releaseNotes}\n=====\n")
+
+    set_github_release(
+        repository_name: "DuckDuckGo/Android",
+        api_token: token,
+        name: version,
+        tag_name: version,
+        description: releaseNotes,
+        upload_assets: [apkPath],
+        is_draft: false,
+        is_prerelease: false)
+
+    end
+end

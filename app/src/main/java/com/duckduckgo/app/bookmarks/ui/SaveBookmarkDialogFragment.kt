@@ -61,10 +61,10 @@ class SaveBookmarkDialogFragment : DialogFragment() {
 
     private fun userAcceptedDialog(titleInput: EditText, urlInput: EditText) {
         listener?.onBookmarkSaved(
-                getExistingId(),
-                titleInput.text.toString(),
-                urlInput.text.toString()
-            )
+            getExistingId(),
+            titleInput.text.toString(),
+            urlInput.text.toString()
+        )
     }
 
     private fun showKeyboard(titleInput: EditText, alert: AlertDialog) {
@@ -96,7 +96,8 @@ class SaveBookmarkDialogFragment : DialogFragment() {
         val args = arguments!!
         if (!args.containsKey(KEY_IS_EDIT_MODE) ||
             !args.containsKey(KEY_PREEXISTING_TITLE) ||
-            !args.containsKey(KEY_PREEXISTING_URL)) {
+            !args.containsKey(KEY_PREEXISTING_URL)
+        ) {
             throw IllegalArgumentException("Bundle arguments required [KEY_IS_EDIT_MODE, KEY_PREEXISTING_TITLE, KEY_PREEXISTING_URL]")
         }
     }

@@ -64,11 +64,11 @@ class DataUriParser @Inject constructor() {
         object Invalid : ParseResult()
 
         data class ParsedDataUri(
-                val fileTypeGeneral: String,
-                val fileTypeSpecific: String,
-                val data: String,
-                val mimeType: String,
-                val filename: GeneratedFilename
+            val fileTypeGeneral: String,
+            val fileTypeSpecific: String,
+            val data: String,
+            val mimeType: String,
+            val filename: GeneratedFilename
         ) : ParseResult()
     }
 

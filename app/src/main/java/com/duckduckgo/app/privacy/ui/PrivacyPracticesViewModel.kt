@@ -24,10 +24,10 @@ import com.duckduckgo.app.privacy.model.TermsOfService
 class PrivacyPracticesViewModel : ViewModel() {
 
     data class ViewState(
-            val domain: String,
-            val practices: TermsOfService.Practices,
-            val goodTerms: List<String>,
-            val badTerms: List<String>
+        val domain: String,
+        val practices: TermsOfService.Practices,
+        val goodTerms: List<String>,
+        val badTerms: List<String>
     )
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -38,10 +38,10 @@ class PrivacyPracticesViewModel : ViewModel() {
 
     private fun resetViewState() {
         viewState.value = ViewState(
-                domain = "",
-                practices = TermsOfService.Practices.UNKNOWN,
-                goodTerms = ArrayList(),
-                badTerms = ArrayList()
+            domain = "",
+            practices = TermsOfService.Practices.UNKNOWN,
+            goodTerms = ArrayList(),
+            badTerms = ArrayList()
         )
     }
 
@@ -51,10 +51,10 @@ class PrivacyPracticesViewModel : ViewModel() {
             return
         }
         viewState.value = viewState.value?.copy(
-                domain = site.uri?.host ?: "",
-                practices = site.termsOfService.practices,
-                goodTerms = site.termsOfService.goodPrivacyTerms,
-                badTerms = site.termsOfService.badPrivacyTerms
+            domain = site.uri?.host ?: "",
+            practices = site.termsOfService.practices,
+            goodTerms = site.termsOfService.goodPrivacyTerms,
+            badTerms = site.termsOfService.badPrivacyTerms
         )
     }
 }

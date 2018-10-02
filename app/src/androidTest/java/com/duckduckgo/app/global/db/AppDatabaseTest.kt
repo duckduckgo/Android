@@ -89,10 +89,10 @@ class AppDatabaseTest {
 
     private fun database(): AppDatabase {
         val database = Room
-                .databaseBuilder(InstrumentationRegistry.getTargetContext(), AppDatabase::class.java, TEST_DB_NAME)
-                .addMigrations(AppDatabase.MIGRATION_1_TO_2, AppDatabase.MIGRATION_2_TO_3, AppDatabase.MIGRATION_3_TO_4, AppDatabase.MIGRATION_4_TO_5)
-                .allowMainThreadQueries()
-                .build()
+            .databaseBuilder(InstrumentationRegistry.getTargetContext(), AppDatabase::class.java, TEST_DB_NAME)
+            .addMigrations(AppDatabase.MIGRATION_1_TO_2, AppDatabase.MIGRATION_2_TO_3, AppDatabase.MIGRATION_3_TO_4, AppDatabase.MIGRATION_4_TO_5)
+            .allowMainThreadQueries()
+            .build()
 
         testHelper.closeWhenFinished(database)
 

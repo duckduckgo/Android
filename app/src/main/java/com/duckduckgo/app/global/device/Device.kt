@@ -17,8 +17,8 @@
 package com.duckduckgo.app.global.device
 
 import android.content.Context
-import javax.inject.Inject
 import android.util.TypedValue
+import javax.inject.Inject
 
 
 interface DeviceInfo {

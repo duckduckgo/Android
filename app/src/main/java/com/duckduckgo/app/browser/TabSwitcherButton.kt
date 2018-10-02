@@ -49,7 +49,7 @@ class TabSwitcherButton(context: Context) : FrameLayout(context) {
     fun increment(callback: () -> Unit) {
         anim.progress = 0.0f
 
-        anim.addAnimatorListener(object: AnimatorListenerAdapter() {
+        anim.addAnimatorListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 callback()
             }
@@ -64,7 +64,7 @@ class TabSwitcherButton(context: Context) : FrameLayout(context) {
     }
 
     private fun fadeOutCount(callback: () -> Unit) {
-        val listener = object: AnimatorListenerAdapter() {
+        val listener = object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 // otherwise on end keeps being called repeatedly
                 tabCount.animate().setListener(null)

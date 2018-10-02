@@ -22,27 +22,27 @@
 
     <ImageView
         android:id="@+id/phraseOrUrlIndicator"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:layout_centerVertical="true"
-        android:layout_marginEnd="24dp"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"
         android:importantForAccessibility="no"
-        android:src="@drawable/ic_search_white_18dp" />
+        android:src="@drawable/ic_loupe_24dp" />
 
     <TextView
         android:id="@+id/phrase"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
-        android:layout_toEndOf="@id/phraseOrUrlIndicator"
         android:layout_toStartOf="@+id/editQueryImage"
+        android:layout_toEndOf="@id/phraseOrUrlIndicator"
         android:ellipsize="end"
         android:fontFamily="sans-serif"
         android:gravity="center_vertical|start"
         android:maxLines="1"
         android:textAlignment="textStart"
-        android:textColor="@color/white"
+        android:textColor="?attr/autoCompleteTextColor"
         android:textSize="16sp"
         tools:text="phrase or URL suggestion" />
 
@@ -53,14 +53,14 @@
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:padding="6dp"
-        android:paddingEnd="24dp"
-        android:paddingStart="24dp">
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp">
 
         <ImageView
             android:layout_width="18dp"
             android:layout_height="18dp"
             android:contentDescription="@string/editQueryBeforeSubmitting"
-            android:src="@drawable/ic_add_white_24dp" />
+            android:src="@drawable/ic_add_24dp" />
 
     </FrameLayout>
 

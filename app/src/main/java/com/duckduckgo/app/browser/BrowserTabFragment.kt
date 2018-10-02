@@ -155,8 +155,8 @@ class BrowserTabFragment : Fragment(), FindListener {
     private val omnibarInputTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
             viewModel.onOmnibarInputStateChanged(
-                    omnibarTextInput.text.toString(),
-                    omnibarTextInput.hasFocus()
+                omnibarTextInput.text.toString(),
+                omnibarTextInput.hasFocus()
             )
         }
     }
@@ -222,8 +222,8 @@ class BrowserTabFragment : Fragment(), FindListener {
             onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
             onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) {
                 viewModel.desktopSiteModeToggled(
-                        urlString = webView?.url,
-                        desktopSiteRequested = view.requestDesktopSiteCheckMenuItem.isChecked
+                    urlString = webView?.url,
+                    desktopSiteRequested = view.requestDesktopSiteCheckMenuItem.isChecked
                 )
             }
             onMenuItemClicked(view.sharePageMenuItem) { viewModel.userSharingLink(webView?.url) }
@@ -336,10 +336,10 @@ class BrowserTabFragment : Fragment(), FindListener {
             }
             is Command.ShowFullScreen -> {
                 webViewFullScreenContainer.addView(
-                        it.view, ViewGroup.LayoutParams(
+                    it.view, ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT
-                )
+                    )
                 )
             }
             is Command.DownloadImage -> requestImageDownload(it.url)
@@ -355,7 +355,9 @@ class BrowserTabFragment : Fragment(), FindListener {
                     addHomeShortcut(it, context)
                 }
             }
-            is Command.HandleExternalAppLink -> { externalAppLinkClicked(it) }
+            is Command.HandleExternalAppLink -> {
+                externalAppLinkClicked(it)
+            }
         }
     }
 
@@ -432,12 +434,12 @@ class BrowserTabFragment : Fragment(), FindListener {
         val context = context ?: return
         autoCompleteSuggestionsList.layoutManager = LinearLayoutManager(context)
         autoCompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
-                immediateSearchClickListener = {
-                    userEnteredQuery(it.phrase)
-                },
-                editableSearchClickListener = {
-                    viewModel.onUserSelectedToEditQuery(it.phrase)
-                }
+            immediateSearchClickListener = {
+                userEnteredQuery(it.phrase)
+            },
+            editableSearchClickListener = {
+                viewModel.onUserSelectedToEditQuery(it.phrase)
+            }
         )
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
@@ -515,7 +517,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         // we want layout transitions for when the size changes; we don't want them when items disappear (can cause glitch on call to action button)
         newTabLayout.layoutTransition?.enableTransitionType(CHANGING)
         newTabLayout.layoutTransition?.disableTransitionType(DISAPPEARING)
-        
+
         rootView.addOnLayoutChangeListener(logoHidingLayoutChangeListener)
     }
 
@@ -525,7 +527,11 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
-        webView = layoutInflater.inflate(R.layout.include_duckduckgo_browser_webview, webViewContainer, true).findViewById(R.id.browserWebView) as WebView
+        webView = layoutInflater.inflate(
+            R.layout.include_duckduckgo_browser_webview,
+            webViewContainer,
+            true
+        ).findViewById(R.id.browserWebView) as WebView
         webView?.let {
             userAgentProvider = UserAgentProvider(it.settings.userAgentString)
 
@@ -593,8 +599,8 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private fun addBookmark() {
         val addBookmarkDialog = SaveBookmarkDialogFragment.createDialogCreationMode(
-                existingTitle = webView?.title,
-                existingUrl = webView?.url
+            existingTitle = webView?.title,
+            existingUrl = webView?.url
         )
         addBookmarkDialog.show(childFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
         addBookmarkDialog.listener = viewModel
@@ -662,7 +668,7 @@ class BrowserTabFragment : Fragment(), FindListener {
      */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        ddgLogo.setImageResource(R.drawable.full_logo)
+        ddgLogo.setImageResource(R.drawable.logo_full)
     }
 
     private fun resetTabState() {
@@ -702,18 +708,20 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private fun requestFileDownload(url: String, contentDisposition: String, mimeType: String) {
         pendingFileDownload = PendingFileDownload(
-                url = url,
-                contentDisposition = contentDisposition,
-                mimeType = mimeType,
-                subfolder = Environment.DIRECTORY_DOWNLOADS)
+            url = url,
+            contentDisposition = contentDisposition,
+            mimeType = mimeType,
+            subfolder = Environment.DIRECTORY_DOWNLOADS
+        )
 
         downloadFileWithPermissionCheck()
     }
 
     private fun requestImageDownload(url: String) {
         pendingFileDownload = PendingFileDownload(
-                url = url,
-                subfolder = Environment.DIRECTORY_PICTURES)
+            url = url,
+            subfolder = Environment.DIRECTORY_PICTURES
+        )
 
         downloadFileWithPermissionCheck()
     }

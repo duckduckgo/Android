@@ -60,6 +60,36 @@ class UriExtensionTest {
     }
 
     @Test
+    fun whenUriContainsDomainThenSimpleUrlIsEqual() {
+        val url = "http://example.com"
+        assertEquals(url, Uri.parse(url).simpleUrl)
+    }
+
+    @Test
+    fun whenUriCotnainsSubdomainThenSimpleUrlIsEqual() {
+        val url = "http://subdomain.example.com"
+        assertEquals(url, Uri.parse(url).simpleUrl)
+    }
+
+    @Test
+    fun whenUriContainsPathThenSimpleUrlIsEqual() {
+        val url = "http://example.com/about"
+        assertEquals(url, Uri.parse(url).simpleUrl)
+    }
+
+    @Test
+    fun whenUriContainsUsernameThenSimpleUrlOmitsThis() {
+        val url = "http://user@example.com"
+        assertEquals("http://example.com", Uri.parse(url).simpleUrl)
+    }
+
+    @Test
+    fun whenUriContainsParametersThenSimpleUrlOmitsThese() {
+        val url = "http://example.com?search=54"
+        assertEquals("http://example.com", Uri.parse(url).simpleUrl)
+    }
+
+    @Test
     fun whenUriIsHttpIrrespectiveOfCaseThenIsHttpIsTrue() {
         assertTrue(Uri.parse("http://example.com").isHttp)
         assertTrue(Uri.parse("HTTP://example.com").isHttp)

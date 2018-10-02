@@ -43,6 +43,14 @@ class StatisticsSharedPreferences @Inject constructor(private val context: Conte
         get() = preferences.getString(KEY_RETENTION_ATB, null)
         set(value) = preferences.edit { putString(KEY_RETENTION_ATB, value) }
 
+    override var httpsUpgradesTotal: Int
+        get() = preferences.getInt(KEY_HTTPS_UPGRADES_TOTAL, 0)
+        set(value) = preferences.edit { putInt(KEY_HTTPS_UPGRADES_TOTAL, value) }
+
+    override var httpsUpgradesFailures: Int
+        get() = preferences.getInt(KEY_HTTPS_UPGRADES_FAILURES, 0)
+        set(value) = preferences.edit { putInt(KEY_HTTPS_UPGRADES_FAILURES, value) }
+
     override fun saveAtb(atb: Atb) {
         preferences.edit {
             putString(KEY_ATB, atb.version)
@@ -65,5 +73,7 @@ class StatisticsSharedPreferences @Inject constructor(private val context: Conte
         private const val KEY_ATB = "com.duckduckgo.app.statistics.atb"
         private const val KEY_RETENTION_ATB = "com.duckduckgo.app.statistics.retentionatb"
         private const val KEY_VARIANT = "com.duckduckgo.app.statistics.variant"
+        private const val KEY_HTTPS_UPGRADES_TOTAL = "com.duckduckgo.app.statistics.httpsupgradestotal"
+        private const val KEY_HTTPS_UPGRADES_FAILURES = "com.duckduckgo.app.statistics.httpsupgradesfailures"
     }
 }
