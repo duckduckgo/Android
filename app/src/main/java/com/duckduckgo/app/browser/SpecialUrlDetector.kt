@@ -92,6 +92,9 @@ class SpecialUrlDetector @Inject constructor() {
 
         private const val EXTRA_FALLBACK_URL = "browser_fallback_url"
 
-        private val SCHEME_REGEX = Regex("[a-z][a-z0-9+.-]*")
+        private val REGEX_BLACKLIST = arrayListOf("site").toString()
+        private val SCHEME_REGEX = Regex("^((?!\\b" + REGEX_BLACKLIST
+                .substring(1, REGEX_BLACKLIST.lastIndex)
+                .replace(", ", "\\b|") + "\\b))([a-z][a-z0-9+.-]*)")
     }
 }
