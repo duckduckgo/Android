@@ -65,7 +65,7 @@ class UnsentForgetAllPixelStoreSharedPreferences @Inject constructor(private val
     companion object {
 
         @VisibleForTesting
-        const val FILENAME = "com.duckduckgo.app.fire.settings"
+        const val FILENAME = "com.duckduckgo.app.fire.unsentpixels.settings"
         const val KEY_UNSENT_CLEAR_PIXELS = "KEY_UNSENT_CLEAR_PIXELS"
         const val KEY_TIMESTAMP_LAST_CLEARED = "KEY_TIMESTAMP_LAST_CLEARED"
     }

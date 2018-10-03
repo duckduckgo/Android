@@ -30,8 +30,9 @@ class UnsentForgetAllPixelStoreSharedPreferencesTest {
 
     @Before
     fun setup() {
-        testee = UnsentForgetAllPixelStoreSharedPreferences(InstrumentationRegistry.getTargetContext())
-        InstrumentationRegistry.getTargetContext().getSharedPreferences(FILENAME, 0).edit { clear() }
+        val context = InstrumentationRegistry.getTargetContext()
+        context.getSharedPreferences(FILENAME, 0).edit { clear() }
+        testee = UnsentForgetAllPixelStoreSharedPreferences(context)
     }
 
     @Test
