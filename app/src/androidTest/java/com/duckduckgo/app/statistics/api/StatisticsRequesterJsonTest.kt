@@ -39,6 +39,7 @@ import org.junit.Test
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
+import java.util.concurrent.TimeUnit
 
 
 class StatisticsRequesterJsonTest {
@@ -127,7 +128,7 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_JSON)
         queueResponseFromString("", 200)
         testee.initializeAtb()
-        val request = server.takeRequest()
+        val request = takeRequestImmediately()
         assertEquals("/atb.js", request.requestUrl.encodedPath())
     }
 
@@ -136,7 +137,7 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_JSON)
         queueResponseFromString("", 200)
         testee.initializeAtb()
-        val atbRequest = server.takeRequest()
+        val atbRequest = takeRequestImmediately()
         val testParam = atbRequest.requestUrl.queryParameter(ParamKey.DEV_MODE)
         assertTestParameterSent(testParam)
     }
@@ -146,8 +147,8 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_JSON)
         queueResponseFromString("", 200)
         testee.initializeAtb()
-        server.takeRequest()
-        val extiRequest = server.takeRequest()
+        takeRequestImmediately()
+        val extiRequest = takeRequestImmediately()
         assertEquals("/exti/", extiRequest.requestUrl.encodedPath())
     }
 
@@ -156,8 +157,8 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_JSON)
         queueResponseFromString("", 200)
         testee.initializeAtb()
-        server.takeRequest()
-        val extiRequest = server.takeRequest()
+        takeRequestImmediately()
+        val extiRequest = takeRequestImmediately()
         val testParam = extiRequest.requestUrl.queryParameter(ParamKey.DEV_MODE)
         assertTestParameterSent(testParam)
     }
@@ -167,8 +168,8 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_JSON)
         queueResponseFromString("", 200)
         testee.initializeAtb()
-        server.takeRequest()
-        val extiRequest = server.takeRequest()
+        takeRequestImmediately()
+        val extiRequest = takeRequestImmediately()
         val atbQueryParam = extiRequest.requestUrl.queryParameter("atb")
         assertNotNull(atbQueryParam)
         assertEquals("v105-3ma", atbQueryParam)
@@ -179,7 +180,7 @@ class StatisticsRequesterJsonTest {
         statisticsStore.saveAtb(Atb("100-1"))
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshRetentionAtb()
-        val refreshRequest = server.takeRequest()
+        val refreshRequest = takeRequestImmediately()
         assertEquals("/atb.js", refreshRequest.requestUrl.encodedPath())
     }
 
@@ -196,7 +197,7 @@ class StatisticsRequesterJsonTest {
         statisticsStore.saveAtb(Atb("100-1"))
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshRetentionAtb()
-        val refreshRequest = server.takeRequest()
+        val refreshRequest = takeRequestImmediately()
         val testParam = refreshRequest.requestUrl.queryParameter(ParamKey.DEV_MODE)
         assertTestParameterSent(testParam)
     }
@@ -206,7 +207,7 @@ class StatisticsRequesterJsonTest {
         statisticsStore.saveAtb(Atb("100-1"))
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshRetentionAtb()
-        val refreshRequest = server.takeRequest()
+        val refreshRequest = takeRequestImmediately()
         val atbParam = refreshRequest.requestUrl.queryParameter(ParamKey.ATB)
         assertEquals("100-1ma", atbParam)
     }
@@ -217,10 +218,19 @@ class StatisticsRequesterJsonTest {
         statisticsStore.retentionAtb = "101-3"
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshRetentionAtb()
-        val refreshRequest = server.takeRequest()
+        val refreshRequest = takeRequestImmediately()
         val atbParam = refreshRequest.requestUrl.queryParameter(ParamKey.RETENTION_ATB)
         assertEquals("101-3", atbParam)
     }
+
+    /**
+     * Should there be an issue obtaining the request, this will avoid the tests stalling indefinitely.
+     *
+     * If it takes more than the specified time to obtain the request, it's probably a developer error in configuring the test.
+     *
+     * However, it has been observed that the request could stall indefinitely when working with a device with Charles proxy configured.
+     */
+    private fun takeRequestImmediately() = server.takeRequest(100, TimeUnit.MILLISECONDS)
 
     private fun assertTestParameterSent(testParam: String?) {
         assertNotNull(testParam)
