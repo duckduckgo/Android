@@ -17,24 +17,30 @@
 package com.duckduckgo.app.global.view
 
 import android.content.Context
+import android.support.annotation.UiThread
 import android.webkit.CookieManager
 import android.webkit.WebStorage
 import android.webkit.WebView
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.fire.FireActivity
+import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import timber.log.Timber
 import javax.inject.Inject
 
 class ClearPersonalDataAction @Inject constructor(
     private val context: Context,
-    private val dataManager: WebDataManager
+    private val dataManager: WebDataManager,
+    private val clearingStore: UnsentForgetAllPixelStore
 ) {
 
+    @UiThread
     fun clear() {
+        val startTime = System.currentTimeMillis()
+        clearingStore.incrementCount()
         dataManager.clearData(WebView(context), WebStorage.getInstance(), context)
         dataManager.clearWebViewSessions()
         dataManager.clearExternalCookies(CookieManager.getInstance()) {
-            Timber.i("Finished clearing everything; restarting process")
+            Timber.i("Finished clearing everything; took ${System.currentTimeMillis() - startTime}ms. Restarting process")
             FireActivity.triggerRestart(context)
         }
     }

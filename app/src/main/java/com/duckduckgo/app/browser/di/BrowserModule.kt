@@ -59,7 +59,7 @@ class BrowserModule {
 
     @Singleton
     @Provides
-    fun webDataManager(webViewSessionStorage: WebViewSessionStorage) = WebDataManager(AppUrl.Url.HOST, webViewSessionStorage)
+    fun webDataManager(webViewSessionStorage: WebViewSessionStorage): WebDataManager = WebViewDataManager(AppUrl.Url.HOST, webViewSessionStorage)
 
     @Provides
     fun clipboardManager(context: Context) : ClipboardManager {
