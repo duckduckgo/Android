@@ -19,7 +19,7 @@ package com.duckduckgo.app.global.view
 import android.support.test.InstrumentationRegistry
 import android.support.test.annotation.UiThreadTest
 import com.duckduckgo.app.browser.WebDataManager
-import com.duckduckgo.app.fire.DataClearingStore
+import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -31,18 +31,18 @@ class ClearPersonalDataActionTest {
     private lateinit var testee: ClearPersonalDataAction
 
     private val mockDataManager: WebDataManager = mock()
-    private val mockClearingStore: DataClearingStore = mock()
+    private val mockClearingUnsentForgetAllPixelStore: UnsentForgetAllPixelStore = mock()
 
     @Before
     fun setup() {
-        testee = ClearPersonalDataAction(InstrumentationRegistry.getTargetContext(), mockDataManager, mockClearingStore)
+        testee = ClearPersonalDataAction(InstrumentationRegistry.getTargetContext(), mockDataManager, mockClearingUnsentForgetAllPixelStore)
     }
 
     @UiThreadTest
     @Test
     fun whenClearCalledThenPixelCountIncremented() {
         testee.clear()
-        verify(mockClearingStore).incrementCount()
+        verify(mockClearingUnsentForgetAllPixelStore).incrementCount()
     }
 
     @UiThreadTest

@@ -28,7 +28,7 @@ import android.support.v4.app.Fragment
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.DaggerAppComponent
-import com.duckduckgo.app.fire.DataClearingStore
+import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.notification.NotificationRegistrar
@@ -95,7 +95,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     lateinit var httpsUpgrader: HttpsUpgrader
 
     @Inject
-    lateinit var dataClearingStore: DataClearingStore
+    lateinit var unsentForgetAllPixelStore: UnsentForgetAllPixelStore
 
     private var launchedByFireAction: Boolean = false
 
@@ -186,10 +186,10 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     }
 
     private fun submitUnsentFirePixels() {
-        val count = dataClearingStore.pendingPixelCountClearData
+        val count = unsentForgetAllPixelStore.pendingPixelCountClearData
         Timber.i("Found $count unsent clear data pixels")
         if (count > 0) {
-            val timeDifferenceMillis = System.currentTimeMillis() - dataClearingStore.lastClearTimestamp
+            val timeDifferenceMillis = System.currentTimeMillis() - unsentForgetAllPixelStore.lastClearTimestamp
             if (timeDifferenceMillis <= APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD) {
                 Timber.i("The app was re-launched as a result of the fire action being triggered (happened ${timeDifferenceMillis}ms ago)")
                 launchedByFireAction = true
@@ -197,7 +197,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
             for (i in 1..count) {
                 pixel.fire(Pixel.PixelName.FORGET_ALL_EXECUTED)
             }
-            dataClearingStore.resetCount()
+            unsentForgetAllPixelStore.resetCount()
         }
     }
 
