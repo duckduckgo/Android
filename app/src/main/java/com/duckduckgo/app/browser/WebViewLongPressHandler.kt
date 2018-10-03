@@ -110,6 +110,7 @@ class WebViewLongPressHandler @Inject constructor(private val context: Context, 
                 return ShareLink(longPressTarget)
             }
             CONTEXT_MENU_ID_COPY -> {
+                pixel.fire(LONG_PRESS_COPY_URL)
                 return CopyLink(longPressTarget)
             }
             else -> None
