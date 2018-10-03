@@ -23,7 +23,7 @@ import androidx.core.content.edit
 import javax.inject.Inject
 
 
-interface DataClearingStore {
+interface UnsentForgetAllPixelStore {
     val pendingPixelCountClearData: Int
     val lastClearTimestamp: Long
 
@@ -36,7 +36,7 @@ interface DataClearingStore {
  *
  * When writing values here to SharedPreferences, it is crucial to use `commit = true`. As otherwise the change can be lost in the process restart.
  */
-class DataClearingStoreSharedPreferences @Inject constructor(private val context: Context) : DataClearingStore {
+class UnsentForgetAllPixelStoreSharedPreferences @Inject constructor(private val context: Context) : UnsentForgetAllPixelStore {
 
     override val pendingPixelCountClearData: Int
         get() = preferences.getInt(KEY_UNSENT_CLEAR_PIXELS, 0)

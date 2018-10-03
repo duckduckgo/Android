@@ -18,19 +18,19 @@ package com.duckduckgo.app.fire
 
 import android.support.test.InstrumentationRegistry
 import androidx.core.content.edit
-import com.duckduckgo.app.fire.DataClearingStoreSharedPreferences.Companion.FILENAME
+import com.duckduckgo.app.fire.UnsentForgetAllPixelStoreSharedPreferences.Companion.FILENAME
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-class DataClearingStoreSharedPreferencesTest {
+class UnsentForgetAllPixelStoreSharedPreferencesTest {
 
-    private lateinit var testee: DataClearingStoreSharedPreferences
+    private lateinit var testee: UnsentForgetAllPixelStoreSharedPreferences
 
     @Before
     fun setup() {
-        testee = DataClearingStoreSharedPreferences(InstrumentationRegistry.getTargetContext())
+        testee = UnsentForgetAllPixelStoreSharedPreferences(InstrumentationRegistry.getTargetContext())
         InstrumentationRegistry.getTargetContext().getSharedPreferences(FILENAME, 0).edit { clear() }
     }
 
