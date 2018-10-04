@@ -31,7 +31,10 @@ import com.duckduckgo.app.global.simpleUrl
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.HTTPS_UPGRADE_SITE_ERROR
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.APP_VERSION
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.ERROR_CODE
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.URL
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.concurrent.thread
@@ -42,6 +45,7 @@ class BrowserWebViewClient @Inject constructor(
     private val specialUrlDetector: SpecialUrlDetector,
     private val webViewRequestInterceptor: WebViewRequestInterceptor,
     private val httpsUpgrader: HttpsUpgrader,
+    private val statisticsDataStore: StatisticsDataStore,
     private val pixel: Pixel
 ) : WebViewClient() {
 
@@ -105,6 +109,11 @@ class BrowserWebViewClient @Inject constructor(
         currentUrl = url
         webViewClientListener?.loadingStarted()
         webViewClientListener?.urlChanged(url)
+
+        val uri = if (url != null) Uri.parse(url) else null
+        if (uri != null) {
+            reportHttpsIfInUpgradeList(uri)
+        }
     }
 
     override fun onPageFinished(webView: WebView, url: String?) {
@@ -125,7 +134,7 @@ class BrowserWebViewClient @Inject constructor(
     override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             val url = failingUrl.toUri()
-            reportHttpsErrorIfInUpgradeList(url, statusCode = null, error = "WEB_RESOURCE_ERROR_$errorCode")
+            reportHttpsErrorIfInUpgradeList(url, error = "WEB_RESOURCE_ERROR_$errorCode")
         }
         super.onReceivedError(view, errorCode, description, failingUrl)
     }
@@ -134,43 +143,47 @@ class BrowserWebViewClient @Inject constructor(
     @TargetApi(Build.VERSION_CODES.M)
     override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
         if (request.isForMainFrame) {
-            reportHttpsErrorIfInUpgradeList(request.url, statusCode = null, error = "WEB_RESOURCE_ERROR_${error.errorCode}")
+            reportHttpsErrorIfInUpgradeList(request.url, error = "WEB_RESOURCE_ERROR_${error.errorCode}")
         }
         super.onReceivedError(view, request, error)
     }
 
     @UiThread
-    override fun onReceivedHttpError(view: WebView, request: WebResourceRequest, errorResponse: WebResourceResponse) {
-        if (request.isForMainFrame) {
-            reportHttpsErrorIfInUpgradeList(request.url, errorResponse.statusCode, error = null)
-        }
-        super.onReceivedHttpError(view, request, errorResponse)
-    }
-
-    @UiThread
     override fun onReceivedSslError(view: WebView, handler: SslErrorHandler, error: SslError) {
         val uri = error.url.toUri()
-        reportHttpsErrorIfInUpgradeList(uri, null, "SSL_ERROR_${error.primaryError}")
+        val isMainFrameRequest = currentUrl == uri.toString()
+        if (isMainFrameRequest) {
+            reportHttpsErrorIfInUpgradeList(uri, "SSL_ERROR_${error.primaryError}")
+        }
         super.onReceivedSslError(view, handler, error)
     }
 
     @AnyThread
-    private fun reportHttpsErrorIfInUpgradeList(url: Uri, statusCode: Int?, error: String?) {
-
+    private fun reportHttpsErrorIfInUpgradeList(url: Uri, error: String?) {
         if (!url.isHttps) return
-
         thread {
             if (httpsUpgrader.isInUpgradeList(url)) {
-                reportHttpsUpgradeSiteError(url, statusCode, error)
+                reportHttpsUpgradeSiteError(url, error)
+                statisticsDataStore.httpsUpgradesFailures += 1
             }
         }
     }
 
-    private fun reportHttpsUpgradeSiteError(url: Uri, statusCode: Int?, error: String?) {
+    @AnyThread
+    private fun reportHttpsIfInUpgradeList(url: Uri) {
+        if (!url.isHttps) return
+        thread {
+            if (httpsUpgrader.isInUpgradeList(url)) {
+                statisticsDataStore.httpsUpgradesTotal += 1
+            }
+        }
+    }
+
+    private fun reportHttpsUpgradeSiteError(url: Uri, error: String?) {
         val params = mapOf(
-            PixelParameter.URL to url.simpleUrl,
-            PixelParameter.ERROR_CODE to error,
-            PixelParameter.STATUS_CODE to statusCode.toString()
+            APP_VERSION to "${BuildConfig.VERSION_NAME}",
+            URL to url.simpleUrl,
+            ERROR_CODE to error
         )
         pixel.fire(HTTPS_UPGRADE_SITE_ERROR, params)
     }

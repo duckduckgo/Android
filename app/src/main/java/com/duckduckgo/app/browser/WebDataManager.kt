@@ -25,9 +25,15 @@ import android.webkit.WebViewDatabase
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import javax.inject.Inject
 
-class WebDataManager @Inject constructor(private val host: String, private val webViewSessionStorage: WebViewSessionStorage) {
+interface WebDataManager {
+    fun clearData(webView: WebView, webStorage: WebStorage, context: Context)
+    fun clearExternalCookies(cookieManager: CookieManager, clearAllCallback: (() -> Unit))
+    fun clearWebViewSessions()
+}
 
-    fun clearData(webView: WebView, webStorage: WebStorage, context: Context) {
+class WebViewDataManager @Inject constructor(private val host: String, private val webViewSessionStorage: WebViewSessionStorage) : WebDataManager {
+
+    override fun clearData(webView: WebView, webStorage: WebStorage, context: Context) {
         webView.clearCache(true)
         webView.clearHistory()
         webStorage.deleteAllData()
@@ -46,7 +52,7 @@ class WebDataManager @Inject constructor(private val host: String, private val w
         webViewDatabase.clearFormData()
     }
 
-    fun clearExternalCookies(cookieManager: CookieManager, clearAllCallback: (() -> Unit)) {
+    override fun clearExternalCookies(cookieManager: CookieManager, clearAllCallback: (() -> Unit)) {
 
         val ddgCookie = cookieManager.getCookie(host)?.split(";")
 
@@ -56,7 +62,7 @@ class WebDataManager @Inject constructor(private val host: String, private val w
         }
     }
 
-    fun clearWebViewSessions() {
+    override fun clearWebViewSessions() {
         webViewSessionStorage.deleteAllSessions()
     }
 }

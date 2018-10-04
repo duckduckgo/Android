@@ -141,6 +141,7 @@ class BrowserTabViewModel(
         class ShowFullScreen(val view: View) : Command()
         class DownloadImage(val url: String) : Command()
         class ShareLink(val url: String) : Command()
+        class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
         class BrokenSiteFeedback(val url: String?) : Command()
         class DisplayMessage(@StringRes val messageId: Int) : Command()
@@ -478,6 +479,10 @@ class BrowserTabViewModel(
             }
             is RequiredAction.ShareLink -> {
                 command.value = ShareLink(requiredAction.url)
+                true
+            }
+            is RequiredAction.CopyLink -> {
+                command.value = CopyLink(requiredAction.url)
                 true
             }
             RequiredAction.None -> {

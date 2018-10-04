@@ -21,6 +21,7 @@ import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.Module
 import dagger.Provides
+import io.reactivex.Completable
 import retrofit2.Retrofit
 
 @Module
@@ -44,8 +45,14 @@ class StubStatisticsModule {
     @Provides
     fun stubPixel(): Pixel {
         return object : Pixel {
+
             override fun fire(pixel: Pixel.PixelName, parameters: Map<String, String?>) {
             }
+
+            override fun fireCompletable(pixel: Pixel.PixelName, parameters: Map<String, String?>): Completable {
+                return Completable.fromAction {}
+            }
+
         }
     }
 }

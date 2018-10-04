@@ -29,7 +29,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.ArgumentCaptor
 
-class WebDataManagerTest {
+class WebViewDataManagerTest {
 
     private inline fun <reified T : Any> argumentCaptor() = ArgumentCaptor.forClass(T::class.java)
 
@@ -37,7 +37,7 @@ class WebDataManagerTest {
 
     private val mockStorage: WebStorage = mock()
 
-    private val testee = WebDataManager(host, WebViewSessionInMemoryStorage())
+    private val testee = WebViewDataManager(host, WebViewSessionInMemoryStorage())
 
     @UiThreadTest
     @Test

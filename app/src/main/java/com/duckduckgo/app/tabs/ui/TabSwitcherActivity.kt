@@ -28,7 +28,6 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.settings.SettingsActivity
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
@@ -42,9 +41,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
 
     @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
-
-    @Inject
-    lateinit var pixel: Pixel
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
@@ -107,7 +103,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     }
 
     private fun onFire() {
-        val dialog = FireDialog(context = this, pixel = pixel, clearPersonalDataAction = clearPersonalDataAction)
+        val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction)
         dialog.clearStarted = { viewModel.onClearRequested() }
         dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.show()
