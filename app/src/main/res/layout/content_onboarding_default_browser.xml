@@ -65,7 +65,6 @@
     <Button
         android:id="@+id/launchSettingsButton"
         style="@style/OnboardingButtonDefaultBrowserLaunchSettings"
-        android:onClick="onLaunchDefaultBrowserSettingsClicked"
         android:text="@string/onboardingDefaultBrowserGoToSettingsAction"
         android:theme="@style/OnboardingButtonDefaultBrowserLaunchSettings"
         app:layout_constraintBottom_toTopOf="@+id/continueButton" />
