@@ -30,7 +30,10 @@ interface SettingsDataStore {
 class SettingsSharedPreferences @Inject constructor(private val context: Context) : SettingsDataStore {
 
     override var theme: DuckDuckGoTheme?
-        get() = preferences.getString(KEY_THEME, null)?.let { DuckDuckGoTheme.valueOf(it) }
+        get() {
+            val themeName = preferences.getString(KEY_THEME, null) ?: return null
+            return DuckDuckGoTheme.valueOf(themeName)
+        }
         set(theme) = preferences.edit { putString(KEY_THEME, theme.toString()) }
 
     override var autoCompleteSuggestionsEnabled: Boolean

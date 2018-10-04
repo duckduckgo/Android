@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.global
 
-import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -36,7 +35,7 @@ enum class DuckDuckGoTheme {
 
 fun DuckDuckGoActivity.applyTheme(settingsDataStore: SettingsDataStore, variant: Variant): BroadcastReceiver? {
 
-    if (settingsDataStore.theme == null ) {
+    if (settingsDataStore.theme == null) {
         settingsDataStore.theme = defaultApplicationTheme(variant)
     }
 
