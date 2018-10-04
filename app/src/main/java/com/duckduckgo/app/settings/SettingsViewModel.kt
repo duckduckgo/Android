@@ -20,9 +20,11 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ThemeFeature.ThemeToggle
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -35,6 +37,7 @@ class SettingsViewModel @Inject constructor(
     data class ViewState(
         val loading: Boolean = true,
         val version: String = "",
+        val showThemeToggle: Boolean = false,
         val lightThemeEnabled: Boolean = false,
         val autoCompleteSuggestionsEnabled: Boolean = true,
         val showDefaultBrowserSetting: Boolean = false,
@@ -58,17 +61,17 @@ class SettingsViewModel @Inject constructor(
     fun start() {
 
         val defaultBrowserAlready = defaultWebBrowserCapability.isCurrentlyConfiguredAsDefaultBrowser()
-        Timber.i("Is already default browser? $defaultBrowserAlready")
-
-        val variantKey = variantManager.getVariant().key
+        val variant = variantManager.getVariant()
+        val isLightTheme = settingsDataStore.theme == DuckDuckGoTheme.LIGHT
 
         viewState.value = currentViewState.copy(
             loading = false,
-            lightThemeEnabled = settingsDataStore.lightThemeEnabled,
+            showThemeToggle = variant.hasFeature(ThemeToggle),
+            lightThemeEnabled = isLightTheme,
             autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
             isAppDefaultBrowser = defaultBrowserAlready,
             showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
-            version = obtainVersion(variantKey)
+            version = obtainVersion(variant.key)
         )
     }
 
@@ -78,7 +81,7 @@ class SettingsViewModel @Inject constructor(
 
     fun onLightThemeToggled(enabled: Boolean) {
         Timber.i("User toggled light theme, is now enabled: $enabled")
-        settingsDataStore.lightThemeEnabled = enabled
+        settingsDataStore.theme = if (enabled) DuckDuckGoTheme.LIGHT else DuckDuckGoTheme.DARK
         command.value = Command.UpdateTheme
     }
 
