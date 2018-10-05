@@ -26,6 +26,8 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
+import com.duckduckgo.app.entities.db.NetworkEntity
+import com.duckduckgo.app.entities.db.NetworkEntityDao
 import com.duckduckgo.app.feedback.ui.FeedbackActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.intentText
@@ -35,6 +37,7 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.longToast
 import timber.log.Timber
 import javax.inject.Inject
@@ -44,6 +47,9 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
+
+    @Inject
+    lateinit var networkEntityDao: NetworkEntityDao
 
     private var currentTab: BrowserTabFragment? = null
 
@@ -206,6 +212,11 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchBookmarks() {
+        doAsync {
+            networkEntityDao.insert(NetworkEntity("${System.currentTimeMillis()}", "domain"))
+            Timber.d("Network Entities" + networkEntityDao.getAll())
+        }
+
         startActivity(BookmarksActivity.intent(this))
     }
 
