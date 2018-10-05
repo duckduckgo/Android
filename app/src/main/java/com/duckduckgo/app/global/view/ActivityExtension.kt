@@ -20,7 +20,9 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import android.support.annotation.RequiresApi
+import android.support.v4.app.ActivityOptionsCompat
 import android.support.v4.app.FragmentActivity
 import android.view.View
 import android.widget.Toast
@@ -47,6 +49,11 @@ fun Context.launchDefaultAppActivity() {
         Timber.w(e, errorMessage)
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
     }
+}
+
+fun Context.fadeTransitionConfig(): Bundle? {
+    val config = ActivityOptionsCompat.makeCustomAnimation(this, android.R.anim.fade_in, android.R.anim.fade_out)
+    return config.toBundle()
 }
 
 fun FragmentActivity.toggleFullScreen() {

@@ -16,20 +16,16 @@
 
 package com.duckduckgo.app.fire
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.app.Activity
 import android.app.ActivityManager
-import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Process
-import android.support.v4.app.ActivityOptionsCompat
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import kotlinx.android.synthetic.main.activity_fire.*
+import com.duckduckgo.app.global.view.fadeTransitionConfig
 
 /**
  * Activity which is responsible for killing the main process and restarting it. This Activity will automatically finish itself after a brief time.
@@ -39,56 +35,15 @@ import kotlinx.android.synthetic.main.activity_fire.*
  * The correct way to invoke this Activity is through its `triggerRestart(context)` method.
  *
  * This Activity was largely inspired by https://github.com/JakeWharton/ProcessPhoenix
- *
- * We need to detect the user leaving this activity and possibly returning to it:
- *     if the user left our app to do something else, restarting our browser activity would feel wrong
- *     if the user left our app but came back, we should restart the browser activity
  */
 class FireActivity : DuckDuckGoActivity() {
 
-    private val viewModel: FireViewModel by bindViewModel()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_fire)
-        if (savedInstanceState == null) {
-
-            fireAnimationView.addAnimatorListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationStart(animator: Animator?) {
-                    viewModel.startDeathClock()
-                }
-            })
-        }
-
-        viewModel.viewState.observe(this, Observer<FireViewModel.ViewState> {
-            it?.let { viewState ->
-                if (!viewState.animate) {
-
-                    // restart the app only if the user hasn't navigated away during the fire animation
-                    if (viewState.autoStart) {
-                        val intent = intent.getParcelableExtra<Intent>(KEY_RESTART_INTENTS)
-                        startActivity(intent, activityFadeOptions(this))
-                    }
-
-                    viewModel.viewState.removeObservers(this)
-                    finish()
-                    killProcess()
-                }
-            }
-        })
-    }
-
-    override fun onStop() {
-        super.onStop()
-
-        if (!isChangingConfigurations) {
-            viewModel.onViewStopped()
-        }
-    }
-
-    override fun onRestart() {
-        super.onRestart()
-        viewModel.onViewRestarted()
+        val intent = intent.getParcelableExtra<Intent>(KEY_RESTART_INTENTS)
+        startActivity(intent, fadeTransitionConfig())
+        finish()
+        killProcess()
     }
 
     override fun onBackPressed() {
@@ -107,7 +62,7 @@ class FireActivity : DuckDuckGoActivity() {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.putExtra(KEY_RESTART_INTENTS, nextIntent)
 
-            context.startActivity(intent, activityFadeOptions(context))
+            context.startActivity(intent, context.fadeTransitionConfig())
             if (context is Activity) {
                 context.finish()
             }
@@ -133,11 +88,6 @@ class FireActivity : DuckDuckGoActivity() {
                 }
             }
             return false
-        }
-
-        private fun activityFadeOptions(context: Context): Bundle? {
-            val config = ActivityOptionsCompat.makeCustomAnimation(context, android.R.anim.fade_in, android.R.anim.fade_out)
-            return config.toBundle()
         }
     }
 }
