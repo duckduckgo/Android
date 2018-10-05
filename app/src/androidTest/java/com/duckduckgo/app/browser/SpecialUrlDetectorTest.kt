@@ -127,4 +127,25 @@ class SpecialUrlDetectorTest {
         val type = testee.determineType("smsto:123-555-12323") as Sms
         assertEquals("123-555-12323", type.telephoneNumber)
     }
+
+    @Test
+    fun whenUriSchemeConformsToRegexThenIntentTypeDetected() {
+        val expected = IntentType::class
+        val actual = testee.determineType("plausible-uri+.scheme:")
+        assertEquals(expected, actual::class)
+    }
+
+    @Test
+    fun whenUriSchemeHasWhiteSpaceBetweenCharactersThenSearchQueryTypeDetected() {
+        val expected = SearchQuery::class
+        val actual = testee.determineType("notaplausible urischeme:")
+        assertEquals(expected, actual::class)
+    }
+
+    @Test
+    fun whenUriSchemeIsSiteThenSearchQueryTypeDetected() {
+        val expected = SearchQuery::class
+        val actual = testee.determineType("site:")
+        assertEquals(expected, actual::class)
+    }
 }
