@@ -19,6 +19,7 @@ package com.duckduckgo.app.statistics
 import android.os.Build
 import android.support.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ThemeFeature.*
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
 
@@ -27,6 +28,11 @@ interface VariantManager {
 
     sealed class VariantFeature {
 
+        sealed class ThemeFeature : VariantFeature() {
+            object ThemeToggle : ThemeFeature()
+            object LightThemeAsDefault : ThemeFeature()
+            object DarkThemeAsDefault : ThemeFeature()
+        }
     }
 
     companion object {
@@ -37,7 +43,12 @@ interface VariantManager {
         val ACTIVE_VARIANTS = listOf(
             // SERP variants - do not remove
             Variant(key = "sa", weight = 1.0, features = emptyList()),
-            Variant(key = "sb", weight = 1.0, features = emptyList())
+            Variant(key = "sb", weight = 1.0, features = emptyList()),
+
+            // Light theme experiment
+            Variant(key = "mg", weight = 2.0, features = emptyList()),
+            Variant(key = "mh", weight = 1.0, features = listOf(LightThemeAsDefault, ThemeToggle)),
+            Variant(key = "mj", weight = 1.0, features = listOf(DarkThemeAsDefault, ThemeToggle))
         )
     }
 

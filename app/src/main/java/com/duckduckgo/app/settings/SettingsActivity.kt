@@ -24,6 +24,7 @@ import android.os.Bundle
 import android.support.v7.widget.SwitchCompat
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
+import androidx.core.view.isVisible
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.FeedbackActivity
@@ -76,6 +77,7 @@ class SettingsActivity : DuckDuckGoActivity() {
         viewModel.viewState.observe(this, Observer<SettingsViewModel.ViewState> { viewState ->
             viewState?.let {
                 version.text = it.version
+                lightThemeToggle.isVisible = it.showThemeToggle
                 lightThemeToggle.quietlySetIsChecked(it.lightThemeEnabled, lightThemeToggleListener)
                 autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
                 updateDefaultBrowserViewVisibility(it)

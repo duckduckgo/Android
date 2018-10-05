@@ -16,6 +16,10 @@
 
 package com.duckduckgo.app.onboarding.ui
 
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.support.annotation.ColorRes
 import android.support.annotation.LayoutRes
@@ -24,6 +28,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserSystemSettings
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import dagger.android.support.AndroidSupportInjection
+import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
+import timber.log.Timber
+import javax.inject.Inject
 
 sealed class OnboardingPageFragment : Fragment() {
 
@@ -52,5 +64,62 @@ sealed class OnboardingPageFragment : Fragment() {
     class DefaultBrowserPage : OnboardingPageFragment() {
         override fun layoutResource(): Int = R.layout.content_onboarding_default_browser
         override fun backgroundColor(): Int = R.color.eastBay
+
+        @Inject
+        lateinit var pixel: Pixel
+
+        @Inject
+        lateinit var defaultBrowserDetector: DefaultBrowserDetector
+
+        override fun onAttach(context: Context?) {
+            AndroidSupportInjection.inject(this)
+            super.onAttach(context)
+        }
+
+        override fun onActivityCreated(savedInstanceState: Bundle?) {
+            super.onActivityCreated(savedInstanceState)
+            launchSettingsButton.setOnClickListener { onLaunchDefaultBrowserSettingsClicked() }
+        }
+
+        override fun setUserVisibleHint(isVisibleToUser: Boolean) {
+            super.setUserVisibleHint(isVisibleToUser)
+            if (isVisibleToUser) {
+                pixel.fire(DEFAULT_BROWSER_INFO_VIEWED)
+            }
+        }
+
+        private fun onLaunchDefaultBrowserSettingsClicked() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val intent = DefaultBrowserSystemSettings.intent()
+                try {
+                    startActivityForResult(intent, DEFAULT_BROWSER_REQUEST_CODE)
+                } catch (e: ActivityNotFoundException) {
+                    Timber.w(e, getString(R.string.cannotLaunchDefaultAppSettings))
+                }
+            }
+        }
+
+        override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+            when (requestCode) {
+                DEFAULT_BROWSER_REQUEST_CODE -> {
+                    fireDefaultBrowserPixel()
+                }
+                else -> super.onActivityResult(requestCode, resultCode, data)
+            }
+        }
+
+        private fun fireDefaultBrowserPixel() {
+            if (defaultBrowserDetector.isCurrentlyConfiguredAsDefaultBrowser()) {
+                Timber.i("User returned from default settings; DDG is now the default")
+                pixel.fire(DEFAULT_BROWSER_SET)
+            } else {
+                Timber.i("User returned from default settings; DDG was not set default")
+                pixel.fire(DEFAULT_BROWSER_NOT_SET)
+            }
+        }
+
+        companion object {
+            private const val DEFAULT_BROWSER_REQUEST_CODE = 100
+        }
     }
 }

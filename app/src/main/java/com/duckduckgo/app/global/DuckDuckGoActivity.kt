@@ -24,6 +24,7 @@ import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
@@ -36,11 +37,14 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
 
+    @Inject
+    lateinit var variantManager: VariantManager
+
     private var themeChangeReceiver: BroadcastReceiver? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
-        themeChangeReceiver = applyTheme(settingsDataStore)
+        themeChangeReceiver = applyTheme(settingsDataStore, variantManager.getVariant())
         super.onCreate(savedInstanceState)
     }
 
