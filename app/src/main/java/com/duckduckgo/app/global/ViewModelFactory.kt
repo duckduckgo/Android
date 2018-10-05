@@ -95,7 +95,8 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(
                     appSettingsPreferencesStore,
                     defaultBrowserDetector,
-                    variantManager
+                    variantManager,
+                    pixel
                 )
                 isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel(bookmarksDao)
                 isAssignableFrom(FireViewModel::class.java) -> FireViewModel()
