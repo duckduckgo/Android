@@ -131,7 +131,7 @@ class SpecialUrlDetectorTest {
     @Test
     fun whenUriSchemeConformsToRegexThenIntentTypeDetected() {
         val expected = IntentType::class
-        val actual = testee.determineType("plausible-uri+.scheme:")
+        val actual = testee.determineType("plausible-uri+.scheme1:")
         assertEquals(expected, actual::class)
     }
 
