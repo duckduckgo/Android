@@ -26,6 +26,7 @@ import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.job.AppConfigurationJobService
 import com.duckduckgo.app.launch.LaunchActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
+import com.duckduckgo.app.onboarding.ui.OnboardingPageFragment
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.privacy.ui.PrivacyPracticesActivity
 import com.duckduckgo.app.privacy.ui.ScorecardActivity
@@ -101,6 +102,9 @@ abstract class AndroidBindingModule {
 
     @ContributesAndroidInjector
     abstract fun browserTabFragment(): BrowserTabFragment
+
+    @ContributesAndroidInjector
+    abstract fun onboardingDefaultBrowserFragment(): OnboardingPageFragment.DefaultBrowserPage
 
     /* Services */
 

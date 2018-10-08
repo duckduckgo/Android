@@ -23,10 +23,12 @@ import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ThemeFeature.ThemeToggle
 import com.nhaarman.mockito_kotlin.*
 import org.junit.Assert.*
 import org.junit.Before
@@ -102,7 +104,7 @@ class SettingsViewModelTest {
     @Test
     fun whenLightThemeToggledOnThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() {
         testee.onLightThemeToggled(true)
-        verify(mockAppSettingsDataStore).lightThemeEnabled = true
+        verify(mockAppSettingsDataStore).theme = DuckDuckGoTheme.LIGHT
 
         testee.command.blockingObserve()
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -112,7 +114,7 @@ class SettingsViewModelTest {
     @Test
     fun whenLightThemeTogglesOffThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() {
         testee.onLightThemeToggled(false)
-        verify(mockAppSettingsDataStore).lightThemeEnabled = false
+        verify(mockAppSettingsDataStore).theme = DuckDuckGoTheme.DARK
 
         testee.command.blockingObserve()
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -184,6 +186,19 @@ class SettingsViewModelTest {
         assertEquals(expectedStartString, latestViewState().version)
     }
 
+    @Test
+    fun whenThemeToggleFeatureExistsThenThemeToggleIsShown() {
+        whenever(mockVariantManager.getVariant()).thenReturn(Variant("aa", 1.0, listOf(ThemeToggle)))
+        testee.start()
+        assertTrue(latestViewState().showThemeToggle)
+    }
+
+    @Test
+    fun whenThemeToggleFeatureDoesNotExistThenThemeToggleIsNotShown() {
+        whenever(mockVariantManager.getVariant()).thenReturn(Variant("aa", 1.0, emptyList()))
+        testee.start()
+        assertFalse(latestViewState().showThemeToggle)
+    }
 
     private fun latestViewState() = testee.viewState.value!!
 }
