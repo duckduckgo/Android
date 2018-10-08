@@ -16,10 +16,27 @@
 
 package com.duckduckgo.app.entities.db
 
-import android.arch.persistence.room.Entity
+import android.arch.persistence.room.*
 
-@Entity(
-    tableName = "network_entities",
-    primaryKeys = ["entityName", "domainName"]
-)
-data class NetworkEntity(val entityName: String, val domainName: String)
+@Dao
+abstract class EntityListDao {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun insertAll(entities: List<EntityListEntity>)
+
+    @Query("select * from entity_list order by domainName")
+    abstract fun getAll(): List<EntityListEntity>
+
+    @Query("delete from entity_list")
+    abstract fun deleteAll()
+
+    @Query("select count(1) from entity_list")
+    abstract fun count(): Int
+
+    @Transaction
+    open fun updateAll(entities: List<EntityListEntity>) {
+        deleteAll()
+        insertAll(entities)
+    }
+
+}

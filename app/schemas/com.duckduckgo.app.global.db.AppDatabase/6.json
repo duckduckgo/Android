@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 6,
-    "identityHash": "b39804a6bb9ad4dcad2d9f950f8d63c5",
+    "identityHash": "f3266efd1653285bed6fc3c2c3e56ebf",
     "entities": [
       {
         "tableName": "disconnect_tracker",
@@ -306,8 +306,8 @@
         "foreignKeys": []
       },
       {
-        "tableName": "network_entities",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`entityName` TEXT NOT NULL, `domainName` TEXT NOT NULL, PRIMARY KEY(`entityName`, `domainName`))",
+        "tableName": "entity_list",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`entityName` TEXT NOT NULL, `domainName` TEXT NOT NULL, PRIMARY KEY(`domainName`))",
         "fields": [
           {
             "fieldPath": "entityName",
@@ -324,7 +324,6 @@
         ],
         "primaryKey": {
           "columnNames": [
-            "entityName",
             "domainName"
           ],
           "autoGenerate": false
@@ -335,7 +334,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"b39804a6bb9ad4dcad2d9f950f8d63c5\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"f3266efd1653285bed6fc3c2c3e56ebf\")"
     ]
   }
 }

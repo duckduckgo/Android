@@ -22,8 +22,8 @@ import android.arch.persistence.room.RoomDatabase
 import android.arch.persistence.room.migration.Migration
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.entities.db.NetworkEntity
-import com.duckduckgo.app.entities.db.NetworkEntityDao
+import com.duckduckgo.app.entities.db.EntityListEntity
+import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
@@ -48,7 +48,7 @@ import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
         TabEntity::class,
         TabSelectionEntity::class,
         BookmarkEntity::class,
-        NetworkEntity::class
+        EntityListEntity::class
     ]
 )
 
@@ -61,7 +61,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun appConfigurationDao(): AppConfigurationDao
     abstract fun tabsDao(): TabsDao
     abstract fun bookmarksDao(): BookmarksDao
-    abstract fun networkEntityDao(): NetworkEntityDao
+    abstract fun networkEntityDao(): EntityListDao
 
     companion object {
         val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {

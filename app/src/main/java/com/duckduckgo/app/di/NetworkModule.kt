@@ -19,6 +19,7 @@ package com.duckduckgo.app.di
 import android.app.job.JobScheduler
 import android.content.Context
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
+import com.duckduckgo.app.entities.api.EntityListService
 import com.duckduckgo.app.feedback.api.FeedbackSender
 import com.duckduckgo.app.feedback.api.FeedbackService
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
@@ -114,6 +115,10 @@ class NetworkModule {
     @Provides
     fun feedbackService(@Named("api") retrofit: Retrofit): FeedbackService =
         retrofit.create(FeedbackService::class.java)
+
+    @Provides
+    fun entityListService(@Named("api") retrofit: Retrofit): EntityListService =
+        retrofit.create(EntityListService::class.java)
 
     @Provides
     fun feedbackSender(statisticsStore: StatisticsDataStore, variantManager: VariantManager, feedbackSerice: FeedbackService): FeedbackSender =
