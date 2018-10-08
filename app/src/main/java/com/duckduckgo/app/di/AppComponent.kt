@@ -54,7 +54,8 @@ import javax.inject.Singleton
         NotificationModule::class,
         OnboardingModule::class,
         VariantModule::class,
-        FaviconModule::class
+        FaviconModule::class,
+        TrackersModule::class
     ]
 )
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {

@@ -53,13 +53,16 @@ class TabDataRepositoryTest {
     @Mock
     private lateinit var mockPrevalenceStore: PrevalenceStore
 
+    @Mock
+    private lateinit var mockTrackerNetworks: TrackerNetworks
+
     private lateinit var testee: TabDataRepository
 
     @UiThreadTest
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        testee = TabDataRepository(mockDao, SiteFactory(mockTermsOfServiceStore, TrackerNetworks(prevalenceStore = mockPrevalenceStore), prevalenceStore = mockPrevalenceStore))
+        testee = TabDataRepository(mockDao, SiteFactory(mockTermsOfServiceStore, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore))
     }
 
     @Test

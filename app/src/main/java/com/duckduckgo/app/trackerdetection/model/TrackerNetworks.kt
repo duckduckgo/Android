@@ -16,31 +16,44 @@
 
 package com.duckduckgo.app.trackerdetection.model
 
+import com.duckduckgo.app.entities.db.EntityListEntity
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import java.io.Serializable
-import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
+interface TrackerNetworks {
+
+    fun updateTrackers(trackers: List<DisconnectTracker>)
+    fun updateEntities(entities: List<EntityListEntity>)
+    fun network(url: String): TrackerNetwork?
+
+}
 
 @Singleton
-class TrackerNetworks @Inject constructor(val prevalenceStore: PrevalenceStore) : Serializable {
+class TrackerNetworksImpl @Inject constructor(val prevalenceStore: PrevalenceStore) : TrackerNetworks, Serializable {
 
-    private var data: List<DisconnectTracker> = ArrayList()
+    private var trackers: List<DisconnectTracker> = emptyList()
+    private var entities: List<EntityListEntity> = emptyList()
 
-    fun updateData(trackers: List<DisconnectTracker>) {
-        this.data = trackers
+    override fun updateTrackers(trackers: List<DisconnectTracker>) {
+        this.trackers = trackers
     }
 
-    fun network(url: String): TrackerNetwork? {
-        val disconnectEntry = data.find { sameOrSubdomain(url, it.url) || sameOrSubdomain(url, it.networkUrl) } ?: return null
-        val prevalence = prevalenceStore.findPrevalenceOf(disconnectEntry.networkName)
+    override fun updateEntities(entities: List<EntityListEntity>) {
+        this.entities = entities
+    }
+
+    override fun network(url: String): TrackerNetwork? {
+        val entity = entities.find { sameOrSubdomain(url, it.domainName) } ?: return null
+        val tracker = trackers.find { it.networkName == entity.entityName }
+
+        val prevalence = prevalenceStore.findPrevalenceOf(entity.entityName)
 
         return TrackerNetwork(
-            name = disconnectEntry.networkName,
-            url = disconnectEntry.networkUrl,
-            category = disconnectEntry.category,
+            name = entity.entityName,
+            category = tracker?.category,
             isMajor = (prevalence ?: 0.0) > MAJOR_NETWORK_PREVALENCE
         )
     }

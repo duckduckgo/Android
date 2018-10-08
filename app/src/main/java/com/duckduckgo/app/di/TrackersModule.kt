@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.model
+package com.duckduckgo.app.di
 
-data class TrackerNetwork(
-    val name: String,
-    val category: String? = null,
-    val isMajor: Boolean = false
-)
+import com.duckduckgo.app.privacy.store.PrevalenceStore
+import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
+import com.duckduckgo.app.trackerdetection.model.TrackerNetworksImpl
+import dagger.Module
+import dagger.Provides
+import javax.inject.Singleton
+
+@Module
+internal class TrackersModule {
+
+    @Provides
+    @Singleton
+    fun trackerNetworks(prevalenceStore: PrevalenceStore): TrackerNetworks = TrackerNetworksImpl(prevalenceStore)
+
+}

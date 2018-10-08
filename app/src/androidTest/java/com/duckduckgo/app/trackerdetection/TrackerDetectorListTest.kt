@@ -42,7 +42,7 @@ class TrackerDetectorListTest {
         private val resourceType = ResourceType.UNKNOWN
     }
 
-    private lateinit var mockPrevalenceStore: PrevalenceStore
+    private lateinit var mockTrackerNetworks: TrackerNetworks
     private lateinit var blockingOnlyTestee: TrackerDetector
     private lateinit var testeeWithWhitelist: TrackerDetector
     private lateinit var settingStore: PrivacySettingsStore
@@ -56,15 +56,16 @@ class TrackerDetectorListTest {
         // re-using blocking sample as a whitelist to hammer the point home
         val trackersWhitelistAdblocks = adblockClient(TRACKERSWHITELIST, "binary/easylist_sample")
 
-        mockPrevalenceStore = mock()
         settingStore = mock()
+        mockTrackerNetworks = mock()
+
         whenever(settingStore.privacyOn).thenReturn(true)
 
-        blockingOnlyTestee = TrackerDetectorImpl(TrackerNetworks(prevalenceStore = mockPrevalenceStore), settingStore)
+        blockingOnlyTestee = TrackerDetectorImpl(mockTrackerNetworks, settingStore)
         blockingOnlyTestee.addClient(easyprivacyAdblock)
         blockingOnlyTestee.addClient(easylistAdblock)
 
-        testeeWithWhitelist = TrackerDetectorImpl(TrackerNetworks(prevalenceStore = mockPrevalenceStore), settingStore)
+        testeeWithWhitelist = TrackerDetectorImpl(mockTrackerNetworks, settingStore)
         testeeWithWhitelist.addClient(trackersWhitelistAdblocks)
         testeeWithWhitelist.addClient(easyprivacyAdblock)
         testeeWithWhitelist.addClient(easylistAdblock)

@@ -76,6 +76,9 @@ class BrowserTabViewModelTest {
     private lateinit var mockPrevalenceStore: PrevalenceStore
 
     @Mock
+    private lateinit var mockTrackerNetworks: TrackerNetworks
+
+    @Mock
     private lateinit var mockNetworkLeaderboardDao: NetworkLeaderboardDao
 
     @Mock
@@ -132,7 +135,7 @@ class BrowserTabViewModelTest {
             .build()
         appConfigurationDao = db.appConfigurationDao()
 
-        val siteFactory = SiteFactory(mockTermsOfServiceStore, TrackerNetworks(prevalenceStore = mockPrevalenceStore), prevalenceStore = mockPrevalenceStore)
+        val siteFactory = SiteFactory(mockTermsOfServiceStore, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore)
 
         whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
 

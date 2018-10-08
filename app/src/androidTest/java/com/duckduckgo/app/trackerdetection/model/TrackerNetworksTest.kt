@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection.model
 
+import com.duckduckgo.app.entities.db.EntityListEntity
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
@@ -32,13 +33,12 @@ class TrackerNetworksTest {
         private const val networkUrl = "http://www.network.com/"
         private const val majorNetworkName = "google"
         private const val majorNetworkUrl = "google.com"
-        private const val majorNetworkPercentage = 84
     }
 
     private var mockPrevalenceStore: PrevalenceStore = mock()
 
     private val testee: TrackerNetworks by lazy {
-        TrackerNetworks(mockPrevalenceStore)
+        TrackerNetworksImpl(mockPrevalenceStore)
     }
 
     @Before
@@ -48,53 +48,61 @@ class TrackerNetworksTest {
     @Test
     fun whenUrlMatchesTrackerUrlThenNetworkIsReturned() {
         val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl))
-        testee.updateData(data)
-        val expected = TrackerNetwork(networkName, networkUrl, category)
+        testee.updateTrackers(data)
+        val entities = listOf(EntityListEntity("tracker.com", networkName), EntityListEntity("network.com", networkName))
+        testee.updateEntities(entities)
+        val expected = TrackerNetwork(networkName, category)
         assertEquals(expected, testee.network("http://tracker.com/script.js"))
     }
 
     @Test
     fun whenUrlMatchesNetworkUrlThenNetworkIsReturned() {
-        val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl))
-        testee.updateData(data)
-        val expected = TrackerNetwork(networkName, networkUrl, category)
+        val trackers = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl))
+        testee.updateTrackers(trackers)
+        val entities = listOf(EntityListEntity("tracker.com", networkName), EntityListEntity("network.com", networkName))
+        testee.updateEntities(entities)
+        val expected = TrackerNetwork(networkName, category)
         assertEquals(expected, testee.network("http://www.network.com/index.html"))
     }
 
     @Test
     fun whenUrlDoesNotMatchEitherTrackerOrNetworkUrlThenNullIsReturned() {
         val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl))
-        testee.updateData(data)
+        testee.updateTrackers(data)
         assertNull(testee.network("http://example.com/index.html"))
     }
 
     @Test
     fun whenUrlSubdomainMatchesTrackerUrlThenNetworkIsReturned() {
         val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl))
-        testee.updateData(data)
-        val expected = TrackerNetwork(networkName, networkUrl, category)
+        testee.updateTrackers(data)
+        val entities = listOf(EntityListEntity("tracker.com", networkName), EntityListEntity("network.com", networkName))
+        testee.updateEntities(entities)
+        val expected = TrackerNetwork(networkName, category)
         assertEquals(expected, testee.network("http://subdomain.tracker.com/script.js"))
     }
 
     @Test
     fun whenUrlSubdomainMatchesNetworkUrlThenNetworkIsReturned() {
         val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl))
-        testee.updateData(data)
-        val expected = TrackerNetwork(networkName, networkUrl, category)
+        testee.updateTrackers(data)
+        val entities = listOf(EntityListEntity("tracker.com", networkName), EntityListEntity("network.com", networkName))
+        testee.updateEntities(entities)
+        val expected = TrackerNetwork(networkName, category)
         assertEquals(expected, testee.network("http://www.subdomain.network.com/index.html"))
     }
 
     @Test
     fun whenUrlContainsButIsNotSubdomainOfTrackerUrlThenNullIsReturned() {
         val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl))
-        testee.updateData(data)
+        testee.updateTrackers(data)
         assertNull(testee.network("http://notsubdomainoftracker.com/script.js"))
     }
 
     @Test
     fun whenUrlContainsButIsNotSubdomainOfNetworkUrlThenNullIsReturned() {
         val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl))
-        testee.updateData(data)
+        testee.updateTrackers(data)
         assertNull(testee.network("http://notsubdomainofnetwork.com/index.html"))
     }
 
@@ -103,8 +111,12 @@ class TrackerNetworksTest {
         whenever(mockPrevalenceStore.findPrevalenceOf(majorNetworkName)).thenReturn(100.0)
 
         val data = listOf(DisconnectTracker("tracker.com", category, majorNetworkName, majorNetworkUrl))
-        testee.updateData(data)
-        val expected = TrackerNetwork(majorNetworkName, majorNetworkUrl, category,true)
+        testee.updateTrackers(data)
+
+        val entities = listOf(EntityListEntity("tracker.com", majorNetworkName), EntityListEntity("network.com", majorNetworkName))
+        testee.updateEntities(entities)
+
+        val expected = TrackerNetwork(majorNetworkName, category, true)
         assertEquals(expected, testee.network("http://tracker.com/script.js"))
     }
 }

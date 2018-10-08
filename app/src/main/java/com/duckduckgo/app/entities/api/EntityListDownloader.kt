@@ -19,6 +19,8 @@ package com.duckduckgo.app.entities.api
 import com.duckduckgo.app.entities.db.EntityListEntity
 import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.global.api.isCached
+import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import io.reactivex.Completable
 import timber.log.Timber
 import java.io.IOException
@@ -30,7 +32,9 @@ data class NetworkEntityJson(val properties: Array<String>, val resources: Array
 
 class EntityListDownloader @Inject constructor(
     private val entityListService: EntityListService,
-    private val entityListDao: EntityListDao
+    private val entityListDao: EntityListDao,
+    private val trackerDataLoader: TrackerDataLoader,
+    private val appDatabase: AppDatabase
 ) {
 
     fun download(): Completable {
@@ -61,8 +65,10 @@ class EntityListDownloader @Inject constructor(
                     }
                 }
 
-                entityListDao.updateAll(entities)
-                // TODO update something else here? (if so run in transaction)
+                appDatabase.runInTransaction {
+                    entityListDao.updateAll(entities)
+                    trackerDataLoader.loadEntityListData()
+                }
 
             } else {
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
