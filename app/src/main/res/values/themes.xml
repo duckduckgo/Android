@@ -17,6 +17,11 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.AppCompat.Light">
+
+        <!-- neutral colors to cover cases like startup before dynamic theme can be applied -->
+        <item name="colorPrimary">@color/subtleGrayTwo</item>
+        <item name="colorPrimaryDark">@color/subtleGrayTwo</item>
+
         <item name="android:windowBackground">?attr/colorPrimaryDark</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -95,10 +100,6 @@
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
         <!-- The status bar must always be dark prior to API 23 as the light text cannot be changed -->
         <item name="android:statusBarColor">@color/almostBlack</item>
-    </style>
-
-    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="android:windowBackground">?attr/colorPrimaryDark</item>
     </style>
 
     <style name="ModalCardTheme" parent="Theme.AppCompat.Light.NoActionBar">
