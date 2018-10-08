@@ -45,6 +45,7 @@
         <item name="settingsSectionTextColor">@color/grayishTwo</item>
         <item name="settingsItemTextColor">@color/white</item>
         <item name="settingsMinorTextColor">@color/grayishTwo</item>
+        <item name="settingsSwitchBackgroundColor">@color/subtleGrayTwo</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -86,6 +87,7 @@
         <item name="settingsSectionTextColor">@color/warmerGray</item>
         <item name="settingsItemTextColor">@color/grayishBrown</item>
         <item name="settingsMinorTextColor">@color/warmerGray</item>
+        <item name="settingsSwitchBackgroundColor">@color/brownishGrayTwo</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
