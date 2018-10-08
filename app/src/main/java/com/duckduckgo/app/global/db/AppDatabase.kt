@@ -109,7 +109,7 @@ abstract class AppDatabase : RoomDatabase() {
 
         val MIGRATION_5_TO_6: Migration = object : Migration(5, 6) {
             override fun migrate(database: SupportSQLiteDatabase) {
-
+                database.execSQL("CREATE TABLE IF NOT EXISTS `network_entities` (`entityName` TEXT NOT NULL, `domainName` TEXT NOT NULL, PRIMARY KEY(`entityName`, `domainName`))")
             }
         }
 

@@ -50,6 +50,17 @@ class NetworkEntityDaoTest {
     }
 
     @Test
+    fun testWhenAllEntitiesDeletedThenGetAllIsEmpty() {
+        dao.insert(NetworkEntity("entity", domainName = "domain"))
+        dao.insert(NetworkEntity("entity2", domainName = "domain"))
+        dao.insert(NetworkEntity("entity3", domainName = "domain"))
+        assertEquals(3, dao.getAll().size)
+
+        dao.deleteAll()
+        assertTrue(dao.getAll().isEmpty())
+    }
+
+    @Test
     fun testWhenNetworkEntityAddedThenItIsSaved() {
         val entity = NetworkEntity("entity", domainName = "domain")
         dao.insert(entity)
