@@ -16,9 +16,7 @@
 
 package com.duckduckgo.app.entities.db
 
-import android.net.Network
 import com.duckduckgo.app.FileUtilities
-import com.duckduckgo.app.entities.api.EntityListJson
 import com.duckduckgo.app.entities.api.NetworkEntityJson
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
