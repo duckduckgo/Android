@@ -114,8 +114,10 @@
     </style>
 
     <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:background">?attr/colorPrimary</item>
         <item name="colorControlNormal">?attr/toolbarIconColor</item>
         <item name="android:textColorPrimary">?attr/toolbarTextColor</item>
+        <item name="colorControlHighlight">@color/subtleGrayTwo</item>
     </style>
 
     <style name="SwitchTheme" parent="Widget.AppCompat.CompoundButton.Switch">
