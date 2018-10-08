@@ -209,6 +209,7 @@ class BrowserTabFragment : Fragment(), FindListener {
     override fun onResume() {
         super.onResume()
         addTextChangedListeners()
+        appBarLayout.setExpanded(true)
         viewModel.onViewVisible()
     }
 
