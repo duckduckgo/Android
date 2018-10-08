@@ -47,7 +47,7 @@ class TrackerNetworksImpl @Inject constructor(val prevalenceStore: PrevalenceSto
 
     override fun network(url: String): TrackerNetwork? {
         val entity = entities.find { sameOrSubdomain(url, it.domainName) } ?: return null
-        val tracker = trackers.find { it.networkName == entity.entityName }
+        val tracker = trackers.find { sameOrSubdomain(url, it.url) }
 
         val prevalence = prevalenceStore.findPrevalenceOf(entity.entityName)
 

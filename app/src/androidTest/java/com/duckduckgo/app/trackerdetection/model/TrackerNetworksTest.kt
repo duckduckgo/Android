@@ -29,6 +29,7 @@ class TrackerNetworksTest {
 
     companion object {
         private const val category = "Social"
+        private const val otherCategory = "Advertising"
         private const val networkName = "NetworkName"
         private const val networkUrl = "http://www.network.com/"
         private const val majorNetworkName = "google"
@@ -46,6 +47,21 @@ class TrackerNetworksTest {
     }
 
     @Test
+    fun whenUrlMatchesTrackerUrlThenCategoryForTrackerUrlIsReturned() {
+
+        val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl),
+            DisconnectTracker("network.com", otherCategory, networkName, networkUrl))
+        testee.updateTrackers(data)
+
+        val entities = listOf(EntityListEntity("tracker.com", networkName), EntityListEntity("network.com", networkName))
+        testee.updateEntities(entities)
+
+        assertEquals(category, testee.network("http://tracker.com/script.js")?.category)
+        assertEquals(otherCategory, testee.network("http://network.com/script.js")?.category)
+
+    }
+
+    @Test
     fun whenUrlMatchesTrackerUrlThenNetworkIsReturned() {
         val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl))
         testee.updateTrackers(data)
@@ -57,7 +73,8 @@ class TrackerNetworksTest {
 
     @Test
     fun whenUrlMatchesNetworkUrlThenNetworkIsReturned() {
-        val trackers = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl))
+        val trackers = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl),
+            DisconnectTracker("network.com", category, networkName, networkUrl))
         testee.updateTrackers(trackers)
         val entities = listOf(EntityListEntity("tracker.com", networkName), EntityListEntity("network.com", networkName))
         testee.updateEntities(entities)
@@ -84,7 +101,8 @@ class TrackerNetworksTest {
 
     @Test
     fun whenUrlSubdomainMatchesNetworkUrlThenNetworkIsReturned() {
-        val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl))
+        val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl),
+            DisconnectTracker("network.com", category, networkName, networkUrl))
         testee.updateTrackers(data)
         val entities = listOf(EntityListEntity("tracker.com", networkName), EntityListEntity("network.com", networkName))
         testee.updateEntities(entities)
@@ -113,7 +131,8 @@ class TrackerNetworksTest {
         val data = listOf(DisconnectTracker("tracker.com", category, majorNetworkName, majorNetworkUrl))
         testee.updateTrackers(data)
 
-        val entities = listOf(EntityListEntity("tracker.com", majorNetworkName), EntityListEntity("network.com", majorNetworkName))
+        val entities = listOf(EntityListEntity("tracker.com", majorNetworkName),
+            EntityListEntity("network.com", majorNetworkName))
         testee.updateEntities(entities)
 
         val expected = TrackerNetwork(majorNetworkName, category, true)
