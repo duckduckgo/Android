@@ -36,9 +36,10 @@
         <item name="omnibarTextColor">@color/white</item>
         <item name="omnibarHintColor">@color/grayishTwo</item>
         <item name="autoCompleteTextColor">@color/white</item>
-        <item name="tabsBackgroundColor">?attr/colorPrimary</item>
         <item name="tabTitleTextColor">@color/midnight</item>
         <item name="tabSubtitleTextColor">@color/coolGray</item>
+        <item name="tabSelectedBorderColor">@color/skyBlue</item>
+        <item name="tabsFireTextColor">@color/white</item>
         <item name="bookmarkIconColor">@color/white</item>
         <item name="bookmarkTitleTextColor">@color/white</item>
         <item name="bookmarkSubtitleTextColor">@color/grayishTwo</item>
@@ -78,9 +79,10 @@
         <item name="omnibarTextColor">@color/brownishGrayTwo</item>
         <item name="omnibarHintColor">@color/warmGray</item>
         <item name="autoCompleteTextColor">@color/grayishBrown</item>
-        <item name="tabsBackgroundColor">@color/greyishBrownTwo</item>
         <item name="tabTitleTextColor">@color/almostBlack</item>
         <item name="tabSubtitleTextColor">@color/warmerGray</item>
+        <item name="tabSelectedBorderColor">@color/cornflowerBlue</item>
+        <item name="tabsFireTextColor">@color/warmerGray</item>
         <item name="bookmarkIconColor">@color/grayishBrown</item>
         <item name="bookmarkTitleTextColor">@color/almostBlack</item>
         <item name="bookmarkSubtitleTextColor">@color/warmerGray</item>

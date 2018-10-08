@@ -112,7 +112,7 @@ class BrowserTabFragment : Fragment(), FindListener {
     lateinit var shortcutBuilder: ShortcutBuilder
 
     @Inject
-    lateinit var  clipboardManager: ClipboardManager
+    lateinit var clipboardManager: ClipboardManager
 
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
