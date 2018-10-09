@@ -1,0 +1,167 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+
+    <!-- Onboarding Activity -->
+    <string name="onboardingProtectDataTitle">保護你的資料</string>
+    <string name="onboardingProtectDataDescription">按下隱私等級看看我們抓到誰正在偷窺你。</string>
+    <string name="onboardingNoTraceDescription1">按下燃燒按鈕抹除分頁和瀏覽紀錄</string>
+    <string name="onboardingDefaultBrowserTitle">把我們設為你的預設</string>
+    <string name="onboardingDefaultBrowserDescription">在設定裡將DuckDuckGo設為你的預設瀏覽器</string>
+    <string name="onboardingDefaultBrowserGoToSettingsAction">到 設定</string>
+    <string name="onboardingContinue">繼續</string>
+
+    <!-- Default Browser -->
+    <string name="cannotLaunchDefaultAppSettings">無法開啟預設應用程式設定畫面</string>
+    <string name="defaultBrowserInfoTitle">把我們設為你的預設瀏覽器</string>
+    <string name="defaultBrowserInfoMessage">在你的裝置設定裡將DuckDuckGo設為預設瀏覽器以得到全時的追蹤保護</string>
+    <string name="settingsDefaultBrowserEnabled">設為預設瀏覽器</string>
+
+    <!-- Browser Activity -->
+    <string name="browserPopupMenu">瀏覽器選單</string>
+    <string name="refresh">重新整理</string>
+    <string name="back">返回</string>
+    <string name="forward">往前</string>
+
+    <string name="omnibarInputHint">搜尋或輸入網址</string>
+    <string name="clearButtonContentDescription">清除搜尋欄</string>
+    <string name="no_compatible_third_party_app_installed">尚未安裝合適的app</string>
+    <string name="addBookmarkMenuTitle">加到書籤</string>
+    <string name="imageOptions">圖片選項</string>
+    <string name="requestDesktopSiteMenuTitle">桌面版網站</string>
+
+    <!-- Downloading files -->
+    <string name="downloadImage">下載圖片</string>
+    <string name="permissionRequiredToDownload">下載需要儲存權限</string>
+    <string name="downloadComplete">下載完成</string>
+    <string name="downloadFailed">下載失敗</string>
+    <string name="downloadInProgress">正在下載</string>
+
+    <!-- Sharing options -->
+    <string name="options">選項</string>
+    <string name="shareLink">分享連結</string>
+    <string name="shareMenuTitle">分享...</string>
+    <string name="copyUrl">複製連結網址</string>
+
+    <!-- Find in page -->
+    <string name="findInPageMenuTitle">在頁面中尋找</string>
+    <string name="nextSearchTermDescription">找下一個</string>
+    <string name="previousSearchTermDescription">尋找先前的</string>
+    <string name="findInPageHint">在頁面中尋找</string>
+
+    <!-- AutoComplete Suggestions -->
+    <string name="settingsAutocompleteEnabled">自動完成提示</string>
+
+    <!-- Opening external apps -->
+    <string name="openExternalApp">開啟外部App</string>
+    <string name="launchingExternalApp">在另一個程式開啟</string>
+    <string name="confirmOpenExternalApp">你想離開DuckDuckGo觀看這個內容嗎？</string>
+    <string name="unableToOpenLink">無法開啟這種連結</string>
+
+    <!-- Tabs -->
+    <string name="tabActivityTitle">分頁</string>
+    <string name="tabsMenuItem">分頁</string>
+    <string name="newTabMenuItem">新分頁</string>
+    <string name="openInNewTab">在新分頁中開啟</string>
+    <string name="openInNewBackgroundTab">在背景分頁中開啟</string>
+    <string name="closeContentDescription">關閉</string>
+    <string name="tapFireDirective">按下</string>
+    <string name="tapFireIconDescription">燃燒</string>
+    <string name="tapFireExplanation">忘記所有東西</string>
+    <string name="closeAllTabsMenuItem">關閉所有分頁</string>
+
+    <!-- Privacy Dashboard Activities -->
+    <string name="privacyDashboardActivityTitle">隱私面板</string>
+    <string name="privacyProtectionEnabled">啟用隱私保護</string>
+    <string name="privacyProtectionDisabled">停用隱私保護</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ENHANCED FROM &lt;img src="%d" /> TO &lt;img src="%d" /></string>
+    <string name="privacyGradeContentDescription">隱私等級</string>
+
+    <string name="httpsGood">連線已加密</string>
+    <string name="httpsMixed">混合的加密連線</string>
+    <string name="httpsBad">未加密的連線</string>
+
+    <string name="networksActivityTitle">追蹤器網絡</string>
+    <string name="networksContentDescription">追蹤器網絡</string>
+
+
+
+
+
+
+
+    <string name="scorecardActivityTitle">隱私等級</string>
+    <string name="scorecardSiteIsMemberOfMajorNetwork">網站是主要追蹤器網絡</string>
+    <string name="scorecardPrivacyGrade">隱私等級</string>
+
+    <string name="privacyTermsActivityTitle">隱私政策</string>
+    <string name="practicesGood">好的隱私政策</string>
+    <string name="practicesBad">不好的隱私政策</string>
+    <string name="practicesUnknown">未知的隱私政策</string>
+    <string name="privacyProtectionToggle">隱私保護</string>
+
+    <string name="networkTrackerSummaryHeader">追蹤器網絡主要罪犯</string>
+    <string name="networkTrackerSummaryNotReady">我們依然在收集資訊來顯示我們阻擋了多少追蹤器。</string>
+
+    <!-- Fire -->
+    <string name="fireMenu">清除資料</string>
+    <string name="fireClearAll">清除所有分頁和資料</string>
+    <string name="fireCancel">取消</string>
+    <string name="fireDataCleared">資料已清除</string>
+
+    <!-- Settings Activity -->
+    <string name="settingsActivityTitle">設定</string>
+    <string name="settingsMenuItemTitle">設定</string>
+    <string name="settingsHeadingGeneral">一般</string>
+    <string name="settingsHeadingOther">其他</string>
+    <string name="settingsLightTheme">明亮主題</string>
+    <string name="settingsOnboarding">隱私功能</string>
+    <string name="settingsAboutDuckduckgo">關於DuckDuckGo</string>
+    <string name="settingsVersion">版本</string>
+    <string name="leaveFeedback">留下回饋</string>
+
+    <!-- About Activity -->
+    <string name="aboutActivityTitle">關於我們</string>
+    <string name="aboutHeading">隱私，簡單。</string>
+    <string name="aboutDescription">在DuckDuckGo，我們正在建立線上信任的新標準。\n
+      \\\n
+        DuckDuckGo隱私瀏覽器在你搜尋及瀏覽時提供所有你需要的隱私保護，包括阻擋追蹤器，智慧加密，還有DuckDuckGo隱私搜尋。\n
+      \\\n
+        總而言之，網路不該令人感到不舒適，得到你應得的隱私就像關上百頁窗一樣簡單。</string>
+    <string name="aboutMoreLink">更多在duckduckgo.com/about</string>
+    <string name="no_suggestions">沒有建議</string>
+
+    <!-- Feedback Activity -->
+    <string name="feedbackActivityTitle">回饋</string>
+    <string name="feedbackReportBrokenSiteMenuItem">回報出錯網站</string>
+    <string name="feedbackHeading">分享你的回饋</string>
+    <string name="feedbackModalDescription">匿名分享你的回饋幫助我們改善DuckDuckGo隱私瀏覽器</string>
+    <string name="feedbackReportBrokenSite">回報出錯的網站</string>
+    <string name="feedbackUrlHint">輸入網址</string>
+    <string name="feedbackMessageHint">怎麼改善這個程式？你喜歡什麼？哪裡壞了？請盡可能明確。</string>
+    <string name="feedbackBrokenSiteHint">哪一個網站內容或功能壞了？請盡可能明確。</string>
+    <string name="feedbackSubmitButton">提交回饋</string>
+    <string name="feedbackSubmitted">謝謝你/妳 ! 回饋已提交</string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">書籤</string>
+    <string name="bookmarksActivityTitle">書籤</string>
+    <string name="bookmarkDeleteConfirmMessage">你確定你想要刪除書籤 <b>%s</b>?</string>
+    <string name="bookmarkDeleteConfirmTitle">確認</string>
+    <string name="bookmarkAddedFeedback">已加到書籤</string>
+    <string name="bookmarkTitleHint">書籤標題</string>
+    <string name="bookmarkUrlHint">書籤網址</string>
+    <string name="bookmarkSave">儲存</string>
+    <string name="bookmarkTitleEdit">編輯書籤</string>
+    <string name="bookmarkTitleSave">儲存書籤</string>
+    <string name="noBookmarks">未加入任何書籤</string>
+    <string name="bookmarkOverflowContentDescription">書籤 %s 的更多選項</string>
+    <string name="delete">刪除</string>
+    <string name="edit">編輯</string>
+
+    <!-- Widget -->
+    <string name="searchWidgetTextHint">搜尋DuckDuckGo</string>
+
+    <!-- Home Screen Shortcuts -->
+    <string name="addToHome">加到主畫面</string>
+
+</resources>
