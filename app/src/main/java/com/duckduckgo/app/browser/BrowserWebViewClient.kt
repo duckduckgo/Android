@@ -181,7 +181,7 @@ class BrowserWebViewClient @Inject constructor(
 
     private fun reportHttpsUpgradeSiteError(url: Uri, error: String?) {
         val params = mapOf(
-            APP_VERSION to "${BuildConfig.VERSION_NAME}",
+            APP_VERSION to BuildConfig.VERSION_NAME,
             URL to url.simpleUrl,
             ERROR_CODE to error
         )

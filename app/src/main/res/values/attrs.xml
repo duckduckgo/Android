@@ -24,14 +24,16 @@
     <attr name="omnibarTextColor" format="color" />
     <attr name="omnibarHintColor" format="color" />
     <attr name="autoCompleteTextColor" format="color" />
-    <attr name="tabsBackgroundColor" format="color" />
     <attr name="tabTitleTextColor" format="color" />
     <attr name="tabSubtitleTextColor" format="color" />
+    <attr name="tabSelectedBorderColor" format="color" />
+    <attr name="tabsFireTextColor" format="color" />
     <attr name="bookmarkIconColor" format="color" />
     <attr name="bookmarkTitleTextColor" format="color" />
     <attr name="bookmarkSubtitleTextColor" format="color" />
     <attr name="settingsSectionTextColor" format="color" />
     <attr name="settingsItemTextColor" format="color" />
     <attr name="settingsMinorTextColor" format="color" />
+    <attr name="settingsSwitchBackgroundColor" format="color" />
 
 </resources>

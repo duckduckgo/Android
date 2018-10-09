@@ -18,6 +18,6 @@
     <solid android:color="@color/white" />
     <stroke
         android:width="2dp"
-        android:color="@color/skyBlue" />
+        android:color="?attr/tabSelectedBorderColor" />
     <corners android:radius="2dp" />
 </shape>

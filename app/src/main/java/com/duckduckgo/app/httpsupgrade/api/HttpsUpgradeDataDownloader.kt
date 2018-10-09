@@ -122,7 +122,7 @@ class HttpsUpgradeDataDownloader @Inject constructor(
                 return@defer complete()
             }
             val params = mapOf(
-                APP_VERSION to "${BuildConfig.VERSION_NAME}",
+                APP_VERSION to BuildConfig.VERSION_NAME,
                 TOTAL_COUNT to statisticsDataStore.httpsUpgradesTotal.toString(),
                 FAILURE_COUNT to statisticsDataStore.httpsUpgradesFailures.toString()
             )

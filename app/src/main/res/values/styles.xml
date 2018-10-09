@@ -127,7 +127,7 @@
 
     <style name="SettingsItem.SettingsSwitch">
         <item name="colorSwitchThumbNormal">@color/white</item>
-        <item name="android:colorForeground">@color/subtleGrayTwo</item>
+        <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
         <item name="android:layout_marginEnd">0dp</item>
         <item name="android:layout_marginStart">0dp</item>
         <item name="android:layout_marginTop">0dp</item>

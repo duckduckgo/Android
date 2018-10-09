@@ -28,14 +28,17 @@ import android.support.v4.app.Fragment
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.DaggerAppComponent
-import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.FireActivity
+import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
+import com.duckduckgo.app.global.Theming.initializeTheme
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.notification.NotificationRegistrar
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.migration.LegacyMigration
+import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_LAUNCH
@@ -83,7 +86,13 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     lateinit var appInstallStore: AppInstallStore
 
     @Inject
+    lateinit var settingsDataStore: SettingsDataStore
+
+    @Inject
     lateinit var notificationRegistrar: NotificationRegistrar
+
+    @Inject
+    lateinit var variantManager: VariantManager
 
     @Inject
     lateinit var pixel: Pixel
@@ -118,6 +127,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         }
 
         initializeStatistics()
+        initializeTheme(settingsDataStore, variantManager.getVariant())
         loadTrackerData()
         configureDataDownloader()
         recordInstallationTimestamp()
