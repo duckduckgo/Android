@@ -18,9 +18,10 @@
 
     <style name="AppTheme" parent="Theme.AppCompat.Light">
 
-        <!-- neutral colors to cover cases like startup before dynamic theme can be applied -->
-        <item name="colorPrimary">@color/subtleGrayTwo</item>
-        <item name="colorPrimaryDark">@color/subtleGrayTwo</item>
+        <!-- These neutral colors cover cases before dynamic theme can be applied
+             such as the app launch color -->
+        <item name="colorPrimary">@color/almostBlackDark</item>
+        <item name="colorPrimaryDark">@color/almostBlackDark</item>
 
         <item name="android:windowBackground">?attr/colorPrimaryDark</item>
         <item name="windowActionBar">false</item>
