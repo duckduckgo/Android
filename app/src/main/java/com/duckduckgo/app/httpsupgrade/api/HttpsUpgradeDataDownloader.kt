@@ -79,7 +79,7 @@ class HttpsUpgradeDataDownloader @Inject constructor(
 
             val bytes = response.body()!!.bytes()
             if (!binaryDataStore.verifyCheckSum(bytes, specification.sha256)) {
-                throw IOException("Https binary has incorrect checksum, throwing away file")
+                throw IOException("Https binary has incorrect sha, throwing away file")
             }
 
             Timber.d("Updating https bloom data store with new data")
