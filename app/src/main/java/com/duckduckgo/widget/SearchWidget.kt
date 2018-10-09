@@ -24,10 +24,10 @@ import android.widget.RemoteViews
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 
-/**
- * Implementation of App Widget functionality.
- */
-class SearchWidget : AppWidgetProvider() {
+
+class SearchWidgetLight : SearchWidget(R.layout.search_widget_light)
+
+open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         // There may be multiple widgets active, so update all of them
@@ -36,22 +36,14 @@ class SearchWidget : AppWidgetProvider() {
         }
     }
 
-    companion object {
+    private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
+        val views = RemoteViews(context.packageName, layoutId)
+        views.setOnClickPendingIntent(R.id.widgetContainer, buildPendingIntent(context))
+        appWidgetManager.updateAppWidget(appWidgetId, views)
+    }
 
-        internal fun updateAppWidget(
-            context: Context, appWidgetManager: AppWidgetManager,
-            appWidgetId: Int
-        ) {
-
-            val views = RemoteViews(context.packageName, R.layout.search_widget)
-            views.setOnClickPendingIntent(R.id.widgetContainer, buildPendingIntent(context))
-            appWidgetManager.updateAppWidget(appWidgetId, views)
-        }
-
-        private fun buildPendingIntent(context: Context): PendingIntent {
-            val intent = BrowserActivity.intent(context, newSearch = true)
-            return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-        }
+    private fun buildPendingIntent(context: Context): PendingIntent {
+        val intent = BrowserActivity.intent(context, newSearch = true)
+        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 }
-

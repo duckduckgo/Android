@@ -41,3 +41,6 @@ captures/
 
 # Keystore files
 *.jks
+
+# Fastlane
+fastlane/report.xml

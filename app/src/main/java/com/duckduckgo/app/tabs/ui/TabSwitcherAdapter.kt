@@ -53,7 +53,6 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
         holder.url.text = tab.displayUrl()
         holder.tabUnread.visibility = if (tab.viewed) View.INVISIBLE else View.VISIBLE
         holder.root.setBackgroundResource(if (tab.tabId == selectedTab?.tabId) SELECTED_BACKGROUND else DEFAULT_BACKGROUND)
-        holder.root.alpha = if (tab.tabId == selectedTab?.tabId) SELECTED_ALPHA else DEFAULT_ALPHA
 
         GlideApp.with(holder.root)
             .load(tab.favicon())
@@ -103,10 +102,6 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
         private const val SELECTED_BACKGROUND = R.drawable.tab_background_selected
         @DrawableRes
         private const val DEFAULT_BACKGROUND = R.drawable.tab_background
-
-        private const val SELECTED_ALPHA = 1.0f
-        private const val DEFAULT_ALPHA = 0.77f
-
     }
 
 }

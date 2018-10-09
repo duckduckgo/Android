@@ -20,20 +20,28 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.global.DuckDuckGoTheme
+import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ThemeFeature.ThemeToggle
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import timber.log.Timber
 import javax.inject.Inject
 
 class SettingsViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
-    private val variantManager: VariantManager
+    private val variantManager: VariantManager,
+    private val pixel: Pixel
 ) : ViewModel() {
 
     data class ViewState(
         val loading: Boolean = true,
         val version: String = "",
+        val showThemeToggle: Boolean = false,
+        val lightThemeEnabled: Boolean = false,
         val autoCompleteSuggestionsEnabled: Boolean = true,
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false
@@ -43,6 +51,7 @@ class SettingsViewModel @Inject constructor(
 
     sealed class Command {
         object LaunchFeedback : Command()
+        object UpdateTheme : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().apply {
@@ -50,23 +59,26 @@ class SettingsViewModel @Inject constructor(
         value = currentViewState
     }
 
-    val command: MutableLiveData<Command> = MutableLiveData()
+    val command: SingleLiveEvent<Command> = SingleLiveEvent()
+
+    init {
+        pixel.fire(SETTINGS_OPENED)
+    }
 
     fun start() {
-        val autoCompleteEnabled = settingsDataStore.autoCompleteSuggestionsEnabled
-        Timber.i("Is auto complete enabled? $autoCompleteEnabled")
 
         val defaultBrowserAlready = defaultWebBrowserCapability.isCurrentlyConfiguredAsDefaultBrowser()
-        Timber.i("Is already default browser? $defaultBrowserAlready")
-
-        val variantKey = variantManager.getVariant().key
+        val variant = variantManager.getVariant()
+        val isLightTheme = settingsDataStore.theme == DuckDuckGoTheme.LIGHT
 
         viewState.value = currentViewState.copy(
             loading = false,
-            autoCompleteSuggestionsEnabled = autoCompleteEnabled,
+            showThemeToggle = variant.hasFeature(ThemeToggle),
+            lightThemeEnabled = isLightTheme,
+            autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
             isAppDefaultBrowser = defaultBrowserAlready,
             showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
-            version = obtainVersion(variantKey)
+            version = obtainVersion(variant.key)
         )
     }
 
@@ -74,9 +86,18 @@ class SettingsViewModel @Inject constructor(
         command.value = Command.LaunchFeedback
     }
 
-    fun userRequestedToChangeAutocompleteSetting(checked: Boolean) {
-        Timber.i("User changed autocomplete setting, is now enabled: $checked")
-        settingsDataStore.autoCompleteSuggestionsEnabled = checked
+    fun onLightThemeToggled(enabled: Boolean) {
+        Timber.i("User toggled light theme, is now enabled: $enabled")
+        settingsDataStore.theme = if (enabled) DuckDuckGoTheme.LIGHT else DuckDuckGoTheme.DARK
+        command.value = Command.UpdateTheme
+
+        val pixelName = if (enabled) SETTINGS_THEME_TOGGLED_LIGHT else SETTINGS_THEME_TOGGLED_DARK
+        pixel.fire(pixelName)
+    }
+
+    fun onAutocompleteSettingChanged(enabled: Boolean) {
+        Timber.i("User changed autocomplete setting, is now enabled: $enabled")
+        settingsDataStore.autoCompleteSuggestionsEnabled = enabled
     }
 
     private fun obtainVersion(variantKey: String): String {

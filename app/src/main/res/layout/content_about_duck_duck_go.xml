@@ -43,7 +43,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
             android:contentDescription="@string/duckDuckGoLogoDescription"
-            android:src="@drawable/full_logo" />
+            android:src="@drawable/logo_full" />
 
         <TextView
             android:layout_width="match_parent"
@@ -54,7 +54,7 @@
             android:lineSpacingExtra="6sp"
             android:text="@string/aboutHeading"
             android:textAlignment="center"
-            android:textColor="@color/white"
+            android:textColor="?attr/normalTextColor"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -66,7 +66,7 @@
             android:lineSpacingExtra="6sp"
             android:text="@string/aboutDescription"
             android:textAlignment="center"
-            android:textColor="@color/white"
+            android:textColor="?attr/normalTextColor"
             android:textSize="16sp"
             android:textStyle="normal"
             tools:text="Long description would go here\n\nLots and lots of words" />

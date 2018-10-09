@@ -28,7 +28,6 @@ import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.feedback.api.FeedbackSender
 import com.duckduckgo.app.feedback.ui.FeedbackViewModel
-import com.duckduckgo.app.fire.FireViewModel
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.launch.LaunchViewModel
@@ -95,10 +94,10 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(
                     appSettingsPreferencesStore,
                     defaultBrowserDetector,
-                    variantManager
+                    variantManager,
+                    pixel
                 )
                 isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel(bookmarksDao)
-                isAssignableFrom(FireViewModel::class.java) -> FireViewModel()
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
         } as T

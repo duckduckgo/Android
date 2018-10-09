@@ -26,14 +26,19 @@ import android.arch.lifecycle.ProcessLifecycleOwner
 import android.os.Build
 import android.support.v4.app.Fragment
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.fire.FireActivity
+import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
+import com.duckduckgo.app.global.Theming.initializeTheme
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.notification.NotificationRegistrar
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.migration.LegacyMigration
+import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_LAUNCH
@@ -81,7 +86,13 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     lateinit var appInstallStore: AppInstallStore
 
     @Inject
+    lateinit var settingsDataStore: SettingsDataStore
+
+    @Inject
     lateinit var notificationRegistrar: NotificationRegistrar
+
+    @Inject
+    lateinit var variantManager: VariantManager
 
     @Inject
     lateinit var pixel: Pixel
@@ -91,6 +102,13 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     @Inject
     lateinit var httpsUpgrader: HttpsUpgrader
+
+    @Inject
+    lateinit var unsentForgetAllPixelStore: UnsentForgetAllPixelStore
+
+    private var launchedByFireAction: Boolean = false
+
+    open lateinit var daggerAppComponent: AppComponent
 
     override fun onCreate() {
         super.onCreate()
@@ -109,6 +127,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         }
 
         initializeStatistics()
+        initializeTheme(settingsDataStore, variantManager.getVariant())
         loadTrackerData()
         configureDataDownloader()
         recordInstallationTimestamp()
@@ -117,7 +136,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         notificationRegistrar.registerApp()
 
         initializeHttpsUpgrader()
-
+        submitUnsentFirePixels()
     }
 
     private fun recordInstallationTimestamp() {
@@ -162,10 +181,10 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     }
 
     protected open fun configureDependencyInjection() {
-        DaggerAppComponent.builder()
+        daggerAppComponent = DaggerAppComponent.builder()
             .application(this)
-            .create(this)
-            .inject(this)
+            .build()
+        daggerAppComponent.inject(this)
     }
 
     private fun initializeStatistics() {
@@ -174,6 +193,22 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     private fun initializeHttpsUpgrader() {
         thread { httpsUpgrader.reloadData() }
+    }
+
+    private fun submitUnsentFirePixels() {
+        val count = unsentForgetAllPixelStore.pendingPixelCountClearData
+        Timber.i("Found $count unsent clear data pixels")
+        if (count > 0) {
+            val timeDifferenceMillis = System.currentTimeMillis() - unsentForgetAllPixelStore.lastClearTimestamp
+            if (timeDifferenceMillis <= APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD) {
+                Timber.i("The app was re-launched as a result of the fire action being triggered (happened ${timeDifferenceMillis}ms ago)")
+                launchedByFireAction = true
+            }
+            for (i in 1..count) {
+                pixel.fire(Pixel.PixelName.FORGET_ALL_EXECUTED)
+            }
+            unsentForgetAllPixelStore.resetCount()
+        }
     }
 
     /**
@@ -197,10 +232,17 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     override fun serviceInjector(): AndroidInjector<Service> = serviceInjector
 
-
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onAppForegrounded() {
+        if (launchedByFireAction) {
+            launchedByFireAction = false
+            Timber.i("Suppressing app launch pixel")
+            return
+        }
         pixel.fire(APP_LAUNCH)
     }
 
+    companion object {
+        private const val APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD: Long = 10_000L
+    }
 }

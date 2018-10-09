@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.di
 
+import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
@@ -25,6 +26,7 @@ import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.job.AppConfigurationJobService
 import com.duckduckgo.app.launch.LaunchActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
+import com.duckduckgo.app.onboarding.ui.OnboardingPageFragment
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.privacy.ui.PrivacyPracticesActivity
 import com.duckduckgo.app.privacy.ui.ScorecardActivity
@@ -92,10 +94,17 @@ abstract class AndroidBindingModule {
     @ContributesAndroidInjector
     abstract fun fireActivity(): FireActivity
 
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun aboutDuckDuckGoActivity(): AboutDuckDuckGoActivity
+
     /* Fragments */
 
     @ContributesAndroidInjector
     abstract fun browserTabFragment(): BrowserTabFragment
+
+    @ContributesAndroidInjector
+    abstract fun onboardingDefaultBrowserFragment(): OnboardingPageFragment.DefaultBrowserPage
 
     /* Services */
 

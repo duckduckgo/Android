@@ -33,8 +33,6 @@ import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FORGET_ALL_EXECUTED
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import org.jetbrains.anko.longToast
@@ -46,9 +44,6 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
-
-    @Inject
-    lateinit var pixel: Pixel
 
     private var currentTab: BrowserTabFragment? = null
 
@@ -124,7 +119,6 @@ class BrowserActivity : DuckDuckGoActivity() {
         if (intent.getBooleanExtra(LAUNCHED_FROM_FIRE_EXTRA, false)) {
             Timber.i("Launched from fire")
             Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
-            pixel.fire(FORGET_ALL_EXECUTED)
         }
 
         if (launchNewSearch(intent)) {
@@ -185,7 +179,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchFire() {
-        val dialog = FireDialog(context = this, pixel = pixel, clearPersonalDataAction = clearPersonalDataAction)
+        val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction)
         dialog.clearStarted = { viewModel.onClearRequested() }
         dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.show()

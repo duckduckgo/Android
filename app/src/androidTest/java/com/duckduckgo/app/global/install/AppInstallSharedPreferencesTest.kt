@@ -27,7 +27,7 @@ class AppInstallSharedPreferencesTest {
 
     private lateinit var testee: AppInstallSharedPreferences
 
-    private val context = InstrumentationRegistry.getContext()
+    private val context = InstrumentationRegistry.getTargetContext()
 
     @Before
     fun setup() {

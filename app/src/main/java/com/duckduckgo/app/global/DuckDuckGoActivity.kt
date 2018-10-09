@@ -18,9 +18,13 @@ package com.duckduckgo.app.global
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProviders
+import android.content.BroadcastReceiver
 import android.os.Bundle
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
+import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
@@ -30,8 +34,17 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
+
+    @Inject
+    lateinit var variantManager: VariantManager
+
+    private var themeChangeReceiver: BroadcastReceiver? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
+        themeChangeReceiver = applyTheme(settingsDataStore, variantManager.getVariant())
         super.onCreate(savedInstanceState)
     }
 
@@ -43,6 +56,13 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onDestroy() {
+        themeChangeReceiver?.let {
+            LocalBroadcastManager.getInstance(applicationContext).unregisterReceiver(it)
+        }
+        super.onDestroy()
     }
 
     protected inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProviders.of(this, viewModelFactory).get(V::class.java) }

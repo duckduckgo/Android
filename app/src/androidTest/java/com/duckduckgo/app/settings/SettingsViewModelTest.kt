@@ -23,14 +23,14 @@ import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
-import com.nhaarman.mockito_kotlin.KArgumentCaptor
-import com.nhaarman.mockito_kotlin.argumentCaptor
-import com.nhaarman.mockito_kotlin.verify
-import com.nhaarman.mockito_kotlin.whenever
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ThemeFeature.ThemeToggle
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.nhaarman.mockito_kotlin.*
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -60,6 +60,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockVariantManager: VariantManager
 
+    @Mock
+    private lateinit var mockPixel: Pixel
+
     private lateinit var commandCaptor: KArgumentCaptor<Command>
 
     @Before
@@ -69,10 +72,16 @@ class SettingsViewModelTest {
         context = InstrumentationRegistry.getTargetContext()
         commandCaptor = argumentCaptor()
 
-        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager)
+        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockPixel)
         testee.command.observeForever(commandObserver)
 
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
+    }
+
+    @Test
+    fun whenViewModelInitialisedThenPixelIsFired() {
+        testee // init
+        verify(mockPixel).fire(Pixel.PixelName.SETTINGS_OPENED)
     }
 
     @Test
@@ -103,6 +112,50 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun whenLightThemeToggledOnThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() {
+        testee.onLightThemeToggled(true)
+        verify(mockAppSettingsDataStore).theme = DuckDuckGoTheme.LIGHT
+
+        testee.command.blockingObserve()
+        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.UpdateTheme, commandCaptor.firstValue)
+    }
+
+    @Test
+    fun whenLightThemeToggledOnThenLighThemePixelIsSent() {
+        testee.onLightThemeToggled(true)
+        verify(mockPixel).fire(Pixel.PixelName.SETTINGS_THEME_TOGGLED_LIGHT)
+    }
+
+    @Test
+    fun whenLightThemeTogglesOffThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() {
+        testee.onLightThemeToggled(false)
+        verify(mockAppSettingsDataStore).theme = DuckDuckGoTheme.DARK
+
+        testee.command.blockingObserve()
+        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.UpdateTheme, commandCaptor.firstValue)
+    }
+
+    @Test
+    fun whenLightThemeToggledOffThenDarkThemePixelIsSent() {
+        testee.onLightThemeToggled(false)
+        verify(mockPixel).fire(Pixel.PixelName.SETTINGS_THEME_TOGGLED_DARK)
+    }
+
+    @Test
+    fun whenAutocompleteSwitchedOnThenDataStoreIsUpdated() {
+        testee.onAutocompleteSettingChanged(true)
+        verify(mockAppSettingsDataStore).autoCompleteSuggestionsEnabled = true
+    }
+
+    @Test
+    fun whenAutocompleteSwitchedOffThenDataStoreIsUpdated() {
+        testee.onAutocompleteSettingChanged(false)
+        verify(mockAppSettingsDataStore).autoCompleteSuggestionsEnabled = false
+    }
+
+    @Test
     fun whenLeaveFeedBackRequestedThenCommandIsLaunchFeedback() {
         testee.userRequestedToSendFeedback()
         testee.command.blockingObserve()
@@ -117,7 +170,6 @@ class SettingsViewModelTest {
         val viewState = latestViewState()
         assertTrue(viewState.isAppDefaultBrowser)
     }
-
 
     @Test
     fun whenDefaultBrowserAppNotSetToOursThenIsDefaultBrowserFlagIsFalse() {
@@ -156,6 +208,19 @@ class SettingsViewModelTest {
         assertEquals(expectedStartString, latestViewState().version)
     }
 
+    @Test
+    fun whenThemeToggleFeatureExistsThenThemeToggleIsShown() {
+        whenever(mockVariantManager.getVariant()).thenReturn(Variant("aa", 1.0, listOf(ThemeToggle)))
+        testee.start()
+        assertTrue(latestViewState().showThemeToggle)
+    }
+
+    @Test
+    fun whenThemeToggleFeatureDoesNotExistThenThemeToggleIsNotShown() {
+        whenever(mockVariantManager.getVariant()).thenReturn(Variant("aa", 1.0, emptyList()))
+        testee.start()
+        assertFalse(latestViewState().showThemeToggle)
+    }
 
     private fun latestViewState() = testee.viewState.value!!
 }

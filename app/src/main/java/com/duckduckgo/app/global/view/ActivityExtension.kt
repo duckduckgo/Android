@@ -20,12 +20,14 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.provider.Settings
+import android.os.Bundle
 import android.support.annotation.RequiresApi
+import android.support.v4.app.ActivityOptionsCompat
 import android.support.v4.app.FragmentActivity
 import android.view.View
 import android.widget.Toast
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserSystemSettings
 import org.jetbrains.anko.toast
 import timber.log.Timber
 
@@ -40,13 +42,18 @@ fun FragmentActivity.launchExternalActivity(intent: Intent) {
 @RequiresApi(Build.VERSION_CODES.N)
 fun Context.launchDefaultAppActivity() {
     try {
-        val intent = Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS)
+        val intent = DefaultBrowserSystemSettings.intent()
         startActivity(intent)
     } catch (e: ActivityNotFoundException) {
         val errorMessage = getString(R.string.cannotLaunchDefaultAppSettings)
         Timber.w(e, errorMessage)
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
     }
+}
+
+fun Context.fadeTransitionConfig(): Bundle? {
+    val config = ActivityOptionsCompat.makeCustomAnimation(this, android.R.anim.fade_in, android.R.anim.fade_out)
+    return config.toBundle()
 }
 
 fun FragmentActivity.toggleFullScreen() {
