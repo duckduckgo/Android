@@ -66,6 +66,7 @@ class EntityListDownloader @Inject constructor(
                 }
 
                 appDatabase.runInTransaction {
+                    Timber.d("Updating entity list with ${entities.size} entries")
                     entityListDao.updateAll(entities)
                     trackerDataLoader.loadEntityListData()
                 }
