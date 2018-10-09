@@ -38,6 +38,8 @@
                 android:id="@+id/toolbar"
                 android:layout_width="0dp"
                 android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                android:theme="@style/OmnibarToolbarTheme"
                 app:contentInsetEnd="0dp"
                 app:contentInsetStart="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -45,7 +47,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_scrollFlags="scroll|enterAlways"
-                android:theme="@style/ToolbarTheme"
                 app:popupTheme="@style/AppTheme.Dark.PopupOverlay">
 
                 <android.support.constraint.ConstraintLayout

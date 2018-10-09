@@ -120,6 +120,10 @@
         <item name="colorControlHighlight">@color/subtleGrayTwo</item>
     </style>
 
+    <style name="OmnibarToolbarTheme">
+        <item name="colorControlHighlight">@color/subtleGrayTwo</item>
+    </style>
+
     <style name="SwitchTheme" parent="Widget.AppCompat.CompoundButton.Switch">
         <item name="colorControlActivated">@android:color/white</item>
     </style>
