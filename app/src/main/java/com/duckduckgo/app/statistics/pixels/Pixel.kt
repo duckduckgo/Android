@@ -50,6 +50,10 @@ interface Pixel {
         LONG_PRESS_SHARE("mlp_s"),
         LONG_PRESS_COPY_URL("mlp_c"),
 
+        SETTINGS_OPENED("ms"),
+        SETTINGS_THEME_TOGGLED_LIGHT("ms_tl"),
+        SETTINGS_THEME_TOGGLED_DARK("ms_td"),
+
         HTTPS_UPGRADE_SITE_ERROR("ehd"),
         HTTPS_UPGRADE_SITE_SUMMARY("ehs")
     }
