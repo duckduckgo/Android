@@ -51,6 +51,9 @@ class TermsOfServiceRawStore @Inject constructor(
         }
     }
 
+    override val terms: List<TermsOfService>
+        get() = data
+
     override fun retrieveTerms(url: String): TermsOfService? {
         val entry = data.find { it.name != null && UriString.sameOrSubdomain(url, it.name) }
         if (entry != null) {
