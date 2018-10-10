@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.entities.api
 
-import com.duckduckgo.app.entities.db.EntityListEntity
 import com.duckduckgo.app.entities.db.EntityListDao
+import com.duckduckgo.app.entities.db.EntityListEntity
 import com.duckduckgo.app.global.api.isCached
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader

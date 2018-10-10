@@ -24,25 +24,32 @@ class Grade() {
     enum class Grading {
 
         A,
-        @Json(name="B+") B_PLUS,
+        @Json(name = "B+")
+        B_PLUS,
         B,
-        @Json(name="C+") C_PLUS,
+        @Json(name = "C+")
+        C_PLUS,
         C,
         D,
-        @Json(name="D-") D_MINUS
+        @Json(name = "D-")
+        D_MINUS
 
     }
 
 
-    data class Score(val grade: Grading,
-                     val score: Int,
-                     val httpsScore: Int,
-                     val trackerScore: Int,
-                     val privacyScore: Int) {
+    data class Score(
+        val grade: Grading,
+        val score: Int,
+        val httpsScore: Int,
+        val trackerScore: Int,
+        val privacyScore: Int
+    ) {
     }
 
-    data class Scores(val site: Score,
-                      val enhanced: Score) {
+    data class Scores(
+        val site: Score,
+        val enhanced: Score
+    ) {
     }
 
     var https: Boolean = false
@@ -86,29 +93,33 @@ class Grade() {
         val siteGrade = gradeForScore(siteTotalScore)
         val enhancedGrade = gradeForScore(enhancedTotalScore)
 
-        val site = Score(grade = siteGrade,
+        val site = Score(
+            grade = siteGrade,
             httpsScore = siteHttpsScore,
             privacyScore = privacyScore,
             score = siteTotalScore,
-            trackerScore = siteTrackerScore)
+            trackerScore = siteTrackerScore
+        )
 
-        val enhanced = Score(grade = enhancedGrade,
+        val enhanced = Score(
+            grade = enhancedGrade,
             httpsScore = enhancedHttpsScore,
             privacyScore = privacyScore,
             score = enhancedTotalScore,
-            trackerScore = enhancedTrackerScore)
+            trackerScore = enhancedTrackerScore
+        )
 
         return Scores(site = site, enhanced = enhanced)
     }
 
     private fun gradeForScore(score: Int): Grading {
-        when(score) {
-            in Int.MIN_VALUE .. 1 -> return A
-            in 2 .. 3 -> return B_PLUS
-            in 4 .. 9 -> return B
-            in 10 .. 13 -> return C_PLUS
-            in 14 .. 19 -> return C
-            in 20 .. 29 -> return D
+        when (score) {
+            in Int.MIN_VALUE..1 -> return A
+            in 2..3 -> return B_PLUS
+            in 4..9 -> return B
+            in 10..13 -> return C_PLUS
+            in 14..19 -> return C
+            in 20..29 -> return D
         }
 
         return D_MINUS
@@ -126,17 +137,17 @@ class Grade() {
             return 0
         }
 
-        when(prevalence) {
+        when (prevalence) {
 
-            in 0.0 .. 0.1 -> return 1
-            in 0.1 .. 1.0 -> return 2
-            in 1.0 .. 5.0 -> return 3
-            in 5.0 .. 10.0 -> return 4
-            in 10.0 .. 15.0 -> return 5
-            in 15.0 .. 20.0 -> return 6
-            in 20.0 .. 30.0 -> return 7
-            in 30.0 .. 45.0 -> return 8
-            in 45.0 .. 66.0 -> return 9
+            in 0.0..0.1 -> return 1
+            in 0.1..1.0 -> return 2
+            in 1.0..5.0 -> return 3
+            in 5.0..10.0 -> return 4
+            in 10.0..15.0 -> return 5
+            in 15.0..20.0 -> return 6
+            in 20.0..30.0 -> return 7
+            in 30.0..45.0 -> return 8
+            in 45.0..66.0 -> return 9
 
         }
 

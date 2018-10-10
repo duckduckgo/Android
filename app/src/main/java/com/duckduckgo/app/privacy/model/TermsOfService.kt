@@ -36,7 +36,7 @@ data class TermsOfService(
     val practices: Practices
         get() {
 
-            when(classification) {
+            when (classification) {
 
                 "A" -> return GOOD
                 "B" -> return MIXED

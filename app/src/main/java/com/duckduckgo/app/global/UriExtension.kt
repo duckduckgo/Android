@@ -41,9 +41,15 @@ val Uri.baseHost: String?
 val Uri.simpleUrl: String
     get() {
         var string = ""
-        if (scheme != null) { string = "$scheme://" }
-        if (host != null) { string += host }
-        if (path != null) { string += path }
+        if (scheme != null) {
+            string = "$scheme://"
+        }
+        if (host != null) {
+            string += host
+        }
+        if (path != null) {
+            string += path
+        }
         return string
     }
 

@@ -62,7 +62,7 @@ class BrowserModule {
     fun webDataManager(webViewSessionStorage: WebViewSessionStorage): WebDataManager = WebViewDataManager(AppUrl.Url.HOST, webViewSessionStorage)
 
     @Provides
-    fun clipboardManager(context: Context) : ClipboardManager {
+    fun clipboardManager(context: Context): ClipboardManager {
         return context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     }
 }

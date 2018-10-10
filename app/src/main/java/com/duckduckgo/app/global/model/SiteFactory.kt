@@ -25,7 +25,11 @@ import javax.inject.Singleton
 
 
 @Singleton
-class SiteFactory @Inject constructor(private val termsOfServiceStore: TermsOfServiceStore, private val trackerNetworks: TrackerNetworks, private val prevalenceStore: PrevalenceStore) {
+class SiteFactory @Inject constructor(
+    private val termsOfServiceStore: TermsOfServiceStore,
+    private val trackerNetworks: TrackerNetworks,
+    private val prevalenceStore: PrevalenceStore
+) {
 
     fun build(url: String, title: String? = null): Site {
         val terms = termsOfServiceStore.retrieveTerms(url) ?: TermsOfService()

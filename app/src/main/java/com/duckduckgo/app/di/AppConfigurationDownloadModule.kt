@@ -43,7 +43,8 @@ open class AppConfigurationDownloaderModule {
             httpsUpgradeDataDownloader,
             resourceSurrogateDownloader,
             entityListDownloader,
-            appDatabase)
+            appDatabase
+        )
 
     }
 }

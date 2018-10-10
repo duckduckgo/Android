@@ -17,7 +17,6 @@
 package com.duckduckgo.app.global.model
 
 import android.net.Uri
-import com.duckduckgo.app.global.UriString.Companion.host
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.hasIpHost
 import com.duckduckgo.app.global.isHttps
@@ -123,7 +122,7 @@ class SiteMonitor(
 
     private fun privacyGrade(grade: Grade.Grading): PrivacyGrade {
         // TODO privacy grade needs to support B+ and C+
-        when(grade) {
+        when (grade) {
             Grade.Grading.A -> return PrivacyGrade.A
             Grade.Grading.B_PLUS -> return PrivacyGrade.B
             Grade.Grading.B -> return PrivacyGrade.B
