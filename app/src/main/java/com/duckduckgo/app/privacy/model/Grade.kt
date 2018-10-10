@@ -64,8 +64,8 @@ class Grade() {
     private fun calculate(): Grade.Scores {
 
         // HTTPS
-        var siteHttpsScore = 0
-        var enhancedHttpsScore = 0
+        val siteHttpsScore: Int
+        val enhancedHttpsScore: Int
 
         if (httpsAutoUpgrade) {
             siteHttpsScore = 0
