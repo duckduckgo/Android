@@ -17,91 +17,82 @@
 package com.duckduckgo.app.privacy.model
 
 import com.duckduckgo.app.privacy.model.TermsOfService.Practices
+import com.duckduckgo.app.privacy.model.TermsOfService.Practices.*
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
-class TermsOfServiceTest {
+@RunWith(Parameterized::class)
+class TermsOfServiceTest(val testCase: TermsOfServiceTestCase) {
+
+    @Test
+    fun test() {
+
+        testCase.expectedScore?.let {
+            assertEquals(it, testCase.terms.derivedScore)
+        }
+
+        testCase.expectedPractices?.let {
+            assertEquals(it, testCase.terms.practices)
+        }
+
+    }
 
     companion object {
-        const val badTerm = "badTerm"
-        const val goodTerm = "goodTerm"
+
+        @JvmStatic
+        @Parameterized.Parameters
+        fun data(): Array<TermsOfServiceTestCase> {
+            return arrayOf(
+                // scores
+
+                TermsOfServiceTestCase(expectedScore = 0, terms = TermsOfService(classification = "A", score = 0)),
+                TermsOfServiceTestCase(expectedScore = 1, terms = TermsOfService(classification = "B", score = 0)),
+                TermsOfServiceTestCase(expectedScore = 5, terms = TermsOfService(classification = null, score = 0)),
+                TermsOfServiceTestCase(expectedScore = 7, terms = TermsOfService(classification = "C", score = 0)),
+                TermsOfServiceTestCase(expectedScore = 7, terms = TermsOfService(classification = null, score = 101)),
+                TermsOfServiceTestCase(expectedScore = 10, terms = TermsOfService(classification = "D", score = 0)),
+                TermsOfServiceTestCase(expectedScore = 10, terms = TermsOfService(classification = null, score = 151)),
+
+                // practices
+
+                // score and reasons are ignored
+                TermsOfServiceTestCase(expectedPractices = GOOD, terms = TermsOfService(classification = "A", score = 0)),
+                TermsOfServiceTestCase(expectedPractices = MIXED, terms = TermsOfService(classification = "B", score = 0)),
+                TermsOfServiceTestCase(expectedPractices = POOR, terms = TermsOfService(classification = "C", score = 0)),
+                TermsOfServiceTestCase(expectedPractices = POOR, terms = TermsOfService(classification = "D", score = 0)),
+
+                TermsOfServiceTestCase(expectedPractices = GOOD, terms = TermsOfService(classification = "A", score = 1)),
+                TermsOfServiceTestCase(expectedPractices = MIXED, terms = TermsOfService(classification = "B", score = -1)),
+                TermsOfServiceTestCase(expectedPractices = POOR, terms = TermsOfService(classification = "C", score = 0, goodPrivacyTerms = listOf("good"))),
+                TermsOfServiceTestCase(expectedPractices = POOR, terms = TermsOfService(classification = "D", score = 0, badPrivacyTerms = listOf("bad"))),
+
+
+                // class and score are ignored
+                TermsOfServiceTestCase(expectedPractices = MIXED, terms = TermsOfService(score = 0, goodPrivacyTerms = listOf("good"), badPrivacyTerms = listOf("bad"))),
+
+                // class and reasons are ignored
+                TermsOfServiceTestCase(expectedPractices = GOOD, terms = TermsOfService(score = -1)),
+                TermsOfServiceTestCase(expectedPractices = GOOD, terms = TermsOfService(score = -10)),
+                TermsOfServiceTestCase(expectedPractices = GOOD, terms = TermsOfService(score = -100)),
+                TermsOfServiceTestCase(expectedPractices = GOOD, terms = TermsOfService(score = -1000)),
+
+                // class is ignored, must be at least one reason of either kind
+                TermsOfServiceTestCase(expectedPractices = MIXED, terms = TermsOfService(score = 0, goodPrivacyTerms = listOf("good"))),
+                TermsOfServiceTestCase(expectedPractices = MIXED, terms = TermsOfService(score = 0, badPrivacyTerms = listOf("bad"))),
+
+                // class and reasons are ignored
+                TermsOfServiceTestCase(expectedPractices = POOR, terms = TermsOfService(score = 1)),
+                TermsOfServiceTestCase(expectedPractices = POOR, terms = TermsOfService(score = 10)),
+                TermsOfServiceTestCase(expectedPractices = POOR, terms = TermsOfService(score = 100)),
+                TermsOfServiceTestCase(expectedPractices = POOR, terms = TermsOfService(score = 1000))
+
+            )
+        }
+
     }
 
-    @Test
-    fun whenNoDataThenPracticesUnknown() {
-        val testee = TermsOfService()
-        assertEquals(Practices.UNKNOWN, testee.practices)
-    }
-
-    @Test
-    fun whenClassificationIsAAndReasonsExistThenPracticesAreGood() {
-        val testee = TermsOfService(classification = "A", goodPrivacyTerms = listOf(goodTerm), badPrivacyTerms = listOf(badTerm))
-        assertEquals(Practices.GOOD, testee.practices)
-    }
-
-    @Test
-    fun whenClassificationIsBAndReasonsExistThenPracticesAreMixed() {
-        val testee = TermsOfService(classification = "B", goodPrivacyTerms = listOf(goodTerm), badPrivacyTerms = listOf(badTerm))
-        assertEquals(Practices.MIXED, testee.practices)
-    }
-
-    @Test
-    fun whenClassificationIsCAndReasonsExistThenPracticesArePoor() {
-        val testee = TermsOfService(classification = "C", goodPrivacyTerms = listOf(goodTerm), badPrivacyTerms = listOf(badTerm))
-        assertEquals(Practices.POOR, testee.practices)
-    }
-
-    @Test
-    fun whenClassificationIsDAndReasonsExistThenPracticesArePoor() {
-        val testee = TermsOfService(classification = "D", goodPrivacyTerms = listOf(goodTerm), badPrivacyTerms = listOf(badTerm))
-        assertEquals(Practices.POOR, testee.practices)
-    }
-
-    @Test
-    fun whenClassificationIsEAndReasonsExistThenPracticesArePoor() {
-        val testee = TermsOfService(classification = "E", goodPrivacyTerms = listOf(goodTerm), badPrivacyTerms = listOf(badTerm))
-        assertEquals(Practices.POOR, testee.practices)
-    }
-
-    @Test
-    fun whenNoClassificationWithGoodAndBadReasonsThenPracticesAreMixed() {
-        val testee = TermsOfService(goodPrivacyTerms = listOf(goodTerm), badPrivacyTerms = listOf(badTerm))
-        assertEquals(Practices.MIXED, testee.practices)
-    }
-
-    @Test
-    fun whenGoodTermsAndScoreLessThanZeroThenPracticesAreGood() {
-        val testee = TermsOfService(score = -10, goodPrivacyTerms = listOf(goodTerm))
-        assertEquals(Practices.GOOD, testee.practices)
-    }
-
-    @Test
-    fun whenBadTermsAndScoreLessThanZeroThenPracticesAreGood() {
-        val testee = TermsOfService(score = -10, badPrivacyTerms = listOf(badTerm))
-        assertEquals(Practices.GOOD, testee.practices)
-    }
-
-    @Test
-    fun whenGoodTermsAndScoreOfZeroThenPracticesAreMixed() {
-        val testee = TermsOfService(score = 0, goodPrivacyTerms = listOf(goodTerm))
-        assertEquals(Practices.MIXED, testee.practices)
-    }
-
-    @Test
-    fun whenBadTermsAndScoreOfZeroThenPracticesAreMixed() {
-        val testee = TermsOfService(score = 0, badPrivacyTerms = listOf(badTerm))
-        assertEquals(Practices.MIXED, testee.practices)
-    }
-
-    @Test
-    fun whenGoodTermsAndScoreGreaterThanZeroThenPracticesArePoor() {
-        val testee = TermsOfService(score = 10, goodPrivacyTerms = listOf(goodTerm))
-        assertEquals(Practices.POOR, testee.practices)
-    }
-
-    @Test
-    fun whenBadTermsAndScoreGreaterThanZeroThenPracticesArePoor() {
-        val testee = TermsOfService(score = 10, badPrivacyTerms = listOf(badTerm))
-        assertEquals(Practices.POOR, testee.practices)
-    }
 }
+
+data class TermsOfServiceTestCase(val expectedPractices: Practices? = null, val expectedScore: Int? = null, val terms: TermsOfService)
