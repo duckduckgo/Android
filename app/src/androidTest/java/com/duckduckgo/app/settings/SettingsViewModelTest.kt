@@ -29,6 +29,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ThemeFeature.ThemeToggle
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockito_kotlin.*
 import org.junit.Assert.*
 import org.junit.Before
@@ -59,6 +60,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockVariantManager: VariantManager
 
+    @Mock
+    private lateinit var mockPixel: Pixel
+
     private lateinit var commandCaptor: KArgumentCaptor<Command>
 
     @Before
@@ -68,10 +72,16 @@ class SettingsViewModelTest {
         context = InstrumentationRegistry.getTargetContext()
         commandCaptor = argumentCaptor()
 
-        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager)
+        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockPixel)
         testee.command.observeForever(commandObserver)
 
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
+    }
+
+    @Test
+    fun whenViewModelInitialisedThenPixelIsFired() {
+        testee // init
+        verify(mockPixel).fire(Pixel.PixelName.SETTINGS_OPENED)
     }
 
     @Test
@@ -112,6 +122,12 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun whenLightThemeToggledOnThenLighThemePixelIsSent() {
+        testee.onLightThemeToggled(true)
+        verify(mockPixel).fire(Pixel.PixelName.SETTINGS_THEME_TOGGLED_LIGHT)
+    }
+
+    @Test
     fun whenLightThemeTogglesOffThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() {
         testee.onLightThemeToggled(false)
         verify(mockAppSettingsDataStore).theme = DuckDuckGoTheme.DARK
@@ -119,6 +135,12 @@ class SettingsViewModelTest {
         testee.command.blockingObserve()
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.UpdateTheme, commandCaptor.firstValue)
+    }
+
+    @Test
+    fun whenLightThemeToggledOffThenDarkThemePixelIsSent() {
+        testee.onLightThemeToggled(false)
+        verify(mockPixel).fire(Pixel.PixelName.SETTINGS_THEME_TOGGLED_DARK)
     }
 
     @Test

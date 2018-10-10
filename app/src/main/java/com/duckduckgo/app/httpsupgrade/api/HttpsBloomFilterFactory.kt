@@ -43,6 +43,12 @@ class HttpsBloomFilterFactoryImpl @Inject constructor(private val dao: HttpsBloo
             return null
         }
 
+        if (!binaryDataStore.verifyCheckSum(HTTPS_BINARY_FILE, specification.sha256)) {
+            Timber.d("Https update data failed checksum, clearing")
+            binaryDataStore.clearData(HTTPS_BINARY_FILE)
+            return null
+        }
+
         val initialTimestamp = System.currentTimeMillis()
         Timber.d("Found https data at $dataPath, building filter")
         var bloomFilter = BloomFilter(dataPath, specification.totalEntries)

@@ -59,7 +59,7 @@ class BloomFilterTest {
             }
         }
 
-        val errorRate = falsePositives / testData.size
+        val errorRate = falsePositives.toDouble() / testData.size.toDouble()
         assertEquals(0, falseNegatives)
         assertEquals(bloomData.size, truePositives)
         assertTrue(trueNegatives <= testData.size - bloomData.size)
@@ -73,9 +73,9 @@ class BloomFilterTest {
     }
 
     companion object {
-        const val FILTER_ELEMENT_COUNT = 1000
-        const val ADDITIONAL_TEST_DATA_ELEMENT_COUNT = 9000
+        const val FILTER_ELEMENT_COUNT = 5000
+        const val ADDITIONAL_TEST_DATA_ELEMENT_COUNT = 5000
         const val TARGET_ERROR_RATE = 0.001
-        const val ACCEPTABLE_ERROR_RATE = TARGET_ERROR_RATE * 1.1
+        const val ACCEPTABLE_ERROR_RATE = TARGET_ERROR_RATE * 2
     }
 }

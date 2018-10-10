@@ -25,13 +25,16 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ThemeFeature.ThemeToggle
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import timber.log.Timber
 import javax.inject.Inject
 
 class SettingsViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
-    private val variantManager: VariantManager
+    private val variantManager: VariantManager,
+    private val pixel: Pixel
 ) : ViewModel() {
 
     data class ViewState(
@@ -58,6 +61,10 @@ class SettingsViewModel @Inject constructor(
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
+    init {
+        pixel.fire(SETTINGS_OPENED)
+    }
+
     fun start() {
 
         val defaultBrowserAlready = defaultWebBrowserCapability.isCurrentlyConfiguredAsDefaultBrowser()
@@ -83,6 +90,9 @@ class SettingsViewModel @Inject constructor(
         Timber.i("User toggled light theme, is now enabled: $enabled")
         settingsDataStore.theme = if (enabled) DuckDuckGoTheme.LIGHT else DuckDuckGoTheme.DARK
         command.value = Command.UpdateTheme
+
+        val pixelName = if (enabled) SETTINGS_THEME_TOGGLED_LIGHT else SETTINGS_THEME_TOGGLED_DARK
+        pixel.fire(pixelName)
     }
 
     fun onAutocompleteSettingChanged(enabled: Boolean) {

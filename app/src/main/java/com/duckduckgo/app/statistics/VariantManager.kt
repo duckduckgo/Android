@@ -96,14 +96,8 @@ class ExperimentationVariantManager(
     }
 
     private fun generateVariant(activeVariants: List<Variant>): Variant {
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
-            Timber.i("No variants available for pre-Nougat devices")
-            return DEFAULT_VARIANT
-        }
-
         val randomizedIndex = indexRandomizer.random(activeVariants)
         return activeVariants[randomizedIndex]
-
     }
 }
 

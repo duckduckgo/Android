@@ -17,6 +17,12 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.AppCompat.Light">
+
+        <!-- These neutral colors cover cases before dynamic theme can be applied
+             such as the app launch color -->
+        <item name="colorPrimary">@color/almostBlackDark</item>
+        <item name="colorPrimaryDark">@color/almostBlackDark</item>
+
         <item name="android:windowBackground">?attr/colorPrimaryDark</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -36,15 +42,17 @@
         <item name="omnibarTextColor">@color/white</item>
         <item name="omnibarHintColor">@color/grayishTwo</item>
         <item name="autoCompleteTextColor">@color/white</item>
-        <item name="tabsBackgroundColor">?attr/colorPrimary</item>
         <item name="tabTitleTextColor">@color/midnight</item>
         <item name="tabSubtitleTextColor">@color/coolGray</item>
+        <item name="tabSelectedBorderColor">@color/skyBlue</item>
+        <item name="tabsFireTextColor">@color/white</item>
         <item name="bookmarkIconColor">@color/white</item>
         <item name="bookmarkTitleTextColor">@color/white</item>
         <item name="bookmarkSubtitleTextColor">@color/grayishTwo</item>
         <item name="settingsSectionTextColor">@color/grayishTwo</item>
         <item name="settingsItemTextColor">@color/white</item>
         <item name="settingsMinorTextColor">@color/grayishTwo</item>
+        <item name="settingsSwitchBackgroundColor">@color/subtleGrayTwo</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -77,24 +85,22 @@
         <item name="omnibarTextColor">@color/brownishGrayTwo</item>
         <item name="omnibarHintColor">@color/warmGray</item>
         <item name="autoCompleteTextColor">@color/grayishBrown</item>
-        <item name="tabsBackgroundColor">@color/greyishBrownTwo</item>
         <item name="tabTitleTextColor">@color/almostBlack</item>
         <item name="tabSubtitleTextColor">@color/warmerGray</item>
+        <item name="tabSelectedBorderColor">@color/cornflowerBlue</item>
+        <item name="tabsFireTextColor">@color/warmerGray</item>
         <item name="bookmarkIconColor">@color/grayishBrown</item>
         <item name="bookmarkTitleTextColor">@color/almostBlack</item>
         <item name="bookmarkSubtitleTextColor">@color/warmerGray</item>
         <item name="settingsSectionTextColor">@color/warmerGray</item>
         <item name="settingsItemTextColor">@color/grayishBrown</item>
         <item name="settingsMinorTextColor">@color/warmerGray</item>
+        <item name="settingsSwitchBackgroundColor">@color/brownishGrayTwo</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
         <!-- The status bar must always be dark prior to API 23 as the light text cannot be changed -->
         <item name="android:statusBarColor">@color/almostBlack</item>
-    </style>
-
-    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="android:windowBackground">?attr/colorPrimaryDark</item>
     </style>
 
     <style name="ModalCardTheme" parent="Theme.AppCompat.Light.NoActionBar">
@@ -111,6 +117,11 @@
     <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="colorControlNormal">?attr/toolbarIconColor</item>
         <item name="android:textColorPrimary">?attr/toolbarTextColor</item>
+        <item name="colorControlHighlight">@color/subtleGrayTwo</item>
+    </style>
+
+    <style name="OmnibarToolbarTheme">
+        <item name="colorControlHighlight">@color/subtleGrayTwo</item>
     </style>
 
     <style name="SwitchTheme" parent="Widget.AppCompat.CompoundButton.Switch">
