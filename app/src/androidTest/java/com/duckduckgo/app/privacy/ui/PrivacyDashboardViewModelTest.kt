@@ -24,6 +24,7 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao.NetworkTally
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
+import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.*
 import com.duckduckgo.app.privacy.model.TermsOfService
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -85,7 +86,7 @@ class PrivacyDashboardViewModelTest {
         assertEquals(HttpsStatus.SECURE, viewState.httpsStatus)
         assertEquals(0, viewState.networkCount)
         assertTrue(viewState.allTrackersBlocked)
-        assertEquals(TermsOfService.Practices.UNKNOWN, testee.viewState.value!!.practices)
+        assertEquals(UNKNOWN, testee.viewState.value!!.practices)
     }
 
     @Test
@@ -152,7 +153,7 @@ class PrivacyDashboardViewModelTest {
     fun whenTermsAreUpdatedThenPracticesAreUpdatedInViewModel() {
         val terms = TermsOfService(classification = "A", goodPrivacyTerms = listOf("good"))
         testee.onSiteChanged(site(terms = terms))
-        assertEquals(TermsOfService.Practices.GOOD, testee.viewState.value!!.practices)
+        assertEquals(GOOD, testee.viewState.value!!.practices)
     }
 
     @Test

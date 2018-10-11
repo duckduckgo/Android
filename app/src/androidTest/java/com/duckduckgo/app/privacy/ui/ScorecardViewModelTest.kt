@@ -21,6 +21,7 @@ import android.arch.lifecycle.Observer
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
+import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TermsOfService
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
@@ -63,7 +64,7 @@ class ScorecardViewModelTest {
         assertTrue(viewState.allTrackersBlocked)
         assertFalse(viewState.showIsMemberOfMajorNetwork)
         assertFalse(viewState.showEnhancedGrade)
-        assertEquals(TermsOfService.Practices.UNKNOWN, testee.viewState.value!!.practices)
+        assertEquals(PrivacyPractices.Summary.UNKNOWN, testee.viewState.value!!.practices)
     }
 
     @Test
@@ -108,7 +109,7 @@ class ScorecardViewModelTest {
     fun whenTermsAreUpdatedThenPracticesAreUpdatedInViewModel() {
         val terms = TermsOfService(classification = "A", goodPrivacyTerms = listOf("good"))
         testee.onSiteChanged(site(terms = terms))
-        assertEquals(TermsOfService.Practices.GOOD, testee.viewState.value!!.practices)
+        assertEquals(PrivacyPractices.Summary.GOOD, testee.viewState.value!!.practices)
     }
 
     @Test

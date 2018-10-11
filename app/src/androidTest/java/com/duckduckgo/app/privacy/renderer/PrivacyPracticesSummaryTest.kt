@@ -18,107 +18,107 @@ package com.duckduckgo.app.privacy.renderer
 
 import android.support.test.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.privacy.model.TermsOfService
+import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.*
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class TermsPracticesRendererExtensionTest {
+class PrivacyPracticesSummaryTest {
 
     private val context = InstrumentationRegistry.getTargetContext()
 
     @Test
     fun whenTermsAreGoodThenBannerIsGood() {
-        val testee = TermsOfService.Practices.GOOD
+        val testee = GOOD
         assertEquals(R.drawable.practices_banner_good, testee.banner())
     }
 
     @Test
     fun whenTermsArePoorThenBannerIsPoor() {
-        val testee = TermsOfService.Practices.POOR
+        val testee = POOR
         assertEquals(R.drawable.practices_banner_bad, testee.banner())
     }
 
     @Test
     fun whenTermsAreMixedThenBannerNeutral() {
-        val testee = TermsOfService.Practices.MIXED
+        val testee = MIXED
         assertEquals(R.drawable.practices_banner_neutral, testee.banner())
     }
 
     @Test
     fun whenTermsAreUnknownThenBannerIsNeutral() {
-        val testee = TermsOfService.Practices.UNKNOWN
+        val testee = UNKNOWN
         assertEquals(R.drawable.practices_banner_neutral, testee.banner())
     }
 
     @Test
     fun whenTermsAreGoodThenIconIsGood() {
-        val testee = TermsOfService.Practices.GOOD
+        val testee = GOOD
         assertEquals(R.drawable.practices_icon_good, testee.icon())
     }
 
     @Test
     fun whenTermsArePoorThenIconIsPoor() {
-        val testee = TermsOfService.Practices.POOR
+        val testee = POOR
         assertEquals(R.drawable.practices_icon_bad, testee.icon())
     }
 
     @Test
     fun whenTermsAreMixedThenIconNeutral() {
-        val testee = TermsOfService.Practices.MIXED
+        val testee = MIXED
         assertEquals(R.drawable.practices_icon_neutral, testee.icon())
     }
 
     @Test
     fun whenTermsAreUnknownThenIconIsNeutral() {
-        val testee = TermsOfService.Practices.UNKNOWN
+        val testee = UNKNOWN
         assertEquals(R.drawable.practices_icon_neutral, testee.icon())
     }
 
     @Test
     fun whenTermsAreGoodThenSuccessFailureIconIsSuccess() {
-        val testee = TermsOfService.Practices.GOOD
+        val testee = GOOD
         assertEquals(R.drawable.icon_success, testee.successFailureIcon())
     }
 
     @Test
     fun whenTermsArePoorThenSuccessFailureIconIsFailure() {
-        val testee = TermsOfService.Practices.POOR
+        val testee = POOR
         assertEquals(R.drawable.icon_fail, testee.successFailureIcon())
     }
 
     @Test
     fun whenTermsAreMixedThenSuccessFailureIconIsFailure() {
-        val testee = TermsOfService.Practices.MIXED
+        val testee = MIXED
         assertEquals(R.drawable.icon_fail, testee.successFailureIcon())
     }
 
     @Test
     fun whenTermsAreUnknownThenSuccessFailureIconIsFailure() {
-        val testee = TermsOfService.Practices.UNKNOWN
+        val testee = UNKNOWN
         assertEquals(R.drawable.icon_fail, testee.successFailureIcon())
     }
 
     @Test
     fun whenTermsAreGoodThenTextReflectsSame() {
-        val testee = TermsOfService.Practices.GOOD
+        val testee = GOOD
         assertEquals(context.getString(R.string.practicesGood), testee.text(context))
     }
 
     @Test
     fun whenTermsArePoorThenTextReflectsSame() {
-        val testee = TermsOfService.Practices.POOR
+        val testee = POOR
         assertEquals(context.getString(R.string.practicesBad), testee.text(context))
     }
 
     @Test
     fun whenTermsAreMixedThenTextReflectsSame() {
-        val testee = TermsOfService.Practices.MIXED
+        val testee = MIXED
         assertEquals(context.getString(R.string.practicesMixed), testee.text(context))
     }
 
     @Test
     fun whenTermsAreUnknownThenTextReflectsSame() {
-        val testee = TermsOfService.Practices.UNKNOWN
+        val testee = UNKNOWN
         assertEquals(context.getString(R.string.practicesUnknown), testee.text(context))
     }
 }

@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.privacy.model
 
-import com.duckduckgo.app.privacy.model.TermsOfService.Practices.*
+import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.*
 
 data class TermsOfService(
     val name: String? = null,
@@ -26,14 +26,7 @@ data class TermsOfService(
     val badPrivacyTerms: List<String> = ArrayList()
 ) {
 
-    enum class Practices {
-        POOR,
-        GOOD,
-        MIXED,
-        UNKNOWN
-    }
-
-    val practices: Practices
+    val practices: PrivacyPractices.Summary
         get() {
 
             when (classification) {

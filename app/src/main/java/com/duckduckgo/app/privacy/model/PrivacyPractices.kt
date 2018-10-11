@@ -69,17 +69,7 @@ class PrivacyPractices @Inject constructor(
         val entity = entityMapping.entityForUrl(url)
         val terms = termsOfServiceStore.terms.find { sameOrSubdomain(url, it.name ?: "") } ?: return UNKNOWN
         val score = entityScores[entity?.entityName] ?: terms.derivedScore
-        return Practices(score, toPractices(terms.practices), terms.goodPrivacyTerms, terms.badPrivacyTerms)
-    }
-
-    // TODO remove
-    private fun toPractices(practices: TermsOfService.Practices): Summary {
-        when(practices) {
-            TermsOfService.Practices.GOOD -> return Summary.GOOD
-            TermsOfService.Practices.POOR -> return Summary.POOR
-            TermsOfService.Practices.MIXED -> return Summary.MIXED
-            TermsOfService.Practices.UNKNOWN -> return Summary.UNKNOWN
-        }
+        return Practices(score, terms.practices, terms.goodPrivacyTerms, terms.badPrivacyTerms)
     }
 
     companion object {

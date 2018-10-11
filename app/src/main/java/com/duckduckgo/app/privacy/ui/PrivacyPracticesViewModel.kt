@@ -19,13 +19,16 @@ package com.duckduckgo.app.privacy.ui
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.privacy.model.PrivacyPractices
+import com.duckduckgo.app.privacy.model.PrivacyPractices.*
+import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.*
 import com.duckduckgo.app.privacy.model.TermsOfService
 
 class PrivacyPracticesViewModel : ViewModel() {
 
     data class ViewState(
         val domain: String,
-        val practices: TermsOfService.Practices,
+        val practices: PrivacyPractices.Summary,
         val goodTerms: List<String>,
         val badTerms: List<String>
     )
@@ -39,7 +42,7 @@ class PrivacyPracticesViewModel : ViewModel() {
     private fun resetViewState() {
         viewState.value = ViewState(
             domain = "",
-            practices = TermsOfService.Practices.UNKNOWN,
+            practices = UNKNOWN,
             goodTerms = ArrayList(),
             badTerms = ArrayList()
         )

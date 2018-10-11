@@ -16,8 +16,7 @@
 
 package com.duckduckgo.app.privacy.model
 
-import com.duckduckgo.app.privacy.model.TermsOfService.Practices
-import com.duckduckgo.app.privacy.model.TermsOfService.Practices.*
+import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.*
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -95,4 +94,4 @@ class TermsOfServiceTest(val testCase: TermsOfServiceTestCase) {
 
 }
 
-data class TermsOfServiceTestCase(val expectedPractices: Practices? = null, val expectedScore: Int? = null, val terms: TermsOfService)
+data class TermsOfServiceTestCase(val expectedPractices: PrivacyPractices.Summary? = null, val expectedScore: Int? = null, val terms: TermsOfService)

@@ -20,6 +20,7 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
 import android.net.Uri
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.*
 import com.duckduckgo.app.privacy.model.TermsOfService
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
@@ -52,7 +53,7 @@ class PrivacyPracticesViewModelTest {
     fun whenNoDataThenDefaultValuesAreUsed() {
         val viewState = testee.viewState.value!!
         assertEquals("", viewState.domain)
-        assertEquals(TermsOfService.Practices.UNKNOWN, viewState.practices)
+        assertEquals(UNKNOWN, viewState.practices)
         assertEquals(0, viewState.goodTerms.size)
         assertEquals(0, viewState.badTerms.size)
     }
@@ -68,7 +69,7 @@ class PrivacyPracticesViewModelTest {
         val terms = TermsOfService(classification = "C", goodPrivacyTerms = listOf("good", "good"), badPrivacyTerms = listOf("good"))
         testee.onSiteChanged(site(terms = terms))
         val viewState = testee.viewState.value!!
-        assertEquals(TermsOfService.Practices.POOR, viewState.practices)
+        assertEquals(POOR, viewState.practices)
         assertEquals(2, viewState.goodTerms.size)
         assertEquals(1, viewState.badTerms.size)
     }

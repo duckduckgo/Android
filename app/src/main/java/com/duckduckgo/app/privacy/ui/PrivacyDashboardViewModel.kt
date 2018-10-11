@@ -26,6 +26,8 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao.NetworkTally
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
+import com.duckduckgo.app.privacy.model.PrivacyPractices
+import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 import com.duckduckgo.app.privacy.model.TermsOfService
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -44,7 +46,7 @@ class PrivacyDashboardViewModel(
         val httpsStatus: HttpsStatus,
         val networkCount: Int,
         val allTrackersBlocked: Boolean,
-        val practices: TermsOfService.Practices,
+        val practices: PrivacyPractices.Summary,
         val toggleEnabled: Boolean,
         val showTrackerNetworkLeaderboard: Boolean,
         val domainsVisited: Int,
@@ -119,7 +121,7 @@ class PrivacyDashboardViewModel(
             networkCount = 0,
             allTrackersBlocked = true,
             toggleEnabled = settingsStore.privacyOn,
-            practices = TermsOfService.Practices.UNKNOWN,
+            practices = UNKNOWN,
             showTrackerNetworkLeaderboard = false,
             domainsVisited = 0,
             trackerNetworkTally = emptyList(),

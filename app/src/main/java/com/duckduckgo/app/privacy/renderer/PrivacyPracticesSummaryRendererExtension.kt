@@ -19,30 +19,30 @@ package com.duckduckgo.app.privacy.renderer
 import android.content.Context
 import android.support.annotation.DrawableRes
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.privacy.model.TermsOfService
-import com.duckduckgo.app.privacy.model.TermsOfService.Practices.*
+import com.duckduckgo.app.privacy.model.PrivacyPractices
+import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.*
 
 @DrawableRes
-fun TermsOfService.Practices.banner(): Int = when (this) {
+fun PrivacyPractices.Summary.banner(): Int = when (this) {
     GOOD -> R.drawable.practices_banner_good
     POOR -> R.drawable.practices_banner_bad
     MIXED, UNKNOWN -> R.drawable.practices_banner_neutral
 }
 
 @DrawableRes
-fun TermsOfService.Practices.icon(): Int = when (this) {
+fun PrivacyPractices.Summary.icon(): Int = when (this) {
     GOOD -> R.drawable.practices_icon_good
     POOR -> R.drawable.practices_icon_bad
     MIXED, UNKNOWN -> R.drawable.practices_icon_neutral
 }
 
 @DrawableRes
-fun TermsOfService.Practices.successFailureIcon(): Int = when (this) {
+fun PrivacyPractices.Summary.successFailureIcon(): Int = when (this) {
     GOOD -> R.drawable.icon_success
     POOR, MIXED, UNKNOWN -> R.drawable.icon_fail
 }
 
-fun TermsOfService.Practices.text(context: Context): String = when (this) {
+fun PrivacyPractices.Summary.text(context: Context): String = when (this) {
     GOOD -> context.getString(R.string.practicesGood)
     POOR -> context.getString(R.string.practicesBad)
     MIXED -> context.getString(R.string.practicesMixed)
