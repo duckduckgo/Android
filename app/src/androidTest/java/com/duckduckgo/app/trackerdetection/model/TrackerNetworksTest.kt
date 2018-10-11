@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.trackerdetection.model
 
+import com.duckduckgo.app.entities.EntityMapping
+import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.entities.db.EntityListEntity
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.nhaarman.mockito_kotlin.mock
@@ -38,12 +40,17 @@ class TrackerNetworksTest {
 
     private var mockPrevalenceStore: PrevalenceStore = mock()
 
+    private var mockEntityListDao: EntityListDao = mock()
+
+    private var entityMapping = EntityMapping(mockEntityListDao)
+
     private val testee: TrackerNetworks by lazy {
-        TrackerNetworksImpl(mockPrevalenceStore)
+        TrackerNetworksImpl(mockPrevalenceStore, entityMapping)
     }
 
     @Before
     fun setUp() {
+
     }
 
     @Test
@@ -54,7 +61,7 @@ class TrackerNetworksTest {
         testee.updateTrackers(data)
 
         val entities = listOf(EntityListEntity("tracker.com", networkName), EntityListEntity("network.com", networkName))
-        testee.updateEntities(entities)
+        entityMapping.updateEntities(entities)
 
         assertEquals(category, testee.network("http://tracker.com/script.js")?.category)
         assertEquals(otherCategory, testee.network("http://network.com/script.js")?.category)
@@ -66,7 +73,7 @@ class TrackerNetworksTest {
         val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl))
         testee.updateTrackers(data)
         val entities = listOf(EntityListEntity("tracker.com", networkName), EntityListEntity("network.com", networkName))
-        testee.updateEntities(entities)
+        entityMapping.updateEntities(entities)
         val expected = TrackerNetwork(networkName, category)
         assertEquals(expected, testee.network("http://tracker.com/script.js"))
     }
@@ -77,7 +84,7 @@ class TrackerNetworksTest {
             DisconnectTracker("network.com", category, networkName, networkUrl))
         testee.updateTrackers(trackers)
         val entities = listOf(EntityListEntity("tracker.com", networkName), EntityListEntity("network.com", networkName))
-        testee.updateEntities(entities)
+        entityMapping.updateEntities(entities)
         val expected = TrackerNetwork(networkName, category)
         assertEquals(expected, testee.network("http://www.network.com/index.html"))
     }
@@ -94,7 +101,7 @@ class TrackerNetworksTest {
         val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl))
         testee.updateTrackers(data)
         val entities = listOf(EntityListEntity("tracker.com", networkName), EntityListEntity("network.com", networkName))
-        testee.updateEntities(entities)
+        entityMapping.updateEntities(entities)
         val expected = TrackerNetwork(networkName, category)
         assertEquals(expected, testee.network("http://subdomain.tracker.com/script.js"))
     }
@@ -105,7 +112,7 @@ class TrackerNetworksTest {
             DisconnectTracker("network.com", category, networkName, networkUrl))
         testee.updateTrackers(data)
         val entities = listOf(EntityListEntity("tracker.com", networkName), EntityListEntity("network.com", networkName))
-        testee.updateEntities(entities)
+        entityMapping.updateEntities(entities)
         val expected = TrackerNetwork(networkName, category)
         assertEquals(expected, testee.network("http://www.subdomain.network.com/index.html"))
     }
@@ -133,7 +140,7 @@ class TrackerNetworksTest {
 
         val entities = listOf(EntityListEntity("tracker.com", majorNetworkName),
             EntityListEntity("network.com", majorNetworkName))
-        testee.updateEntities(entities)
+        entityMapping.updateEntities(entities)
 
         val expected = TrackerNetwork(majorNetworkName, category, true)
         assertEquals(expected, testee.network("http://tracker.com/script.js"))

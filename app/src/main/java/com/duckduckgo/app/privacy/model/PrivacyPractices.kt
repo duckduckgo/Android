@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.privacy.model
 
+import com.duckduckgo.app.entities.EntityMapping
 import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.entities.db.EntityListEntity
 import com.duckduckgo.app.global.UriString
@@ -24,9 +25,10 @@ import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import javax.inject.Inject
 import javax.inject.Singleton
 
-class PrivacyPractices(
+@Singleton
+class PrivacyPractices @Inject constructor(
     private val termsOfServiceStore: TermsOfServiceStore,
-    private val entityListDao: EntityListDao) {
+    private val entityMapping: EntityMapping) {
 
     enum class Summary {
         POOR,
@@ -50,7 +52,7 @@ class PrivacyPractices(
             val url = it.name ?: return@forEach
             val derivedScore = it.derivedScore
 
-            entityForUrl(url)?.let {
+            entityMapping.entityForUrl(url)?.let {
 
                 val entityScore = entityScores[it.entityName]
                 if (entityScore == null || entityScore < derivedScore) {
@@ -64,7 +66,7 @@ class PrivacyPractices(
     }
 
     fun privacyPracticesFor(url: String): Practices {
-        val entity = entityForUrl(url)
+        val entity = entityMapping.entityForUrl(url)
         val terms = termsOfServiceStore.terms.find { sameOrSubdomain(url, it.name ?: "") } ?: return UNKNOWN
         val score = entityScores[entity?.entityName] ?: terms.derivedScore
         return Practices(score, toPractices(terms.practices), terms.goodPrivacyTerms, terms.badPrivacyTerms)
@@ -78,10 +80,6 @@ class PrivacyPractices(
             TermsOfService.Practices.MIXED -> return Summary.MIXED
             TermsOfService.Practices.UNKNOWN -> return Summary.UNKNOWN
         }
-    }
-
-    private fun entityForUrl(url: String): EntityListEntity? {
-        return entityListDao.getAll().find { sameOrSubdomain(it.domainName, url) }
     }
 
     companion object {

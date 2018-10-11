@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.di
 
+import com.duckduckgo.app.entities.EntityMapping
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworksImpl
@@ -28,6 +29,6 @@ internal class TrackersModule {
 
     @Provides
     @Singleton
-    fun trackerNetworks(prevalenceStore: PrevalenceStore): TrackerNetworks = TrackerNetworksImpl(prevalenceStore)
+    fun trackerNetworks(prevalenceStore: PrevalenceStore, entityMapping: EntityMapping): TrackerNetworks = TrackerNetworksImpl(prevalenceStore, entityMapping)
 
 }

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection.model
 
+import com.duckduckgo.app.entities.EntityMapping
 import com.duckduckgo.app.entities.db.EntityListEntity
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.privacy.store.PrevalenceStore
@@ -26,27 +27,21 @@ import javax.inject.Singleton
 interface TrackerNetworks {
 
     fun updateTrackers(trackers: List<DisconnectTracker>)
-    fun updateEntities(entities: List<EntityListEntity>)
     fun network(url: String): TrackerNetwork?
 
 }
 
 @Singleton
-class TrackerNetworksImpl @Inject constructor(val prevalenceStore: PrevalenceStore) : TrackerNetworks, Serializable {
+class TrackerNetworksImpl @Inject constructor(val prevalenceStore: PrevalenceStore, val entityMapping: EntityMapping) : TrackerNetworks, Serializable {
 
     private var trackers: List<DisconnectTracker> = emptyList()
-    private var entities: List<EntityListEntity> = emptyList()
 
     override fun updateTrackers(trackers: List<DisconnectTracker>) {
         this.trackers = trackers
     }
 
-    override fun updateEntities(entities: List<EntityListEntity>) {
-        this.entities = entities
-    }
-
     override fun network(url: String): TrackerNetwork? {
-        val entity = entities.find { sameOrSubdomain(url, it.domainName) } ?: return null
+        val entity = entityMapping.entityForUrl(url) ?: return null
         val tracker = trackers.find { sameOrSubdomain(url, it.url) }
 
         val prevalence = prevalenceStore.findPrevalenceOf(entity.entityName)

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.trackerdetection
 
 import android.support.annotation.WorkerThread
+import com.duckduckgo.app.entities.EntityMapping
 import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
@@ -30,7 +31,8 @@ class TrackerDataLoader @Inject constructor(
     private val binaryDataStore: BinaryDataStore,
     private val trackerDataDao: TrackerDataDao,
     private val networkTrackers: TrackerNetworks,
-    private val entityListDao: EntityListDao
+    private val entityListDao: EntityListDao,
+    private val entityMapping: EntityMapping
 ) {
 
     fun loadData() {
@@ -70,7 +72,7 @@ class TrackerDataLoader @Inject constructor(
         val entities = entityListDao.getAll()
         Timber.d("Loaded ${entities.size} entities from DB")
 
-        networkTrackers.updateEntities(entities)
+        entityMapping.updateEntities(entities)
     }
 
 }

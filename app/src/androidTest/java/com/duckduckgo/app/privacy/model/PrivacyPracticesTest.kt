@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.privacy.model
 
+import com.duckduckgo.app.entities.EntityMapping
 import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.entities.db.EntityListEntity
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Practices
@@ -37,8 +38,6 @@ class PrivacyPracticesTest {
     @Mock
     lateinit var mockEntityDao: EntityListDao
 
-    lateinit var testee: PrivacyPractices
-
     @Before
     fun before() {
         initMocks(this)
@@ -50,7 +49,7 @@ class PrivacyPracticesTest {
             TermsOfService("example.com", classification = "D")
         ))
 
-        testee = PrivacyPractices(mockTermsStore, mockEntityDao)
+        val testee = PrivacyPractices(mockTermsStore, EntityMapping(mockEntityDao))
 
         assertEquals(10, testee.privacyPracticesFor("http://www.example.com").score)
 
@@ -71,7 +70,7 @@ class PrivacyPracticesTest {
             EntityListEntity("sibling3.com", "Network"),
             EntityListEntity("sibling4.com", "Network")))
 
-        testee = PrivacyPractices(mockTermsStore, mockEntityDao)
+        val testee = PrivacyPractices(mockTermsStore, EntityMapping(mockEntityDao))
 
         assertEquals(10, testee.privacyPracticesFor("http://www.sibling1.com").score)
     }
@@ -81,7 +80,7 @@ class PrivacyPracticesTest {
         whenever(mockTermsStore.terms).thenReturn(listOf(TermsOfService("example.com", classification = "A")))
         whenever(mockEntityDao.getAll()).thenReturn(listOf(EntityListEntity("example.com", "Network")))
 
-        testee = PrivacyPractices(mockTermsStore, mockEntityDao)
+        val testee = PrivacyPractices(mockTermsStore, EntityMapping(mockEntityDao))
 
         val expected = Practices(score = 0, summary = GOOD, goodReasons = emptyList(), badReasons = emptyList())
         assertEquals(expected, testee.privacyPracticesFor("http://www.example.com"))
@@ -89,7 +88,7 @@ class PrivacyPracticesTest {
 
     @Test
     fun whenInitialisedWithEmptyTermsStoreAndEntityListThenReturnsUnknownForUrl() {
-        testee = PrivacyPractices(mockTermsStore, mockEntityDao)
+        val testee = PrivacyPractices(mockTermsStore, EntityMapping(mockEntityDao))
         assertEquals(PrivacyPractices.UNKNOWN, testee.privacyPracticesFor("http://www.example.com"))
     }
 
