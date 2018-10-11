@@ -49,7 +49,7 @@ class PrivacyPracticesTest {
             TermsOfService("example.com", classification = "D")
         ))
 
-        val testee = PrivacyPractices(mockTermsStore, EntityMapping(mockEntityDao))
+        val testee = PrivacyPracticesImpl(mockTermsStore, EntityMapping(mockEntityDao))
 
         assertEquals(10, testee.privacyPracticesFor("http://www.example.com").score)
 
@@ -70,7 +70,7 @@ class PrivacyPracticesTest {
             EntityListEntity("sibling3.com", "Network"),
             EntityListEntity("sibling4.com", "Network")))
 
-        val testee = PrivacyPractices(mockTermsStore, EntityMapping(mockEntityDao))
+        val testee = PrivacyPracticesImpl(mockTermsStore, EntityMapping(mockEntityDao))
 
         assertEquals(10, testee.privacyPracticesFor("http://www.sibling1.com").score)
     }
@@ -80,7 +80,7 @@ class PrivacyPracticesTest {
         whenever(mockTermsStore.terms).thenReturn(listOf(TermsOfService("example.com", classification = "A")))
         whenever(mockEntityDao.getAll()).thenReturn(listOf(EntityListEntity("example.com", "Network")))
 
-        val testee = PrivacyPractices(mockTermsStore, EntityMapping(mockEntityDao))
+        val testee = PrivacyPracticesImpl(mockTermsStore, EntityMapping(mockEntityDao))
 
         val expected = Practices(score = 0, summary = GOOD, goodReasons = emptyList(), badReasons = emptyList())
         assertEquals(expected, testee.privacyPracticesFor("http://www.example.com"))
@@ -88,7 +88,7 @@ class PrivacyPracticesTest {
 
     @Test
     fun whenInitialisedWithEmptyTermsStoreAndEntityListThenReturnsUnknownForUrl() {
-        val testee = PrivacyPractices(mockTermsStore, EntityMapping(mockEntityDao))
+        val testee = PrivacyPracticesImpl(mockTermsStore, EntityMapping(mockEntityDao))
         assertEquals(PrivacyPractices.UNKNOWN, testee.privacyPracticesFor("http://www.example.com"))
     }
 

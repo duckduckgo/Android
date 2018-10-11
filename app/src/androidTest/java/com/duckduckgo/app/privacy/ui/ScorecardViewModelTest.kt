@@ -22,7 +22,8 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
-import com.duckduckgo.app.privacy.model.TermsOfService
+import com.duckduckgo.app.privacy.model.PrivacyPractices.Practices
+import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.GOOD
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.nhaarman.mockito_kotlin.mock
@@ -107,9 +108,9 @@ class ScorecardViewModelTest {
 
     @Test
     fun whenTermsAreUpdatedThenPracticesAreUpdatedInViewModel() {
-        val terms = TermsOfService(classification = "A", goodPrivacyTerms = listOf("good"))
-        testee.onSiteChanged(site(terms = terms))
-        assertEquals(PrivacyPractices.Summary.GOOD, testee.viewState.value!!.practices)
+        val privacyPractices = Practices(0, GOOD, listOf("good"), listOf())
+        testee.onSiteChanged(site(privacyPractices = privacyPractices))
+        assertEquals(GOOD, testee.viewState.value!!.practices)
     }
 
     @Test
@@ -153,7 +154,7 @@ class ScorecardViewModelTest {
         majorNetworkCount: Int = 0,
         hasTrackerFromMajorNetwork: Boolean = false,
         allTrackersBlocked: Boolean = true,
-        terms: TermsOfService = TermsOfService(),
+        privacyPractices: Practices = PrivacyPractices.UNKNOWN,
         memberNetwork: TrackerNetwork? = null,
         grade: PrivacyGrade = PrivacyGrade.UNKNOWN,
         improvedGrade: PrivacyGrade = PrivacyGrade.UNKNOWN
@@ -165,7 +166,7 @@ class ScorecardViewModelTest {
         whenever(site.majorNetworkCount).thenReturn(majorNetworkCount)
         whenever(site.hasTrackerFromMajorNetwork).thenReturn(hasTrackerFromMajorNetwork)
         whenever(site.allTrackersBlocked).thenReturn(allTrackersBlocked)
-        whenever(site.termsOfService).thenReturn(terms)
+        whenever(site.privacyPractices).thenReturn(privacyPractices)
         whenever(site.grade).thenReturn(grade)
         whenever(site.improvedGrade).thenReturn(improvedGrade)
         return site

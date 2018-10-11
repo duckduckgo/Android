@@ -17,19 +17,19 @@
 package com.duckduckgo.app.di
 
 import com.duckduckgo.app.entities.EntityMapping
-import com.duckduckgo.app.privacy.store.PrevalenceStore
-import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
-import com.duckduckgo.app.trackerdetection.model.TrackerNetworksImpl
+import com.duckduckgo.app.privacy.model.PrivacyPractices
+import com.duckduckgo.app.privacy.model.PrivacyPracticesImpl
+import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-internal class TrackersModule {
+internal class PrivacyModule {
 
     @Provides
     @Singleton
-    fun trackerNetworks(prevalenceStore: PrevalenceStore, entityMapping: EntityMapping): TrackerNetworks
-            = TrackerNetworksImpl(prevalenceStore, entityMapping)
+    fun privacyPractices(termsOfServiceStore: TermsOfServiceStore, entityMapping: EntityMapping): PrivacyPractices
+            = PrivacyPracticesImpl(termsOfServiceStore, entityMapping)
 
 }

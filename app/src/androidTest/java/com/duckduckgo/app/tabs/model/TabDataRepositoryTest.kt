@@ -22,6 +22,7 @@ import android.support.test.annotation.UiThreadTest
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.tabs.db.TabsDao
@@ -48,7 +49,7 @@ class TabDataRepositoryTest {
     private lateinit var mockDao: TabsDao
 
     @Mock
-    private lateinit var mockTermsOfServiceStore: TermsOfServiceStore
+    private lateinit var mockPrivacyPractices: PrivacyPractices
 
     @Mock
     private lateinit var mockPrevalenceStore: PrevalenceStore
@@ -62,7 +63,10 @@ class TabDataRepositoryTest {
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        testee = TabDataRepository(mockDao, SiteFactory(mockTermsOfServiceStore, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore))
+
+        whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
+
+        testee = TabDataRepository(mockDao, SiteFactory(mockPrivacyPractices, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore))
     }
 
     @Test
@@ -73,7 +77,6 @@ class TabDataRepositoryTest {
         val captor = argumentCaptor<TabEntity>()
         verify(mockDao).insertTabAtPosition(captor.capture())
         assertEquals(badUrl, captor.firstValue.url)
-
     }
 
     @Test

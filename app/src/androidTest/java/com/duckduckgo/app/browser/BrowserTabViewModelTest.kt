@@ -43,6 +43,7 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyGrade
+import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -91,7 +92,7 @@ class BrowserTabViewModelTest {
     private lateinit var mockCommandObserver: Observer<Command>
 
     @Mock
-    private lateinit var mockTermsOfServiceStore: TermsOfServiceStore
+    private lateinit var mockPrivacyPractices: PrivacyPractices
 
     @Mock
     private lateinit var mockSettingsStore: SettingsDataStore
@@ -135,9 +136,10 @@ class BrowserTabViewModelTest {
             .build()
         appConfigurationDao = db.appConfigurationDao()
 
-        val siteFactory = SiteFactory(mockTermsOfServiceStore, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore)
+        val siteFactory = SiteFactory(mockPrivacyPractices, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore)
 
         whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
+        whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,

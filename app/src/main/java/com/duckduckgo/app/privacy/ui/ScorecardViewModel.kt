@@ -83,7 +83,7 @@ class ScorecardViewModel(private val settingsStore: PrivacySettingsStore) : View
             majorNetworkCount = site.majorNetworkCount,
             httpsStatus = site.https,
             allTrackersBlocked = site.allTrackersBlocked,
-            practices = site.termsOfService.practices,
+            practices = site.privacyPractices.summary,
             showIsMemberOfMajorNetwork = site.memberNetwork?.isMajor ?: false,
             showEnhancedGrade = site.grade != site.improvedGrade
         )

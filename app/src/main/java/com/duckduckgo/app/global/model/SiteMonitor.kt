@@ -20,10 +20,7 @@ import android.net.Uri
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.hasIpHost
 import com.duckduckgo.app.global.isHttps
-import com.duckduckgo.app.privacy.model.Grade
-import com.duckduckgo.app.privacy.model.HttpsStatus
-import com.duckduckgo.app.privacy.model.PrivacyGrade
-import com.duckduckgo.app.privacy.model.TermsOfService
+import com.duckduckgo.app.privacy.model.*
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -31,7 +28,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 class SiteMonitor(
     override val url: String,
-    override val termsOfService: TermsOfService,
+    override val privacyPractices: PrivacyPractices.Practices,
     override val memberNetwork: TrackerNetwork? = null,
     val prevalenceStore: PrevalenceStore
 ) : Site {
@@ -41,7 +38,7 @@ class SiteMonitor(
     init {
         gradeCalculator.https = uri?.isHttps ?: false
         gradeCalculator.httpsAutoUpgrade = gradeCalculator.https // not support yet, don't penalise sites for now
-        gradeCalculator.privacyScore = termsOfService.score // TODO
+        gradeCalculator.privacyScore = privacyPractices.score
 
         memberNetwork?.let {
             gradeCalculator.setParentEntityAndPrevalence(it.name, prevalenceStore.findPrevalenceOf(it.name))

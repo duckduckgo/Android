@@ -25,10 +25,7 @@ import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class PrivacyPractices @Inject constructor(
-    private val termsOfServiceStore: TermsOfServiceStore,
-    private val entityMapping: EntityMapping) {
+interface PrivacyPractices {
 
     enum class Summary {
         POOR,
@@ -37,7 +34,22 @@ class PrivacyPractices @Inject constructor(
         UNKNOWN
     }
 
-    data class Practices(val score: Int, val summary: Summary, val goodReasons: List<String>, val badReasons: List<String>)
+    data class Practices(val score: Int, val summary: PrivacyPractices.Summary, val goodReasons: List<String>, val badReasons: List<String>)
+
+    fun privacyPracticesFor(url: String): PrivacyPractices.Practices
+
+    companion object {
+
+        val UNKNOWN = PrivacyPractices.Practices(2, PrivacyPractices.Summary.UNKNOWN, emptyList(), emptyList())
+
+    }
+
+}
+
+class PrivacyPracticesImpl @Inject constructor(
+    private val termsOfServiceStore: TermsOfServiceStore,
+    private val entityMapping: EntityMapping): PrivacyPractices {
+
 
     private var entityScores: Map<String, Int> = mapOf()
 
@@ -65,17 +77,11 @@ class PrivacyPractices @Inject constructor(
         this.entityScores = entityScores
     }
 
-    fun privacyPracticesFor(url: String): Practices {
+    override fun privacyPracticesFor(url: String): PrivacyPractices.Practices {
         val entity = entityMapping.entityForUrl(url)
-        val terms = termsOfServiceStore.terms.find { sameOrSubdomain(url, it.name ?: "") } ?: return UNKNOWN
+        val terms = termsOfServiceStore.terms.find { sameOrSubdomain(url, it.name ?: "") } ?: return PrivacyPractices.UNKNOWN
         val score = entityScores[entity?.entityName] ?: terms.derivedScore
-        return Practices(score, terms.practices, terms.goodPrivacyTerms, terms.badPrivacyTerms)
-    }
-
-    companion object {
-
-        val UNKNOWN = Practices(2, Summary.UNKNOWN, emptyList(), emptyList())
-
+        return PrivacyPractices.Practices(score, terms.practices, terms.goodPrivacyTerms, terms.badPrivacyTerms)
     }
 
 }

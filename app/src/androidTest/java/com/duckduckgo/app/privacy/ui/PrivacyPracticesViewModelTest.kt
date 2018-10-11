@@ -20,6 +20,7 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
 import android.net.Uri
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.*
 import com.duckduckgo.app.privacy.model.TermsOfService
 import com.nhaarman.mockito_kotlin.mock
@@ -65,20 +66,21 @@ class PrivacyPracticesViewModelTest {
     }
 
     @Test
-    fun whenTermsAreUpdatedThenViewModelPracticesAndTermsListsAreUpdated() {
-        val terms = TermsOfService(classification = "C", goodPrivacyTerms = listOf("good", "good"), badPrivacyTerms = listOf("good"))
-        testee.onSiteChanged(site(terms = terms))
+    fun whenPrivacyPracticesAreUpdatedThenViewModelPracticesAndTermsListsAreUpdated() {
+        val privacyPractices = PrivacyPractices.Practices(0, POOR, listOf("good", "also good"), listOf("bad"))
+
+        testee.onSiteChanged(site(privacyPractices = privacyPractices))
         val viewState = testee.viewState.value!!
         assertEquals(POOR, viewState.practices)
         assertEquals(2, viewState.goodTerms.size)
         assertEquals(1, viewState.badTerms.size)
     }
 
-    private fun site(url: String = "", terms: TermsOfService = TermsOfService()): Site {
+    private fun site(url: String = "", privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN): Site {
         val site: Site = mock()
         whenever(site.url).thenReturn(url)
         whenever(site.uri).thenReturn(Uri.parse(url))
-        whenever(site.termsOfService).thenReturn(terms)
+        whenever(site.privacyPractices).thenReturn(privacyPractices)
         return site
     }
 

@@ -137,7 +137,7 @@ class PrivacyDashboardViewModel(
             httpsStatus = site.https,
             networkCount = site.networkCount,
             allTrackersBlocked = site.allTrackersBlocked,
-            practices = site.termsOfService.practices
+            practices = site.privacyPractices.summary
         )
     }
 

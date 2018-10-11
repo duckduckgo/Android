@@ -55,9 +55,9 @@ class PrivacyPracticesViewModel : ViewModel() {
         }
         viewState.value = viewState.value?.copy(
             domain = site.uri?.host ?: "",
-            practices = site.termsOfService.practices,
-            goodTerms = site.termsOfService.goodPrivacyTerms,
-            badTerms = site.termsOfService.badPrivacyTerms
+            practices = site.privacyPractices.summary,
+            goodTerms = site.privacyPractices.goodReasons,
+            badTerms = site.privacyPractices.badReasons
         )
     }
 }
