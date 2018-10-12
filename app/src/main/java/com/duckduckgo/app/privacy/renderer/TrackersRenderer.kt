@@ -29,12 +29,6 @@ class TrackersRenderer {
         return context.resources.getQuantityString(resource, trackerCount, trackerCount)
     }
 
-    // TODO remove
-//    fun networksText(context: Context, networkCount: Int, allTrackersBlocked: Boolean): String {
-//        val resource = if (allTrackersBlocked) R.plurals.networksBlocked else R.plurals.networksFound
-//        return context.resources.getQuantityString(resource, networkCount, networkCount)
-//    }
-
     fun majorNetworksText(context: Context, networkCount: Int, allTrackersBlocked: Boolean): String {
         val resource = if (allTrackersBlocked) R.plurals.majorNetworksBlocked else R.plurals.majorNetworksFound
         return context.resources.getQuantityString(resource, networkCount, networkCount)

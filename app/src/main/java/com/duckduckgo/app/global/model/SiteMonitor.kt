@@ -115,12 +115,11 @@ class SiteMonitor(
         get() = privacyGrade(gradeCalculator.scores.enhanced.grade)
 
     private fun privacyGrade(grade: Grade.Grading): PrivacyGrade {
-        // TODO privacy grade needs to support B+ and C+
         when (grade) {
             Grade.Grading.A -> return PrivacyGrade.A
-            Grade.Grading.B_PLUS -> return PrivacyGrade.B
+            Grade.Grading.B_PLUS -> return PrivacyGrade.B_PLUS
             Grade.Grading.B -> return PrivacyGrade.B
-            Grade.Grading.C_PLUS -> return PrivacyGrade.C
+            Grade.Grading.C_PLUS -> return PrivacyGrade.C_PLUS
             Grade.Grading.C -> return PrivacyGrade.C
             Grade.Grading.D -> return PrivacyGrade.D
             Grade.Grading.D_MINUS -> return PrivacyGrade.D

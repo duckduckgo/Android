@@ -24,7 +24,9 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 fun PrivacyGrade.icon(): Int {
     return when (this) {
         PrivacyGrade.A -> R.drawable.privacygrade_icon_a
+        PrivacyGrade.B_PLUS -> R.drawable.privacygrade_icon_b_plus
         PrivacyGrade.B -> R.drawable.privacygrade_icon_b
+        PrivacyGrade.C_PLUS -> R.drawable.privacygrade_icon_c_plus
         PrivacyGrade.C -> R.drawable.privacygrade_icon_c
         PrivacyGrade.D -> R.drawable.privacygrade_icon_d
         PrivacyGrade.UNKNOWN -> R.drawable.privacygrade_icon_unknown
@@ -35,10 +37,12 @@ fun PrivacyGrade.icon(): Int {
 fun PrivacyGrade.smallIcon(): Int {
     return when (this) {
         PrivacyGrade.A -> R.drawable.privacygrade_icon_small_a
+        PrivacyGrade.B_PLUS -> R.drawable.privacygrade_icon_small_b_plus
         PrivacyGrade.B -> R.drawable.privacygrade_icon_small_b
+        PrivacyGrade.C_PLUS -> R.drawable.privacygrade_icon_small_c_plus
         PrivacyGrade.C -> R.drawable.privacygrade_icon_small_c
         PrivacyGrade.D -> R.drawable.privacygrade_icon_small_d
-        PrivacyGrade.UNKNOWN -> 0
+        PrivacyGrade.UNKNOWN -> R.drawable.privacygrade_icon_unknown
     }
 }
 
@@ -54,7 +58,9 @@ fun PrivacyGrade.banner(privacyOn: Boolean): Int {
 private fun PrivacyGrade.privacyOnBanner(): Int {
     return when (this) {
         PrivacyGrade.A -> R.drawable.privacygrade_banner_a_on
+        PrivacyGrade.B_PLUS -> R.drawable.privacygrade_banner_b_on
         PrivacyGrade.B -> R.drawable.privacygrade_banner_b_on
+        PrivacyGrade.C_PLUS -> R.drawable.privacygrade_banner_c_on
         PrivacyGrade.C -> R.drawable.privacygrade_banner_c_on
         PrivacyGrade.D -> R.drawable.privacygrade_banner_d_on
         PrivacyGrade.UNKNOWN -> R.drawable.privacygrade_banner_unknown
@@ -65,11 +71,11 @@ private fun PrivacyGrade.privacyOnBanner(): Int {
 private fun PrivacyGrade.privacyOffBanner(): Int {
     return when (this) {
         PrivacyGrade.A -> R.drawable.privacygrade_banner_a_off
+        PrivacyGrade.B_PLUS -> R.drawable.privacygrade_banner_b_off
         PrivacyGrade.B -> R.drawable.privacygrade_banner_b_off
+        PrivacyGrade.C_PLUS -> R.drawable.privacygrade_banner_c_off
         PrivacyGrade.C -> R.drawable.privacygrade_banner_c_off
         PrivacyGrade.D -> R.drawable.privacygrade_banner_d_off
         PrivacyGrade.UNKNOWN -> R.drawable.privacygrade_banner_unknown
     }
 }
-
-

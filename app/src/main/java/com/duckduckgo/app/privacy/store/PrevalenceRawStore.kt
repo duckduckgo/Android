@@ -18,8 +18,8 @@ package com.duckduckgo.app.privacy.store
 
 import android.content.Context
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.privacy.api.PrevalenceJson
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,13 +30,15 @@ class PrevalenceRawStore @Inject constructor(
     context: Context
 ) : PrevalenceStore {
 
-    private var prevalenceJson: PrevalenceJson? = null
+    data class PrevalenceJson(val data: Map<String, Double>)
+
+     private var prevalenceJson: PrevalenceJson? = null
 
     init {
         Schedulers.io().scheduleDirect {
             val json = context.resources.openRawResource(R.raw.prevalence).bufferedReader().use { it.readText() }
-            val adapter = moshi.adapter<PrevalenceJson>(PrevalenceJson::class.java)
-            prevalenceJson = adapter.fromJson(json)
+             val adapter = moshi.adapter<PrevalenceJson>(PrevalenceJson::class.java)
+             prevalenceJson = adapter.fromJson("{ \"data\": ${json} }")
         }
     }
 
