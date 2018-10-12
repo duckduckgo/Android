@@ -26,7 +26,7 @@ class TrackerNetworksViewModel : ViewModel() {
     data class ViewState(
         val domain: String,
         val allTrackersBlocked: Boolean,
-        val networkCount: Int,
+        val trackerCount: Int,
         val trackingEventsByNetwork: Map<String, List<TrackingEvent>>
     )
 
@@ -39,7 +39,7 @@ class TrackerNetworksViewModel : ViewModel() {
     private fun resetViewState() {
         viewState.value = ViewState(
             domain = "",
-            networkCount = 0,
+            trackerCount = 0,
             allTrackersBlocked = true,
             trackingEventsByNetwork = HashMap()
         )
@@ -52,7 +52,7 @@ class TrackerNetworksViewModel : ViewModel() {
         }
         viewState.value = viewState.value?.copy(
             domain = site.uri?.host ?: "",
-            networkCount = site.networkCount,
+            trackerCount = site.trackerCount,
             allTrackersBlocked = site.allTrackersBlocked,
             trackingEventsByNetwork = site.distinctTrackersByNetwork
         )

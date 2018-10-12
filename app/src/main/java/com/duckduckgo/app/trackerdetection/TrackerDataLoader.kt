@@ -44,6 +44,7 @@ class TrackerDataLoader @Inject constructor(
 
         // stored in DB, then read into memory
         loadDisconnectData()
+        loadEntityListData()
     }
 
     fun loadAdblockData(name: Client.ClientName) {

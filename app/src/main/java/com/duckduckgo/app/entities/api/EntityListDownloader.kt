@@ -56,12 +56,8 @@ class EntityListDownloader @Inject constructor(
                 body.entries.forEach {
                     val entity = it.key
 
-                    it.value.properties.forEach {
-                        entities += EntityListEntity(entity, it)
-                    }
-
-                    it.value.resources.forEach {
-                        entities += EntityListEntity(entity, it)
+                    (it.value.properties + it.value.resources).forEach {
+                        entities += EntityListEntity(entityName = entity, domainName = it)
                     }
                 }
 

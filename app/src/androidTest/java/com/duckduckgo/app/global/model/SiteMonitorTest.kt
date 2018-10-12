@@ -105,49 +105,11 @@ class SiteMonitorTest {
     }
 
     @Test
-    fun whenSiteMonitorCreatedThenNetworkCountIsZero() {
-        val testee = SiteMonitor(document, unknownPractices, prevalenceStore = mockPrevalenceStore)
-        assertEquals(0, testee.networkCount)
-    }
-
-    @Test
     fun whenTrackersAreDetectedThenTrackerCountIsIncremented() {
         val testee = SiteMonitor(document, unknownPractices, prevalenceStore = mockPrevalenceStore)
         testee.trackerDetected(TrackingEvent(document, trackerA, null, true))
         testee.trackerDetected(TrackingEvent(document, trackerB, null, true))
         assertEquals(2, testee.trackerCount)
-    }
-
-    @Test
-    fun whenUniqueTrackerNetworksAreDetectedThenNetworkCountIsIncrementedEachTime() {
-        val testee = SiteMonitor(document, unknownPractices, prevalenceStore = mockPrevalenceStore)
-        testee.trackerDetected(TrackingEvent(document, networkATracker, networkA, true))
-        testee.trackerDetected(TrackingEvent(document, networkBTracker, networkB, true))
-        assertEquals(2, testee.networkCount)
-    }
-
-    @Test
-    fun whenDuplicateTrackerNetworksDetectedThenNetworkCountIsIncrementedOnlyFirstTime() {
-        val testee = SiteMonitor(document, unknownPractices, prevalenceStore = mockPrevalenceStore)
-        testee.trackerDetected(TrackingEvent(document, networkATracker, networkA, true))
-        testee.trackerDetected(TrackingEvent(document, networkATracker, networkA, true))
-        assertEquals(1, testee.networkCount)
-    }
-
-    @Test
-    fun whenUnqiueNonNetworkTrackersAreDetectedThenNetworkCountIsIncrementedForEachDomain() {
-        val testee = SiteMonitor(document, unknownPractices, prevalenceStore = mockPrevalenceStore)
-        testee.trackerDetected(TrackingEvent(document, trackerA, null, true))
-        testee.trackerDetected(TrackingEvent(document, trackerB, null, true))
-        assertEquals(2, testee.networkCount)
-    }
-
-    @Test
-    fun whenDuplicateNonNetworkTrackersAreDetectedThenNetworkCountIsIncrementedOnce() {
-        val testee = SiteMonitor(document, unknownPractices, prevalenceStore = mockPrevalenceStore)
-        testee.trackerDetected(TrackingEvent(document, trackerA, null, true))
-        testee.trackerDetected(TrackingEvent(document, trackerA, null, true))
-        assertEquals(1, testee.networkCount)
     }
 
     @Test

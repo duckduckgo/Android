@@ -85,7 +85,6 @@ class PrivacyDashboardViewModelTest {
         assertEquals(PrivacyGrade.UNKNOWN, viewState.beforeGrade)
         assertEquals(PrivacyGrade.UNKNOWN, viewState.afterGrade)
         assertEquals(HttpsStatus.SECURE, viewState.httpsStatus)
-        assertEquals(0, viewState.networkCount)
         assertTrue(viewState.allTrackersBlocked)
         assertEquals(UNKNOWN, testee.viewState.value!!.practices)
     }
@@ -130,12 +129,6 @@ class PrivacyDashboardViewModelTest {
     fun whenSiteHttpsStatusIsUpdatedThenViewModelIsUpdated() {
         testee.onSiteChanged(site(https = HttpsStatus.MIXED))
         assertEquals(HttpsStatus.MIXED, testee.viewState.value?.httpsStatus)
-    }
-
-    @Test
-    fun whenNetworkCountIsUpdatedThenCountIsUpdatedInViewModel() {
-        testee.onSiteChanged(site(networkCount = 10))
-        assertEquals(10, testee.viewState.value!!.networkCount)
     }
 
     @Test
@@ -208,7 +201,6 @@ class PrivacyDashboardViewModelTest {
     private fun site(
         https: HttpsStatus = HttpsStatus.SECURE,
         trackerCount: Int = 0,
-        networkCount: Int = 0,
         hasTrackerFromMajorNetwork: Boolean = false,
         allTrackersBlocked: Boolean = true,
         privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN,
@@ -218,7 +210,6 @@ class PrivacyDashboardViewModelTest {
         val site: Site = mock()
         whenever(site.https).thenReturn(https)
         whenever(site.trackerCount).thenReturn(trackerCount)
-        whenever(site.networkCount).thenReturn(networkCount)
         whenever(site.hasTrackerFromMajorNetwork).thenReturn(hasTrackerFromMajorNetwork)
         whenever(site.allTrackersBlocked).thenReturn(allTrackersBlocked)
         whenever(site.privacyPractices).thenReturn(privacyPractices)

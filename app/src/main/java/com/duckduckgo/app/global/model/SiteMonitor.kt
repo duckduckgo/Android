@@ -72,9 +72,6 @@ class SiteMonitor(
             return networks
         }
 
-    override val networkCount: Int
-        get() = distinctTrackersByNetwork.count()
-
     override val majorNetworkCount: Int
         get() = trackingEvents.distinctBy { it.trackerNetwork?.name }.count { it.trackerNetwork?.isMajor ?: false }
 

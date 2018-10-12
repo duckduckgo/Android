@@ -44,7 +44,7 @@ class PrivacyDashboardViewModel(
         val beforeGrade: PrivacyGrade,
         val afterGrade: PrivacyGrade,
         val httpsStatus: HttpsStatus,
-        val networkCount: Int,
+        val trackerCount: Int,
         val allTrackersBlocked: Boolean,
         val practices: PrivacyPractices.Summary,
         val toggleEnabled: Boolean,
@@ -118,7 +118,7 @@ class PrivacyDashboardViewModel(
             beforeGrade = PrivacyGrade.UNKNOWN,
             afterGrade = PrivacyGrade.UNKNOWN,
             httpsStatus = HttpsStatus.SECURE,
-            networkCount = 0,
+            trackerCount = 0,
             allTrackersBlocked = true,
             toggleEnabled = settingsStore.privacyOn,
             practices = UNKNOWN,
@@ -135,7 +135,7 @@ class PrivacyDashboardViewModel(
             beforeGrade = site.grade,
             afterGrade = site.improvedGrade,
             httpsStatus = site.https,
-            networkCount = site.networkCount,
+            trackerCount = site.trackerCount,
             allTrackersBlocked = site.allTrackersBlocked,
             practices = site.privacyPractices.summary
         )

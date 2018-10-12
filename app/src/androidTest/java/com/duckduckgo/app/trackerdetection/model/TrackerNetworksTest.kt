@@ -40,9 +40,7 @@ class TrackerNetworksTest {
 
     private var mockPrevalenceStore: PrevalenceStore = mock()
 
-    private var mockEntityListDao: EntityListDao = mock()
-
-    private var entityMapping = EntityMapping(mockEntityListDao)
+    private var entityMapping = EntityMapping()
 
     private val testee: TrackerNetworks by lazy {
         TrackerNetworksImpl(mockPrevalenceStore, entityMapping)

@@ -16,24 +16,19 @@
 
 package com.duckduckgo.app.entities
 
-import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.entities.db.EntityListEntity
 import com.duckduckgo.app.global.UriString
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class EntityMapping @Inject constructor(
-    entityListDao: EntityListDao
-) {
+class EntityMapping @Inject constructor() {
 
-    var entities: List<EntityListEntity>
-
-    init {
-        entities = entityListDao.getAll()
-    }
+    var entities: List<EntityListEntity> = emptyList()
 
     fun updateEntities(entities: List<EntityListEntity>) {
+        Timber.d("updateEntities")
         this.entities = entities
     }
 
