@@ -27,8 +27,6 @@ import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Test
 
-// TODO test that scores are recalulated when trackers are detected
-
 class SiteMonitorTest {
 
     companion object {
@@ -80,13 +78,6 @@ class SiteMonitorTest {
     }
 
     @Test
-    fun whenIpTrackerDetectedThenHasObscureTrackerIsTrue() {
-        val testee = SiteMonitor(document, unknownPractices, prevalenceStore = mockPrevalenceStore)
-        testee.trackerDetected(TrackingEvent(document, "http://54.229.105.203/abc", null, true))
-        assertTrue(testee.hasObscureTracker)
-    }
-
-    @Test
     fun whenSiteMonitorCreatedThenUrlIsCorrect() {
         val testee = SiteMonitor(document, unknownPractices, prevalenceStore = mockPrevalenceStore)
         assertEquals(document, testee.url)
@@ -113,19 +104,17 @@ class SiteMonitorTest {
     }
 
     @Test
-    fun whenNonMajorNetworkTrackerIsDetectedThenMajorNetworkCoutnIsZeroAndHasTrackerFromMajorNetworkIsFalse() {
+    fun whenNonMajorNetworkTrackerIsDetectedThenMajorNetworkCoutnIsZero() {
         val testee = SiteMonitor(document, unknownPractices, prevalenceStore = mockPrevalenceStore)
         testee.trackerDetected(TrackingEvent(document, trackerA, networkA, true))
         assertEquals(0, testee.majorNetworkCount)
-        assertFalse(testee.hasTrackerFromMajorNetwork)
     }
 
     @Test
-    fun whenMajorNetworkTrackerIsDetectedThenMajorNetworkCountIsOneAndHasTrackerFromMajorNetworkIsTrue() {
+    fun whenMajorNetworkTrackerIsDetectedThenMajorNetworkCountIsOne() {
         val testee = SiteMonitor(document, unknownPractices, prevalenceStore = mockPrevalenceStore)
         testee.trackerDetected(TrackingEvent(document, majorNetworkTracker, majorNetwork, true))
         assertEquals(1, testee.majorNetworkCount)
-        assertTrue(testee.hasTrackerFromMajorNetwork)
     }
 
     @Test

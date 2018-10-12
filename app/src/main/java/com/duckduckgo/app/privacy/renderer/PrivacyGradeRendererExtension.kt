@@ -42,7 +42,7 @@ fun PrivacyGrade.smallIcon(): Int {
         PrivacyGrade.C_PLUS -> R.drawable.privacygrade_icon_small_c_plus
         PrivacyGrade.C -> R.drawable.privacygrade_icon_small_c
         PrivacyGrade.D -> R.drawable.privacygrade_icon_small_d
-        PrivacyGrade.UNKNOWN -> R.drawable.privacygrade_icon_unknown
+        PrivacyGrade.UNKNOWN -> 0
     }
 }
 

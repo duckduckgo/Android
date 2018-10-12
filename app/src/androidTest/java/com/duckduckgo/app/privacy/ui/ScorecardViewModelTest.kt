@@ -152,7 +152,6 @@ class ScorecardViewModelTest {
         https: HttpsStatus = HttpsStatus.SECURE,
         trackerCount: Int = 0,
         majorNetworkCount: Int = 0,
-        hasTrackerFromMajorNetwork: Boolean = false,
         allTrackersBlocked: Boolean = true,
         privacyPractices: Practices = PrivacyPractices.UNKNOWN,
         memberNetwork: TrackerNetwork? = null,
@@ -164,7 +163,6 @@ class ScorecardViewModelTest {
         whenever(site.memberNetwork).thenReturn(memberNetwork)
         whenever(site.trackerCount).thenReturn(trackerCount)
         whenever(site.majorNetworkCount).thenReturn(majorNetworkCount)
-        whenever(site.hasTrackerFromMajorNetwork).thenReturn(hasTrackerFromMajorNetwork)
         whenever(site.allTrackersBlocked).thenReturn(allTrackersBlocked)
         whenever(site.privacyPractices).thenReturn(privacyPractices)
         whenever(site.grade).thenReturn(grade)

@@ -201,7 +201,6 @@ class PrivacyDashboardViewModelTest {
     private fun site(
         https: HttpsStatus = HttpsStatus.SECURE,
         trackerCount: Int = 0,
-        hasTrackerFromMajorNetwork: Boolean = false,
         allTrackersBlocked: Boolean = true,
         privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN,
         grade: PrivacyGrade = PrivacyGrade.UNKNOWN,
@@ -210,7 +209,6 @@ class PrivacyDashboardViewModelTest {
         val site: Site = mock()
         whenever(site.https).thenReturn(https)
         whenever(site.trackerCount).thenReturn(trackerCount)
-        whenever(site.hasTrackerFromMajorNetwork).thenReturn(hasTrackerFromMajorNetwork)
         whenever(site.allTrackersBlocked).thenReturn(allTrackersBlocked)
         whenever(site.privacyPractices).thenReturn(privacyPractices)
         whenever(site.grade).thenReturn(grade)

@@ -37,9 +37,9 @@ interface Site {
     val trackerCount: Int
     val distinctTrackersByNetwork: Map<String, List<TrackingEvent>>
     val majorNetworkCount: Int
-    val hasTrackerFromMajorNetwork: Boolean
+//    val hasTrackerFromMajorNetwork: Boolean
     val allTrackersBlocked: Boolean
-    val hasObscureTracker: Boolean
+//    val hasObscureTracker: Boolean
     var hasHttpResources: Boolean
     fun trackerDetected(event: TrackingEvent)
 

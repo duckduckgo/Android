@@ -75,12 +75,8 @@ class SiteMonitor(
     override val majorNetworkCount: Int
         get() = trackingEvents.distinctBy { it.trackerNetwork?.name }.count { it.trackerNetwork?.isMajor ?: false }
 
-    override val hasTrackerFromMajorNetwork: Boolean
-        get() = trackingEvents.any { it.trackerNetwork?.isMajor ?: false }
-
-    override val hasObscureTracker: Boolean
-        get() = trackingEvents.any { Uri.parse(it.trackerUrl).hasIpHost }
-
+//    override val hasTrackerFromMajorNetwork: Boolean
+//        get() = trackingEvents.any { it.trackerNetwork?.isMajor ?: false }
 
     override val allTrackersBlocked: Boolean
         get() = trackingEvents.none { !it.blocked }

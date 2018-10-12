@@ -42,11 +42,11 @@ interface VariantManager {
 
         val ACTIVE_VARIANTS = listOf(
             // SERP variants - do not remove
-            Variant(key = "sa", weight = 1.0, features = emptyList()),
-            Variant(key = "sb", weight = 1.0, features = emptyList()),
+//            Variant(key = "sa", weight = 1.0, features = emptyList()),
+//            Variant(key = "sb", weight = 1.0, features = emptyList()),
 
             // Light theme experiment
-            Variant(key = "mg", weight = 2.0, features = emptyList()),
+//            Variant(key = "mg", weight = 2.0, features = emptyList()),
             Variant(key = "mh", weight = 1.0, features = listOf(LightThemeAsDefault, ThemeToggle)),
             Variant(key = "mj", weight = 1.0, features = listOf(DarkThemeAsDefault, ThemeToggle))
         )
