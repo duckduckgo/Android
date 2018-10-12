@@ -58,9 +58,9 @@ fun PrivacyGrade.banner(privacyOn: Boolean): Int {
 private fun PrivacyGrade.privacyOnBanner(): Int {
     return when (this) {
         PrivacyGrade.A -> R.drawable.privacygrade_banner_a_on
-        PrivacyGrade.B_PLUS -> R.drawable.privacygrade_banner_b_on
+        PrivacyGrade.B_PLUS -> R.drawable.privacygrade_banner_b_plus_on
         PrivacyGrade.B -> R.drawable.privacygrade_banner_b_on
-        PrivacyGrade.C_PLUS -> R.drawable.privacygrade_banner_c_on
+        PrivacyGrade.C_PLUS -> R.drawable.privacygrade_banner_c_plus_on
         PrivacyGrade.C -> R.drawable.privacygrade_banner_c_on
         PrivacyGrade.D -> R.drawable.privacygrade_banner_d_on
         PrivacyGrade.UNKNOWN -> R.drawable.privacygrade_banner_unknown
@@ -71,9 +71,9 @@ private fun PrivacyGrade.privacyOnBanner(): Int {
 private fun PrivacyGrade.privacyOffBanner(): Int {
     return when (this) {
         PrivacyGrade.A -> R.drawable.privacygrade_banner_a_off
-        PrivacyGrade.B_PLUS -> R.drawable.privacygrade_banner_b_off
+        PrivacyGrade.B_PLUS -> R.drawable.privacygrade_banner_b_plus_off
         PrivacyGrade.B -> R.drawable.privacygrade_banner_b_off
-        PrivacyGrade.C_PLUS -> R.drawable.privacygrade_banner_c_off
+        PrivacyGrade.C_PLUS -> R.drawable.privacygrade_banner_c_plus_off
         PrivacyGrade.C -> R.drawable.privacygrade_banner_c_off
         PrivacyGrade.D -> R.drawable.privacygrade_banner_d_off
         PrivacyGrade.UNKNOWN -> R.drawable.privacygrade_banner_unknown
