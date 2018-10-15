@@ -179,9 +179,10 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     private fun reportHttpsUpgradeSiteError(url: Uri, error: String?) {
+        val host = url.host ?: return
         val params = mapOf(
             APP_VERSION to BuildConfig.VERSION_NAME,
-            URL to "${url.scheme}://${url.host}",
+            URL to "https://$host",
             ERROR_CODE to error
         )
         pixel.fire(HTTPS_UPGRADE_SITE_ERROR, params)
