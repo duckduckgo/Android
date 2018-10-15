@@ -27,7 +27,6 @@ import android.support.annotation.WorkerThread
 import android.webkit.*
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.isHttps
-import com.duckduckgo.app.global.simpleUrl
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.HTTPS_UPGRADE_SITE_ERROR
@@ -182,7 +181,7 @@ class BrowserWebViewClient @Inject constructor(
     private fun reportHttpsUpgradeSiteError(url: Uri, error: String?) {
         val params = mapOf(
             APP_VERSION to BuildConfig.VERSION_NAME,
-            URL to url.simpleUrl,
+            URL to "${url.scheme}://${url.host}",
             ERROR_CODE to error
         )
         pixel.fire(HTTPS_UPGRADE_SITE_ERROR, params)
