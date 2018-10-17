@@ -42,14 +42,15 @@ import kotlin.concurrent.thread
 class BrowserWebViewClient @Inject constructor(
     private val requestRewriter: RequestRewriter,
     private val specialUrlDetector: SpecialUrlDetector,
-    private val webViewRequestInterceptor: WebViewRequestInterceptor,
+    private val requestInterceptor: RequestInterceptor,
     private val httpsUpgrader: HttpsUpgrader,
     private val statisticsDataStore: StatisticsDataStore,
     private val pixel: Pixel
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
-    var currentUrl: String? = null
+
+    private var currentUrl: String? = null
 
     /**
      * This is the new method of url overriding available from API 24 onwards
@@ -72,6 +73,7 @@ class BrowserWebViewClient @Inject constructor(
      * API-agnostic implementation of deciding whether to override url or not
      */
     private fun shouldOverride(webView: WebView, url: Uri): Boolean {
+        Timber.v("shouldOverride $url")
 
         val urlType = specialUrlDetector.determineType(url)
 
@@ -105,9 +107,9 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
-        currentUrl = url
+        Timber.d("onPageStarted $url")
+
         webViewClientListener?.loadingStarted()
-        webViewClientListener?.urlChanged(url)
 
         val uri = if (url != null) Uri.parse(url) else null
         if (uri != null) {
@@ -115,17 +117,29 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    override fun onPageFinished(webView: WebView, url: String?) {
-        val canGoBack = webView.canGoBack()
-        val canGoForward = webView.canGoForward()
+    override fun onPageCommitVisible(webView: WebView, url: String?) {
+        Timber.d("onPageCommitVisible $url")
 
-        webViewClientListener?.loadingFinished(url, canGoBack, canGoForward)
+        currentUrl = url
+        webViewClientListener?.let {
+            it.urlChanged(url)
+            it.navigationOptionsChanged(determineNavigationOptions(webView))
+        }
+    }
+
+    override fun onPageFinished(webView: WebView, url: String?) {
+        Timber.d("onPageFinished $url")
+
+        webViewClientListener?.let {
+            it.loadingFinished(url)
+            it.navigationOptionsChanged(determineNavigationOptions(webView))
+        }
     }
 
     @WorkerThread
     override fun shouldInterceptRequest(webView: WebView, request: WebResourceRequest): WebResourceResponse? {
         Timber.v("Intercepting resource ${request.url} on page $currentUrl")
-        return webViewRequestInterceptor.shouldIntercept(request, webView, currentUrl, webViewClientListener)
+        return requestInterceptor.shouldIntercept(request, webView, currentUrl, webViewClientListener)
     }
 
     @UiThread
@@ -197,4 +211,13 @@ class BrowserWebViewClient @Inject constructor(
         function()
         return true
     }
+
+    private fun determineNavigationOptions(webView: WebView): BrowserNavigationOptions {
+        val canGoBack = webView.canGoBack()
+        val canGoForward = webView.canGoForward()
+        return BrowserNavigationOptions(canGoBack, canGoForward)
+    }
+
+    data class BrowserNavigationOptions(val canGoBack: Boolean, val canGoForward: Boolean)
+
 }

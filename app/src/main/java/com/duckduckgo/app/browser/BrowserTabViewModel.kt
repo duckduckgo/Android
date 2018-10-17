@@ -38,6 +38,7 @@ import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment.SaveBookmarkListener
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
+import com.duckduckgo.app.browser.BrowserWebViewClient.BrowserNavigationOptions
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
@@ -258,12 +259,11 @@ class BrowserTabViewModel(
         autoCompleteViewState.value = AutoCompleteViewState(false)
     }
 
-    override fun progressChanged(newProgress: Int, canGoBack: Boolean, canGoForward: Boolean) {
+    override fun progressChanged(newProgress: Int) {
         Timber.v("Loading in progress $newProgress")
 
         val progress = currentLoadingViewState()
         loadingViewState.value = progress.copy(progress = newProgress)
-        browserViewState.value = currentBrowserViewState().copy(canGoBack = canGoBack, canGoForward = canGoForward)
     }
 
     override fun goFullScreen(view: View) {
@@ -286,7 +286,14 @@ class BrowserTabViewModel(
         onSiteChanged()
     }
 
-    override fun loadingFinished(url: String?, canGoBack: Boolean, canGoForward: Boolean) {
+    override fun navigationOptionsChanged(navigationOptions: BrowserNavigationOptions) {
+        browserViewState.value = currentBrowserViewState().copy(
+            canGoBack = navigationOptions.canGoBack,
+            canGoForward = navigationOptions.canGoForward
+        )
+    }
+
+    override fun loadingFinished(url: String?) {
         Timber.v("Loading finished")
 
         val currentOmnibarViewState = currentOmnibarViewState()
@@ -296,7 +303,7 @@ class BrowserTabViewModel(
 
         loadingViewState.value = currentLoadingViewState.copy(isLoading = false)
         omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarText)
-        browserViewState.value = currentBrowserViewState().copy(canGoBack = canGoBack, canGoForward = canGoForward)
+
         registerSiteVisit()
     }
 

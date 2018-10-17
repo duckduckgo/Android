@@ -21,13 +21,13 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class SpecialUrlDetectorTest {
+class SpecialUrlDetectorImplTest {
 
     lateinit var testee: SpecialUrlDetector
 
     @Before
     fun setup() {
-        testee = SpecialUrlDetector()
+        testee = SpecialUrlDetectorImpl()
     }
 
     @Test

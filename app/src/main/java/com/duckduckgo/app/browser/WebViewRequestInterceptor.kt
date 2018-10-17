@@ -27,14 +27,23 @@ import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.ResourceType
 import timber.log.Timber
-import javax.inject.Inject
 
+interface RequestInterceptor {
 
-class WebViewRequestInterceptor @Inject constructor(
+    @WorkerThread
+    fun shouldIntercept(
+        request: WebResourceRequest,
+        webView: WebView,
+        currentUrl: String?,
+        webViewClientListener: WebViewClientListener?
+    ): WebResourceResponse?
+}
+
+class WebViewRequestInterceptor(
     private val resourceSurrogates: ResourceSurrogates,
     private val trackerDetector: TrackerDetector,
     private val httpsUpgrader: HttpsUpgrader
-) {
+) : RequestInterceptor {
 
     /**
      * Notify the application of a resource request and allow the application to return the data.
@@ -46,7 +55,7 @@ class WebViewRequestInterceptor @Inject constructor(
      * caution when accessing private data or the view system.
      */
     @WorkerThread
-    fun shouldIntercept(
+    override fun shouldIntercept(
         request: WebResourceRequest,
         webView: WebView,
         currentUrl: String?,
