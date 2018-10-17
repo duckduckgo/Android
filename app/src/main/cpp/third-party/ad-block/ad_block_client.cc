@@ -269,7 +269,7 @@ void parseFilter(const char *input, const char *end, Filter *f,
           }
           break;
         case '/': {
-          const size_t inputLen = strlen(input);
+          const size_t inputLen = end - input;
           if (parseState == FPStart || parseState == FPPastWhitespace) {
             if (input[inputLen - 1] == '/' && inputLen > 1) {
               // Just copy out the whole regex and return early
