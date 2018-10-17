@@ -24,7 +24,11 @@ import android.support.annotation.VisibleForTesting
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao.NetworkTally
-import com.duckduckgo.app.privacy.model.*
+import com.duckduckgo.app.privacy.model.HttpsStatus
+import com.duckduckgo.app.privacy.model.PrivacyGrade
+import com.duckduckgo.app.privacy.model.PrivacyPractices
+import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
+import com.duckduckgo.app.privacy.model.TermsOfService
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.PRIVACY_DASHBOARD_OPENED
@@ -40,9 +44,9 @@ class PrivacyDashboardViewModel(
         val beforeGrade: PrivacyGrade,
         val afterGrade: PrivacyGrade,
         val httpsStatus: HttpsStatus,
-        val networkCount: Int,
+        val trackerCount: Int,
         val allTrackersBlocked: Boolean,
-        val practices: TermsOfService.Practices,
+        val practices: PrivacyPractices.Summary,
         val toggleEnabled: Boolean,
         val showTrackerNetworkLeaderboard: Boolean,
         val domainsVisited: Int,
@@ -114,10 +118,10 @@ class PrivacyDashboardViewModel(
             beforeGrade = PrivacyGrade.UNKNOWN,
             afterGrade = PrivacyGrade.UNKNOWN,
             httpsStatus = HttpsStatus.SECURE,
-            networkCount = 0,
+            trackerCount = 0,
             allTrackersBlocked = true,
             toggleEnabled = settingsStore.privacyOn,
-            practices = TermsOfService.Practices.UNKNOWN,
+            practices = UNKNOWN,
             showTrackerNetworkLeaderboard = false,
             domainsVisited = 0,
             trackerNetworkTally = emptyList(),
@@ -131,9 +135,9 @@ class PrivacyDashboardViewModel(
             beforeGrade = site.grade,
             afterGrade = site.improvedGrade,
             httpsStatus = site.https,
-            networkCount = site.networkCount,
+            trackerCount = site.trackerCount,
             allTrackersBlocked = site.allTrackersBlocked,
-            practices = site.termsOfService.practices
+            practices = site.privacyPractices.summary
         )
     }
 

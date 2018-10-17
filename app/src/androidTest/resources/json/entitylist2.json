@@ -1,0 +1,28 @@
+{
+  "365Media": {
+    "properties": [
+      "aggregateintelligence.com"
+    ],
+    "resources": [
+      "365dm.com",
+      "365media.com",
+      "aggregateintelligence.com"
+    ]
+  },
+  "4mads": {
+    "properties": [
+      "4mads.com"
+    ],
+    "resources": [
+      "4mads.com"
+    ]
+  },
+  "AdKernel": {
+    "properties": [
+      "adkernel.com"
+    ],
+    "resources": [
+      "adkernel.com"
+    ]
+  }
+}

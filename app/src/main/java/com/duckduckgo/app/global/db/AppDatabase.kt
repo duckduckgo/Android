@@ -22,6 +22,8 @@ import android.arch.persistence.room.RoomDatabase
 import android.arch.persistence.room.migration.Migration
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.entities.db.EntityListDao
+import com.duckduckgo.app.entities.db.EntityListEntity
 import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
@@ -36,7 +38,7 @@ import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 
 @Database(
-    exportSchema = true, version = 5, entities = [
+    exportSchema = true, version = 6, entities = [
         DisconnectTracker::class,
         HttpsBloomFilterSpec::class,
         HttpsWhitelistedDomain::class,
@@ -45,7 +47,8 @@ import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
         AppConfigurationEntity::class,
         TabEntity::class,
         TabSelectionEntity::class,
-        BookmarkEntity::class
+        BookmarkEntity::class,
+        EntityListEntity::class
     ]
 )
 
@@ -58,6 +61,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun appConfigurationDao(): AppConfigurationDao
     abstract fun tabsDao(): TabsDao
     abstract fun bookmarksDao(): BookmarksDao
+    abstract fun networkEntityDao(): EntityListDao
 
     companion object {
         val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
@@ -102,5 +106,12 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
         }
+
+        val MIGRATION_5_TO_6: Migration = object : Migration(5, 6) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `entity_list` (`entityName` TEXT NOT NULL, `domainName` TEXT NOT NULL, PRIMARY KEY(`domainName`))")
+            }
+        }
+
     }
 }

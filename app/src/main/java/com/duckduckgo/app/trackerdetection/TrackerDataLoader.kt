@@ -17,6 +17,8 @@
 package com.duckduckgo.app.trackerdetection
 
 import android.support.annotation.WorkerThread
+import com.duckduckgo.app.entities.EntityMapping
+import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
@@ -28,7 +30,9 @@ class TrackerDataLoader @Inject constructor(
     private val trackerDetector: TrackerDetector,
     private val binaryDataStore: BinaryDataStore,
     private val trackerDataDao: TrackerDataDao,
-    private val networkTrackers: TrackerNetworks
+    private val networkTrackers: TrackerNetworks,
+    private val entityListDao: EntityListDao,
+    private val entityMapping: EntityMapping
 ) {
 
     fun loadData() {
@@ -40,6 +44,7 @@ class TrackerDataLoader @Inject constructor(
 
         // stored in DB, then read into memory
         loadDisconnectData()
+        loadEntityListData()
     }
 
     fun loadAdblockData(name: Client.ClientName) {
@@ -61,6 +66,14 @@ class TrackerDataLoader @Inject constructor(
 
         val client = DisconnectClient(Client.ClientName.DISCONNECT, trackers)
         trackerDetector.addClient(client)
-        networkTrackers.updateData(trackers)
+        networkTrackers.updateTrackers(trackers)
     }
+
+    fun loadEntityListData() {
+        val entities = entityListDao.getAll()
+        Timber.d("Loaded ${entities.size} entities from DB")
+
+        entityMapping.updateEntities(entities)
+    }
+
 }

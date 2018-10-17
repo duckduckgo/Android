@@ -21,7 +21,9 @@ import android.arch.lifecycle.Observer
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
-import com.duckduckgo.app.privacy.model.TermsOfService
+import com.duckduckgo.app.privacy.model.PrivacyPractices
+import com.duckduckgo.app.privacy.model.PrivacyPractices.Practices
+import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.GOOD
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.nhaarman.mockito_kotlin.mock
@@ -63,12 +65,12 @@ class ScorecardViewModelTest {
         assertTrue(viewState.allTrackersBlocked)
         assertFalse(viewState.showIsMemberOfMajorNetwork)
         assertFalse(viewState.showEnhancedGrade)
-        assertEquals(TermsOfService.Practices.UNKNOWN, testee.viewState.value!!.practices)
+        assertEquals(PrivacyPractices.Summary.UNKNOWN, testee.viewState.value!!.practices)
     }
 
     @Test
-    fun whenSiteHasTrackersThenViewModelGradesAreUpdated() {
-        val site = site(allTrackersBlocked = true, trackerCount = 1000)
+    fun whenSiteGradesAreUpdatedThenViewModelGradesAreUpdated() {
+        val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)
         testee.onSiteChanged(site)
         assertEquals(PrivacyGrade.D, testee.viewState.value?.beforeGrade)
         assertEquals(PrivacyGrade.B, testee.viewState.value?.afterGrade)
@@ -106,21 +108,21 @@ class ScorecardViewModelTest {
 
     @Test
     fun whenTermsAreUpdatedThenPracticesAreUpdatedInViewModel() {
-        val terms = TermsOfService(classification = "A", goodPrivacyTerms = listOf("good"))
-        testee.onSiteChanged(site(terms = terms))
-        assertEquals(TermsOfService.Practices.GOOD, testee.viewState.value!!.practices)
+        val privacyPractices = Practices(0, GOOD, listOf("good"), listOf())
+        testee.onSiteChanged(site(privacyPractices = privacyPractices))
+        assertEquals(GOOD, testee.viewState.value!!.practices)
     }
 
     @Test
     fun whenIsMemberOfMajorNetworkThenShowIsMemberOfMajorNetworkIsTrue() {
-        val site = site(memberNetwork = TrackerNetwork("", "", "", 5, true))
+        val site = site(memberNetwork = TrackerNetwork("", "", true))
         testee.onSiteChanged(site)
         assertTrue(testee.viewState.value!!.showIsMemberOfMajorNetwork)
     }
 
     @Test
     fun whenIsNotMemberOfMajorNetworkThenShowIsMemberOfMajorNetworkIsFalse() {
-        val site = site(memberNetwork = TrackerNetwork("", "", "", null, false))
+        val site = site(memberNetwork = TrackerNetwork("", "", false))
         testee.onSiteChanged(site)
         assertFalse(testee.viewState.value!!.showIsMemberOfMajorNetwork)
     }
@@ -134,7 +136,7 @@ class ScorecardViewModelTest {
 
     @Test
     fun whenSiteHasDifferentBeforeAndImprovedGradeThenShowEnhancedGradeIsTrue() {
-        val site = site(allTrackersBlocked = true, trackerCount = 10)
+        val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.A)
         testee.onSiteChanged(site)
         assertTrue(testee.viewState.value!!.showEnhancedGrade)
     }
@@ -150,19 +152,21 @@ class ScorecardViewModelTest {
         https: HttpsStatus = HttpsStatus.SECURE,
         trackerCount: Int = 0,
         majorNetworkCount: Int = 0,
-        hasTrackerFromMajorNetwork: Boolean = false,
         allTrackersBlocked: Boolean = true,
-        terms: TermsOfService = TermsOfService(),
-        memberNetwork: TrackerNetwork? = null
+        privacyPractices: Practices = PrivacyPractices.UNKNOWN,
+        memberNetwork: TrackerNetwork? = null,
+        grade: PrivacyGrade = PrivacyGrade.UNKNOWN,
+        improvedGrade: PrivacyGrade = PrivacyGrade.UNKNOWN
     ): Site {
         val site: Site = mock()
         whenever(site.https).thenReturn(https)
         whenever(site.memberNetwork).thenReturn(memberNetwork)
         whenever(site.trackerCount).thenReturn(trackerCount)
         whenever(site.majorNetworkCount).thenReturn(majorNetworkCount)
-        whenever(site.hasTrackerFromMajorNetwork).thenReturn(hasTrackerFromMajorNetwork)
         whenever(site.allTrackersBlocked).thenReturn(allTrackersBlocked)
-        whenever(site.termsOfService).thenReturn(terms)
+        whenever(site.privacyPractices).thenReturn(privacyPractices)
+        whenever(site.grade).thenReturn(grade)
+        whenever(site.improvedGrade).thenReturn(improvedGrade)
         return site
     }
 }

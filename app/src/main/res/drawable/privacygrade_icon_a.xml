@@ -1,28 +1,9 @@
-<!--
-  ~ Copyright (c) 2017 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="22dp"
-    android:height="22dp"
-    android:viewportWidth="22.0"
-    android:viewportHeight="22.0">
-    <path
-        android:fillColor="?attr/toolbarIconColor"
-        android:pathData="M9.74,12.305h2.52l-1.25,-3.74z" />
-    <path
-        android:fillColor="?attr/toolbarIconColor"
-        android:pathData="M11,0C4.925,0 0,4.925 0,11s4.925,11 11,11 11,-4.925 11,-11A11,11 0,0 0,11 0zM13.45,15.965l-0.5,-1.43L9.045,14.535l-0.5,1.43L5.65,15.965l3.735,-9.93h3.23l3.735,9.93h-2.9z" />
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M12,23C5.925,23 1,18.075 1,12S5.925,1 12,1s11,4.925 11,11 -4.925,11 -11,11zM16.758,16.4l-3.534,-9.171h-2.448L7.242,16.4h2.214l0.578,-1.554h3.932l0.578,1.554h2.213zM13.43,13.128h-2.86L12,9.18l1.43,3.947z"
+      android:fillColor="?attr/toolbarIconColor" />
 </vector>

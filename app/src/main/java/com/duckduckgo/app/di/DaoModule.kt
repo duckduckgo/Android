@@ -44,4 +44,7 @@ class DaoModule {
     @Provides
     fun appConfigurationDao(database: AppDatabase) = database.appConfigurationDao()
 
+    @Provides
+    fun networkEntityDao(database: AppDatabase) = database.networkEntityDao()
+
 }

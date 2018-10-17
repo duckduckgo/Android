@@ -89,7 +89,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         httpsIcon.setImageResource(viewState.httpsStatus.icon())
         httpsText.text = viewState.httpsStatus.text(this)
         networksIcon.setImageResource(trackersRenderer.networksIcon(viewState.allTrackersBlocked))
-        networksText.text = trackersRenderer.networksText(this, viewState.networkCount, viewState.allTrackersBlocked)
+        networksText.text = trackersRenderer.trackersText(this, viewState.trackerCount, viewState.allTrackersBlocked)
         practicesIcon.setImageResource(viewState.practices.icon())
         practicesText.text = viewState.practices.text(this)
         renderToggle(viewState.toggleEnabled)

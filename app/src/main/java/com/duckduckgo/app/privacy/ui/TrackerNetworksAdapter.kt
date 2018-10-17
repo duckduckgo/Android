@@ -27,7 +27,6 @@ import android.widget.TextView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
-import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import kotlinx.android.synthetic.main.item_tracker_network_element.view.*
 import kotlinx.android.synthetic.main.item_tracker_network_header.view.*
@@ -103,7 +102,7 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     fun updateData(data: Map<String, List<TrackingEvent>>) {
-        val majorNetworkKeys = TrackerNetworks.majorNetworks.map { it.name }.filter { data.containsKey(it) }
+        val majorNetworkKeys = data.map { if (it.value.find { it.trackerNetwork?.isMajor == true } != null) it.key else null  }.filterNotNull()
         val otherKeys = data.keys.filter { !majorNetworkKeys.contains(it) }.sorted()
 
         val oldViewData = viewData

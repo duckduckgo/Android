@@ -39,7 +39,6 @@ import org.jetbrains.anko.longToast
 import timber.log.Timber
 import javax.inject.Inject
 
-
 class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject

@@ -1,28 +1,9 @@
-<!--
-  ~ Copyright (c) 2017 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="22dp"
-    android:height="22dp"
-    android:viewportWidth="22.0"
-    android:viewportHeight="22.0">
-    <path
-        android:fillColor="?attr/toolbarIconColor"
-        android:pathData="M12.77,9.045a0.78,0.78 0,0 0,-0.875 -0.775h-2.5v1.545h2.5a0.77,0.77 0,0 0,0.875 -0.77zM12,12.05H9.405v1.68H12c0.615,0 1,-0.31 1,-0.845 0,-0.535 -0.39,-0.835 -1,-0.835z" />
-    <path
-        android:fillColor="?attr/toolbarIconColor"
-        android:pathData="M11,0C4.925,0 0,4.925 0,11s4.925,11 11,11 11,-4.925 11,-11A11,11 0,0 0,11 0zM12.65,15.965L6.845,15.965v-9.93L12.5,6.035c2,0 2.9,1.28 2.9,2.53a2.225,2.225 0,0 1,-1.695 2.28,2.375 2.375,0 0,1 1.89,2.425c-0.025,1.445 -0.995,2.695 -2.945,2.695z" />
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M12,23C5.925,23 1,18.075 1,12S5.925,1 12,1s11,4.925 11,11 -4.925,11 -11,11zM13.815,16.771c1.76,0 2.668,-1.1 2.668,-2.489 0,-1.14 -0.77,-2.09 -1.76,-2.24 0.866,-0.18 1.58,-0.963 1.58,-2.104 0,-1.224 -0.893,-2.338 -2.64,-2.338L8.839,7.6v9.171h4.977zM13.238,11.244L10.79,11.244L10.79,9.319h2.448c0.66,0 1.072,0.398 1.072,0.962 0,0.591 -0.412,0.963 -1.072,0.963zM13.32,15.053h-2.53v-2.09h2.53c0.756,0 1.169,0.467 1.169,1.045 0,0.66 -0.44,1.045 -1.169,1.045z"
+      android:fillColor="?attr/toolbarIconColor" />
 </vector>

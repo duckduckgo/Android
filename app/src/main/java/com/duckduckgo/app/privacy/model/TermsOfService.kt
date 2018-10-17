@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.privacy.model
 
+import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.*
+
 data class TermsOfService(
     val name: String? = null,
     val score: Int = 0,
@@ -24,37 +26,49 @@ data class TermsOfService(
     val badPrivacyTerms: List<String> = ArrayList()
 ) {
 
-    enum class Practices {
-        POOR,
-        GOOD,
-        MIXED,
-        UNKNOWN
-    }
-
-    private val hasNoTerms: Boolean
-        get() = goodPrivacyTerms.isEmpty() && badPrivacyTerms.isEmpty()
-
-    private val hasMixedTerms: Boolean
-        get() = !goodPrivacyTerms.isEmpty() && !badPrivacyTerms.isEmpty()
-
-    val practices: Practices
+    val practices: PrivacyPractices.Summary
         get() {
-            if (hasNoTerms) {
-                return Practices.UNKNOWN
-            }
+
             when (classification) {
-                "A" -> return Practices.GOOD
-                "B" -> return Practices.MIXED
-                "C", "D", "E" -> return Practices.POOR
+
+                "A" -> return GOOD
+                "B" -> return MIXED
+                "C" -> return POOR
+                "D" -> return POOR
+
             }
-            if (hasMixedTerms) {
-                return Practices.MIXED
+
+            if (goodPrivacyTerms.isNotEmpty() && badPrivacyTerms.isNotEmpty()) {
+                return MIXED
             }
-            when {
-                score < 0 -> return Practices.GOOD
-                score > 0 -> return Practices.POOR
-                score == 0 -> return Practices.MIXED
+
+            if (score < 0) {
+                return GOOD
+            } else if (score == 0 && (goodPrivacyTerms.isNotEmpty() || badPrivacyTerms.isNotEmpty())) {
+                return MIXED
+            } else if (score > 0) {
+                return POOR
             }
-            return Practices.UNKNOWN
+
+            return UNKNOWN
         }
+
+    val derivedScore: Int
+        get() {
+            var derived = 5
+
+            // assign a score value to the classes/scores provided in the JSON file
+            if (classification == "A") {
+                derived = 0
+            } else if (classification == "B") {
+                derived = 1
+            } else if (classification == "D" || score > 150) {
+                derived = 10
+            } else if (classification == "C" || score > 100) {
+                derived = 7
+            }
+
+            return derived
+        }
+
 }

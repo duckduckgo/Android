@@ -51,6 +51,9 @@ class TermsOfServiceRawStore @Inject constructor(
         }
     }
 
+    override val terms: List<TermsOfService>
+        get() = data
+
     override fun retrieveTerms(url: String): TermsOfService? {
         val entry = data.find { it.name != null && UriString.sameOrSubdomain(url, it.name) }
         if (entry != null) {
@@ -59,7 +62,7 @@ class TermsOfServiceRawStore @Inject constructor(
 
         val network = trackerNetworks.network(url)
         if (network != null) {
-            return data.find { it.name != null && UriString.sameOrSubdomain(network.url, it.name) }
+            return data.find { it.name == network.name }
         }
 
         return null
