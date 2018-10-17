@@ -28,7 +28,7 @@ import javax.inject.Inject
 
 typealias EntityListJson = Map<String, NetworkEntityJson>
 
-data class NetworkEntityJson(val properties: Array<String>, val resources: Array<String>)
+class NetworkEntityJson(val properties: Array<String>, val resources: Array<String>)
 
 class EntityListDownloader @Inject constructor(
     private val entityListService: EntityListService,

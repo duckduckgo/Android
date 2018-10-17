@@ -75,9 +75,6 @@ class SiteMonitor(
     override val majorNetworkCount: Int
         get() = trackingEvents.distinctBy { it.trackerNetwork?.name }.count { it.trackerNetwork?.isMajor ?: false }
 
-//    override val hasTrackerFromMajorNetwork: Boolean
-//        get() = trackingEvents.any { it.trackerNetwork?.isMajor ?: false }
-
     override val allTrackersBlocked: Boolean
         get() = trackingEvents.none { !it.blocked }
 
@@ -111,14 +108,14 @@ class SiteMonitor(
         get() = privacyGrade(gradeCalculator.scores.enhanced.grade)
 
     private fun privacyGrade(grade: Grade.Grading): PrivacyGrade {
-        when (grade) {
-            Grade.Grading.A -> return PrivacyGrade.A
-            Grade.Grading.B_PLUS -> return PrivacyGrade.B_PLUS
-            Grade.Grading.B -> return PrivacyGrade.B
-            Grade.Grading.C_PLUS -> return PrivacyGrade.C_PLUS
-            Grade.Grading.C -> return PrivacyGrade.C
-            Grade.Grading.D -> return PrivacyGrade.D
-            Grade.Grading.D_MINUS -> return PrivacyGrade.D
+        return when (grade) {
+            Grade.Grading.A -> PrivacyGrade.A
+            Grade.Grading.B_PLUS -> PrivacyGrade.B_PLUS
+            Grade.Grading.B -> PrivacyGrade.B
+            Grade.Grading.C_PLUS -> PrivacyGrade.C_PLUS
+            Grade.Grading.C -> PrivacyGrade.C
+            Grade.Grading.D -> PrivacyGrade.D
+            Grade.Grading.D_MINUS -> PrivacyGrade.D
         }
     }
 

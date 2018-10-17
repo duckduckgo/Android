@@ -24,7 +24,7 @@ abstract class EntityListDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertAll(entities: List<EntityListEntity>)
 
-    @Query("select * from entity_list order by domainName")
+    @Query("select * from entity_list")
     abstract fun getAll(): List<EntityListEntity>
 
     @Query("delete from entity_list")

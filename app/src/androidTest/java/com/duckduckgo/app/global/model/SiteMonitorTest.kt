@@ -18,13 +18,11 @@ package com.duckduckgo.app.global.model
 
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyPractices
-import com.duckduckgo.app.privacy.model.TermsOfService
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.nhaarman.mockito_kotlin.mock
-import org.junit.Assert
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class SiteMonitorTest {
@@ -39,13 +37,10 @@ class SiteMonitorTest {
         private const val trackerB = "http://standalonetrackerB.com/script.js"
         private const val trackerC = "http://standalonetrackerC.com/script.js"
 
-        private const val networkATracker = "http://networkAtracker.com/script.js"
-        private const val networkBTracker = "http://networkBtracker.com/script.js"
         private const val majorNetworkTracker = "http://majorNetworkTracker.com/script.js"
 
         private val networkA = TrackerNetwork("NetworkA", "networkA.com")
-        private val networkB = TrackerNetwork("NetworkB", "networkB.com")
-        private val majorNetwork = TrackerNetwork("MajorNetwork", "majorNetwork.com",true)
+        private val majorNetwork = TrackerNetwork("MajorNetwork", "majorNetwork.com", true)
 
         private val unknownPractices = PrivacyPractices.UNKNOWN
     }

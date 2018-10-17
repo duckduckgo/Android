@@ -17,14 +17,12 @@
 package com.duckduckgo.app.trackerdetection.model
 
 import com.duckduckgo.app.entities.EntityMapping
-import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.entities.db.EntityListEntity
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
-import org.junit.Before
 import org.junit.Test
 
 class TrackerNetworksTest {
@@ -46,16 +44,13 @@ class TrackerNetworksTest {
         TrackerNetworksImpl(mockPrevalenceStore, entityMapping)
     }
 
-    @Before
-    fun setUp() {
-
-    }
-
     @Test
     fun whenUrlMatchesTrackerUrlThenCategoryForTrackerUrlIsReturned() {
 
-        val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl),
-            DisconnectTracker("network.com", otherCategory, networkName, networkUrl))
+        val data = listOf(
+            DisconnectTracker("tracker.com", category, networkName, networkUrl),
+            DisconnectTracker("network.com", otherCategory, networkName, networkUrl)
+        )
         testee.updateTrackers(data)
 
         val entities = listOf(EntityListEntity("tracker.com", networkName), EntityListEntity("network.com", networkName))
@@ -78,8 +73,10 @@ class TrackerNetworksTest {
 
     @Test
     fun whenUrlMatchesNetworkUrlThenNetworkIsReturned() {
-        val trackers = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl),
-            DisconnectTracker("network.com", category, networkName, networkUrl))
+        val trackers = listOf(
+            DisconnectTracker("tracker.com", category, networkName, networkUrl),
+            DisconnectTracker("network.com", category, networkName, networkUrl)
+        )
         testee.updateTrackers(trackers)
         val entities = listOf(EntityListEntity("tracker.com", networkName), EntityListEntity("network.com", networkName))
         entityMapping.updateEntities(entities)
@@ -106,8 +103,10 @@ class TrackerNetworksTest {
 
     @Test
     fun whenUrlSubdomainMatchesNetworkUrlThenNetworkIsReturned() {
-        val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl),
-            DisconnectTracker("network.com", category, networkName, networkUrl))
+        val data = listOf(
+            DisconnectTracker("tracker.com", category, networkName, networkUrl),
+            DisconnectTracker("network.com", category, networkName, networkUrl)
+        )
         testee.updateTrackers(data)
         val entities = listOf(EntityListEntity("tracker.com", networkName), EntityListEntity("network.com", networkName))
         entityMapping.updateEntities(entities)
@@ -136,8 +135,10 @@ class TrackerNetworksTest {
         val data = listOf(DisconnectTracker("tracker.com", category, majorNetworkName, majorNetworkUrl))
         testee.updateTrackers(data)
 
-        val entities = listOf(EntityListEntity("tracker.com", majorNetworkName),
-            EntityListEntity("network.com", majorNetworkName))
+        val entities = listOf(
+            EntityListEntity("tracker.com", majorNetworkName),
+            EntityListEntity("network.com", majorNetworkName)
+        )
         entityMapping.updateEntities(entities)
 
         val expected = TrackerNetwork(majorNetworkName, category, true)

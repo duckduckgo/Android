@@ -31,9 +31,9 @@ class JobBuilder @Inject constructor() {
     fun appConfigurationJob(context: Context): JobInfo {
 
         return JobInfo.Builder(APP_CONFIGURATION_JOB_ID, ComponentName(context, AppConfigurationJobService::class.java))
-            .setPeriodic(TimeUnit.HOURS.toMillis(3))
+            .setPeriodic(TimeUnit.HOURS.toMillis(12))
             .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-            .setBackoffCriteria(TimeUnit.MINUTES.toMillis(30), BACKOFF_POLICY_EXPONENTIAL)
+            .setBackoffCriteria(TimeUnit.MINUTES.toMillis(60), BACKOFF_POLICY_EXPONENTIAL)
             .setPersisted(true)
             .build()
     }

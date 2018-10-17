@@ -29,13 +29,9 @@ class JsonModule {
 
     @Provides
     @Singleton
-    fun moshi(): Moshi = buildMosh()
-
-    private fun buildMosh(): Moshi {
-        var builder = Moshi.Builder()
-            .add(HttpsWhitelistJsonAdapter())
-            .add(DisconnectListJsonAdapter())
-            .add(TermsOfServiceListAdapter())
-        return builder.build()
-    }
+    fun moshi(): Moshi = Moshi.Builder()
+        .add(HttpsWhitelistJsonAdapter())
+        .add(DisconnectListJsonAdapter())
+        .add(TermsOfServiceListAdapter())
+        .build()
 }

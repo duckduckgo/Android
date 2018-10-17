@@ -30,20 +30,20 @@ class PrevalenceRawStore @Inject constructor(
     context: Context
 ) : PrevalenceStore {
 
-    data class PrevalenceJson(val data: Map<String, Double>)
-
-     private var prevalenceJson: PrevalenceJson? = null
+     private var data: Map<String, Double> = emptyMap()
 
     init {
         Schedulers.io().scheduleDirect {
+
             val json = context.resources.openRawResource(R.raw.prevalence).bufferedReader().use { it.readText() }
-             val adapter = moshi.adapter<PrevalenceJson>(PrevalenceJson::class.java)
-             prevalenceJson = adapter.fromJson("{ \"data\": ${json} }")
+            val mapType = Types.newParameterizedType(Map::class.java, String::class.java, Any::class.java)
+            val adapter = moshi.adapter<Map<String, Double>>(mapType)
+            data = adapter.fromJson(json)
         }
     }
 
     override fun findPrevalenceOf(entity: String): Double? {
-        return prevalenceJson?.data?.get(entity)
+        return data?.get(entity)
     }
 
 }

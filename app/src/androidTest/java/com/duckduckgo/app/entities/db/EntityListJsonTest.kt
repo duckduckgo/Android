@@ -26,7 +26,7 @@ import org.junit.Test
 class EntityListJsonTest {
 
     @Test
-    fun test() {
+    fun whenJsonIsValidThenParseSucceeds() {
         val json = FileUtilities.loadText("json/entitylist2.json")
         val type = Types.newParameterizedType(Map::class.java, String::class.java, NetworkEntityJson::class.java)
         val adapter = Moshi.Builder().build().adapter<Map<String, NetworkEntityJson>>(type)

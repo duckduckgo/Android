@@ -35,7 +35,13 @@ class DatabaseModule {
     @Singleton
     fun provideDatabase(context: Context): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
-            .addMigrations(MIGRATION_1_TO_2, MIGRATION_2_TO_3, MIGRATION_3_TO_4, MIGRATION_4_TO_5, MIGRATION_5_TO_6)
+            .addMigrations(
+                MIGRATION_1_TO_2,
+                MIGRATION_2_TO_3,
+                MIGRATION_3_TO_4,
+                MIGRATION_4_TO_5,
+                MIGRATION_5_TO_6
+            )
             .build()
     }
 

@@ -19,7 +19,7 @@ package com.duckduckgo.app.privacy.model
 import com.duckduckgo.app.privacy.model.Grade.Grading.*
 import com.squareup.moshi.Json
 
-class Grade() {
+class Grade {
 
     enum class Grading {
 
@@ -43,14 +43,12 @@ class Grade() {
         val httpsScore: Int,
         val trackerScore: Int,
         val privacyScore: Int
-    ) {
-    }
+    )
 
     data class Scores(
         val site: Score,
         val enhanced: Score
-    ) {
-    }
+    )
 
     var https: Boolean = false
     var httpsAutoUpgrade: Boolean = false
@@ -79,7 +77,7 @@ class Grade() {
         }
 
         // PRIVACY
-        val privacyScore = Math.min(privacyScore ?: unknownPrivacyScore, maxPrivacyScore)
+        val privacyScore = Math.min(privacyScore ?: UNKNOWN_PRIVACY_SCORE, MAX_PRIVACY_SCORE)
 
         // TRACKERS
         val enhancedTrackerScore = trackerScore(entitiesNotBlocked)
@@ -113,16 +111,15 @@ class Grade() {
     }
 
     private fun gradeForScore(score: Int): Grading {
-        when (score) {
-            in Int.MIN_VALUE..1 -> return A
-            in 2..3 -> return B_PLUS
-            in 4..9 -> return B
-            in 10..13 -> return C_PLUS
-            in 14..19 -> return C
-            in 20..29 -> return D
+        return when {
+            score <= 1 -> A
+            score <= 3 -> B_PLUS
+            score <= 9 -> B
+            score <= 13 -> C_PLUS
+            score <= 19 -> C
+            score <= 29 -> D
+            else -> D_MINUS
         }
-
-        return D_MINUS
     }
 
     private fun trackerScore(entities: Map<String, Double>): Int {
@@ -132,26 +129,19 @@ class Grade() {
     }
 
     private fun scoreFromPrevalence(prevalence: Double): Int {
-
-        if (prevalence <= 0.0) {
-            return 0
+        return when {
+            prevalence <= 0.0 -> 0
+            prevalence <= 0.1 -> 1
+            prevalence <= 1.0 -> 2
+            prevalence <= 5.0 -> 3
+            prevalence <= 10.0 -> 4
+            prevalence <= 15.0 -> 5
+            prevalence <= 20.0 -> 6
+            prevalence <= 30.0 -> 7
+            prevalence <= 45.0 -> 8
+            prevalence <= 66.0 -> 9
+            else -> 10
         }
-
-        when (prevalence) {
-
-            in 0.0..0.1 -> return 1
-            in 0.1..1.0 -> return 2
-            in 1.0..5.0 -> return 3
-            in 5.0..10.0 -> return 4
-            in 10.0..15.0 -> return 5
-            in 15.0..20.0 -> return 6
-            in 20.0..30.0 -> return 7
-            in 30.0..45.0 -> return 8
-            in 45.0..66.0 -> return 9
-
-        }
-
-        return 10
     }
 
     fun setParentEntityAndPrevalence(parentEntity: String?, prevalence: Double?) {
@@ -171,8 +161,8 @@ class Grade() {
 
     companion object {
 
-        val unknownPrivacyScore = 2
-        val maxPrivacyScore = 10
+        const val UNKNOWN_PRIVACY_SCORE = 2
+        const val MAX_PRIVACY_SCORE = 10
 
     }
 

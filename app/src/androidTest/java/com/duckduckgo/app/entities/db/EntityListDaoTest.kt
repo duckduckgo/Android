@@ -63,7 +63,7 @@ class EntityListDaoTest {
         val updates = listOf(
             EntityListEntity("domain", "entity3"),
             EntityListEntity("domain2", "entity4"),
-            EntityListEntity("domain3",  "domain5")
+            EntityListEntity("domain3",  "entity5")
         )
 
         entityListDao.updateAll(updates)

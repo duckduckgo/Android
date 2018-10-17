@@ -28,7 +28,7 @@ import org.junit.runners.Parameterized
 import timber.log.Timber
 
 @RunWith(Parameterized::class)
-class PredefinedGradeTest(val testCase: GradeTestCase) {
+class PredefinedGradeTest(private val testCase: GradeTestCase) {
 
     @Test
     fun predefinedGradeTests() {
@@ -69,17 +69,15 @@ class PredefinedGradeTest(val testCase: GradeTestCase) {
 
 }
 
-data class GradeTestCase(val expected: Grade.Scores, val input: Input, val url: String) {
+class GradeTestCase(val expected: Grade.Scores, val input: Input, val url: String) {
 
-    data class Input(val https: Boolean,
+    class Input(val https: Boolean,
                      val httpsAutoUpgrade: Boolean,
                      val parentEntity: String?,
                      val parentTrackerPrevalence: Double?,
                      val privacyScore: Int?,
-                     val trackers: Array<Tracker>) {
-    }
+                     val trackers: Array<Tracker>)
 
-    data class Tracker(val blocked: Boolean, val parentEntity: String, val prevalence: Double?)
+    class Tracker(val blocked: Boolean, val parentEntity: String, val prevalence: Double?)
 
 }
-

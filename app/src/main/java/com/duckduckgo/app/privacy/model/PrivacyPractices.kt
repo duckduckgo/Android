@@ -57,7 +57,7 @@ class PrivacyPracticesImpl @Inject constructor(
         refreshScores()
     }
 
-    fun refreshScores() {
+    private fun refreshScores() {
         val entityScores: MutableMap<String, Int> = mutableMapOf()
 
         termsOfServiceStore.terms.forEach {

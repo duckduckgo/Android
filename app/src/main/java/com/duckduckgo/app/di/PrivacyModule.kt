@@ -25,7 +25,7 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-internal class PrivacyModule {
+class PrivacyModule {
 
     @Provides
     @Singleton
