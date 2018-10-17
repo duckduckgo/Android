@@ -129,7 +129,7 @@ class BrowserWebViewClient @Inject constructor(
 
     override fun onPageFinished(webView: WebView, url: String?) {
         Timber.d("onPageFinished $url")
-        
+
         webViewClientListener?.let {
             it.loadingFinished(url)
             it.navigationOptionsChanged(determineNavigationOptions(webView))
