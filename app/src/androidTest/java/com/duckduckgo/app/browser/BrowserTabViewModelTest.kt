@@ -32,6 +32,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
+import com.duckduckgo.app.browser.addToHome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -110,6 +111,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockFaviconDownloader: FaviconDownloader
 
+    @Mock
+    private lateinit var mockAddToHomeCapabilityDetector: AddToHomeCapabilityDetector
+
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
 
@@ -146,7 +150,8 @@ class BrowserTabViewModelTest {
             appConfigurationDao = appConfigurationDao,
             webViewSessionStorage = webViewSessionStorage,
             specialUrlDetector = SpecialUrlDetector(),
-            faviconDownloader = mockFaviconDownloader
+            faviconDownloader = mockFaviconDownloader,
+            addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector
         )
 
         testee.loadData("abc", null)
