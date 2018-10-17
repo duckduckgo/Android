@@ -51,9 +51,7 @@ class BrowserChromeClient @Inject constructor() : WebChromeClient() {
     }
 
     override fun onProgressChanged(webView: WebView, newProgress: Int) {
-        val canGoBack = webView.canGoBack()
-        val canGoForward = webView.canGoForward()
-        webViewClientListener?.progressChanged(newProgress, canGoBack, canGoForward)
+        webViewClientListener?.progressChanged(newProgress)
     }
 
     override fun onReceivedTitle(view: WebView, title: String) {

@@ -145,7 +145,7 @@ class BrowserTabViewModelTest {
             longPressHandler = mockLongPressHandler,
             appConfigurationDao = appConfigurationDao,
             webViewSessionStorage = webViewSessionStorage,
-            specialUrlDetector = SpecialUrlDetector(),
+            specialUrlDetector = SpecialUrlDetectorImpl(),
             faviconDownloader = mockFaviconDownloader
         )
 
@@ -251,28 +251,28 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewModelNotifiedThatWebViewHasFinishedLoadingThenViewStateIsUpdated() {
-        testee.loadingFinished(null, false, false)
+        testee.loadingFinished(null)
         assertFalse(loadingViewState().isLoading)
     }
 
     @Test
     fun whenLoadingFinishedWithUrlThenSiteVisitedEntryAddedToLeaderboardDao() {
         testee.url.value = "http://example.com/abc"
-        testee.loadingFinished(null, false, false)
+        testee.loadingFinished(null)
         verify(mockNetworkLeaderboardDao).insert(SiteVisitedEntity("example.com"))
     }
 
     @Test
     fun whenLoadingFinishedWithUrlThenOmnibarTextUpdatedToMatch() {
         val exampleUrl = "http://example.com/abc"
-        testee.loadingFinished(exampleUrl, false, false)
+        testee.loadingFinished(exampleUrl)
         assertEquals(exampleUrl, omnibarViewState().omnibarText)
     }
 
     @Test
     fun whenLoadingFinishedWithQueryUrlThenOmnibarTextUpdatedToShowQuery() {
         val queryUrl = "http://duckduckgo.com?q=test"
-        testee.loadingFinished(queryUrl, false, false)
+        testee.loadingFinished(queryUrl)
         assertEquals("test", omnibarViewState().omnibarText)
     }
 
@@ -280,13 +280,13 @@ class BrowserTabViewModelTest {
     fun whenLoadingFinishedWithNoUrlThenOmnibarTextUpdatedToMatch() {
         val exampleUrl = "http://example.com/abc"
         testee.urlChanged(exampleUrl)
-        testee.loadingFinished(null, false, false)
+        testee.loadingFinished(null)
         assertEquals(exampleUrl, omnibarViewState().omnibarText)
     }
 
     @Test
     fun whenLoadingFinishedWithNoUrlThenSiteVisitedEntryNotAddedToLeaderboardDao() {
-        testee.loadingFinished(null, false, false)
+        testee.loadingFinished(null)
         verify(mockNetworkLeaderboardDao, never()).insert(SiteVisitedEntity("example.com"))
     }
 
@@ -345,13 +345,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewModelGetsProgressUpdateThenViewStateIsUpdated() {
-        testee.progressChanged(0, false, false)
+        testee.progressChanged(0)
         assertEquals(0, loadingViewState().progress)
 
-        testee.progressChanged(50, false, false)
+        testee.progressChanged(50)
         assertEquals(50, loadingViewState().progress)
 
-        testee.progressChanged(100, false, false)
+        testee.progressChanged(100)
         assertEquals(100, loadingViewState().progress)
     }
 
