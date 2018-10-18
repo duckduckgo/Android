@@ -43,6 +43,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.view.*
+import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.webkit.ValueCallback
@@ -915,7 +916,11 @@ class BrowserTabFragment : Fragment(), FindListener {
                 newTabPopupMenuItem.isEnabled = browserShowing
                 addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
                 sharePageMenuItem?.isEnabled = viewState.canSharePage
-                addToHome?.isEnabled = viewState.canAddToHome
+
+                addToHome?.let {
+                    it.visibility = if (viewState.addToHomeVisible) VISIBLE else GONE
+                    it.isEnabled = viewState.addToHomeEnabled
+                }
             }
         }
 

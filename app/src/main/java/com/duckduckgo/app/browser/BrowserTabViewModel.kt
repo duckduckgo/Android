@@ -38,8 +38,10 @@ import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment.SaveBookmarkListener
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
+import com.duckduckgo.app.browser.BrowserWebViewClient.BrowserNavigationOptions
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
+import com.duckduckgo.app.browser.addToHome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -55,7 +57,6 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyGrade
-import com.duckduckgo.app.privacy.model.improvedGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -81,6 +82,7 @@ class BrowserTabViewModel(
     private val webViewSessionStorage: WebViewSessionStorage,
     private val specialUrlDetector: SpecialUrlDetector,
     private val faviconDownloader: FaviconDownloader,
+    private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, ViewModel() {
 
@@ -101,7 +103,8 @@ class BrowserTabViewModel(
         val canAddBookmarks: Boolean = false,
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
-        val canAddToHome: Boolean = false
+        val addToHomeEnabled: Boolean = false,
+        val addToHomeVisible: Boolean = false
     )
 
     data class OmnibarViewState(
@@ -258,12 +261,11 @@ class BrowserTabViewModel(
         autoCompleteViewState.value = AutoCompleteViewState(false)
     }
 
-    override fun progressChanged(newProgress: Int, canGoBack: Boolean, canGoForward: Boolean) {
+    override fun progressChanged(newProgress: Int) {
         Timber.v("Loading in progress $newProgress")
 
         val progress = currentLoadingViewState()
         loadingViewState.value = progress.copy(progress = newProgress)
-        browserViewState.value = currentBrowserViewState().copy(canGoBack = canGoBack, canGoForward = canGoForward)
     }
 
     override fun goFullScreen(view: View) {
@@ -286,7 +288,14 @@ class BrowserTabViewModel(
         onSiteChanged()
     }
 
-    override fun loadingFinished(url: String?, canGoBack: Boolean, canGoForward: Boolean) {
+    override fun navigationOptionsChanged(navigationOptions: BrowserNavigationOptions) {
+        browserViewState.value = currentBrowserViewState().copy(
+            canGoBack = navigationOptions.canGoBack,
+            canGoForward = navigationOptions.canGoForward
+        )
+    }
+
+    override fun loadingFinished(url: String?) {
         Timber.v("Loading finished")
 
         val currentOmnibarViewState = currentOmnibarViewState()
@@ -296,7 +305,7 @@ class BrowserTabViewModel(
 
         loadingViewState.value = currentLoadingViewState.copy(isLoading = false)
         omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarText)
-        browserViewState.value = currentBrowserViewState().copy(canGoBack = canGoBack, canGoForward = canGoForward)
+
         registerSiteVisit()
     }
 
@@ -334,7 +343,7 @@ class BrowserTabViewModel(
             findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = false)
 
             val currentBrowserViewState = currentBrowserViewState()
-            browserViewState.value = currentBrowserViewState.copy(canAddBookmarks = false, canAddToHome = false)
+            browserViewState.value = currentBrowserViewState.copy(canAddBookmarks = false, addToHomeEnabled = false, addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported())
 
             return
         }
@@ -348,7 +357,8 @@ class BrowserTabViewModel(
         browserViewState.value = currentBrowserViewState.copy(
             browserShowing = true,
             canAddBookmarks = true,
-            canAddToHome = true,
+            addToHomeEnabled = true,
+            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = true,
             showPrivacyGrade = appConfigurationDownloaded
         )
@@ -556,7 +566,7 @@ class BrowserTabViewModel(
 
     private fun initializeViewStates() {
         globalLayoutState.value = GlobalLayoutViewState()
-        browserViewState.value = BrowserViewState()
+        browserViewState.value = BrowserViewState().copy(addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported())
         loadingViewState.value = LoadingViewState()
         autoCompleteViewState.value = AutoCompleteViewState()
         omnibarViewState.value = OmnibarViewState()

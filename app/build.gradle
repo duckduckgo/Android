@@ -27,6 +27,7 @@ android {
         }
         sourceSets {
             androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+            androidTest.resources.srcDirs += files("$projectDir/../submodules/".toString())
         }
     }
     signingConfigs {
@@ -80,7 +81,7 @@ ext {
     architectureComponents = "1.1.1"
     architectureComponentsExtensions = "1.1.1"
     androidKtx = "0.3"
-    dagger = "2.14.1"
+    dagger = "2.15"
     retrofit = "2.3.0"
     ankoVersion = "0.10.4"
     glide = "4.6.1"

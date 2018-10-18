@@ -89,24 +89,6 @@ class TrackersRendererTest {
     }
 
     @Test
-    fun whenNoTrackerNetworksThenNetworksTextShowsZeroBlocked() {
-        val text = testee.networksText(context, 0, true)
-        assertEquals("0 Tracker Networks Blocked", text)
-    }
-
-    @Test
-    fun whenTenTrackerNetworksAndAllBlockedThenNetworksTextShowsTenBlocked() {
-        val text = testee.networksText(context, 10, true)
-        assertEquals("10 Tracker Networks Blocked", text)
-    }
-
-    @Test
-    fun whenTenTrackersNetworksAndNotAllBlockedThenNetworksTextShowsTenFound() {
-        val text = testee.networksText(context, 10, false)
-        assertEquals("10 Tracker Networks Found", text)
-    }
-
-    @Test
     fun whenAllTrackersBlockedThenNetworksBannerIsGood() {
         val resource = testee.networksBanner(true)
         assertEquals(R.drawable.networks_banner_good, resource)

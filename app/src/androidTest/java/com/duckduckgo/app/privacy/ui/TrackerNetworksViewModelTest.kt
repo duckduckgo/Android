@@ -52,7 +52,6 @@ class TrackerNetworksViewModelTest {
     fun whenNoDataThenDefaultValuesAreUsed() {
         val viewState = testee.viewState.value!!
         assertEquals("", viewState.domain)
-        assertEquals(0, viewState.networkCount)
         assertEquals(true, viewState.allTrackersBlocked)
         assertTrue(viewState.trackingEventsByNetwork.isEmpty())
     }
@@ -61,13 +60,6 @@ class TrackerNetworksViewModelTest {
     fun whenUrlIsUpdatedThenViewModelDomainIsUpdated() {
         testee.onSiteChanged(site(url = "http://example.com/path"))
         assertEquals("example.com", testee.viewState.value!!.domain)
-    }
-
-    @Test
-    fun whenNetworkCountIsUpdatedThenViewModelCountUpdated() {
-        testee.onSiteChanged(site(networkCount = 10))
-        val viewState = testee.viewState.value!!
-        assertEquals(10, viewState.networkCount)
     }
 
     @Test
@@ -82,7 +74,6 @@ class TrackerNetworksViewModelTest {
         val site: Site = mock()
         whenever(site.url).thenReturn(url)
         whenever(site.uri).thenReturn(Uri.parse(url))
-        whenever(site.networkCount).thenReturn(networkCount)
         whenever(site.distinctTrackersByNetwork).thenReturn(trackersByNetwork)
         return site
     }
