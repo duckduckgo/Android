@@ -19,6 +19,8 @@ package com.duckduckgo.app.browser.di
 import android.content.ClipboardManager
 import android.content.Context
 import com.duckduckgo.app.browser.*
+import com.duckduckgo.app.browser.addToHome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.browser.addToHome.AddToHomeSystemCapabilityDetector
 import com.duckduckgo.app.browser.defaultBrowsing.AndroidDefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
@@ -67,6 +69,11 @@ class BrowserModule {
     @Provides
     fun clipboardManager(context: Context): ClipboardManager {
         return context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    }
+
+    @Provides
+    fun addToHomeCapabilityDetector(context: Context): AddToHomeCapabilityDetector {
+        return AddToHomeSystemCapabilityDetector(context)
     }
 
     @Provides

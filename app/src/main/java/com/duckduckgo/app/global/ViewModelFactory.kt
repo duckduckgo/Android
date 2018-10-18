@@ -22,6 +22,7 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
 import com.duckduckgo.app.browser.*
+import com.duckduckgo.app.browser.addToHome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
@@ -70,6 +71,7 @@ class ViewModelFactory @Inject constructor(
     private val webViewSessionStorage: WebViewSessionStorage,
     private val specialUrlDetector: SpecialUrlDetector,
     private val faviconDownloader: FaviconDownloader,
+    private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
     private val pixel: Pixel
 
 ) : ViewModelProvider.NewInstanceFactory() {
@@ -116,6 +118,7 @@ class ViewModelFactory @Inject constructor(
         webViewSessionStorage = webViewSessionStorage,
         autoCompleteApi = autoCompleteApi,
         specialUrlDetector = specialUrlDetector,
-        faviconDownloader = faviconDownloader
+        faviconDownloader = faviconDownloader,
+        addToHomeCapabilityDetector = addToHomeCapabilityDetector
     )
 }
