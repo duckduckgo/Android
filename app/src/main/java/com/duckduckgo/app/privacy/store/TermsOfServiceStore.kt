@@ -20,6 +20,8 @@ import com.duckduckgo.app.privacy.model.TermsOfService
 
 interface TermsOfServiceStore {
 
+    val terms: List<TermsOfService>
+
     fun retrieveTerms(url: String): TermsOfService?
 
 }

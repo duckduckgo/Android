@@ -20,17 +20,30 @@ import android.net.Uri
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.hasIpHost
 import com.duckduckgo.app.global.isHttps
-import com.duckduckgo.app.privacy.model.HttpsStatus
-import com.duckduckgo.app.privacy.model.TermsOfService
+import com.duckduckgo.app.privacy.model.*
+import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import java.util.concurrent.CopyOnWriteArrayList
 
 class SiteMonitor(
     override val url: String,
-    override val termsOfService: TermsOfService,
-    override val memberNetwork: TrackerNetwork? = null
+    override val privacyPractices: PrivacyPractices.Practices,
+    override val memberNetwork: TrackerNetwork? = null,
+    val prevalenceStore: PrevalenceStore
 ) : Site {
+
+    private val gradeCalculator = Grade()
+
+    init {
+        gradeCalculator.https = uri?.isHttps ?: false
+        gradeCalculator.httpsAutoUpgrade = gradeCalculator.https // not support yet, don't penalise sites for now
+        gradeCalculator.privacyScore = privacyPractices.score
+
+        memberNetwork?.let {
+            gradeCalculator.setParentEntityAndPrevalence(it.name, prevalenceStore.findPrevalenceOf(it.name))
+        }
+    }
 
     override val uri: Uri?
         get() = Uri.parse(url)
@@ -59,18 +72,8 @@ class SiteMonitor(
             return networks
         }
 
-    override val networkCount: Int
-        get() = distinctTrackersByNetwork.count()
-
     override val majorNetworkCount: Int
-        get() = trackingEvents.distinctBy { it.trackerNetwork?.url }.count { it.trackerNetwork?.isMajor ?: false }
-
-    override val hasTrackerFromMajorNetwork: Boolean
-        get() = trackingEvents.any { it.trackerNetwork?.isMajor ?: false }
-
-    override val hasObscureTracker: Boolean
-        get() = trackingEvents.any { Uri.parse(it.trackerUrl).hasIpHost }
-
+        get() = trackingEvents.distinctBy { it.trackerNetwork?.name }.count { it.trackerNetwork?.isMajor ?: false }
 
     override val allTrackersBlocked: Boolean
         get() = trackingEvents.none { !it.blocked }
@@ -88,5 +91,32 @@ class SiteMonitor(
 
     override fun trackerDetected(event: TrackingEvent) {
         trackingEvents.add(event)
+
+        val entity = event.entity
+        val prevalence = prevalenceStore.findPrevalenceOf(entity)
+        if (event.blocked) {
+            gradeCalculator.addEntityBlocked(entity, prevalence)
+        } else {
+            gradeCalculator.addEntityNotBlocked(entity, prevalence)
+        }
     }
+
+    override val grade: PrivacyGrade
+        get() = privacyGrade(gradeCalculator.scores.site.grade)
+
+    override val improvedGrade: PrivacyGrade
+        get() = privacyGrade(gradeCalculator.scores.enhanced.grade)
+
+    private fun privacyGrade(grade: Grade.Grading): PrivacyGrade {
+        return when (grade) {
+            Grade.Grading.A -> PrivacyGrade.A
+            Grade.Grading.B_PLUS -> PrivacyGrade.B_PLUS
+            Grade.Grading.B -> PrivacyGrade.B
+            Grade.Grading.C_PLUS -> PrivacyGrade.C_PLUS
+            Grade.Grading.C -> PrivacyGrade.C
+            Grade.Grading.D -> PrivacyGrade.D
+            Grade.Grading.D_MINUS -> PrivacyGrade.D
+        }
+    }
+
 }

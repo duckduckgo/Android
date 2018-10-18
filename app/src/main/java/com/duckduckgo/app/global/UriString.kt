@@ -27,9 +27,13 @@ class UriString {
         private const val space = " "
         private val webUrlRegex = PatternsCompat.WEB_URL.toRegex()
 
+        fun host(uriString: String): String? {
+            return Uri.parse(uriString).baseHost
+        }
+
         fun sameOrSubdomain(child: String, parent: String): Boolean {
-            val childHost = Uri.parse(child)?.baseHost ?: return false
-            val parentHost = Uri.parse(parent)?.baseHost ?: return false
+            val childHost = host(child) ?: return false
+            val parentHost = host(parent) ?: return false
             return parentHost == childHost || childHost.endsWith(".$parentHost")
         }
 

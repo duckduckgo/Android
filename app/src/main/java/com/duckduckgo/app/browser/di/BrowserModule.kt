@@ -26,9 +26,12 @@ import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.surrogates.ResourceSurrogates
+import com.duckduckgo.app.trackerdetection.TrackerDetector
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -72,4 +75,14 @@ class BrowserModule {
     fun addToHomeCapabilityDetector(context: Context): AddToHomeCapabilityDetector {
         return AddToHomeSystemCapabilityDetector(context)
     }
+
+    @Provides
+    fun specialUrlDetector(): SpecialUrlDetector = SpecialUrlDetectorImpl()
+
+    @Provides
+    fun webViewRequestInterceptor(
+        resourceSurrogates: ResourceSurrogates,
+        trackerDetector: TrackerDetector,
+        httpsUpgrader: HttpsUpgrader
+    ): RequestInterceptor = WebViewRequestInterceptor(resourceSurrogates, trackerDetector, httpsUpgrader)
 }

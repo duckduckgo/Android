@@ -44,6 +44,8 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyGrade
+import com.duckduckgo.app.privacy.model.PrivacyPractices
+import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -73,6 +75,12 @@ class BrowserTabViewModelTest {
     val schedulers = InstantSchedulersRule()
 
     @Mock
+    private lateinit var mockPrevalenceStore: PrevalenceStore
+
+    @Mock
+    private lateinit var mockTrackerNetworks: TrackerNetworks
+
+    @Mock
     private lateinit var mockNetworkLeaderboardDao: NetworkLeaderboardDao
 
     @Mock
@@ -85,7 +93,7 @@ class BrowserTabViewModelTest {
     private lateinit var mockCommandObserver: Observer<Command>
 
     @Mock
-    private lateinit var mockTermsOfServiceStore: TermsOfServiceStore
+    private lateinit var mockPrivacyPractices: PrivacyPractices
 
     @Mock
     private lateinit var mockSettingsStore: SettingsDataStore
@@ -132,9 +140,10 @@ class BrowserTabViewModelTest {
             .build()
         appConfigurationDao = db.appConfigurationDao()
 
-        val siteFactory = SiteFactory(mockTermsOfServiceStore, TrackerNetworks())
+        val siteFactory = SiteFactory(mockPrivacyPractices, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore)
 
         whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
+        whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -149,7 +158,7 @@ class BrowserTabViewModelTest {
             longPressHandler = mockLongPressHandler,
             appConfigurationDao = appConfigurationDao,
             webViewSessionStorage = webViewSessionStorage,
-            specialUrlDetector = SpecialUrlDetector(),
+            specialUrlDetector = SpecialUrlDetectorImpl(),
             faviconDownloader = mockFaviconDownloader,
             addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector
         )
@@ -256,28 +265,28 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewModelNotifiedThatWebViewHasFinishedLoadingThenViewStateIsUpdated() {
-        testee.loadingFinished(null, false, false)
+        testee.loadingFinished(null)
         assertFalse(loadingViewState().isLoading)
     }
 
     @Test
     fun whenLoadingFinishedWithUrlThenSiteVisitedEntryAddedToLeaderboardDao() {
         testee.url.value = "http://example.com/abc"
-        testee.loadingFinished(null, false, false)
+        testee.loadingFinished(null)
         verify(mockNetworkLeaderboardDao).insert(SiteVisitedEntity("example.com"))
     }
 
     @Test
     fun whenLoadingFinishedWithUrlThenOmnibarTextUpdatedToMatch() {
         val exampleUrl = "http://example.com/abc"
-        testee.loadingFinished(exampleUrl, false, false)
+        testee.loadingFinished(exampleUrl)
         assertEquals(exampleUrl, omnibarViewState().omnibarText)
     }
 
     @Test
     fun whenLoadingFinishedWithQueryUrlThenOmnibarTextUpdatedToShowQuery() {
         val queryUrl = "http://duckduckgo.com?q=test"
-        testee.loadingFinished(queryUrl, false, false)
+        testee.loadingFinished(queryUrl)
         assertEquals("test", omnibarViewState().omnibarText)
     }
 
@@ -285,13 +294,13 @@ class BrowserTabViewModelTest {
     fun whenLoadingFinishedWithNoUrlThenOmnibarTextUpdatedToMatch() {
         val exampleUrl = "http://example.com/abc"
         testee.urlChanged(exampleUrl)
-        testee.loadingFinished(null, false, false)
+        testee.loadingFinished(null)
         assertEquals(exampleUrl, omnibarViewState().omnibarText)
     }
 
     @Test
     fun whenLoadingFinishedWithNoUrlThenSiteVisitedEntryNotAddedToLeaderboardDao() {
-        testee.loadingFinished(null, false, false)
+        testee.loadingFinished(null)
         verify(mockNetworkLeaderboardDao, never()).insert(SiteVisitedEntity("example.com"))
     }
 
@@ -350,13 +359,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewModelGetsProgressUpdateThenViewStateIsUpdated() {
-        testee.progressChanged(0, false, false)
+        testee.progressChanged(0)
         assertEquals(0, loadingViewState().progress)
 
-        testee.progressChanged(50, false, false)
+        testee.progressChanged(50)
         assertEquals(50, loadingViewState().progress)
 
-        testee.progressChanged(100, false, false)
+        testee.progressChanged(100)
         assertEquals(100, loadingViewState().progress)
     }
 
@@ -368,17 +377,19 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUrlChangedThenPrivacyGradeIsReset() {
+        val grade = testee.privacyGrade.value
         testee.urlChanged("https://example.com")
-        assertEquals(PrivacyGrade.B, testee.privacyGrade.value)
+        assertNotEquals(grade, testee.privacyGrade.value)
     }
 
     @Test
     fun whenEnoughTrackersDetectedThenPrivacyGradeIsUpdated() {
+        val grade = testee.privacyGrade.value
         testee.urlChanged("https://example.com")
         for (i in 1..10) {
             testee.trackerDetected(TrackingEvent("https://example.com", "", null, false))
         }
-        assertEquals(PrivacyGrade.C, testee.privacyGrade.value)
+        assertNotEquals(grade, testee.privacyGrade.value)
     }
 
     @Test

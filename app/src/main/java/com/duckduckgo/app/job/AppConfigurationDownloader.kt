@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.job
 
+import com.duckduckgo.app.entities.api.EntityListDownloader
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeDataDownloader
@@ -33,6 +34,7 @@ class AppConfigurationDownloader(
     private val trackerDataDownloader: TrackerDataDownloader,
     private val httpsUpgradeDataDownloader: HttpsUpgradeDataDownloader,
     private val resourceSurrogateDownloader: ResourceSurrogateListDownloader,
+    private val entityListDownloader: EntityListDownloader,
     private val appDatabase: AppDatabase
 ) : ConfigurationDownloader {
 
@@ -41,6 +43,7 @@ class AppConfigurationDownloader(
         val easyPrivacyDownload = trackerDataDownloader.downloadList(EASYPRIVACY)
         val trackersWhitelist = trackerDataDownloader.downloadList(TRACKERSWHITELIST)
         val disconnectDownload = trackerDataDownloader.downloadList(DISCONNECT)
+        val entityListDownload = entityListDownloader.download()
         val surrogatesDownload = resourceSurrogateDownloader.downloadList()
         val httpsUpgradeDownload = httpsUpgradeDataDownloader.download()
         val httpStatisticsReport = httpsUpgradeDataDownloader.reportUpgradeStatistics()
@@ -51,6 +54,7 @@ class AppConfigurationDownloader(
                 easyPrivacyDownload,
                 trackersWhitelist,
                 disconnectDownload,
+                entityListDownload,
                 surrogatesDownload,
                 httpsUpgradeDownload,
                 httpStatisticsReport

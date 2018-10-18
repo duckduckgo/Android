@@ -16,24 +16,14 @@
 
 package com.duckduckgo.app.privacy.model
 
-
 enum class PrivacyGrade {
+
     A,
+    B_PLUS,
     B,
+    C_PLUS,
     C,
     D,
     UNKNOWN;
 
-    companion object {
-
-        fun gradeForScore(score: Int): PrivacyGrade {
-            return when (score) {
-                0 -> PrivacyGrade.A
-                1 -> PrivacyGrade.B
-                2 -> PrivacyGrade.C
-                else -> PrivacyGrade.D
-            }
-        }
-
-    }
 }

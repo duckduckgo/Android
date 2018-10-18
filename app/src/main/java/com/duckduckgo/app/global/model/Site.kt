@@ -18,6 +18,8 @@ package com.duckduckgo.app.global.model
 
 import android.net.Uri
 import com.duckduckgo.app.privacy.model.HttpsStatus
+import com.duckduckgo.app.privacy.model.PrivacyGrade
+import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TermsOfService
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -25,20 +27,21 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 interface Site {
 
     val url: String
+    val privacyPractices: PrivacyPractices.Practices
+    val memberNetwork: TrackerNetwork?
+
     val uri: Uri?
     var title: String?
     val https: HttpsStatus
-    val termsOfService: TermsOfService
-    val memberNetwork: TrackerNetwork?
     val trackingEvents: List<TrackingEvent>
     val trackerCount: Int
     val distinctTrackersByNetwork: Map<String, List<TrackingEvent>>
-    val networkCount: Int
     val majorNetworkCount: Int
-    val hasTrackerFromMajorNetwork: Boolean
     val allTrackersBlocked: Boolean
-    val hasObscureTracker: Boolean
     var hasHttpResources: Boolean
     fun trackerDetected(event: TrackingEvent)
+
+    val grade: PrivacyGrade
+    val improvedGrade: PrivacyGrade
 
 }

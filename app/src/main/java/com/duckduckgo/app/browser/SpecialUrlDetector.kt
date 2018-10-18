@@ -18,12 +18,13 @@ package com.duckduckgo.app.browser
 
 import android.content.Intent
 import android.net.Uri
+import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
 import timber.log.Timber
 import java.net.URISyntaxException
-import javax.inject.Inject
 
-
-class SpecialUrlDetector @Inject constructor() {
+interface SpecialUrlDetector {
+    fun determineType(uri: Uri): UrlType
+    fun determineType(uriString: String?): UrlType
 
     sealed class UrlType {
         class Web(val webAddress: String) : UrlType()
@@ -35,7 +36,11 @@ class SpecialUrlDetector @Inject constructor() {
         class Unknown(val url: String) : UrlType()
     }
 
-    fun determineType(uri: Uri): UrlType {
+}
+
+class SpecialUrlDetectorImpl : SpecialUrlDetector {
+
+    override fun determineType(uri: Uri): UrlType {
         val uriString = uri.toString()
         val scheme = uri.scheme
 
@@ -73,7 +78,7 @@ class SpecialUrlDetector @Inject constructor() {
         }
     }
 
-    fun determineType(uriString: String?): UrlType {
+    override fun determineType(uriString: String?): UrlType {
         if (uriString == null) return UrlType.Web("")
 
         return determineType(Uri.parse(uriString))
