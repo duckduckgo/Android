@@ -52,6 +52,8 @@ class BrowserWebViewClient @Inject constructor(
 
     private var currentUrl: String? = null
 
+    private val willGetNotifiedOfPageCommits = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+
     /**
      * This is the new method of url overriding available from API 24 onwards
      */
@@ -111,7 +113,7 @@ class BrowserWebViewClient @Inject constructor(
 
         webViewClientListener?.loadingStarted()
 
-        if (!willGetNotifiedOfPageCommits()) onUrlChanged(url, webView)
+        if (!willGetNotifiedOfPageCommits) onUrlChanged(url, webView)
 
         val uri = if (url != null) Uri.parse(url) else null
         if (uri != null) {
@@ -218,10 +220,6 @@ class BrowserWebViewClient @Inject constructor(
         val canGoBack = webView.canGoBack()
         val canGoForward = webView.canGoForward()
         return BrowserNavigationOptions(canGoBack, canGoForward)
-    }
-
-    private fun willGetNotifiedOfPageCommits(): Boolean {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
     }
 
     private fun onUrlChanged(url: String?, webView: WebView) {
