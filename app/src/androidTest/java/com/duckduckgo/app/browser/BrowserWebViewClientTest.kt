@@ -17,8 +17,10 @@
 package com.duckduckgo.app.browser
 
 import android.content.Context
+import android.os.Build
 import android.support.test.InstrumentationRegistry
 import android.support.test.annotation.UiThreadTest
+import android.support.test.filters.SdkSuppress
 import android.webkit.WebView
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -61,11 +63,21 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledThenListenerNotInstructedToUpdateUrl() {
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
+    fun whenOnPageStartedCalledOnNewerDevicesThenListenerNotInstructedToUpdateUrl() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         verify(listener, never()).urlChanged(any())
     }
 
+    @UiThreadTest
+    @Test
+    @SdkSuppress(maxSdkVersion = Build.VERSION_CODES.LOLLIPOP_MR1)
+    fun whenOnPageStartedCalledOnOlderDevicesThenListenerInstructedToUpdateUrl() {
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        verify(listener).urlChanged(any())
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
     @UiThreadTest
     @Test
     fun whenOnPageCommitVisibleCalledThenListenerInstructedToUpdateUrl() {
