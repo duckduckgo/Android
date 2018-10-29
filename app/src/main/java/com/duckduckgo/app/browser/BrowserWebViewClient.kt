@@ -111,20 +111,22 @@ class BrowserWebViewClient @Inject constructor(
 
         webViewClientListener?.loadingStarted()
 
+        if (!willGetNotifiedOfPageCommits()) onUrlChanged(url, webView)
+
         val uri = if (url != null) Uri.parse(url) else null
         if (uri != null) {
             reportHttpsIfInUpgradeList(uri)
         }
     }
 
+    /**
+     * Note, this method is only called on APIs >= 23
+     * While this is the ideal time to indicate the URL has changed, on lower APIs we need to handle that instead in onPageStarted()
+     */
     override fun onPageCommitVisible(webView: WebView, url: String?) {
         Timber.d("onPageCommitVisible $url")
 
-        currentUrl = url
-        webViewClientListener?.let {
-            it.urlChanged(url)
-            it.navigationOptionsChanged(determineNavigationOptions(webView))
-        }
+        onUrlChanged(url, webView)
     }
 
     override fun onPageFinished(webView: WebView, url: String?) {
@@ -216,6 +218,18 @@ class BrowserWebViewClient @Inject constructor(
         val canGoBack = webView.canGoBack()
         val canGoForward = webView.canGoForward()
         return BrowserNavigationOptions(canGoBack, canGoForward)
+    }
+
+    private fun willGetNotifiedOfPageCommits(): Boolean {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+    }
+
+    private fun onUrlChanged(url: String?, webView: WebView) {
+        currentUrl = url
+        webViewClientListener?.let {
+            it.urlChanged(url)
+            it.navigationOptionsChanged(determineNavigationOptions(webView))
+        }
     }
 
     data class BrowserNavigationOptions(val canGoBack: Boolean, val canGoForward: Boolean)
