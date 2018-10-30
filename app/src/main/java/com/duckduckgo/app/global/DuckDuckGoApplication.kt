@@ -38,7 +38,6 @@ import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.migration.LegacyMigration
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_LAUNCH
@@ -90,10 +89,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     @Inject
     lateinit var notificationRegistrar: NotificationRegistrar
-
-    @Inject
-    lateinit var variantManager: VariantManager
-
+    
     @Inject
     lateinit var pixel: Pixel
 
@@ -127,7 +123,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         }
 
         initializeStatistics()
-        initializeTheme(settingsDataStore, variantManager.getVariant())
+        initializeTheme(settingsDataStore)
         loadTrackerData()
         configureDataDownloader()
         recordInstallationTimestamp()
