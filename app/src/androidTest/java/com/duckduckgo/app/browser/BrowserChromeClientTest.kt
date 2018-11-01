@@ -112,23 +112,13 @@ class BrowserChromeClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnProgressChangedCalledWithNoUrlChangeThenListenerNotInstructedToUpdateUrlASecondTime() {
-        val url = "https://example.com"
-        webView.stubUrl = url
-        testee.onProgressChanged(webView, 10)
-        testee.onProgressChanged(webView, 20) // should NOT update url
-        verify(mockWebViewClientListener).urlChanged(url)
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnProgressChangedCalledAfterUrlChangeThenListenerInstructedToUpdateUrl() {
+    fun whenOnProgressChangedCalledAfterUrlChangeThenListenerInstructedToUpdateUrlEveryTime() {
         webView.stubUrl = "foo.com"
-        testee.onProgressChanged(webView, 10) // should update url
-        testee.onProgressChanged(webView, 20) // should NOT update url
+        testee.onProgressChanged(webView, 10)
+        testee.onProgressChanged(webView, 20)
         webView.stubUrl = "bar.com"
-        testee.onProgressChanged(webView, 30) // should update url
-        verify(mockWebViewClientListener, times(2)).urlChanged(any())
+        testee.onProgressChanged(webView, 30)
+        verify(mockWebViewClientListener, times(3)).urlChanged(any())
     }
 
     private class TestWebView(context: Context) : WebView(context) {

@@ -107,14 +107,15 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
-        Timber.d("onPageStarted $url")
-
-        webViewClientListener?.loadingStarted()
+        Timber.d("\nonPageStarted {\nurl: $url\nwebView.url: ${webView.url}\n}\n")
 
         currentUrl = url
-        webViewClientListener?.navigationOptionsChanged(determineNavigationOptions(webView))
+        webViewClientListener?.let {
+            it.loadingStarted()
+            it.navigationOptionsChanged(determineNavigationOptions(webView))
+        }
 
-        val uri = if (url != null) Uri.parse(url) else null
+        val uri = if (currentUrl != null) Uri.parse(currentUrl) else null
         if (uri != null) {
             reportHttpsIfInUpgradeList(uri)
         }
@@ -124,7 +125,6 @@ class BrowserWebViewClient @Inject constructor(
         Timber.d("onPageFinished $url")
 
         currentUrl = url
-
         webViewClientListener?.let {
             it.loadingFinished(url)
             it.urlChanged(url)

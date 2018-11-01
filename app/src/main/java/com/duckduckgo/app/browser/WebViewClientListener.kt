@@ -24,6 +24,8 @@ import com.duckduckgo.app.browser.BrowserWebViewClient.BrowserNavigationOptions
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 
 interface WebViewClientListener {
+    fun currentUrl(): String?
+
     fun loadingStarted()
     fun loadingFinished(url: String? = null)
     fun progressChanged(newProgress: Int)

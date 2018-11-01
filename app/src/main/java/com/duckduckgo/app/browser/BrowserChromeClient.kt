@@ -30,7 +30,6 @@ class BrowserChromeClient @Inject constructor() : WebChromeClient() {
     var webViewClientListener: WebViewClientListener? = null
 
     private var customView: View? = null
-    private var currentUrl: String? = null
 
     override fun onShowCustomView(view: View, callback: CustomViewCallback?) {
         Timber.d("on show custom view")
@@ -56,9 +55,10 @@ class BrowserChromeClient @Inject constructor() : WebChromeClient() {
 
         webViewClientListener?.progressChanged(newProgress)
 
+        val currentUrl = webViewClientListener?.currentUrl()
         if (currentUrl != webView.url) {
-            currentUrl = webView.url
-            webViewClientListener?.urlChanged(currentUrl)
+            Timber.i("Url has changed from $currentUrl to ${webView.url}")
+            webViewClientListener?.urlChanged(webView.url)
         }
     }
 
