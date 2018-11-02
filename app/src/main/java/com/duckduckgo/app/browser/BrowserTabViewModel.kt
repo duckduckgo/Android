@@ -85,7 +85,6 @@ class BrowserTabViewModel(
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, ViewModel() {
-
     data class GlobalLayoutViewState(
         val isNewTabState: Boolean = true
     )
@@ -343,7 +342,11 @@ class BrowserTabViewModel(
             findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = false)
 
             val currentBrowserViewState = currentBrowserViewState()
-            browserViewState.value = currentBrowserViewState.copy(canAddBookmarks = false, addToHomeEnabled = false, addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported())
+            browserViewState.value = currentBrowserViewState.copy(
+                canAddBookmarks = false,
+                addToHomeEnabled = false,
+                addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported()
+            )
 
             return
         }
@@ -367,8 +370,10 @@ class BrowserTabViewModel(
             statisticsUpdater.refreshRetentionAtb()
         }
 
-        site = siteFactory.build(url)
-        onSiteChanged()
+        if (currentUrl() != url) {
+            site = siteFactory.build(url)
+            onSiteChanged()
+        }
     }
 
     private fun omnibarTextForUrl(url: String): String {
@@ -555,6 +560,10 @@ class BrowserTabViewModel(
         } else {
             command.value = Refresh
         }
+    }
+
+    override fun currentUrl(): String? {
+        return site?.url
     }
 
     fun resetView() {
