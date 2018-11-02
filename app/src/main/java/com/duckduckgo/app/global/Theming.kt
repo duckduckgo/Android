@@ -22,13 +22,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.support.v4.content.LocalBroadcastManager
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.DuckDuckGoTheme.DARK
-import com.duckduckgo.app.global.DuckDuckGoTheme.LIGHT
 import com.duckduckgo.app.global.Theming.Constants.BROADCAST_THEME_CHANGED
 import com.duckduckgo.app.global.Theming.Constants.THEME_MAP
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.Variant
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ThemeFeature.LightThemeAsDefault
 
 
 enum class DuckDuckGoTheme {
@@ -38,9 +34,9 @@ enum class DuckDuckGoTheme {
 
 object Theming {
 
-    fun initializeTheme(settingsDataStore: SettingsDataStore, variant: Variant) {
+    fun initializeTheme(settingsDataStore: SettingsDataStore) {
         if (settingsDataStore.theme == null) {
-            settingsDataStore.theme = if (variant.hasFeature(LightThemeAsDefault)) LIGHT else DARK
+            settingsDataStore.theme = DuckDuckGoTheme.DARK
         }
     }
 
@@ -55,7 +51,7 @@ object Theming {
     }
 }
 
-fun DuckDuckGoActivity.applyTheme(settingsDataStore: SettingsDataStore, variant: Variant): BroadcastReceiver? {
+fun DuckDuckGoActivity.applyTheme(settingsDataStore: SettingsDataStore): BroadcastReceiver? {
     val themeId = THEME_MAP[Pair(manifestThemeId(), settingsDataStore.theme)] ?: return null
     setTheme(themeId)
     return registerForThemeChangeBroadcast()

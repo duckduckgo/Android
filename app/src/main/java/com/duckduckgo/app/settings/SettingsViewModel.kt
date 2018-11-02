@@ -24,7 +24,6 @@ import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ThemeFeature.ThemeToggle
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import timber.log.Timber
@@ -40,7 +39,6 @@ class SettingsViewModel @Inject constructor(
     data class ViewState(
         val loading: Boolean = true,
         val version: String = "",
-        val showThemeToggle: Boolean = false,
         val lightThemeEnabled: Boolean = false,
         val autoCompleteSuggestionsEnabled: Boolean = true,
         val showDefaultBrowserSetting: Boolean = false,
@@ -73,7 +71,6 @@ class SettingsViewModel @Inject constructor(
 
         viewState.value = currentViewState.copy(
             loading = false,
-            showThemeToggle = variant.hasFeature(ThemeToggle),
             lightThemeEnabled = isLightTheme,
             autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
             isAppDefaultBrowser = defaultBrowserAlready,

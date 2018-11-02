@@ -17,10 +17,8 @@
 package com.duckduckgo.app.browser
 
 import android.content.Context
-import android.os.Build
 import android.support.test.InstrumentationRegistry
 import android.support.test.annotation.UiThreadTest
-import android.support.test.filters.SdkSuppress
 import android.webkit.WebView
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -63,33 +61,9 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
-    fun whenOnPageStartedCalledOnNewerDevicesThenListenerNotInstructedToUpdateUrl() {
+    fun whenOnPageStartedCalledThenListenerNeverInstructedToUpdateUrl() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         verify(listener, never()).urlChanged(any())
-    }
-
-    @UiThreadTest
-    @Test
-    @SdkSuppress(maxSdkVersion = Build.VERSION_CODES.LOLLIPOP_MR1)
-    fun whenOnPageStartedCalledOnOlderDevicesThenListenerInstructedToUpdateUrl() {
-        testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(listener).urlChanged(any())
-    }
-
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
-    @UiThreadTest
-    @Test
-    fun whenOnPageCommitVisibleCalledThenListenerInstructedToUpdateUrl() {
-        testee.onPageCommitVisible(webView, EXAMPLE_URL)
-        verify(listener).urlChanged(EXAMPLE_URL)
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnPageCommitVisibleCalledThenListenerInstructedToUpdateNavigationOptions() {
-        testee.onPageCommitVisible(webView, EXAMPLE_URL)
-        verify(listener).navigationOptionsChanged(any())
     }
 
     @UiThreadTest
@@ -104,6 +78,13 @@ class BrowserWebViewClientTest {
     fun whenOnPageFinishedCalledThenListenerInstructedToUpdateNavigationOptions() {
         testee.onPageFinished(webView, EXAMPLE_URL)
         verify(listener).navigationOptionsChanged(any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageFinishedCalledThenListenerInstructedToUpdateUrl() {
+        testee.onPageFinished(webView, EXAMPLE_URL)
+        verify(listener).urlChanged(EXAMPLE_URL)
     }
 
     private class TestWebView(context: Context) : WebView(context)
