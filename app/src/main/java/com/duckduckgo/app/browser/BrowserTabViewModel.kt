@@ -370,8 +370,7 @@ class BrowserTabViewModel(
             statisticsUpdater.refreshRetentionAtb()
         }
 
-        val currentUrl = currentUrl()
-        if (currentUrl != url) {
+        if (currentUrl() != url) {
             site = siteFactory.build(url)
             onSiteChanged()
         }
