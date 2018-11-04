@@ -1,0 +1,185 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="appName">DuckDuckGo</string>
+    <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
+
+    <!-- Onboarding Activity -->
+    <string name="onboardingProtectDataTitle">Proteger Vos Données</string>
+    <string name="onboardingProtectDataDescription">Tapper la Note de Vie Privée pour révéler qui nous avons attrapé en train d\'essayer de vous traquer.</string>
+    <string name="onboardingNoTraceTitle">Laisser Aucune Trace</string>
+    <string name="onboardingNoTraceDescription1">Taper le Button Feu pour effacer vos onglet et votre historique de navigation.</string>
+    <string name="onboardingNoTraceDescription2">Vos données sont grillées !</string>
+    <string name="onboardingDefaultBrowserTitle">Faire de Nous Votre Défaut</string>
+    <string name="onboardingDefaultBrowserDescription">Faire de DuckDuckGo votre navigateur par défaut dans les paramètres.</string>
+    <string name="onboardingDefaultBrowserGoToSettingsAction">Aller à Paramètres</string>
+    <string name="onboardingContinue">Continuer</string>
+
+    <!-- Default Browser -->
+    <string name="cannotLaunchDefaultAppSettings">Impossible de lancer l\'écran des paramètres des applications par défaut</string>
+    <string name="defaultBrowserInfoTitle">Faites de Nous Votre Navigateur par Défaut</string>
+    <string name="defaultBrowserInfoMessage">Faites de DuckDuckGo le navigateur par défaut dans les Paramètres de l\'Appareil pour une protection permanente du traçage.</string>
+    <string name="dismissDefaultBrowserInfo">Rejeter information navigateur par défaut</string>
+    <string name="settingsDefaultBrowserEnabled">Mettre en Navigateur par Défaut</string>
+
+    <!-- Browser Activity -->
+    <string name="browserPopupMenu">Menu du Navigateur</string>
+    <string name="refresh">Rafraîchir</string>
+    <string name="back">Retour</string>
+    <string name="forward">Transmettre</string>
+
+    <string name="omnibarInputHint">Chercher ou enter URL</string>
+    <string name="clearButtonContentDescription">Vider l\'entrée de la recherche</string>
+    <string name="no_compatible_third_party_app_installed">Pas d\'application compatible installée</string>
+    <string name="addBookmarkMenuTitle">Ajouter un Favori</string>
+    <string name="imageOptions">Options Image</string>
+    <string name="requestDesktopSiteMenuTitle">Site Ordinateur</string>
+
+    <!-- Downloading files -->
+    <string name="downloadImage">Télécharger Image</string>
+    <string name="permissionRequiredToDownload">Télécharger requiert les permissions de stockage</string>
+    <string name="downloadComplete">Téléchargement terminé.</string>
+    <string name="downloadFailed">Échec du téléchargement</string>
+    <string name="downloadInProgress">En téléchargement</string>
+
+    <!-- Sharing options -->
+    <string name="options">Options</string>
+    <string name="shareLink">Partager Lien</string>
+    <string name="shareMenuTitle">Partager...</string>
+    <string name="copyUrl">Copier l\'Adresse du Lien</string>
+
+    <!-- Find in page -->
+    <string name="findInPageMenuTitle">Trouver dans la Page</string>
+    <string name="nextSearchTermDescription">Trouver suivant</string>
+    <string name="previousSearchTermDescription">Trouver Précédent</string>
+    <string name="closeFindInPageButtonDescription">Fermer trouver en vue page</string>
+    <string name="findInPageHint">Trouver dans la page</string>
+    <string name="findInPageMatches">%d/%d</string>
+
+    <!-- AutoComplete Suggestions -->
+    <string name="editQueryBeforeSubmitting">Modifier requête avant recherche</string>
+    <string name="settingsAutocompleteEnabled">Suggestions d\'auto-complétion</string>
+
+    <!-- Opening external apps -->
+    <string name="openExternalApp">Ouvrir Application Externe</string>
+    <string name="launchingExternalApp">Ouvrir dans une Autre Application</string>
+    <string name="confirmOpenExternalApp">Souhaitez-vous quitter DuckDuckGo pour voir ce contenu ?</string>
+    <string name="unableToOpenLink">Impossible d\'ouvrir ce type de lien</string>
+
+    <!-- Tabs -->
+    <string name="homeTab">DuckDuckGo</string>
+    <string name="tabActivityTitle">Onglets</string>
+    <string name="tabsMenuItem">Onglets</string>
+    <string name="newTabMenuItem">Nouvel Onglet</string>
+    <string name="openInNewTab">Ouvrir dans Nouvel Onglet</string>
+    <string name="openInNewBackgroundTab">Ouvrir Dans Onglet en Arrière Plan</string>
+    <string name="faviconContentDescription">Favicon</string>
+    <string name="closeContentDescription">Fermer</string>
+    <string name="tapFireDirective">Tapper</string>
+    <string name="tapFireIconDescription">feu</string>
+    <string name="tapFireExplanation">pour tout oublier</string>
+    <string name="closeAllTabsMenuItem">Fermer Tous les Onglets</string>
+
+    <!-- Privacy Dashboard Activities -->
+    <string name="privacyDashboardActivityTitle">Tableau de Bord de Vie Privée</string>
+    <string name="privacyProtectionEnabled">PROTECTION DE LA VIE PRIVÉE ACTIVÉE</string>
+    <string name="privacyProtectionDisabled">PROTECTION DE LA VIE PRIVÉE DÉSACTIVÉE</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ENHANCED FROM &lt;img src="%d" /> TO &lt;img src="%d" /></string>
+    <string name="privacyGradeContentDescription">Note de Respect de Vie Privée</string>
+
+    <string name="httpsGood">Connexion Cryptée</string>
+    <string name="httpsMixed">Connexion à Cryptage mixte</string>
+    <string name="httpsBad">Connexion non Cryptée</string>
+
+    <string name="networksActivityTitle">Réseaux de Tracker</string>
+    <string name="networksContentDescription">Réseaux de Tracker</string>
+    <string name="networksOverview">Les réseaux de tracker agglomèrent votre historique Web dans un profil de données à proposé de vous. Les réseaux de tracker majeurs sont plus dangereux parce qu\'il peuvent vous traquer et vous cibler sur une plus grande partie de l\'internet.</string>
+
+
+
+
+
+
+
+    <string name="scorecardActivityTitle">Note de Respect de Vie Privée</string>
+    <string name="scorecardSiteIsMemberOfMajorNetwork">Le Site est un Réseau de Tracker Majeur</string>
+    <string name="scorecardPrivacyGrade">Note de Respect de Vie Privée</string>
+    <string name="scorecardEnhancedGrade">Note Améliorée</string>
+
+    <string name="privacyTermsActivityTitle">Pratiques de Respect de la Vie Privée</string>
+    <string name="practicesGood">Bonnes Pratiques de Respect de la Vie Privée</string>
+    <string name="practicesMixed">Pratiques de Respect de la Vie Privée Mixtes\"</string>
+    <string name="practicesBad">"Mauvaises Pratiques de Respect de la Vie Privée"</string>
+    <string name="practicesUnknown">Pratiques de Respect de la Vie Privées Inconnues</string>
+    <string name="practicesOverview">Les pratiques de respect de la vie privée indiquent combien de vos informations personnelles partagées avec ce site sont protégées.</string>
+    <string name="practicesTosdrLink">Résultat des Pratiques de Respect de la Vie Privées de <b ><u >ToS;DR</u></b></string>
+    <string name="practicesIconContentGood">Icône de Bonne Pratique</string>
+    <string name="practicesIconContentBad">Icône de Mauvaise Pratique</string>
+    <string name="privacyProtectionToggle">Protection de la Vie Privée</string>
+
+    <string name="networkTrackerSummaryHeader">RÉSEAUX DE TRACKER OFFENSEURS LES PLUS IMPORTANTS</string>
+    <string name="networkTrackerSummaryNotReady">Nous collectons encore des données pour montrer combien de tracker nous avons bloqués.</string>
+
+    <!-- Fire -->
+    <string name="fireMenu">Vider Données</string>
+    <string name="fireClearAll">Vider Tous les Onglets et Données</string>
+    <string name="fireCancel">Annuler</string>
+    <string name="fireDataCleared">Données vidées</string>
+    <string name="fireProcessName">:fire</string>
+
+    <!-- Settings Activity -->
+    <string name="settingsActivityTitle">Paramètres</string>
+    <string name="settingsMenuItemTitle">Paramètres</string>
+    <string name="settingsHeadingGeneral">Général</string>
+    <string name="settingsHeadingOther">Autre</string>
+    <string name="settingsLightTheme">Thème Clair</string>
+    <string name="settingsOnboarding">Fonctionnalités Vie Privée</string>
+    <string name="settingsAboutDuckduckgo">À proposé de DuckDuckGo</string>
+    <string name="settingsVersion">Version</string>
+    <string name="leaveFeedback">Laisser un Retour</string>
+
+    <!-- About Activity -->
+    <string name="aboutActivityTitle">À propos</string>
+    <string name="aboutHeading">La vie privée, simplifiée.</string>
+    <string name="aboutDescription">Chez DuckDuckGo, nous sommes le nouveau standard de la confiance en ligne.\n
+ \\\n
+ 					DuckDuckGo Privacy Browser fournit tous les fonctions de protection de vie privée essentielles pour vous protéger vous et vos recherches quand vous naviguez sur le Web, dont un bloqueur de tracker, un cryptage plus intelligent, et la recherche privée DuckDuckGo.\n
+ \\\n
+ 					Après tout, Internet ne devrait pas avoir l\'air si effrayant, et obtenir la vie privée que vous méritez en ligne devrait être aussi simple que de fermer les volets.</string>
+    <string name="aboutMoreLink">Plus sur duckduckgo.com/about</string>
+    <string name="no_suggestions">Pas de Suggestions</string>
+
+    <!-- Feedback Activity -->
+    <string name="feedbackActivityTitle">Retour</string>
+    <string name="feedbackReportBrokenSiteMenuItem">Reporter Site Cassé</string>
+    <string name="feedbackHeading">Partager Votre Retour</string>
+    <string name="feedbackModalDescription">Partager votre expérience anonymement pour nous aider à améliorer DuckDuckGo Privacy Browser</string>
+    <string name="feedbackReportBrokenSite">Reporter un site cassé</string>
+    <string name="feedbackUrlHint">Entrer URL</string>
+    <string name="feedbackMessageHint">Comment cette application peut être améliorée ? Qu\'aimez vous ? Qu\'est-ce qui ne fonctionne pas ? Merci d\'être aussi spécifique que possible.</string>
+    <string name="feedbackBrokenSiteHint">Quel contenu ou fonctionnalité du site ne fonctionne pas ? Merci d\'être aussi spécifique que possible.</string>
+    <string name="feedbackSubmitButton">Soumettre un retour</string>
+    <string name="feedbackSubmitted">Merci ! Retour envoyé</string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">Favoris</string>
+    <string name="bookmarksActivityTitle">Favoris</string>
+    <string name="bookmarkDeleteConfirmMessage">Êtes vous sûrs de vouloir retirer le favori <b>%s</b>?</string>
+    <string name="bookmarkDeleteConfirmTitle">Confirmer</string>
+    <string name="bookmarkAddedFeedback">Favori ajouté</string>
+    <string name="bookmarkTitleHint">Nom du Favori</string>
+    <string name="bookmarkUrlHint">URL du Favori</string>
+    <string name="bookmarkSave">Sauvegarder</string>
+    <string name="bookmarkTitleEdit">Modifier Favori</string>
+    <string name="bookmarkTitleSave">Sauvegarder Favori</string>
+    <string name="noBookmarks">Pas de favoris ajoutés pour l\'instant</string>
+    <string name="bookmarkOverflowContentDescription">Plus d\'options pour le favori %s</string>
+    <string name="delete">Supprimer</string>
+    <string name="edit">Modifier</string>
+
+    <!-- Widget -->
+    <string name="searchWidgetTextHint">Rechercher sur DuckDuckGo</string>
+
+    <!-- Home Screen Shortcuts -->
+    <string name="addToHome">Ajouter à l\'Accueil</string>
+
+</resources>
