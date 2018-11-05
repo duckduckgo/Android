@@ -22,64 +22,47 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:ignore="Overdraw">
 
-    <LinearLayout
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="20dp">
 
-        <TextView
-            style="@style/SettingsSectionTitle"
-            android:text="@string/settingsHeadingGeneral" />
+        <include
+            layout="@layout/content_settings_general"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintStart_toStartOf="parent" />
 
-        <android.support.v7.widget.SwitchCompat
-            android:id="@+id/lightThemeToggle"
-            style="@style/SettingsItem"
-            android:text="@string/settingsLightTheme"
-            app:theme="@style/SettingsItem.SettingsSwitch"
-            tools:checked="true" />
+        <View
+            android:id="@+id/settingsSectionGeneralBottomDivider"
+            style="@style/SettingsGroupDivider"
+            app:layout_constraintTop_toBottomOf="@id/settingsSectionGeneral" />
 
-        <android.support.v7.widget.SwitchCompat
-            android:id="@+id/autocompleteToggle"
-            style="@style/SettingsItem"
-            android:text="@string/settingsAutocompleteEnabled"
-            app:theme="@style/SettingsItem.SettingsSwitch"
-            tools:checked="true" />
+        <include
+            layout="@layout/content_settings_privacy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintTop_toBottomOf="@id/settingsSectionGeneralBottomDivider" />
 
-        <android.support.v7.widget.SwitchCompat
-            android:id="@+id/setAsDefaultBrowserSetting"
-            style="@style/SettingsItem"
-            android:text="@string/settingsDefaultBrowserEnabled"
-            app:theme="@style/SettingsItem.SettingsSwitch" />
+        <View
+            android:id="@+id/settingsSectionPrivacyBottomDivider"
+            style="@style/SettingsGroupDivider"
+            app:layout_constraintTop_toBottomOf="@id/settingsSectionPrivacy" />
 
-        <TextView
-            android:id="@+id/onboarding"
-            style="@style/SettingsItemClickable"
-            android:text="@string/settingsOnboarding" />
+        <include
+            layout="@layout/content_settings_other"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintTop_toBottomOf="@id/settingsSectionPrivacyBottomDivider" />
 
-        <TextView
-            style="@style/SettingsSectionTitle"
-            android:text="@string/settingsHeadingOther" />
-
-        <TextView
-            android:id="@+id/about"
-            style="@style/SettingsItemClickable"
-            android:text="@string/settingsAboutDuckduckgo" />
-
-        <TextView
-            android:id="@+id/provideFeedback"
-            style="@style/SettingsItemClickable"
-            android:text="@string/leaveFeedback" />
-
-        <TextView
-            style="@style/SettingsItem"
-            android:text="@string/settingsVersion" />
-
-        <TextView
-            android:id="@+id/version"
-            style="@style/SettingsMinorText"
-            tools:text="DuckDuckGo 123.43.5456" />
-
-    </LinearLayout>
+    </android.support.constraint.ConstraintLayout>
 
 
 </ScrollView>

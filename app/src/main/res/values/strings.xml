@@ -155,11 +155,14 @@
     <string name="settingsMenuItemTitle">Settings</string>
     <string name="settingsHeadingGeneral">General</string>
     <string name="settingsHeadingOther">Other</string>
+    <string name="settingsHeadingPrivacy">Privacy</string>
     <string name="settingsLightTheme">Light Theme</string>
     <string name="settingsOnboarding">Privacy Features</string>
     <string name="settingsAboutDuckduckgo">About DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Leave Feedback</string>
+    <string name="settingsAutomaticallyClearWhat">Automatically clear…</string>
+    <string name="settingsAutomaticallyClearWhen">Clear on…</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">About us</string>

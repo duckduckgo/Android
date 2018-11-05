@@ -32,7 +32,8 @@ import com.duckduckgo.app.global.sendThemeChangedBroadcast
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.settings.SettingsViewModel.Command
-import kotlinx.android.synthetic.main.content_settings.*
+import kotlinx.android.synthetic.main.content_settings_general.*
+import kotlinx.android.synthetic.main.content_settings_other.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 
 class SettingsActivity : DuckDuckGoActivity() {
@@ -75,7 +76,7 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun observeViewModel() {
         viewModel.viewState.observe(this, Observer<SettingsViewModel.ViewState> { viewState ->
             viewState?.let {
-                version.text = it.version
+                version.setSubtitle(it.version)
                 lightThemeToggle.quietlySetIsChecked(it.lightThemeEnabled, lightThemeToggleListener)
                 autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
                 updateDefaultBrowserViewVisibility(it)
