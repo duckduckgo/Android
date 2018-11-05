@@ -22,6 +22,8 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment.ClearWhatOption
+import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -42,8 +44,11 @@ class SettingsViewModel @Inject constructor(
         val lightThemeEnabled: Boolean = false,
         val autoCompleteSuggestionsEnabled: Boolean = true,
         val showDefaultBrowserSetting: Boolean = false,
-        val isAppDefaultBrowser: Boolean = false
+        val isAppDefaultBrowser: Boolean = false,
+        val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY)
     )
+
+    data class AutomaticallyClearData(val clearWhatOption: ClearWhatOption, val clearWhenOption: ClearWhenOption)
 
     private lateinit var currentViewState: ViewState
 
@@ -68,6 +73,8 @@ class SettingsViewModel @Inject constructor(
         val defaultBrowserAlready = defaultWebBrowserCapability.isCurrentlyConfiguredAsDefaultBrowser()
         val variant = variantManager.getVariant()
         val isLightTheme = settingsDataStore.theme == DuckDuckGoTheme.LIGHT
+        val automaticallyClearWhat = settingsDataStore.automaticallyClearWhatOption
+        val automaticallyClearWhen = settingsDataStore.automaticallyClearWhenOption
 
         viewState.value = currentViewState.copy(
             loading = false,
@@ -75,7 +82,8 @@ class SettingsViewModel @Inject constructor(
             autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
             isAppDefaultBrowser = defaultBrowserAlready,
             showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
-            version = obtainVersion(variant.key)
+            version = obtainVersion(variant.key),
+            automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen)
         )
     }
 
@@ -100,5 +108,13 @@ class SettingsViewModel @Inject constructor(
     private fun obtainVersion(variantKey: String): String {
         val formattedVariantKey = if (variantKey.isBlank()) " " else " $variantKey "
         return "${BuildConfig.VERSION_NAME}$formattedVariantKey(${BuildConfig.VERSION_CODE})"
+    }
+
+    fun onAutomaticallyWhatOptionSelected(clearWhatSetting: ClearWhatOption) {
+        settingsDataStore.automaticallyClearWhatOption = clearWhatSetting
+
+        if (clearWhatSetting == ClearWhatOption.CLEAR_NONE) settingsDataStore.automaticallyClearWhenOption = ClearWhenOption.APP_EXIT_ONLY
+
+        viewState.value = currentViewState.copy(automaticallyClearData = AutomaticallyClearData(clearWhatSetting, settingsDataStore.automaticallyClearWhenOption))
     }
 }

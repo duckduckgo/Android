@@ -31,12 +31,15 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.sendThemeChangedBroadcast
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
+import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment.ClearWhatOption
+import com.duckduckgo.app.settings.SettingsViewModel.AutomaticallyClearData
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import kotlinx.android.synthetic.main.content_settings_general.*
 import kotlinx.android.synthetic.main.content_settings_other.*
+import kotlinx.android.synthetic.main.content_settings_privacy.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 
-class SettingsActivity : DuckDuckGoActivity() {
+class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFragment.Listener {
 
     private val viewModel: SettingsViewModel by bindViewModel()
 
@@ -71,6 +74,7 @@ class SettingsActivity : DuckDuckGoActivity() {
         lightThemeToggle.setOnCheckedChangeListener(lightThemeToggleListener)
         autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
         setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
+        automaticallyClearWhatSetting.setOnClickListener { showAutomaticallyClearWhatDialog() }
     }
 
     private fun observeViewModel() {
@@ -80,12 +84,27 @@ class SettingsActivity : DuckDuckGoActivity() {
                 lightThemeToggle.quietlySetIsChecked(it.lightThemeEnabled, lightThemeToggleListener)
                 autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
                 updateDefaultBrowserViewVisibility(it)
+                updateAutomaticClearDataOptions(it.automaticallyClearData)
             }
         })
 
         viewModel.command.observe(this, Observer {
             processCommand(it)
         })
+    }
+
+    private fun updateAutomaticClearDataOptions(automaticallyClearData: AutomaticallyClearData) {
+        val clearWhatSubtitle = getString(automaticallyClearData.clearWhatOption.nameStringRes)
+        automaticallyClearWhatSetting.setSubtitle(clearWhatSubtitle)
+
+        val clearWhenSubtitle = getString(automaticallyClearData.clearWhenOption.nameStringRes)
+        automaticallyClearWhenSetting.setSubtitle(clearWhenSubtitle)
+    }
+
+    private fun showAutomaticallyClearWhatDialog() {
+        val dialog = SettingsAutomaticallyClearWhatFragment.create(viewModel.viewState.value?.automaticallyClearData?.clearWhatOption)
+        dialog.listener = this
+        dialog.show(supportFragmentManager, CLEAR_WHAT_DIALOG_TAG)
     }
 
     private fun processCommand(it: Command?) {
@@ -121,7 +140,14 @@ class SettingsActivity : DuckDuckGoActivity() {
         startActivity(Intent(FeedbackActivity.intent(this)))
     }
 
+    override fun onAutomaticallyClearWhatOptionSelected(clearWhatSetting: ClearWhatOption) {
+        viewModel.onAutomaticallyWhatOptionSelected(clearWhatSetting)
+    }
+
     companion object {
+        private const val CLEAR_WHAT_DIALOG_TAG = "CLEAR_WHAT_DIALOG_FRAGMENT"
+        private const val CLEAR_WHEN_DIALOG_TAG = "CLEAR_WHEN_DIALOG_FRAGMENT"
+
         fun intent(context: Context): Intent {
             return Intent(context, SettingsActivity::class.java)
         }
