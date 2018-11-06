@@ -41,6 +41,8 @@
     <color name="almostBlackDark">#222222</color>
     <color name="almostBlack">#333333</color>
 
+    <color name="disabledTextViewLightTheme">#55494949</color>
+    <color name="disabledTextViewDarkTheme">#55777777</color>
     <color name="grayishBrown">#494949</color>
     <color name="greyishBrownTwo">#444444</color>
     <color name="midGray">#555</color>

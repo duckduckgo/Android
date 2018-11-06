@@ -14,27 +14,31 @@
  * limitations under the License.
  */
 
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package com.duckduckgo.app.settings
 
 import android.content.Context
 import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.TextView
 import com.duckduckgo.app.browser.R
+import org.jetbrains.anko.childrenRecursiveSequence
 
 
-@Suppress("MemberVisibilityCanBePrivate")
 class SettingsOptionWithSubtitle : ConstraintLayout {
 
-    private var titleView: TextView?
-    private var subtitleView: TextView?
+    private var root: View
+    private var titleView: TextView
+    private var subtitleView: TextView
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, R.style.SettingsItem)
     constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle) {
 
-        val root = LayoutInflater.from(context).inflate(R.layout.settings_option_with_subtitle, this, true)
+        root = LayoutInflater.from(context).inflate(R.layout.settings_option_with_subtitle, this, true)
         titleView = root.findViewById(R.id.title)
         subtitleView = root.findViewById(R.id.subtitle)
 
@@ -45,10 +49,17 @@ class SettingsOptionWithSubtitle : ConstraintLayout {
     }
 
     fun setTitle(title: String) {
-        titleView?.text = title
+        titleView.text = title
     }
 
     fun setSubtitle(subtitle: String) {
-        subtitleView?.text = subtitle
+        subtitleView.text = subtitle
     }
+
+    override fun setEnabled(enabled: Boolean) {
+        root.childrenRecursiveSequence().forEach { it.isEnabled = enabled }
+        super.setEnabled(enabled)
+    }
+
+
 }

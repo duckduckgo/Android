@@ -23,7 +23,7 @@ import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment.ClearWhatOption
-import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment.ClearWhenOption
+import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -48,9 +48,12 @@ class SettingsViewModel @Inject constructor(
         val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY)
     )
 
-    data class AutomaticallyClearData(val clearWhatOption: ClearWhatOption, val clearWhenOption: ClearWhenOption)
+    data class AutomaticallyClearData(
+        val clearWhatOption: ClearWhatOption,
+        val clearWhenOption: ClearWhenOption,
+        val clearWhenOptionEnabled: Boolean = true
+    )
 
-    private lateinit var currentViewState: ViewState
 
     sealed class Command {
         object LaunchFeedback : Command()
@@ -58,8 +61,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().apply {
-        currentViewState = ViewState()
-        value = currentViewState
+        value = ViewState()
     }
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -75,15 +77,16 @@ class SettingsViewModel @Inject constructor(
         val isLightTheme = settingsDataStore.theme == DuckDuckGoTheme.LIGHT
         val automaticallyClearWhat = settingsDataStore.automaticallyClearWhatOption
         val automaticallyClearWhen = settingsDataStore.automaticallyClearWhenOption
+        val automaticallyClearWhenEnabled = isAutomaticallyClearingDataWhenSettingEnabled(automaticallyClearWhat)
 
-        viewState.value = currentViewState.copy(
+        viewState.value = currentViewState().copy(
             loading = false,
             lightThemeEnabled = isLightTheme,
             autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
             isAppDefaultBrowser = defaultBrowserAlready,
             showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
             version = obtainVersion(variant.key),
-            automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen)
+            automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled)
         )
     }
 
@@ -113,8 +116,29 @@ class SettingsViewModel @Inject constructor(
     fun onAutomaticallyWhatOptionSelected(clearWhatSetting: ClearWhatOption) {
         settingsDataStore.automaticallyClearWhatOption = clearWhatSetting
 
-        if (clearWhatSetting == ClearWhatOption.CLEAR_NONE) settingsDataStore.automaticallyClearWhenOption = ClearWhenOption.APP_EXIT_ONLY
+        viewState.value = currentViewState().copy(
+            automaticallyClearData = AutomaticallyClearData(
+                clearWhatOption = clearWhatSetting,
+                clearWhenOption = settingsDataStore.automaticallyClearWhenOption,
+                clearWhenOptionEnabled = isAutomaticallyClearingDataWhenSettingEnabled(clearWhatSetting)
+            )
+        )
+    }
 
-        viewState.value = currentViewState.copy(automaticallyClearData = AutomaticallyClearData(clearWhatSetting, settingsDataStore.automaticallyClearWhenOption))
+    private fun isAutomaticallyClearingDataWhenSettingEnabled(clearWhatOption: ClearWhatOption): Boolean {
+        return clearWhatOption != ClearWhatOption.CLEAR_NONE
+    }
+
+    fun onAutomaticallyWhenOptionSelected(clearWhenSetting: ClearWhenOption) {
+        settingsDataStore.automaticallyClearWhenOption = clearWhenSetting
+        viewState.value = currentViewState().copy(
+            automaticallyClearData = AutomaticallyClearData(
+                settingsDataStore.automaticallyClearWhatOption,
+                clearWhenSetting
+            )
+        )
+    }
+    private fun currentViewState(): ViewState{
+        return viewState.value!!
     }
 }

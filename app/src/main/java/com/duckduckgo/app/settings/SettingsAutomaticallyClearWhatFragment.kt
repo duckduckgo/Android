@@ -26,7 +26,6 @@ import android.view.View
 import android.widget.RadioGroup
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment.ClearWhatOption.*
-import timber.log.Timber
 
 
 class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
@@ -42,24 +41,21 @@ class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
         val currentOption: ClearWhatOption = arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as ClearWhatOption? ?: CLEAR_NONE
 
         val rootView = View.inflate(activity, R.layout.settings_automatically_clear_what_fragment, null)
-        val radioGroup: RadioGroup = rootView.findViewById(R.id.settingsClearWhenGroup)
+        val radioGroup: RadioGroup = rootView.findViewById(R.id.settingsClearWhatGroup)
         updateCurrentSelect(currentOption, radioGroup)
 
         val alertBuilder = AlertDialog.Builder(activity!!)
             .setView(rootView)
             .setTitle(R.string.settingsAutomaticallyClearWhat)
             .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave) { _, _ ->
-                val selectedOption = when(radioGroup.checkedRadioButtonId) {
+                val selectedOption = when (radioGroup.checkedRadioButtonId) {
                     R.id.settingTabsOnly -> CLEAR_TABS_ONLY
                     R.id.settingTabsAndData -> CLEAR_TABS_AND_DATA
                     else -> CLEAR_NONE
                 }
-                Timber.i("User selected option: $selectedOption")
                 listener?.onAutomaticallyClearWhatOptionSelected(selectedOption)
             }
-            .setNegativeButton(android.R.string.cancel) { _, _ ->
-                Timber.i("Negative button")
-            }
+            .setNegativeButton(android.R.string.cancel) { _, _ -> }
 
         return alertBuilder.create()
     }
@@ -89,13 +85,4 @@ class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
         CLEAR_TABS_ONLY(R.id.settingTabsOnly, R.string.settingsAutomaticallyClearWhatOptionTabs),
         CLEAR_TABS_AND_DATA(R.id.settingTabsAndData, R.string.settingsAutomaticallyClearWhatOptionTabsAndData)
     }
-
-    enum class ClearWhenOption constructor(@IdRes val radioButtonId: Int, @StringRes val nameStringRes: Int) {
-        APP_EXIT_ONLY(R.id.settingNone, R.string.settingsAutomaticallyClearWhenAppExitOnly),
-        APP_EXIT_OR_5_MINS(R.id.settingNone, R.string.settingsAutomaticallyClearWhenAppExit5Mins),
-        APP_EXIT_OR_15_MINS(R.id.settingNone, R.string.settingsAutomaticallyClearWhenAppExit15Mins),
-        APP_EXIT_OR_30_MINS(R.id.settingNone, R.string.settingsAutomaticallyClearWhenAppExit30Mins),
-        APP_EXIT_OR_60_MINS(R.id.settingNone, R.string.settingsAutomaticallyClearWhenAppExit60Mins),
-    }
-
 }

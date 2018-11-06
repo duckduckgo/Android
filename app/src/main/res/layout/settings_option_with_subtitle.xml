@@ -19,17 +19,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="10dp"
-    android:orientation="vertical">
+    android:background="?attr/selectableItemBackground"
+    android:orientation="vertical"
+    android:paddingBottom="10dp">
 
-    <TextView
+    <android.support.v7.widget.AppCompatTextView
         android:id="@+id/title"
-        style="@style/SettingsItemClickable"
+        style="@style/SettingsItem"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="Title goes here" />
 
 
-    <TextView
+    <android.support.v7.widget.AppCompatTextView
         android:id="@+id/subtitle"
         style="@style/SettingsMinorText"
         app:layout_constraintStart_toStartOf="parent"
