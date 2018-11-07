@@ -45,7 +45,7 @@ class SiteMonitorTest {
         private val unknownPractices = PrivacyPractices.UNKNOWN
     }
 
-    var mockPrevalenceStore: PrevalenceStore = mock()
+    private var mockPrevalenceStore: PrevalenceStore = mock()
 
     @Test
     fun whenUrlIsHttpsThenHttpsStatusIsSecure() {

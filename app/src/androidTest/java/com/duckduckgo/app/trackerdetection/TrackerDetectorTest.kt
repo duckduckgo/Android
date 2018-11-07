@@ -38,7 +38,6 @@ class TrackerDetectorTest {
 
     companion object {
         private val resourceType = ResourceType.UNKNOWN
-        private const val network = "Network"
     }
 
     @Test

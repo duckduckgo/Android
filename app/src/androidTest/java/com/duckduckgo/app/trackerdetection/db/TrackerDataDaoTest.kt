@@ -93,7 +93,7 @@ class TrackerDataDaoTest {
         assertEquals(0, dao.count())
     }
 
-    fun createTracker(url: String): DisconnectTracker {
+    private fun createTracker(url: String): DisconnectTracker {
         return DisconnectTracker(url, "", "", "")
     }
 

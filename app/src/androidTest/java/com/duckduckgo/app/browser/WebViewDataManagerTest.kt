@@ -52,7 +52,7 @@ class WebViewDataManagerTest {
 
     @Test
     fun whenExternalCookiesClearedThenCookiesRemoved() {
-        testee.clearExternalCookies(mockCookieManager, {})
+        testee.clearExternalCookies(mockCookieManager) {}
         verify(mockCookieManager).removeAllCookies(any())
     }
 
@@ -75,7 +75,7 @@ class WebViewDataManagerTest {
     fun whenExternalCookiesClearedThenExternalCookiesAreNotRecreated() {
         whenever(mockCookieManager.getCookie(host)).thenReturn("da=abc; dz=zyx")
         whenever(mockCookieManager.getCookie(externalHost)).thenReturn("ea=abc; ez=zyx")
-        testee.clearExternalCookies(mockCookieManager, {})
+        testee.clearExternalCookies(mockCookieManager) {}
 
         val captor = argumentCaptor<ValueCallback<Boolean>>()
         verify(mockCookieManager).removeAllCookies(captor.capture())

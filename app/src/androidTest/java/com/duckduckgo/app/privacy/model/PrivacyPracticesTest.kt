@@ -30,7 +30,7 @@ import org.mockito.MockitoAnnotations.initMocks
 
 class PrivacyPracticesTest {
 
-    val entityMapping = EntityMapping()
+    private val entityMapping = EntityMapping()
 
     @Mock
     lateinit var mockTermsStore: TermsOfServiceStore
