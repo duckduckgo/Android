@@ -62,7 +62,7 @@ class EntityListDaoTest {
         val updates = listOf(
             EntityListEntity("domain", "entity3"),
             EntityListEntity("domain2", "entity4"),
-            EntityListEntity("domain3",  "entity5")
+            EntityListEntity("domain3", "entity5")
         )
 
         entityListDao.updateAll(updates)
@@ -77,9 +77,9 @@ class EntityListDaoTest {
     fun whenEntitiesWithSameDomainAddedThenOnlySingleEntryForDomainExists() {
 
         val list = listOf(
-            EntityListEntity("domain","entity"),
+            EntityListEntity("domain", "entity"),
             EntityListEntity("domain", "entity2"),
-            EntityListEntity("domain",  "entity3")
+            EntityListEntity("domain", "entity3")
         )
 
         entityListDao.updateAll(list)
@@ -93,8 +93,8 @@ class EntityListDaoTest {
 
         val list = listOf(
             EntityListEntity("domain", "entity"),
-            EntityListEntity("domain2",  "entity2"),
-            EntityListEntity("domain3",  "entity3")
+            EntityListEntity("domain2", "entity2"),
+            EntityListEntity("domain3", "entity3")
         )
 
         entityListDao.updateAll(list)

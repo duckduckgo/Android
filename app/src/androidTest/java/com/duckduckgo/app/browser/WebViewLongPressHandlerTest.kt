@@ -155,7 +155,12 @@ class WebViewLongPressHandlerTest {
     }
 
     private fun verifyNewBackgroundTabItemAdded() {
-        verify(mockMenu).add(anyInt(), eq(WebViewLongPressHandler.CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB), anyInt(), eq(R.string.openInNewBackgroundTab))
+        verify(mockMenu).add(
+            anyInt(),
+            eq(WebViewLongPressHandler.CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB),
+            anyInt(),
+            eq(R.string.openInNewBackgroundTab)
+        )
     }
 
     private fun verifyMenuNotAltered() {

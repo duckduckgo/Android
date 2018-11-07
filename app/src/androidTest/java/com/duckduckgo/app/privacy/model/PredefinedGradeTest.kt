@@ -69,12 +69,14 @@ class PredefinedGradeTest(private val testCase: GradeTestCase) {
 
 class GradeTestCase(val expected: Grade.Scores, val input: Input, val url: String) {
 
-    class Input(val https: Boolean,
-                     val httpsAutoUpgrade: Boolean,
-                     val parentEntity: String?,
-                     val parentTrackerPrevalence: Double?,
-                     val privacyScore: Int?,
-                     val trackers: Array<Tracker>)
+    class Input(
+        val https: Boolean,
+        val httpsAutoUpgrade: Boolean,
+        val parentEntity: String?,
+        val parentTrackerPrevalence: Double?,
+        val privacyScore: Int?,
+        val trackers: Array<Tracker>
+    )
 
     class Tracker(val blocked: Boolean, val parentEntity: String, val prevalence: Double?)
 

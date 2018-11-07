@@ -35,7 +35,11 @@ class ClearPersonalDataActionTest {
 
     @Before
     fun setup() {
-        testee = ClearPersonalDataAction(InstrumentationRegistry.getInstrumentation().targetContext, mockDataManager, mockClearingUnsentForgetAllPixelStore)
+        testee = ClearPersonalDataAction(
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            mockDataManager,
+            mockClearingUnsentForgetAllPixelStore
+        )
     }
 
     @UiThreadTest

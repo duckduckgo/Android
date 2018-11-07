@@ -42,9 +42,11 @@ class PrivacyPracticesTest {
 
     @Test
     fun whenUrlButNoParentEntityThenStillHasScore() {
-        whenever(mockTermsStore.terms).thenReturn(listOf(
-            TermsOfService("example.com", classification = "D")
-        ))
+        whenever(mockTermsStore.terms).thenReturn(
+            listOf(
+                TermsOfService("example.com", classification = "D")
+            )
+        )
 
         val testee = PrivacyPracticesImpl(mockTermsStore, entityMapping)
 
@@ -54,18 +56,23 @@ class PrivacyPracticesTest {
 
     @Test
     fun whenUrlHasParentEntityThenItsScoreIsWorstInNetwork() {
-        whenever(mockTermsStore.terms).thenReturn(listOf(
-            TermsOfService("sibling1.com", classification = "A"),
-            TermsOfService("sibling2.com", classification = "B"),
-            TermsOfService("sibling3.com", classification = "C"),
-            TermsOfService("sibling4.com", classification = "D")
-        ))
+        whenever(mockTermsStore.terms).thenReturn(
+            listOf(
+                TermsOfService("sibling1.com", classification = "A"),
+                TermsOfService("sibling2.com", classification = "B"),
+                TermsOfService("sibling3.com", classification = "C"),
+                TermsOfService("sibling4.com", classification = "D")
+            )
+        )
 
-        entityMapping.updateEntities(listOf(
-            EntityListEntity("sibling1.com", "Network"),
-            EntityListEntity("sibling2.com", "Network"),
-            EntityListEntity("sibling3.com", "Network"),
-            EntityListEntity("sibling4.com", "Network")))
+        entityMapping.updateEntities(
+            listOf(
+                EntityListEntity("sibling1.com", "Network"),
+                EntityListEntity("sibling2.com", "Network"),
+                EntityListEntity("sibling3.com", "Network"),
+                EntityListEntity("sibling4.com", "Network")
+            )
+        )
 
         val testee = PrivacyPracticesImpl(mockTermsStore, entityMapping)
 
