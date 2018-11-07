@@ -35,6 +35,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.support.annotation.AnyThread
 import android.support.annotation.StringRes
+import android.support.constraint.ConstraintSet
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
@@ -66,6 +67,7 @@ import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.feedback.ui.UserSurveyActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -77,6 +79,7 @@ import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
+import kotlinx.android.synthetic.main.include_survey_cta.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
@@ -131,6 +134,8 @@ class BrowserTabFragment : Fragment(), FindListener {
     private var pendingUploadTask: ValueCallback<Array<Uri>>? = null
 
     private lateinit var renderer: BrowserTabFragmentRenderer
+
+    private val callToActionConfigurator = CallToActionConfigurator()
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProviders.of(this, viewModelFactory).get(BrowserTabViewModel::class.java)
@@ -198,6 +203,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
+            callToActionConfigurator.configureBottomSheetCallToAction()
         }
     }
 
@@ -795,6 +801,17 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
     }
 
+    private fun launchSurvey() {
+
+        context?.let {
+            startActivity(UserSurveyActivity.intent(it))
+        }
+    }
+
+    private fun dismissSurvey() {
+        //TODO
+    }
+
     companion object {
 
         private const val TAB_ID_ARG = "TAB_ID_ARG"
@@ -1012,4 +1029,34 @@ class BrowserTabFragment : Fragment(), FindListener {
         private fun shouldUpdateOmnibarTextInput(viewState: OmnibarViewState, omnibarInput: String?) =
             !viewState.isEditing && omnibarTextInput.isDifferent(omnibarInput)
     }
+
+    private inner class CallToActionConfigurator {
+
+        fun configureBottomSheetCallToAction() {
+            if (callToActionStub == null) return
+
+            callToActionStub.layoutResource = R.layout.include_survey_cta
+            val container = callToActionStub.inflate()
+
+            adjustLogoConstraintsForCallToAction(container)
+            launchSurveyButton.setOnClickListener { launchSurvey() }
+            dismissSurveyButton.setOnClickListener { dismissSurvey() }
+        }
+
+        /**
+         * We want to center logo in space available above call to action, but c2a isn't in original view hierarchy.
+         * After appropriate c2a is loaded, we programmatically apply ConstraintLayout constraints to position logo
+         */
+        private fun adjustLogoConstraintsForCallToAction(callToActionContainer: View) {
+
+            logoHidingLayoutChangeListener.callToActionButton = callToActionContainer
+
+            ConstraintSet().also {
+                it.clone(newTabLayout)
+                it.connect(ddgLogo.id, ConstraintSet.BOTTOM, callToActionContainer.id, ConstraintSet.TOP, 0)
+                it.applyTo(newTabLayout)
+            }
+        }
+    }
+
 }

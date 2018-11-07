@@ -205,4 +205,12 @@
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Add to Home</string>
 
+    <!-- User Survey -->
+    <string name="surveyBannerTitle">Help us improve the app!</string>
+    <string name="surveyDescription">Take our short, anonymous survey and share your feedback.</string>
+    <string name="surveyLaunchButton">Take the Survey</string>
+    <string name="surveyDismissBannerContentDescription">Dismiss survey banner</string>
+    <string name="surveyTitle">DUCKDUCKGO SURVEY</string>
+    <string name="surveyDismissContentDescription">Dismiss survey</string>
+
 </resources>
