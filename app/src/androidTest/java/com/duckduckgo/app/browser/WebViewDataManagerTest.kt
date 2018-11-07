@@ -17,12 +17,12 @@
 package com.duckduckgo.app.browser
 
 import android.content.Context
-import androidx.test.InstrumentationRegistry
-import androidx.test.annotation.UiThreadTest
 import android.webkit.CookieManager
 import android.webkit.ValueCallback
 import android.webkit.WebStorage
 import android.webkit.WebView
+import androidx.test.annotation.UiThreadTest
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.nhaarman.mockito_kotlin.*
 import org.junit.Assert.assertTrue
@@ -42,7 +42,7 @@ class WebViewDataManagerTest {
     @UiThreadTest
     @Test
     fun whenDataClearedThenCacheHistoryAndStorageDataCleared() {
-        val context = InstrumentationRegistry.getTargetContext()
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
         val webView = TestWebView(context)
         testee.clearData(webView, mockStorage, context)
         assertTrue(webView.historyCleared)

@@ -17,17 +17,13 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
-import androidx.test.runner.AndroidJUnit4
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockito_kotlin.mock
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Test
-import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
 class QueryUrlConverterTest {
 
     private var mockStatisticsStore: StatisticsDataStore = mock()
@@ -80,6 +76,8 @@ class QueryUrlConverterTest {
         assertEquals("https", uri.scheme)
         assertEquals("", uri.path)
         assertEquals("ddg_android", uri.getQueryParameter("t"))
-        assertTrue("Query string doesn't match. Expected `q=$query` somewhere in query ${uri.encodedQuery}", uri.encodedQuery.contains("q=$query"))
+        val encodedQuery = uri.encodedQuery
+        assertNotNull(encodedQuery)
+        assertTrue("Query string doesn't match. Expected `q=$query` somewhere in query ${uri.encodedQuery}", encodedQuery!!.contains("q=$query"))
     }
 }

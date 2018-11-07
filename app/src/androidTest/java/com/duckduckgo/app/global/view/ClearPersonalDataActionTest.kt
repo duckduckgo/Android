@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.global.view
 
-import androidx.test.InstrumentationRegistry
 import androidx.test.annotation.UiThreadTest
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.nhaarman.mockito_kotlin.any
@@ -35,7 +35,7 @@ class ClearPersonalDataActionTest {
 
     @Before
     fun setup() {
-        testee = ClearPersonalDataAction(InstrumentationRegistry.getTargetContext(), mockDataManager, mockClearingUnsentForgetAllPixelStore)
+        testee = ClearPersonalDataAction(InstrumentationRegistry.getInstrumentation().targetContext, mockDataManager, mockClearingUnsentForgetAllPixelStore)
     }
 
     @UiThreadTest

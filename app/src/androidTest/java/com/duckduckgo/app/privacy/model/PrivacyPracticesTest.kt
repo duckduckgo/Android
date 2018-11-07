@@ -17,11 +17,9 @@
 package com.duckduckgo.app.privacy.model
 
 import com.duckduckgo.app.entities.EntityMapping
-import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.entities.db.EntityListEntity
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Practices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.GOOD
-import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.POOR
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Assert.assertEquals

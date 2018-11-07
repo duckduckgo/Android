@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.privacy.renderer
 
-import androidx.test.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao.NetworkTally
 import org.junit.Assert.assertEquals
@@ -25,7 +25,7 @@ import org.junit.Test
 
 class TrackersRendererTest {
 
-    private val context = InstrumentationRegistry.getTargetContext()
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val testee = TrackersRenderer()
 
     @Test

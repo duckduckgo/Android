@@ -17,11 +17,11 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
-import androidx.test.InstrumentationRegistry
-import androidx.test.annotation.UiThreadTest
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
+import androidx.test.annotation.UiThreadTest
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.surrogates.SurrogateResponse
@@ -61,7 +61,7 @@ class WebViewRequestInterceptorTest {
             resourceSurrogates = mockResourceSurrogates
         )
 
-        val context = InstrumentationRegistry.getTargetContext()
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
 
         webView = WebView(context)
     }

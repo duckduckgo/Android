@@ -20,8 +20,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
-import androidx.test.InstrumentationRegistry
-import androidx.test.InstrumentationRegistry.getInstrumentation
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.blockingObserve
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -94,7 +93,7 @@ class AppDatabaseTest {
 
     private fun database(): AppDatabase {
         val database = Room
-            .databaseBuilder(InstrumentationRegistry.getTargetContext(), AppDatabase::class.java, TEST_DB_NAME)
+            .databaseBuilder(androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java, TEST_DB_NAME)
             .addMigrations(
                 AppDatabase.MIGRATION_1_TO_2,
                 AppDatabase.MIGRATION_2_TO_3,

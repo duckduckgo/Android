@@ -18,8 +18,6 @@
 package com.duckduckgo.app.privacy.model
 
 import com.duckduckgo.app.FileUtilities
-import com.duckduckgo.app.privacy.model.Grade.Grading.*
-import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
 import org.junit.Assert.assertEquals
 import org.junit.Test

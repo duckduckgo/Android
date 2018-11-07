@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.browser
 
-import androidx.test.InstrumentationRegistry
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.webkit.WebView.HitTestResult
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.never
@@ -50,7 +50,7 @@ class WebViewLongPressHandlerTest {
     @Mock
     private lateinit var mockPixel: Pixel
 
-    private var context = InstrumentationRegistry.getTargetContext()
+    private var context = InstrumentationRegistry.getInstrumentation().targetContext
 
     @Before
     fun setup() {

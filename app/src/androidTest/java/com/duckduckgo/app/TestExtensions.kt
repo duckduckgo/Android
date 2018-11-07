@@ -19,7 +19,7 @@ package com.duckduckgo.app
 import androidx.annotation.UiThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.test.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.di.TestAppComponent
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -39,7 +39,7 @@ fun <T> LiveData<T>.blockingObserve(): T? {
 }
 
 fun getApp(): TestApplication {
-    return InstrumentationRegistry.getTargetContext().applicationContext as TestApplication
+    return InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as TestApplication
 }
 
 fun getDaggerComponent(): TestAppComponent {

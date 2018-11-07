@@ -17,11 +17,11 @@
 package com.duckduckgo.app.browser
 
 import android.content.Context
-import androidx.test.InstrumentationRegistry
-import androidx.test.annotation.UiThreadTest
 import android.view.View
 import android.webkit.WebChromeClient
 import android.webkit.WebView
+import androidx.test.annotation.UiThreadTest
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.times
@@ -34,7 +34,7 @@ class BrowserChromeClientTest {
     private lateinit var testee: BrowserChromeClient
     private lateinit var webView: TestWebView
     private lateinit var mockWebViewClientListener: WebViewClientListener
-    private val fakeView = View(InstrumentationRegistry.getTargetContext())
+    private val fakeView = View(getInstrumentation().targetContext)
 
     @UiThreadTest
     @Before
@@ -42,7 +42,7 @@ class BrowserChromeClientTest {
         testee = BrowserChromeClient()
         mockWebViewClientListener = mock()
         testee.webViewClientListener = mockWebViewClientListener
-        webView = TestWebView(InstrumentationRegistry.getTargetContext())
+        webView = TestWebView(getInstrumentation().targetContext)
     }
 
     @Test

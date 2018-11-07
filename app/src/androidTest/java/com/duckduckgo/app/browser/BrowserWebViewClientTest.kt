@@ -17,9 +17,9 @@
 package com.duckduckgo.app.browser
 
 import android.content.Context
-import androidx.test.InstrumentationRegistry
-import androidx.test.annotation.UiThreadTest
 import android.webkit.WebView
+import androidx.test.annotation.UiThreadTest
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -46,7 +46,7 @@ class BrowserWebViewClientTest {
     @UiThreadTest
     @Before
     fun setup() {
-        webView = TestWebView(InstrumentationRegistry.getTargetContext())
+        webView = TestWebView(InstrumentationRegistry.getInstrumentation().targetContext)
 
         testee = BrowserWebViewClient(requestRewriter, specialUrlDetector, requestInterceptor, httpsUpgrader, statisticsDataStore, pixel)
         testee.webViewClientListener = listener

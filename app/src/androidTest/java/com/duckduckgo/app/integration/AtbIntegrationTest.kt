@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.integration
 
-import androidx.test.InstrumentationRegistry
 import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.getDaggerComponent
 import com.duckduckgo.app.statistics.Variant
@@ -54,7 +54,7 @@ class AtbIntegrationTest {
     @Before
     fun before() {
         mockVariantManager = mock()
-        statisticsStore = StatisticsSharedPreferences(InstrumentationRegistry.getTargetContext())
+        statisticsStore = StatisticsSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
         statisticsStore.clearAtb()
 
         whenever(mockVariantManager.getVariant()).thenReturn(Variant("ma", 100.0))
