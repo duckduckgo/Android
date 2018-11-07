@@ -43,10 +43,8 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.SiteVisitedEntity
-import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.PrevalenceStore
-import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -177,6 +175,27 @@ class BrowserTabViewModelTest {
         db.close()
         testee.url.removeObserver(mockQueryObserver)
         testee.command.removeObserver(mockCommandObserver)
+    }
+
+    @Test
+    fun whenSearchUrlSharedThenAtbAndSourceParametersAreRemoved() {
+        testee.userSharingLink("https://duckduckgo.com/?q=test&atb=v117-1&t=ddg_test")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.ShareLink)
+
+        val shareLink = commandCaptor.lastValue as Command.ShareLink
+        assertEquals("https://duckduckgo.com/?q=test", shareLink.url)
+    }
+
+    @Test
+    fun whenNonSearchUrlSharedThenUrlIsUnchanged() {
+        val url = "https://duckduckgo.com/about?atb=v117-1&t=ddg_test"
+        testee.userSharingLink(url)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.ShareLink)
+
+        val shareLink = commandCaptor.lastValue as Command.ShareLink
+        assertEquals(url, shareLink.url)
     }
 
     @Test
