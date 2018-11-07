@@ -75,8 +75,8 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
         lightThemeToggle.setOnCheckedChangeListener(lightThemeToggleListener)
         autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
         setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
-        automaticallyClearWhatSetting.setOnClickListener { showAutomaticallyClearWhatDialog() }
-        automaticallyClearWhenSetting.setOnClickListener { showAutomaticallyClearWhenDialog() }
+        automaticallyClearWhatSetting.setOnClickListener { launchAutomaticallyClearWhatDialog() }
+        automaticallyClearWhenSetting.setOnClickListener { launchAutomaticallyClearWhenDialog() }
     }
 
     private fun observeViewModel() {
@@ -106,13 +106,13 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
         automaticallyClearWhenSetting.isEnabled = whenOptionEnabled
     }
 
-    private fun showAutomaticallyClearWhatDialog() {
+    private fun launchAutomaticallyClearWhatDialog() {
         val dialog = SettingsAutomaticallyClearWhatFragment.create(viewModel.viewState.value?.automaticallyClearData?.clearWhatOption)
         dialog.listener = this
         dialog.show(supportFragmentManager, CLEAR_WHAT_DIALOG_TAG)
     }
 
-    private fun showAutomaticallyClearWhenDialog() {
+    private fun launchAutomaticallyClearWhenDialog() {
         val dialog = SettingsAutomaticallyClearWhenFragment.create(viewModel.viewState.value?.automaticallyClearData?.clearWhenOption)
         dialog.listener = this
         dialog.show(supportFragmentManager, CLEAR_WHEN_DIALOG_TAG)

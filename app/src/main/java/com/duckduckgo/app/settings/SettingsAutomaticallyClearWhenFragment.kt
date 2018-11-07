@@ -83,11 +83,11 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
     }
 
     enum class ClearWhenOption constructor(@IdRes val radioButtonId: Int, @StringRes val nameStringRes: Int) {
-        APP_EXIT_ONLY(R.id.settingNone, R.string.settingsAutomaticallyClearWhenAppExitOnly),
-        APP_EXIT_OR_5_MINS(R.id.settingNone, R.string.settingsAutomaticallyClearWhenAppExit5Mins),
-        APP_EXIT_OR_15_MINS(R.id.settingNone, R.string.settingsAutomaticallyClearWhenAppExit15Mins),
-        APP_EXIT_OR_30_MINS(R.id.settingNone, R.string.settingsAutomaticallyClearWhenAppExit30Mins),
-        APP_EXIT_OR_60_MINS(R.id.settingNone, R.string.settingsAutomaticallyClearWhenAppExit60Mins),
+        APP_EXIT_ONLY(R.id.settingAppExitOnly, R.string.settingsAutomaticallyClearWhenAppExitOnly),
+        APP_EXIT_OR_5_MINS(R.id.settingInactive5Mins, R.string.settingsAutomaticallyClearWhenAppExit5Mins),
+        APP_EXIT_OR_15_MINS(R.id.settingInactive15Mins, R.string.settingsAutomaticallyClearWhenAppExit15Mins),
+        APP_EXIT_OR_30_MINS(R.id.settingInactive30Mins, R.string.settingsAutomaticallyClearWhenAppExit30Mins),
+        APP_EXIT_OR_60_MINS(R.id.settingInactive60Mins, R.string.settingsAutomaticallyClearWhenAppExit60Mins),
     }
 
 }
