@@ -16,11 +16,11 @@
 
 package com.duckduckgo.app.browser
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Observer
-import android.arch.persistence.room.Room
-import android.support.test.InstrumentationRegistry
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.room.Room
+import androidx.test.InstrumentationRegistry
 import android.view.MenuItem
 import android.view.View
 import com.duckduckgo.app.InstantSchedulersRule

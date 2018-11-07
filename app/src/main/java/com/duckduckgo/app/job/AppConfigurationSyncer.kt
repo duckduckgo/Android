@@ -18,7 +18,7 @@ package com.duckduckgo.app.job
 
 import android.app.job.JobScheduler
 import android.content.Context
-import android.support.annotation.CheckResult
+import androidx.annotation.CheckResult
 import com.duckduckgo.app.global.job.APP_CONFIGURATION_JOB_ID
 import com.duckduckgo.app.global.job.JobBuilder
 import io.reactivex.Completable

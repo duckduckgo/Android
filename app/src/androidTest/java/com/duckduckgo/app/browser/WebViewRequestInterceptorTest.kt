@@ -17,8 +17,8 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
-import android.support.test.InstrumentationRegistry
-import android.support.test.annotation.UiThreadTest
+import androidx.test.InstrumentationRegistry
+import androidx.test.annotation.UiThreadTest
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView

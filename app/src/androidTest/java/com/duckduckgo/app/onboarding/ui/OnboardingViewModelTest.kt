@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.onboarding.ui
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.statistics.VariantManager

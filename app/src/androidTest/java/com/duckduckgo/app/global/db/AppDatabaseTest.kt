@@ -16,11 +16,11 @@
 
 package com.duckduckgo.app.global.db
 
-import android.arch.persistence.db.framework.FrameworkSQLiteOpenHelperFactory
-import android.arch.persistence.room.Room
-import android.arch.persistence.room.testing.MigrationTestHelper
-import android.support.test.InstrumentationRegistry
-import android.support.test.InstrumentationRegistry.getInstrumentation
+import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
+import androidx.room.Room
+import androidx.room.testing.MigrationTestHelper
+import androidx.test.InstrumentationRegistry
+import androidx.test.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.blockingObserve
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

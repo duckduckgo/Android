@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.surrogates
 
-import android.support.test.InstrumentationRegistry
+import androidx.test.InstrumentationRegistry
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
 import org.junit.Assert
 import org.junit.Assert.assertEquals

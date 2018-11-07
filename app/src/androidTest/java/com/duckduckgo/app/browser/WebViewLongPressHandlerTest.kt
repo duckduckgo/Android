@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.browser
 
-import android.support.test.InstrumentationRegistry
+import androidx.test.InstrumentationRegistry
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.webkit.WebView.HitTestResult

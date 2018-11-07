@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.global.view
 
-import android.support.test.InstrumentationRegistry
-import android.support.test.annotation.UiThreadTest
+import androidx.test.InstrumentationRegistry
+import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.nhaarman.mockito_kotlin.any

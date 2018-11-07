@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.fire
 
-import android.support.test.InstrumentationRegistry
+import androidx.test.InstrumentationRegistry
 import androidx.core.content.edit
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStoreSharedPreferences.Companion.FILENAME
 import org.junit.Assert.assertEquals

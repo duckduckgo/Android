@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.httpsupgrade.db
 
-import android.arch.persistence.room.Room
-import android.support.test.InstrumentationRegistry
+import androidx.room.Room
+import androidx.test.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import org.junit.After

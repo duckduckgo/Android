@@ -16,15 +16,15 @@
 
 package com.duckduckgo.app.browser
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import android.graphics.Bitmap
 import android.net.Uri
-import android.support.annotation.AnyThread
-import android.support.annotation.StringRes
-import android.support.annotation.VisibleForTesting
+import androidx.annotation.AnyThread
+import androidx.annotation.StringRes
+import androidx.annotation.VisibleForTesting
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View

@@ -17,7 +17,7 @@
 package com.duckduckgo.app.global.install
 
 import android.content.Context
-import android.support.test.InstrumentationRegistry
+import androidx.test.InstrumentationRegistry
 import androidx.core.content.edit
 import org.junit.Assert.*
 import org.junit.Before

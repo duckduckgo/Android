@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.Observer
-import android.support.test.InstrumentationRegistry
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.test.InstrumentationRegistry
 import com.duckduckgo.app.di.TestAppComponent
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit

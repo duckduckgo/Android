@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.tabs.db
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.arch.persistence.room.Room
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.room.Room
 import android.database.sqlite.SQLiteConstraintException
-import android.support.test.InstrumentationRegistry
+import androidx.test.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity

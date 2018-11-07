@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.privacy.ui
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.arch.lifecycle.Observer
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.Observer
 import android.net.Uri
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent

@@ -17,13 +17,13 @@
 package com.duckduckgo.app.bookmarks.ui
 
 import android.app.AlertDialog
-import android.arch.lifecycle.Observer
+import androidx.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.RecyclerView.*
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.RecyclerView.*
 import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
@@ -64,7 +64,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         adapter = BookmarksAdapter(applicationContext, viewModel)
         recycler.adapter = adapter
 
-        val separator = DividerItemDecoration(this, VERTICAL)
+        val separator = androidx.recyclerview.widget.DividerItemDecoration(this, VERTICAL)
         recycler.addItemDecoration(separator)
     }
 

@@ -17,8 +17,8 @@
 package com.duckduckgo.app.browser
 
 import android.content.Context
-import android.support.test.InstrumentationRegistry
-import android.support.test.annotation.UiThreadTest
+import androidx.test.InstrumentationRegistry
+import androidx.test.annotation.UiThreadTest
 import android.webkit.WebView
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.statistics.pixels.Pixel

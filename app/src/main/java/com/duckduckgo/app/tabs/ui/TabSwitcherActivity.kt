@@ -16,11 +16,11 @@
 
 package com.duckduckgo.app.tabs.ui
 
-import android.arch.lifecycle.Observer
+import androidx.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import com.duckduckgo.app.browser.R
@@ -60,7 +60,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     }
 
     private fun configureRecycler() {
-        tabsRecycler.layoutManager = LinearLayoutManager(this)
+        tabsRecycler.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         tabsRecycler.adapter = tabsAdapter
     }
 

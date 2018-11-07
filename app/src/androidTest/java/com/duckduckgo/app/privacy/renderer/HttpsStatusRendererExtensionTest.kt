@@ -17,7 +17,7 @@
 package com.duckduckgo.app.privacy.renderer
 
 import android.content.Context
-import android.support.test.InstrumentationRegistry
+import androidx.test.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import org.junit.Assert.assertEquals

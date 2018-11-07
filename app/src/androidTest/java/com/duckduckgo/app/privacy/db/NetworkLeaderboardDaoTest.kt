@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.privacy.db
 
-import android.arch.persistence.room.Room
-import android.support.test.InstrumentationRegistry
+import androidx.room.Room
+import androidx.test.InstrumentationRegistry
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao.NetworkTally

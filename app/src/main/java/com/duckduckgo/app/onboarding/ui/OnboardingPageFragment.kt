@@ -21,9 +21,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.support.annotation.ColorRes
-import android.support.annotation.LayoutRes
-import android.support.v4.app.Fragment
+import androidx.annotation.ColorRes
+import androidx.annotation.LayoutRes
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,7 +37,7 @@ import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
 import timber.log.Timber
 import javax.inject.Inject
 
-sealed class OnboardingPageFragment : Fragment() {
+sealed class OnboardingPageFragment : androidx.fragment.app.Fragment() {
 
     @ColorRes
     abstract fun backgroundColor(): Int

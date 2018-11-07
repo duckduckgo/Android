@@ -21,17 +21,16 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.support.annotation.RequiresApi
-import android.support.v4.app.ActivityOptionsCompat
-import android.support.v4.app.FragmentActivity
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityOptionsCompat
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserSystemSettings
 import org.jetbrains.anko.toast
 import timber.log.Timber
 
-fun FragmentActivity.launchExternalActivity(intent: Intent) {
+fun androidx.fragment.app.FragmentActivity.launchExternalActivity(intent: Intent) {
     if (intent.resolveActivity(packageManager) != null) {
         startActivity(intent)
     } else {
@@ -56,7 +55,7 @@ fun Context.fadeTransitionConfig(): Bundle? {
     return config.toBundle()
 }
 
-fun FragmentActivity.toggleFullScreen() {
+fun androidx.fragment.app.FragmentActivity.toggleFullScreen() {
 
     val newUiOptions = window.decorView.systemUiVisibility
         .xor(android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
@@ -66,7 +65,7 @@ fun FragmentActivity.toggleFullScreen() {
     window.decorView.systemUiVisibility = newUiOptions
 }
 
-fun FragmentActivity.isImmersiveModeEnabled(): Boolean {
+fun androidx.fragment.app.FragmentActivity.isImmersiveModeEnabled(): Boolean {
     val uiOptions = window.decorView.systemUiVisibility
     return uiOptions or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY == uiOptions
 }

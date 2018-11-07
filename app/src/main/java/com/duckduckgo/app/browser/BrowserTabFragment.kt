@@ -21,8 +21,8 @@ import android.animation.LayoutTransition.CHANGING
 import android.animation.LayoutTransition.DISAPPEARING
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -33,14 +33,14 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.support.annotation.AnyThread
-import android.support.annotation.StringRes
-import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
-import android.support.v4.content.pm.ShortcutManagerCompat
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.LinearLayoutManager
+import androidx.annotation.AnyThread
+import androidx.annotation.StringRes
+import com.google.android.material.snackbar.Snackbar
+import androidx.fragment.app.Fragment
+import androidx.core.content.ContextCompat
+import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.text.Editable
 import android.view.*
 import android.view.View.GONE
@@ -86,7 +86,7 @@ import javax.inject.Inject
 import kotlin.concurrent.thread
 
 
-class BrowserTabFragment : Fragment(), FindListener {
+class BrowserTabFragment : androidx.fragment.app.Fragment(), FindListener {
 
     @Inject
     lateinit var webViewClient: BrowserWebViewClient
@@ -442,7 +442,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private fun configureAutoComplete() {
         val context = context ?: return
-        autoCompleteSuggestionsList.layoutManager = LinearLayoutManager(context)
+        autoCompleteSuggestionsList.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
         autoCompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
             immediateSearchClickListener = {
                 userEnteredQuery(it.phrase)

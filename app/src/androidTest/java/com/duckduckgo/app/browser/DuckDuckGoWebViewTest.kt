@@ -17,8 +17,8 @@
 package com.duckduckgo.app.browser
 
 import android.os.Build
-import android.support.test.InstrumentationRegistry
-import android.support.test.annotation.UiThreadTest
+import androidx.test.InstrumentationRegistry
+import androidx.test.annotation.UiThreadTest
 import org.junit.Assert.assertFalse
 import org.junit.Test
 

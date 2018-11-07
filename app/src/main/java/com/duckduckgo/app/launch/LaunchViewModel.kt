@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.launch
 
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 

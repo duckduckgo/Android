@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.settings
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.arch.lifecycle.Observer
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.Observer
 import android.content.Context
-import android.support.test.InstrumentationRegistry
+import androidx.test.InstrumentationRegistry
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector

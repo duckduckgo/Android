@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.migration
 
-import android.arch.lifecycle.LiveData
-import android.arch.persistence.room.Room
+import androidx.lifecycle.LiveData
+import androidx.room.Room
 import android.content.ContentValues
-import android.support.test.InstrumentationRegistry
+import androidx.test.InstrumentationRegistry
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.DuckDuckGoRequestRewriter

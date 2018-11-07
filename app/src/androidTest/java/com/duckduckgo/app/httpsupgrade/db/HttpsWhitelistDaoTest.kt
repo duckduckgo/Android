@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.httpsupgrade.db
 
-import android.arch.persistence.room.Room
-import android.support.test.InstrumentationRegistry.getContext
+import androidx.room.Room
+import androidx.test.InstrumentationRegistry.getContext
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.model.HttpsWhitelistedDomain
 import org.junit.After

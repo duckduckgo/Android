@@ -16,13 +16,13 @@
 
 package com.duckduckgo.app.onboarding.ui
 
-import android.support.annotation.ColorInt
-import android.support.v4.view.ViewPager
+import androidx.annotation.ColorInt
+import androidx.viewpager.widget.ViewPager
 import com.duckduckgo.app.global.view.ColorCombiner
 
 
 class ColorChangingPageListener(private val colorCombiner: ColorCombiner, private val newColorListener: NewColorListener) :
-    ViewPager.OnPageChangeListener {
+    androidx.viewpager.widget.ViewPager.OnPageChangeListener {
 
     interface NewColorListener {
         fun update(@ColorInt color: Int)

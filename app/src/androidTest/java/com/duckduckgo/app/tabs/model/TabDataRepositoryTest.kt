@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.tabs.model
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.arch.lifecycle.MutableLiveData
-import android.support.test.annotation.UiThreadTest
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.MutableLiveData
+import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory

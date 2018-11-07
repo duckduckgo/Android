@@ -31,21 +31,21 @@
             style="@style/SettingsSectionTitle"
             android:text="@string/settingsHeadingGeneral" />
 
-        <android.support.v7.widget.SwitchCompat
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/lightThemeToggle"
             style="@style/SettingsItem"
             android:text="@string/settingsLightTheme"
             app:theme="@style/SettingsItem.SettingsSwitch"
             tools:checked="true" />
 
-        <android.support.v7.widget.SwitchCompat
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/autocompleteToggle"
             style="@style/SettingsItem"
             android:text="@string/settingsAutocompleteEnabled"
             app:theme="@style/SettingsItem.SettingsSwitch"
             tools:checked="true" />
 
-        <android.support.v7.widget.SwitchCompat
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/setAsDefaultBrowserSetting"
             style="@style/SettingsItem"
             android:text="@string/settingsDefaultBrowserEnabled"

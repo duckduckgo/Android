@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.tabs.ui
 
-import android.support.test.InstrumentationRegistry
+import androidx.test.InstrumentationRegistry
 import com.duckduckgo.app.tabs.model.TabEntity
 import org.junit.Assert.*
 import org.junit.Test

@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.browser.autoComplete
 
-import android.support.annotation.UiThread
-import android.support.v7.widget.RecyclerView
+import androidx.annotation.UiThread
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,7 +32,7 @@ import javax.inject.Inject
 class BrowserAutoCompleteSuggestionsAdapter @Inject constructor(
     private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
     private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
-) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
+) : androidx.recyclerview.widget.RecyclerView.Adapter<AutoCompleteViewHolder>() {
 
     private val suggestions: MutableList<AutoCompleteSuggestion> = ArrayList()
 
@@ -84,7 +84,7 @@ class BrowserAutoCompleteSuggestionsAdapter @Inject constructor(
         notifyDataSetChanged()
     }
 
-    sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    sealed class AutoCompleteViewHolder(itemView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
 
         class SuggestionViewHolder(itemView: View) : AutoCompleteViewHolder(itemView) {
             fun bind(

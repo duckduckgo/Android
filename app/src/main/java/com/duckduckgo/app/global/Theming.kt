@@ -20,7 +20,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.support.v4.content.LocalBroadcastManager
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.Theming.Constants.BROADCAST_THEME_CHANGED
 import com.duckduckgo.app.global.Theming.Constants.THEME_MAP
@@ -58,7 +58,7 @@ fun DuckDuckGoActivity.applyTheme(settingsDataStore: SettingsDataStore): Broadca
 }
 
 private fun DuckDuckGoActivity.registerForThemeChangeBroadcast(): BroadcastReceiver {
-    val manager = LocalBroadcastManager.getInstance(applicationContext)
+    val manager = androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(applicationContext)
     val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             recreate()
@@ -69,7 +69,7 @@ private fun DuckDuckGoActivity.registerForThemeChangeBroadcast(): BroadcastRecei
 }
 
 fun DuckDuckGoActivity.sendThemeChangedBroadcast() {
-    val manager = LocalBroadcastManager.getInstance(applicationContext)
+    val manager = androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(applicationContext)
     manager.sendBroadcast(Intent(BROADCAST_THEME_CHANGED))
 }
 

@@ -17,13 +17,13 @@
 package com.duckduckgo.app.onboarding.ui
 
 import android.content.Context
-import android.support.annotation.ColorInt
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
-import android.support.v4.content.ContextCompat
+import androidx.annotation.ColorInt
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
+import androidx.core.content.ContextCompat
 import com.duckduckgo.app.browser.R
 
-class PagerAdapter(fragmentManager: FragmentManager, private val viewModel: OnboardingViewModel) : FragmentPagerAdapter(fragmentManager) {
+class PagerAdapter(fragmentManager: androidx.fragment.app.FragmentManager, private val viewModel: OnboardingViewModel) : androidx.fragment.app.FragmentPagerAdapter(fragmentManager) {
 
     override fun getCount(): Int {
         return viewModel.pageCount()

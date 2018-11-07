@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.feedback.ui
 
-import android.arch.lifecycle.Observer
+import androidx.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle

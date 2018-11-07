@@ -17,7 +17,7 @@
 package com.duckduckgo.app.browser.downloader
 
 import android.os.Environment
-import android.support.annotation.WorkerThread
+import androidx.annotation.WorkerThread
 import android.webkit.URLUtil
 import java.io.File
 import javax.inject.Inject

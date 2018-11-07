@@ -17,7 +17,7 @@
 package com.duckduckgo.app.trackerdetection
 
 
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.runner.AndroidJUnit4
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*

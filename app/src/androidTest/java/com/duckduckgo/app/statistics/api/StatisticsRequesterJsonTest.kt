@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.statistics.api
 
-import android.support.test.InstrumentationRegistry
+import androidx.test.InstrumentationRegistry
 import com.duckduckgo.app.FileUtilities.loadText
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.global.AppUrl.ParamKey

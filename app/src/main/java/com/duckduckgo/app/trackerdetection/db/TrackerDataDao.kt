@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection.db
 
-import android.arch.persistence.room.*
+import androidx.room.*
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 
 

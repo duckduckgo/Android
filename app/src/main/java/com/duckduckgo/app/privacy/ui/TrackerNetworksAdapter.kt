@@ -17,8 +17,8 @@
 package com.duckduckgo.app.privacy.ui
 
 import android.net.Uri
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,7 +32,7 @@ import kotlinx.android.synthetic.main.item_tracker_network_element.view.*
 import kotlinx.android.synthetic.main.item_tracker_network_header.view.*
 
 
-class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class TrackerNetworksAdapter : androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
 
     companion object {
         const val HEADER = 0
@@ -47,18 +47,18 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         val root: View,
         val network: TextView,
         val icon: ImageView
-    ) : RecyclerView.ViewHolder(root)
+    ) : androidx.recyclerview.widget.RecyclerView.ViewHolder(root)
 
     class RowViewHolder(
         val root: View,
         val host: TextView,
         val category: TextView
-    ) : RecyclerView.ViewHolder(root)
+    ) : androidx.recyclerview.widget.RecyclerView.ViewHolder(root)
 
     private var viewData: List<ViewData> = ArrayList()
     private var networkRenderer: TrackersRenderer = TrackersRenderer()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
         return when (viewType) {
             HEADER -> {
                 val root = LayoutInflater.from(parent.context).inflate(R.layout.item_tracker_network_header, parent, false)
@@ -71,7 +71,7 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
         val viewElement = viewData[position]
         if (holder is HeaderViewHolder && viewElement is Header) {
             onBindHeader(holder, viewElement)

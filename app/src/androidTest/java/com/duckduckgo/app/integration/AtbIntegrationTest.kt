@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.integration
 
-import android.support.test.InstrumentationRegistry
-import android.support.test.filters.LargeTest
+import androidx.test.InstrumentationRegistry
+import androidx.test.filters.LargeTest
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.getDaggerComponent
 import com.duckduckgo.app.statistics.Variant

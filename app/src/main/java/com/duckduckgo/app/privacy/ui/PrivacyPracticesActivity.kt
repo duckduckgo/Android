@@ -16,11 +16,11 @@
 
 package com.duckduckgo.app.privacy.ui
 
-import android.arch.lifecycle.Observer
+import androidx.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.View
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
@@ -65,7 +65,7 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
     }
 
     private fun configureRecycler() {
-        practicesList.layoutManager = LinearLayoutManager(this)
+        practicesList.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         practicesList.adapter = practicesAdapter
     }
 
