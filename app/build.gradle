@@ -77,17 +77,18 @@ android {
 }
 
 ext {
-    supportLibrary = "28.0.0-rc01"
+    supportLibrary = "28.0.0"
     architectureComponents = "1.1.1"
     architectureComponentsExtensions = "1.1.1"
-    androidKtx = "0.3"
-    dagger = "2.15"
+    androidKtx = "1.0.1"
+    dagger = "2.17"
     retrofit = "2.3.0"
     ankoVersion = "0.10.4"
-    glide = "4.6.1"
+    glide = "4.8.0"
     androidTestRunner = "1.0.2"
     lottieVersion = "2.6.0-beta19"
     okHttp = "3.10.0"
+    constraintLayout = "1.1.3"
 }
 
 
@@ -100,7 +101,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "com.android.support:appcompat-v7:$supportLibrary"
     implementation "com.android.support:design:$supportLibrary"
-    implementation "com.android.support.constraint:constraint-layout:1.1.0"
+    implementation "com.android.support.constraint:constraint-layout:$constraintLayout"
     implementation "com.squareup.okhttp3:okhttp:$okHttp"
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofit"
