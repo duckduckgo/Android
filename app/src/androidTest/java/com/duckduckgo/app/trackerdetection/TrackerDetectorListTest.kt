@@ -96,7 +96,7 @@ class TrackerDetectorListTest {
     }
 
     private fun adblockClient(name: Client.ClientName, dataFile: String): Client {
-        val data = javaClass.classLoader.getResource(dataFile).readBytes()
+        val data = javaClass.classLoader!!.getResource(dataFile).readBytes()
         val initialAdBlock = AdBlockClient(name)
         initialAdBlock.loadBasicData(data)
         val adblockWithProcessedData = AdBlockClient(name)

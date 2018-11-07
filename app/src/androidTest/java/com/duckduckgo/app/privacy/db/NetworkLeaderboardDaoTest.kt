@@ -18,7 +18,7 @@ package com.duckduckgo.app.privacy.db
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
-import androidx.test.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao.NetworkTally
@@ -41,7 +41,7 @@ class NetworkLeaderboardDaoTest {
     @Before
     fun before() {
         db = Room
-            .inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java)
+            .inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
 
