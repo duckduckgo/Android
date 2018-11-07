@@ -16,13 +16,13 @@
 
 package com.duckduckgo.app.tabs.ui
 
-import androidx.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
@@ -60,7 +60,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     }
 
     private fun configureRecycler() {
-        tabsRecycler.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+        tabsRecycler.layoutManager = LinearLayoutManager(this)
         tabsRecycler.adapter = tabsAdapter
     }
 

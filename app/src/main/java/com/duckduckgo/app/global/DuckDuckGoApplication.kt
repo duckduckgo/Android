@@ -19,12 +19,12 @@ package com.duckduckgo.app.global
 import android.app.Activity
 import android.app.Application
 import android.app.Service
+import android.os.Build
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
-import android.os.Build
-import androidx.fragment.app.Fragment
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.DaggerAppComponent
@@ -61,7 +61,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     lateinit var activityInjector: DispatchingAndroidInjector<Activity>
 
     @Inject
-    lateinit var supportFragmentInjector: DispatchingAndroidInjector<androidx.fragment.app.Fragment>
+    lateinit var supportFragmentInjector: DispatchingAndroidInjector<Fragment>
 
     @Inject
     lateinit var serviceInjector: DispatchingAndroidInjector<Service>
@@ -224,7 +224,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     override fun activityInjector(): AndroidInjector<Activity> = activityInjector
 
-    override fun supportFragmentInjector(): AndroidInjector<androidx.fragment.app.Fragment> = supportFragmentInjector
+    override fun supportFragmentInjector(): AndroidInjector<Fragment> = supportFragmentInjector
 
     override fun serviceInjector(): AndroidInjector<Service> = serviceInjector
 

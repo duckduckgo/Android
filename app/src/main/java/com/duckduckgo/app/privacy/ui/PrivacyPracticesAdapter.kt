@@ -16,17 +16,16 @@
 
 package com.duckduckgo.app.privacy.ui
 
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import kotlinx.android.synthetic.main.item_privacy_practice.view.*
 
-class PrivacyPracticesAdapter : androidx.recyclerview.widget.RecyclerView.Adapter<PrivacyPracticesAdapter.PracticeViewHolder>() {
+class PrivacyPracticesAdapter : RecyclerView.Adapter<PrivacyPracticesAdapter.PracticeViewHolder>() {
 
     companion object {
         const val GOOD = 1
@@ -61,7 +60,7 @@ class PrivacyPracticesAdapter : androidx.recyclerview.widget.RecyclerView.Adapte
         val root: View,
         val icon: ImageView,
         val description: TextView
-    ) : androidx.recyclerview.widget.RecyclerView.ViewHolder(root)
+    ) : RecyclerView.ViewHolder(root)
 
 }
 

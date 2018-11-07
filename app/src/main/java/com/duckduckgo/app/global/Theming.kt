@@ -58,7 +58,7 @@ fun DuckDuckGoActivity.applyTheme(settingsDataStore: SettingsDataStore): Broadca
 }
 
 private fun DuckDuckGoActivity.registerForThemeChangeBroadcast(): BroadcastReceiver {
-    val manager = androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(applicationContext)
+    val manager = LocalBroadcastManager.getInstance(applicationContext)
     val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             recreate()
@@ -69,7 +69,7 @@ private fun DuckDuckGoActivity.registerForThemeChangeBroadcast(): BroadcastRecei
 }
 
 fun DuckDuckGoActivity.sendThemeChangedBroadcast() {
-    val manager = androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(applicationContext)
+    val manager = LocalBroadcastManager.getInstance(applicationContext)
     manager.sendBroadcast(Intent(BROADCAST_THEME_CHANGED))
 }
 

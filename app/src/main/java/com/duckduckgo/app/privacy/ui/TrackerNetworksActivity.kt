@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.privacy.ui
 
-import androidx.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -61,7 +61,7 @@ class TrackerNetworksActivity : DuckDuckGoActivity() {
     }
 
     private fun configureRecycler() {
-        networksList.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+        networksList.layoutManager = LinearLayoutManager(this)
         networksList.adapter = networksAdapter
     }
 
