@@ -16,9 +16,10 @@
 
 package com.duckduckgo.app.global.db
 
-import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
+import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.InstrumentationRegistry
 import androidx.test.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.blockingObserve
@@ -29,6 +30,10 @@ import org.junit.Test
 
 
 class AppDatabaseTest {
+
+    @get:Rule
+    @Suppress("unused")
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
     val testHelper = MigrationTestHelper(getInstrumentation(), AppDatabase::class.qualifiedName, FrameworkSQLiteOpenHelperFactory())
