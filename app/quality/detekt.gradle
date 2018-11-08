@@ -25,5 +25,6 @@ detekt {
         filters = ".*test.*,.*/resources/.*,.*/tmp/.*"
         output = "${project.buildDir}/reports/detekt.xml"
         parallel = true
+        baseline = "quality/baseline.xml"
     }
 }

@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <Blacklist timestamp="1541695688773"></Blacklist>
+  <Whitelist timestamp="1541695688773">
+    <ID>EmptyClassBlock:VariantManager.kt$VariantManager$VariantFeature</ID>
+    <ID>Indentation:</ID>
+    <ID>NoBlankLineBeforeRbrace:</ID>
+    <ID>NoConsecutiveBlankLines:</ID>
+    <ID>NoEmptyClassBody:</ID>
+    <ID>NoLineBreakBeforeAssignment:</ID>
+    <ID>NoMultipleSpaces:</ID>
+    <ID>NoTrailingSpaces:</ID>
+    <ID>NoUnusedImports:</ID>
+    <ID>ParameterListWrapping:</ID>
+    <ID>SpacingAroundColon:</ID>
+    <ID>SpacingAroundComma:</ID>
+    <ID>TooGenericExceptionCaught:ResourceSurrogateLoader.kt$ResourceSurrogateLoader$e: Throwable</ID>
+    <ID>TooGenericExceptionCaught:ViewExtension.kt$ignored: RuntimeException</ID>
+  </Whitelist>
+</SmellBaseline>
