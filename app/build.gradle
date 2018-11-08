@@ -112,6 +112,8 @@ dependencies {
     implementation "com.google.dagger:dagger-android:$dagger"
     implementation "com.google.dagger:dagger-android-support:$dagger"
 
+    detekt "io.gitlab.arturbosch.detekt:detekt-formatting:1.0.0.RC8"
+
     // RxRelay
     implementation "com.jakewharton.rxrelay2:rxrelay:2.0.0"
 

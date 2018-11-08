@@ -66,7 +66,7 @@ comments:
     active: false
 
 complexity:
-  active: true
+  active: false
   ComplexCondition:
     active: true
     threshold: 4
@@ -195,7 +195,8 @@ exceptions:
 formatting:
   active: true
   android: false
-  autoCorrect: true
+  autoCorrect: false
+
   ChainWrapping:
     active: true
     autoCorrect: true
@@ -208,8 +209,8 @@ formatting:
     active: true
     autoCorrect: true
   ImportOrdering:
-    active: true
-    autoCorrect: true
+    active: false
+    autoCorrect: false
   Indentation:
     active: true
     autoCorrect: true
@@ -217,7 +218,7 @@ formatting:
     continuationIndentSize: 4
   MaximumLineLength:
     active: true
-    maxLineLength: 120
+    maxLineLength: 150
   ModifierOrdering:
     active: true
     autoCorrect: true
@@ -231,7 +232,7 @@ formatting:
     active: true
     autoCorrect: true
   NoItParamInMultilineLambda:
-    active: true
+    active: false
   NoLineBreakAfterElse:
     active: true
     autoCorrect: true
@@ -254,8 +255,8 @@ formatting:
     active: true
     autoCorrect: true
   NoWildcardImports:
-    active: true
-    autoCorrect: true
+    active: false
+    autoCorrect: false
   PackageName:
     active: true
     autoCorrect: true
@@ -289,7 +290,7 @@ formatting:
     autoCorrect: true
 
 naming:
-  active: true
+  active: false
   ClassNaming:
     active: true
     classPattern: '[A-Z$][a-zA-Z0-9$]*'
@@ -396,7 +397,7 @@ potential-bugs:
     active: false
 
 style:
-  active: true
+  active: false
   CollapsibleIfStatements:
     active: false
   DataClassContainsFunctions:
@@ -425,7 +426,7 @@ style:
     active: false
     maxJumpCount: 1
   MagicNumber:
-    active: true
+    active: false
     ignoreNumbers: '-1,0,1,2'
     ignoreHashCodeFunction: true
     ignorePropertyDeclaration: false
@@ -438,7 +439,7 @@ style:
     active: false
   MaxLineLength:
     active: true
-    maxLineLength: 120
+    maxLineLength: 150
     excludePackageStatements: true
     excludeImportStatements: true
     excludeCommentStatements: false
@@ -449,7 +450,7 @@ style:
   NestedClassesVisibility:
     active: false
   NewLineAtEndOfFile:
-    active: true
+    active: false
   NoTabs:
     active: false
   OptionalAbstractKeyword:
@@ -466,7 +467,7 @@ style:
     active: false
   ReturnCount:
     active: true
-    max: 2
+    max: 4
     excludedFunctions: "equals"
   SafeCast:
     active: true
@@ -505,5 +506,5 @@ style:
   VarCouldBeVal:
     active: false
   WildcardImport:
-    active: true
+    active: false
     excludeImports: 'java.util.*,kotlinx.android.synthetic.*'
