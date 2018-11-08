@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.image
 
-import com.bumptech.glide.annotation.GlideModule
-import com.bumptech.glide.module.AppGlideModule
+apply plugin: "io.gitlab.arturbosch.detekt"
 
-
-@GlideModule
-class GlobalGlideModule : AppGlideModule()
+detekt {
+    version = "1.0.0.RC8"
+    profile("main") {
+        input = "$projectDir"
+        config = "quality/detekt-config.yml"
+        filters = ".*test.*,.*/resources/.*,.*/tmp/.*"
+        output = "${project.buildDir}/reports/detekt.xml"
+        parallel = true
+    }
+}
