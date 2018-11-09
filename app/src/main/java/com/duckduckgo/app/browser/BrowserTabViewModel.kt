@@ -45,14 +45,11 @@ import com.duckduckgo.app.browser.addToHome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
-import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
-import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
-import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.SiteVisitedEntity
@@ -584,8 +581,26 @@ class BrowserTabViewModel(
 
     fun userSharingLink(url: String?) {
         if (url != null) {
-            command.value = ShareLink(url)
+            command.value = ShareLink(removeAtbAndSourceParamsFromSearch(url))
         }
+    }
+
+    private fun removeAtbAndSourceParamsFromSearch(url: String): String {
+        if (!duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
+            return url
+        }
+
+        val uri = Uri.parse(url)
+        val paramsToRemove = arrayOf(AppUrl.ParamKey.ATB, AppUrl.ParamKey.SOURCE)
+        val parameterNames = uri.queryParameterNames.filterNot { paramsToRemove.contains(it) }
+        val builder = uri.buildUpon()
+        builder.clearQuery()
+
+        for (paramName in parameterNames) {
+            builder.appendQueryParameter(paramName, uri.getQueryParameter(paramName))
+        }
+
+        return builder.build().toString()
     }
 
     fun saveWebViewState(webView: WebView?, tabId: String) {
