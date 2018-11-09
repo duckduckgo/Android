@@ -1,5 +1,8 @@
 source "https://rubygems.org"
 
+git_source(:github) {|Android| "https://github.com/duckduckgo/Android" }
+
+
 gem "fastlane"
 gem "danger"
 
