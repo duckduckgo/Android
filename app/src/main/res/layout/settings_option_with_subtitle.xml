@@ -23,14 +23,14 @@
     android:orientation="vertical"
     android:paddingBottom="10dp">
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/title"
         style="@style/SettingsItem"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="Title goes here" />
 
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/subtitle"
         style="@style/SettingsMinorText"
         app:layout_constraintStart_toStartOf="parent"

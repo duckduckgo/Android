@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/settingsSectionPrivacy"
     android:layout_width="match_parent"
@@ -42,4 +42,4 @@
         app:layout_constraintTop_toBottomOf="@id/automaticallyClearWhatSetting"
         app:subtitle="test test test"
         app:title="@string/settingsAutomaticallyClearWhen" />
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
