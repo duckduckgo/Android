@@ -16,13 +16,13 @@
 
 package com.duckduckgo.app.global
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProviders
 import android.content.BroadcastReceiver
 import android.os.Bundle
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProviders
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import dagger.android.AndroidInjection
 import javax.inject.Inject
@@ -56,7 +56,7 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         themeChangeReceiver?.let {
-            androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(applicationContext).unregisterReceiver(it)
+            LocalBroadcastManager.getInstance(applicationContext).unregisterReceiver(it)
         }
         super.onDestroy()
     }

@@ -53,6 +53,7 @@ import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
@@ -441,7 +442,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private fun configureAutoComplete() {
         val context = context ?: return
-        autoCompleteSuggestionsList.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
+        autoCompleteSuggestionsList.layoutManager = LinearLayoutManager(context)
         autoCompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
             immediateSearchClickListener = {
                 userEnteredQuery(it.phrase)

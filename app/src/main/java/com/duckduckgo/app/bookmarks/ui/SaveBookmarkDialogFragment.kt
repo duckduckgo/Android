@@ -18,18 +18,18 @@ package com.duckduckgo.app.bookmarks.ui
 
 import android.app.Dialog
 import android.os.Bundle
-import androidx.fragment.app.DialogFragment
-import androidx.appcompat.app.AlertDialog
 import android.view.View
 import android.view.WindowManager
 import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.showKeyboard
 import org.jetbrains.anko.find
 
 
-class SaveBookmarkDialogFragment : androidx.fragment.app.DialogFragment() {
+class SaveBookmarkDialogFragment : DialogFragment() {
 
     interface SaveBookmarkListener {
         fun onBookmarkSaved(id: Int?, title: String, url: String)

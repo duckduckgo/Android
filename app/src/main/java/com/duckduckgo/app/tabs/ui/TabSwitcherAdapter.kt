@@ -24,6 +24,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -93,7 +94,7 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
         val url: TextView,
         val close: ImageView,
         val tabUnread: View
-    ) : androidx.recyclerview.widget.RecyclerView.ViewHolder(root)
+    ) : ViewHolder(root)
 
     companion object {
 

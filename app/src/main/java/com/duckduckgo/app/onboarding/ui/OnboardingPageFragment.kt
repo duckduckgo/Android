@@ -21,12 +21,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import androidx.annotation.ColorRes
-import androidx.annotation.LayoutRes
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.ColorRes
+import androidx.annotation.LayoutRes
+import androidx.fragment.app.Fragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserSystemSettings
@@ -37,7 +37,7 @@ import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
 import timber.log.Timber
 import javax.inject.Inject
 
-sealed class OnboardingPageFragment : androidx.fragment.app.Fragment() {
+sealed class OnboardingPageFragment : Fragment() {
 
     @ColorRes
     abstract fun backgroundColor(): Int
