@@ -71,7 +71,6 @@ app:
     TEST_VARIANT: Debug
   - opts:
       is_expand: false
-    DANGER_GITHUB_API_TOKEN: 86caa8ef63e5f08724fdc06eaac7b94d069a7a70
 trigger_map:
 - push_branch: feature/*
   workflow: vdt
