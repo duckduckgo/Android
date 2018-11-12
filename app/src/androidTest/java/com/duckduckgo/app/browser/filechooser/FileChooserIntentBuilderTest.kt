@@ -149,7 +149,7 @@ class FileChooserIntentBuilderTest {
                 it.clipData = ClipData(clipDescription, Item(Uri.parse(clipData.first())))
 
                 for (i in 1 until clipData.size) {
-                    it.clipData.addItem(Item(Uri.parse(clipData[i])))
+                    it.clipData?.addItem(Item(Uri.parse(clipData[i])))
                 }
             }
         }

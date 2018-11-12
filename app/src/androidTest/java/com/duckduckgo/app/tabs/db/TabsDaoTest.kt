@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.tabs.db
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.arch.persistence.room.Room
 import android.database.sqlite.SQLiteConstraintException
-import android.support.test.InstrumentationRegistry
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.room.Room
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
@@ -39,10 +39,7 @@ class TabsDaoTest {
 
     @Before
     fun before() {
-        database = Room.inMemoryDatabaseBuilder(
-            InstrumentationRegistry.getContext(),
-            AppDatabase::class.java
-        )
+        database = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         testee = database.tabsDao()

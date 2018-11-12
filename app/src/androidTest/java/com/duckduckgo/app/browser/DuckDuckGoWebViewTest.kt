@@ -17,8 +17,8 @@
 package com.duckduckgo.app.browser
 
 import android.os.Build
-import android.support.test.InstrumentationRegistry
-import android.support.test.annotation.UiThreadTest
+import androidx.test.annotation.UiThreadTest
+import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertFalse
 import org.junit.Test
 
@@ -30,7 +30,7 @@ class DuckDuckGoWebViewTest {
     @Test
     fun whenWebViewInitialisedThenSafeBrowsingDisabled() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            testee = DuckDuckGoWebView(InstrumentationRegistry.getTargetContext())
+            testee = DuckDuckGoWebView(InstrumentationRegistry.getInstrumentation().targetContext)
             assertFalse(testee.settings.safeBrowsingEnabled)
         }
     }

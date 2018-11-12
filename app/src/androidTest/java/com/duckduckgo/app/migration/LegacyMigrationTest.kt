@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.migration
 
-import android.arch.lifecycle.LiveData
-import android.arch.persistence.room.Room
 import android.content.ContentValues
-import android.support.test.InstrumentationRegistry
+import androidx.lifecycle.LiveData
+import androidx.room.Room
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.DuckDuckGoRequestRewriter
@@ -38,8 +38,7 @@ import org.junit.Test
 
 class LegacyMigrationTest {
 
-    // target context else we can't write a db file
-    private val context = InstrumentationRegistry.getTargetContext()
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private var mockStatisticsStore: StatisticsDataStore = mock()
     private val mockVariantManager: VariantManager = mock()
     private val urlConverter = QueryUrlConverter(DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector(), mockStatisticsStore, mockVariantManager))

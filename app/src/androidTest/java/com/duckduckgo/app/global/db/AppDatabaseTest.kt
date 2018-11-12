@@ -16,11 +16,12 @@
 
 package com.duckduckgo.app.global.db
 
-import android.arch.persistence.db.framework.FrameworkSQLiteOpenHelperFactory
-import android.arch.persistence.room.Room
-import android.arch.persistence.room.testing.MigrationTestHelper
-import android.support.test.InstrumentationRegistry
-import android.support.test.InstrumentationRegistry.getInstrumentation
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.room.Room
+import androidx.room.testing.MigrationTestHelper
+import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.blockingObserve
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -29,6 +30,10 @@ import org.junit.Test
 
 
 class AppDatabaseTest {
+
+    @get:Rule
+    @Suppress("unused")
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
     val testHelper = MigrationTestHelper(getInstrumentation(), AppDatabase::class.qualifiedName, FrameworkSQLiteOpenHelperFactory())
@@ -89,13 +94,14 @@ class AppDatabaseTest {
 
     private fun database(): AppDatabase {
         val database = Room
-            .databaseBuilder(InstrumentationRegistry.getTargetContext(), AppDatabase::class.java, TEST_DB_NAME)
+            .databaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java, TEST_DB_NAME)
             .addMigrations(
                 AppDatabase.MIGRATION_1_TO_2,
                 AppDatabase.MIGRATION_2_TO_3,
                 AppDatabase.MIGRATION_3_TO_4,
                 AppDatabase.MIGRATION_4_TO_5,
-                AppDatabase.MIGRATION_5_TO_6)
+                AppDatabase.MIGRATION_5_TO_6
+            )
             .allowMainThreadQueries()
             .build()
 

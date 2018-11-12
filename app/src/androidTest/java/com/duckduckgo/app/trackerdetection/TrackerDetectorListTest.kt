@@ -17,8 +17,6 @@
 package com.duckduckgo.app.trackerdetection
 
 
-import android.support.test.runner.AndroidJUnit4
-import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.model.ResourceType
@@ -30,11 +28,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.Mock
 
 
-@RunWith(AndroidJUnit4::class)
 class TrackerDetectorListTest {
 
     companion object {
@@ -98,7 +93,7 @@ class TrackerDetectorListTest {
     }
 
     private fun adblockClient(name: Client.ClientName, dataFile: String): Client {
-        val data = javaClass.classLoader.getResource(dataFile).readBytes()
+        val data = javaClass.classLoader!!.getResource(dataFile).readBytes()
         val initialAdBlock = AdBlockClient(name)
         initialAdBlock.loadBasicData(data)
         val adblockWithProcessedData = AdBlockClient(name)

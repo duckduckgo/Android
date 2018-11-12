@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.browser.downloader
 
-import android.support.annotation.WorkerThread
+import androidx.annotation.WorkerThread
 import android.util.Base64
 import com.duckduckgo.app.browser.downloader.DataUriParser.GeneratedFilename
 import com.duckduckgo.app.browser.downloader.DataUriParser.ParseResult

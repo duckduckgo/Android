@@ -67,7 +67,7 @@ class BloomFilterTest {
     }
 
     private fun createRandomStrings(items: Int): ArrayList<String> {
-        var list = ArrayList<String>()
+        val list = ArrayList<String>()
         repeat(items) { list.add(UUID.randomUUID().toString()) }
         return list
     }

@@ -19,11 +19,11 @@
 package com.duckduckgo.app.settings
 
 import android.content.Context
-import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.duckduckgo.app.browser.R
 import org.jetbrains.anko.childrenRecursiveSequence
 

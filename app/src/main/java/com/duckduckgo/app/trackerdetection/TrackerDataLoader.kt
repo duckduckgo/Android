@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection
 
-import android.support.annotation.WorkerThread
+import androidx.annotation.WorkerThread
 import com.duckduckgo.app.entities.EntityMapping
 import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.global.store.BinaryDataStore

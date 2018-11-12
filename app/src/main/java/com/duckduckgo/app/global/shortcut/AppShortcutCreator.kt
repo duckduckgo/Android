@@ -21,9 +21,9 @@ import android.content.Intent
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.os.Build
-import android.support.annotation.RequiresApi
-import android.support.v4.content.pm.ShortcutInfoCompat
-import android.support.v4.graphics.drawable.IconCompat
+import androidx.annotation.RequiresApi
+import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.graphics.drawable.IconCompat
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import javax.inject.Inject

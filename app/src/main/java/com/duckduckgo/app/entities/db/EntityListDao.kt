@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.entities.db
 
-import android.arch.persistence.room.*
+import androidx.room.*
 
 @Dao
 abstract class EntityListDao {

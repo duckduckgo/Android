@@ -67,5 +67,5 @@ class AdBlockClientTest {
     }
 
     private fun data(): ByteArray =
-        javaClass.classLoader.getResource("binary/easylist_sample").readBytes()
+        javaClass.classLoader!!.getResource("binary/easylist_sample").readBytes()
 }

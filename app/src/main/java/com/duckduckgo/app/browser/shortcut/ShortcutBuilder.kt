@@ -18,8 +18,8 @@ package com.duckduckgo.app.browser.shortcut
 
 import android.content.Context
 import android.content.Intent
-import android.support.v4.content.pm.ShortcutInfoCompat
-import android.support.v4.graphics.drawable.IconCompat
+import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.graphics.drawable.IconCompat
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel
 import com.duckduckgo.app.browser.R

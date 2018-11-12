@@ -17,7 +17,7 @@
 package com.duckduckgo.app.global.view
 
 import android.content.Context
-import android.support.annotation.UiThread
+import androidx.annotation.UiThread
 import android.webkit.CookieManager
 import android.webkit.WebStorage
 import android.webkit.WebView

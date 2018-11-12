@@ -17,7 +17,7 @@
 package com.duckduckgo.app.browser.addToHome
 
 import android.content.Context
-import android.support.v4.content.pm.ShortcutManagerCompat
+import androidx.core.content.pm.ShortcutManagerCompat
 import timber.log.Timber
 import javax.inject.Inject
 
