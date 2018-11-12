@@ -9,6 +9,17 @@ workflows:
         run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
     - git-clone@4.0.11: {}
     - cache-pull@2.0.1: {}
+    - script@1.1.5:
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            # fail if any commands fails
+            set -ex
+
+            export GIT_REPOSITORY_URL="git@github.com/duckduckgo/android.git"
+            bundle install
+            bundle exec danger
+        title: Run Danger
     - install-missing-android-tools@2.2.0: {}
     - gradle-runner@1.8.3:
         inputs:
@@ -22,39 +33,24 @@ workflows:
         - test_type: instrumentation
     - deploy-to-bitrise-io: {}
     - cache-push@2.0.5: {}
-  primary-backup:
+  primary_backup_2018-11-09:
     steps:
-    - avd-manager@0.9.2:
-        inputs:
-        - version: '27'
-    - activate-ssh-key@3.1.1:
+    - activate-ssh-key:
         run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
     - git-clone@4.0.11: {}
     - cache-pull@2.0.1: {}
-    - script@1.1.5:
-        title: Do anything with Script step
-    - install-missing-android-tools@2.1.1: {}
+    - install-missing-android-tools@2.2.0: {}
     - gradle-runner@1.8.3:
         inputs:
-        - gradle_task: assembleDebug
+        - gradle_task: assembleDebug assembleDebugAndroidTest
         title: Build APK
-    - android-lint@0.9.2:
+    - virtual-device-testing-for-android@1.0.2:
         inputs:
-        - project_location: "$PROJECT_LOCATION"
-        - module: "$MODULE"
-        - variant: "$TEST_VARIANT"
-    - android-unit-test@0.9.3:
-        inputs:
-        - project_location: "$PROJECT_LOCATION"
-        - module: "$MODULE"
-        - variant: "$TEST_VARIANT"
-        title: Run JVM Unit Tests
-    - wait-for-android-emulator@1.0.4: {}
-    - gradle-runner@1.8.3:
-        inputs:
-        - gradle_task: connectedDebugAndroidTest
-        title: Run Instrumentation Tests
-    - deploy-to-bitrise-io@1.3.12: {}
+        - test_devices: |-
+            NexusLowRes,26,en,portrait
+            Nexus4,21,en,portrait
+        - test_type: instrumentation
+    - deploy-to-bitrise-io: {}
     - cache-push@2.0.5: {}
 app:
   envs:
@@ -73,6 +69,9 @@ app:
   - opts:
       is_expand: false
     TEST_VARIANT: Debug
+  - opts:
+      is_expand: false
+    DANGER_GITHUB_API_TOKEN: 86caa8ef63e5f08724fdc06eaac7b94d069a7a70
 trigger_map:
 - push_branch: feature/*
   workflow: vdt
