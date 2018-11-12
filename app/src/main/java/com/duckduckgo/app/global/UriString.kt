@@ -17,7 +17,7 @@
 package com.duckduckgo.app.global
 
 import android.net.Uri
-import android.support.v4.util.PatternsCompat
+import androidx.core.util.PatternsCompat
 
 class UriString {
 

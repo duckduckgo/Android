@@ -16,12 +16,12 @@
 
 package com.duckduckgo.app.settings
 
-import android.arch.lifecycle.Observer
+import androidx.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.support.v7.widget.SwitchCompat
+import androidx.appcompat.widget.SwitchCompat
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity

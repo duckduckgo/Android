@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.privacy.renderer
 
-import android.support.test.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.*
 import org.junit.Assert.assertEquals
@@ -24,7 +24,7 @@ import org.junit.Test
 
 class PrivacyPracticesSummaryTest {
 
-    private val context = InstrumentationRegistry.getTargetContext()
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     @Test
     fun whenTermsAreGoodThenBannerIsGood() {

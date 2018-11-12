@@ -21,9 +21,9 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslError
 import android.os.Build
-import android.support.annotation.AnyThread
-import android.support.annotation.UiThread
-import android.support.annotation.WorkerThread
+import androidx.annotation.AnyThread
+import androidx.annotation.UiThread
+import androidx.annotation.WorkerThread
 import android.webkit.*
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.isHttps

@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.launch
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.arch.lifecycle.Observer
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.Observer
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Home
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Onboarding
 import com.duckduckgo.app.onboarding.store.OnboardingStore

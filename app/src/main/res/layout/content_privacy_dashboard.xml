@@ -23,7 +23,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:ignore="Overdraw">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:context="com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity"
@@ -33,7 +33,7 @@
             android:id="@+id/privacyGrade"
             layout="@layout/include_privacy_dashboard_header" />
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/review"
             android:layout_width="match_parent"
             android:layout_height="169dp"
@@ -105,9 +105,9 @@
 
             </LinearLayout>
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/privacyToggleContainer"
             android:layout_width="match_parent"
             android:layout_height="50dp"
@@ -128,7 +128,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/privacyToggle"
                 android:layout_width="wrap_content"
                 android:layout_height="26dp"
@@ -137,9 +137,9 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/trackerNetworkLeaderboard"
             android:layout_width="match_parent"
             android:layout_height="108dp"
@@ -200,8 +200,8 @@
                 app:layout_constraintLeft_toRightOf="@+id/trackerNetworkPill2"
                 app:layout_constraintTop_toBottomOf="@+id/trackerNetworkLeaderboardHeader" />
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>

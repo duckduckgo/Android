@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.browser
 
-import android.support.test.InstrumentationRegistry
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.webkit.WebView.HitTestResult
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.never
@@ -50,7 +50,7 @@ class WebViewLongPressHandlerTest {
     @Mock
     private lateinit var mockPixel: Pixel
 
-    private var context = InstrumentationRegistry.getTargetContext()
+    private var context = InstrumentationRegistry.getInstrumentation().targetContext
 
     @Before
     fun setup() {
@@ -155,7 +155,12 @@ class WebViewLongPressHandlerTest {
     }
 
     private fun verifyNewBackgroundTabItemAdded() {
-        verify(mockMenu).add(anyInt(), eq(WebViewLongPressHandler.CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB), anyInt(), eq(R.string.openInNewBackgroundTab))
+        verify(mockMenu).add(
+            anyInt(),
+            eq(WebViewLongPressHandler.CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB),
+            anyInt(),
+            eq(R.string.openInNewBackgroundTab)
+        )
     }
 
     private fun verifyMenuNotAltered() {

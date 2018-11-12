@@ -16,10 +16,9 @@
 
 package com.duckduckgo.app.privacy.store
 
-import android.support.test.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.InstantSchedulersRule
 import com.squareup.moshi.Moshi
-import org.junit.Assert
 import org.junit.Assert.assertNotNull
 import org.junit.Rule
 import org.junit.Test
@@ -33,7 +32,7 @@ class PrevalenceRawStoreTest {
     @Test
     fun whenIntialisedThenJsonIsLoadedCorrectly() {
         val moshi = Moshi.Builder().build()
-        val context = InstrumentationRegistry.getTargetContext()
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
         val prevalenceStore = PrevalenceRawStore(context = context, moshi = moshi)
         assertNotNull(prevalenceStore.findPrevalenceOf("Oath"))
     }

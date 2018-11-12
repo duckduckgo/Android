@@ -16,13 +16,12 @@
 
 package com.duckduckgo.app.entities.db
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.arch.persistence.room.Room
-import android.support.test.InstrumentationRegistry
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.room.Room
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -38,7 +37,7 @@ class EntityListDaoTest {
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java)
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         entityListDao = db.networkEntityDao()
@@ -63,7 +62,7 @@ class EntityListDaoTest {
         val updates = listOf(
             EntityListEntity("domain", "entity3"),
             EntityListEntity("domain2", "entity4"),
-            EntityListEntity("domain3",  "entity5")
+            EntityListEntity("domain3", "entity5")
         )
 
         entityListDao.updateAll(updates)
@@ -78,9 +77,9 @@ class EntityListDaoTest {
     fun whenEntitiesWithSameDomainAddedThenOnlySingleEntryForDomainExists() {
 
         val list = listOf(
-            EntityListEntity("domain","entity"),
+            EntityListEntity("domain", "entity"),
             EntityListEntity("domain", "entity2"),
-            EntityListEntity("domain",  "entity3")
+            EntityListEntity("domain", "entity3")
         )
 
         entityListDao.updateAll(list)
@@ -94,8 +93,8 @@ class EntityListDaoTest {
 
         val list = listOf(
             EntityListEntity("domain", "entity"),
-            EntityListEntity("domain2",  "entity2"),
-            EntityListEntity("domain3",  "entity3")
+            EntityListEntity("domain2", "entity2"),
+            EntityListEntity("domain3", "entity3")
         )
 
         entityListDao.updateAll(list)

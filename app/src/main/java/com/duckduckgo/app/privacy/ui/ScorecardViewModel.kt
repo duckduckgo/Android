@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.privacy.ui
 
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade

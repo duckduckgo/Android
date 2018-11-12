@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.httpsupgrade.db
 
-import android.arch.persistence.room.Room
-import android.support.test.InstrumentationRegistry.getContext
+import androidx.room.Room
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.model.HttpsWhitelistedDomain
 import org.junit.After
@@ -32,7 +32,7 @@ class HttpsWhitelistDaoTest {
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(getContext(), AppDatabase::class.java).build()
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java).build()
         dao = db.httpsWhitelistedDao()
     }
 

@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.httpsupgrade.db
 
-import android.arch.persistence.room.Room
-import android.support.test.InstrumentationRegistry
+import androidx.room.Room
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import org.junit.After
@@ -32,7 +32,7 @@ class HttpsBloomFilterSpecDaoTest {
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java).build()
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java).build()
         dao = db.httpsBloomFilterSpecDao()
     }
 
@@ -60,8 +60,8 @@ class HttpsBloomFilterSpecDaoTest {
         val specification = dao.get()
         assertNotNull(specification)
         assertEquals(0.2, specification!!.errorRate, 0.01)
-        assertEquals(60, specification!!.totalEntries)
-        assertEquals("xyz", specification!!.sha256)
+        assertEquals(60, specification.totalEntries)
+        assertEquals("xyz", specification.sha256)
     }
 
 }

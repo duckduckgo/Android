@@ -20,7 +20,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.support.v4.content.LocalBroadcastManager
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.Theming.Constants.BROADCAST_THEME_CHANGED
 import com.duckduckgo.app.global.Theming.Constants.THEME_MAP

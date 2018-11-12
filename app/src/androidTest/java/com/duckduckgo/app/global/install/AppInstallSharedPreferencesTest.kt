@@ -17,8 +17,8 @@
 package com.duckduckgo.app.global.install
 
 import android.content.Context
-import android.support.test.InstrumentationRegistry
 import androidx.core.content.edit
+import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -27,7 +27,7 @@ class AppInstallSharedPreferencesTest {
 
     private lateinit var testee: AppInstallSharedPreferences
 
-    private val context = InstrumentationRegistry.getTargetContext()
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     @Before
     fun setup() {

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.fire
 
-import android.support.test.InstrumentationRegistry
 import androidx.core.content.edit
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStoreSharedPreferences.Companion.FILENAME
 import org.junit.Assert.assertEquals
@@ -30,7 +29,7 @@ class UnsentForgetAllPixelStoreSharedPreferencesTest {
 
     @Before
     fun setup() {
-        val context = InstrumentationRegistry.getTargetContext()
+        val context = androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().targetContext
         context.getSharedPreferences(FILENAME, 0).edit { clear() }
         testee = UnsentForgetAllPixelStoreSharedPreferences(context)
     }

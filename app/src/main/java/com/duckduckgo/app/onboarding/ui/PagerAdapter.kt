@@ -17,10 +17,10 @@
 package com.duckduckgo.app.onboarding.ui
 
 import android.content.Context
-import android.support.annotation.ColorInt
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
-import android.support.v4.content.ContextCompat
+import androidx.annotation.ColorInt
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
 import com.duckduckgo.app.browser.R
 
 class PagerAdapter(fragmentManager: FragmentManager, private val viewModel: OnboardingViewModel) : FragmentPagerAdapter(fragmentManager) {

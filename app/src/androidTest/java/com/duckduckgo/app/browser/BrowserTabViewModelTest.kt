@@ -16,13 +16,13 @@
 
 package com.duckduckgo.app.browser
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Observer
-import android.arch.persistence.room.Room
-import android.support.test.InstrumentationRegistry
 import android.view.MenuItem
 import android.view.View
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.room.Room
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
@@ -133,7 +133,7 @@ class BrowserTabViewModelTest {
     fun before() {
         MockitoAnnotations.initMocks(this)
 
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java)
+        db = Room.inMemoryDatabaseBuilder(getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         appConfigurationDao = db.appConfigurationDao()
@@ -588,14 +588,14 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNotifiedEnteringFullScreenThenViewStateUpdatedWithFullScreenFlag() {
-        val stubView = View(InstrumentationRegistry.getTargetContext())
+        val stubView = View(getInstrumentation().targetContext)
         testee.goFullScreen(stubView)
         assertTrue(browserViewState().isFullScreen)
     }
 
     @Test
     fun whenNotifiedEnteringFullScreenThenEnterFullScreenCommandIssued() {
-        val stubView = View(InstrumentationRegistry.getTargetContext())
+        val stubView = View(getInstrumentation().targetContext)
         testee.goFullScreen(stubView)
         verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShowFullScreen)

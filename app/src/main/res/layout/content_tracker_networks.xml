@@ -13,7 +13,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -22,18 +22,18 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:ignore="Overdraw">
 
-    <android.support.v4.widget.NestedScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true">
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:context="com.duckduckgo.app.privacy.ui.TrackerNetworksActivity"
             tools:showIn="@layout/activity_tracker_networks">
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/networksBannerContainer"
                 android:layout_width="match_parent"
                 android:layout_height="169dp"
@@ -83,7 +83,7 @@
                     app:layout_constraintTop_toBottomOf="@id/domain"
                     tools:text="8 TRACKERS BLOCKED" />
 
-            </android.support.constraint.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
                 android:id="@+id/networksOverview"
@@ -111,7 +111,7 @@
                 android:background="@color/divider"
                 app:layout_constraintTop_toBottomOf="@id/networksOverview" />
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/networksList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -120,8 +120,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/topDivider" />
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </android.support.v4.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

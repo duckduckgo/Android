@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.privacy.db
 
-import android.arch.persistence.room.Entity
+import androidx.room.Entity
 
 @Entity(
     tableName = "network_leaderboard",
