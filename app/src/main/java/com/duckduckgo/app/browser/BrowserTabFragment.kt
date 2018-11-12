@@ -203,6 +203,8 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
+
+            //TODO make this render as appropriate
             callToActionConfigurator.configureBottomSheetCallToAction()
         }
     }
@@ -374,6 +376,7 @@ class BrowserTabFragment : Fragment(), FindListener {
             is Command.HandleExternalAppLink -> {
                 externalAppLinkClicked(it)
             }
+            is Command.LaunchSurvey -> launchSurvey()
         }
     }
 
@@ -802,14 +805,15 @@ class BrowserTabFragment : Fragment(), FindListener {
     }
 
     private fun launchSurvey() {
-
         context?.let {
             startActivity(UserSurveyActivity.intent(it))
         }
     }
 
     private fun dismissSurvey() {
-        //TODO
+        context?.let {
+            startActivity(UserSurveyActivity.intent(it))
+        }
     }
 
     companion object {
@@ -1039,8 +1043,8 @@ class BrowserTabFragment : Fragment(), FindListener {
             val container = callToActionStub.inflate()
 
             adjustLogoConstraintsForCallToAction(container)
-            launchSurveyButton.setOnClickListener { launchSurvey() }
-            dismissSurveyButton.setOnClickListener { dismissSurvey() }
+            launchSurveyButton.setOnClickListener { viewModel.onUserOpenedSurvey() }
+            dismissSurveyButton.setOnClickListener { viewModel.onUserDismissedSurvey() }
         }
 
         /**

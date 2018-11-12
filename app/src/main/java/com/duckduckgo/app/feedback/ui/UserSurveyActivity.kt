@@ -20,11 +20,13 @@ import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.feedback.ui.UserSurveyViewModel.Command
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import kotlinx.android.synthetic.main.activity_user_survey.*
 
@@ -37,17 +39,20 @@ class UserSurveyActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_survey)
         configureListeners()
-        configureObservers()
+
+        webView.settings.javaScriptEnabled = true
+        webView.setBackgroundColor(ContextCompat.getColor(this, R.color.cornflowerBlue))
+        webView.webViewClient = SurveyWebChromeClient()
 
         if (savedInstanceState == null) {
+            configureObservers()
             consumeIntentExtra()
-            webView.webViewClient = SurveyWebChromeClient()
-            webView.settings.javaScriptEnabled = true
-            webView.loadUrl("https://www.surveymonkey.com/r/9JTMFGJ")
         }
     }
 
     private fun consumeIntentExtra() {
+        //TODO this will be provided
+        webView.loadUrl("https://www.surveymonkey.com/r/9JTMFGJ")
     }
 
     private fun configureListeners() {
@@ -65,17 +70,23 @@ class UserSurveyActivity : DuckDuckGoActivity() {
         })
     }
 
-    private fun processCommand(command: UserSurveyViewModel.Command) {
-        when (command) {
+    private fun render(viewState: UserSurveyViewModel.ViewState) {
+    }
 
+    private fun processCommand(command: Command) {
+        when (command) {
+            is Command.Close -> finish()
         }
     }
 
-    private fun dismissSurvey() {
-        finish()
+    override fun onSaveInstanceState(outState: Bundle) {
+        webView.saveState(outState)
+        super.onSaveInstanceState(outState)
     }
 
-    private fun render(viewState: UserSurveyViewModel.ViewState) {
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        webView.restoreState(savedInstanceState)
     }
 
     companion object {

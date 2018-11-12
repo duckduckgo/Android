@@ -152,6 +152,7 @@ class BrowserTabViewModel(
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         class HandleExternalAppLink(val appLink: IntentType) : Command()
         class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap? = null) : Command()
+        object LaunchSurvey : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -622,6 +623,15 @@ class BrowserTabViewModel(
                 Timber.w(throwable, "Failed to obtain favicon")
                 command.value = AddHomeShortcut(title, currentPage)
             })
+    }
+
+    fun onUserOpenedSurvey() {
+        //TODO save new state
+        command.value = LaunchSurvey
+    }
+
+    fun onUserDismissedSurvey() {
+        //TODO save cancelled state
     }
 
     override fun externalAppLinkClicked(appLink: IntentType) {
