@@ -393,7 +393,7 @@ class BrowserTabFragment : Fragment(), FindListener {
                     if (appLinkCommand.appLink.fallbackUrl != null) {
                         webView?.loadUrl(appLinkCommand.appLink.fallbackUrl)
                     } else {
-                        showToast(R.string.unableToOpenLink)
+                        submitQuery("search:${appLinkCommand.appLink.url}")
                     }
                     return
                 }

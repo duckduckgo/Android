@@ -39,10 +39,13 @@ interface SpecialUrlDetector {
 }
 
 class SpecialUrlDetectorImpl : SpecialUrlDetector {
+    private val ipPattern =  "([0-9]+)\\.([0-9]+)\\.([0-9]+)\\.([0-9]+)".toPattern()
 
     override fun determineType(uri: Uri): UrlType {
         val uriString = uri.toString()
         val scheme = uri.scheme
+
+        if (isIpAddress(scheme?:"")) return UrlType.Web("http://$uriString")
 
         return when (scheme) {
             TEL_SCHEME -> buildTelephone(uriString)
@@ -52,8 +55,18 @@ class SpecialUrlDetectorImpl : SpecialUrlDetector {
             SMSTO_SCHEME -> buildSmsTo(uriString)
             HTTP_SCHEME, HTTPS_SCHEME -> UrlType.Web(uriString)
             ABOUT_SCHEME -> UrlType.Unknown(uriString)
+            SEARCH_SCHEME -> UrlType.SearchQuery(uriString.substring(7))
             null -> UrlType.SearchQuery(uriString)
             else -> buildIntent(uriString)
+        }
+    }
+
+    private fun isIpAddress(uriString: String): Boolean {
+        val ipMatcher = ipPattern.matcher(uriString)
+        return if (ipMatcher.matches()) {
+            (1..ipMatcher.groupCount()).all { ipMatcher.group(it).toInt() in (0..255) }
+        } else {
+            false
         }
     }
 
@@ -93,7 +106,7 @@ class SpecialUrlDetectorImpl : SpecialUrlDetector {
         private const val HTTP_SCHEME = "http"
         private const val HTTPS_SCHEME = "https"
         private const val ABOUT_SCHEME = "about"
-
+        private const val SEARCH_SCHEME = "search"
         private const val EXTRA_FALLBACK_URL = "browser_fallback_url"
     }
 }

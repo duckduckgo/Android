@@ -41,6 +41,8 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.BrowserWebViewClient.BrowserNavigationOptions
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
+import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.SearchQuery
+import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.Web
 import com.duckduckgo.app.browser.addToHome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
@@ -244,10 +246,12 @@ class BrowserTabViewModel(
         val trimmedInput = input.trim()
 
         val type = specialUrlDetector.determineType(trimmedInput)
-        if (type is IntentType) {
-            externalAppLinkClicked(type)
-        } else {
-            url.value = queryUrlConverter.convertQueryToUrl(trimmedInput)
+
+        when (type) {
+            is IntentType -> externalAppLinkClicked(type)
+            is SearchQuery -> url.value = queryUrlConverter.convertQueryToUrl(type.query)
+            is Web -> url.value = queryUrlConverter.convertQueryToUrl(type.webAddress)
+            else -> url.value = queryUrlConverter.convertQueryToUrl(trimmedInput)
         }
 
         globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
