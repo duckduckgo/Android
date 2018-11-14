@@ -125,8 +125,8 @@ class SettingsViewModel @Inject constructor(
         )
     }
 
-    private fun isAutomaticallyClearingDataWhenSettingEnabled(clearWhatOption: ClearWhatOption): Boolean {
-        return clearWhatOption != ClearWhatOption.CLEAR_NONE
+    private fun isAutomaticallyClearingDataWhenSettingEnabled(clearWhatOption: ClearWhatOption?): Boolean {
+        return clearWhatOption != null && clearWhatOption != ClearWhatOption.CLEAR_NONE
     }
 
     fun onAutomaticallyWhenOptionSelected(clearWhenSetting: ClearWhenOption) {
@@ -138,7 +138,8 @@ class SettingsViewModel @Inject constructor(
             )
         )
     }
-    private fun currentViewState(): ViewState{
+
+    private fun currentViewState(): ViewState {
         return viewState.value!!
     }
 }

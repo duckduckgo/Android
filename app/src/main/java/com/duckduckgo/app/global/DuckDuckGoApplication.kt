@@ -28,6 +28,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.DaggerAppComponent
+import com.duckduckgo.app.fire.AutomaticDataClearer
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.global.Theming.initializeTheme
@@ -89,7 +90,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     @Inject
     lateinit var notificationRegistrar: NotificationRegistrar
-    
+
     @Inject
     lateinit var pixel: Pixel
 
@@ -101,6 +102,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     @Inject
     lateinit var unsentForgetAllPixelStore: UnsentForgetAllPixelStore
+
+    @Inject
+    lateinit var automaticDataClearer: AutomaticDataClearer
 
     private var launchedByFireAction: Boolean = false
 
@@ -116,7 +120,10 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
         if (appIsRestarting()) return
 
-        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+        ProcessLifecycleOwner.get().lifecycle.also {
+            it.addObserver(this)
+            it.addObserver(automaticDataClearer)
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             appShortcutCreator.configureAppShortcuts(this)

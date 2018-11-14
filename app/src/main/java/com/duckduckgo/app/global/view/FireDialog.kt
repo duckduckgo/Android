@@ -18,9 +18,9 @@ package com.duckduckgo.app.global.view
 
 import android.content.Context
 import android.os.Bundle
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.view.View
 import com.duckduckgo.app.browser.R
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.sheet_fire_clear_data.*
 
 class FireDialog(context: Context, private val clearPersonalDataAction: ClearPersonalDataAction) : BottomSheetDialog(context) {
@@ -38,7 +38,7 @@ class FireDialog(context: Context, private val clearPersonalDataAction: ClearPer
 
         clearAllOption.setOnClickListener {
             clearStarted()
-            clearPersonalDataAction.clear()
+            clearPersonalDataAction.clearEverything(restartProcess = true)
             dismiss()
         }
 

@@ -29,6 +29,9 @@ interface SettingsDataStore {
     var autoCompleteSuggestionsEnabled: Boolean
     var automaticallyClearWhatOption: ClearWhatOption
     var automaticallyClearWhenOption: ClearWhenOption
+    var appBackgroundedTimestamp: Long
+    fun hasBackgroundTimestampRecorded(): Boolean
+    fun clearAppBackgroundTimestamp()
 }
 
 class SettingsSharedPreferences @Inject constructor(private val context: Context) : SettingsDataStore {
@@ -59,6 +62,13 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         }
         set(value) = preferences.edit { putString(KEY_AUTOMATICALLY_CLEAR_WHEN_OPTION, value.name) }
 
+    override var appBackgroundedTimestamp: Long
+        get() = preferences.getLong(KEY_APP_BACKGROUNDED_TIMESTAMP, 0)
+        set(value) = preferences.edit { putLong(KEY_APP_BACKGROUNDED_TIMESTAMP, value) }
+
+    override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
+    override fun clearAppBackgroundTimestamp() = preferences.edit { remove(KEY_APP_BACKGROUNDED_TIMESTAMP) }
+
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
@@ -69,5 +79,6 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         const val KEY_AUTOCOMPLETE_ENABLED = "AUTOCOMPLETE_ENABLED"
         const val KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION = "AUTOMATICALLY_CLEAR_WHAT_OPTION"
         const val KEY_AUTOMATICALLY_CLEAR_WHEN_OPTION = "AUTOMATICALLY_CLEAR_WHEN_OPTION"
+        const val KEY_APP_BACKGROUNDED_TIMESTAMP = "APP_BACKGROUNDED_TIMESTAMP"
     }
 }

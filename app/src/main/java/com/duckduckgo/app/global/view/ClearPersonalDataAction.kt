@@ -17,31 +17,52 @@
 package com.duckduckgo.app.global.view
 
 import android.content.Context
-import androidx.annotation.UiThread
 import android.webkit.CookieManager
 import android.webkit.WebStorage
 import android.webkit.WebView
+import androidx.annotation.UiThread
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
+import com.duckduckgo.app.tabs.model.TabRepository
 import timber.log.Timber
 import javax.inject.Inject
+
+interface ClearDataAction {
+
+    @UiThread
+    fun clearEverything(restartProcess: Boolean)
+
+    fun clearTabs()
+}
 
 class ClearPersonalDataAction @Inject constructor(
     private val context: Context,
     private val dataManager: WebDataManager,
-    private val clearingStore: UnsentForgetAllPixelStore
-) {
+    private val clearingStore: UnsentForgetAllPixelStore,
+    private val tabRepository: TabRepository
+) : ClearDataAction {
 
     @UiThread
-    fun clear() {
+    override fun clearEverything(restartProcess: Boolean) {
+        Timber.i("Clearing everything; will restart process? $restartProcess")
         val startTime = System.currentTimeMillis()
+        clearTabs()
         clearingStore.incrementCount()
         dataManager.clearData(WebView(context), WebStorage.getInstance(), context)
-        dataManager.clearWebViewSessions()
         dataManager.clearExternalCookies(CookieManager.getInstance()) {
-            Timber.i("Finished clearing everything; took ${System.currentTimeMillis() - startTime}ms. Restarting process")
-            FireActivity.triggerRestart(context)
+            Timber.i("Finished clearing everything; took ${System.currentTimeMillis() - startTime}ms.")
+
+            if (restartProcess) {
+                Timber.i("Restarting process")
+                FireActivity.triggerRestart(context)
+            }
         }
+    }
+
+    override fun clearTabs() {
+        Timber.i("Clearing tabs")
+        dataManager.clearWebViewSessions()
+        tabRepository.deleteAll()
     }
 }

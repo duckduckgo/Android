@@ -82,12 +82,6 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenClearRequestedThenDeleteAllCalledOnRepository() {
-        testee.onClearRequested()
-        verify(mockTabRepository).deleteAll()
-    }
-
-    @Test
     fun whenClearCompleteThenMessageDisplayedAndSwitcherClosed() {
         testee.onClearComplete()
         verify(mockCommandObserver, times(2)).onChanged(commandCaptor.capture())

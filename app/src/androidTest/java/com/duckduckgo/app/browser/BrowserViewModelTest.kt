@@ -109,12 +109,6 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenClearRequestedThenDeleteAllCalledOnRepository() {
-        testee.onClearRequested()
-        verify(mockTabRepository).deleteAll()
-    }
-
-    @Test
     fun whenClearCompleteThenMessageDisplayed() {
         testee.onClearComplete()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())

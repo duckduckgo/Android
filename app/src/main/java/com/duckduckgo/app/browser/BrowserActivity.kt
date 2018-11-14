@@ -16,12 +16,12 @@
 
 package com.duckduckgo.app.browser
 
-import androidx.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
 import android.os.Bundle
 import android.widget.Toast
+import androidx.lifecycle.Observer
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
@@ -110,8 +110,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
-            viewModel.onClearRequested()
-            clearPersonalDataAction.clear()
+            clearPersonalDataAction.clearEverything(restartProcess = true)
             return
         }
 
@@ -179,7 +178,6 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     fun launchFire() {
         val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction)
-        dialog.clearStarted = { viewModel.onClearRequested() }
         dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.show()
     }

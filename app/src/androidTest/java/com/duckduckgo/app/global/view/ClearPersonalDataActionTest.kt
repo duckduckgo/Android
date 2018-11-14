@@ -20,6 +20,7 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -32,41 +33,50 @@ class ClearPersonalDataActionTest {
 
     private val mockDataManager: WebDataManager = mock()
     private val mockClearingUnsentForgetAllPixelStore: UnsentForgetAllPixelStore = mock()
+    private val mockTabRepository: TabRepository = mock()
 
     @Before
     fun setup() {
         testee = ClearPersonalDataAction(
             InstrumentationRegistry.getInstrumentation().targetContext,
             mockDataManager,
-            mockClearingUnsentForgetAllPixelStore
+            mockClearingUnsentForgetAllPixelStore,
+            mockTabRepository
         )
     }
 
     @UiThreadTest
     @Test
     fun whenClearCalledThenPixelCountIncremented() {
-        testee.clear()
+        testee.clearEverything(false)
         verify(mockClearingUnsentForgetAllPixelStore).incrementCount()
     }
 
     @UiThreadTest
     @Test
     fun whenClearCalledThenDataManagerClearsSessions() {
-        testee.clear()
+        testee.clearEverything(false)
         verify(mockDataManager).clearWebViewSessions()
     }
 
     @UiThreadTest
     @Test
     fun whenClearCalledThenDataManagerClearsData() {
-        testee.clear()
+        testee.clearEverything(false)
         verify(mockDataManager).clearData(any(), any(), any())
     }
 
     @UiThreadTest
     @Test
     fun whenClearCalledThenDataManagerClearsCookies() {
-        testee.clear()
+        testee.clearEverything(false)
         verify(mockDataManager).clearExternalCookies(any(), any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenClearCalledThenTabsCleared() {
+        testee.clearEverything(false)
+        verify(mockTabRepository).deleteAll()
     }
 }
