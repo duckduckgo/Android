@@ -34,8 +34,6 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
         fun onAutomaticallyClearWhenOptionSelected(clearWhenSetting: ClearWhenOption)
     }
 
-    var listener: Listener? = null
-
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         val currentOption: ClearWhenOption = arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as ClearWhenOption? ?: APP_EXIT_ONLY
@@ -55,6 +53,7 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
                     R.id.settingInactive60Mins -> ClearWhenOption.APP_EXIT_OR_60_MINS
                     else -> APP_EXIT_ONLY
                 }
+                val listener = activity as Listener?
                 listener?.onAutomaticallyClearWhenOptionSelected(selectedOption)
             }
             .setNegativeButton(android.R.string.cancel) { _, _ -> }

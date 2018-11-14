@@ -97,7 +97,7 @@ ext {
     rxAndroid = "2.0.2"
     timber = "4.6.1"
     rxRelay = "2.0.0"
-    leakCanary = "1.5.4"
+    leakCanary = "1.6.2"
     mockito = "2.23.0"
 }
 

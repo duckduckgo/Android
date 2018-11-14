@@ -34,8 +34,6 @@ class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
         fun onAutomaticallyClearWhatOptionSelected(clearWhatSetting: ClearWhatOption)
     }
 
-    var listener: Listener? = null
-
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         val currentOption: ClearWhatOption = arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as ClearWhatOption? ?: CLEAR_NONE
@@ -53,6 +51,7 @@ class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
                     R.id.settingTabsAndData -> CLEAR_TABS_AND_DATA
                     else -> CLEAR_NONE
                 }
+                val listener = activity as Listener?
                 listener?.onAutomaticallyClearWhatOptionSelected(selectedOption)
             }
             .setNegativeButton(android.R.string.cancel) { _, _ -> }

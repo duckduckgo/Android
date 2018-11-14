@@ -109,13 +109,11 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
 
     private fun launchAutomaticallyClearWhatDialog() {
         val dialog = SettingsAutomaticallyClearWhatFragment.create(viewModel.viewState.value?.automaticallyClearData?.clearWhatOption)
-        dialog.listener = this
         dialog.show(supportFragmentManager, CLEAR_WHAT_DIALOG_TAG)
     }
 
     private fun launchAutomaticallyClearWhenDialog() {
         val dialog = SettingsAutomaticallyClearWhenFragment.create(viewModel.viewState.value?.automaticallyClearData?.clearWhenOption)
-        dialog.listener = this
         dialog.show(supportFragmentManager, CLEAR_WHEN_DIALOG_TAG)
     }
 
