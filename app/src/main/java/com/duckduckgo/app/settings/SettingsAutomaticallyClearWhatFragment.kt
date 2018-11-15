@@ -39,13 +39,13 @@ class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
         val currentOption: ClearWhatOption = arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as ClearWhatOption? ?: CLEAR_NONE
 
         val rootView = View.inflate(activity, R.layout.settings_automatically_clear_what_fragment, null)
-        val radioGroup: RadioGroup = rootView.findViewById(R.id.settingsClearWhatGroup)
-        updateCurrentSelect(currentOption, radioGroup)
+        updateCurrentSelect(currentOption, rootView.findViewById(R.id.settingsClearWhatGroup))
 
         val alertBuilder = AlertDialog.Builder(activity!!)
             .setView(rootView)
             .setTitle(R.string.settingsAutomaticallyClearWhat)
             .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave) { _, _ ->
+                val radioGroup = dialog.findViewById(R.id.settingsClearWhatGroup) as RadioGroup
                 val selectedOption = when (radioGroup.checkedRadioButtonId) {
                     R.id.settingTabsOnly -> CLEAR_TABS_ONLY
                     R.id.settingTabsAndData -> CLEAR_TABS_AND_DATA

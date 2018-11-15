@@ -39,13 +39,13 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
         val currentOption: ClearWhenOption = arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as ClearWhenOption? ?: APP_EXIT_ONLY
 
         val rootView = View.inflate(activity, R.layout.settings_automatically_clear_when_fragment, null)
-        val radioGroup: RadioGroup = rootView.findViewById(R.id.settingsClearWhenGroup)
-        updateCurrentSelect(currentOption, radioGroup)
+        updateCurrentSelect(currentOption, rootView.findViewById(R.id.settingsClearWhenGroup))
 
         val alertBuilder = AlertDialog.Builder(activity!!)
             .setView(rootView)
             .setTitle(R.string.settingsAutomaticallyClearWhat)
             .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave) { _, _ ->
+                val radioGroup = dialog.findViewById(R.id.settingsClearWhenGroup) as RadioGroup
                 val selectedOption = when (radioGroup.checkedRadioButtonId) {
                     R.id.settingInactive5Mins -> ClearWhenOption.APP_EXIT_OR_5_MINS
                     R.id.settingInactive15Mins -> ClearWhenOption.APP_EXIT_OR_15_MINS
