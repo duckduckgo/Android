@@ -67,6 +67,7 @@ import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.feedback.ui.UserSurveyActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
@@ -135,8 +136,6 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private lateinit var renderer: BrowserTabFragmentRenderer
 
-    private val callToActionConfigurator = CallToActionConfigurator()
-
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProviders.of(this, viewModelFactory).get(BrowserTabViewModel::class.java)
         viewModel.loadData(tabId, initialUrl)
@@ -203,9 +202,6 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
-
-            //TODO make this render as appropriate
-            callToActionConfigurator.configureBottomSheetCallToAction()
         }
     }
 
@@ -287,6 +283,10 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         viewModel.command.observe(this, Observer {
             processCommand(it)
+        })
+
+        viewModel.survey.observe(this, Observer<Survey> {
+            it.let { viewModel.onSurveyChanged(it) }
         })
 
         addTabsObserver()
@@ -376,7 +376,9 @@ class BrowserTabFragment : Fragment(), FindListener {
             is Command.HandleExternalAppLink -> {
                 externalAppLinkClicked(it)
             }
-            is Command.LaunchSurvey -> launchSurvey()
+            is Command.DisplaySurveyCta -> displaySurveyCta()
+            is Command.LaunchSurvey -> launchSurvey(it.survey)
+            is Command.HideSurveyCta -> hideSurveyCta()
         }
     }
 
@@ -804,15 +806,35 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
     }
 
-    private fun launchSurvey() {
+    private fun displaySurveyCta() {
+        if (surveyCallToActionContainer != null) {
+            surveyCallToActionContainer.show()
+            return
+        }
+        callToActionStub.layoutResource = R.layout.include_survey_cta
+        val container = callToActionStub.inflate()
+        logoHidingLayoutChangeListener.callToActionButton = container
+
+        ConstraintSet().also {
+            it.clone(newTabLayout)
+            it.connect(ddgLogo.id, ConstraintSet.BOTTOM, container.id, ConstraintSet.TOP, 0)
+            it.applyTo(newTabLayout)
+        }
+
+        launchSurveyButton.setOnClickListener { viewModel.onUserOpenedSurvey() }
+        dismissSurveyButton.setOnClickListener { viewModel.onUserDismissedSurvey() }
+    }
+
+    private fun launchSurvey(survey: Survey) {
         context?.let {
-            startActivity(UserSurveyActivity.intent(it))
+            startActivity(UserSurveyActivity.intent(it, survey))
         }
     }
 
-    private fun dismissSurvey() {
-        context?.let {
-            startActivity(UserSurveyActivity.intent(it))
+    private fun hideSurveyCta() {
+        //TODO clear constraint and background
+        if (surveyCallToActionContainer != null) {
+            surveyCallToActionContainer.hide()
         }
     }
 
@@ -1033,34 +1055,4 @@ class BrowserTabFragment : Fragment(), FindListener {
         private fun shouldUpdateOmnibarTextInput(viewState: OmnibarViewState, omnibarInput: String?) =
             !viewState.isEditing && omnibarTextInput.isDifferent(omnibarInput)
     }
-
-    private inner class CallToActionConfigurator {
-
-        fun configureBottomSheetCallToAction() {
-            if (callToActionStub == null) return
-
-            callToActionStub.layoutResource = R.layout.include_survey_cta
-            val container = callToActionStub.inflate()
-
-            adjustLogoConstraintsForCallToAction(container)
-            launchSurveyButton.setOnClickListener { viewModel.onUserOpenedSurvey() }
-            dismissSurveyButton.setOnClickListener { viewModel.onUserDismissedSurvey() }
-        }
-
-        /**
-         * We want to center logo in space available above call to action, but c2a isn't in original view hierarchy.
-         * After appropriate c2a is loaded, we programmatically apply ConstraintLayout constraints to position logo
-         */
-        private fun adjustLogoConstraintsForCallToAction(callToActionContainer: View) {
-
-            logoHidingLayoutChangeListener.callToActionButton = callToActionContainer
-
-            ConstraintSet().also {
-                it.clone(newTabLayout)
-                it.connect(ddgLogo.id, ConstraintSet.BOTTOM, callToActionContainer.id, ConstraintSet.TOP, 0)
-                it.applyTo(newTabLayout)
-            }
-        }
-    }
-
 }

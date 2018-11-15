@@ -26,7 +26,10 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.feedback.ui.UserSurveyViewModel.Command
+import com.duckduckgo.app.feedback.ui.UserSurveyViewModel.Command.Close
+import com.duckduckgo.app.feedback.ui.UserSurveyViewModel.Command.LoadSurvey
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import kotlinx.android.synthetic.main.activity_user_survey.*
 
@@ -51,8 +54,8 @@ class UserSurveyActivity : DuckDuckGoActivity() {
     }
 
     private fun consumeIntentExtra() {
-        //TODO this will be provided
-        webView.loadUrl("https://www.surveymonkey.com/r/9JTMFGJ")
+        val survey = intent.getSerializableExtra(SURVEY_EXTRA) as Survey
+        viewModel.start(survey)
     }
 
     private fun configureListeners() {
@@ -65,17 +68,12 @@ class UserSurveyActivity : DuckDuckGoActivity() {
         viewModel.command.observe(this, Observer {
             it?.let { processCommand(it) }
         })
-        viewModel.viewState.observe(this, Observer<UserSurveyViewModel.ViewState> {
-            it?.let { render(it) }
-        })
-    }
-
-    private fun render(viewState: UserSurveyViewModel.ViewState) {
     }
 
     private fun processCommand(command: Command) {
         when (command) {
-            is Command.Close -> finish()
+            is LoadSurvey -> webView.loadUrl(command.url)
+            is Close -> finish()
         }
     }
 
@@ -91,10 +89,13 @@ class UserSurveyActivity : DuckDuckGoActivity() {
 
     companion object {
 
-        fun intent(context: Context): Intent {
+        fun intent(context: Context, survey: Survey): Intent {
             val intent = Intent(context, UserSurveyActivity::class.java)
+            intent.putExtra(SURVEY_EXTRA, survey)
             return intent
         }
+
+        const val SURVEY_EXTRA = "SURVEY_EXTRA"
     }
 
     inner class SurveyWebChromeClient : WebViewClient() {

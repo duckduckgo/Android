@@ -66,6 +66,18 @@ class AppDatabaseTest {
     }
 
     @Test
+    fun whenMigratingFromVersion5To6ThenValidationSucceeds() {
+        testHelper.createDatabase(TEST_DB_NAME, 5).close()
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 6, true, AppDatabase.MIGRATION_5_TO_6)
+    }
+
+    @Test
+    fun whenMigratingFromVersion6To7ThenValidationSucceeds() {
+        testHelper.createDatabase(TEST_DB_NAME, 6).close()
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 7, true, AppDatabase.MIGRATION_6_TO_7)
+    }
+
+    @Test
     fun whenMigratingFromVersion4To5ThenUpdatePositionsOfStoredTabs() {
 
         testHelper.createDatabase(TEST_DB_NAME, 4).use {
@@ -95,7 +107,9 @@ class AppDatabaseTest {
                 AppDatabase.MIGRATION_2_TO_3,
                 AppDatabase.MIGRATION_3_TO_4,
                 AppDatabase.MIGRATION_4_TO_5,
-                AppDatabase.MIGRATION_5_TO_6)
+                AppDatabase.MIGRATION_5_TO_6,
+                AppDatabase.MIGRATION_6_TO_7
+            )
             .allowMainThreadQueries()
             .build()
 

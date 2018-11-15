@@ -16,32 +16,33 @@
 
 package com.duckduckgo.app.feedback.ui
 
-import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import com.duckduckgo.app.feedback.db.SurveyDao
+import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.global.SingleLiveEvent
+import kotlin.concurrent.thread
 
 
-class UserSurveyViewModel() : ViewModel() {
-
-    data class ViewState(
-        val submitAllowed: Boolean = false
-    )
+class UserSurveyViewModel(private val surveyDao: SurveyDao) : ViewModel() {
 
     sealed class Command {
+        class LoadSurvey(val url: String) : Command()
         object Close : Command()
     }
 
-    val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
+    private lateinit var survey: Survey
 
-    private val viewValue: ViewState get() = viewState.value!!
-
-    init {
-        viewState.value = ViewState()
+    fun start(survey: Survey) {
+        this.survey = survey
+        command.value = Command.LoadSurvey(survey.url)
     }
 
     fun onSurveyCompleted() {
-        //TODO save away completed result
+        survey.status = Survey.Status.DONE
+        thread {
+            surveyDao.update(survey)
+        }
         command.value = Command.Close
     }
 

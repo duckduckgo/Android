@@ -19,11 +19,14 @@ package com.duckduckgo.app.global.db
 import android.arch.persistence.db.SupportSQLiteDatabase
 import android.arch.persistence.room.Database
 import android.arch.persistence.room.RoomDatabase
+import android.arch.persistence.room.TypeConverters
 import android.arch.persistence.room.migration.Migration
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.entities.db.EntityListEntity
+import com.duckduckgo.app.feedback.db.SurveyDao
+import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
@@ -38,7 +41,7 @@ import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 
 @Database(
-    exportSchema = true, version = 6, entities = [
+    exportSchema = true, version = 7, entities = [
         DisconnectTracker::class,
         HttpsBloomFilterSpec::class,
         HttpsWhitelistedDomain::class,
@@ -48,10 +51,12 @@ import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
         TabEntity::class,
         TabSelectionEntity::class,
         BookmarkEntity::class,
-        EntityListEntity::class
+        EntityListEntity::class,
+        Survey::class
     ]
 )
 
+@TypeConverters(Survey.StatusTypeConverter::class)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun trackerDataDao(): TrackerDataDao
@@ -62,6 +67,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tabsDao(): TabsDao
     abstract fun bookmarksDao(): BookmarksDao
     abstract fun networkEntityDao(): EntityListDao
+    abstract fun surveyDao(): SurveyDao
 
     companion object {
         val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
@@ -113,5 +119,10 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_6_TO_7: Migration = object : Migration(6, 7) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `survey` (`surveyId` TEXT NOT NULL, `url` TEXT NOT NULL, `installationDay` INTEGER, `status` TEXT NOT NULL, PRIMARY KEY(`surveyId`))")
+            }
+        }
     }
 }

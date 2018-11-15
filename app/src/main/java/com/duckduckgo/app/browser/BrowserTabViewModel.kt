@@ -45,10 +45,14 @@ import com.duckduckgo.app.browser.addToHome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.feedback.db.SurveyDao
+import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
+import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.global.install.daysSinceInstallation
 import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
@@ -67,6 +71,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+import kotlin.concurrent.thread
 
 class BrowserTabViewModel(
     private val statisticsUpdater: StatisticsUpdater,
@@ -83,6 +88,8 @@ class BrowserTabViewModel(
     private val specialUrlDetector: SpecialUrlDetector,
     private val faviconDownloader: FaviconDownloader,
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
+    private val appInstallStore: AppInstallStore,
+    private val surveyDao: SurveyDao,
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, ViewModel() {
     data class GlobalLayoutViewState(
@@ -152,7 +159,9 @@ class BrowserTabViewModel(
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         class HandleExternalAppLink(val appLink: IntentType) : Command()
         class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap? = null) : Command()
-        object LaunchSurvey : Command()
+        object DisplaySurveyCta : Command()
+        object HideSurveyCta : Command()
+        class LaunchSurvey(val survey: Survey) : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -163,6 +172,7 @@ class BrowserTabViewModel(
     val findInPageViewState: MutableLiveData<FindInPageViewState> = MutableLiveData()
 
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
+    val survey: LiveData<Survey> = surveyDao.getLiveScheduled()
     val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
     val url: SingleLiveEvent<String> = SingleLiveEvent()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -181,6 +191,7 @@ class BrowserTabViewModel(
     private var siteLiveData = MutableLiveData<Site>()
     private var site: Site? = null
     private lateinit var tabId: String
+    private var currentSurvey: Survey? = null
 
 
     init {
@@ -625,13 +636,31 @@ class BrowserTabViewModel(
             })
     }
 
+    fun onSurveyChanged(survey: Survey?) {
+        if (survey == null) {
+            command.value = HideSurveyCta
+            return
+        }
+
+        val showOnDay = survey.installationDay
+        if (showOnDay == null || showOnDay.toLong() == appInstallStore.daysSinceInstallation()) {
+            command.value = DisplaySurveyCta
+            currentSurvey = survey
+        }
+    }
+
     fun onUserOpenedSurvey() {
-        //TODO save new state
-        command.value = LaunchSurvey
+        currentSurvey?.let {
+            command.value = LaunchSurvey(it)
+        }
     }
 
     fun onUserDismissedSurvey() {
-        //TODO save cancelled state
+        command.value = HideSurveyCta
+        currentSurvey = null
+        thread {
+            surveyDao.cancel()
+        }
     }
 
     override fun externalAppLinkClicked(appLink: IntentType) {

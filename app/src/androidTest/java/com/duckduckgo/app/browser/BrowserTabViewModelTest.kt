@@ -36,17 +36,17 @@ import com.duckduckgo.app.browser.addToHome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.feedback.db.SurveyDao
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.SiteVisitedEntity
-import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.PrevalenceStore
-import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -122,6 +122,12 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockAddToHomeCapabilityDetector: AddToHomeCapabilityDetector
 
+    @Mock
+    private lateinit var surveyDao: SurveyDao
+
+    @Mock
+    private lateinit var appInstallStore: AppInstallStore
+
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
 
@@ -160,7 +166,9 @@ class BrowserTabViewModelTest {
             webViewSessionStorage = webViewSessionStorage,
             specialUrlDetector = SpecialUrlDetectorImpl(),
             faviconDownloader = mockFaviconDownloader,
-            addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector
+            addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector,
+            surveyDao = surveyDao,
+            appInstallStore = appInstallStore
         )
 
         testee.loadData("abc", null)
