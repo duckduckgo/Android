@@ -31,7 +31,7 @@ import javax.inject.Inject
 interface ClearDataAction {
 
     @UiThread
-    fun clearEverything(restartProcess: Boolean)
+    fun clearEverything(killAndRestartProcess: Boolean = false, killProcess: Boolean = false)
 
     fun clearTabs()
 }
@@ -44,8 +44,9 @@ class ClearPersonalDataAction @Inject constructor(
 ) : ClearDataAction {
 
     @UiThread
-    override fun clearEverything(restartProcess: Boolean) {
-        Timber.i("Clearing everything; will restart process? $restartProcess")
+    override fun clearEverything(killAndRestartProcess: Boolean, killProcess: Boolean) {
+        Timber.i("Clearing everything; will restart process? $killAndRestartProcess will kill process? $killProcess")
+
         val startTime = System.currentTimeMillis()
         clearTabs()
         clearingStore.incrementCount()
@@ -53,9 +54,12 @@ class ClearPersonalDataAction @Inject constructor(
         dataManager.clearExternalCookies(CookieManager.getInstance()) {
             Timber.i("Finished clearing everything; took ${System.currentTimeMillis() - startTime}ms.")
 
-            if (restartProcess) {
+            if (killAndRestartProcess) {
                 Timber.i("Restarting process")
                 FireActivity.triggerRestart(context)
+            } else if(killProcess) {
+                Timber.i("Killing process")
+                System.exit(0)
             }
         }
     }

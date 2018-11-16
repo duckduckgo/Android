@@ -38,7 +38,7 @@ class FireDialog(context: Context, private val clearPersonalDataAction: ClearPer
 
         clearAllOption.setOnClickListener {
             clearStarted()
-            clearPersonalDataAction.clearEverything(restartProcess = true)
+            clearPersonalDataAction.clearEverything(killAndRestartProcess = true)
             dismiss()
         }
 

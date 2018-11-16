@@ -19,7 +19,6 @@ package com.duckduckgo.app.fire
 import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 interface BackgroundTimeKeeper {
@@ -38,10 +37,7 @@ class DataClearerTimeKeeper @Inject constructor(private val settingsDataStore: S
 
         return when (clearWhenOption) {
             SettingsAutomaticallyClearWhenFragment.ClearWhenOption.APP_EXIT_ONLY -> true
-            SettingsAutomaticallyClearWhenFragment.ClearWhenOption.APP_EXIT_OR_5_MINS -> elapsedTime >= TimeUnit.MINUTES.toMillis(5)
-            SettingsAutomaticallyClearWhenFragment.ClearWhenOption.APP_EXIT_OR_15_MINS -> elapsedTime >= TimeUnit.MINUTES.toMillis(15)
-            SettingsAutomaticallyClearWhenFragment.ClearWhenOption.APP_EXIT_OR_30_MINS -> elapsedTime >= TimeUnit.MINUTES.toMillis(30)
-            SettingsAutomaticallyClearWhenFragment.ClearWhenOption.APP_EXIT_OR_60_MINS -> elapsedTime >= TimeUnit.MINUTES.toMillis(60)
+            else -> elapsedTime >= clearWhenOption.durationMillis
         }
     }
 
