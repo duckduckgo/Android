@@ -832,9 +832,8 @@ class BrowserTabFragment : Fragment(), FindListener {
     }
 
     private fun hideSurveyCta() {
-        //TODO clear constraint and background
         if (surveyCallToActionContainer != null) {
-            surveyCallToActionContainer.hide()
+            surveyCallToActionContainer.gone()
         }
     }
 
