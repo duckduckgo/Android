@@ -22,7 +22,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserInfoActivity
 import com.duckduckgo.app.feedback.ui.FeedbackActivity
-import com.duckduckgo.app.feedback.ui.UserSurveyActivity
+import com.duckduckgo.app.feedback.ui.SurveyActivity
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.job.AppConfigurationJobService
 import com.duckduckgo.app.launch.LaunchActivity
@@ -81,7 +81,7 @@ abstract class AndroidBindingModule {
 
     @ActivityScoped
     @ContributesAndroidInjector
-    abstract fun userSurveyActivity(): UserSurveyActivity
+    abstract fun userSurveyActivity(): SurveyActivity
 
     @ActivityScoped
     @ContributesAndroidInjector

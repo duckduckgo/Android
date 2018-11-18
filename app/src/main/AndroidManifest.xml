@@ -104,7 +104,7 @@
             android:label="@string/feedbackActivityTitle"
             android:theme="@style/ModalCardTheme" />
         <activity
-            android:name="com.duckduckgo.app.feedback.ui.UserSurveyActivity"
+            android:name="com.duckduckgo.app.feedback.ui.SurveyActivity"
             android:label="@string/feedbackActivityTitle"
             android:parentActivityName=".BrowserActivity"
             android:theme="@style/ModalCardTheme" />

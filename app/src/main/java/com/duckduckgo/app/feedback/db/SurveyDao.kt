@@ -39,11 +39,11 @@ abstract class SurveyDao {
     abstract fun getLiveScheduled(): LiveData<Survey>
 
     @Query("select * from survey where status = \"SCHEDULED\"")
-    abstract fun getAllScheduled(): List<Survey>
+    abstract fun getScheduled(): List<Survey>
 
     @Transaction
     open fun cancelScheduledSurveys() {
-        getAllScheduled().forEach {
+        getScheduled().forEach {
             it.status = Survey.Status.CANCELLED
             update(it)
         }

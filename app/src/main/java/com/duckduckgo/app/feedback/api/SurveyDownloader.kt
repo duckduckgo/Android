@@ -46,7 +46,7 @@ class SurveyDownloader @Inject constructor(
             }
 
             val surveyGroup = response.body()
-            if (surveyGroup == null || surveyGroup.id == null) {
+            if (surveyGroup?.id == null) {
                 Timber.d("No survey received, canceling any old scheduled surveys")
                 surveyDao.cancelScheduledSurveys()
                 return@fromAction

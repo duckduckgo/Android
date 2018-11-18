@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.feedback.ui
 
+import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
@@ -27,17 +28,18 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.model.Survey
-import com.duckduckgo.app.feedback.ui.UserSurveyViewModel.Command
-import com.duckduckgo.app.feedback.ui.UserSurveyViewModel.Command.Close
-import com.duckduckgo.app.feedback.ui.UserSurveyViewModel.Command.LoadSurvey
+import com.duckduckgo.app.feedback.ui.SurveyViewModel.Command
+import com.duckduckgo.app.feedback.ui.SurveyViewModel.Command.Close
+import com.duckduckgo.app.feedback.ui.SurveyViewModel.Command.LoadSurvey
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import kotlinx.android.synthetic.main.activity_user_survey.*
 
 
-class UserSurveyActivity : DuckDuckGoActivity() {
+class SurveyActivity : DuckDuckGoActivity() {
 
-    private val viewModel: UserSurveyViewModel by bindViewModel()
+    private val viewModel: SurveyViewModel by bindViewModel()
 
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_survey)
@@ -59,14 +61,14 @@ class UserSurveyActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListeners() {
-        dismissButton.setOnClickListener { _ ->
+        dismissButton.setOnClickListener {
             viewModel.onSurveyDismissed()
         }
     }
 
     private fun configureObservers() {
         viewModel.command.observe(this, Observer {
-            it?.let { processCommand(it) }
+            it?.let { command -> processCommand(command) }
         })
     }
 
@@ -90,7 +92,7 @@ class UserSurveyActivity : DuckDuckGoActivity() {
     companion object {
 
         fun intent(context: Context, survey: Survey): Intent {
-            val intent = Intent(context, UserSurveyActivity::class.java)
+            val intent = Intent(context, SurveyActivity::class.java)
             intent.putExtra(SURVEY_EXTRA, survey)
             return intent
         }

@@ -30,7 +30,7 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.feedback.api.FeedbackSender
 import com.duckduckgo.app.feedback.db.SurveyDao
 import com.duckduckgo.app.feedback.ui.FeedbackViewModel
-import com.duckduckgo.app.feedback.ui.UserSurveyViewModel
+import com.duckduckgo.app.feedback.ui.SurveyViewModel
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
@@ -98,7 +98,7 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                 isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
                 isAssignableFrom(FeedbackViewModel::class.java) -> FeedbackViewModel(feedbackSender)
-                isAssignableFrom(UserSurveyViewModel::class.java) -> UserSurveyViewModel(surveyDao)
+                isAssignableFrom(SurveyViewModel::class.java) -> SurveyViewModel(surveyDao)
                 isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(
                     appSettingsPreferencesStore,
                     defaultBrowserDetector,

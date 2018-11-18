@@ -68,7 +68,7 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.feedback.model.Survey
-import com.duckduckgo.app.feedback.ui.UserSurveyActivity
+import com.duckduckgo.app.feedback.ui.SurveyActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -827,7 +827,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private fun launchSurvey(survey: Survey) {
         context?.let {
-            startActivity(UserSurveyActivity.intent(it, survey))
+            startActivity(SurveyActivity.intent(it, survey))
         }
     }
 

@@ -69,7 +69,7 @@ class FeedbackActivity : DuckDuckGoActivity() {
                 viewModel.onBrokenSiteUrlChanged(editable.toString())
             }
         })
-        submitButton.setOnClickListener { _ ->
+        submitButton.setOnClickListener {
             viewModel.onSubmitPressed()
         }
     }

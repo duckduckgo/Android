@@ -23,7 +23,7 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import kotlin.concurrent.thread
 
 
-class UserSurveyViewModel(private val surveyDao: SurveyDao) : ViewModel() {
+class SurveyViewModel(private val surveyDao: SurveyDao) : ViewModel() {
 
     sealed class Command {
         class LoadSurvey(val url: String) : Command()

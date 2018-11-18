@@ -31,7 +31,7 @@ interface AppInstallStore {
 }
 
 fun AppInstallStore.daysSinceInstallation(): Long {
-    return TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - installTimestamp) + 1
+    return TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - installTimestamp)
 }
 
 class AppInstallSharedPreferences @Inject constructor(private val context: Context) : AppInstallStore {
