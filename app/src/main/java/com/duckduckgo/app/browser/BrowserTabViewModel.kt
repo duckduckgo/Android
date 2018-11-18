@@ -659,7 +659,7 @@ class BrowserTabViewModel(
         command.value = HideSurveyCta
         currentSurvey = null
         thread {
-            surveyDao.cancel()
+            surveyDao.cancelScheduledSurveys()
         }
     }
 

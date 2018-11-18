@@ -42,8 +42,8 @@ abstract class SurveyDao {
     abstract fun getAllScheduled(): List<Survey>
 
     @Transaction
-    open fun cancel() {
-        getAllScheduled()?.forEach {
+    open fun cancelScheduledSurveys() {
+        getAllScheduled().forEach {
             it.status = Survey.Status.CANCELLED
             update(it)
         }

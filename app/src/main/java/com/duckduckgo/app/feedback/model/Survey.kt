@@ -26,7 +26,7 @@ import java.io.Serializable
 )
 data class Survey(
     @PrimaryKey val surveyId: String,
-    val url: String,
+    val url: String?,
     val installationDay: Int?,
     var status: Status
 ) : Serializable {

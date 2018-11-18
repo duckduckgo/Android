@@ -34,8 +34,9 @@ class UserSurveyViewModel(private val surveyDao: SurveyDao) : ViewModel() {
     private lateinit var survey: Survey
 
     fun start(survey: Survey) {
+        val url = survey.url ?: return
         this.survey = survey
-        command.value = Command.LoadSurvey(survey.url)
+        command.value = Command.LoadSurvey(url)
     }
 
     fun onSurveyCompleted() {
