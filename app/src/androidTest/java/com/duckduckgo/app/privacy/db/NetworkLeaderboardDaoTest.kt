@@ -16,8 +16,9 @@
 
 package com.duckduckgo.app.privacy.db
 
-import android.arch.persistence.room.Room
-import android.support.test.InstrumentationRegistry
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.room.Room
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao.NetworkTally
@@ -25,6 +26,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 class NetworkLeaderboardDaoTest {
@@ -32,10 +34,15 @@ class NetworkLeaderboardDaoTest {
     private lateinit var db: AppDatabase
     private lateinit var dao: NetworkLeaderboardDao
 
+    @get:Rule
+    @Suppress("unused")
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
+
     @Before
     fun before() {
         db = Room
-            .inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java)
+            .inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
+            .allowMainThreadQueries()
             .build()
 
         dao = db.networkLeaderboardDao()

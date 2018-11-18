@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.feedback.db
 
-import android.arch.lifecycle.LiveData
-import android.arch.persistence.room.*
+import androidx.lifecycle.LiveData
+import androidx.room.*
 import com.duckduckgo.app.feedback.model.Survey
 
 @Dao

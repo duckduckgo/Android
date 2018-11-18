@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.feedback.model
 
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.PrimaryKey
-import android.arch.persistence.room.TypeConverter
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
 import java.io.Serializable
 
 @Entity(

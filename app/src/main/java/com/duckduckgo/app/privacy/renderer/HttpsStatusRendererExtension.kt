@@ -17,7 +17,7 @@
 package com.duckduckgo.app.privacy.renderer
 
 import android.content.Context
-import android.support.annotation.DrawableRes
+import androidx.annotation.DrawableRes
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacy.model.HttpsStatus
 

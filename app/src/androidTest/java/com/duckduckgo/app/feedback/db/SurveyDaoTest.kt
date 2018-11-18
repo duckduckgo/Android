@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.feedback.db
 
-import android.arch.persistence.room.Room
-import android.support.test.InstrumentationRegistry
+import androidx.room.Room
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.global.db.AppDatabase
 import org.junit.After
@@ -32,7 +32,7 @@ class SurveyDaoTest {
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java).build()
+        db = Room.inMemoryDatabaseBuilder(getInstrumentation().targetContext, AppDatabase::class.java).build()
         dao = db.surveyDao()
     }
 

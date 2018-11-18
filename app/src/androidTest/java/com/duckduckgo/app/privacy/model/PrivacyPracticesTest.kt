@@ -17,11 +17,9 @@
 package com.duckduckgo.app.privacy.model
 
 import com.duckduckgo.app.entities.EntityMapping
-import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.entities.db.EntityListEntity
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Practices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.GOOD
-import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.POOR
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Assert.assertEquals
@@ -32,7 +30,7 @@ import org.mockito.MockitoAnnotations.initMocks
 
 class PrivacyPracticesTest {
 
-    val entityMapping = EntityMapping()
+    private val entityMapping = EntityMapping()
 
     @Mock
     lateinit var mockTermsStore: TermsOfServiceStore
@@ -44,9 +42,11 @@ class PrivacyPracticesTest {
 
     @Test
     fun whenUrlButNoParentEntityThenStillHasScore() {
-        whenever(mockTermsStore.terms).thenReturn(listOf(
-            TermsOfService("example.com", classification = "D")
-        ))
+        whenever(mockTermsStore.terms).thenReturn(
+            listOf(
+                TermsOfService("example.com", classification = "D")
+            )
+        )
 
         val testee = PrivacyPracticesImpl(mockTermsStore, entityMapping)
 
@@ -56,18 +56,23 @@ class PrivacyPracticesTest {
 
     @Test
     fun whenUrlHasParentEntityThenItsScoreIsWorstInNetwork() {
-        whenever(mockTermsStore.terms).thenReturn(listOf(
-            TermsOfService("sibling1.com", classification = "A"),
-            TermsOfService("sibling2.com", classification = "B"),
-            TermsOfService("sibling3.com", classification = "C"),
-            TermsOfService("sibling4.com", classification = "D")
-        ))
+        whenever(mockTermsStore.terms).thenReturn(
+            listOf(
+                TermsOfService("sibling1.com", classification = "A"),
+                TermsOfService("sibling2.com", classification = "B"),
+                TermsOfService("sibling3.com", classification = "C"),
+                TermsOfService("sibling4.com", classification = "D")
+            )
+        )
 
-        entityMapping.updateEntities(listOf(
-            EntityListEntity("sibling1.com", "Network"),
-            EntityListEntity("sibling2.com", "Network"),
-            EntityListEntity("sibling3.com", "Network"),
-            EntityListEntity("sibling4.com", "Network")))
+        entityMapping.updateEntities(
+            listOf(
+                EntityListEntity("sibling1.com", "Network"),
+                EntityListEntity("sibling2.com", "Network"),
+                EntityListEntity("sibling3.com", "Network"),
+                EntityListEntity("sibling4.com", "Network")
+            )
+        )
 
         val testee = PrivacyPracticesImpl(mockTermsStore, entityMapping)
 

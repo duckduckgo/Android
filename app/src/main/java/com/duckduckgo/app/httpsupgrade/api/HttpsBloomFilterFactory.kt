@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.httpsupgrade.api
 
-import android.support.annotation.WorkerThread
+import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.httpsupgrade.BloomFilter
 import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao

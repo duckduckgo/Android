@@ -18,7 +18,7 @@ package com.duckduckgo.app.global.install
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.support.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject

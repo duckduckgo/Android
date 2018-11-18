@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.surrogates
 
-import android.support.annotation.WorkerThread
+import androidx.annotation.WorkerThread
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
 import timber.log.Timber
 import java.io.ByteArrayInputStream

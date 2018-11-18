@@ -18,7 +18,7 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.content.Context
 import android.graphics.Rect
-import android.support.v7.widget.AppCompatEditText
+import androidx.appcompat.widget.AppCompatEditText
 import android.util.AttributeSet
 import android.view.KeyEvent
 import com.duckduckgo.app.global.view.showKeyboard

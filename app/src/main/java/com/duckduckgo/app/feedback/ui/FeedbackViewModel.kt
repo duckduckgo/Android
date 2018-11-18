@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.feedback.ui
 
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.feedback.api.FeedbackSender
 import com.duckduckgo.app.global.SingleLiveEvent
 

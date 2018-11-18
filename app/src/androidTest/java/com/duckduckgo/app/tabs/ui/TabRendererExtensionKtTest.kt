@@ -16,14 +16,14 @@
 
 package com.duckduckgo.app.tabs.ui
 
-import android.support.test.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.tabs.model.TabEntity
 import org.junit.Assert.*
 import org.junit.Test
 
 class TabRendererExtensionTest {
 
-    private val context = InstrumentationRegistry.getTargetContext()
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     @Test
     fun whenTabIsBlankThenDisplayTitleIsDuckDuckGo() {

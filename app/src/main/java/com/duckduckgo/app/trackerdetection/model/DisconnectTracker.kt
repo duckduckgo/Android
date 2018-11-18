@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.trackerdetection.model
 
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.PrimaryKey
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 @Entity(tableName = "disconnect_tracker")
 data class DisconnectTracker(
