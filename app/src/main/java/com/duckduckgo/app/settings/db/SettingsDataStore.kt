@@ -30,8 +30,10 @@ interface SettingsDataStore {
     var automaticallyClearWhatOption: ClearWhatOption
     var automaticallyClearWhenOption: ClearWhenOption
     var appBackgroundedTimestamp: Long
+    var lastClearTimestamp: Long
     fun hasBackgroundTimestampRecorded(): Boolean
     fun clearAppBackgroundTimestamp()
+    fun hasLastClearTimestamp(): Boolean
 }
 
 class SettingsSharedPreferences @Inject constructor(private val context: Context) : SettingsDataStore {
@@ -64,9 +66,14 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
 
     override var appBackgroundedTimestamp: Long
         get() = preferences.getLong(KEY_APP_BACKGROUNDED_TIMESTAMP, 0)
-        set(value) = preferences.edit { putLong(KEY_APP_BACKGROUNDED_TIMESTAMP, value) }
+        set(value) = preferences.edit(commit = true) { putLong(KEY_APP_BACKGROUNDED_TIMESTAMP, value) }
+
+    override var lastClearTimestamp: Long
+        get() = preferences.getLong(KEY_LAST_CLEAR_TIMESTAMP, 0)
+        set(value) = preferences.edit(commit = true) { putLong(KEY_LAST_CLEAR_TIMESTAMP, value) }
 
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
+    override fun hasLastClearTimestamp(): Boolean = preferences.contains(KEY_LAST_CLEAR_TIMESTAMP)
     override fun clearAppBackgroundTimestamp() = preferences.edit { remove(KEY_APP_BACKGROUNDED_TIMESTAMP) }
 
 
@@ -80,5 +87,6 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         const val KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION = "AUTOMATICALLY_CLEAR_WHAT_OPTION"
         const val KEY_AUTOMATICALLY_CLEAR_WHEN_OPTION = "AUTOMATICALLY_CLEAR_WHEN_OPTION"
         const val KEY_APP_BACKGROUNDED_TIMESTAMP = "APP_BACKGROUNDED_TIMESTAMP"
+        const val KEY_LAST_CLEAR_TIMESTAMP = "LAST_CLEAR_TIMESTAMP"
     }
 }

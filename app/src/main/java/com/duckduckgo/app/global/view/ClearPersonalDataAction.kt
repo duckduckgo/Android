@@ -24,6 +24,7 @@ import androidx.annotation.UiThread
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import timber.log.Timber
 import javax.inject.Inject
@@ -32,7 +33,6 @@ interface ClearDataAction {
 
     @UiThread
     fun clearEverything(killAndRestartProcess: Boolean = false, killProcess: Boolean = false)
-
     fun clearTabs()
 }
 
@@ -40,7 +40,8 @@ class ClearPersonalDataAction @Inject constructor(
     private val context: Context,
     private val dataManager: WebDataManager,
     private val clearingStore: UnsentForgetAllPixelStore,
-    private val tabRepository: TabRepository
+    private val tabRepository: TabRepository,
+    private val settingsDataStore: SettingsDataStore
 ) : ClearDataAction {
 
     @UiThread
@@ -57,7 +58,7 @@ class ClearPersonalDataAction @Inject constructor(
             if (killAndRestartProcess) {
                 Timber.i("Restarting process")
                 FireActivity.triggerRestart(context)
-            } else if(killProcess) {
+            } else if (killProcess) {
                 Timber.i("Killing process")
                 System.exit(0)
             }
@@ -68,5 +69,6 @@ class ClearPersonalDataAction @Inject constructor(
         Timber.i("Clearing tabs")
         dataManager.clearWebViewSessions()
         tabRepository.deleteAll()
+        settingsDataStore.lastClearTimestamp = System.currentTimeMillis()
     }
 }

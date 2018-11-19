@@ -19,6 +19,7 @@ package com.duckduckgo.app.di
 import android.content.Context
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.entities.EntityMapping
+import com.duckduckgo.app.fire.AutomaticDataClearer
 import com.duckduckgo.app.fire.BackgroundTimeKeeper
 import com.duckduckgo.app.fire.DataClearerTimeKeeper
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
@@ -46,14 +47,26 @@ class PrivacyModule {
         context: Context,
         dataManager: WebDataManager,
         clearingStore: UnsentForgetAllPixelStore,
-        tabRepository: TabRepository
+        tabRepository: TabRepository,
+        settingsDataStore: SettingsDataStore
     ): ClearDataAction {
-        return ClearPersonalDataAction(context, dataManager, clearingStore, tabRepository)
+        return ClearPersonalDataAction(context, dataManager, clearingStore, tabRepository, settingsDataStore)
     }
 
     @Provides
     fun backgroundTimeKeeper(settingsDataStore: SettingsDataStore): BackgroundTimeKeeper {
         return DataClearerTimeKeeper(settingsDataStore)
+    }
+
+    @Provides
+    @Singleton
+    fun automaticDataClearer(
+        settingsDataStore: SettingsDataStore,
+        clearDataAction: ClearDataAction,
+        dataClearerTimeKeeper: BackgroundTimeKeeper,
+        context: Context
+    ): AutomaticDataClearer {
+        return AutomaticDataClearer(settingsDataStore, clearDataAction, dataClearerTimeKeeper, context)
     }
 
 }

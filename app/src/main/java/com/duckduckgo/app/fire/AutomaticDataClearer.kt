@@ -16,6 +16,9 @@
 
 package com.duckduckgo.app.fire
 
+import android.content.Context
+import android.os.Handler
+import androidx.core.os.postDelayed
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -24,17 +27,21 @@ import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment.ClearW
 import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import timber.log.Timber
-import javax.inject.Inject
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 
-class AutomaticDataClearer @Inject constructor(
+class AutomaticDataClearer(
     private val settingsDataStore: SettingsDataStore,
     private val clearDataAction: ClearDataAction,
-    private val dataClearerTimeKeeper: BackgroundTimeKeeper
+    private val dataClearerTimeKeeper: BackgroundTimeKeeper,
+    private val context: Context
 ) : LifecycleObserver {
 
     private var isFreshAppLaunch = false
+    var willClearData: Boolean = false
 
+    private var timer: Timer? = null
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun onAppCreated() {
@@ -43,7 +50,11 @@ class AutomaticDataClearer @Inject constructor(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onAppForegrounded() {
+
         Timber.i("onAppForegrounded; is from fresh app launch? $isFreshAppLaunch")
+
+        timer?.cancel()
+        timer = null
 
         val clearWhat = settingsDataStore.automaticallyClearWhatOption
         val clearWhen = settingsDataStore.automaticallyClearWhenOption
@@ -51,9 +62,13 @@ class AutomaticDataClearer @Inject constructor(
         Timber.d("Currently configured to automatically clear $clearWhat")
         if (clearWhat != ClearWhatOption.CLEAR_NONE) {
             if (shouldClearData(clearWhen)) {
-                clearData(clearWhat, restartProcess = !isFreshAppLaunch)
+
+                willClearData = true
+
+                clearData(clearWhat, appInBackground = false)
             } else {
                 Timber.d("Will not clear data at this time")
+                willClearData = false
             }
         }
 
@@ -65,25 +80,71 @@ class AutomaticDataClearer @Inject constructor(
     fun onAppBackgrounded() {
         Timber.i("Recording when app backgrounded")
         settingsDataStore.appBackgroundedTimestamp = System.currentTimeMillis()
+
+        val clearWhenOption = settingsDataStore.automaticallyClearWhenOption
+        val clearWhatOption = settingsDataStore.automaticallyClearWhatOption
+
+        if(clearWhatOption == ClearWhatOption.CLEAR_NONE || clearWhenOption == ClearWhenOption.APP_EXIT_ONLY) {
+            Timber.i("No background timer required for current configuration: $clearWhatOption / $clearWhenOption")
+        } else {
+            scheduleBackgroundTimerToTriggerClear(clearWhenOption.durationMillis)
+        }
     }
 
-    fun clearData(clearWhat: ClearWhatOption, restartProcess: Boolean) {
+    private fun scheduleBackgroundTimerToTriggerClear(durationMillis: Long) {
+        Timber.i("Scheduling background timer, ${durationMillis}ms from now, to clear data if the user hasn't returned to the app")
+        timer = Timer()
+        timer?.schedule(object : TimerTask() {
+            override fun run() {
+                Timber.i("BG timeout reached")
+                val clearWhat = settingsDataStore.automaticallyClearWhatOption
+                willClearData = true
+                clearData(clearWhat, appInBackground = true)
+            }
+        }, durationMillis)
+    }
+
+    fun clearData(clearWhat: ClearWhatOption, appInBackground: Boolean) {
         Timber.i("Clearing data: $clearWhat")
 
         when (clearWhat) {
             ClearWhatOption.CLEAR_NONE -> Timber.w("Automatically clear data invoked, but set to clear nothing")
-            ClearWhatOption.CLEAR_TABS_ONLY -> clearDataAction.clearTabs()
-            ClearWhatOption.CLEAR_TABS_AND_DATA -> clearDataAction.clearEverything(restartProcess)
+            ClearWhatOption.CLEAR_TABS_ONLY -> {
+                clearDataAction.clearTabs()
+                willClearData = false
+            }
+            ClearWhatOption.CLEAR_TABS_AND_DATA -> {
+                if (appInBackground) {
+                    Timber.w("App is in background, so just outright killing it")
+                    clearDataAction.clearEverything(killProcess = true)
+                } else {
+                    val processNeedsRestarted = !isFreshAppLaunch
+                    Timber.i("App is in foreground; restart needed? $processNeedsRestarted")
+
+                    Handler().postDelayed(300) {
+                        Timber.i("Clearing now")
+                        clearDataAction.clearEverything(killAndRestartProcess = processNeedsRestarted)
+                    }
+                }
+            }
         }
     }
 
     private fun shouldClearData(cleanWhenOption: ClearWhenOption): Boolean {
-        if (isFreshAppLaunch) return true
-
+        if (isFreshAppLaunch && timeSinceLastClearEnough()) return true
         if (cleanWhenOption == ClearWhenOption.APP_EXIT_ONLY) return false
-
         return dataClearerTimeKeeper.hasEnoughTimeElapsed()
 
     }
 
+    private fun timeSinceLastClearEnough(): Boolean {
+        if (!settingsDataStore.hasLastClearTimestamp()) {
+            Timber.d("Not last clear timestamp available")
+            return true
+        }
+        val lastClear = settingsDataStore.lastClearTimestamp
+        val lastClearDuration = (System.currentTimeMillis() - lastClear)
+        Timber.d("Last cleared ${lastClearDuration}ms ago")
+        return lastClearDuration >= TimeUnit.SECONDS.toMillis(5)
+    }
 }
