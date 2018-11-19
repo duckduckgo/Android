@@ -17,12 +17,10 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
+import androidx.work.WorkerFactory
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.entities.EntityMapping
-import com.duckduckgo.app.fire.AutomaticDataClearer
-import com.duckduckgo.app.fire.BackgroundTimeKeeper
-import com.duckduckgo.app.fire.DataClearerTimeKeeper
-import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
+import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.privacy.model.PrivacyPractices
@@ -63,10 +61,14 @@ class PrivacyModule {
     fun automaticDataClearer(
         settingsDataStore: SettingsDataStore,
         clearDataAction: ClearDataAction,
-        dataClearerTimeKeeper: BackgroundTimeKeeper,
-        context: Context
+        dataClearerTimeKeeper: BackgroundTimeKeeper
     ): AutomaticDataClearer {
-        return AutomaticDataClearer(settingsDataStore, clearDataAction, dataClearerTimeKeeper, context)
+        return AutomaticDataClearer(settingsDataStore, clearDataAction, dataClearerTimeKeeper)
     }
 
+    @Provides
+    @Singleton
+    fun workerFactory(settingsDataStore: SettingsDataStore, clearDataAction: ClearDataAction): WorkerFactory {
+        return DaggerWorkerFactory(settingsDataStore, clearDataAction)
+    }
 }

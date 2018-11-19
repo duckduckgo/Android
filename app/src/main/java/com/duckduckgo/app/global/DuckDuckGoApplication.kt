@@ -25,6 +25,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.work.Configuration
+import androidx.work.WorkManager
+import androidx.work.WorkerFactory
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.DaggerAppComponent
@@ -106,6 +109,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     @Inject
     lateinit var automaticDataClearer: AutomaticDataClearer
 
+    @Inject
+    lateinit var  workerFactory: WorkerFactory
+
     private var launchedByFireAction: Boolean = false
 
     open lateinit var daggerAppComponent: AppComponent
@@ -119,6 +125,8 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         configureDependencyInjection()
 
         if (appIsRestarting()) return
+
+        configureWorkManager()
 
         ProcessLifecycleOwner.get().lifecycle.also {
             it.addObserver(this)
@@ -140,6 +148,14 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
         initializeHttpsUpgrader()
         submitUnsentFirePixels()
+    }
+
+    private fun configureWorkManager() {
+        val config = Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
+
+        WorkManager.initialize(this, config)
     }
 
     private fun recordInstallationTimestamp() {

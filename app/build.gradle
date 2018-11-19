@@ -86,6 +86,7 @@ ext {
     constraintLayout = "2.0.0-alpha2"
     lifecycle = "2.0.0"
     room = "2.1.0-alpha02"
+    workManager = "1.0.0-alpha11"
 
     dagger = "2.18"
     retrofit = "2.3.0"
@@ -143,6 +144,9 @@ dependencies {
     kapt "androidx.room:room-compiler:$room"
     testImplementation "androidx.room:room-testing:$room"
     androidTestImplementation "androidx.room:room-testing:$room"
+
+    // WorkManager
+    implementation "android.arch.work:work-runtime-ktx:$workManager"
 
     // Dagger
     kapt "com.google.dagger:dagger-android-processor:$dagger"
