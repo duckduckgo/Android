@@ -121,7 +121,7 @@ abstract class AppDatabase : RoomDatabase() {
 
         val MIGRATION_6_TO_7: Migration = object : Migration(6, 7) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("CREATE TABLE IF NOT EXISTS `survey` (`surveyId` TEXT NOT NULL, `url` TEXT, `installationDay` INTEGER, `status` TEXT NOT NULL, PRIMARY KEY(`surveyId`))")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `survey` (`surveyId` TEXT NOT NULL, `url` TEXT, `daysInstalled` INTEGER, `status` TEXT NOT NULL, PRIMARY KEY(`surveyId`))")
             }
         }
     }

@@ -51,7 +51,7 @@ import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.global.install.daysSinceInstallation
+import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
@@ -68,7 +68,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
-import kotlin.concurrent.thread
 
 class BrowserTabViewModel(
     private val statisticsUpdater: StatisticsUpdater,
@@ -658,7 +657,8 @@ class BrowserTabViewModel(
         }
 
         val showOnDay = survey.installationDay?.toLong()
-        if (showOnDay == null || showOnDay == appInstallStore.daysSinceInstallation() - 1) {
+        val daysInstalled = appInstallStore.daysInstalled()
+        if (showOnDay == null || showOnDay == daysInstalled) {
             command.value = DisplaySurveyCta
             currentSurvey = survey
         }
@@ -673,7 +673,7 @@ class BrowserTabViewModel(
     fun onUserDismissedSurvey() {
         command.value = HideSurveyCta
         currentSurvey = null
-        thread {
+        Schedulers.io().scheduleDirect {
             surveyDao.cancelScheduledSurveys()
         }
     }

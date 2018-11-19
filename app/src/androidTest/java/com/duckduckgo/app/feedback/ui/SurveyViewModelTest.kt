@@ -25,6 +25,7 @@ import com.duckduckgo.app.feedback.model.Survey.Status.DONE
 import com.duckduckgo.app.feedback.model.Survey.Status.SCHEDULED
 import com.duckduckgo.app.feedback.ui.SurveyViewModel.Command
 import com.nhaarman.mockito_kotlin.*
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -52,6 +53,11 @@ class SurveyViewModelTest {
         MockitoAnnotations.initMocks(this)
         testee = SurveyViewModel(mockSurveyDao)
         testee.command.observeForever(mockCommandObserver)
+    }
+
+    @After
+    fun after() {
+        testee.command.removeObserver(mockCommandObserver)
     }
 
     @Test

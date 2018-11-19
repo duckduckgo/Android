@@ -30,7 +30,7 @@ interface AppInstallStore {
     fun hasInstallTimestampRecorded(): Boolean
 }
 
-fun AppInstallStore.daysSinceInstallation(): Long {
+fun AppInstallStore.daysInstalled(): Long {
     return TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - installTimestamp)
 }
 
