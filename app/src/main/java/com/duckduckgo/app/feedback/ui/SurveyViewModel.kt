@@ -20,7 +20,7 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.feedback.db.SurveyDao
 import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.global.SingleLiveEvent
-import kotlin.concurrent.thread
+import io.reactivex.schedulers.Schedulers
 
 
 class SurveyViewModel(private val surveyDao: SurveyDao) : ViewModel() {
@@ -41,7 +41,7 @@ class SurveyViewModel(private val surveyDao: SurveyDao) : ViewModel() {
 
     fun onSurveyCompleted() {
         survey.status = Survey.Status.DONE
-        thread {
+        Schedulers.io().scheduleDirect {
             surveyDao.update(survey)
         }
         command.value = Command.Close
