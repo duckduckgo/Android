@@ -656,7 +656,7 @@ class BrowserTabViewModel(
             return
         }
 
-        val showOnDay = survey.installationDay?.toLong()
+        val showOnDay = survey.daysInstalled?.toLong()
         val daysInstalled = appInstallStore.daysInstalled()
         if (showOnDay == null || showOnDay == daysInstalled) {
             command.value = DisplaySurveyCta

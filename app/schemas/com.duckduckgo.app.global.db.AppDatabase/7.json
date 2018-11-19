@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "a91300a083d03fc5d4546e1331ae8f3a",
+    "identityHash": "afbc470cd9c23ee98e8bf02083afeb07",
     "entities": [
       {
         "tableName": "disconnect_tracker",
@@ -333,7 +333,7 @@
       },
       {
         "tableName": "survey",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`surveyId` TEXT NOT NULL, `url` TEXT, `installationDay` INTEGER, `status` TEXT NOT NULL, PRIMARY KEY(`surveyId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`surveyId` TEXT NOT NULL, `url` TEXT, `daysInstalled` INTEGER, `status` TEXT NOT NULL, PRIMARY KEY(`surveyId`))",
         "fields": [
           {
             "fieldPath": "surveyId",
@@ -348,8 +348,8 @@
             "notNull": false
           },
           {
-            "fieldPath": "installationDay",
-            "columnName": "installationDay",
+            "fieldPath": "daysInstalled",
+            "columnName": "daysInstalled",
             "affinity": "INTEGER",
             "notNull": false
           },
@@ -370,9 +370,10 @@
         "foreignKeys": []
       }
     ],
+    "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"a91300a083d03fc5d4546e1331ae8f3a\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"afbc470cd9c23ee98e8bf02083afeb07\")"
     ]
   }
 }

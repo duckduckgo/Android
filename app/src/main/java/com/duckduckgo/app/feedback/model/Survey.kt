@@ -27,7 +27,7 @@ import java.io.Serializable
 data class Survey(
     @PrimaryKey val surveyId: String,
     val url: String?,
-    val installationDay: Int?,
+    val daysInstalled: Int?,
     var status: Status
 ) : Serializable {
     enum class Status {
