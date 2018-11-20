@@ -18,14 +18,16 @@ package com.duckduckgo.app.fire
 
 import android.content.Context
 import android.os.Handler
+import androidx.annotation.AnyThread
+import androidx.annotation.UiThread
+import androidx.annotation.WorkerThread
 import androidx.core.os.postDelayed
-import androidx.work.ListenableWorker
 import androidx.work.Worker
-import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import org.jetbrains.anko.runOnUiThread
 import timber.log.Timber
 
 
@@ -37,60 +39,48 @@ class DataClearingWorker(
     lateinit var settingsDataStore: SettingsDataStore
     lateinit var clearDataAction: ClearDataAction
 
-
+    @WorkerThread
     override fun doWork(): Result {
         Timber.i("Doing work")
         clearData(settingsDataStore.automaticallyClearWhatOption, appInBackground = true)
         return Result.SUCCESS
     }
 
+    @AnyThread
     fun clearData(clearWhat: SettingsAutomaticallyClearWhatFragment.ClearWhatOption, appInBackground: Boolean) {
         Timber.i("Clearing data: $clearWhat")
 
         when (clearWhat) {
             SettingsAutomaticallyClearWhatFragment.ClearWhatOption.CLEAR_NONE -> Timber.w("Automatically clear data invoked, but set to clear nothing")
             SettingsAutomaticallyClearWhatFragment.ClearWhatOption.CLEAR_TABS_ONLY -> {
-                clearDataAction.clearTabs()
+                clearTabs(appInBackground)
             }
             SettingsAutomaticallyClearWhatFragment.ClearWhatOption.CLEAR_TABS_AND_DATA -> {
-                if (appInBackground) {
-                    Timber.w("App is in background, so just outright killing it")
-                    clearDataAction.clearEverything(killProcess = true)
-                } else {
-                    val processNeedsRestarted = true
-                    Timber.i("App is in foreground; restart needed? $processNeedsRestarted")
-
-                    Handler().postDelayed(300) {
-                        Timber.i("Clearing now")
-                        clearDataAction.clearEverything(killAndRestartProcess = processNeedsRestarted)
-                    }
+                applicationContext.runOnUiThread {
+                    clearTabsAndData(appInBackground)
                 }
             }
         }
     }
 
+    private fun clearTabs(appInBackground: Boolean) {
+        clearDataAction.clearTabs(appInForeground = !appInBackground)
+    }
 
-}
+    @UiThread
+    private fun clearTabsAndData(appInBackground: Boolean) {
+        if (appInBackground) {
+            Timber.w("App is in background, so just outright killing it")
+            clearDataAction.clearTabsAndAllData(killProcess = true, appInForeground = !appInBackground)
+        } else {
+            val processNeedsRestarted = true
+            Timber.i("App is in foreground; ${!appInBackground}. restart needed? $processNeedsRestarted")
 
-class DaggerWorkerFactory(private val settingsDataStore: SettingsDataStore, private val clearDataAction: ClearDataAction) : WorkerFactory() {
-
-    override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
-
-        val workerKlass = Class.forName(workerClassName).asSubclass(Worker::class.java)
-        val constructor = workerKlass.getDeclaredConstructor(Context::class.java, WorkerParameters::class.java)
-
-        val instance = constructor.newInstance(appContext, workerParameters)
-
-        when (instance) {
-            is DataClearingWorker -> {
-                instance.settingsDataStore = settingsDataStore
-                instance.clearDataAction = clearDataAction
-            }
-            else -> {
-                Timber.i("No injection required for worker workerClassName")
+            Handler().postDelayed(300) {
+                Timber.i("Clearing now")
+                clearDataAction.clearTabsAndAllData(killAndRestartProcess = processNeedsRestarted, appInForeground = !appInBackground)
             }
         }
-
-        return instance
     }
 }
+

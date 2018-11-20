@@ -32,8 +32,8 @@ import javax.inject.Inject
 interface ClearDataAction {
 
     @UiThread
-    fun clearEverything(killAndRestartProcess: Boolean = false, killProcess: Boolean = false)
-    fun clearTabs()
+    fun clearTabsAndAllData(killAndRestartProcess: Boolean = false, killProcess: Boolean = false, appInForeground: Boolean)
+    fun clearTabs(appInForeground: Boolean)
 }
 
 class ClearPersonalDataAction @Inject constructor(
@@ -45,11 +45,12 @@ class ClearPersonalDataAction @Inject constructor(
 ) : ClearDataAction {
 
     @UiThread
-    override fun clearEverything(killAndRestartProcess: Boolean, killProcess: Boolean) {
-        Timber.i("Clearing everything; will restart process? $killAndRestartProcess will kill process? $killProcess")
-
+    override fun clearTabsAndAllData(killAndRestartProcess: Boolean, killProcess: Boolean, appInForeground: Boolean) {
         val startTime = System.currentTimeMillis()
-        clearTabs()
+
+        Timber.i("Clearing tabs and data; {restart process = $killAndRestartProcess} {kill process = $killProcess}")
+
+        clearTabs(appInForeground)
         clearingStore.incrementCount()
         dataManager.clearData(WebView(context), WebStorage.getInstance(), context)
         dataManager.clearExternalCookies(CookieManager.getInstance()) {
@@ -65,10 +66,14 @@ class ClearPersonalDataAction @Inject constructor(
         }
     }
 
-    override fun clearTabs() {
+    override fun clearTabs(appInForeground: Boolean) {
         Timber.i("Clearing tabs")
+
+        val startTime = System.currentTimeMillis()
         dataManager.clearWebViewSessions()
         tabRepository.deleteAll()
-        settingsDataStore.lastClearTimestamp = System.currentTimeMillis()
+        settingsDataStore.appUsedSinceLastClear = appInForeground
+
+        Timber.i("Finished clearing tabs; took ${System.currentTimeMillis() - startTime}ms.")
     }
 }

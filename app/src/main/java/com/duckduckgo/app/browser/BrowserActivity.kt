@@ -110,7 +110,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
-            clearPersonalDataAction.clearEverything(killAndRestartProcess = true)
+            clearPersonalDataAction.clearTabsAndAllData(killAndRestartProcess = true, appInForeground = true)
             return
         }
 
