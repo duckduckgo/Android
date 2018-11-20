@@ -39,6 +39,10 @@ class SurveyViewModel(private val surveyDao: SurveyDao) : ViewModel() {
         command.value = Command.LoadSurvey(url)
     }
 
+    private fun addParametersToUrl() {
+
+    }
+
     fun onSurveyCompleted() {
         survey.status = Survey.Status.DONE
         Schedulers.io().scheduleDirect {
