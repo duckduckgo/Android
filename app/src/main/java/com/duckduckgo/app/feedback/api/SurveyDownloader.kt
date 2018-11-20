@@ -53,11 +53,11 @@ class SurveyDownloader @Inject constructor(
             }
 
             if (surveyDao.exists(surveyGroup.id)) {
-                Timber.d("Survey received is already in db, ignoring")
+                Timber.d("Survey received already in db, ignoring")
                 return@fromAction
             }
 
-            Timber.d("New survey received, canceling any old scheduled surveys")
+            Timber.d("New survey received replaces any previous scheduled surveys")
             surveyDao.cancelScheduledSurveys()
             val surveyOption = determineOption(surveyGroup.surveyOptions) ?: return@fromAction
             val newSurvey = Survey(surveyGroup.id, surveyOption.url, surveyOption.installationDay, Survey.Status.SCHEDULED)

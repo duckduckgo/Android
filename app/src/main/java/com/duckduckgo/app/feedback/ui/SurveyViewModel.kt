@@ -16,14 +16,24 @@
 
 package com.duckduckgo.app.feedback.ui
 
+import android.os.Build
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
+import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.feedback.db.SurveyDao
 import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.global.install.daysInstalled
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import io.reactivex.schedulers.Schedulers
 
 
-class SurveyViewModel(private val surveyDao: SurveyDao) : ViewModel() {
+class SurveyViewModel(
+    private val surveyDao: SurveyDao,
+    private val statisticsStore: StatisticsDataStore,
+    private val appInstallStore: AppInstallStore
+) : ViewModel() {
 
     sealed class Command {
         class LoadSurvey(val url: String) : Command()
@@ -36,11 +46,21 @@ class SurveyViewModel(private val surveyDao: SurveyDao) : ViewModel() {
     fun start(survey: Survey) {
         val url = survey.url ?: return
         this.survey = survey
-        command.value = Command.LoadSurvey(url)
+        command.value = Command.LoadSurvey(addSurveyParameters(url))
     }
 
-    private fun addParametersToUrl() {
-
+    private fun addSurveyParameters(url: String): String {
+        return url.toUri()
+            .buildUpon()
+            .appendQueryParameter(SurveyParams.ATB, statisticsStore.atb?.version ?: "")
+            .appendQueryParameter(SurveyParams.ATB_VARIANT, statisticsStore.variant)
+            .appendQueryParameter(SurveyParams.DAYS_INSTALLED, "${appInstallStore.daysInstalled()}")
+            .appendQueryParameter(SurveyParams.ANDROID_VERSION, "${Build.VERSION.SDK_INT}")
+            .appendQueryParameter(SurveyParams.APP_VERSION, BuildConfig.VERSION_NAME)
+            .appendQueryParameter(SurveyParams.MANUFACTURER, Build.MANUFACTURER)
+            .appendQueryParameter(SurveyParams.MODEL, Build.MODEL)
+            .build()
+            .toString()
     }
 
     fun onSurveyCompleted() {
@@ -53,5 +73,15 @@ class SurveyViewModel(private val surveyDao: SurveyDao) : ViewModel() {
 
     fun onSurveyDismissed() {
         command.value = Command.Close
+    }
+
+    private object SurveyParams {
+        const val ATB = "atb"
+        const val ATB_VARIANT = "var"
+        const val DAYS_INSTALLED = "delta"
+        const val ANDROID_VERSION = "av"
+        const val APP_VERSION = "ddgv"
+        const val MANUFACTURER = "man"
+        const val MODEL = "model"
     }
 }

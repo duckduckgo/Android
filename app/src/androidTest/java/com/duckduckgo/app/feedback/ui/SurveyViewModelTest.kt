@@ -24,6 +24,8 @@ import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.feedback.model.Survey.Status.DONE
 import com.duckduckgo.app.feedback.model.Survey.Status.SCHEDULED
 import com.duckduckgo.app.feedback.ui.SurveyViewModel.Command
+import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockito_kotlin.*
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -46,12 +48,16 @@ class SurveyViewModelTest {
 
     private var mockSurveyDao: SurveyDao = mock()
 
+    private var mockAppInstallStore: AppInstallStore = mock()
+
+    private var mockStatisticsStore: StatisticsDataStore = mock()
+
     private lateinit var testee: SurveyViewModel
 
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        testee = SurveyViewModel(mockSurveyDao)
+        testee = SurveyViewModel(mockSurveyDao, mockStatisticsStore, mockAppInstallStore)
         testee.command.observeForever(mockCommandObserver)
     }
 

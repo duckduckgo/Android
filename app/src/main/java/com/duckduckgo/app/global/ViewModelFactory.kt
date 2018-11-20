@@ -48,6 +48,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel
 import javax.inject.Inject
@@ -56,6 +57,7 @@ import javax.inject.Inject
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory @Inject constructor(
     private val statisticsUpdater: StatisticsUpdater,
+    private val statisticsStore: StatisticsDataStore,
     private val onboaringStore: OnboardingStore,
     private val appInstallStore: AppInstallStore,
     private val queryUrlConverter: QueryUrlConverter,
@@ -98,7 +100,7 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                 isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
                 isAssignableFrom(FeedbackViewModel::class.java) -> FeedbackViewModel(feedbackSender)
-                isAssignableFrom(SurveyViewModel::class.java) -> SurveyViewModel(surveyDao)
+                isAssignableFrom(SurveyViewModel::class.java) -> SurveyViewModel(surveyDao, statisticsStore, appInstallStore)
                 isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(
                     appSettingsPreferencesStore,
                     defaultBrowserDetector,
