@@ -16,23 +16,29 @@
 
 package com.duckduckgo.app.feedback.ui
 
+import android.os.Build
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.core.net.toUri
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.feedback.db.SurveyDao
 import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.feedback.model.Survey.Status.DONE
 import com.duckduckgo.app.feedback.model.Survey.Status.SCHEDULED
 import com.duckduckgo.app.feedback.ui.SurveyViewModel.Command
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockito_kotlin.*
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.MockitoAnnotations
+import java.util.concurrent.TimeUnit
 
 class SurveyViewModelTest {
 
@@ -73,7 +79,27 @@ class SurveyViewModelTest {
 
         testee.start(Survey("", url, null, SCHEDULED))
         verify(mockCommandObserver).onChanged(captor.capture())
-        assertEquals(url, captor.lastValue.url)
+        assertTrue(captor.lastValue.url.contains(url))
+    }
+
+    @Test
+    fun whenSurveyUrlStartedThenParametersAdded() {
+        whenever(mockStatisticsStore.atb).thenReturn(Atb("123"))
+        whenever(mockStatisticsStore.variant).thenReturn("abc")
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
+
+        val captor = argumentCaptor<Command.LoadSurvey>()
+        testee.start(Survey("", "https://survey.com", null, SCHEDULED))
+        verify(mockCommandObserver).onChanged(captor.capture())
+        val loadedUri = captor.lastValue.url.toUri()
+
+        assertEquals("123", loadedUri.getQueryParameter("atb"))
+        assertEquals("abc", loadedUri.getQueryParameter("var"))
+        assertEquals("2", loadedUri.getQueryParameter("delta"))
+        assertEquals("${Build.VERSION.SDK_INT}", loadedUri.getQueryParameter("av"))
+        assertEquals("${BuildConfig.VERSION_NAME}", loadedUri.getQueryParameter("ddgv"))
+        assertEquals("${Build.MANUFACTURER}", loadedUri.getQueryParameter("man"))
+        assertEquals("${Build.MODEL}", loadedUri.getQueryParameter("model"))
     }
 
     @Test
