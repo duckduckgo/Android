@@ -37,11 +37,14 @@ class SurveyViewModel(
 
     sealed class Command {
         class LoadSurvey(val url: String) : Command()
+        object ShowError : Command()
+        object ShowSurvey : Command()
         object Close : Command()
     }
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
     private lateinit var survey: Survey
+    private var didError = false
 
     fun start(survey: Survey) {
         val url = survey.url ?: return
@@ -61,6 +64,17 @@ class SurveyViewModel(
             .appendQueryParameter(SurveyParams.MODEL, Build.MODEL)
             .build()
             .toString()
+    }
+
+    fun onSurveyFailedToLoad() {
+        didError = true
+        command.value = Command.ShowError
+    }
+
+    fun onSurveyLoaded() {
+        if (!didError) {
+            command.value = Command.ShowSurvey
+        }
     }
 
     fun onSurveyCompleted() {

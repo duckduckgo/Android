@@ -83,7 +83,7 @@ class SurveyViewModelTest {
     }
 
     @Test
-    fun whenSurveyUrlStartedThenParametersAdded() {
+    fun whenSurveyStartedThenParametersAddedToUrl() {
         whenever(mockStatisticsStore.atb).thenReturn(Atb("123"))
         whenever(mockStatisticsStore.variant).thenReturn("abc")
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
@@ -100,6 +100,18 @@ class SurveyViewModelTest {
         assertEquals("${BuildConfig.VERSION_NAME}", loadedUri.getQueryParameter("ddgv"))
         assertEquals("${Build.MANUFACTURER}", loadedUri.getQueryParameter("man"))
         assertEquals("${Build.MODEL}", loadedUri.getQueryParameter("model"))
+    }
+
+    @Test
+    fun whenSurveyFailsToLoadThenErrorShown() {
+        testee.onSurveyFailedToLoad()
+        verify(mockCommandObserver).onChanged(Command.ShowError)
+    }
+
+    @Test
+    fun whenSurveyLoadedThenSurveyIsShown() {
+        testee.onSurveyLoaded()
+        verify(mockCommandObserver).onChanged(Command.ShowSurvey)
     }
 
     @Test

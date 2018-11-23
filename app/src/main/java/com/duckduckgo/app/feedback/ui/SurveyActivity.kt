@@ -20,10 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.*
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
@@ -32,6 +29,8 @@ import com.duckduckgo.app.feedback.ui.SurveyViewModel.Command
 import com.duckduckgo.app.feedback.ui.SurveyViewModel.Command.Close
 import com.duckduckgo.app.feedback.ui.SurveyViewModel.Command.LoadSurvey
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.view.gone
+import com.duckduckgo.app.global.view.show
 import kotlinx.android.synthetic.main.activity_user_survey.*
 
 
@@ -47,7 +46,7 @@ class SurveyActivity : DuckDuckGoActivity() {
 
         webView.settings.javaScriptEnabled = true
         webView.setBackgroundColor(ContextCompat.getColor(this, R.color.cornflowerBlue))
-        webView.webViewClient = SurveyWebChromeClient()
+        webView.webViewClient = SurveyWebViewClient()
 
         if (savedInstanceState == null) {
             configureObservers()
@@ -75,8 +74,24 @@ class SurveyActivity : DuckDuckGoActivity() {
     private fun processCommand(command: Command) {
         when (command) {
             is LoadSurvey -> webView.loadUrl(command.url)
+            is Command.ShowSurvey -> {
+                showSurvey()
+            }
+            is Command.ShowError -> {
+                showError()
+            }
             is Close -> finish()
         }
+    }
+
+    private fun showSurvey() {
+        progress.gone()
+        webView.show()
+    }
+
+    private fun showError() {
+        progress.gone()
+        errorView.show()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -100,7 +115,12 @@ class SurveyActivity : DuckDuckGoActivity() {
         const val SURVEY_EXTRA = "SURVEY_EXTRA"
     }
 
-    inner class SurveyWebChromeClient : WebViewClient() {
+    inner class SurveyWebViewClient : WebViewClient() {
+
+        override fun onPageFinished(view: WebView?, url: String?) {
+            super.onPageFinished(view, url)
+            viewModel.onSurveyLoaded()
+        }
 
         override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
             if (request.isForMainFrame && request.url.host == "www.duckduckgo.com") {
@@ -110,8 +130,9 @@ class SurveyActivity : DuckDuckGoActivity() {
             }
             return null
         }
+
+        override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
+            viewModel.onSurveyFailedToLoad()
+        }
     }
-
 }
-
-
