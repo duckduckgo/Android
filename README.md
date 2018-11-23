@@ -9,6 +9,15 @@ Are you a talented cross-platform mobile developer? We are looking for a Senior 
 
 Contact us at https://duckduckgo.com/feedback if you have feedback, questions or want to chat.
 
+## Building the Project
+We use git submodules and so when you are checking out the app, you'll need to ensure the submodules are initialized properly. You can use the `--recursive` flag when cloning the project to do this.
+
+    git clone --recursive https://github.com/duckduckgo/android.git
+
+Alternatively, if you already have the project checked out, you can initialize the submodules manually.
+
+    git submodule update --init
+
 ## Reporting Bugs
 
 We want our app to be as stable as possible thus your bug reports are immensely valuable. When reporting bugs let us know the:
