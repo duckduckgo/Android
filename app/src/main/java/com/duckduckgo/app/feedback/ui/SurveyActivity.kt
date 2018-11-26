@@ -131,8 +131,15 @@ class SurveyActivity : DuckDuckGoActivity() {
             return null
         }
 
-        override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
+        @Suppress("OverridingDeprecatedMember")
+        override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
             viewModel.onSurveyFailedToLoad()
+        }
+
+        override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+            if (request.isForMainFrame) {
+                viewModel.onSurveyFailedToLoad()
+            }
         }
     }
 }
