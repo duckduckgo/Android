@@ -20,6 +20,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
+import timber.log.Timber
 import javax.inject.Singleton
 
 @Dao
@@ -64,6 +65,7 @@ abstract class TabsDao {
 
     @Transaction
     open fun addAndSelectTab(tab: TabEntity) {
+        Timber.i("addAndSelectTab: $tab")
         deleteBlankTabs()
         insertTab(tab)
         insertTabSelection(TabSelectionEntity(tabId = tab.tabId))

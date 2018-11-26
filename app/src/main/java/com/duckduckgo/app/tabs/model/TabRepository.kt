@@ -29,11 +29,11 @@ interface TabRepository {
     /**
      * @return tabId of new record
      */
-    fun add(url: String? = null): String
+    fun add(url: String? = null, isDefaultTab: Boolean = false): String
 
     fun addNewTabAfterExistingTab(url: String? = null, tabId: String)
 
-    fun add(tabId: String, data: MutableLiveData<Site>)
+    fun add(tabId: String, data: MutableLiveData<Site>, isDefaultTab: Boolean = false)
 
     fun update(tabId: String, site: Site?)
 

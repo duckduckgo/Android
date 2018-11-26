@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.fire
 
-import android.os.Handler
-import androidx.core.os.postDelayed
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -27,52 +25,58 @@ import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment.ClearWhatOption
 import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import kotlinx.coroutines.*
 import timber.log.Timber
-import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.CoroutineContext
 
+interface DataClearListener {
+    fun onNoClearRequired()
+    fun onClearFinished()
+}
 
 class AutomaticDataClearer(
     private val settingsDataStore: SettingsDataStore,
     private val clearDataAction: ClearDataAction,
     private val dataClearerTimeKeeper: BackgroundTimeKeeper
-) : LifecycleObserver {
+) : LifecycleObserver, CoroutineScope {
 
-    private var isFreshAppLaunch = false
-    private var backgroundJobId: UUID? = null
+    private val clearJob: Job = Job()
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun onAppCreated() {
-        isFreshAppLaunch = true
-    }
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main + clearJob
+
+    var isFreshAppLaunch = true
+    var listener: DataClearListener? = null
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onAppForegrounded() {
 
         Timber.i("onAppForegrounded; is from fresh app launch? $isFreshAppLaunch")
 
-        Timber.i("Existing background job id: $backgroundJobId")
+        WorkManager.getInstance().cancelAllWorkByTag(DataClearingWorker.WORK_REQUEST_TAG)
 
-        backgroundJobId?.let {
-            Timber.i("Cancelling background job with ID $it")
-            WorkManager.getInstance().cancelWorkById(it)
-        }
+        val appUsedSinceLastClear = settingsDataStore.appUsedSinceLastClear
+        settingsDataStore.appUsedSinceLastClear = true
 
         val clearWhat = settingsDataStore.automaticallyClearWhatOption
         val clearWhen = settingsDataStore.automaticallyClearWhenOption
-
         Timber.i("Currently configured to automatically clear $clearWhat / $clearWhen")
-        if (clearWhat != ClearWhatOption.CLEAR_NONE) {
-            if (shouldClearData(clearWhen)) {
+
+        if (clearWhat == ClearWhatOption.CLEAR_NONE) {
+            Timber.i("No data will be cleared as it's configured to clear nothing automatically")
+            listener?.onNoClearRequired()
+        } else {
+            if (shouldClearData(clearWhen, appUsedSinceLastClear)) {
                 Timber.i("Decided data should be cleared")
                 clearDataWhenAppInForeground(clearWhat)
             } else {
                 Timber.i("Decided not to clear data at this time")
+                listener?.onNoClearRequired()
             }
         }
 
         isFreshAppLaunch = false
-        settingsDataStore.appUsedSinceLastClear = true
         settingsDataStore.clearAppBackgroundTimestamp()
     }
 
@@ -92,41 +96,58 @@ class AutomaticDataClearer(
     }
 
     private fun scheduleBackgroundTimerToTriggerClear(durationMillis: Long) {
-        Timber.i("Scheduling background timer, ${durationMillis}ms from now, to clear data if the user hasn't returned to the app")
-
         WorkManager.getInstance().also {
             val workRequest = OneTimeWorkRequestBuilder<DataClearingWorker>()
                 .setInitialDelay(durationMillis, TimeUnit.MILLISECONDS)
+                .addTag(DataClearingWorker.WORK_REQUEST_TAG)
                 .build()
-            backgroundJobId = workRequest.id
             it.enqueue(workRequest)
+            Timber.i("Work request scheduled, ${durationMillis}ms from now, to clear data if the user hasn't returned to the app. job id: ${workRequest.id}")
         }
     }
 
+    @Suppress("NON_EXHAUSTIVE_WHEN")
     private fun clearDataWhenAppInForeground(clearWhat: ClearWhatOption) {
         Timber.i("Clearing data when app is in the foreground: $clearWhat")
 
         when (clearWhat) {
-            ClearWhatOption.CLEAR_NONE -> Timber.w("Automatically clear data invoked, but set to clear nothing")
             ClearWhatOption.CLEAR_TABS_ONLY -> {
-                clearDataAction.clearTabs(true)
+                launch(Dispatchers.IO) {
+                    clearDataAction.clearTabsAsync(true)
+
+                    withContext(Dispatchers.Main) {
+                        Timber.i("Notifying listener that clearing has finished")
+                        listener?.onClearFinished()
+
+                    }
+                }
             }
+
             ClearWhatOption.CLEAR_TABS_AND_DATA -> {
                 val processNeedsRestarted = !isFreshAppLaunch
                 Timber.i("App is in foreground; restart needed? $processNeedsRestarted")
 
-                Handler().postDelayed(300) {
-                    Timber.i("Clearing now")
-                    clearDataAction.clearTabsAndAllData(killAndRestartProcess = processNeedsRestarted, appInForeground = true)
+                launch(Dispatchers.Main) {
+                    clearDataAction.clearTabsAndAllDataAsync(appInForeground = true)
+                    Timber.i("Notifying listener that clearing has finished")
+                    listener?.onClearFinished()
+
+                    Timber.i("All data now cleared, will restart process? $processNeedsRestarted")
+                    if (processNeedsRestarted) {
+                        Timber.i("Will now restart process")
+                        clearDataAction.killAndRestartProcess()
+                    } else {
+                        Timber.i("Will not restart process")
+                    }
                 }
             }
         }
     }
 
-    private fun shouldClearData(cleanWhenOption: ClearWhenOption): Boolean {
+    private fun shouldClearData(cleanWhenOption: ClearWhenOption, appUsedSinceLastClear: Boolean): Boolean {
         Timber.d("Determining if data should be cleared for option $cleanWhenOption")
 
-        if (!settingsDataStore.appUsedSinceLastClear) {
+        if (!appUsedSinceLastClear) {
             Timber.d("App hasn't been used since last clear; no need to clear again")
             return false
         }

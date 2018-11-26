@@ -21,10 +21,7 @@ import android.app.Application
 import android.app.Service
 import android.os.Build
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
-import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.*
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
@@ -32,6 +29,7 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.fire.AutomaticDataClearer
+import com.duckduckgo.app.fire.DataClearListener
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.global.Theming.initializeTheme
@@ -59,7 +57,8 @@ import timber.log.Timber
 import javax.inject.Inject
 import kotlin.concurrent.thread
 
-open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasSupportFragmentInjector, Application(), LifecycleObserver {
+open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasSupportFragmentInjector, Application(), LifecycleObserver,
+    DataClearListener {
 
     @Inject
     lateinit var activityInjector: DispatchingAndroidInjector<Activity>
@@ -116,12 +115,17 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     open lateinit var daggerAppComponent: AppComponent
 
+    val status: MutableLiveData<Boolean> = MutableLiveData<Boolean>().also {
+        it.value = false
+    }
+
     override fun onCreate() {
         super.onCreate()
 
         if (!installLeakCanary()) return
 
         configureLogging()
+        Timber.i("Creating DuckDuckGoApplication")
         configureDependencyInjection()
 
         if (appIsRestarting()) return
@@ -136,6 +140,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             appShortcutCreator.configureAppShortcuts(this)
         }
+
+
+        automaticDataClearer.listener = this
 
         initializeStatistics()
         initializeTheme(settingsDataStore)
@@ -243,6 +250,14 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
                 appConfigurationSyncer.scheduleRegularSync(this)
             })
             .subscribe({}, { Timber.w("Failed to download initial app configuration ${it.localizedMessage}") })
+    }
+
+    override fun onNoClearRequired() {
+        status.value = true
+    }
+
+    override fun onClearFinished() {
+        status.value = true
     }
 
     override fun activityInjector(): AndroidInjector<Activity> = activityInjector

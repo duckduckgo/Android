@@ -27,7 +27,7 @@ import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockitokotlin2.*
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -318,6 +318,7 @@ class WebViewRequestInterceptorTest {
 
     private fun configureShouldNotUpgrade() {
         whenever(mockHttpsUpgrader.shouldUpgrade(any())).thenReturn(false)
+
         whenever(mockRequest.url).thenReturn(validUri())
         whenever(mockRequest.isForMainFrame).thenReturn(true)
     }

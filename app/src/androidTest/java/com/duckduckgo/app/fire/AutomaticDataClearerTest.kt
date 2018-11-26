@@ -16,13 +16,16 @@
 
 package com.duckduckgo.app.fire
 
+import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment.ClearWhatOption
 import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment.ClearWhatOption.*
 import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment.ClearWhenOption
-import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment.ClearWhenOption.*
+import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment.ClearWhenOption.APP_EXIT_ONLY
+import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment.ClearWhenOption.APP_EXIT_OR_5_MINS
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -51,64 +54,218 @@ class AutomaticDataClearerTest(private val testCase: TestCase) {
                 /* Clear None */
 
                 // fresh app launch, enough time passed - no clearing
-                TestCase(Expected(false, false), Input(CLEAR_NONE, APP_EXIT_ONLY, true, true)),
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_NONE, APP_EXIT_ONLY, true, true, true)
+                ),
+
+                // fresh app launch, enough time passed - no clearing
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_NONE, APP_EXIT_ONLY, true, true, false)
+                ),
 
                 // fresh app launch, not enough time passed - no clearing
-                TestCase(Expected(false, false), Input(CLEAR_NONE, APP_EXIT_ONLY, false, true)),
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_NONE, APP_EXIT_ONLY, false, true, true)
+                ),
+
+                // fresh app launch, not enough time passed - no clearing
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_NONE, APP_EXIT_ONLY, false, true, false)
+                ),
 
                 // not fresh app launch, enough time passed - no clearing
-                TestCase(Expected(false, false), Input(CLEAR_NONE, APP_EXIT_ONLY, true, false)),
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_NONE, APP_EXIT_ONLY, true, false, true)
+                ),
+
+                // not fresh app launch, enough time passed - no clearing
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_NONE, APP_EXIT_ONLY, true, false, false)
+                ),
+
+                // not fresh app launch, enough time passed - no clearing
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_NONE, APP_EXIT_ONLY, true, false, true)
+                ),
+
+                // not fresh app launch, enough time passed - no clearing
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_NONE, APP_EXIT_ONLY, true, false, false)
+                ),
 
                 // not fresh app launch, not enough time passed - no clearing
-                TestCase(Expected(false, false), Input(CLEAR_NONE, APP_EXIT_ONLY, false, false)),
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_NONE, APP_EXIT_ONLY, false, false, true)
+                ),
+
+                // not fresh app launch, not enough time passed - no clearing
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_NONE, APP_EXIT_ONLY, false, false, false)
+                ),
 
 
                 /* Clear Tabs */
 
-                // fresh app launch, enough time passed - should clear tabs
-                TestCase(Expected(true, false), Input(CLEAR_TABS_ONLY, APP_EXIT_ONLY, true, true)),
+                // fresh app launch, enough time passed, app used since last clear - should clear tabs
+                TestCase(
+                    Expected(true, false),
+                    Input(CLEAR_TABS_ONLY, APP_EXIT_ONLY, true, true, true)
+                ),
 
-                // fresh app launch, not enough time passed - should clear tabs
-                TestCase(Expected(true, false), Input(CLEAR_TABS_ONLY, APP_EXIT_ONLY, false, true)),
+                // fresh app launch, enough time passed, app not used since last clear - should clear tabs
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_TABS_ONLY, APP_EXIT_ONLY, true, true, false)
+                ),
 
-                // not fresh app launch, enough time passed - no clearing
-                TestCase(Expected(false, false), Input(CLEAR_TABS_ONLY, APP_EXIT_ONLY, true, false)),
+                // fresh app launch, not enough time passed, app used since last clear - should clear tabs
+                TestCase(
+                    Expected(true, false),
+                    Input(CLEAR_TABS_ONLY, APP_EXIT_ONLY, false, true, true)
+                ),
 
-                // not fresh app launch, not enough time passed - no clearing
-                TestCase(Expected(false, false), Input(CLEAR_TABS_ONLY, APP_EXIT_ONLY, false, false)),
+                // fresh app launch, not enough time passed, app not used since last clear - should clear tabs
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_TABS_ONLY, APP_EXIT_ONLY, false, true, false)
+                ),
 
-                // not app exit only - enough time passed - should clear tabs
-                TestCase(Expected(true, false), Input(CLEAR_TABS_ONLY, APP_EXIT_OR_5_MINS, true, false)),
+                // not fresh app launch, enough time passed, app used since last clear - no clearing
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_TABS_ONLY, APP_EXIT_ONLY, true, false, true)
+                ),
 
-                // not app exit only - not enough time passed - no clearing
-                TestCase(Expected(false, false), Input(CLEAR_TABS_ONLY, APP_EXIT_OR_5_MINS, false, false)),
+                // not fresh app launch, enough time passed, app not used since last clear - no clearing
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_TABS_ONLY, APP_EXIT_ONLY, true, false, false)
+                ),
+
+                // not fresh app launch, not enough time passed, app used since last clear - no clearing
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_TABS_ONLY, APP_EXIT_ONLY, false, false, true)
+                ),
+
+                // not fresh app launch, not enough time passed, app not used since last clear - no clearing
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_TABS_ONLY, APP_EXIT_ONLY, false, false, false)
+                ),
+
+                // not app exit only - enough time passed, app used since last clear - should clear tabs
+                TestCase(
+                    Expected(true, false),
+                    Input(CLEAR_TABS_ONLY, APP_EXIT_OR_5_MINS, true, false, true)
+                ),
+
+                // not app exit only - enough time passed, app not used since last clear - should clear tabs
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_TABS_ONLY, APP_EXIT_OR_5_MINS, true, false, false)
+                ),
+
+                // not app exit only - not enough time passed, app used since last clear - no clearing
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_TABS_ONLY, APP_EXIT_OR_5_MINS, false, false, true)
+                ),
+
+                // not app exit only - not enough time passed, app not used since last clear - no clearing
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_TABS_ONLY, APP_EXIT_OR_5_MINS, false, false, false)
+                ),
 
 
                 /* Clear everything */
 
-                // fresh app launch, enough time passed - should clear everything
-                TestCase(Expected(false, true), Input(CLEAR_TABS_AND_DATA, APP_EXIT_ONLY, true, true)),
+                // fresh app launch, enough time passed, , app used since last clear - should clear everything
+                TestCase(
+                    Expected(false, true),
+                    Input(CLEAR_TABS_AND_DATA, APP_EXIT_ONLY, true, true, true)
+                ),
 
-                // fresh app launch, not enough time passed - should clear everything
-                TestCase(Expected(false, true), Input(CLEAR_TABS_AND_DATA, APP_EXIT_ONLY, false, true)),
+                // fresh app launch, enough time passed, app not used since last clear - should clear everything
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_TABS_AND_DATA, APP_EXIT_ONLY, true, true, false)
+                ),
 
-                // not fresh app launch, enough time passed - no clearing
-                TestCase(Expected(false, false), Input(CLEAR_TABS_AND_DATA, APP_EXIT_ONLY, true, false)),
+                // fresh app launch, not enough time passed, app used since last clear - should clear everything
+                TestCase
+                    (
+                    Expected(false, true),
+                    Input(CLEAR_TABS_AND_DATA, APP_EXIT_ONLY, false, true, true)
+                ),
 
-                // not fresh app launch, not enough time passed - no clearing
-                TestCase(Expected(false, false), Input(CLEAR_TABS_AND_DATA, APP_EXIT_ONLY, false, false)),
+                // fresh app launch, not enough time passed, app not used since last clear - should clear everything
+                TestCase
+                    (
+                    Expected(false, false),
+                    Input(CLEAR_TABS_AND_DATA, APP_EXIT_ONLY, false, true, false)
+                ),
 
-                // not app exit only - enough time passed - should clear everything
-                TestCase(Expected(false, true), Input(CLEAR_TABS_AND_DATA, APP_EXIT_OR_5_MINS, true, false)),
+                // not fresh app launch, enough time passed, app used since last clear - no clearing
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_TABS_AND_DATA, APP_EXIT_ONLY, true, false, true)
+                ),
 
-                // not app exit only - not enough time passed - no clearing
-                TestCase(Expected(false, false), Input(CLEAR_TABS_AND_DATA, APP_EXIT_OR_5_MINS, false, false)),
+                // not fresh app launch, enough time passed, app not used since last clear - no clearing
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_TABS_AND_DATA, APP_EXIT_ONLY, true, false, false)
+                ),
 
-                // fresh app launch - should not restart process
-                TestCase(Expected(false, true, false), Input(CLEAR_TABS_AND_DATA, APP_EXIT_OR_15_MINS, false, true)),
+                // not fresh app launch, not enough time passed, app used since last clear - no clearing
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_TABS_AND_DATA, APP_EXIT_ONLY, false, false, true)
+                ),
 
-                // not fresh app launch, enough time passed - should restart process
-                TestCase(Expected(false, true, true), Input(CLEAR_TABS_AND_DATA, APP_EXIT_OR_15_MINS, true, false))
+                // not fresh app launch, not enough time passed, app not used since last clear - no clearing
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_TABS_AND_DATA, APP_EXIT_ONLY, false, false, false)
+                ),
+
+                // not app exit only - enough time passed, app used since last clear - should clear everything
+                TestCase(
+                    Expected(false, true),
+                    Input(CLEAR_TABS_AND_DATA, APP_EXIT_OR_5_MINS, true, false, true)
+                ),
+
+                // not app exit only - enough time passed, app not used since last clear - should clear everything
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_TABS_AND_DATA, APP_EXIT_OR_5_MINS, true, false, false)
+                ),
+
+                // not app exit only - not enough time passed, app used since last clear - no clearing
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_TABS_AND_DATA, APP_EXIT_OR_5_MINS, false, false, true)
+                ),
+
+
+                // not app exit only - not enough time passed, app not used since last clear - no clearing
+                TestCase(
+                    Expected(false, false),
+                    Input(CLEAR_TABS_AND_DATA, APP_EXIT_OR_5_MINS, false, false, false)
+                )
+
             )
         }
     }
@@ -121,11 +278,12 @@ class AutomaticDataClearerTest(private val testCase: TestCase) {
         whenever(mockTimeKeeper.hasEnoughTimeElapsed(any())).thenReturn(testCase.input.enoughTimePassed)
         whenever(mockSettingsDataStore.automaticallyClearWhatOption).thenReturn(testCase.input.clearWhat)
         whenever(mockSettingsDataStore.automaticallyClearWhenOption).thenReturn(testCase.input.clearWhen)
-
+        whenever(mockSettingsDataStore.appUsedSinceLastClear).thenReturn(testCase.input.appUsedSinceLastClear)
     }
 
+    @UiThreadTest
     @Test
-    fun dataClearingTests() {
+    fun dataClearingTests() = runBlocking {
         simulateLifecycle()
 
         verifyIfTabsCleared()
@@ -133,49 +291,34 @@ class AutomaticDataClearerTest(private val testCase: TestCase) {
         verifyIfBackgroundTimestampCleared()
     }
 
-    private fun verifyIfTabsCleared() {
-        verify(mockClearAction, testCase.expected.shouldClearTabs.toVerificationMode()).clearTabs()
+    private suspend fun verifyIfTabsCleared() {
+        verify(mockClearAction, testCase.expected.shouldClearTabs.toVerificationMode()).clearTabsAsync(any())
     }
 
-    private fun verifyIfAllDataCleared() {
+    private suspend fun verifyIfAllDataCleared() {
         val numberOfTimesExpected = testCase.expected.shouldClearEverything.toVerificationMode()
-        val restartProcessExpected = testCase.expected.shouldRestartProcess
-
-        if (restartProcessExpected == null) {
-            verify(mockClearAction, numberOfTimesExpected).clearEverything(anyBoolean())
-        } else {
-            verify(mockClearAction, numberOfTimesExpected).clearEverything(restartProcessExpected)
-        }
+        verify(mockClearAction, numberOfTimesExpected).clearTabsAndAllDataAsync(anyBoolean())
     }
 
     private fun verifyIfBackgroundTimestampCleared() {
         verify(mockSettingsDataStore).clearAppBackgroundTimestamp()
     }
 
-
     private fun simulateLifecycle() {
-        if (testCase.input.isFreshAppLaunch) {
-            testee.onAppCreated()
-        }
+        testee.isFreshAppLaunch = testCase.input.isFreshAppLaunch
         testee.onAppForegrounded()
     }
 
-    data class TestCase(
-        val expected: Expected,
-        val input: Input
-    )
+    data class TestCase(val expected: Expected, val input: Input)
 
-    data class Expected(
-        val shouldClearTabs: Boolean,
-        val shouldClearEverything: Boolean,
-        val shouldRestartProcess: Boolean? = null
-    )
+    data class Expected(val shouldClearTabs: Boolean, val shouldClearEverything: Boolean)
 
     data class Input(
         val clearWhat: ClearWhatOption,
         val clearWhen: ClearWhenOption,
         val enoughTimePassed: Boolean,
-        val isFreshAppLaunch: Boolean
+        val isFreshAppLaunch: Boolean,
+        val appUsedSinceLastClear: Boolean
     )
 
     private fun Boolean.toVerificationMode(): VerificationMode {

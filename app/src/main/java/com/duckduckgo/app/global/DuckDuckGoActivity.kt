@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.global
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.os.Bundle
 import android.view.MenuItem
@@ -38,10 +39,19 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
 
     private var themeChangeReceiver: BroadcastReceiver? = null
 
+    @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
+        onCreate(savedInstanceState, true)
+    }
+
+    fun onCreate(savedInstanceState: Bundle?, daggerInject: Boolean = true) {
+        if(daggerInject) daggerInject()
         themeChangeReceiver = applyTheme(settingsDataStore)
         super.onCreate(savedInstanceState)
+    }
+
+    protected fun daggerInject() {
+        AndroidInjection.inject(this)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -62,4 +72,5 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
     }
 
     protected inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProviders.of(this, viewModelFactory).get(V::class.java) }
+
 }

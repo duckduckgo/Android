@@ -47,17 +47,17 @@ class BrowserViewModel(
     var selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    fun onNewTabRequested() {
-        tabRepository.add()
+    fun onNewTabRequested(isDefaultTab: Boolean = false) {
+        tabRepository.add(isDefaultTab = isDefaultTab)
     }
 
     fun onOpenInNewTabRequested(query: String) {
-        tabRepository.add(queryUrlConverter.convertQueryToUrl(query))
+        tabRepository.add(queryUrlConverter.convertQueryToUrl(query), isDefaultTab = false)
     }
 
     fun onTabsUpdated(tabs: List<TabEntity>?) {
         if (tabs == null || tabs.isEmpty()) {
-            tabRepository.add()
+            tabRepository.add(isDefaultTab = true)
             return
         }
     }

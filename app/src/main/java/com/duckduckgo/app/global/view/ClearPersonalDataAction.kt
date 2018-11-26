@@ -17,23 +17,33 @@
 package com.duckduckgo.app.global.view
 
 import android.content.Context
-import android.webkit.CookieManager
 import android.webkit.WebStorage
 import android.webkit.WebView
 import androidx.annotation.UiThread
+import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 interface ClearDataAction {
 
+    @WorkerThread
+    suspend fun clearTabsAsync(appInForeground: Boolean)
+
     @UiThread
-    fun clearTabsAndAllData(killAndRestartProcess: Boolean = false, killProcess: Boolean = false, appInForeground: Boolean)
-    fun clearTabs(appInForeground: Boolean)
+    suspend fun clearTabsAndAllDataAsync(appInForeground: Boolean): Unit?
+
+    fun killProcess()
+    fun killAndRestartProcess()
 }
 
 class ClearPersonalDataAction @Inject constructor(
@@ -42,38 +52,59 @@ class ClearPersonalDataAction @Inject constructor(
     private val clearingStore: UnsentForgetAllPixelStore,
     private val tabRepository: TabRepository,
     private val settingsDataStore: SettingsDataStore
-) : ClearDataAction {
+) : ClearDataAction, CoroutineScope {
 
-    @UiThread
-    override fun clearTabsAndAllData(killAndRestartProcess: Boolean, killProcess: Boolean, appInForeground: Boolean) {
-        val startTime = System.currentTimeMillis()
+    private val clearJob: Job = Job()
 
-        Timber.i("Clearing tabs and data; {restart process = $killAndRestartProcess} {kill process = $killProcess}")
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main + clearJob
 
-        clearTabs(appInForeground)
-        clearingStore.incrementCount()
-        dataManager.clearData(WebView(context), WebStorage.getInstance(), context)
-        dataManager.clearExternalCookies(CookieManager.getInstance()) {
-            Timber.i("Finished clearing everything; took ${System.currentTimeMillis() - startTime}ms.")
-
-            if (killAndRestartProcess) {
-                Timber.i("Restarting process")
-                FireActivity.triggerRestart(context)
-            } else if (killProcess) {
-                Timber.i("Killing process")
-                System.exit(0)
-            }
-        }
+    override fun killAndRestartProcess() {
+        Timber.i("Restarting process")
+        FireActivity.triggerRestart(context)
     }
 
-    override fun clearTabs(appInForeground: Boolean) {
+    override fun killProcess() {
+        Timber.i("Killing process")
+        System.exit(0)
+    }
+
+    @UiThread
+    override suspend fun clearTabsAndAllDataAsync(appInForeground: Boolean) {
+        val startTime = System.currentTimeMillis()
+
+        Timber.i("Clearing tabs and data")
+
+        withContext(Dispatchers.IO) {
+            clearTabsAsync(appInForeground)
+        }
+
+        clearDataAsync()
+
+        Timber.i("Finished clearing everything; took ${System.currentTimeMillis() - startTime}ms.")
+    }
+
+    @WorkerThread
+    override suspend fun clearTabsAsync(appInForeground: Boolean) {
+        val startTime = System.currentTimeMillis()
         Timber.i("Clearing tabs")
 
-        val startTime = System.currentTimeMillis()
         dataManager.clearWebViewSessions()
+
         tabRepository.deleteAll()
+
+        Timber.w("Setting appUsedSinceClear flag to $appInForeground")
         settingsDataStore.appUsedSinceLastClear = appInForeground
 
         Timber.i("Finished clearing tabs; took ${System.currentTimeMillis() - startTime}ms.")
+    }
+
+    @UiThread
+    private suspend fun clearDataAsync() {
+        val startTime = System.currentTimeMillis()
+        clearingStore.incrementCount()
+        dataManager.clearData(WebView(context), WebStorage.getInstance(), context)
+        dataManager.clearExternalCookies()
+        Timber.i("Finished clearing data; took ${System.currentTimeMillis() - startTime}ms.")
     }
 }

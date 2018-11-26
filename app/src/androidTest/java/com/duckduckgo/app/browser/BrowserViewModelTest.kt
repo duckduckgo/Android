@@ -24,7 +24,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockitokotlin2.*
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -86,7 +86,7 @@ class BrowserViewModelTest {
     @Test
     fun whenTabsUpdatedAndNoTabsThenNewTabAddedToRepository() {
         testee.onTabsUpdated(ArrayList())
-        verify(mockTabRepository).add()
+        verify(mockTabRepository).add(null, true)
     }
 
     @Test

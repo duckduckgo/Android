@@ -17,70 +17,78 @@
 package com.duckduckgo.app.fire
 
 import android.content.Context
-import android.os.Handler
-import androidx.annotation.AnyThread
-import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
-import androidx.core.os.postDelayed
-import androidx.work.Worker
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import org.jetbrains.anko.runOnUiThread
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
-class DataClearingWorker(
-    context: Context,
-    workerParams: WorkerParameters
-) : Worker(context, workerParams) {
+class DataClearingWorker(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams), CoroutineScope {
 
     lateinit var settingsDataStore: SettingsDataStore
     lateinit var clearDataAction: ClearDataAction
 
     @WorkerThread
-    override fun doWork(): Result {
-        Timber.i("Doing work")
-        clearData(settingsDataStore.automaticallyClearWhatOption, appInBackground = true)
-        return Result.SUCCESS
+    override suspend fun doWork(): Payload {
+
+        if (jobAlreadyExecuted()) {
+            Timber.i("This job has run before; no more work needed")
+            return Payload(Result.SUCCESS)
+        }
+
+        settingsDataStore.lastExecutedJobId = id.toString()
+
+        launch {
+            clearData(settingsDataStore.automaticallyClearWhatOption)
+        }.join()
+
+        Timber.i("Returning success")
+        return Payload(Result.SUCCESS)
     }
 
-    @AnyThread
-    fun clearData(clearWhat: SettingsAutomaticallyClearWhatFragment.ClearWhatOption, appInBackground: Boolean) {
+    private fun jobAlreadyExecuted(): Boolean {
+        val newJobId = id.toString()
+        val lastJobId = settingsDataStore.lastExecutedJobId
+        Timber.i("Worker invoked - new jobId: $newJobId, last jobId: $lastJobId")
+        return lastJobId == newJobId
+    }
+
+    suspend fun clearData(clearWhat: SettingsAutomaticallyClearWhatFragment.ClearWhatOption) {
         Timber.i("Clearing data: $clearWhat")
 
         when (clearWhat) {
             SettingsAutomaticallyClearWhatFragment.ClearWhatOption.CLEAR_NONE -> Timber.w("Automatically clear data invoked, but set to clear nothing")
-            SettingsAutomaticallyClearWhatFragment.ClearWhatOption.CLEAR_TABS_ONLY -> {
-                clearTabs(appInBackground)
-            }
-            SettingsAutomaticallyClearWhatFragment.ClearWhatOption.CLEAR_TABS_AND_DATA -> {
-                applicationContext.runOnUiThread {
-                    clearTabsAndData(appInBackground)
-                }
-            }
+            SettingsAutomaticallyClearWhatFragment.ClearWhatOption.CLEAR_TABS_ONLY -> clearTabsOnly()
+            SettingsAutomaticallyClearWhatFragment.ClearWhatOption.CLEAR_TABS_AND_DATA -> clearEverything()
+
         }
     }
 
-    private fun clearTabs(appInBackground: Boolean) {
-        clearDataAction.clearTabs(appInForeground = !appInBackground)
+    private suspend fun clearTabsOnly() {
+        launch(Dispatchers.IO) {
+            clearDataAction.clearTabsAsync(appInForeground = false)
+        }.join()
     }
 
-    @UiThread
-    private fun clearTabsAndData(appInBackground: Boolean) {
-        if (appInBackground) {
-            Timber.w("App is in background, so just outright killing it")
-            clearDataAction.clearTabsAndAllData(killProcess = true, appInForeground = !appInBackground)
-        } else {
-            val processNeedsRestarted = true
-            Timber.i("App is in foreground; ${!appInBackground}. restart needed? $processNeedsRestarted")
 
-            Handler().postDelayed(300) {
-                Timber.i("Clearing now")
-                clearDataAction.clearTabsAndAllData(killAndRestartProcess = processNeedsRestarted, appInForeground = !appInBackground)
-            }
-        }
+    private suspend fun clearEverything() {
+        Timber.i("App is in background, so just outright killing the process")
+        launch(Dispatchers.Main) {
+            clearDataAction.clearTabsAndAllDataAsync(appInForeground = false)
+        }.join()
+
+        Timber.i("Will kill process now: jobId: $id")
+        clearDataAction.killProcess()
+    }
+
+    companion object {
+        const val WORK_REQUEST_TAG = "background-clear-data"
     }
 }
 
