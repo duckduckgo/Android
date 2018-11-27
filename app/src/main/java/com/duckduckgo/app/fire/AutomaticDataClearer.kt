@@ -31,7 +31,6 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
 interface DataClearListener {
-    fun onNoClearRequired()
     fun onClearFinished()
 }
 
@@ -65,14 +64,14 @@ class AutomaticDataClearer(
 
         if (clearWhat == ClearWhatOption.CLEAR_NONE) {
             Timber.i("No data will be cleared as it's configured to clear nothing automatically")
-            listener?.onNoClearRequired()
+            listener?.onClearFinished()
         } else {
             if (shouldClearData(clearWhen, appUsedSinceLastClear)) {
                 Timber.i("Decided data should be cleared")
                 clearDataWhenAppInForeground(clearWhat)
             } else {
                 Timber.i("Decided not to clear data at this time")
-                listener?.onNoClearRequired()
+                listener?.onClearFinished()
             }
         }
 

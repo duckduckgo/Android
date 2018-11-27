@@ -30,6 +30,7 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.feedback.ui.FeedbackActivity
 import com.duckduckgo.app.fire.AutomaticDataClearer
+import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.intentText
@@ -75,20 +76,32 @@ class BrowserActivity : DuckDuckGoActivity() {
         awaitClearDataFinishedNotification()
     }
 
+    /**
+     * To ensure the best UX, we might not want to show anything to the user while the clear is taking place.
+     * This method will await until the ApplicationClearDataState.FINISHED event is received
+     */
     private fun awaitClearDataFinishedNotification() {
-        dataClearingStatus().observe(this, Observer<Boolean> {
+        dataClearingStatus().observe(this, Observer<ApplicationClearDataState> {
             Timber.w("Notified of status change. Now $it")
 
-            if (it) {
-                Timber.i("BrowserActivity can now start displaying web content. instance state is $instanceStateBundles")
+            it?.let { state ->
 
-                dataClearingStatus().removeObservers(this)
+                when (state) {
+                    ApplicationClearDataState.INITIALIZING -> {
+                        Timber.i("App clear state initializing")
+                    }
+                    ApplicationClearDataState.FINISHED -> {
+                        Timber.i("BrowserActivity can now start displaying web content. instance state is $instanceStateBundles")
 
-                configureObservers()
+                        dataClearingStatus().removeObservers(this)
 
-                if (instanceStateBundles?.originalInstanceState == null) {
-                    Timber.i("Original instance state is null, so will inspect intent for actions to take. $intent")
-                    launchNewSearchOrQuery(intent)
+                        configureObservers()
+
+                        if (instanceStateBundles?.originalInstanceState == null) {
+                            Timber.i("Original instance state is null, so will inspect intent for actions to take. $intent")
+                            launchNewSearchOrQuery(intent)
+                        }
+                    }
                 }
             }
         })
@@ -185,7 +198,7 @@ class BrowserActivity : DuckDuckGoActivity() {
             processCommand(it)
         })
         viewModel.selectedTab.observe(this, Observer {
-            if(it != null) selectTab(it)
+            if (it != null) selectTab(it)
         })
         viewModel.tabs.observe(this, Observer {
             clearStaleTabs(it)
@@ -270,7 +283,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun dataClearingStatus(): LiveData<Boolean> {
+    private fun dataClearingStatus(): LiveData<ApplicationClearDataState> {
         return (applicationContext as DuckDuckGoApplication).status
     }
 

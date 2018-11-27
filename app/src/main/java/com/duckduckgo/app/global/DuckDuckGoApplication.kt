@@ -32,6 +32,8 @@ import com.duckduckgo.app.fire.AutomaticDataClearer
 import com.duckduckgo.app.fire.DataClearListener
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
+import com.duckduckgo.app.global.ApplicationClearDataState.FINISHED
+import com.duckduckgo.app.global.ApplicationClearDataState.INITIALIZING
 import com.duckduckgo.app.global.Theming.initializeTheme
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.notification.NotificationRegistrar
@@ -109,14 +111,14 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     lateinit var automaticDataClearer: AutomaticDataClearer
 
     @Inject
-    lateinit var  workerFactory: WorkerFactory
+    lateinit var workerFactory: WorkerFactory
 
     private var launchedByFireAction: Boolean = false
 
     open lateinit var daggerAppComponent: AppComponent
 
-    val status: MutableLiveData<Boolean> = MutableLiveData<Boolean>().also {
-        it.value = false
+    val status: MutableLiveData<ApplicationClearDataState> = MutableLiveData<ApplicationClearDataState>().also {
+        it.value = INITIALIZING
     }
 
     override fun onCreate() {
@@ -252,12 +254,8 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
             .subscribe({}, { Timber.w("Failed to download initial app configuration ${it.localizedMessage}") })
     }
 
-    override fun onNoClearRequired() {
-        status.value = true
-    }
-
     override fun onClearFinished() {
-        status.value = true
+        status.value = FINISHED
     }
 
     override fun activityInjector(): AndroidInjector<Activity> = activityInjector
