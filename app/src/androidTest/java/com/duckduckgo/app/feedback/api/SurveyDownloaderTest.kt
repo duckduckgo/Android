@@ -29,10 +29,10 @@ import retrofit2.Call
 import retrofit2.Response
 
 class SurveyDownloaderTest {
-    private var mockyDao: SurveyDao = mock()
+    private var mockDao: SurveyDao = mock()
     private var mockService: SurveyService = mock()
     private var mockCall: Call<SurveyGroup?> = mock()
-    private var testee = SurveyDownloader(mockService, mockyDao)
+    private var testee = SurveyDownloader(mockService, mockDao)
 
     @get:Rule
     @Suppress("unused")
@@ -43,8 +43,8 @@ class SurveyDownloaderTest {
         whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocation("abc")))
         whenever(mockService.survey()).thenReturn(mockCall)
         testee.download().blockingAwait()
-        verify(mockyDao).insert(Survey("abc", SURVEY_URL, 7, SCHEDULED))
-        verify(mockyDao).cancelScheduledSurveys()
+        verify(mockDao).insert(Survey("abc", SURVEY_URL, 7, SCHEDULED))
+        verify(mockDao).cancelScheduledSurveys()
     }
 
     @Test
@@ -52,18 +52,18 @@ class SurveyDownloaderTest {
         whenever(mockCall.execute()).thenReturn(Response.success(surveyNoAllocation("abc")))
         whenever(mockService.survey()).thenReturn(mockCall)
         testee.download().blockingAwait()
-        verify(mockyDao).insert(Survey("abc", null, null, NOT_ALLOCATED))
-        verify(mockyDao).cancelScheduledSurveys()
+        verify(mockDao).insert(Survey("abc", null, null, NOT_ALLOCATED))
+        verify(mockDao).cancelScheduledSurveys()
     }
 
     @Test
     fun whenSurveyAlreadyExistsThenNotSavedAndOldSurveysNotCancelled() {
-        whenever(mockyDao.exists(any())).thenReturn(true)
+        whenever(mockDao.exists(any())).thenReturn(true)
         whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocation("abc")))
         whenever(mockService.survey()).thenReturn(mockCall)
         testee.download().blockingAwait()
-        verify(mockyDao, never()).insert(any())
-        verify(mockyDao, never()).cancelScheduledSurveys()
+        verify(mockDao, never()).insert(any())
+        verify(mockDao, never()).cancelScheduledSurveys()
     }
 
     @Test
@@ -71,7 +71,7 @@ class SurveyDownloaderTest {
         whenever(mockCall.execute()).thenReturn(Response.success(null))
         whenever(mockService.survey()).thenReturn(mockCall)
         testee.download().blockingAwait()
-        verify(mockyDao).cancelScheduledSurveys()
+        verify(mockDao).cancelScheduledSurveys()
     }
 
     @Test(expected = RuntimeException::class)
