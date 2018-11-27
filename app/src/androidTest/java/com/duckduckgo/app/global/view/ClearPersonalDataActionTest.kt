@@ -16,24 +16,19 @@
 
 package com.duckduckgo.app.global.view
 
-import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.WebDataManager
-import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Captor
 
-@ExperimentalCoroutinesApi
+@Suppress("RemoveExplicitTypeArguments")
 class ClearPersonalDataActionTest {
 
     private lateinit var testee: ClearPersonalDataAction
@@ -42,10 +37,6 @@ class ClearPersonalDataActionTest {
     private val mockClearingUnsentForgetAllPixelStore: UnsentForgetAllPixelStore = mock()
     private val mockTabRepository: TabRepository = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
-    private val mockCookieManager: DuckDuckGoCookieManager = mock()
-
-    @Captor
-    private val clearDataCallbackCaptor = argumentCaptor<() -> Unit>()
 
     @Before
     fun setup() {
@@ -58,37 +49,32 @@ class ClearPersonalDataActionTest {
         )
     }
 
-    @UiThreadTest
     @Test
-    fun whenClearCalledThenPixelCountIncremented() = runBlocking {
+    fun whenClearCalledThenPixelCountIncremented() = runBlocking<Unit> {
         testee.clearTabsAndAllDataAsync(false)
         verify(mockClearingUnsentForgetAllPixelStore).incrementCount()
     }
 
-    @UiThreadTest
     @Test
-    fun whenClearCalledThenDataManagerClearsSessions() = runBlocking {
+    fun whenClearCalledThenDataManagerClearsSessions() = runBlocking<Unit> {
         testee.clearTabsAndAllDataAsync(false)
         verify(mockDataManager).clearWebViewSessions()
     }
 
-    @UiThreadTest
     @Test
-    fun whenClearCalledThenDataManagerClearsData() = runBlocking {
+    fun whenClearCalledThenDataManagerClearsData() = runBlocking<Unit> {
         testee.clearTabsAndAllDataAsync(false)
         verify(mockDataManager).clearData(any(), any(), any())
     }
 
-    @UiThreadTest
     @Test
-    fun whenClearCalledThenDataManagerClearsCookies() = runBlocking {
+    fun whenClearCalledThenDataManagerClearsCookies() = runBlocking<Unit> {
         testee.clearTabsAndAllDataAsync(false)
         verify(mockDataManager).clearExternalCookies()
     }
 
-    @UiThreadTest
     @Test
-    fun whenClearCalledThenTabsCleared() = runBlocking {
+    fun whenClearCalledThenTabsCleared() = runBlocking<Unit> {
         testee.clearTabsAndAllDataAsync(false)
         verify(mockTabRepository).deleteAll()
     }
