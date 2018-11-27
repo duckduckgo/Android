@@ -78,7 +78,8 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     /**
      * To ensure the best UX, we might not want to show anything to the user while the clear is taking place.
-     * This method will await until the ApplicationClearDataState.FINISHED event is received
+     * This method will await until the ApplicationClearDataState.FINISHED event is received before observing for other changes
+     * The effect of this delay is that we won't show old tabs if they are in the process of deleting them.
      */
     private fun awaitClearDataFinishedNotification() {
         dataClearingStatus().observe(this, Observer<ApplicationClearDataState> {
