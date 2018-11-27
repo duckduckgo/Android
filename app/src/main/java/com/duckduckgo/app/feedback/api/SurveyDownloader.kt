@@ -19,6 +19,8 @@ package com.duckduckgo.app.feedback.api
 import com.duckduckgo.app.feedback.api.SurveyGroup.SurveyOption
 import com.duckduckgo.app.feedback.db.SurveyDao
 import com.duckduckgo.app.feedback.model.Survey
+import com.duckduckgo.app.feedback.model.Survey.Status.NOT_ALLOCATED
+import com.duckduckgo.app.feedback.model.Survey.Status.SCHEDULED
 import io.reactivex.Completable
 import timber.log.Timber
 import java.io.IOException
@@ -59,8 +61,11 @@ class SurveyDownloader @Inject constructor(
 
             Timber.d("New survey received replaces any previous scheduled surveys")
             surveyDao.cancelScheduledSurveys()
-            val surveyOption = determineOption(surveyGroup.surveyOptions) ?: return@fromAction
-            val newSurvey = Survey(surveyGroup.id, surveyOption.url, surveyOption.installationDay, Survey.Status.SCHEDULED)
+            val surveyOption = determineOption(surveyGroup.surveyOptions)
+            val newSurvey = when {
+                surveyOption != null -> Survey(surveyGroup.id, surveyOption.url, surveyOption.installationDay, SCHEDULED)
+                else -> Survey(surveyGroup.id, null, null, NOT_ALLOCATED)
+            }
             surveyDao.insert(newSurvey)
         }
     }
