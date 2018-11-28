@@ -16,6 +16,7 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingStart="20dp"
@@ -41,44 +42,56 @@
             android:text="@string/settingsAutomaticallyClearWhenAppExitOnly" />
 
         <RadioButton
-            android:id="@+id/settingInactive5Mins"
+            android:id="@+id/settingInactive5Seconds"
             android:layout_width="match_parent"
-            android:layout_marginTop="8dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:padding="10dp"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:text="@string/settingsAutomaticallyClearWhenAppExit5Mins" />
+            android:text="@string/settingsAutomaticallyClearWhenAppExit5Seconds"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <RadioButton
+            android:id="@+id/settingInactive5Mins"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:padding="10dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="@string/settingsAutomaticallyClearWhenAppExit5Minutes" />
 
         <RadioButton
             android:id="@+id/settingInactive15Mins"
             android:layout_width="match_parent"
-            android:layout_marginTop="8dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:padding="10dp"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:text="@string/settingsAutomaticallyClearWhenAppExit15Mins" />
+            android:text="@string/settingsAutomaticallyClearWhenAppExit15Minutes" />
 
         <RadioButton
             android:id="@+id/settingInactive30Mins"
             android:layout_width="match_parent"
-            android:layout_marginTop="8dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:padding="10dp"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:text="@string/settingsAutomaticallyClearWhenAppExit30Mins" />
+            android:text="@string/settingsAutomaticallyClearWhenAppExit30Minutes" />
 
         <RadioButton
             android:id="@+id/settingInactive60Mins"
             android:layout_width="match_parent"
-            android:layout_marginTop="8dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:padding="10dp"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:text="@string/settingsAutomaticallyClearWhenAppExit60Mins" />
+            android:text="@string/settingsAutomaticallyClearWhenAppExit60Minutes" />
 
     </RadioGroup>
 

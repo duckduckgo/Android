@@ -24,8 +24,10 @@ import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment.ClearWhenOption.APP_EXIT_ONLY
+import com.duckduckgo.app.global.view.show
+import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment.ClearWhenOption.*
 import java.util.concurrent.TimeUnit
 
 
@@ -40,6 +42,11 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
         val currentOption: ClearWhenOption = arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as ClearWhenOption? ?: APP_EXIT_ONLY
 
         val rootView = View.inflate(activity, R.layout.settings_automatically_clear_when_fragment, null)
+
+        if (BuildConfig.DEBUG) {
+            showDebugOnlyOption(rootView)
+        }
+
         updateCurrentSelect(currentOption, rootView.findViewById(R.id.settingsClearWhenGroup))
 
         val alertBuilder = AlertDialog.Builder(activity!!)
@@ -48,10 +55,11 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
             .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave) { _, _ ->
                 val radioGroup = dialog.findViewById(R.id.settingsClearWhenGroup) as RadioGroup
                 val selectedOption = when (radioGroup.checkedRadioButtonId) {
-                    R.id.settingInactive5Mins -> ClearWhenOption.APP_EXIT_OR_5_MINS
-                    R.id.settingInactive15Mins -> ClearWhenOption.APP_EXIT_OR_15_MINS
-                    R.id.settingInactive30Mins -> ClearWhenOption.APP_EXIT_OR_30_MINS
-                    R.id.settingInactive60Mins -> ClearWhenOption.APP_EXIT_OR_60_MINS
+                    R.id.settingInactive5Mins -> APP_EXIT_OR_5_MINS
+                    R.id.settingInactive15Mins -> APP_EXIT_OR_15_MINS
+                    R.id.settingInactive30Mins -> APP_EXIT_OR_30_MINS
+                    R.id.settingInactive60Mins -> APP_EXIT_OR_60_MINS
+                    R.id.settingInactive5Seconds -> APP_EXIT_OR_5_SECONDS
                     else -> APP_EXIT_ONLY
                 }
                 val listener = activity as Listener?
@@ -65,6 +73,11 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
     private fun updateCurrentSelect(currentOption: ClearWhenOption, radioGroup: RadioGroup) {
         val selectedId = currentOption.radioButtonId
         radioGroup.check(selectedId)
+    }
+
+    private fun showDebugOnlyOption(rootView: View) {
+        val debugOption: View = rootView.findViewById(R.id.settingInactive5Seconds) ?: return
+        debugOption.show()
     }
 
     companion object {
@@ -85,10 +98,13 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
     enum class
     ClearWhenOption constructor(@IdRes val radioButtonId: Int, @StringRes val nameStringRes: Int, val durationMillis: Long) {
         APP_EXIT_ONLY(R.id.settingAppExitOnly, R.string.settingsAutomaticallyClearWhenAppExitOnly, 0),
-        APP_EXIT_OR_5_MINS(R.id.settingInactive5Mins, R.string.settingsAutomaticallyClearWhenAppExit5Mins, TimeUnit.MINUTES.toMillis(5)),
-        APP_EXIT_OR_15_MINS(R.id.settingInactive15Mins, R.string.settingsAutomaticallyClearWhenAppExit15Mins, TimeUnit.MINUTES.toMillis(15)),
-        APP_EXIT_OR_30_MINS(R.id.settingInactive30Mins, R.string.settingsAutomaticallyClearWhenAppExit30Mins, TimeUnit.MINUTES.toMillis(30)),
-        APP_EXIT_OR_60_MINS(R.id.settingInactive60Mins, R.string.settingsAutomaticallyClearWhenAppExit60Mins, TimeUnit.MINUTES.toMillis(60))
+        APP_EXIT_OR_5_MINS(R.id.settingInactive5Mins, R.string.settingsAutomaticallyClearWhenAppExit5Minutes, TimeUnit.MINUTES.toMillis(5)),
+        APP_EXIT_OR_15_MINS(R.id.settingInactive15Mins, R.string.settingsAutomaticallyClearWhenAppExit15Minutes, TimeUnit.MINUTES.toMillis(15)),
+        APP_EXIT_OR_30_MINS(R.id.settingInactive30Mins, R.string.settingsAutomaticallyClearWhenAppExit30Minutes, TimeUnit.MINUTES.toMillis(30)),
+        APP_EXIT_OR_60_MINS(R.id.settingInactive60Mins, R.string.settingsAutomaticallyClearWhenAppExit60Minutes, TimeUnit.MINUTES.toMillis(60)),
+
+        // only available to debug builds
+        APP_EXIT_OR_5_SECONDS(R.id.settingInactive5Seconds, R.string.settingsAutomaticallyClearWhenAppExit5Seconds, TimeUnit.SECONDS.toMillis(5)),
     }
 
 }

@@ -172,10 +172,11 @@
 
     <string name="settingsAutomaticallyClearWhen">Clear on…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">App exit only</string>
-    <string name="settingsAutomaticallyClearWhenAppExit5Mins">App exit, Inactive for 5 minutes</string>
-    <string name="settingsAutomaticallyClearWhenAppExit15Mins">App exit, Inactive for 15 minutes</string>
-    <string name="settingsAutomaticallyClearWhenAppExit30Mins">App exit, Inactive for 30 minutes</string>
-    <string name="settingsAutomaticallyClearWhenAppExit60Mins">App exit, Inactive for 60 minutes</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">App exit, Inactive for 5 seconds</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">App exit, Inactive for 5 minutes</string>
+    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">App exit, Inactive for 15 minutes</string>
+    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">App exit, Inactive for 30 minutes</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App exit, Inactive for 60 minutes</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">About us</string>
