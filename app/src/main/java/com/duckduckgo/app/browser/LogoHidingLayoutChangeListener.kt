@@ -62,7 +62,7 @@ class LogoHidingLayoutChangeListener(private var ddgLogoView: View) : View.OnLay
     }
 
     companion object {
-        private const val MINIMUM_AVAILABLE_HEIGHT_REQUIRED_TO_SHOW_LOGO = 160
+        private const val MINIMUM_AVAILABLE_HEIGHT_REQUIRED_TO_SHOW_LOGO = 64
     }
 
 }

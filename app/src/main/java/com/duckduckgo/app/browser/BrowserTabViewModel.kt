@@ -88,6 +88,7 @@ class BrowserTabViewModel(
     private val surveyDao: SurveyDao,
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, ViewModel() {
+
     data class GlobalLayoutViewState(
         val isNewTabState: Boolean = true
     )
@@ -128,6 +129,10 @@ class BrowserTabViewModel(
         val canFindInPage: Boolean = false
     )
 
+    data class SurveyViewState(
+        val hasValidSurvey: Boolean = false
+    )
+
     data class AutoCompleteViewState(
         val showSuggestions: Boolean = false,
         val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
@@ -155,8 +160,6 @@ class BrowserTabViewModel(
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         class HandleExternalAppLink(val appLink: IntentType) : Command()
         class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap? = null) : Command()
-        object DisplaySurveyCta : Command()
-        object HideSurveyCta : Command()
         class LaunchSurvey(val survey: Survey) : Command()
     }
 
@@ -166,6 +169,7 @@ class BrowserTabViewModel(
     val loadingViewState: MutableLiveData<LoadingViewState> = MutableLiveData()
     val omnibarViewState: MutableLiveData<OmnibarViewState> = MutableLiveData()
     val findInPageViewState: MutableLiveData<FindInPageViewState> = MutableLiveData()
+    val surveyViewState: MutableLiveData<SurveyViewState> = MutableLiveData()
 
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val survey: LiveData<Survey> = surveyDao.getLiveScheduled()
@@ -588,6 +592,7 @@ class BrowserTabViewModel(
         autoCompleteViewState.value = AutoCompleteViewState()
         omnibarViewState.value = OmnibarViewState()
         findInPageViewState.value = FindInPageViewState()
+        surveyViewState.value = SurveyViewState()
     }
 
     fun userSharingLink(url: String?) {
@@ -652,14 +657,14 @@ class BrowserTabViewModel(
 
     fun onSurveyChanged(survey: Survey?) {
         if (survey == null) {
-            command.value = HideSurveyCta
+            surveyViewState.value = surveyViewState.value?.copy(hasValidSurvey = false)
             return
         }
 
         val showOnDay = survey.daysInstalled?.toLong()
         val daysInstalled = appInstallStore.daysInstalled()
         if (showOnDay == null || showOnDay == daysInstalled) {
-            command.value = DisplaySurveyCta
+            surveyViewState.value = surveyViewState.value?.copy(hasValidSurvey = true)
             currentSurvey = survey
         }
     }
@@ -671,7 +676,7 @@ class BrowserTabViewModel(
     }
 
     fun onUserDismissedSurvey() {
-        command.value = HideSurveyCta
+        surveyViewState.value = surveyViewState.value?.copy(hasValidSurvey = false)
         currentSurvey = null
         Schedulers.io().scheduleDirect {
             surveyDao.cancelScheduledSurveys()

@@ -742,23 +742,21 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenScheduledSurveyChangesAndNewSurveyInstallationDayMatchesDaysInstalledThenSurveyCtaIsShown() {
+    fun whenScheduledSurveyChangesAndNewSurveyInstallationDayMatchesDaysInstalledThenHasValidSurveyIsTrue() {
         testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
-        val command = captureCommands().value as Command.DisplaySurveyCta
-        assertNotNull(command)
+        assertTrue(testee.surveyViewState.value!!.hasValidSurvey)
     }
 
     @Test
-    fun whenScheduledSurveyChangesAndNewSurveyInstallationDoesNotMatchDaysInstalledThenSurveyCtaIsNotShown() {
+    fun whenScheduledSurveyChangesAndNewSurveyInstallationDoesNotMatchDaysInstalledThenHasValidSurveyIsFalse() {
         testee.onSurveyChanged(Survey("abc", "http://example.com", 2, SCHEDULED))
-        verify(mockCommandObserver, never()).onChanged(Command.DisplaySurveyCta)
+        assertFalse(testee.surveyViewState.value!!.hasValidSurvey)
     }
 
     @Test
-    fun whenScheduledSurveyIsNullThenSurveyCtaIsHidden() {
+    fun whenScheduledSurveyIsNullThenHasValidSurveyIsFalse() {
         testee.onSurveyChanged(null)
-        val command = captureCommands().value as Command.HideSurveyCta
-        assertNotNull(command)
+        assertFalse(testee.surveyViewState.value!!.hasValidSurvey)
     }
 
     @Test
@@ -770,10 +768,9 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserDismissesSurveyThenSurveyCancelledAndCtaHidden() {
+    fun whenUserDismissesSurveyThenSurveyCancelledAndHasValidSurveyIsFalse() {
         testee.onUserDismissedSurvey()
-        val command = captureCommands().value as Command.HideSurveyCta
-        assertNotNull(command)
+        assertFalse(testee.surveyViewState.value!!.hasValidSurvey)
         verify(surveyDao).cancelScheduledSurveys()
     }
 
