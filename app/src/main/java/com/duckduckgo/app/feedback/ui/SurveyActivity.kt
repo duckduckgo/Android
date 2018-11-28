@@ -73,7 +73,7 @@ class SurveyActivity : DuckDuckGoActivity() {
 
     private fun processCommand(command: Command) {
         when (command) {
-            is LoadSurvey -> webView.loadUrl(command.url)
+            is LoadSurvey -> loadSurvey(command.url)
             is Command.ShowSurvey -> {
                 showSurvey()
             }
@@ -82,6 +82,11 @@ class SurveyActivity : DuckDuckGoActivity() {
             }
             is Close -> finish()
         }
+    }
+
+    private fun loadSurvey(url: String) {
+        progress.show()
+        webView.loadUrl(url)
     }
 
     private fun showSurvey() {

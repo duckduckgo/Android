@@ -206,6 +206,7 @@
     <string name="addToHome">Add to Home</string>
 
     <!-- User Survey -->
+    <string name="surveyActivityTitle">User Survey</string>
     <string name="surveyBannerTitle">Help us improve the app!</string>
     <string name="surveyDescription">Take our short, anonymous survey and share your feedback.</string>
     <string name="surveyLaunchButton">Take the Survey</string>
