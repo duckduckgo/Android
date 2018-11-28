@@ -23,7 +23,7 @@ import com.duckduckgo.app.global.view.toDp
 import timber.log.Timber
 
 
-class LogoHidingLayoutChangeListener(var ddgLogoView: View) : View.OnLayoutChangeListener {
+class LogoHidingLayoutChangeListener(private var ddgLogoView: View) : View.OnLayoutChangeListener {
 
     var callToActionButton: View? = null
 
@@ -37,16 +37,7 @@ class LogoHidingLayoutChangeListener(var ddgLogoView: View) : View.OnLayoutChang
         Timber.v("App height now: $heightDp dp, call to action button showing: ${callToActionButton?.isVisible}")
 
         if (enoughRoomForLogo(heightDp)) {
-
-            val callToActionView = callToActionButton
-            if (callToActionView != null) {
-                if (callToActionView.isVisible) {
-                    ddgLogoView.alpha = 0.1f
-                } else {
-                    ddgLogoView.alpha = 1.0f
-                }
-            }
-
+            ddgLogoView.alpha = 1.0f
         } else {
             ddgLogoView.alpha = 0f
         }
