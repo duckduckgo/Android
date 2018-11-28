@@ -17,6 +17,7 @@
 package com.duckduckgo.app.fire
 
 import androidx.test.annotation.UiThreadTest
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment.ClearWhatOption
 import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment.ClearWhatOption.CLEAR_NONE
@@ -115,6 +116,7 @@ class AutomaticDataClearerClearNoneTest(private val testCase: TestCase) {
         }
     }
 
+    @UiThreadTest
     @Before
     fun setup() {
 
@@ -126,14 +128,15 @@ class AutomaticDataClearerClearNoneTest(private val testCase: TestCase) {
         whenever(mockSettingsDataStore.appUsedSinceLastClear).thenReturn(testCase.input.appUsedSinceLastClear)
     }
 
-    @UiThreadTest
     @Test
-    fun dataClearingTestsClearNone() = runBlocking {
-        simulateLifecycle()
+    fun dataClearingTestsClearNone() = runOnUiThread {
+        runBlocking {
+            simulateLifecycle()
 
-        verifyIfTabsCleared()
-        verifyIfAllDataCleared()
-        verifyIfBackgroundTimestampCleared()
+            verifyIfTabsCleared()
+            verifyIfAllDataCleared()
+            verifyIfBackgroundTimestampCleared()
+        }
     }
 
     private suspend fun verifyIfTabsCleared() {
@@ -149,9 +152,9 @@ class AutomaticDataClearerClearNoneTest(private val testCase: TestCase) {
         verify(mockSettingsDataStore).clearAppBackgroundTimestamp()
     }
 
-    private fun simulateLifecycle() {
+    private suspend fun simulateLifecycle() {
         testee.isFreshAppLaunch = testCase.input.isFreshAppLaunch
-        testee.onAppForegrounded()
+        testee.onAppForegroundedAsync()
     }
 
     data class TestCase(val expected: Expected, val input: Input)

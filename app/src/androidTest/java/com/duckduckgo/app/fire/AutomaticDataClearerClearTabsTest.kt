@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.fire
 
+import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment.ClearWhatOption
 import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment.ClearWhatOption.CLEAR_TABS_ONLY
@@ -24,8 +25,9 @@ import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment.ClearW
 import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment.ClearWhenOption.APP_EXIT_OR_15_MINS
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.nhaarman.mockitokotlin2.*
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.junit.Before
 import org.junit.Test
 
@@ -38,7 +40,7 @@ class AutomaticDataClearerClearTabsTest {
     private val mockClearAction: ClearDataAction = mock()
     private val mockTimeKeeper: BackgroundTimeKeeper = mock()
 
-
+    @UiThreadTest
     @Before
     fun setup() {
         testee = AutomaticDataClearer(mockSettingsDataStore, mockClearAction, mockTimeKeeper)
@@ -51,8 +53,10 @@ class AutomaticDataClearerClearTabsTest {
         configureEnoughTimePassed()
         configureAppUsedSinceLastClear()
 
-        simulateLifecycle(isFreshAppLaunch)
-        verifyTabsCleared()
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyTabsCleared()
+        }
     }
 
     @Test
@@ -62,8 +66,10 @@ class AutomaticDataClearerClearTabsTest {
         configureEnoughTimePassed()
         configureAppNotUsedSinceLastClear()
 
-        simulateLifecycle(isFreshAppLaunch)
-        verifyTabsNotCleared()
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyTabsNotCleared()
+        }
     }
 
     @Test
@@ -73,8 +79,10 @@ class AutomaticDataClearerClearTabsTest {
         configureNotEnoughTimePassed()
         configureAppUsedSinceLastClear()
 
-        simulateLifecycle(isFreshAppLaunch)
-        verifyTabsCleared()
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyTabsCleared()
+        }
     }
 
     @Test
@@ -84,8 +92,10 @@ class AutomaticDataClearerClearTabsTest {
         configureNotEnoughTimePassed()
         configureAppNotUsedSinceLastClear()
 
-        simulateLifecycle(isFreshAppLaunch)
-        verifyTabsNotCleared()
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyTabsNotCleared()
+        }
     }
 
     @Test
@@ -95,8 +105,10 @@ class AutomaticDataClearerClearTabsTest {
         configureEnoughTimePassed()
         configureAppUsedSinceLastClear()
 
-        simulateLifecycle(isFreshAppLaunch)
-        verifyTabsNotCleared()
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyTabsNotCleared()
+        }
     }
 
     @Test
@@ -106,8 +118,10 @@ class AutomaticDataClearerClearTabsTest {
         configureEnoughTimePassed()
         configureAppNotUsedSinceLastClear()
 
-        simulateLifecycle(isFreshAppLaunch)
-        verifyTabsNotCleared()
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyTabsNotCleared()
+        }
     }
 
     @Test
@@ -117,8 +131,10 @@ class AutomaticDataClearerClearTabsTest {
         configureNotEnoughTimePassed()
         configureAppUsedSinceLastClear()
 
-        simulateLifecycle(isFreshAppLaunch)
-        verifyTabsNotCleared()
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyTabsNotCleared()
+        }
     }
 
     @Test
@@ -128,8 +144,10 @@ class AutomaticDataClearerClearTabsTest {
         configureNotEnoughTimePassed()
         configureAppNotUsedSinceLastClear()
 
-        simulateLifecycle(isFreshAppLaunch)
-        verifyTabsNotCleared()
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyTabsNotCleared()
+        }
     }
 
     @Test
@@ -139,8 +157,10 @@ class AutomaticDataClearerClearTabsTest {
         configureEnoughTimePassed()
         configureAppUsedSinceLastClear()
 
-        simulateLifecycle(isFreshAppLaunch)
-        verifyTabsCleared()
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyTabsCleared()
+        }
     }
 
     @Test
@@ -150,8 +170,10 @@ class AutomaticDataClearerClearTabsTest {
         configureEnoughTimePassed()
         configureAppUsedSinceLastClear()
 
-        simulateLifecycle(isFreshAppLaunch)
-        verifyTabsCleared()
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyTabsCleared()
+        }
     }
 
     @Test
@@ -161,8 +183,10 @@ class AutomaticDataClearerClearTabsTest {
         configureNotEnoughTimePassed()
         configureAppUsedSinceLastClear()
 
-        simulateLifecycle(isFreshAppLaunch)
-        verifyTabsCleared()
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyTabsCleared()
+        }
     }
 
     @Test
@@ -172,8 +196,10 @@ class AutomaticDataClearerClearTabsTest {
         configureNotEnoughTimePassed()
         configureAppNotUsedSinceLastClear()
 
-        simulateLifecycle(isFreshAppLaunch)
-        verifyTabsNotCleared()
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyTabsNotCleared()
+        }
     }
 
     private fun configureAppUsedSinceLastClear() {
@@ -183,7 +209,6 @@ class AutomaticDataClearerClearTabsTest {
     private fun configureAppNotUsedSinceLastClear() {
         whenever(mockSettingsDataStore.appUsedSinceLastClear).thenReturn(false)
     }
-
 
     private fun configureUserOptions(whatOption: ClearWhatOption, whenOption: ClearWhenOption) {
         whenever(mockSettingsDataStore.automaticallyClearWhenOption).thenReturn(whenOption)
@@ -199,7 +224,6 @@ class AutomaticDataClearerClearTabsTest {
     }
 
     private suspend fun verifyTabsCleared() {
-        delay(100)
         verify(mockClearAction).clearTabsAsync(any())
     }
 
@@ -207,8 +231,8 @@ class AutomaticDataClearerClearTabsTest {
         verify(mockClearAction, never()).clearTabsAsync(any())
     }
 
-    private fun simulateLifecycle(isFreshAppLaunch: Boolean) {
+    private suspend fun simulateLifecycle(isFreshAppLaunch: Boolean) {
         testee.isFreshAppLaunch = isFreshAppLaunch
-        testee.onAppForegrounded()
+        testee.onAppForegroundedAsync()
     }
 }

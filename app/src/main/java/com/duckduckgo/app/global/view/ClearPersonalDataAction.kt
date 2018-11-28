@@ -41,6 +41,7 @@ interface ClearDataAction {
 
     suspend fun clearTabsAndAllDataAsync(appInForeground: Boolean): Unit?
 
+    fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean)
     fun killProcess()
     fun killAndRestartProcess()
 }
@@ -90,8 +91,7 @@ class ClearPersonalDataAction @Inject constructor(
         dataManager.clearWebViewSessions()
         tabRepository.deleteAll()
 
-        Timber.d("Setting appUsedSinceClear flag to $appInForeground")
-        settingsDataStore.appUsedSinceLastClear = appInForeground
+        setAppUsedSinceLastClearFlag(appInForeground)
 
         Timber.i("Finished clearing tabs; took ${System.currentTimeMillis() - startTime}ms.")
     }
@@ -104,5 +104,11 @@ class ClearPersonalDataAction @Inject constructor(
         dataManager.clearExternalCookies()
 
         Timber.i("Finished clearing data; took ${System.currentTimeMillis() - startTime}ms.")
+    }
+
+    override fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean) {
+        Timber.d("Setting appUsedSinceClear flag to $appUsedSinceLastClear")
+        settingsDataStore.appUsedSinceLastClear = appUsedSinceLastClear
+
     }
 }

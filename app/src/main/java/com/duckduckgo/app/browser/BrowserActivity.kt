@@ -22,7 +22,6 @@ import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
 import android.os.Bundle
 import android.widget.Toast
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
@@ -32,14 +31,16 @@ import com.duckduckgo.app.feedback.ui.FeedbackActivity
 import com.duckduckgo.app.fire.AutomaticDataClearer
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.global.view.FireDialog
+import com.duckduckgo.app.global.view.hide
+import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
+import kotlinx.android.synthetic.main.activity_browser.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.longToast
@@ -82,21 +83,19 @@ class BrowserActivity : DuckDuckGoActivity() {
      * The effect of this delay is that we won't show old tabs if they are in the process of deleting them.
      */
     private fun awaitClearDataFinishedNotification() {
-        dataClearingStatus().observe(this, Observer<ApplicationClearDataState> {
-            Timber.w("Notified of status change. Now $it")
-
+        automaticDataClearer.dataClearerState.observe(this, Observer<ApplicationClearDataState> {
             it?.let { state ->
 
                 when (state) {
                     ApplicationClearDataState.INITIALIZING -> {
+                        fragmentContainer.hide()
+                        removeObservers()
                         Timber.i("App clear state initializing")
                     }
                     ApplicationClearDataState.FINISHED -> {
-                        Timber.i("BrowserActivity can now start displaying web content. instance state is $instanceStateBundles")
-
-                        dataClearingStatus().removeObservers(this)
-
+                        fragmentContainer.show()
                         configureObservers()
+                        Timber.i("BrowserActivity can now start displaying web content. instance state is $instanceStateBundles")
 
                         if (instanceStateBundles?.originalInstanceState == null) {
                             Timber.i("Original instance state is null, so will inspect intent for actions to take. $intent")
@@ -207,6 +206,12 @@ class BrowserActivity : DuckDuckGoActivity() {
         })
     }
 
+    private fun removeObservers() {
+        viewModel.command.removeObservers(this)
+        viewModel.selectedTab.removeObservers(this)
+        viewModel.tabs.removeObservers(this)
+    }
+
     private fun clearStaleTabs(updatedTabs: List<TabEntity>?) {
         if (updatedTabs == null) {
             return
@@ -282,10 +287,6 @@ class BrowserActivity : DuckDuckGoActivity() {
         if (currentTab?.onBackPressed() != true) {
             super.onBackPressed()
         }
-    }
-
-    private fun dataClearingStatus(): LiveData<ApplicationClearDataState> {
-        return (applicationContext as DuckDuckGoApplication).status
     }
 
     companion object {
