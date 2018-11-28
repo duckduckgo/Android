@@ -212,6 +212,7 @@
     <string name="surveyDismissBannerContentDescription">Dismiss survey banner</string>
     <string name="surveyTitle">DUCKDUCKGO SURVEY</string>
     <string name="surveyDismissContentDescription">Dismiss survey</string>
-    <string name="surveyLoadingErrorText">Oh no! Our survey is not currently loading, please try again later.</string>
+    <string name="surveyLoadingErrorTitle">Oh no!</string>
+    <string name="surveyLoadingErrorText">Our survey is not currently loading.\nPlease try again later.</string>
 
 </resources>
