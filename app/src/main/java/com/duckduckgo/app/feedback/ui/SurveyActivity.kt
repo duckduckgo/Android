@@ -116,6 +116,11 @@ class SurveyActivity : DuckDuckGoActivity() {
         webView.restoreState(savedInstanceState)
     }
 
+    override fun onBackPressed() {
+        pixel.fire(SURVEY_SURVEY_DISMISSED)
+        super.onBackPressed()
+    }
+
     companion object {
 
         fun intent(context: Context, survey: Survey): Intent {
