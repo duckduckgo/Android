@@ -31,12 +31,18 @@ import com.duckduckgo.app.feedback.ui.SurveyViewModel.Command.LoadSurvey
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.show
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import kotlinx.android.synthetic.main.activity_user_survey.*
+import javax.inject.Inject
 
 
 class SurveyActivity : DuckDuckGoActivity() {
 
     private val viewModel: SurveyViewModel by bindViewModel()
+
+    @Inject
+    lateinit var pixel: Pixel
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,6 +67,7 @@ class SurveyActivity : DuckDuckGoActivity() {
 
     private fun configureListeners() {
         dismissButton.setOnClickListener {
+            pixel.fire(SURVEY_SURVEY_DISMISSED)
             viewModel.onSurveyDismissed()
         }
     }

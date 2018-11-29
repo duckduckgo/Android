@@ -73,6 +73,8 @@ import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
@@ -120,6 +122,9 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     @Inject
     lateinit var clipboardManager: ClipboardManager
+
+    @Inject
+    lateinit var pixel: Pixel
 
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
@@ -1001,6 +1006,7 @@ class BrowserTabFragment : Fragment(), FindListener {
                 surveyCallToActionContainer.show()
                 return
             }
+            pixel.fire(SURVEY_CTA_SHOWN)
             callToActionStub.layoutResource = R.layout.include_survey_cta
             val container = callToActionStub.inflate()
             logoHidingLayoutChangeListener.callToActionButton = container
@@ -1011,8 +1017,15 @@ class BrowserTabFragment : Fragment(), FindListener {
                 it.applyTo(newTabLayout)
             }
 
-            launchSurveyButton.setOnClickListener { viewModel.onUserOpenedSurvey() }
-            dismissSurveyButton.setOnClickListener { viewModel.onUserDismissedSurvey() }
+            launchSurveyButton.setOnClickListener {
+                pixel.fire(SURVEY_CTA_LAUNCHED_SURVEY)
+                viewModel.onUserOpenedSurvey()
+            }
+
+            dismissSurveyButton.setOnClickListener {
+                pixel.fire(SURVEY_CTA_DISMISSED)
+                viewModel.onUserDismissedSurvey()
+            }
         }
 
         private fun hideSurveyCta() {
