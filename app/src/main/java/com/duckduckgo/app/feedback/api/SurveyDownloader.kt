@@ -36,7 +36,7 @@ class SurveyDownloader @Inject constructor(
 
         return Completable.fromAction {
 
-            Timber.d("Downloading use survey data")
+            Timber.d("Downloading user survey data")
 
             val call = service.survey()
             val response = call.execute()

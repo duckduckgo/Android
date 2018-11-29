@@ -35,10 +35,10 @@ abstract class SurveyDao {
     @Query("select * from survey where surveyId = :surveyId")
     abstract fun get(surveyId: String): Survey?
 
-    @Query("select * from survey where status = \"SCHEDULED\" limit 1")
+    @Query("""select * from survey where status = "SCHEDULED" limit 1""")
     abstract fun getLiveScheduled(): LiveData<Survey>
 
-    @Query("select * from survey where status = \"SCHEDULED\"")
+    @Query("""select * from survey where status = "SCHEDULED"""")
     abstract fun getScheduled(): List<Survey>
 
     @Transaction

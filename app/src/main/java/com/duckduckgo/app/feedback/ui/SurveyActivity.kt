@@ -32,7 +32,7 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.SURVEY_SURVEY_DISMISSED
 import kotlinx.android.synthetic.main.activity_user_survey.*
 import javax.inject.Inject
 
@@ -71,8 +71,7 @@ class SurveyActivity : DuckDuckGoActivity() {
 
     private fun configureListeners() {
         dismissButton.setOnClickListener {
-            pixel.fire(SURVEY_SURVEY_DISMISSED)
-            viewModel.onSurveyDismissed()
+            onSurveyDismissed()
         }
     }
 
@@ -122,8 +121,16 @@ class SurveyActivity : DuckDuckGoActivity() {
     }
 
     override fun onBackPressed() {
+        if (webView.canGoBack()) {
+            webView.goBack()
+        } else {
+            onSurveyDismissed()
+        }
+    }
+
+    private fun onSurveyDismissed() {
         pixel.fire(SURVEY_SURVEY_DISMISSED)
-        super.onBackPressed()
+        viewModel.onSurveyDismissed()
     }
 
     companion object {

@@ -122,11 +122,11 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
             appShortcutCreator.configureAppShortcuts(this)
         }
 
+        recordInstallationTimestamp()
         initializeStatistics()
         initializeTheme(settingsDataStore)
         loadTrackerData()
         configureDataDownloader()
-        recordInstallationTimestamp()
 
         migrateLegacyDb()
         notificationRegistrar.registerApp()
