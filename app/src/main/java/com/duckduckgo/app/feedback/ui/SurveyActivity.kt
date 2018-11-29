@@ -54,8 +54,12 @@ class SurveyActivity : DuckDuckGoActivity() {
         webView.setBackgroundColor(ContextCompat.getColor(this, R.color.cornflowerBlue))
         webView.webViewClient = SurveyWebViewClient()
 
-        if (savedInstanceState == null) {
-            configureObservers()
+        configureObservers()
+
+        val lastCommand = viewModel.command.value
+        if (lastCommand != null) {
+            processCommand(lastCommand)
+        } else {
             consumeIntentExtra()
         }
     }
