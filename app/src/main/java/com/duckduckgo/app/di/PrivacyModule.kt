@@ -46,9 +46,10 @@ class PrivacyModule {
         dataManager: WebDataManager,
         clearingStore: UnsentForgetAllPixelStore,
         tabRepository: TabRepository,
-        settingsDataStore: SettingsDataStore
+        settingsDataStore: SettingsDataStore,
+        cookieManager: DuckDuckGoCookieManager
     ): ClearDataAction {
-        return ClearPersonalDataAction(context, dataManager, clearingStore, tabRepository, settingsDataStore)
+        return ClearPersonalDataAction(context, dataManager, clearingStore, tabRepository, settingsDataStore, cookieManager)
     }
 
     @Provides

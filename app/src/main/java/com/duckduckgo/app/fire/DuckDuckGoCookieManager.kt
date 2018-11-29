@@ -17,39 +17,65 @@
 package com.duckduckgo.app.fire
 
 import android.webkit.CookieManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 
 interface DuckDuckGoCookieManager {
     suspend fun removeExternalCookies()
+    fun flush()
 }
 
 class WebViewCookieManager(
     private val cookieManager: CookieManager,
     private val host: String
 ) : DuckDuckGoCookieManager {
-
     override suspend fun removeExternalCookies() {
 
         val ddgCookies = getDuckDuckGoCookies()
 
         suspendCoroutine<Unit> { continuation ->
             cookieManager.removeAllCookies {
+                Timber.i("All cookies removed; restoring ${ddgCookies.size} DDG cookies")
                 continuation.resume(Unit)
             }
         }
 
         storeDuckDuckGoCookies(ddgCookies)
+
+        withContext(Dispatchers.IO) {
+            flush()
+        }
     }
 
-    private fun storeDuckDuckGoCookies(cookies: List<String>) {
+    private suspend fun storeDuckDuckGoCookies(cookies: List<String>) {
         cookies.forEach {
-            cookieManager.setCookie(host, it.trim())
+            val cookie = it.trim()
+            Timber.d("Restoring DDB cookie: $cookie")
+            storeCookie(cookie)
+        }
+    }
+
+    private suspend fun storeCookie(cookie: String) {
+        suspendCoroutine<Unit> { continuation ->
+            cookieManager.setCookie(host, cookie) { success ->
+                Timber.v("Cookie $cookie stored successfully: $success")
+                continuation.resume(Unit)
+            }
         }
     }
 
     private fun getDuckDuckGoCookies(): List<String> {
         return cookieManager.getCookie(host)?.split(";").orEmpty()
+    }
+
+    override fun flush() {
+        val startTime = System.currentTimeMillis()
+        Timber.v("Forcing cookie manager flush")
+        cookieManager.flush()
+        Timber.v("Finished cookie manager flush; took ${System.currentTimeMillis() - startTime}ms")
     }
 }

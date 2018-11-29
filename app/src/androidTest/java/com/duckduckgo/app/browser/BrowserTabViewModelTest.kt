@@ -150,15 +150,15 @@ class BrowserTabViewModelTest {
             siteFactory = siteFactory,
             tabRepository = mockTabsRepository,
             networkLeaderboardDao = mockNetworkLeaderboardDao,
+            bookmarksDao = bookmarksDao,
             autoCompleteApi = mockAutoCompleteApi,
             appSettingsPreferencesStore = mockSettingsStore,
-            bookmarksDao = bookmarksDao,
             longPressHandler = mockLongPressHandler,
-            appConfigurationDao = appConfigurationDao,
             webViewSessionStorage = webViewSessionStorage,
             specialUrlDetector = SpecialUrlDetectorImpl(),
             faviconDownloader = mockFaviconDownloader,
-            addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector
+            addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector,
+            appConfigurationDao = appConfigurationDao
         )
 
         testee.loadData("abc", null)

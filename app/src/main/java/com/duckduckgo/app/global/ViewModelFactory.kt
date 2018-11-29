@@ -112,13 +112,13 @@ class ViewModelFactory @Inject constructor(
         tabRepository = tabRepository,
         networkLeaderboardDao = networkLeaderboardDao,
         bookmarksDao = bookmarksDao,
+        autoCompleteApi = autoCompleteApi,
         appSettingsPreferencesStore = appSettingsPreferencesStore,
-        appConfigurationDao = appConfigurationDao,
         longPressHandler = webViewLongPressHandler,
         webViewSessionStorage = webViewSessionStorage,
-        autoCompleteApi = autoCompleteApi,
         specialUrlDetector = specialUrlDetector,
         faviconDownloader = faviconDownloader,
-        addToHomeCapabilityDetector = addToHomeCapabilityDetector
+        addToHomeCapabilityDetector = addToHomeCapabilityDetector,
+        appConfigurationDao = appConfigurationDao
     )
 }
