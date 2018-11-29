@@ -247,6 +247,9 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     fun launchFire() {
         val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction)
+        dialog.clearStarted = {
+            clearingInProgressView.show()
+        }
         dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.show()
     }
