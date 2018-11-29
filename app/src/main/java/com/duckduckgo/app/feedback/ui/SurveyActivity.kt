@@ -103,6 +103,7 @@ class SurveyActivity : DuckDuckGoActivity() {
 
     private fun showError() {
         progress.gone()
+        webView.gone()
         errorView.show()
     }
 
