@@ -21,8 +21,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.support.annotation.AnyThread
-import android.support.v4.app.NotificationCompat
+import androidx.annotation.AnyThread
+import androidx.core.app.NotificationCompat
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.notification.NotificationRegistrar
 import org.jetbrains.anko.longToast

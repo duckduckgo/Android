@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.httpsupgrade.model
 
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.PrimaryKey
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 @Entity(tableName = "https_whitelisted_domain")
 data class HttpsWhitelistedDomain(

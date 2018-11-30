@@ -16,11 +16,11 @@
 
 package com.duckduckgo.app.browser.autoComplete
 
-import android.support.annotation.UiThread
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.UiThread
+import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter.AutoCompleteViewHolder

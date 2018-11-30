@@ -17,7 +17,7 @@
 package com.duckduckgo.app.global.view
 
 import android.graphics.Color
-import android.support.annotation.ColorInt
+import androidx.annotation.ColorInt
 
 class ColorCombiner {
 

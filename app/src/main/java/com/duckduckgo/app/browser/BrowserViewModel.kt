@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.browser
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.ViewModel
-import android.support.annotation.StringRes
+import androidx.annotation.StringRes
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter

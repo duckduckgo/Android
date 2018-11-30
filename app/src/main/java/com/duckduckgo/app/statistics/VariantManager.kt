@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.statistics
 
-import android.support.annotation.WorkerThread
+import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber

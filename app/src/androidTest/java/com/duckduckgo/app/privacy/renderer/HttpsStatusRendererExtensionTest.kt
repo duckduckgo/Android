@@ -17,7 +17,7 @@
 package com.duckduckgo.app.privacy.renderer
 
 import android.content.Context
-import android.support.test.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import org.junit.Assert.assertEquals
@@ -25,7 +25,7 @@ import org.junit.Test
 
 class HttpsStatusRendererExtensionTest {
 
-    private val context: Context = InstrumentationRegistry.getTargetContext()
+    private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
 
     @Test
     fun whenHttpsStatusIsSecureThenTextReflectsSame() {

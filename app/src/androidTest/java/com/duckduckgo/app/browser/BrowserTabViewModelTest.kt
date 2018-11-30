@@ -16,13 +16,13 @@
 
 package com.duckduckgo.app.browser
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Observer
-import android.arch.persistence.room.Room
-import android.support.test.InstrumentationRegistry
 import android.view.MenuItem
 import android.view.View
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.room.Room
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
@@ -36,17 +36,19 @@ import com.duckduckgo.app.browser.addToHome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.feedback.db.SurveyDao
+import com.duckduckgo.app.feedback.model.Survey
+import com.duckduckgo.app.feedback.model.Survey.Status.SCHEDULED
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.SiteVisitedEntity
-import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.PrevalenceStore
-import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -63,6 +65,7 @@ import org.mockito.*
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
+import java.util.concurrent.TimeUnit
 
 class BrowserTabViewModelTest {
 
@@ -122,6 +125,12 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockAddToHomeCapabilityDetector: AddToHomeCapabilityDetector
 
+    @Mock
+    private lateinit var surveyDao: SurveyDao
+
+    @Mock
+    private lateinit var mockAppInstallStore: AppInstallStore
+
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
 
@@ -135,7 +144,7 @@ class BrowserTabViewModelTest {
     fun before() {
         MockitoAnnotations.initMocks(this)
 
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java)
+        db = Room.inMemoryDatabaseBuilder(getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         appConfigurationDao = db.appConfigurationDao()
@@ -144,6 +153,7 @@ class BrowserTabViewModelTest {
 
         whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -160,7 +170,9 @@ class BrowserTabViewModelTest {
             webViewSessionStorage = webViewSessionStorage,
             specialUrlDetector = SpecialUrlDetectorImpl(),
             faviconDownloader = mockFaviconDownloader,
-            addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector
+            addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector,
+            surveyDao = surveyDao,
+            appInstallStore = mockAppInstallStore
         )
 
         testee.loadData("abc", null)
@@ -177,6 +189,27 @@ class BrowserTabViewModelTest {
         db.close()
         testee.url.removeObserver(mockQueryObserver)
         testee.command.removeObserver(mockCommandObserver)
+    }
+
+    @Test
+    fun whenSearchUrlSharedThenAtbAndSourceParametersAreRemoved() {
+        testee.userSharingLink("https://duckduckgo.com/?q=test&atb=v117-1&t=ddg_test")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.ShareLink)
+
+        val shareLink = commandCaptor.lastValue as Command.ShareLink
+        assertEquals("https://duckduckgo.com/?q=test", shareLink.url)
+    }
+
+    @Test
+    fun whenNonSearchUrlSharedThenUrlIsUnchanged() {
+        val url = "https://duckduckgo.com/about?atb=v117-1&t=ddg_test"
+        testee.userSharingLink(url)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.ShareLink)
+
+        val shareLink = commandCaptor.lastValue as Command.ShareLink
+        assertEquals(url, shareLink.url)
     }
 
     @Test
@@ -563,22 +596,22 @@ class BrowserTabViewModelTest {
     @Test
     fun whenEnteringNonEmptyQueryThenHideKeyboardCommandIssued() {
         testee.onUserSubmittedQuery("foo")
-        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.value == Command.HideKeyboard)
     }
 
     @Test
     fun whenNotifiedEnteringFullScreenThenViewStateUpdatedWithFullScreenFlag() {
-        val stubView = View(InstrumentationRegistry.getTargetContext())
+        val stubView = View(getInstrumentation().targetContext)
         testee.goFullScreen(stubView)
         assertTrue(browserViewState().isFullScreen)
     }
 
     @Test
     fun whenNotifiedEnteringFullScreenThenEnterFullScreenCommandIssued() {
-        val stubView = View(InstrumentationRegistry.getTargetContext())
+        val stubView = View(getInstrumentation().targetContext)
         testee.goFullScreen(stubView)
-        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShowFullScreen)
     }
 
@@ -600,7 +633,7 @@ class BrowserTabViewModelTest {
 
         val mockMenuItem: MenuItem = mock()
         testee.userSelectedItemFromLongPressMenu("example.com", mockMenuItem)
-        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.DownloadImage)
 
         val lastCommand = commandCaptor.lastValue as Command.DownloadImage
@@ -635,7 +668,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSelectsDesktopSiteThenDesktopModeStateUpdated() {
         testee.desktopSiteModeToggled("http://example.com", desktopSiteRequested = true)
-        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(browserViewState().isDesktopBrowsingMode)
     }
 
@@ -648,7 +681,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSelectsDesktopSiteWhenOnMobileSpecificSiteThenUrlModified() {
         testee.desktopSiteModeToggled("http://m.example.com", desktopSiteRequested = true)
-        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue as Navigate
         assertEquals("http://example.com", ultimateCommand.url)
     }
@@ -656,7 +689,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSelectsDesktopSiteWhenNotOnMobileSpecificSiteThenUrlNotModified() {
         testee.desktopSiteModeToggled("http://example.com", desktopSiteRequested = true)
-        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
         assertTrue(ultimateCommand == Command.Refresh)
     }
@@ -664,7 +697,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSelectsMobileSiteWhenOnMobileSpecificSiteThenUrlNotModified() {
         testee.desktopSiteModeToggled("http://m.example.com", desktopSiteRequested = false)
-        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
         assertTrue(ultimateCommand == Command.Refresh)
     }
@@ -672,7 +705,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSelectsMobileSiteWhenNotOnMobileSpecificSiteThenUrlNotModified() {
         testee.desktopSiteModeToggled("http://example.com", desktopSiteRequested = false)
-        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
         assertTrue(ultimateCommand == Command.Refresh)
     }
@@ -706,6 +739,39 @@ class BrowserTabViewModelTest {
         testee.onBrokenSiteSelected()
         val command = captureCommands().value as Command.BrokenSiteFeedback
         assertNull(command.url)
+    }
+
+    @Test
+    fun whenScheduledSurveyChangesAndNewSurveyInstallationDayMatchesDaysInstalledThenHasValidSurveyIsTrue() {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
+        assertTrue(testee.surveyViewState.value!!.hasValidSurvey)
+    }
+
+    @Test
+    fun whenScheduledSurveyChangesAndNewSurveyInstallationDoesNotMatchDaysInstalledThenHasValidSurveyIsFalse() {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", 2, SCHEDULED))
+        assertFalse(testee.surveyViewState.value!!.hasValidSurvey)
+    }
+
+    @Test
+    fun whenScheduledSurveyIsNullThenHasValidSurveyIsFalse() {
+        testee.onSurveyChanged(null)
+        assertFalse(testee.surveyViewState.value!!.hasValidSurvey)
+    }
+
+    @Test
+    fun whenSurveyExistsAndUserOpensSurveyThenSurveyShown() {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
+        testee.onUserOpenedSurvey()
+        val command = captureCommands().value as Command.LaunchSurvey
+        assertNotNull(command)
+    }
+
+    @Test
+    fun whenUserDismissesSurveyThenSurveyCancelledAndHasValidSurveyIsFalse() {
+        testee.onUserDismissedSurvey()
+        assertFalse(testee.surveyViewState.value!!.hasValidSurvey)
+        verify(surveyDao).cancelScheduledSurveys()
     }
 
     @Test
@@ -749,7 +815,7 @@ class BrowserTabViewModelTest {
     }
 
     private fun captureCommands(): ArgumentCaptor<Command> {
-        verify(mockCommandObserver, Mockito.atLeastOnce()).onChanged(commandCaptor.capture())
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         return commandCaptor
     }
 

@@ -16,10 +16,9 @@
 
 package com.duckduckgo.app.onboarding.ui
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.statistics.VariantManager
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.verify
@@ -38,7 +37,6 @@ class OnboardingViewModelTest {
 
     private var onboardingStore: OnboardingStore = mock()
     private var mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
-    private var variantManager: VariantManager = mock()
 
     private val testee: OnboardingViewModel by lazy {
         OnboardingViewModel(onboardingStore, mockDefaultBrowserDetector)

@@ -28,13 +28,13 @@
         android:layout_above="@id/bottomDivider"
         android:layout_alignParentTop="true">
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:context="com.duckduckgo.app.privacy.ui.PrivacyPracticesActivity"
             tools:showIn="@layout/activity_privacy_practices">
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/practicesBannerContainer"
                 android:layout_width="match_parent"
                 android:layout_height="169dp"
@@ -83,7 +83,7 @@
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/domain" />
 
-            </android.support.constraint.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
                 android:id="@+id/practicesOverview"
@@ -111,7 +111,7 @@
                 android:background="@color/divider"
                 app:layout_constraintTop_toBottomOf="@id/practicesOverview" />
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/practicesList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -119,7 +119,7 @@
                 android:layout_marginBottom="22dp"
                 app:layout_constraintTop_toBottomOf="@id/topDivider" />
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
 

@@ -16,13 +16,13 @@
 
 package com.duckduckgo.app.global
 
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProviders
 import android.content.BroadcastReceiver
 import android.os.Bundle
-import android.support.v4.content.LocalBroadcastManager
-import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProviders
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import dagger.android.AndroidInjection
 import javax.inject.Inject

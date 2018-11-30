@@ -1,13 +1,14 @@
 package com.duckduckgo.app.feedback.ui
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.arch.lifecycle.Observer
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.Observer
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.feedback.api.FeedbackSender
 import com.duckduckgo.app.feedback.ui.FeedbackViewModel.Command
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.verify
+import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -42,6 +43,11 @@ class FeedbackViewModelTest {
         MockitoAnnotations.initMocks(this)
         testee = FeedbackViewModel(mockFeedbackSender)
         testee.command.observeForever(mockCommandObserver)
+    }
+
+    @After
+    fun after() {
+        testee.command.removeObserver(mockCommandObserver)
     }
 
     @Test

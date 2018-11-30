@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.trackerdetection.db
 
-import android.arch.persistence.room.Room
-import android.support.test.InstrumentationRegistry
+import androidx.room.Room
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 import org.junit.After
@@ -33,7 +33,7 @@ class TrackerDataDaoTest {
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(), AppDatabase::class.java).build()
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java).build()
         dao = db.trackerDataDao()
     }
 
@@ -93,7 +93,7 @@ class TrackerDataDaoTest {
         assertEquals(0, dao.count())
     }
 
-    fun createTracker(url: String): DisconnectTracker {
+    private fun createTracker(url: String): DisconnectTracker {
         return DisconnectTracker(url, "", "", "")
     }
 

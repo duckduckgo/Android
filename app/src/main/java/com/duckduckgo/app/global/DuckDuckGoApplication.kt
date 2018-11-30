@@ -19,12 +19,12 @@ package com.duckduckgo.app.global
 import android.app.Activity
 import android.app.Application
 import android.app.Service
-import android.arch.lifecycle.Lifecycle
-import android.arch.lifecycle.LifecycleObserver
-import android.arch.lifecycle.OnLifecycleEvent
-import android.arch.lifecycle.ProcessLifecycleOwner
 import android.os.Build
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.DaggerAppComponent
@@ -122,11 +122,11 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
             appShortcutCreator.configureAppShortcuts(this)
         }
 
+        recordInstallationTimestamp()
         initializeStatistics()
         initializeTheme(settingsDataStore)
         loadTrackerData()
         configureDataDownloader()
-        recordInstallationTimestamp()
 
         migrateLegacyDb()
         notificationRegistrar.registerApp()
