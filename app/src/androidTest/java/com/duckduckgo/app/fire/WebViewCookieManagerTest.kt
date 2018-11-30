@@ -17,9 +17,11 @@
 package com.duckduckgo.app.fire
 
 import android.webkit.CookieManager
-import android.webkit.ValueCallback
-import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -28,44 +30,38 @@ class WebViewCookieManagerTest {
 
     private lateinit var testee: WebViewCookieManager
 
-    private val mockCookieManager: CookieManager = mock()
-    private val captor = argumentCaptor<ValueCallback<Boolean>>()
+    private val cookieManager: CookieManager = CookieManager.getInstance()
 
     @Before
     fun setup() {
-        testee = WebViewCookieManager(mockCookieManager, host)
-
-        doAnswer {
-            captor.firstValue.onReceiveValue(true)
-        }.whenever(mockCookieManager).removeAllCookies(captor.capture())
-    }
-
-    @Test
-    fun whenRemoveExernalCookiesCalledThenUnderlyingCookieManagerCalledToRemoveAllCookies() = runBlocking<Unit> {
-        testee.removeExternalCookies()
-        verify(mockCookieManager).removeAllCookies(any())
+        testee = WebViewCookieManager(cookieManager, host)
     }
 
     @Test
     fun whenExternalCookiesClearedThenInternalCookiesRecreated() = runBlocking<Unit> {
-        whenever(mockCookieManager.getCookie(host)).thenReturn("da=abc; dz=zyx")
-        whenever(mockCookieManager.getCookie(externalHost)).thenReturn("ea=abc; ez=zyx")
+        cookieManager.setCookie(host, "da=abc")
+        cookieManager.setCookie(externalHost, "dz=zyx")
 
-        testee.removeExternalCookies()
+        withContext(Dispatchers.Main) {
+            testee.removeExternalCookies()
+        }
 
-        verify(mockCookieManager).setCookie(host, "da=abc")
-        verify(mockCookieManager).setCookie(host, "dz=zyx")
+        val actualCookies = cookieManager.getCookie(host)?.split(";").orEmpty()
+        assertEquals(1, actualCookies.size)
+        assertTrue(actualCookies.contains("da=abc"))
     }
 
     @Test
     fun whenExternalCookiesClearedThenExternalCookiesAreNotRecreated() = runBlocking<Unit> {
-        whenever(mockCookieManager.getCookie(host)).thenReturn("da=abc; dz=zyx")
-        whenever(mockCookieManager.getCookie(externalHost)).thenReturn("ea=abc; ez=zyx")
+        cookieManager.setCookie(host, "da=abc")
+        cookieManager.setCookie(externalHost, "dz=zyx")
 
-        testee.removeExternalCookies()
+        withContext(Dispatchers.Main) {
+            testee.removeExternalCookies()
+        }
 
-        verify(mockCookieManager, never()).setCookie(host, "ea=abc")
-        verify(mockCookieManager, never()).setCookie(host, "ez=zyx")
+        val actualCookies = cookieManager.getCookie(externalHost)?.split(";").orEmpty()
+        assertEquals(0, actualCookies.size)
     }
 
     companion object {

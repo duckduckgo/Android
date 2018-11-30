@@ -93,7 +93,6 @@ class ClearPersonalDataAction @Inject constructor(
 
         dataManager.clearWebViewSessions()
         tabRepository.deleteAll()
-
         setAppUsedSinceLastClearFlag(appInForeground)
 
         Timber.i("Finished clearing tabs; took ${System.currentTimeMillis() - startTime}ms.")

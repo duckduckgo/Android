@@ -31,7 +31,7 @@ import androidx.work.WorkerFactory
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.DaggerAppComponent
-import com.duckduckgo.app.fire.AutomaticDataClearer
+import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.global.Theming.initializeTheme
@@ -107,7 +107,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     lateinit var unsentForgetAllPixelStore: UnsentForgetAllPixelStore
 
     @Inject
-    lateinit var automaticDataClearer: AutomaticDataClearer
+    lateinit var dataClearer: DataClearer
 
     @Inject
     lateinit var workerFactory: WorkerFactory
@@ -131,7 +131,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
         ProcessLifecycleOwner.get().lifecycle.also {
             it.addObserver(this)
-            it.addObserver(automaticDataClearer)
+            it.addObserver(dataClearer)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {

@@ -63,7 +63,7 @@ class PrivacyModule {
         settingsDataStore: SettingsDataStore,
         clearDataAction: ClearDataAction,
         dataClearerTimeKeeper: BackgroundTimeKeeper
-    ): AutomaticDataClearer {
+    ): DataClearer {
         return AutomaticDataClearer(settingsDataStore, clearDataAction, dataClearerTimeKeeper)
     }
 

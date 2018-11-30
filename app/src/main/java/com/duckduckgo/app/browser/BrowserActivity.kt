@@ -28,13 +28,13 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.feedback.ui.FeedbackActivity
-import com.duckduckgo.app.fire.AutomaticDataClearer
+import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.global.view.FireDialog
-import com.duckduckgo.app.global.view.hide
+import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
@@ -53,7 +53,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
 
     @Inject
-    lateinit var automaticDataClearer: AutomaticDataClearer
+    lateinit var dataClearer: DataClearer
 
     private var currentTab: BrowserTabFragment? = null
 
@@ -61,56 +61,64 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     private var instanceStateBundles: CombinedInstanceState? = null
 
+    private var lastIntent: Intent? = null
+
     private data class CombinedInstanceState(val originalInstanceState: Bundle?, val newInstanceState: Bundle?)
 
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.daggerInject()
 
-        Timber.i("onCreate called. freshAppLaunch: ${automaticDataClearer.isFreshAppLaunch}, savedInstanceState: $savedInstanceState")
+        Timber.i("onCreate called. freshAppLaunch: ${dataClearer.isFreshAppLaunch}, savedInstanceState: $savedInstanceState")
 
-        val newInstanceState = if (automaticDataClearer.isFreshAppLaunch) null else savedInstanceState
+        val newInstanceState = if (dataClearer.isFreshAppLaunch) null else savedInstanceState
         instanceStateBundles = CombinedInstanceState(originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
         setContentView(R.layout.activity_browser)
-        awaitClearDataFinishedNotification()
-    }
-
-    /**
-     * To ensure the best UX, we might not want to show anything to the user while the clear is taking place.
-     * This method will await until the ApplicationClearDataState.FINISHED event is received before observing for other changes
-     * The effect of this delay is that we won't show old tabs if they are in the process of deleting them.
-     */
-    private fun awaitClearDataFinishedNotification() {
-        automaticDataClearer.dataClearerState.observe(this, Observer<ApplicationClearDataState> {
-            it?.let { state ->
-
-                when (state) {
-                    ApplicationClearDataState.INITIALIZING -> {
-                        fragmentContainer.hide()
-                        removeObservers()
-                        Timber.i("App clear state initializing")
-                    }
-                    ApplicationClearDataState.FINISHED -> {
-                        fragmentContainer.show()
-                        configureObservers()
-                        Timber.i("BrowserActivity can now start displaying web content. instance state is $instanceStateBundles")
-
-                        if (instanceStateBundles?.originalInstanceState == null) {
-                            Timber.i("Original instance state is null, so will inspect intent for actions to take. $intent")
-                            launchNewSearchOrQuery(intent)
-                        }
-                    }
-                }
-            }
+        viewModel.viewState.observe(this, Observer {
+            renderViewState(it)
         })
+        viewModel.awaitClearDataFinishedNotification()
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         Timber.i("onNewIntent: $intent")
-        launchNewSearchOrQuery(intent)
+
+        if (dataClearer.dataClearerState.value == ApplicationClearDataState.FINISHED) {
+            Timber.i("Automatic data clearer has finished, so processing intent now")
+            launchNewSearchOrQuery(intent)
+        } else {
+            Timber.i("Automatic data clearer not yet finished, so deferring processing of intent")
+            lastIntent = intent
+        }
+    }
+
+    private fun renderViewState(viewState: BrowserViewModel.ViewState?) {
+        if (viewState == null) return
+
+        if (viewState.hideWebContent) {
+            Timber.w("Hiding web view content")
+            removeObservers()
+            clearingInProgressView.show()
+        } else {
+            Timber.i("BrowserActivity can now start displaying web content. instance state is $instanceStateBundles")
+            Timber.w("Showing web view content")
+            configureObservers()
+
+            if (lastIntent != null) {
+                Timber.i("There was a deferred intent to process; handling now")
+                launchNewSearchOrQuery(lastIntent)
+                lastIntent = null
+            }
+
+            if (instanceStateBundles?.originalInstanceState == null) {
+                Timber.i("Original instance state is null, so will inspect intent for actions to take. $intent")
+                launchNewSearchOrQuery(intent)
+            }
+            clearingInProgressView.gone()
+        }
     }
 
     private fun openNewTab(tabId: String, url: String? = null) {
@@ -168,6 +176,7 @@ class BrowserActivity : DuckDuckGoActivity() {
             Timber.i("Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set")
             GlobalScope.launch {
                 clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true)
+                clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
                 clearPersonalDataAction.killAndRestartProcess()
             }
 

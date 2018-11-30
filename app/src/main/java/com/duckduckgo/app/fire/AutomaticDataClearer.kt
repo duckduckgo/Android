@@ -19,10 +19,7 @@ package com.duckduckgo.app.fire
 import android.os.Handler
 import androidx.annotation.UiThread
 import androidx.core.os.postDelayed
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.*
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.duckduckgo.app.global.ApplicationClearDataState
@@ -37,21 +34,26 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
+interface DataClearer : LifecycleObserver {
+    val dataClearerState: LiveData<ApplicationClearDataState>
+    var isFreshAppLaunch: Boolean
+}
+
 class AutomaticDataClearer(
     private val settingsDataStore: SettingsDataStore,
     private val clearDataAction: ClearDataAction,
     private val dataClearerTimeKeeper: BackgroundTimeKeeper
-) : LifecycleObserver, CoroutineScope {
+) : DataClearer, LifecycleObserver, CoroutineScope {
 
     private val clearJob: Job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + clearJob
 
-    val dataClearerState: MutableLiveData<ApplicationClearDataState> = MutableLiveData<ApplicationClearDataState>().also {
+    override val dataClearerState: MutableLiveData<ApplicationClearDataState> = MutableLiveData<ApplicationClearDataState>().also {
         it.postValue(INITIALIZING)
     }
 
-    var isFreshAppLaunch = true
+    override var isFreshAppLaunch = true
 
     @UiThread
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
@@ -98,6 +100,9 @@ class AutomaticDataClearer(
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onAppBackgrounded() {
         Timber.i("Recording when app backgrounded")
+
+        dataClearerState.value = INITIALIZING
+
         settingsDataStore.appBackgroundedTimestamp = System.currentTimeMillis()
 
         val clearWhenOption = settingsDataStore.automaticallyClearWhenOption
