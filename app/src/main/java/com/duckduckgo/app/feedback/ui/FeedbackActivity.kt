@@ -16,13 +16,13 @@
 
 package com.duckduckgo.app.feedback.ui
 
-import androidx.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.widget.EditText
 import androidx.core.view.isVisible
+import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.FeedbackViewModel.Command
 import com.duckduckgo.app.feedback.ui.FeedbackViewModel.ViewState
@@ -69,7 +69,7 @@ class FeedbackActivity : DuckDuckGoActivity() {
                 viewModel.onBrokenSiteUrlChanged(editable.toString())
             }
         })
-        submitButton.setOnClickListener { _ ->
+        submitButton.setOnClickListener {
             viewModel.onSubmitPressed()
         }
     }

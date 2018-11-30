@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
@@ -27,6 +28,10 @@ interface AppInstallStore {
     var installTimestamp: Long
 
     fun hasInstallTimestampRecorded(): Boolean
+}
+
+fun AppInstallStore.daysInstalled(): Long {
+    return TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - installTimestamp)
 }
 
 class AppInstallSharedPreferences @Inject constructor(private val context: Context) : AppInstallStore {
@@ -46,3 +51,4 @@ class AppInstallSharedPreferences @Inject constructor(private val context: Conte
         const val KEY_TIMESTAMP_UTC = "INSTALL_TIMESTAMP_UTC"
     }
 }
+

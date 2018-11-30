@@ -27,6 +27,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Bundle
@@ -46,6 +47,7 @@ import android.widget.TextView
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.isVisible
@@ -65,10 +67,14 @@ import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.feedback.model.Survey
+import com.duckduckgo.app.feedback.ui.SurveyActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
@@ -77,7 +83,9 @@ import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
+import kotlinx.android.synthetic.main.include_survey_cta.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
+import org.jetbrains.anko.configuration
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
@@ -114,6 +122,9 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     @Inject
     lateinit var clipboardManager: ClipboardManager
+
+    @Inject
+    lateinit var pixel: Pixel
 
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
@@ -277,8 +288,16 @@ class BrowserTabFragment : Fragment(), FindListener {
             it?.let { navigate(it) }
         })
 
+        viewModel.surveyViewState.observe(this, Observer {
+            it?.let { renderer.renderSurveyViewState(it) }
+        })
+
         viewModel.command.observe(this, Observer {
             processCommand(it)
+        })
+
+        viewModel.survey.observe(this, Observer<Survey> {
+            it.let { viewModel.onSurveyChanged(it) }
         })
 
         addTabsObserver()
@@ -368,6 +387,7 @@ class BrowserTabFragment : Fragment(), FindListener {
             is Command.HandleExternalAppLink -> {
                 externalAppLinkClicked(it)
             }
+            is Command.LaunchSurvey -> launchSurvey(it.survey)
         }
     }
 
@@ -678,6 +698,7 @@ class BrowserTabFragment : Fragment(), FindListener {
      */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        renderer.refreshSurveyViewState(newConfig.isLandscape)
         ddgLogo.setImageResource(R.drawable.logo_full)
     }
 
@@ -795,6 +816,12 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
     }
 
+    private fun launchSurvey(survey: Survey) {
+        context?.let {
+            startActivity(SurveyActivity.intent(it, survey))
+        }
+    }
+
     companion object {
 
         private const val TAB_ID_ARG = "TAB_ID_ARG"
@@ -825,6 +852,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         private var lastSeenBrowserViewState: BrowserViewState? = null
         private var lastSeenGlobalViewState: GlobalLayoutViewState? = null
         private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
+        private var lastSeenSurveyViewState: SurveyViewState? = null
 
         fun renderAutocomplete(viewState: AutoCompleteViewState) {
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
@@ -956,6 +984,56 @@ class BrowserTabFragment : Fragment(), FindListener {
             }
         }
 
+        fun renderSurveyViewState(viewState: BrowserTabViewModel.SurveyViewState) {
+            renderIfChanged(viewState, lastSeenSurveyViewState) {
+                lastSeenSurveyViewState = viewState
+                val isLandscape = activity?.configuration?.isLandscape ?: false
+                refreshSurveyViewState(isLandscape)
+            }
+        }
+
+        fun refreshSurveyViewState(isLandscape: Boolean) {
+            val hasSurvey = lastSeenSurveyViewState?.hasValidSurvey ?: false
+            if (hasSurvey && !isLandscape) {
+                displaySurveyCta()
+            } else {
+                hideSurveyCta()
+            }
+        }
+
+        private fun displaySurveyCta() {
+            if (surveyCallToActionContainer != null) {
+                surveyCallToActionContainer.show()
+                return
+            }
+            pixel.fire(SURVEY_CTA_SHOWN)
+            callToActionStub.layoutResource = R.layout.include_survey_cta
+            val container = callToActionStub.inflate()
+            logoHidingLayoutChangeListener.callToActionButton = container
+
+            ConstraintSet().also {
+                it.clone(newTabLayout)
+                it.connect(ddgLogo.id, ConstraintSet.BOTTOM, container.id, ConstraintSet.TOP, 0)
+                it.applyTo(newTabLayout)
+            }
+
+            launchSurveyButton.setOnClickListener {
+                pixel.fire(SURVEY_CTA_LAUNCHED_SURVEY)
+                viewModel.onUserOpenedSurvey()
+            }
+
+            dismissSurveyButton.setOnClickListener {
+                pixel.fire(SURVEY_CTA_DISMISSED)
+                viewModel.onUserDismissedSurvey()
+            }
+        }
+
+        private fun hideSurveyCta() {
+            if (surveyCallToActionContainer != null) {
+                surveyCallToActionContainer.gone()
+            }
+        }
+
         /**
          * This method will execute the given lambda only if the given view states differ
          */
@@ -1012,4 +1090,8 @@ class BrowserTabFragment : Fragment(), FindListener {
         private fun shouldUpdateOmnibarTextInput(viewState: OmnibarViewState, omnibarInput: String?) =
             !viewState.isEditing && omnibarTextInput.isDifferent(omnibarInput)
     }
+
+    val Configuration.isLandscape: Boolean
+        get() = orientation == ORIENTATION_LANDSCAPE
+
 }

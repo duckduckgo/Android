@@ -54,6 +54,9 @@
         <item name="settingsMinorTextColor">@color/grayishTwo</item>
         <item name="settingsSwitchBackgroundColor">@color/subtleGrayTwo</item>
         <item name="settingsDividerColor">@color/almostBlack</item>
+        <item name="callToActionCloseButtonColor">@color/brownishGrayTwo</item>
+        <item name="callToActionTitleColor">@color/white</item>
+        <item name="callToActionSubtitleColor">@color/grayishThree</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -98,6 +101,9 @@
         <item name="settingsMinorTextColor">@color/warmerGray</item>
         <item name="settingsSwitchBackgroundColor">@color/brownishGrayTwo</item>
         <item name="settingsDividerColor">@color/whiteSix</item>
+        <item name="callToActionCloseButtonColor">@color/pinkishGray</item>
+        <item name="callToActionTitleColor">@color/almostBlack</item>
+        <item name="callToActionSubtitleColor">@color/brownishGrayTwo</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
@@ -114,6 +120,8 @@
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowAnimationStyle">@android:style/Animation</item>
+
+        <item name="toolbarIconColor">@color/grayish</item>
     </style>
 
     <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">

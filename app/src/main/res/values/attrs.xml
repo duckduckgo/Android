@@ -36,5 +36,8 @@
     <attr name="settingsMinorTextColor" format="color" />
     <attr name="settingsSwitchBackgroundColor" format="color" />
     <attr name="settingsDividerColor" format="color" />
+    <attr name="callToActionCloseButtonColor" format="color" />
+    <attr name="callToActionTitleColor" format="color" />
+    <attr name="callToActionSubtitleColor" format="color" />
 
 </resources>

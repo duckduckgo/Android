@@ -46,11 +46,13 @@
     <color name="midGray">#555</color>
     <color name="grayish">#aaaaaa</color>
     <color name="grayishTwo">#939393</color>
+    <color name="grayishThree">#ddd</color>
     <color name="warmGray">#999999</color>
     <color name="warmerGray">#777777</color>
     <color name="paleBrownishGray">#b0b0b0</color>
     <color name="brownishGray">#5c5c5c</color>
     <color name="brownishGrayTwo">#666666</color>
+    <color name="pinkishGray">#d0d0d0</color>
     <color name="coolGray">#969799</color>
     <color name="subtleGray">#f0f0f0</color>
     <color name="subtleGrayTwo">#d8d8d8</color>
@@ -65,6 +67,7 @@
     <color name="denimBlue">#3d5599</color>
     <color name="cornflowerBlue">#678fff</color>
     <color name="skyBlue">#42bffe</color>
+    <color name="carolinaBlue">#94b0ff</color>
 
     <color name="lightOliveGreen">#93c04d</color>
     <color name="muddyGreen">#58732e</color>

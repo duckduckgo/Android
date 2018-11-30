@@ -17,6 +17,7 @@
 package com.duckduckgo.app.job
 
 import com.duckduckgo.app.entities.api.EntityListDownloader
+import com.duckduckgo.app.feedback.api.SurveyDownloader
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeDataDownloader
@@ -35,6 +36,7 @@ class AppConfigurationDownloader(
     private val httpsUpgradeDataDownloader: HttpsUpgradeDataDownloader,
     private val resourceSurrogateDownloader: ResourceSurrogateListDownloader,
     private val entityListDownloader: EntityListDownloader,
+    private val surveyDownloader: SurveyDownloader,
     private val appDatabase: AppDatabase
 ) : ConfigurationDownloader {
 
@@ -47,6 +49,7 @@ class AppConfigurationDownloader(
         val surrogatesDownload = resourceSurrogateDownloader.downloadList()
         val httpsUpgradeDownload = httpsUpgradeDataDownloader.download()
         val httpStatisticsReport = httpsUpgradeDataDownloader.reportUpgradeStatistics()
+        val surveyDownload = surveyDownloader.download()
 
         return Completable.mergeDelayError(
             listOf(
@@ -57,7 +60,8 @@ class AppConfigurationDownloader(
                 entityListDownload,
                 surrogatesDownload,
                 httpsUpgradeDownload,
-                httpStatisticsReport
+                httpStatisticsReport,
+                surveyDownload
             )
         ).doOnComplete {
             Timber.i("Download task completed successfully")
@@ -65,6 +69,4 @@ class AppConfigurationDownloader(
             appDatabase.appConfigurationDao().configurationDownloadSuccessful(appConfiguration)
         }
     }
-
-
 }

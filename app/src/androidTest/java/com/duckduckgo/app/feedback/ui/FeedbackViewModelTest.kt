@@ -8,6 +8,7 @@ import com.duckduckgo.app.feedback.ui.FeedbackViewModel.Command
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
+import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -42,6 +43,11 @@ class FeedbackViewModelTest {
         MockitoAnnotations.initMocks(this)
         testee = FeedbackViewModel(mockFeedbackSender)
         testee.command.observeForever(mockCommandObserver)
+    }
+
+    @After
+    fun after() {
+        testee.command.removeObserver(mockCommandObserver)
     }
 
     @Test

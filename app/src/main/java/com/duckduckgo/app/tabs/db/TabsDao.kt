@@ -30,10 +30,10 @@ abstract class TabsDao {
     @Query("select * from tabs order by position limit 1")
     abstract fun firstTab(): TabEntity?
 
-    @Query("select * from tabs inner join tab_selection ON tabs.tabId = tab_selection.tabId order by position limit 1")
+    @Query("select * from tabs inner join tab_selection on tabs.tabId = tab_selection.tabId order by position limit 1")
     abstract fun selectedTab(): TabEntity?
 
-    @Query("select * from tabs inner join tab_selection ON tabs.tabId = tab_selection.tabId order by position limit 1")
+    @Query("select * from tabs inner join tab_selection on tabs.tabId = tab_selection.tabId order by position limit 1")
     abstract fun liveSelectedTab(): LiveData<TabEntity>
 
     @Query("select * from tabs order by position")
@@ -57,7 +57,7 @@ abstract class TabsDao {
     @Query("delete from tabs")
     abstract fun deleteAllTabs()
 
-    @Query("delete from tabs where url IS null")
+    @Query("delete from tabs where url is null")
     abstract fun deleteBlankTabs()
 
     @Query("update tabs set position = position + 1 where position >= :position")

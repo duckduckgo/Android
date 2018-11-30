@@ -55,7 +55,12 @@ interface Pixel {
         SETTINGS_THEME_TOGGLED_DARK("ms_td"),
 
         HTTPS_UPGRADE_SITE_ERROR("ehd"),
-        HTTPS_UPGRADE_SITE_SUMMARY("ehs")
+        HTTPS_UPGRADE_SITE_SUMMARY("ehs"),
+
+        SURVEY_CTA_SHOWN(pixelName = "mus_cs"),
+        SURVEY_CTA_DISMISSED(pixelName = "mus_cd"),
+        SURVEY_CTA_LAUNCHED_SURVEY(pixelName = "mus_cl"),
+        SURVEY_SURVEY_DISMISSED(pixelName = "mus_sd")
     }
 
     object PixelParameter {
