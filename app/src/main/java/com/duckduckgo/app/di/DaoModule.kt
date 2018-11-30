@@ -47,4 +47,6 @@ class DaoModule {
     @Provides
     fun networkEntityDao(database: AppDatabase) = database.networkEntityDao()
 
+    @Provides
+    fun surveyDao(database: AppDatabase) = database.surveyDao()
 }

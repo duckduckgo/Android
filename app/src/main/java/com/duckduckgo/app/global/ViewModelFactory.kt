@@ -28,8 +28,11 @@ import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.feedback.api.FeedbackSender
+import com.duckduckgo.app.feedback.db.SurveyDao
 import com.duckduckgo.app.feedback.ui.FeedbackViewModel
+import com.duckduckgo.app.feedback.ui.SurveyViewModel
 import com.duckduckgo.app.global.db.AppConfigurationDao
+import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -45,6 +48,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel
 import javax.inject.Inject
@@ -53,7 +57,9 @@ import javax.inject.Inject
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory @Inject constructor(
     private val statisticsUpdater: StatisticsUpdater,
+    private val statisticsStore: StatisticsDataStore,
     private val onboaringStore: OnboardingStore,
+    private val appInstallStore: AppInstallStore,
     private val queryUrlConverter: QueryUrlConverter,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val tabRepository: TabRepository,
@@ -62,6 +68,7 @@ class ViewModelFactory @Inject constructor(
     private val appConfigurationDao: AppConfigurationDao,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
+    private val surveyDao: SurveyDao,
     private val autoCompleteApi: AutoCompleteApi,
     private val appSettingsPreferencesStore: SettingsDataStore,
     private val webViewLongPressHandler: LongPressHandler,
@@ -93,6 +100,7 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                 isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
                 isAssignableFrom(FeedbackViewModel::class.java) -> FeedbackViewModel(feedbackSender)
+                isAssignableFrom(SurveyViewModel::class.java) -> SurveyViewModel(surveyDao, statisticsStore, appInstallStore)
                 isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(
                     appSettingsPreferencesStore,
                     defaultBrowserDetector,
@@ -119,6 +127,8 @@ class ViewModelFactory @Inject constructor(
         autoCompleteApi = autoCompleteApi,
         specialUrlDetector = specialUrlDetector,
         faviconDownloader = faviconDownloader,
-        addToHomeCapabilityDetector = addToHomeCapabilityDetector
+        addToHomeCapabilityDetector = addToHomeCapabilityDetector,
+        surveyDao = surveyDao,
+        appInstallStore = appInstallStore
     )
 }

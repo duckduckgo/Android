@@ -18,12 +18,13 @@ package com.duckduckgo.app.browser
 
 import android.graphics.Rect
 import android.view.View
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.duckduckgo.app.global.view.toDp
 import timber.log.Timber
 
 
-class LogoHidingLayoutChangeListener(var ddgLogoView: View) : View.OnLayoutChangeListener {
+class LogoHidingLayoutChangeListener(private var ddgLogoView: View) : View.OnLayoutChangeListener {
 
     var callToActionButton: View? = null
 
@@ -37,16 +38,7 @@ class LogoHidingLayoutChangeListener(var ddgLogoView: View) : View.OnLayoutChang
         Timber.v("App height now: $heightDp dp, call to action button showing: ${callToActionButton?.isVisible}")
 
         if (enoughRoomForLogo(heightDp)) {
-
-            val callToActionView = callToActionButton
-            if (callToActionView != null) {
-                if (callToActionView.isVisible) {
-                    ddgLogoView.alpha = 0.1f
-                } else {
-                    ddgLogoView.alpha = 1.0f
-                }
-            }
-
+            ddgLogoView.alpha = 1.0f
         } else {
             ddgLogoView.alpha = 0f
         }
@@ -60,9 +52,13 @@ class LogoHidingLayoutChangeListener(var ddgLogoView: View) : View.OnLayoutChang
 
     private fun enoughRoomForLogo(heightDp: Int): Boolean {
 
+        val isGone = callToActionButton?.isGone ?: true
+        if (isGone) {
+            return true
+        }
+
         val callToActionButtonHeightDp = callToActionButton?.measuredHeight?.toDp() ?: 0
         val heightMinusCallToAction = heightDp - callToActionButtonHeightDp
-
         if (heightMinusCallToAction >= MINIMUM_AVAILABLE_HEIGHT_REQUIRED_TO_SHOW_LOGO) {
             return true
         }
@@ -71,7 +67,7 @@ class LogoHidingLayoutChangeListener(var ddgLogoView: View) : View.OnLayoutChang
     }
 
     companion object {
-        private const val MINIMUM_AVAILABLE_HEIGHT_REQUIRED_TO_SHOW_LOGO = 160
+        private const val MINIMUM_AVAILABLE_HEIGHT_REQUIRED_TO_SHOW_LOGO = 220
     }
 
 }

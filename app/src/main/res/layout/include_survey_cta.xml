@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2018 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/surveyCallToActionContainer"
+    android:layout_width="0dp"
+    android:layout_height="160dp"
+    android:background="?attr/colorPrimary"
+    android:elevation="12dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent">
+
+    <ImageView
+        android:id="@+id/surveyIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/survey_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/surveyTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/surveyBannerTitle"
+        android:textColor="?attr/callToActionTitleColor"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/dismissSurveyButton"
+        app:layout_constraintStart_toEndOf="@id/surveyIcon"
+        app:layout_constraintTop_toTopOf="@id/surveyIcon" />
+
+    <TextView
+        android:id="@+id/surveySubtitle"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="top"
+        android:lineSpacingExtra="4sp"
+        android:text="@string/surveyDescription"
+        android:textColor="?attr/callToActionSubtitleColor"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toTopOf="@id/launchSurveyButton"
+        app:layout_constraintEnd_toStartOf="@id/dismissSurveyButton"
+        app:layout_constraintStart_toEndOf="@id/surveyIcon"
+        app:layout_constraintTop_toBottomOf="@id/surveyTitle" />
+
+    <Button
+        android:id="@+id/launchSurveyButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="22dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="22dp"
+        android:background="@drawable/modal_card_button_bg"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:text="@string/surveyLaunchButton"
+        android:textColor="@color/white"
+        android:textSize="@dimen/modalCardMajorButtonTextSize"
+        android:transitionName="defaultBrowserBannerTransition"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/surveyIcon" />
+
+    <ImageView
+        android:id="@+id/dismissSurveyButton"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:contentDescription="@string/surveyDismissBannerContentDescription"
+        android:scaleType="center"
+        android:src="@drawable/ic_close_24dp"
+        android:tint="?attr/callToActionCloseButtonColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -16,22 +16,22 @@
 
 package com.duckduckgo.app.browser
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import android.graphics.Bitmap
 import android.net.Uri
-import androidx.annotation.AnyThread
-import androidx.annotation.StringRes
-import androidx.annotation.VisibleForTesting
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
+import androidx.annotation.AnyThread
+import androidx.annotation.StringRes
+import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
@@ -45,9 +45,13 @@ import com.duckduckgo.app.browser.addToHome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.feedback.db.SurveyDao
+import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
+import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
@@ -80,8 +84,11 @@ class BrowserTabViewModel(
     private val specialUrlDetector: SpecialUrlDetector,
     private val faviconDownloader: FaviconDownloader,
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
+    private val appInstallStore: AppInstallStore,
+    private val surveyDao: SurveyDao,
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, ViewModel() {
+
     data class GlobalLayoutViewState(
         val isNewTabState: Boolean = true
     )
@@ -122,6 +129,10 @@ class BrowserTabViewModel(
         val canFindInPage: Boolean = false
     )
 
+    data class SurveyViewState(
+        val hasValidSurvey: Boolean = false
+    )
+
     data class AutoCompleteViewState(
         val showSuggestions: Boolean = false,
         val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
@@ -149,6 +160,7 @@ class BrowserTabViewModel(
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         class HandleExternalAppLink(val appLink: IntentType) : Command()
         class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap? = null) : Command()
+        class LaunchSurvey(val survey: Survey) : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -157,8 +169,10 @@ class BrowserTabViewModel(
     val loadingViewState: MutableLiveData<LoadingViewState> = MutableLiveData()
     val omnibarViewState: MutableLiveData<OmnibarViewState> = MutableLiveData()
     val findInPageViewState: MutableLiveData<FindInPageViewState> = MutableLiveData()
+    val surveyViewState: MutableLiveData<SurveyViewState> = MutableLiveData()
 
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
+    val survey: LiveData<Survey> = surveyDao.getLiveScheduled()
     val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
     val url: SingleLiveEvent<String> = SingleLiveEvent()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -177,6 +191,7 @@ class BrowserTabViewModel(
     private var siteLiveData = MutableLiveData<Site>()
     private var site: Site? = null
     private lateinit var tabId: String
+    private var currentSurvey: Survey? = null
 
 
     init {
@@ -577,6 +592,7 @@ class BrowserTabViewModel(
         autoCompleteViewState.value = AutoCompleteViewState()
         omnibarViewState.value = OmnibarViewState()
         findInPageViewState.value = FindInPageViewState()
+        surveyViewState.value = SurveyViewState()
     }
 
     fun userSharingLink(url: String?) {
@@ -637,6 +653,34 @@ class BrowserTabViewModel(
                 Timber.w(throwable, "Failed to obtain favicon")
                 command.value = AddHomeShortcut(title, currentPage)
             })
+    }
+
+    fun onSurveyChanged(survey: Survey?) {
+        if (survey == null) {
+            surveyViewState.value = surveyViewState.value?.copy(hasValidSurvey = false)
+            return
+        }
+
+        val showOnDay = survey.daysInstalled?.toLong()
+        val daysInstalled = appInstallStore.daysInstalled()
+        if (showOnDay == null || showOnDay == daysInstalled) {
+            surveyViewState.value = surveyViewState.value?.copy(hasValidSurvey = true)
+            currentSurvey = survey
+        }
+    }
+
+    fun onUserOpenedSurvey() {
+        currentSurvey?.let {
+            command.value = LaunchSurvey(it)
+        }
+    }
+
+    fun onUserDismissedSurvey() {
+        surveyViewState.value = surveyViewState.value?.copy(hasValidSurvey = false)
+        currentSurvey = null
+        Schedulers.io().scheduleDirect {
+            surveyDao.cancelScheduledSurveys()
+        }
     }
 
     override fun externalAppLinkClicked(appLink: IntentType) {
