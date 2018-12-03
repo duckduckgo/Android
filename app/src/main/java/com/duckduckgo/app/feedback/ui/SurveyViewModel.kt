@@ -96,6 +96,6 @@ class SurveyViewModel(
         const val ANDROID_VERSION = "av"
         const val APP_VERSION = "ddgv"
         const val MANUFACTURER = "man"
-        const val MODEL = "model"
+        const val MODEL = "mo"
     }
 }
