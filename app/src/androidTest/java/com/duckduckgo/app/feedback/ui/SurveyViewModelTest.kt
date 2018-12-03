@@ -99,7 +99,7 @@ class SurveyViewModelTest {
         assertEquals("${Build.VERSION.SDK_INT}", loadedUri.getQueryParameter("av"))
         assertEquals("${BuildConfig.VERSION_NAME}", loadedUri.getQueryParameter("ddgv"))
         assertEquals("${Build.MANUFACTURER}", loadedUri.getQueryParameter("man"))
-        assertEquals("${Build.MODEL}", loadedUri.getQueryParameter("model"))
+        assertEquals("${Build.MODEL}", loadedUri.getQueryParameter("mo"))
     }
 
     @Test
