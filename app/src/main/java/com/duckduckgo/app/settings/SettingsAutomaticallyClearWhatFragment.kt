@@ -26,6 +26,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment.ClearWhatOption.*
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 
 
 class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
@@ -79,9 +80,9 @@ class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
         }
     }
 
-    enum class ClearWhatOption constructor(@IdRes val radioButtonId: Int, @StringRes val nameStringRes: Int) {
-        CLEAR_NONE(R.id.settingNone, R.string.settingsAutomaticallyClearWhatOptionNone),
-        CLEAR_TABS_ONLY(R.id.settingTabsOnly, R.string.settingsAutomaticallyClearWhatOptionTabs),
-        CLEAR_TABS_AND_DATA(R.id.settingTabsAndData, R.string.settingsAutomaticallyClearWhatOptionTabsAndData)
+    enum class ClearWhatOption (@IdRes val radioButtonId: Int, @StringRes val nameStringRes: Int, val pixelEvent: PixelName) {
+        CLEAR_NONE(R.id.settingNone, R.string.settingsAutomaticallyClearWhatOptionNone, PixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_NONE),
+        CLEAR_TABS_ONLY(R.id.settingTabsOnly, R.string.settingsAutomaticallyClearWhatOptionTabs, PixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_TABS),
+        CLEAR_TABS_AND_DATA(R.id.settingTabsAndData, R.string.settingsAutomaticallyClearWhatOptionTabsAndData, PixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_TABS_AND_DATA)
     }
 }

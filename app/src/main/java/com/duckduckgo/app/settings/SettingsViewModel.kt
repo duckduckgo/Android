@@ -114,6 +114,8 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onAutomaticallyWhatOptionSelected(clearWhatSetting: ClearWhatOption) {
+        pixel.fire(clearWhatSetting.pixelEvent)
+
         settingsDataStore.automaticallyClearWhatOption = clearWhatSetting
 
         viewState.value = currentViewState().copy(
@@ -130,6 +132,10 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onAutomaticallyWhenOptionSelected(clearWhenSetting: ClearWhenOption) {
+        clearWhenSetting.pixelEvent?.let {
+            pixel.fire(it)
+        }
+
         settingsDataStore.automaticallyClearWhenOption = clearWhenSetting
         viewState.value = currentViewState().copy(
             automaticallyClearData = AutomaticallyClearData(

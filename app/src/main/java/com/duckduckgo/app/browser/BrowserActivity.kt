@@ -104,7 +104,6 @@ class BrowserActivity : DuckDuckGoActivity() {
             clearingInProgressView.show()
         } else {
             Timber.i("BrowserActivity can now start displaying web content. instance state is $instanceStateBundles")
-            Timber.w("Showing web view content")
             configureObservers()
 
             if (lastIntent != null) {

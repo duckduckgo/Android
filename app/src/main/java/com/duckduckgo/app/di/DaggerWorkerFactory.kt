@@ -34,13 +34,15 @@ class DaggerWorkerFactory(private val settingsDataStore: SettingsDataStore, priv
         val instance = constructor.newInstance(appContext, workerParameters)
 
         when (instance) {
-            is DataClearingWorker -> {
-                instance.settingsDataStore = settingsDataStore
-                instance.clearDataAction = clearDataAction
-            }
+            is DataClearingWorker -> injectWorker(instance)
             else -> Timber.i("No injection required for worker $workerClassName")
         }
 
         return instance
+    }
+
+    private fun injectWorker(worker: DataClearingWorker) {
+        worker.settingsDataStore = settingsDataStore
+        worker.clearDataAction = clearDataAction
     }
 }
