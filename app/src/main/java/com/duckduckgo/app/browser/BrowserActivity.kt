@@ -32,10 +32,7 @@ import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.intentText
-import com.duckduckgo.app.global.view.ClearPersonalDataAction
-import com.duckduckgo.app.global.view.FireDialog
-import com.duckduckgo.app.global.view.gone
-import com.duckduckgo.app.global.view.show
+import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -63,11 +60,13 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     private var lastIntent: Intent? = null
 
-    private data class CombinedInstanceState(val originalInstanceState: Bundle?, val newInstanceState: Bundle?)
+    private lateinit var renderer: BrowserStateRenderer
 
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.daggerInject()
+
+        renderer = BrowserStateRenderer()
 
         Timber.i("onCreate called. freshAppLaunch: ${dataClearer.isFreshAppLaunch}, savedInstanceState: $savedInstanceState")
 
@@ -77,7 +76,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
         setContentView(R.layout.activity_browser)
         viewModel.viewState.observe(this, Observer {
-            renderViewState(it)
+            renderer.renderBrowserViewState(it)
         })
         viewModel.awaitClearDataFinishedNotification()
     }
@@ -92,31 +91,6 @@ class BrowserActivity : DuckDuckGoActivity() {
         } else {
             Timber.i("Automatic data clearer not yet finished, so deferring processing of intent")
             lastIntent = intent
-        }
-    }
-
-    private fun renderViewState(viewState: BrowserViewModel.ViewState?) {
-        if (viewState == null) return
-
-        if (viewState.hideWebContent) {
-            Timber.w("Hiding web view content")
-            removeObservers()
-            clearingInProgressView.show()
-        } else {
-            Timber.i("BrowserActivity can now start displaying web content. instance state is $instanceStateBundles")
-            configureObservers()
-
-            if (lastIntent != null) {
-                Timber.i("There was a deferred intent to process; handling now")
-                launchNewSearchOrQuery(lastIntent)
-                lastIntent = null
-            }
-
-            if (instanceStateBundles?.originalInstanceState == null) {
-                Timber.i("Original instance state is null, so will inspect intent for actions to take. $intent")
-                launchNewSearchOrQuery(intent)
-            }
-            clearingInProgressView.gone()
         }
     }
 
@@ -316,4 +290,48 @@ class BrowserActivity : DuckDuckGoActivity() {
         private const val DASHBOARD_REQUEST_CODE = 100
     }
 
+    inner class BrowserStateRenderer {
+
+        private var lastSeenBrowserState: BrowserViewModel.ViewState? = null
+        private var processedOriginalIntent = false
+
+        fun renderBrowserViewState(viewState: BrowserViewModel.ViewState) {
+            renderIfChanged(viewState, lastSeenBrowserState) {
+                lastSeenBrowserState = viewState
+
+                if (viewState.hideWebContent) {
+                    hideWebContent()
+                } else {
+                    showWebContent()
+                }
+            }
+        }
+
+        private fun showWebContent() {
+            Timber.i("BrowserActivity can now start displaying web content. instance state is $instanceStateBundles")
+            configureObservers()
+            clearingInProgressView.gone()
+
+            if (lastIntent != null) {
+                Timber.i("There was a deferred intent to process; handling now")
+                launchNewSearchOrQuery(lastIntent)
+                lastIntent = null
+                return
+            }
+
+            if (!processedOriginalIntent && instanceStateBundles?.originalInstanceState == null) {
+                Timber.i("Original instance state is null, so will inspect intent for actions to take. $intent")
+                launchNewSearchOrQuery(intent)
+                processedOriginalIntent = true
+            }
+        }
+    }
+
+    private fun hideWebContent() {
+        Timber.w("Hiding web view content")
+        removeObservers()
+        clearingInProgressView.show()
+    }
+
+    private data class CombinedInstanceState(val originalInstanceState: Bundle?, val newInstanceState: Bundle?)
 }
