@@ -46,9 +46,7 @@ interface SettingsDataStore {
 
 class SettingsSharedPreferences @Inject constructor(private val context: Context) : SettingsDataStore {
     override var lastExecutedJobId: String?
-        get() {
-            return preferences.getString(KEY_BACKGROUND_JOB_ID, null)
-        }
+        get() = preferences.getString(KEY_BACKGROUND_JOB_ID, null)
         set(value) {
             preferences.edit(commit = true) {
                 if (value == null) remove(KEY_BACKGROUND_JOB_ID)

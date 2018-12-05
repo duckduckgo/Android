@@ -24,8 +24,8 @@
     <TextView
         android:id="@+id/settingsGeneralTitle"
         style="@style/SettingsSectionTitle"
-        app:layout_constraintTop_toTopOf="parent"
-        android:text="@string/settingsHeadingGeneral" />
+        android:text="@string/settingsHeadingGeneral"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/lightThemeToggle"

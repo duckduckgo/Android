@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2018 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +16,7 @@
 
 <resources>
     <declare-styleable name="SettingsOptionWithSubtitle">
-        <attr name="title" format="string"/>
-        <attr name="subtitle" format="string"/>
+        <attr name="title" format="string" />
+        <attr name="subtitle" format="string" />
     </declare-styleable>
 </resources>

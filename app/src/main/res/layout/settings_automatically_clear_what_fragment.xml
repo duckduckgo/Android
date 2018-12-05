@@ -43,8 +43,8 @@
         <RadioButton
             android:id="@+id/settingTabsOnly"
             android:layout_width="match_parent"
-            android:layout_marginTop="8dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:padding="10dp"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
@@ -53,9 +53,9 @@
         <RadioButton
             android:id="@+id/settingTabsAndData"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:padding="10dp"
-            android:layout_height="wrap_content"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:text="@string/settingsAutomaticallyClearWhatOptionTabsAndData" />
