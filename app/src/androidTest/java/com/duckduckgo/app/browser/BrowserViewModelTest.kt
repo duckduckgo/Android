@@ -56,14 +56,14 @@ class BrowserViewModelTest {
     private lateinit var mockOmnibarEntryConverter: OmnibarEntryConverter
 
     @Mock
-    private lateinit var mockAutomaticDeprecated: DataClearer
+    private lateinit var mockAutomaticDataClearer: DataClearer
 
     private lateinit var testee: BrowserViewModel
 
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        testee = BrowserViewModel(mockTabRepository, mockOmnibarEntryConverter, mockAutomaticDeprecated)
+        testee = BrowserViewModel(mockTabRepository, mockOmnibarEntryConverter, mockAutomaticDataClearer)
         testee.command.observeForever(mockCommandObserver)
         whenever(mockTabRepository.add()).thenReturn(TAB_ID)
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(any())).then { it.arguments.first() }

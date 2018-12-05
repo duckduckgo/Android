@@ -122,8 +122,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         if (!installLeakCanary()) return
 
         configureLogging()
-        Timber.i("Creating DuckDuckGoApplication")
         configureDependencyInjection()
+
+        Timber.i("Creating DuckDuckGoApplication")
 
         if (appIsRestarting()) return
 

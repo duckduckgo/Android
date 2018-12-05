@@ -209,7 +209,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun processCommand(command: Command?) {
-        Timber.w("Processing command: $command")
+        Timber.i("Processing command: $command")
         when (command) {
             is Query -> currentTab?.submitQuery(command.query)
             is Refresh -> currentTab?.refresh()
@@ -308,7 +308,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
 
         private fun showWebContent() {
-            Timber.i("BrowserActivity can now start displaying web content. instance state is $instanceStateBundles")
+            Timber.d("BrowserActivity can now start displaying web content. instance state is $instanceStateBundles")
             configureObservers()
             clearingInProgressView.gone()
 
@@ -328,7 +328,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun hideWebContent() {
-        Timber.w("Hiding web view content")
+        Timber.d("Hiding web view content")
         removeObservers()
         clearingInProgressView.show()
     }

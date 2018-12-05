@@ -44,8 +44,12 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
         onCreate(savedInstanceState, true)
     }
 
+    /**
+     * We need to conditionally defer the Dagger initialization in certain places.
+     * So if this method is called from an Activity with daggerInject=false, you'll probably need to call daggerInject() directly.
+     */
     fun onCreate(savedInstanceState: Bundle?, daggerInject: Boolean = true) {
-        if(daggerInject) daggerInject()
+        if (daggerInject) daggerInject()
         themeChangeReceiver = applyTheme(settingsDataStore)
         super.onCreate(savedInstanceState)
     }

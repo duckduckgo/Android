@@ -52,7 +52,7 @@ class DataClearingWorker(context: Context, workerParams: WorkerParameters) : Cor
     }
 
     /**
-     * If we are kill the process as part of running the job, WorkManager will not be aware that this task finished successfully.
+     * If we are killing the process as part of running the job, WorkManager will not be aware that this task finished successfully.
      * As such, it will try and run it again soon.
      *
      * We store the last job ID internally so that we can bail early if we've executed it before. This time, WorkManager will mark it as successful.
@@ -78,7 +78,8 @@ class DataClearingWorker(context: Context, workerParams: WorkerParameters) : Cor
         withContext(Dispatchers.Main) {
             clearDataAction.clearTabsAndAllDataAsync(appInForeground = false)
             clearDataAction.setAppUsedSinceLastClearFlag(false)
-            Timber.i("Will kill process now: jobId: $id")
+
+            Timber.i("Will kill process now")
             clearDataAction.killProcess()
         }
     }

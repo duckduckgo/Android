@@ -27,6 +27,14 @@ import javax.inject.Inject
 interface SettingsDataStore {
     var theme: DuckDuckGoTheme?
     var autoCompleteSuggestionsEnabled: Boolean
+
+    /**
+     * This will be checked upon app startup and used to decide whether it should perform a clear or not.
+     * If the app is cleared and the process restarted as a result, then we don't want to clear and restart again when the app launches.
+     * To avoid this extra clear, we can indicate whether the app could have been used since the last clear or not.
+     * If the app is cleared in the background, or the process is being restarted, we can set this to false.
+     * If the app is cleared in the foreground, but the process isn't restarted, we can set this to true.
+     */
     var appUsedSinceLastClear: Boolean
     var automaticallyClearWhatOption: ClearWhatOption
     var automaticallyClearWhenOption: ClearWhenOption

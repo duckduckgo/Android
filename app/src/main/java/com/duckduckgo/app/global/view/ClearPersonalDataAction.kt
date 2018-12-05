@@ -64,6 +64,8 @@ class ClearPersonalDataAction @Inject constructor(
     override fun killAndRestartProcess() {
         Timber.i("Restarting process")
         FireActivity.triggerRestart(context)
+
+        clearJob.cancel()
     }
 
     override fun killProcess() {
