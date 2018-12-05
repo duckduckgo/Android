@@ -22,8 +22,8 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment.ClearWhatOption
-import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment.ClearWhenOption
+import com.duckduckgo.app.settings.clear.ClearWhatOption
+import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel

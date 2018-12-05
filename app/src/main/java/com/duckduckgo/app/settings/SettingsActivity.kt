@@ -31,8 +31,8 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.sendThemeChangedBroadcast
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
-import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment.ClearWhatOption
-import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment.ClearWhenOption
+import com.duckduckgo.app.settings.clear.ClearWhatOption
+import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.SettingsViewModel.AutomaticallyClearData
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import kotlinx.android.synthetic.main.content_settings_general.*

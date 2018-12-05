@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.fire
 
-import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment.ClearWhenOption
-import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment.ClearWhenOption.*
+import com.duckduckgo.app.settings.clear.ClearWhenOption
+import com.duckduckgo.app.settings.clear.ClearWhenOption.*
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever

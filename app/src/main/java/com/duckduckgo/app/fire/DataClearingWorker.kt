@@ -22,7 +22,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker.Result.SUCCESS
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.global.view.ClearDataAction
-import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment
+import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -63,13 +63,13 @@ class DataClearingWorker(context: Context, workerParams: WorkerParameters) : Cor
         return lastJobId == newJobId
     }
 
-    suspend fun clearData(clearWhat: SettingsAutomaticallyClearWhatFragment.ClearWhatOption) {
+    suspend fun clearData(clearWhat: ClearWhatOption) {
         Timber.i("Clearing data: $clearWhat")
 
         when (clearWhat) {
-            SettingsAutomaticallyClearWhatFragment.ClearWhatOption.CLEAR_NONE -> Timber.w("Automatically clear data invoked, but set to clear nothing")
-            SettingsAutomaticallyClearWhatFragment.ClearWhatOption.CLEAR_TABS_ONLY -> clearDataAction.clearTabsAsync(appInForeground = false)
-            SettingsAutomaticallyClearWhatFragment.ClearWhatOption.CLEAR_TABS_AND_DATA -> clearEverything()
+            ClearWhatOption.CLEAR_NONE -> Timber.w("Automatically clear data invoked, but set to clear nothing")
+            ClearWhatOption.CLEAR_TABS_ONLY -> clearDataAction.clearTabsAsync(appInForeground = false)
+            ClearWhatOption.CLEAR_TABS_AND_DATA -> clearEverything()
         }
     }
 

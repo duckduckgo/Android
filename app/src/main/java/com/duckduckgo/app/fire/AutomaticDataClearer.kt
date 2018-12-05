@@ -26,8 +26,8 @@ import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.ApplicationClearDataState.FINISHED
 import com.duckduckgo.app.global.ApplicationClearDataState.INITIALIZING
 import com.duckduckgo.app.global.view.ClearDataAction
-import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment.ClearWhatOption
-import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment.ClearWhenOption
+import com.duckduckgo.app.settings.clear.ClearWhatOption
+import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import kotlinx.coroutines.*
 import timber.log.Timber

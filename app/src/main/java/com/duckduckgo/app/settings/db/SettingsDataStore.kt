@@ -20,8 +20,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.global.DuckDuckGoTheme
-import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment.ClearWhatOption
-import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment.ClearWhenOption
+import com.duckduckgo.app.settings.clear.ClearWhatOption
+import com.duckduckgo.app.settings.clear.ClearWhenOption
 import javax.inject.Inject
 
 interface SettingsDataStore {

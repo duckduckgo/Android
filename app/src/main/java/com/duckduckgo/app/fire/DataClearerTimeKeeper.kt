@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.fire
 
-import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment
+import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import timber.log.Timber
 import javax.inject.Inject
@@ -36,7 +36,7 @@ class DataClearerTimeKeeper @Inject constructor(private val settingsDataStore: S
         Timber.i("It has been ${elapsedTime}ms since the app was backgrounded. Current configuration is for $clearWhenOption")
 
         return when (clearWhenOption) {
-            SettingsAutomaticallyClearWhenFragment.ClearWhenOption.APP_EXIT_ONLY -> true
+            ClearWhenOption.APP_EXIT_ONLY -> true
             else -> elapsedTime >= clearWhenOption.durationMillis
         }
     }

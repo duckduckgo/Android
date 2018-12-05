@@ -19,10 +19,10 @@ package com.duckduckgo.app.fire
 import androidx.test.annotation.UiThreadTest
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import com.duckduckgo.app.global.view.ClearDataAction
-import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment.ClearWhatOption
-import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhatFragment.ClearWhatOption.CLEAR_NONE
-import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment.ClearWhenOption
-import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment.ClearWhenOption.APP_EXIT_ONLY
+import com.duckduckgo.app.settings.clear.ClearWhatOption
+import com.duckduckgo.app.settings.clear.ClearWhatOption.CLEAR_NONE
+import com.duckduckgo.app.settings.clear.ClearWhenOption
+import com.duckduckgo.app.settings.clear.ClearWhenOption.APP_EXIT_ONLY
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.runBlocking

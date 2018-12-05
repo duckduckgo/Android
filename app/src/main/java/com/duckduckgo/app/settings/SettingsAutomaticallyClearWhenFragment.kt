@@ -20,18 +20,13 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import android.widget.RadioGroup
-import androidx.annotation.IdRes
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.show
-import com.duckduckgo.app.settings.SettingsAutomaticallyClearWhenFragment.ClearWhenOption.*
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_ONLY
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_5_MINS
-import java.util.concurrent.TimeUnit
+import com.duckduckgo.app.settings.clear.ClearWhenOption
+import com.duckduckgo.app.settings.clear.ClearWhenOption.*
 
 
 class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
@@ -96,53 +91,6 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
             }
             return fragment
         }
-    }
-
-    enum class
-    ClearWhenOption constructor(
-        @IdRes val radioButtonId: Int,
-        @StringRes val nameStringRes: Int,
-        val durationMillis: Long,
-        val pixelEvent: Pixel.PixelName?
-    ) {
-        APP_EXIT_ONLY(
-            R.id.settingAppExitOnly,
-            R.string.settingsAutomaticallyClearWhenAppExitOnly,
-            0,
-            AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_ONLY
-        ),
-        APP_EXIT_OR_5_MINS(
-            R.id.settingInactive5Mins,
-            R.string.settingsAutomaticallyClearWhenAppExit5Minutes,
-            TimeUnit.MINUTES.toMillis(5),
-            AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_5_MINS
-        ),
-        APP_EXIT_OR_15_MINS(
-            R.id.settingInactive15Mins,
-            R.string.settingsAutomaticallyClearWhenAppExit15Minutes,
-            TimeUnit.MINUTES.toMillis(15),
-            Pixel.PixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_15_MINS
-        ),
-        APP_EXIT_OR_30_MINS(
-            R.id.settingInactive30Mins,
-            R.string.settingsAutomaticallyClearWhenAppExit30Minutes,
-            TimeUnit.MINUTES.toMillis(30),
-            Pixel.PixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_30_MINS
-        ),
-        APP_EXIT_OR_60_MINS(
-            R.id.settingInactive60Mins,
-            R.string.settingsAutomaticallyClearWhenAppExit60Minutes,
-            TimeUnit.MINUTES.toMillis(60),
-            Pixel.PixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_60_MINS
-        ),
-
-        // only available to debug builds
-        APP_EXIT_OR_5_SECONDS(
-            R.id.settingInactive5Seconds,
-            R.string.settingsAutomaticallyClearWhenAppExit5Seconds,
-            TimeUnit.SECONDS.toMillis(5),
-            null
-        ),
     }
 
 }
