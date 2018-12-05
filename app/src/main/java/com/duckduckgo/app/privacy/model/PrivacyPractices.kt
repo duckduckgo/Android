@@ -48,7 +48,8 @@ interface PrivacyPractices {
 
 class PrivacyPracticesImpl @Inject constructor(
     private val termsOfServiceStore: TermsOfServiceStore,
-    private val entityMapping: EntityMapping): PrivacyPractices {
+    private val entityMapping: EntityMapping
+) : PrivacyPractices {
 
 
     private var entityScores: Map<String, Int> = mapOf()

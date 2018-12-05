@@ -21,7 +21,7 @@ import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.statistics.pixels.Pixel
 
-enum class ClearWhatOption (@IdRes val radioButtonId: Int, @StringRes val nameStringRes: Int, val pixelEvent: Pixel.PixelName) {
+enum class ClearWhatOption(@IdRes val radioButtonId: Int, @StringRes val nameStringRes: Int, val pixelEvent: Pixel.PixelName) {
     CLEAR_NONE(
         R.id.settingNone,
         R.string.settingsAutomaticallyClearWhatOptionNone,

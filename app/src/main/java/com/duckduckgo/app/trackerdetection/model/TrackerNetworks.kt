@@ -17,7 +17,6 @@
 package com.duckduckgo.app.trackerdetection.model
 
 import com.duckduckgo.app.entities.EntityMapping
-import com.duckduckgo.app.entities.db.EntityListEntity
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import java.io.Serializable
@@ -32,7 +31,8 @@ interface TrackerNetworks {
 }
 
 @Singleton
-class TrackerNetworksImpl @Inject constructor(val prevalenceStore: PrevalenceStore, val entityMapping: EntityMapping) : TrackerNetworks, Serializable {
+class TrackerNetworksImpl @Inject constructor(val prevalenceStore: PrevalenceStore, val entityMapping: EntityMapping) : TrackerNetworks,
+    Serializable {
 
     private var trackers: List<DisconnectTracker> = emptyList()
 

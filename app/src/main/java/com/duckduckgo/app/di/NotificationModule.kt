@@ -34,7 +34,7 @@ class NotificationModule {
 
     @Provides
     @Singleton
-    fun provideLocalBroadcastManager(context: Context) : LocalBroadcastManager {
+    fun provideLocalBroadcastManager(context: Context): LocalBroadcastManager {
         return LocalBroadcastManager.getInstance(context)
     }
 
