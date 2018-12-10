@@ -17,25 +17,18 @@
 package com.duckduckgo.app.fire
 
 import androidx.test.annotation.UiThreadTest
-import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import com.duckduckgo.app.global.view.ClearDataAction
-import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhatOption.CLEAR_NONE
-import com.duckduckgo.app.settings.clear.ClearWhenOption
-import com.duckduckgo.app.settings.clear.ClearWhenOption.APP_EXIT_ONLY
+import com.duckduckgo.app.settings.clear.ClearWhenOption.APP_EXIT_OR_15_MINS
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
-import org.junit.runners.Parameterized.Parameters
-import org.mockito.ArgumentMatchers.anyBoolean
-import org.mockito.verification.VerificationMode
 
-@RunWith(Parameterized::class)
-class AutomaticDataClearerClearNoneTest(private val testCase: TestCase) {
+class AutomaticDataClearerClearNoneTest {
 
     private lateinit var testee: AutomaticDataClearer
 
@@ -43,137 +36,133 @@ class AutomaticDataClearerClearNoneTest(private val testCase: TestCase) {
     private val mockClearAction: ClearDataAction = mock()
     private val mockTimeKeeper: BackgroundTimeKeeper = mock()
 
-    companion object {
-
-        @JvmStatic
-        @Parameters(name = "Test case: {index} - {0}")
-        fun testData(): Array<TestCase> {
-
-            return arrayOf(
-
-                /* Clear None */
-
-                // fresh app launch, enough time passed - no clearing
-                TestCase(
-                    Expected(false, false),
-                    Input(CLEAR_NONE, APP_EXIT_ONLY, true, true, true)
-                ),
-
-                // fresh app launch, enough time passed - no clearing
-                TestCase(
-                    Expected(false, false),
-                    Input(CLEAR_NONE, APP_EXIT_ONLY, true, true, false)
-                ),
-
-                // fresh app launch, not enough time passed - no clearing
-                TestCase(
-                    Expected(false, false),
-                    Input(CLEAR_NONE, APP_EXIT_ONLY, false, true, true)
-                ),
-
-                // fresh app launch, not enough time passed - no clearing
-                TestCase(
-                    Expected(false, false),
-                    Input(CLEAR_NONE, APP_EXIT_ONLY, false, true, false)
-                ),
-
-                // not fresh app launch, enough time passed - no clearing
-                TestCase(
-                    Expected(false, false),
-                    Input(CLEAR_NONE, APP_EXIT_ONLY, true, false, true)
-                ),
-
-                // not fresh app launch, enough time passed - no clearing
-                TestCase(
-                    Expected(false, false),
-                    Input(CLEAR_NONE, APP_EXIT_ONLY, true, false, false)
-                ),
-
-                // not fresh app launch, enough time passed - no clearing
-                TestCase(
-                    Expected(false, false),
-                    Input(CLEAR_NONE, APP_EXIT_ONLY, true, false, true)
-                ),
-
-                // not fresh app launch, enough time passed - no clearing
-                TestCase(
-                    Expected(false, false),
-                    Input(CLEAR_NONE, APP_EXIT_ONLY, true, false, false)
-                ),
-
-                // not fresh app launch, not enough time passed - no clearing
-                TestCase(
-                    Expected(false, false),
-                    Input(CLEAR_NONE, APP_EXIT_ONLY, false, false, true)
-                ),
-
-                // not fresh app launch, not enough time passed - no clearing
-                TestCase(
-                    Expected(false, false),
-                    Input(CLEAR_NONE, APP_EXIT_ONLY, false, false, false)
-                )
-            )
-        }
-    }
-
     @UiThreadTest
     @Before
     fun setup() {
-
+        whenever(mockSettingsDataStore.automaticallyClearWhatOption).thenReturn(CLEAR_NONE)
+        whenever(mockSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_OR_15_MINS)
         testee = AutomaticDataClearer(mockSettingsDataStore, mockClearAction, mockTimeKeeper)
-
-        whenever(mockTimeKeeper.hasEnoughTimeElapsed(any())).thenReturn(testCase.input.enoughTimePassed)
-        whenever(mockSettingsDataStore.automaticallyClearWhatOption).thenReturn(testCase.input.clearWhat)
-        whenever(mockSettingsDataStore.automaticallyClearWhenOption).thenReturn(testCase.input.clearWhen)
-        whenever(mockSettingsDataStore.appUsedSinceLastClear).thenReturn(testCase.input.appUsedSinceLastClear)
     }
 
-    @Test
-    fun dataClearingTestsClearNone() = runOnUiThread {
-        runBlocking {
-            simulateLifecycle()
-
-            verifyIfTabsCleared()
-            verifyIfAllDataCleared()
-            verifyIfBackgroundTimestampCleared()
-        }
-    }
-
-    private suspend fun verifyIfTabsCleared() {
-        verify(mockClearAction, testCase.expected.shouldClearTabs.toVerificationMode()).clearTabsAsync(any())
-    }
-
-    private suspend fun verifyIfAllDataCleared() {
-        val numberOfTimesExpected = testCase.expected.shouldClearEverything.toVerificationMode()
-        verify(mockClearAction, numberOfTimesExpected).clearTabsAndAllDataAsync(anyBoolean())
-    }
-
-    private fun verifyIfBackgroundTimestampCleared() {
-        verify(mockSettingsDataStore).clearAppBackgroundTimestamp()
-    }
-
-    private suspend fun simulateLifecycle() {
-        testee.isFreshAppLaunch = testCase.input.isFreshAppLaunch
+    private suspend fun simulateLifecycle(isFreshAppLaunch: Boolean) {
+        testee.isFreshAppLaunch = isFreshAppLaunch
         testee.onAppForegroundedAsync()
     }
 
-    data class TestCase(val expected: Expected, val input: Input)
+    @Test
+    fun whenFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearThenDataNotCleared() = runBlocking {
+        val isFreshAppLaunch = true
+        configureEnoughTimePassed()
+        configureAppUsedSinceLastClear()
 
-    data class Expected(val shouldClearTabs: Boolean, val shouldClearEverything: Boolean)
-
-    data class Input(
-        val clearWhat: ClearWhatOption,
-        val clearWhen: ClearWhenOption,
-        val enoughTimePassed: Boolean,
-        val isFreshAppLaunch: Boolean,
-        val appUsedSinceLastClear: Boolean
-    )
-
-    private fun Boolean.toVerificationMode(): VerificationMode {
-        return if (this) {
-            times(1)
-        } else {
-            never()
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyTabsNotCleared()
         }
+    }
+
+    @Test
+    fun whenFreshAppLaunchAndEnoughTimePassedAndAppNotUsedSinceLastClearThenDataNotCleared() = runBlocking {
+        val isFreshAppLaunch = true
+        configureEnoughTimePassed()
+        configureAppNotUsedSinceLastClear()
+
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyTabsNotCleared()
+        }
+    }
+
+    @Test
+    fun whenFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearThenDataNotCleared() = runBlocking {
+        val isFreshAppLaunch = true
+        configureNotEnoughTimePassed()
+        configureAppUsedSinceLastClear()
+
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyTabsNotCleared()
+        }
+    }
+
+    @Test
+    fun whenFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearThenDataNotCleared() = runBlocking {
+        val isFreshAppLaunch = true
+        configureNotEnoughTimePassed()
+        configureAppNotUsedSinceLastClear()
+
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyTabsNotCleared()
+        }
+    }
+
+    @Test
+    fun whenNotFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearThenDataNotCleared() = runBlocking {
+        val isFreshAppLaunch = false
+        configureEnoughTimePassed()
+        configureAppUsedSinceLastClear()
+
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyTabsNotCleared()
+        }
+    }
+
+    @Test
+    fun whenNotFreshAppLaunchAndEnoughTimePassedAndAppNotUsedSinceLastClearThenDataNotCleared() = runBlocking {
+        val isFreshAppLaunch = false
+        configureEnoughTimePassed()
+        configureAppNotUsedSinceLastClear()
+
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyTabsNotCleared()
+        }
+    }
+
+    @Test
+    fun whenNotFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearThenDataNotCleared() = runBlocking {
+        val isFreshAppLaunch = false
+        configureNotEnoughTimePassed()
+        configureAppUsedSinceLastClear()
+
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyTabsNotCleared()
+        }
+    }
+
+
+    @Test
+    fun whenNotFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearThenDataNotCleared() = runBlocking {
+        val isFreshAppLaunch = false
+        configureNotEnoughTimePassed()
+        configureAppNotUsedSinceLastClear()
+
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyTabsNotCleared()
+        }
+    }
+
+    private fun configureAppUsedSinceLastClear() {
+        whenever(mockSettingsDataStore.appUsedSinceLastClear).thenReturn(true)
+    }
+
+    private fun configureAppNotUsedSinceLastClear() {
+        whenever(mockSettingsDataStore.appUsedSinceLastClear).thenReturn(false)
+    }
+
+    private fun configureEnoughTimePassed() {
+        whenever(mockTimeKeeper.hasEnoughTimeElapsed(any())).thenReturn(true)
+    }
+
+    private fun configureNotEnoughTimePassed() {
+        whenever(mockTimeKeeper.hasEnoughTimeElapsed(any())).thenReturn(false)
+    }
+
+    private suspend fun verifyTabsNotCleared() {
+        verify(mockClearAction, never()).clearTabsAsync(any())
     }
 }
