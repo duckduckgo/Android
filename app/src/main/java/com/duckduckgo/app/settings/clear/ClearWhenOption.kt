@@ -22,8 +22,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.statistics.pixels.Pixel
 import java.util.concurrent.TimeUnit
 
-enum class
-ClearWhenOption constructor(
+enum class ClearWhenOption constructor(
     @IdRes val radioButtonId: Int,
     @StringRes val nameStringRes: Int,
     val durationMillis: Long,
