@@ -29,7 +29,6 @@
         app:layout_constraintStart_toStartOf="parent"
         tools:text="Title goes here" />
 
-
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/subtitle"
         style="@style/SettingsMinorText"
