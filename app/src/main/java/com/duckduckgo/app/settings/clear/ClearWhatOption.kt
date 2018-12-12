@@ -16,25 +16,8 @@
 
 package com.duckduckgo.app.settings.clear
 
-import androidx.annotation.IdRes
-import androidx.annotation.StringRes
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.statistics.pixels.Pixel
-
-enum class ClearWhatOption(@IdRes val radioButtonId: Int, @StringRes val nameStringRes: Int, val pixelEvent: Pixel.PixelName) {
-    CLEAR_NONE(
-        R.id.settingNone,
-        R.string.settingsAutomaticallyClearWhatOptionNone,
-        Pixel.PixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_NONE
-    ),
-    CLEAR_TABS_ONLY(
-        R.id.settingTabsOnly,
-        R.string.settingsAutomaticallyClearWhatOptionTabs,
-        Pixel.PixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_TABS
-    ),
-    CLEAR_TABS_AND_DATA(
-        R.id.settingTabsAndData,
-        R.string.settingsAutomaticallyClearWhatOptionTabsAndData,
-        Pixel.PixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_TABS_AND_DATA
-    )
+enum class ClearWhatOption {
+    CLEAR_NONE,
+    CLEAR_TABS_ONLY,
+    CLEAR_TABS_AND_DATA
 }

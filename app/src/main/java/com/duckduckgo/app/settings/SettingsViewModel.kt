@@ -27,6 +27,7 @@ import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -114,7 +115,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onAutomaticallyWhatOptionSelected(clearWhatSetting: ClearWhatOption) {
-        pixel.fire(clearWhatSetting.pixelEvent)
+        pixel.fire(clearWhatSetting.pixelEvent())
 
         settingsDataStore.automaticallyClearWhatOption = clearWhatSetting
 
@@ -132,7 +133,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onAutomaticallyWhenOptionSelected(clearWhenSetting: ClearWhenOption) {
-        clearWhenSetting.pixelEvent?.let {
+        clearWhenSetting.pixelEvent()?.let {
             pixel.fire(it)
         }
 
@@ -148,4 +149,24 @@ class SettingsViewModel @Inject constructor(
     private fun currentViewState(): ViewState {
         return viewState.value!!
     }
+
+    private fun ClearWhatOption.pixelEvent(): Pixel.PixelName {
+        return when (this) {
+            ClearWhatOption.CLEAR_NONE -> PixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_NONE
+            ClearWhatOption.CLEAR_TABS_ONLY -> PixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_TABS
+            ClearWhatOption.CLEAR_TABS_AND_DATA -> PixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_TABS_AND_DATA
+        }
+    }
+
+    private fun ClearWhenOption.pixelEvent(): Pixel.PixelName? {
+        return when (this) {
+            ClearWhenOption.APP_EXIT_ONLY -> PixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_ONLY
+            ClearWhenOption.APP_EXIT_OR_5_MINS -> PixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_5_MINS
+            ClearWhenOption.APP_EXIT_OR_15_MINS -> PixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_15_MINS
+            ClearWhenOption.APP_EXIT_OR_30_MINS -> PixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_30_MINS
+            ClearWhenOption.APP_EXIT_OR_60_MINS -> PixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_60_MINS
+            else -> null
+        }
+    }
+
 }

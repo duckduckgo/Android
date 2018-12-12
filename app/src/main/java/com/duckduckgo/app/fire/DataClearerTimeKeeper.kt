@@ -22,12 +22,12 @@ import timber.log.Timber
 import javax.inject.Inject
 
 interface BackgroundTimeKeeper {
-    fun hasEnoughTimeElapsed(timeNow: Long = System.currentTimeMillis()): Boolean
+    fun hasEnoughTimeElapsed(timeNow: Long = System.currentTimeMillis(), selectedOptionDurationMillis: Long): Boolean
 }
 
 class DataClearerTimeKeeper @Inject constructor(private val settingsDataStore: SettingsDataStore) : BackgroundTimeKeeper {
 
-    override fun hasEnoughTimeElapsed(timeNow: Long): Boolean {
+    override fun hasEnoughTimeElapsed(timeNow: Long, selectedOptionDurationMillis: Long): Boolean {
         if (!settingsDataStore.hasBackgroundTimestampRecorded()) return false
 
         val clearWhenOption = settingsDataStore.automaticallyClearWhenOption
@@ -37,7 +37,7 @@ class DataClearerTimeKeeper @Inject constructor(private val settingsDataStore: S
 
         return when (clearWhenOption) {
             ClearWhenOption.APP_EXIT_ONLY -> true
-            else -> elapsedTime >= clearWhenOption.durationMillis
+            else -> elapsedTime >= selectedOptionDurationMillis
         }
     }
 

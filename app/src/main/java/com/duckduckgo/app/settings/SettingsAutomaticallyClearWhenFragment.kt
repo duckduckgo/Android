@@ -20,6 +20,7 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import android.widget.RadioGroup
+import androidx.annotation.IdRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.BuildConfig
@@ -69,13 +70,25 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
     }
 
     private fun updateCurrentSelect(currentOption: ClearWhenOption, radioGroup: RadioGroup) {
-        val selectedId = currentOption.radioButtonId
+        val selectedId = currentOption.radioButtonId()
         radioGroup.check(selectedId)
     }
 
     private fun showDebugOnlyOption(rootView: View) {
         val debugOption: View = rootView.findViewById(R.id.settingInactive5Seconds) ?: return
         debugOption.show()
+    }
+
+    @IdRes
+    private fun ClearWhenOption.radioButtonId() : Int {
+        return when (this) {
+            ClearWhenOption.APP_EXIT_ONLY -> R.id.settingAppExitOnly
+            ClearWhenOption.APP_EXIT_OR_5_MINS -> R.id.settingInactive5Mins
+            ClearWhenOption.APP_EXIT_OR_15_MINS -> R.id.settingInactive15Mins
+            ClearWhenOption.APP_EXIT_OR_30_MINS -> R.id.settingInactive30Mins
+            ClearWhenOption.APP_EXIT_OR_60_MINS -> R.id.settingInactive60Mins
+            ClearWhenOption.APP_EXIT_OR_5_SECONDS -> R.id.settingInactive5Seconds
+        }
     }
 
     companion object {

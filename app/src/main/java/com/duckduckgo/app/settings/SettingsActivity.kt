@@ -22,6 +22,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
+import androidx.annotation.StringRes
 import androidx.appcompat.widget.SwitchCompat
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
@@ -31,10 +32,10 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.sendThemeChangedBroadcast
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
-import com.duckduckgo.app.settings.clear.ClearWhatOption
-import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.SettingsViewModel.AutomaticallyClearData
 import com.duckduckgo.app.settings.SettingsViewModel.Command
+import com.duckduckgo.app.settings.clear.ClearWhatOption
+import com.duckduckgo.app.settings.clear.ClearWhenOption
 import kotlinx.android.synthetic.main.content_settings_general.*
 import kotlinx.android.synthetic.main.content_settings_other.*
 import kotlinx.android.synthetic.main.content_settings_privacy.*
@@ -97,10 +98,10 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     }
 
     private fun updateAutomaticClearDataOptions(automaticallyClearData: AutomaticallyClearData) {
-        val clearWhatSubtitle = getString(automaticallyClearData.clearWhatOption.nameStringRes)
+        val clearWhatSubtitle = getString(automaticallyClearData.clearWhatOption.nameStringResourceId())
         automaticallyClearWhatSetting.setSubtitle(clearWhatSubtitle)
 
-        val clearWhenSubtitle = getString(automaticallyClearData.clearWhenOption.nameStringRes)
+        val clearWhenSubtitle = getString(automaticallyClearData.clearWhenOption.nameStringResourceId())
         automaticallyClearWhenSetting.setSubtitle(clearWhenSubtitle)
 
         val whenOptionEnabled = automaticallyClearData.clearWhenOptionEnabled
@@ -156,6 +157,27 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
 
     override fun onAutomaticallyClearWhenOptionSelected(clearWhenSetting: ClearWhenOption) {
         viewModel.onAutomaticallyWhenOptionSelected(clearWhenSetting)
+    }
+
+    @StringRes
+    private fun ClearWhatOption.nameStringResourceId(): Int {
+        return when (this) {
+            ClearWhatOption.CLEAR_NONE -> R.string.settingsAutomaticallyClearWhatOptionNone
+            ClearWhatOption.CLEAR_TABS_ONLY -> R.string.settingsAutomaticallyClearWhatOptionTabs
+            ClearWhatOption.CLEAR_TABS_AND_DATA -> R.string.settingsAutomaticallyClearWhatOptionTabsAndData
+        }
+    }
+
+    @StringRes
+    private fun ClearWhenOption.nameStringResourceId() : Int {
+        return when (this) {
+            ClearWhenOption.APP_EXIT_ONLY -> R.string.settingsAutomaticallyClearWhenAppExitOnly
+            ClearWhenOption.APP_EXIT_OR_5_MINS -> R.string.settingsAutomaticallyClearWhenAppExit5Minutes
+            ClearWhenOption.APP_EXIT_OR_15_MINS -> R.string.settingsAutomaticallyClearWhenAppExit15Minutes
+            ClearWhenOption.APP_EXIT_OR_30_MINS -> R.string.settingsAutomaticallyClearWhenAppExit30Minutes
+            ClearWhenOption.APP_EXIT_OR_60_MINS -> R.string.settingsAutomaticallyClearWhenAppExit60Minutes
+            ClearWhenOption.APP_EXIT_OR_5_SECONDS -> R.string.settingsAutomaticallyClearWhenAppExit5Seconds
+        }
     }
 
     companion object {

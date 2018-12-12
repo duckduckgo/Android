@@ -20,6 +20,7 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import android.widget.RadioGroup
+import androidx.annotation.IdRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
@@ -59,8 +60,17 @@ class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
     }
 
     private fun updateCurrentSelect(currentOption: ClearWhatOption, radioGroup: RadioGroup) {
-        val selectedId = currentOption.radioButtonId
+        val selectedId = currentOption.radioButtonId()
         radioGroup.check(selectedId)
+    }
+
+    @IdRes
+    private fun ClearWhatOption.radioButtonId(): Int {
+        return when (this) {
+            ClearWhatOption.CLEAR_NONE -> R.id.settingNone
+            ClearWhatOption.CLEAR_TABS_ONLY -> R.id.settingTabsOnly
+            ClearWhatOption.CLEAR_TABS_AND_DATA -> R.id.settingTabsAndData
+        }
     }
 
     companion object {
