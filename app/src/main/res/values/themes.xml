@@ -53,7 +53,8 @@
         <item name="settingsItemTextColor">@color/white</item>
         <item name="settingsMinorTextColor">@color/grayishTwo</item>
         <item name="settingsSwitchBackgroundColor">@color/subtleGrayTwo</item>
-        <item name="callToActionCloseButtonColor">@color/brownishGrayTwo</item>
+        <item name="buttonOutlinedTextColor">@color/pinkishGrayThree</item>
+        <item name="buttonOutlinedBorderColor">@color/brownishGrayTwo</item>
         <item name="callToActionTitleColor">@color/white</item>
         <item name="callToActionSubtitleColor">@color/grayishThree</item>
     </style>
@@ -99,7 +100,8 @@
         <item name="settingsItemTextColor">@color/grayishBrown</item>
         <item name="settingsMinorTextColor">@color/warmerGray</item>
         <item name="settingsSwitchBackgroundColor">@color/brownishGrayTwo</item>
-        <item name="callToActionCloseButtonColor">@color/pinkishGray</item>
+        <item name="buttonOutlinedTextColor">@color/cornflowerDark</item>
+        <item name="buttonOutlinedBorderColor">@color/grayishThree</item>
         <item name="callToActionTitleColor">@color/almostBlack</item>
         <item name="callToActionSubtitleColor">@color/brownishGrayTwo</item>
     </style>

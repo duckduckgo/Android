@@ -35,7 +35,8 @@
     <attr name="settingsItemTextColor" format="color" />
     <attr name="settingsMinorTextColor" format="color" />
     <attr name="settingsSwitchBackgroundColor" format="color" />
-    <attr name="callToActionCloseButtonColor" format="color" />
+    <attr name="buttonOutlinedBorderColor" format="color" />
+    <attr name="buttonOutlinedTextColor" format="color" />
     <attr name="callToActionTitleColor" format="color" />
     <attr name="callToActionSubtitleColor" format="color" />
 
