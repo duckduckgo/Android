@@ -83,7 +83,7 @@ import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
-import kotlinx.android.synthetic.main.include_survey_cta.*
+import kotlinx.android.synthetic.main.include_cta.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import org.jetbrains.anko.configuration
 import org.jetbrains.anko.longToast
@@ -995,19 +995,19 @@ class BrowserTabFragment : Fragment(), FindListener {
         fun refreshSurveyViewState(isLandscape: Boolean) {
             val hasSurvey = lastSeenSurveyViewState?.hasValidSurvey ?: false
             if (hasSurvey && !isLandscape) {
-                displaySurveyCta()
+                displayCta()
             } else {
-                hideSurveyCta()
+                hideCta()
             }
         }
 
-        private fun displaySurveyCta() {
-            if (surveyCallToActionContainer != null) {
-                surveyCallToActionContainer.show()
+        private fun displayCta() {
+            if (ctaContainer != null) {
+                ctaContainer.show()
                 return
             }
             pixel.fire(SURVEY_CTA_SHOWN)
-            callToActionStub.layoutResource = R.layout.include_survey_cta
+            callToActionStub.layoutResource = R.layout.include_cta
             val container = callToActionStub.inflate()
             logoHidingLayoutChangeListener.callToActionButton = container
 
@@ -1017,20 +1017,20 @@ class BrowserTabFragment : Fragment(), FindListener {
                 it.applyTo(newTabLayout)
             }
 
-            launchSurveyButton.setOnClickListener {
+            launchButton.setOnClickListener {
                 pixel.fire(SURVEY_CTA_LAUNCHED_SURVEY)
                 viewModel.onUserOpenedSurvey()
             }
 
-            dismissSurveyButton.setOnClickListener {
+            dismissButton.setOnClickListener {
                 pixel.fire(SURVEY_CTA_DISMISSED)
                 viewModel.onUserDismissedSurvey()
             }
         }
 
-        private fun hideSurveyCta() {
-            if (surveyCallToActionContainer != null) {
-                surveyCallToActionContainer.gone()
+        private fun hideCta() {
+            if (ctaContainer != null) {
+                ctaContainer.gone()
             }
         }
 

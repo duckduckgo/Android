@@ -18,7 +18,7 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/surveyCallToActionContainer"
+    android:id="@+id/ctaContainer"
     android:layout_width="0dp"
     android:layout_height="160dp"
     android:background="?attr/colorPrimary"
@@ -28,7 +28,7 @@
     app:layout_constraintStart_toStartOf="parent">
 
     <ImageView
-        android:id="@+id/surveyIcon"
+        android:id="@+id/ctaIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
@@ -38,7 +38,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/surveyTitle"
+        android:id="@+id/ctaTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -47,12 +47,12 @@
         android:textColor="?attr/callToActionTitleColor"
         android:textSize="15sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@id/dismissSurveyButton"
-        app:layout_constraintStart_toEndOf="@id/surveyIcon"
-        app:layout_constraintTop_toTopOf="@id/surveyIcon" />
+        app:layout_constraintEnd_toStartOf="@id/dismissButton"
+        app:layout_constraintStart_toEndOf="@id/ctaIcon"
+        app:layout_constraintTop_toTopOf="@id/ctaIcon" />
 
     <TextView
-        android:id="@+id/surveySubtitle"
+        android:id="@+id/ctaSubtitle"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
@@ -64,13 +64,13 @@
         android:text="@string/surveyDescription"
         android:textColor="?attr/callToActionSubtitleColor"
         android:textSize="13sp"
-        app:layout_constraintBottom_toTopOf="@id/launchSurveyButton"
-        app:layout_constraintEnd_toStartOf="@id/dismissSurveyButton"
-        app:layout_constraintStart_toEndOf="@id/surveyIcon"
-        app:layout_constraintTop_toBottomOf="@id/surveyTitle" />
+        app:layout_constraintBottom_toTopOf="@id/launchButton"
+        app:layout_constraintEnd_toStartOf="@id/dismissButton"
+        app:layout_constraintStart_toEndOf="@id/ctaIcon"
+        app:layout_constraintTop_toBottomOf="@id/ctaTitle" />
 
     <Button
-        android:id="@+id/launchSurveyButton"
+        android:id="@+id/launchButton"
         style="?android:attr/borderlessButtonStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -87,10 +87,10 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/surveyIcon" />
+        app:layout_constraintTop_toBottomOf="@id/ctaIcon" />
 
     <ImageView
-        android:id="@+id/dismissSurveyButton"
+        android:id="@+id/dismissButton"
         android:layout_width="42dp"
         android:layout_height="42dp"
         android:contentDescription="@string/surveyDismissBannerContentDescription"
