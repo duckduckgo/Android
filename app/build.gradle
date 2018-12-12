@@ -99,7 +99,7 @@ ext {
     timber = "4.6.1"
     rxRelay = "2.0.0"
     leakCanary = "1.6.2"
-    mockito = "2.23.0"
+    mockito = "2.18.3"
     mockitoKotlin = "2.0.0"
 }
 
