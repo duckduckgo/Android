@@ -16,7 +16,6 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/settingsSectionGeneral"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -27,27 +26,25 @@
         android:text="@string/settingsHeadingGeneral"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.appcompat.widget.SwitchCompat
+    <com.duckduckgo.app.settings.SettingsSwitch
         android:id="@+id/lightThemeToggle"
-        style="@style/SettingsItem"
-        android:text="@string/settingsLightTheme"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/settingsGeneralTitle"
-        app:theme="@style/SettingsItem.SettingsSwitch"
-        tools:checked="true" />
+        app:settingsSwitchTitle="@string/settingsLightTheme" />
 
-    <androidx.appcompat.widget.SwitchCompat
+    <com.duckduckgo.app.settings.SettingsSwitch
         android:id="@+id/autocompleteToggle"
-        style="@style/SettingsItem"
-        android:text="@string/settingsAutocompleteEnabled"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/lightThemeToggle"
-        app:theme="@style/SettingsItem.SettingsSwitch"
-        tools:checked="true" />
+        app:settingsSwitchTitle="@string/settingsAutocompleteEnabled" />
 
-    <androidx.appcompat.widget.SwitchCompat
+    <com.duckduckgo.app.settings.SettingsSwitch
         android:id="@+id/setAsDefaultBrowserSetting"
-        style="@style/SettingsItem"
-        android:text="@string/settingsDefaultBrowserEnabled"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/autocompleteToggle"
-        app:theme="@style/SettingsItem.SettingsSwitch" />
+        app:settingsSwitchTitle="@string/settingsDefaultBrowserEnabled" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

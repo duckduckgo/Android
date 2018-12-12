@@ -85,8 +85,8 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
         viewModel.viewState.observe(this, Observer<SettingsViewModel.ViewState> { viewState ->
             viewState?.let {
                 version.setSubtitle(it.version)
-                lightThemeToggle.quietlySetIsChecked(it.lightThemeEnabled, lightThemeToggleListener)
-                autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
+                lightThemeToggle.quietlySetIsChecked(it.lightThemeEnabled)
+                autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled)
                 updateDefaultBrowserViewVisibility(it)
                 updateAutomaticClearDataOptions(it.automaticallyClearData)
             }
@@ -127,7 +127,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
 
     private fun updateDefaultBrowserViewVisibility(it: SettingsViewModel.ViewState) {
         if (it.showDefaultBrowserSetting) {
-            setAsDefaultBrowserSetting.quietlySetIsChecked(it.isAppDefaultBrowser, defaultBrowserChangeListener)
+            setAsDefaultBrowserSetting.quietlySetIsChecked(it.isAppDefaultBrowser)
             setAsDefaultBrowserSetting.visibility = View.VISIBLE
         } else {
             setAsDefaultBrowserSetting.visibility = View.GONE
@@ -169,7 +169,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     }
 
     @StringRes
-    private fun ClearWhenOption.nameStringResourceId() : Int {
+    private fun ClearWhenOption.nameStringResourceId(): Int {
         return when (this) {
             ClearWhenOption.APP_EXIT_ONLY -> R.string.settingsAutomaticallyClearWhenAppExitOnly
             ClearWhenOption.APP_EXIT_OR_5_MINS -> R.string.settingsAutomaticallyClearWhenAppExit5Minutes
