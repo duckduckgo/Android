@@ -43,6 +43,7 @@ class AutomaticDataClearerClearTabsTest {
     @UiThreadTest
     @Before
     fun setup() {
+        whenever(mockSettingsDataStore.hasBackgroundTimestampRecorded()).thenReturn(true)
         testee = AutomaticDataClearer(mockSettingsDataStore, mockClearAction, mockTimeKeeper)
     }
 
@@ -216,11 +217,11 @@ class AutomaticDataClearerClearTabsTest {
     }
 
     private fun configureEnoughTimePassed() {
-        whenever(mockTimeKeeper.hasEnoughTimeElapsed(any())).thenReturn(true)
+        whenever(mockTimeKeeper.hasEnoughTimeElapsed(any(), any(), any())).thenReturn(true)
     }
 
     private fun configureNotEnoughTimePassed() {
-        whenever(mockTimeKeeper.hasEnoughTimeElapsed(any())).thenReturn(false)
+        whenever(mockTimeKeeper.hasEnoughTimeElapsed(any(), any(), any())).thenReturn(false)
     }
 
     private suspend fun verifyTabsCleared() {

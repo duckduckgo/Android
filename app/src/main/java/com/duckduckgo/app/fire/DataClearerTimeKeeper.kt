@@ -17,32 +17,24 @@
 package com.duckduckgo.app.fire
 
 import com.duckduckgo.app.settings.clear.ClearWhenOption
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import timber.log.Timber
-import javax.inject.Inject
 
 interface BackgroundTimeKeeper {
-    fun hasEnoughTimeElapsed(timeNow: Long = System.currentTimeMillis()): Boolean
+    fun hasEnoughTimeElapsed(timeNow: Long = System.currentTimeMillis(), backgroundedTimestamp: Long, clearWhenOption: ClearWhenOption): Boolean
 }
 
-class DataClearerTimeKeeper @Inject constructor(private val settingsDataStore: SettingsDataStore) : BackgroundTimeKeeper {
+class DataClearerTimeKeeper : BackgroundTimeKeeper {
 
-    override fun hasEnoughTimeElapsed(timeNow: Long): Boolean {
-        if (!settingsDataStore.hasBackgroundTimestampRecorded()) return false
+    override fun hasEnoughTimeElapsed(timeNow: Long, backgroundedTimestamp: Long, clearWhenOption: ClearWhenOption): Boolean {
+        if (clearWhenOption == ClearWhenOption.APP_EXIT_ONLY) return false
 
-        val clearWhenOption = settingsDataStore.automaticallyClearWhenOption
-
-        val elapsedTime = timeSinceAppBackgrounded(settingsDataStore, timeNow)
+        val elapsedTime = timeSinceAppBackgrounded(timeNow, backgroundedTimestamp)
         Timber.i("It has been ${elapsedTime}ms since the app was backgrounded. Current configuration is for $clearWhenOption")
 
-        return when (clearWhenOption) {
-            ClearWhenOption.APP_EXIT_ONLY -> true
-            else -> elapsedTime >= clearWhenOption.durationMilliseconds()
-        }
+        return elapsedTime >= clearWhenOption.durationMilliseconds()
     }
 
-    private fun timeSinceAppBackgrounded(settingsDataStore: SettingsDataStore, timeNow: Long): Long {
-        val timestamp = settingsDataStore.appBackgroundedTimestamp
-        return timeNow - timestamp
+    private fun timeSinceAppBackgrounded(timeNow: Long, backgroundedTimestamp: Long): Long {
+        return timeNow - backgroundedTimestamp
     }
 }

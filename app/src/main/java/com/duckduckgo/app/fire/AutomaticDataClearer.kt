@@ -184,8 +184,15 @@ class AutomaticDataClearer(
             Timber.d("This is NOT a fresh app launch, and the configuration is for app exit only. Not clearing the data")
             return false
         }
+        if (!settingsDataStore.hasBackgroundTimestampRecorded()) {
+            Timber.w("No background timestamp recorded; will not clear the data")
+            return false
+        }
 
-        val enoughTimePassed = dataClearerTimeKeeper.hasEnoughTimeElapsed()
+        val enoughTimePassed = dataClearerTimeKeeper.hasEnoughTimeElapsed(
+            backgroundedTimestamp = settingsDataStore.appBackgroundedTimestamp,
+            clearWhenOption = cleanWhenOption
+        )
         Timber.d("Has enough time passed to trigger the data clear? $enoughTimePassed")
         return enoughTimePassed
     }

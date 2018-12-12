@@ -53,8 +53,8 @@ class PrivacyModule {
     }
 
     @Provides
-    fun backgroundTimeKeeper(settingsDataStore: SettingsDataStore): BackgroundTimeKeeper {
-        return DataClearerTimeKeeper(settingsDataStore)
+    fun backgroundTimeKeeper(): BackgroundTimeKeeper {
+        return DataClearerTimeKeeper()
     }
 
     @Provides

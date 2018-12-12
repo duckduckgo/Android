@@ -18,11 +18,7 @@ package com.duckduckgo.app.fire
 
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption.*
-import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -33,8 +29,7 @@ import java.util.concurrent.TimeUnit
 @RunWith(Parameterized::class)
 class DataClearerTimeKeeperTest(private val testCase: TestCase) {
 
-    private val mockSettingsDataStore: SettingsDataStore = mock()
-    private val testee: DataClearerTimeKeeper = DataClearerTimeKeeper(mockSettingsDataStore)
+    private val testee: DataClearerTimeKeeper = DataClearerTimeKeeper()
 
     companion object {
 
@@ -45,36 +40,27 @@ class DataClearerTimeKeeperTest(private val testCase: TestCase) {
             val timeNow = System.currentTimeMillis()
 
             return arrayOf(
-                // no background time recorded - always expected to indicate not enough time passed
-                TestCase(false, APP_EXIT_ONLY, TimeUnit.MINUTES.toMillis(5), timeNow, false),
-                TestCase(false, APP_EXIT_ONLY, TimeUnit.MINUTES.toMillis(0), timeNow, false),
-                TestCase(false, APP_EXIT_ONLY, TimeUnit.MINUTES.toMillis(-5), timeNow, false),
-                TestCase(false, APP_EXIT_OR_5_MINS, TimeUnit.MINUTES.toMillis(-5), timeNow, false),
-                TestCase(false, APP_EXIT_OR_5_MINS, TimeUnit.MINUTES.toMillis(4), timeNow, false),
-                TestCase(false, APP_EXIT_OR_5_MINS, TimeUnit.MINUTES.toMillis(0), timeNow, false),
-                TestCase(false, APP_EXIT_OR_5_MINS, TimeUnit.MINUTES.toMillis(5), timeNow, false),
+                // APP_EXIT_ONLY shouldn't be passed to this method - always expected to return false regardless of other configuration/inputs
+                TestCase(false, APP_EXIT_ONLY, TimeUnit.MINUTES.toMillis(5), timeNow),
+                TestCase(false, APP_EXIT_ONLY, TimeUnit.MINUTES.toMillis(0), timeNow),
+                TestCase(false, APP_EXIT_ONLY, TimeUnit.MINUTES.toMillis(-5), timeNow),
 
-                // background time recorded - will always return true since this is APP_EXIT_ONLY
-                TestCase(true, APP_EXIT_ONLY, TimeUnit.MINUTES.toMillis(5), timeNow),
-                TestCase(true, APP_EXIT_ONLY, TimeUnit.MINUTES.toMillis(0), timeNow),
-                TestCase(true, APP_EXIT_ONLY, TimeUnit.MINUTES.toMillis(-5), timeNow),
-
-                // background time recorded - will return true when duration is >= 5 mins
+                // will return true when duration is >= 5 mins
                 TestCase(false, APP_EXIT_OR_5_MINS, TimeUnit.MINUTES.toMillis(4), timeNow),
                 TestCase(true, APP_EXIT_OR_5_MINS, TimeUnit.MINUTES.toMillis(5), timeNow),
                 TestCase(true, APP_EXIT_OR_5_MINS, TimeUnit.MINUTES.toMillis(6), timeNow),
 
-                // background time recorded - will return true when duration is >= 15 mins
+                // will return true when duration is >= 15 mins
                 TestCase(false, APP_EXIT_OR_15_MINS, TimeUnit.MINUTES.toMillis(14), timeNow),
                 TestCase(true, APP_EXIT_OR_15_MINS, TimeUnit.MINUTES.toMillis(15), timeNow),
                 TestCase(true, APP_EXIT_OR_15_MINS, TimeUnit.MINUTES.toMillis(16), timeNow),
 
-                // background time recorded - will return true when duration is >= 30 mins
+                // will return true when duration is >= 30 mins
                 TestCase(false, APP_EXIT_OR_30_MINS, TimeUnit.MINUTES.toMillis(29), timeNow),
                 TestCase(true, APP_EXIT_OR_30_MINS, TimeUnit.MINUTES.toMillis(30), timeNow),
                 TestCase(true, APP_EXIT_OR_30_MINS, TimeUnit.MINUTES.toMillis(31), timeNow),
 
-                // background time recorded - will return true when duration is >= 60 mins
+                // will return true when duration is >= 60 mins
                 TestCase(false, APP_EXIT_OR_60_MINS, TimeUnit.MINUTES.toMillis(59), timeNow),
                 TestCase(true, APP_EXIT_OR_60_MINS, TimeUnit.MINUTES.toMillis(60), timeNow),
                 TestCase(true, APP_EXIT_OR_60_MINS, TimeUnit.MINUTES.toMillis(61), timeNow)
@@ -82,26 +68,10 @@ class DataClearerTimeKeeperTest(private val testCase: TestCase) {
         }
     }
 
-    @Before
-    fun setup() {
-
-        whenever(mockSettingsDataStore.hasBackgroundTimestampRecorded()).thenReturn(testCase.hasBackgroundTimeRecorded)
-
-        // configure amount of time backgrounded
-        val timestamp = getPastTimestamp(testCase.durationBackgrounded, testCase.timeNow)
-        configureBackgroundedTime(timestamp)
-
-        // configure which clear-when setting is configured
-        whenever(mockSettingsDataStore.automaticallyClearWhenOption).thenReturn(testCase.clearWhenOption)
-    }
-
     @Test
     fun enoughTimePassed() {
-        assertEquals(testCase.expected, testee.hasEnoughTimeElapsed())
-    }
-
-    private fun configureBackgroundedTime(timestamp: Long) {
-        whenever(mockSettingsDataStore.appBackgroundedTimestamp).thenReturn(timestamp)
+        val timestamp = getPastTimestamp(testCase.durationBackgrounded, testCase.timeNow)
+        assertEquals(testCase.expected, testee.hasEnoughTimeElapsed(backgroundedTimestamp = timestamp, clearWhenOption = testCase.clearWhenOption))
     }
 
     private fun getPastTimestamp(millisPreviously: Long, timeNow: Long = System.currentTimeMillis()): Long {
@@ -115,7 +85,6 @@ class DataClearerTimeKeeperTest(private val testCase: TestCase) {
         val expected: Boolean,
         val clearWhenOption: ClearWhenOption,
         val durationBackgrounded: Long,
-        val timeNow: Long,
-        val hasBackgroundTimeRecorded: Boolean = true
+        val timeNow: Long
     )
 }
