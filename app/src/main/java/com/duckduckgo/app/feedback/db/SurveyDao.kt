@@ -26,6 +26,9 @@ abstract class SurveyDao {
     @Insert
     abstract fun insert(survey: Survey)
 
+    @Delete
+    abstract fun delete(survey: Survey)
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     abstract fun update(survey: Survey)
 
@@ -41,11 +44,21 @@ abstract class SurveyDao {
     @Query("""select * from survey where status = "SCHEDULED"""")
     abstract fun getScheduled(): List<Survey>
 
+    @Query("""select * from survey where status = "SCHEDULED" or status = "NOT_ALLOCATED"""")
+    abstract fun getUnused(): List<Survey>
+
     @Transaction
     open fun cancelScheduledSurveys() {
         getScheduled().forEach {
             it.status = Survey.Status.CANCELLED
             update(it)
+        }
+    }
+
+    @Transaction
+    open fun deleteUnusedSurveys() {
+        getUnused().forEach {
+            delete(it)
         }
     }
 }
