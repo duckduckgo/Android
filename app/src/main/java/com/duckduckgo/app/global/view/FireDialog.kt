@@ -43,7 +43,7 @@ class FireDialog(context: Context, private val clearPersonalDataAction: ClearPer
             clearStarted()
 
             GlobalScope.launch {
-                clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true)
+                clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
                 clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
                 clearPersonalDataAction.killAndRestartProcess()
             }

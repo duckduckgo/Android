@@ -148,7 +148,7 @@ class BrowserActivity : DuckDuckGoActivity() {
 
             Timber.i("Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set")
             GlobalScope.launch {
-                clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true)
+                clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
                 clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
                 clearPersonalDataAction.killAndRestartProcess()
             }

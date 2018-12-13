@@ -24,6 +24,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -53,32 +54,38 @@ class ClearPersonalDataActionTest {
     }
 
     @Test
-    fun whenClearCalledThenPixelCountIncremented() = runBlocking<Unit> {
-        testee.clearTabsAndAllDataAsync(false)
+    fun whenClearCalledWithPixelIncrementSetToTrueThenPixelCountIncremented() = runBlocking<Unit> {
+        testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = true)
         verify(mockClearingUnsentForgetAllPixelStore).incrementCount()
     }
 
     @Test
+    fun whenClearCalledWithPixelIncrementSetToFalseThenPixelCountNotIncremented() = runBlocking<Unit> {
+        testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
+        verify(mockClearingUnsentForgetAllPixelStore, never()).incrementCount()
+    }
+
+    @Test
     fun whenClearCalledThenDataManagerClearsSessions() = runBlocking<Unit> {
-        testee.clearTabsAndAllDataAsync(false)
+        testee.clearTabsAndAllDataAsync(false, false)
         verify(mockDataManager).clearWebViewSessions()
     }
 
     @Test
     fun whenClearCalledThenDataManagerClearsData() = runBlocking<Unit> {
-        testee.clearTabsAndAllDataAsync(false)
+        testee.clearTabsAndAllDataAsync(false, false)
         verify(mockDataManager).clearData(any(), any(), any())
     }
 
     @Test
     fun whenClearCalledThenDataManagerClearsCookies() = runBlocking<Unit> {
-        testee.clearTabsAndAllDataAsync(false)
+        testee.clearTabsAndAllDataAsync(false, false)
         verify(mockDataManager).clearExternalCookies()
     }
 
     @Test
     fun whenClearCalledThenTabsCleared() = runBlocking<Unit> {
-        testee.clearTabsAndAllDataAsync(false)
+        testee.clearTabsAndAllDataAsync(false, false)
         verify(mockTabRepository).deleteAll()
     }
 }

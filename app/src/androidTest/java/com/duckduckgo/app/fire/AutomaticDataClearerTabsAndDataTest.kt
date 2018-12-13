@@ -239,11 +239,11 @@ class AutomaticDataClearerTabsAndDataTest {
     }
 
     private suspend fun verifyEverythingCleared() {
-        verify(mockClearAction).clearTabsAndAllDataAsync(any())
+        verify(mockClearAction).clearTabsAndAllDataAsync(any(), any())
     }
 
     private suspend fun verifyEverythingNotCleared() {
-        verify(mockClearAction, never()).clearTabsAndAllDataAsync(any())
+        verify(mockClearAction, never()).clearTabsAndAllDataAsync(any(), any())
     }
 
     private suspend fun simulateLifecycle(isFreshAppLaunch: Boolean) {
