@@ -138,4 +138,10 @@
         <item name="colorControlActivated">@android:color/white</item>
     </style>
 
+    <style name="SettingsSwitchTheme">
+        <item name="colorControlActivated">@color/cornflowerBlue</item>
+        <item name="colorSwitchThumbNormal">@color/white</item>
+        <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
+    </style>
+
 </resources>

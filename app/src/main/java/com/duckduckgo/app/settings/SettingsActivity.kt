@@ -85,8 +85,8 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
         viewModel.viewState.observe(this, Observer<SettingsViewModel.ViewState> { viewState ->
             viewState?.let {
                 version.setSubtitle(it.version)
-                lightThemeToggle.quietlySetIsChecked(it.lightThemeEnabled)
-                autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled)
+                lightThemeToggle.quietlySetIsChecked(it.lightThemeEnabled, lightThemeToggleListener)
+                autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
                 updateDefaultBrowserViewVisibility(it)
                 updateAutomaticClearDataOptions(it.automaticallyClearData)
             }
@@ -127,7 +127,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
 
     private fun updateDefaultBrowserViewVisibility(it: SettingsViewModel.ViewState) {
         if (it.showDefaultBrowserSetting) {
-            setAsDefaultBrowserSetting.quietlySetIsChecked(it.isAppDefaultBrowser)
+            setAsDefaultBrowserSetting.quietlySetIsChecked(it.isAppDefaultBrowser, defaultBrowserChangeListener)
             setAsDefaultBrowserSetting.visibility = View.VISIBLE
         } else {
             setAsDefaultBrowserSetting.visibility = View.GONE

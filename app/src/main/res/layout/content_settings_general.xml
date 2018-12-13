@@ -24,27 +24,36 @@
         android:id="@+id/settingsGeneralTitle"
         style="@style/SettingsSectionTitle"
         android:text="@string/settingsHeadingGeneral"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.duckduckgo.app.settings.SettingsSwitch
+    <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/lightThemeToggle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/settingsGeneralTitle"
-        app:settingsSwitchTitle="@string/settingsLightTheme" />
+        style="@style/SettingsSwitch"
+        android:text="@string/settingsLightTheme"
+        android:theme="@style/SettingsSwitchTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/settingsGeneralTitle" />
 
-    <com.duckduckgo.app.settings.SettingsSwitch
+    <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/autocompleteToggle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/lightThemeToggle"
-        app:settingsSwitchTitle="@string/settingsAutocompleteEnabled" />
+        style="@style/SettingsSwitch"
+        android:text="@string/settingsAutocompleteEnabled"
+        android:theme="@style/SettingsSwitchTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lightThemeToggle" />
 
-    <com.duckduckgo.app.settings.SettingsSwitch
+    <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/setAsDefaultBrowserSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/autocompleteToggle"
-        app:settingsSwitchTitle="@string/settingsDefaultBrowserEnabled" />
+        style="@style/SettingsSwitch"
+        android:text="@string/settingsDefaultBrowserEnabled"
+        android:theme="@style/SettingsSwitchTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/autocompleteToggle" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
