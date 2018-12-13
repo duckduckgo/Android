@@ -17,13 +17,14 @@
 package com.duckduckgo.app.tabs.model
 
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import android.net.Uri
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.db.TabsDao
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -37,9 +38,9 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
 
     private val siteData: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
 
-    override fun add(url: String?): String {
+    override fun add(url: String?, isDefaultTab: Boolean): String {
         val tabId = generateTabId()
-        add(tabId, buildSiteData(url))
+        add(tabId, buildSiteData(url), isDefaultTab = isDefaultTab)
         return tabId
     }
 
@@ -54,9 +55,18 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
         return data
     }
 
-    override fun add(tabId: String, data: MutableLiveData<Site>) {
+    override fun add(tabId: String, data: MutableLiveData<Site>, isDefaultTab: Boolean) {
         siteData[tabId] = data
         Schedulers.io().scheduleDirect {
+
+            Timber.i("Trying to add tab, is default? $isDefaultTab, current tabs count: ${tabsDao.tabs().size}")
+
+            if (isDefaultTab && tabsDao.tabs().isNotEmpty()) {
+                Timber.i("Default tab being added but there are already tabs; will not add this tab")
+                return@scheduleDirect
+            }
+
+            Timber.i("About to add a new tab, isDefaultTab: $isDefaultTab. $tabId")
             val position = tabsDao.lastTab()?.position ?: 0
             tabsDao.addAndSelectTab(TabEntity(tabId, data.value?.url, data.value?.title, true, position))
         }
@@ -99,9 +109,8 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
     }
 
     override fun deleteAll() {
-        Schedulers.io().scheduleDirect {
-            tabsDao.deleteAllTabs()
-        }
+        Timber.i("Deleting tabs right now")
+        tabsDao.deleteAllTabs()
         siteData.clear()
     }
 

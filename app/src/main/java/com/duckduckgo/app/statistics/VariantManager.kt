@@ -35,7 +35,8 @@ interface VariantManager {
         val ACTIVE_VARIANTS = listOf(
             // SERP variants - do not remove
             Variant(key = "sa", weight = 1.0, features = emptyList()),
-            Variant(key = "sb", weight = 1.0, features = emptyList()))
+            Variant(key = "sb", weight = 1.0, features = emptyList())
+        )
     }
 
     fun getVariant(activeVariants: List<Variant> = ACTIVE_VARIANTS): Variant

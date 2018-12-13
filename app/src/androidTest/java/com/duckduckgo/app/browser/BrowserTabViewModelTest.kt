@@ -55,7 +55,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockitokotlin2.*
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -162,15 +162,15 @@ class BrowserTabViewModelTest {
             siteFactory = siteFactory,
             tabRepository = mockTabsRepository,
             networkLeaderboardDao = mockNetworkLeaderboardDao,
+            bookmarksDao = bookmarksDao,
             autoCompleteApi = mockAutoCompleteApi,
             appSettingsPreferencesStore = mockSettingsStore,
-            bookmarksDao = bookmarksDao,
             longPressHandler = mockLongPressHandler,
-            appConfigurationDao = appConfigurationDao,
             webViewSessionStorage = webViewSessionStorage,
             specialUrlDetector = SpecialUrlDetectorImpl(),
             faviconDownloader = mockFaviconDownloader,
             addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector,
+            appConfigurationDao = appConfigurationDao,
             surveyDao = surveyDao,
             appInstallStore = mockAppInstallStore
         )

@@ -21,10 +21,10 @@ import android.view.MenuItem
 import android.webkit.WebView.HitTestResult
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockito_kotlin.eq
-import com.nhaarman.mockito_kotlin.never
-import com.nhaarman.mockito_kotlin.verify
-import com.nhaarman.mockito_kotlin.whenever
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before

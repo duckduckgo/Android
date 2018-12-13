@@ -33,4 +33,6 @@
     <dimen name="feedbackFormFieldsMargin">16dp</dimen>
     <dimen name="feedbackCardHorizontalMargin">16dp</dimen>
 
+    <dimen name="settingsItemHorizontalPadding">20dp</dimen>
+
 </resources>

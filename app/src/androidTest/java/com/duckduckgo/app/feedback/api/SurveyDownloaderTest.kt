@@ -21,7 +21,7 @@ import com.duckduckgo.app.feedback.db.SurveyDao
 import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.feedback.model.Survey.Status.NOT_ALLOCATED
 import com.duckduckgo.app.feedback.model.Survey.Status.SCHEDULED
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockitokotlin2.*
 import okhttp3.ResponseBody
 import org.junit.Rule
 import org.junit.Test

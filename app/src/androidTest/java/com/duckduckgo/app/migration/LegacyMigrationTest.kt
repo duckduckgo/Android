@@ -30,7 +30,7 @@ import com.duckduckgo.app.migration.legacy.LegacyDb
 import com.duckduckgo.app.migration.legacy.LegacyDbContracts
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockitokotlin2.mock
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals

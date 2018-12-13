@@ -17,27 +17,24 @@
 package com.duckduckgo.app.browser
 
 import android.content.Context
-import android.webkit.CookieManager
-import android.webkit.ValueCallback
 import android.webkit.WebStorage
 import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
-import com.nhaarman.mockito_kotlin.*
+import com.duckduckgo.app.fire.DuckDuckGoCookieManager
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.mockito.ArgumentCaptor
 
+@Suppress("RemoveExplicitTypeArguments")
 class WebViewDataManagerTest {
 
-    private inline fun <reified T : Any> argumentCaptor() = ArgumentCaptor.forClass(T::class.java)
-
-    private val mockCookieManager: CookieManager = mock()
-
+    private val mockCookieManager: DuckDuckGoCookieManager = mock()
     private val mockStorage: WebStorage = mock()
-
-    private val testee = WebViewDataManager(host, WebViewSessionInMemoryStorage())
+    private val testee = WebViewDataManager(WebViewSessionInMemoryStorage(), mockCookieManager)
 
     @UiThreadTest
     @Test
@@ -51,38 +48,9 @@ class WebViewDataManagerTest {
     }
 
     @Test
-    fun whenExternalCookiesClearedThenCookiesRemoved() {
-        testee.clearExternalCookies(mockCookieManager) {}
-        verify(mockCookieManager).removeAllCookies(any())
-    }
-
-    @Test
-    fun whenExternalCookiesClearedThenInternalCookiesRecreated() {
-
-        whenever(mockCookieManager.getCookie(host)).thenReturn("da=abc; dz=zyx")
-        whenever(mockCookieManager.getCookie(externalHost)).thenReturn("ea=abc; ez=zyx")
-        testee.clearExternalCookies(mockCookieManager) {}
-
-        val captor = argumentCaptor<ValueCallback<Boolean>>()
-        verify(mockCookieManager).removeAllCookies(captor.capture())
-        captor.value.onReceiveValue(true)
-
-        verify(mockCookieManager).setCookie(host, "da=abc")
-        verify(mockCookieManager).setCookie(host, "dz=zyx")
-    }
-
-    @Test
-    fun whenExternalCookiesClearedThenExternalCookiesAreNotRecreated() {
-        whenever(mockCookieManager.getCookie(host)).thenReturn("da=abc; dz=zyx")
-        whenever(mockCookieManager.getCookie(externalHost)).thenReturn("ea=abc; ez=zyx")
-        testee.clearExternalCookies(mockCookieManager) {}
-
-        val captor = argumentCaptor<ValueCallback<Boolean>>()
-        verify(mockCookieManager).removeAllCookies(captor.capture())
-        captor.value.onReceiveValue(true)
-
-        verify(mockCookieManager, never()).setCookie(host, "ea=abc")
-        verify(mockCookieManager, never()).setCookie(host, "ez=zyx")
+    fun whenExternalCookiesClearedThenCookiesRemoved() = runBlocking<Unit> {
+        testee.clearExternalCookies()
+        verify(mockCookieManager).removeExternalCookies()
     }
 
     private class TestWebView(context: Context) : WebView(context) {
@@ -104,11 +72,4 @@ class WebViewDataManagerTest {
             }
         }
     }
-
-
-    companion object {
-        private const val host = "duckduckgo.com"
-        private const val externalHost = "example.com"
-    }
-
 }

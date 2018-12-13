@@ -19,8 +19,8 @@ package com.duckduckgo.app.httpsupgrade
 import android.net.Uri
 import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.whenever
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before

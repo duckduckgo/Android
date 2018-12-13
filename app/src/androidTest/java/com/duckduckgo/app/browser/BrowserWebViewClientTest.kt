@@ -23,10 +23,10 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.never
-import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.verify
 import org.junit.Before
 import org.junit.Test
 
