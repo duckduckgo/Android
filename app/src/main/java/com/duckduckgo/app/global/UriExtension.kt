@@ -46,12 +46,24 @@ val Uri.hasIpHost: Boolean
         return baseHost?.matches(ipRegex) ?: false
     }
 
+private const val MOBILE_URL_PREFIX_SHORT = "m."
+private const val MOBILE_URL_PREFIX_LONG = "mobile."
+
 val Uri.isMobileSite: Boolean
-    get() = authority.startsWith("m.")
+    get() {
+        val auth = authority ?: return false
+        return auth.startsWith(MOBILE_URL_PREFIX_SHORT) || auth.startsWith(MOBILE_URL_PREFIX_LONG)
+    }
 
 fun Uri.toDesktopUri(): Uri {
     return if (isMobileSite) {
-        Uri.parse(toString().replaceFirst("m.", ""))
+        val urlString = toString()
+        val newUrl = if (urlString.contains(MOBILE_URL_PREFIX_SHORT)) {
+            urlString.replaceFirst(MOBILE_URL_PREFIX_SHORT, "")
+        } else {
+            urlString.replaceFirst(MOBILE_URL_PREFIX_LONG, "")
+        }
+        return Uri.parse(newUrl)
     } else {
         this
     }
