@@ -135,6 +135,12 @@ class UriExtensionTest {
     }
 
     @Test
+    fun whenConvertingMobileSiteToDesktopSiteThenMultipleMobilePrefixesStripped() {
+        val converted = Uri.parse("https://mobile.m.example.com").toDesktopUri()
+        assertEquals("https://example.com", converted.toString())
+    }
+
+    @Test
     fun whenConvertingDesktopSiteToDesktopSiteThenUrlUnchanged() {
         val converted = Uri.parse("https://example.com").toDesktopUri()
         assertEquals("https://example.com", converted.toString())
