@@ -58,7 +58,7 @@
     <TextView
         android:id="@+id/ctaSubtitle"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="22dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="30dp"
@@ -67,10 +67,16 @@
         android:text="@string/surveyDescription"
         android:textColor="?attr/callToActionSubtitleColor"
         android:textSize="13sp"
-        app:layout_constraintBottom_toTopOf="@id/launchButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/ctaIcon"
         app:layout_constraintTop_toBottomOf="@id/ctaTitle" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrierHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="ctaIcon,ctaSubtitle" />
 
     <Button
         android:id="@+id/dismissButton"
@@ -89,7 +95,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/launchButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ctaIcon" />
+        app:layout_constraintTop_toBottomOf="@id/barrierHorizontal" />
 
     <Button
         android:id="@+id/launchButton"
@@ -108,6 +114,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/dismissButton"
-        app:layout_constraintTop_toBottomOf="@id/ctaIcon" />
+        app:layout_constraintTop_toBottomOf="@id/barrierHorizontal" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
