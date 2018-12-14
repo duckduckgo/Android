@@ -56,14 +56,6 @@ class SurveyDaoTest {
     }
 
     @Test
-    fun whenSurveyDeletedThenItDoesNotExist() {
-        val survey = Survey("1", "", null, SCHEDULED)
-        dao.insert(survey)
-        dao.delete(survey)
-        assertFalse(dao.exists("1"))
-    }
-
-    @Test
     fun whenSurveyUpdatedThenRecordIsUpdated() {
         val original = Survey("1", "https://abc.com", null, SCHEDULED)
         val updated = Survey("1", "https://xyz.com", null, CANCELLED)
