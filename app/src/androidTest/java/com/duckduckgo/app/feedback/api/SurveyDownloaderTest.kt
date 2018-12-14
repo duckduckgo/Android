@@ -39,39 +39,39 @@ class SurveyDownloaderTest {
     val schedulers = InstantSchedulersRule()
 
     @Test
-    fun whenNewSurveyAllocatedThenSavedAsScheduledAndOldSurveysCancelled() {
+    fun whenNewSurveyAllocatedThenSavedAsScheduledAndUnusedSurveysDeleted() {
         whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocation("abc")))
         whenever(mockService.survey()).thenReturn(mockCall)
         testee.download().blockingAwait()
         verify(mockDao).insert(Survey("abc", SURVEY_URL, 7, SCHEDULED))
-        verify(mockDao).cancelScheduledSurveys()
+        verify(mockDao).deleteUnusedSurveys()
     }
 
     @Test
-    fun whenNewSurveyNotAllocatedThenSavedAsUnallocatedAndOldSurveysCancelled() {
+    fun whenNewSurveyNotAllocatedThenSavedAsUnallocatedAndUnusedSurveysDeleted() {
         whenever(mockCall.execute()).thenReturn(Response.success(surveyNoAllocation("abc")))
         whenever(mockService.survey()).thenReturn(mockCall)
         testee.download().blockingAwait()
         verify(mockDao).insert(Survey("abc", null, null, NOT_ALLOCATED))
-        verify(mockDao).cancelScheduledSurveys()
+        verify(mockDao).deleteUnusedSurveys()
     }
 
     @Test
-    fun whenSurveyAlreadyExistsThenNotSavedAndOldSurveysNotCancelled() {
+    fun whenSurveyAlreadyExistsThenNotSavedAndUnusedSurveysNotDeleted() {
         whenever(mockDao.exists(any())).thenReturn(true)
         whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocation("abc")))
         whenever(mockService.survey()).thenReturn(mockCall)
         testee.download().blockingAwait()
         verify(mockDao, never()).insert(any())
-        verify(mockDao, never()).cancelScheduledSurveys()
+        verify(mockDao, never()).deleteUnusedSurveys()
     }
 
     @Test
-    fun whenSuccessfulRequestReturnsNoSurveysThenOldSurveysCancelled() {
+    fun whenSuccessfulRequestReturnsNoSurveysThenUnusedSurveysDeleted() {
         whenever(mockCall.execute()).thenReturn(Response.success(null))
         whenever(mockService.survey()).thenReturn(mockCall)
         testee.download().blockingAwait()
-        verify(mockDao).cancelScheduledSurveys()
+        verify(mockDao).deleteUnusedSurveys()
     }
 
     @Test(expected = RuntimeException::class)

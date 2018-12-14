@@ -49,8 +49,8 @@ class SurveyDownloader @Inject constructor(
 
             val surveyGroup = response.body()
             if (surveyGroup?.id == null) {
-                Timber.d("No survey received, canceling any old scheduled surveys")
-                surveyDao.cancelScheduledSurveys()
+                Timber.d("No survey received, deleting old unused surveys")
+                surveyDao.deleteUnusedSurveys()
                 return@fromAction
             }
 
@@ -59,8 +59,8 @@ class SurveyDownloader @Inject constructor(
                 return@fromAction
             }
 
-            Timber.d("New survey received replaces any previous scheduled surveys")
-            surveyDao.cancelScheduledSurveys()
+            Timber.d("New survey received. Unused surveys cleared and new survey saved")
+            surveyDao.deleteUnusedSurveys()
             val surveyOption = determineOption(surveyGroup.surveyOptions)
             val newSurvey = when {
                 surveyOption != null -> Survey(surveyGroup.id, surveyOption.url, surveyOption.installationDay, SCHEDULED)
