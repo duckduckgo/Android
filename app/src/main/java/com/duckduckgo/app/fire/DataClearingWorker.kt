@@ -76,7 +76,7 @@ class DataClearingWorker(context: Context, workerParams: WorkerParameters) : Cor
     private suspend fun clearEverything() {
         Timber.i("App is in background, so just outright killing the process")
         withContext(Dispatchers.Main) {
-            clearDataAction.clearTabsAndAllDataAsync(appInForeground = false)
+            clearDataAction.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
             clearDataAction.setAppUsedSinceLastClearFlag(false)
 
             Timber.i("Will kill process now")

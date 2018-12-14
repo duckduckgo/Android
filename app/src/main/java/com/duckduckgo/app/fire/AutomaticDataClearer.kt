@@ -148,7 +148,7 @@ class AutomaticDataClearer(
                 val processNeedsRestarted = !isFreshAppLaunch
                 Timber.i("App is in foreground; restart needed? $processNeedsRestarted")
 
-                clearDataAction.clearTabsAndAllDataAsync(appInForeground = true)
+                clearDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = false)
 
                 Timber.i("All data now cleared, will restart process? $processNeedsRestarted")
                 if (processNeedsRestarted) {

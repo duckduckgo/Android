@@ -40,8 +40,7 @@ interface ClearDataAction {
     @WorkerThread
     suspend fun clearTabsAsync(appInForeground: Boolean)
 
-    suspend fun clearTabsAndAllDataAsync(appInForeground: Boolean): Unit?
-
+    suspend fun clearTabsAndAllDataAsync(appInForeground: Boolean, shouldFireDataClearPixel: Boolean): Unit?
     fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean)
     fun killProcess()
     fun killAndRestartProcess()
@@ -73,7 +72,7 @@ class ClearPersonalDataAction @Inject constructor(
         System.exit(0)
     }
 
-    override suspend fun clearTabsAndAllDataAsync(appInForeground: Boolean) {
+    override suspend fun clearTabsAndAllDataAsync(appInForeground: Boolean, shouldFireDataClearPixel: Boolean) {
         val startTime = System.currentTimeMillis()
 
         withContext(Dispatchers.IO) {
@@ -82,7 +81,7 @@ class ClearPersonalDataAction @Inject constructor(
         }
 
         withContext(Dispatchers.Main) {
-            clearDataAsync()
+            clearDataAsync(shouldFireDataClearPixel)
         }
 
         Timber.i("Finished clearing everything; took ${System.currentTimeMillis() - startTime}ms.")
@@ -101,9 +100,13 @@ class ClearPersonalDataAction @Inject constructor(
     }
 
     @UiThread
-    private suspend fun clearDataAsync() {
+    private suspend fun clearDataAsync(shouldFireDataClearPixel: Boolean) {
         val startTime = System.currentTimeMillis()
-        clearingStore.incrementCount()
+
+        if (shouldFireDataClearPixel) {
+            clearingStore.incrementCount()
+        }
+
         dataManager.clearData(WebView(context), WebStorage.getInstance(), context)
         dataManager.clearExternalCookies()
 
