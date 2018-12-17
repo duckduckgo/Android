@@ -36,12 +36,18 @@ import com.duckduckgo.app.settings.SettingsViewModel.AutomaticallyClearData
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import kotlinx.android.synthetic.main.content_settings_general.*
 import kotlinx.android.synthetic.main.content_settings_other.*
 import kotlinx.android.synthetic.main.content_settings_privacy.*
 import kotlinx.android.synthetic.main.include_toolbar.*
+import javax.inject.Inject
 
 class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFragment.Listener, SettingsAutomaticallyClearWhenFragment.Listener {
+
+    @Inject
+    lateinit var pixel: Pixel
 
     private val viewModel: SettingsViewModel by bindViewModel()
 
@@ -111,11 +117,13 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     private fun launchAutomaticallyClearWhatDialog() {
         val dialog = SettingsAutomaticallyClearWhatFragment.create(viewModel.viewState.value?.automaticallyClearData?.clearWhatOption)
         dialog.show(supportFragmentManager, CLEAR_WHAT_DIALOG_TAG)
+        pixel.fire(PixelName.AUTOMATIC_CLEAR_DATA_WHAT_SHOWN)
     }
 
     private fun launchAutomaticallyClearWhenDialog() {
         val dialog = SettingsAutomaticallyClearWhenFragment.create(viewModel.viewState.value?.automaticallyClearData?.clearWhenOption)
         dialog.show(supportFragmentManager, CLEAR_WHEN_DIALOG_TAG)
+        pixel.fire(PixelName.AUTOMATIC_CLEAR_DATA_WHEN_SHOWN)
     }
 
     private fun processCommand(it: Command?) {
