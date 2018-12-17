@@ -18,20 +18,23 @@ package com.duckduckgo.app.browser
 
 import android.content.Context
 import android.os.Build
-import android.webkit.CookieManager
 import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewDatabase
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import javax.inject.Inject
 
 interface WebDataManager {
+    suspend fun clearExternalCookies()
     fun clearData(webView: WebView, webStorage: WebStorage, context: Context)
-    fun clearExternalCookies(cookieManager: CookieManager, clearAllCallback: (() -> Unit))
     fun clearWebViewSessions()
 }
 
-class WebViewDataManager @Inject constructor(private val host: String, private val webViewSessionStorage: WebViewSessionStorage) : WebDataManager {
+class WebViewDataManager @Inject constructor(
+    private val webViewSessionStorage: WebViewSessionStorage,
+    private val cookieManager: DuckDuckGoCookieManager
+) : WebDataManager {
 
     override fun clearData(webView: WebView, webStorage: WebStorage, context: Context) {
         webView.clearCache(true)
@@ -52,14 +55,8 @@ class WebViewDataManager @Inject constructor(private val host: String, private v
         webViewDatabase.clearFormData()
     }
 
-    override fun clearExternalCookies(cookieManager: CookieManager, clearAllCallback: (() -> Unit)) {
-
-        val ddgCookie = cookieManager.getCookie(host)?.split(";")
-
-        cookieManager.removeAllCookies {
-            ddgCookie?.forEach { cookieManager.setCookie(host, it.trim()) }
-            clearAllCallback()
-        }
+    override suspend fun clearExternalCookies() {
+        cookieManager.removeExternalCookies()
     }
 
     override fun clearWebViewSessions() {

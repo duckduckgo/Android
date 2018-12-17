@@ -21,6 +21,14 @@
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />
 
+        <!-- Disable WorkManager's default initialization so we can use Dagger with it -->
+        <provider
+            android:name="androidx.work.impl.WorkManagerInitializer"
+            android:authorities="com.duckduckgo.app.browser.workmanager-init"
+            android:enabled="false"
+            android:exported="false"
+            tools:replace="android:authorities" />
+
         <!--
             To protect user privacy, disable SafeBrowsing which could send URLs to Google servers
             https://developer.android.com/reference/android/webkit/WebView

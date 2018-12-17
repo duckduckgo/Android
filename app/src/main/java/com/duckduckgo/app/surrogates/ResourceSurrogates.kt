@@ -37,7 +37,7 @@ class ResourceSurrogatesImpl : ResourceSurrogates {
         val uriString = uri.toString()
 
         return surrogates.find { uriString.contains(it.name) }
-                ?: return SurrogateResponse(responseAvailable = false)
+            ?: return SurrogateResponse(responseAvailable = false)
     }
 
     override fun getAll(): List<SurrogateResponse> {

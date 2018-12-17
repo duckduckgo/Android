@@ -31,6 +31,7 @@ import com.duckduckgo.app.feedback.api.FeedbackSender
 import com.duckduckgo.app.feedback.db.SurveyDao
 import com.duckduckgo.app.feedback.ui.FeedbackViewModel
 import com.duckduckgo.app.feedback.ui.SurveyViewModel
+import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
@@ -79,7 +80,8 @@ class ViewModelFactory @Inject constructor(
     private val specialUrlDetector: SpecialUrlDetector,
     private val faviconDownloader: FaviconDownloader,
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
-    private val pixel: Pixel
+    private val pixel: Pixel,
+    private val dataClearer: DataClearer
 
 ) : ViewModelProvider.NewInstanceFactory() {
 
@@ -88,7 +90,7 @@ class ViewModelFactory @Inject constructor(
             when {
                 isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboaringStore)
                 isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore, defaultBrowserDetector)
-                isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository, queryUrlConverter)
+                isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository, queryUrlConverter, dataClearer)
                 isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
                 isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository, webViewSessionStorage)
                 isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(
@@ -120,14 +122,14 @@ class ViewModelFactory @Inject constructor(
         tabRepository = tabRepository,
         networkLeaderboardDao = networkLeaderboardDao,
         bookmarksDao = bookmarksDao,
+        autoCompleteApi = autoCompleteApi,
         appSettingsPreferencesStore = appSettingsPreferencesStore,
-        appConfigurationDao = appConfigurationDao,
         longPressHandler = webViewLongPressHandler,
         webViewSessionStorage = webViewSessionStorage,
-        autoCompleteApi = autoCompleteApi,
         specialUrlDetector = specialUrlDetector,
         faviconDownloader = faviconDownloader,
         addToHomeCapabilityDetector = addToHomeCapabilityDetector,
+        appConfigurationDao = appConfigurationDao,
         surveyDao = surveyDao,
         appInstallStore = appInstallStore
     )

@@ -19,6 +19,7 @@ package com.duckduckgo.app.feedback.db
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.feedback.model.Survey
+import com.duckduckgo.app.feedback.model.Survey.Status.*
 import com.duckduckgo.app.global.db.AppDatabase
 import org.junit.After
 import org.junit.Assert.*
@@ -48,7 +49,7 @@ class SurveyDaoTest {
 
     @Test
     fun whenSurveyInsertedThenItExists() {
-        val survey = Survey("1", "", null, Survey.Status.SCHEDULED)
+        val survey = Survey("1", "", null, SCHEDULED)
         dao.insert(survey)
         assertTrue(dao.exists("1"))
         assertEquals(survey, dao.get("1"))
@@ -56,8 +57,8 @@ class SurveyDaoTest {
 
     @Test
     fun whenSurveyUpdatedThenRecordIsUpdated() {
-        val original = Survey("1", "https://abc.com", null, Survey.Status.SCHEDULED)
-        val updated = Survey("1", "https://xyz.com", null, Survey.Status.CANCELLED)
+        val original = Survey("1", "https://abc.com", null, SCHEDULED)
+        val updated = Survey("1", "https://xyz.com", null, CANCELLED)
 
         dao.insert(original)
         dao.update(updated)
@@ -73,18 +74,30 @@ class SurveyDaoTest {
 
     @Test
     fun whenScheduledSurveysExistThenGetScheduledContainsThem() {
-        dao.insert(Survey("1", "", null, Survey.Status.SCHEDULED))
-        dao.insert(Survey("2", "", null, Survey.Status.SCHEDULED))
-        dao.insert(Survey("3", "", null, Survey.Status.DONE))
-        dao.insert(Survey("4", "", null, Survey.Status.CANCELLED))
+        dao.insert(Survey("1", "", null, SCHEDULED))
+        dao.insert(Survey("2", "", null, SCHEDULED))
+        dao.insert(Survey("3", "", null, DONE))
+        dao.insert(Survey("4", "", null, CANCELLED))
         assertEquals(2, dao.getScheduled().size)
     }
 
     @Test
-    fun whenScheduledSurveysAreCanceledThenGetScheduledIsEmpty() {
-        dao.insert(Survey("1", "", null, Survey.Status.SCHEDULED))
-        dao.insert(Survey("2", "", null, Survey.Status.SCHEDULED))
+    fun whenScheduledSurveysAreCancelledTheirStatusIsUpdatedAndGetScheduledIsEmpty() {
+        dao.insert(Survey("1", "", null, SCHEDULED))
+        dao.insert(Survey("2", "", null, SCHEDULED))
         dao.cancelScheduledSurveys()
-        assertEquals(0, dao.getScheduled().size)
+        assertEquals(CANCELLED, dao.get("1")?.status)
+        assertEquals(CANCELLED, dao.get("2")?.status)
+        assertTrue(dao.getScheduled().isEmpty())
+    }
+
+    @Test
+    fun whenUnusedSurveysAreDeletedThenTheyNoLongerExistAndGetScheduledIsEmpty() {
+        dao.insert(Survey("1", "", null, SCHEDULED))
+        dao.insert(Survey("2", "", null, NOT_ALLOCATED))
+        dao.deleteUnusedSurveys()
+        assertFalse(dao.exists("1"))
+        assertFalse(dao.exists("2"))
+        assertTrue(dao.getScheduled().isEmpty())
     }
 }

@@ -82,10 +82,10 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingTop">32dp</item>
         <item name="android:paddingBottom">14dp</item>
-        <item name="android:layout_marginEnd">20dp</item>
-        <item name="android:layout_marginStart">20dp</item>
+        <item name="android:paddingStart">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:paddingEnd">@dimen/settingsItemHorizontalPadding</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">?attr/settingsSectionTextColor</item>
+        <item name="android:textColor">@color/cornflowerBlue</item>
         <item name="android:textSize">12sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textAllCaps">true</item>
@@ -96,11 +96,11 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingStart">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:paddingEnd">@dimen/settingsItemHorizontalPadding</item>
         <item name="android:paddingBottom">10dp</item>
-        <item name="android:layout_marginEnd">20dp</item>
-        <item name="android:layout_marginStart">20dp</item>
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">?attr/settingsItemTextColor</item>
+        <item name="android:textColor">@color/settings_title_color_selector</item>
         <item name="android:textSize">17sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:selectable">false</item>
@@ -115,26 +115,35 @@
     <style name="SettingsMinorText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginEnd">20dp</item>
-        <item name="android:layout_marginStart">20dp</item>
-        <item name="android:paddingTop">-4dp</item>
+        <item name="android:layout_marginTop">-7dp</item>
+        <item name="android:paddingStart">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:paddingEnd">@dimen/settingsItemHorizontalPadding</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:lineSpacingExtra">4sp</item>
-        <item name="android:textColor">?attr/settingsMinorTextColor</item>
-        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/settings_subtitle_color_selector</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:textStyle">normal</item>
     </style>
 
-    <style name="SettingsItem.SettingsSwitch">
-        <item name="colorSwitchThumbNormal">@color/white</item>
-        <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
-        <item name="android:layout_marginEnd">0dp</item>
-        <item name="android:layout_marginStart">0dp</item>
-        <item name="android:layout_marginTop">0dp</item>
-        <item name="android:layout_marginBottom">0dp</item>
+    <style name="SettingsSwitch">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingStart">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:paddingEnd">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">?attr/settingsItemTextColor</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:selectable">false</item>
         <item name="android:gravity">start</item>
-        <item name="android:paddingBottom">12dp</item>
-        <item name="android:paddingTop">12dp</item>
+    </style>
+
+    <style name="SettingsGroupDivider">
+        <item name="android:background">?attr/settingsDividerColor</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_marginTop">25dp</item>
+        <item name="android:layout_height">1dp</item>
     </style>
 
     <style name="BrowserIconMenuItem">

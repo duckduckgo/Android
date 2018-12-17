@@ -49,10 +49,11 @@
         <item name="bookmarkIconColor">@color/white</item>
         <item name="bookmarkTitleTextColor">@color/white</item>
         <item name="bookmarkSubtitleTextColor">@color/grayishTwo</item>
-        <item name="settingsSectionTextColor">@color/grayishTwo</item>
         <item name="settingsItemTextColor">@color/white</item>
+        <item name="settingsItemTextColorDisabled">@color/midGray</item>
         <item name="settingsMinorTextColor">@color/grayishTwo</item>
         <item name="settingsSwitchBackgroundColor">@color/subtleGrayTwo</item>
+        <item name="settingsDividerColor">@color/almostBlack</item>
         <item name="callToActionCloseButtonColor">@color/brownishGrayTwo</item>
         <item name="callToActionTitleColor">@color/white</item>
         <item name="callToActionSubtitleColor">@color/grayishThree</item>
@@ -95,10 +96,11 @@
         <item name="bookmarkIconColor">@color/grayishBrown</item>
         <item name="bookmarkTitleTextColor">@color/almostBlack</item>
         <item name="bookmarkSubtitleTextColor">@color/warmerGray</item>
-        <item name="settingsSectionTextColor">@color/warmerGray</item>
         <item name="settingsItemTextColor">@color/grayishBrown</item>
+        <item name="settingsItemTextColorDisabled">@color/pinkish_grey_two</item>
         <item name="settingsMinorTextColor">@color/warmerGray</item>
         <item name="settingsSwitchBackgroundColor">@color/brownishGrayTwo</item>
+        <item name="settingsDividerColor">@color/whiteSix</item>
         <item name="callToActionCloseButtonColor">@color/pinkishGray</item>
         <item name="callToActionTitleColor">@color/almostBlack</item>
         <item name="callToActionSubtitleColor">@color/brownishGrayTwo</item>
@@ -134,6 +136,12 @@
 
     <style name="SwitchTheme" parent="Widget.AppCompat.CompoundButton.Switch">
         <item name="colorControlActivated">@android:color/white</item>
+    </style>
+
+    <style name="SettingsSwitchTheme">
+        <item name="colorControlActivated">@color/cornflowerBlue</item>
+        <item name="colorSwitchThumbNormal">@color/white</item>
+        <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
     </style>
 
 </resources>

@@ -17,7 +17,7 @@
 package com.duckduckgo.app.statistics
 
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockitokotlin2.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before

@@ -60,7 +60,19 @@ interface Pixel {
         SURVEY_CTA_SHOWN(pixelName = "mus_cs"),
         SURVEY_CTA_DISMISSED(pixelName = "mus_cd"),
         SURVEY_CTA_LAUNCHED_SURVEY(pixelName = "mus_cl"),
-        SURVEY_SURVEY_DISMISSED(pixelName = "mus_sd")
+        SURVEY_SURVEY_DISMISSED(pixelName = "mus_sd"),
+
+        AUTOMATIC_CLEAR_DATA_WHAT_SHOWN("macwhat_s"),
+        AUTOMATIC_CLEAR_DATA_WHAT_OPTION_NONE("macwhat_n"),
+        AUTOMATIC_CLEAR_DATA_WHAT_OPTION_TABS("macwhat_t"),
+        AUTOMATIC_CLEAR_DATA_WHAT_OPTION_TABS_AND_DATA("macwhat_d"),
+
+        AUTOMATIC_CLEAR_DATA_WHEN_SHOWN("macwhen_s"),
+        AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_ONLY("macwhen_x"),
+        AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_5_MINS("macwhen_5"),
+        AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_15_MINS("macwhen_15"),
+        AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_30_MINS("macwhen_30"),
+        AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_60_MINS("macwhen_60")
     }
 
     object PixelParameter {

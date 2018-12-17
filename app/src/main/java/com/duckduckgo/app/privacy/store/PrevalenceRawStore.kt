@@ -30,7 +30,7 @@ class PrevalenceRawStore @Inject constructor(
     context: Context
 ) : PrevalenceStore {
 
-     private var data: Map<String, Double> = emptyMap()
+    private var data: Map<String, Double> = emptyMap()
 
     init {
         Schedulers.io().scheduleDirect {

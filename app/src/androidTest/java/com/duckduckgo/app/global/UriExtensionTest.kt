@@ -108,6 +108,11 @@ class UriExtensionTest {
     }
 
     @Test
+    fun whenUrlStartsMobileDotThenIdentifiedAsMobileSite() {
+        assertTrue(Uri.parse("https://mobile.example.com").isMobileSite)
+    }
+
+    @Test
     fun whenUrlSubdomainEndsWithMThenNotIdentifiedAsMobileSite() {
         assertFalse(Uri.parse("https://adam.example.com").isMobileSite)
     }
@@ -118,8 +123,20 @@ class UriExtensionTest {
     }
 
     @Test
-    fun whenConvertingMobileSiteToDesktopSiteThenMobilePrefixStripped() {
+    fun whenConvertingMobileSiteToDesktopSiteThenShortMobilePrefixStripped() {
         val converted = Uri.parse("https://m.example.com").toDesktopUri()
+        assertEquals("https://example.com", converted.toString())
+    }
+
+    @Test
+    fun whenConvertingMobileSiteToDesktopSiteThenLongMobilePrefixStripped() {
+        val converted = Uri.parse("https://mobile.example.com").toDesktopUri()
+        assertEquals("https://example.com", converted.toString())
+    }
+
+    @Test
+    fun whenConvertingMobileSiteToDesktopSiteThenMultipleMobilePrefixesStripped() {
+        val converted = Uri.parse("https://mobile.m.example.com").toDesktopUri()
         assertEquals("https://example.com", converted.toString())
     }
 

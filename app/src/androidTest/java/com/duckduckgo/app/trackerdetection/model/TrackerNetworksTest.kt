@@ -19,8 +19,8 @@ package com.duckduckgo.app.trackerdetection.model
 import com.duckduckgo.app.entities.EntityMapping
 import com.duckduckgo.app.entities.db.EntityListEntity
 import com.duckduckgo.app.privacy.store.PrevalenceStore
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.whenever
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test

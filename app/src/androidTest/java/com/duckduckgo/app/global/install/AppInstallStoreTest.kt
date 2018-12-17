@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.global.install
 
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.whenever
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.concurrent.TimeUnit
