@@ -1,7 +1,7 @@
 ## What's new in this release?
-In this release, we added a setting to allow you to clear your data automatically; if you want it, you can have it deleting all tabs and all cookies, or just deleting old tabs.
+In this release, we added new settings to allow you to automatically clear your tabs and data.
 
-We also made improvements under the hood to improve the cookie clearing process.
+We also made improvements under the hood to improve the data clearing process.
 
 ## Have feedback?
 You can always reach us at https://duckduckgo.com/feedback.
