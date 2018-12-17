@@ -27,7 +27,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Bundle
@@ -79,13 +78,13 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
+import kotlinx.android.synthetic.main.include_cta.*
+import kotlinx.android.synthetic.main.include_cta_buttons.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
-import kotlinx.android.synthetic.main.include_cta.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
-import org.jetbrains.anko.configuration
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
@@ -698,7 +697,7 @@ class BrowserTabFragment : Fragment(), FindListener {
      */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        renderer.refreshSurveyViewState(newConfig.isLandscape)
+        renderer.refreshCta()
         ddgLogo.setImageResource(R.drawable.logo_full)
     }
 
@@ -987,17 +986,18 @@ class BrowserTabFragment : Fragment(), FindListener {
         fun renderSurveyViewState(viewState: BrowserTabViewModel.SurveyViewState) {
             renderIfChanged(viewState, lastSeenSurveyViewState) {
                 lastSeenSurveyViewState = viewState
-                val isLandscape = activity?.configuration?.isLandscape ?: false
-                refreshSurveyViewState(isLandscape)
+                if (viewState.hasValidSurvey) {
+                    pixel.fire(SURVEY_CTA_SHOWN)
+                    displayCta()
+                } else {
+                    hideCta()
+                }
             }
         }
 
-        fun refreshSurveyViewState(isLandscape: Boolean) {
-            val hasSurvey = lastSeenSurveyViewState?.hasValidSurvey ?: false
-            if (hasSurvey && !isLandscape) {
-                displayCta()
-            } else {
-                hideCta()
+       fun refreshCta() {
+            if (ctaContainer != null) {
+                ctaContainer.refreshDrawableState()
             }
         }
 
@@ -1006,7 +1006,6 @@ class BrowserTabFragment : Fragment(), FindListener {
                 ctaContainer.show()
                 return
             }
-            pixel.fire(SURVEY_CTA_SHOWN)
             callToActionStub.layoutResource = R.layout.include_cta
             val container = callToActionStub.inflate()
             logoHidingLayoutChangeListener.callToActionButton = container
@@ -1090,8 +1089,4 @@ class BrowserTabFragment : Fragment(), FindListener {
         private fun shouldUpdateOmnibarTextInput(viewState: OmnibarViewState, omnibarInput: String?) =
             !viewState.isEditing && omnibarTextInput.isDifferent(omnibarInput)
     }
-
-    val Configuration.isLandscape: Boolean
-        get() = orientation == ORIENTATION_LANDSCAPE
-
 }

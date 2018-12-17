@@ -98,5 +98,4 @@ class ApiBasedPixel @Inject constructor(
         val atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
         return api.fire(pixel.pixelName, deviceInfo.formFactor().description, atb, parameters)
     }
-
 }
