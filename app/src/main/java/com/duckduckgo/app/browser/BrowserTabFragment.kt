@@ -576,10 +576,8 @@ class BrowserTabFragment : Fragment(), FindListener {
                 useWideViewPort = true
                 builtInZoomControls = true
                 displayZoomControls = false
-
-                // explicitly disable database to try protect against Magellan WebSQL/SQLite vulnerability
-                databaseEnabled = false
                 mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+                disableWebSql(this)
                 setSupportZoom(true)
             }
 
@@ -598,6 +596,13 @@ class BrowserTabFragment : Fragment(), FindListener {
 
             it.setFindListener(this)
         }
+    }
+
+    /**
+     * Explicitly disable database to try protect against Magellan WebSQL/SQLite vulnerability
+     */
+    private fun disableWebSql(settings: WebSettings) {
+        settings.databaseEnabled = false
     }
 
     private fun addTextChangedListeners() {
