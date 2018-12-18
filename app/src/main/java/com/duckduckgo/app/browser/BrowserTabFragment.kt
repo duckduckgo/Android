@@ -33,8 +33,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.text.Editable
 import android.view.*
-import android.view.View.GONE
-import android.view.View.VISIBLE
+import android.view.View.*
 import android.view.inputmethod.EditorInfo
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
@@ -78,7 +77,6 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
-import kotlinx.android.synthetic.main.include_cta.*
 import kotlinx.android.synthetic.main.include_cta_buttons.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
@@ -91,6 +89,7 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import kotlin.concurrent.thread
+import kotlin.math.log
 
 
 class BrowserTabFragment : Fragment(), FindListener {
@@ -697,8 +696,20 @@ class BrowserTabFragment : Fragment(), FindListener {
      */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        renderer.refreshCta()
         ddgLogo.setImageResource(R.drawable.logo_full)
+        refreshCtaLayout()
+    }
+
+    private fun refreshCtaLayout() {
+        ctaContainer.removeAllViews()
+        inflate(context, R.layout.include_cta, ctaContainer)
+        logoHidingLayoutChangeListener.callToActionView = ctaContainer
+
+        ConstraintSet().also {
+            it.clone(newTabLayout)
+            it.connect(ddgLogo.id, ConstraintSet.BOTTOM, ctaContainer.id, ConstraintSet.TOP, 0)
+            it.applyTo(newTabLayout)
+        }
     }
 
     private fun resetTabState() {
@@ -914,6 +925,7 @@ class BrowserTabFragment : Fragment(), FindListener {
                 val browserShowing = viewState.browserShowing
                 if (browserShowing) {
                     webView?.show()
+                    logoHidingLayoutChangeListener.callToActionView = ctaContainer
                 } else {
                     webView?.hide()
                 }
@@ -987,7 +999,6 @@ class BrowserTabFragment : Fragment(), FindListener {
             renderIfChanged(viewState, lastSeenSurveyViewState) {
                 lastSeenSurveyViewState = viewState
                 if (viewState.hasValidSurvey) {
-                    pixel.fire(SURVEY_CTA_SHOWN)
                     displayCta()
                 } else {
                     hideCta()
@@ -995,26 +1006,10 @@ class BrowserTabFragment : Fragment(), FindListener {
             }
         }
 
-       fun refreshCta() {
-            if (ctaContainer != null) {
-                ctaContainer.refreshDrawableState()
-            }
-        }
-
         private fun displayCta() {
-            if (ctaContainer != null) {
-                ctaContainer.show()
-                return
-            }
-            callToActionStub.layoutResource = R.layout.include_cta
-            val container = callToActionStub.inflate()
-            logoHidingLayoutChangeListener.callToActionButton = container
+            ctaContainer.show()
 
-            ConstraintSet().also {
-                it.clone(newTabLayout)
-                it.connect(ddgLogo.id, ConstraintSet.BOTTOM, container.id, ConstraintSet.TOP, 0)
-                it.applyTo(newTabLayout)
-            }
+            pixel.fire(SURVEY_CTA_SHOWN)
 
             launchButton.setOnClickListener {
                 pixel.fire(SURVEY_CTA_LAUNCHED_SURVEY)
@@ -1028,9 +1023,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
 
         private fun hideCta() {
-            if (ctaContainer != null) {
-                ctaContainer.gone()
-            }
+            ctaContainer.gone()
         }
 
         /**
