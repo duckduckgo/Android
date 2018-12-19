@@ -48,6 +48,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.core.view.isEmpty
+import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
@@ -77,7 +79,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
-import kotlinx.android.synthetic.main.include_cta_buttons.*
+import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
@@ -89,7 +91,6 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import kotlin.concurrent.thread
-import kotlin.math.log
 
 
 class BrowserTabFragment : Fragment(), FindListener {
@@ -697,18 +698,8 @@ class BrowserTabFragment : Fragment(), FindListener {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         ddgLogo.setImageResource(R.drawable.logo_full)
-        refreshCtaLayout()
-    }
-
-    private fun refreshCtaLayout() {
-        ctaContainer.removeAllViews()
-        inflate(context, R.layout.include_cta, ctaContainer)
-        logoHidingLayoutChangeListener.callToActionView = ctaContainer
-
-        ConstraintSet().also {
-            it.clone(newTabLayout)
-            it.connect(ddgLogo.id, ConstraintSet.BOTTOM, ctaContainer.id, ConstraintSet.TOP, 0)
-            it.applyTo(newTabLayout)
+        if (ctaContainer.isNotEmpty()) {
+            renderer.renderCta()
         }
     }
 
@@ -999,31 +990,46 @@ class BrowserTabFragment : Fragment(), FindListener {
             renderIfChanged(viewState, lastSeenSurveyViewState) {
                 lastSeenSurveyViewState = viewState
                 if (viewState.hasValidSurvey) {
-                    displayCta()
+                    showCta()
                 } else {
                     hideCta()
                 }
             }
         }
 
-        private fun displayCta() {
+        private fun showCta() {
             ctaContainer.show()
-
             pixel.fire(SURVEY_CTA_SHOWN)
-
-            launchButton.setOnClickListener {
-                pixel.fire(SURVEY_CTA_LAUNCHED_SURVEY)
-                viewModel.onUserOpenedSurvey()
-            }
-
-            dismissButton.setOnClickListener {
-                pixel.fire(SURVEY_CTA_DISMISSED)
-                viewModel.onUserDismissedSurvey()
+            if (ctaContainer.isEmpty()) {
+                renderCta()
             }
         }
 
         private fun hideCta() {
             ctaContainer.gone()
+        }
+
+        fun renderCta() {
+
+            ctaContainer.removeAllViews()
+            inflate(context, R.layout.include_cta, ctaContainer)
+            logoHidingLayoutChangeListener.callToActionView = ctaContainer
+
+            ctaContainer.launchButton.setOnClickListener {
+                pixel.fire(SURVEY_CTA_LAUNCHED_SURVEY)
+                viewModel.onUserOpenedSurvey()
+            }
+
+            ctaContainer.dismissButton.setOnClickListener {
+                pixel.fire(SURVEY_CTA_DISMISSED)
+                viewModel.onUserDismissedSurvey()
+            }
+
+            ConstraintSet().also {
+                it.clone(newTabLayout)
+                it.connect(ddgLogo.id, ConstraintSet.BOTTOM, ctaContainer.id, ConstraintSet.TOP, 0)
+                it.applyTo(newTabLayout)
+            }
         }
 
         /**
