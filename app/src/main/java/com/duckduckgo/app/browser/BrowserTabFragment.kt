@@ -74,7 +74,6 @@ import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
@@ -124,6 +123,9 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var ctaViewModel: CtaViewModel
 
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
@@ -287,8 +289,8 @@ class BrowserTabFragment : Fragment(), FindListener {
             it?.let { navigate(it) }
         })
 
-        viewModel.surveyViewState.observe(this, Observer {
-            it?.let { renderer.renderSurveyViewState(it) }
+        viewModel.ctaViewState.observe(this, Observer {
+            it?.let { renderer.renderCtaViewState(it) }
         })
 
         viewModel.command.observe(this, Observer {
@@ -853,7 +855,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         private var lastSeenBrowserViewState: BrowserViewState? = null
         private var lastSeenGlobalViewState: GlobalLayoutViewState? = null
         private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
-        private var lastSeenSurveyViewState: SurveyViewState? = null
+        private var lastSeenCtaViewState: CtaViewModel.CtaViewState? = null
 
         fun renderAutocomplete(viewState: AutoCompleteViewState) {
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
@@ -986,23 +988,25 @@ class BrowserTabFragment : Fragment(), FindListener {
             }
         }
 
-        fun renderSurveyViewState(viewState: BrowserTabViewModel.SurveyViewState) {
-            renderIfChanged(viewState, lastSeenSurveyViewState) {
-                lastSeenSurveyViewState = viewState
-                if (viewState.hasValidSurvey) {
-                    showCta()
+        fun renderCtaViewState(viewState: CtaViewModel.CtaViewState) {
+            renderIfChanged(viewState, lastSeenCtaViewState) {
+                lastSeenCtaViewState = viewState
+                val context = context ?: return
+                if (viewState.cta != null) {
+                    showCta(viewState.cta)
                 } else {
                     hideCta()
                 }
             }
         }
 
-        private fun showCta() {
-            ctaContainer.show()
-            pixel.fire(SURVEY_CTA_SHOWN)
+        private fun showCta(configuration: CtaConfiguration) {
             if (ctaContainer.isEmpty()) {
                 renderCta()
             }
+            configuration.apply(ctaContainer)
+            ctaContainer.show()
+            ctaViewModel.onCtaShown()
         }
 
         private fun hideCta() {
@@ -1011,18 +1015,20 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         fun renderCta() {
 
+            val context = context ?: return
+            val configuration = lastSeenCtaViewState?.cta ?: return
             ctaContainer.removeAllViews()
+
             inflate(context, R.layout.include_cta, ctaContainer)
             logoHidingLayoutChangeListener.callToActionView = ctaContainer
 
-            ctaContainer.launchButton.setOnClickListener {
-                pixel.fire(SURVEY_CTA_LAUNCHED_SURVEY)
-                viewModel.onUserOpenedSurvey()
+            configuration.apply(ctaContainer)
+            ctaContainer.ctaOkButton.setOnClickListener {
+                viewModel.onUserLaunchedCta()
             }
 
-            ctaContainer.dismissButton.setOnClickListener {
-                pixel.fire(SURVEY_CTA_DISMISSED)
-                viewModel.onUserDismissedSurvey()
+            ctaContainer.ctaDismissButton.setOnClickListener {
+                viewModel.onUserDismissedCta()
             }
 
             ConstraintSet().also {

@@ -17,12 +17,13 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
     <Button
-        android:id="@+id/dismissButton"
+        android:id="@+id/ctaDismissButton"
         style="?android:attr/borderlessButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="36dp"
@@ -33,12 +34,12 @@
         android:layout_weight="1"
         android:background="@drawable/button_outlined_bg"
         android:foreground="?attr/selectableItemBackgroundBorderless"
-        android:text="@string/surveyDismissButton"
         android:textColor="?attr/buttonOutlinedTextColor"
-        android:textSize="13sp" />
+        android:textSize="13sp"
+        tools:text="@string/surveyCtaDismissButton" />
 
     <Button
-        android:id="@+id/launchButton"
+        android:id="@+id/ctaOkButton"
         style="?android:attr/borderlessButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="36dp"
@@ -49,8 +50,8 @@
         android:layout_weight="1"
         android:background="@drawable/button_contained_bg"
         android:foreground="?attr/selectableItemBackgroundBorderless"
-        android:text="@string/surveyLaunchButton"
         android:textColor="@color/white"
-        android:textSize="13sp" />
+        android:textSize="13sp"
+        tools:text="@string/surveyCtaLaunchButton" />
 
 </LinearLayout>

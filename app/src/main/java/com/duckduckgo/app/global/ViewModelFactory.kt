@@ -79,7 +79,8 @@ class ViewModelFactory @Inject constructor(
     private val specialUrlDetector: SpecialUrlDetector,
     private val faviconDownloader: FaviconDownloader,
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
-    private val pixel: Pixel
+    private val pixel: Pixel,
+    private val ctaViewModel: CtaViewModel
 
 ) : ViewModelProvider.NewInstanceFactory() {
 
@@ -128,7 +129,6 @@ class ViewModelFactory @Inject constructor(
         specialUrlDetector = specialUrlDetector,
         faviconDownloader = faviconDownloader,
         addToHomeCapabilityDetector = addToHomeCapabilityDetector,
-        surveyDao = surveyDao,
-        appInstallStore = appInstallStore
+        ctaViewModel = ctaViewModel
     )
 }

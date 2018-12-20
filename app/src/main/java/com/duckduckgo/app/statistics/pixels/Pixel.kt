@@ -59,8 +59,15 @@ interface Pixel {
 
         SURVEY_CTA_SHOWN(pixelName = "mus_cs"),
         SURVEY_CTA_DISMISSED(pixelName = "mus_cd"),
-        SURVEY_CTA_LAUNCHED_SURVEY(pixelName = "mus_cl"),
-        SURVEY_SURVEY_DISMISSED(pixelName = "mus_sd")
+        SURVEY_CTA_LAUNCHED(pixelName = "mus_cl"),
+        SURVEY_SURVEY_DISMISSED(pixelName = "mus_sd"),
+
+        ADD_WIDGET_CTA_SHOWN(pixelName = "maw_cs"),
+        ADD_WIDGET_CTA_DISMISSED(pixelName = "maw_cd"),
+        ADD_WIDGET_CTA_LAUNCHED_LEGACY(pixelName = "maw_cll"),
+        ADD_WIDGET_CTA_LAUNCHED_MODERN(pixelName = "maw_clm"),
+        ADD_WIDGET_INSTALL_LEGACY(pixelName = "maw_il"),
+        ADD_WIDGET_INSTALL_MODERN(pixelName = "maw_im")
     }
 
     object PixelParameter {

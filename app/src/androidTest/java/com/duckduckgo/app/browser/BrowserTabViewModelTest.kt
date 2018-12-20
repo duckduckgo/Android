@@ -126,10 +126,7 @@ class BrowserTabViewModelTest {
     private lateinit var mockAddToHomeCapabilityDetector: AddToHomeCapabilityDetector
 
     @Mock
-    private lateinit var surveyDao: SurveyDao
-
-    @Mock
-    private lateinit var mockAppInstallStore: AppInstallStore
+    private lateinit var mockCtaViewModel: CtaViewModel
 
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
@@ -153,7 +150,6 @@ class BrowserTabViewModelTest {
 
         whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
-        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -171,8 +167,7 @@ class BrowserTabViewModelTest {
             specialUrlDetector = SpecialUrlDetectorImpl(),
             faviconDownloader = mockFaviconDownloader,
             addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector,
-            surveyDao = surveyDao,
-            appInstallStore = mockAppInstallStore
+            ctaViewModel = mockCtaViewModel
         )
 
         testee.loadData("abc", null)
@@ -741,38 +736,6 @@ class BrowserTabViewModelTest {
         assertNull(command.url)
     }
 
-    @Test
-    fun whenScheduledSurveyChangesAndNewSurveyInstallationDayMatchesDaysInstalledThenHasValidSurveyIsTrue() {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
-        assertTrue(testee.surveyViewState.value!!.hasValidSurvey)
-    }
-
-    @Test
-    fun whenScheduledSurveyChangesAndNewSurveyInstallationDoesNotMatchDaysInstalledThenHasValidSurveyIsFalse() {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", 2, SCHEDULED))
-        assertFalse(testee.surveyViewState.value!!.hasValidSurvey)
-    }
-
-    @Test
-    fun whenScheduledSurveyIsNullThenHasValidSurveyIsFalse() {
-        testee.onSurveyChanged(null)
-        assertFalse(testee.surveyViewState.value!!.hasValidSurvey)
-    }
-
-    @Test
-    fun whenSurveyExistsAndUserOpensSurveyThenSurveyShown() {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
-        testee.onUserOpenedSurvey()
-        val command = captureCommands().value as Command.LaunchSurvey
-        assertNotNull(command)
-    }
-
-    @Test
-    fun whenUserDismissesSurveyThenSurveyCancelledAndHasValidSurveyIsFalse() {
-        testee.onUserDismissedSurvey()
-        assertFalse(testee.surveyViewState.value!!.hasValidSurvey)
-        verify(surveyDao).cancelScheduledSurveys()
-    }
 
     @Test
     fun whenUserSelectsToShareLinkWithNullUrlThenShareLinkCommandNotSent() {

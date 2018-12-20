@@ -1,0 +1,81 @@
+<!--
+  ~ Copyright (c) 2018 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="69dp"
+    android:viewportWidth="64"
+    android:viewportHeight="69">
+    <path
+        android:fillAlpha=".2"
+        android:fillColor="#AAA"
+        android:fillType="evenOdd"
+        android:pathData="M52.571,61.512V20.238a2.286,2.286 0,0 0,-2.285 -2.286H13.714a2.286,2.286 0,0 0,-2.285 2.286v41.274C4.44,55.642 0,46.84 0,37 0,19.327 14.327,5 32,5c17.673,0 32,14.327 32,32 0,9.84 -4.441,18.642 -11.429,24.512z" />
+    <path
+        android:fillAlpha=".1"
+        android:fillColor="#444"
+        android:fillType="evenOdd"
+        android:pathData="M52.571,61.512v-6.461a36.765,36.765 0,0 0,10.714 -11.29c-1.52,7.065 -5.373,13.265 -10.714,17.751zM11.429,61.512C6.089,57.026 2.235,50.827 0.715,43.76A36.764,36.764 0,0 0,11.43 55.051v6.461z" />
+    <path
+        android:fillAlpha="0"
+        android:fillColor="#678FFF"
+        android:fillType="evenOdd"
+        android:pathData="M4.978,19.852L4.978,-1.346a4.2,4.2 0,0 1,4.2 -4.2h46.62a4.2,4.2 0,0 1,4.2 4.2v22.838A31.856,31.856 0,0 1,64 37a31.856,31.856 0,0 1,-4.002 15.509v1.13h-0.658C53.722,62.85 43.579,69 32,69c-17.673,0 -32,-14.327 -32,-32a31.85,31.85 0,0 1,4.978 -17.148z" />
+    <path
+        android:fillColor="#000"
+        android:fillType="evenOdd"
+        android:pathData="M14.2,5h35.6a4.2,4.2 0,0 1,4.2 4.2L54,72.186L10,72.186L10,9.2a4.2,4.2 0,0 1,4.2 -4.2z" />
+    <path
+        android:fillColor="#FFF"
+        android:fillType="evenOdd"
+        android:pathData="M14.2,5h35.6a4.2,4.2 0,0 1,4.2 4.2L54,72.186L10,72.186L10,9.2a4.2,4.2 0,0 1,4.2 -4.2z" />
+    <path
+        android:fillColor="#678FFF"
+        android:fillType="evenOdd"
+        android:pathData="M13.4,13h37.2a1.4,1.4 0,0 1,1.4 1.4L52,71.796L12,71.796L12,14.4a1.4,1.4 0,0 1,1.4 -1.4z" />
+    <path
+        android:fillColor="#5078E9"
+        android:fillType="evenOdd"
+        android:pathData="M16,17L29,17A1,1 0,0 1,30 18L30,18A1,1 0,0 1,29 19L16,19A1,1 0,0 1,15 18L15,18A1,1 0,0 1,16 17z" />
+    <path
+        android:fillColor="#5078E9"
+        android:fillType="evenOdd"
+        android:pathData="M48,17L48,17A1,1 0,0 1,49 18L49,18A1,1 0,0 1,48 19L48,19A1,1 0,0 1,47 18L47,18A1,1 0,0 1,48 17z" />
+    <path
+        android:fillColor="#5078E9"
+        android:fillType="evenOdd"
+        android:pathData="M44,17L44,17A1,1 0,0 1,45 18L45,18A1,1 0,0 1,44 19L44,19A1,1 0,0 1,43 18L43,18A1,1 0,0 1,44 17z" />
+    <path
+        android:fillAlpha="0.95"
+        android:fillColor="#000"
+        android:fillType="evenOdd"
+        android:pathData="M18,49L46,49A4,4 0,0 1,50 53L50,53A4,4 0,0 1,46 57L18,57A4,4 0,0 1,14 53L14,53A4,4 0,0 1,18 49z"
+        android:strokeAlpha="0.95" />
+    <path
+        android:fillAlpha="0.95"
+        android:fillColor="#FFF"
+        android:fillType="evenOdd"
+        android:pathData="M18,49L46,49A4,4 0,0 1,50 53L50,53A4,4 0,0 1,46 57L18,57A4,4 0,0 1,14 53L14,53A4,4 0,0 1,18 49z"
+        android:strokeAlpha="0.95" />
+    <path
+        android:fillColor="#DE5833"
+        android:fillType="evenOdd"
+        android:pathData="M46,53m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0" />
+    <path
+        android:fillColor="#EAEAEA"
+        android:fillType="evenOdd"
+        android:pathData="M27,8L37,8A1,1 0,0 1,38 9L38,9A1,1 0,0 1,37 10L27,10A1,1 0,0 1,26 9L26,9A1,1 0,0 1,27 8z" />
+</vector>
