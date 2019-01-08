@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.app.cta.ui
 
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.os.Build
 import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.db.SurveyDao
 import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -68,7 +70,7 @@ class CtaViewModel @Inject constructor(
             }
         }
 
-        // TODO check if already seen!
+        // TODO check if already dismissed!
         ctaViewState.value = ctaViewState.value!!.copy(cta = CtaConfiguration.AddWidget(context))
     }
 
@@ -87,7 +89,8 @@ class CtaViewModel @Inject constructor(
                     surveyDao.cancelScheduledSurveys()
                 }
             }
-            is CtaConfiguration.AddWidget -> {
+            else -> {
+                //TODO save dismissed
             }
         }
 
@@ -125,12 +128,12 @@ sealed class CtaConfiguration(
 
     class AddWidget(context: Context) : CtaConfiguration(
         R.drawable.add_widget_cta_icon,
-        context.getString(R.string.addHomeCtaTitle),
-        context.getString(R.string.addHomeCtaDescription),
-        context.getString(R.string.addHomeCtaLaunchButton),
-        context.getString(R.string.addHomeCtaDismissButton),
+        context.getString(R.string.addWidgetCtaTitle),
+        context.getString(R.string.addWidgetCtaDescription),
+        context.getString(R.string.addWidgetCtaLaunchButton),
+        context.getString(R.string.addWidgetCtaDismissButton),
         ADD_WIDGET_CTA_SHOWN,
-        if (supportsAutomaticWidgets) ADD_WIDGET_CTA_LAUNCHED_MODERN else ADD_WIDGET_CTA_LAUNCHED_LEGACY,
+        if (context.supportsAutomaticWidgets) ADD_WIDGET_CTA_LAUNCHED_AUTO else ADD_WIDGET_CTA_LAUNCHED_MANUAL,
         ADD_WIDGET_CTA_DISMISSED
     )
 
@@ -143,7 +146,6 @@ sealed class CtaConfiguration(
     }
 }
 
-private val supportsAutomaticWidgets: Boolean
-    get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
-
+val Context.supportsAutomaticWidgets: Boolean
+    get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && AppWidgetManager.getInstance(this).isRequestPinAppWidgetSupported
 

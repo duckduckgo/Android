@@ -64,10 +64,10 @@ interface Pixel {
 
         ADD_WIDGET_CTA_SHOWN(pixelName = "maw_cs"),
         ADD_WIDGET_CTA_DISMISSED(pixelName = "maw_cd"),
-        ADD_WIDGET_CTA_LAUNCHED_LEGACY(pixelName = "maw_cll"),
-        ADD_WIDGET_CTA_LAUNCHED_MODERN(pixelName = "maw_clm"),
-        ADD_WIDGET_INSTALL_LEGACY(pixelName = "maw_il"),
-        ADD_WIDGET_INSTALL_MODERN(pixelName = "maw_im")
+        ADD_WIDGET_CTA_LAUNCHED_AUTO(pixelName = "maw_cla"),
+        ADD_WIDGET_CTA_LAUNCHED_MANUAL(pixelName = "maw_clm"),
+        ADD_WIDGET_INSTALL_AUTO(pixelName = "maw_ia"),
+        ADD_WIDGET_INSTALL_MANUAL(pixelName = "maw_ia")
     }
 
     object PixelParameter {

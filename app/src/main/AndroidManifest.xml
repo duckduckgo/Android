@@ -110,6 +110,10 @@
             android:parentActivityName=".BrowserActivity"
             android:theme="@style/ModalCardTheme" />
         <activity
+            android:name="com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity"
+            android:label="@string/addWidgetInstructionsActivityTitle"
+            android:theme="@style/ModalCardTheme" />
+        <activity
             android:name="com.duckduckgo.app.about.AboutDuckDuckGoActivity"
             android:label="@string/aboutActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
@@ -144,7 +148,6 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/search_widget_info_light" />
         </receiver>
-
 
     </application>
 

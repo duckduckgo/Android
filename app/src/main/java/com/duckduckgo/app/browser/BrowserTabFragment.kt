@@ -21,10 +21,8 @@ import android.animation.LayoutTransition.CHANGING
 import android.animation.LayoutTransition.DISAPPEARING
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Intent
+import android.appwidget.AppWidgetManager
+import android.content.*
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
@@ -67,6 +65,9 @@ import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.cta.ui.CtaConfiguration
+import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.supportsAutomaticWidgets
 import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.feedback.ui.SurveyActivity
 import com.duckduckgo.app.global.ViewModelFactory
@@ -75,6 +76,8 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
+import com.duckduckgo.widget.SearchWidget
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
@@ -389,6 +392,7 @@ class BrowserTabFragment : Fragment(), FindListener {
                 externalAppLinkClicked(it)
             }
             is Command.LaunchSurvey -> launchSurvey(it.survey)
+            is Command.LaunchWidget -> launchWidget()
         }
     }
 
@@ -822,6 +826,17 @@ class BrowserTabFragment : Fragment(), FindListener {
     private fun launchSurvey(survey: Survey) {
         context?.let {
             startActivity(SurveyActivity.intent(it, survey))
+        }
+    }
+
+    private fun launchWidget() {
+        context?.let {
+            if (it.supportsAutomaticWidgets) {
+                val provider = ComponentName(it, SearchWidget::class.java)
+                AppWidgetManager.getInstance(it).requestPinAppWidget(provider, null, null)
+            } else {
+                startActivity(AddWidgetInstructionsActivity.intent(it))
+            }
         }
     }
 

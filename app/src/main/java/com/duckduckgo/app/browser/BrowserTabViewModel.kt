@@ -45,6 +45,8 @@ import com.duckduckgo.app.browser.addToHome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.cta.ui.CtaConfiguration
+import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.db.AppConfigurationDao
