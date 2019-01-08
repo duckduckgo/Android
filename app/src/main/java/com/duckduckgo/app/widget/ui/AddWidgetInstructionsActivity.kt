@@ -31,11 +31,20 @@ class AddWidgetInstructionsActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_widget_instructions)
-        configureAnimation()
+        configureListeners()
     }
 
-    private fun configureAnimation() {
-        animation.playAnimation()
+    private fun configureListeners() {
+        closeButton.setOnClickListener {
+            viewModel.onClosed()
+        }
+        closeButton.setOnClickListener {
+            viewModel.onGoToHomeTapped()
+        }
+    }
+
+    override fun onBackPressed() {
+        viewModel.onClosed()
     }
 
     companion object {

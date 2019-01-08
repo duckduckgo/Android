@@ -18,9 +18,7 @@
 
 
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
-        <bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-            android:gravity="fill_horizontal|top"
-            android:src="@drawable/background_slide_modal_pattern" />
-    </item>
+    <item
+        android:drawable="@drawable/background_slide_modal_pattern"
+        android:gravity="fill_horizontal|top" />
 </layer-list>

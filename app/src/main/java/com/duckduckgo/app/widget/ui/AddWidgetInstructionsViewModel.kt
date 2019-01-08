@@ -18,4 +18,10 @@ package com.duckduckgo.app.widget.ui
 
 import androidx.lifecycle.ViewModel
 
-class AddWidgetInstructionsViewModel : ViewModel()
+class AddWidgetInstructionsViewModel : ViewModel() {
+    fun onClosed() {
+    }
+
+    fun onGoToHomeTapped() {
+    }
+}
