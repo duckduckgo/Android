@@ -81,6 +81,7 @@ class BrowserViewModel(
 
     fun onTabsUpdated(tabs: List<TabEntity>?) {
         if (tabs == null || tabs.isEmpty()) {
+            Timber.i("Tabs list is null or empty; adding default tab")
             tabRepository.add(isDefaultTab = true)
             return
         }
