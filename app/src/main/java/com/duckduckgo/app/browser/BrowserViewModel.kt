@@ -39,7 +39,7 @@ class BrowserViewModel(
 ) : ViewModel() {
 
     data class ViewState(
-        val hideWebContent: Boolean = false
+        val hideWebContent: Boolean = true
     )
 
     sealed class Command {
