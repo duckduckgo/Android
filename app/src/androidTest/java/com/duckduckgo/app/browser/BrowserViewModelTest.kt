@@ -28,6 +28,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.nhaarman.mockitokotlin2.*
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -117,6 +118,11 @@ class BrowserViewModelTest {
         testee.onClearComplete()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(DisplayMessage(R.string.fireDataCleared), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenViewStateCreatedThenWebViewContentShouldBeHidden() {
+        assertTrue(testee.viewState.value!!.hideWebContent)
     }
 
     companion object {

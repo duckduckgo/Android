@@ -23,6 +23,7 @@ import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.db.TabsDao
+import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.util.*
@@ -57,7 +58,7 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
 
     override fun add(tabId: String, data: MutableLiveData<Site>, isDefaultTab: Boolean) {
         siteData[tabId] = data
-        Schedulers.io().scheduleDirect {
+        databaseExecutor().scheduleDirect {
 
             Timber.i("Trying to add tab, is default? $isDefaultTab, current tabs count: ${tabsDao.tabs().size}")
 
@@ -73,7 +74,7 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
     }
 
     override fun addNewTabAfterExistingTab(url: String?, tabId: String) {
-        Schedulers.io().scheduleDirect {
+        databaseExecutor().scheduleDirect {
             val position = tabsDao.tab(tabId)?.position ?: -1
             val uri = Uri.parse(url)
             val title = uri.host?.removePrefix("www.") ?: url
@@ -83,7 +84,7 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
     }
 
     override fun update(tabId: String, site: Site?) {
-        Schedulers.io().scheduleDirect {
+        databaseExecutor().scheduleDirect {
             val position = tabsDao.tab(tabId)?.position ?: 0
             val tab = TabEntity(tabId, site?.url, site?.title, true, position)
             tabsDao.updateTab(tab)
@@ -102,7 +103,7 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
     }
 
     override fun delete(tab: TabEntity) {
-        Schedulers.io().scheduleDirect {
+        databaseExecutor().scheduleDirect {
             tabsDao.deleteTabAndUpdateSelection(tab)
         }
         siteData.remove(tab.tabId)
@@ -115,9 +116,21 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
     }
 
     override fun select(tabId: String) {
-        Schedulers.io().scheduleDirect {
+        databaseExecutor().scheduleDirect {
             val selection = TabSelectionEntity(tabId = tabId)
             tabsDao.insertTabSelection(selection)
         }
+    }
+
+    /**
+     * In this class we typically delegate DB work to a scheduler
+     * Historically, this was the IO scheduler, which can use multiple threads to do the work
+     * However, this presented the possibility of race conditions. One such case was when the blank tab was shown to the user and the URL
+     * they actually wanted was opened in a background tab.
+     *
+     * While there are likely even better ways of doing this, moving to a single-threaded executor is likely good enough to fix this for now
+     */
+    private fun databaseExecutor(): Scheduler {
+        return Schedulers.single()
     }
 }
