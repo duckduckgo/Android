@@ -40,7 +40,7 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
-        themeChangeReceiver = applyTheme(settingsDataStore)
+        themeChangeReceiver = applyTheme()
         super.onCreate(savedInstanceState)
     }
 

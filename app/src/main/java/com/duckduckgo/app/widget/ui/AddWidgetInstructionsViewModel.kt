@@ -17,11 +17,25 @@
 package com.duckduckgo.app.widget.ui
 
 import androidx.lifecycle.ViewModel
+import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.Close
+import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.ShowHome
 
 class AddWidgetInstructionsViewModel : ViewModel() {
-    fun onClosed() {
+
+    sealed class Command {
+        object ShowHome : Command()
+        object Close : Command()
     }
 
-    fun onGoToHomeTapped() {
+    val command: SingleLiveEvent<Command> = SingleLiveEvent()
+
+    fun onShowHomePressed() {
+        command.value = ShowHome
     }
+
+    fun onClosePressed() {
+        command.value = Close
+    }
+
 }

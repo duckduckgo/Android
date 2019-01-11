@@ -21,6 +21,7 @@ import android.animation.LayoutTransition.CHANGING
 import android.animation.LayoutTransition.DISAPPEARING
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
+import android.app.ActivityOptions
 import android.appwidget.AppWidgetManager
 import android.content.*
 import android.content.pm.PackageManager
@@ -70,7 +71,8 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.supportsAutomaticWidgets
 import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.feedback.ui.SurveyActivity
-import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.*
+import com.duckduckgo.app.global.DuckDuckGoTheme.LIGHT
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
@@ -78,9 +80,11 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidget
+import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
+import kotlinx.android.synthetic.main.include_cta_buttons.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
@@ -305,7 +309,6 @@ class BrowserTabFragment : Fragment(), FindListener {
         })
 
         addTabsObserver()
-
     }
 
     private fun addTabsObserver() {
@@ -829,14 +832,17 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
     }
 
+    @SuppressLint("NewApi")
     private fun launchWidget() {
-        context?.let {
-            if (it.supportsAutomaticWidgets) {
-                val provider = ComponentName(it, SearchWidget::class.java)
-                AppWidgetManager.getInstance(it).requestPinAppWidget(provider, null, null)
-            } else {
-                startActivity(AddWidgetInstructionsActivity.intent(it))
-            }
+        val context = context ?: return
+        if (context.supportsAutomaticWidgets) {
+            val ddgActivity = activity as? DuckDuckGoActivity
+            val widgetClass = if (ddgActivity?.appTheme() == LIGHT) SearchWidgetLight::class.java else SearchWidget::class.java
+            val provider = ComponentName(context, widgetClass)
+            AppWidgetManager.getInstance(context).requestPinAppWidget(provider, null, null)
+        } else {
+            val options = ActivityOptions.makeSceneTransitionAnimation(this.activity, ctaOkButton, "animation")
+            startActivity(AddWidgetInstructionsActivity.intent(context), options.toBundle())
         }
     }
 
@@ -933,8 +939,8 @@ class BrowserTabFragment : Fragment(), FindListener {
                 val browserShowing = viewState.browserShowing
                 if (browserShowing) {
                     webView?.show()
-                    logoHidingLayoutChangeListener.callToActionView = ctaContainer
                 } else {
+                    logoHidingLayoutChangeListener.callToActionView = ctaContainer
                     webView?.hide()
                 }
 
@@ -1006,7 +1012,6 @@ class BrowserTabFragment : Fragment(), FindListener {
         fun renderCtaViewState(viewState: CtaViewModel.CtaViewState) {
             renderIfChanged(viewState, lastSeenCtaViewState) {
                 lastSeenCtaViewState = viewState
-                val context = context ?: return
                 if (viewState.cta != null) {
                     showCta(viewState.cta)
                 } else {
