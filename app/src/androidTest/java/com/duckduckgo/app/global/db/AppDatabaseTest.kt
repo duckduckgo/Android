@@ -118,7 +118,8 @@ class AppDatabaseTest {
                 AppDatabase.MIGRATION_3_TO_4,
                 AppDatabase.MIGRATION_4_TO_5,
                 AppDatabase.MIGRATION_5_TO_6,
-                AppDatabase.MIGRATION_6_TO_7
+                AppDatabase.MIGRATION_6_TO_7,
+                AppDatabase.MIGRATION_7_TO_8
             )
             .allowMainThreadQueries()
             .build()

@@ -43,7 +43,7 @@ import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 
 @Database(
-    exportSchema = true, version = 7, entities = [
+    exportSchema = true, version = 8, entities = [
         DisconnectTracker::class,
         HttpsBloomFilterSpec::class,
         HttpsWhitelistedDomain::class,

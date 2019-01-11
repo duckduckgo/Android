@@ -36,10 +36,13 @@ import com.duckduckgo.app.browser.addToHome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.feedback.db.SurveyDao
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
@@ -48,6 +51,7 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
@@ -62,6 +66,7 @@ import org.mockito.*
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
+import java.util.concurrent.TimeUnit
 
 class BrowserTabViewModelTest {
 
@@ -122,7 +127,18 @@ class BrowserTabViewModelTest {
     private lateinit var mockAddToHomeCapabilityDetector: AddToHomeCapabilityDetector
 
     @Mock
-    private lateinit var mockCtaViewModel: CtaViewModel
+    private lateinit var mockSurveyDao: SurveyDao
+
+    @Mock
+    private lateinit var mockDismissedCtaDao: DismissedCtaDao
+
+    @Mock
+    private lateinit var mockAppInstallStore: AppInstallStore
+
+    @Mock
+    private lateinit var mockPixel: Pixel
+
+    private lateinit var ctaViewModel: CtaViewModel
 
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
@@ -140,12 +156,15 @@ class BrowserTabViewModelTest {
         db = Room.inMemoryDatabaseBuilder(getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
+
+        ctaViewModel = CtaViewModel(getInstrumentation().targetContext, mockAppInstallStore, mockPixel, mockSurveyDao, mockDismissedCtaDao)
         appConfigurationDao = db.appConfigurationDao()
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore)
 
         whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -163,7 +182,7 @@ class BrowserTabViewModelTest {
             specialUrlDetector = SpecialUrlDetectorImpl(),
             faviconDownloader = mockFaviconDownloader,
             addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector,
-            ctaViewModel = mockCtaViewModel
+            ctaViewModel = ctaViewModel
         )
 
         testee.loadData("abc", null)

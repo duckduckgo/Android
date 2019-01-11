@@ -23,10 +23,7 @@ import androidx.room.TypeConverter
 import com.duckduckgo.app.cta.ui.CtaId
 
 @Entity(
-    tableName = "dismissed_cta",
-    indices = [
-        Index("ctaId")
-    ]
+    tableName = "dismissed_cta"
 )
 data class DismissedCta(
     @PrimaryKey
