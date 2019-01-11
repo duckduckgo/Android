@@ -24,6 +24,8 @@ import androidx.annotation.DrawableRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.feedback.db.SurveyDao
 import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -39,7 +41,8 @@ class CtaViewModel @Inject constructor(
     private val context: Context,
     private val appInstallStore: AppInstallStore,
     private val pixel: Pixel,
-    private val surveyDao: SurveyDao
+    private val surveyDao: SurveyDao,
+    private val dismissedCtaDao: DismissedCtaDao
 ) {
 
     val ctaViewState: MutableLiveData<CtaViewState> = MutableLiveData()
@@ -60,18 +63,28 @@ class CtaViewModel @Inject constructor(
     }
 
     private fun selectNextCta() {
+        surveyCta()?.let {
+            ctaViewState.value = ctaViewState.value!!.copy(cta = it)
+            return@let
+        }
+
+        Schedulers.io().scheduleDirect {
+            if (!dismissedCtaDao.exists(CtaId.ADD_WIDGET)) {
+                ctaViewState.postValue(ctaViewState.value!!.copy(CtaConfiguration.AddWidget(context)))
+            }
+        }
+    }
+
+    private fun surveyCta(): CtaConfiguration.Survey? {
         val survey = activeSurvey
         if (survey?.url != null) {
             val showOnDay = survey.daysInstalled?.toLong()
             val daysInstalled = appInstallStore.daysInstalled()
             if (showOnDay == null || showOnDay == daysInstalled) {
-                ctaViewState.value = ctaViewState.value!!.copy(cta = CtaConfiguration.Survey(context, survey))
-                return
+                return CtaConfiguration.Survey(context, survey)
             }
         }
-
-        // TODO check if already dismissed!
-        ctaViewState.value = ctaViewState.value!!.copy(cta = CtaConfiguration.AddWidget(context))
+        return null
     }
 
     fun onCtaShown() {
@@ -90,7 +103,9 @@ class CtaViewModel @Inject constructor(
                 }
             }
             else -> {
-                //TODO save dismissed
+                Schedulers.io().scheduleDirect {
+                    dismissedCtaDao.insert(DismissedCta(cta.ctaId))
+                }
             }
         }
 
@@ -104,7 +119,13 @@ class CtaViewModel @Inject constructor(
     }
 }
 
+enum class CtaId {
+    SURVEY,
+    ADD_WIDGET
+}
+
 sealed class CtaConfiguration(
+    open val ctaId: CtaId,
     open @DrawableRes val image: Int,
     open val title: String,
     open val description: String,
@@ -116,6 +137,7 @@ sealed class CtaConfiguration(
 ) {
 
     class Survey(context: Context, val survey: com.duckduckgo.app.feedback.model.Survey) : CtaConfiguration(
+        CtaId.SURVEY,
         R.drawable.survey_cta_icon,
         context.getString(R.string.surveyCtaTitle),
         context.getString(R.string.surveyCtaDescription),
@@ -127,6 +149,7 @@ sealed class CtaConfiguration(
     )
 
     class AddWidget(context: Context) : CtaConfiguration(
+        CtaId.ADD_WIDGET,
         R.drawable.add_widget_cta_icon,
         context.getString(R.string.addWidgetCtaTitle),
         context.getString(R.string.addWidgetCtaDescription),

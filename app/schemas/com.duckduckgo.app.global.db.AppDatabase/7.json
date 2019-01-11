@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "afbc470cd9c23ee98e8bf02083afeb07",
+    "identityHash": "d22f098f9063fef16722815c0b54571a",
     "entities": [
       {
         "tableName": "disconnect_tracker",
@@ -368,12 +368,41 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "dismissed_cta",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`ctaId` TEXT NOT NULL, PRIMARY KEY(`ctaId`))",
+        "fields": [
+          {
+            "fieldPath": "ctaId",
+            "columnName": "ctaId",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "ctaId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_dismissed_cta_ctaId",
+            "unique": false,
+            "columnNames": [
+              "ctaId"
+            ],
+            "createSql": "CREATE  INDEX `index_dismissed_cta_ctaId` ON `${TABLE_NAME}` (`ctaId`)"
+          }
+        ],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"afbc470cd9c23ee98e8bf02083afeb07\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"d22f098f9063fef16722815c0b54571a\")"
     ]
   }
 }

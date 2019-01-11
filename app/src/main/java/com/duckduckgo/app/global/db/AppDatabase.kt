@@ -23,6 +23,8 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.entities.db.EntityListEntity
 import com.duckduckgo.app.feedback.db.SurveyDao
@@ -52,11 +54,15 @@ import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
         TabSelectionEntity::class,
         BookmarkEntity::class,
         EntityListEntity::class,
-        Survey::class
+        Survey::class,
+        DismissedCta::class
     ]
 )
 
-@TypeConverters(Survey.StatusTypeConverter::class)
+@TypeConverters(
+    Survey.StatusTypeConverter::class,
+    DismissedCta.IdTypeConverter::class
+)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun trackerDataDao(): TrackerDataDao
@@ -68,6 +74,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun bookmarksDao(): BookmarksDao
     abstract fun networkEntityDao(): EntityListDao
     abstract fun surveyDao(): SurveyDao
+    abstract fun dismissedCtaDao(): DismissedCtaDao
 
     companion object {
         val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
@@ -122,6 +129,12 @@ abstract class AppDatabase : RoomDatabase() {
         val MIGRATION_6_TO_7: Migration = object : Migration(6, 7) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `survey` (`surveyId` TEXT NOT NULL, `url` TEXT, `daysInstalled` INTEGER, `status` TEXT NOT NULL, PRIMARY KEY(`surveyId`))")
+            }
+        }
+
+        val MIGRATION_7_TO_8: Migration = object : Migration(7, 8) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `dismissed_cta` (`ctaId` TEXT NOT NULL, PRIMARY KEY(`ctaId`))")
             }
         }
     }

@@ -28,7 +28,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
-
 class AppDatabaseTest {
 
     @get:Rule
@@ -80,6 +79,12 @@ class AppDatabaseTest {
     fun whenMigratingFromVersion6To7ThenValidationSucceeds() {
         testHelper.createDatabase(TEST_DB_NAME, 6).close()
         testHelper.runMigrationsAndValidate(TEST_DB_NAME, 7, true, AppDatabase.MIGRATION_6_TO_7)
+    }
+
+    @Test
+    fun whenMigratingFromVersion7To8ThenValidationSucceeds() {
+        testHelper.createDatabase(TEST_DB_NAME, 7).close()
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 8, true, AppDatabase.MIGRATION_7_TO_8)
     }
 
     @Test

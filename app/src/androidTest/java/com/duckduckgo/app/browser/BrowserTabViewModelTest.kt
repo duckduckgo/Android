@@ -36,6 +36,7 @@ import com.duckduckgo.app.browser.addToHome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.feedback.db.SurveyDao
 import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.feedback.model.Survey.Status.SCHEDULED
@@ -736,6 +737,7 @@ class BrowserTabViewModelTest {
         assertNull(command.url)
     }
 
+    //TODO add CTA View model tests
 
     @Test
     fun whenUserSelectsToShareLinkWithNullUrlThenShareLinkCommandNotSent() {
