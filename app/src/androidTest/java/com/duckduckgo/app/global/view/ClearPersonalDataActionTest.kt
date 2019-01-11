@@ -16,57 +16,76 @@
 
 package com.duckduckgo.app.global.view
 
-import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.WebDataManager
+import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
-import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.verify
+import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.tabs.model.TabRepository
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.verify
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 
+@Suppress("RemoveExplicitTypeArguments")
 class ClearPersonalDataActionTest {
 
     private lateinit var testee: ClearPersonalDataAction
 
     private val mockDataManager: WebDataManager = mock()
     private val mockClearingUnsentForgetAllPixelStore: UnsentForgetAllPixelStore = mock()
+    private val mockTabRepository: TabRepository = mock()
+    private val mockSettingsDataStore: SettingsDataStore = mock()
+    private val mockCookieManager: DuckDuckGoCookieManager = mock()
 
     @Before
     fun setup() {
         testee = ClearPersonalDataAction(
             InstrumentationRegistry.getInstrumentation().targetContext,
             mockDataManager,
-            mockClearingUnsentForgetAllPixelStore
+            mockClearingUnsentForgetAllPixelStore,
+            mockTabRepository,
+            mockSettingsDataStore,
+            mockCookieManager
         )
     }
 
-    @UiThreadTest
     @Test
-    fun whenClearCalledThenPixelCountIncremented() {
-        testee.clear()
+    fun whenClearCalledWithPixelIncrementSetToTrueThenPixelCountIncremented() = runBlocking<Unit> {
+        testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = true)
         verify(mockClearingUnsentForgetAllPixelStore).incrementCount()
     }
 
-    @UiThreadTest
     @Test
-    fun whenClearCalledThenDataManagerClearsSessions() {
-        testee.clear()
+    fun whenClearCalledWithPixelIncrementSetToFalseThenPixelCountNotIncremented() = runBlocking<Unit> {
+        testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
+        verify(mockClearingUnsentForgetAllPixelStore, never()).incrementCount()
+    }
+
+    @Test
+    fun whenClearCalledThenDataManagerClearsSessions() = runBlocking<Unit> {
+        testee.clearTabsAndAllDataAsync(false, false)
         verify(mockDataManager).clearWebViewSessions()
     }
 
-    @UiThreadTest
     @Test
-    fun whenClearCalledThenDataManagerClearsData() {
-        testee.clear()
+    fun whenClearCalledThenDataManagerClearsData() = runBlocking<Unit> {
+        testee.clearTabsAndAllDataAsync(false, false)
         verify(mockDataManager).clearData(any(), any(), any())
     }
 
-    @UiThreadTest
     @Test
-    fun whenClearCalledThenDataManagerClearsCookies() {
-        testee.clear()
-        verify(mockDataManager).clearExternalCookies(any(), any())
+    fun whenClearCalledThenDataManagerClearsCookies() = runBlocking<Unit> {
+        testee.clearTabsAndAllDataAsync(false, false)
+        verify(mockDataManager).clearExternalCookies()
+    }
+
+    @Test
+    fun whenClearCalledThenTabsCleared() = runBlocking<Unit> {
+        testee.clearTabsAndAllDataAsync(false, false)
+        verify(mockTabRepository).deleteAll()
     }
 }

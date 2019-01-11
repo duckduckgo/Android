@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.di
 
 import android.content.ClipboardManager
 import android.content.Context
+import android.webkit.CookieManager
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addToHome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addToHome.AddToHomeSystemCapabilityDetector
@@ -25,6 +26,8 @@ import com.duckduckgo.app.browser.defaultBrowsing.AndroidDefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.fire.DuckDuckGoCookieManager
+import com.duckduckgo.app.fire.WebViewCookieManager
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.statistics.VariantManager
@@ -64,7 +67,8 @@ class BrowserModule {
 
     @Singleton
     @Provides
-    fun webDataManager(webViewSessionStorage: WebViewSessionStorage): WebDataManager = WebViewDataManager(AppUrl.Url.HOST, webViewSessionStorage)
+    fun webDataManager(webViewSessionStorage: WebViewSessionStorage, cookieManager: DuckDuckGoCookieManager): WebDataManager =
+        WebViewDataManager(webViewSessionStorage, cookieManager)
 
     @Provides
     fun clipboardManager(context: Context): ClipboardManager {
@@ -85,4 +89,15 @@ class BrowserModule {
         trackerDetector: TrackerDetector,
         httpsUpgrader: HttpsUpgrader
     ): RequestInterceptor = WebViewRequestInterceptor(resourceSurrogates, trackerDetector, httpsUpgrader)
+
+    @Provides
+    fun cookieManager(cookieManager: CookieManager): DuckDuckGoCookieManager {
+        return WebViewCookieManager(cookieManager, AppUrl.Url.HOST)
+    }
+
+    @Singleton
+    @Provides
+    fun webViewCookieManager(): CookieManager {
+        return CookieManager.getInstance()
+    }
 }

@@ -46,15 +46,22 @@ val Uri.hasIpHost: Boolean
         return baseHost?.matches(ipRegex) ?: false
     }
 
+private val MOBILE_URL_PREFIXES = listOf("m.", "mobile.")
+
 val Uri.isMobileSite: Boolean
-    get() = authority.startsWith("m.")
+    get() {
+        val auth = authority ?: return false
+        return MOBILE_URL_PREFIXES.firstOrNull { auth.startsWith(it) } != null
+    }
 
 fun Uri.toDesktopUri(): Uri {
-    return if (isMobileSite) {
-        Uri.parse(toString().replaceFirst("m.", ""))
-    } else {
-        this
+    if (!isMobileSite) return this
+
+    val newUrl = MOBILE_URL_PREFIXES.fold(toString()) { url, prefix ->
+        url.replaceFirst(prefix, "")
     }
+
+    return Uri.parse(newUrl)
 }
 
 private const val faviconBaseUrlFormat = "https://icons.duckduckgo.com/ip3/%s.ico"

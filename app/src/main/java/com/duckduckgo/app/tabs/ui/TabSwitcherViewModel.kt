@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.tabs.ui
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -49,10 +49,6 @@ class TabSwitcherViewModel(private val tabRepository: TabRepository, private val
     fun onTabDeleted(tab: TabEntity) {
         tabRepository.delete(tab)
         webViewSessionStorage.deleteSession(tab.tabId)
-    }
-
-    fun onClearRequested() {
-        tabRepository.deleteAll()
     }
 
     fun onClearComplete() {

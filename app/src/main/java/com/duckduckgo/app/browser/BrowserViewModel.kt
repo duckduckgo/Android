@@ -18,23 +18,28 @@ package com.duckduckgo.app.browser
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.fire.DataClearer
+import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import timber.log.Timber
 
 class BrowserViewModel(
     private val tabRepository: TabRepository,
-    private val queryUrlConverter: OmnibarEntryConverter
+    private val queryUrlConverter: OmnibarEntryConverter,
+    private val dataClearer: DataClearer
 ) : ViewModel() {
 
     data class ViewState(
-        val isFullScreen: Boolean = false,
-        val isDesktopBrowsingMode: Boolean = false
+        val hideWebContent: Boolean = true
     )
 
     sealed class Command {
@@ -43,21 +48,41 @@ class BrowserViewModel(
         data class DisplayMessage(@StringRes val messageId: Int) : Command()
     }
 
+    var viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().also {
+        it.value = ViewState()
+    }
+
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     var selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    fun onNewTabRequested() {
-        tabRepository.add()
+    private var dataClearingObserver = Observer<ApplicationClearDataState> {
+        it?.let { state ->
+            when (state) {
+                ApplicationClearDataState.INITIALIZING -> {
+                    Timber.i("App clear state initializing")
+                    viewState.value = ViewState(hideWebContent = true)
+                }
+                ApplicationClearDataState.FINISHED -> {
+                    Timber.i("App clear state finished")
+                    viewState.value = ViewState(hideWebContent = false)
+                }
+            }
+        }
+    }
+
+    fun onNewTabRequested(isDefaultTab: Boolean = false) {
+        tabRepository.add(isDefaultTab = isDefaultTab)
     }
 
     fun onOpenInNewTabRequested(query: String) {
-        tabRepository.add(queryUrlConverter.convertQueryToUrl(query))
+        tabRepository.add(queryUrlConverter.convertQueryToUrl(query), isDefaultTab = false)
     }
 
     fun onTabsUpdated(tabs: List<TabEntity>?) {
         if (tabs == null || tabs.isEmpty()) {
-            tabRepository.add()
+            Timber.i("Tabs list is null or empty; adding default tab")
+            tabRepository.add(isDefaultTab = true)
             return
         }
     }
@@ -66,11 +91,21 @@ class BrowserViewModel(
         if (resultCode == RELOAD_RESULT_CODE) command.value = Refresh
     }
 
-    fun onClearRequested() {
-        tabRepository.deleteAll()
-    }
-
     fun onClearComplete() {
         command.value = DisplayMessage(R.string.fireDataCleared)
+    }
+
+    /**
+     * To ensure the best UX, we might not want to show anything to the user while the clear is taking place.
+     * This method will await until the ApplicationClearDataState.FINISHED event is received before observing for other changes
+     * The effect of this delay is that we won't show old tabs if they are in the process of deleting them.
+     */
+    fun awaitClearDataFinishedNotification() {
+        dataClearer.dataClearerState.observeForever(dataClearingObserver)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        dataClearer.dataClearerState.removeObserver(dataClearingObserver)
     }
 }

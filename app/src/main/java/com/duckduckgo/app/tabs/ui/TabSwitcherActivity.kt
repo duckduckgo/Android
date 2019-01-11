@@ -104,7 +104,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
 
     private fun onFire() {
         val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction)
-        dialog.clearStarted = { viewModel.onClearRequested() }
         dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.show()
     }

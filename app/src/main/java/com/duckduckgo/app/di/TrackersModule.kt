@@ -29,7 +29,7 @@ internal class TrackersModule {
 
     @Provides
     @Singleton
-    fun trackerNetworks(prevalenceStore: PrevalenceStore, entityMapping: EntityMapping): TrackerNetworks
-            = TrackerNetworksImpl(prevalenceStore, entityMapping)
+    fun trackerNetworks(prevalenceStore: PrevalenceStore, entityMapping: EntityMapping): TrackerNetworks =
+        TrackerNetworksImpl(prevalenceStore, entityMapping)
 
 }

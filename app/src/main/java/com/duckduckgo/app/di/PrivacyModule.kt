@@ -16,10 +16,18 @@
 
 package com.duckduckgo.app.di
 
+import android.content.Context
+import androidx.work.WorkerFactory
+import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.entities.EntityMapping
+import com.duckduckgo.app.fire.*
+import com.duckduckgo.app.global.view.ClearDataAction
+import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPracticesImpl
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
+import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.tabs.model.TabRepository
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -29,7 +37,39 @@ class PrivacyModule {
 
     @Provides
     @Singleton
-    fun privacyPractices(termsOfServiceStore: TermsOfServiceStore, entityMapping: EntityMapping): PrivacyPractices
-            = PrivacyPracticesImpl(termsOfServiceStore, entityMapping)
+    fun privacyPractices(termsOfServiceStore: TermsOfServiceStore, entityMapping: EntityMapping): PrivacyPractices =
+        PrivacyPracticesImpl(termsOfServiceStore, entityMapping)
 
+    @Provides
+    fun clearDataAction(
+        context: Context,
+        dataManager: WebDataManager,
+        clearingStore: UnsentForgetAllPixelStore,
+        tabRepository: TabRepository,
+        settingsDataStore: SettingsDataStore,
+        cookieManager: DuckDuckGoCookieManager
+    ): ClearDataAction {
+        return ClearPersonalDataAction(context, dataManager, clearingStore, tabRepository, settingsDataStore, cookieManager)
+    }
+
+    @Provides
+    fun backgroundTimeKeeper(): BackgroundTimeKeeper {
+        return DataClearerTimeKeeper()
+    }
+
+    @Provides
+    @Singleton
+    fun automaticDataClearer(
+        settingsDataStore: SettingsDataStore,
+        clearDataAction: ClearDataAction,
+        dataClearerTimeKeeper: BackgroundTimeKeeper
+    ): DataClearer {
+        return AutomaticDataClearer(settingsDataStore, clearDataAction, dataClearerTimeKeeper)
+    }
+
+    @Provides
+    @Singleton
+    fun workerFactory(settingsDataStore: SettingsDataStore, clearDataAction: ClearDataAction): WorkerFactory {
+        return DaggerWorkerFactory(settingsDataStore, clearDataAction)
+    }
 }

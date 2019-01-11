@@ -21,12 +21,14 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockitokotlin2.*
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -54,12 +56,15 @@ class BrowserViewModelTest {
     @Mock
     private lateinit var mockOmnibarEntryConverter: OmnibarEntryConverter
 
+    @Mock
+    private lateinit var mockAutomaticDataClearer: DataClearer
+
     private lateinit var testee: BrowserViewModel
 
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        testee = BrowserViewModel(mockTabRepository, mockOmnibarEntryConverter)
+        testee = BrowserViewModel(mockTabRepository, mockOmnibarEntryConverter, mockAutomaticDataClearer)
         testee.command.observeForever(mockCommandObserver)
         whenever(mockTabRepository.add()).thenReturn(TAB_ID)
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(any())).then { it.arguments.first() }
@@ -86,7 +91,7 @@ class BrowserViewModelTest {
     @Test
     fun whenTabsUpdatedAndNoTabsThenNewTabAddedToRepository() {
         testee.onTabsUpdated(ArrayList())
-        verify(mockTabRepository).add()
+        verify(mockTabRepository).add(null, true)
     }
 
     @Test
@@ -109,16 +114,15 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenClearRequestedThenDeleteAllCalledOnRepository() {
-        testee.onClearRequested()
-        verify(mockTabRepository).deleteAll()
-    }
-
-    @Test
     fun whenClearCompleteThenMessageDisplayed() {
         testee.onClearComplete()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(DisplayMessage(R.string.fireDataCleared), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenViewStateCreatedThenWebViewContentShouldBeHidden() {
+        assertTrue(testee.viewState.value!!.hideWebContent)
     }
 
     companion object {

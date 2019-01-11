@@ -21,7 +21,7 @@ import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Observable
 import okhttp3.ResponseBody
 import org.junit.Before
@@ -110,7 +110,6 @@ class StatisticsRequesterTest {
         verify(mockStatisticsStore).atb = Atb("v123")
         verify(mockStatisticsStore).variant = ""
     }
-
 
     private fun configureNoStoredStatistics() {
         whenever(mockStatisticsStore.hasInstallationStatistics).thenReturn(false)

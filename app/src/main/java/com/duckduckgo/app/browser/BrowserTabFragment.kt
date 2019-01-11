@@ -585,6 +585,7 @@ class BrowserTabFragment : Fragment(), FindListener {
                 builtInZoomControls = true
                 displayZoomControls = false
                 mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+                disableWebSql(this)
                 setSupportZoom(true)
             }
 
@@ -603,6 +604,13 @@ class BrowserTabFragment : Fragment(), FindListener {
 
             it.setFindListener(this)
         }
+    }
+
+    /**
+     * Explicitly disable database to try protect against Magellan WebSQL/SQLite vulnerability
+     */
+    private fun disableWebSql(settings: WebSettings) {
+        settings.databaseEnabled = false
     }
 
     private fun addTextChangedListeners() {
@@ -1055,17 +1063,6 @@ class BrowserTabFragment : Fragment(), FindListener {
                 it.clone(newTabLayout)
                 it.connect(ddgLogo.id, ConstraintSet.BOTTOM, ctaContainer.id, ConstraintSet.TOP, 0)
                 it.applyTo(newTabLayout)
-            }
-        }
-
-        /**
-         * This method will execute the given lambda only if the given view states differ
-         */
-        private inline fun renderIfChanged(newViewState: Any, lastSeenViewState: Any?, block: () -> Unit) {
-            if (newViewState == lastSeenViewState) {
-                Timber.v("view state identical to last seen state; skipping rendering for ${newViewState.javaClass.simpleName}")
-            } else {
-                block()
             }
         }
 

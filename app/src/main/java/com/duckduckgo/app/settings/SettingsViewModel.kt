@@ -22,9 +22,12 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.settings.clear.ClearWhatOption
+import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -42,10 +45,16 @@ class SettingsViewModel @Inject constructor(
         val lightThemeEnabled: Boolean = false,
         val autoCompleteSuggestionsEnabled: Boolean = true,
         val showDefaultBrowserSetting: Boolean = false,
-        val isAppDefaultBrowser: Boolean = false
+        val isAppDefaultBrowser: Boolean = false,
+        val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY)
     )
 
-    private lateinit var currentViewState: ViewState
+    data class AutomaticallyClearData(
+        val clearWhatOption: ClearWhatOption,
+        val clearWhenOption: ClearWhenOption,
+        val clearWhenOptionEnabled: Boolean = true
+    )
+
 
     sealed class Command {
         object LaunchFeedback : Command()
@@ -53,8 +62,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().apply {
-        currentViewState = ViewState()
-        value = currentViewState
+        value = ViewState()
     }
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -68,14 +76,18 @@ class SettingsViewModel @Inject constructor(
         val defaultBrowserAlready = defaultWebBrowserCapability.isCurrentlyConfiguredAsDefaultBrowser()
         val variant = variantManager.getVariant()
         val isLightTheme = settingsDataStore.theme == DuckDuckGoTheme.LIGHT
+        val automaticallyClearWhat = settingsDataStore.automaticallyClearWhatOption
+        val automaticallyClearWhen = settingsDataStore.automaticallyClearWhenOption
+        val automaticallyClearWhenEnabled = isAutomaticallyClearingDataWhenSettingEnabled(automaticallyClearWhat)
 
-        viewState.value = currentViewState.copy(
+        viewState.value = currentViewState().copy(
             loading = false,
             lightThemeEnabled = isLightTheme,
             autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
             isAppDefaultBrowser = defaultBrowserAlready,
             showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
-            version = obtainVersion(variant.key)
+            version = obtainVersion(variant.key),
+            automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled)
         )
     }
 
@@ -86,6 +98,7 @@ class SettingsViewModel @Inject constructor(
     fun onLightThemeToggled(enabled: Boolean) {
         Timber.i("User toggled light theme, is now enabled: $enabled")
         settingsDataStore.theme = if (enabled) DuckDuckGoTheme.LIGHT else DuckDuckGoTheme.DARK
+        viewState.value = currentViewState().copy(lightThemeEnabled = enabled)
         command.value = Command.UpdateTheme
 
         val pixelName = if (enabled) SETTINGS_THEME_TOGGLED_LIGHT else SETTINGS_THEME_TOGGLED_DARK
@@ -95,10 +108,68 @@ class SettingsViewModel @Inject constructor(
     fun onAutocompleteSettingChanged(enabled: Boolean) {
         Timber.i("User changed autocomplete setting, is now enabled: $enabled")
         settingsDataStore.autoCompleteSuggestionsEnabled = enabled
+
+        viewState.value = currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)
     }
 
     private fun obtainVersion(variantKey: String): String {
         val formattedVariantKey = if (variantKey.isBlank()) " " else " $variantKey "
         return "${BuildConfig.VERSION_NAME}$formattedVariantKey(${BuildConfig.VERSION_CODE})"
     }
+
+    fun onAutomaticallyWhatOptionSelected(clearWhatSetting: ClearWhatOption) {
+        pixel.fire(clearWhatSetting.pixelEvent())
+
+        settingsDataStore.automaticallyClearWhatOption = clearWhatSetting
+
+        viewState.value = currentViewState().copy(
+            automaticallyClearData = AutomaticallyClearData(
+                clearWhatOption = clearWhatSetting,
+                clearWhenOption = settingsDataStore.automaticallyClearWhenOption,
+                clearWhenOptionEnabled = isAutomaticallyClearingDataWhenSettingEnabled(clearWhatSetting)
+            )
+        )
+    }
+
+    private fun isAutomaticallyClearingDataWhenSettingEnabled(clearWhatOption: ClearWhatOption?): Boolean {
+        return clearWhatOption != null && clearWhatOption != ClearWhatOption.CLEAR_NONE
+    }
+
+    fun onAutomaticallyWhenOptionSelected(clearWhenSetting: ClearWhenOption) {
+        clearWhenSetting.pixelEvent()?.let {
+            pixel.fire(it)
+        }
+
+        settingsDataStore.automaticallyClearWhenOption = clearWhenSetting
+        viewState.value = currentViewState().copy(
+            automaticallyClearData = AutomaticallyClearData(
+                settingsDataStore.automaticallyClearWhatOption,
+                clearWhenSetting
+            )
+        )
+    }
+
+    private fun currentViewState(): ViewState {
+        return viewState.value!!
+    }
+
+    private fun ClearWhatOption.pixelEvent(): Pixel.PixelName {
+        return when (this) {
+            ClearWhatOption.CLEAR_NONE -> PixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_NONE
+            ClearWhatOption.CLEAR_TABS_ONLY -> PixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_TABS
+            ClearWhatOption.CLEAR_TABS_AND_DATA -> PixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_TABS_AND_DATA
+        }
+    }
+
+    private fun ClearWhenOption.pixelEvent(): Pixel.PixelName? {
+        return when (this) {
+            ClearWhenOption.APP_EXIT_ONLY -> PixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_ONLY
+            ClearWhenOption.APP_EXIT_OR_5_MINS -> PixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_5_MINS
+            ClearWhenOption.APP_EXIT_OR_15_MINS -> PixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_15_MINS
+            ClearWhenOption.APP_EXIT_OR_30_MINS -> PixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_30_MINS
+            ClearWhenOption.APP_EXIT_OR_60_MINS -> PixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_60_MINS
+            else -> null
+        }
+    }
+
 }

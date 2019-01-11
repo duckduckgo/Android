@@ -18,6 +18,7 @@ package com.duckduckgo.app.di
 
 import android.app.NotificationManager
 import android.content.Context
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -29,6 +30,12 @@ class NotificationModule {
     @Singleton
     fun provideNotificationManager(context: Context): NotificationManager {
         return context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    }
+
+    @Provides
+    @Singleton
+    fun provideLocalBroadcastManager(context: Context): LocalBroadcastManager {
+        return LocalBroadcastManager.getInstance(context)
     }
 
 }

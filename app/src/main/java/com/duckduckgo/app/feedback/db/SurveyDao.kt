@@ -41,6 +41,9 @@ abstract class SurveyDao {
     @Query("""select * from survey where status = "SCHEDULED"""")
     abstract fun getScheduled(): List<Survey>
 
+    @Query("""delete from survey where status = "SCHEDULED" or status = "NOT_ALLOCATED"""")
+    abstract fun deleteUnusedSurveys()
+
     @Transaction
     open fun cancelScheduledSurveys() {
         getScheduled().forEach {
