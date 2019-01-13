@@ -22,6 +22,7 @@ import android.animation.LayoutTransition.DISAPPEARING
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
+import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.*
 import android.content.pm.PackageManager
@@ -68,11 +69,12 @@ import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.CtaConfiguration
 import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.cta.ui.supportsAutomaticWidgets
 import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.feedback.ui.SurveyActivity
-import com.duckduckgo.app.global.*
+import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.DuckDuckGoTheme.LIGHT
+import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.appTheme
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
@@ -395,7 +397,8 @@ class BrowserTabFragment : Fragment(), FindListener {
                 externalAppLinkClicked(it)
             }
             is Command.LaunchSurvey -> launchSurvey(it.survey)
-            is Command.LaunchWidget -> launchWidget()
+            is Command.LaunchAddWidget -> launchAddWidget()
+            is Command.LaunchLegacyAddWidget -> launchLegacyAddWidget()
         }
     }
 
@@ -841,17 +844,17 @@ class BrowserTabFragment : Fragment(), FindListener {
     }
 
     @SuppressLint("NewApi")
-    private fun launchWidget() {
+    private fun launchAddWidget() {
+        val theme = (activity as? DuckDuckGoActivity)?.appTheme()
+        val widgetClass = if (theme == LIGHT) SearchWidgetLight::class.java else SearchWidget::class.java
+        val provider = ComponentName(context, widgetClass)
+        AppWidgetManager.getInstance(context).requestPinAppWidget(provider, null, null)
+    }
+
+    private fun launchLegacyAddWidget() {
         val context = context ?: return
-        if (context.supportsAutomaticWidgets) {
-            val ddgActivity = activity as? DuckDuckGoActivity
-            val widgetClass = if (ddgActivity?.appTheme() == LIGHT) SearchWidgetLight::class.java else SearchWidget::class.java
-            val provider = ComponentName(context, widgetClass)
-            AppWidgetManager.getInstance(context).requestPinAppWidget(provider, null, null)
-        } else {
-            val options = ActivityOptions.makeSceneTransitionAnimation(this.activity, ctaOkButton, "animation")
-            startActivity(AddWidgetInstructionsActivity.intent(context), options.toBundle())
-        }
+        val options = ActivityOptions.makeSceneTransitionAnimation(this.activity, ctaOkButton, "animation")
+        startActivity(AddWidgetInstructionsActivity.intent(context), options.toBundle())
     }
 
     companion object {

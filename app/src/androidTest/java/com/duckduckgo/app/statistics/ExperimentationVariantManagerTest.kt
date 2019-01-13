@@ -17,6 +17,7 @@
 package com.duckduckgo.app.statistics
 
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -28,6 +29,7 @@ class ExperimentationVariantManagerTest {
     private lateinit var testee: ExperimentationVariantManager
 
     private val mockStore: StatisticsDataStore = mock()
+    private val mockWidgetCapabilities: WidgetCapabilities = mock()
     private val mockRandomizer: IndexRandomizer = mock()
     private val activeVariants = mutableListOf<Variant>()
 
@@ -36,7 +38,7 @@ class ExperimentationVariantManagerTest {
         // mock randomizer always returns the first active variant
         whenever(mockRandomizer.random(any())).thenReturn(0)
 
-        testee = ExperimentationVariantManager(mockStore, mockRandomizer)
+        testee = ExperimentationVariantManager(mockStore, mockWidgetCapabilities, mockRandomizer)
     }
 
     @Test

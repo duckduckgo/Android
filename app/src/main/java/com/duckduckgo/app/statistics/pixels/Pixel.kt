@@ -62,12 +62,17 @@ interface Pixel {
         SURVEY_CTA_LAUNCHED(pixelName = "mus_cl"),
         SURVEY_SURVEY_DISMISSED(pixelName = "mus_sd"),
 
-        ADD_WIDGET_CTA_SHOWN(pixelName = "maw_cs"),
-        ADD_WIDGET_CTA_DISMISSED(pixelName = "maw_cd"),
-        ADD_WIDGET_CTA_LAUNCHED_AUTO(pixelName = "maw_cla"),
-        ADD_WIDGET_CTA_LAUNCHED_MANUAL(pixelName = "maw_clm"),
-        ADD_WIDGET_INSTALL_AUTO(pixelName = "maw_ia"),
-        ADD_WIDGET_INSTALL_MANUAL(pixelName = "maw_ia"),
+        ADD_WIDGET_AUTO_CTA_SHOWN(pixelName = "maw_acs"),
+        ADD_WIDGET_AUTO_CTA_DISMISSED(pixelName = "maw_acd"),
+        ADD_WIDGET_AUTO_CTA_LAUNCHED(pixelName = "maw_acl"),
+        ADD_WIDGET_AUTO_ADDED(pixelName = "maw_aa"),
+        ADD_WIDGET_AUTO_DELETED(pixelName = "maw_ad"),
+
+        ADD_WIDGET_INSTRUCTIONS_CTA_SHOWN(pixelName = "maw_ics"),
+        ADD_WIDGET_INSTRUCTIONS_CTA_DISMISSED(pixelName = "maw_icd"),
+        ADD_WIDGET_INSTRUCTIONS_CTA_LAUNCHED(pixelName = "maw_icl"),
+        ADD_WIDGET_INSTRUCTIONS_ADDED(pixelName = "maw_ia"),
+        ADD_WIDGET_INSTRUCTIONS_DELETED(pixelName = "maw_id"),
 
         AUTOMATIC_CLEAR_DATA_WHAT_SHOWN("macwhat_s"),
         AUTOMATIC_CLEAR_DATA_WHAT_OPTION_NONE("macwhat_n"),

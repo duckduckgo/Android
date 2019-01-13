@@ -18,8 +18,8 @@ package com.duckduckgo.app.cta.db
 
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.cta.ui.CtaId
 import com.duckduckgo.app.global.db.AppDatabase
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

@@ -155,7 +155,8 @@ class BrowserTabViewModel(
         class HandleExternalAppLink(val appLink: IntentType) : Command()
         class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap? = null) : Command()
         class LaunchSurvey(val survey: Survey) : Command()
-        object LaunchWidget : Command()
+        object LaunchAddWidget : Command()
+        object LaunchLegacyAddWidget : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -241,6 +242,7 @@ class BrowserTabViewModel(
 
     fun onViewVisible() {
         command.value = if (url.value == null) ShowKeyboard else Command.HideKeyboard
+        ctaViewModel.refreshCta()
     }
 
     fun onUserSubmittedQuery(input: String) {
@@ -653,13 +655,10 @@ class BrowserTabViewModel(
 
     fun onUserLaunchedCta() {
         val cta = ctaViewState.value?.cta ?: return
-        when (cta) {
-            is CtaConfiguration.Survey -> {
-                command.value = LaunchSurvey(cta.survey)
-            }
-            is CtaConfiguration.AddWidget -> {
-                command.value = LaunchWidget
-            }
+        command.value = when (cta) {
+            is CtaConfiguration.Survey -> LaunchSurvey(cta.survey)
+            is CtaConfiguration.AddWidgetAuto -> LaunchAddWidget
+            is CtaConfiguration.AddWidgetInstructions -> LaunchLegacyAddWidget
         }
         ctaViewModel.onCtaLaunched()
     }

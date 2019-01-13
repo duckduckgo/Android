@@ -14,33 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.cta.model
+package com.duckduckgo.app.di
 
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverter
-import com.duckduckgo.app.cta.ui.CtaId
+import android.content.Context
+import com.duckduckgo.app.widget.ui.AppWidgetCapabilities
+import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import dagger.Module
+import dagger.Provides
+import javax.inject.Singleton
 
-@Entity(
-    tableName = "dismissed_cta"
-)
-data class DismissedCta(
-    @PrimaryKey
-    var ctaId: CtaId
-) {
 
-    class IdTypeConverter {
+@Module
+class WidgetModule {
 
-        @TypeConverter
-        fun toId(value: String): CtaId {
-            return CtaId.valueOf(value)
-        }
-
-        @TypeConverter
-        fun fromId(value: CtaId): String {
-            return value.name
-        }
-    }
+    @Provides
+    @Singleton
+    fun widgetCapabilities(context: Context): WidgetCapabilities = AppWidgetCapabilities(context)
 }
-

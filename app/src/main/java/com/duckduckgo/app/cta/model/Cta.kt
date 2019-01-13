@@ -14,24 +14,37 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.cta.db
+package com.duckduckgo.app.cta.model
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import com.duckduckgo.app.cta.model.CtaId
-import com.duckduckgo.app.cta.model.DismissedCta
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
 
-@Dao
-abstract class DismissedCtaDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insert(dismissedCta: DismissedCta)
-
-    @Query("select count(1) > 0 from dismissed_cta where ctaId = :ctaId")
-    abstract fun exists(ctaId: CtaId): Boolean
+enum class CtaId {
+    SURVEY,
+    ADD_WIDGET
 }
 
+@Entity(
+    tableName = "dismissed_cta"
+)
+data class DismissedCta(
+    @PrimaryKey
+    var ctaId: CtaId
+) {
 
+    class IdTypeConverter {
+
+        @TypeConverter
+        fun toId(value: String): CtaId {
+            return CtaId.valueOf(value)
+        }
+
+        @TypeConverter
+        fun fromId(value: CtaId): String {
+            return value.name
+        }
+    }
+}
 

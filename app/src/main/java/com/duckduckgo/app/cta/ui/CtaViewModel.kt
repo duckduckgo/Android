@@ -16,33 +16,40 @@
 
 package com.duckduckgo.app.cta.ui
 
-import android.appwidget.AppWidgetManager
-import android.content.Context
-import android.os.Build
 import android.view.View
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
+import com.duckduckgo.app.cta.ui.CtaConfiguration.*
 import com.duckduckgo.app.feedback.db.SurveyDao
 import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.AddWidgetCta
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_content.view.*
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class CtaViewModel @Inject constructor(
-    private val context: Context,
     private val appInstallStore: AppInstallStore,
     private val pixel: Pixel,
     private val surveyDao: SurveyDao,
-    private val dismissedCtaDao: DismissedCtaDao
+    private val widgetCapabilities: WidgetCapabilities,
+    private val dismissedCtaDao: DismissedCtaDao,
+    private val variantManager: VariantManager
 ) {
 
     val ctaViewState: MutableLiveData<CtaViewState> = MutableLiveData()
@@ -53,24 +60,23 @@ class CtaViewModel @Inject constructor(
         val cta: CtaConfiguration? = null
     )
 
-    init {
-        ctaViewState.value = CtaViewState()
-    }
-
     fun onSurveyChanged(survey: Survey?) {
         activeSurvey = survey
-        selectNextCta()
+        refreshCta()
     }
 
-    private fun selectNextCta() {
+    fun refreshCta() {
         surveyCta()?.let {
             ctaViewState.value = ctaViewState.value!!.copy(cta = it)
-            return@let
+            return
         }
 
         Schedulers.io().scheduleDirect {
-            if (!dismissedCtaDao.exists(CtaId.ADD_WIDGET)) {
-                ctaViewState.postValue(ctaViewState.value!!.copy(CtaConfiguration.AddWidget(context)))
+            if (canShowWidgetCta()) {
+                val ctaType = if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
+                ctaViewState.postValue(ctaViewState.value!!.copy(cta = ctaType))
+            } else {
+                ctaViewState.postValue(ctaViewState.value!!.copy(cta = null))
             }
         }
     }
@@ -81,10 +87,18 @@ class CtaViewModel @Inject constructor(
             val showOnDay = survey.daysInstalled?.toLong()
             val daysInstalled = appInstallStore.daysInstalled()
             if (showOnDay == null || showOnDay == daysInstalled) {
-                return CtaConfiguration.Survey(context, survey)
+                return Survey(survey)
             }
         }
         return null
+    }
+
+    @WorkerThread
+    private fun canShowWidgetCta(): Boolean {
+        return variantManager.getVariant().hasFeature(AddWidgetCta) &&
+                widgetCapabilities.supportsStandardWidgetAdd &&
+                !widgetCapabilities.hasInstalledWidgets &&
+                !dismissedCtaDao.exists(CtaId.ADD_WIDGET)
     }
 
     fun onCtaShown() {
@@ -99,6 +113,7 @@ class CtaViewModel @Inject constructor(
         when (cta) {
             is CtaConfiguration.Survey -> {
                 Schedulers.io().scheduleDirect {
+                    activeSurvey = null
                     surveyDao.cancelScheduledSurveys()
                 }
             }
@@ -110,65 +125,72 @@ class CtaViewModel @Inject constructor(
         }
 
         ctaViewState.value = ctaViewState.value?.copy(cta = null)
-        selectNextCta()
+        refreshCta()
     }
 
     fun onCtaLaunched() {
         val cta = ctaViewState.value?.cta ?: return
         pixel.fire(cta.okPixel)
     }
-}
 
-enum class CtaId {
-    SURVEY,
-    ADD_WIDGET
+    init {
+        ctaViewState.value = CtaViewState()
+    }
 }
 
 sealed class CtaConfiguration(
     open val ctaId: CtaId,
-    open @DrawableRes val image: Int,
-    open val title: String,
-    open val description: String,
-    open val okButton: String,
-    open val dismissButton: String,
+    @DrawableRes open val image: Int,
+    @StringRes open val title: Int,
+    @StringRes open val description: Int,
+    @StringRes open val okButton: Int,
+    @StringRes open val dismissButton: Int,
     open val shownPixel: Pixel.PixelName,
     open val okPixel: Pixel.PixelName,
     open val cancelPixel: Pixel.PixelName
 ) {
 
-    class Survey(context: Context, val survey: com.duckduckgo.app.feedback.model.Survey) : CtaConfiguration(
+    data class Survey(val survey: com.duckduckgo.app.feedback.model.Survey) : CtaConfiguration(
         CtaId.SURVEY,
         R.drawable.survey_cta_icon,
-        context.getString(R.string.surveyCtaTitle),
-        context.getString(R.string.surveyCtaDescription),
-        context.getString(R.string.surveyCtaLaunchButton),
-        context.getString(R.string.surveyCtaDismissButton),
+        R.string.surveyCtaTitle,
+        R.string.surveyCtaDescription,
+        R.string.surveyCtaLaunchButton,
+        R.string.surveyCtaDismissButton,
         SURVEY_CTA_SHOWN,
         SURVEY_CTA_LAUNCHED,
         SURVEY_CTA_DISMISSED
     )
 
-    class AddWidget(context: Context) : CtaConfiguration(
+    object AddWidgetAuto : CtaConfiguration(
         CtaId.ADD_WIDGET,
         R.drawable.add_widget_cta_icon,
-        context.getString(R.string.addWidgetCtaTitle),
-        context.getString(R.string.addWidgetCtaDescription),
-        context.getString(R.string.addWidgetCtaLaunchButton),
-        context.getString(R.string.addWidgetCtaDismissButton),
-        ADD_WIDGET_CTA_SHOWN,
-        if (context.supportsAutomaticWidgets) ADD_WIDGET_CTA_LAUNCHED_AUTO else ADD_WIDGET_CTA_LAUNCHED_MANUAL,
-        ADD_WIDGET_CTA_DISMISSED
+        R.string.addWidgetCtaTitle,
+        R.string.addWidgetCtaDescription,
+        R.string.addWidgetCtaAutoLaunchButton,
+        R.string.addWidgetCtaDismissButton,
+        ADD_WIDGET_AUTO_CTA_SHOWN,
+        ADD_WIDGET_AUTO_CTA_LAUNCHED,
+        ADD_WIDGET_AUTO_CTA_DISMISSED
+    )
+
+    object AddWidgetInstructions : CtaConfiguration(
+        CtaId.ADD_WIDGET,
+        R.drawable.add_widget_cta_icon,
+        R.string.addWidgetCtaTitle,
+        R.string.addWidgetCtaDescription,
+        R.string.addWidgetCtaInstructionsLaunchButton,
+        R.string.addWidgetCtaDismissButton,
+        ADD_WIDGET_INSTRUCTIONS_CTA_SHOWN,
+        ADD_WIDGET_INSTRUCTIONS_CTA_LAUNCHED,
+        ADD_WIDGET_INSTRUCTIONS_CTA_DISMISSED
     )
 
     fun apply(view: View) {
         view.ctaIcon.setImageResource(image)
-        view.ctaTitle.text = title
-        view.ctaSubtitle.text = description
-        view.ctaOkButton.text = okButton
-        view.ctaDismissButton.text = dismissButton
+        view.ctaTitle.text = view.context.getString(title)
+        view.ctaSubtitle.text = view.context.getString(description)
+        view.ctaOkButton.text = view.context.getString(okButton)
+        view.ctaDismissButton.text = view.context.getString(dismissButton)
     }
 }
-
-val Context.supportsAutomaticWidgets: Boolean
-    get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && AppWidgetManager.getInstance(this).isRequestPinAppWidgetSupported
-

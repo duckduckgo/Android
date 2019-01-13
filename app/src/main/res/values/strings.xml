@@ -236,7 +236,8 @@
     <!-- Add widget -->
     <string name="addWidgetCtaTitle">Try Our Search Widget!</string>
     <string name="addWidgetCtaDescription">Add our search widget to your home screen for quick and easy access.</string>
-    <string name="addWidgetCtaLaunchButton">Install Widget</string>
+    <string name="addWidgetCtaAutoLaunchButton">Install Widget</string>
+    <string name="addWidgetCtaInstructionsLaunchButton">Show Me</string>
     <string name="addWidgetCtaDismissButton">No thanks</string>
     <string name="addWidgetInstructionsActivityTitle">Add widget</string>
     <string name="addWidgetInstruction1Label">1</string>

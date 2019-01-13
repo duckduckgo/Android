@@ -50,12 +50,14 @@ import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
 import org.junit.After
 import org.junit.Assert.*
@@ -138,6 +140,12 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockPixel: Pixel
 
+    @Mock
+    private lateinit var mockVariantManager: VariantManager
+
+    @Mock
+    private lateinit var mockWidgetCapabilities: WidgetCapabilities
+
     private lateinit var ctaViewModel: CtaViewModel
 
     @Captor
@@ -157,14 +165,23 @@ class BrowserTabViewModelTest {
             .allowMainThreadQueries()
             .build()
 
-        ctaViewModel = CtaViewModel(getInstrumentation().targetContext, mockAppInstallStore, mockPixel, mockSurveyDao, mockDismissedCtaDao)
         appConfigurationDao = db.appConfigurationDao()
+
+        ctaViewModel = CtaViewModel(
+            mockAppInstallStore,
+            mockPixel,
+            mockSurveyDao,
+            mockWidgetCapabilities,
+            mockDismissedCtaDao,
+            mockVariantManager
+        )
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore)
 
         whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+        whenever(mockVariantManager.getVariant(any())).thenReturn(VariantManager.DEFAULT_VARIANT)
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -238,7 +255,7 @@ class BrowserTabViewModelTest {
         testee.url.value = "http://exmaple.com"
         testee.onViewVisible()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.lastValue is Command.HideKeyboard)
+        assertTrue(commandCaptor.allValues.contains(Command.HideKeyboard))
     }
 
     @Test
@@ -246,7 +263,7 @@ class BrowserTabViewModelTest {
         testee.url.value = null
         testee.onViewVisible()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.lastValue is Command.ShowKeyboard)
+        assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
     }
 
     @Test
@@ -750,8 +767,6 @@ class BrowserTabViewModelTest {
         val command = captureCommands().value as Command.BrokenSiteFeedback
         assertNull(command.url)
     }
-
-    //TODO add CTA View model tests
 
     @Test
     fun whenUserSelectsToShareLinkWithNullUrlThenShareLinkCommandNotSent() {
