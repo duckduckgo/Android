@@ -67,7 +67,7 @@ class CtaViewModel @Inject constructor(
 
     fun refreshCta() {
         surveyCta()?.let {
-            ctaViewState.value = ctaViewState.value!!.copy(cta = it)
+            ctaViewState.postValue(ctaViewState.value!!.copy(cta = it))
             return
         }
 
@@ -110,22 +110,19 @@ class CtaViewModel @Inject constructor(
         val cta = ctaViewState.value?.cta ?: return
         pixel.fire(cta.cancelPixel)
 
-        when (cta) {
-            is CtaConfiguration.Survey -> {
-                Schedulers.io().scheduleDirect {
+        Schedulers.io().scheduleDirect {
+            when (cta) {
+                is CtaConfiguration.Survey -> {
                     activeSurvey = null
                     surveyDao.cancelScheduledSurveys()
                 }
-            }
-            else -> {
-                Schedulers.io().scheduleDirect {
+                else -> {
                     dismissedCtaDao.insert(DismissedCta(cta.ctaId))
                 }
             }
+            ctaViewState.postValue(ctaViewState.value?.copy(cta = null))
+            refreshCta()
         }
-
-        ctaViewState.value = ctaViewState.value?.copy(cta = null)
-        refreshCta()
     }
 
     fun onCtaLaunched() {
