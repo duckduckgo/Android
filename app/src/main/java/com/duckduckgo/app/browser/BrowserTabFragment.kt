@@ -70,17 +70,13 @@ import com.duckduckgo.app.cta.ui.CtaConfiguration
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.feedback.ui.SurveyActivity
-import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.DuckDuckGoTheme.LIGHT
 import com.duckduckgo.app.global.ViewModelFactory
-import com.duckduckgo.app.global.appTheme
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
-import com.duckduckgo.widget.SearchWidget
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
@@ -844,9 +840,7 @@ class BrowserTabFragment : Fragment(), FindListener {
     @SuppressLint("NewApi")
     private fun launchAddWidget() {
         val context = context ?: return
-        val theme = (activity as? DuckDuckGoActivity)?.appTheme()
-        val widgetClass = if (theme == LIGHT) SearchWidgetLight::class.java else SearchWidget::class.java
-        val provider = ComponentName(context, widgetClass)
+        val provider = ComponentName(context, SearchWidgetLight::class.java)
         AppWidgetManager.getInstance(context).requestPinAppWidget(provider, null, null)
     }
 
