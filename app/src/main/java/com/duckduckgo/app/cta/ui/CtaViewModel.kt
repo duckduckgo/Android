@@ -52,13 +52,17 @@ class CtaViewModel @Inject constructor(
     private val variantManager: VariantManager
 ) {
 
+    data class CtaViewState(
+        val cta: CtaConfiguration? = null
+    )
+
     val ctaViewState: MutableLiveData<CtaViewState> = MutableLiveData()
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
     private var activeSurvey: Survey? = null
 
-    data class CtaViewState(
-        val cta: CtaConfiguration? = null
-    )
+    init {
+        ctaViewState.value = CtaViewState()
+    }
 
     fun onSurveyChanged(survey: Survey?) {
         activeSurvey = survey
@@ -128,10 +132,6 @@ class CtaViewModel @Inject constructor(
     fun onCtaLaunched() {
         val cta = ctaViewState.value?.cta ?: return
         pixel.fire(cta.okPixel)
-    }
-
-    init {
-        ctaViewState.value = CtaViewState()
     }
 }
 

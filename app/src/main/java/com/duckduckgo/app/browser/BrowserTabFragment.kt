@@ -22,7 +22,6 @@ import android.animation.LayoutTransition.DISAPPEARING
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.*
 import android.content.pm.PackageManager
@@ -845,6 +844,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     @SuppressLint("NewApi")
     private fun launchAddWidget() {
+        val context = context ?: return
         val theme = (activity as? DuckDuckGoActivity)?.appTheme()
         val widgetClass = if (theme == LIGHT) SearchWidgetLight::class.java else SearchWidget::class.java
         val provider = ComponentName(context, widgetClass)
