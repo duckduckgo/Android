@@ -59,7 +59,7 @@ class CtaViewModel @Inject constructor(
     val ctaViewState: MutableLiveData<CtaViewState> = MutableLiveData()
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
 
-    private val ctaViewStateValue: CtaViewState
+    private val currentViewState: CtaViewState
         get() = ctaViewState.value!!
 
     private var activeSurvey: Survey? = null
@@ -75,16 +75,16 @@ class CtaViewModel @Inject constructor(
 
     fun refreshCta() {
         surveyCta()?.let {
-            ctaViewState.postValue(ctaViewStateValue.copy(cta = it))
+            ctaViewState.postValue(currentViewState.copy(cta = it))
             return
         }
 
         Schedulers.io().scheduleDirect {
             if (canShowWidgetCta()) {
                 val ctaType = if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
-                ctaViewState.postValue(ctaViewStateValue.copy(cta = ctaType))
+                ctaViewState.postValue(currentViewState.copy(cta = ctaType))
             } else {
-                ctaViewState.postValue(ctaViewStateValue.copy(cta = null))
+                ctaViewState.postValue(currentViewState.copy(cta = null))
             }
         }
     }
@@ -110,12 +110,12 @@ class CtaViewModel @Inject constructor(
     }
 
     fun onCtaShown() {
-        val cta = ctaViewStateValue.cta ?: return
+        val cta = currentViewState.cta ?: return
         pixel.fire(cta.shownPixel)
     }
 
     fun onCtaDismissed() {
-        val cta = ctaViewStateValue.cta ?: return
+        val cta = currentViewState.cta ?: return
         pixel.fire(cta.cancelPixel)
 
         Schedulers.io().scheduleDirect {
@@ -128,13 +128,13 @@ class CtaViewModel @Inject constructor(
                     dismissedCtaDao.insert(DismissedCta(cta.ctaId))
                 }
             }
-            ctaViewState.postValue(ctaViewStateValue.copy(cta = null))
+            ctaViewState.postValue(currentViewState.copy(cta = null))
             refreshCta()
         }
     }
 
     fun onCtaLaunched() {
-        val cta = ctaViewStateValue.cta ?: return
+        val cta = currentViewState.cta ?: return
         pixel.fire(cta.okPixel)
     }
 }
