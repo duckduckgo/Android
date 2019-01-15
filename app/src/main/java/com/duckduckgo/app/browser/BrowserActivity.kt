@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
@@ -249,7 +250,8 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchBrokenSiteFeedback(url: String?) {
-        startActivity(FeedbackActivity.intent(this, true, url))
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(FeedbackActivity.intent(this, true, url), options)
     }
 
     fun launchSettings() {

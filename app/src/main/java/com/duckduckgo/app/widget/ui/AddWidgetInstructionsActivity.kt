@@ -67,7 +67,7 @@ class AddWidgetInstructionsActivity : DuckDuckGoActivity() {
     }
 
     fun close() {
-        finish()
+        finishAfterTransition()
     }
 
     companion object {
