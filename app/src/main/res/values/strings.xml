@@ -236,14 +236,14 @@
     <!-- Add widget -->
     <string name="addWidgetCtaTitle">Try Our Search Widget!</string>
     <string name="addWidgetCtaDescription">Add our search widget to your home screen for quick and easy access.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Install Widget</string>
+    <string name="addWidgetCtaAutoLaunchButton">Add Widget</string>
     <string name="addWidgetCtaInstructionsLaunchButton">Show Me</string>
-    <string name="addWidgetCtaDismissButton">No thanks</string>
+    <string name="addWidgetCtaDismissButton">Dismiss</string>
     <string name="addWidgetInstructionsActivityTitle">Add widget</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Long press your home screen then open the widgets menu</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Find and select the DuckDuckGo widget</string>
+    <string name="addWidgetInstruction2">Find the DuckDuckGo widget</string>
     <string name="addWidgetInstruction3Label">3</string>
     <string name="addWidgetInstruction3">Drag the widget to your home screen</string>
     <string name="addWidgetInstructionsButtonGoHome">Go to Home Screen</string>
