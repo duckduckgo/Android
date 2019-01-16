@@ -26,7 +26,7 @@ import timber.log.Timber
 
 class LogoHidingLayoutChangeListener(private var ddgLogoView: View) : View.OnLayoutChangeListener {
 
-    var callToActionButton: View? = null
+    var callToActionView: View? = null
 
     override fun onLayoutChange(view: View, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
         update()
@@ -35,7 +35,7 @@ class LogoHidingLayoutChangeListener(private var ddgLogoView: View) : View.OnLay
     fun update() {
         val heightDp = getHeightDp()
 
-        Timber.v("App height now: $heightDp dp, call to action button showing: ${callToActionButton?.isVisible}")
+        Timber.v("App height now: $heightDp dp, call to action button showing: ${callToActionView?.isVisible}")
 
         if (enoughRoomForLogo(heightDp)) {
             ddgLogoView.alpha = 1.0f
@@ -52,12 +52,12 @@ class LogoHidingLayoutChangeListener(private var ddgLogoView: View) : View.OnLay
 
     private fun enoughRoomForLogo(heightDp: Int): Boolean {
 
-        val isGone = callToActionButton?.isGone ?: true
+        val isGone = callToActionView?.isGone ?: true
         if (isGone) {
             return true
         }
 
-        val callToActionButtonHeightDp = callToActionButton?.measuredHeight?.toDp() ?: 0
+        val callToActionButtonHeightDp = callToActionView?.measuredHeight?.toDp() ?: 0
         val heightMinusCallToAction = heightDp - callToActionButtonHeightDp
         if (heightMinusCallToAction >= MINIMUM_AVAILABLE_HEIGHT_REQUIRED_TO_SHOW_LOGO) {
             return true

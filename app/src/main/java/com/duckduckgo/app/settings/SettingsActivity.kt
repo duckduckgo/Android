@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.settings
 
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -156,7 +157,8 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     }
 
     private fun launchFeedback() {
-        startActivity(Intent(FeedbackActivity.intent(this)))
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(Intent(FeedbackActivity.intent(this)), options)
     }
 
     override fun onAutomaticallyClearWhatOptionSelected(clearWhatSetting: ClearWhatOption) {

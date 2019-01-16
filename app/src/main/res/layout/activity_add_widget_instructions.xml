@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2019 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    tools:context="com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/cornflowerDark">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_partial_modal">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/animation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:clickable="false"
+                android:paddingTop="16dp"
+                android:paddingBottom="18dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/add_widget_instructions"
+                app:lottie_repeatMode="restart" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/instructionsStartBarrier"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="72dp"
+                app:barrierDirection="start"
+                app:constraint_referenced_ids="instruction1,instruction2,instruction3" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/instructionsEndBarrier"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="32dp"
+                app:barrierDirection="end"
+                app:constraint_referenced_ids="instruction1,instruction2,instruction3" />
+
+            <TextView
+                android:id="@+id/instructionLabel1"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_margin="16dp"
+                android:background="@drawable/background_add_widget_number"
+                android:fontFamily="sans-serif-black"
+                android:gravity="center"
+                android:text="@string/addWidgetInstruction1Label"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:textStyle="normal"
+                app:layout_constraintBaseline_toBaselineOf="@id/instruction1"
+                app:layout_constraintEnd_toStartOf="@id/instruction1"
+                tools:ignore="SmallSp" />
+
+            <TextView
+                android:id="@+id/instruction1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:lineSpacingExtra="4sp"
+                android:paddingBottom="20dp"
+                android:text="@string/addWidgetInstruction1"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="normal"
+                app:layout_constraintEnd_toEndOf="@id/instructionsEndBarrier"
+                app:layout_constraintStart_toEndOf="@id/instructionLabel1"
+                app:layout_constraintStart_toStartOf="@id/instructionsStartBarrier"
+                app:layout_constraintTop_toBottomOf="@id/animation"
+                app:layout_constraintWidth_max="400dp" />
+
+            <TextView
+                android:id="@+id/instructionLabel2"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_margin="16dp"
+                android:background="@drawable/background_add_widget_number"
+                android:fontFamily="sans-serif-black"
+                android:gravity="center"
+                android:text="@string/addWidgetInstruction2Label"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:textStyle="normal"
+                app:layout_constraintBaseline_toBaselineOf="@id/instruction2"
+                app:layout_constraintEnd_toStartOf="@id/instruction2"
+                tools:ignore="SmallSp" />
+
+            <TextView
+                android:id="@+id/instruction2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:lineSpacingExtra="4sp"
+                android:paddingBottom="20dp"
+                android:text="@string/addWidgetInstruction2"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="normal"
+                app:layout_constraintEnd_toEndOf="@id/instructionsEndBarrier"
+                app:layout_constraintStart_toStartOf="@id/instructionsStartBarrier"
+                app:layout_constraintTop_toBottomOf="@+id/instruction1"
+                app:layout_constraintWidth_max="400dp" />
+
+            <TextView
+                android:id="@+id/instructionLabel3"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_margin="16dp"
+                android:background="@drawable/background_add_widget_number"
+                android:fontFamily="sans-serif-black"
+                android:gravity="center"
+                android:text="@string/addWidgetInstruction3Label"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:textStyle="normal"
+                app:layout_constraintBaseline_toBaselineOf="@id/instruction3"
+                app:layout_constraintEnd_toStartOf="@id/instruction3"
+                tools:ignore="SmallSp" />
+
+            <TextView
+                android:id="@+id/instruction3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:lineSpacingExtra="4sp"
+                android:paddingBottom="42dp"
+                android:text="@string/addWidgetInstruction3"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="normal"
+                app:layout_constraintEnd_toEndOf="@id/instructionsEndBarrier"
+                app:layout_constraintStart_toStartOf="@id/instructionsStartBarrier"
+                app:layout_constraintTop_toBottomOf="@+id/instruction2"
+                app:layout_constraintWidth_max="400dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider"
+                app:layout_constraintBottom_toTopOf="@id/homeButton"
+                app:layout_constraintTop_toBottomOf="@id/instruction3" />
+
+            <Button
+                android:id="@+id/closeButton"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/addWidgetInstructionsButtonClose"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                app:layout_constraintEnd_toStartOf="@id/homeButton"
+                app:layout_constraintTop_toBottomOf="@id/instruction3" />
+
+            <Button
+                android:id="@+id/homeButton"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/addWidgetInstructionsButtonGoHome"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/instruction3" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+</ScrollView>
+

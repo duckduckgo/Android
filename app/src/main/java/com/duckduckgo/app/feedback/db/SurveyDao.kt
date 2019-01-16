@@ -23,7 +23,7 @@ import com.duckduckgo.app.feedback.model.Survey
 @Dao
 abstract class SurveyDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insert(survey: Survey)
 
     @Update(onConflict = OnConflictStrategy.REPLACE)

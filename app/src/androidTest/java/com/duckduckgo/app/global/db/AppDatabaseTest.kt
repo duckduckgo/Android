@@ -28,7 +28,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
-
 class AppDatabaseTest {
 
     @get:Rule
@@ -83,6 +82,12 @@ class AppDatabaseTest {
     }
 
     @Test
+    fun whenMigratingFromVersion7To8ThenValidationSucceeds() {
+        testHelper.createDatabase(TEST_DB_NAME, 7).close()
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 8, true, AppDatabase.MIGRATION_7_TO_8)
+    }
+
+    @Test
     fun whenMigratingFromVersion4To5ThenUpdatePositionsOfStoredTabs() {
 
         testHelper.createDatabase(TEST_DB_NAME, 4).use {
@@ -113,7 +118,8 @@ class AppDatabaseTest {
                 AppDatabase.MIGRATION_3_TO_4,
                 AppDatabase.MIGRATION_4_TO_5,
                 AppDatabase.MIGRATION_5_TO_6,
-                AppDatabase.MIGRATION_6_TO_7
+                AppDatabase.MIGRATION_6_TO_7,
+                AppDatabase.MIGRATION_7_TO_8
             )
             .allowMainThreadQueries()
             .build()

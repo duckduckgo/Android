@@ -34,6 +34,7 @@ import com.duckduckgo.app.privacy.ui.ScorecardActivity
 import com.duckduckgo.app.privacy.ui.TrackerNetworksActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
+import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -82,6 +83,10 @@ abstract class AndroidBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector
     abstract fun userSurveyActivity(): SurveyActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun addWidgetInstructionsActivity(): AddWidgetInstructionsActivity
 
     @ActivityScoped
     @ContributesAndroidInjector
