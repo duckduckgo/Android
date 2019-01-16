@@ -40,6 +40,8 @@ interface SettingsDataStore {
     var automaticallyClearWhenOption: ClearWhenOption
     var appBackgroundedTimestamp: Long
     var lastExecutedJobId: String?
+    fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean
+    fun isCurrentlySelected(clearWhenOption: ClearWhenOption): Boolean
     fun hasBackgroundTimestampRecorded(): Boolean
     fun clearAppBackgroundTimestamp()
 }
@@ -70,17 +72,11 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         set(enabled) = preferences.edit(commit = true) { putBoolean(KEY_APP_USED_SINCE_LAST_CLEAR, enabled) }
 
     override var automaticallyClearWhatOption: ClearWhatOption
-        get() {
-            val savedValue = preferences.getString(KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION, null) ?: ClearWhatOption.CLEAR_NONE.name
-            return ClearWhatOption.valueOf(savedValue)
-        }
+        get() = automaticallyClearWhatSavedValue() ?: ClearWhatOption.CLEAR_NONE
         set(value) = preferences.edit { putString(KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION, value.name) }
 
     override var automaticallyClearWhenOption: ClearWhenOption
-        get() {
-            val savedValue = preferences.getString(KEY_AUTOMATICALLY_CLEAR_WHEN_OPTION, null) ?: ClearWhenOption.APP_EXIT_ONLY.name
-            return ClearWhenOption.valueOf(savedValue)
-        }
+        get() = automaticallyClearWhenSavedValue() ?: ClearWhenOption.APP_EXIT_ONLY
         set(value) = preferences.edit { putString(KEY_AUTOMATICALLY_CLEAR_WHEN_OPTION, value.name) }
 
     override var appBackgroundedTimestamp: Long
@@ -90,6 +86,25 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
     override fun clearAppBackgroundTimestamp() = preferences.edit { remove(KEY_APP_BACKGROUNDED_TIMESTAMP) }
 
+    override fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean {
+        val currentlySelected = automaticallyClearWhatSavedValue() ?: return false
+        return currentlySelected == clearWhatOption
+    }
+
+    override fun isCurrentlySelected(clearWhenOption: ClearWhenOption): Boolean {
+        val currentlySelected = automaticallyClearWhenSavedValue() ?: return false
+        return currentlySelected == clearWhenOption
+    }
+
+    private fun automaticallyClearWhatSavedValue(): ClearWhatOption? {
+        val savedValue = preferences.getString(KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION, null) ?: return null
+        return ClearWhatOption.valueOf(savedValue)
+    }
+
+    private fun automaticallyClearWhenSavedValue(): ClearWhenOption? {
+        val savedValue = preferences.getString(KEY_AUTOMATICALLY_CLEAR_WHEN_OPTION, null) ?: return null
+        return ClearWhenOption.valueOf(savedValue)
+    }
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)

@@ -117,16 +117,21 @@ class SettingsViewModel @Inject constructor(
         return "${BuildConfig.VERSION_NAME}$formattedVariantKey(${BuildConfig.VERSION_CODE})"
     }
 
-    fun onAutomaticallyWhatOptionSelected(clearWhatSetting: ClearWhatOption) {
-        pixel.fire(clearWhatSetting.pixelEvent())
+    fun onAutomaticallyWhatOptionSelected(clearWhatNewSetting: ClearWhatOption) {
+        if (settingsDataStore.isCurrentlySelected(clearWhatNewSetting)) {
+            Timber.v("User selected same thing they already have set: $clearWhatNewSetting; no need to do anything else")
+            return
+        }
 
-        settingsDataStore.automaticallyClearWhatOption = clearWhatSetting
+        pixel.fire(clearWhatNewSetting.pixelEvent())
+
+        settingsDataStore.automaticallyClearWhatOption = clearWhatNewSetting
 
         viewState.value = currentViewState().copy(
             automaticallyClearData = AutomaticallyClearData(
-                clearWhatOption = clearWhatSetting,
+                clearWhatOption = clearWhatNewSetting,
                 clearWhenOption = settingsDataStore.automaticallyClearWhenOption,
-                clearWhenOptionEnabled = isAutomaticallyClearingDataWhenSettingEnabled(clearWhatSetting)
+                clearWhenOptionEnabled = isAutomaticallyClearingDataWhenSettingEnabled(clearWhatNewSetting)
             )
         )
     }
@@ -135,16 +140,21 @@ class SettingsViewModel @Inject constructor(
         return clearWhatOption != null && clearWhatOption != ClearWhatOption.CLEAR_NONE
     }
 
-    fun onAutomaticallyWhenOptionSelected(clearWhenSetting: ClearWhenOption) {
-        clearWhenSetting.pixelEvent()?.let {
+    fun onAutomaticallyWhenOptionSelected(clearWhenNewSetting: ClearWhenOption) {
+        if (settingsDataStore.isCurrentlySelected(clearWhenNewSetting)) {
+            Timber.v("User selected same thing they already have set: $clearWhenNewSetting; no need to do anything else")
+            return
+        }
+
+        clearWhenNewSetting.pixelEvent()?.let {
             pixel.fire(it)
         }
 
-        settingsDataStore.automaticallyClearWhenOption = clearWhenSetting
+        settingsDataStore.automaticallyClearWhenOption = clearWhenNewSetting
         viewState.value = currentViewState().copy(
             automaticallyClearData = AutomaticallyClearData(
                 settingsDataStore.automaticallyClearWhatOption,
-                clearWhenSetting
+                clearWhenNewSetting
             )
         )
     }
