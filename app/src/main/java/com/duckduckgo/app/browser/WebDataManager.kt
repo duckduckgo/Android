@@ -94,9 +94,8 @@ class WebViewDataManager @Inject constructor(
     }
 
     private fun deleteFile(it: File) {
-        var deleted = false
-        measureExecution("Deleted file: ${it.name} successfully? $deleted", Log.VERBOSE) {
-           deleted = it.deleteRecursively()
+        measureExecution("Deleted file: ${it.name}", Log.VERBOSE) {
+           it.deleteRecursively()
         }
     }
 
