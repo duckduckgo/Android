@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.view
 
 import android.content.Context
+import android.util.Log
 import android.webkit.WebStorage
 import android.webkit.WebView
 import androidx.annotation.UiThread
@@ -25,6 +26,7 @@ import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
+import com.duckduckgo.app.global.performance.measureExecution
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import kotlinx.coroutines.CoroutineScope
@@ -73,49 +75,57 @@ class ClearPersonalDataAction @Inject constructor(
     }
 
     override suspend fun clearTabsAndAllDataAsync(appInForeground: Boolean, shouldFireDataClearPixel: Boolean) {
-        val startTime = System.currentTimeMillis()
+        measureExecution("Finished clearing everything", Log.INFO) {
+            withContext(Dispatchers.IO) {
+                cookieManager.flush()
+                clearTabsAsync(appInForeground)
+            }
 
-        withContext(Dispatchers.IO) {
-            cookieManager.flush()
-            clearTabsAsync(appInForeground)
+            withContext(Dispatchers.Main) {
+                clearDataAsync(shouldFireDataClearPixel)
+            }
         }
-
-        withContext(Dispatchers.Main) {
-            clearDataAsync(shouldFireDataClearPixel)
-        }
-
-        Timber.i("Finished clearing everything; took ${System.currentTimeMillis() - startTime}ms.")
     }
 
     @WorkerThread
     override suspend fun clearTabsAsync(appInForeground: Boolean) {
-        val startTime = System.currentTimeMillis()
-        Timber.i("Clearing tabs")
-
-        dataManager.clearWebViewSessions()
-        tabRepository.deleteAll()
-        setAppUsedSinceLastClearFlag(appInForeground)
-
-        Timber.i("Finished clearing tabs; took ${System.currentTimeMillis() - startTime}ms.")
+        measureExecution("Finished clearing tabs", Log.INFO) {
+            Timber.i("Clearing tabs")
+            dataManager.clearWebViewSessions()
+            tabRepository.deleteAll()
+            setAppUsedSinceLastClearFlag(appInForeground)
+        }
     }
 
     @UiThread
     private suspend fun clearDataAsync(shouldFireDataClearPixel: Boolean) {
-        val startTime = System.currentTimeMillis()
+        measureExecution("Finished clearing data", Log.INFO) {
+            Timber.i("Clearing data")
 
-        if (shouldFireDataClearPixel) {
-            clearingStore.incrementCount()
+            if (shouldFireDataClearPixel) {
+                measureExecution("Incremented data-clear pixel count") { clearingStore.incrementCount() }
+            }
+
+            dataManager.clearData(createWebView(), createWebStorage(), context)
+            dataManager.clearExternalCookies()
         }
+    }
 
-        dataManager.clearData(WebView(context), WebStorage.getInstance(), context)
-        dataManager.clearExternalCookies()
+    private fun createWebView(): WebView {
+        return measureExecution("Created WebView instance for clearing") {
+            WebView(context)
+        }
+    }
 
-        Timber.i("Finished clearing data; took ${System.currentTimeMillis() - startTime}ms.")
+    private fun createWebStorage(): WebStorage {
+        return measureExecution("Created web storage") {
+            WebStorage.getInstance()
+        }
     }
 
     override fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean) {
-        Timber.d("Setting appUsedSinceClear flag to $appUsedSinceLastClear")
-        settingsDataStore.appUsedSinceLastClear = appUsedSinceLastClear
-
+        measureExecution("Set appUsedSinceClear flag to $appUsedSinceLastClear") {
+            settingsDataStore.appUsedSinceLastClear = appUsedSinceLastClear
+        }
     }
 }
