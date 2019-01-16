@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.feedback.api.FeedbackSender
 import com.duckduckgo.app.feedback.db.SurveyDao
 import com.duckduckgo.app.feedback.ui.FeedbackViewModel
@@ -52,6 +53,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel
+import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel
 import javax.inject.Inject
 
 
@@ -81,8 +83,8 @@ class ViewModelFactory @Inject constructor(
     private val faviconDownloader: FaviconDownloader,
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
     private val pixel: Pixel,
-    private val dataClearer: DataClearer
-
+    private val dataClearer: DataClearer,
+    private val ctaViewModel: CtaViewModel
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -103,6 +105,7 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
                 isAssignableFrom(FeedbackViewModel::class.java) -> FeedbackViewModel(feedbackSender)
                 isAssignableFrom(SurveyViewModel::class.java) -> SurveyViewModel(surveyDao, statisticsStore, appInstallStore)
+                isAssignableFrom(AddWidgetInstructionsViewModel::class.java) -> AddWidgetInstructionsViewModel()
                 isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(
                     appSettingsPreferencesStore,
                     defaultBrowserDetector,
@@ -124,13 +127,12 @@ class ViewModelFactory @Inject constructor(
         bookmarksDao = bookmarksDao,
         autoCompleteApi = autoCompleteApi,
         appSettingsPreferencesStore = appSettingsPreferencesStore,
+        appConfigurationDao = appConfigurationDao,
         longPressHandler = webViewLongPressHandler,
         webViewSessionStorage = webViewSessionStorage,
         specialUrlDetector = specialUrlDetector,
         faviconDownloader = faviconDownloader,
         addToHomeCapabilityDetector = addToHomeCapabilityDetector,
-        appConfigurationDao = appConfigurationDao,
-        surveyDao = surveyDao,
-        appInstallStore = appInstallStore
+        ctaViewModel = ctaViewModel
     )
 }

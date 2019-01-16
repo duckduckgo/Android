@@ -36,9 +36,9 @@ import com.duckduckgo.app.browser.addToHome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.feedback.db.SurveyDao
-import com.duckduckgo.app.feedback.model.Survey
-import com.duckduckgo.app.feedback.model.Survey.Status.SCHEDULED
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
@@ -50,11 +50,14 @@ import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
 import org.junit.After
 import org.junit.Assert.*
@@ -126,10 +129,24 @@ class BrowserTabViewModelTest {
     private lateinit var mockAddToHomeCapabilityDetector: AddToHomeCapabilityDetector
 
     @Mock
-    private lateinit var surveyDao: SurveyDao
+    private lateinit var mockSurveyDao: SurveyDao
+
+    @Mock
+    private lateinit var mockDismissedCtaDao: DismissedCtaDao
 
     @Mock
     private lateinit var mockAppInstallStore: AppInstallStore
+
+    @Mock
+    private lateinit var mockPixel: Pixel
+
+    @Mock
+    private lateinit var mockVariantManager: VariantManager
+
+    @Mock
+    private lateinit var mockWidgetCapabilities: WidgetCapabilities
+
+    private lateinit var ctaViewModel: CtaViewModel
 
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
@@ -147,13 +164,24 @@ class BrowserTabViewModelTest {
         db = Room.inMemoryDatabaseBuilder(getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
+
         appConfigurationDao = db.appConfigurationDao()
+
+        ctaViewModel = CtaViewModel(
+            mockAppInstallStore,
+            mockPixel,
+            mockSurveyDao,
+            mockWidgetCapabilities,
+            mockDismissedCtaDao,
+            mockVariantManager
+        )
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore)
 
         whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+        whenever(mockVariantManager.getVariant(any())).thenReturn(VariantManager.DEFAULT_VARIANT)
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -162,17 +190,16 @@ class BrowserTabViewModelTest {
             siteFactory = siteFactory,
             tabRepository = mockTabsRepository,
             networkLeaderboardDao = mockNetworkLeaderboardDao,
-            bookmarksDao = bookmarksDao,
             autoCompleteApi = mockAutoCompleteApi,
             appSettingsPreferencesStore = mockSettingsStore,
+            bookmarksDao = bookmarksDao,
             longPressHandler = mockLongPressHandler,
+            appConfigurationDao = appConfigurationDao,
             webViewSessionStorage = webViewSessionStorage,
             specialUrlDetector = SpecialUrlDetectorImpl(),
             faviconDownloader = mockFaviconDownloader,
             addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector,
-            appConfigurationDao = appConfigurationDao,
-            surveyDao = surveyDao,
-            appInstallStore = mockAppInstallStore
+            ctaViewModel = ctaViewModel
         )
 
         testee.loadData("abc", null)
@@ -228,7 +255,7 @@ class BrowserTabViewModelTest {
         testee.url.value = "http://exmaple.com"
         testee.onViewVisible()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.lastValue is Command.HideKeyboard)
+        assertTrue(commandCaptor.allValues.contains(Command.HideKeyboard))
     }
 
     @Test
@@ -236,7 +263,7 @@ class BrowserTabViewModelTest {
         testee.url.value = null
         testee.onViewVisible()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.lastValue is Command.ShowKeyboard)
+        assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
     }
 
     @Test
@@ -739,39 +766,6 @@ class BrowserTabViewModelTest {
         testee.onBrokenSiteSelected()
         val command = captureCommands().value as Command.BrokenSiteFeedback
         assertNull(command.url)
-    }
-
-    @Test
-    fun whenScheduledSurveyChangesAndNewSurveyInstallationDayMatchesDaysInstalledThenHasValidSurveyIsTrue() {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
-        assertTrue(testee.surveyViewState.value!!.hasValidSurvey)
-    }
-
-    @Test
-    fun whenScheduledSurveyChangesAndNewSurveyInstallationDoesNotMatchDaysInstalledThenHasValidSurveyIsFalse() {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", 2, SCHEDULED))
-        assertFalse(testee.surveyViewState.value!!.hasValidSurvey)
-    }
-
-    @Test
-    fun whenScheduledSurveyIsNullThenHasValidSurveyIsFalse() {
-        testee.onSurveyChanged(null)
-        assertFalse(testee.surveyViewState.value!!.hasValidSurvey)
-    }
-
-    @Test
-    fun whenSurveyExistsAndUserOpensSurveyThenSurveyShown() {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
-        testee.onUserOpenedSurvey()
-        val command = captureCommands().value as Command.LaunchSurvey
-        assertNotNull(command)
-    }
-
-    @Test
-    fun whenUserDismissesSurveyThenSurveyCancelledAndHasValidSurveyIsFalse() {
-        testee.onUserDismissedSurvey()
-        assertFalse(testee.surveyViewState.value!!.hasValidSurvey)
-        verify(surveyDao).cancelScheduledSurveys()
     }
 
     @Test

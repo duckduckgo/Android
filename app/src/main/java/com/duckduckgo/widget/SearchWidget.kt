@@ -23,11 +23,21 @@ import android.content.Context
 import android.widget.RemoteViews
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.DuckDuckGoApplication
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.app.widget.ui.supportsAutomaticWidgetAdd
 
 
 class SearchWidgetLight : SearchWidget(R.layout.search_widget_light)
 
 open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetProvider() {
+
+    override fun onEnabled(context: Context) {
+        val application = context.applicationContext as? DuckDuckGoApplication
+        val pixelType = if (context.supportsAutomaticWidgetAdd) ADD_WIDGET_AUTO_ADDED else ADD_WIDGET_INSTRUCTIONS_ADDED
+        application?.pixel?.fire(pixelType)
+        super.onEnabled(context)
+    }
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         // There may be multiple widgets active, so update all of them
@@ -45,5 +55,11 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
     private fun buildPendingIntent(context: Context): PendingIntent {
         val intent = BrowserActivity.intent(context, newSearch = true)
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    }
+
+    override fun onDeleted(context: Context, appWidgetIds: IntArray?) {
+        val application = context.applicationContext as? DuckDuckGoApplication
+        val pixelType = if (context.supportsAutomaticWidgetAdd) ADD_WIDGET_AUTO_DELETED else ADD_WIDGET_INSTRUCTIONS_DELETED
+        application?.pixel?.fire(pixelType)
     }
 }

@@ -50,7 +50,7 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
      */
     fun onCreate(savedInstanceState: Bundle?, daggerInject: Boolean = true) {
         if (daggerInject) daggerInject()
-        themeChangeReceiver = applyTheme(settingsDataStore)
+        themeChangeReceiver = applyTheme()
         super.onCreate(savedInstanceState)
     }
 

@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.di
 
-import androidx.room.Room
 import android.content.Context
+import androidx.room.Room
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_1_TO_2
 import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_2_TO_3
@@ -25,6 +25,7 @@ import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_3_TO_4
 import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_4_TO_5
 import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_5_TO_6
 import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_6_TO_7
+import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_7_TO_8
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -42,7 +43,8 @@ class DatabaseModule {
                 MIGRATION_3_TO_4,
                 MIGRATION_4_TO_5,
                 MIGRATION_5_TO_6,
-                MIGRATION_6_TO_7
+                MIGRATION_6_TO_7,
+                MIGRATION_7_TO_8
             )
             .build()
     }

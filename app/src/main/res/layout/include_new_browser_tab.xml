@@ -33,18 +33,21 @@
         android:contentDescription="@string/duckDuckGoLogoDescription"
         android:src="@drawable/logo_full"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/callToActionStub"
+        app:layout_constraintBottom_toTopOf="@+id/ctaContainer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_max="180dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_max="180dp" />
 
-    <ViewStub
-        android:id="@+id/callToActionStub"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:id="@+id/ctaContainer"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintWidth_max="450dp"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:elevation="12dp"
+        android:outlineProvider="paddedBounds"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

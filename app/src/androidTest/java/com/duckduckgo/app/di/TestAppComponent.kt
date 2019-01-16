@@ -59,7 +59,8 @@ import javax.inject.Singleton
         VariantModule::class,
         FaviconModule::class,
         TrackersModule::class,
-        PrivacyModule::class
+        PrivacyModule::class,
+        WidgetModule::class
     ]
 )
 interface TestAppComponent : AppComponent {

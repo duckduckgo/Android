@@ -49,4 +49,7 @@ class DaoModule {
 
     @Provides
     fun surveyDao(database: AppDatabase) = database.surveyDao()
+
+    @Provides
+    fun dismissedCtaDao(database: AppDatabase) = database.dismissedCtaDao()
 }

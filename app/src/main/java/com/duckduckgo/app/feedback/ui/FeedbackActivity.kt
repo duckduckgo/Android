@@ -93,7 +93,7 @@ class FeedbackActivity : DuckDuckGoActivity() {
 
     private fun confirmAndFinish() {
         longToast(R.string.feedbackSubmitted)
-        finish()
+        finishAfterTransition()
     }
 
     private fun render(viewState: ViewState) {
