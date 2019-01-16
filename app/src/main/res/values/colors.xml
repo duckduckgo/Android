@@ -52,7 +52,7 @@
     <color name="paleBrownishGray">#b0b0b0</color>
     <color name="brownishGray">#5c5c5c</color>
     <color name="brownishGrayTwo">#666666</color>
-    <color name="pinkishGray">#d0d0d0</color>
+    <color name="pinkishGrayThree">#cccccc</color>
     <color name="coolGray">#969799</color>
     <color name="subtleGray">#f0f0f0</color>
     <color name="subtleGrayTwo">#d8d8d8</color>
@@ -65,7 +65,9 @@
     <color name="powderBlue">#50bfff</color>
     <color name="powderBlue2">#b2d6f3</color>
     <color name="denimBlue">#3d5599</color>
+    <color name="warmBlue">#3f66d5</color>
     <color name="cornflowerBlue">#678fff</color>
+    <color name="cornflowerDark">#5078e9</color>
     <color name="skyBlue">#42bffe</color>
     <color name="carolinaBlue">#94b0ff</color>
 

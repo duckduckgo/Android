@@ -45,13 +45,12 @@ import com.duckduckgo.app.browser.addToHome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
-import com.duckduckgo.app.feedback.db.SurveyDao
+import com.duckduckgo.app.cta.ui.CtaConfiguration
+import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
-import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
@@ -84,8 +83,7 @@ class BrowserTabViewModel(
     private val specialUrlDetector: SpecialUrlDetector,
     private val faviconDownloader: FaviconDownloader,
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
-    private val appInstallStore: AppInstallStore,
-    private val surveyDao: SurveyDao,
+    private val ctaViewModel: CtaViewModel,
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, ViewModel() {
 
@@ -129,10 +127,6 @@ class BrowserTabViewModel(
         val canFindInPage: Boolean = false
     )
 
-    data class SurveyViewState(
-        val hasValidSurvey: Boolean = false
-    )
-
     data class AutoCompleteViewState(
         val showSuggestions: Boolean = false,
         val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
@@ -161,6 +155,8 @@ class BrowserTabViewModel(
         class HandleExternalAppLink(val appLink: IntentType) : Command()
         class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap? = null) : Command()
         class LaunchSurvey(val survey: Survey) : Command()
+        object LaunchAddWidget : Command()
+        object LaunchLegacyAddWidget : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -169,10 +165,10 @@ class BrowserTabViewModel(
     val loadingViewState: MutableLiveData<LoadingViewState> = MutableLiveData()
     val omnibarViewState: MutableLiveData<OmnibarViewState> = MutableLiveData()
     val findInPageViewState: MutableLiveData<FindInPageViewState> = MutableLiveData()
-    val surveyViewState: MutableLiveData<SurveyViewState> = MutableLiveData()
+    val ctaViewState: MutableLiveData<CtaViewModel.CtaViewState> = ctaViewModel.ctaViewState
 
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
-    val survey: LiveData<Survey> = surveyDao.getLiveScheduled()
+    val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
     val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
     val url: SingleLiveEvent<String> = SingleLiveEvent()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -191,8 +187,6 @@ class BrowserTabViewModel(
     private var siteLiveData = MutableLiveData<Site>()
     private var site: Site? = null
     private lateinit var tabId: String
-    private var currentSurvey: Survey? = null
-
 
     init {
         initializeViewStates()
@@ -248,6 +242,7 @@ class BrowserTabViewModel(
 
     fun onViewVisible() {
         command.value = if (url.value == null) ShowKeyboard else Command.HideKeyboard
+        ctaViewModel.refreshCta()
     }
 
     fun onUserSubmittedQuery(input: String) {
@@ -592,7 +587,6 @@ class BrowserTabViewModel(
         autoCompleteViewState.value = AutoCompleteViewState()
         omnibarViewState.value = OmnibarViewState()
         findInPageViewState.value = FindInPageViewState()
-        surveyViewState.value = SurveyViewState()
     }
 
     fun userSharingLink(url: String?) {
@@ -656,37 +650,25 @@ class BrowserTabViewModel(
     }
 
     fun onSurveyChanged(survey: Survey?) {
-        if (survey == null) {
-            surveyViewState.value = surveyViewState.value?.copy(hasValidSurvey = false)
-            return
-        }
-
-        val showOnDay = survey.daysInstalled?.toLong()
-        val daysInstalled = appInstallStore.daysInstalled()
-        if (showOnDay == null || showOnDay == daysInstalled) {
-            surveyViewState.value = surveyViewState.value?.copy(hasValidSurvey = true)
-            currentSurvey = survey
-        }
+        ctaViewModel.onSurveyChanged(survey)
     }
 
-    fun onUserOpenedSurvey() {
-        currentSurvey?.let {
-            command.value = LaunchSurvey(it)
+    fun onUserLaunchedCta() {
+        val cta = ctaViewState.value?.cta ?: return
+        command.value = when (cta) {
+            is CtaConfiguration.Survey -> LaunchSurvey(cta.survey)
+            is CtaConfiguration.AddWidgetAuto -> LaunchAddWidget
+            is CtaConfiguration.AddWidgetInstructions -> LaunchLegacyAddWidget
         }
+        ctaViewModel.onCtaLaunched()
     }
 
-    fun onUserDismissedSurvey() {
-        surveyViewState.value = surveyViewState.value?.copy(hasValidSurvey = false)
-        currentSurvey = null
-        Schedulers.io().scheduleDirect {
-            surveyDao.cancelScheduledSurveys()
-        }
+    fun onUserDismissedCta() {
+        ctaViewModel.onCtaDismissed()
     }
 
     override fun externalAppLinkClicked(appLink: IntentType) {
         command.value = HandleExternalAppLink(appLink)
     }
 }
-
-
 
