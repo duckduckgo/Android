@@ -77,16 +77,18 @@ android {
 }
 
 ext {
-    androidX = "1.0.1"
-    materialDesign = "1.1.0-alpha01"
+    androidX = "1.0.2"
+    materialDesign = "1.1.0-alpha02"
     architectureComponents = "1.1.1"
     architectureComponentsExtensions = "1.1.1"
     androidKtx = "1.0.1"
     androidTestRunner = "1.0.2"
     constraintLayout = "2.0.0-alpha2"
     lifecycle = "2.0.0"
-    room = "2.1.0-alpha02"
-    workManager = "1.0.0-alpha11"
+    coreTesting = "2.0.0"
+    room = "2.1.0-alpha03"
+    workManager = "1.0.0-beta02"
+    testRunner = "1.1.1"
 
     dagger = "2.18"
     retrofit = "2.3.0"
@@ -137,8 +139,8 @@ dependencies {
     // ViewModel and LiveData
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle"
     kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle"
-    testImplementation "androidx.arch.core:core-testing:$lifecycle"
-    androidTestImplementation "androidx.arch.core:core-testing:$lifecycle"
+    testImplementation "androidx.arch.core:core-testing:$coreTesting"
+    androidTestImplementation "androidx.arch.core:core-testing:$coreTesting"
 
     // Room
     implementation "androidx.room:room-runtime:$room"
@@ -169,10 +171,10 @@ dependencies {
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
     testImplementation "junit:junit:4.12"
 
-    androidTestImplementation 'androidx.test:runner:1.1.0'
-    androidTestImplementation 'androidx.test:rules:1.1.0'
-    androidTestUtil "androidx.test:orchestrator:1.1.0"
-    androidTestImplementation "androidx.test.espresso:espresso-core:3.1.0"
+    androidTestImplementation "androidx.test:runner:$testRunner"
+    androidTestImplementation "androidx.test:rules:$testRunner"
+    androidTestUtil "androidx.test:orchestrator:$testRunner"
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.1.1"
     androidTestImplementation "org.mockito:mockito-android:$mockito"
     androidTestImplementation "com.squareup.okhttp3:mockwebserver:$okHttp"
     androidTestImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
