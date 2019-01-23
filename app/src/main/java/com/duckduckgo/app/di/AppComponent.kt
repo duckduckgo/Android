@@ -21,6 +21,7 @@ import android.app.Application
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteModule
 import com.duckduckgo.app.browser.di.BrowserModule
 import com.duckduckgo.app.browser.favicon.FaviconModule
+import com.duckduckgo.app.browser.rating.di.RatingModule
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.httpsupgrade.di.HttpsUpgraderModule
 import com.duckduckgo.app.onboarding.di.OnboardingModule
@@ -57,7 +58,8 @@ import javax.inject.Singleton
         FaviconModule::class,
         TrackersModule::class,
         PrivacyModule::class,
-        WidgetModule::class
+        WidgetModule::class,
+        RatingModule::class
     ]
 )
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {

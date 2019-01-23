@@ -36,6 +36,7 @@ import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.global.rating.AppEnjoymentManager
 import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
@@ -84,7 +85,8 @@ class ViewModelFactory @Inject constructor(
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
     private val pixel: Pixel,
     private val dataClearer: DataClearer,
-    private val ctaViewModel: CtaViewModel
+    private val ctaViewModel: CtaViewModel,
+    private val appEnjoyment: AppEnjoymentManager
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -92,7 +94,7 @@ class ViewModelFactory @Inject constructor(
             when {
                 isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboaringStore)
                 isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore, defaultBrowserDetector)
-                isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository, queryUrlConverter, dataClearer)
+                isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository, queryUrlConverter, dataClearer, appEnjoyment)
                 isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
                 isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository, webViewSessionStorage)
                 isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(
