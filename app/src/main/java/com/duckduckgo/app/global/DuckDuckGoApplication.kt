@@ -41,6 +41,7 @@ import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.migration.LegacyMigration
+import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -150,6 +151,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
         initializeHttpsUpgrader()
         submitUnsentFirePixels()
+        scheduleLocalNotifications()
     }
 
     private fun configureWorkManager() {
@@ -230,6 +232,11 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
             }
             unsentForgetAllPixelStore.resetCount()
         }
+    }
+
+    private fun scheduleLocalNotifications() {
+        val notifications = NotificationScheduler()
+        notifications.scheduleClearDataNotification()
     }
 
     /**

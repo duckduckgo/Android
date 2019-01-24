@@ -249,4 +249,8 @@
     <string name="addWidgetInstructionsButtonGoHome">Go to Home Screen</string>
     <string name="addWidgetInstructionsButtonClose">Close</string>
 
+    <!-- Clear Notification -->
+    <string name="clearNotificationTitle">DuckDuckGo Privacy Browser</string>
+    <string name="clearNotificationDescription">Customize how DuckDuckGo clears your browsing data.</string>
+
 </resources>
