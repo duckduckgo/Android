@@ -43,22 +43,41 @@ class PlayStoreUtils {
 
     fun isPlayStoreInstalled(context: Context): Boolean {
         return try {
-            context.packageManager.getPackageInfo(PLAY_STORE_PACKAGE, 0)
-            val appInfo = context.packageManager.getApplicationInfo(PLAY_STORE_PACKAGE, 0)
-            val isAppEnabled = appInfo.enabled
+
+            if (!isPlayStoreActivityResolvable(context)) {
+                Timber.i("Cannot resolve Play Store activity")
+                return false
+            }
+
+            val isAppEnabled = isPlayStoreAppEnabled(context)
             Timber.i("The Play Store app is installed " + if (isAppEnabled) "and enabled" else "but disabled")
             return isAppEnabled
+
         } catch (e: PackageManager.NameNotFoundException) {
             Timber.i("Could not find package details for $PLAY_STORE_PACKAGE; Play Store is not installed")
             false
         }
     }
 
-    fun launchPlayStore(context: Context) {
-        val intent = Intent(Intent.ACTION_VIEW).apply {
+    private fun isPlayStoreAppEnabled(context: Context): Boolean {
+        context.packageManager.getPackageInfo(PLAY_STORE_PACKAGE, 0)
+        val appInfo = context.packageManager.getApplicationInfo(PLAY_STORE_PACKAGE, 0)
+        return appInfo.enabled
+    }
+
+    private fun isPlayStoreActivityResolvable(context: Context): Boolean {
+        return playStoreIntent().resolveActivity(context.packageManager) != null
+    }
+
+    private fun playStoreIntent(): Intent {
+        return Intent(Intent.ACTION_VIEW).apply {
             data = Uri.parse("$PLAY_STORE_URI$DDG_APP_PACKAGE")
             setPackage(PLAY_STORE_PACKAGE)
         }
+    }
+
+    fun launchPlayStore(context: Context) {
+        val intent = playStoreIntent()
         try {
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
