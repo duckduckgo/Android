@@ -40,7 +40,7 @@ class NotificationGenerator(val context: Context) {
             channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         }
 
-        val icon = if (SDK_INT >= M) R.drawable.logo_notification_transparent else R.drawable.logo_notification
+        val icon = if (SDK_INT >= M) R.drawable.notification_fire else R.drawable.notification_fire_legacy
         val text = if (SDK_INT >= M) R.string.clearNotificationDescription else R.string.clearNotificationDescriptionLegacy
 
         return NotificationCompat.Builder(context, specification.channel.id)
