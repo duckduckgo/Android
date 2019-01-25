@@ -14,30 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.rating.di
+package com.duckduckgo.app.usage.di
 
-import android.content.Context
-import com.duckduckgo.app.global.rating.AppEnjoyment
-import com.duckduckgo.app.global.rating.AppEnjoymentManager
-import com.duckduckgo.app.playstore.PlayStoreUtils
+import com.duckduckgo.app.usage.AppDaysUsedRecorder
 import com.duckduckgo.app.usage.app.AppDaysUsedDao
-import com.duckduckgo.app.usage.search.SearchCountDao
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
 
 
 @Module
-class RatingModule {
-
-    @Singleton
-    @Provides
-    fun appEnjoymentManager(playStoreUtils: PlayStoreUtils, searchCountDao: SearchCountDao, appDaysUsedDao: AppDaysUsedDao, context: Context): AppEnjoymentManager {
-        return AppEnjoyment(playStoreUtils, searchCountDao, appDaysUsedDao, context)
-    }
+class AppUsageModule {
 
     @Provides
-    fun playStoreUtils(): PlayStoreUtils {
-        return PlayStoreUtils()
+    fun appDaysUsedRecorder(appDaysUsedDao: AppDaysUsedDao) : AppDaysUsedRecorder {
+        return AppDaysUsedRecorder(appDaysUsedDao)
     }
 }

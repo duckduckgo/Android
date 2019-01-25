@@ -52,4 +52,10 @@ class DaoModule {
 
     @Provides
     fun dismissedCtaDao(database: AppDatabase) = database.dismissedCtaDao()
+
+    @Provides
+    fun searchCountDao(database: AppDatabase) = database.searchCountDao()
+
+    @Provides
+    fun appDaysUsedDao(database: AppDatabase) = database.appsDaysUsedDao()
 }

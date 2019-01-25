@@ -37,7 +37,6 @@ import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.global.Theming.initializeTheme
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.notification.NotificationRegistrar
-import com.duckduckgo.app.global.rating.AppEnjoyment
 import com.duckduckgo.app.global.rating.AppEnjoymentManager
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
@@ -49,6 +48,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_LAUNCH
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
+import com.duckduckgo.app.usage.AppDaysUsedRecorder
 import com.squareup.leakcanary.LeakCanary
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -117,6 +117,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     @Inject
     lateinit var appEnjoyment: AppEnjoymentManager
 
+    @Inject
+    lateinit var appDaysUsedRecorder: AppDaysUsedRecorder
+
     private var launchedByFireAction: Boolean = false
 
     open lateinit var daggerAppComponent: AppComponent
@@ -138,6 +141,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         ProcessLifecycleOwner.get().lifecycle.also {
             it.addObserver(this)
             it.addObserver(dataClearer)
+            it.addObserver(appDaysUsedRecorder)
             it.addObserver(appEnjoyment)
         }
 

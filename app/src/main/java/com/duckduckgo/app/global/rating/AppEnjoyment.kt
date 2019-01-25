@@ -20,8 +20,13 @@ import android.content.Context
 import androidx.annotation.UiThread
 import androidx.lifecycle.*
 import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.app.global.rating.AppEnjoyment.AppEnjoymentPromptOptions.*
 import com.duckduckgo.app.playstore.PlayStoreUtils
+import com.duckduckgo.app.usage.app.AppDaysUsedDao
+import com.duckduckgo.app.usage.search.SearchCountDao
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface AppEnjoymentManager : LifecycleObserver {
@@ -35,7 +40,13 @@ interface AppEnjoymentManager : LifecycleObserver {
     val promptType: LiveData<AppEnjoyment.AppEnjoymentPromptOptions>
 }
 
-class AppEnjoyment(private val playStoreUtils: PlayStoreUtils, private val context: Context) : AppEnjoymentManager {
+class AppEnjoyment(
+    private val playStoreUtils: PlayStoreUtils,
+    private val searchCountDao: SearchCountDao,
+    private val appDaysUsedDao: AppDaysUsedDao,
+    private val context: Context
+) :
+    AppEnjoymentManager {
 
     private val _promptType: MutableLiveData<AppEnjoymentPromptOptions> = MutableLiveData<AppEnjoymentPromptOptions>()
         .also { it.value = AppEnjoymentPromptOptions.ShowNothing }
@@ -43,43 +54,82 @@ class AppEnjoyment(private val playStoreUtils: PlayStoreUtils, private val conte
     override val promptType: LiveData<AppEnjoymentPromptOptions>
         get() = _promptType
 
+    private var isFreshAppCreation = false
+
     @UiThread
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun onAppCreation() {
         Timber.i("On app creation")
-
-        _promptType.value = determineInitialPromptType()
+        isFreshAppCreation = true
     }
 
-    private fun determineInitialPromptType(): AppEnjoymentPromptOptions {
-        if (!playStoreUtils.isPlayStoreInstalled(context)) {
-            Timber.i("Play Store is not installed; cannot show ratings app enjoyment prompts")
-            return ShowNothing
-        }
+    @UiThread
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun onAppStart() {
+        Timber.i("On app start")
 
-        if (!playStoreUtils.installedFromPlayStore(context)) {
-            Timber.i("DuckDuckGo was not installed from Play Store")
-
-            if (BuildConfig.DEBUG) {
-                Timber.i("Running in DEBUG mode so will allow this; would normally enforce this check")
-            } else {
-                Timber.i("Cannot show app enjoyment prompts")
-                return ShowNothing
+        if (isFreshAppCreation) {
+            GlobalScope.launch {
+                _promptType.postValue(determineInitialPromptType())
             }
+            isFreshAppCreation = false
         }
+    }
 
-        // some other logic to determine whether to show it or not
-        return ShowEnjoymentPrompt
+    private suspend fun determineInitialPromptType(): AppEnjoymentPromptOptions {
+        return withContext(Dispatchers.IO) {
+            if (!playStoreUtils.isPlayStoreInstalled(context)) {
+                Timber.i("Play Store is not installed; cannot show ratings app enjoyment prompts")
+                return@withContext AppEnjoymentPromptOptions.ShowNothing
+            }
+
+            if (!playStoreUtils.installedFromPlayStore(context)) {
+                Timber.i("DuckDuckGo was not installed from Play Store")
+
+                if (BuildConfig.DEBUG) {
+                    Timber.i("Running in DEBUG mode so will allow this; would normally enforce this check")
+                } else {
+                    Timber.i("Cannot show app enjoyment prompts")
+                    return@withContext AppEnjoymentPromptOptions.ShowNothing
+                }
+            }
+
+            if (enoughSearchesMade() && enoughDaysPassed()) {
+                return@withContext AppEnjoymentPromptOptions.ShowEnjoymentPrompt
+            }
+
+            Timber.d("Decided not to show any prompts")
+
+            return@withContext AppEnjoymentPromptOptions.ShowNothing
+        }
+    }
+
+    private fun enoughDaysPassed(): Boolean {
+        val daysUsed = appDaysUsedDao.getNumberOfDaysAppUsed()
+        val enoughDaysUsed = daysUsed >= MINIMUM_DAYS_USED_THRESHOLD
+
+        return enoughDaysUsed.also {
+            Timber.i("Number of days usage: $daysUsed. Enough days have passed to show app enjoyment prompt: %s", if (enoughDaysUsed) "yes" else "no")
+        }
+    }
+
+    private fun enoughSearchesMade(): Boolean {
+        val numberSearchesMade= searchCountDao.getSearchesMade()
+        val enoughMade = numberSearchesMade >= MINIMUM_SEARCHES_THRESHOLD
+
+        return enoughMade.also {
+            Timber.i("Searches made: $numberSearchesMade. Enough searches made to show app enjoyment prompt: %s", if (enoughMade) "yes" else "no")
+        }
     }
 
     override fun onUserEnjoyingApp() {
         Timber.i("User is enjoying app; asking for rating")
-        _promptType.value = ShowRatingPrompt
+        _promptType.value = AppEnjoymentPromptOptions.ShowRatingPrompt
     }
 
     override fun onUserNotEnjoyingApp() {
         Timber.i("User is not enjoying app; asking for feedback")
-        _promptType.value = ShowFeedbackPrompt
+        _promptType.value = AppEnjoymentPromptOptions.ShowFeedbackPrompt
     }
 
     override fun onUserSelectedToRateApp() {
@@ -99,7 +149,14 @@ class AppEnjoyment(private val playStoreUtils: PlayStoreUtils, private val conte
     }
 
     private fun hideAllPrompts() {
-        _promptType.value = ShowNothing
+        _promptType.value = AppEnjoymentPromptOptions.ShowNothing
+    }
+
+    companion object {
+
+        // todo change this to 5
+        private const val MINIMUM_SEARCHES_THRESHOLD = 0
+        private const val MINIMUM_DAYS_USED_THRESHOLD = 3
     }
 
     sealed class AppEnjoymentPromptOptions {

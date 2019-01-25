@@ -54,6 +54,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel
+import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel
 import javax.inject.Inject
 
@@ -86,7 +87,8 @@ class ViewModelFactory @Inject constructor(
     private val pixel: Pixel,
     private val dataClearer: DataClearer,
     private val ctaViewModel: CtaViewModel,
-    private val appEnjoyment: AppEnjoymentManager
+    private val appEnjoyment: AppEnjoymentManager,
+    private val searchCountDao: SearchCountDao
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -135,6 +137,7 @@ class ViewModelFactory @Inject constructor(
         specialUrlDetector = specialUrlDetector,
         faviconDownloader = faviconDownloader,
         addToHomeCapabilityDetector = addToHomeCapabilityDetector,
-        ctaViewModel = ctaViewModel
+        ctaViewModel = ctaViewModel,
+        searchCountDao = searchCountDao
     )
 }

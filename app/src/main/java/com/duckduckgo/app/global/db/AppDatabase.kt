@@ -41,9 +41,13 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
+import com.duckduckgo.app.usage.app.AppDaysUsedDao
+import com.duckduckgo.app.usage.app.AppDaysUsedEntity
+import com.duckduckgo.app.usage.search.SearchCountDao
+import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 8, entities = [
+    exportSchema = true, version = 9, entities = [
         DisconnectTracker::class,
         HttpsBloomFilterSpec::class,
         HttpsWhitelistedDomain::class,
@@ -55,7 +59,9 @@ import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
         BookmarkEntity::class,
         EntityListEntity::class,
         Survey::class,
-        DismissedCta::class
+        DismissedCta::class,
+        SearchCountEntity::class,
+        AppDaysUsedEntity::class
     ]
 )
 
@@ -75,6 +81,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun networkEntityDao(): EntityListDao
     abstract fun surveyDao(): SurveyDao
     abstract fun dismissedCtaDao(): DismissedCtaDao
+    abstract fun searchCountDao(): SearchCountDao
+    abstract fun appsDaysUsedDao(): AppDaysUsedDao
 
     companion object {
         val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
@@ -135,6 +143,13 @@ abstract class AppDatabase : RoomDatabase() {
         val MIGRATION_7_TO_8: Migration = object : Migration(7, 8) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `dismissed_cta` (`ctaId` TEXT NOT NULL, PRIMARY KEY(`ctaId`))")
+            }
+        }
+
+        val MIGRATION_8_TO_9: Migration = object : Migration(8, 9) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `search_count` (`key` TEXT NOT NULL, `numberSearchesMade` INTEGER NOT NULL, PRIMARY KEY(`key`))")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `app_days_used` (`date` TEXT NOT NULL, PRIMARY KEY(`date`))")
             }
         }
     }
