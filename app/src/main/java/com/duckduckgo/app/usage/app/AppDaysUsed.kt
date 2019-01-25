@@ -27,15 +27,11 @@ private val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 @Singleton
 abstract class AppDaysUsedDao {
 
-    @Query("SELECT COUNT(*) from app_days_used where date <= :dateToday ORDER BY date ASC")
-    abstract fun getNumberOfDaysAppUsed(dateToday: String = formatter.format(Date())): Int
+    @Query("SELECT COUNT(*) from app_days_used")
+    abstract fun getNumberOfDaysAppUsed(): Long
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract fun insert(appUsedEntity: AppDaysUsedEntity)
-
-    fun recordAppUsedToday() {
-        insert(AppDaysUsedEntity())
-    }
 }
 
 @Entity(tableName = "app_days_used")

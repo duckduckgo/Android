@@ -16,17 +16,26 @@
 
 package com.duckduckgo.app.usage.di
 
+import com.duckduckgo.app.usage.AppDaysUsedDatabaseRepository
 import com.duckduckgo.app.usage.AppDaysUsedRecorder
+import com.duckduckgo.app.usage.AppDaysUsedRepository
 import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import dagger.Module
 import dagger.Provides
+import javax.inject.Singleton
 
 
 @Module
 class AppUsageModule {
 
     @Provides
-    fun appDaysUsedRecorder(appDaysUsedDao: AppDaysUsedDao) : AppDaysUsedRecorder {
-        return AppDaysUsedRecorder(appDaysUsedDao)
+    fun appDaysUsedRecorder(appDaysUsedRepository: AppDaysUsedRepository): AppDaysUsedRecorder {
+        return AppDaysUsedRecorder(appDaysUsedRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun appDaysUsedRespository(appDaysUsedDao: AppDaysUsedDao): AppDaysUsedRepository {
+        return AppDaysUsedDatabaseRepository(appDaysUsedDao)
     }
 }

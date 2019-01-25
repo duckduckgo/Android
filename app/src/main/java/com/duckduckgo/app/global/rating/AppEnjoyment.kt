@@ -21,7 +21,7 @@ import androidx.annotation.UiThread
 import androidx.lifecycle.*
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.playstore.PlayStoreUtils
-import com.duckduckgo.app.usage.app.AppDaysUsedDao
+import com.duckduckgo.app.usage.AppDaysUsedRepository
 import com.duckduckgo.app.usage.search.SearchCountDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -43,7 +43,7 @@ interface AppEnjoymentManager : LifecycleObserver {
 class AppEnjoyment(
     private val playStoreUtils: PlayStoreUtils,
     private val searchCountDao: SearchCountDao,
-    private val appDaysUsedDao: AppDaysUsedDao,
+    private val appDaysUsedRepository: AppDaysUsedRepository,
     private val context: Context
 ) :
     AppEnjoymentManager {
@@ -69,8 +69,9 @@ class AppEnjoyment(
         Timber.i("On app start")
 
         if (isFreshAppCreation) {
-            GlobalScope.launch {
-                _promptType.postValue(determineInitialPromptType())
+            GlobalScope.launch(Dispatchers.Main) {
+                val type = determineInitialPromptType()
+                _promptType.value = type
             }
             isFreshAppCreation = false
         }
@@ -78,6 +79,7 @@ class AppEnjoyment(
 
     private suspend fun determineInitialPromptType(): AppEnjoymentPromptOptions {
         return withContext(Dispatchers.IO) {
+
             if (!playStoreUtils.isPlayStoreInstalled(context)) {
                 Timber.i("Play Store is not installed; cannot show ratings app enjoyment prompts")
                 return@withContext AppEnjoymentPromptOptions.ShowNothing
@@ -104,8 +106,8 @@ class AppEnjoyment(
         }
     }
 
-    private fun enoughDaysPassed(): Boolean {
-        val daysUsed = appDaysUsedDao.getNumberOfDaysAppUsed()
+    private suspend fun enoughDaysPassed(): Boolean {
+        val daysUsed = appDaysUsedRepository.getNumberOfDaysAppUsed()
         val enoughDaysUsed = daysUsed >= MINIMUM_DAYS_USED_THRESHOLD
 
         return enoughDaysUsed.also {
@@ -114,7 +116,7 @@ class AppEnjoyment(
     }
 
     private fun enoughSearchesMade(): Boolean {
-        val numberSearchesMade= searchCountDao.getSearchesMade()
+        val numberSearchesMade = searchCountDao.getSearchesMade()
         val enoughMade = numberSearchesMade >= MINIMUM_SEARCHES_THRESHOLD
 
         return enoughMade.also {
@@ -156,7 +158,9 @@ class AppEnjoyment(
 
         // todo change this to 5
         private const val MINIMUM_SEARCHES_THRESHOLD = 0
-        private const val MINIMUM_DAYS_USED_THRESHOLD = 3
+
+        // todo change this to 3
+        private const val MINIMUM_DAYS_USED_THRESHOLD = 0
     }
 
     sealed class AppEnjoymentPromptOptions {

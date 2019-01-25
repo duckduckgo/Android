@@ -20,7 +20,7 @@ import android.content.Context
 import com.duckduckgo.app.global.rating.AppEnjoyment
 import com.duckduckgo.app.global.rating.AppEnjoymentManager
 import com.duckduckgo.app.playstore.PlayStoreUtils
-import com.duckduckgo.app.usage.app.AppDaysUsedDao
+import com.duckduckgo.app.usage.AppDaysUsedRepository
 import com.duckduckgo.app.usage.search.SearchCountDao
 import dagger.Module
 import dagger.Provides
@@ -32,8 +32,8 @@ class RatingModule {
 
     @Singleton
     @Provides
-    fun appEnjoymentManager(playStoreUtils: PlayStoreUtils, searchCountDao: SearchCountDao, appDaysUsedDao: AppDaysUsedDao, context: Context): AppEnjoymentManager {
-        return AppEnjoyment(playStoreUtils, searchCountDao, appDaysUsedDao, context)
+    fun appEnjoymentManager(playStoreUtils: PlayStoreUtils, searchCountDao: SearchCountDao, appDaysUsedRepository: AppDaysUsedRepository, context: Context): AppEnjoymentManager {
+        return AppEnjoyment(playStoreUtils, searchCountDao, appDaysUsedRepository, context)
     }
 
     @Provides
