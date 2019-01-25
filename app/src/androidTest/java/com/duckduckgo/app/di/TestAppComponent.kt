@@ -25,6 +25,7 @@ import com.duckduckgo.app.httpsupgrade.di.HttpsUpgraderModule
 import com.duckduckgo.app.onboarding.di.OnboardingModule
 import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
 import com.duckduckgo.app.trackerdetection.di.TrackerDetectionModule
+import com.duckduckgo.app.usage.di.AppUsageModule
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.support.AndroidSupportInjectionModule
@@ -62,7 +63,8 @@ import javax.inject.Singleton
         TrackersModule::class,
         PrivacyModule::class,
         WidgetModule::class,
-        RatingModule::class
+        RatingModule::class,
+        AppUsageModule::class
     ]
 )
 interface TestAppComponent : AppComponent {

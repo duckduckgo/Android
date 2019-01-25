@@ -57,6 +57,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
 import org.junit.After
@@ -135,6 +136,9 @@ class BrowserTabViewModelTest {
     private lateinit var mockDismissedCtaDao: DismissedCtaDao
 
     @Mock
+    private lateinit var mockSearchCountDao: SearchCountDao
+
+    @Mock
     private lateinit var mockAppInstallStore: AppInstallStore
 
     @Mock
@@ -199,7 +203,8 @@ class BrowserTabViewModelTest {
             specialUrlDetector = SpecialUrlDetectorImpl(),
             faviconDownloader = mockFaviconDownloader,
             addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector,
-            ctaViewModel = ctaViewModel
+            ctaViewModel = ctaViewModel,
+            searchCountDao = mockSearchCountDao
         )
 
         testee.loadData("abc", null)
