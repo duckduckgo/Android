@@ -56,10 +56,10 @@ class NotificationGenerator(val context: Context) {
     data class Channel(val id: String, val name: String, val description: String, val priority: Int)
 
     object Channels {
-        val features = Channel(
-            "com.duckduckgo.features",
-            "App Features and Tips",
-            "Displays app features and tips",
+        val privacyTips = Channel(
+            "com.duckduckgo.privacytips",
+            "Privacy Tips",
+            "Displays helpful privacy tips",
             IMPORTANCE_DEFAULT
         )
     }
@@ -67,6 +67,6 @@ class NotificationGenerator(val context: Context) {
     data class NotificationSpec(val id: Int, val channel: Channel, val name: String)
 
     object NotificationSpecs {
-        val autoClear = NotificationSpec(1, Channels.features, "Update auto clear data")
+        val autoClear = NotificationSpec(1, Channels.privacyTips, "Update auto clear data")
     }
 }
