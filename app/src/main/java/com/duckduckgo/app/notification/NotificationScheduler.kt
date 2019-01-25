@@ -45,6 +45,7 @@ class NotificationScheduler {
             val notification = generator.buildNotification(manager, specification)
             manager.notify(specification.id, notification)
             return Result.SUCCESS
+
         }
     }
 

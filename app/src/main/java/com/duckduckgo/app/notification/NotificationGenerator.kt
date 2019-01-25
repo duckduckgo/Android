@@ -41,14 +41,14 @@ class NotificationGenerator(val context: Context) {
         }
 
         val icon = if (SDK_INT >= M) R.drawable.notification_fire else R.drawable.notification_fire_legacy
-        val text = if (SDK_INT >= M) R.string.clearNotificationDescription else R.string.clearNotificationDescriptionLegacy
+        val text = context.getString(R.string.clearNotificationDescription)
 
         return NotificationCompat.Builder(context, specification.channel.id)
             .setPriority(specification.channel.priority)
             .setSmallIcon(icon)
             .setContentTitle(context.getString(R.string.clearNotificationTitle))
-            .setContentText(context.getString(text))
             .setAutoCancel(true)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
             .setColor(ContextCompat.getColor(context, R.color.orange))
             .build()
     }

@@ -250,8 +250,7 @@
     <string name="addWidgetInstructionsButtonClose">Close</string>
 
     <!-- Clear Notification -->
-    <string name="clearNotificationTitle">DuckDuckGo Privacy Browser</string>
-    <string name="clearNotificationDescription">Customize how DuckDuckGo clears your browsing data 🔥</string>
-    <string name="clearNotificationDescriptionLegacy">Customize how DuckDuckGo clears your browsing data.</string>
+    <string name="clearNotificationTitle">Data clearing set to manual</string>
+    <string name="clearNotificationDescription">Customize DuckDuckGo to automatically clear browsing history after every session.</string>
 
 </resources>
