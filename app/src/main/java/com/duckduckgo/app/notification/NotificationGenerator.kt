@@ -21,8 +21,11 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_DEFAULT
 import android.content.Context
-import android.os.Build
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES.M
+import android.os.Build.VERSION_CODES.O
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.duckduckgo.app.browser.R
 
 
@@ -30,19 +33,23 @@ class NotificationGenerator(val context: Context) {
 
     fun buildNotification(manager: NotificationManager, specification: NotificationSpec): Notification {
 
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
+        if (SDK_INT > O) {
             val channel = NotificationChannel(specification.channel.id, specification.channel.name, specification.channel.priority)
             channel.description = specification.channel.description
             manager.createNotificationChannel(channel)
             channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         }
 
+        val icon = if (SDK_INT >= M) R.drawable.logo_notification_transparent else R.drawable.logo_notification
+        val text = if (SDK_INT >= M) R.string.clearNotificationDescription else R.string.clearNotificationDescriptionLegacy
+
         return NotificationCompat.Builder(context, specification.channel.id)
             .setPriority(specification.channel.priority)
-            .setSmallIcon(R.drawable.logo_notification)
+            .setSmallIcon(icon)
             .setContentTitle(context.getString(R.string.clearNotificationTitle))
-            .setContentText(context.getString(R.string.clearNotificationDescription))
+            .setContentText(context.getString(text))
             .setAutoCancel(true)
+            .setColor(ContextCompat.getColor(context, R.color.orange))
             .build()
     }
 

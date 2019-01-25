@@ -31,7 +31,7 @@ class NotificationScheduler {
 
         val request = OneTimeWorkRequestBuilder<ShowClearDataNotification>()
             .addTag(WORK_REQUEST_TAG)
-            .setInitialDelay(10, TimeUnit.SECONDS)
+            .setInitialDelay(1, TimeUnit.SECONDS)
 
         WorkManager.getInstance().enqueue(request.build())
     }
@@ -45,7 +45,6 @@ class NotificationScheduler {
             val notification = generator.buildNotification(manager, specification)
             manager.notify(specification.id, notification)
             return Result.SUCCESS
-
         }
     }
 
