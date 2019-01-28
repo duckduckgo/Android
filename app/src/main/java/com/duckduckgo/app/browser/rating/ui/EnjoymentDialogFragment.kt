@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.rating
+package com.duckduckgo.app.browser.rating.ui
 
 import android.app.Dialog
 import android.os.Bundle

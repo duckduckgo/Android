@@ -17,10 +17,14 @@
 package com.duckduckgo.app.browser.rating.di
 
 import android.content.Context
+import com.duckduckgo.app.browser.rating.db.AppEnjoymentDao
+import com.duckduckgo.app.browser.rating.db.AppEnjoymentDatabaseRepository
+import com.duckduckgo.app.browser.rating.db.AppEnjoymentRepository
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.rating.AppEnjoyment
 import com.duckduckgo.app.global.rating.AppEnjoymentManager
 import com.duckduckgo.app.playstore.PlayStoreUtils
-import com.duckduckgo.app.usage.AppDaysUsedRepository
+import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.app.usage.search.SearchCountDao
 import dagger.Module
 import dagger.Provides
@@ -32,12 +36,31 @@ class RatingModule {
 
     @Singleton
     @Provides
-    fun appEnjoymentManager(playStoreUtils: PlayStoreUtils, searchCountDao: SearchCountDao, appDaysUsedRepository: AppDaysUsedRepository, context: Context): AppEnjoymentManager {
-        return AppEnjoyment(playStoreUtils, searchCountDao, appDaysUsedRepository, context)
+    fun appEnjoymentManager(
+        playStoreUtils: PlayStoreUtils,
+        searchCountDao: SearchCountDao,
+        appDaysUsedRepository: AppDaysUsedRepository,
+        appEnjoymentRepository: AppEnjoymentRepository,
+        context: Context
+    ): AppEnjoymentManager {
+        return AppEnjoyment(playStoreUtils, searchCountDao, appDaysUsedRepository, appEnjoymentRepository, context)
     }
 
     @Provides
     fun playStoreUtils(): PlayStoreUtils {
         return PlayStoreUtils()
     }
+
+    @Singleton
+    @Provides
+    fun appEnjoymentDao(database: AppDatabase): AppEnjoymentDao {
+        return database.appEnjoymentDao()
+    }
+
+    @Singleton
+    @Provides
+    fun appEnjoymentRepository(appEnjoymentDao: AppEnjoymentDao): AppEnjoymentRepository {
+        return AppEnjoymentDatabaseRepository(appEnjoymentDao)
+    }
+
 }

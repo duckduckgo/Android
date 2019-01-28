@@ -29,9 +29,9 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
-import com.duckduckgo.app.browser.rating.EnjoymentDialogFragment
-import com.duckduckgo.app.browser.rating.GiveFeedbackDialogFragment
-import com.duckduckgo.app.browser.rating.RateAppDialogFragment
+import com.duckduckgo.app.browser.rating.ui.EnjoymentDialogFragment
+import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
+import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
 import com.duckduckgo.app.feedback.ui.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.ApplicationClearDataState
@@ -48,6 +48,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import kotlinx.android.synthetic.main.activity_browser.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.longToast
 import timber.log.Timber
 import javax.inject.Inject

@@ -32,14 +32,21 @@ import com.duckduckgo.app.global.rating.AppEnjoymentManager
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.coroutines.CoroutineContext
 
 class BrowserViewModel(
     private val tabRepository: TabRepository,
     private val queryUrlConverter: OmnibarEntryConverter,
     private val dataClearer: DataClearer,
     private val appEnjoyment: AppEnjoymentManager
-) : ViewModel() {
+) : ViewModel(), CoroutineScope {
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main
 
     data class ViewState(
         val hideWebContent: Boolean = true
@@ -83,7 +90,7 @@ class BrowserViewModel(
 
     private val appEnjoymentObserver = Observer<AppEnjoymentPromptOptions> {
         it?.let { promptType ->
-            Timber.i("Observed $it")
+            Timber.v("Observed $it")
             when (promptType) {
                 is AppEnjoymentPromptOptions.ShowEnjoymentPrompt -> {
                     command.value = Command.ShowAppEnjoymentPrompt
@@ -151,19 +158,20 @@ class BrowserViewModel(
     }
 
     fun onUserSelectedToRateApp() {
-        appEnjoyment.onUserSelectedToRateApp()
         command.value = Command.LaunchPlayStore
+
+        launch { appEnjoyment.onUserSelectedToRateApp() }
     }
 
     fun onUserDeclinedToRateApp() {
-        appEnjoyment.userDeclinedToRateApp()
+        launch { appEnjoyment.userDeclinedToRateApp() }
     }
 
     fun onUserSelectedToGiveFeedback() {
-        appEnjoyment.onUserSelectedToGiveFeedback()
+        launch { appEnjoyment.onUserSelectedToGiveFeedback() }
     }
 
     fun onUserDeclinedToGiveFeedback() {
-        appEnjoyment.onUserDeclinedToGiveFeedback()
+        launch { appEnjoyment.onUserDeclinedToGiveFeedback() }
     }
 }

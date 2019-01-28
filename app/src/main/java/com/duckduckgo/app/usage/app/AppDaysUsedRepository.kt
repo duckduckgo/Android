@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.usage
+package com.duckduckgo.app.usage.app
 
-import androidx.annotation.WorkerThread
-import com.duckduckgo.app.usage.app.AppDaysUsedDao
-import com.duckduckgo.app.usage.app.AppDaysUsedEntity
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
@@ -26,7 +23,6 @@ import java.util.concurrent.Executors
 
 interface AppDaysUsedRepository {
 
-    @WorkerThread
     suspend fun getNumberOfDaysAppUsed(): Long
 
     suspend fun recordAppUsedToday()

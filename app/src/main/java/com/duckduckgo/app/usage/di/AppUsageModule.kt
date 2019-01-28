@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.usage.di
 
-import com.duckduckgo.app.usage.AppDaysUsedDatabaseRepository
-import com.duckduckgo.app.usage.AppDaysUsedRecorder
-import com.duckduckgo.app.usage.AppDaysUsedRepository
 import com.duckduckgo.app.usage.app.AppDaysUsedDao
+import com.duckduckgo.app.usage.app.AppDaysUsedDatabaseRepository
+import com.duckduckgo.app.usage.app.AppDaysUsedRecorder
+import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

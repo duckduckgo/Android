@@ -20,8 +20,9 @@ import android.content.Context
 import androidx.annotation.UiThread
 import androidx.lifecycle.*
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.browser.rating.db.AppEnjoymentRepository
 import com.duckduckgo.app.playstore.PlayStoreUtils
-import com.duckduckgo.app.usage.AppDaysUsedRepository
+import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.app.usage.search.SearchCountDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -32,10 +33,10 @@ import timber.log.Timber
 interface AppEnjoymentManager : LifecycleObserver {
     fun onUserEnjoyingApp()
     fun onUserNotEnjoyingApp()
-    fun onUserSelectedToRateApp()
-    fun userDeclinedToRateApp()
-    fun onUserDeclinedToGiveFeedback()
-    fun onUserSelectedToGiveFeedback()
+    suspend fun onUserSelectedToRateApp()
+    suspend fun userDeclinedToRateApp()
+    suspend fun onUserDeclinedToGiveFeedback()
+    suspend fun onUserSelectedToGiveFeedback()
 
     val promptType: LiveData<AppEnjoyment.AppEnjoymentPromptOptions>
 }
@@ -44,6 +45,7 @@ class AppEnjoyment(
     private val playStoreUtils: PlayStoreUtils,
     private val searchCountDao: SearchCountDao,
     private val appDaysUsedRepository: AppDaysUsedRepository,
+    private val appEnjoymentRepository: AppEnjoymentRepository,
     private val context: Context
 ) :
     AppEnjoymentManager {
@@ -96,7 +98,7 @@ class AppEnjoyment(
                 }
             }
 
-            if (enoughSearchesMade() && enoughDaysPassed()) {
+            if (enoughSearchesMade() && enoughDaysPassed() && !userRecentlyTookAction()) {
                 return@withContext AppEnjoymentPromptOptions.ShowEnjoymentPrompt
             }
 
@@ -104,6 +106,10 @@ class AppEnjoyment(
 
             return@withContext AppEnjoymentPromptOptions.ShowNothing
         }
+    }
+
+    private suspend fun userRecentlyTookAction(): Boolean {
+        return appEnjoymentRepository.hasUserRecentlyRespondedToAppEnjoymentPrompt()
     }
 
     private suspend fun enoughDaysPassed(): Boolean {
@@ -134,20 +140,36 @@ class AppEnjoyment(
         _promptType.value = AppEnjoymentPromptOptions.ShowFeedbackPrompt
     }
 
-    override fun onUserSelectedToRateApp() {
+    override suspend fun onUserSelectedToRateApp() {
         hideAllPrompts()
+
+        appEnjoymentRepository.onUserSelectedToRateApp()
+
+        Timber.i("Recorded that user selected to rate app")
     }
 
-    override fun userDeclinedToRateApp() {
+    override suspend fun userDeclinedToRateApp() {
         hideAllPrompts()
+
+        appEnjoymentRepository.onUserDeclinedToRateApp()
+
+        Timber.i("Recorded that user declined to rate app")
     }
 
-    override fun onUserDeclinedToGiveFeedback() {
+    override suspend fun onUserSelectedToGiveFeedback() {
         hideAllPrompts()
+
+        appEnjoymentRepository.onUserSelectedToGiveFeedback()
+
+        Timber.i("Recorded that user selected to give feedback")
     }
 
-    override fun onUserSelectedToGiveFeedback() {
+    override suspend fun onUserDeclinedToGiveFeedback() {
         hideAllPrompts()
+
+        appEnjoymentRepository.onUserDeclinedToGiveFeedback()
+
+        Timber.i("Recorded that user declined to give feedback")
     }
 
     private fun hideAllPrompts() {

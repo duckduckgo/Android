@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 9,
-    "identityHash": "fff7fe26e9db160475caeb47215a3994",
+    "identityHash": "bc8fc860fc5c8511c524d7bda7e896ae",
     "entities": [
       {
         "tableName": "disconnect_tracker",
@@ -434,12 +434,44 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "app_enjoyment",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`eventType` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `primaryKey` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "eventType",
+            "columnName": "eventType",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "primaryKey",
+            "columnName": "primaryKey",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "primaryKey"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"fff7fe26e9db160475caeb47215a3994\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"bc8fc860fc5c8511c524d7bda7e896ae\")"
     ]
   }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.usage
+package com.duckduckgo.app.usage.app
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver

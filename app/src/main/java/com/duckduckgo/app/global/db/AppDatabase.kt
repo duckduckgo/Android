@@ -23,6 +23,9 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.browser.rating.db.AppEnjoymentDao
+import com.duckduckgo.app.browser.rating.db.AppEnjoymentEntity
+import com.duckduckgo.app.browser.rating.db.AppEnjoymentTypeConverter
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.entities.db.EntityListDao
@@ -61,13 +64,15 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         Survey::class,
         DismissedCta::class,
         SearchCountEntity::class,
-        AppDaysUsedEntity::class
+        AppDaysUsedEntity::class,
+        AppEnjoymentEntity::class
     ]
 )
 
 @TypeConverters(
     Survey.StatusTypeConverter::class,
-    DismissedCta.IdTypeConverter::class
+    DismissedCta.IdTypeConverter::class,
+    AppEnjoymentTypeConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -83,6 +88,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun dismissedCtaDao(): DismissedCtaDao
     abstract fun searchCountDao(): SearchCountDao
     abstract fun appsDaysUsedDao(): AppDaysUsedDao
+    abstract fun appEnjoymentDao(): AppEnjoymentDao
 
     companion object {
         val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
@@ -150,6 +156,7 @@ abstract class AppDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `search_count` (`key` TEXT NOT NULL, `numberSearchesMade` INTEGER NOT NULL, PRIMARY KEY(`key`))")
                 database.execSQL("CREATE TABLE IF NOT EXISTS `app_days_used` (`date` TEXT NOT NULL, PRIMARY KEY(`date`))")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `app_enjoyment` (`eventType` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `primaryKey` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)")
             }
         }
     }

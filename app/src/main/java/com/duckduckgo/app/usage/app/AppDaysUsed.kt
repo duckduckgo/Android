@@ -19,12 +19,10 @@ package com.duckduckgo.app.usage.app
 import androidx.room.*
 import java.text.SimpleDateFormat
 import java.util.*
-import javax.inject.Singleton
 
 private val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
 @Dao
-@Singleton
 abstract class AppDaysUsedDao {
 
     @Query("SELECT COUNT(*) from app_days_used")
