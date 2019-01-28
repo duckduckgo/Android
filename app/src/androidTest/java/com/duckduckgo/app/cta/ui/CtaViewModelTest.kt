@@ -30,6 +30,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.ACTIVE_VARIANTS
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.AddWidgetCta
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
@@ -88,7 +89,7 @@ class CtaViewModelTest {
             .build()
 
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        whenever(mockVariantManager.getVariant(any())).thenReturn(ACTIVE_VARIANTS[3])
+        whenever(mockVariantManager.getVariant(any())).thenReturn(ACTIVE_VARIANTS.find { it.hasFeature(AddWidgetCta) })
 
         testee = CtaViewModel(
             mockAppInstallStore,
