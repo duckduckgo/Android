@@ -41,7 +41,7 @@ abstract class SearchCountDao {
     open fun incrementSearchCount() {
         val changedRows = incrementSearchCountIfExists()
         if (changedRows == 0) {
-            initialiseValue(SearchCountEntity(numberSearchesMade = getSearchesMade() + 1))
+            initialiseValue(SearchCountEntity(numberSearchesMade = 1))
         }
     }
 }
