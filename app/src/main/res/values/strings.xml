@@ -251,6 +251,6 @@
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Data clearing set to manual</string>
-    <string name="clearNotificationDescription">Customize DuckDuckGo to automatically clear browsing history after every session.</string>
+    <string name="clearNotificationDescription">Customize DuckDuckGo to automatically clear browsing data after every session.</string>
 
 </resources>
