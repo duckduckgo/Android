@@ -111,6 +111,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     lateinit var dataClearer: DataClearer
 
     @Inject
+    lateinit var notificationScheduler: NotificationScheduler
+
+    @Inject
     lateinit var workerFactory: WorkerFactory
 
     private var launchedByFireAction: Boolean = false
@@ -235,8 +238,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     }
 
     private fun scheduleLocalNotifications() {
-        val notifications = NotificationScheduler()
-        notifications.scheduleClearDataNotification()
+        notificationScheduler.scheduleClearDataNotification()
     }
 
     /**

@@ -33,6 +33,8 @@ import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import com.duckduckgo.app.httpsupgrade.model.HttpsWhitelistedDomain
+import com.duckduckgo.app.notification.model.Notification
+import com.duckduckgo.app.notification.store.NotificationDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.SiteVisitedEntity
@@ -43,7 +45,7 @@ import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 
 @Database(
-    exportSchema = true, version = 8, entities = [
+    exportSchema = true, version = 9, entities = [
         DisconnectTracker::class,
         HttpsBloomFilterSpec::class,
         HttpsWhitelistedDomain::class,
@@ -55,7 +57,8 @@ import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
         BookmarkEntity::class,
         EntityListEntity::class,
         Survey::class,
-        DismissedCta::class
+        DismissedCta::class,
+        Notification::class
     ]
 )
 
@@ -75,6 +78,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun networkEntityDao(): EntityListDao
     abstract fun surveyDao(): SurveyDao
     abstract fun dismissedCtaDao(): DismissedCtaDao
+    abstract fun notificationDao(): NotificationDao
 
     companion object {
         val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
@@ -135,6 +139,12 @@ abstract class AppDatabase : RoomDatabase() {
         val MIGRATION_7_TO_8: Migration = object : Migration(7, 8) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `dismissed_cta` (`ctaId` TEXT NOT NULL, PRIMARY KEY(`ctaId`))")
+            }
+        }
+
+        val MIGRATION_8_TO_9: Migration = object : Migration(8, 9) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `notification` (`notificationId` TEXT NOT NULL, PRIMARY KEY(`notificationId`))")
             }
         }
     }

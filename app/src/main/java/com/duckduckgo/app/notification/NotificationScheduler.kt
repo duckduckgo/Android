@@ -22,30 +22,55 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.duckduckgo.app.notification.model.Notification
+import com.duckduckgo.app.notification.store.NotificationDao
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NotificationDayOne
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NotificationDayThree
+import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class NotificationScheduler {
+class NotificationScheduler @Inject constructor(val dao: NotificationDao, val variantManager: VariantManager) {
 
     fun scheduleClearDataNotification() {
         WorkManager.getInstance().cancelAllWorkByTag(WORK_REQUEST_TAG)
 
-        val request = OneTimeWorkRequestBuilder<ShowClearDataNotification>()
-            .addTag(WORK_REQUEST_TAG)
-            .setInitialDelay(1, TimeUnit.SECONDS)
+        val day1 = variantManager.getVariant().hasFeature(NotificationDayOne)
+        val day3 = variantManager.getVariant().hasFeature(NotificationDayThree)
+        if (!day1 && !day3) {
+            Timber.i("Notification not enabled for this variant")
+            return
+        }
 
-        WorkManager.getInstance().enqueue(request.build())
+        Schedulers.io().scheduleDirect {
+            if (dao.exists(NotificationGenerator.NotificationSpecs.autoClear.id)) {
+                Timber.i("Notification already seen, no need to schedule")
+                return@scheduleDirect
+            }
+
+            val days: Long = if (day1) 1 else 3
+            val request = OneTimeWorkRequestBuilder<ShowClearDataNotification>()
+                .addTag(WORK_REQUEST_TAG)
+                .setInitialDelay(days, TimeUnit.DAYS)
+
+            WorkManager.getInstance().enqueue(request.build())
+        }
     }
 
     class ShowClearDataNotification(val context: Context, params: WorkerParameters) : Worker(context, params) {
 
+        lateinit var manager: NotificationManager
+        lateinit var notificationDao: NotificationDao
+
         override fun doWork(): Result {
-            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             val generator = NotificationGenerator(context)
             val specification = NotificationGenerator.NotificationSpecs.autoClear
             val notification = generator.buildNotification(manager, specification)
-            manager.notify(specification.id, notification)
+            notificationDao.insert(Notification(specification.id))
+            manager.notify(specification.systemId, notification)
             return Result.SUCCESS
-
         }
     }
 

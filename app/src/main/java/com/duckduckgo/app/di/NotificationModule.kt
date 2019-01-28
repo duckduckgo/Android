@@ -19,6 +19,9 @@ package com.duckduckgo.app.di
 import android.app.NotificationManager
 import android.content.Context
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.duckduckgo.app.notification.NotificationScheduler
+import com.duckduckgo.app.notification.store.NotificationDao
+import com.duckduckgo.app.statistics.VariantManager
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -38,4 +41,9 @@ class NotificationModule {
         return LocalBroadcastManager.getInstance(context)
     }
 
+    @Provides
+    @Singleton
+    fun providesNotificationScheduler(notificationDao: NotificationDao, variantManager: VariantManager): NotificationScheduler {
+        return NotificationScheduler(notificationDao, variantManager)
+    }
 }
