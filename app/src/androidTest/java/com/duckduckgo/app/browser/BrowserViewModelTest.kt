@@ -130,6 +130,20 @@ class BrowserViewModelTest {
     }
 
     @Test
+    fun whenUserSelectedToRateAppThenPlayStoreCommandTriggered() {
+        testee.onUserSelectedToRateApp()
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.LaunchPlayStore, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenUserSelectedToGiveFeedbackThenFeedbackCommandTriggered() {
+        testee.onUserSelectedToGiveFeedback()
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.LaunchFeedbackView, commandCaptor.lastValue)
+    }
+
+    @Test
     fun whenViewStateCreatedThenWebViewContentShouldBeHidden() {
         assertTrue(testee.viewState.value!!.hideWebContent)
     }

@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.rating.db.AppEnjoymentRepository
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.rating.AppEnjoyment
 import com.duckduckgo.app.global.rating.AppEnjoymentManager
+import com.duckduckgo.app.playstore.PlayStoreAndroidUtils
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.app.usage.search.SearchCountDao
@@ -48,7 +49,7 @@ class RatingModule {
 
     @Provides
     fun playStoreUtils(): PlayStoreUtils {
-        return PlayStoreUtils()
+        return PlayStoreAndroidUtils()
     }
 
     @Singleton

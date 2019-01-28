@@ -57,6 +57,7 @@ class BrowserViewModel(
         data class Query(val query: String) : Command()
         data class DisplayMessage(@StringRes val messageId: Int) : Command()
         object LaunchPlayStore : Command()
+        object LaunchFeedbackView : Command()
         object ShowAppEnjoymentPrompt : Command()
         object ShowAppRatingPrompt : Command()
         object ShowAppFeedbackPrompt : Command()
@@ -168,6 +169,8 @@ class BrowserViewModel(
     }
 
     fun onUserSelectedToGiveFeedback() {
+        command.value = Command.LaunchFeedbackView
+
         launch { appEnjoyment.onUserSelectedToGiveFeedback() }
     }
 

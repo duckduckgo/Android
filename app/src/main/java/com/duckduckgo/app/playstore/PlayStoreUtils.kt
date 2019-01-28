@@ -23,10 +23,16 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import timber.log.Timber
 
+interface PlayStoreUtils {
 
-class PlayStoreUtils {
+    fun installedFromPlayStore(context: Context): Boolean
+    fun launchPlayStore(context: Context)
+    fun isPlayStoreInstalled(context: Context): Boolean
+}
 
-    fun installedFromPlayStore(context: Context): Boolean {
+class PlayStoreAndroidUtils : PlayStoreUtils {
+
+    override fun installedFromPlayStore(context: Context): Boolean {
         return try {
             val installSource = context.packageManager.getInstallerPackageName(DDG_APP_PACKAGE)
             return matchesPlayStoreInstallSource(installSource)
@@ -41,7 +47,7 @@ class PlayStoreUtils {
         return installSource == PLAY_STORE_PACKAGE
     }
 
-    fun isPlayStoreInstalled(context: Context): Boolean {
+    override fun isPlayStoreInstalled(context: Context): Boolean {
         return try {
 
             if (!isPlayStoreActivityResolvable(context)) {
@@ -76,7 +82,7 @@ class PlayStoreUtils {
         }
     }
 
-    fun launchPlayStore(context: Context) {
+    override fun launchPlayStore(context: Context) {
         val intent = playStoreIntent()
         try {
             context.startActivity(intent)

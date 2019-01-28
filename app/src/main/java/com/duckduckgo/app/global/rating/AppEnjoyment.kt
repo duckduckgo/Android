@@ -51,7 +51,7 @@ class AppEnjoyment(
     AppEnjoymentManager {
 
     private val _promptType: MutableLiveData<AppEnjoymentPromptOptions> = MutableLiveData<AppEnjoymentPromptOptions>()
-        .also { it.value = AppEnjoymentPromptOptions.ShowNothing }
+        //.also { it.value = AppEnjoymentPromptOptions.ShowNothing }
 
     override val promptType: LiveData<AppEnjoymentPromptOptions>
         get() = _promptType
@@ -179,10 +179,10 @@ class AppEnjoyment(
     companion object {
 
         // todo change this to 5
-        private const val MINIMUM_SEARCHES_THRESHOLD = 0
+        private const val MINIMUM_SEARCHES_THRESHOLD = 5
 
         // todo change this to 3
-        private const val MINIMUM_DAYS_USED_THRESHOLD = 0
+        private const val MINIMUM_DAYS_USED_THRESHOLD = 3
     }
 
     sealed class AppEnjoymentPromptOptions {

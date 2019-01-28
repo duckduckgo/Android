@@ -48,7 +48,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import kotlinx.android.synthetic.main.activity_browser.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.jetbrains.anko.longToast
 import timber.log.Timber
 import javax.inject.Inject
@@ -235,6 +234,9 @@ class BrowserActivity : DuckDuckGoActivity(), EnjoymentDialogFragment.Listener, 
             }
             is Command.ShowAppFeedbackPrompt -> {
                 showAppEnjoymentPrompt(GiveFeedbackDialogFragment.create())
+            }
+            is Command.LaunchFeedbackView -> {
+                startActivity(FeedbackActivity.intent(this, brokenSite = false))
             }
         }
     }
