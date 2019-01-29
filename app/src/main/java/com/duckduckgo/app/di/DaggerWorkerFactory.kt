@@ -23,7 +23,8 @@ import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.fire.DataClearingWorker
 import com.duckduckgo.app.global.view.ClearDataAction
-import com.duckduckgo.app.notification.NotificationScheduler
+import com.duckduckgo.app.notification.NotificationGenerator
+import com.duckduckgo.app.notification.NotificationScheduler.ShowClearDataNotification
 import com.duckduckgo.app.notification.store.NotificationDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import timber.log.Timber
@@ -32,7 +33,8 @@ class DaggerWorkerFactory(
     private val settingsDataStore: SettingsDataStore,
     private val clearDataAction: ClearDataAction,
     private val notificationManager: NotificationManager,
-    private val notificationDao: NotificationDao
+    private val notificationDao: NotificationDao,
+    private val notificationGenerator: NotificationGenerator
 ) : WorkerFactory() {
 
     override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
@@ -43,7 +45,7 @@ class DaggerWorkerFactory(
 
         when (instance) {
             is DataClearingWorker -> injectDataClearWorker(instance)
-            is NotificationScheduler.ShowClearDataNotification -> injectShowClearNotificationWorker(instance)
+            is ShowClearDataNotification -> injectShowClearNotificationWorker(instance)
             else -> Timber.i("No injection required for worker $workerClassName")
         }
 
@@ -55,8 +57,9 @@ class DaggerWorkerFactory(
         worker.clearDataAction = clearDataAction
     }
 
-    private fun injectShowClearNotificationWorker(worker: NotificationScheduler.ShowClearDataNotification) {
+    private fun injectShowClearNotificationWorker(worker: ShowClearDataNotification) {
         worker.manager = notificationManager
         worker.notificationDao = notificationDao
+        worker.generator = notificationGenerator
     }
 }

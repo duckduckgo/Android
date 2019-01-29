@@ -19,7 +19,7 @@ package com.duckduckgo.app.notification
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.NotificationManager.IMPORTANCE_DEFAULT
+import android.app.PendingIntent
 import android.content.Context
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.M
@@ -28,10 +28,30 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.browser.R
+import javax.inject.Inject
 
-class NotificationGenerator(val context: Context) {
+class NotificationGenerator @Inject constructor(val context: Context) {
 
-    fun buildNotification(manager: NotificationManager, specification: NotificationSpec): Notification {
+    data class Channel(
+        val id: String,
+        val name: String,
+        val description: String,
+        val priority: Int
+    )
+
+    data class NotificationSpec(
+        val systemId: Int,
+        val id:
+        String,
+        val channel: Channel,
+        val name: String,
+        val icon: Int,
+        val legacyIcon: Int,
+        val title: Int,
+        val description: Int
+    )
+
+    fun createNotification(manager: NotificationManager, specification: NotificationSpec, tapIntent: PendingIntent): Notification {
 
         if (SDK_INT > O) {
             createNotificationChannel(specification, manager)
@@ -46,6 +66,8 @@ class NotificationGenerator(val context: Context) {
             .setAutoCancel(true)
             .setStyle(NotificationCompat.BigTextStyle().bigText(context.getString(specification.description)))
             .setColor(ContextCompat.getColor(context, R.color.orange))
+            .setAutoCancel(true)
+            .setContentIntent(tapIntent)
             .build()
     }
 
@@ -55,50 +77,5 @@ class NotificationGenerator(val context: Context) {
         channel.description = specification.channel.description
         manager.createNotificationChannel(channel)
         channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-    }
-
-    data class Channel(
-        val id: String,
-        val name: String,
-        val description: String,
-        val priority: Int
-    )
-
-    object Channels {
-
-        val privacyTips = Channel(
-            "com.duckduckgo.privacytips",
-            "Privacy Tips",
-            "Displays helpful privacy tips",
-            IMPORTANCE_DEFAULT
-        )
-
-    }
-
-    data class NotificationSpec(
-        val systemId: Int,
-        val id:
-        String,
-        val channel: Channel,
-        val name: String,
-        val icon: Int,
-        val legacyIcon: Int,
-        val title: Int,
-        val description: Int
-    )
-
-    object NotificationSpecs {
-
-        val autoClear = NotificationSpec(
-            1,
-            "com.duckduckgo.privacytips.autoclear",
-            Channels.privacyTips,
-            "Update auto clear data",
-            R.drawable.notification_fire,
-            R.drawable.notification_fire_legacy,
-            R.string.clearNotificationTitle,
-            R.string.clearNotificationDescription
-        )
-
     }
 }

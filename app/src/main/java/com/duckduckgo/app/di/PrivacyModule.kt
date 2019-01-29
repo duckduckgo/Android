@@ -24,6 +24,7 @@ import com.duckduckgo.app.entities.EntityMapping
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
+import com.duckduckgo.app.notification.NotificationGenerator
 import com.duckduckgo.app.notification.store.NotificationDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPracticesImpl
@@ -75,8 +76,9 @@ class PrivacyModule {
         settingsDataStore: SettingsDataStore,
         clearDataAction: ClearDataAction,
         notficationManager: NotificationManager,
-        notificationDao: NotificationDao
+        notificationDao: NotificationDao,
+        notificationGenerator: NotificationGenerator
     ): WorkerFactory {
-        return DaggerWorkerFactory(settingsDataStore, clearDataAction, notficationManager, notificationDao)
+        return DaggerWorkerFactory(settingsDataStore, clearDataAction, notficationManager, notificationDao, notificationGenerator)
     }
 }
