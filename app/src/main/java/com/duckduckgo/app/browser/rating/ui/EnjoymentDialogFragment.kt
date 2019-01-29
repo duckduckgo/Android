@@ -35,12 +35,12 @@ class EnjoymentDialogFragment : DialogFragment() {
         isCancelable = false
 
         return AlertDialog.Builder(activity!!, R.style.AlertDialogTheme)
-            .setTitle("Enjoying the app?")
-            .setMessage("We'd love to know what you think")
-            .setPositiveButton("YES") { _, _ ->
+            .setTitle(R.string.app_enjoyment_dialog_title)
+            .setMessage(R.string.app_enjoyment_dialog_message)
+            .setPositiveButton(R.string.app_enjoyment_dialog_positive_button) { _, _ ->
                 listener?.onUserSelectedAppIsEnjoyed()
             }
-            .setNegativeButton("NO") { _, _ ->
+            .setNegativeButton(R.string.app_enjoyment_dialog_negative_button) { _, _ ->
                 listener?.onUserSelectedAppIsNotEnjoyed()
             }
             .create()

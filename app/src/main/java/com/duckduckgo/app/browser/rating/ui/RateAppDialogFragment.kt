@@ -20,6 +20,7 @@ import android.app.Dialog
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import com.duckduckgo.app.browser.R
 
 
 class RateAppDialogFragment : DialogFragment() {
@@ -33,13 +34,13 @@ class RateAppDialogFragment : DialogFragment() {
 
         isCancelable = false
 
-        return AlertDialog.Builder(activity!!)
-            .setTitle("Rate us 5 star")
-            .setMessage("Support us by giving us a 5 star rating")
-            .setPositiveButton("OF COURSE") { _, _ ->
+        return AlertDialog.Builder(activity!!, R.style.AlertDialogTheme)
+            .setTitle(R.string.rate_app_dialog_title)
+            .setMessage(R.string.rate_app_dialog_message)
+            .setPositiveButton(R.string.rate_app_dialog_positive_button) { _, _ ->
                 listener?.onUserSelectedToRateApp()
             }
-            .setNegativeButton("NO") { _, _ ->
+            .setNegativeButton(R.string.rate_app_dialog_negative_button) { _, _ ->
                 listener?.onUserDeclinedToRateApp()
             }
             .create()

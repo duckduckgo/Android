@@ -20,6 +20,7 @@ import android.app.Dialog
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import com.duckduckgo.app.browser.R
 
 
 class GiveFeedbackDialogFragment : DialogFragment() {
@@ -33,13 +34,13 @@ class GiveFeedbackDialogFragment : DialogFragment() {
 
         isCancelable = false
 
-        return AlertDialog.Builder(activity!!)
-            .setTitle("Help us improve")
-            .setMessage("Would you like to provide feedback so we can make your experience a happier one?")
-            .setPositiveButton("YES") { _, _ ->
+        return AlertDialog.Builder(activity!!, R.style.AlertDialogTheme)
+            .setTitle(R.string.give_feedback_dialog_title)
+            .setMessage(R.string.give_feedback_dialog_message)
+            .setPositiveButton(R.string.give_feedback_dialog_positive_button) { _, _ ->
                 listener?.onUserSelectedToGiveFeedback()
             }
-            .setNegativeButton("NO") { _, _ ->
+            .setNegativeButton(R.string.give_feedback_dialog_negative_button) { _, _ ->
                 listener?.onUserDeclinedToGiveFeedback()
             }
             .create()
