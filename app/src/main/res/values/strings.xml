@@ -250,8 +250,8 @@
     <string name="addWidgetInstructionsButtonClose">Close</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
-    <string name="app_enjoyment_dialog_title">Enjoying the app?</string>
-    <string name="app_enjoyment_dialog_message">We\'d love to know if we\'re meeting your needs</string>
+    <string name="app_enjoyment_dialog_title">Enjoying DuckDuckGo?</string>
+    <string name="app_enjoyment_dialog_message">We\'d love to know what you think</string>
     <string name="app_enjoyment_dialog_positive_button">@string/yes</string>
     <string name="app_enjoyment_dialog_negative_button">@string/no</string>
 
