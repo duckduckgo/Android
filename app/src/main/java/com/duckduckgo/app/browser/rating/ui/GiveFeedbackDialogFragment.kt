@@ -31,6 +31,8 @@ class GiveFeedbackDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
+        isCancelable = false
+
         return AlertDialog.Builder(activity!!)
             .setTitle("Help us improve")
             .setMessage("Would you like to provide feedback so we can make your experience a happier one?")
@@ -40,7 +42,6 @@ class GiveFeedbackDialogFragment : DialogFragment() {
             .setNegativeButton("NO") { _, _ ->
                 listener?.onUserDeclinedToGiveFeedback()
             }
-            .setCancelable(false)
             .create()
     }
 

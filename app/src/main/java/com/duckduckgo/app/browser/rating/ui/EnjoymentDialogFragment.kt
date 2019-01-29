@@ -20,6 +20,7 @@ import android.app.Dialog
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import com.duckduckgo.app.browser.R
 
 
 class EnjoymentDialogFragment : DialogFragment() {
@@ -31,16 +32,17 @@ class EnjoymentDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        return AlertDialog.Builder(activity!!)
-            .setTitle("Enjoying DuckDuckGo?")
-            .setMessage("Are you enjoying using this app?")
+        isCancelable = false
+
+        return AlertDialog.Builder(activity!!, R.style.AlertDialogTheme)
+            .setTitle("Enjoying the app?")
+            .setMessage("We'd love to know what you think")
             .setPositiveButton("YES") { _, _ ->
                 listener?.onUserSelectedAppIsEnjoyed()
             }
             .setNegativeButton("NO") { _, _ ->
                 listener?.onUserSelectedAppIsNotEnjoyed()
             }
-            .setCancelable(false)
             .create()
     }
 

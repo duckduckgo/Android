@@ -31,6 +31,8 @@ class RateAppDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
+        isCancelable = false
+
         return AlertDialog.Builder(activity!!)
             .setTitle("Rate us 5 star")
             .setMessage("Support us by giving us a 5 star rating")
@@ -40,7 +42,6 @@ class RateAppDialogFragment : DialogFragment() {
             .setNegativeButton("NO") { _, _ ->
                 listener?.onUserDeclinedToRateApp()
             }
-            .setCancelable(false)
             .create()
     }
 
