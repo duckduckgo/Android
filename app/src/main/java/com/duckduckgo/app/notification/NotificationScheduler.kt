@@ -78,21 +78,23 @@ class NotificationScheduler @Inject constructor(
 
         WorkManager.getInstance().cancelAllWorkByTag(WORK_REQUEST_TAG)
 
+        Timber.v("Scheduling clear data notification")
+
         val day1 = variantManager.getVariant().hasFeature(NotificationDayOne)
         val day3 = variantManager.getVariant().hasFeature(NotificationDayThree)
         if (!day1 && !day3) {
-            Timber.i("Notifications not enabled for this variant")
+            Timber.v("Notifications not enabled for this variant")
             return
         }
 
         if (settingsDataStore.automaticallyClearWhatOption != ClearWhatOption.CLEAR_NONE) {
-            Timber.i("No need for notification, user already has clear option set")
+            Timber.v("No need for notification, user already has clear option set")
             return
         }
 
         Schedulers.io().scheduleDirect {
             if (dao.exists(NotificationSpecs.autoClear.id)) {
-                Timber.i("Notification already seen, no need to schedule")
+                Timber.v("Notification already seen, no need to schedule")
                 return@scheduleDirect
             }
 
