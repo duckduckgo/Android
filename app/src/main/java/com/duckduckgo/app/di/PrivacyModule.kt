@@ -16,16 +16,12 @@
 
 package com.duckduckgo.app.di
 
-import android.app.NotificationManager
 import android.content.Context
-import androidx.work.WorkerFactory
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.entities.EntityMapping
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
-import com.duckduckgo.app.notification.NotificationGenerator
-import com.duckduckgo.app.notification.store.NotificationDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPracticesImpl
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
@@ -68,17 +64,5 @@ class PrivacyModule {
         dataClearerTimeKeeper: BackgroundTimeKeeper
     ): DataClearer {
         return AutomaticDataClearer(settingsDataStore, clearDataAction, dataClearerTimeKeeper)
-    }
-
-    @Provides
-    @Singleton
-    fun workerFactory(
-        settingsDataStore: SettingsDataStore,
-        clearDataAction: ClearDataAction,
-        notficationManager: NotificationManager,
-        notificationDao: NotificationDao,
-        notificationGenerator: NotificationGenerator
-    ): WorkerFactory {
-        return DaggerWorkerFactory(settingsDataStore, clearDataAction, notficationManager, notificationDao, notificationGenerator)
     }
 }

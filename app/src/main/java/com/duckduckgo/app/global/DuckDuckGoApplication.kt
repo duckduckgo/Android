@@ -20,6 +20,7 @@ import android.app.Activity
 import android.app.Application
 import android.app.Service
 import android.os.Build
+import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
@@ -45,7 +46,7 @@ import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_LAUNCH
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.squareup.leakcanary.LeakCanary
@@ -269,7 +270,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onAppResumed() {
-        notificationScheduler.scheduleClearDataNotification()
+        notificationScheduler.scheduleNextNotification()
     }
 
     companion object {

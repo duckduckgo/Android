@@ -17,25 +17,32 @@
 package com.duckduckgo.app.notification
 
 import android.app.NotificationManager
+import android.app.NotificationManager.IMPORTANCE_NONE
 import android.app.PendingIntent
+import android.app.PendingIntent.getService
 import android.content.Context
 import android.content.Intent
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES.O
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.NotificationManagerCompat.IMPORTANCE_DEFAULT
-import androidx.core.app.TaskStackBuilder
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.notification.NotificationGenerator.NotificationSpec
+import com.duckduckgo.app.notification.NotificationFactory.NotificationSpec
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_CANCELLED
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCHED
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.store.NotificationDao
-import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NotificationDayOne
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NotificationDayThree
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATIONS_SHOWN
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -44,23 +51,23 @@ import javax.inject.Inject
 
 class NotificationScheduler @Inject constructor(
     val dao: NotificationDao,
+    val compatManager: NotificationManagerCompat,
+    val manager: NotificationManager,
     val settingsDataStore: SettingsDataStore,
-    val variantManager: VariantManager
+    val variantManager: VariantManager,
+    var pixel: Pixel
 ) {
 
     object Channels {
-
-        val privacyTips = NotificationGenerator.Channel(
+        val privacyTips = NotificationFactory.Channel(
             "com.duckduckgo.privacytips",
             "Privacy Tips",
             "Displays helpful privacy tips",
             IMPORTANCE_DEFAULT
         )
-
     }
 
     object NotificationSpecs {
-
         val autoClear = NotificationSpec(
             1,
             "com.duckduckgo.privacytips.autoclear",
@@ -71,66 +78,86 @@ class NotificationScheduler @Inject constructor(
             R.string.clearNotificationTitle,
             R.string.clearNotificationDescription
         )
-
     }
 
-    fun scheduleClearDataNotification() {
-
+    fun scheduleNextNotification() {
         WorkManager.getInstance().cancelAllWorkByTag(WORK_REQUEST_TAG)
+        updateNotificationsStatus()
 
-        Timber.v("Scheduling clear data notification")
-
-        val day1 = variantManager.getVariant().hasFeature(NotificationDayOne)
-        val day3 = variantManager.getVariant().hasFeature(NotificationDayThree)
-        if (!day1 && !day3) {
-            Timber.v("Notifications not enabled for this variant")
-            return
+        val duration = when {
+            variantManager.getVariant().hasFeature(NotificationDayOne) -> 1
+            variantManager.getVariant().hasFeature(NotificationDayThree) -> 3
+            else -> {
+                Timber.v("Notifications not enabled for this variant")
+                return
+            }
         }
+        scheduleClearDataNotification(duration.toLong(), TimeUnit.DAYS)
+    }
+
+    private fun updateNotificationsStatus() {
+        var systemEnabled = compatManager.areNotificationsEnabled()
+        val channelEnabled = when {
+            SDK_INT >= O -> manager.getNotificationChannel(Channels.privacyTips.id)?.importance != IMPORTANCE_NONE
+            else -> true
+        }
+        val enabled = systemEnabled && channelEnabled
+        if (settingsDataStore.appNotificationsEnabled != enabled) {
+            pixel.fire(if (enabled && channelEnabled) Pixel.PixelName.NOTIFICATIONS_ENABLED else Pixel.PixelName.NOTIFICATIONS_DISABLED)
+            settingsDataStore.appNotificationsEnabled = enabled
+        }
+    }
+
+    private fun scheduleClearDataNotification(duration: Long, unit: TimeUnit): Boolean {
 
         if (settingsDataStore.automaticallyClearWhatOption != ClearWhatOption.CLEAR_NONE) {
             Timber.v("No need for notification, user already has clear option set")
-            return
+            return true
         }
 
         Schedulers.io().scheduleDirect {
             if (dao.exists(NotificationSpecs.autoClear.id)) {
-                Timber.v("Notification already seen, no need to schedule")
+                Timber.v("Clear data notification already seen, no need to schedule")
                 return@scheduleDirect
             }
 
+            Timber.v("Scheduling clear data notification")
             val request = OneTimeWorkRequestBuilder<ShowClearDataNotification>()
                 .addTag(WORK_REQUEST_TAG)
-                .setInitialDelay(if (day1) 1 else 3, TimeUnit.DAYS)
+                .setInitialDelay(duration, unit)
 
             WorkManager.getInstance().enqueue(request.build())
         }
+        return false
     }
 
     class ShowClearDataNotification(val context: Context, params: WorkerParameters) : Worker(context, params) {
 
         lateinit var manager: NotificationManager
-        lateinit var generator: NotificationGenerator
+        lateinit var factory: NotificationFactory
         lateinit var notificationDao: NotificationDao
+        lateinit var pixel: Pixel
 
         override fun doWork(): Result {
 
             val specification = NotificationSpecs.autoClear
-            val pendingIntent = buildPendingIntent(SettingsActivity.intent(context))
-            val notification = generator.createNotification(manager, specification, pendingIntent)
+            val launchIntent = pendingNotificationHandlerIntent(context, CLEAR_DATA_LAUNCHED)
+            val cancelIntent = pendingNotificationHandlerIntent(context, CLEAR_DATA_CANCELLED)
 
+            val notification = factory.createNotification(specification, launchIntent, cancelIntent)
             notificationDao.insert(Notification(specification.id))
             manager.notify(specification.systemId, notification)
+            pixel.fire(NOTIFICATIONS_SHOWN)
 
             return Result.SUCCESS
         }
 
-        private fun buildPendingIntent(intent: Intent): PendingIntent {
-            val stackBuilder = TaskStackBuilder.create(context.applicationContext)
-            stackBuilder.addNextIntentWithParentStack(intent)
-            return stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)!!
+        private fun pendingNotificationHandlerIntent(context: Context, eventType: String): PendingIntent {
+            var intent = Intent(context, NotificationHandlerService::class.java)
+            intent.setType(eventType)
+            return getService(context, 0, intent, 0)!!
         }
     }
-
 
     companion object {
         const val WORK_REQUEST_TAG = "com.duckduckgo.notifications"

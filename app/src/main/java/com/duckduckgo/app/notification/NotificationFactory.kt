@@ -30,7 +30,7 @@ import androidx.core.content.ContextCompat
 import com.duckduckgo.app.browser.R
 import javax.inject.Inject
 
-class NotificationGenerator @Inject constructor(val context: Context) {
+class NotificationFactory @Inject constructor(val context: Context, val manager: NotificationManager) {
 
     data class Channel(
         val id: String,
@@ -51,7 +51,7 @@ class NotificationGenerator @Inject constructor(val context: Context) {
         val description: Int
     )
 
-    fun createNotification(manager: NotificationManager, specification: NotificationSpec, tapIntent: PendingIntent): Notification {
+    fun createNotification(specification: NotificationSpec, launchIntent: PendingIntent, cancelIntent: PendingIntent): Notification {
 
         if (SDK_INT > O) {
             createNotificationChannel(specification, manager)
@@ -67,7 +67,8 @@ class NotificationGenerator @Inject constructor(val context: Context) {
             .setStyle(NotificationCompat.BigTextStyle().bigText(context.getString(specification.description)))
             .setColor(ContextCompat.getColor(context, R.color.orange))
             .setAutoCancel(true)
-            .setContentIntent(tapIntent)
+            .setContentIntent(launchIntent)
+            .setDeleteIntent(cancelIntent)
             .build()
     }
 

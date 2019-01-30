@@ -18,12 +18,14 @@ package com.duckduckgo.app.di
 
 import android.app.NotificationManager
 import android.content.Context
+import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.duckduckgo.app.notification.NotificationGenerator
+import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.notification.store.NotificationDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -39,6 +41,12 @@ class NotificationModule {
 
     @Provides
     @Singleton
+    fun provideNotificationManagerCompat(context: Context): NotificationManagerCompat {
+        return NotificationManagerCompat.from(context)
+    }
+
+    @Provides
+    @Singleton
     fun provideLocalBroadcastManager(context: Context): LocalBroadcastManager {
         return LocalBroadcastManager.getInstance(context)
     }
@@ -47,13 +55,18 @@ class NotificationModule {
     @Singleton
     fun providesNotificationScheduler(
         notificationDao: NotificationDao,
+        notificationManagerCompat: NotificationManagerCompat,
+        notificationManager: NotificationManager,
         settingsDataStore: SettingsDataStore,
-        variantManager: VariantManager
+        variantManager: VariantManager,
+        pixel: Pixel
     ): NotificationScheduler {
-        return NotificationScheduler(notificationDao, settingsDataStore, variantManager)
+        return NotificationScheduler(notificationDao, notificationManagerCompat, notificationManager, settingsDataStore, variantManager, pixel)
     }
 
-    fun providesNotificationGenerator(context: Context): NotificationGenerator {
-        return NotificationGenerator(context)
+    @Provides
+    @Singleton
+    fun providesNotificationFactory(context: Context, manager: NotificationManager): NotificationFactory {
+        return NotificationFactory(context, manager)
     }
 }

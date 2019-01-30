@@ -139,6 +139,8 @@
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
+        <service android:name="com.duckduckgo.app.notification.NotificationHandlerService" />
+
         <receiver android:name="com.duckduckgo.widget.SearchWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

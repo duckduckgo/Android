@@ -23,10 +23,11 @@ import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.fire.DataClearingWorker
 import com.duckduckgo.app.global.view.ClearDataAction
-import com.duckduckgo.app.notification.NotificationGenerator
+import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.NotificationScheduler.ShowClearDataNotification
 import com.duckduckgo.app.notification.store.NotificationDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import timber.log.Timber
 
 class DaggerWorkerFactory(
@@ -34,7 +35,8 @@ class DaggerWorkerFactory(
     private val clearDataAction: ClearDataAction,
     private val notificationManager: NotificationManager,
     private val notificationDao: NotificationDao,
-    private val notificationGenerator: NotificationGenerator
+    private val notificationFactory: NotificationFactory,
+    private val pixel: Pixel
 ) : WorkerFactory() {
 
     override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
@@ -60,6 +62,7 @@ class DaggerWorkerFactory(
     private fun injectShowClearNotificationWorker(worker: ShowClearDataNotification) {
         worker.manager = notificationManager
         worker.notificationDao = notificationDao
-        worker.generator = notificationGenerator
+        worker.factory = notificationFactory
+        worker.pixel = pixel
     }
 }
