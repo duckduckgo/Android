@@ -257,7 +257,7 @@
 
 
     <string name="rate_app_dialog_title">Rate the app</string>
-    <string name="rate_app_dialog_message">Your feedback matters. Please share the love with a 5-star review</string>
+    <string name="rate_app_dialog_message">Your feedback matters. Please share the love with a 5-star review.</string>
     <string name="rate_app_dialog_positive_button">@string/yes</string>
     <string name="rate_app_dialog_negative_button">@string/no</string>
 
