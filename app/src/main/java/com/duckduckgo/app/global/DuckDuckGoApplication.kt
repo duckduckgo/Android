@@ -154,7 +154,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
         initializeHttpsUpgrader()
         submitUnsentFirePixels()
-        scheduleLocalNotifications()
     }
 
     private fun configureWorkManager() {
@@ -237,10 +236,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         }
     }
 
-    private fun scheduleLocalNotifications() {
-        notificationScheduler.scheduleClearDataNotification()
-    }
-
     /**
      * Immediately syncs data. Upon completion (successful or error),
      * it will schedule a recurring job to keep the data in sync.
@@ -270,6 +265,11 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
             return
         }
         pixel.fire(APP_LAUNCH)
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    fun onAppResumed() {
+        notificationScheduler.scheduleClearDataNotification()
     }
 
     companion object {
