@@ -18,6 +18,8 @@ package com.duckduckgo.app.global.rating
 
 import android.content.Context
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions.ShowEnjoymentPrompt
+import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions.ShowNothing
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.usage.search.SearchCountDao
 import kotlinx.coroutines.Dispatchers
@@ -40,37 +42,43 @@ class InitialPromptTypeDecider(
     override suspend fun determineInitialPromptType(): AppEnjoymentPromptOptions {
         return withContext(Dispatchers.IO) {
 
-            if (!playStoreUtils.isPlayStoreInstalled(context)) {
-                Timber.i("Play Store is not installed; cannot show ratings app enjoyment prompts")
-                return@withContext AppEnjoymentPromptOptions.ShowNothing
-            }
+            if (!isPlayStoreInstalled()) return@withContext ShowNothing
+            if (!wasInstalledThroughPlayStore()) return@withContext ShowNothing
+            if (!enoughSearchesMade()) return@withContext ShowNothing
 
-            if (!playStoreUtils.installedFromPlayStore(context)) {
-                Timber.i("DuckDuckGo was not installed from Play Store")
-
-                if (BuildConfig.DEBUG) {
-                    Timber.i("Running in DEBUG mode so will allow this; would normally enforce this check")
-                } else {
-                    Timber.i("Cannot show app enjoyment prompts")
-                    return@withContext AppEnjoymentPromptOptions.ShowNothing
+            when {
+                initialPromptDecider.shouldShowPrompt() -> return@withContext ShowEnjoymentPrompt(PromptCount.first())
+                secondaryPromptDecider.shouldShowPrompt() -> return@withContext ShowEnjoymentPrompt(PromptCount.second())
+                else -> {
+                    Timber.i("Decided not to show any prompts")
+                    return@withContext ShowNothing
                 }
             }
-
-            if (!enoughSearchesMade()) {
-                Timber.i("Not enough searches made to show prompt")
-                return@withContext AppEnjoymentPromptOptions.ShowNothing
-            }
-
-            if (initialPromptDecider.shouldShowPrompt()) {
-                Timber.i("Should show prompt to user for the first time")
-                return@withContext AppEnjoymentPromptOptions.ShowEnjoymentPrompt(PromptCount.first())
-            } else if (secondaryPromptDecider.shouldShowPrompt()) {
-                Timber.i("Should show prompt to user for the second time")
-                return@withContext AppEnjoymentPromptOptions.ShowEnjoymentPrompt(PromptCount.second())
-            }
-            Timber.i("Decided not to show any prompts")
-            return@withContext AppEnjoymentPromptOptions.ShowNothing
         }
+    }
+
+    private fun isPlayStoreInstalled(): Boolean {
+        if (!playStoreUtils.isPlayStoreInstalled(context)) {
+            Timber.i("Play Store is not installed; cannot show ratings app enjoyment prompts")
+            return false
+        }
+        return true
+    }
+
+    private fun wasInstalledThroughPlayStore(): Boolean {
+        if (!playStoreUtils.installedFromPlayStore(context)) {
+            Timber.i("DuckDuckGo was not installed from Play Store")
+
+            return if (BuildConfig.DEBUG) {
+                Timber.i("Running in DEBUG mode so will allow this; would normally enforce this check")
+                true
+            } else {
+                Timber.i("Cannot show app enjoyment prompts")
+                false
+            }
+        }
+
+        return true
     }
 
     private fun enoughSearchesMade(): Boolean {
