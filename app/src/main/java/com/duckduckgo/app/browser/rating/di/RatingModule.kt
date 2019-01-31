@@ -45,6 +45,7 @@ class RatingModule {
     }
 
     @Provides
+    @Singleton
     fun appEnjoymentPromptEmitter(): AppEnjoymentPromptEmitter {
         return AppEnjoymentLiveDataEmitter()
     }

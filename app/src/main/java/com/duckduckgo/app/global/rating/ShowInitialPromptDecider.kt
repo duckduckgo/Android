@@ -81,12 +81,11 @@ class SecondaryPromptDecider(
     private suspend fun enoughDaysPassedToShowSecondPrompt(): Boolean {
         val date = appEnjoymentRepository.dateUserDismissedFirstPrompt()
         if (date == null) {
-            Timber.i("Couldn't find a previous time first prompt was handled; bailing out here")
+            Timber.d("Couldn't find a previous time first prompt was handled; must never have been shown")
             return false
         }
 
         val daysUsed = appDaysUsedRepository.getNumberOfDaysAppUsedSinceDate(date)
-
         val enoughDaysUsed = daysUsed >= MINIMUM_DAY_USAGE_SINCE_INITIAL_PROMPT_BEFORE_SECONDARY_PROMPT
 
         return enoughDaysUsed.also {

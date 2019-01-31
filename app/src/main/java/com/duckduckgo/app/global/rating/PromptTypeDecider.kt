@@ -46,14 +46,18 @@ class InitialPromptTypeDecider(
             if (!wasInstalledThroughPlayStore()) return@withContext ShowNothing
             if (!enoughSearchesMade()) return@withContext ShowNothing
 
-            when {
-                initialPromptDecider.shouldShowPrompt() -> return@withContext ShowEnjoymentPrompt(PromptCount.first())
-                secondaryPromptDecider.shouldShowPrompt() -> return@withContext ShowEnjoymentPrompt(PromptCount.second())
-                else -> {
-                    Timber.i("Decided not to show any prompts")
-                    return@withContext ShowNothing
-                }
+            if (initialPromptDecider.shouldShowPrompt()) {
+                Timber.i("Will show app enjoyment prompt for first time")
+                return@withContext ShowEnjoymentPrompt(PromptCount.first())
             }
+
+            if (secondaryPromptDecider.shouldShowPrompt()) {
+                Timber.i("Will show app enjoyment prompt for second time")
+                return@withContext ShowEnjoymentPrompt(PromptCount.second())
+            }
+
+            Timber.i("Decided not to show any app enjoyment prompts")
+            return@withContext ShowNothing
         }
     }
 
@@ -91,6 +95,7 @@ class InitialPromptTypeDecider(
     }
 
     companion object {
+        // todo set back to 5
         private const val MINIMUM_SEARCHES_THRESHOLD = 1
     }
 }

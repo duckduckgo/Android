@@ -94,7 +94,6 @@ class BrowserViewModel(
 
     private val appEnjoymentObserver = Observer<AppEnjoymentPromptOptions> {
         it?.let { promptType ->
-            Timber.v("Observed $it")
             when (promptType) {
                 is AppEnjoymentPromptOptions.ShowEnjoymentPrompt -> {
                     command.value = Command.ShowAppEnjoymentPrompt(promptType.promptCount)
