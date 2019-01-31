@@ -34,7 +34,7 @@ import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import com.duckduckgo.app.httpsupgrade.model.HttpsWhitelistedDomain
 import com.duckduckgo.app.notification.model.Notification
-import com.duckduckgo.app.notification.store.NotificationDao
+import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.SiteVisitedEntity

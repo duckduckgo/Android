@@ -18,7 +18,9 @@ package com.duckduckgo.app.notification
 
 import android.app.IntentService
 import android.app.TaskStackBuilder
+import android.content.Context
 import android.content.Intent
+import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_CANCELLED
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCHED
 import com.duckduckgo.app.settings.SettingsActivity
@@ -32,12 +34,16 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     @Inject
     lateinit var pixel: Pixel
 
+    @Inject
+    lateinit var context: Context
+
     override fun onCreate() {
         super.onCreate()
         AndroidInjection.inject(this)
     }
 
-    override fun onHandleIntent(workIntent: Intent) {
+    @VisibleForTesting
+    public override fun onHandleIntent(workIntent: Intent) {
         when (workIntent.type) {
             CLEAR_DATA_LAUNCHED -> onClearDataLaunched()
             CLEAR_DATA_CANCELLED -> onClearDataCancelled()
@@ -46,8 +52,8 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
 
     private fun onClearDataLaunched() {
         Timber.i("Launched!")
-        val settingsIntent = SettingsActivity.intent(applicationContext)
-        TaskStackBuilder.create(applicationContext)
+        val settingsIntent = SettingsActivity.intent(context)
+        TaskStackBuilder.create(context)
             .addNextIntentWithParentStack(settingsIntent)
             .startActivities()
         pixel.fire(Pixel.PixelName.NOTIFICATION_LAUNCHED)

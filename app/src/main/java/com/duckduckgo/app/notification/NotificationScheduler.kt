@@ -35,7 +35,7 @@ import com.duckduckgo.app.notification.NotificationFactory.NotificationSpec
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_CANCELLED
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCHED
 import com.duckduckgo.app.notification.model.Notification
-import com.duckduckgo.app.notification.store.NotificationDao
+import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
@@ -55,7 +55,7 @@ class NotificationScheduler @Inject constructor(
     val manager: NotificationManager,
     val settingsDataStore: SettingsDataStore,
     val variantManager: VariantManager,
-    var pixel: Pixel
+    val pixel: Pixel
 ) {
 
     object Channels {
@@ -95,15 +95,18 @@ class NotificationScheduler @Inject constructor(
         scheduleClearDataNotification(duration.toLong(), TimeUnit.DAYS)
     }
 
-    private fun updateNotificationsStatus() {
-        var systemEnabled = compatManager.areNotificationsEnabled()
+    fun updateNotificationsStatus() {
+        val systemEnabled = compatManager.areNotificationsEnabled()
         val channelEnabled = when {
             SDK_INT >= O -> manager.getNotificationChannel(Channels.privacyTips.id)?.importance != IMPORTANCE_NONE
             else -> true
         }
-        val enabled = systemEnabled && channelEnabled
+        updateNotificationStatus(systemEnabled && channelEnabled)
+    }
+
+    fun updateNotificationStatus(enabled: Boolean) {
         if (settingsDataStore.appNotificationsEnabled != enabled) {
-            pixel.fire(if (enabled && channelEnabled) Pixel.PixelName.NOTIFICATIONS_ENABLED else Pixel.PixelName.NOTIFICATIONS_DISABLED)
+            pixel.fire(if (enabled) Pixel.PixelName.NOTIFICATIONS_ENABLED else Pixel.PixelName.NOTIFICATIONS_DISABLED)
             settingsDataStore.appNotificationsEnabled = enabled
         }
     }
@@ -154,7 +157,7 @@ class NotificationScheduler @Inject constructor(
 
         private fun pendingNotificationHandlerIntent(context: Context, eventType: String): PendingIntent {
             var intent = Intent(context, NotificationHandlerService::class.java)
-            intent.setType(eventType)
+            intent.type = eventType
             return getService(context, 0, intent, 0)!!
         }
     }

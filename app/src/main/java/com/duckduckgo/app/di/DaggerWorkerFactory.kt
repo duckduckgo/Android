@@ -25,7 +25,7 @@ import com.duckduckgo.app.fire.DataClearingWorker
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.NotificationScheduler.ShowClearDataNotification
-import com.duckduckgo.app.notification.store.NotificationDao
+import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import timber.log.Timber

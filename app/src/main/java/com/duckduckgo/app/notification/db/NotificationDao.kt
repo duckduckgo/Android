@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.notification.store
+package com.duckduckgo.app.notification.db
 
 import androidx.room.Dao
 import androidx.room.Insert

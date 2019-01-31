@@ -26,4 +26,3 @@ data class Notification(
     @PrimaryKey
     var notificationId: String
 )
-
