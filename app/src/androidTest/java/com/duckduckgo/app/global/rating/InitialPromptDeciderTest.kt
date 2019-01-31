@@ -60,7 +60,6 @@ class InitialPromptDeciderTest {
         assertFalse(testee.shouldShowPrompt())
     }
 
-
     @Test
     fun whenUserHasSeenPromptBeforeAndNotUsedTheAppMuchThenShouldNotSeePrompt() = runBlocking<Unit> {
         whenever(mockAppDaysUsedRepository.getNumberOfDaysAppUsed()).thenReturn(0)
