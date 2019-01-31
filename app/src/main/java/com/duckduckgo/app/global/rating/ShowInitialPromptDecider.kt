@@ -46,7 +46,7 @@ class InitialPromptDecider(
 
     private suspend fun enoughDaysPassedToShowFirstPrompt(): Boolean {
         val daysUsed = appDaysUsedRepository.getNumberOfDaysAppUsed()
-        val enoughDaysUsed = daysUsed >= MINIMUM_DAYS_USAGE_BEFORE_SHOWING_FIRST_PROMPT
+        val enoughDaysUsed = daysUsed >= MINIMUM_DAYS_USAGE_BEFORE_FIRST_PROMPT
 
         return enoughDaysUsed.also {
             Timber.i("Number of days usage: $daysUsed. Enough days have passed to show app enjoyment prompt: %s", if (enoughDaysUsed) "yes" else "no")
@@ -81,7 +81,7 @@ class SecondaryPromptDecider(
         }
 
         val daysUsed = appDaysUsedRepository.getNumberOfDaysAppUsedSinceDate(date)
-        val enoughDaysUsed = daysUsed >= MINIMUM_DAY_USAGE_SINCE_INITIAL_PROMPT_BEFORE_SECOND_PROMPT
+        val enoughDaysUsed = daysUsed >= MINIMUM_DAYS_USAGE_SINCE_INITIAL_PROMPT_BEFORE_SECOND_PROMPT
 
         return enoughDaysUsed.also {
             Timber.i(
