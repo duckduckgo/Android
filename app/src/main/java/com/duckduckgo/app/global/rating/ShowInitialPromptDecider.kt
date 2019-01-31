@@ -52,11 +52,6 @@ class InitialPromptDecider(
             Timber.i("Number of days usage: $daysUsed. Enough days have passed to show app enjoyment prompt: %s", if (enoughDaysUsed) "yes" else "no")
         }
     }
-
-    companion object {
-        private const val MINIMUM_DAYS_USAGE_BEFORE_SHOWING_FIRST_PROMPT = 3
-    }
-
 }
 
 class SecondaryPromptDecider(
@@ -86,7 +81,7 @@ class SecondaryPromptDecider(
         }
 
         val daysUsed = appDaysUsedRepository.getNumberOfDaysAppUsedSinceDate(date)
-        val enoughDaysUsed = daysUsed >= MINIMUM_DAY_USAGE_SINCE_INITIAL_PROMPT_BEFORE_SECONDARY_PROMPT
+        val enoughDaysUsed = daysUsed >= MINIMUM_DAY_USAGE_SINCE_INITIAL_PROMPT_BEFORE_SECOND_PROMPT
 
         return enoughDaysUsed.also {
             Timber.i(
@@ -95,9 +90,4 @@ class SecondaryPromptDecider(
             )
         }
     }
-
-    companion object {
-        private const val MINIMUM_DAY_USAGE_SINCE_INITIAL_PROMPT_BEFORE_SECONDARY_PROMPT = 4
-    }
-
 }

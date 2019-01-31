@@ -93,11 +93,6 @@ class InitialPromptTypeDecider(
             Timber.i("Searches made: $numberSearchesMade. Enough searches made to show app enjoyment prompt: %s", if (enoughMade) "yes" else "no")
         }
     }
-
-    companion object {
-        // todo set back to 5
-        private const val MINIMUM_SEARCHES_THRESHOLD = 1
-    }
 }
 
 sealed class AppEnjoymentPromptOptions {
