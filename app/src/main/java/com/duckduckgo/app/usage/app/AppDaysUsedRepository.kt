@@ -16,16 +16,22 @@
 
 package com.duckduckgo.app.usage.app
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.Executors
 
+private val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
 interface AppDaysUsedRepository {
 
     suspend fun getNumberOfDaysAppUsed(): Long
 
     suspend fun recordAppUsedToday()
+    suspend fun getNumberOfDaysAppUsedSinceDate(date: Date): Long
 }
 
 class AppDaysUsedDatabaseRepository(private val appDaysUsedDao: AppDaysUsedDao) : AppDaysUsedRepository {
@@ -41,4 +47,15 @@ class AppDaysUsedDatabaseRepository(private val appDaysUsedDao: AppDaysUsedDao) 
             return@withContext appDaysUsedDao.getNumberOfDaysAppUsed()
         }
     }
+
+    override suspend fun getNumberOfDaysAppUsedSinceDate(date: Date): Long {
+        return withContext(singleThreadedDispatcher) {
+            return@withContext appDaysUsedDao.getNumberOfDaysAppUsedSince(formatter.format(date))
+        }
+    }
 }
+
+@Entity(tableName = "app_days_used")
+data class AppDaysUsedEntity(
+    @PrimaryKey val date: String = formatter.format((Date()))
+)

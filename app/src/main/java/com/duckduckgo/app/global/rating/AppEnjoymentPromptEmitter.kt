@@ -14,25 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.usage.app
+package com.duckduckgo.app.global.rating
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.lifecycle.MutableLiveData
 
-@Dao
-abstract class AppDaysUsedDao {
 
-    @Query("SELECT COUNT(*) from app_days_used")
-    abstract fun getNumberOfDaysAppUsed(): Long
-
-    @Query("SELECT COUNT(*) from app_days_used WHERE date > :isoDate")
-    abstract fun getNumberOfDaysAppUsedSince(isoDate: String): Long
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    abstract fun insert(appUsedEntity: AppDaysUsedEntity)
+interface AppEnjoymentPromptEmitter {
+    val promptType: MutableLiveData<AppEnjoymentPromptOptions>
 }
 
+class AppEnjoymentLiveDataEmitter : AppEnjoymentPromptEmitter {
 
+    override val promptType: MutableLiveData<AppEnjoymentPromptOptions> = MutableLiveData()
 
+}

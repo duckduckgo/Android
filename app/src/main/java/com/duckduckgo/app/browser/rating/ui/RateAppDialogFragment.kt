@@ -21,27 +21,29 @@ import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.rating.PromptCount
 
 
 class RateAppDialogFragment : DialogFragment() {
 
     interface Listener {
-        fun onUserSelectedToRateApp()
-        fun onUserDeclinedToRateApp()
+        fun onUserSelectedToRateApp(promptCount: PromptCount)
+        fun onUserDeclinedToRateApp(promptCount: PromptCount)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         isCancelable = false
+        val promptCount = arguments!![PROMPT_COUNT_KEY] as Int
 
         return AlertDialog.Builder(activity!!, R.style.AlertDialogTheme)
             .setTitle(R.string.rate_app_dialog_title)
             .setMessage(R.string.rate_app_dialog_message)
             .setPositiveButton(R.string.rate_app_dialog_positive_button) { _, _ ->
-                listener?.onUserSelectedToRateApp()
+                listener?.onUserSelectedToRateApp(PromptCount(promptCount))
             }
             .setNegativeButton(R.string.rate_app_dialog_negative_button) { _, _ ->
-                listener?.onUserDeclinedToRateApp()
+                listener?.onUserDeclinedToRateApp(PromptCount(promptCount))
             }
             .create()
     }
@@ -51,8 +53,14 @@ class RateAppDialogFragment : DialogFragment() {
 
     companion object {
 
-        fun create(): RateAppDialogFragment {
-            return RateAppDialogFragment()
+        fun create(promptCount: PromptCount): RateAppDialogFragment {
+            return RateAppDialogFragment().also { fragment ->
+                val bundle = Bundle()
+                bundle.putInt(PROMPT_COUNT_KEY, promptCount.value)
+                fragment.arguments = bundle
+            }
         }
+
+        private const val PROMPT_COUNT_KEY = "PROMPT_COUNT"
     }
 }

@@ -37,8 +37,7 @@ import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.intentText
-import com.duckduckgo.app.global.rating.AppEnjoyment
-import com.duckduckgo.app.global.rating.AppEnjoyment.AppEnjoymentPromptOptions.*
+import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
@@ -87,7 +86,7 @@ class BrowserActivity : DuckDuckGoActivity(), EnjoymentDialogFragment.Listener, 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
         setContentView(R.layout.activity_browser)
         viewModel.viewState.observe(this, Observer {
-            renderer.renderBrowserViewState(it, this)
+            renderer.renderBrowserViewState(it)
         })
         viewModel.awaitClearDataFinishedNotification()
     }
@@ -227,13 +226,13 @@ class BrowserActivity : DuckDuckGoActivity(), EnjoymentDialogFragment.Listener, 
             is Command.DisplayMessage -> applicationContext?.longToast(command.messageId)
             is Command.LaunchPlayStore -> launchPlayStore()
             is Command.ShowAppEnjoymentPrompt -> {
-                showAppEnjoymentPrompt(EnjoymentDialogFragment.create())
+                showAppEnjoymentPrompt(EnjoymentDialogFragment.create(command.promptCount))
             }
             is Command.ShowAppRatingPrompt -> {
-                showAppEnjoymentPrompt(RateAppDialogFragment.create())
+                showAppEnjoymentPrompt(RateAppDialogFragment.create(command.promptCount))
             }
             is Command.ShowAppFeedbackPrompt -> {
-                showAppEnjoymentPrompt(GiveFeedbackDialogFragment.create())
+                showAppEnjoymentPrompt(GiveFeedbackDialogFragment.create(command.promptCount))
             }
             is Command.LaunchFeedbackView -> {
                 startActivity(FeedbackActivity.intent(this, brokenSite = false))
@@ -323,7 +322,7 @@ class BrowserActivity : DuckDuckGoActivity(), EnjoymentDialogFragment.Listener, 
         private var lastSeenBrowserState: BrowserViewModel.ViewState? = null
         private var processedOriginalIntent = false
 
-        fun renderBrowserViewState(viewState: BrowserViewModel.ViewState, context: Context) {
+        fun renderBrowserViewState(viewState: BrowserViewModel.ViewState) {
             renderIfChanged(viewState, lastSeenBrowserState) {
                 lastSeenBrowserState = viewState
 
@@ -355,15 +354,6 @@ class BrowserActivity : DuckDuckGoActivity(), EnjoymentDialogFragment.Listener, 
         }
     }
 
-    private fun determineDialogType(promptType: AppEnjoyment.AppEnjoymentPromptOptions): DialogFragment? {
-        return when (promptType) {
-            is ShowNothing -> null
-            ShowEnjoymentPrompt -> EnjoymentDialogFragment.create()
-            ShowFeedbackPrompt -> null
-            ShowRatingPrompt -> RateAppDialogFragment.create()
-        }
-    }
-
     private fun showAppEnjoymentPrompt(prompt: DialogFragment) {
         prompt.show(supportFragmentManager, APP_ENJOYMENT_DIALOG_TAG)
     }
@@ -374,28 +364,28 @@ class BrowserActivity : DuckDuckGoActivity(), EnjoymentDialogFragment.Listener, 
         clearingInProgressView.show()
     }
 
-    override fun onUserSelectedAppIsEnjoyed() {
-        viewModel.onUserSelectedAppIsEnjoyed()
+    override fun onUserSelectedAppIsEnjoyed(promptCount: PromptCount) {
+        viewModel.onUserSelectedAppIsEnjoyed(promptCount)
     }
 
-    override fun onUserSelectedAppIsNotEnjoyed() {
-        viewModel.onUserSelectedAppIsNotEnjoyed()
+    override fun onUserSelectedAppIsNotEnjoyed(promptCount: PromptCount) {
+        viewModel.onUserSelectedAppIsNotEnjoyed(promptCount)
     }
 
-    override fun onUserSelectedToRateApp() {
-        viewModel.onUserSelectedToRateApp()
+    override fun onUserSelectedToRateApp(promptCount: PromptCount) {
+        viewModel.onUserSelectedToRateApp(promptCount)
     }
 
-    override fun onUserDeclinedToRateApp() {
-        viewModel.onUserDeclinedToRateApp()
+    override fun onUserDeclinedToRateApp(promptCount: PromptCount) {
+        viewModel.onUserDeclinedToRateApp(promptCount)
     }
 
-    override fun onUserSelectedToGiveFeedback() {
-        viewModel.onUserSelectedToGiveFeedback()
+    override fun onUserSelectedToGiveFeedback(promptCount: PromptCount) {
+        viewModel.onUserSelectedToGiveFeedback(promptCount)
     }
 
-    override fun onUserDeclinedToGiveFeedback() {
-        viewModel.onUserDeclinedToGiveFeedback()
+    override fun onUserDeclinedToGiveFeedback(promptCount: PromptCount) {
+        viewModel.onUserDeclinedToGiveFeedback(promptCount)
     }
 
     private fun launchPlayStore() {

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 9,
-    "identityHash": "bc8fc860fc5c8511c524d7bda7e896ae",
+    "identityHash": "ac76e2ef41a65a09bc0a05b15ddcec28",
     "entities": [
       {
         "tableName": "disconnect_tracker",
@@ -437,11 +437,17 @@
       },
       {
         "tableName": "app_enjoyment",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`eventType` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `primaryKey` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`eventType` INTEGER NOT NULL, `promptCount` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `primaryKey` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
         "fields": [
           {
             "fieldPath": "eventType",
             "columnName": "eventType",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "promptCount",
+            "columnName": "promptCount",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -471,7 +477,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"bc8fc860fc5c8511c524d7bda7e896ae\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"ac76e2ef41a65a09bc0a05b15ddcec28\")"
     ]
   }
 }

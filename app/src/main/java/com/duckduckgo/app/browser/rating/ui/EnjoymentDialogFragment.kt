@@ -21,27 +21,29 @@ import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.rating.PromptCount
 
 
 class EnjoymentDialogFragment : DialogFragment() {
 
     interface Listener {
-        fun onUserSelectedAppIsEnjoyed()
-        fun onUserSelectedAppIsNotEnjoyed()
+        fun onUserSelectedAppIsEnjoyed(promptCount: PromptCount)
+        fun onUserSelectedAppIsNotEnjoyed(promptCount: PromptCount)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         isCancelable = false
+        val promptCount = arguments!![PROMPT_COUNT_KEY] as Int
 
         return AlertDialog.Builder(activity!!, R.style.AlertDialogTheme)
             .setTitle(R.string.app_enjoyment_dialog_title)
             .setMessage(R.string.app_enjoyment_dialog_message)
             .setPositiveButton(R.string.app_enjoyment_dialog_positive_button) { _, _ ->
-                listener?.onUserSelectedAppIsEnjoyed()
+                listener?.onUserSelectedAppIsEnjoyed(PromptCount(promptCount))
             }
             .setNegativeButton(R.string.app_enjoyment_dialog_negative_button) { _, _ ->
-                listener?.onUserSelectedAppIsNotEnjoyed()
+                listener?.onUserSelectedAppIsNotEnjoyed(PromptCount(promptCount))
             }
             .create()
     }
@@ -51,8 +53,14 @@ class EnjoymentDialogFragment : DialogFragment() {
 
     companion object {
 
-        fun create(): EnjoymentDialogFragment {
-            return EnjoymentDialogFragment()
+        fun create(promptCount: PromptCount): EnjoymentDialogFragment {
+            return EnjoymentDialogFragment().also { fragment ->
+                val bundle = Bundle()
+                bundle.putInt(PROMPT_COUNT_KEY, promptCount.value)
+                fragment.arguments = bundle
+            }
         }
+
+        private const val PROMPT_COUNT_KEY = "PROMPT_COUNT"
     }
 }

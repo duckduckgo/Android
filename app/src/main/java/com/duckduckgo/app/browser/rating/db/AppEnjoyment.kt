@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.rating.db
 
 import androidx.room.*
+import com.duckduckgo.app.global.rating.PromptCount
 
 private const val TYPE_PROVIDED_RATING = 1
 private const val TYPE_DECLINED_RATING = 2
@@ -32,20 +33,24 @@ interface AppEnjoymentDao {
     @Query("SELECT * from app_enjoyment WHERE eventType = $TYPE_PROVIDED_RATING")
     fun hasUserProvidedRating(): Boolean
 
-    @Query("SELECT * from app_enjoyment WHERE eventType = $TYPE_DECLINED_RATING")
-    fun hasUserDeclinedRating(): Boolean
+    @Query("SELECT * from app_enjoyment WHERE eventType = $TYPE_DECLINED_RATING AND promptCount = :promptCount")
+    fun hasUserDeclinedRating(promptCount: Int): Boolean
 
     @Query("SELECT * from app_enjoyment WHERE eventType = $TYPE_PROVIDED_FEEDBACK")
     fun hasUserProvidedFeedback(): Boolean
 
-    @Query("SELECT * from app_enjoyment WHERE eventType = $TYPE_DECLINED_FEEDBACK")
-    fun hasUserDeclinedFeedback(): Boolean
+    @Query("SELECT * from app_enjoyment WHERE eventType = $TYPE_DECLINED_FEEDBACK AND promptCount = :promptCount")
+    fun hasUserDeclinedFeedback(promptCount: Int): Boolean
+
+    @Query("SELECT timestamp FROM app_enjoyment WHERE eventType=$TYPE_DECLINED_RATING OR eventType=$TYPE_DECLINED_FEEDBACK ORDER BY timestamp DESC LIMIT 1")
+    fun latestDateUserDeclinedRatingOrFeedback(): Long?
 
 }
 
 @Entity(tableName = "app_enjoyment")
 data class AppEnjoymentEntity(
     val eventType: AppEnjoymentEventType,
+    val promptCount: PromptCount,
     val timestamp: Long = System.currentTimeMillis(), @PrimaryKey(autoGenerate = true) val primaryKey: Int = 0
 )
 
@@ -70,5 +75,15 @@ class AppEnjoymentTypeConverter {
 
     @TypeConverter
     fun convertFromDb(value: Int): AppEnjoymentEventType? = AppEnjoymentEventType.fromValue(value)
+
+}
+
+class PromptCountConverter {
+
+    @TypeConverter
+    fun convertForDb(promptCount: PromptCount): Int = promptCount.value
+
+    @TypeConverter
+    fun convertFromDb(promptCount: Int): PromptCount = PromptCount(promptCount)
 
 }

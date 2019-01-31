@@ -37,7 +37,7 @@ import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.global.Theming.initializeTheme
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.notification.NotificationRegistrar
-import com.duckduckgo.app.global.rating.AppEnjoymentManager
+import com.duckduckgo.app.global.rating.AppEnjoymentLifecycleObserver
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.AppConfigurationSyncer
@@ -115,7 +115,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     lateinit var workerFactory: WorkerFactory
 
     @Inject
-    lateinit var appEnjoyment: AppEnjoymentManager
+    lateinit var appEnjoymentLifecycleObserver: AppEnjoymentLifecycleObserver
 
     @Inject
     lateinit var appDaysUsedRecorder: AppDaysUsedRecorder
@@ -142,7 +142,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
             it.addObserver(this)
             it.addObserver(dataClearer)
             it.addObserver(appDaysUsedRecorder)
-            it.addObserver(appEnjoyment)
+            it.addObserver(appEnjoymentLifecycleObserver)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {

@@ -21,27 +21,29 @@ import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.rating.PromptCount
 
 
 class GiveFeedbackDialogFragment : DialogFragment() {
 
     interface Listener {
-        fun onUserSelectedToGiveFeedback()
-        fun onUserDeclinedToGiveFeedback()
+        fun onUserSelectedToGiveFeedback(promptCount: PromptCount)
+        fun onUserDeclinedToGiveFeedback(promptCount: PromptCount)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         isCancelable = false
+        val promptCount = arguments!![PROMPT_COUNT_KEY] as Int
 
         return AlertDialog.Builder(activity!!, R.style.AlertDialogTheme)
             .setTitle(R.string.give_feedback_dialog_title)
             .setMessage(R.string.give_feedback_dialog_message)
             .setPositiveButton(R.string.give_feedback_dialog_positive_button) { _, _ ->
-                listener?.onUserSelectedToGiveFeedback()
+                listener?.onUserSelectedToGiveFeedback(PromptCount(promptCount))
             }
             .setNegativeButton(R.string.give_feedback_dialog_negative_button) { _, _ ->
-                listener?.onUserDeclinedToGiveFeedback()
+                listener?.onUserDeclinedToGiveFeedback(PromptCount(promptCount))
             }
             .create()
     }
@@ -51,8 +53,14 @@ class GiveFeedbackDialogFragment : DialogFragment() {
 
     companion object {
 
-        fun create(): GiveFeedbackDialogFragment {
-            return GiveFeedbackDialogFragment()
+        fun create(promptCount: PromptCount): GiveFeedbackDialogFragment {
+            return GiveFeedbackDialogFragment().also { fragment ->
+                val bundle = Bundle()
+                bundle.putInt(PROMPT_COUNT_KEY, promptCount.value)
+                fragment.arguments = bundle
+            }
         }
+
+        private const val PROMPT_COUNT_KEY = "PROMPT_COUNT"
     }
 }
