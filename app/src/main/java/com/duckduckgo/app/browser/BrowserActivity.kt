@@ -70,6 +70,8 @@ class BrowserActivity : DuckDuckGoActivity(), EnjoymentDialogFragment.Listener, 
 
     private var lastIntent: Intent? = null
 
+    private var currentAppEnjoymentFragment: DialogFragment? = null
+
     private lateinit var renderer: BrowserStateRenderer
 
     @SuppressLint("MissingSuperCall")
@@ -355,7 +357,9 @@ class BrowserActivity : DuckDuckGoActivity(), EnjoymentDialogFragment.Listener, 
     }
 
     private fun showAppEnjoymentPrompt(prompt: DialogFragment) {
+        currentAppEnjoymentFragment?.dismiss()
         prompt.show(supportFragmentManager, APP_ENJOYMENT_DIALOG_TAG)
+        currentAppEnjoymentFragment = prompt
     }
 
     private fun hideWebContent() {
