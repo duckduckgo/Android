@@ -32,23 +32,11 @@ class AppEnjoymentAppCreationObserver(
 ) :
     AppEnjoymentLifecycleObserver {
 
-    private var isFreshAppCreation = false
-
-    @UiThread
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun onAppCreation() {
-        isFreshAppCreation = true
-    }
-
     @UiThread
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onAppStart() {
-        if (isFreshAppCreation) {
-
             GlobalScope.launch(Dispatchers.Main) {
                 appEnjoymentPromptEmitter.promptType.value = promptTypeDecider.determineInitialPromptType()
             }
-            isFreshAppCreation = false
-        }
     }
 }
