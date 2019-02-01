@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.di
 
-import android.app.NotificationManager
+import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkerFactory
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.notification.NotificationFactory
@@ -35,7 +35,7 @@ class WorkerModule {
     fun workerFactory(
         settingsDataStore: SettingsDataStore,
         clearDataAction: ClearDataAction,
-        notficationManager: NotificationManager,
+        notficationManager: NotificationManagerCompat,
         notificationDao: NotificationDao,
         notificationFactory: NotificationFactory,
         pixel: Pixel

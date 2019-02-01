@@ -25,7 +25,6 @@ import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -55,18 +54,16 @@ class NotificationModule {
     @Singleton
     fun providesNotificationScheduler(
         notificationDao: NotificationDao,
-        notificationManagerCompat: NotificationManagerCompat,
-        notificationManager: NotificationManager,
+        notificationManager: NotificationManagerCompat,
         settingsDataStore: SettingsDataStore,
-        variantManager: VariantManager,
-        pixel: Pixel
+        variantManager: VariantManager
     ): NotificationScheduler {
-        return NotificationScheduler(notificationDao, notificationManagerCompat, notificationManager, settingsDataStore, variantManager, pixel)
+        return NotificationScheduler(notificationDao, notificationManager, settingsDataStore, variantManager)
     }
 
     @Provides
     @Singleton
-    fun providesNotificationFactory(context: Context, manager: NotificationManager): NotificationFactory {
+    fun providesNotificationFactory(context: Context, manager: NotificationManagerCompat): NotificationFactory {
         return NotificationFactory(context, manager)
     }
 }

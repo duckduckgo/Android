@@ -30,8 +30,9 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NotificationDayOne
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NotificationDayThree
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -47,7 +48,6 @@ class NotificationSchedulerTest {
     private val mockNotificationsDao: NotificationDao = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockVariantManager: VariantManager = mock()
-    private val mockPixel: Pixel = mock()
 
     private lateinit var testee: NotificationScheduler
 
@@ -61,43 +61,9 @@ class NotificationSchedulerTest {
         testee = NotificationScheduler(
             mockNotificationsDao,
             notifcationManagerCompat,
-            notificationManager,
             mockSettingsDataStore,
-            mockVariantManager,
-            mockPixel
+            mockVariantManager
         )
-    }
-
-    @Test
-    fun whenNotificationsPreviouslyOffAndNowOnThenPixelIsFiredAndSettingsUpdated() {
-        whenever(mockSettingsDataStore.appNotificationsEnabled).thenReturn(false)
-        testee.updateNotificationStatus(true)
-        verify(mockPixel).fire(eq(Pixel.PixelName.NOTIFICATIONS_ENABLED), any())
-        verify(mockSettingsDataStore).appNotificationsEnabled = true
-    }
-
-    @Test
-    fun whenNotificationsPreviouslyOffAndStillOffThenNoPixelIsFiredAndSettingsUnchanged() {
-        whenever(mockSettingsDataStore.appNotificationsEnabled).thenReturn(false)
-        testee.updateNotificationStatus(false)
-        verify(mockPixel, never()).fire(any(), any())
-        verify(mockSettingsDataStore, never()).appNotificationsEnabled = true
-    }
-
-    @Test
-    fun whenNotificationsPreviouslyOnAndStillOnThenNoPixelIsFiredAndSettingsUnchanged() {
-        whenever(mockSettingsDataStore.appNotificationsEnabled).thenReturn(true)
-        testee.updateNotificationStatus(true)
-        verify(mockPixel, never()).fire(any(), any())
-        verify(mockSettingsDataStore, never()).appNotificationsEnabled = false
-    }
-
-    @Test
-    fun whenNotificationsPreviouslyOnAndNowOffPixelIsFiredAndSettingsUpdated() {
-        whenever(mockSettingsDataStore.appNotificationsEnabled).thenReturn(true)
-        testee.updateNotificationStatus(false)
-        verify(mockPixel).fire(eq(Pixel.PixelName.NOTIFICATIONS_DISABLED), any())
-        verify(mockSettingsDataStore).appNotificationsEnabled = false
     }
 
     @Test

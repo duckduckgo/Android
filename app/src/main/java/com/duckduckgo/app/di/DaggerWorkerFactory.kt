@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.di
 
-import android.app.NotificationManager
 import android.content.Context
+import androidx.core.app.NotificationManagerCompat
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
@@ -33,7 +33,7 @@ import timber.log.Timber
 class DaggerWorkerFactory(
     private val settingsDataStore: SettingsDataStore,
     private val clearDataAction: ClearDataAction,
-    private val notificationManager: NotificationManager,
+    private val notificationManager: NotificationManagerCompat,
     private val notificationDao: NotificationDao,
     private val notificationFactory: NotificationFactory,
     private val pixel: Pixel

@@ -24,7 +24,7 @@ import android.net.Uri
 import androidx.annotation.AnyThread
 import androidx.core.app.NotificationCompat
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.notification.NotificationRegistrar
+import com.duckduckgo.app.notification.NotificationRegistrar.ChannelType
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.runOnUiThread
 import javax.inject.Inject
@@ -39,7 +39,7 @@ class FileDownloadNotificationManager @Inject constructor(
         applicationContext.runOnUiThread {
             applicationContext.longToast(getString(R.string.downloadInProgress))
 
-            val notification = NotificationCompat.Builder(applicationContext, NotificationRegistrar.FILE_DOWNLOADING_CHANNEL_ID)
+            val notification = NotificationCompat.Builder(applicationContext, ChannelType.FILE_DOWNLOADING.id)
                 .setContentTitle(applicationContext.getString(R.string.downloadInProgress))
                 .setSmallIcon(R.drawable.ic_file_download_white_24dp)
                 .build()
@@ -56,7 +56,7 @@ class FileDownloadNotificationManager @Inject constructor(
             val i = Intent(Intent.ACTION_VIEW)
             i.setDataAndType(uri, mimeType)
 
-            val notification = NotificationCompat.Builder(applicationContext, NotificationRegistrar.FILE_DOWNLOADED_CHANNEL_ID)
+            val notification = NotificationCompat.Builder(applicationContext, ChannelType.FILE_DOWNLOADED.id)
                 .setContentTitle(filename)
                 .setContentText(applicationContext.getString(R.string.downloadComplete))
                 .setContentIntent(PendingIntent.getActivity(applicationContext, 0, i, PendingIntent.FLAG_UPDATE_CURRENT))
@@ -72,7 +72,7 @@ class FileDownloadNotificationManager @Inject constructor(
         applicationContext.runOnUiThread {
             applicationContext.longToast(getString(R.string.downloadFailed))
 
-            val notification = NotificationCompat.Builder(applicationContext, NotificationRegistrar.FILE_DOWNLOADED_CHANNEL_ID)
+            val notification = NotificationCompat.Builder(applicationContext, ChannelType.FILE_DOWNLOADED.id)
                 .setContentTitle(applicationContext.getString(R.string.downloadFailed))
                 .setSmallIcon(R.drawable.ic_file_download_white_24dp)
                 .build()

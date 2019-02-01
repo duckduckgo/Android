@@ -16,22 +16,16 @@
 
 package com.duckduckgo.app.notification
 
-import android.app.NotificationManager
-import android.app.NotificationManager.IMPORTANCE_NONE
 import android.app.PendingIntent
 import android.app.PendingIntent.getService
 import android.content.Context
 import android.content.Intent
-import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES.O
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.app.NotificationManagerCompat.IMPORTANCE_DEFAULT
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.notification.NotificationFactory.NotificationSpec
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_CANCELLED
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCHED
 import com.duckduckgo.app.notification.db.NotificationDao
@@ -51,27 +45,26 @@ import javax.inject.Inject
 
 class NotificationScheduler @Inject constructor(
     val dao: NotificationDao,
-    val compatManager: NotificationManagerCompat,
-    val manager: NotificationManager,
+    val manager: NotificationManagerCompat,
     val settingsDataStore: SettingsDataStore,
-    val variantManager: VariantManager,
-    val pixel: Pixel
+    val variantManager: VariantManager
 ) {
 
-    object Channels {
-        val privacyTips = NotificationFactory.Channel(
-            "com.duckduckgo.privacytips",
-            "Privacy Tips",
-            "Displays helpful privacy tips",
-            IMPORTANCE_DEFAULT
-        )
-    }
+    data class NotificationSpec(
+        val systemId: Int,
+        val id: String,
+        val channel: NotificationRegistrar.Channel,
+        val name: String,
+        val icon: Int,
+        val title: Int,
+        val description: Int
+    )
 
     object NotificationSpecs {
         val autoClear = NotificationSpec(
-            1,
+            100,
             "com.duckduckgo.privacytips.autoclear",
-            Channels.privacyTips,
+            NotificationRegistrar.ChannelType.PRIVACY_TIPS,
             "Update auto clear data",
             R.drawable.notification_fire,
             R.string.clearNotificationTitle,
@@ -81,7 +74,6 @@ class NotificationScheduler @Inject constructor(
 
     fun scheduleNextNotification() {
         WorkManager.getInstance().cancelAllWorkByTag(WORK_REQUEST_TAG)
-        updateNotificationsStatus()
 
         val duration = when {
             variantManager.getVariant().hasFeature(NotificationDayOne) -> 1
@@ -92,22 +84,6 @@ class NotificationScheduler @Inject constructor(
             }
         }
         scheduleClearDataNotification(duration.toLong(), TimeUnit.DAYS)
-    }
-
-    private fun updateNotificationsStatus() {
-        val systemEnabled = compatManager.areNotificationsEnabled()
-        val channelEnabled = when {
-            SDK_INT >= O -> manager.getNotificationChannel(Channels.privacyTips.id)?.importance != IMPORTANCE_NONE
-            else -> true
-        }
-        updateNotificationStatus(systemEnabled && channelEnabled)
-    }
-
-    fun updateNotificationStatus(enabled: Boolean) {
-        if (settingsDataStore.appNotificationsEnabled != enabled) {
-            pixel.fire(if (enabled) Pixel.PixelName.NOTIFICATIONS_ENABLED else Pixel.PixelName.NOTIFICATIONS_DISABLED)
-            settingsDataStore.appNotificationsEnabled = enabled
-        }
     }
 
     private fun scheduleClearDataNotification(duration: Long, unit: TimeUnit): Boolean {
@@ -135,7 +111,7 @@ class NotificationScheduler @Inject constructor(
 
     class ShowClearDataNotification(val context: Context, params: WorkerParameters) : Worker(context, params) {
 
-        lateinit var manager: NotificationManager
+        lateinit var manager: NotificationManagerCompat
         lateinit var factory: NotificationFactory
         lateinit var notificationDao: NotificationDao
         lateinit var settingsDataStore: SettingsDataStore
@@ -154,6 +130,7 @@ class NotificationScheduler @Inject constructor(
             val notification = factory.createNotification(specification, launchIntent, cancelIntent)
             notificationDao.insert(Notification(specification.id))
             manager.notify(specification.systemId, notification)
+
             pixel.fire(NOTIFICATIONS_SHOWN)
             return Result.SUCCESS
         }
@@ -166,6 +143,6 @@ class NotificationScheduler @Inject constructor(
     }
 
     companion object {
-        const val WORK_REQUEST_TAG = "com.duckduckgo.notifications"
+        const val WORK_REQUEST_TAG = "com.duckduckgo.notification.schedule"
     }
 }

@@ -17,44 +17,21 @@
 package com.duckduckgo.app.notification
 
 import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
-import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES.O
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.browser.R
 import javax.inject.Inject
 
-class NotificationFactory @Inject constructor(val context: Context, val manager: NotificationManager) {
+class NotificationFactory @Inject constructor(val context: Context, val manager: NotificationManagerCompat) {
 
-    data class Channel(
-        val id: String,
-        val name: String,
-        val description: String,
-        val priority: Int
-    )
-
-    data class NotificationSpec(
-        val systemId: Int,
-        val id:
-        String,
-        val channel: Channel,
-        val name: String,
-        val icon: Int,
-        val title: Int,
-        val description: Int
-    )
-
-    fun createNotification(specification: NotificationSpec, launchIntent: PendingIntent, cancelIntent: PendingIntent): Notification {
-
-        if (SDK_INT > O) {
-            createNotificationChannel(specification, manager)
-        }
-
+    fun createNotification(
+        specification: NotificationScheduler.NotificationSpec,
+        launchIntent: PendingIntent,
+        cancelIntent: PendingIntent
+    ): Notification {
         return NotificationCompat.Builder(context, specification.channel.id)
             .setPriority(specification.channel.priority)
             .setSmallIcon(specification.icon)
@@ -66,13 +43,5 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
             .setContentIntent(launchIntent)
             .setDeleteIntent(cancelIntent)
             .build()
-    }
-
-    @RequiresApi(O)
-    private fun createNotificationChannel(specification: NotificationSpec, manager: NotificationManager) {
-        val channel = NotificationChannel(specification.channel.id, specification.channel.name, specification.channel.priority)
-        channel.description = specification.channel.description
-        manager.createNotificationChannel(channel)
-        channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
     }
 }
