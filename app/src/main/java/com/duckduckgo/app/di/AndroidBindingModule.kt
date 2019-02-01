@@ -21,6 +21,9 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserInfoActivity
+import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
+import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
+import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
 import com.duckduckgo.app.feedback.ui.FeedbackActivity
 import com.duckduckgo.app.feedback.ui.SurveyActivity
 import com.duckduckgo.app.fire.FireActivity
@@ -115,6 +118,16 @@ abstract class AndroidBindingModule {
 
     @ContributesAndroidInjector
     abstract fun onboardingDefaultBrowserFragment(): OnboardingPageFragment.DefaultBrowserPage
+
+    @ContributesAndroidInjector
+    abstract fun appEnjoymentDialogFragment(): AppEnjoymentDialogFragment
+
+    @ContributesAndroidInjector
+    abstract fun giveFeedbackDialogFragment(): GiveFeedbackDialogFragment
+
+    @ContributesAndroidInjector
+    abstract fun rateAppDialogFragment(): RateAppDialogFragment
+
 
     /* Services */
 

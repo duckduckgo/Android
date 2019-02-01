@@ -24,26 +24,26 @@ import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 
 
-class RateAppDialogFragment : EnjoymentDialog() {
+class AppEnjoymentDialogFragment : EnjoymentDialog() {
 
     interface Listener {
-        fun onUserSelectedToRateApp(promptCount: PromptCount)
-        fun onUserDeclinedToRateApp(promptCount: PromptCount)
+        fun onUserSelectedAppIsEnjoyed(promptCount: PromptCount)
+        fun onUserSelectedAppIsNotEnjoyed(promptCount: PromptCount)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        firePixelWithPromptCount(APP_RATING_DIALOG_SHOWN)
+        firePixelWithPromptCount(APP_ENJOYMENT_DIALOG_SHOWN)
 
         return AlertDialog.Builder(activity!!, R.style.AlertDialogTheme)
-            .setTitle(R.string.rate_app_dialog_title)
-            .setMessage(R.string.rate_app_dialog_message)
-            .setPositiveButton(R.string.rate_app_dialog_positive_button) { _, _ ->
-                firePixelWithPromptCount(APP_RATING_DIALOG_USER_GAVE_RATING)
-                listener?.onUserSelectedToRateApp(PromptCount(promptCount))
+            .setTitle(R.string.app_enjoyment_dialog_title)
+            .setMessage(R.string.app_enjoyment_dialog_message)
+            .setPositiveButton(R.string.app_enjoyment_dialog_positive_button) { _, _ ->
+                firePixelWithPromptCount(APP_ENJOYMENT_DIALOG_USER_ENJOYING)
+                listener?.onUserSelectedAppIsEnjoyed(PromptCount(promptCount))
             }
-            .setNegativeButton(R.string.rate_app_dialog_negative_button) { _, _ ->
-                firePixelWithPromptCount(APP_RATING_DIALOG_USER_DECLINED_RATING)
-                listener?.onUserDeclinedToRateApp(PromptCount(promptCount))
+            .setNegativeButton(R.string.app_enjoyment_dialog_negative_button) { _, _ ->
+                firePixelWithPromptCount(APP_ENJOYMENT_DIALOG_USER_NOT_ENJOYING)
+                listener?.onUserSelectedAppIsNotEnjoyed(PromptCount(promptCount))
             }
             .create()
     }
@@ -52,8 +52,8 @@ class RateAppDialogFragment : EnjoymentDialog() {
         get() = activity as Listener
 
     companion object {
-        fun create(promptCount: PromptCount): RateAppDialogFragment {
-            return RateAppDialogFragment().also { fragment ->
+        fun create(promptCount: PromptCount): AppEnjoymentDialogFragment {
+            return AppEnjoymentDialogFragment().also { fragment ->
                 val bundle = Bundle()
                 bundle.putInt(PROMPT_COUNT_BUNDLE_KEY, promptCount.value)
                 fragment.arguments = bundle

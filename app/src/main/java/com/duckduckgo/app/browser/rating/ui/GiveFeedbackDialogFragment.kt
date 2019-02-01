@@ -19,12 +19,12 @@ package com.duckduckgo.app.browser.rating.ui
 import android.app.Dialog
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.rating.PromptCount
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 
 
-class GiveFeedbackDialogFragment : DialogFragment() {
+class GiveFeedbackDialogFragment : EnjoymentDialog() {
 
     interface Listener {
         fun onUserSelectedToGiveFeedback(promptCount: PromptCount)
@@ -32,17 +32,17 @@ class GiveFeedbackDialogFragment : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
-        isCancelable = false
-        val promptCount = arguments!![PROMPT_COUNT_KEY] as Int
+        firePixelWithPromptCount(APP_FEEDBACK_DIALOG_SHOWN)
 
         return AlertDialog.Builder(activity!!, R.style.AlertDialogTheme)
             .setTitle(R.string.give_feedback_dialog_title)
             .setMessage(R.string.give_feedback_dialog_message)
             .setPositiveButton(R.string.give_feedback_dialog_positive_button) { _, _ ->
+                firePixelWithPromptCount(APP_FEEDBACK_DIALOG_USER_GAVE_FEEDBACK)
                 listener?.onUserSelectedToGiveFeedback(PromptCount(promptCount))
             }
             .setNegativeButton(R.string.give_feedback_dialog_negative_button) { _, _ ->
+                firePixelWithPromptCount(APP_FEEDBACK_DIALOG_USER_DECLINED_FEEDBACK)
                 listener?.onUserDeclinedToGiveFeedback(PromptCount(promptCount))
             }
             .create()
@@ -52,15 +52,12 @@ class GiveFeedbackDialogFragment : DialogFragment() {
         get() = activity as Listener
 
     companion object {
-
         fun create(promptCount: PromptCount): GiveFeedbackDialogFragment {
             return GiveFeedbackDialogFragment().also { fragment ->
                 val bundle = Bundle()
-                bundle.putInt(PROMPT_COUNT_KEY, promptCount.value)
+                bundle.putInt(PROMPT_COUNT_BUNDLE_KEY, promptCount.value)
                 fragment.arguments = bundle
             }
         }
-
-        private const val PROMPT_COUNT_KEY = "PROMPT_COUNT"
     }
 }

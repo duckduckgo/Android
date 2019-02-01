@@ -29,7 +29,7 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
-import com.duckduckgo.app.browser.rating.ui.EnjoymentDialogFragment
+import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
 import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
 import com.duckduckgo.app.feedback.ui.FeedbackActivity
@@ -51,7 +51,7 @@ import org.jetbrains.anko.longToast
 import timber.log.Timber
 import javax.inject.Inject
 
-class BrowserActivity : DuckDuckGoActivity(), EnjoymentDialogFragment.Listener, RateAppDialogFragment.Listener, GiveFeedbackDialogFragment.Listener {
+class BrowserActivity : DuckDuckGoActivity(), AppEnjoymentDialogFragment.Listener, RateAppDialogFragment.Listener, GiveFeedbackDialogFragment.Listener {
 
     @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
@@ -228,7 +228,7 @@ class BrowserActivity : DuckDuckGoActivity(), EnjoymentDialogFragment.Listener, 
             is Command.DisplayMessage -> applicationContext?.longToast(command.messageId)
             is Command.LaunchPlayStore -> launchPlayStore()
             is Command.ShowAppEnjoymentPrompt -> {
-                showAppEnjoymentPrompt(EnjoymentDialogFragment.create(command.promptCount))
+                showAppEnjoymentPrompt(AppEnjoymentDialogFragment.create(command.promptCount))
             }
             is Command.ShowAppRatingPrompt -> {
                 showAppEnjoymentPrompt(RateAppDialogFragment.create(command.promptCount))
