@@ -34,8 +34,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.notification.NotificationFactory.NotificationSpec
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_CANCELLED
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCHED
-import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
@@ -95,7 +95,7 @@ class NotificationScheduler @Inject constructor(
         scheduleClearDataNotification(duration.toLong(), TimeUnit.DAYS)
     }
 
-    fun updateNotificationsStatus() {
+    private fun updateNotificationsStatus() {
         val systemEnabled = compatManager.areNotificationsEnabled()
         val channelEnabled = when {
             SDK_INT >= O -> manager.getNotificationChannel(Channels.privacyTips.id)?.importance != IMPORTANCE_NONE
@@ -156,7 +156,7 @@ class NotificationScheduler @Inject constructor(
         }
 
         private fun pendingNotificationHandlerIntent(context: Context, eventType: String): PendingIntent {
-            var intent = Intent(context, NotificationHandlerService::class.java)
+            val intent = Intent(context, NotificationHandlerService::class.java)
             intent.type = eventType
             return getService(context, 0, intent, 0)!!
         }

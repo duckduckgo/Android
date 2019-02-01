@@ -42,8 +42,8 @@ class NotificationHandlerServiceTest {
     }
 
     @Test
-    fun whenIntentIsClearDataLaunchedThenCorrespondingIsFired() {
-        var intent = Intent(context, NotificationHandlerService::class.java)
+    fun whenIntentIsClearDataLaunchedThenCorrespondingPixelIsFired() {
+        val intent = Intent(context, NotificationHandlerService::class.java)
         intent.type = CLEAR_DATA_LAUNCHED
         testee.onHandleIntent(intent)
         verify(mockPixel).fire(eq(Pixel.PixelName.NOTIFICATION_LAUNCHED), any())
@@ -51,7 +51,7 @@ class NotificationHandlerServiceTest {
 
     @Test
     fun whenIntentIsClearDataCancelledThenCorrespondingPixelIsFired() {
-        var intent = Intent(context, NotificationHandlerService::class.java)
+        val intent = Intent(context, NotificationHandlerService::class.java)
         intent.type = CLEAR_DATA_CANCELLED
         testee.onHandleIntent(intent)
         verify(mockPixel).fire(eq(Pixel.PixelName.NOTIFICATION_CANCELLED), any())
