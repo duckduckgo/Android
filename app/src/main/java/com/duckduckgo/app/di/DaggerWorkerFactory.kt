@@ -62,6 +62,7 @@ class DaggerWorkerFactory(
     private fun injectShowClearNotificationWorker(worker: ShowClearDataNotification) {
         worker.manager = notificationManager
         worker.notificationDao = notificationDao
+        worker.settingsDataStore = settingsDataStore
         worker.factory = notificationFactory
         worker.pixel = pixel
     }

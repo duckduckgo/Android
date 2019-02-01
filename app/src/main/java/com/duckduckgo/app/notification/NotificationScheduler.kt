@@ -138,19 +138,23 @@ class NotificationScheduler @Inject constructor(
         lateinit var manager: NotificationManager
         lateinit var factory: NotificationFactory
         lateinit var notificationDao: NotificationDao
+        lateinit var settingsDataStore: SettingsDataStore
         lateinit var pixel: Pixel
 
         override fun doWork(): Result {
 
+            if (settingsDataStore.automaticallyClearWhatOption != ClearWhatOption.CLEAR_NONE) {
+                Timber.v("No need for notification, user already has clear option set")
+                return Result.SUCCESS
+            }
+
             val specification = NotificationSpecs.autoClear
             val launchIntent = pendingNotificationHandlerIntent(context, CLEAR_DATA_LAUNCHED)
             val cancelIntent = pendingNotificationHandlerIntent(context, CLEAR_DATA_CANCELLED)
-
             val notification = factory.createNotification(specification, launchIntent, cancelIntent)
             notificationDao.insert(Notification(specification.id))
             manager.notify(specification.systemId, notification)
             pixel.fire(NOTIFICATIONS_SHOWN)
-
             return Result.SUCCESS
         }
 
