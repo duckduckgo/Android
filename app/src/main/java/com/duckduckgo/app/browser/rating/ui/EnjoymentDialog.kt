@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.rating.ui
 
-import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
@@ -33,14 +32,14 @@ abstract class EnjoymentDialog : DialogFragment() {
     val promptCount: Int
         get() = arguments!![PROMPT_COUNT_BUNDLE_KEY] as Int
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        isCancelable = false
+    }
+
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
-    }
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        isCancelable = false
-        return super.onCreateDialog(savedInstanceState)
     }
 
     fun firePixelWithPromptCount(name: Pixel.PixelName) {
