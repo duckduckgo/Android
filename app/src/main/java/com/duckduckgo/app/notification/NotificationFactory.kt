@@ -22,7 +22,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES.M
 import android.os.Build.VERSION_CODES.O
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
@@ -46,7 +45,6 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
         val channel: Channel,
         val name: String,
         val icon: Int,
-        val legacyIcon: Int,
         val title: Int,
         val description: Int
     )
@@ -57,11 +55,9 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
             createNotificationChannel(specification, manager)
         }
 
-        val icon = if (SDK_INT >= M) specification.icon else specification.legacyIcon
-
         return NotificationCompat.Builder(context, specification.channel.id)
             .setPriority(specification.channel.priority)
-            .setSmallIcon(icon)
+            .setSmallIcon(specification.icon)
             .setContentTitle(context.getString(specification.title))
             .setAutoCancel(true)
             .setStyle(NotificationCompat.BigTextStyle().bigText(context.getString(specification.description)))

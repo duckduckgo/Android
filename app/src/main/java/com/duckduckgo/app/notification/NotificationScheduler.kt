@@ -74,7 +74,6 @@ class NotificationScheduler @Inject constructor(
             Channels.privacyTips,
             "Update auto clear data",
             R.drawable.notification_fire,
-            R.drawable.notification_fire_legacy,
             R.string.clearNotificationTitle,
             R.string.clearNotificationDescription
         )
