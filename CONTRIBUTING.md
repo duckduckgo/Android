@@ -5,7 +5,7 @@ Thank you for taking the time to contribute to DuckDuckGo! :sparkles:
 We are pleased to open up the project to you - our community. How can you contribute?
 
 ## Share feedback
-Contact us at https://duckduckgo.com/feedback if you have feedback, questions or want to chat. You can also use the feedback form embedded within our Mobile App - to do so please navigate to Settings and select "Send Feedback.
+Contact us at https://duckduckgo.com/feedback if you have feedback, questions or want to chat. You can also use the feedback form embedded within our Mobile App - to do so please navigate to Settings and select "Leave Feedback".
 
 ## Report an issue
 A great way to contribute to the project is to report an issue when you encounter a problem.
