@@ -24,7 +24,7 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.blockingObserve
-import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -74,8 +74,8 @@ class AppDatabaseTest {
             it.execSQL("INSERT INTO `tabs` values ('tabid2', 'url', 'title') ")
         }
 
-        Assert.assertEquals(0, database().tabsDao().tabs()[0].position)
-        Assert.assertEquals(1, database().tabsDao().tabs()[1].position)
+        assertEquals(0, database().tabsDao().tabs()[0].position)
+        assertEquals(1, database().tabsDao().tabs()[1].position)
     }
 
     @Test

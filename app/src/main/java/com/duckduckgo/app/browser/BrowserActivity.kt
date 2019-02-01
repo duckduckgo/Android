@@ -227,18 +227,10 @@ class BrowserActivity : DuckDuckGoActivity(), AppEnjoymentDialogFragment.Listene
             is Refresh -> currentTab?.refresh()
             is Command.DisplayMessage -> applicationContext?.longToast(command.messageId)
             is Command.LaunchPlayStore -> launchPlayStore()
-            is Command.ShowAppEnjoymentPrompt -> {
-                showAppEnjoymentPrompt(AppEnjoymentDialogFragment.create(command.promptCount))
-            }
-            is Command.ShowAppRatingPrompt -> {
-                showAppEnjoymentPrompt(RateAppDialogFragment.create(command.promptCount))
-            }
-            is Command.ShowAppFeedbackPrompt -> {
-                showAppEnjoymentPrompt(GiveFeedbackDialogFragment.create(command.promptCount))
-            }
-            is Command.LaunchFeedbackView -> {
-                startActivity(FeedbackActivity.intent(this, brokenSite = false))
-            }
+            is Command.ShowAppEnjoymentPrompt -> showAppEnjoymentPrompt(AppEnjoymentDialogFragment.create(command.promptCount))
+            is Command.ShowAppRatingPrompt -> showAppEnjoymentPrompt(RateAppDialogFragment.create(command.promptCount))
+            is Command.ShowAppFeedbackPrompt -> showAppEnjoymentPrompt(GiveFeedbackDialogFragment.create(command.promptCount))
+            is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this, brokenSite = false))
         }
     }
 
