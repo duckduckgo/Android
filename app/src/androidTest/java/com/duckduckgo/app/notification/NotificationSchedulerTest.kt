@@ -16,13 +16,11 @@
 
 package com.duckduckgo.app.notification
 
-import android.app.NotificationManager
-import android.content.Context.NOTIFICATION_SERVICE
 import androidx.core.app.NotificationManagerCompat
+import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -33,27 +31,24 @@ import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NotificationD
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 
 class NotificationSchedulerTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val notifcationManagerCompat = NotificationManagerCompat.from(context)
-    private val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+    private val testScope = CoroutineScope(Dispatchers.Main)
 
     private val mockNotificationsDao: NotificationDao = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockVariantManager: VariantManager = mock()
 
     private lateinit var testee: NotificationScheduler
-
-    @get:Rule
-    @Suppress("unused")
-    val schedulers = InstantSchedulersRule()
 
     @Before
     fun before() {
@@ -67,37 +62,38 @@ class NotificationSchedulerTest {
     }
 
     @Test
-    fun whenInNotificationDayOneFeatureAndNotificaiontNotSeenAndOptionNotSetThenNotificationScheduled() {
+    fun whenInNotificationDayOneFeatureAndNotificationtNotSeenAndOptionNotSetThenNotificationScheduled() {
         setup(NotificationDayOne, false, ClearWhatOption.CLEAR_NONE)
         testee.scheduleNextNotification()
         assertTrue(notificationScheduled())
     }
 
     @Test
-    fun whenInNotificationDayThreeFeatureAndNotificaionNotSeenAndOptionNotSetThenNotificationScheduled() {
+    fun whenInNotificationDayThreeFeatureAndNotificationNotSeenAndOptionNotSetThenNotificationScheduled() {
         setup(NotificationDayThree, false, ClearWhatOption.CLEAR_NONE)
-        testee.scheduleNextNotification()
+        testee.scheduleNextNotification(testScope)
         assertTrue(notificationScheduled())
     }
 
     @Test
     fun whenndNotificaionNotSeenAndOptionNotSetButNoNotificationFeatureOffThenNotificationNotScheduled() {
         setup(null, false, ClearWhatOption.CLEAR_NONE)
-        testee.scheduleNextNotification()
+        testee.scheduleNextNotification(testScope)
         assertFalse(notificationScheduled())
     }
 
     @Test
     fun whenInNotificationCohortAndNotificationNotSeenButClearOptionsAlreadySetThenNotificationNotScheduled() {
         setup(NotificationDayOne, false, ClearWhatOption.CLEAR_TABS_ONLY)
-        testee.scheduleNextNotification()
+        testee.scheduleNextNotification(testScope)
         assertFalse(notificationScheduled())
     }
 
     @Test
+    @UiThreadTest
     fun whenInNotificationCohortAndOptionNotSetButNotificationAlreadySeenThenNotificationNotScheduled() {
         setup(NotificationDayOne, true, ClearWhatOption.CLEAR_NONE)
-        testee.scheduleNextNotification()
+        testee.scheduleNextNotification(testScope)
         assertFalse(notificationScheduled())
     }
 

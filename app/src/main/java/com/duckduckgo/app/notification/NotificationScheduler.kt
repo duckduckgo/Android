@@ -37,7 +37,9 @@ import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NotificationD
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NotificationDayThree
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATIONS_SHOWN
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -72,7 +74,7 @@ class NotificationScheduler @Inject constructor(
         )
     }
 
-    fun scheduleNextNotification() {
+    fun scheduleNextNotification(scope: CoroutineScope = GlobalScope) {
         WorkManager.getInstance().cancelAllWorkByTag(WORK_REQUEST_TAG)
 
         val duration = when {
@@ -83,20 +85,20 @@ class NotificationScheduler @Inject constructor(
                 return
             }
         }
-        scheduleClearDataNotification(duration.toLong(), TimeUnit.DAYS)
+        scheduleClearDataNotification(duration.toLong(), TimeUnit.DAYS, scope)
     }
 
-    private fun scheduleClearDataNotification(duration: Long, unit: TimeUnit): Boolean {
+    private fun scheduleClearDataNotification(duration: Long, unit: TimeUnit, scope: CoroutineScope) {
 
         if (settingsDataStore.automaticallyClearWhatOption != ClearWhatOption.CLEAR_NONE) {
             Timber.v("No need for notification, user already has clear option set")
-            return true
+            return
         }
 
-        Schedulers.io().scheduleDirect {
+        scope.launch {
             if (dao.exists(NotificationSpecs.autoClear.id)) {
                 Timber.v("Clear data notification already seen, no need to schedule")
-                return@scheduleDirect
+                return@launch
             }
 
             Timber.v("Scheduling clear data notification")
@@ -106,7 +108,6 @@ class NotificationScheduler @Inject constructor(
 
             WorkManager.getInstance().enqueue(request.build())
         }
-        return false
     }
 
     class ShowClearDataNotification(val context: Context, params: WorkerParameters) : Worker(context, params) {
