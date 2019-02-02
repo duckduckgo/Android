@@ -42,7 +42,7 @@ class NotificationSchedulerTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val notifcationManagerCompat = NotificationManagerCompat.from(context)
-    private val testScope = CoroutineScope(Dispatchers.Main)
+    private val testScope = CoroutineScope(Dispatchers.Unconfined)
 
     private val mockNotificationsDao: NotificationDao = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
@@ -64,7 +64,7 @@ class NotificationSchedulerTest {
     @Test
     fun whenInNotificationDayOneFeatureAndNotificationtNotSeenAndOptionNotSetThenNotificationScheduled() {
         setup(NotificationDayOne, false, ClearWhatOption.CLEAR_NONE)
-        testee.scheduleNextNotification()
+        testee.scheduleNextNotification(testScope)
         assertTrue(notificationScheduled())
     }
 
@@ -72,6 +72,7 @@ class NotificationSchedulerTest {
     fun whenInNotificationDayThreeFeatureAndNotificationNotSeenAndOptionNotSetThenNotificationScheduled() {
         setup(NotificationDayThree, false, ClearWhatOption.CLEAR_NONE)
         testee.scheduleNextNotification(testScope)
+
         assertTrue(notificationScheduled())
     }
 
