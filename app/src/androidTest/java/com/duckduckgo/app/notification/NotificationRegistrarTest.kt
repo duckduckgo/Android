@@ -44,6 +44,7 @@ class NotificationRegistrarTest {
     fun before() {
         whenever(mockVariantManager.getVariant(any())).thenReturn(DEFAULT_VARIANT)
         testee = NotificationRegistrar(
+            context,
             notificationManager,
             notifcationManagerCompat,
             mockSettingsDataStore,

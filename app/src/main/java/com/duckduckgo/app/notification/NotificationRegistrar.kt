@@ -20,15 +20,19 @@ import android.annotation.TargetApi
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_NONE
+import android.content.Context
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.O
+import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import timber.log.Timber
 import javax.inject.Inject
 
 class NotificationRegistrar @Inject constructor(
+    private val context: Context,
     private val manager: NotificationManager,
     private val compatManager: NotificationManagerCompat,
     private val settingsDataStore: SettingsDataStore,
@@ -37,24 +41,24 @@ class NotificationRegistrar @Inject constructor(
 
     data class Channel(
         val id: String,
-        val name: String,
+        @StringRes val name: Int,
         val priority: Int
     )
 
     object ChannelType {
         val FILE_DOWNLOADING = Channel(
             "com.duckduckgo.downloading",
-            "File downloading",
+            R.string.notificationChannelFileDownloading,
             NotificationManagerCompat.IMPORTANCE_LOW
         )
         val FILE_DOWNLOADED = Channel(
             "com.duckduckgo.downloaded",
-            "File downloaded",
+            R.string.notificationChannelFileDownloaded,
             NotificationManagerCompat.IMPORTANCE_LOW
         )
         val PRIVACY_TIPS = Channel(
             "com.duckduckgo.privacytips",
-            "Privacy Tips",
+            R.string.notificationChannelPrivacyTips,
             NotificationManagerCompat.IMPORTANCE_DEFAULT
         )
     }
@@ -77,7 +81,7 @@ class NotificationRegistrar @Inject constructor(
     @TargetApi(O)
     private fun configureNotificationChannels() {
         val notificationChannels = channels.map {
-            NotificationChannel(it.id, it.name, it.priority)
+            NotificationChannel(it.id, context.getString(it.name), it.priority)
         }
         manager.createNotificationChannels(notificationChannels)
     }

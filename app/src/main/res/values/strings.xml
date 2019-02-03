@@ -249,6 +249,11 @@
     <string name="addWidgetInstructionsButtonGoHome">Go to Home Screen</string>
     <string name="addWidgetInstructionsButtonClose">Close</string>
 
+    <!-- Notification Channel Names -->
+    <string name="notificationChannelFileDownloading">File Downloading</string>
+    <string name="notificationChannelFileDownloaded">File Downloaded</string>
+    <string name="notificationChannelPrivacyTips">Privacy Tips</string>
+
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Data clearing set to manual</string>
     <string name="clearNotificationDescription">Customize DuckDuckGo to automatically clear browsing data after every session.</string>
