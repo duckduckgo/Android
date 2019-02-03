@@ -17,7 +17,6 @@
 package com.duckduckgo.app.notification
 
 import androidx.core.app.NotificationManagerCompat
-import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -72,7 +71,6 @@ class NotificationSchedulerTest {
     fun whenInNotificationDayThreeFeatureAndNotificationNotSeenAndOptionNotSetThenNotificationScheduled() {
         setup(NotificationDayThree, false, ClearWhatOption.CLEAR_NONE)
         testee.scheduleNextNotification(testScope)
-
         assertTrue(notificationScheduled())
     }
 
@@ -91,7 +89,6 @@ class NotificationSchedulerTest {
     }
 
     @Test
-    @UiThreadTest
     fun whenInNotificationCohortAndOptionNotSetButNotificationAlreadySeenThenNotificationNotScheduled() {
         setup(NotificationDayOne, true, ClearWhatOption.CLEAR_NONE)
         testee.scheduleNextNotification(testScope)
