@@ -50,7 +50,6 @@ import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -141,9 +140,6 @@ class BrowserTabViewModelTest {
     private lateinit var mockPixel: Pixel
 
     @Mock
-    private lateinit var mockVariantManager: VariantManager
-
-    @Mock
     private lateinit var mockWidgetCapabilities: WidgetCapabilities
 
     private lateinit var ctaViewModel: CtaViewModel
@@ -172,16 +168,13 @@ class BrowserTabViewModelTest {
             mockPixel,
             mockSurveyDao,
             mockWidgetCapabilities,
-            mockDismissedCtaDao,
-            mockVariantManager
+            mockDismissedCtaDao
         )
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore)
-
         whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        whenever(mockVariantManager.getVariant(any())).thenReturn(VariantManager.DEFAULT_VARIANT)
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
