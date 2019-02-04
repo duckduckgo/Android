@@ -25,9 +25,7 @@ import timber.log.Timber
 @WorkerThread
 interface VariantManager {
 
-    sealed class VariantFeature {
-        object AddWidgetCta : VariantFeature()
-    }
+    sealed class VariantFeature
 
     companion object {
 
@@ -37,10 +35,7 @@ interface VariantManager {
         val ACTIVE_VARIANTS = listOf(
             // SERP variants - do not remove
             Variant(key = "sa", weight = 1.0, features = emptyList()),
-            Variant(key = "sb", weight = 1.0, features = emptyList()),
-
-            Variant(key = "mn", weight = 1.0, features = emptyList()), //control
-            Variant(key = "mo", weight = 1.0, features = listOf(VariantFeature.AddWidgetCta))
+            Variant(key = "sb", weight = 1.0, features = emptyList())
         )
     }
 
@@ -90,13 +85,7 @@ class ExperimentationVariantManager(
 
     private fun generateVariant(activeVariants: List<Variant>): Variant {
         val randomizedIndex = indexRandomizer.random(activeVariants)
-        val variant = activeVariants[randomizedIndex]
-        if ((variant.key == "mn" || variant.key == "mo") && !widgetCapabilities.supportsStandardWidgetAdd) {
-            Timber.i("This device does not support $variant.key., using default")
-            return DEFAULT_VARIANT
-        }
-
-        return variant
+        return activeVariants[randomizedIndex]
     }
 }
 
