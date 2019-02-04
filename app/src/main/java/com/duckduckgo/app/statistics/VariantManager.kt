@@ -27,7 +27,6 @@ import java.util.*
 interface VariantManager {
 
     sealed class VariantFeature {
-        object AddWidgetCta : VariantFeature()
         object NotificationDayOne : VariantFeature()
         object NotificationDayThree : VariantFeature()
     }
@@ -50,11 +49,7 @@ interface VariantManager {
             // Notifications non-english speakers
             Variant(key = "md", weight = 1.0, features = emptyList()),
             Variant(key = "mf", weight = 1.0, features = listOf(VariantFeature.NotificationDayOne)),
-            Variant(key = "mu", weight = 1.0, features = listOf(VariantFeature.NotificationDayThree)),
-
-            // Add Widget
-            Variant(key = "mn", weight = 1.0, features = emptyList()), //control
-            Variant(key = "mo", weight = 1.0, features = listOf(VariantFeature.AddWidgetCta))
+            Variant(key = "mu", weight = 1.0, features = listOf(VariantFeature.NotificationDayThree))
         )
     }
 
@@ -105,12 +100,6 @@ class ExperimentationVariantManager(
     private fun generateVariant(activeVariants: List<Variant>): Variant {
         val randomizedIndex = indexRandomizer.random(activeVariants)
         val variant = activeVariants[randomizedIndex]
-
-        if ((variant.key == "mn" || variant.key == "mo") && !widgetCapabilities.supportsStandardWidgetAdd) {
-            Timber.i("This device does not support $variant.key., using default")
-            return DEFAULT_VARIANT
-        }
-
         return adjustNotificationVariantsForLanguage(variant, activeVariants)
     }
 
