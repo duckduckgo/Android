@@ -75,7 +75,6 @@ class NotificationRegistrar @Inject constructor(
             return
         }
         configureNotificationChannels()
-        updateStatus()
     }
 
     @TargetApi(O)

@@ -269,6 +269,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onAppResumed() {
+        notificationRegistrar.updateStatus()
         notificationScheduler.scheduleNextNotification()
     }
 
