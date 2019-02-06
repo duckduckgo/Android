@@ -17,15 +17,27 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
+import androidx.core.app.NotificationManagerCompat
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.fire.DataClearingWorker
 import com.duckduckgo.app.global.view.ClearDataAction
+import com.duckduckgo.app.notification.NotificationFactory
+import com.duckduckgo.app.notification.NotificationScheduler.ShowClearDataNotification
+import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import timber.log.Timber
 
-class DaggerWorkerFactory(private val settingsDataStore: SettingsDataStore, private val clearDataAction: ClearDataAction) : WorkerFactory() {
+class DaggerWorkerFactory(
+    private val settingsDataStore: SettingsDataStore,
+    private val clearDataAction: ClearDataAction,
+    private val notificationManager: NotificationManagerCompat,
+    private val notificationDao: NotificationDao,
+    private val notificationFactory: NotificationFactory,
+    private val pixel: Pixel
+) : WorkerFactory() {
 
     override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
 
@@ -34,15 +46,24 @@ class DaggerWorkerFactory(private val settingsDataStore: SettingsDataStore, priv
         val instance = constructor.newInstance(appContext, workerParameters)
 
         when (instance) {
-            is DataClearingWorker -> injectWorker(instance)
+            is DataClearingWorker -> injectDataClearWorker(instance)
+            is ShowClearDataNotification -> injectShowClearNotificationWorker(instance)
             else -> Timber.i("No injection required for worker $workerClassName")
         }
 
         return instance
     }
 
-    private fun injectWorker(worker: DataClearingWorker) {
+    private fun injectDataClearWorker(worker: DataClearingWorker) {
         worker.settingsDataStore = settingsDataStore
         worker.clearDataAction = clearDataAction
+    }
+
+    private fun injectShowClearNotificationWorker(worker: ShowClearDataNotification) {
+        worker.manager = notificationManager
+        worker.notificationDao = notificationDao
+        worker.settingsDataStore = settingsDataStore
+        worker.factory = notificationFactory
+        worker.pixel = pixel
     }
 }

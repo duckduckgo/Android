@@ -26,6 +26,7 @@ import com.duckduckgo.app.feedback.ui.SurveyActivity
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.job.AppConfigurationJobService
 import com.duckduckgo.app.launch.LaunchActivity
+import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingPageFragment
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
@@ -120,4 +121,7 @@ abstract class AndroidBindingModule {
 
     @ContributesAndroidInjector
     abstract fun jobService(): AppConfigurationJobService
+
+    @ContributesAndroidInjector
+    abstract fun notificationHandlerService(): NotificationHandlerService
 }

@@ -44,6 +44,7 @@ import javax.inject.Singleton
 
         /* real modules */
         ApplicationModule::class,
+        WorkerModule::class,
         AndroidBindingModule::class,
         AndroidSupportInjectionModule::class,
         NetworkModule::class,

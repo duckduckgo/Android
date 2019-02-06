@@ -17,7 +17,6 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import androidx.work.WorkerFactory
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.entities.EntityMapping
 import com.duckduckgo.app.fire.*
@@ -65,11 +64,5 @@ class PrivacyModule {
         dataClearerTimeKeeper: BackgroundTimeKeeper
     ): DataClearer {
         return AutomaticDataClearer(settingsDataStore, clearDataAction, dataClearerTimeKeeper)
-    }
-
-    @Provides
-    @Singleton
-    fun workerFactory(settingsDataStore: SettingsDataStore, clearDataAction: ClearDataAction): WorkerFactory {
-        return DaggerWorkerFactory(settingsDataStore, clearDataAction)
     }
 }
