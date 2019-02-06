@@ -63,6 +63,7 @@ import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
+import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
@@ -129,6 +130,9 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     @Inject
     lateinit var ctaViewModel: CtaViewModel
+
+    @Inject
+    lateinit var omnibarScrolling: OmnibarScrolling
 
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
@@ -943,9 +947,11 @@ class BrowserTabFragment : Fragment(), FindListener {
                 val browserShowing = viewState.browserShowing
                 if (browserShowing) {
                     webView?.show()
+                    omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
                 } else {
                     logoHidingLayoutChangeListener.callToActionView = ctaContainer
                     webView?.hide()
+                    omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
                 }
 
                 toggleDesktopSiteMode(viewState.isDesktopBrowsingMode)
