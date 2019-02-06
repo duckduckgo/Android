@@ -36,11 +36,12 @@ import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.global.Theming.initializeTheme
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.global.notification.NotificationRegistrar
+import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.migration.LegacyMigration
+import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -108,6 +109,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     @Inject
     lateinit var dataClearer: DataClearer
+
+    @Inject
+    lateinit var notificationScheduler: NotificationScheduler
 
     @Inject
     lateinit var workerFactory: WorkerFactory
@@ -261,6 +265,12 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
             return
         }
         pixel.fire(APP_LAUNCH)
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    fun onAppResumed() {
+        notificationRegistrar.updateStatus()
+        notificationScheduler.scheduleNextNotification()
     }
 
     companion object {

@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.global.db
 
+import androidx.annotation.CheckResult
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import androidx.annotation.CheckResult
 import com.duckduckgo.app.global.db.AppConfigurationDao.Companion.KEY
 import org.intellij.lang.annotations.Language
 

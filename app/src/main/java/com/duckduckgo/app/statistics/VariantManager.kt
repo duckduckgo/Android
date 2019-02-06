@@ -21,12 +21,14 @@ import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import timber.log.Timber
+import java.util.*
 
 @WorkerThread
 interface VariantManager {
 
     sealed class VariantFeature {
-        object AddWidgetCta : VariantFeature()
+        object NotificationDayOne : VariantFeature()
+        object NotificationDayThree : VariantFeature()
     }
 
     companion object {
@@ -39,8 +41,15 @@ interface VariantManager {
             Variant(key = "sa", weight = 1.0, features = emptyList()),
             Variant(key = "sb", weight = 1.0, features = emptyList()),
 
-            Variant(key = "mn", weight = 1.0, features = emptyList()), //control
-            Variant(key = "mo", weight = 1.0, features = listOf(VariantFeature.AddWidgetCta))
+            // Notifications english speakers
+            Variant(key = "mc", weight = 1.0, features = emptyList()),
+            Variant(key = "me", weight = 1.0, features = listOf(VariantFeature.NotificationDayOne)),
+            Variant(key = "mt", weight = 1.0, features = listOf(VariantFeature.NotificationDayThree)),
+
+            // Notifications non-english speakers
+            Variant(key = "md", weight = 1.0, features = emptyList()),
+            Variant(key = "mf", weight = 1.0, features = listOf(VariantFeature.NotificationDayOne)),
+            Variant(key = "mu", weight = 1.0, features = listOf(VariantFeature.NotificationDayThree))
         )
     }
 
@@ -91,14 +100,25 @@ class ExperimentationVariantManager(
     private fun generateVariant(activeVariants: List<Variant>): Variant {
         val randomizedIndex = indexRandomizer.random(activeVariants)
         val variant = activeVariants[randomizedIndex]
-        if ((variant.key == "mn" || variant.key == "mo") && !widgetCapabilities.supportsStandardWidgetAdd) {
-            Timber.i("This device does not support $variant.key., using default")
-            return DEFAULT_VARIANT
-        }
+        return adjustNotificationVariantsForLanguage(variant, activeVariants)
+    }
 
-        return variant
+    private fun adjustNotificationVariantsForLanguage(variant: Variant, activeVariants: List<Variant>): Variant {
+        return when {
+            !isLanguageEnglish && variant.key == "mc" -> activeVariants.find { it.key == "md" }!!
+            !isLanguageEnglish && variant.key == "me" -> activeVariants.find { it.key == "mf" }!!
+            !isLanguageEnglish && variant.key == "mt" -> activeVariants.find { it.key == "mu" }!!
+            isLanguageEnglish && variant.key == "md" -> activeVariants.find { it.key == "mc" }!!
+            isLanguageEnglish && variant.key == "mf" -> activeVariants.find { it.key == "me" }!!
+            isLanguageEnglish && variant.key == "mu" -> activeVariants.find { it.key == "mt" }!!
+            else -> variant
+        }
     }
 }
+
+private val isLanguageEnglish
+    get() = Locale.getDefault().isO3Language == Locale.ENGLISH.isO3Language
+
 
 /**
  * A variant which can be used for experimentation.

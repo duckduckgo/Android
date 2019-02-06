@@ -37,6 +37,7 @@ import javax.inject.Singleton
     modules = [
         ApplicationModule::class,
         JobsModule::class,
+        WorkerModule::class,
         AndroidBindingModule::class,
         AndroidSupportInjectionModule::class,
         NetworkModule::class,
