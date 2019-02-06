@@ -40,7 +40,6 @@ import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.AppConfigurationSyncer
-import com.duckduckgo.app.migration.LegacyMigration
 import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -79,9 +78,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     @Inject
     lateinit var appConfigurationSyncer: AppConfigurationSyncer
-
-    @Inject
-    lateinit var migration: LegacyMigration
 
     @Inject
     lateinit var statisticsUpdater: StatisticsUpdater
@@ -149,7 +145,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         loadTrackerData()
         configureDataDownloader()
 
-        migrateLegacyDb()
         notificationRegistrar.registerApp()
 
         initializeHttpsUpgrader()
@@ -184,14 +179,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
             return true
         }
         return false
-    }
-
-    private fun migrateLegacyDb() {
-        doAsync {
-            migration.start { favourites, searches ->
-                Timber.d("Migrated $favourites favourites, $searches")
-            }
-        }
     }
 
     private fun loadTrackerData() {
