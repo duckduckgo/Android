@@ -365,13 +365,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewModelNotifiedThatUrlGotFocusThenViewStateIsUpdated() {
-        testee.onOmnibarInputStateChanged("", true)
+        testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
         assertTrue(omnibarViewState().isEditing)
     }
 
     @Test
     fun whenViewModelNotifiedThatUrlLostFocusThenViewStateIsUpdated() {
-        testee.onOmnibarInputStateChanged("", false)
+        testee.onOmnibarInputStateChanged("", false, hasQueryChanged = false)
         assertFalse(omnibarViewState().isEditing)
     }
 
@@ -468,27 +468,27 @@ class BrowserTabViewModelTest {
     fun whenOmnibarInputDoesNotHaveFocusAndAppConfigDownloadedAndBrowserShownThenPrivacyGradeIsShown() {
         testee.onUserSubmittedQuery("foo")
         testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
-        testee.onOmnibarInputStateChanged(query = "", hasFocus = false)
+        testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
         assertTrue(browserViewState().showPrivacyGrade)
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusAndAppConfigDownloadedButBrowserNotShownThenPrivacyGradeIsHidden() {
         testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
-        testee.onOmnibarInputStateChanged(query = "", hasFocus = false)
+        testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
         assertFalse(browserViewState().showPrivacyGrade)
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusAndAppConfigNotDownloadedThenPrivacyGradeIsNotShown() {
         testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = false))
-        testee.onOmnibarInputStateChanged("", false)
+        testee.onOmnibarInputStateChanged("", false, hasQueryChanged = false)
         assertFalse(browserViewState().showPrivacyGrade)
     }
 
     @Test
     fun whenOmnibarInputHasFocusThenPrivacyGradeIsNotShown() {
-        testee.onOmnibarInputStateChanged("", true)
+        testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
         assertFalse(browserViewState().showPrivacyGrade)
     }
 
@@ -499,25 +499,25 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusAndHasQueryThenFireButtonIsShown() {
-        testee.onOmnibarInputStateChanged("query", false)
+        testee.onOmnibarInputStateChanged("query", false, hasQueryChanged = false)
         assertTrue(browserViewState().showFireButton)
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusOrQueryThenFireButtonIsShown() {
-        testee.onOmnibarInputStateChanged("", false)
+        testee.onOmnibarInputStateChanged("", false, hasQueryChanged = false)
         assertTrue(browserViewState().showFireButton)
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndNoQueryThenFireButtonIsShown() {
-        testee.onOmnibarInputStateChanged("", true)
+        testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
         assertTrue(browserViewState().showFireButton)
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndQueryThenFireButtonIsHidden() {
-        testee.onOmnibarInputStateChanged("query", true)
+        testee.onOmnibarInputStateChanged("query", true, hasQueryChanged = false)
         assertFalse(browserViewState().showFireButton)
     }
 
@@ -528,25 +528,25 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusOrQueryThenTabsButtonIsShown() {
-        testee.onOmnibarInputStateChanged("", false)
+        testee.onOmnibarInputStateChanged("", false, hasQueryChanged = false)
         assertTrue(browserViewState().showTabsButton)
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusAndHasQueryThenTabsButtonIsShown() {
-        testee.onOmnibarInputStateChanged("query", false)
+        testee.onOmnibarInputStateChanged("query", false, hasQueryChanged = false)
         assertTrue(browserViewState().showTabsButton)
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndNoQueryThenTabsButtonIsShown() {
-        testee.onOmnibarInputStateChanged("", true)
+        testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
         assertTrue(browserViewState().showTabsButton)
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndQueryThenTabsButtonIsHidden() {
-        testee.onOmnibarInputStateChanged("query", true)
+        testee.onOmnibarInputStateChanged("query", true, hasQueryChanged = false)
         assertFalse(browserViewState().showTabsButton)
     }
 
@@ -557,53 +557,60 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusOrQueryThenMenuButtonIsShown() {
-        testee.onOmnibarInputStateChanged("", false)
+        testee.onOmnibarInputStateChanged("", false, hasQueryChanged = false)
         assertTrue(browserViewState().showMenuButton)
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusAndHasQueryThenMenuButtonIsShown() {
-        testee.onOmnibarInputStateChanged("query", false)
+        testee.onOmnibarInputStateChanged("query", false, hasQueryChanged = false)
         assertTrue(browserViewState().showMenuButton)
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndNoQueryThenMenuButtonIsShown() {
-        testee.onOmnibarInputStateChanged("", true)
+        testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
         assertTrue(browserViewState().showMenuButton)
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndQueryThenMenuButtonIsHidden() {
-        testee.onOmnibarInputStateChanged("query", true)
+        testee.onOmnibarInputStateChanged("query", true, hasQueryChanged = false)
         assertFalse(browserViewState().showMenuButton)
     }
 
     @Test
     fun whenEnteringQueryWithAutoCompleteEnabledThenAutoCompleteSuggestionsShown() {
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
-        testee.onOmnibarInputStateChanged("foo", true)
+        testee.onOmnibarInputStateChanged("foo", true, hasQueryChanged = true)
         assertTrue(autoCompleteViewState().showSuggestions)
+    }
+
+    @Test
+    fun whenOmnibarInputStateChangedWithAutoCompleteEnabledButNoQueryChangeThenAutoCompleteSuggestionsNotShown() {
+        doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+        testee.onOmnibarInputStateChanged("foo", true, hasQueryChanged = false)
+        assertFalse(autoCompleteViewState().showSuggestions)
     }
 
     @Test
     fun whenEnteringQueryWithAutoCompleteDisabledThenAutoCompleteSuggestionsNotShown() {
         doReturn(false).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
-        testee.onOmnibarInputStateChanged("foo", true)
+        testee.onOmnibarInputStateChanged("foo", true, hasQueryChanged = true)
         assertFalse(autoCompleteViewState().showSuggestions)
     }
 
     @Test
     fun whenEnteringEmptyQueryWithAutoCompleteEnabledThenAutoCompleteSuggestionsNotShown() {
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
-        testee.onOmnibarInputStateChanged("", true)
+        testee.onOmnibarInputStateChanged("", true, hasQueryChanged = true)
         assertFalse(autoCompleteViewState().showSuggestions)
     }
 
     @Test
     fun whenEnteringEmptyQueryWithAutoCompleteDisabledThenAutoCompleteSuggestionsNotShown() {
         doReturn(false).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
-        testee.onOmnibarInputStateChanged("", true)
+        testee.onOmnibarInputStateChanged("", true, hasQueryChanged = true)
         assertFalse(autoCompleteViewState().showSuggestions)
     }
 
