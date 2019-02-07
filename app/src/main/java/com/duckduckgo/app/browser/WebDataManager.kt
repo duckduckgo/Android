@@ -18,11 +18,14 @@ package com.duckduckgo.app.browser
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewDatabase
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
+import com.duckduckgo.app.global.performance.measureExecution
+import java.io.File
 import javax.inject.Inject
 
 interface WebDataManager {
@@ -37,13 +40,39 @@ class WebViewDataManager @Inject constructor(
 ) : WebDataManager {
 
     override fun clearData(webView: WebView, webStorage: WebStorage, context: Context) {
-        webView.clearCache(true)
-        webView.clearHistory()
-        webStorage.deleteAllData()
-        webView.clearFormData()
+        clearCache(webView)
+        clearHistory(webView)
+        clearWebStorage(webStorage)
+        clearFormData(webView)
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             clearFormData(WebViewDatabase.getInstance(context))
+        }
+
+        deleteWebViewDirectory(context)
+    }
+
+    private fun clearCache(webView: WebView) {
+        measureExecution("Cleared global WebView cache") {
+            webView.clearCache(true)
+        }
+    }
+
+    private fun clearHistory(webView: WebView) {
+        measureExecution("Cleared history") {
+            webView.clearHistory()
+        }
+    }
+
+    private fun clearWebStorage(webStorage: WebStorage) {
+        measureExecution("Cleared web storage") {
+            webStorage.deleteAllData()
+        }
+    }
+
+    private fun clearFormData(webView: WebView) {
+        measureExecution("Cleared web view form data") {
+            webView.clearFormData()
         }
     }
 
@@ -52,14 +81,37 @@ class WebViewDataManager @Inject constructor(
      */
     @Suppress("DEPRECATION")
     private fun clearFormData(webViewDatabase: WebViewDatabase) {
-        webViewDatabase.clearFormData()
+        measureExecution("Cleared legacy form data") {
+            webViewDatabase.clearFormData()
+        }
+    }
+
+    private fun deleteWebViewDirectory(context: Context) {
+        val webViewDirectory = File(context.applicationInfo.dataDir, WEBVIEW_STORAGE_DIRECTORY)
+        measureExecution("Deleted WebView directory ${webViewDirectory.name}") {
+            webViewDirectory.listFiles()?.forEach { deleteFile(it) }
+        }
+    }
+
+    private fun deleteFile(it: File) {
+        measureExecution("Deleted file: ${it.name}", Log.VERBOSE) {
+           it.deleteRecursively()
+        }
     }
 
     override suspend fun clearExternalCookies() {
-        cookieManager.removeExternalCookies()
+        measureExecution("Cleared cookies") {
+            cookieManager.removeExternalCookies()
+        }
     }
 
     override fun clearWebViewSessions() {
-        webViewSessionStorage.deleteAllSessions()
+        measureExecution("Cleared web view sessions") {
+            webViewSessionStorage.deleteAllSessions()
+        }
+    }
+
+    companion object {
+        private const val WEBVIEW_STORAGE_DIRECTORY = "app_webview"
     }
 }

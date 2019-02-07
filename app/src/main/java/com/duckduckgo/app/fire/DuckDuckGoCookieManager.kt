@@ -16,7 +16,9 @@
 
 package com.duckduckgo.app.fire
 
+import android.util.Log
 import android.webkit.CookieManager
+import com.duckduckgo.app.global.performance.measureExecution
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -39,7 +41,7 @@ class WebViewCookieManager(
 
         suspendCoroutine<Unit> { continuation ->
             cookieManager.removeAllCookies {
-                Timber.i("All cookies removed; restoring ${ddgCookies.size} DDG cookies")
+                Timber.v("All cookies removed; restoring ${ddgCookies.size} DDG cookies")
                 continuation.resume(Unit)
             }
         }
@@ -73,9 +75,8 @@ class WebViewCookieManager(
     }
 
     override fun flush() {
-        val startTime = System.currentTimeMillis()
-        Timber.v("Forcing cookie manager flush")
-        cookieManager.flush()
-        Timber.v("Finished cookie manager flush; took ${System.currentTimeMillis() - startTime}ms")
+        measureExecution("Finished cookie manager flush", Log.VERBOSE) {
+            cookieManager.flush()
+        }
     }
 }
