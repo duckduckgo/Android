@@ -175,10 +175,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private val omnibarInputTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
-            viewModel.onOmnibarInputStateChanged(
-                omnibarTextInput.text.toString(),
-                omnibarTextInput.hasFocus()
-            )
+            viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), omnibarTextInput.hasFocus(), true)
         }
     }
 
@@ -526,7 +523,7 @@ class BrowserTabFragment : Fragment(), FindListener {
     private fun configureOmnibarTextInput() {
         omnibarTextInput.onFocusChangeListener =
                 View.OnFocusChangeListener { _, hasFocus: Boolean ->
-                    viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), hasFocus)
+                    viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), hasFocus, false)
                 }
 
         omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
