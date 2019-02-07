@@ -122,7 +122,7 @@ class NotificationScheduler @Inject constructor(
 
             if (settingsDataStore.automaticallyClearWhatOption != ClearWhatOption.CLEAR_NONE) {
                 Timber.v("No need for notification, user already has clear option set")
-                return Result.SUCCESS
+                return Result.success()
             }
 
             val specification = NotificationSpecs.autoClear
@@ -133,7 +133,7 @@ class NotificationScheduler @Inject constructor(
             manager.notify(specification.systemId, notification)
 
             pixel.fire(NOTIFICATIONS_SHOWN)
-            return Result.SUCCESS
+            return Result.success()
         }
 
         private fun pendingNotificationHandlerIntent(context: Context, eventType: String): PendingIntent {
