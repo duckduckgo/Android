@@ -44,12 +44,12 @@ interface VariantManager {
             // Notifications english speakers
             Variant(key = "mc", weight = 1.0, features = emptyList()),
             Variant(key = "me", weight = 1.0, features = listOf(VariantFeature.NotificationDayOne)),
-            Variant(key = "mt", weight = 1.0, features = listOf(VariantFeature.NotificationDayThree)),
+            Variant(key = "mi", weight = 1.0, features = listOf(VariantFeature.NotificationDayThree)),
 
             // Notifications non-english speakers
             Variant(key = "md", weight = 1.0, features = emptyList()),
             Variant(key = "mf", weight = 1.0, features = listOf(VariantFeature.NotificationDayOne)),
-            Variant(key = "mu", weight = 1.0, features = listOf(VariantFeature.NotificationDayThree))
+            Variant(key = "mk", weight = 1.0, features = listOf(VariantFeature.NotificationDayThree))
         )
     }
 
