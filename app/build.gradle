@@ -77,17 +77,22 @@ android {
 }
 
 ext {
-    androidX = "1.0.1"
-    materialDesign = "1.1.0-alpha01"
+    androidX = "1.0.2"
+    materialDesign = "1.1.0-alpha02"
     architectureComponents = "1.1.1"
     architectureComponentsExtensions = "1.1.1"
     androidKtx = "1.0.1"
-    androidTestRunner = "1.0.2"
-    constraintLayout = "2.0.0-alpha2"
+    constraintLayout = "2.0.0-alpha3"
     lifecycle = "2.0.0"
-    room = "2.1.0-alpha02"
-    workManager = "1.0.0-alpha11"
+    room = "2.1.0-alpha04"
+    workManager = "1.0.0-beta03"
+    legacySupport = "1.0.0"
+    espressoCore = "3.1.1"
+    coreTesting = "2.0.0"
+    androidTestRunner = "1.0.2"
+    testRunner = "1.1.1"
 
+    junit = "4.12"
     dagger = "2.18"
     retrofit = "2.3.0"
     ankoVersion = "0.10.4"
@@ -101,11 +106,12 @@ ext {
     leakCanary = "1.6.2"
     mockito = "2.18.3"
     mockitoKotlin = "2.0.0"
+    commonsMath = "3.6.1"
 }
 
 
 dependencies {
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation "androidx.legacy:legacy-support-v4:$legacySupport"
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanary"
     releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakCanary"
 
@@ -137,8 +143,8 @@ dependencies {
     // ViewModel and LiveData
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle"
     kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle"
-    testImplementation "androidx.arch.core:core-testing:$lifecycle"
-    androidTestImplementation "androidx.arch.core:core-testing:$lifecycle"
+    testImplementation "androidx.arch.core:core-testing:$coreTesting"
+    androidTestImplementation "androidx.arch.core:core-testing:$coreTesting"
 
     // Room
     implementation "androidx.room:room-runtime:$room"
@@ -163,16 +169,16 @@ dependencies {
     implementation "com.airbnb.android:lottie:$lottieVersion"
 
     // Apache commons
-    implementation "org.apache.commons:commons-math3:3.6.1"
+    implementation "org.apache.commons:commons-math3:$commonsMath"
 
     testImplementation "org.mockito:mockito-core:$mockito"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
-    testImplementation "junit:junit:4.12"
+    testImplementation "junit:junit:$junit"
 
-    androidTestImplementation 'androidx.test:runner:1.1.0'
-    androidTestImplementation 'androidx.test:rules:1.1.0'
-    androidTestUtil "androidx.test:orchestrator:1.1.0"
-    androidTestImplementation "androidx.test.espresso:espresso-core:3.1.0"
+    androidTestImplementation "androidx.test:runner:$testRunner"
+    androidTestImplementation "androidx.test:rules:$testRunner"
+    androidTestUtil "androidx.test:orchestrator:$testRunner"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoCore"
     androidTestImplementation "org.mockito:mockito-android:$mockito"
     androidTestImplementation "com.squareup.okhttp3:mockwebserver:$okHttp"
     androidTestImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"

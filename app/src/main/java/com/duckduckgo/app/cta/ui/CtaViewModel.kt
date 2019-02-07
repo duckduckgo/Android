@@ -31,8 +31,6 @@ import com.duckduckgo.app.feedback.db.SurveyDao
 import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.AddWidgetCta
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
@@ -48,8 +46,7 @@ class CtaViewModel @Inject constructor(
     private val pixel: Pixel,
     private val surveyDao: SurveyDao,
     private val widgetCapabilities: WidgetCapabilities,
-    private val dismissedCtaDao: DismissedCtaDao,
-    private val variantManager: VariantManager
+    private val dismissedCtaDao: DismissedCtaDao
 ) {
 
     data class CtaViewState(
@@ -103,8 +100,7 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private fun canShowWidgetCta(): Boolean {
-        return variantManager.getVariant().hasFeature(AddWidgetCta) &&
-                widgetCapabilities.supportsStandardWidgetAdd &&
+        return widgetCapabilities.supportsStandardWidgetAdd &&
                 !widgetCapabilities.hasInstalledWidgets &&
                 !dismissedCtaDao.exists(CtaId.ADD_WIDGET)
     }

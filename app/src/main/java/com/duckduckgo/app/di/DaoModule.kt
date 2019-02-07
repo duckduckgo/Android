@@ -52,4 +52,7 @@ class DaoModule {
 
     @Provides
     fun dismissedCtaDao(database: AppDatabase) = database.dismissedCtaDao()
+
+    @Provides
+    fun notification(database: AppDatabase) = database.notificationDao()
 }

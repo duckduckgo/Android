@@ -26,6 +26,7 @@ import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_4_TO_5
 import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_5_TO_6
 import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_6_TO_7
 import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_7_TO_8
+import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_8_TO_9
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -44,7 +45,8 @@ class DatabaseModule {
                 MIGRATION_4_TO_5,
                 MIGRATION_5_TO_6,
                 MIGRATION_6_TO_7,
-                MIGRATION_7_TO_8
+                MIGRATION_7_TO_8,
+                MIGRATION_8_TO_9
             )
             .build()
     }

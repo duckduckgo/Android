@@ -25,6 +25,8 @@ import com.duckduckgo.app.settings.clear.ClearWhenOption
 import javax.inject.Inject
 
 interface SettingsDataStore {
+
+    var lastExecutedJobId: String?
     var theme: DuckDuckGoTheme?
     var autoCompleteSuggestionsEnabled: Boolean
 
@@ -39,12 +41,15 @@ interface SettingsDataStore {
     var automaticallyClearWhatOption: ClearWhatOption
     var automaticallyClearWhenOption: ClearWhenOption
     var appBackgroundedTimestamp: Long
-    var lastExecutedJobId: String?
+    var appNotificationsEnabled: Boolean
+    fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean
+    fun isCurrentlySelected(clearWhenOption: ClearWhenOption): Boolean
     fun hasBackgroundTimestampRecorded(): Boolean
     fun clearAppBackgroundTimestamp()
 }
 
 class SettingsSharedPreferences @Inject constructor(private val context: Context) : SettingsDataStore {
+
     override var lastExecutedJobId: String?
         get() = preferences.getString(KEY_BACKGROUND_JOB_ID, null)
         set(value) {
@@ -70,38 +75,56 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         set(enabled) = preferences.edit(commit = true) { putBoolean(KEY_APP_USED_SINCE_LAST_CLEAR, enabled) }
 
     override var automaticallyClearWhatOption: ClearWhatOption
-        get() {
-            val savedValue = preferences.getString(KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION, null) ?: ClearWhatOption.CLEAR_NONE.name
-            return ClearWhatOption.valueOf(savedValue)
-        }
+        get() = automaticallyClearWhatSavedValue() ?: ClearWhatOption.CLEAR_NONE
         set(value) = preferences.edit { putString(KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION, value.name) }
 
     override var automaticallyClearWhenOption: ClearWhenOption
-        get() {
-            val savedValue = preferences.getString(KEY_AUTOMATICALLY_CLEAR_WHEN_OPTION, null) ?: ClearWhenOption.APP_EXIT_ONLY.name
-            return ClearWhenOption.valueOf(savedValue)
-        }
+        get() = automaticallyClearWhenSavedValue() ?: ClearWhenOption.APP_EXIT_ONLY
         set(value) = preferences.edit { putString(KEY_AUTOMATICALLY_CLEAR_WHEN_OPTION, value.name) }
 
     override var appBackgroundedTimestamp: Long
         get() = preferences.getLong(KEY_APP_BACKGROUNDED_TIMESTAMP, 0)
         set(value) = preferences.edit(commit = true) { putLong(KEY_APP_BACKGROUNDED_TIMESTAMP, value) }
 
+    override var appNotificationsEnabled: Boolean
+        get() = preferences.getBoolean(KEY_APP_NOTIFICATIONS_ENABLED, true)
+        set(enabled) = preferences.edit { putBoolean(KEY_APP_NOTIFICATIONS_ENABLED, enabled) }
+
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
     override fun clearAppBackgroundTimestamp() = preferences.edit { remove(KEY_APP_BACKGROUNDED_TIMESTAMP) }
 
+    override fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean {
+        val currentlySelected = automaticallyClearWhatSavedValue() ?: return false
+        return currentlySelected == clearWhatOption
+    }
+
+    override fun isCurrentlySelected(clearWhenOption: ClearWhenOption): Boolean {
+        val currentlySelected = automaticallyClearWhenSavedValue() ?: return false
+        return currentlySelected == clearWhenOption
+    }
+
+    private fun automaticallyClearWhatSavedValue(): ClearWhatOption? {
+        val savedValue = preferences.getString(KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION, null) ?: return null
+        return ClearWhatOption.valueOf(savedValue)
+    }
+
+    private fun automaticallyClearWhenSavedValue(): ClearWhenOption? {
+        val savedValue = preferences.getString(KEY_AUTOMATICALLY_CLEAR_WHEN_OPTION, null) ?: return null
+        return ClearWhenOption.valueOf(savedValue)
+    }
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.settings_activity.settings"
+        const val KEY_BACKGROUND_JOB_ID = "BACKGROUND_JOB_ID"
         const val KEY_THEME = "THEME"
         const val KEY_AUTOCOMPLETE_ENABLED = "AUTOCOMPLETE_ENABLED"
         const val KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION = "AUTOMATICALLY_CLEAR_WHAT_OPTION"
         const val KEY_AUTOMATICALLY_CLEAR_WHEN_OPTION = "AUTOMATICALLY_CLEAR_WHEN_OPTION"
         const val KEY_APP_BACKGROUNDED_TIMESTAMP = "APP_BACKGROUNDED_TIMESTAMP"
-        const val KEY_BACKGROUND_JOB_ID = "BACKGROUND_JOB_ID"
+        const val KEY_APP_NOTIFICATIONS_ENABLED = "APP_NOTIFCATIONS_ENABLED"
         const val KEY_APP_USED_SINCE_LAST_CLEAR = "APP_USED_SINCE_LAST_CLEAR"
     }
 }
