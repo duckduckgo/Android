@@ -167,7 +167,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         get() = toolbar.menu.findItem(R.id.fire)
 
     private val menuButton: ViewGroup?
-        get() = toolbar.browserMenu
+        get() = appBarLayout.browserMenu
 
     private var webView: WebView? = null
 
@@ -203,7 +203,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         super.onActivityCreated(savedInstanceState)
         createPopupMenu()
         configureObservers()
-        configureToolbar()
+        configureAppBar()
         configureWebView()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
@@ -480,7 +480,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
-    private fun configureToolbar() {
+    private fun configureAppBar() {
         toolbar.inflateMenu(R.menu.menu_browser_activity)
 
         toolbar.setOnMenuItemClickListener { menuItem ->
