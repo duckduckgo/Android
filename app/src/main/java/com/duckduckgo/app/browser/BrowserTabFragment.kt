@@ -166,8 +166,8 @@ class BrowserTabFragment : Fragment(), FindListener {
     private val fireMenuButton: MenuItem?
         get() = toolbar.menu.findItem(R.id.fire)
 
-    private val menuButton: MenuItem?
-        get() = toolbar.menu.findItem(R.id.browserPopup)
+    private val menuButton: ViewGroup?
+        get() = toolbar.browserMenu
 
     private var webView: WebView? = null
 
@@ -489,17 +489,17 @@ class BrowserTabFragment : Fragment(), FindListener {
                     browserActivity?.launchFire()
                     return@setOnMenuItemClickListener true
                 }
-                R.id.browserPopup -> {
-                    hideKeyboardImmediately()
-                    launchPopupMenu()
-                    return@setOnMenuItemClickListener true
-                }
                 else -> return@setOnMenuItemClickListener false
             }
         }
 
         toolbar.privacyGradeButton.setOnClickListener {
             browserActivity?.launchPrivacyDashboard()
+        }
+
+        browserMenu.setOnClickListener {
+            hideKeyboardImmediately()
+            launchPopupMenu()
         }
 
         viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
