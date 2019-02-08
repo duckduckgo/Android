@@ -902,9 +902,9 @@ class BrowserTabFragment : Fragment(), FindListener {
                 lastSeenOmnibarViewState = viewState
 
                 if (viewState.isEditing) {
-                    omniBarContainer.setBackgroundResource(R.drawable.omnibar_editing_background)
-                } else {
                     omniBarContainer.background = null
+                } else {
+                    omniBarContainer.setBackgroundResource(R.drawable.omnibar_field_background)
                 }
 
                 if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {

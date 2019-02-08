@@ -20,7 +20,7 @@
     <attr name="normalTextColor" format="color" />
     <attr name="toolbarIconColor" format="color" />
     <attr name="toolbarTextColor" format="color" />
-    <attr name="omnibarEditingBackgroundColor" format="color" />
+    <attr name="omnibarRoundedFieldBackgroundColor" format="color" />
     <attr name="omnibarTextColor" format="color" />
     <attr name="omnibarHintColor" format="color" />
     <attr name="autoCompleteTextColor" format="color" />
