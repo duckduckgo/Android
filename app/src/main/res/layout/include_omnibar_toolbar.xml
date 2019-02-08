@@ -119,27 +119,6 @@
 
             </androidx.appcompat.widget.Toolbar>
 
-            <ProgressBar
-                android:id="@+id/pageLoadingIndicator"
-                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="4dp"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:progress="50"
-                tools:visibility="visible" />
-
-            <include
-                layout="@layout/include_find_in_page"
-                android:layout_width="0dp"
-                android:layout_height="?attr/actionBarSize"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
             <FrameLayout
                 android:id="@+id/browserMenu"
                 android:layout_width="wrap_content"
@@ -161,6 +140,27 @@
                     android:src="@drawable/ic_overflow_12dp" />
 
             </FrameLayout>
+
+            <ProgressBar
+                android:id="@+id/pageLoadingIndicator"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:progress="50"
+                tools:visibility="visible" />
+
+            <include
+                layout="@layout/include_find_in_page"
+                android:layout_width="0dp"
+                android:layout_height="?attr/actionBarSize"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
