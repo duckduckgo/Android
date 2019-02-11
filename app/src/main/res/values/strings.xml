@@ -252,8 +252,8 @@
     <!-- App Enjoyment / Rating / Feedback -->
     <string name="appEnjoymentDialogTitle">Enjoying DuckDuckGo?</string>
     <string name="appEnjoymentDialogMessage">We\'d love to know what you think</string>
-    <string name="appEnjoymentDialogPositiveButton">@string/yes</string>
-    <string name="appEnjoymentDialogNegativeButton">@string/no</string>
+    <string name="appEnjoymentDialogPositiveButton">Yes</string>
+    <string name="appEnjoymentDialogNegativeButton">No</string>
 
     <string name="rateAppDialogTitle">Rate the app</string>
     <string name="rateAppDialogMessage">Your feedback matters. Please share the love with a 5-star review.</string>
@@ -265,8 +265,6 @@
     <string name="giveFeedbackDialogPositiveButton">Give Feedback</string>
     <string name="giveFeedbackDialogNegativeButton">@string/dismiss</string>
 
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
     <string name="dismiss">Dismiss</string>
 
     <!-- Notification Channel Names -->
