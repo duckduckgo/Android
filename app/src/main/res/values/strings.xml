@@ -252,8 +252,8 @@
     <!-- App Enjoyment / Rating / Feedback -->
     <string name="appEnjoymentDialogTitle">Enjoying DuckDuckGo?</string>
     <string name="appEnjoymentDialogMessage">We\'d love to know what you think</string>
-    <string name="appEnjoymentDialogPositiveButton">Yes</string>
-    <string name="appEnjoymentDialogNegativeButton">No</string>
+    <string name="appEnjoymentDialogPositiveButton">I like it</string>
+    <string name="appEnjoymentDialogNegativeButton">It needs work</string>
 
     <string name="rateAppDialogTitle">Rate the app</string>
     <string name="rateAppDialogMessage">Your feedback matters. Please share the love with a 5-star review.</string>
