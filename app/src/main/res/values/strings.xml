@@ -258,14 +258,14 @@
     <string name="rateAppDialogTitle">Rate the app</string>
     <string name="rateAppDialogMessage">Your feedback matters. Please share the love with a 5-star review.</string>
     <string name="rateAppDialogPositiveButton">Rate App</string>
-    <string name="rateAppDialogNegativeButton">@string/dismiss</string>
+    <string name="rateAppDialogNegativeButton">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">We\'re sorry to hear that</string>
     <string name="giveFeedbackDialogMessage">Let us know how we can improve the app for you</string>
     <string name="giveFeedbackDialogPositiveButton">Give Feedback</string>
-    <string name="giveFeedbackDialogNegativeButton">@string/dismiss</string>
+    <string name="giveFeedbackDialogNegativeButton">@string/noThanks</string>
 
-    <string name="dismiss">Dismiss</string>
+    <string name="noThanks">No Thanks</string>
 
     <!-- Notification Channel Names -->
     <string name="notificationChannelFileDownloading">File Downloading</string>
