@@ -256,7 +256,7 @@
     <string name="appEnjoymentDialogNegativeButton">It needs work</string>
 
     <string name="rateAppDialogTitle">Rate the app</string>
-    <string name="rateAppDialogMessage">Your feedback matters. Please share the love with a 5-star review.</string>
+    <string name="rateAppDialogMessage">Your feedback matters. Please share the love with a review.</string>
     <string name="rateAppDialogPositiveButton">Rate App</string>
     <string name="rateAppDialogNegativeButton">@string/noThanks</string>
 
