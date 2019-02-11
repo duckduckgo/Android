@@ -89,9 +89,8 @@ class InitialPromptTypeDecider(
         val numberSearchesMade = searchCountDao.getSearchesMade()
         val enoughMade = numberSearchesMade >= MINIMUM_SEARCHES_THRESHOLD
 
-        return enoughMade.also {
-            Timber.i("Searches made: $numberSearchesMade. Enough searches made to show app enjoyment prompt: %s", if (enoughMade) "yes" else "no")
-        }
+        Timber.i("Searches made: $numberSearchesMade. Enough searches made to show app enjoyment prompt: %s", if (enoughMade) "yes" else "no")
+        return enoughMade
     }
 }
 
