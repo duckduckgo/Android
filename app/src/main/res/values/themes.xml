@@ -38,7 +38,7 @@
         <item name="normalTextColor">@color/white</item>
         <item name="toolbarIconColor">@color/grayish</item>
         <item name="toolbarTextColor">@color/grayish</item>
-        <item name="omnibarEditingBackgroundColor">@color/midGray</item>
+        <item name="omnibarRoundedFieldBackgroundColor">@color/midGray</item>
         <item name="omnibarTextColor">@color/white</item>
         <item name="omnibarHintColor">@color/grayishTwo</item>
         <item name="autoCompleteTextColor">@color/white</item>
@@ -86,7 +86,7 @@
         <item name="normalTextColor">@color/grayishBrown</item>
         <item name="toolbarIconColor">@color/grayishBrown</item>
         <item name="toolbarTextColor">@color/grayishBrown</item>
-        <item name="omnibarEditingBackgroundColor">@color/whiteFour</item>
+        <item name="omnibarRoundedFieldBackgroundColor">@color/whiteFour</item>
         <item name="omnibarTextColor">@color/brownishGrayTwo</item>
         <item name="omnibarHintColor">@color/warmGray</item>
         <item name="autoCompleteTextColor">@color/grayishBrown</item>

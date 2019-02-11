@@ -27,7 +27,7 @@
 
     <item
         android:id="@+id/newTab"
-        android:icon="@drawable/ic_add_30dp"
+        android:icon="@drawable/ic_add_24dp"
         android:title="@string/newTabMenuItem"
         app:showAsAction="always" />
 
