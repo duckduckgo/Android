@@ -172,5 +172,18 @@ abstract class AppDatabase : RoomDatabase() {
             }
 
         }
+
+        val ALL_MIGRATIONS: List<Migration>
+            get() = listOf(
+                MIGRATION_1_TO_2,
+                MIGRATION_2_TO_3,
+                MIGRATION_3_TO_4,
+                MIGRATION_4_TO_5,
+                MIGRATION_5_TO_6,
+                MIGRATION_6_TO_7,
+                MIGRATION_7_TO_8,
+                MIGRATION_8_TO_9,
+                MIGRATION_9_TO_10
+            )
     }
 }

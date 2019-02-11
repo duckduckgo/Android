@@ -19,15 +19,6 @@ package com.duckduckgo.app.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_1_TO_2
-import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_2_TO_3
-import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_3_TO_4
-import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_4_TO_5
-import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_5_TO_6
-import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_6_TO_7
-import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_7_TO_8
-import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_8_TO_9
-import com.duckduckgo.app.global.db.AppDatabase.Companion.MIGRATION_9_TO_10
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -39,17 +30,7 @@ class DatabaseModule {
     @Singleton
     fun provideDatabase(context: Context): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
-            .addMigrations(
-                MIGRATION_1_TO_2,
-                MIGRATION_2_TO_3,
-                MIGRATION_3_TO_4,
-                MIGRATION_4_TO_5,
-                MIGRATION_5_TO_6,
-                MIGRATION_6_TO_7,
-                MIGRATION_7_TO_8,
-                MIGRATION_8_TO_9,
-                MIGRATION_9_TO_10
-            )
+            .addMigrations(*AppDatabase.ALL_MIGRATIONS.toTypedArray())
             .build()
     }
 
