@@ -35,6 +35,7 @@
             android:id="@+id/toolbarContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:theme="@style/OmnibarToolbarTheme"
             app:layout_scrollFlags="scroll|enterAlways">
 
             <androidx.appcompat.widget.Toolbar
@@ -42,11 +43,10 @@
                 android:layout_width="0dp"
                 android:layout_height="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
-                android:theme="@style/OmnibarToolbarTheme"
                 app:contentInsetEnd="0dp"
                 app:contentInsetStart="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/browserMenu"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_scrollFlags="scroll|enterAlways"
@@ -60,7 +60,7 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="5dp"
                     android:layout_marginBottom="8dp"
-                    android:background="@drawable/omnibar_editing_background"
+                    android:background="@drawable/omnibar_field_background"
                     android:paddingStart="6dp"
                     android:paddingEnd="6dp">
 
@@ -119,6 +119,28 @@
 
             </androidx.appcompat.widget.Toolbar>
 
+            <FrameLayout
+                android:id="@+id/browserMenu"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingStart="9dp"
+                android:paddingEnd="13dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="gone">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/browserPopupMenu"
+                    android:padding="3dp"
+                    android:src="@drawable/ic_overflow_12dp" />
+
+            </FrameLayout>
+
             <ProgressBar
                 android:id="@+id/pageLoadingIndicator"
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
@@ -139,6 +161,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

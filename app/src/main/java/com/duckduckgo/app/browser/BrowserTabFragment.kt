@@ -166,8 +166,8 @@ class BrowserTabFragment : Fragment(), FindListener {
     private val fireMenuButton: MenuItem?
         get() = toolbar.menu.findItem(R.id.fire)
 
-    private val menuButton: MenuItem?
-        get() = toolbar.menu.findItem(R.id.browserPopup)
+    private val menuButton: ViewGroup?
+        get() = appBarLayout.browserMenu
 
     private var webView: WebView? = null
 
@@ -203,7 +203,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         super.onActivityCreated(savedInstanceState)
         createPopupMenu()
         configureObservers()
-        configureToolbar()
+        configureAppBar()
         configureWebView()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
@@ -480,7 +480,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
-    private fun configureToolbar() {
+    private fun configureAppBar() {
         toolbar.inflateMenu(R.menu.menu_browser_activity)
 
         toolbar.setOnMenuItemClickListener { menuItem ->
@@ -489,17 +489,17 @@ class BrowserTabFragment : Fragment(), FindListener {
                     browserActivity?.launchFire()
                     return@setOnMenuItemClickListener true
                 }
-                R.id.browserPopup -> {
-                    hideKeyboardImmediately()
-                    launchPopupMenu()
-                    return@setOnMenuItemClickListener true
-                }
                 else -> return@setOnMenuItemClickListener false
             }
         }
 
         toolbar.privacyGradeButton.setOnClickListener {
             browserActivity?.launchPrivacyDashboard()
+        }
+
+        browserMenu.setOnClickListener {
+            hideKeyboardImmediately()
+            launchPopupMenu()
         }
 
         viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
@@ -902,9 +902,9 @@ class BrowserTabFragment : Fragment(), FindListener {
                 lastSeenOmnibarViewState = viewState
 
                 if (viewState.isEditing) {
-                    omniBarContainer.setBackgroundResource(R.drawable.omnibar_editing_background)
-                } else {
                     omniBarContainer.background = null
+                } else {
+                    omniBarContainer.setBackgroundResource(R.drawable.omnibar_field_background)
                 }
 
                 if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {

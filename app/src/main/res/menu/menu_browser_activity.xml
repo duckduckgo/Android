@@ -31,10 +31,4 @@
         app:actionViewClass="com.duckduckgo.app.browser.TabSwitcherButton"
         app:showAsAction="always" />
 
-    <item
-        android:id="@+id/browserPopup"
-        android:icon="@drawable/ic_overflow_24dp"
-        android:title="@string/browserPopupMenu"
-        app:showAsAction="always" />
-
 </menu>
