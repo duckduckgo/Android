@@ -37,6 +37,8 @@ import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import com.duckduckgo.app.httpsupgrade.model.HttpsWhitelistedDomain
+import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.SiteVisitedEntity
@@ -51,7 +53,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 9, entities = [
+    exportSchema = true, version = 10, entities = [
         DisconnectTracker::class,
         HttpsBloomFilterSpec::class,
         HttpsWhitelistedDomain::class,
@@ -66,7 +68,8 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         DismissedCta::class,
         SearchCountEntity::class,
         AppDaysUsedEntity::class,
-        AppEnjoymentEntity::class
+        AppEnjoymentEntity::class,
+        Notification::class
     ]
 )
 
@@ -91,6 +94,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun searchCountDao(): SearchCountDao
     abstract fun appsDaysUsedDao(): AppDaysUsedDao
     abstract fun appEnjoymentDao(): AppEnjoymentDao
+    abstract fun notificationDao(): NotificationDao
 
     companion object {
         val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
@@ -156,10 +160,17 @@ abstract class AppDatabase : RoomDatabase() {
 
         val MIGRATION_8_TO_9: Migration = object : Migration(8, 9) {
             override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `notification` (`notificationId` TEXT NOT NULL, PRIMARY KEY(`notificationId`))")
+            }
+        }
+
+        val MIGRATION_9_TO_10: Migration = object : Migration(9, 10) {
+            override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `search_count` (`key` TEXT NOT NULL, `numberSearchesMade` INTEGER NOT NULL, PRIMARY KEY(`key`))")
                 database.execSQL("CREATE TABLE IF NOT EXISTS `app_days_used` (`date` TEXT NOT NULL, PRIMARY KEY(`date`))")
                 database.execSQL("CREATE TABLE IF NOT EXISTS `app_enjoyment` (`eventType` INTEGER NOT NULL, `promptCount` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `primaryKey` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)")
             }
+
         }
     }
 }

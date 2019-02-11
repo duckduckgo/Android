@@ -225,7 +225,6 @@ class BrowserTabViewModel(
     private fun configureAutoComplete() {
         autoCompletePublishSubject
             .debounce(300, TimeUnit.MILLISECONDS)
-            .distinctUntilChanged()
             .switchMap { autoCompleteApi.autoComplete(it) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -443,7 +442,7 @@ class BrowserTabViewModel(
     private fun currentOmnibarViewState(): OmnibarViewState = omnibarViewState.value!!
     private fun currentLoadingViewState(): LoadingViewState = loadingViewState.value!!
 
-    fun onOmnibarInputStateChanged(query: String, hasFocus: Boolean) {
+    fun onOmnibarInputStateChanged(query: String, hasFocus: Boolean, hasQueryChanged: Boolean) {
 
         // determine if empty list to be shown, or existing search results
         val autoCompleteSearchResults = if (query.isBlank()) {
@@ -453,7 +452,6 @@ class BrowserTabViewModel(
         }
 
         val currentOmnibarViewState = currentOmnibarViewState()
-        val hasQueryChanged = (currentOmnibarViewState.omnibarText != query)
         val autoCompleteSuggestionsEnabled = appSettingsPreferencesStore.autoCompleteSuggestionsEnabled
         val showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && autoCompleteSuggestionsEnabled
         val showClearButton = hasFocus && query.isNotBlank()

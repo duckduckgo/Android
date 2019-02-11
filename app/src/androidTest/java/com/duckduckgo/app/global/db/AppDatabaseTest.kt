@@ -67,6 +67,12 @@ class AppDatabaseTest {
     }
 
     @Test
+    fun whenMigratingFromVersion8To9ThenValidationSucceeds() {
+        testHelper.createDatabase(TEST_DB_NAME, 8).close()
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 9, true, AppDatabase.MIGRATION_8_TO_9)
+    }
+
+    @Test
     fun whenMigratingFromVersion4To5ThenUpdatePositionsOfStoredTabs() {
 
         testHelper.createDatabase(TEST_DB_NAME, 4).use {

@@ -44,3 +44,6 @@ captures/
 
 # Fastlane
 fastlane/report.xml
+
+# Bitrise configuration
+bitrise.yml

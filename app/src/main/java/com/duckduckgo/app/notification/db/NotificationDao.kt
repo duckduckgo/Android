@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,23 @@
  * limitations under the License.
  */
 
+package com.duckduckgo.app.notification.db
 
-/**
- * @deprecated DO NOT USE THE CODE IN THIS PACKAGE.
- * <p>
- * The code in this package is derived from the Search and Stories application for the purpose of
- * migration.
- */
-package com.duckduckgo.app.migration.legacy;
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import com.duckduckgo.app.notification.model.Notification
+
+@Dao
+abstract class NotificationDao {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun insert(notification: Notification)
+
+    @Query("select count(1) > 0 from notification where notificationId = :notificationId")
+    abstract fun exists(notificationId: String): Boolean
+}
+
+
+

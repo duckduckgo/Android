@@ -58,4 +58,7 @@ class DaoModule {
 
     @Provides
     fun appDaysUsedDao(database: AppDatabase) = database.appsDaysUsedDao()
+
+    @Provides
+    fun notification(database: AppDatabase) = database.notificationDao()
 }
