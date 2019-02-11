@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 10,
-    "identityHash": "910cbc97ea198601dbf4e474de5b70c8",
+    "identityHash": "01987583248e4a41b40930e396c8e151",
     "entities": [
       {
         "tableName": "disconnect_tracker",
@@ -391,7 +391,7 @@
       },
       {
         "tableName": "search_count",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` TEXT NOT NULL, `numberSearchesMade` INTEGER NOT NULL, PRIMARY KEY(`key`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` TEXT NOT NULL, `count` INTEGER NOT NULL, PRIMARY KEY(`key`))",
         "fields": [
           {
             "fieldPath": "key",
@@ -400,8 +400,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "numberSearchesMade",
-            "columnName": "numberSearchesMade",
+            "fieldPath": "count",
+            "columnName": "count",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -497,7 +497,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"910cbc97ea198601dbf4e474de5b70c8\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"01987583248e4a41b40930e396c8e151\")"
     ]
   }
 }

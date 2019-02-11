@@ -68,7 +68,7 @@ class SearchCountDaoTest {
 
     @Test
     fun whenInitialisedToArbitraryValueThenThatIsReturnedInSearchCount() {
-        dao.initialiseValue(SearchCountEntity(numberSearchesMade = 5))
+        dao.initialiseValue(SearchCountEntity(count = 5))
         assertEquals(5, dao.getSearchesMade())
     }
 }

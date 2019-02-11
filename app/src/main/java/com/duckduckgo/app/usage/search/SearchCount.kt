@@ -24,10 +24,10 @@ import javax.inject.Singleton
 @Singleton
 abstract class SearchCountDao {
 
-    @Query("SELECT numberSearchesMade FROM search_count LIMIT 1")
+    @Query("SELECT count FROM search_count LIMIT 1")
     abstract fun getSearchesMade(): Long
 
-    @Query("UPDATE search_count SET numberSearchesMade = numberSearchesMade + 1")
+    @Query("UPDATE search_count SET count = count + 1")
     abstract fun incrementSearchCountIfExists(): Int
 
     @Insert
@@ -41,7 +41,7 @@ abstract class SearchCountDao {
     open fun incrementSearchCount() {
         val changedRows = incrementSearchCountIfExists()
         if (changedRows == 0) {
-            initialiseValue(SearchCountEntity(numberSearchesMade = 1))
+            initialiseValue(SearchCountEntity(count = 1))
         }
     }
 }
@@ -49,7 +49,7 @@ abstract class SearchCountDao {
 @Entity(tableName = "search_count")
 data class SearchCountEntity(
     @PrimaryKey val key: String = SINGLETON_KEY,
-    val numberSearchesMade: Long
+    val count: Long
 ) {
 
     companion object {
