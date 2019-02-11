@@ -35,13 +35,13 @@ class GiveFeedbackDialogFragment : EnjoymentDialog() {
         firePixelWithPromptCount(APP_FEEDBACK_DIALOG_SHOWN)
 
         return AlertDialog.Builder(activity!!, R.style.AlertDialogTheme)
-            .setTitle(R.string.give_feedback_dialog_title)
-            .setMessage(R.string.give_feedback_dialog_message)
-            .setPositiveButton(R.string.give_feedback_dialog_positive_button) { _, _ ->
+            .setTitle(R.string.giveFeedbackDialogTitle)
+            .setMessage(R.string.giveFeedbackDialogMessage)
+            .setPositiveButton(R.string.giveFeedbackDialogPositiveButton) { _, _ ->
                 firePixelWithPromptCount(APP_FEEDBACK_DIALOG_USER_GAVE_FEEDBACK)
                 listener?.onUserSelectedToGiveFeedback(PromptCount(promptCount))
             }
-            .setNegativeButton(R.string.give_feedback_dialog_negative_button) { _, _ ->
+            .setNegativeButton(R.string.giveFeedbackDialogNegativeButton) { _, _ ->
                 firePixelWithPromptCount(APP_FEEDBACK_DIALOG_USER_DECLINED_FEEDBACK)
                 listener?.onUserDeclinedToGiveFeedback(PromptCount(promptCount))
             }

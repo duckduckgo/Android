@@ -35,13 +35,13 @@ class RateAppDialogFragment : EnjoymentDialog() {
         firePixelWithPromptCount(APP_RATING_DIALOG_SHOWN)
 
         return AlertDialog.Builder(activity!!, R.style.AlertDialogTheme)
-            .setTitle(R.string.rate_app_dialog_title)
-            .setMessage(R.string.rate_app_dialog_message)
-            .setPositiveButton(R.string.rate_app_dialog_positive_button) { _, _ ->
+            .setTitle(R.string.rateAppDialogTitle)
+            .setMessage(R.string.rateAppDialogMessage)
+            .setPositiveButton(R.string.rateAppDialogPositiveButton) { _, _ ->
                 firePixelWithPromptCount(APP_RATING_DIALOG_USER_GAVE_RATING)
                 listener?.onUserSelectedToRateApp(PromptCount(promptCount))
             }
-            .setNegativeButton(R.string.rate_app_dialog_negative_button) { _, _ ->
+            .setNegativeButton(R.string.rateAppDialogNegativeButton) { _, _ ->
                 firePixelWithPromptCount(APP_RATING_DIALOG_USER_DECLINED_RATING)
                 listener?.onUserDeclinedToRateApp(PromptCount(promptCount))
             }

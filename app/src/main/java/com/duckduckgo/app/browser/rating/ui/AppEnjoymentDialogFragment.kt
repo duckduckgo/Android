@@ -35,13 +35,13 @@ class AppEnjoymentDialogFragment : EnjoymentDialog() {
         firePixelWithPromptCount(APP_ENJOYMENT_DIALOG_SHOWN)
 
         return AlertDialog.Builder(activity!!, R.style.AlertDialogTheme)
-            .setTitle(R.string.app_enjoyment_dialog_title)
-            .setMessage(R.string.app_enjoyment_dialog_message)
-            .setPositiveButton(R.string.app_enjoyment_dialog_positive_button) { _, _ ->
+            .setTitle(R.string.appEnjoymentDialogTitle)
+            .setMessage(R.string.appEnjoymentDialogMessage)
+            .setPositiveButton(R.string.appEnjoymentDialogPositiveButton) { _, _ ->
                 firePixelWithPromptCount(APP_ENJOYMENT_DIALOG_USER_ENJOYING)
                 listener?.onUserSelectedAppIsEnjoyed(PromptCount(promptCount))
             }
-            .setNegativeButton(R.string.app_enjoyment_dialog_negative_button) { _, _ ->
+            .setNegativeButton(R.string.appEnjoymentDialogNegativeButton) { _, _ ->
                 firePixelWithPromptCount(APP_ENJOYMENT_DIALOG_USER_NOT_ENJOYING)
                 listener?.onUserSelectedAppIsNotEnjoyed(PromptCount(promptCount))
             }

@@ -250,20 +250,20 @@
     <string name="addWidgetInstructionsButtonClose">Close</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
-    <string name="app_enjoyment_dialog_title">Enjoying DuckDuckGo?</string>
-    <string name="app_enjoyment_dialog_message">We\'d love to know what you think</string>
-    <string name="app_enjoyment_dialog_positive_button">@string/yes</string>
-    <string name="app_enjoyment_dialog_negative_button">@string/no</string>
+    <string name="appEnjoymentDialogTitle">Enjoying DuckDuckGo?</string>
+    <string name="appEnjoymentDialogMessage">We\'d love to know what you think</string>
+    <string name="appEnjoymentDialogPositiveButton">@string/yes</string>
+    <string name="appEnjoymentDialogNegativeButton">@string/no</string>
 
-    <string name="rate_app_dialog_title">Rate the app</string>
-    <string name="rate_app_dialog_message">Your feedback matters. Please share the love with a 5-star review.</string>
-    <string name="rate_app_dialog_positive_button">Rate App</string>
-    <string name="rate_app_dialog_negative_button">@string/dismiss</string>
+    <string name="rateAppDialogTitle">Rate the app</string>
+    <string name="rateAppDialogMessage">Your feedback matters. Please share the love with a 5-star review.</string>
+    <string name="rateAppDialogPositiveButton">Rate App</string>
+    <string name="rateAppDialogNegativeButton">@string/dismiss</string>
 
-    <string name="give_feedback_dialog_title">We\'re sorry to hear that</string>
-    <string name="give_feedback_dialog_message">Let us know how we can improve the app for you</string>
-    <string name="give_feedback_dialog_positive_button">Give Feedback</string>
-    <string name="give_feedback_dialog_negative_button">@string/dismiss</string>
+    <string name="giveFeedbackDialogTitle">We\'re sorry to hear that</string>
+    <string name="giveFeedbackDialogMessage">Let us know how we can improve the app for you</string>
+    <string name="giveFeedbackDialogPositiveButton">Give Feedback</string>
+    <string name="giveFeedbackDialogNegativeButton">@string/dismiss</string>
 
     <string name="yes">Yes</string>
     <string name="no">No</string>
