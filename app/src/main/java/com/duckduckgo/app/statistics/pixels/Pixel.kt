@@ -90,7 +90,19 @@ interface Pixel {
         AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_5_MINS("macwhen_5"),
         AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_15_MINS("macwhen_15"),
         AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_30_MINS("macwhen_30"),
-        AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_60_MINS("macwhen_60")
+        AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_60_MINS("macwhen_60"),
+
+        APP_ENJOYMENT_DIALOG_SHOWN("mrp_e_d%d_ds"),
+        APP_ENJOYMENT_DIALOG_USER_ENJOYING("mrp_e_d%d_y"),
+        APP_ENJOYMENT_DIALOG_USER_NOT_ENJOYING("mrp_e_d%d_n"),
+
+        APP_RATING_DIALOG_SHOWN("mrp_r_d%d_ds"),
+        APP_RATING_DIALOG_USER_GAVE_RATING("mrp_r_d%d_y"),
+        APP_RATING_DIALOG_USER_DECLINED_RATING("mrp_r_d%d_n"),
+
+        APP_FEEDBACK_DIALOG_SHOWN("mrp_f_d%d_ds"),
+        APP_FEEDBACK_DIALOG_USER_GAVE_FEEDBACK("mrp_f_d%d_y"),
+        APP_FEEDBACK_DIALOG_USER_DECLINED_FEEDBACK("mrp_f_d%d_n"),
     }
 
     object PixelParameter {
@@ -102,8 +114,8 @@ interface Pixel {
     }
 
     fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap())
-
-    fun fireCompletable(pixel: Pixel.PixelName, parameters: Map<String, String?>): Completable
+    fun fire(pixelName: String, parameters: Map<String, String?> = emptyMap())
+    fun fireCompletable(pixelName: String, parameters: Map<String, String?>): Completable
 
 }
 
@@ -113,19 +125,22 @@ class ApiBasedPixel @Inject constructor(
     private val variantManager: VariantManager,
     private val deviceInfo: DeviceInfo
 ) : Pixel {
-
     override fun fire(pixel: Pixel.PixelName, parameters: Map<String, String?>) {
-        fireCompletable(pixel, parameters)
+        fire(pixel.pixelName, parameters)
+    }
+
+    override fun fire(pixelName: String, parameters: Map<String, String?>) {
+        fireCompletable(pixelName, parameters)
             .subscribeOn(Schedulers.io())
             .subscribe({
-                Timber.v("Pixel sent: ${pixel.pixelName}")
+                Timber.v("Pixel sent: $pixelName")
             }, {
-                Timber.w("Pixel failed: ${pixel.pixelName}", it)
+                Timber.w("Pixel failed: $pixelName", it)
             })
     }
 
-    override fun fireCompletable(pixel: Pixel.PixelName, parameters: Map<String, String?>): Completable {
+    override fun fireCompletable(pixelName: String, parameters: Map<String, String?>): Completable {
         val atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
-        return api.fire(pixel.pixelName, deviceInfo.formFactor().description, atb, parameters)
+        return api.fire(pixelName, deviceInfo.formFactor().description, atb, parameters)
     }
 }

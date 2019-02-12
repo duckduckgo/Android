@@ -127,7 +127,7 @@ class HttpsUpgradeDataDownloader @Inject constructor(
                 FAILURE_COUNT to statisticsDataStore.httpsUpgradesFailures.toString()
             )
 
-            pixel.fireCompletable(Pixel.PixelName.HTTPS_UPGRADE_SITE_SUMMARY, params).andThen {
+            pixel.fireCompletable(Pixel.PixelName.HTTPS_UPGRADE_SITE_SUMMARY.pixelName, params).andThen {
                 Timber.v("Sent https statistics")
                 statisticsDataStore.httpsUpgradesTotal = 0
                 statisticsDataStore.httpsUpgradesFailures = 0

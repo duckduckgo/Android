@@ -27,16 +27,29 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
+import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
+import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
+import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.coroutines.CoroutineContext
 
 class BrowserViewModel(
     private val tabRepository: TabRepository,
     private val queryUrlConverter: OmnibarEntryConverter,
-    private val dataClearer: DataClearer
-) : ViewModel() {
+    private val dataClearer: DataClearer,
+    private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
+    private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder
+) : ViewModel(), CoroutineScope {
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main
 
     data class ViewState(
         val hideWebContent: Boolean = true
@@ -46,11 +59,19 @@ class BrowserViewModel(
         object Refresh : Command()
         data class Query(val query: String) : Command()
         data class DisplayMessage(@StringRes val messageId: Int) : Command()
+        object LaunchPlayStore : Command()
+        object LaunchFeedbackView : Command()
+        data class ShowAppEnjoymentPrompt(val promptCount: PromptCount) : Command()
+        data class ShowAppRatingPrompt(val promptCount: PromptCount) : Command()
+        data class ShowAppFeedbackPrompt(val promptCount: PromptCount) : Command()
     }
 
     var viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().also {
         it.value = ViewState()
     }
+
+    private val currentViewState: ViewState
+        get() = viewState.value!!
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     var selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
@@ -61,15 +82,36 @@ class BrowserViewModel(
             when (state) {
                 ApplicationClearDataState.INITIALIZING -> {
                     Timber.i("App clear state initializing")
-                    viewState.value = ViewState(hideWebContent = true)
+                    viewState.value = currentViewState.copy(hideWebContent = true)
                 }
                 ApplicationClearDataState.FINISHED -> {
                     Timber.i("App clear state finished")
-                    viewState.value = ViewState(hideWebContent = false)
+                    viewState.value = currentViewState.copy(hideWebContent = false)
                 }
             }
         }
     }
+
+    private val appEnjoymentObserver = Observer<AppEnjoymentPromptOptions> {
+        it?.let { promptType ->
+            when (promptType) {
+                is AppEnjoymentPromptOptions.ShowEnjoymentPrompt -> {
+                    command.value = Command.ShowAppEnjoymentPrompt(promptType.promptCount)
+                }
+                is AppEnjoymentPromptOptions.ShowRatingPrompt -> {
+                    command.value = Command.ShowAppRatingPrompt(promptType.promptCount)
+                }
+                is AppEnjoymentPromptOptions.ShowFeedbackPrompt -> {
+                    command.value = Command.ShowAppFeedbackPrompt(promptType.promptCount)
+                }
+            }
+        }
+    }
+
+    init {
+        appEnjoymentPromptEmitter.promptType.observeForever(appEnjoymentObserver)
+    }
+
 
     fun onNewTabRequested(isDefaultTab: Boolean = false) {
         tabRepository.add(isDefaultTab = isDefaultTab)
@@ -107,5 +149,34 @@ class BrowserViewModel(
     override fun onCleared() {
         super.onCleared()
         dataClearer.dataClearerState.removeObserver(dataClearingObserver)
+        appEnjoymentPromptEmitter.promptType.removeObserver(appEnjoymentObserver)
+    }
+
+    fun onUserSelectedAppIsEnjoyed(promptCount: PromptCount) {
+        appEnjoymentUserEventRecorder.onUserEnjoyingApp(promptCount)
+    }
+
+    fun onUserSelectedAppIsNotEnjoyed(promptCount: PromptCount) {
+        appEnjoymentUserEventRecorder.onUserNotEnjoyingApp(promptCount)
+    }
+
+    fun onUserSelectedToRateApp(promptCount: PromptCount) {
+        command.value = Command.LaunchPlayStore
+
+        launch { appEnjoymentUserEventRecorder.onUserSelectedToRateApp(promptCount) }
+    }
+
+    fun onUserDeclinedToRateApp(promptCount: PromptCount) {
+        launch { appEnjoymentUserEventRecorder.userDeclinedToRateApp(promptCount) }
+    }
+
+    fun onUserSelectedToGiveFeedback(promptCount: PromptCount) {
+        command.value = Command.LaunchFeedbackView
+
+        launch { appEnjoymentUserEventRecorder.onUserSelectedToGiveFeedback(promptCount) }
+    }
+
+    fun onUserDeclinedToGiveFeedback(promptCount: PromptCount) {
+        launch { appEnjoymentUserEventRecorder.onUserDeclinedToGiveFeedback(promptCount) }
     }
 }

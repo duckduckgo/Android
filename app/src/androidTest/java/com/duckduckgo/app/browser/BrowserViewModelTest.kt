@@ -17,11 +17,16 @@
 package com.duckduckgo.app.browser
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
+import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
+import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
+import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
+import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -59,12 +64,27 @@ class BrowserViewModelTest {
     @Mock
     private lateinit var mockAutomaticDataClearer: DataClearer
 
+    @Mock
+    private lateinit var mockAppEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder
+
+    @Mock
+    private lateinit var mockAppEnjoymentPromptEmitter: AppEnjoymentPromptEmitter
+
     private lateinit var testee: BrowserViewModel
 
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        testee = BrowserViewModel(mockTabRepository, mockOmnibarEntryConverter, mockAutomaticDataClearer)
+
+        doReturn(MutableLiveData<AppEnjoymentPromptOptions>()).whenever(mockAppEnjoymentPromptEmitter).promptType
+
+        testee = BrowserViewModel(
+            tabRepository = mockTabRepository,
+            queryUrlConverter = mockOmnibarEntryConverter,
+            dataClearer = mockAutomaticDataClearer,
+            appEnjoymentPromptEmitter = mockAppEnjoymentPromptEmitter,
+            appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder
+        )
         testee.command.observeForever(mockCommandObserver)
         whenever(mockTabRepository.add()).thenReturn(TAB_ID)
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(any())).then { it.arguments.first() }
@@ -118,6 +138,20 @@ class BrowserViewModelTest {
         testee.onClearComplete()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(DisplayMessage(R.string.fireDataCleared), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenUserSelectedToRateAppThenPlayStoreCommandTriggered() {
+        testee.onUserSelectedToRateApp(PromptCount.first())
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.LaunchPlayStore, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenUserSelectedToGiveFeedbackThenFeedbackCommandTriggered() {
+        testee.onUserSelectedToGiveFeedback(PromptCount.first())
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.LaunchFeedbackView, commandCaptor.lastValue)
     }
 
     @Test

@@ -21,11 +21,13 @@ import android.app.Application
 import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteModule
 import com.duckduckgo.app.browser.di.BrowserModule
 import com.duckduckgo.app.browser.favicon.FaviconModule
+import com.duckduckgo.app.browser.rating.di.RatingModule
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.httpsupgrade.di.HttpsUpgraderModule
 import com.duckduckgo.app.onboarding.di.OnboardingModule
 import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
 import com.duckduckgo.app.trackerdetection.di.TrackerDetectionModule
+import com.duckduckgo.app.usage.di.AppUsageModule
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjector
@@ -58,7 +60,9 @@ import javax.inject.Singleton
         FaviconModule::class,
         TrackersModule::class,
         PrivacyModule::class,
-        WidgetModule::class
+        WidgetModule::class,
+        RatingModule::class,
+        AppUsageModule::class
     ]
 )
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {

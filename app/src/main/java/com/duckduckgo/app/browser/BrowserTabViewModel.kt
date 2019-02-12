@@ -62,11 +62,17 @@ import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.app.usage.search.SearchCountDao
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.CoroutineContext
 
 class BrowserTabViewModel(
     private val statisticsUpdater: StatisticsUpdater,
@@ -84,8 +90,13 @@ class BrowserTabViewModel(
     private val faviconDownloader: FaviconDownloader,
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
     private val ctaViewModel: CtaViewModel,
+    private val searchCountDao: SearchCountDao,
     appConfigurationDao: AppConfigurationDao
-) : WebViewClientListener, SaveBookmarkListener, ViewModel() {
+) : WebViewClientListener, SaveBookmarkListener, CoroutineScope, ViewModel() {
+
+    private val job = SupervisorJob()
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main + job
 
     data class GlobalLayoutViewState(
         val isNewTabState: Boolean = true
@@ -251,6 +262,10 @@ class BrowserTabViewModel(
 
         command.value = HideKeyboard
         val trimmedInput = input.trim()
+
+        launch(Dispatchers.IO) {
+            searchCountDao.incrementSearchCount()
+        }
 
         val type = specialUrlDetector.determineType(trimmedInput)
         if (type is IntentType) {
