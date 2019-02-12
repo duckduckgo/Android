@@ -23,6 +23,10 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.browser.rating.db.AppEnjoymentDao
+import com.duckduckgo.app.browser.rating.db.AppEnjoymentEntity
+import com.duckduckgo.app.browser.rating.db.AppEnjoymentTypeConverter
+import com.duckduckgo.app.browser.rating.db.PromptCountConverter
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.entities.db.EntityListDao
@@ -43,9 +47,13 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
+import com.duckduckgo.app.usage.app.AppDaysUsedDao
+import com.duckduckgo.app.usage.app.AppDaysUsedEntity
+import com.duckduckgo.app.usage.search.SearchCountDao
+import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 9, entities = [
+    exportSchema = true, version = 10, entities = [
         DisconnectTracker::class,
         HttpsBloomFilterSpec::class,
         HttpsWhitelistedDomain::class,
@@ -58,13 +66,18 @@ import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
         EntityListEntity::class,
         Survey::class,
         DismissedCta::class,
+        SearchCountEntity::class,
+        AppDaysUsedEntity::class,
+        AppEnjoymentEntity::class,
         Notification::class
     ]
 )
 
 @TypeConverters(
     Survey.StatusTypeConverter::class,
-    DismissedCta.IdTypeConverter::class
+    DismissedCta.IdTypeConverter::class,
+    AppEnjoymentTypeConverter::class,
+    PromptCountConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -78,6 +91,9 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun networkEntityDao(): EntityListDao
     abstract fun surveyDao(): SurveyDao
     abstract fun dismissedCtaDao(): DismissedCtaDao
+    abstract fun searchCountDao(): SearchCountDao
+    abstract fun appsDaysUsedDao(): AppDaysUsedDao
+    abstract fun appEnjoymentDao(): AppEnjoymentDao
     abstract fun notificationDao(): NotificationDao
 
     companion object {
@@ -147,5 +163,27 @@ abstract class AppDatabase : RoomDatabase() {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `notification` (`notificationId` TEXT NOT NULL, PRIMARY KEY(`notificationId`))")
             }
         }
+
+        val MIGRATION_9_TO_10: Migration = object : Migration(9, 10) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `search_count` (`key` TEXT NOT NULL, `count` INTEGER NOT NULL, PRIMARY KEY(`key`))")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `app_days_used` (`date` TEXT NOT NULL, PRIMARY KEY(`date`))")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `app_enjoyment` (`eventType` INTEGER NOT NULL, `promptCount` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `primaryKey` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)")
+            }
+
+        }
+
+        val ALL_MIGRATIONS: List<Migration>
+            get() = listOf(
+                MIGRATION_1_TO_2,
+                MIGRATION_2_TO_3,
+                MIGRATION_3_TO_4,
+                MIGRATION_4_TO_5,
+                MIGRATION_5_TO_6,
+                MIGRATION_6_TO_7,
+                MIGRATION_7_TO_8,
+                MIGRATION_8_TO_9,
+                MIGRATION_9_TO_10
+            )
     }
 }

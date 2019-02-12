@@ -23,17 +23,23 @@ import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
 import android.os.Bundle
 import android.widget.Toast
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
+import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
+import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
+import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
 import com.duckduckgo.app.feedback.ui.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.intentText
+import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.global.view.*
+import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -45,13 +51,16 @@ import org.jetbrains.anko.longToast
 import timber.log.Timber
 import javax.inject.Inject
 
-class BrowserActivity : DuckDuckGoActivity() {
+class BrowserActivity : DuckDuckGoActivity(), AppEnjoymentDialogFragment.Listener, RateAppDialogFragment.Listener, GiveFeedbackDialogFragment.Listener {
 
     @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
 
     @Inject
     lateinit var dataClearer: DataClearer
+
+    @Inject
+    lateinit var playStoreUtils: PlayStoreUtils
 
     private var currentTab: BrowserTabFragment? = null
 
@@ -60,6 +69,8 @@ class BrowserActivity : DuckDuckGoActivity() {
     private var instanceStateBundles: CombinedInstanceState? = null
 
     private var lastIntent: Intent? = null
+
+    private var currentAppEnjoymentFragment: DialogFragment? = null
 
     private lateinit var renderer: BrowserStateRenderer
 
@@ -215,6 +226,11 @@ class BrowserActivity : DuckDuckGoActivity() {
             is Query -> currentTab?.submitQuery(command.query)
             is Refresh -> currentTab?.refresh()
             is Command.DisplayMessage -> applicationContext?.longToast(command.messageId)
+            is Command.LaunchPlayStore -> launchPlayStore()
+            is Command.ShowAppEnjoymentPrompt -> showAppEnjoymentPrompt(AppEnjoymentDialogFragment.create(command.promptCount))
+            is Command.ShowAppRatingPrompt -> showAppEnjoymentPrompt(RateAppDialogFragment.create(command.promptCount))
+            is Command.ShowAppFeedbackPrompt -> showAppEnjoymentPrompt(GiveFeedbackDialogFragment.create(command.promptCount))
+            is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this, brokenSite = false))
         }
     }
 
@@ -289,6 +305,9 @@ class BrowserActivity : DuckDuckGoActivity() {
         const val NEW_SEARCH_EXTRA = "NEW_SEARCH_EXTRA"
         const val PERFORM_FIRE_ON_ENTRY_EXTRA = "PERFORM_FIRE_ON_ENTRY_EXTRA"
         const val LAUNCHED_FROM_FIRE_EXTRA = "LAUNCHED_FROM_FIRE_EXTRA"
+
+        private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"
+
         private const val DASHBOARD_REQUEST_CODE = 100
     }
 
@@ -329,11 +348,46 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun showAppEnjoymentPrompt(prompt: DialogFragment) {
+        currentAppEnjoymentFragment?.dismiss()
+        prompt.show(supportFragmentManager, APP_ENJOYMENT_DIALOG_TAG)
+        currentAppEnjoymentFragment = prompt
+    }
+
     private fun hideWebContent() {
         Timber.d("Hiding web view content")
         removeObservers()
         clearingInProgressView.show()
     }
 
+    override fun onUserSelectedAppIsEnjoyed(promptCount: PromptCount) {
+        viewModel.onUserSelectedAppIsEnjoyed(promptCount)
+    }
+
+    override fun onUserSelectedAppIsNotEnjoyed(promptCount: PromptCount) {
+        viewModel.onUserSelectedAppIsNotEnjoyed(promptCount)
+    }
+
+    override fun onUserSelectedToRateApp(promptCount: PromptCount) {
+        viewModel.onUserSelectedToRateApp(promptCount)
+    }
+
+    override fun onUserDeclinedToRateApp(promptCount: PromptCount) {
+        viewModel.onUserDeclinedToRateApp(promptCount)
+    }
+
+    override fun onUserSelectedToGiveFeedback(promptCount: PromptCount) {
+        viewModel.onUserSelectedToGiveFeedback(promptCount)
+    }
+
+    override fun onUserDeclinedToGiveFeedback(promptCount: PromptCount) {
+        viewModel.onUserDeclinedToGiveFeedback(promptCount)
+    }
+
+    private fun launchPlayStore() {
+        playStoreUtils.launchPlayStore(this)
+    }
+
     private data class CombinedInstanceState(val originalInstanceState: Bundle?, val newInstanceState: Bundle?)
+
 }

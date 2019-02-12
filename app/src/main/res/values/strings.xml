@@ -249,6 +249,24 @@
     <string name="addWidgetInstructionsButtonGoHome">Go to Home Screen</string>
     <string name="addWidgetInstructionsButtonClose">Close</string>
 
+    <!-- App Enjoyment / Rating / Feedback -->
+    <string name="appEnjoymentDialogTitle">Enjoying DuckDuckGo?</string>
+    <string name="appEnjoymentDialogMessage">We\'d love to know what you think</string>
+    <string name="appEnjoymentDialogPositiveButton">I like it</string>
+    <string name="appEnjoymentDialogNegativeButton">It needs work</string>
+
+    <string name="rateAppDialogTitle">Rate the app</string>
+    <string name="rateAppDialogMessage">Your feedback matters. Please share the love with a review.</string>
+    <string name="rateAppDialogPositiveButton">Rate App</string>
+    <string name="rateAppDialogNegativeButton">@string/noThanks</string>
+
+    <string name="giveFeedbackDialogTitle">We\'re sorry to hear that</string>
+    <string name="giveFeedbackDialogMessage">Let us know how we can improve the app for you</string>
+    <string name="giveFeedbackDialogPositiveButton">Give Feedback</string>
+    <string name="giveFeedbackDialogNegativeButton">@string/noThanks</string>
+
+    <string name="noThanks">No Thanks</string>
+
     <!-- Notification Channel Names -->
     <string name="notificationChannelFileDownloading">File Downloading</string>
     <string name="notificationChannelFileDownloaded">File Downloaded</string>

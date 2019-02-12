@@ -49,10 +49,13 @@ class StubStatisticsModule {
             override fun fire(pixel: Pixel.PixelName, parameters: Map<String, String?>) {
             }
 
-            override fun fireCompletable(pixel: Pixel.PixelName, parameters: Map<String, String?>): Completable {
-                return Completable.fromAction {}
+            override fun fire(pixelName: String, parameters: Map<String, String?>) {
+
             }
 
+            override fun fireCompletable(pixelName: String, parameters: Map<String, String?>): Completable {
+                return Completable.fromAction {}
+            }
         }
     }
 }

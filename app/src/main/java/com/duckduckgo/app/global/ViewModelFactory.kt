@@ -36,6 +36,8 @@ import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
+import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
@@ -53,6 +55,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel
+import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel
 import javax.inject.Inject
 
@@ -84,7 +87,10 @@ class ViewModelFactory @Inject constructor(
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
     private val pixel: Pixel,
     private val dataClearer: DataClearer,
-    private val ctaViewModel: CtaViewModel
+    private val ctaViewModel: CtaViewModel,
+    private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
+    private val searchCountDao: SearchCountDao,
+    private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -92,30 +98,48 @@ class ViewModelFactory @Inject constructor(
             when {
                 isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboaringStore)
                 isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore, defaultBrowserDetector)
-                isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository, queryUrlConverter, dataClearer)
+                isAssignableFrom(BrowserViewModel::class.java) -> browserViewModel()
                 isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
                 isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository, webViewSessionStorage)
-                isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(
-                    privacySettingsStore,
-                    networkLeaderboardDao,
-                    pixel
-                )
+                isAssignableFrom(PrivacyDashboardViewModel::class.java) -> privacyDashboardViewModel()
                 isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                 isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                 isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
                 isAssignableFrom(FeedbackViewModel::class.java) -> FeedbackViewModel(feedbackSender)
                 isAssignableFrom(SurveyViewModel::class.java) -> SurveyViewModel(surveyDao, statisticsStore, appInstallStore)
                 isAssignableFrom(AddWidgetInstructionsViewModel::class.java) -> AddWidgetInstructionsViewModel()
-                isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(
-                    appSettingsPreferencesStore,
-                    defaultBrowserDetector,
-                    variantManager,
-                    pixel
-                )
+                isAssignableFrom(SettingsViewModel::class.java) -> settingsViewModel()
                 isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel(bookmarksDao)
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
         } as T
+
+    private fun settingsViewModel(): SettingsViewModel {
+        return SettingsViewModel(
+            appSettingsPreferencesStore,
+            defaultBrowserDetector,
+            variantManager,
+            pixel
+        )
+    }
+
+    private fun privacyDashboardViewModel(): PrivacyDashboardViewModel {
+        return PrivacyDashboardViewModel(
+            privacySettingsStore,
+            networkLeaderboardDao,
+            pixel
+        )
+    }
+
+    private fun browserViewModel(): BrowserViewModel {
+        return BrowserViewModel(
+            tabRepository,
+            queryUrlConverter,
+            dataClearer,
+            appEnjoymentPromptEmitter,
+            appEnjoymentUserEventRecorder
+        )
+    }
 
     private fun browserTabViewModel(): ViewModel = BrowserTabViewModel(
         statisticsUpdater = statisticsUpdater,
@@ -133,6 +157,7 @@ class ViewModelFactory @Inject constructor(
         specialUrlDetector = specialUrlDetector,
         faviconDownloader = faviconDownloader,
         addToHomeCapabilityDetector = addToHomeCapabilityDetector,
-        ctaViewModel = ctaViewModel
+        ctaViewModel = ctaViewModel,
+        searchCountDao = searchCountDao
     )
 }
