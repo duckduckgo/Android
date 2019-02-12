@@ -19,7 +19,7 @@ package com.duckduckgo.app.fire
 import android.content.Context
 import androidx.annotation.WorkerThread
 import androidx.work.CoroutineWorker
-import androidx.work.ListenableWorker.Result.SUCCESS
+import androidx.work.ListenableWorker.Result.success
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.clear.ClearWhatOption
@@ -36,11 +36,11 @@ class DataClearingWorker(context: Context, workerParams: WorkerParameters) : Cor
     lateinit var clearDataAction: ClearDataAction
 
     @WorkerThread
-    override suspend fun doWork(): Payload {
+    override suspend fun doWork(): Result {
 
         if (jobAlreadyExecuted()) {
             Timber.i("This job has run before; no more work needed")
-            return Payload(SUCCESS)
+            return success()
         }
 
         settingsDataStore.lastExecutedJobId = id.toString()
@@ -48,7 +48,7 @@ class DataClearingWorker(context: Context, workerParams: WorkerParameters) : Cor
         clearData(settingsDataStore.automaticallyClearWhatOption)
 
         Timber.i("Clear data job finished; returning SUCCESS")
-        return Payload(SUCCESS)
+        return success()
     }
 
     /**

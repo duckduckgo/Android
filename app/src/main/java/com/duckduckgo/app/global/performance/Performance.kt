@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
+package com.duckduckgo.app.global.performance
 
-/**
- * @deprecated DO NOT USE THE CODE IN THIS PACKAGE.
- * <p>
- * The code in this package is derived from the Search and Stories application for the purpose of
- * migration.
- */
-package com.duckduckgo.app.migration.legacy;
+import android.util.Log
+import timber.log.Timber
+import java.util.concurrent.TimeUnit
+
+
+inline fun <T> measureExecution(logMessage: String, logLevel: Int = Log.DEBUG, function: () -> T): T {
+    val startTime = System.nanoTime()
+    return function.invoke().also {
+        val difference = System.nanoTime() - startTime
+        Timber.log(logLevel, "$logMessage; took ${TimeUnit.NANOSECONDS.toMillis(difference)}ms")
+    }
+}

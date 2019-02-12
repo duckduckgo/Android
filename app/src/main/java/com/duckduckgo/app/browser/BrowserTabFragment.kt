@@ -63,6 +63,7 @@ import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
+import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
@@ -130,6 +131,9 @@ class BrowserTabFragment : Fragment(), FindListener {
     @Inject
     lateinit var ctaViewModel: CtaViewModel
 
+    @Inject
+    lateinit var omnibarScrolling: OmnibarScrolling
+
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
     private val initialUrl get() = arguments!![URL_EXTRA_ARG] as String?
@@ -162,8 +166,8 @@ class BrowserTabFragment : Fragment(), FindListener {
     private val fireMenuButton: MenuItem?
         get() = toolbar.menu.findItem(R.id.fire)
 
-    private val menuButton: MenuItem?
-        get() = toolbar.menu.findItem(R.id.browserPopup)
+    private val menuButton: ViewGroup?
+        get() = appBarLayout.browserMenu
 
     private var webView: WebView? = null
 
@@ -175,10 +179,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private val omnibarInputTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
-            viewModel.onOmnibarInputStateChanged(
-                omnibarTextInput.text.toString(),
-                omnibarTextInput.hasFocus()
-            )
+            viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), omnibarTextInput.hasFocus(), true)
         }
     }
 
@@ -202,7 +203,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         super.onActivityCreated(savedInstanceState)
         createPopupMenu()
         configureObservers()
-        configureToolbar()
+        configureAppBar()
         configureWebView()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
@@ -479,7 +480,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
-    private fun configureToolbar() {
+    private fun configureAppBar() {
         toolbar.inflateMenu(R.menu.menu_browser_activity)
 
         toolbar.setOnMenuItemClickListener { menuItem ->
@@ -488,17 +489,17 @@ class BrowserTabFragment : Fragment(), FindListener {
                     browserActivity?.launchFire()
                     return@setOnMenuItemClickListener true
                 }
-                R.id.browserPopup -> {
-                    hideKeyboardImmediately()
-                    launchPopupMenu()
-                    return@setOnMenuItemClickListener true
-                }
                 else -> return@setOnMenuItemClickListener false
             }
         }
 
         toolbar.privacyGradeButton.setOnClickListener {
             browserActivity?.launchPrivacyDashboard()
+        }
+
+        browserMenu.setOnClickListener {
+            hideKeyboardImmediately()
+            launchPopupMenu()
         }
 
         viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
@@ -526,7 +527,7 @@ class BrowserTabFragment : Fragment(), FindListener {
     private fun configureOmnibarTextInput() {
         omnibarTextInput.onFocusChangeListener =
                 View.OnFocusChangeListener { _, hasFocus: Boolean ->
-                    viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), hasFocus)
+                    viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), hasFocus, false)
                 }
 
         omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
@@ -901,9 +902,9 @@ class BrowserTabFragment : Fragment(), FindListener {
                 lastSeenOmnibarViewState = viewState
 
                 if (viewState.isEditing) {
-                    omniBarContainer.setBackgroundResource(R.drawable.omnibar_editing_background)
-                } else {
                     omniBarContainer.background = null
+                } else {
+                    omniBarContainer.setBackgroundResource(R.drawable.omnibar_field_background)
                 }
 
                 if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
@@ -943,9 +944,11 @@ class BrowserTabFragment : Fragment(), FindListener {
                 val browserShowing = viewState.browserShowing
                 if (browserShowing) {
                     webView?.show()
+                    omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
                 } else {
                     logoHidingLayoutChangeListener.callToActionView = ctaContainer
                     webView?.hide()
+                    omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
                 }
 
                 toggleDesktopSiteMode(viewState.isDesktopBrowsingMode)

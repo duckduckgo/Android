@@ -59,7 +59,7 @@
                 android:layout_marginStart="6dp"
                 android:layout_marginEnd="6dp"
                 android:contentDescription="@string/tapFireIconDescription"
-                android:src="@drawable/ic_fire_24dp"
+                android:src="@drawable/ic_fire_no_padding"
                 android:tint="?attr/tabsFireTextColor" />
 
             <TextView
