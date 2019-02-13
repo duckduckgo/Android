@@ -25,6 +25,7 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.Close
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.ShowHome
 import kotlinx.android.synthetic.main.activity_add_widget_instructions.*
+import kotlinx.android.synthetic.main.include_add_widget_instruction_buttons.*
 
 class AddWidgetInstructionsActivity : DuckDuckGoActivity() {
 
