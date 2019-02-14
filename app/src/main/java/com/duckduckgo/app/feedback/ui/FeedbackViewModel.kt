@@ -33,8 +33,6 @@ class FeedbackViewModel(private val feedbackSender: FeedbackSender) : ViewModel(
     )
 
     sealed class Command {
-        object FocusUrl : Command()
-        object FocusMessage : Command()
         object ConfirmAndFinish : Command()
     }
 
@@ -45,56 +43,6 @@ class FeedbackViewModel(private val feedbackSender: FeedbackSender) : ViewModel(
 
     init {
         viewState.value = ViewState()
-    }
-
-    fun setInitialBrokenSite(url: String?) {
-        onBrokenSiteUrlChanged(url)
-        onBrokenSiteChanged(true)
-    }
-
-    fun onBrokenSiteChanged(isBroken: Boolean) {
-        if (isBroken == viewState.value?.isBrokenSite) {
-            return
-        }
-
-        viewState.value = viewState.value?.copy(
-            isBrokenSite = isBroken,
-            showUrl = isBroken,
-            submitAllowed = canSubmit(isBroken, viewValue.url, viewValue.message)
-        )
-
-        if (isBroken && viewValue.url.isNullOrBlank()) {
-            command.value = Command.FocusUrl
-        } else {
-            command.value = Command.FocusMessage
-        }
-    }
-
-    fun onBrokenSiteUrlChanged(newUrl: String?) {
-        viewState.value = viewState.value?.copy(
-            url = newUrl,
-            submitAllowed = canSubmit(viewValue.isBrokenSite, newUrl, viewValue.message)
-        )
-    }
-
-    fun onFeedbackMessageChanged(newMessage: String?) {
-        viewState.value = viewState.value?.copy(
-            message = newMessage,
-            submitAllowed = canSubmit(viewValue.isBrokenSite, viewValue.url, newMessage)
-        )
-    }
-
-    private fun canSubmit(isBrokenSite: Boolean, url: String?, feedbackMessage: String?): Boolean {
-
-        if (feedbackMessage.isNullOrBlank()) {
-            return false
-        }
-
-        if (isBrokenSite && url.isNullOrBlank()) {
-            return false
-        }
-
-        return true
     }
 
     fun onSubmitPressed() {

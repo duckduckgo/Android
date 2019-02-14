@@ -189,7 +189,7 @@
     <string name="no_suggestions">No Suggestions</string>
 
     <!-- Feedback Activity -->
-    <string name="feedbackActivityTitle">Feedback</string>
+    <string name="feedbackActivityTitle">Share Your Feedback</string>
     <string name="feedbackReportBrokenSiteMenuItem">Report Broken Site</string>
     <string name="feedbackHeading">Share Your Feedback</string>
     <string name="feedbackModalDescription">Anonymously share your feedback to help us improve the DuckDuckGo Privacy Browser</string>

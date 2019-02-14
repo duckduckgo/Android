@@ -91,6 +91,8 @@ class BrowserActivity : DuckDuckGoActivity(), AppEnjoymentDialogFragment.Listene
             renderer.renderBrowserViewState(it)
         })
         viewModel.awaitClearDataFinishedNotification()
+
+        startActivity(FeedbackActivity.intent(this, brokenSite = false))
     }
 
     override fun onNewIntent(intent: Intent?) {

@@ -19,16 +19,12 @@ package com.duckduckgo.app.feedback.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.widget.EditText
-import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.FeedbackViewModel.Command
 import com.duckduckgo.app.feedback.ui.FeedbackViewModel.ViewState
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.view.TextChangedWatcher
-import kotlinx.android.synthetic.main.activity_feedback.*
+import kotlinx.android.synthetic.main.include_toolbar.*
 import org.jetbrains.anko.longToast
 
 
@@ -39,39 +35,17 @@ class FeedbackActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_feedback)
+        setupActionBar()
         configureListeners()
         configureObservers()
-
-        if (savedInstanceState == null) {
-            consumeIntentExtra()
-        }
     }
 
-    private fun consumeIntentExtra() {
-        val brokenSite = intent.getBooleanExtra(BROKEN_SITE_EXTRA, false)
-        if (brokenSite) {
-            val url = intent.getStringExtra(URL_EXTRA)
-            viewModel.setInitialBrokenSite(url)
-        }
+    private fun setupActionBar() {
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun configureListeners() {
-        brokenSiteSwitch.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.onBrokenSiteChanged(isChecked)
-        }
-        feedbackMessage.addTextChangedListener(object : TextChangedWatcher() {
-            override fun afterTextChanged(editable: Editable) {
-                viewModel.onFeedbackMessageChanged(editable.toString())
-            }
-        })
-        brokenSiteUrl.addTextChangedListener(object : TextChangedWatcher() {
-            override fun afterTextChanged(editable: Editable) {
-                viewModel.onBrokenSiteUrlChanged(editable.toString())
-            }
-        })
-        submitButton.setOnClickListener {
-            viewModel.onSubmitPressed()
-        }
     }
 
     private fun configureObservers() {
@@ -85,8 +59,6 @@ class FeedbackActivity : DuckDuckGoActivity() {
 
     private fun processCommand(command: Command) {
         when (command) {
-            Command.FocusUrl -> brokenSiteUrl.requestFocus()
-            Command.FocusMessage -> feedbackMessage.requestFocus()
             Command.ConfirmAndFinish -> confirmAndFinish()
         }
     }
@@ -97,18 +69,6 @@ class FeedbackActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: ViewState) {
-        val messageHint = if (viewState.isBrokenSite) R.string.feedbackBrokenSiteHint else R.string.feedbackMessageHint
-        brokenSiteSwitch.isChecked = viewState.isBrokenSite
-        brokenSiteUrl.isVisible = viewState.showUrl
-        brokenSiteUrl.updateText(viewState.url ?: "")
-        feedbackMessage.setHint(messageHint)
-        submitButton.isEnabled = viewState.submitAllowed
-    }
-
-    private fun EditText.updateText(newText: String) {
-        if (text.toString() != newText) {
-            setText(newText)
-        }
     }
 
     companion object {
