@@ -25,7 +25,7 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="65dp"
+        android:layout_marginTop="@dimen/feedbackTitleMarginTop"
         android:fontFamily="sans-serif-medium"
         android:text="Let's get started!"
         android:textColor="@color/almostBlackDark"
@@ -38,22 +38,29 @@
         android:id="@+id/subtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="38dp"
         android:layout_marginStart="38dp"
         android:layout_marginTop="9dp"
-        android:layout_marginEnd="38dp"
+        android:fontFamily="sans-serif"
         android:text="How would you categorize your feedback?"
         android:textColor="@color/almostBlack"
+        android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title" />
 
     <ImageView
         android:id="@+id/positiveFeedbackButton"
-        android:contentDescription="Positive feedback button"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginTop="34dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:contentDescription="Positive feedback button"
+        android:focusable="true"
         android:src="@drawable/ic_positive_feedback"
+        app:layout_constraintEnd_toStartOf="@id/negativeFeedbackButton"
+        app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/subtitle" />
 
@@ -61,12 +68,48 @@
         android:id="@+id/negativeFeedbackButton"
         android:layout_width="100dp"
         android:layout_height="100dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+
         android:contentDescription="Negative feedback button"
-        android:layout_marginStart="211dp"
-        android:src="@drawable/ic_positive_feedback"
+        android:src="@drawable/ic_negative_feedback"
         app:layout_constraintBottom_toBottomOf="@id/positiveFeedbackButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/positiveFeedbackButton"
+        app:layout_constraintStart_toEndOf="@id/positiveFeedbackButton"
         app:layout_constraintTop_toTopOf="@id/positiveFeedbackButton" />
+
+    <Button
+        android:id="@+id/reportBrokenSiteButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        android:background="@drawable/report_broken_site_button_outlined_bg"
+        android:foreground="?attr/selectableItemBackground"
+        android:text="REPORT BROKEN SITE"
+        android:textColor="@color/cornflowerBlue"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toTopOf="@id/bottomInfoCard"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <View
+        android:id="@+id/bottomInfoCard"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:text="Your anonymous feedback is important to us"
+        android:textColor="@color/warmerGray"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@id/bottomInfoCard"
+        app:layout_constraintEnd_toEndOf="@id/bottomInfoCard"
+        app:layout_constraintStart_toStartOf="@id/bottomInfoCard"
+        app:layout_constraintTop_toTopOf="@id/bottomInfoCard" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

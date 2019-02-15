@@ -24,6 +24,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.FeedbackViewModel.Command
 import com.duckduckgo.app.feedback.ui.FeedbackViewModel.ViewState
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import kotlinx.android.synthetic.main.content_feedback.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import org.jetbrains.anko.longToast
 
@@ -46,6 +47,9 @@ class FeedbackActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListeners() {
+        positiveFeedbackButton.setOnClickListener { viewModel.onPositiveFeedback() }
+        negativeFeedbackButton.setOnClickListener { viewModel.onNegativeFeedback() }
+        reportBrokenSiteButton.setOnClickListener { viewModel.onReportBrokenSite() }
     }
 
     private fun configureObservers() {
@@ -69,6 +73,13 @@ class FeedbackActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: ViewState) {
+    }
+
+    private fun showInitialFeedbackView() {
+//        val fragment =
+//        val transaction = supportFragmentManager.beginTransaction()
+//        transaction.replace(R.id.fragmentContainer, fragment)
+//        transaction.commit()
     }
 
     companion object {

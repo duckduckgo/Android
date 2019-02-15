@@ -20,16 +20,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.feedback.api.FeedbackSender
 import com.duckduckgo.app.global.SingleLiveEvent
+import timber.log.Timber
 
 
 class FeedbackViewModel(private val feedbackSender: FeedbackSender) : ViewModel() {
 
     data class ViewState(
-        val isBrokenSite: Boolean = false,
-        val url: String? = null,
-        val showUrl: Boolean = false,
-        val message: String? = null,
-        val submitAllowed: Boolean = false
+            val isBrokenSite: Boolean = false,
+            val url: String? = null,
+            val showUrl: Boolean = false,
+            val message: String? = null,
+            val submitAllowed: Boolean = false
     )
 
     sealed class Command {
@@ -39,7 +40,8 @@ class FeedbackViewModel(private val feedbackSender: FeedbackSender) : ViewModel(
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val viewValue: ViewState get() = viewState.value!!
+    private val viewValue: ViewState
+        get() = viewState.value!!
 
     init {
         viewState.value = ViewState()
@@ -57,6 +59,18 @@ class FeedbackViewModel(private val feedbackSender: FeedbackSender) : ViewModel(
         }
 
         command.value = Command.ConfirmAndFinish
+    }
+
+    fun onPositiveFeedback() {
+        Timber.i("User is giving positive feedback")
+    }
+
+    fun onNegativeFeedback() {
+        Timber.i("User is giving negative feedback")
+    }
+
+    fun onReportBrokenSite() {
+        Timber.i("User wants to report broken site")
     }
 
 }
