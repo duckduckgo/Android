@@ -28,7 +28,7 @@ import javax.inject.Inject
 
 interface WebDataManager {
     suspend fun clearExternalCookies()
-    suspend fun clearData(webView: WebView, webStorage: WebStorage, context: Context)
+    fun clearData(webView: WebView, webStorage: WebStorage, context: Context)
     fun clearWebViewSessions()
 }
 
@@ -37,7 +37,7 @@ class WebViewDataManager @Inject constructor(
     private val cookieManager: DuckDuckGoCookieManager
 ) : WebDataManager {
 
-    override suspend fun clearData(webView: WebView, webStorage: WebStorage, context: Context) {
+    override fun clearData(webView: WebView, webStorage: WebStorage, context: Context) {
         clearCache(webView)
         clearHistory(webView)
         clearWebStorage(webStorage)
