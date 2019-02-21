@@ -57,7 +57,7 @@ class AppEnjoymentDatabaseRepository(private val appEnjoymentDao: AppEnjoymentDa
     }
 
     override suspend fun onUserDeclinedToSayIfEnjoyingApp(promptCount: PromptCount) = withContext(singleThreadedDispatcher) {
-        appEnjoymentDao.insertEvent(AppEnjoymentEntity(AppEnjoymentEventType.USER_DECLINED_FEEDBACK, promptCount))
+        appEnjoymentDao.insertEvent(AppEnjoymentEntity(AppEnjoymentEventType.USER_DECLINED_TO_SAY_WHETHER_ENJOYING, promptCount))
     }
 
     override suspend fun canUserBeShownFirstPrompt(): Boolean {
