@@ -18,19 +18,17 @@ package com.duckduckgo.app.browser
 
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewDatabase
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.global.performance.measureExecution
-import java.io.File
 import javax.inject.Inject
 
 interface WebDataManager {
     suspend fun clearExternalCookies()
-    fun clearData(webView: WebView, webStorage: WebStorage, context: Context)
+    suspend fun clearData(webView: WebView, webStorage: WebStorage, context: Context)
     fun clearWebViewSessions()
 }
 
@@ -39,7 +37,7 @@ class WebViewDataManager @Inject constructor(
     private val cookieManager: DuckDuckGoCookieManager
 ) : WebDataManager {
 
-    override fun clearData(webView: WebView, webStorage: WebStorage, context: Context) {
+    override suspend fun clearData(webView: WebView, webStorage: WebStorage, context: Context) {
         clearCache(webView)
         clearHistory(webView)
         clearWebStorage(webStorage)
@@ -48,8 +46,6 @@ class WebViewDataManager @Inject constructor(
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             clearFormData(WebViewDatabase.getInstance(context))
         }
-
-        deleteWebViewDirectory(context)
     }
 
     private fun clearCache(webView: WebView) {
@@ -86,19 +82,6 @@ class WebViewDataManager @Inject constructor(
         }
     }
 
-    private fun deleteWebViewDirectory(context: Context) {
-        val webViewDirectory = File(context.applicationInfo.dataDir, WEBVIEW_STORAGE_DIRECTORY)
-        measureExecution("Deleted WebView directory ${webViewDirectory.name}") {
-            webViewDirectory.listFiles()?.forEach { deleteFile(it) }
-        }
-    }
-
-    private fun deleteFile(it: File) {
-        measureExecution("Deleted file: ${it.name}", Log.VERBOSE) {
-           it.deleteRecursively()
-        }
-    }
-
     override suspend fun clearExternalCookies() {
         measureExecution("Cleared cookies") {
             cookieManager.removeExternalCookies()
@@ -109,9 +92,5 @@ class WebViewDataManager @Inject constructor(
         measureExecution("Cleared web view sessions") {
             webViewSessionStorage.deleteAllSessions()
         }
-    }
-
-    companion object {
-        private const val WEBVIEW_STORAGE_DIRECTORY = "app_webview"
     }
 }

@@ -19,14 +19,15 @@ package com.duckduckgo.app.browser
 import android.content.Context
 import android.webkit.WebStorage
 import android.webkit.WebView
-import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertTrue
+import kotlinx.coroutines.withContext
+import org.junit.Assert
 import org.junit.Test
 
 @Suppress("RemoveExplicitTypeArguments")
@@ -36,15 +37,17 @@ class WebViewDataManagerTest {
     private val mockStorage: WebStorage = mock()
     private val testee = WebViewDataManager(WebViewSessionInMemoryStorage(), mockCookieManager)
 
-    @UiThreadTest
     @Test
-    fun whenDataClearedThenCacheHistoryAndStorageDataCleared() {
+    fun whenDataClearedThenCacheHistoryAndStorageDataCleared() = runBlocking<Unit> {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val webView = TestWebView(context)
-        testee.clearData(webView, mockStorage, context)
-        assertTrue(webView.historyCleared)
-        assertTrue(webView.cacheCleared)
-        verify(mockStorage).deleteAllData()
+
+        withContext(Dispatchers.Main) {
+            val webView = TestWebView(context)
+            testee.clearData(webView, mockStorage, context)
+            Assert.assertTrue(webView.historyCleared)
+            Assert.assertTrue(webView.cacheCleared)
+            verify(mockStorage).deleteAllData()
+        }
     }
 
     @Test
