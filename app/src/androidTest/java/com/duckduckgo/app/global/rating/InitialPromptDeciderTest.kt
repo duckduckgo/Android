@@ -26,7 +26,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-@Suppress("RemoveExplicitTypeArguments")
+@Suppress("RemoveExplicitTypeArguments", "PrivatePropertyName")
 class InitialPromptDeciderTest {
 
     private lateinit var testee: InitialPromptDecider
@@ -46,42 +46,42 @@ class InitialPromptDeciderTest {
     @Test
     fun whenUserHasNotSeenPromptBeforeAndNotUsedTheAppEnoughThenShouldNotSeePrompt() = runBlocking<Unit> {
         whenever(mockAppDaysUsedRepository.getNumberOfDaysAppUsed()).thenReturn(NOT_ENOUGH_DAYS)
-        whenever(mockAppEnjoymentRepository.hasUserPreviouslySeenFirstPrompt()).thenReturn(false)
+        whenever(mockAppEnjoymentRepository.canUserBeShownFirstPrompt()).thenReturn(true)
         assertFalse(testee.shouldShowPrompt())
     }
 
     @Test
     fun whenUserHasNotSeenPromptBeforeAndUsedTheAppExactEnoughDaysThenShouldSeePrompt() = runBlocking<Unit> {
         whenever(mockAppDaysUsedRepository.getNumberOfDaysAppUsed()).thenReturn(EXACT_NUMBER_OF_DAYS)
-        whenever(mockAppEnjoymentRepository.hasUserPreviouslySeenFirstPrompt()).thenReturn(false)
+        whenever(mockAppEnjoymentRepository.canUserBeShownFirstPrompt()).thenReturn(true)
         assertTrue(testee.shouldShowPrompt())
     }
 
     @Test
     fun whenUserHasNotSeenPromptBeforeAndUsedTheAppMoreThanEnoughDaysThenShouldSeePrompt() = runBlocking<Unit> {
         whenever(mockAppDaysUsedRepository.getNumberOfDaysAppUsed()).thenReturn(MORE_THAN_ENOUGH_DAYS)
-        whenever(mockAppEnjoymentRepository.hasUserPreviouslySeenFirstPrompt()).thenReturn(false)
+        whenever(mockAppEnjoymentRepository.canUserBeShownFirstPrompt()).thenReturn(true)
         assertTrue(testee.shouldShowPrompt())
     }
 
     @Test
     fun whenUserHasSeenPromptBeforeAndNotUsedTheAppEnoughThenShouldNotSeePrompt() = runBlocking<Unit> {
         whenever(mockAppDaysUsedRepository.getNumberOfDaysAppUsed()).thenReturn(NOT_ENOUGH_DAYS)
-        whenever(mockAppEnjoymentRepository.hasUserPreviouslySeenFirstPrompt()).thenReturn(true)
+        whenever(mockAppEnjoymentRepository.canUserBeShownFirstPrompt()).thenReturn(false)
         assertFalse(testee.shouldShowPrompt())
     }
 
     @Test
     fun whenUserHasSeenPromptBeforeAndUsedTheAppExactEnoughDaysThenShouldNotSeePrompt() = runBlocking<Unit> {
         whenever(mockAppDaysUsedRepository.getNumberOfDaysAppUsed()).thenReturn(EXACT_NUMBER_OF_DAYS)
-        whenever(mockAppEnjoymentRepository.hasUserPreviouslySeenFirstPrompt()).thenReturn(true)
+        whenever(mockAppEnjoymentRepository.canUserBeShownFirstPrompt()).thenReturn(false)
         assertFalse(testee.shouldShowPrompt())
     }
 
     @Test
     fun whenUserHasSeenPromptBeforeAndUsedTheAppMoreThanEnoughDaysThenShouldNotSeePrompt() = runBlocking<Unit> {
         whenever(mockAppDaysUsedRepository.getNumberOfDaysAppUsed()).thenReturn(MORE_THAN_ENOUGH_DAYS)
-        whenever(mockAppEnjoymentRepository.hasUserPreviouslySeenFirstPrompt()).thenReturn(true)
+        whenever(mockAppEnjoymentRepository.canUserBeShownFirstPrompt()).thenReturn(false)
         assertFalse(testee.shouldShowPrompt())
     }
 

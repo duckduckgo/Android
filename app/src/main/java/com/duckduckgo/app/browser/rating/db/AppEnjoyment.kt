@@ -23,6 +23,7 @@ private const val TYPE_PROVIDED_RATING = 1
 private const val TYPE_DECLINED_RATING = 2
 private const val TYPE_PROVIDED_FEEDBACK = 3
 private const val TYPE_DECLINED_FEEDBACK = 4
+private const val TYPE_DECLINED_TO_PARTICIPATE = 5
 
 @Dao
 interface AppEnjoymentDao {
@@ -42,6 +43,9 @@ interface AppEnjoymentDao {
     @Query("SELECT * from app_enjoyment WHERE eventType = $TYPE_DECLINED_FEEDBACK AND promptCount = :promptCount")
     fun hasUserDeclinedFeedback(promptCount: Int): Boolean
 
+    @Query("SELECT * from app_enjoyment WHERE eventType = $TYPE_DECLINED_TO_PARTICIPATE AND promptCount = :promptCount")
+    fun hasUserDeclinedToSayWhetherEnjoying(promptCount: Int): Boolean
+
     @Query("SELECT timestamp FROM app_enjoyment WHERE eventType=$TYPE_DECLINED_RATING OR eventType=$TYPE_DECLINED_FEEDBACK ORDER BY timestamp DESC LIMIT 1")
     fun latestDateUserDeclinedRatingOrFeedback(): Long?
 
@@ -59,7 +63,8 @@ enum class AppEnjoymentEventType(val value: Int) {
     USER_PROVIDED_RATING(TYPE_PROVIDED_RATING),
     USER_DECLINED_RATING(TYPE_DECLINED_RATING),
     USER_PROVIDED_FEEDBACK(TYPE_PROVIDED_FEEDBACK),
-    USER_DECLINED_FEEDBACK(TYPE_DECLINED_FEEDBACK);
+    USER_DECLINED_FEEDBACK(TYPE_DECLINED_FEEDBACK),
+    USER_DECLINED_TO_SAY_WHETHER_ENJOYING(TYPE_DECLINED_TO_PARTICIPATE);
 
     companion object {
         private val map = AppEnjoymentEventType.values().associateBy(AppEnjoymentEventType::value)

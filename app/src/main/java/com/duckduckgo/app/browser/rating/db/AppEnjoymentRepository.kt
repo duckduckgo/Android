@@ -30,8 +30,9 @@ interface AppEnjoymentRepository {
     suspend fun onUserDeclinedToRateApp(promptCount: PromptCount)
     suspend fun onUserSelectedToGiveFeedback(promptCount: PromptCount)
     suspend fun onUserDeclinedToGiveFeedback(promptCount: PromptCount)
+    suspend fun onUserDeclinedToSayIfEnjoyingApp(promptCount: PromptCount)
 
-    suspend fun hasUserPreviouslySeenFirstPrompt(): Boolean
+    suspend fun canUserBeShownFirstPrompt(): Boolean
     suspend fun canUserBeShownSecondPrompt(): Boolean
     suspend fun dateUserDismissedFirstPrompt(): Date?
 }
@@ -55,33 +56,42 @@ class AppEnjoymentDatabaseRepository(private val appEnjoymentDao: AppEnjoymentDa
         appEnjoymentDao.insertEvent(AppEnjoymentEntity(AppEnjoymentEventType.USER_DECLINED_FEEDBACK, promptCount))
     }
 
-    override suspend fun hasUserPreviouslySeenFirstPrompt(): Boolean {
+    override suspend fun onUserDeclinedToSayIfEnjoyingApp(promptCount: PromptCount) = withContext(singleThreadedDispatcher) {
+        appEnjoymentDao.insertEvent(AppEnjoymentEntity(AppEnjoymentEventType.USER_DECLINED_FEEDBACK, promptCount))
+    }
+
+    override suspend fun canUserBeShownFirstPrompt(): Boolean {
         return withContext(singleThreadedDispatcher) {
 
             if (appEnjoymentDao.hasUserProvidedRating()) {
                 Timber.d("User has given a rating previously")
-                return@withContext true
+                return@withContext false
             }
 
             if (appEnjoymentDao.hasUserProvidedFeedback()) {
                 Timber.d("User has provided feedback previously")
-                return@withContext true
+                return@withContext false
             }
 
             val promptCount = PromptCount.first().value
 
             if (appEnjoymentDao.hasUserDeclinedRating(promptCount)) {
                 Timber.d("User has declined to give rating previously for prompt number $promptCount")
-                return@withContext true
+                return@withContext false
             }
 
             if (appEnjoymentDao.hasUserDeclinedFeedback(promptCount)) {
                 Timber.d("User has declined feedback previously for prompt number $promptCount")
-                return@withContext true
+                return@withContext false
+            }
+
+            if (appEnjoymentDao.hasUserDeclinedToSayWhetherEnjoying(promptCount)) {
+                Timber.d("User has declined to say whether enjoying or not for prompt number $promptCount")
+                return@withContext false
             }
 
             Timber.d("User has not recently responded to app enjoyment prompt number $promptCount")
-            return@withContext false
+            return@withContext true
         }
     }
 
@@ -101,12 +111,17 @@ class AppEnjoymentDatabaseRepository(private val appEnjoymentDao: AppEnjoymentDa
             val secondPrompt = PromptCount.second().value
 
             if (appEnjoymentDao.hasUserDeclinedFeedback(secondPrompt)) {
-                Timber.i("User has already declined feedback for second prompt previously")
+                Timber.d("User has already declined feedback for second prompt previously")
                 return@withContext false
             }
 
             if (appEnjoymentDao.hasUserDeclinedRating(secondPrompt)) {
-                Timber.i("User has already declined rating for second prompt previously")
+                Timber.d("User has already declined rating for second prompt previously")
+                return@withContext false
+            }
+
+            if (appEnjoymentDao.hasUserDeclinedToSayWhetherEnjoying(secondPrompt)) {
+                Timber.d("User has already declined to say whether enjoying the app or not previously")
                 return@withContext false
             }
 

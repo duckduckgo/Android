@@ -95,14 +95,17 @@ interface Pixel {
         APP_ENJOYMENT_DIALOG_SHOWN("mrp_e_d%d_ds"),
         APP_ENJOYMENT_DIALOG_USER_ENJOYING("mrp_e_d%d_y"),
         APP_ENJOYMENT_DIALOG_USER_NOT_ENJOYING("mrp_e_d%d_n"),
+        APP_ENJOYMENT_DIALOG_USER_CANCELLED("mrp_e_d%d_c"),
 
         APP_RATING_DIALOG_SHOWN("mrp_r_d%d_ds"),
         APP_RATING_DIALOG_USER_GAVE_RATING("mrp_r_d%d_y"),
         APP_RATING_DIALOG_USER_DECLINED_RATING("mrp_r_d%d_n"),
+        APP_RATING_DIALOG_USER_CANCELLED("mrp_r_d%d_c"),
 
         APP_FEEDBACK_DIALOG_SHOWN("mrp_f_d%d_ds"),
         APP_FEEDBACK_DIALOG_USER_GAVE_FEEDBACK("mrp_f_d%d_y"),
         APP_FEEDBACK_DIALOG_USER_DECLINED_FEEDBACK("mrp_f_d%d_n"),
+        APP_FEEDBACK_DIALOG_USER_CANCELLED("mrp_f_d%d_c"),
     }
 
     object PixelParameter {
