@@ -400,7 +400,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUrlChangedWithDuckDuckGoUrlContainingQueryThenAtbRefreshed() {
         testee.urlChanged("http://duckduckgo.com?q=test")
-        verify(mockStatisticsUpdater).refreshRetentionAtb()
+        verify(mockStatisticsUpdater).refreshSearchRetentionAtb()
     }
 
     @Test

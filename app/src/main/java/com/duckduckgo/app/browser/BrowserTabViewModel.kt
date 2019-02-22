@@ -388,7 +388,7 @@ class BrowserTabViewModel(
         )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            statisticsUpdater.refreshRetentionAtb()
+            statisticsUpdater.refreshSearchRetentionAtb()
         }
 
         if (currentUrl() != url) {

@@ -34,11 +34,16 @@ class StubStatisticsModule {
     @Provides
     fun stubStatisticsUpdater(): StatisticsUpdater {
         return object : StatisticsUpdater {
-            override fun refreshRetentionAtb() {
-            }
 
             override fun initializeAtb() {
             }
+
+            override fun refreshAppRetentionAtb() {
+            }
+
+            override fun refreshSearchRetentionAtb() {
+            }
+
         }
     }
 
