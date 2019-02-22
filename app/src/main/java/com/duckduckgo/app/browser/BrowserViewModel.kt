@@ -24,6 +24,9 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
+import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
+import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -46,7 +49,11 @@ class BrowserViewModel(
     private val dataClearer: DataClearer,
     private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
     private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder
-) : ViewModel(), CoroutineScope {
+) : AppEnjoymentDialogFragment.Listener,
+    RateAppDialogFragment.Listener,
+    GiveFeedbackDialogFragment.Listener,
+    ViewModel(),
+    CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
@@ -152,31 +159,44 @@ class BrowserViewModel(
         appEnjoymentPromptEmitter.promptType.removeObserver(appEnjoymentObserver)
     }
 
-    fun onUserSelectedAppIsEnjoyed(promptCount: PromptCount) {
+    override fun onUserSelectedAppIsEnjoyed(promptCount: PromptCount) {
         appEnjoymentUserEventRecorder.onUserEnjoyingApp(promptCount)
     }
 
-    fun onUserSelectedAppIsNotEnjoyed(promptCount: PromptCount) {
+    override fun onUserSelectedAppIsNotEnjoyed(promptCount: PromptCount) {
         appEnjoymentUserEventRecorder.onUserNotEnjoyingApp(promptCount)
     }
 
-    fun onUserSelectedToRateApp(promptCount: PromptCount) {
+    override fun onUserSelectedToRateApp(promptCount: PromptCount) {
         command.value = Command.LaunchPlayStore
 
         launch { appEnjoymentUserEventRecorder.onUserSelectedToRateApp(promptCount) }
     }
 
-    fun onUserDeclinedToRateApp(promptCount: PromptCount) {
+    override fun onUserDeclinedToRateApp(promptCount: PromptCount) {
         launch { appEnjoymentUserEventRecorder.userDeclinedToRateApp(promptCount) }
     }
 
-    fun onUserSelectedToGiveFeedback(promptCount: PromptCount) {
+    override fun onUserSelectedToGiveFeedback(promptCount: PromptCount) {
         command.value = Command.LaunchFeedbackView
 
         launch { appEnjoymentUserEventRecorder.onUserSelectedToGiveFeedback(promptCount) }
     }
 
-    fun onUserDeclinedToGiveFeedback(promptCount: PromptCount) {
+    override fun onUserDeclinedToGiveFeedback(promptCount: PromptCount) {
         launch { appEnjoymentUserEventRecorder.onUserDeclinedToGiveFeedback(promptCount) }
     }
+
+    override fun onUserCancelledAppEnjoymentDialog(promptCount: PromptCount) {
+        launch { appEnjoymentUserEventRecorder.onUserDeclinedToSayIfEnjoyingApp(promptCount)}
+    }
+
+    override fun onUserCancelledRateAppDialog(promptCount: PromptCount) {
+        onUserDeclinedToRateApp(promptCount)
+    }
+
+    override fun onUserCancelledGiveFeedbackDialog(promptCount: PromptCount) {
+        onUserDeclinedToGiveFeedback(promptCount)
+    }
+
 }
