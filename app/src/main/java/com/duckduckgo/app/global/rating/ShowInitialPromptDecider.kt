@@ -36,7 +36,7 @@ class InitialPromptDecider(
             return false
         }
 
-        if (appEnjoymentRepository.hasUserPreviouslySeenFirstPrompt()) {
+        if (!appEnjoymentRepository.canUserBeShownFirstPrompt()) {
             Timber.i("User has seen first prompt already")
             return false
         }

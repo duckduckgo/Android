@@ -28,6 +28,7 @@ interface AppEnjoymentUserEventRecorder {
     suspend fun userDeclinedToRateApp(promptCount: PromptCount)
     suspend fun onUserSelectedToGiveFeedback(promptCount: PromptCount)
     suspend fun onUserDeclinedToGiveFeedback(promptCount: PromptCount)
+    suspend fun onUserDeclinedToSayIfEnjoyingApp(promptCount: PromptCount)
 }
 
 class AppEnjoymentUserEventDatabaseRecorder(
@@ -75,6 +76,14 @@ class AppEnjoymentUserEventDatabaseRecorder(
         appEnjoymentRepository.onUserDeclinedToGiveFeedback(promptCount)
 
         Timber.i("Recorded that user declined to give feedback")
+    }
+
+    override suspend fun onUserDeclinedToSayIfEnjoyingApp(promptCount: PromptCount) {
+        hideAllPrompts()
+
+        appEnjoymentRepository.onUserDeclinedToSayIfEnjoyingApp(promptCount)
+
+        Timber.i("Recorded that user didn't want to participate in app enjoyment")
     }
 
     private fun hideAllPrompts() {

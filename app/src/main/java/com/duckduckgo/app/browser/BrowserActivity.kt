@@ -37,7 +37,6 @@ import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.intentText
-import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
@@ -51,7 +50,7 @@ import org.jetbrains.anko.longToast
 import timber.log.Timber
 import javax.inject.Inject
 
-class BrowserActivity : DuckDuckGoActivity(), AppEnjoymentDialogFragment.Listener, RateAppDialogFragment.Listener, GiveFeedbackDialogFragment.Listener {
+class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
@@ -227,9 +226,9 @@ class BrowserActivity : DuckDuckGoActivity(), AppEnjoymentDialogFragment.Listene
             is Refresh -> currentTab?.refresh()
             is Command.DisplayMessage -> applicationContext?.longToast(command.messageId)
             is Command.LaunchPlayStore -> launchPlayStore()
-            is Command.ShowAppEnjoymentPrompt -> showAppEnjoymentPrompt(AppEnjoymentDialogFragment.create(command.promptCount))
-            is Command.ShowAppRatingPrompt -> showAppEnjoymentPrompt(RateAppDialogFragment.create(command.promptCount))
-            is Command.ShowAppFeedbackPrompt -> showAppEnjoymentPrompt(GiveFeedbackDialogFragment.create(command.promptCount))
+            is Command.ShowAppEnjoymentPrompt -> showAppEnjoymentPrompt(AppEnjoymentDialogFragment.create(command.promptCount, viewModel))
+            is Command.ShowAppRatingPrompt -> showAppEnjoymentPrompt(RateAppDialogFragment.create(command.promptCount, viewModel))
+            is Command.ShowAppFeedbackPrompt -> showAppEnjoymentPrompt(GiveFeedbackDialogFragment.create(command.promptCount, viewModel))
             is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this, brokenSite = false))
         }
     }
@@ -358,30 +357,6 @@ class BrowserActivity : DuckDuckGoActivity(), AppEnjoymentDialogFragment.Listene
         Timber.d("Hiding web view content")
         removeObservers()
         clearingInProgressView.show()
-    }
-
-    override fun onUserSelectedAppIsEnjoyed(promptCount: PromptCount) {
-        viewModel.onUserSelectedAppIsEnjoyed(promptCount)
-    }
-
-    override fun onUserSelectedAppIsNotEnjoyed(promptCount: PromptCount) {
-        viewModel.onUserSelectedAppIsNotEnjoyed(promptCount)
-    }
-
-    override fun onUserSelectedToRateApp(promptCount: PromptCount) {
-        viewModel.onUserSelectedToRateApp(promptCount)
-    }
-
-    override fun onUserDeclinedToRateApp(promptCount: PromptCount) {
-        viewModel.onUserDeclinedToRateApp(promptCount)
-    }
-
-    override fun onUserSelectedToGiveFeedback(promptCount: PromptCount) {
-        viewModel.onUserSelectedToGiveFeedback(promptCount)
-    }
-
-    override fun onUserDeclinedToGiveFeedback(promptCount: PromptCount) {
-        viewModel.onUserDeclinedToGiveFeedback(promptCount)
     }
 
     private fun launchPlayStore() {
