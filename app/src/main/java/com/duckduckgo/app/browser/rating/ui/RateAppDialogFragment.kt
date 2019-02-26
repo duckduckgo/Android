@@ -29,7 +29,10 @@ class RateAppDialogFragment : EnjoymentDialog() {
     interface Listener {
         fun onUserSelectedToRateApp(promptCount: PromptCount)
         fun onUserDeclinedToRateApp(promptCount: PromptCount)
+        fun onUserCancelledRateAppDialog(promptCount: PromptCount)
     }
+
+    private lateinit var listener: Listener
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         firePixelWithPromptCount(APP_RATING_DIALOG_SHOWN)
@@ -39,24 +42,26 @@ class RateAppDialogFragment : EnjoymentDialog() {
             .setMessage(R.string.rateAppDialogMessage)
             .setPositiveButton(R.string.rateAppDialogPositiveButton) { _, _ ->
                 firePixelWithPromptCount(APP_RATING_DIALOG_USER_GAVE_RATING)
-                listener?.onUserSelectedToRateApp(PromptCount(promptCount))
+                listener.onUserSelectedToRateApp(promptCount)
             }
             .setNegativeButton(R.string.rateAppDialogNegativeButton) { _, _ ->
                 firePixelWithPromptCount(APP_RATING_DIALOG_USER_DECLINED_RATING)
-                listener?.onUserDeclinedToRateApp(PromptCount(promptCount))
+                listener.onUserDeclinedToRateApp(promptCount)
             }
+            .setOnKeyListener(BackKeyListener {
+                firePixelWithPromptCount(APP_RATING_DIALOG_USER_CANCELLED)
+                listener.onUserCancelledRateAppDialog(promptCount)
+            })
             .create()
     }
 
-    private val listener: Listener?
-        get() = activity as Listener
-
     companion object {
-        fun create(promptCount: PromptCount): RateAppDialogFragment {
+        fun create(promptCount: PromptCount, listener: Listener): RateAppDialogFragment {
             return RateAppDialogFragment().also { fragment ->
                 val bundle = Bundle()
                 bundle.putInt(PROMPT_COUNT_BUNDLE_KEY, promptCount.value)
                 fragment.arguments = bundle
+                fragment.listener = listener
             }
         }
     }
