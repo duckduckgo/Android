@@ -25,15 +25,8 @@ class VariantManagerTest {
     private val variants = VariantManager.ACTIVE_VARIANTS
 
     @Test
-    fun serpVariantAConfiguredCorrectly() {
-        val variant = variants.firstOrNull { it.key == "sa" }
-        assertEqualsDouble(1.0, variant!!.weight)
-        assertEquals(0, variant.features.size)
-    }
-
-    @Test
-    fun serpVariantBConfiguredCorrectly() {
-        val variant = variants.firstOrNull { it.key == "sb" }
+    fun sharedControlVariantConfiguredCorrectly() {
+        val variant = variants.firstOrNull { it.key == "sc" }
         assertEqualsDouble(1.0, variant!!.weight)
         assertEquals(0, variant.features.size)
     }

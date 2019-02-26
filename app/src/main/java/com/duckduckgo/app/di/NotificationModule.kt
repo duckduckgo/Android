@@ -55,10 +55,9 @@ class NotificationModule {
     fun providesNotificationScheduler(
         notificationDao: NotificationDao,
         notificationManager: NotificationManagerCompat,
-        settingsDataStore: SettingsDataStore,
-        variantManager: VariantManager
+        settingsDataStore: SettingsDataStore
     ): NotificationScheduler {
-        return NotificationScheduler(notificationDao, notificationManager, settingsDataStore, variantManager)
+        return NotificationScheduler(notificationDao, notificationManager, settingsDataStore)
     }
 
     @Provides

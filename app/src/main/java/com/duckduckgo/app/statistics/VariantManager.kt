@@ -19,16 +19,12 @@ package com.duckduckgo.app.statistics
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import timber.log.Timber
-import java.util.*
 
 @WorkerThread
 interface VariantManager {
 
     sealed class VariantFeature {
-        object NotificationDayOne : VariantFeature()
-        object NotificationDayThree : VariantFeature()
     }
 
     companion object {
@@ -37,19 +33,10 @@ interface VariantManager {
         val DEFAULT_VARIANT = Variant(key = "", features = emptyList())
 
         val ACTIVE_VARIANTS = listOf(
-            // SERP variants - do not remove
-            Variant(key = "sa", weight = 1.0, features = emptyList()),
-            Variant(key = "sb", weight = 1.0, features = emptyList()),
-
-            // Notifications english speakers
-            Variant(key = "mc", weight = 1.0, features = emptyList()),
-            Variant(key = "me", weight = 1.0, features = listOf(VariantFeature.NotificationDayOne)),
-            Variant(key = "mi", weight = 1.0, features = listOf(VariantFeature.NotificationDayThree)),
-
-            // Notifications non-english speakers
-            Variant(key = "md", weight = 1.0, features = emptyList()),
-            Variant(key = "mf", weight = 1.0, features = listOf(VariantFeature.NotificationDayOne)),
-            Variant(key = "mk", weight = 1.0, features = listOf(VariantFeature.NotificationDayThree))
+            // Shared control. Use this control only if you want the general population
+            // in your experiment. If your experiment is on a subgroup of users e.g a
+            // device API or specific language then create an experiment specific control group
+            Variant(key = "sc", weight = 1.0, features = emptyList())
         )
     }
 
@@ -58,7 +45,6 @@ interface VariantManager {
 
 class ExperimentationVariantManager(
     private val store: StatisticsDataStore,
-    private val widgetCapabilities: WidgetCapabilities,
     private val indexRandomizer: IndexRandomizer
 ) : VariantManager {
 
@@ -99,26 +85,9 @@ class ExperimentationVariantManager(
 
     private fun generateVariant(activeVariants: List<Variant>): Variant {
         val randomizedIndex = indexRandomizer.random(activeVariants)
-        val variant = activeVariants[randomizedIndex]
-        return adjustNotificationVariantsForLanguage(variant, activeVariants)
-    }
-
-    private fun adjustNotificationVariantsForLanguage(variant: Variant, activeVariants: List<Variant>): Variant {
-        return when {
-            !isLanguageEnglish && variant.key == "mc" -> activeVariants.find { it.key == "md" }!!
-            !isLanguageEnglish && variant.key == "me" -> activeVariants.find { it.key == "mf" }!!
-            !isLanguageEnglish && variant.key == "mt" -> activeVariants.find { it.key == "mu" }!!
-            isLanguageEnglish && variant.key == "md" -> activeVariants.find { it.key == "mc" }!!
-            isLanguageEnglish && variant.key == "mf" -> activeVariants.find { it.key == "me" }!!
-            isLanguageEnglish && variant.key == "mu" -> activeVariants.find { it.key == "mt" }!!
-            else -> variant
-        }
+        return activeVariants[randomizedIndex]
     }
 }
-
-private val isLanguageEnglish
-    get() = Locale.getDefault().isO3Language == Locale.ENGLISH.isO3Language
-
 
 /**
  * A variant which can be used for experimentation.
