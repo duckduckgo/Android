@@ -52,12 +52,12 @@ class EntityListDownloader @Inject constructor(
                 Timber.d("Updating entity list data from server")
                 val body = response.body()!!
 
-                var entities = emptyList<EntityListEntity>()
+                var entities = ArrayList<EntityListEntity>()
                 body.entries.forEach {
                     val entity = it.key
 
                     (it.value.properties + it.value.resources).forEach {
-                        entities += EntityListEntity(entityName = entity, domainName = it)
+                        entities.add(EntityListEntity(entityName = entity, domainName = it))
                     }
                 }
 
