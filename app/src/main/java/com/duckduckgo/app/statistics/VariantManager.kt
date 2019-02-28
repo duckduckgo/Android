@@ -33,9 +33,9 @@ interface VariantManager {
         val DEFAULT_VARIANT = Variant(key = "", features = emptyList())
 
         val ACTIVE_VARIANTS = listOf(
-            // Shared control. Use this control only if you want the general population
-            // in your experiment. If your experiment is on a subgroup of users e.g a
-            // device API or specific language then create an experiment specific control group
+
+            // Shared control. You can use this as your control unless you are experimenting on
+            // a subgroup e.g a device API or specific language
             Variant(key = "sc", weight = 1.0, features = emptyList())
         )
     }
