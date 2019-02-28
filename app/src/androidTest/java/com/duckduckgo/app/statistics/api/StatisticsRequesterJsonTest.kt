@@ -192,7 +192,7 @@ class StatisticsRequesterJsonTest {
         testee.refreshAppRetentionAtb()
         val refreshRequest = takeRequestImmediately()
         assertEquals("/atb.js", refreshRequest.requestUrl.encodedPath())
-        assertEquals("au", refreshRequest.requestUrl.queryParameter("at"))
+        assertEquals("app_use", refreshRequest.requestUrl.queryParameter("type"))
     }
 
     @Test
