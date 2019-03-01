@@ -792,9 +792,9 @@ class BrowserTabFragment : Fragment(), FindListener {
                 }
 
                 override fun downloadFinished(file: File, mimeType: String?) {
-                    MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null, { _, uri ->
+                    MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null) { _, uri ->
                         fileDownloadNotificationManager.showDownloadFinishedNotification(file.name, uri, mimeType)
-                    })
+                    }
                 }
 
                 override fun downloadFailed(message: String) {

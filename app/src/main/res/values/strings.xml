@@ -31,7 +31,6 @@
     <string name="clearButtonContentDescription">Clear search input</string>
     <string name="no_compatible_third_party_app_installed">No compatible app installed</string>
     <string name="addBookmarkMenuTitle">Add Bookmark</string>
-    <string name="imageOptions">Image Options</string>
     <string name="requestDesktopSiteMenuTitle">Desktop Site</string>
 
     <!-- Downloading files -->
@@ -102,16 +101,6 @@
     <plurals name="trackerBlocked">
         <item quantity="one">%s Tracker Blocked</item>
         <item quantity="other">%s Trackers Blocked</item>
-    </plurals>
-
-    <plurals name="networksBlocked">
-        <item quantity="one">%s Tracker Network Blocked</item>
-        <item quantity="other">%s Tracker Networks Blocked</item>
-    </plurals>
-
-    <plurals name="networksFound">
-        <item quantity="one">%s Tracker Network Found</item>
-        <item quantity="other">%s Tracker Networks Found</item>
     </plurals>
 
     <plurals name="majorNetworksFound">

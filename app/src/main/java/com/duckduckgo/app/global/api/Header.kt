@@ -17,5 +17,5 @@
 package com.duckduckgo.app.global.api
 
 object Header {
-    val USER_AGENT = "User-Agent"
+    const val USER_AGENT = "User-Agent"
 }

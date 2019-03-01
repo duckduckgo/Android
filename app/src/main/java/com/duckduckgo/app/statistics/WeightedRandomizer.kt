@@ -38,7 +38,7 @@ class WeightedRandomizer : IndexRandomizer {
     }
 
     private fun arrayPopulatedWithIndexes(items: List<Probabilistic>): IntArray {
-        return IntArray(items.size, { i -> i })
+        return IntArray(items.size) { i -> i }
     }
 
     private fun arrayPopulatedWithProbabilities(items: List<Probabilistic>): DoubleArray {
