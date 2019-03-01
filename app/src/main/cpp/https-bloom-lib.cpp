@@ -35,7 +35,7 @@ JNICALL
 Java_com_duckduckgo_app_httpsupgrade_BloomFilter_releaseBloomFilter(JNIEnv *env,
                                                                     jobject,
                                                                     jlong pointer) {
-    BloomFilter *filter = (BloomFilter *) pointer;
+    auto *filter = (BloomFilter *) pointer;
     delete filter;
 }
 

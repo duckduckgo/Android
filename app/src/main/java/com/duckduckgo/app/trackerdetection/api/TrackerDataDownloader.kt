@@ -44,7 +44,7 @@ class TrackerDataDownloader @Inject constructor(
 
         return when (clientName) {
             DISCONNECT -> downloadDisconnectList()
-            TRACKERSWHITELIST -> downloadAdblockList(clientName, { trackerListService.trackersWhitelist() })
+            TRACKERSWHITELIST -> downloadAdblockList(clientName) { trackerListService.trackersWhitelist() }
             EASYLIST, EASYPRIVACY -> removeLegacyList(clientName)
         }
     }

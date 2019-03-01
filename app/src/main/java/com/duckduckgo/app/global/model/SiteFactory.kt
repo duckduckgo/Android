@@ -17,9 +17,7 @@
 package com.duckduckgo.app.global.model
 
 import com.duckduckgo.app.privacy.model.PrivacyPractices
-import com.duckduckgo.app.privacy.model.TermsOfService
 import com.duckduckgo.app.privacy.store.PrevalenceStore
-import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import javax.inject.Inject
 import javax.inject.Singleton
