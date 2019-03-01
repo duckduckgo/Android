@@ -23,10 +23,6 @@ import androidx.work.WorkManager
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NotificationDayOne
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NotificationDayThree
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -45,59 +41,40 @@ class NotificationSchedulerTest {
 
     private val mockNotificationsDao: NotificationDao = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
-    private val mockVariantManager: VariantManager = mock()
 
     private lateinit var testee: NotificationScheduler
 
     @Before
     fun before() {
-        whenever(mockVariantManager.getVariant(any())).thenReturn(DEFAULT_VARIANT)
         testee = NotificationScheduler(
             mockNotificationsDao,
             notifcationManagerCompat,
-            mockSettingsDataStore,
-            mockVariantManager
+            mockSettingsDataStore
         )
     }
 
     @Test
-    fun whenInNotificationDayOneFeatureAndNotificationtNotSeenAndOptionNotSetThenNotificationScheduled() {
-        setup(NotificationDayOne, false, ClearWhatOption.CLEAR_NONE)
+    fun whenNotificationtNotSeenAndOptionNotSetThenNotificationScheduled() {
+        setup(false, ClearWhatOption.CLEAR_NONE)
         testee.scheduleNextNotification(testScope)
         assertTrue(notificationScheduled())
     }
 
     @Test
-    fun whenInNotificationDayThreeFeatureAndNotificationNotSeenAndOptionNotSetThenNotificationScheduled() {
-        setup(NotificationDayThree, false, ClearWhatOption.CLEAR_NONE)
-        testee.scheduleNextNotification(testScope)
-        assertTrue(notificationScheduled())
-    }
-
-    @Test
-    fun whenndNotificaionNotSeenAndOptionNotSetButNoNotificationFeatureOffThenNotificationNotScheduled() {
-        setup(null, false, ClearWhatOption.CLEAR_NONE)
+    fun whenNotificationNotSeenAndClearOptionsAlreadySetThenNotificationNotScheduled() {
+        setup(false, ClearWhatOption.CLEAR_TABS_ONLY)
         testee.scheduleNextNotification(testScope)
         assertFalse(notificationScheduled())
     }
 
     @Test
-    fun whenInNotificationCohortAndNotificationNotSeenButClearOptionsAlreadySetThenNotificationNotScheduled() {
-        setup(NotificationDayOne, false, ClearWhatOption.CLEAR_TABS_ONLY)
+    fun whenNotificationAlreadySeenAndOptionNotSetThenNotificationNotScheduled() {
+        setup(true, ClearWhatOption.CLEAR_NONE)
         testee.scheduleNextNotification(testScope)
         assertFalse(notificationScheduled())
     }
 
-    @Test
-    fun whenInNotificationCohortAndOptionNotSetButNotificationAlreadySeenThenNotificationNotScheduled() {
-        setup(NotificationDayOne, true, ClearWhatOption.CLEAR_NONE)
-        testee.scheduleNextNotification(testScope)
-        assertFalse(notificationScheduled())
-    }
-
-    private fun setup(feature: VariantManager.VariantFeature?, notificationSeen: Boolean, clearWhatOption: ClearWhatOption) {
-        val variant = if (feature == null) DEFAULT_VARIANT else VariantManager.ACTIVE_VARIANTS.find { it.hasFeature(feature) }
-        whenever(mockVariantManager.getVariant(any())).thenReturn(variant)
+    private fun setup(notificationSeen: Boolean, clearWhatOption: ClearWhatOption) {
         whenever(mockNotificationsDao.exists(any())).thenReturn(notificationSeen)
         whenever(mockSettingsDataStore.automaticallyClearWhatOption).thenReturn(clearWhatOption)
     }
