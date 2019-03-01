@@ -27,7 +27,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserSystemSettings
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import org.jetbrains.anko.toast
 import timber.log.Timber
 

@@ -17,7 +17,7 @@
 package com.duckduckgo.app.onboarding.ui
 
 import androidx.lifecycle.ViewModel
-import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 
 class OnboardingViewModel(

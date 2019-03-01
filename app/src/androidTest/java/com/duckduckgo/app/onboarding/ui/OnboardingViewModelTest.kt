@@ -17,7 +17,7 @@
 package com.duckduckgo.app.onboarding.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never

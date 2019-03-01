@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.defaultBrowsing
+package com.duckduckgo.app.browser.defaultbrowsing
 
 import android.content.Intent
 import android.os.Build
