@@ -93,9 +93,6 @@ class BrowserTabViewModelTest {
     private lateinit var mockStatisticsUpdater: StatisticsUpdater
 
     @Mock
-    private lateinit var mockQueryObserver: Observer<String>
-
-    @Mock
     private lateinit var mockCommandObserver: Observer<Command>
 
     @Mock
@@ -201,7 +198,6 @@ class BrowserTabViewModelTest {
         )
 
         testee.loadData("abc", null)
-        testee.url.observeForever(mockQueryObserver)
         testee.command.observeForever(mockCommandObserver)
 
         whenever(mockOmnibarConverter.convertQueryToUrl(any())).thenReturn("duckduckgo.com")
@@ -212,7 +208,6 @@ class BrowserTabViewModelTest {
     fun after() {
         testee.onCleared()
         db.close()
-        testee.url.removeObserver(mockQueryObserver)
         testee.command.removeObserver(mockCommandObserver)
     }
 
@@ -250,7 +245,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewBecomesVisibleWithActiveSiteThenKeyboardHidden() {
-        testee.url.value = "http://exmaple.com"
+        testee.urlChanged("http://exmaple.com")
         testee.onViewVisible()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.contains(Command.HideKeyboard))
@@ -258,7 +253,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewBecomesVisibleWithoutActiveSiteThenKeyboardShown() {
-        testee.url.value = null
+        testee.urlChanged(null)
         testee.onViewVisible()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
@@ -298,21 +293,22 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenEmptyInputQueryThenNoQueryMadeAvailableToActivity() {
+    fun whenEmptyInputQueryThenQueryNavigateCommandNotSubmittedToActivityActivity() {
         testee.onUserSubmittedQuery("")
-        verify(mockQueryObserver, never()).onChanged(ArgumentMatchers.anyString())
+        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
     }
 
     @Test
-    fun whenBlankInputQueryThenNoQueryMadeAvailableToActivity() {
+    fun whenBlankInputQueryThenQueryNavigateCommandNotSubmittedToActivity() {
         testee.onUserSubmittedQuery("     ")
-        verify(mockQueryObserver, never()).onChanged(ArgumentMatchers.anyString())
+        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
     }
 
     @Test
-    fun whenNonEmptyInputThenQueryMadeAvailableToActivity() {
+    fun whenNonEmptyInputThenNavigateCommandSubmittedToActivity() {
         testee.onUserSubmittedQuery("foo")
-        verify(mockQueryObserver).onChanged(ArgumentMatchers.anyString())
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Navigate)
     }
 
     @Test
@@ -329,7 +325,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenLoadingFinishedWithUrlThenSiteVisitedEntryAddedToLeaderboardDao() {
-        testee.url.value = "http://example.com/abc"
+        testee.urlChanged("http://example.com/abc")
         testee.loadingFinished(null)
         verify(mockNetworkLeaderboardDao).insert(SiteVisitedEntity("example.com"))
     }
@@ -629,7 +625,7 @@ class BrowserTabViewModelTest {
     fun whenEnteringNonEmptyQueryThenHideKeyboardCommandIssued() {
         testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.value == Command.HideKeyboard)
+        assertTrue(commandCaptor.allValues.any { it == Command.HideKeyboard })
     }
 
     @Test
@@ -796,14 +792,17 @@ class BrowserTabViewModelTest {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo.com")).thenReturn("foo.com")
         whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(false)
         testee.restoreWebViewState(null, "foo.com")
-        assertEquals("foo.com", testee.url.value)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.lastValue as Navigate
+        assertEquals("foo.com", command.url)
     }
 
     @Test
     fun whenRestoringWebViewSessionNotRestorableAndNoPreviousUrlThenNoUrlLoaded() {
         whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(false)
         testee.restoreWebViewState(null, "")
-        assertNull(testee.url.value)
+        assertFalse(commandCaptor.allValues.any { it is Navigate })
     }
 
     @Test

@@ -95,6 +95,10 @@ class BrowserTabViewModel(
 ) : WebViewClientListener, SaveBookmarkListener, CoroutineScope, ViewModel() {
 
     private val job = SupervisorJob()
+
+    override val url: String?
+        get() = site?.url
+
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
 
@@ -181,7 +185,6 @@ class BrowserTabViewModel(
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
     val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
-    val url: SingleLiveEvent<String> = SingleLiveEvent()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     @VisibleForTesting
@@ -217,7 +220,7 @@ class BrowserTabViewModel(
     }
 
     fun onViewReady() {
-        site?.url?.let {
+        url?.let {
             onUserSubmittedQuery(it)
         }
     }
@@ -251,7 +254,7 @@ class BrowserTabViewModel(
     }
 
     fun onViewVisible() {
-        command.value = if (url.value == null) ShowKeyboard else Command.HideKeyboard
+        command.value = if (url == null) ShowKeyboard else Command.HideKeyboard
         ctaViewModel.refreshCta()
     }
 
@@ -271,7 +274,7 @@ class BrowserTabViewModel(
         if (type is IntentType) {
             externalAppLinkClicked(type)
         } else {
-            url.value = queryUrlConverter.convertQueryToUrl(trimmedInput)
+            command.value = Navigate(queryUrlConverter.convertQueryToUrl(trimmedInput))
         }
 
         globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
@@ -330,7 +333,7 @@ class BrowserTabViewModel(
     }
 
     private fun registerSiteVisit() {
-        val domainVisited = url.value?.toUri()?.host ?: return
+        val domainVisited = url?.toUri()?.host ?: return
         Schedulers.io().scheduleDirect {
             networkLeaderboardDao.insert(SiteVisitedEntity(domainVisited))
         }
@@ -390,11 +393,8 @@ class BrowserTabViewModel(
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             statisticsUpdater.refreshRetentionAtb()
         }
-
-        if (currentUrl() != url) {
-            site = siteFactory.build(url)
-            onSiteChanged()
-        }
+        site = siteFactory.build(url)
+        onSiteChanged()
     }
 
     private fun omnibarTextForUrl(url: String): String {
@@ -405,7 +405,7 @@ class BrowserTabViewModel(
     }
 
     override fun trackerDetected(event: TrackingEvent) {
-        if (event.documentUrl == site?.url) {
+        if (event.documentUrl == url) {
             site?.trackerDetected(event)
             onSiteChanged()
         }
@@ -420,7 +420,7 @@ class BrowserTabViewModel(
     }
 
     override fun pageHasHttpResources(page: String?) {
-        if (page == site?.url) {
+        if (page == url) {
             site?.hasHttpResources = true
             onSiteChanged()
         }
@@ -483,7 +483,7 @@ class BrowserTabViewModel(
     }
 
     fun onBrokenSiteSelected() {
-        command.value = BrokenSiteFeedback(site?.url)
+        command.value = BrokenSiteFeedback(url)
     }
 
     fun onUserSelectedToEditQuery(query: String) {
@@ -582,13 +582,8 @@ class BrowserTabViewModel(
         }
     }
 
-    override fun currentUrl(): String? {
-        return site?.url
-    }
-
     fun resetView() {
         site = null
-        url.value = null
         onSiteChanged()
         initializeViewStates()
     }

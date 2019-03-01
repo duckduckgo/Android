@@ -54,8 +54,7 @@ class BrowserChromeClient @Inject constructor() : WebChromeClient() {
         Timber.d("onProgressChanged - $newProgress - ${webView.url}")
 
         webViewClientListener?.progressChanged(newProgress)
-
-        val currentUrl = webViewClientListener?.currentUrl()
+        val currentUrl = webViewClientListener?.url
         if (currentUrl != webView.url) {
             Timber.i("Url has changed from $currentUrl to ${webView.url}")
             webViewClientListener?.urlChanged(webView.url)
