@@ -108,10 +108,10 @@ class BrowserWebViewClient @Inject constructor(
 
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
         Timber.d("\nonPageStarted {\nurl: $url\nwebView.url: ${webView.url}\n}\n")
-
         currentUrl = url
+
         webViewClientListener?.let {
-            it.loadingStarted()
+            it.loadingStarted(url)
             it.navigationOptionsChanged(determineNavigationOptions(webView))
         }
 
@@ -127,7 +127,6 @@ class BrowserWebViewClient @Inject constructor(
         currentUrl = url
         webViewClientListener?.let {
             it.loadingFinished(url)
-            it.urlChanged(url)
             it.navigationOptionsChanged(determineNavigationOptions(webView))
         }
     }

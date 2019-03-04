@@ -52,13 +52,7 @@ class BrowserChromeClient @Inject constructor() : WebChromeClient() {
 
     override fun onProgressChanged(webView: WebView, newProgress: Int) {
         Timber.d("onProgressChanged - $newProgress - ${webView.url}")
-
-        webViewClientListener?.progressChanged(newProgress)
-        val currentUrl = webViewClientListener?.url
-        if (currentUrl != webView.url) {
-            Timber.i("Url has changed from $currentUrl to ${webView.url}")
-            webViewClientListener?.urlChanged(webView.url)
-        }
+        webViewClientListener?.progressChanged(webView.url, newProgress)
     }
 
     override fun onReceivedTitle(view: WebView, title: String) {

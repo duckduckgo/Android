@@ -96,9 +96,6 @@ class BrowserTabViewModel(
 
     private val job = SupervisorJob()
 
-    override val url: String?
-        get() = site?.url
-
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
 
@@ -195,6 +192,11 @@ class BrowserTabViewModel(
         }
     }
 
+    override val url: String?
+        get() = site?.url
+
+    private var nextUrl: String? = null
+
     private var appConfigurationDownloaded = false
     private val appConfigurationObservable = appConfigurationDao.appConfigurationStatus()
     private val autoCompletePublishSubject = PublishRelay.create<String>()
@@ -284,11 +286,15 @@ class BrowserTabViewModel(
         autoCompleteViewState.value = AutoCompleteViewState(false)
     }
 
-    override fun progressChanged(newProgress: Int) {
+    override fun progressChanged(progressedUrl: String?, newProgress: Int) {
         Timber.v("Loading in progress $newProgress")
-
         val progress = currentLoadingViewState()
         loadingViewState.value = progress.copy(progress = newProgress)
+
+        if (nextUrl == progressedUrl) {
+            Timber.i("Url has changed from ${this.url} to $nextUrl")
+            urlChanged(nextUrl)
+        }
     }
 
     override fun goFullScreen(view: View) {
@@ -303,10 +309,11 @@ class BrowserTabViewModel(
         browserViewState.value = currentState.copy(isFullScreen = false)
     }
 
-    override fun loadingStarted() {
+    override fun loadingStarted(url: String?) {
         Timber.v("Loading started")
         val progress = currentLoadingViewState()
         loadingViewState.value = progress.copy(isLoading = true)
+        nextUrl = url
         site = null
         onSiteChanged()
     }
@@ -320,6 +327,10 @@ class BrowserTabViewModel(
 
     override fun loadingFinished(url: String?) {
         Timber.v("Loading finished")
+
+        if (this.url != url) {
+            urlChanged(url)
+        }
 
         val currentOmnibarViewState = currentOmnibarViewState()
         val currentLoadingViewState = currentLoadingViewState()
@@ -359,7 +370,7 @@ class BrowserTabViewModel(
         command.postValue(SendSms(telephoneNumber))
     }
 
-    override fun urlChanged(url: String?) {
+    private fun urlChanged(url: String?) {
         Timber.v("Url changed: $url")
 
         if (url == null) {
@@ -393,6 +404,7 @@ class BrowserTabViewModel(
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             statisticsUpdater.refreshRetentionAtb()
         }
+        nextUrl = null
         site = siteFactory.build(url)
         onSiteChanged()
     }
@@ -583,6 +595,7 @@ class BrowserTabViewModel(
     }
 
     fun resetView() {
+        nextUrl = null
         site = null
         onSiteChanged()
         initializeViewStates()
