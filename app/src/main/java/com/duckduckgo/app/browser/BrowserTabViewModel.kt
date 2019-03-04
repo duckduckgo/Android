@@ -292,7 +292,6 @@ class BrowserTabViewModel(
         loadingViewState.value = progress.copy(progress = newProgress)
 
         if (nextUrl == progressedUrl) {
-            Timber.i("Url has changed from ${this.url} to $nextUrl")
             urlChanged(nextUrl)
         }
     }
@@ -328,7 +327,7 @@ class BrowserTabViewModel(
     override fun loadingFinished(url: String?) {
         Timber.v("Loading finished")
 
-        if (this.url != url) {
+        if (nextUrl != null) {
             urlChanged(url)
         }
 

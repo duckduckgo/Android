@@ -324,14 +324,27 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLoadingFinishedThenUrUpdated() {
-        val url = "http://example.com/abc"
-        testee.loadingFinished(url)
-        assertEquals(url, testee.url)
+    fun whenLoadingFinishedAndInitialUrlNeverProgressedThenUrlUpdated() {
+        val initialUrl = "http://foo.com/abc"
+        val finalUrl = "http://bar.com/abc"
+        testee.loadingStarted(initialUrl)
+        testee.loadingFinished(finalUrl)
+        assertEquals(finalUrl, testee.url)
+    }
+
+    @Test
+    fun whenLoadingFinishedAndInitialUrlProgressedThenUrlNotUpdated() {
+        val initialUrl = "http://foo.com/abc"
+        val finalUrl = "http://foo.com/xyz"
+        testee.loadingStarted(initialUrl)
+        testee.progressChanged(initialUrl, 10)
+        testee.loadingFinished(finalUrl)
+        assertEquals(initialUrl, testee.url)
     }
 
     @Test
     fun whenLoadingFinishedWithUrlThenSiteVisitedEntryAddedToLeaderboardDao() {
+        testee.loadingStarted("http://example.com/abc")
         testee.loadingFinished("http://example.com/abc")
         verify(mockNetworkLeaderboardDao).insert(SiteVisitedEntity("example.com"))
     }
