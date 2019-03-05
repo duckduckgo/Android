@@ -195,7 +195,7 @@ class BrowserTabViewModel(
     override val url: String?
         get() = site?.url
 
-    private var nextUrl: String? = null
+    private var pendingUrl: String? = null
 
     private var appConfigurationDownloaded = false
     private val appConfigurationObservable = appConfigurationDao.appConfigurationStatus()
@@ -291,8 +291,10 @@ class BrowserTabViewModel(
         val progress = currentLoadingViewState()
         loadingViewState.value = progress.copy(progress = newProgress)
 
-        if (nextUrl == progressedUrl) {
-            urlChanged(nextUrl)
+        if (progressedUrl == pendingUrl) {
+            // We change the url here rather than loadingStarted to protect against phishing
+            // See https://github.com/duckduckgo/Android/pull/390
+            urlChanged(pendingUrl)
         }
     }
 
@@ -312,7 +314,7 @@ class BrowserTabViewModel(
         Timber.v("Loading started")
         val progress = currentLoadingViewState()
         loadingViewState.value = progress.copy(isLoading = true)
-        nextUrl = url
+        pendingUrl = url
         site = null
         onSiteChanged()
     }
@@ -327,7 +329,7 @@ class BrowserTabViewModel(
     override fun loadingFinished(url: String?) {
         Timber.v("Loading finished")
 
-        if (nextUrl != null) {
+        if (pendingUrl != null) {
             urlChanged(url)
         }
 
@@ -403,7 +405,7 @@ class BrowserTabViewModel(
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             statisticsUpdater.refreshRetentionAtb()
         }
-        nextUrl = null
+        pendingUrl = null
         site = siteFactory.build(url)
         onSiteChanged()
     }
@@ -594,7 +596,7 @@ class BrowserTabViewModel(
     }
 
     fun resetView() {
-        nextUrl = null
+        pendingUrl = null
         site = null
         onSiteChanged()
         initializeViewStates()
