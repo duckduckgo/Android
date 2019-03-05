@@ -17,13 +17,9 @@
 package com.duckduckgo.app.privacy.model
 
 import com.duckduckgo.app.entities.EntityMapping
-import com.duckduckgo.app.entities.db.EntityListDao
-import com.duckduckgo.app.entities.db.EntityListEntity
-import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import javax.inject.Inject
-import javax.inject.Singleton
 
 interface PrivacyPractices {
 

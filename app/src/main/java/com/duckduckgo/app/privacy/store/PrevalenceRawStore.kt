@@ -43,7 +43,7 @@ class PrevalenceRawStore @Inject constructor(
     }
 
     override fun findPrevalenceOf(entity: String): Double? {
-        return data?.get(entity)
+        return data[entity]
     }
 
 }

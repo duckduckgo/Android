@@ -97,9 +97,9 @@ class SurveyViewModelTest {
         assertEquals("abc", loadedUri.getQueryParameter("var"))
         assertEquals("2", loadedUri.getQueryParameter("delta"))
         assertEquals("${Build.VERSION.SDK_INT}", loadedUri.getQueryParameter("av"))
-        assertEquals("${BuildConfig.VERSION_NAME}", loadedUri.getQueryParameter("ddgv"))
-        assertEquals("${Build.MANUFACTURER}", loadedUri.getQueryParameter("man"))
-        assertEquals("${Build.MODEL}", loadedUri.getQueryParameter("mo"))
+        assertEquals(BuildConfig.VERSION_NAME, loadedUri.getQueryParameter("ddgv"))
+        assertEquals(Build.MANUFACTURER, loadedUri.getQueryParameter("man"))
+        assertEquals(Build.MODEL, loadedUri.getQueryParameter("mo"))
     }
 
     @Test

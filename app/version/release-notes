@@ -1,8 +1,5 @@
 ## What's new in this release?
-In this release, we improved data clearing to ensure DuckDuckGo preferences are kept while all other data is removed.
-
-We also added a way for users to give us feedback or rate the app.
-
+In this release, we added a notification to let new users know that they can automatically clear their data. We also squashed some bugs and cleaned up potential performance issues.
 
 ## Have feedback?
 You can always reach us at https://duckduckgo.com/feedback.

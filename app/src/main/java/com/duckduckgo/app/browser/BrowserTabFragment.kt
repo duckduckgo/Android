@@ -57,7 +57,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
-import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
@@ -287,10 +287,6 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         viewModel.findInPageViewState.observe(this, Observer<FindInPageViewState> {
             it?.let { renderer.renderFindInPageState(it) }
-        })
-
-        viewModel.url.observe(this, Observer {
-            it?.let { navigate(it) }
         })
 
         viewModel.ctaViewState.observe(this, Observer {
@@ -792,9 +788,9 @@ class BrowserTabFragment : Fragment(), FindListener {
                 }
 
                 override fun downloadFinished(file: File, mimeType: String?) {
-                    MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null, { _, uri ->
+                    MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null) { _, uri ->
                         fileDownloadNotificationManager.showDownloadFinishedNotification(file.name, uri, mimeType)
-                    })
+                    }
                 }
 
                 override fun downloadFailed(message: String) {

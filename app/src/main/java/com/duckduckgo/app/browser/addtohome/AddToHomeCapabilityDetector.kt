@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.autoComplete
+package com.duckduckgo.app.browser.addtohome
 
 import android.content.Context
-import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences
-import dagger.Module
-import dagger.Provides
+import androidx.core.content.pm.ShortcutManagerCompat
+import timber.log.Timber
+import javax.inject.Inject
 
+interface AddToHomeCapabilityDetector {
+    fun isAddToHomeSupported(): Boolean
+}
 
-@Module
-class BrowserAutoCompleteModule {
+class AddToHomeSystemCapabilityDetector @Inject constructor(val context: Context) : AddToHomeCapabilityDetector {
 
-    @Provides
-    fun settingsDataStore(context: Context): SettingsDataStore = SettingsSharedPreferences(context)
-
+    override fun isAddToHomeSupported(): Boolean {
+        val supported = ShortcutManagerCompat.isRequestPinShortcutSupported(context)
+        Timber.v("Add to home is %ssupported", if (supported) "" else "not ")
+        return supported
+    }
 }
