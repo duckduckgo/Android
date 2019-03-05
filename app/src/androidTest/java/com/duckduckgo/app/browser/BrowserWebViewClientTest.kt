@@ -25,7 +25,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.Before
 import org.junit.Test
@@ -56,14 +55,7 @@ class BrowserWebViewClientTest {
     @Test
     fun whenOnPageStartedCalledThenListenerNotified() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(listener).loadingStarted()
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnPageStartedCalledThenListenerNeverInstructedToUpdateUrl() {
-        testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(listener, never()).urlChanged(any())
+        verify(listener).loadingStarted(EXAMPLE_URL)
     }
 
     @UiThreadTest
@@ -78,13 +70,6 @@ class BrowserWebViewClientTest {
     fun whenOnPageFinishedCalledThenListenerInstructedToUpdateNavigationOptions() {
         testee.onPageFinished(webView, EXAMPLE_URL)
         verify(listener).navigationOptionsChanged(any())
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnPageFinishedCalledThenListenerInstructedToUpdateUrl() {
-        testee.onPageFinished(webView, EXAMPLE_URL)
-        verify(listener).urlChanged(EXAMPLE_URL)
     }
 
     private class TestWebView(context: Context) : WebView(context)

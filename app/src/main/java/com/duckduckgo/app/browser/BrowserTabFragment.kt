@@ -289,10 +289,6 @@ class BrowserTabFragment : Fragment(), FindListener {
             it?.let { renderer.renderFindInPageState(it) }
         })
 
-        viewModel.url.observe(this, Observer {
-            it?.let { navigate(it) }
-        })
-
         viewModel.ctaViewState.observe(this, Observer {
             it?.let { renderer.renderCtaViewState(it) }
         })
