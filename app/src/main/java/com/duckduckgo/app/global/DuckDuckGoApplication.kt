@@ -242,9 +242,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     private fun configureDataDownloader() {
         appConfigurationSyncer.scheduleImmediateSync()
             .subscribeOn(Schedulers.io())
-            .doAfterTerminate({
+            .doAfterTerminate {
                 appConfigurationSyncer.scheduleRegularSync(this)
-            })
+            }
             .subscribe({}, { Timber.w("Failed to download initial app configuration ${it.localizedMessage}") })
     }
 

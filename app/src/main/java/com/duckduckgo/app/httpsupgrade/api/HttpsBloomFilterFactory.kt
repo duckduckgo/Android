@@ -51,7 +51,7 @@ class HttpsBloomFilterFactoryImpl @Inject constructor(private val dao: HttpsBloo
 
         val initialTimestamp = System.currentTimeMillis()
         Timber.d("Found https data at $dataPath, building filter")
-        var bloomFilter = BloomFilter(dataPath, specification.totalEntries)
+        val bloomFilter = BloomFilter(dataPath, specification.totalEntries)
         Timber.v("Loading took ${System.currentTimeMillis() - initialTimestamp}ms")
 
         return bloomFilter

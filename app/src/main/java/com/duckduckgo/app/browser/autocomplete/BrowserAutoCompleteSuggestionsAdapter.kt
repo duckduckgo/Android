@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.autoComplete
+package com.duckduckgo.app.browser.autocomplete
 
 import android.view.LayoutInflater
 import android.view.View
@@ -23,9 +23,9 @@ import androidx.annotation.UiThread
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter.AutoCompleteViewHolder
-import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter.AutoCompleteViewHolder.EmptySuggestionViewHolder
-import com.duckduckgo.app.browser.autoComplete.BrowserAutoCompleteSuggestionsAdapter.AutoCompleteViewHolder.SuggestionViewHolder
+import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.AutoCompleteViewHolder
+import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.AutoCompleteViewHolder.EmptySuggestionViewHolder
+import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.AutoCompleteViewHolder.SuggestionViewHolder
 import kotlinx.android.synthetic.main.item_autocomplete_suggestion.view.*
 import javax.inject.Inject
 

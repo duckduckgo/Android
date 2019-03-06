@@ -30,7 +30,7 @@ open class AutoCompleteApi @Inject constructor(private val autoCompleteService: 
         }
 
         return autoCompleteService.autoComplete(query)
-            .flatMapIterable { it -> it }
+            .flatMapIterable { it }
             .map { AutoCompleteSuggestion(it.phrase, UriString.isWebUrl(it.phrase)) }
             .toList()
             .onErrorReturn { emptyList() }

@@ -78,7 +78,7 @@ class BrowserChromeClientTest {
     @Test
     fun whenOnProgressChangedCalledThenListenerInstructedToUpdateProgress() {
         testee.onProgressChanged(webView, 10)
-        verify(mockWebViewClientListener).progressChanged(10)
+        verify(mockWebViewClientListener).progressChanged(webView.stubUrl, 10)
     }
 
     @UiThreadTest
@@ -87,7 +87,7 @@ class BrowserChromeClientTest {
         webView.stubUrl = "foo.com"
         testee.onProgressChanged(webView, 10)
         testee.onProgressChanged(webView, 20)
-        verify(mockWebViewClientListener, times(2)).progressChanged(any())
+        verify(mockWebViewClientListener, times(2)).progressChanged(any(), any())
     }
 
     @UiThreadTest
@@ -98,27 +98,16 @@ class BrowserChromeClientTest {
         testee.onProgressChanged(webView, 20)
         webView.stubUrl = "bar.com"
         testee.onProgressChanged(webView, 30)
-        verify(mockWebViewClientListener, times(3)).progressChanged(any())
+        verify(mockWebViewClientListener, times(3)).progressChanged(any(), any())
     }
 
     @UiThreadTest
     @Test
-    fun whenOnProgressChangedCalledThenListenerInstructedToUpdateUrl() {
+    fun whenOnProgressChangedCalledThenPassedOnToWebClient() {
         val url = "https://example.com"
         webView.stubUrl = url
         testee.onProgressChanged(webView, 10)
-        verify(mockWebViewClientListener).urlChanged(url)
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnProgressChangedCalledAfterUrlChangeThenListenerInstructedToUpdateUrlEveryTime() {
-        webView.stubUrl = "foo.com"
-        testee.onProgressChanged(webView, 10)
-        testee.onProgressChanged(webView, 20)
-        webView.stubUrl = "bar.com"
-        testee.onProgressChanged(webView, 30)
-        verify(mockWebViewClientListener, times(3)).urlChanged(any())
+        verify(mockWebViewClientListener).progressChanged(url, 10)
     }
 
     private class TestWebView(context: Context) : WebView(context) {
