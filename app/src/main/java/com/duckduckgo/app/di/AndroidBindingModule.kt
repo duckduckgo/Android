@@ -18,14 +18,20 @@ package com.duckduckgo.app.di
 
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
+import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserInfoActivity
 import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
 import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
-import com.duckduckgo.app.feedback.ui.FeedbackActivity
 import com.duckduckgo.app.feedback.ui.SurveyActivity
+import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
+import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragment
+import com.duckduckgo.app.feedback.ui.negative.initial.MainReasonNegativeFeedbackFragment
+import com.duckduckgo.app.feedback.ui.negative.initial.SubReasonNegativeFeedbackFragment
+import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackFragment
+import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.job.AppConfigurationJobService
 import com.duckduckgo.app.launch.LaunchActivity
@@ -86,6 +92,10 @@ abstract class AndroidBindingModule {
 
     @ActivityScoped
     @ContributesAndroidInjector
+    abstract fun brokenSiteActivity(): BrokenSiteActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
     abstract fun userSurveyActivity(): SurveyActivity
 
     @ActivityScoped
@@ -129,6 +139,20 @@ abstract class AndroidBindingModule {
     @ContributesAndroidInjector
     abstract fun rateAppDialogFragment(): RateAppDialogFragment
 
+    @ContributesAndroidInjector
+    abstract fun initialfFeedbackFragment(): InitialFeedbackFragment
+
+    @ContributesAndroidInjector
+    abstract fun positiveFeedbackLandingFragment(): PositiveFeedbackLandingFragment
+
+    @ContributesAndroidInjector
+    abstract fun shareOpenEndedPositiveFeedbackFragment(): ShareOpenEndedNegativeFeedbackFragment
+
+    @ContributesAndroidInjector
+    abstract fun mainReasonNegativeFeedbackFragment(): MainReasonNegativeFeedbackFragment
+
+    @ContributesAndroidInjector
+    abstract fun disambiguationNegativeFeedbackFragment(): SubReasonNegativeFeedbackFragment
 
     /* Services */
 

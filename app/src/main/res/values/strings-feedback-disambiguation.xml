@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2019 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+
+    <string name="missingBrowserFeaturesTitleLong">Browser features are missing or frustrating</string>
+    <string name="missingBrowserFeaturesTitleShort">Browser feature issues</string>
+    <string name="missingBrowserFeaturesSubtitle">Which browsing feature can we add or improve?</string>
+    <string name="missingBrowserFeatureSubReasonNavigation">Navigating forward, backward, refreshing</string>
+    <string name="missingBrowserFeatureSubReasonTabManagement">Navigating forward, backward, refreshing</string>
+    <string name="missingBrowserFeatureSubReasonAdPopups">Ad and pop-up blocking</string>
+    <string name="missingBrowserFeatureSubReasonVideos">Watching videos</string>
+    <string name="missingBrowserFeatureSubReasonImages">Interacting with images</string>
+    <string name="missingBrowserFeatureSubReasonBookmarks">Creating and managing bookmarks</string>
+    <string name="missingBrowserFeatureSubReasonOther">None of these</string>
+
+    <string name="websiteNotLoadingTitleLong">Certainly websites don\'t load correctly</string>
+    <string name="websiteNotLoadingTitleShort">Website loading issues</string>
+    <string name="websiteNotLoadingSubtitle">Which website is broken?"</string>
+
+    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo search isn\'t good enough</string>
+    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo search issues</string>
+    <string name="searchNotGoodEnoughSubtitle">Which search feature can we add or improve?</string>
+    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programming/technical search</string>
+    <string name="searchNotGoodEnoughSubReasonGoogleLayout">The layout should be more like Google</string>
+    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Faster load time</string>
+    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Searching in a specific language or region</string>
+    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Better autocomplete</string>
+    <string name="searchNotGoodEnoughSubReasonOther">None of these</string>
+
+    <string name="needMoreCustomizationTitleLong">There aren\'t enough ways to customize the app</string>
+    <string name="needMoreCustomizationTitleShort">Customization issues</string>
+    <string name="needMoreCustomizationSubtitle">Which customization option can we add or improve?</string>
+    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">The home screen configuration</string>
+    <string name="needMoreCustomizationSubReasonTabDisplay">How tabs are displayed</string>
+    <string name="needMoreCustomizationSubReasonAppLooks">How the app looks</string>
+    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Which data is cleared</string>
+    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">When data is cleared</string>
+    <string name="needMoreCustomizationSubReasonBookmarksDisplay">How bookmarks are displayed</string>
+    <string name="needMoreCustomizationSubReasonOther">None of these</string>
+
+    <string name="appIsSlowOrBuggyTitleLong">There aren\'t enough ways to customize the app</string>
+    <string name="appIsSlowOrBuggyTitleShort">Performance issues</string>
+    <string name="appIsSlowOrBuggySubtitle">Which issue are you experiencing?</string>
+    <string name="appIsSlowOrBuggySubReasonSlowResults">Web pages or search results load slowly</string>
+    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">The app crashes or freezes</string>
+    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Video or media playback bugs</string>
+    <string name="appIsSlowOrBuggySubReasonOther">None of these</string>
+
+    <string name="otherMainReasonTitleLong">None of these</string>
+    <string name="otherMainReasonTitleShort">Your feedback is important to us</string>
+    <string name="otherMainReasonSubtitle">Please tell us what we can improve</string>
+
+    <string name="openEndedInputHint">How can we improve? (Optional)</string>
+    <string name="submitFeedback">SUBMIT FEEDBACK</string>
+    <string name="appreciateYourFeedback">We appreciate your feedback</string>
+    <string name="anonymousFeedbackIsImportant">Your anonymous feedback is important to us</string>
+
+</resources>

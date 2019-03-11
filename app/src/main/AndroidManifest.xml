@@ -108,8 +108,12 @@
             android:label="@string/settingsActivityTitle"
             android:parentActivityName=".BrowserActivity" />
         <activity
-            android:name="com.duckduckgo.app.feedback.ui.FeedbackActivity"
-            android:label="@string/feedbackActivityTitle" />
+            android:name="com.duckduckgo.app.feedback.ui.common.FeedbackActivity"
+            android:label="@string/brokenSiteActivityTitle" />
+        <activity
+            android:name="com.duckduckgo.app.brokensite.BrokenSiteActivity"
+            android:theme="@style/ModalCardTheme"
+            android:label="@string/brokenSiteActivityTitle" />
         <activity
             android:name="com.duckduckgo.app.feedback.ui.SurveyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"

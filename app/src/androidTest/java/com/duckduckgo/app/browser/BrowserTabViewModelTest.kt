@@ -284,8 +284,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBookmarkAddedThenDaoIsUpdatedAndUserNotified() {
-        testee.onBookmarkSaved(null, "A title", "www.example.com")
-        verify(bookmarksDao).insert(BookmarkEntity(title = "A title", url = "www.example.com"))
+        testee.onBookmarkSaved(null, "A reasonTextView", "www.example.com")
+        verify(bookmarksDao).insert(BookmarkEntity(title = "A reasonTextView", url = "www.example.com"))
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is DisplayMessage)
     }

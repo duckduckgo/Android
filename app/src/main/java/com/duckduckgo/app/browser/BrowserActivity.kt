@@ -26,13 +26,14 @@ import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
+import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
 import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
-import com.duckduckgo.app.feedback.ui.FeedbackActivity
+import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -92,7 +93,7 @@ class BrowserActivity : DuckDuckGoActivity(), AppEnjoymentDialogFragment.Listene
         })
         viewModel.awaitClearDataFinishedNotification()
 
-        startActivity(FeedbackActivity.intent(this, brokenSite = false))
+        startActivity(SettingsActivity.intent(this))
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -232,7 +233,7 @@ class BrowserActivity : DuckDuckGoActivity(), AppEnjoymentDialogFragment.Listene
             is Command.ShowAppEnjoymentPrompt -> showAppEnjoymentPrompt(AppEnjoymentDialogFragment.create(command.promptCount))
             is Command.ShowAppRatingPrompt -> showAppEnjoymentPrompt(RateAppDialogFragment.create(command.promptCount))
             is Command.ShowAppFeedbackPrompt -> showAppEnjoymentPrompt(GiveFeedbackDialogFragment.create(command.promptCount))
-            is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this, brokenSite = false))
+            is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this))
         }
     }
 
@@ -269,7 +270,7 @@ class BrowserActivity : DuckDuckGoActivity(), AppEnjoymentDialogFragment.Listene
 
     fun launchBrokenSiteFeedback(url: String?) {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(FeedbackActivity.intent(this, true, url), options)
+        startActivity(BrokenSiteActivity.intent(this, true, url), options)
     }
 
     fun launchSettings() {

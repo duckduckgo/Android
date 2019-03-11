@@ -47,7 +47,7 @@ class BookmarksViewModelTest {
     private val commandObserver: Observer<BookmarksViewModel.Command> = mock()
     private val bookmarksDao: BookmarksDao = mock()
 
-    private val bookmark = BookmarkEntity(title = "title", url = "www.example.com")
+    private val bookmark = BookmarkEntity(title = "reasonTextView", url = "www.example.com")
 
     private val testee: BookmarksViewModel by lazy {
         val model = BookmarksViewModel(bookmarksDao)

@@ -4,7 +4,9 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.feedback.api.FeedbackSender
-import com.duckduckgo.app.feedback.ui.FeedbackViewModel.Command
+import com.duckduckgo.app.feedback.ui.common.FeedbackViewModel
+import com.duckduckgo.app.feedback.ui.common.FeedbackViewModel.Command
+import com.duckduckgo.app.feedback.ui.positive.initial.Command
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
@@ -41,7 +43,7 @@ class FeedbackViewModelTest {
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        testee = FeedbackViewModel(mockFeedbackSender)
+        testee = com.duckduckgo.app.brokensite.FeedbackViewModel(mockFeedbackSender)
         testee.command.observeForever(mockCommandObserver)
     }
 

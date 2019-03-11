@@ -53,6 +53,7 @@ import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.global.performance.measureExecution
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.SiteVisitedEntity
@@ -413,10 +414,12 @@ class BrowserTabViewModel(
     }
 
     private fun updateNetworkLeaderboard(event: TrackingEvent) {
-        val networkName = event.trackerNetwork?.name ?: return
-        val domainVisited = Uri.parse(event.documentUrl).host ?: return
-        networkLeaderboardDao.insert(NetworkLeaderboardEntry(networkName, domainVisited))
-        networkLeaderboardDao.insert(SiteVisitedEntity(domainVisited))
+        measureExecution("updated network leaderboard") {
+            val networkName = event.trackerNetwork?.name ?: return
+            val domainVisited = Uri.parse(event.documentUrl).host ?: return
+            networkLeaderboardDao.insert(NetworkLeaderboardEntry(networkName, domainVisited))
+            networkLeaderboardDao.insert(SiteVisitedEntity(domainVisited))
+        }
     }
 
     override fun pageHasHttpResources(page: String?) {
@@ -427,9 +430,11 @@ class BrowserTabViewModel(
     }
 
     private fun onSiteChanged() {
-        siteLiveData.postValue(site)
-        privacyGrade.postValue(site?.improvedGrade)
-        tabRepository.update(tabId, site)
+        measureExecution("on site changed") {
+            siteLiveData.postValue(site)
+            privacyGrade.postValue(site?.improvedGrade)
+            tabRepository.update(tabId, site)
+        }
     }
 
     override fun showFileChooser(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams) {

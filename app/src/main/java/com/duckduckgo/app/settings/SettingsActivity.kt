@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.settings
 
+import android.app.Activity
 import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
@@ -23,12 +24,13 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
+import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.SwitchCompat
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.feedback.ui.FeedbackActivity
+import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.sendThemeChangedBroadcast
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
@@ -69,6 +71,8 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
 
         configureUiEventHandlers()
         observeViewModel()
+
+        startActivityForResult(Intent(FeedbackActivity.intent(this)), FEEDBACK_RC)
     }
 
     override fun onStart() {
@@ -158,7 +162,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
 
     private fun launchFeedback() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(Intent(FeedbackActivity.intent(this)), options)
+        startActivityForResult(Intent(FeedbackActivity.intent(this)), FEEDBACK_RC, options)
     }
 
     override fun onAutomaticallyClearWhatOptionSelected(clearWhatSetting: ClearWhatOption) {
@@ -167,6 +171,21 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
 
     override fun onAutomaticallyClearWhenOptionSelected(clearWhenSetting: ClearWhenOption) {
         viewModel.onAutomaticallyWhenOptionSelected(clearWhenSetting)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            FEEDBACK_RC -> {
+                handleFeedbackResult(resultCode)
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun handleFeedbackResult(resultCode: Int) {
+        if (resultCode == Activity.RESULT_OK) {
+            Toast.makeText(this, R.string.thanksForTheFeedback, Toast.LENGTH_LONG).show()
+        }
     }
 
     @StringRes
@@ -193,6 +212,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     companion object {
         private const val CLEAR_WHAT_DIALOG_TAG = "CLEAR_WHAT_DIALOG_FRAGMENT"
         private const val CLEAR_WHEN_DIALOG_TAG = "CLEAR_WHEN_DIALOG_FRAGMENT"
+        private const val FEEDBACK_RC = 100
 
         fun intent(context: Context): Intent {
             return Intent(context, SettingsActivity::class.java)

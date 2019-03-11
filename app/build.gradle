@@ -5,6 +5,8 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
 
+apply plugin: 'org.jetbrains.kotlin.android.extensions'
+
 ext {
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
 }
@@ -74,18 +76,23 @@ android {
         println "Signing properties not found at ${propertiesPath}, releases will NOT succeed"
         android.buildTypes.release.signingConfig = null
     }
+
+    androidExtensions {
+        experimental = true
+    }
 }
 
 ext {
     androidX = "1.0.2"
-    materialDesign = "1.1.0-alpha02"
+    materialDesign = "1.0.0"
     architectureComponents = "1.1.1"
     architectureComponentsExtensions = "1.1.1"
     androidKtx = "1.0.1"
+    fragmentKtx = "1.0.0"
     constraintLayout = "2.0.0-alpha3"
     lifecycle = "2.0.0"
     room = "2.1.0-alpha04"
-    workManager = "1.0.0-beta03"
+    workManager = "1.0.0-rc01"
     legacySupport = "1.0.0"
     espressoCore = "3.1.1"
     coreTesting = "2.0.0"
@@ -112,6 +119,8 @@ ext {
 
 dependencies {
     implementation "androidx.legacy:legacy-support-v4:$legacySupport"
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0-beta01'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.0.0'
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanary"
     releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakCanary"
 
@@ -139,6 +148,7 @@ dependencies {
 
     // Android KTX
     implementation "androidx.core:core-ktx:$androidKtx"
+    implementation "androidx.fragment:fragment-ktx:$fragmentKtx"
 
     // ViewModel and LiveData
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle"

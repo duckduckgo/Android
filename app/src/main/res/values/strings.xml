@@ -188,17 +188,17 @@
     <string name="aboutMoreLink">More at duckduckgo.com/about</string>
     <string name="no_suggestions">No Suggestions</string>
 
-    <!-- Feedback Activity -->
-    <string name="feedbackActivityTitle">Share Your Feedback</string>
-    <string name="feedbackReportBrokenSiteMenuItem">Report Broken Site</string>
-    <string name="feedbackHeading">Share Your Feedback</string>
-    <string name="feedbackModalDescription">Anonymously share your feedback to help us improve the DuckDuckGo Privacy Browser</string>
-    <string name="feedbackReportBrokenSite">Report a broken site</string>
-    <string name="feedbackUrlHint">Enter URL</string>
-    <string name="feedbackMessageHint">How can the app be improved? What do you love? What\'s breaking? Please be as specific as possible.</string>
-    <string name="feedbackBrokenSiteHint">Which website content or functionality is breaking? Please be as specific as possible.</string>
-    <string name="feedbackSubmitButton">Submit Feedback</string>
-    <string name="feedbackSubmitted">Thank you! Feedback submitted</string>
+    <!-- Broken Site Activity -->
+    <string name="brokenSiteActivityTitle">Share Your Feedback</string>
+    <string name="brokenSiteReportBrokenSiteMenuItem">Report Broken Site</string>
+    <string name="brokenSiteHeading">Share Your Feedback</string>
+    <string name="brokenSiteModalDescription">Anonymously share your feedback to help us improve the DuckDuckGo Privacy Browser</string>
+    <string name="brokenSiteReportBrokenSite">Report a broken site</string>
+    <string name="brokenSiteUrlHint">Enter URL</string>
+    <string name="brokenSiteMessageHint">How can the app be improved? What do you love? What\'s breaking? Please be as specific as possible.</string>
+    <string name="brokenSiteBrokenSiteHint">Which website content or functionality is breaking? Please be as specific as possible.</string>
+    <string name="brokenSiteSubmitButton">Submit Feedback</string>
+    <string name="brokenSiteSubmitted">Thank you! Feedback submitted</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bookmarks</string>
@@ -275,5 +275,8 @@
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Data clearing set to manual</string>
     <string name="clearNotificationDescription">Customize DuckDuckGo to automatically clear browsing data after every session.</string>
+
+    <!-- Feedback -->
+    <string name="thanksForTheFeedback">Thanks for the feedback!</string>
 
 </resources>
