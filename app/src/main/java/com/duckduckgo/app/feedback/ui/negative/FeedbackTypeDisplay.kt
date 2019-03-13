@@ -19,9 +19,11 @@ package com.duckduckgo.app.feedback.ui.negative
 import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.*
+import com.duckduckgo.app.feedback.ui.negative.FeedbackType.CustomizationSubReasons.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.OTHER
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MissingBrowserFeaturesSubReasons.*
+import com.duckduckgo.app.feedback.ui.negative.FeedbackType.PerformanceSubReasons.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SearchNotGoodEnoughSubReasons.*
 
 fun MainReason.displayText(): FeedbackTypeDisplay.FeedbackTypeMainReasonDisplay? = FeedbackTypeDisplay.mainReasons[this]
@@ -46,7 +48,10 @@ class FeedbackTypeDisplay {
         val subReason: SubReason,
 
         @StringRes
-        val titleDisplayResId: Int
+        val listDisplayResId: Int,
+
+        @StringRes
+        val subtitleDisplayResId: Int = listDisplayResId
     )
 
     companion object {
@@ -135,7 +140,7 @@ class FeedbackTypeDisplay {
             }
 
             MissingBrowserFeaturesSubReasons.OTHER.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.tellUsHowToImprove)
+                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.missingBrowserFeatureSubReasonOther, R.string.tellUsHowToImprove)
             }
 
             PROGRAMMING_TECHNICAL_SEARCHES.also { type ->
@@ -154,12 +159,54 @@ class FeedbackTypeDisplay {
                 it[type] = FeedbackTypeSubReasonDisplay(type, R.string.searchNotGoodEnoughSubReasonSpecificLanguage)
             }
 
-            BETTER_AUTOCOMPLETE.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.searchNotGoodEnoughSubReasonBetterAutocomplete)
+            SearchNotGoodEnoughSubReasons.OTHER.also { type ->
+                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.searchNotGoodEnoughSubReasonOther, R.string.tellUsHowToImprove)
             }
 
-            SearchNotGoodEnoughSubReasons.OTHER.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.tellUsHowToImprove)
+            HOME_SCREEN_CONFIGURATION.also { type ->
+                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.needMoreCustomizationSubReasonHomeScreenConfiguration)
+            }
+
+            TAB_DISPLAY.also { type ->
+                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.needMoreCustomizationSubReasonTabDisplay)
+            }
+
+            HOW_APP_LOOKS.also { type ->
+                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.needMoreCustomizationSubReasonAppLooks)
+            }
+
+            WHICH_DATA_IS_CLEARED.also { type ->
+                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.needMoreCustomizationSubReasonWhichDataIsCleared)
+            }
+
+
+            WHEN_DATA_IS_CLEARED.also { type ->
+                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.needMoreCustomizationSubReasonWhenDataIsCleared)
+            }
+
+
+            BOOKMARK_DISPLAY.also { type ->
+                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.needMoreCustomizationSubReasonBookmarksDisplay)
+            }
+
+            CustomizationSubReasons.OTHER.also { type ->
+                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.needMoreCustomizationSubReasonOther, R.string.tellUsHowToImprove)
+            }
+
+            SLOW_WEB_PAGE_LOADS.also { type ->
+                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.appIsSlowOrBuggySubReasonSlowResults)
+            }
+
+            APP_CRASHES_OR_FREEZES.also { type ->
+                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.appIsSlowOrBuggySubReasonAppCrashesOrFreezes)
+            }
+
+            MEDIA_PLAYBACK_BUGS.also { type ->
+                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.appIsSlowOrBuggySubReasonMediaPlayback)
+            }
+
+            PerformanceSubReasons.OTHER.also { type ->
+                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.appIsSlowOrBuggySubReasonOther, R.string.tellUsHowToImprove)
             }
         }
 

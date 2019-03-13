@@ -109,7 +109,7 @@ class ShareOpenEndedNegativeFeedbackFragment : FeedbackFragment() {
 
     private fun getDisplayText(reason: SubReason?): String {
         val display = subReasons[reason] ?: return getString(R.string.tellUsHowToImprove)
-        return getString(display.titleDisplayResId)
+        return getString(display.subtitleDisplayResId)
     }
 
     override fun configureListeners() {

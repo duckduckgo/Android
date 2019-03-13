@@ -24,19 +24,19 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.feedback.ui.negative.initial.SubReasonNegativeFeedbackFragment.SubReasonDisplay
+import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.FeedbackTypeSubReasonDisplay
 import kotlinx.android.synthetic.main.item_feedback_reason.view.*
 
 
-class SubReasonAdapter(private val itemClickListener: (SubReasonDisplay) -> Unit) :
-    ListAdapter<SubReasonDisplay, SubReasonAdapter.ViewHolder>(DiffCallback()) {
+class SubReasonAdapter(private val itemClickListener: (FeedbackTypeSubReasonDisplay) -> Unit) :
+    ListAdapter<FeedbackTypeSubReasonDisplay, SubReasonAdapter.ViewHolder>(DiffCallback()) {
 
-    class DiffCallback : DiffUtil.ItemCallback<SubReasonDisplay>() {
-        override fun areItemsTheSame(oldItem: SubReasonDisplay, newItem: SubReasonDisplay): Boolean {
+    class DiffCallback<T> : DiffUtil.ItemCallback<T>() {
+        override fun areItemsTheSame(oldItem: T, newItem: T): Boolean {
             return oldItem == newItem
         }
 
-        override fun areContentsTheSame(oldItem: SubReasonDisplay, newItem: SubReasonDisplay): Boolean {
+        override fun areContentsTheSame(oldItem: T, newItem: T): Boolean {
             return oldItem == newItem
         }
     }
@@ -53,8 +53,8 @@ class SubReasonAdapter(private val itemClickListener: (SubReasonDisplay) -> Unit
 
     data class ViewHolder(val root: View, val reasonTextView: TextView) : RecyclerView.ViewHolder(root) {
 
-        fun bind(reason: SubReasonDisplay, clickListener: (SubReasonDisplay) -> Unit) {
-            reasonTextView.text = reason.displayString
+        fun bind(reason: FeedbackTypeSubReasonDisplay, clickListener: (FeedbackTypeSubReasonDisplay) -> Unit) {
+            reasonTextView.text = root.context.getString(reason.listDisplayResId)
             itemView.setOnClickListener { clickListener(reason) }
         }
     }

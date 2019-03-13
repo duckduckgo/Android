@@ -28,11 +28,9 @@ import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
 import com.duckduckgo.app.feedback.ui.common.FeedbackItemDecoration
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.*
-import com.duckduckgo.app.feedback.ui.negative.FeedbackType.CustomizationSubReasons.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.*
-import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MissingBrowserFeaturesSubReasons.*
-import com.duckduckgo.app.feedback.ui.negative.FeedbackType.PerformanceSubReasons.*
-import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SearchNotGoodEnoughSubReasons.*
+import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay
+import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.FeedbackTypeSubReasonDisplay
 import com.duckduckgo.app.feedback.ui.negative.displayText
 import kotlinx.android.synthetic.main.content_feedback_negative_disambiguation_sub_reason.*
 import timber.log.Timber
@@ -61,21 +59,21 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.content_feedback_negative_disambiguation_sub_reason, container, false)
 
-        recyclerAdapter = SubReasonAdapter(object : (SubReasonDisplay) -> Unit {
-            override fun invoke(reason: SubReasonDisplay) {
+        recyclerAdapter = SubReasonAdapter(object : (FeedbackTypeSubReasonDisplay) -> Unit {
+            override fun invoke(reason: FeedbackTypeSubReasonDisplay) {
                 Timber.i("Clicked reason: $reason")
-                when (reason.feedbackType) {
+                when (reason.subReason) {
                     is MissingBrowserFeaturesSubReasons -> {
-                        listener?.userSelectedSubReasonMissingBrowserFeatures(mainReason, reason.feedbackType)
+                        listener?.userSelectedSubReasonMissingBrowserFeatures(mainReason, reason.subReason)
                     }
                     is SearchNotGoodEnoughSubReasons -> {
-                        listener?.userSelectedSubReasonSearchNotGoodEnough(mainReason, reason.feedbackType)
+                        listener?.userSelectedSubReasonSearchNotGoodEnough(mainReason, reason.subReason)
                     }
                     is CustomizationSubReasons -> {
-                        listener?.userSelectedSubReasonNeedMoreCustomization(mainReason, reason.feedbackType)
+                        listener?.userSelectedSubReasonNeedMoreCustomization(mainReason, reason.subReason)
                     }
                     is PerformanceSubReasons -> {
-                        listener?.userSelectedSubReasonAppIsSlowOrBuggy(mainReason, reason.feedbackType)
+                        listener?.userSelectedSubReasonAppIsSlowOrBuggy(mainReason, reason.subReason)
                     }
                 }
             }
@@ -108,7 +106,7 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
         }
     }
 
-    private fun getDisplayTextForReasonType(mainReason: MainReason): List<SubReasonDisplay> {
+    private fun getDisplayTextForReasonType(mainReason: MainReason): List<FeedbackTypeSubReasonDisplay> {
         return when (mainReason) {
             MISSING_BROWSING_FEATURES -> browserFeatureSubReasons()
             SEARCH_NOT_GOOD_ENOUGH -> searchNotGoodEnoughSubReasons()
@@ -118,58 +116,35 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
         }
     }
 
-    private fun browserFeatureSubReasons(): List<SubReasonDisplay> {
-        return listOf(
-            SubReasonDisplay(NAVIGATION_ISSUES, getString(R.string.missingBrowserFeatureSubReasonNavigation)),
-            SubReasonDisplay(TAB_MANAGEMENT, getString(R.string.missingBrowserFeatureSubReasonTabManagement)),
-            SubReasonDisplay(AD_POPUP_BLOCKING, getString(R.string.missingBrowserFeatureSubReasonAdPopups)),
-            SubReasonDisplay(WATCHING_VIDEOS, getString(R.string.missingBrowserFeatureSubReasonVideos)),
-            SubReasonDisplay(INTERACTING_IMAGES, getString(R.string.missingBrowserFeatureSubReasonImages)),
-            SubReasonDisplay(BOOKMARK_MANAGEMENT, getString(R.string.missingBrowserFeatureSubReasonBookmarks)),
-            SubReasonDisplay(MissingBrowserFeaturesSubReasons.OTHER, getString(R.string.missingBrowserFeatureSubReasonOther))
-        )
+    private fun browserFeatureSubReasons(): List<FeedbackTypeSubReasonDisplay> {
+        return MissingBrowserFeaturesSubReasons.values().mapNotNull {
+            FeedbackTypeDisplay.subReasons[it]
+        }
     }
 
-    private fun searchNotGoodEnoughSubReasons(): List<SubReasonDisplay> {
-        return listOf(
-            SubReasonDisplay(PROGRAMMING_TECHNICAL_SEARCHES, getString(R.string.searchNotGoodEnoughSubReasonTechnicalSearches)),
-            SubReasonDisplay(LAYOUT_MORE_LIKE_GOOGLE, getString(R.string.searchNotGoodEnoughSubReasonGoogleLayout)),
-            SubReasonDisplay(FASTER_LOAD_TIME, getString(R.string.searchNotGoodEnoughSubReasonFasterLoadTimes)),
-            SubReasonDisplay(SEARCHING_IN_SPECIFIC_LANGUAGE, getString(R.string.searchNotGoodEnoughSubReasonSpecificLanguage)),
-            SubReasonDisplay(BETTER_AUTOCOMPLETE, getString(R.string.searchNotGoodEnoughSubReasonBetterAutocomplete)),
-            SubReasonDisplay(SearchNotGoodEnoughSubReasons.OTHER, getString(R.string.searchNotGoodEnoughSubReasonOther))
-        )
+    private fun searchNotGoodEnoughSubReasons(): List<FeedbackTypeSubReasonDisplay> {
+        return SearchNotGoodEnoughSubReasons.values().mapNotNull {
+            FeedbackTypeDisplay.subReasons[it]
+        }
     }
 
-    private fun moreCustomizationsSubReasons(): List<SubReasonDisplay> {
-        return listOf(
-            SubReasonDisplay(HOME_SCREEN_CONFIGURATION, getString(R.string.needMoreCustomizationSubReasonHomeScreenConfiguration)),
-            SubReasonDisplay(TAB_DISPLAY, getString(R.string.needMoreCustomizationSubReasonTabDisplay)),
-            SubReasonDisplay(HOW_APP_LOOKS, getString(R.string.needMoreCustomizationSubReasonAppLooks)),
-            SubReasonDisplay(WHICH_DATA_IS_CLEARED, getString(R.string.needMoreCustomizationSubReasonWhichDataIsCleared)),
-            SubReasonDisplay(WHEN_DATA_IS_CLEARED, getString(R.string.needMoreCustomizationSubReasonWhenDataIsCleared)),
-            SubReasonDisplay(BOOKMARK_DISPLAY, getString(R.string.needMoreCustomizationSubReasonBookmarksDisplay)),
-            SubReasonDisplay(SearchNotGoodEnoughSubReasons.OTHER, getString(R.string.needMoreCustomizationSubReasonOther))
-        )
+    private fun moreCustomizationsSubReasons(): List<FeedbackTypeSubReasonDisplay> {
+        return FeedbackType.CustomizationSubReasons.values().mapNotNull {
+            FeedbackTypeDisplay.subReasons[it]
+        }
     }
 
-    private fun appSlowOrBuggySubReasons(): List<SubReasonDisplay> {
-        return listOf(
-            SubReasonDisplay(SLOW_WEB_PAGE_LOADS, getString(R.string.appIsSlowOrBuggySubReasonSlowResults)),
-            SubReasonDisplay(APP_CRASHES_OR_FREEZES, getString(R.string.appIsSlowOrBuggySubReasonAppCrashesOrFreezes)),
-            SubReasonDisplay(MEDIA_PLAYBACK_BUGS, getString(R.string.appIsSlowOrBuggySubReasonMediaPlayback)),
-            SubReasonDisplay(PerformanceSubReasons.OTHER, getString(R.string.appIsSlowOrBuggySubReasonOther))
-        )
+    private fun appSlowOrBuggySubReasons(): List<FeedbackTypeSubReasonDisplay> {
+        return FeedbackType.PerformanceSubReasons.values().mapNotNull() {
+            FeedbackTypeDisplay.subReasons[it]
+        }
     }
-
 
     override fun configureViewModelObservers() {
         viewModel.command.observe(this, Observer { command ->
 
         })
     }
-
-    data class SubReasonDisplay(val feedbackType: SubReason, val displayString: String)
 
     companion object {
 
