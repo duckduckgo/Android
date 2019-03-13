@@ -23,25 +23,30 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
-import com.duckduckgo.app.feedback.ui.negative.FeedbackType
-import com.duckduckgo.app.feedback.ui.positive.openended.ShareOpenEndedNegativeFeedbackViewModel
-import com.duckduckgo.app.feedback.ui.positive.openended.ShareOpenEndedNegativeFeedbackViewModel.Command
-import kotlinx.android.synthetic.main.content_feedback_positive_open_ended_feedback.*
+import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
+import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
+import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.Companion.mainReasons
+import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.Companion.subReasons
+import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel.Command
+import kotlinx.android.synthetic.main.content_feedback_negative_open_ended_feedback.*
 
 
 class ShareOpenEndedNegativeFeedbackFragment : FeedbackFragment() {
 
     override val fragmentTag: String = "Open ended negative feedback"
 
-    interface OpenEndedNegativeFeedbackListener {
+    interface OpenEndedFeedbackListener {
         fun onProvidedNegativeOpenEndedFeedback(feedback: String)
+        fun onProvidedPositiveOpenEndedFeedback(feedback: String)
         fun userCancelled()
     }
 
     private val viewModel by bindViewModel<ShareOpenEndedNegativeFeedbackViewModel>()
 
-    private val listener: OpenEndedNegativeFeedbackListener?
-        get() = activity as OpenEndedNegativeFeedbackListener
+    private val listener: OpenEndedFeedbackListener?
+        get() = activity as OpenEndedFeedbackListener
+
+    private var isPositiveFeedback: Boolean = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.content_feedback_negative_open_ended_feedback, container, false)
@@ -53,8 +58,11 @@ class ShareOpenEndedNegativeFeedbackFragment : FeedbackFragment() {
                 is Command.Exit -> {
                     listener?.userCancelled()
                 }
-                is Command.ExitAndSubmit -> {
+                is Command.ExitAndSubmitNegativeFeedback -> {
                     listener?.onProvidedNegativeOpenEndedFeedback(command.feedback)
+                }
+                is Command.ExitAndSubmitPositiveFeedback -> {
+                    listener?.onProvidedPositiveOpenEndedFeedback(command.feedback)
                 }
             }
         })
@@ -63,24 +71,75 @@ class ShareOpenEndedNegativeFeedbackFragment : FeedbackFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        if (arguments == null) throw IllegalArgumentException("Missing required arguments")
+
         arguments?.let { args ->
-            title.text = "to do!"
-            subtitle.text = "to do!"
+
+            isPositiveFeedback = args.getBoolean(IS_POSITIVE_FEEDBACK_EXTRA)
+
+            if (isPositiveFeedback) {
+                updateDisplayForPositiveFeedback()
+            } else {
+                updateDisplayForNegativeFeedback(args)
+            }
         }
     }
 
+    private fun updateDisplayForPositiveFeedback() {
+        title.text = getString(R.string.feedbackShareDetails)
+        subtitle.text = getString(R.string.sharePositiveFeedbackWithTheTeam)
+        openEndedFeedbackContainer.hint = getString(R.string.whatHaveYouBeenEnjoying)
+        emoticonImage.setImageResource(R.drawable.ic_positive_feedback)
+    }
+
+    private fun updateDisplayForNegativeFeedback(args: Bundle) {
+        val mainReason = args.getSerializable(MAIN_REASON_EXTRA) as MainReason
+        val subReason = args.getSerializable(SUB_REASON_EXTRA) as SubReason?
+
+        title.text = getDisplayText(mainReason)
+        subtitle.text = getDisplayText(subReason)
+        openEndedFeedbackContainer.hint = getString(R.string.openEndedInputHint)
+        emoticonImage.setImageResource(R.drawable.ic_negative_feedback)
+    }
+
+    private fun getDisplayText(reason: MainReason): String {
+        val display = mainReasons[reason] ?: return ""
+        return getString(display.titleDisplayResId)
+    }
+
+    private fun getDisplayText(reason: SubReason?): String {
+        val display = subReasons[reason] ?: return getString(R.string.tellUsHowToImprove)
+        return getString(display.titleDisplayResId)
+    }
+
     override fun configureListeners() {
-        submitFeedbackButton.setOnClickListener { viewModel.userSubmittingFeedback(openEndedFeedback.text.toString()) }
+        submitFeedbackButton.setOnClickListener { viewModel.userSubmittingFeedback(openEndedFeedback.text.toString(), isPositiveFeedback) }
     }
 
     companion object {
 
         private const val MAIN_REASON_EXTRA = "MAIN_REASON_EXTRA"
+        private const val SUB_REASON_EXTRA = "SUB_REASON_EXTRA"
+        private const val IS_POSITIVE_FEEDBACK_EXTRA = "IS_POSITIVE_FEEDBACK_EXTRA"
 
-        fun instance(mainReason: FeedbackType.MainReason): ShareOpenEndedNegativeFeedbackFragment {
+        fun instanceNegativeFeedback(mainReason: MainReason, subReason: SubReason?): ShareOpenEndedNegativeFeedbackFragment {
             val fragment = ShareOpenEndedNegativeFeedbackFragment()
             fragment.arguments = Bundle().also {
-                it.putInt(MAIN_REASON_EXTRA, mainReason.ordinal)
+                it.putBoolean(IS_POSITIVE_FEEDBACK_EXTRA, false)
+
+                it.putSerializable(MAIN_REASON_EXTRA, mainReason)
+
+                if (subReason != null) {
+                    it.putSerializable(SUB_REASON_EXTRA, subReason)
+                }
+            }
+            return fragment
+        }
+
+        fun instancePositiveFeedback(): ShareOpenEndedNegativeFeedbackFragment {
+            val fragment = ShareOpenEndedNegativeFeedbackFragment()
+            fragment.arguments = Bundle().also {
+                it.putBoolean(IS_POSITIVE_FEEDBACK_EXTRA, true)
             }
             return fragment
         }

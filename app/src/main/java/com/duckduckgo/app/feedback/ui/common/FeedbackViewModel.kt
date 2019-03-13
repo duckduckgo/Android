@@ -21,7 +21,7 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.feedback.ui.common.FragmentState.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
-import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MissingBrowserFeaturesSubreasons
+import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
 import com.duckduckgo.app.global.SingleLiveEvent
 import timber.log.Timber
 
@@ -31,9 +31,9 @@ class FeedbackViewModel : ViewModel() {
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
 
     init {
-        //viewState.value = ViewState(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_FORWARDS))
+        viewState.value = ViewState(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_FORWARDS))
         //viewState.value = ViewState(fragmentViewState = FragmentState.PositiveShareFeedback(NAVIGATION_FORWARDS))
-        viewState.value = ViewState(fragmentViewState = FragmentState.NegativeFeedbackMainReason(NAVIGATION_FORWARDS))
+        //viewState.value = ViewState(fragmentViewState = FragmentState.NegativeFeedbackMainReason(NAVIGATION_FORWARDS))
     }
 
     private val currentViewState: ViewState
@@ -61,19 +61,36 @@ class FeedbackViewModel : ViewModel() {
             is NegativeFeedbackSubReason -> {
                 viewState.value = currentViewState.copy(fragmentViewState = NegativeFeedbackMainReason(NAVIGATION_BACKWARDS))
             }
-            else -> {
-                Timber.w("Still needs wired up")
+            is NegativeOpenEndedFeedback -> {
+                val newViewState = when (currentViewState.previousViewState) {
+                    is NegativeFeedbackSubReason -> {
+                        NegativeFeedbackSubReason(NAVIGATION_BACKWARDS, currentViewState.mainReason!!)
+                    }
+                    is NegativeFeedbackMainReason -> {
+                        NegativeFeedbackMainReason(NAVIGATION_BACKWARDS)
+                    }
+                    else -> {
+                        NegativeFeedbackMainReason(NAVIGATION_BACKWARDS)
+                    }
+                }
+                viewState.value = currentViewState.copy(fragmentViewState = newViewState)
             }
         }
     }
 
 
     fun userSelectedPositiveFeedback() {
-        viewState.value = currentViewState.copy(fragmentViewState = PositiveFeedbackStep1(NAVIGATION_FORWARDS))
+        viewState.value = currentViewState.copy(
+            fragmentViewState = PositiveFeedbackStep1(NAVIGATION_FORWARDS),
+            previousViewState = currentViewState.fragmentViewState
+        )
     }
 
     fun userSelectedNegativeFeedback() {
-        viewState.value = currentViewState.copy(fragmentViewState = NegativeFeedbackMainReason(NAVIGATION_FORWARDS))
+        viewState.value = currentViewState.copy(
+            fragmentViewState = NegativeFeedbackMainReason(NAVIGATION_FORWARDS),
+            previousViewState = currentViewState.fragmentViewState
+        )
     }
 
     fun userWantsToCancel() {
@@ -83,37 +100,77 @@ class FeedbackViewModel : ViewModel() {
 
     fun userSelectedToGiveFeedback() {
         Timber.i("User gave feedback")
-        viewState.value = currentViewState.copy(fragmentViewState = PositiveShareFeedback(NAVIGATION_FORWARDS))
+        viewState.value = currentViewState.copy(
+            fragmentViewState = PositiveShareFeedback(NAVIGATION_FORWARDS),
+            previousViewState = currentViewState.fragmentViewState
+        )
     }
 
-    fun userProvidedOpenEndedFeedback(feedback: String) {
-        Timber.i("User provided feedback: {$feedback}")
+    fun onProvidedNegativeOpenEndedFeedback(feedback: String) {
+        Timber.i("User provided negative feedback: {$feedback}")
         command.value = Command.Exit(feedbackSubmitted = true)
     }
 
-    fun userSelectedNegativeFeedbackMainReason(type: MainReason) {
-        val newState = NegativeFeedbackSubReason(NAVIGATION_FORWARDS, type)
-        viewState.value = currentViewState.copy(fragmentViewState = newState)
+    fun onProvidedPositiveOpenEndedFeedback(feedback: String) {
+        Timber.i("User provided positive feedback: {$feedback}")
+        command.value = Command.Exit(feedbackSubmitted = true)
     }
 
-    fun userSelectedNegativeFeedbackMissingBrowserSubReason(type: MissingBrowserFeaturesSubreasons) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    fun userSelectedNegativeFeedbackMainReason(mainReason: MainReason) {
+        val newState = when (mainReason) {
+            MainReason.MISSING_BROWSING_FEATURES -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
+            MainReason.WEBSITES_NOT_LOADING -> NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason)
+            MainReason.SEARCH_NOT_GOOD_ENOUGH -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
+            MainReason.NOT_ENOUGH_CUSTOMIZATIONS -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
+            MainReason.APP_IS_SLOW_OR_BUGGY -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
+            MainReason.OTHER -> NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason)
+        }
+        viewState.value = currentViewState.copy(
+            fragmentViewState = newState,
+            mainReason = mainReason,
+            subReason = null,
+            previousViewState = currentViewState.fragmentViewState
+        )
     }
 
-    fun userSelectedSubReasonWebsitesNotLoading(type: FeedbackType.WebsitesNotLoading) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    fun userSelectedNegativeFeedbackMissingBrowserSubReason(mainReason: MainReason, subReason: FeedbackType.MissingBrowserFeaturesSubReasons) {
+        val newState = NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason, subReason)
+        viewState.value = currentViewState.copy(
+            fragmentViewState = newState,
+            mainReason = mainReason,
+            subReason = subReason,
+            previousViewState = currentViewState.fragmentViewState
+        )
     }
 
-    fun userSelectedSubReasonSearchNotGoodEnough(type: FeedbackType.SearchResultsNotGoodEnough) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    fun userSelectedSubReasonSearchNotGoodEnough(mainReason: MainReason, subReason: FeedbackType.SearchNotGoodEnoughSubReasons) {
+        val newState = NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason, subReason)
+        viewState.value = currentViewState.copy(
+            fragmentViewState = newState,
+            mainReason = mainReason,
+            subReason = subReason,
+            previousViewState = currentViewState.fragmentViewState
+        )
     }
 
-    fun userSelectedSubReasonNeedMoreCustomization(type: FeedbackType.NeedMoreCustomization) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    fun userSelectedSubReasonNeedMoreCustomization(mainReason: MainReason, subReason: FeedbackType.CustomizationSubReasons) {
+        val newState = NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason, subReason)
+        viewState.value = currentViewState.copy(
+            fragmentViewState = newState,
+            mainReason = mainReason,
+            subReason = subReason,
+            previousViewState = currentViewState.fragmentViewState
+        )
     }
 
-    fun userSelectedSubReasonAppIsSlowOrBuggy(type: FeedbackType.AppIsSlowOrBuggy) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    fun userSelectedSubReasonAppIsSlowOrBuggy(mainReason: MainReason, subReason: FeedbackType.PerformanceSubReasons) {
+        val newState = NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason, subReason)
+        viewState.value = currentViewState.copy(
+            fragmentViewState = newState,
+            mainReason = mainReason,
+            subReason = subReason,
+            previousViewState = currentViewState.fragmentViewState
+        )
     }
 
     companion object {
@@ -123,7 +180,10 @@ class FeedbackViewModel : ViewModel() {
 }
 
 data class ViewState(
-    val fragmentViewState: FragmentState
+    val fragmentViewState: FragmentState,
+    val previousViewState: FragmentState? = null,
+    val mainReason: MainReason? = null,
+    val subReason: SubReason? = null
 )
 
 sealed class FragmentState(open val direction: NavigationDirection) {
@@ -137,7 +197,8 @@ sealed class FragmentState(open val direction: NavigationDirection) {
     // negative flow
     data class NegativeFeedbackMainReason(override val direction: NavigationDirection) : FragmentState(direction)
     data class NegativeFeedbackSubReason(override val direction: NavigationDirection, val mainReason: MainReason) : FragmentState(direction)
-    data class NegativeOpenEndedFeedback(override val direction: NavigationDirection, val mainReason: MainReason) : FragmentState(direction)
+    data class NegativeOpenEndedFeedback(override val direction: NavigationDirection, val mainReason: MainReason, val subReason: SubReason? = null) :
+        FragmentState(direction)
 
 }
 

@@ -20,7 +20,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,6 +33,7 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MissingBrowserFeaturesSubReasons.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.PerformanceSubReasons.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SearchNotGoodEnoughSubReasons.*
+import com.duckduckgo.app.feedback.ui.negative.displayText
 import kotlinx.android.synthetic.main.content_feedback_negative_disambiguation_sub_reason.*
 import timber.log.Timber
 
@@ -45,11 +45,10 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
     private lateinit var recyclerAdapter: SubReasonAdapter
 
     interface DisambiguationNegativeFeedbackListener {
-        fun userSelectedSubReasonMissingBrowser(type: FeedbackType.MissingBrowserFeaturesSubreasons)
-        fun userSelectedSubReasonWebsitesNotLoading(type: FeedbackType.WebsitesNotLoading)
-        fun userSelectedSubReasonSearchNotGoodEnough(type: FeedbackType.SearchResultsNotGoodEnough)
-        fun userSelectedSubReasonNeedMoreCustomization(type: FeedbackType.NeedMoreCustomization)
-        fun userSelectedSubReasonAppIsSlowOrBuggy(type: FeedbackType.AppIsSlowOrBuggy)
+        fun userSelectedSubReasonMissingBrowserFeatures(mainReason: MainReason, subReason: FeedbackType.MissingBrowserFeaturesSubReasons)
+        fun userSelectedSubReasonSearchNotGoodEnough(mainReason: MainReason, subReason: FeedbackType.SearchNotGoodEnoughSubReasons)
+        fun userSelectedSubReasonNeedMoreCustomization(mainReason: MainReason, subReason: FeedbackType.CustomizationSubReasons)
+        fun userSelectedSubReasonAppIsSlowOrBuggy(mainReason: MainReason, subReason: FeedbackType.PerformanceSubReasons)
     }
 
     private val viewModel by bindViewModel<SubReasonNegativeFeedbackViewModel>()
@@ -57,13 +56,28 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
     private val listener: DisambiguationNegativeFeedbackListener?
         get() = activity as DisambiguationNegativeFeedbackListener
 
+    private lateinit var mainReason: MainReason
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.content_feedback_negative_disambiguation_sub_reason, container, false)
 
         recyclerAdapter = SubReasonAdapter(object : (SubReasonDisplay) -> Unit {
             override fun invoke(reason: SubReasonDisplay) {
                 Timber.i("Clicked reason: $reason")
-                viewModel.userSelectedFeedbackType(reason.feedbackType)
+                when (reason.feedbackType) {
+                    is MissingBrowserFeaturesSubReasons -> {
+                        listener?.userSelectedSubReasonMissingBrowserFeatures(mainReason, reason.feedbackType)
+                    }
+                    is SearchNotGoodEnoughSubReasons -> {
+                        listener?.userSelectedSubReasonSearchNotGoodEnough(mainReason, reason.feedbackType)
+                    }
+                    is CustomizationSubReasons -> {
+                        listener?.userSelectedSubReasonNeedMoreCustomization(mainReason, reason.feedbackType)
+                    }
+                    is PerformanceSubReasons -> {
+                        listener?.userSelectedSubReasonAppIsSlowOrBuggy(mainReason, reason.feedbackType)
+                    }
+                }
             }
         })
 
@@ -81,46 +95,25 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
 
             arguments?.let { args ->
 
-                val mainReason = values()[args.getInt(MAIN_REASON_EXTRA)]
-                val display = getDisplayTextForReasonType(mainReason)
+                mainReason = args.getSerializable(MAIN_REASON_EXTRA) as MainReason
+                val display = mainReason.displayText()
 
-                title.text = getString(display.title)
-                subtitle.text = getString(display.subtitle)
+                title.text = getString(display!!.titleDisplayResId)
+                subtitle.text = getString(display.subtitleDisplayResId)
 
-
-                //val subreasons = activity?.resources?.getStringArray(args.getInt(SUBREASONS_EXTRA))?.toList() ?: emptyList()
-
-                //title.text = getString(args.getInt(TITLE_EXTRA))
-                //subtitle.text = getString(args.getInt(SUBTITLE_EXTRA))
-                Timber.i("There are ${display.subReasons.size} subReasons to show")
-                recyclerAdapter.submitList(display.subReasons)
+                val subReasons = getDisplayTextForReasonType(mainReason)
+                Timber.i("There are ${subReasons.size} subReasons to show")
+                recyclerAdapter.submitList(subReasons)
             }
         }
-
     }
 
-    private fun getDisplayTextForReasonType(mainReason: MainReason): Display {
+    private fun getDisplayTextForReasonType(mainReason: MainReason): List<SubReasonDisplay> {
         return when (mainReason) {
-            MISSING_BROWSING_FEATURES -> Display(
-                R.string.missingBrowserFeaturesTitleShort,
-                R.string.missingBrowserFeaturesSubtitle,
-                browserFeatureSubReasons()
-            )
-            SEARCH_NOT_GOOD_ENOUGH -> Display(
-                R.string.searchNotGoodEnoughTitleShort,
-                R.string.searchNotGoodEnoughSubtitle,
-                searchNotGoodEnoughSubReasons()
-            )
-            NOT_ENOUGH_CUSOMIZATIONS -> Display(
-                R.string.needMoreCustomizationTitleShort,
-                R.string.needMoreCustomizationSubtitle,
-                moreCustomizationsSubReasons()
-            )
-            APP_IS_SLOW_OR_BUGGY -> Display(
-                R.string.appIsSlowOrBuggyTitleShort,
-                R.string.appIsSlowOrBuggySubtitle,
-                appSlowOrBuggySubReasons()
-            )
+            MISSING_BROWSING_FEATURES -> browserFeatureSubReasons()
+            SEARCH_NOT_GOOD_ENOUGH -> searchNotGoodEnoughSubReasons()
+            NOT_ENOUGH_CUSTOMIZATIONS -> moreCustomizationsSubReasons()
+            APP_IS_SLOW_OR_BUGGY -> appSlowOrBuggySubReasons()
             else -> throw IllegalStateException("Not handled - $mainReason")
         }
     }
@@ -172,19 +165,9 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
 
     override fun configureViewModelObservers() {
         viewModel.command.observe(this, Observer { command ->
-            when (command) {
-                is SubReasonNegativeFeedbackViewModel.Command.NavigateNegativeOpenEndedFeedbackScreen -> {
-                    //listener?.userSelectedNegativeFeedbackTypeDisambiguationSubReason(command.type)
-                }
-            }
+
         })
     }
-
-    data class Display(
-        @StringRes val title: Int,
-        @StringRes val subtitle: Int,
-        val subReasons: List<SubReasonDisplay>
-    )
 
     data class SubReasonDisplay(val feedbackType: SubReason, val displayString: String)
 
@@ -195,18 +178,9 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
         fun instance(mainReason: MainReason): SubReasonNegativeFeedbackFragment {
             val fragment = SubReasonNegativeFeedbackFragment()
             fragment.arguments = Bundle().also {
-                it.putInt(MAIN_REASON_EXTRA, mainReason.ordinal)
+                it.putSerializable(MAIN_REASON_EXTRA, mainReason)
             }
             return fragment
         }
-
-//        fun instance(@StringRes titleResId: Int, @StringRes subTitleResId: Int, @ArrayRes subreasonStringArrayId: Int): SubReasonNegativeFeedbackFragment {
-//            val fragment = SubReasonNegativeFeedbackFragment()
-//            fragment.arguments = Bundle().also {
-//                it.putInt(TITLE_EXTRA, titleResId)
-//                it.putInt(SUBTITLE_EXTRA, subTitleResId)
-//                it.putInt(SUBREASONS_EXTRA, subreasonStringArrayId)
-//            }
-//            return fragment
     }
 }

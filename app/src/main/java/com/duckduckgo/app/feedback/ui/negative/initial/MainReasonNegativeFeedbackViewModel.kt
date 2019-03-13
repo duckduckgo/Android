@@ -20,7 +20,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.global.SingleLiveEvent
-import timber.log.Timber
 
 
 class MainReasonNegativeFeedbackViewModel : ViewModel() {
@@ -33,10 +32,8 @@ class MainReasonNegativeFeedbackViewModel : ViewModel() {
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
 
-    fun userSelectedFeedbackType(type: MainReason) {
-        Timber.i("User selected feedback type: $type")
-        command.value =
-            Command.NavigateNegativeOpenEndedFeedbackScreen(type)
+    fun userSelectedFeedbackType(mainReason: MainReason) {
+        command.value = Command.UserSelectedFeedbackType(mainReason)
     }
 
     sealed class ViewState {
@@ -44,7 +41,7 @@ class MainReasonNegativeFeedbackViewModel : ViewModel() {
     }
 
     sealed class Command {
-        data class NavigateNegativeOpenEndedFeedbackScreen(val type: MainReason) : Command()
+        data class UserSelectedFeedbackType(val type: MainReason) : Command()
     }
 
 }

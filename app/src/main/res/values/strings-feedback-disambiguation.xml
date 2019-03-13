@@ -20,7 +20,7 @@
     <string name="missingBrowserFeaturesTitleShort">Browser feature issues</string>
     <string name="missingBrowserFeaturesSubtitle">Which browsing feature can we add or improve?</string>
     <string name="missingBrowserFeatureSubReasonNavigation">Navigating forward, backward, refreshing</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Navigating forward, backward, refreshing</string>
+    <string name="missingBrowserFeatureSubReasonTabManagement">Creating and managing tabs</string>
     <string name="missingBrowserFeatureSubReasonAdPopups">Ad and pop-up blocking</string>
     <string name="missingBrowserFeatureSubReasonVideos">Watching videos</string>
     <string name="missingBrowserFeatureSubReasonImages">Interacting with images</string>
@@ -52,7 +52,7 @@
     <string name="needMoreCustomizationSubReasonBookmarksDisplay">How bookmarks are displayed</string>
     <string name="needMoreCustomizationSubReasonOther">None of these</string>
 
-    <string name="appIsSlowOrBuggyTitleLong">There aren\'t enough ways to customize the app</string>
+    <string name="appIsSlowOrBuggyTitleLong">The app is slow, buggy, or crashes</string>
     <string name="appIsSlowOrBuggyTitleShort">Performance issues</string>
     <string name="appIsSlowOrBuggySubtitle">Which issue are you experiencing?</string>
     <string name="appIsSlowOrBuggySubReasonSlowResults">Web pages or search results load slowly</string>
@@ -61,12 +61,25 @@
     <string name="appIsSlowOrBuggySubReasonOther">None of these</string>
 
     <string name="otherMainReasonTitleLong">None of these</string>
-    <string name="otherMainReasonTitleShort">Your feedback is important to us</string>
-    <string name="otherMainReasonSubtitle">Please tell us what we can improve</string>
+    <string name="otherMainReasonTitleShort">Other issues</string>
+    <string name="otherMainReasonSubtitle">@string/tellUsHowToImprove</string>
 
     <string name="openEndedInputHint">How can we improve? (Optional)</string>
     <string name="submitFeedback">SUBMIT FEEDBACK</string>
     <string name="appreciateYourFeedback">We appreciate your feedback</string>
     <string name="anonymousFeedbackIsImportant">Your anonymous feedback is important to us</string>
+
+    <string name="tellUsHowToImprove">Please tell us what we can improve</string>
+    <string name="thanksForTheFeedback">Thanks for the feedback!</string>
+    <string name="feedbackNegativeMainReasonPageSubtitle">What is your frustration most related to?</string>
+    <string name="feedbackNegativeMainReasonPageTitle">We\'re sorry to hear that</string>
+    <string name="feedbackShareDetails">Share details</string>
+    <string name="sharePositiveFeedbackWithTheTeam">Are there any details you\'d like to share with the team?</string>
+    <string name="whatHaveYouBeenEnjoying">What have you been enjoying?</string>
+    <string name="awesomeToHear">Awesome to hear!</string>
+    <string name="shareTheLoveWithARating">Please share the love by rating on the Play Store</string>
+    <string name="rateTheApp">RATE THE APP</string>
+    <string name="declineFurtherFeedback">NO THANKS, I\'M DONE</string>
+
 
 </resources>

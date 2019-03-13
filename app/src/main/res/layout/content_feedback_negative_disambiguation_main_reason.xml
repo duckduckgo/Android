@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:fontFamily="sans-serif-medium"
-            android:text="We're sorry to hear that."
+            android:text="@string/feedbackNegativeMainReasonPageTitle"
             android:textAlignment="center"
             android:textColor="@color/almostBlackDark"
             android:textSize="22sp"
@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:fontFamily="sans-serif"
-            android:text="What is your frustration most related to?"
+            android:text="@string/feedbackNegativeMainReasonPageSubtitle"
             android:textAlignment="center"
             android:textColor="@color/almostBlack"
             android:textSize="15sp"
@@ -89,7 +89,7 @@
                 android:paddingEnd="22dp"
                 android:gravity="center_vertical"
                 android:minHeight="50dp"
-                android:text="Browser features are missing or frustrating"
+                android:text="@string/missingBrowserFeaturesTitleLong"
                 android:textColor="@color/greyishBrownTwo"
                 android:textSize="14sp" />
 
@@ -108,7 +108,7 @@
                 android:minHeight="50dp"
                 android:paddingStart="22dp"
                 android:paddingEnd="22dp"
-                android:text="Certain websites don't load correctly"
+                android:text="@string/websiteNotLoadingTitleLong"
                 android:textColor="@color/greyishBrownTwo"
                 android:textSize="14sp" />
 
@@ -127,7 +127,7 @@
                 android:minHeight="50dp"
                 android:paddingStart="22dp"
                 android:paddingEnd="22dp"
-                android:text="DuckDuckGo search isn't good enough"
+                android:text="@string/searchNotGoodEnoughTitleLong"
                 android:textColor="@color/greyishBrownTwo"
                 android:textSize="14sp" />
 
@@ -146,7 +146,7 @@
                 android:minHeight="50dp"
                 android:paddingStart="22dp"
                 android:paddingEnd="22dp"
-                android:text="Not enough ways to customize the app"
+                android:text="@string/needMoreCustomizationTitleLong"
                 android:textColor="@color/greyishBrownTwo"
                 android:textSize="14sp" />
 
@@ -165,7 +165,7 @@
                 android:minHeight="50dp"
                 android:paddingStart="22dp"
                 android:paddingEnd="22dp"
-                android:text="App is slow, buggy, or crashes"
+                android:text="@string/appIsSlowOrBuggyTitleLong"
                 android:textColor="@color/greyishBrownTwo"
                 android:textSize="14sp" />
 
@@ -184,7 +184,7 @@
                 android:minHeight="50dp"
                 android:paddingStart="22dp"
                 android:paddingEnd="22dp"
-                android:text="None of these"
+                android:text="@string/otherMainReasonTitleLong"
                 android:textColor="@color/greyishBrownTwo"
                 android:textSize="14sp" />
 

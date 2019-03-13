@@ -37,7 +37,7 @@ import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragmentViewModel
 import com.duckduckgo.app.feedback.ui.negative.initial.MainReasonNegativeFeedbackViewModel
 import com.duckduckgo.app.feedback.ui.negative.initial.SubReasonNegativeFeedbackViewModel
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingViewModel
-import com.duckduckgo.app.feedback.ui.positive.openended.ShareOpenEndedNegativeFeedbackViewModel
+import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.install.AppInstallStore

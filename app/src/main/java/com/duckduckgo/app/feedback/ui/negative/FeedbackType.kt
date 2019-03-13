@@ -16,18 +16,21 @@
 
 package com.duckduckgo.app.feedback.ui.negative
 
+import java.io.Serializable
+
 sealed class FeedbackType {
 
     enum class MainReason {
         MISSING_BROWSING_FEATURES,
         WEBSITES_NOT_LOADING,
         SEARCH_NOT_GOOD_ENOUGH,
-        NOT_ENOUGH_CUSOMIZATIONS,
+        NOT_ENOUGH_CUSTOMIZATIONS,
         APP_IS_SLOW_OR_BUGGY,
         OTHER
     }
 
-    interface SubReason
+    interface SubReason : Serializable {
+    }
 
     enum class MissingBrowserFeaturesSubReasons : SubReason {
         NAVIGATION_ISSUES,

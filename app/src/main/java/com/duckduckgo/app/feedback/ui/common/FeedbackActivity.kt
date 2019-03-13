@@ -26,12 +26,11 @@ import androidx.fragment.app.transaction
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragment
-import com.duckduckgo.app.feedback.ui.negative.FeedbackType
+import com.duckduckgo.app.feedback.ui.negative.FeedbackType.*
 import com.duckduckgo.app.feedback.ui.negative.initial.MainReasonNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.negative.initial.SubReasonNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
-import com.duckduckgo.app.feedback.ui.positive.openended.ShareOpenEndedPositiveFeedbackFragment
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import kotlinx.android.synthetic.main.include_toolbar.*
 import timber.log.Timber
@@ -40,10 +39,9 @@ import timber.log.Timber
 class FeedbackActivity : DuckDuckGoActivity(),
     InitialFeedbackFragment.InitialFeedbackListener,
     PositiveFeedbackLandingFragment.PositiveFeedbackLandingListener,
-    ShareOpenEndedNegativeFeedbackFragment.OpenEndedNegativeFeedbackListener,
+    ShareOpenEndedNegativeFeedbackFragment.OpenEndedFeedbackListener,
     MainReasonNegativeFeedbackFragment.MainReasonNegativeFeedbackListener,
     SubReasonNegativeFeedbackFragment.DisambiguationNegativeFeedbackListener {
-
     private val viewModel: FeedbackViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,12 +85,12 @@ class FeedbackActivity : DuckDuckGoActivity(),
             is FragmentState.PositiveShareFeedback -> showSharePositiveFeedbackView(state.direction)
             is FragmentState.NegativeFeedbackMainReason -> showNegativeFeedbackMainReasonView(state.direction)
             is FragmentState.NegativeFeedbackSubReason -> showNegativeFeedbackSubReasonView(state.direction, state.mainReason)
-            is FragmentState.NegativeOpenEndedFeedback -> showNegativeOpenEndedFeedbackView(state.direction, state.mainReason)
+            is FragmentState.NegativeOpenEndedFeedback -> showNegativeOpenEndedFeedbackView(state.direction, state.mainReason, state.subReason)
         }
     }
 
     private fun showSharePositiveFeedbackView(direction: NavigationDirection) {
-        val fragment = ShareOpenEndedPositiveFeedbackFragment.instance()
+        val fragment = ShareOpenEndedNegativeFeedbackFragment.instancePositiveFeedback()
         updateFragment(fragment, direction)
     }
 
@@ -101,13 +99,13 @@ class FeedbackActivity : DuckDuckGoActivity(),
         updateFragment(fragment, direction)
     }
 
-    private fun showNegativeFeedbackSubReasonView(direction: NavigationDirection, mainReason: FeedbackType.MainReason) {
+    private fun showNegativeFeedbackSubReasonView(direction: NavigationDirection, mainReason: MainReason) {
         val fragment = SubReasonNegativeFeedbackFragment.instance(mainReason)
         updateFragment(fragment, direction)
     }
 
-    private fun showNegativeOpenEndedFeedbackView(direction: NavigationDirection, mainReason: FeedbackType.MainReason) {
-        val fragment = ShareOpenEndedNegativeFeedbackFragment.instance(mainReason)
+    private fun showNegativeOpenEndedFeedbackView(direction: NavigationDirection, mainReason: MainReason, subReason: SubReason? = null) {
+        val fragment = ShareOpenEndedNegativeFeedbackFragment.instanceNegativeFeedback(mainReason, subReason)
         updateFragment(fragment, direction)
     }
 
@@ -151,7 +149,7 @@ class FeedbackActivity : DuckDuckGoActivity(),
     }
 
     /**
-     * Positive feedback first page listeners
+     * Positive feedback listeners
      */
     override fun userSelectedToRateApp() {
         Timber.i("User gave rating")
@@ -162,39 +160,44 @@ class FeedbackActivity : DuckDuckGoActivity(),
         viewModel.userSelectedToGiveFeedback()
     }
 
+    override fun onProvidedPositiveOpenEndedFeedback(feedback: String) {
+        viewModel.onProvidedPositiveOpenEndedFeedback(feedback)
+    }
+
+
     /**
-     * Positive open ended feedback listener
+     * Negative feedback listeners
      */
     override fun onProvidedNegativeOpenEndedFeedback(feedback: String) {
-        viewModel.userProvidedOpenEndedFeedback(feedback)
+        viewModel.onProvidedNegativeOpenEndedFeedback(feedback)
     }
 
     /**
-     * Negative feedback disambiguation
+     * Negative feedback main reason selection
      */
-    override fun userSelectedNegativeFeedbackTypeDisambiguationMainReason(type: FeedbackType.MainReason) {
+    override fun userSelectedNegativeFeedbackMainReason(type: MainReason) {
         viewModel.userSelectedNegativeFeedbackMainReason(type)
     }
 
 
-    override fun userSelectedSubReasonMissingBrowser(type: FeedbackType.MissingBrowserFeaturesSubreasons) {
-        viewModel.userSelectedNegativeFeedbackMissingBrowserSubReason(type)
+    /**
+     * Negative feedback subReason selection
+     */
+
+    override fun userSelectedSubReasonMissingBrowserFeatures(mainReason: MainReason, subReason: MissingBrowserFeaturesSubReasons) {
+        viewModel.userSelectedNegativeFeedbackMissingBrowserSubReason(mainReason, subReason)
     }
 
-    override fun userSelectedSubReasonWebsitesNotLoading(type: FeedbackType.WebsitesNotLoading) {
-        viewModel.userSelectedSubReasonWebsitesNotLoading(type)
+    override fun userSelectedSubReasonSearchNotGoodEnough(mainReason: MainReason, subReason: SearchNotGoodEnoughSubReasons) {
+        viewModel.userSelectedSubReasonSearchNotGoodEnough(mainReason, subReason)
     }
 
-    override fun userSelectedSubReasonSearchNotGoodEnough(type: FeedbackType.SearchResultsNotGoodEnough) {
-        viewModel.userSelectedSubReasonSearchNotGoodEnough(type)
+    override fun userSelectedSubReasonNeedMoreCustomization(mainReason: MainReason, subReason: CustomizationSubReasons) {
+        viewModel.userSelectedSubReasonNeedMoreCustomization(mainReason, subReason)
     }
 
-    override fun userSelectedSubReasonNeedMoreCustomization(type: FeedbackType.NeedMoreCustomization) {
-        viewModel.userSelectedSubReasonNeedMoreCustomization(type)
-    }
-
-    override fun userSelectedSubReasonAppIsSlowOrBuggy(type: FeedbackType.AppIsSlowOrBuggy) {
-        viewModel.userSelectedSubReasonAppIsSlowOrBuggy(type)
+    override fun userSelectedSubReasonAppIsSlowOrBuggy(mainReason: MainReason, subReason: PerformanceSubReasons) {
+        viewModel.userSelectedSubReasonAppIsSlowOrBuggy(mainReason, subReason)
     }
 
     companion object {

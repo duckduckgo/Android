@@ -276,7 +276,4 @@
     <string name="clearNotificationTitle">Data clearing set to manual</string>
     <string name="clearNotificationDescription">Customize DuckDuckGo to automatically clear browsing data after every session.</string>
 
-    <!-- Feedback -->
-    <string name="thanksForTheFeedback">Thanks for the feedback!</string>
-
 </resources>

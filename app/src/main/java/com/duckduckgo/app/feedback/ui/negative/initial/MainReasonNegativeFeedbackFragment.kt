@@ -32,7 +32,7 @@ class MainReasonNegativeFeedbackFragment : FeedbackFragment() {
     override val fragmentTag: String = "Disambiguation negative feedback"
 
     interface MainReasonNegativeFeedbackListener {
-        fun userSelectedNegativeFeedbackTypeDisambiguationMainReason(type: MainReason)
+        fun userSelectedNegativeFeedbackMainReason(type: MainReason)
     }
 
     private val viewModel by bindViewModel<MainReasonNegativeFeedbackViewModel>()
@@ -47,8 +47,8 @@ class MainReasonNegativeFeedbackFragment : FeedbackFragment() {
     override fun configureViewModelObservers() {
         viewModel.command.observe(this, Observer { command ->
             when (command) {
-                is MainReasonNegativeFeedbackViewModel.Command.NavigateNegativeOpenEndedFeedbackScreen -> {
-                    listener?.userSelectedNegativeFeedbackTypeDisambiguationMainReason(command.type)
+                is MainReasonNegativeFeedbackViewModel.Command.UserSelectedFeedbackType -> {
+                    listener?.userSelectedNegativeFeedbackMainReason(command.type)
                 }
             }
         })
@@ -58,7 +58,7 @@ class MainReasonNegativeFeedbackFragment : FeedbackFragment() {
         optionMissingFeatures.setOnClickListener { viewModel.userSelectedFeedbackType(MainReason.MISSING_BROWSING_FEATURES) }
         optionWebsitesNotLoading.setOnClickListener { viewModel.userSelectedFeedbackType(MainReason.WEBSITES_NOT_LOADING) }
         optionSearchNotGoodEnough.setOnClickListener { viewModel.userSelectedFeedbackType(MainReason.SEARCH_NOT_GOOD_ENOUGH) }
-        optionNotEnoughCustomizationOptions.setOnClickListener { viewModel.userSelectedFeedbackType(MainReason.NOT_ENOUGH_CUSOMIZATIONS) }
+        optionNotEnoughCustomizationOptions.setOnClickListener { viewModel.userSelectedFeedbackType(MainReason.NOT_ENOUGH_CUSTOMIZATIONS) }
         optionAppIsSlowOrBuggy.setOnClickListener { viewModel.userSelectedFeedbackType(MainReason.APP_IS_SLOW_OR_BUGGY) }
         optionNoneOfThese.setOnClickListener { viewModel.userSelectedFeedbackType(MainReason.OTHER) }
     }

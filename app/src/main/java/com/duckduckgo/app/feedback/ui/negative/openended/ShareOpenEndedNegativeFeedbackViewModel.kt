@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.feedback.ui.positive.openended
+package com.duckduckgo.app.feedback.ui.negative.openended
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
-import timber.log.Timber
 
 
 class ShareOpenEndedNegativeFeedbackViewModel : ViewModel() {
@@ -32,9 +31,12 @@ class ShareOpenEndedNegativeFeedbackViewModel : ViewModel() {
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
 
-    fun userSubmittingFeedback(feedback: String) {
-        Timber.i("Received feedback: {$feedback}")
-        command.value = Command.ExitAndSubmit(feedback)
+    fun userSubmittingFeedback(feedback: String, isPositiveFeedback: Boolean) {
+        if (isPositiveFeedback) {
+            command.value = Command.ExitAndSubmitPositiveFeedback(feedback)
+        } else {
+            command.value = Command.ExitAndSubmitNegativeFeedback(feedback)
+        }
     }
 
     sealed class ViewState {
@@ -42,7 +44,8 @@ class ShareOpenEndedNegativeFeedbackViewModel : ViewModel() {
     }
 
     sealed class Command {
-        data class ExitAndSubmit(val feedback: String) : Command()
+        data class ExitAndSubmitNegativeFeedback(val feedback: String) : Command()
+        data class ExitAndSubmitPositiveFeedback(val feedback: String) : Command()
         object Exit : Command()
     }
 }
