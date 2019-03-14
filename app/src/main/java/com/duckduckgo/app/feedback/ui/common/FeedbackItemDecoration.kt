@@ -23,25 +23,24 @@ import com.duckduckgo.app.global.view.toPx
 
 class FeedbackItemDecoration(private val divider: Drawable) : RecyclerView.ItemDecoration() {
 
-    override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
+    override fun onDrawOver(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         val childCount = parent.childCount
-        for (i in 0 until childCount) {
-            val child = parent.getChildAt(i)
 
-            //val extraPadding = getPaddingStart(i, parent)
-            val params = child.layoutParams as RecyclerView.LayoutParams
-            val top = child.bottom + params.bottomMargin
-            drawDividerAlongBottom(parent, top, c)
-        }
-    }
-
-    private fun drawDividerAlongBottom(parent: RecyclerView, childTop: Int, c: Canvas) {
         val left = parent.paddingLeft + 22.toPx()
         val right = parent.width - parent.paddingRight
 
-        val bottom = childTop + divider.intrinsicHeight
+        for (i in 0 until childCount) {
+            val child = parent.getChildAt(i)
+            val params = child.layoutParams as RecyclerView.LayoutParams
+            val top = child.bottom + params.bottomMargin
+            val bottom = top + divider.intrinsicHeight
 
-        divider.setBounds(left, childTop, right, bottom)
-        divider.draw(c)
+            drawDividerAlongBottom(canvas, childLeft = left, childTop = top, childRight = right, childBottom = bottom)
+        }
+    }
+
+    private fun drawDividerAlongBottom(canvas: Canvas, childLeft: Int, childTop: Int, childRight: Int, childBottom: Int) {
+        divider.setBounds(childLeft, childTop, childRight, childBottom)
+        divider.draw(canvas)
     }
 }
