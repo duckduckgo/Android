@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.feedback.ui.negative.initial
+package com.duckduckgo.app.feedback.ui.negative.brokensite
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.global.SingleLiveEvent
 
 
-class MainReasonNegativeFeedbackViewModel : ViewModel() {
+class BrokenSiteNegativeFeedbackViewModel : ViewModel() {
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
 
@@ -32,8 +31,8 @@ class MainReasonNegativeFeedbackViewModel : ViewModel() {
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
 
-    fun userSelectedFeedbackType(mainReason: MainReason) {
-        command.value = Command.UserSelectedFeedbackType(mainReason)
+    fun userSubmittingFeedback(feedback: String, brokenSite: String?) {
+        command.value = Command.ExitAndSubmitFeedback(feedback, brokenSite)
     }
 
     sealed class ViewState {
@@ -41,9 +40,8 @@ class MainReasonNegativeFeedbackViewModel : ViewModel() {
     }
 
     sealed class Command {
-        data class UserSelectedFeedbackType(val type: MainReason) : Command()
+        data class ExitAndSubmitFeedback(val feedback: String, val brokenSite: String?) : Command()
+        object Exit : Command()
     }
-
 }
-
 

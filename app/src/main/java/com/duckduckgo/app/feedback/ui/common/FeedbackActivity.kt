@@ -27,9 +27,10 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragment
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.*
-import com.duckduckgo.app.feedback.ui.negative.initial.MainReasonNegativeFeedbackFragment
-import com.duckduckgo.app.feedback.ui.negative.initial.SubReasonNegativeFeedbackFragment
+import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeedbackFragment
+import com.duckduckgo.app.feedback.ui.negative.mainreason.MainReasonNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackFragment
+import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import kotlinx.android.synthetic.main.include_toolbar.*
@@ -41,7 +42,9 @@ class FeedbackActivity : DuckDuckGoActivity(),
     PositiveFeedbackLandingFragment.PositiveFeedbackLandingListener,
     ShareOpenEndedNegativeFeedbackFragment.OpenEndedFeedbackListener,
     MainReasonNegativeFeedbackFragment.MainReasonNegativeFeedbackListener,
+    BrokenSiteNegativeFeedbackFragment.BrokenSiteFeedbackListener,
     SubReasonNegativeFeedbackFragment.DisambiguationNegativeFeedbackListener {
+
     private val viewModel: FeedbackViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,6 +89,7 @@ class FeedbackActivity : DuckDuckGoActivity(),
             is FragmentState.NegativeFeedbackMainReason -> showNegativeFeedbackMainReasonView(state.direction)
             is FragmentState.NegativeFeedbackSubReason -> showNegativeFeedbackSubReasonView(state.direction, state.mainReason)
             is FragmentState.NegativeOpenEndedFeedback -> showNegativeOpenEndedFeedbackView(state.direction, state.mainReason, state.subReason)
+            is FragmentState.NegativeWebSitesBrokenFeedback -> showNegativeWebSiteBrokenView(state.direction)
         }
     }
 
@@ -116,6 +120,11 @@ class FeedbackActivity : DuckDuckGoActivity(),
 
     private fun showPositiveFeedbackView(direction: NavigationDirection) {
         val fragment = PositiveFeedbackLandingFragment.instance()
+        updateFragment(fragment, direction)
+    }
+
+    private fun showNegativeWebSiteBrokenView(direction: NavigationDirection) {
+        val fragment = BrokenSiteNegativeFeedbackFragment.instance()
         updateFragment(fragment, direction)
     }
 
@@ -198,6 +207,14 @@ class FeedbackActivity : DuckDuckGoActivity(),
 
     override fun userSelectedSubReasonAppIsSlowOrBuggy(mainReason: MainReason, subReason: PerformanceSubReasons) {
         viewModel.userSelectedSubReasonAppIsSlowOrBuggy(mainReason, subReason)
+    }
+
+    /**
+     * Negative feedback, broken site
+     */
+    override fun onProvidedBrokenSiteFeedback(feedback: String, url: String?) {
+        Timber.w("Received broken site feedback for site: ($url): $feedback")
+        viewModel.onProvidedBrokenSiteFeedback(feedback, url)
     }
 
     companion object {

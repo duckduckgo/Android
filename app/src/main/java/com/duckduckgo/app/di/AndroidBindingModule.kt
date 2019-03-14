@@ -28,9 +28,10 @@ import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
 import com.duckduckgo.app.feedback.ui.SurveyActivity
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragment
-import com.duckduckgo.app.feedback.ui.negative.initial.MainReasonNegativeFeedbackFragment
-import com.duckduckgo.app.feedback.ui.negative.initial.SubReasonNegativeFeedbackFragment
+import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeedbackFragment
+import com.duckduckgo.app.feedback.ui.negative.mainreason.MainReasonNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackFragment
+import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.job.AppConfigurationJobService
@@ -153,6 +154,9 @@ abstract class AndroidBindingModule {
 
     @ContributesAndroidInjector
     abstract fun disambiguationNegativeFeedbackFragment(): SubReasonNegativeFeedbackFragment
+
+    @ContributesAndroidInjector
+    abstract fun brokenSiteNegativeFeedbackFragment(): BrokenSiteNegativeFeedbackFragment
 
     /* Services */
 

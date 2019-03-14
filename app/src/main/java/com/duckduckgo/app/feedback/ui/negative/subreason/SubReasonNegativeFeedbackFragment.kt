@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.feedback.ui.negative.initial
+package com.duckduckgo.app.feedback.ui.negative.subreason
 
 import android.os.Bundle
 import android.view.LayoutInflater

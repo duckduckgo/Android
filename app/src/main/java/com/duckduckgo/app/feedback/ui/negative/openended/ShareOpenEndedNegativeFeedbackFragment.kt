@@ -98,7 +98,7 @@ class ShareOpenEndedNegativeFeedbackFragment : FeedbackFragment() {
 
         title.text = getDisplayText(mainReason)
         subtitle.text = getDisplayText(subReason)
-        openEndedFeedbackContainer.hint = getString(R.string.openEndedInputHint)
+        openEndedFeedbackContainer.hint = getInputHintText(mainReason)
         emoticonImage.setImageResource(R.drawable.ic_negative_feedback)
     }
 
@@ -110,6 +110,14 @@ class ShareOpenEndedNegativeFeedbackFragment : FeedbackFragment() {
     private fun getDisplayText(reason: SubReason?): String {
         val display = subReasons[reason] ?: return getString(R.string.tellUsHowToImprove)
         return getString(display.subtitleDisplayResId)
+    }
+
+    private fun getInputHintText(reason: MainReason): String {
+        return if (reason == MainReason.OTHER) {
+            getString(R.string.feedbackSpecificAsPossible)
+        } else {
+            getString(R.string.openEndedInputHint)
+        }
     }
 
     override fun configureListeners() {

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.feedback.ui.negative.initial
+package com.duckduckgo.app.feedback.ui.negative.mainreason
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.duckduckgo.app.feedback.ui.negative.FeedbackType
+import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.global.SingleLiveEvent
 
 
-class SubReasonNegativeFeedbackViewModel : ViewModel() {
+class MainReasonNegativeFeedbackViewModel : ViewModel() {
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
 
@@ -32,13 +32,18 @@ class SubReasonNegativeFeedbackViewModel : ViewModel() {
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
 
+    fun userSelectedFeedbackType(mainReason: MainReason) {
+        command.value = Command.UserSelectedFeedbackType(mainReason)
+    }
+
     sealed class ViewState {
 
     }
 
     sealed class Command {
-        data class NavigateNegativeOpenEndedFeedbackScreen(val type: FeedbackType) : Command()
+        data class UserSelectedFeedbackType(val type: MainReason) : Command()
     }
+
 }
 
 

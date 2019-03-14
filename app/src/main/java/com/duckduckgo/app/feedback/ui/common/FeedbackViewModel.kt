@@ -42,9 +42,25 @@ class FeedbackViewModel : ViewModel() {
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
 
-    fun onBackPressed() {
-        Timber.i("On back button press")
+    fun userSelectedNegativeFeedbackMainReason(mainReason: MainReason) {
+        val newState = when (mainReason) {
+            MainReason.MISSING_BROWSING_FEATURES -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
+            MainReason.WEBSITES_NOT_LOADING -> NegativeWebSitesBrokenFeedback(NAVIGATION_FORWARDS, mainReason)
+            MainReason.SEARCH_NOT_GOOD_ENOUGH -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
+            MainReason.NOT_ENOUGH_CUSTOMIZATIONS -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
+            MainReason.APP_IS_SLOW_OR_BUGGY -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
+            MainReason.OTHER -> NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason)
+        }
+        viewState.value = currentViewState.copy(
+            fragmentViewState = newState,
+            mainReason = mainReason,
+            subReason = null,
+            previousViewState = currentViewState.fragmentViewState
+        )
+    }
 
+
+    fun onBackPressed() {
         when (currentViewState.fragmentViewState) {
             is InitialAppEnjoymentClarifier -> {
                 command.value = Command.Exit(feedbackSubmitted = false)
@@ -78,7 +94,6 @@ class FeedbackViewModel : ViewModel() {
         }
     }
 
-
     fun userSelectedPositiveFeedback() {
         viewState.value = currentViewState.copy(
             fragmentViewState = PositiveFeedbackStep1(NAVIGATION_FORWARDS),
@@ -111,26 +126,13 @@ class FeedbackViewModel : ViewModel() {
         command.value = Command.Exit(feedbackSubmitted = true)
     }
 
-    fun onProvidedPositiveOpenEndedFeedback(feedback: String) {
-        Timber.i("User provided positive feedback: {$feedback}")
+    fun onProvidedBrokenSiteFeedback(feedback: String, brokenSite: String?) {
         command.value = Command.Exit(feedbackSubmitted = true)
     }
 
-    fun userSelectedNegativeFeedbackMainReason(mainReason: MainReason) {
-        val newState = when (mainReason) {
-            MainReason.MISSING_BROWSING_FEATURES -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
-            MainReason.WEBSITES_NOT_LOADING -> NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason)
-            MainReason.SEARCH_NOT_GOOD_ENOUGH -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
-            MainReason.NOT_ENOUGH_CUSTOMIZATIONS -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
-            MainReason.APP_IS_SLOW_OR_BUGGY -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
-            MainReason.OTHER -> NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason)
-        }
-        viewState.value = currentViewState.copy(
-            fragmentViewState = newState,
-            mainReason = mainReason,
-            subReason = null,
-            previousViewState = currentViewState.fragmentViewState
-        )
+    fun onProvidedPositiveOpenEndedFeedback(feedback: String) {
+        Timber.i("User provided positive feedback: {$feedback}")
+        command.value = Command.Exit(feedbackSubmitted = true)
     }
 
     fun userSelectedNegativeFeedbackMissingBrowserSubReason(mainReason: MainReason, subReason: FeedbackType.MissingBrowserFeaturesSubReasons) {
@@ -200,6 +202,11 @@ sealed class FragmentState(open val direction: NavigationDirection) {
     data class NegativeOpenEndedFeedback(override val direction: NavigationDirection, val mainReason: MainReason, val subReason: SubReason? = null) :
         FragmentState(direction)
 
+    data class NegativeWebSitesBrokenFeedback(
+        override val direction: NavigationDirection,
+        val mainReason: MainReason,
+        val subReason: SubReason? = null
+    ) : FragmentState(direction)
 }
 
 inline class NavigationDirection(val isForward: Boolean)
