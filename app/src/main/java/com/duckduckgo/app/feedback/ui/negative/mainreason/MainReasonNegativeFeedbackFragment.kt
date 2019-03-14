@@ -20,54 +20,71 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
+import com.duckduckgo.app.feedback.ui.common.FeedbackItemDecoration
+import com.duckduckgo.app.feedback.ui.negative.FeedbackType
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
+import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay
+import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.FeedbackTypeMainReasonDisplay
 import kotlinx.android.synthetic.main.content_feedback_negative_disambiguation_main_reason.*
+import timber.log.Timber
 
 
 class MainReasonNegativeFeedbackFragment : FeedbackFragment() {
-
-    override val fragmentTag: String = "Disambiguation negative feedback"
+    private lateinit var recyclerAdapter: MainReasonAdapter
 
     interface MainReasonNegativeFeedbackListener {
+
         fun userSelectedNegativeFeedbackMainReason(type: MainReason)
     }
-
-    private val viewModel by bindViewModel<MainReasonNegativeFeedbackViewModel>()
-
     private val listener: MainReasonNegativeFeedbackListener?
         get() = activity as MainReasonNegativeFeedbackListener
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.content_feedback_negative_disambiguation_main_reason, container, false)
+        val rootView = inflater.inflate(R.layout.content_feedback_negative_disambiguation_main_reason, container, false)
+
+        recyclerAdapter = MainReasonAdapter(object : (FeedbackTypeMainReasonDisplay) -> Unit {
+            override fun invoke(reason: FeedbackTypeMainReasonDisplay) {
+                Timber.i("Clicked reason: $reason")
+                listener?.userSelectedNegativeFeedbackMainReason(reason.mainReason)
+            }
+        })
+
+        return rootView
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        activity?.let {
+            recyclerView.layoutManager = LinearLayoutManager(it)
+            recyclerView.adapter = recyclerAdapter
+            recyclerView.addItemDecoration(FeedbackItemDecoration(ContextCompat.getDrawable(it, R.drawable.feedback_list_divider)!!))
+
+            val listValues = getMainReasonsDisplayText()
+            Timber.i("There are ${listValues.size} subReasons to show")
+            recyclerAdapter.submitList(listValues)
+        }
+    }
+
+
+    private fun getMainReasonsDisplayText(): List<FeedbackTypeMainReasonDisplay> {
+        return FeedbackType.MainReason.values().mapNotNull {
+            FeedbackTypeDisplay.mainReasons[it]
+        }
     }
 
     override fun configureViewModelObservers() {
-        viewModel.command.observe(this, Observer { command ->
-            when (command) {
-                is MainReasonNegativeFeedbackViewModel.Command.UserSelectedFeedbackType -> {
-                    listener?.userSelectedNegativeFeedbackMainReason(command.type)
-                }
-            }
-        })
-    }
 
-    override fun configureListeners() {
-        optionMissingFeatures.setOnClickListener { viewModel.userSelectedFeedbackType(MainReason.MISSING_BROWSING_FEATURES) }
-        optionWebsitesNotLoading.setOnClickListener { viewModel.userSelectedFeedbackType(MainReason.WEBSITES_NOT_LOADING) }
-        optionSearchNotGoodEnough.setOnClickListener { viewModel.userSelectedFeedbackType(MainReason.SEARCH_NOT_GOOD_ENOUGH) }
-        optionNotEnoughCustomizationOptions.setOnClickListener { viewModel.userSelectedFeedbackType(MainReason.NOT_ENOUGH_CUSTOMIZATIONS) }
-        optionAppIsSlowOrBuggy.setOnClickListener { viewModel.userSelectedFeedbackType(MainReason.APP_IS_SLOW_OR_BUGGY) }
-        optionNoneOfThese.setOnClickListener { viewModel.userSelectedFeedbackType(MainReason.OTHER) }
     }
 
     companion object {
 
         fun instance(): MainReasonNegativeFeedbackFragment {
-            val fragment = MainReasonNegativeFeedbackFragment()
-            return fragment
+            return MainReasonNegativeFeedbackFragment()
         }
     }
 }

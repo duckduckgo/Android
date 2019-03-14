@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.feedback.ui.positive.initial
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.playstore.PlayStoreUtils
@@ -24,11 +23,6 @@ import timber.log.Timber
 
 
 class PositiveFeedbackLandingViewModel(val playStoreUtils: PlayStoreUtils) : ViewModel() {
-
-    val viewState: MutableLiveData<ViewState> = MutableLiveData()
-
-    private val currentViewState: ViewState
-        get() = viewState.value!!
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
@@ -47,15 +41,6 @@ class PositiveFeedbackLandingViewModel(val playStoreUtils: PlayStoreUtils) : Vie
         Timber.i("User is cancelling")
         command.value = Command.Exit
     }
-
-}
-
-sealed class FragmentState {
-
-}
-
-sealed class ViewState {
-
 }
 
 sealed class Command {

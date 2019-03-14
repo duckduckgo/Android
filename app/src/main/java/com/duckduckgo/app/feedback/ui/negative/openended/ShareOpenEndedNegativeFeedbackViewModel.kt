@@ -16,17 +16,11 @@
 
 package com.duckduckgo.app.feedback.ui.negative.openended
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
 
 
 class ShareOpenEndedNegativeFeedbackViewModel : ViewModel() {
-
-    val viewState: MutableLiveData<ViewState> = MutableLiveData()
-
-    private val currentViewState: ViewState
-        get() = viewState.value!!
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
@@ -36,10 +30,6 @@ class ShareOpenEndedNegativeFeedbackViewModel : ViewModel() {
         } else {
             command.value = Command.ExitAndSubmitNegativeFeedback(feedback)
         }
-    }
-
-    sealed class ViewState {
-
     }
 
     sealed class Command {

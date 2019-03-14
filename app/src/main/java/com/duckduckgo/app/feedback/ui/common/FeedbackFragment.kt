@@ -28,8 +28,6 @@ import javax.inject.Inject
 
 abstract class FeedbackFragment : Fragment() {
 
-    abstract val fragmentTag: String
-
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 

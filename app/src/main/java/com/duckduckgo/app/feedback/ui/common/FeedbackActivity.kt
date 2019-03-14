@@ -129,11 +129,12 @@ class FeedbackActivity : DuckDuckGoActivity(),
     }
 
     private fun updateFragment(fragment: FeedbackFragment, direction: NavigationDirection) {
-        if (supportFragmentManager.findFragmentByTag(fragment.fragmentTag) != null) return
+        val tag = fragment.javaClass.name
+        if (supportFragmentManager.findFragmentByTag(tag) != null) return
 
         supportFragmentManager.transaction {
             this.applyTransition(direction)
-            replace(R.id.fragmentContainer, fragment, fragment.fragmentTag)
+            replace(R.id.fragmentContainer, fragment, fragment.tag)
         }
     }
 

@@ -28,8 +28,6 @@ import kotlinx.android.synthetic.main.content_feedback_negative_broken_site_feed
 
 class BrokenSiteNegativeFeedbackFragment : FeedbackFragment() {
 
-    override val fragmentTag: String = "Open ended negative feedback"
-
     interface BrokenSiteFeedbackListener {
         fun onProvidedBrokenSiteFeedback(feedback: String, url: String?)
         fun userCancelled()

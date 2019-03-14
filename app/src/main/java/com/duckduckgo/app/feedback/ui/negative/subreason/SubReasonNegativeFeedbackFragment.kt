@@ -21,7 +21,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
@@ -38,8 +37,6 @@ import timber.log.Timber
 
 class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
 
-    override val fragmentTag: String = "Disambiguation negative subreason feedback"
-
     private lateinit var recyclerAdapter: SubReasonAdapter
 
     interface DisambiguationNegativeFeedbackListener {
@@ -48,8 +45,6 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
         fun userSelectedSubReasonNeedMoreCustomization(mainReason: MainReason, subReason: FeedbackType.CustomizationSubReasons)
         fun userSelectedSubReasonAppIsSlowOrBuggy(mainReason: MainReason, subReason: FeedbackType.PerformanceSubReasons)
     }
-
-    private val viewModel by bindViewModel<SubReasonNegativeFeedbackViewModel>()
 
     private val listener: DisambiguationNegativeFeedbackListener?
         get() = activity as DisambiguationNegativeFeedbackListener
@@ -88,7 +83,7 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
         activity?.let {
             recyclerView.layoutManager = LinearLayoutManager(it)
             recyclerView.adapter = recyclerAdapter
-            recyclerView.addItemDecoration(FeedbackItemDecoration(ContextCompat.getDrawable(it, R.drawable.feedback_list_divider)))
+            recyclerView.addItemDecoration(FeedbackItemDecoration(ContextCompat.getDrawable(it, R.drawable.feedback_list_divider)!!))
 
 
             arguments?.let { args ->
@@ -140,11 +135,7 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
         }
     }
 
-    override fun configureViewModelObservers() {
-        viewModel.command.observe(this, Observer { command ->
-
-        })
-    }
+    override fun configureViewModelObservers() {}
 
     companion object {
 

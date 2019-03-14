@@ -31,9 +31,10 @@ class FeedbackViewModel : ViewModel() {
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
 
     init {
-        viewState.value = ViewState(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_FORWARDS))
+        //viewState.value = ViewState(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_FORWARDS))
         //viewState.value = ViewState(fragmentViewState = FragmentState.PositiveShareFeedback(NAVIGATION_FORWARDS))
         //viewState.value = ViewState(fragmentViewState = FragmentState.NegativeFeedbackMainReason(NAVIGATION_FORWARDS))
+        viewState.value = ViewState(fragmentViewState = FragmentState.NegativeFeedbackSubReason(NAVIGATION_FORWARDS, MainReason.MISSING_BROWSING_FEATURES))
     }
 
     private val currentViewState: ViewState
@@ -75,6 +76,9 @@ class FeedbackViewModel : ViewModel() {
                 viewState.value = currentViewState.copy(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_BACKWARDS))
             }
             is NegativeFeedbackSubReason -> {
+                viewState.value = currentViewState.copy(fragmentViewState = NegativeFeedbackMainReason(NAVIGATION_BACKWARDS))
+            }
+            is NegativeWebSitesBrokenFeedback -> {
                 viewState.value = currentViewState.copy(fragmentViewState = NegativeFeedbackMainReason(NAVIGATION_BACKWARDS))
             }
             is NegativeOpenEndedFeedback -> {

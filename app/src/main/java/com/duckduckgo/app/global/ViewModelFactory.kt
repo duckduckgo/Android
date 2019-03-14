@@ -35,9 +35,7 @@ import com.duckduckgo.app.feedback.ui.SurveyViewModel
 import com.duckduckgo.app.feedback.ui.common.FeedbackViewModel
 import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragmentViewModel
 import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeedbackViewModel
-import com.duckduckgo.app.feedback.ui.negative.mainreason.MainReasonNegativeFeedbackViewModel
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel
-import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedbackViewModel
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingViewModel
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.db.AppConfigurationDao
@@ -123,8 +121,6 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(InitialFeedbackFragmentViewModel::class.java) -> InitialFeedbackFragmentViewModel()
                 isAssignableFrom(PositiveFeedbackLandingViewModel::class.java) -> PositiveFeedbackLandingViewModel(playStoreUtils)
                 isAssignableFrom(ShareOpenEndedNegativeFeedbackViewModel::class.java) -> ShareOpenEndedNegativeFeedbackViewModel()
-                isAssignableFrom(MainReasonNegativeFeedbackViewModel::class.java) -> MainReasonNegativeFeedbackViewModel()
-                isAssignableFrom(SubReasonNegativeFeedbackViewModel::class.java) -> SubReasonNegativeFeedbackViewModel()
                 isAssignableFrom(BrokenSiteNegativeFeedbackViewModel::class.java) -> BrokenSiteNegativeFeedbackViewModel()
 
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")

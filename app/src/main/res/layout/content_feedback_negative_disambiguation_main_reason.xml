@@ -64,136 +64,27 @@
             app:layout_constraintTop_toBottomOf="@id/title"
             app:layout_constraintWidth_percent="0.66" />
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
+        <View
+            style="@style/FeedbackListSeparator"
+            app:layout_constraintBottom_toTopOf="@id/recyclerView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
             android:layout_marginTop="34dp"
+            app:layout_constraintTop_toBottomOf="@id/subtitle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_height="wrap_content" />
+
+        <View
+            style="@style/FeedbackListSeparator"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/subtitle">
-
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/whiteSix" />
-
-            <TextView
-                android:id="@+id/optionMissingFeatures"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/whiteFive"
-                android:foreground="?attr/selectableItemBackground"
-                android:paddingStart="22dp"
-                android:paddingEnd="22dp"
-                android:gravity="center_vertical"
-                android:minHeight="50dp"
-                android:text="@string/missingBrowserFeaturesTitleLong"
-                android:textColor="@color/greyishBrownTwo"
-                android:textSize="14sp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_marginStart="22dp"
-                android:layout_height="1dp"
-                android:background="@color/whiteSix" />
-
-            <TextView
-                android:id="@+id/optionWebsitesNotLoading"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/whiteFive"
-                android:gravity="center_vertical"
-                android:minHeight="50dp"
-                android:paddingStart="22dp"
-                android:paddingEnd="22dp"
-                android:text="@string/websiteNotLoadingTitleLong"
-                android:textColor="@color/greyishBrownTwo"
-                android:textSize="14sp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginStart="22dp"
-                android:background="@color/whiteSix" />
-
-            <TextView
-                android:id="@+id/optionSearchNotGoodEnough"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/whiteFive"
-                android:gravity="center_vertical"
-                android:minHeight="50dp"
-                android:paddingStart="22dp"
-                android:paddingEnd="22dp"
-                android:text="@string/searchNotGoodEnoughTitleLong"
-                android:textColor="@color/greyishBrownTwo"
-                android:textSize="14sp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginStart="22dp"
-                android:background="@color/whiteSix" />
-
-            <TextView
-                android:id="@+id/optionNotEnoughCustomizationOptions"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/whiteFive"
-                android:gravity="center_vertical"
-                android:minHeight="50dp"
-                android:paddingStart="22dp"
-                android:paddingEnd="22dp"
-                android:text="@string/needMoreCustomizationTitleLong"
-                android:textColor="@color/greyishBrownTwo"
-                android:textSize="14sp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginStart="22dp"
-                android:background="@color/whiteSix" />
-
-            <TextView
-                android:id="@+id/optionAppIsSlowOrBuggy"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/whiteFive"
-                android:gravity="center_vertical"
-                android:minHeight="50dp"
-                android:paddingStart="22dp"
-                android:paddingEnd="22dp"
-                android:text="@string/appIsSlowOrBuggyTitleLong"
-                android:textColor="@color/greyishBrownTwo"
-                android:textSize="14sp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginStart="22dp"
-                android:background="@color/whiteSix" />
-
-            <TextView
-                android:id="@+id/optionNoneOfThese"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/whiteFive"
-                android:gravity="center_vertical"
-                android:minHeight="50dp"
-                android:paddingStart="22dp"
-                android:paddingEnd="22dp"
-                android:text="@string/otherMainReasonTitleLong"
-                android:textColor="@color/greyishBrownTwo"
-                android:textSize="14sp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/whiteSix" />
-
-        </LinearLayout>
+            app:layout_constraintTop_toBottomOf="@id/recyclerView" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

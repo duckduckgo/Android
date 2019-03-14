@@ -30,8 +30,6 @@ import timber.log.Timber
 
 class InitialFeedbackFragment : FeedbackFragment() {
 
-    override val fragmentTag: String = "Initial feedback"
-
     interface InitialFeedbackListener {
         fun userSelectedPositiveFeedback()
         fun userSelectedNegativeFeedback()
@@ -65,8 +63,7 @@ class InitialFeedbackFragment : FeedbackFragment() {
 
     companion object {
         fun instance(): InitialFeedbackFragment {
-            val fragment = InitialFeedbackFragment()
-            return fragment
+            return InitialFeedbackFragment()
         }
     }
 }

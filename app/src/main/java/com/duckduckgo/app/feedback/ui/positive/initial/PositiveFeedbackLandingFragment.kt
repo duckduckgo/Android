@@ -31,8 +31,6 @@ import javax.inject.Inject
 
 class PositiveFeedbackLandingFragment : FeedbackFragment() {
 
-    override val fragmentTag: String = "Positive feedback landing"
-
     interface PositiveFeedbackLandingListener {
         fun userSelectedToRateApp()
         fun userSelectedToGiveFeedback()
@@ -82,8 +80,7 @@ class PositiveFeedbackLandingFragment : FeedbackFragment() {
 
     companion object {
         fun instance(): PositiveFeedbackLandingFragment {
-            val fragment = PositiveFeedbackLandingFragment()
-            return fragment
+            return PositiveFeedbackLandingFragment()
         }
     }
 }

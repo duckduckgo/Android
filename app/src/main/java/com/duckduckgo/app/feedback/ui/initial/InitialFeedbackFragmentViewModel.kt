@@ -19,7 +19,6 @@ package com.duckduckgo.app.feedback.ui.initial
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.feedback.ui.common.ViewState
-import timber.log.Timber
 
 class InitialFeedbackFragmentViewModel : ViewModel() {
 
@@ -27,12 +26,10 @@ class InitialFeedbackFragmentViewModel : ViewModel() {
     val command: MutableLiveData<Command> = MutableLiveData()
 
     fun onPositiveFeedback() {
-        Timber.i("User is giving positive feedback")
         command.value = Command.PositiveFeedbackSelected
     }
 
     fun onNegativeFeedback() {
-        Timber.i("User is giving negative feedback")
         command.value = Command.NegativeFeedbackSelected
     }
 

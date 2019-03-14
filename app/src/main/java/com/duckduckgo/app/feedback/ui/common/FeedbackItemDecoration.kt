@@ -17,55 +17,31 @@
 package com.duckduckgo.app.feedback.ui.common
 
 import android.graphics.Canvas
-import android.graphics.Rect
 import android.graphics.drawable.Drawable
-import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.global.view.toPx
-import timber.log.Timber
 
-class FeedbackItemDecoration(private val divider: Drawable?) : RecyclerView.ItemDecoration() {
-
-    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
-
-//        val position = parent.getChildAdapterPosition(view)
-//
-//        Timber.i("Deciding item decoration for item at position $position, total items = ${parent.totalItemCount()}")
-//        if (isFirstItem(position) || isLastItem(position, parent)) {
-//            Timber.i("Dealing with first or last item")
-//        } else {
-//            Timber.i("Dealing with item in the list (not top nor bottom)")
-//            outRect.left = 22.toPx()
-//        }
-    }
+class FeedbackItemDecoration(private val divider: Drawable) : RecyclerView.ItemDecoration() {
 
     override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
-        if (divider == null) return
-
-        val count = parent.childCount
-        val width = parent.width
-
-
-        for (i in 0 until count) {
-
-            Timber.i("Deciding item decoration for item at position $i, total items = ${parent.totalItemCount()}")
+        val childCount = parent.childCount
+        for (i in 0 until childCount) {
             val child = parent.getChildAt(i)
+
+            //val extraPadding = getPaddingStart(i, parent)
             val params = child.layoutParams as RecyclerView.LayoutParams
-
-            val extraLeftSpace = if(shouldAddExtraPadding(i, parent)) 22.toPx() else 0
-
-            val dividerTop = child.bottom + params.bottomMargin
-            val dividerBottom = dividerTop + divider.intrinsicHeight
-            val dividerLeft = parent.paddingLeft
-            val dividerRight = width - parent.paddingRight
-
-            divider.setBounds(dividerLeft + extraLeftSpace, dividerTop, dividerRight, dividerBottom)
-            divider.draw(c)
+            val top = child.bottom + params.bottomMargin
+            drawDividerAlongBottom(parent, top, c)
         }
     }
 
-    private fun shouldAddExtraPadding(position:Int, parent: RecyclerView) : Boolean = isFirstItem(position)|| isLastItem(position, parent)
-    private fun isFirstItem(position: Int) = position == 0
-    private fun isLastItem(position: Int, parent: RecyclerView) = (position + 1) == parent.totalItemCount()
-    private fun RecyclerView.totalItemCount() = adapter?.itemCount
+    private fun drawDividerAlongBottom(parent: RecyclerView, childTop: Int, c: Canvas) {
+        val left = parent.paddingLeft + 22.toPx()
+        val right = parent.width - parent.paddingRight
+
+        val bottom = childTop + divider.intrinsicHeight
+
+        divider.setBounds(left, childTop, right, bottom)
+        divider.draw(c)
+    }
 }

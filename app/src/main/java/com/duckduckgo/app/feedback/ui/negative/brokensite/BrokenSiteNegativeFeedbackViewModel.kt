@@ -16,27 +16,16 @@
 
 package com.duckduckgo.app.feedback.ui.negative.brokensite
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
 
 
 class BrokenSiteNegativeFeedbackViewModel : ViewModel() {
 
-    val viewState: MutableLiveData<ViewState> = MutableLiveData()
-
-    private val currentViewState: ViewState
-        get() = viewState.value!!
-
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
-
 
     fun userSubmittingFeedback(feedback: String, brokenSite: String?) {
         command.value = Command.ExitAndSubmitFeedback(feedback, brokenSite)
-    }
-
-    sealed class ViewState {
-
     }
 
     sealed class Command {

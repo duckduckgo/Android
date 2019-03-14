@@ -66,6 +66,12 @@
             app:layout_constraintTop_toBottomOf="@id/title"
             app:layout_constraintWidth_percent="0.90" />
 
+        <View
+            style="@style/FeedbackListSeparator"
+            app:layout_constraintBottom_toTopOf="@id/recyclerView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
@@ -74,9 +80,14 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content" />
 
-        </androidx.recyclerview.widget.RecyclerView>
+        <View
+            style="@style/FeedbackListSeparator"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/recyclerView" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

@@ -33,8 +33,6 @@ import kotlinx.android.synthetic.main.content_feedback_negative_open_ended_feedb
 
 class ShareOpenEndedNegativeFeedbackFragment : FeedbackFragment() {
 
-    override val fragmentTag: String = "Open ended negative feedback"
-
     interface OpenEndedFeedbackListener {
         fun onProvidedNegativeOpenEndedFeedback(feedback: String)
         fun onProvidedPositiveOpenEndedFeedback(feedback: String)
