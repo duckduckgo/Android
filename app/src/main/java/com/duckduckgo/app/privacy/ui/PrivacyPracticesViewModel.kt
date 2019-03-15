@@ -20,9 +20,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.model.PrivacyPractices
-import com.duckduckgo.app.privacy.model.PrivacyPractices.*
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.*
-import com.duckduckgo.app.privacy.model.TermsOfService
 
 class PrivacyPracticesViewModel : ViewModel() {
 

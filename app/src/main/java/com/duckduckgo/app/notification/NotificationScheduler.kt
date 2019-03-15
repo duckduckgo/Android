@@ -32,9 +32,6 @@ import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NotificationDayOne
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NotificationDayThree
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATIONS_SHOWN
 import kotlinx.coroutines.CoroutineScope
@@ -48,8 +45,7 @@ import javax.inject.Inject
 class NotificationScheduler @Inject constructor(
     val dao: NotificationDao,
     val manager: NotificationManagerCompat,
-    val settingsDataStore: SettingsDataStore,
-    val variantManager: VariantManager
+    val settingsDataStore: SettingsDataStore
 ) {
 
     data class NotificationSpec(
@@ -76,16 +72,7 @@ class NotificationScheduler @Inject constructor(
 
     fun scheduleNextNotification(scope: CoroutineScope = GlobalScope) {
         WorkManager.getInstance().cancelAllWorkByTag(WORK_REQUEST_TAG)
-
-        val duration = when {
-            variantManager.getVariant().hasFeature(NotificationDayOne) -> 1
-            variantManager.getVariant().hasFeature(NotificationDayThree) -> 3
-            else -> {
-                Timber.v("Notifications not enabled for this variant")
-                return
-            }
-        }
-        scheduleClearDataNotification(duration.toLong(), TimeUnit.DAYS, scope)
+        scheduleClearDataNotification(SCHEDULE_AFTER_INACTIVE_DAYS, TimeUnit.DAYS, scope)
     }
 
     private fun scheduleClearDataNotification(duration: Long, unit: TimeUnit, scope: CoroutineScope) {
@@ -145,5 +132,6 @@ class NotificationScheduler @Inject constructor(
 
     companion object {
         const val WORK_REQUEST_TAG = "com.duckduckgo.notification.schedule"
+        const val SCHEDULE_AFTER_INACTIVE_DAYS = 3L
     }
 }

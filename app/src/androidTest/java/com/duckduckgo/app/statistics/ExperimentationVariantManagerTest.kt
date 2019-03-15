@@ -38,7 +38,7 @@ class ExperimentationVariantManagerTest {
         // mock randomizer always returns the first active variant
         whenever(mockRandomizer.random(any())).thenReturn(0)
 
-        testee = ExperimentationVariantManager(mockStore, mockWidgetCapabilities, mockRandomizer)
+        testee = ExperimentationVariantManager(mockStore, mockRandomizer)
     }
 
     @Test

@@ -20,10 +20,10 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.webkit.CookieManager
 import com.duckduckgo.app.browser.*
-import com.duckduckgo.app.browser.addToHome.AddToHomeCapabilityDetector
-import com.duckduckgo.app.browser.addToHome.AddToHomeSystemCapabilityDetector
-import com.duckduckgo.app.browser.defaultBrowsing.AndroidDefaultBrowserDetector
-import com.duckduckgo.app.browser.defaultBrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
+import com.duckduckgo.app.browser.defaultbrowsing.AndroidDefaultBrowserDetector
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager

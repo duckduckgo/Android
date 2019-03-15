@@ -17,8 +17,11 @@
 package com.duckduckgo.app.browser.rating.ui
 
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
+import android.view.KeyEvent
 import androidx.fragment.app.DialogFragment
+import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -29,8 +32,8 @@ abstract class EnjoymentDialog : DialogFragment() {
     @Inject
     lateinit var pixel: Pixel
 
-    val promptCount: Int
-        get() = arguments!![PROMPT_COUNT_BUNDLE_KEY] as Int
+    val promptCount: PromptCount
+        get() = PromptCount(arguments!![PROMPT_COUNT_BUNDLE_KEY] as Int)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,12 +46,28 @@ abstract class EnjoymentDialog : DialogFragment() {
     }
 
     fun firePixelWithPromptCount(name: Pixel.PixelName) {
-        val formattedPixelName = String.format(name.pixelName, promptCount)
+        val formattedPixelName = String.format(name.pixelName, promptCount.value)
         pixel.fire(formattedPixelName)
     }
 
     companion object {
         const val PROMPT_COUNT_BUNDLE_KEY = "PROMPT_COUNT"
+    }
+
+    inner class BackKeyListener(private val onBackPressed: () -> Unit) : DialogInterface.OnKeyListener {
+
+        override fun onKey(dialog: DialogInterface?, keyCode: Int, event: KeyEvent?): Boolean {
+            if (isBackKey(keyCode, event)) {
+                onBackPressed.invoke()
+                dialog?.dismiss()
+                return true
+            }
+            return false
+        }
+
+        private fun isBackKey(keyCode: Int, event: KeyEvent?): Boolean {
+            return (keyCode == KeyEvent.KEYCODE_BACK && event?.action == KeyEvent.ACTION_UP)
+        }
     }
 
 }

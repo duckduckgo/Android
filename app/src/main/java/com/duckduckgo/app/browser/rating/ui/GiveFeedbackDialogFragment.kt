@@ -29,7 +29,10 @@ class GiveFeedbackDialogFragment : EnjoymentDialog() {
     interface Listener {
         fun onUserSelectedToGiveFeedback(promptCount: PromptCount)
         fun onUserDeclinedToGiveFeedback(promptCount: PromptCount)
+        fun onUserCancelledGiveFeedbackDialog(promptCount: PromptCount)
     }
+
+    private lateinit var listener: Listener
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         firePixelWithPromptCount(APP_FEEDBACK_DIALOG_SHOWN)
@@ -39,24 +42,26 @@ class GiveFeedbackDialogFragment : EnjoymentDialog() {
             .setMessage(R.string.giveFeedbackDialogMessage)
             .setPositiveButton(R.string.giveFeedbackDialogPositiveButton) { _, _ ->
                 firePixelWithPromptCount(APP_FEEDBACK_DIALOG_USER_GAVE_FEEDBACK)
-                listener?.onUserSelectedToGiveFeedback(PromptCount(promptCount))
+                listener.onUserSelectedToGiveFeedback(promptCount)
             }
             .setNegativeButton(R.string.giveFeedbackDialogNegativeButton) { _, _ ->
                 firePixelWithPromptCount(APP_FEEDBACK_DIALOG_USER_DECLINED_FEEDBACK)
-                listener?.onUserDeclinedToGiveFeedback(PromptCount(promptCount))
+                listener.onUserDeclinedToGiveFeedback(promptCount)
             }
+            .setOnKeyListener(BackKeyListener {
+                firePixelWithPromptCount(APP_FEEDBACK_DIALOG_USER_CANCELLED)
+                listener.onUserCancelledGiveFeedbackDialog(promptCount)
+            })
             .create()
     }
 
-    private val listener: Listener?
-        get() = activity as Listener
-
     companion object {
-        fun create(promptCount: PromptCount): GiveFeedbackDialogFragment {
+        fun create(promptCount: PromptCount, listener: Listener): GiveFeedbackDialogFragment {
             return GiveFeedbackDialogFragment().also { fragment ->
                 val bundle = Bundle()
                 bundle.putInt(PROMPT_COUNT_BUNDLE_KEY, promptCount.value)
                 fragment.arguments = bundle
+                fragment.listener = listener
             }
         }
     }

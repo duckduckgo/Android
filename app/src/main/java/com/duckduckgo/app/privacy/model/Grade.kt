@@ -65,15 +65,19 @@ class Grade {
         val siteHttpsScore: Int
         val enhancedHttpsScore: Int
 
-        if (httpsAutoUpgrade) {
-            siteHttpsScore = 0
-            enhancedHttpsScore = 0
-        } else if (https) {
-            siteHttpsScore = 3
-            enhancedHttpsScore = 0
-        } else {
-            siteHttpsScore = 10
-            enhancedHttpsScore = 10
+        when {
+            httpsAutoUpgrade -> {
+                siteHttpsScore = 0
+                enhancedHttpsScore = 0
+            }
+            https -> {
+                siteHttpsScore = 3
+                enhancedHttpsScore = 0
+            }
+            else -> {
+                siteHttpsScore = 10
+                enhancedHttpsScore = 10
+            }
         }
 
         // PRIVACY

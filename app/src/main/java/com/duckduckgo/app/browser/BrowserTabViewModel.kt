@@ -41,7 +41,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.BrowserWebViewClient.BrowserNavigationOptions
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
-import com.duckduckgo.app.browser.addToHome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -96,6 +96,7 @@ class BrowserTabViewModel(
 ) : WebViewClientListener, SaveBookmarkListener, CoroutineScope, ViewModel() {
 
     private val job = SupervisorJob()
+
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
 
@@ -182,7 +183,6 @@ class BrowserTabViewModel(
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
     val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
-    val url: SingleLiveEvent<String> = SingleLiveEvent()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     @VisibleForTesting
@@ -192,6 +192,11 @@ class BrowserTabViewModel(
             appConfigurationDownloaded = it.appConfigurationDownloaded
         }
     }
+
+    override val url: String?
+        get() = site?.url
+
+    private var pendingUrl: String? = null
 
     private var appConfigurationDownloaded = false
     private val appConfigurationObservable = appConfigurationDao.appConfigurationStatus()
@@ -218,7 +223,7 @@ class BrowserTabViewModel(
     }
 
     fun onViewReady() {
-        site?.url?.let {
+        url?.let {
             onUserSubmittedQuery(it)
         }
     }
@@ -252,7 +257,7 @@ class BrowserTabViewModel(
     }
 
     fun onViewVisible() {
-        command.value = if (url.value == null) ShowKeyboard else Command.HideKeyboard
+        command.value = if (url == null) ShowKeyboard else Command.HideKeyboard
         ctaViewModel.refreshCta()
     }
 
@@ -272,7 +277,7 @@ class BrowserTabViewModel(
         if (type is IntentType) {
             externalAppLinkClicked(type)
         } else {
-            url.value = queryUrlConverter.convertQueryToUrl(trimmedInput)
+            command.value = Navigate(queryUrlConverter.convertQueryToUrl(trimmedInput))
         }
 
         globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
@@ -282,11 +287,16 @@ class BrowserTabViewModel(
         autoCompleteViewState.value = AutoCompleteViewState(false)
     }
 
-    override fun progressChanged(newProgress: Int) {
+    override fun progressChanged(progressedUrl: String?, newProgress: Int) {
         Timber.v("Loading in progress $newProgress")
-
         val progress = currentLoadingViewState()
         loadingViewState.value = progress.copy(progress = newProgress)
+
+        if (progressedUrl == pendingUrl) {
+            // We change the url here rather than loadingStarted to protect against phishing
+            // See https://github.com/duckduckgo/Android/pull/390
+            urlChanged(pendingUrl)
+        }
     }
 
     override fun goFullScreen(view: View) {
@@ -301,10 +311,11 @@ class BrowserTabViewModel(
         browserViewState.value = currentState.copy(isFullScreen = false)
     }
 
-    override fun loadingStarted() {
+    override fun loadingStarted(url: String?) {
         Timber.v("Loading started")
         val progress = currentLoadingViewState()
         loadingViewState.value = progress.copy(isLoading = true)
+        pendingUrl = url
         site = null
         onSiteChanged()
     }
@@ -319,6 +330,10 @@ class BrowserTabViewModel(
     override fun loadingFinished(url: String?) {
         Timber.v("Loading finished")
 
+        if (pendingUrl != null) {
+            urlChanged(url)
+        }
+
         val currentOmnibarViewState = currentOmnibarViewState()
         val currentLoadingViewState = currentLoadingViewState()
 
@@ -331,7 +346,7 @@ class BrowserTabViewModel(
     }
 
     private fun registerSiteVisit() {
-        val domainVisited = url.value?.toUri()?.host ?: return
+        val domainVisited = url?.toUri()?.host ?: return
         Schedulers.io().scheduleDirect {
             networkLeaderboardDao.insert(SiteVisitedEntity(domainVisited))
         }
@@ -357,7 +372,7 @@ class BrowserTabViewModel(
         command.postValue(SendSms(telephoneNumber))
     }
 
-    override fun urlChanged(url: String?) {
+    private fun urlChanged(url: String?) {
         Timber.v("Url changed: $url")
 
         if (url == null) {
@@ -391,11 +406,9 @@ class BrowserTabViewModel(
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             statisticsUpdater.refreshRetentionAtb()
         }
-
-        if (currentUrl() != url) {
-            site = siteFactory.build(url)
-            onSiteChanged()
-        }
+        pendingUrl = null
+        site = siteFactory.build(url)
+        onSiteChanged()
     }
 
     private fun omnibarTextForUrl(url: String): String {
@@ -406,7 +419,7 @@ class BrowserTabViewModel(
     }
 
     override fun trackerDetected(event: TrackingEvent) {
-        if (event.documentUrl == site?.url) {
+        if (event.documentUrl == url) {
             site?.trackerDetected(event)
             onSiteChanged()
         }
@@ -423,7 +436,7 @@ class BrowserTabViewModel(
     }
 
     override fun pageHasHttpResources(page: String?) {
-        if (page == site?.url) {
+        if (page == url) {
             site?.hasHttpResources = true
             onSiteChanged()
         }
@@ -488,7 +501,7 @@ class BrowserTabViewModel(
     }
 
     fun onBrokenSiteSelected() {
-        command.value = BrokenSiteFeedback(site?.url)
+        command.value = BrokenSiteFeedback(url)
     }
 
     fun onUserSelectedToEditQuery(query: String) {
@@ -587,13 +600,9 @@ class BrowserTabViewModel(
         }
     }
 
-    override fun currentUrl(): String? {
-        return site?.url
-    }
-
     fun resetView() {
+        pendingUrl = null
         site = null
-        url.value = null
         onSiteChanged()
         initializeViewStates()
     }
