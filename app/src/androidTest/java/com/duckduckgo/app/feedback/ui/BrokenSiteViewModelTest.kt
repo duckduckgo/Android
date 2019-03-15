@@ -3,10 +3,9 @@ package com.duckduckgo.app.feedback.ui
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.brokensite.BrokenSiteViewModel
+import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
 import com.duckduckgo.app.feedback.api.FeedbackSender
-import com.duckduckgo.app.feedback.ui.common.FeedbackViewModel
-import com.duckduckgo.app.feedback.ui.common.FeedbackViewModel.Command
-import com.duckduckgo.app.feedback.ui.positive.initial.Command
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
@@ -19,7 +18,7 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
-class FeedbackViewModelTest {
+class BrokenSiteViewModelTest {
 
     @get:Rule
     @Suppress("unused")
@@ -33,17 +32,17 @@ class FeedbackViewModelTest {
     private lateinit var mockFeedbackSender: FeedbackSender
 
     @Mock
-    private lateinit var mockCommandObserver: Observer<FeedbackViewModel.Command>
+    private lateinit var mockCommandObserver: Observer<BrokenSiteViewModel.Command>
 
-    private lateinit var testee: FeedbackViewModel
+    private lateinit var testee: BrokenSiteViewModel
 
-    private val viewState: FeedbackViewModel.ViewState
+    private val viewState: BrokenSiteViewModel.ViewState
         get() = testee.viewState.value!!
 
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        testee = com.duckduckgo.app.brokensite.FeedbackViewModel(mockFeedbackSender)
+        testee = com.duckduckgo.app.brokensite.BrokenSiteViewModel(mockFeedbackSender)
         testee.command.observeForever(mockCommandObserver)
     }
 

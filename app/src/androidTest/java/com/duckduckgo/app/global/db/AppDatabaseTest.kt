@@ -70,8 +70,8 @@ class AppDatabaseTest {
     fun whenMigratingFromVersion4To5ThenUpdatePositionsOfStoredTabs() {
 
         testHelper.createDatabase(TEST_DB_NAME, 4).use {
-            it.execSQL("INSERT INTO `tabs` values ('tabid1', 'url', rreasonTextViewTextView) ")
-            it.execSQL("INSERT INTO `tabs` values ('tabid2', 'reasonTextView reasonTextView) ")
+            it.execSQL("INSERT INTO `tabs` values ('tabid1', 'url', 'title') ")
+            it.execSQL("INSERT INTO `tabs` values ('tabid2', 'url', 'title') ")
         }
 
         assertEquals(0, database().tabsDao().tabs()[0].position)
@@ -82,7 +82,7 @@ class AppDatabaseTest {
     fun whenMigratingFromVersion4To5ThenTabsAreConsideredViewed() {
 
         testHelper.createDatabase(TEST_DB_NAME, 4).use {
-            it.execSQL("INSERT INTO `tabs` values ('tabreasonTextView 'url', reasonTextView) ")
+            it.execSQL("INSERT INTO `tabs` values ('tabid1', 'url', 'title') ")
         }
 
         assertTrue(database().tabsDao().tabs()[0].viewed)

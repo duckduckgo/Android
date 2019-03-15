@@ -99,7 +99,7 @@ abstract class AppDatabase : RoomDatabase() {
     companion object {
         val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("CREATE TABLE `tabs` (`tabId` TEXT NOT NULL, `url` TEXT, `reasonTextView` TEXT, PRIMARY KEY(`tabId`))")
+                database.execSQL("CREATE TABLE `tabs` (`tabId` TEXT NOT NULL, `url` TEXT, `title` TEXT, PRIMARY KEY(`tabId`))")
                 database.execSQL("CREATE INDEX `index_tabs_tabId` on `tabs` (tabId)")
                 database.execSQL("CREATE TABLE `tab_selection` (`id` INTEGER NOT NULL, `tabId` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`tabId`) REFERENCES `tabs`(`tabId`) ON UPDATE NO ACTION ON DELETE SET NULL)")
                 database.execSQL("CREATE INDEX `index_tab_selection_tabId` on `tab_selection` (tabId)")
