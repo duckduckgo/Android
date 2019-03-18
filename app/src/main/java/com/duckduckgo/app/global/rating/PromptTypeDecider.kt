@@ -62,7 +62,7 @@ class InitialPromptTypeDecider(
     }
 
     private fun isPlayStoreInstalled(): Boolean {
-        if (!playStoreUtils.isPlayStoreInstalled(context)) {
+        if (!playStoreUtils.isPlayStoreInstalled()) {
             Timber.i("Play Store is not installed; cannot show ratings app enjoyment prompts")
             return false
         }
@@ -70,7 +70,7 @@ class InitialPromptTypeDecider(
     }
 
     private fun wasInstalledThroughPlayStore(): Boolean {
-        if (!playStoreUtils.installedFromPlayStore(context)) {
+        if (!playStoreUtils.installedFromPlayStore()) {
             Timber.i("DuckDuckGo was not installed from Play Store")
 
             return if (BuildConfig.DEBUG) {

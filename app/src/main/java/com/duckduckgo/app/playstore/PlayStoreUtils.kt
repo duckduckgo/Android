@@ -25,14 +25,14 @@ import timber.log.Timber
 
 interface PlayStoreUtils {
 
-    fun installedFromPlayStore(context: Context): Boolean
-    fun launchPlayStore(context: Context)
-    fun isPlayStoreInstalled(context: Context): Boolean
+    fun installedFromPlayStore(): Boolean
+    fun launchPlayStore()
+    fun isPlayStoreInstalled(): Boolean
 }
 
-class PlayStoreAndroidUtils : PlayStoreUtils {
+class PlayStoreAndroidUtils(val context: Context) : PlayStoreUtils {
 
-    override fun installedFromPlayStore(context: Context): Boolean {
+    override fun installedFromPlayStore(): Boolean {
         return try {
             val installSource = context.packageManager.getInstallerPackageName(DDG_APP_PACKAGE)
             return matchesPlayStoreInstallSource(installSource)
@@ -47,7 +47,7 @@ class PlayStoreAndroidUtils : PlayStoreUtils {
         return installSource == PLAY_STORE_PACKAGE
     }
 
-    override fun isPlayStoreInstalled(context: Context): Boolean {
+    override fun isPlayStoreInstalled(): Boolean {
         return try {
 
             if (!isPlayStoreActivityResolvable(context)) {
@@ -55,7 +55,7 @@ class PlayStoreAndroidUtils : PlayStoreUtils {
                 return false
             }
 
-            val isAppEnabled = isPlayStoreAppEnabled(context)
+            val isAppEnabled = isPlayStoreAppEnabled()
             Timber.i("The Play Store app is installed " + if (isAppEnabled) "and enabled" else "but disabled")
             return isAppEnabled
 
@@ -65,7 +65,7 @@ class PlayStoreAndroidUtils : PlayStoreUtils {
         }
     }
 
-    private fun isPlayStoreAppEnabled(context: Context): Boolean {
+    private fun isPlayStoreAppEnabled(): Boolean {
         context.packageManager.getPackageInfo(PLAY_STORE_PACKAGE, 0)
         val appInfo = context.packageManager.getApplicationInfo(PLAY_STORE_PACKAGE, 0)
         return appInfo.enabled
@@ -82,7 +82,7 @@ class PlayStoreAndroidUtils : PlayStoreUtils {
         }
     }
 
-    override fun launchPlayStore(context: Context) {
+    override fun launchPlayStore() {
         val intent = playStoreIntent()
         try {
             context.startActivity(intent)

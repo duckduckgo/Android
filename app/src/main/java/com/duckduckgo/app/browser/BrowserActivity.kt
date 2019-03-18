@@ -363,7 +363,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun launchPlayStore() {
-        playStoreUtils.launchPlayStore(this)
+        playStoreUtils.launchPlayStore()
     }
 
     private data class CombinedInstanceState(val originalInstanceState: Bundle?, val newInstanceState: Bundle?)

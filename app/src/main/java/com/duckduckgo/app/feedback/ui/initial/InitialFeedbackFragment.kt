@@ -24,10 +24,16 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
 import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragmentViewModel.Command.*
+import com.duckduckgo.app.global.DuckDuckGoTheme
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import kotlinx.android.synthetic.main.content_feedback.*
+import javax.inject.Inject
 
 
 class InitialFeedbackFragment : FeedbackFragment() {
+
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
 
     interface InitialFeedbackListener {
         fun userSelectedPositiveFeedback()
@@ -42,6 +48,18 @@ class InitialFeedbackFragment : FeedbackFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.content_feedback, container, false)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        if (settingsDataStore.theme == DuckDuckGoTheme.LIGHT) {
+            positiveFeedbackButton.setImageResource(R.drawable.ic_positive_feedback_button)
+            negativeFeedbackButton.setImageResource(R.drawable.ic_negative_feedback_button)
+        } else {
+            positiveFeedbackButton.setImageResource(R.drawable.ic_positive_feedback_button_dark)
+            negativeFeedbackButton.setImageResource(R.drawable.ic_negative_feedback_button_dark)
+        }
     }
 
     override fun configureViewModelObservers() {

@@ -74,8 +74,7 @@ class PositiveFeedbackLandingFragment : FeedbackFragment() {
     }
 
     private fun launchPlayStore() {
-        val context = activity ?: return
-        playStoreUtils.launchPlayStore(context)
+        playStoreUtils.launchPlayStore()
     }
 
     companion object {

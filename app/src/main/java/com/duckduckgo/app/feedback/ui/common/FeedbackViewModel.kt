@@ -18,15 +18,17 @@ package com.duckduckgo.app.feedback.ui.common
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.feedback.ui.common.FragmentState.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.playstore.PlayStoreUtils
 import timber.log.Timber
 
 
-class FeedbackViewModel : ViewModel() {
+class FeedbackViewModel(val playStoreUtils: PlayStoreUtils) : ViewModel() {
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
 
@@ -67,7 +69,11 @@ class FeedbackViewModel : ViewModel() {
                 viewState.value = currentViewState.copy(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_BACKWARDS))
             }
             is PositiveShareFeedback -> {
-                viewState.value = currentViewState.copy(fragmentViewState = PositiveFeedbackStep1(NAVIGATION_BACKWARDS))
+                if (canShowRatingsButton()) {
+                    viewState.value = currentViewState.copy(fragmentViewState = PositiveFeedbackStep1(NAVIGATION_BACKWARDS))
+                } else {
+                    viewState.value = currentViewState.copy(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_BACKWARDS))
+                }
             }
             is NegativeFeedbackMainReason -> {
                 viewState.value = currentViewState.copy(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_BACKWARDS))
@@ -96,10 +102,36 @@ class FeedbackViewModel : ViewModel() {
     }
 
     fun userSelectedPositiveFeedback() {
-        viewState.value = currentViewState.copy(
-            fragmentViewState = PositiveFeedbackStep1(NAVIGATION_FORWARDS),
-            previousViewState = currentViewState.fragmentViewState
-        )
+        viewState.value = if (canShowRatingsButton()) {
+            currentViewState.copy(
+                fragmentViewState = PositiveFeedbackStep1(NAVIGATION_FORWARDS),
+                previousViewState = currentViewState.fragmentViewState
+            )
+        } else {
+            currentViewState.copy(
+                fragmentViewState = PositiveShareFeedback(NAVIGATION_FORWARDS),
+                previousViewState = currentViewState.fragmentViewState
+            )
+        }
+    }
+
+    private fun canShowRatingsButton(): Boolean {
+        val playStoreInstalled = playStoreUtils.isPlayStoreInstalled()
+
+        if (!playStoreInstalled) {
+            Timber.i("Play Store not installed")
+            return false
+        }
+
+        if (playStoreUtils.installedFromPlayStore()) {
+            return true
+        }
+
+        if (BuildConfig.DEBUG) {
+            Timber.i("Not installed from the Play Store but it is DEBUG; will treat as if installed from Play Store")
+            return true
+        }
+        return false
     }
 
     fun userSelectedNegativeFeedback() {
