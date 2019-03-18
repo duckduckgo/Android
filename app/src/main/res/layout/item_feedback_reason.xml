@@ -29,14 +29,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/whiteFive"
+        android:background="?attr/feedbackListItemBackgroundColor"
         android:foreground="?attr/selectableItemBackground"
         android:paddingStart="22dp"
         android:paddingEnd="22dp"
         android:gravity="center_vertical"
-        android:minHeight="50dp"
+        android:minHeight="60dp"
         tools:text="Browser features are missing or frustrating"
-        android:textColor="@color/greyishBrownTwo"
+        android:textColor="?attr/normalTextColor"
         android:textSize="14sp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -22,6 +22,6 @@
         android:width="1dp"
         android:height="1dp" />
 
-    <solid android:color="@color/whiteSix" />
+    <solid android:color="?feedbackListItemSeparatorColor" />
 
 </shape>

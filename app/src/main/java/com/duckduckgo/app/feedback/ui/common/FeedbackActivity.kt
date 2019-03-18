@@ -29,7 +29,7 @@ import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragment
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.*
 import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.negative.mainreason.MainReasonNegativeFeedbackFragment
-import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackFragment
+import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedFeedbackFragment
 import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -40,7 +40,7 @@ import timber.log.Timber
 class FeedbackActivity : DuckDuckGoActivity(),
     InitialFeedbackFragment.InitialFeedbackListener,
     PositiveFeedbackLandingFragment.PositiveFeedbackLandingListener,
-    ShareOpenEndedNegativeFeedbackFragment.OpenEndedFeedbackListener,
+    ShareOpenEndedFeedbackFragment.OpenEndedFeedbackListener,
     MainReasonNegativeFeedbackFragment.MainReasonNegativeFeedbackListener,
     BrokenSiteNegativeFeedbackFragment.BrokenSiteFeedbackListener,
     SubReasonNegativeFeedbackFragment.DisambiguationNegativeFeedbackListener {
@@ -94,7 +94,7 @@ class FeedbackActivity : DuckDuckGoActivity(),
     }
 
     private fun showSharePositiveFeedbackView(direction: NavigationDirection) {
-        val fragment = ShareOpenEndedNegativeFeedbackFragment.instancePositiveFeedback()
+        val fragment = ShareOpenEndedFeedbackFragment.instancePositiveFeedback()
         updateFragment(fragment, direction)
     }
 
@@ -109,7 +109,7 @@ class FeedbackActivity : DuckDuckGoActivity(),
     }
 
     private fun showNegativeOpenEndedFeedbackView(direction: NavigationDirection, mainReason: MainReason, subReason: SubReason? = null) {
-        val fragment = ShareOpenEndedNegativeFeedbackFragment.instanceNegativeFeedback(mainReason, subReason)
+        val fragment = ShareOpenEndedFeedbackFragment.instanceNegativeFeedback(mainReason, subReason)
         updateFragment(fragment, direction)
     }
 
@@ -221,8 +221,7 @@ class FeedbackActivity : DuckDuckGoActivity(),
     companion object {
 
         fun intent(context: Context): Intent {
-            val intent = Intent(context, FeedbackActivity::class.java)
-            return intent
+            return Intent(context, FeedbackActivity::class.java)
         }
 
     }

@@ -28,10 +28,11 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.Companion.mainReasons
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.Companion.subReasons
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel.Command
-import kotlinx.android.synthetic.main.content_feedback_negative_open_ended_feedback.*
+import kotlinx.android.synthetic.main.content_feedback_open_ended_feedback.*
+import timber.log.Timber
 
 
-class ShareOpenEndedNegativeFeedbackFragment : FeedbackFragment() {
+class ShareOpenEndedFeedbackFragment : FeedbackFragment() {
 
     interface OpenEndedFeedbackListener {
         fun onProvidedNegativeOpenEndedFeedback(feedback: String)
@@ -47,7 +48,7 @@ class ShareOpenEndedNegativeFeedbackFragment : FeedbackFragment() {
     private var isPositiveFeedback: Boolean = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.content_feedback_negative_open_ended_feedback, container, false)
+        return inflater.inflate(R.layout.content_feedback_open_ended_feedback, container, false)
     }
 
     override fun configureViewModelObservers() {
@@ -81,6 +82,22 @@ class ShareOpenEndedNegativeFeedbackFragment : FeedbackFragment() {
                 updateDisplayForNegativeFeedback(args)
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        val inputState = openEndedFeedback.text.toString()
+        Timber.i("Saving view state - {$inputState}")
+        super.onSaveInstanceState(outState)
+        outState.putString("input", inputState)
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        Timber.i("restoring view state $savedInstanceState")
+
+        savedInstanceState?.getString("input")?.let {
+            openEndedFeedback.setText(it)
+        }
+        super.onViewStateRestored(savedInstanceState)
     }
 
     private fun updateDisplayForPositiveFeedback() {
@@ -128,8 +145,8 @@ class ShareOpenEndedNegativeFeedbackFragment : FeedbackFragment() {
         private const val SUB_REASON_EXTRA = "SUB_REASON_EXTRA"
         private const val IS_POSITIVE_FEEDBACK_EXTRA = "IS_POSITIVE_FEEDBACK_EXTRA"
 
-        fun instanceNegativeFeedback(mainReason: MainReason, subReason: SubReason?): ShareOpenEndedNegativeFeedbackFragment {
-            val fragment = ShareOpenEndedNegativeFeedbackFragment()
+        fun instanceNegativeFeedback(mainReason: MainReason, subReason: SubReason?): ShareOpenEndedFeedbackFragment {
+            val fragment = ShareOpenEndedFeedbackFragment()
             fragment.arguments = Bundle().also {
                 it.putBoolean(IS_POSITIVE_FEEDBACK_EXTRA, false)
 
@@ -142,8 +159,8 @@ class ShareOpenEndedNegativeFeedbackFragment : FeedbackFragment() {
             return fragment
         }
 
-        fun instancePositiveFeedback(): ShareOpenEndedNegativeFeedbackFragment {
-            val fragment = ShareOpenEndedNegativeFeedbackFragment()
+        fun instancePositiveFeedback(): ShareOpenEndedFeedbackFragment {
+            val fragment = ShareOpenEndedFeedbackFragment()
             fragment.arguments = Bundle().also {
                 it.putBoolean(IS_POSITIVE_FEEDBACK_EXTRA, true)
             }

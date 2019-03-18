@@ -30,7 +30,7 @@ import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragment
 import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.negative.mainreason.MainReasonNegativeFeedbackFragment
-import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackFragment
+import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedFeedbackFragment
 import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
 import com.duckduckgo.app.fire.FireActivity
@@ -147,7 +147,7 @@ abstract class AndroidBindingModule {
     abstract fun positiveFeedbackLandingFragment(): PositiveFeedbackLandingFragment
 
     @ContributesAndroidInjector
-    abstract fun shareOpenEndedPositiveFeedbackFragment(): ShareOpenEndedNegativeFeedbackFragment
+    abstract fun shareOpenEndedPositiveFeedbackFragment(): ShareOpenEndedFeedbackFragment
 
     @ContributesAndroidInjector
     abstract fun mainReasonNegativeFeedbackFragment(): MainReasonNegativeFeedbackFragment

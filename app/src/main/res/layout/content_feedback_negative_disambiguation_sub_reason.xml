@@ -38,13 +38,8 @@
 
         <TextView
             android:id="@+id/title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:fontFamily="sans-serif-medium"
-            android:textAlignment="center"
-            android:textColor="@color/almostBlackDark"
-            android:textSize="22sp"
+            style="@style/FeedbackTitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/emoticonImage"
@@ -53,18 +48,12 @@
 
         <TextView
             android:id="@+id/subtitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:fontFamily="sans-serif"
             tools:text="Which XXX feature can we improve or add?"
-            android:textAlignment="center"
-            android:textColor="@color/almostBlack"
-            android:textSize="15sp"
+            style="@style/FeedbackTitle.FeedbackSubtitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/title"
-            app:layout_constraintWidth_percent="0.90" />
+            app:layout_constraintTop_toBottomOf="@id/title" />
 
 
         <androidx.recyclerview.widget.RecyclerView

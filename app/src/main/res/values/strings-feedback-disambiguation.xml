@@ -83,6 +83,11 @@
     <string name="whichBrokenSites">Where are you seeing these issues?</string>
     <string name="whichBrokenSitesHint">Which website has issues?</string>
     <string name="feedbackSpecificAsPossible">Please be as specific as possible</string>
+    <string name="feedbackInitialDisambiguationTitle">Let\'s get started!</string>
+    <string name="feedbackInitialDisambiguationSubtitle">How would you categorize your feedback?</string>
+    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Positive feedback button</string>
+    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Negative feedback button</string>
+    <string name="feedbackIsImportantToUs">Your anonymous feedback is important to us</string>
 
 
 </resources>

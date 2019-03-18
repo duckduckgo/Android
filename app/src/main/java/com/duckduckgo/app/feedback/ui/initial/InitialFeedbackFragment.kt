@@ -25,7 +25,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
 import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragmentViewModel.Command.*
 import kotlinx.android.synthetic.main.content_feedback.*
-import timber.log.Timber
 
 
 class InitialFeedbackFragment : FeedbackFragment() {
@@ -42,7 +41,6 @@ class InitialFeedbackFragment : FeedbackFragment() {
         get() = activity as InitialFeedbackListener
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        Timber.i("onCreateView")
         return inflater.inflate(R.layout.content_feedback, container, false)
     }
 

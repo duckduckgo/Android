@@ -31,10 +31,7 @@ class FeedbackViewModel : ViewModel() {
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
 
     init {
-        //viewState.value = ViewState(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_FORWARDS))
-        //viewState.value = ViewState(fragmentViewState = FragmentState.PositiveShareFeedback(NAVIGATION_FORWARDS))
-        //viewState.value = ViewState(fragmentViewState = FragmentState.NegativeFeedbackMainReason(NAVIGATION_FORWARDS))
-        viewState.value = ViewState(fragmentViewState = FragmentState.NegativeFeedbackSubReason(NAVIGATION_FORWARDS, MainReason.MISSING_BROWSING_FEATURES))
+        viewState.value = ViewState(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_FORWARDS))
     }
 
     private val currentViewState: ViewState

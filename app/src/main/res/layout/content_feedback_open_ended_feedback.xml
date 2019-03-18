@@ -38,13 +38,8 @@
 
         <TextView
             android:id="@+id/title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:fontFamily="sans-serif-medium"
-            android:textAlignment="center"
-            android:textColor="@color/almostBlackDark"
-            android:textSize="22sp"
+            style="@style/FeedbackTitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/emoticonImage"
@@ -52,18 +47,12 @@
 
         <TextView
             android:id="@+id/subtitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            style="@style/FeedbackTitle.FeedbackSubtitle"
             android:layout_marginTop="5dp"
-            android:fontFamily="sans-serif"
             tools:text="Which feature can we improve or add?"
-            android:textAlignment="center"
-            android:textColor="@color/almostBlack"
-            android:textSize="15sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/title"
-            app:layout_constraintWidth_percent="0.66" />
+            app:layout_constraintTop_toBottomOf="@id/title" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/openEndedFeedbackContainer"
@@ -81,16 +70,8 @@
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/openEndedFeedback"
-                style="@style/Widget.MaterialComponents.TextInputEditText.FilledBox"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/white"
-                android:gravity="top"
-                android:imeOptions="flagNoExtractUi"
-                android:importantForAutofill="no"
-                android:inputType="textLongMessage|textMultiLine"
-                android:textColor="@color/greyishBrownTwo"
-                android:textSize="14sp" />
+                style="@style/FeedbackEditTextInputStyle"
+                android:gravity="top" />
 
         </com.google.android.material.textfield.TextInputLayout>
 

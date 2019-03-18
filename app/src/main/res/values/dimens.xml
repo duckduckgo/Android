@@ -32,7 +32,7 @@
     <dimen name="feedbackCardVerticalMargin">16dp</dimen>
     <dimen name="feedbackFormFieldsMargin">16dp</dimen>
     <dimen name="feedbackCardHorizontalMargin">16dp</dimen>
-    <dimen name="feedbackTitleMarginTop">65dp</dimen>
+    <dimen name="feedbackTitleMarginTop">30dp</dimen>
 
     <dimen name="settingsItemHorizontalPadding">20dp</dimen>
 

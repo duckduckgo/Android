@@ -71,8 +71,6 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
 
         configureUiEventHandlers()
         observeViewModel()
-
-        startActivityForResult(Intent(FeedbackActivity.intent(this)), FEEDBACK_RC)
     }
 
     override fun onStart() {

@@ -42,6 +42,7 @@
     <color name="almostBlackDark">#222222</color>
     <color name="almostBlack">#333333</color>
 
+    <color name="charcoalGrey">#383838</color>
     <color name="grayishBrown">#494949</color>
     <color name="greyishBrownTwo">#444444</color>
     <color name="midGray">#555</color>
@@ -59,6 +60,7 @@
     <color name="subtleGrayTwo">#d8d8d8</color>
     <color name="whiteSix">#e5e5e5</color>
     <color name="pinkish_grey_two">#c0c0c0</color>
+    <color name="veryLightGray">#eaeaea</color>
 
     <color name="orange">#de5833</color>
     <color name="brickOrange">#d03a10</color>
@@ -81,5 +83,6 @@
     <color name="portGore">#2f1f51</color>
 
     <color name="translucentDark">#b000</color>
+    <color name="nearlyBlack">#343434</color>
 
 </resources>

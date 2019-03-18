@@ -58,6 +58,12 @@
         <item name="buttonOutlinedBorderColor">@color/brownishGrayTwo</item>
         <item name="callToActionTitleColor">@color/white</item>
         <item name="callToActionSubtitleColor">@color/grayishThree</item>
+
+        <item name="feedbackAnonymousFeedbackLabelColor">@color/grayish</item>
+        <item name="feedbackListItemBackgroundColor">@color/almostBlack</item>
+        <item name="feedbackListItemSeparatorColor">@color/charcoalGrey</item>
+        <item name="feedbackEditTextBackgroundColor">@color/almostBlack</item>
+        <item name="feedbackEditTextHintColor">@color/grayish</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -106,6 +112,12 @@
         <item name="buttonOutlinedBorderColor">@color/grayishThree</item>
         <item name="callToActionTitleColor">@color/almostBlack</item>
         <item name="callToActionSubtitleColor">@color/brownishGrayTwo</item>
+
+        <item name="feedbackAnonymousFeedbackLabelColor">@color/warmerGray</item>
+        <item name="feedbackListItemBackgroundColor">@color/whiteFive</item>
+        <item name="feedbackListItemSeparatorColor">@color/whiteSix</item>
+        <item name="feedbackEditTextBackgroundColor">@color/whiteFive</item>
+        <item name="feedbackEditTextHintColor">@color/warmerGray</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">

@@ -37,48 +37,46 @@
 
         <TextView
             android:id="@+id/title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            style="@style/FeedbackTitle"
             android:layout_marginTop="12dp"
-            android:fontFamily="sans-serif-medium"
             android:text="@string/awesomeToHear"
-            android:textAlignment="center"
-            android:textColor="@color/almostBlackDark"
-            android:textSize="22sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/emoticonImage" />
 
         <TextView
             android:id="@+id/subtitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            style="@style/FeedbackTitle.FeedbackSubtitle"
             android:layout_marginTop="5dp"
-            android:fontFamily="sans-serif"
             android:text="@string/shareTheLoveWithARating"
-            android:textAlignment="center"
-            android:textColor="@color/almostBlack"
-            android:textSize="15sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/title"
-            app:layout_constraintWidth_percent="0.66" />
+            app:layout_constraintTop_toBottomOf="@id/title" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintGuide_percent="0.5"
+            app:layout_constraintTop_toBottomOf="@id/subtitle" />
 
         <Button
             android:id="@+id/rateAppButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="78dp"
             android:layout_marginEnd="20dp"
             android:background="@drawable/button_contained_bg"
             android:foreground="?attr/selectableItemBackground"
             android:text="@string/rateTheApp"
             android:textColor="@color/white"
             android:textSize="15sp"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/shareFeedbackButton"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/subtitle" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/guideline" />
 
 
         <Button
@@ -86,32 +84,32 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="18dp"
             android:layout_marginEnd="20dp"
+            android:layout_marginTop="18dp"
             android:background="@drawable/report_broken_site_button_outlined_bg"
             android:foreground="?attr/selectableItemBackground"
             android:text="@string/feedbackShareDetails"
             android:textColor="@color/cornflowerBlue"
             android:textSize="15sp"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/rateAppButton" />
-
 
         <Button
             android:id="@+id/cancelButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="18dp"
             android:layout_marginEnd="20dp"
             android:background="@null"
             android:text="@string/declineFurtherFeedback"
+            android:layout_marginTop="30dp"
             android:textColor="@color/cornflowerBlue"
             android:textSize="15sp"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/shareFeedbackButton" />
+            app:layout_constraintTop_toBottomOf="@id/shareFeedbackButton"
+            app:layout_constraintEnd_toEndOf="parent" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

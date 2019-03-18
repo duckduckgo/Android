@@ -80,6 +80,9 @@ android {
     androidExtensions {
         experimental = true
     }
+    kotlinOptions {
+        freeCompilerArgs = ["-XXLanguage:+InlineClasses"]
+    }
 }
 
 ext {
