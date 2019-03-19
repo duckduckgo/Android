@@ -33,7 +33,6 @@ class Grade {
         D,
         @Json(name = "D-")
         D_MINUS
-
     }
 
 
@@ -56,8 +55,8 @@ class Grade {
 
     val scores: Grade.Scores get() = calculate()
 
-    private var entitiesNotBlocked: MutableMap<String, Double> = mutableMapOf()
-    private var entitiesBlocked: MutableMap<String, Double> = mutableMapOf()
+    private var entitiesNotBlocked: Map<String, Double> = mapOf()
+    private var entitiesBlocked: Map<String, Double> = mapOf()
 
     private fun calculate(): Grade.Scores {
 
@@ -155,19 +154,17 @@ class Grade {
 
     fun addEntityNotBlocked(entity: String, prevalence: Double?) {
         prevalence ?: return
-        entitiesNotBlocked[entity] = prevalence
+        entitiesNotBlocked = entitiesNotBlocked + Pair(entity, prevalence)
     }
 
     fun addEntityBlocked(entity: String, prevalence: Double?) {
         prevalence ?: return
-        entitiesBlocked[entity] = prevalence
+        entitiesBlocked = entitiesBlocked + Pair(entity, prevalence)
     }
 
     companion object {
-
         const val UNKNOWN_PRIVACY_SCORE = 2
         const val MAX_PRIVACY_SCORE = 10
-
     }
 
 }
