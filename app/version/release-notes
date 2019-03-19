@@ -1,5 +1,5 @@
 ## What's new in this release?
-In this release, we added a notification to let new users know that they can automatically clear their data. We also squashed some bugs and cleaned up potential performance issues.
+In this release, we fixed a potential crash when loading a new page and a small performance issue.
 
 ## Have feedback?
 You can always reach us at https://duckduckgo.com/feedback.
