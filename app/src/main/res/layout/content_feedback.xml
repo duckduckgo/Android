@@ -20,6 +20,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout style="@style/FeedbackFragmentStyle">
@@ -49,9 +50,9 @@
             android:clickable="true"
             android:contentDescription="@string/feedbackInitialDisambiguationHappyButtonContentDescription"
             android:focusable="true"
-            android:src="@drawable/ic_positive_feedback_button"
+            tools:src="@drawable/ic_button_happy_light_theme"
             app:layout_constraintEnd_toStartOf="@id/negativeFeedbackButton"
-            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/subtitle" />
 
@@ -61,7 +62,8 @@
             android:layout_height="100dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/feedbackInitialDisambiguationSadButtonContentDescription"
-            android:src="@drawable/ic_negative_feedback_button"
+            tools:src="@drawable/ic_button_sad_light_theme"
+            android:layout_marginStart="28dp"
             app:layout_constraintBottom_toBottomOf="@id/positiveFeedbackButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/positiveFeedbackButton"

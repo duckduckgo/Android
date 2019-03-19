@@ -54,11 +54,11 @@ class InitialFeedbackFragment : FeedbackFragment() {
         super.onActivityCreated(savedInstanceState)
 
         if (settingsDataStore.theme == DuckDuckGoTheme.LIGHT) {
-            positiveFeedbackButton.setImageResource(R.drawable.ic_positive_feedback_button)
-            negativeFeedbackButton.setImageResource(R.drawable.ic_negative_feedback_button)
+            positiveFeedbackButton.setImageResource(R.drawable.ic_button_happy_light_theme)
+            negativeFeedbackButton.setImageResource(R.drawable.ic_button_sad_light_theme)
         } else {
-            positiveFeedbackButton.setImageResource(R.drawable.ic_positive_feedback_button_dark)
-            negativeFeedbackButton.setImageResource(R.drawable.ic_negative_feedback_button_dark)
+            positiveFeedbackButton.setImageResource(R.drawable.ic_button_happy_dark_theme)
+            negativeFeedbackButton.setImageResource(R.drawable.ic_button_sad_dark_theme)
         }
     }
 

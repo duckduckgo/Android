@@ -37,6 +37,6 @@
         android:minHeight="60dp"
         tools:text="Browser features are missing or frustrating"
         android:textColor="?attr/normalTextColor"
-        android:textSize="14sp" />
+        android:textSize="15sp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
