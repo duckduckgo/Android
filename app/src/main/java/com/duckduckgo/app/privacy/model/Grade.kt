@@ -154,12 +154,12 @@ class Grade {
 
     fun addEntityNotBlocked(entity: String, prevalence: Double?) {
         prevalence ?: return
-        entitiesNotBlocked = entitiesNotBlocked + Pair(entity, prevalence)
+        entitiesNotBlocked = entitiesNotBlocked.plus(Pair(entity, prevalence))
     }
 
     fun addEntityBlocked(entity: String, prevalence: Double?) {
         prevalence ?: return
-        entitiesBlocked = entitiesBlocked + Pair(entity, prevalence)
+        entitiesBlocked = entitiesBlocked.plus(Pair(entity, prevalence))
     }
 
     companion object {
