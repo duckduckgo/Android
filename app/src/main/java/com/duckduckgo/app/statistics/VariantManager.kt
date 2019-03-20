@@ -18,6 +18,7 @@ package com.duckduckgo.app.statistics
 
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.*
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
 
@@ -25,18 +26,31 @@ import timber.log.Timber
 interface VariantManager {
 
     sealed class VariantFeature {
+        object NotificationPrivacyDay1 : VariantFeature()
+        object NotificationClearDataDay1 : VariantFeature()
+
+        // Already released to production. Added as a feature as some experiments don't use it
+        object NotificationClearDataDay3 : VariantFeature()
     }
 
     companion object {
 
         // this will be returned when there are no other active experiments
-        val DEFAULT_VARIANT = Variant(key = "", features = emptyList())
+        val DEFAULT_VARIANT = Variant(key = "", features = listOf(NotificationClearDataDay3))
 
         val ACTIVE_VARIANTS = listOf(
 
             // Shared control. You can use this as your control unless you are experimenting on
             // a subgroup e.g a device API or specific language
-            Variant(key = "sc", weight = 1.0, features = emptyList())
+            Variant(key = "sc", weight = 1.0, features = listOf(NotificationClearDataDay3)),
+
+            // Notification Content
+            Variant(key = "me", weight = 1.0, features = listOf(NotificationPrivacyDay1)),
+            Variant(key = "mi", weight = 1.0, features = listOf(NotificationClearDataDay1)),
+
+            // Notification Add New
+            Variant(key = "mf", weight = 1.0, features = listOf()),
+            Variant(key = "mk", weight = 1.0, features = listOf(NotificationPrivacyDay1, NotificationClearDataDay3))
         )
     }
 

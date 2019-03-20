@@ -56,9 +56,9 @@ class NotificationRegistrar @Inject constructor(
             R.string.notificationChannelFileDownloaded,
             NotificationManagerCompat.IMPORTANCE_LOW
         )
-        val PRIVACY_TIPS = Channel(
-            "com.duckduckgo.privacytips",
-            R.string.notificationChannelPrivacyTips,
+        val TUTORIALS = Channel(
+            "com.duckduckgo.tutorials",
+            R.string.notificationChannelTutorials,
             NotificationManagerCompat.IMPORTANCE_DEFAULT
         )
     }
@@ -66,7 +66,7 @@ class NotificationRegistrar @Inject constructor(
     private val channels = (listOf(
         ChannelType.FILE_DOWNLOADING,
         ChannelType.FILE_DOWNLOADED,
-        ChannelType.PRIVACY_TIPS
+        ChannelType.TUTORIALS
     ))
 
     fun registerApp() {

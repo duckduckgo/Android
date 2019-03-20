@@ -259,10 +259,14 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelFileDownloading">File Downloading</string>
     <string name="notificationChannelFileDownloaded">File Downloaded</string>
-    <string name="notificationChannelPrivacyTips">Privacy Tips</string>
+    <string name="notificationChannelTutorials">Tutorials</string>
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Data clearing set to manual</string>
     <string name="clearNotificationDescription">Customize DuckDuckGo to automatically clear browsing data after every session.</string>
+
+    <!-- Privacy Protection Notification -->
+    <string name="privacyProtectionNotificationTitle">We are protecting your privacy</string>
+    <string name="privacyProtectionNotificationDescription">DuckDuckGo has protected you from X trackers and encrypted Y requests</string>
 
 </resources>

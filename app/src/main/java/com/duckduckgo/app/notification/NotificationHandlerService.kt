@@ -21,8 +21,9 @@ import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.VisibleForTesting
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_CANCELLED
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCHED
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.android.AndroidInjection
@@ -45,13 +46,20 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     @VisibleForTesting
     public override fun onHandleIntent(workIntent: Intent) {
         when (workIntent.type) {
-            CLEAR_DATA_LAUNCHED -> onClearDataLaunched()
-            CLEAR_DATA_CANCELLED -> onClearDataCancelled()
+            APP_LAUNCH -> onAppLaunched()
+            CLEAR_DATA_LAUNCH -> onClearDataLaunched()
+            CANCEL -> onCancelled()
         }
     }
 
+    private fun onAppLaunched() {
+        pixel.fire(Pixel.PixelName.APP_LAUNCH)
+        TaskStackBuilder.create(context).startActivities()
+        pixel.fire(Pixel.PixelName.NOTIFICATION_LAUNCHED)
+    }
+
     private fun onClearDataLaunched() {
-        Timber.i("Launched!")
+        Timber.i("Clear Data Launched!")
         val settingsIntent = SettingsActivity.intent(context)
         TaskStackBuilder.create(context)
             .addNextIntentWithParentStack(settingsIntent)
@@ -59,12 +67,13 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         pixel.fire(Pixel.PixelName.NOTIFICATION_LAUNCHED)
     }
 
-    private fun onClearDataCancelled() {
+    private fun onCancelled() {
         pixel.fire(Pixel.PixelName.NOTIFICATION_CANCELLED)
     }
 
     object NotificationEvent {
-        const val CLEAR_DATA_LAUNCHED = "com.duckduckgo.notification.cleardata.launched"
-        const val CLEAR_DATA_CANCELLED = "com.duckduckgo.notification.cleardata.cancelled"
+        const val APP_LAUNCH = "com.duckduckgo.notification.launch.app"
+        const val CLEAR_DATA_LAUNCH = "com.duckduckgo.notification.launch.clearData"
+        const val CANCEL = "com.duckduckgo.notification.cancel"
     }
 }

@@ -23,12 +23,13 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.notification.model.NotificationSpec
 import javax.inject.Inject
 
 class NotificationFactory @Inject constructor(val context: Context, val manager: NotificationManagerCompat) {
 
     fun createNotification(
-        specification: NotificationScheduler.NotificationSpec,
+        specification: NotificationSpec,
         launchIntent: PendingIntent,
         cancelIntent: PendingIntent
     ): Notification {
