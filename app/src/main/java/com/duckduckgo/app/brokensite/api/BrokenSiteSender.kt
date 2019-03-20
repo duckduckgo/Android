@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.feedback.api
+package com.duckduckgo.app.brokensite.api
 
 import android.annotation.SuppressLint
 import android.os.Build
+import com.duckduckgo.app.brokensite.api.BrokenSiteService.Platform
+import com.duckduckgo.app.brokensite.api.BrokenSiteService.Reason
 import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.app.feedback.api.FeedbackService.Platform
-import com.duckduckgo.app.feedback.api.FeedbackService.Reason
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
-interface FeedbackSender {
+interface BrokenSiteSender {
     fun submitGeneralFeedback(comment: String)
     fun submitBrokenSiteFeedback(comment: String, url: String)
 }
 
-class FeedbackSubmitter(
+class BrokenSiteSubmitter(
     private val statisticsStore: StatisticsDataStore,
     private val variantManager: VariantManager,
-    private val service: FeedbackService
-) : FeedbackSender {
+    private val service: BrokenSiteService
+) : BrokenSiteSender {
 
     @SuppressLint("CheckResult")
     override fun submitGeneralFeedback(comment: String) {

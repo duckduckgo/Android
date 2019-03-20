@@ -178,8 +178,8 @@ class FeedbackActivity : DuckDuckGoActivity(),
     /**
      * Negative feedback listeners
      */
-    override fun onProvidedNegativeOpenEndedFeedback(feedback: String) {
-        viewModel.onProvidedNegativeOpenEndedFeedback(feedback)
+    override fun onProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String) {
+        viewModel.onProvidedNegativeOpenEndedFeedback(mainReason, subReason, feedback)
     }
 
     /**

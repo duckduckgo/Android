@@ -111,7 +111,7 @@ ext {
     okHttp = "3.10.0"
     rxJava = "2.1.10"
     rxAndroid = "2.0.2"
-    timber = "4.6.1"
+    timber = "4.7.1"
     rxRelay = "2.0.0"
     leakCanary = "1.6.2"
     mockito = "2.18.3"
@@ -136,6 +136,7 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofit"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit"
+    implementation 'com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2'
     implementation "io.reactivex.rxjava2:rxjava:$rxJava"
     implementation "io.reactivex.rxjava2:rxandroid:$rxAndroid"
     implementation "com.jakewharton.timber:timber:$timber"

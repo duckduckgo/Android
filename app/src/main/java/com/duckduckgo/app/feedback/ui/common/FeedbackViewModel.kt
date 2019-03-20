@@ -18,17 +18,25 @@ package com.duckduckgo.app.feedback.ui.common
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.ui.common.FragmentState.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.playstore.PlayStoreUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
-class FeedbackViewModel(val playStoreUtils: PlayStoreUtils) : ViewModel() {
+class FeedbackViewModel(val playStoreUtils: PlayStoreUtils,
+                        val feedbackSubmitter: FeedbackSubmitter,
+                        val brokenSiteSubmitter: BrokenSiteSender
+) : ViewModel() {
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
 
@@ -154,8 +162,13 @@ class FeedbackViewModel(val playStoreUtils: PlayStoreUtils) : ViewModel() {
         )
     }
 
-    fun onProvidedNegativeOpenEndedFeedback(feedback: String) {
-        Timber.i("User provided negative feedback: {$feedback}")
+    fun onProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String) {
+        Timber.i("User provided negative feedback: {$feedback}. mainReason = $mainReason, subReason = $subReason")
+
+        GlobalScope.launch(Dispatchers.IO) {
+            feedbackSubmitter.sendNegativeFeedback(mainReason, subReason, feedback)
+        }
+
         command.value = Command.Exit(feedbackSubmitted = true)
     }
 

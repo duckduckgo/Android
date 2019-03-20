@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.feedback.api
+package com.duckduckgo.app.survey.api
 
-import com.duckduckgo.app.feedback.api.SurveyGroup.SurveyOption
+import com.duckduckgo.app.survey.api.SurveyGroup.SurveyOption
 import com.duckduckgo.app.feedback.db.SurveyDao
 import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.feedback.model.Survey.Status.NOT_ALLOCATED

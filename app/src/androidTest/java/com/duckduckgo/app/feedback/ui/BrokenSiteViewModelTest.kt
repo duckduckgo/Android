@@ -5,7 +5,7 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
-import com.duckduckgo.app.feedback.api.FeedbackSender
+import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
@@ -29,7 +29,7 @@ class BrokenSiteViewModelTest {
     val schedulers = InstantSchedulersRule()
 
     @Mock
-    private lateinit var mockFeedbackSender: FeedbackSender
+    private lateinit var mockBrokenSiteSender: BrokenSiteSender
 
     @Mock
     private lateinit var mockCommandObserver: Observer<BrokenSiteViewModel.Command>
@@ -42,7 +42,7 @@ class BrokenSiteViewModelTest {
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        testee = com.duckduckgo.app.brokensite.BrokenSiteViewModel(mockFeedbackSender)
+        testee = com.duckduckgo.app.brokensite.BrokenSiteViewModel(mockBrokenSiteSender)
         testee.command.observeForever(mockCommandObserver)
     }
 
@@ -138,7 +138,7 @@ class BrokenSiteViewModelTest {
         testee.onFeedbackMessageChanged(message)
         testee.onSubmitPressed()
 
-        verify(mockFeedbackSender).submitBrokenSiteFeedback(message, url)
+        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(message, url)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
 
@@ -146,7 +146,7 @@ class BrokenSiteViewModelTest {
     fun whenCannotSubmitBrokenSiteAndSubmitPressedThenFeedbackNotSubmitted() {
         testee.onBrokenSiteChanged(true)
         testee.onSubmitPressed()
-        verify(mockFeedbackSender, never()).submitBrokenSiteFeedback(any(), any())
+        verify(mockBrokenSiteSender, never()).submitBrokenSiteFeedback(any(), any())
         verify(mockCommandObserver, never()).onChanged(Command.ConfirmAndFinish)
     }
 
@@ -155,7 +155,7 @@ class BrokenSiteViewModelTest {
         testee.onBrokenSiteChanged(false)
         testee.onFeedbackMessageChanged(message)
         testee.onSubmitPressed()
-        verify(mockFeedbackSender).submitGeneralFeedback(message)
+        verify(mockBrokenSiteSender).submitGeneralFeedback(message)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
 
@@ -163,7 +163,7 @@ class BrokenSiteViewModelTest {
     fun whenCannotSubmitMessageAndSubmitPressedThenFeedbackNotSubmitted() {
         testee.onBrokenSiteChanged(false)
         testee.onSubmitPressed()
-        verify(mockFeedbackSender, never()).submitGeneralFeedback(any())
+        verify(mockBrokenSiteSender, never()).submitGeneralFeedback(any())
         verify(mockCommandObserver, never()).onChanged(Command.ConfirmAndFinish)
     }
 

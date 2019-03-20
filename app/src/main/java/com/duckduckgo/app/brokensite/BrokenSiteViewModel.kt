@@ -18,11 +18,11 @@ package com.duckduckgo.app.brokensite
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.duckduckgo.app.feedback.api.FeedbackSender
+import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.global.SingleLiveEvent
 
 
-class BrokenSiteViewModel(private val feedbackSender: FeedbackSender) : ViewModel() {
+class BrokenSiteViewModel(private val brokenSiteSender: BrokenSiteSender) : ViewModel() {
 
     data class ViewState(
         val isBrokenSite: Boolean = false,
@@ -103,9 +103,9 @@ class BrokenSiteViewModel(private val feedbackSender: FeedbackSender) : ViewMode
 
         if (viewValue.isBrokenSite) {
             val url = viewValue.url ?: return
-            feedbackSender.submitBrokenSiteFeedback(message, url)
+            brokenSiteSender.submitBrokenSiteFeedback(message, url)
         } else {
-            feedbackSender.submitGeneralFeedback(message)
+            brokenSiteSender.submitGeneralFeedback(message)
         }
 
         command.value = Command.ConfirmAndFinish

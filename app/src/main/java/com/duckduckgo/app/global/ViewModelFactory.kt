@@ -22,6 +22,7 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
+import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
@@ -29,7 +30,7 @@ import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.feedback.api.FeedbackSender
+import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.db.SurveyDao
 import com.duckduckgo.app.feedback.ui.SurveyViewModel
 import com.duckduckgo.app.feedback.ui.common.FeedbackViewModel
@@ -86,7 +87,7 @@ class ViewModelFactory @Inject constructor(
     private val webViewLongPressHandler: LongPressHandler,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val variantManager: VariantManager,
-    private val feedbackSender: FeedbackSender,
+    private val brokenSiteSender: BrokenSiteSender,
     private val webViewSessionStorage: WebViewSessionStorage,
     private val specialUrlDetector: SpecialUrlDetector,
     private val faviconDownloader: FaviconDownloader,
@@ -97,7 +98,9 @@ class ViewModelFactory @Inject constructor(
     private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
     private val searchCountDao: SearchCountDao,
     private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
-    private val playStoreUtils: PlayStoreUtils
+    private val playStoreUtils: PlayStoreUtils,
+    private val brokenSiteSubmitter: BrokenSiteSender,
+    private val feedbackSubmitter: FeedbackSubmitter
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -112,8 +115,8 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                 isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                 isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
-                isAssignableFrom(FeedbackViewModel::class.java) -> FeedbackViewModel(playStoreUtils)
-                isAssignableFrom(BrokenSiteViewModel::class.java) -> BrokenSiteViewModel(feedbackSender)
+                isAssignableFrom(FeedbackViewModel::class.java) -> FeedbackViewModel(playStoreUtils, feedbackSubmitter, brokenSiteSubmitter)
+                isAssignableFrom(BrokenSiteViewModel::class.java) -> BrokenSiteViewModel(brokenSiteSender)
                 isAssignableFrom(SurveyViewModel::class.java) -> SurveyViewModel(surveyDao, statisticsStore, appInstallStore)
                 isAssignableFrom(AddWidgetInstructionsViewModel::class.java) -> AddWidgetInstructionsViewModel()
                 isAssignableFrom(SettingsViewModel::class.java) -> settingsViewModel()

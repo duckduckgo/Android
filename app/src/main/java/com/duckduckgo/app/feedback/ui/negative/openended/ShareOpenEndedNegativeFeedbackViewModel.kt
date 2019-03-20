@@ -17,6 +17,8 @@
 package com.duckduckgo.app.feedback.ui.negative.openended
 
 import androidx.lifecycle.ViewModel
+import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
+import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
 import com.duckduckgo.app.global.SingleLiveEvent
 
 
@@ -24,16 +26,17 @@ class ShareOpenEndedNegativeFeedbackViewModel : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    fun userSubmittingFeedback(feedback: String, isPositiveFeedback: Boolean) {
-        if (isPositiveFeedback) {
+    fun userSubmittingPositiveFeedback(feedback: String) {
             command.value = Command.ExitAndSubmitPositiveFeedback(feedback)
-        } else {
-            command.value = Command.ExitAndSubmitNegativeFeedback(feedback)
-        }
     }
 
+    fun userSubmittingNegativeFeedback(mainReason: MainReason, subReason: SubReason?, openEndedComment: String) {
+        command.value = Command.ExitAndSubmitNegativeFeedback(mainReason, subReason, openEndedComment)
+    }
+
+
     sealed class Command {
-        data class ExitAndSubmitNegativeFeedback(val feedback: String) : Command()
+        data class ExitAndSubmitNegativeFeedback(val mainReason: MainReason, val subReason: SubReason?, val feedback: String) : Command()
         data class ExitAndSubmitPositiveFeedback(val feedback: String) : Command()
         object Exit : Command()
     }

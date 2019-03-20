@@ -19,11 +19,14 @@ package com.duckduckgo.app.di
 import android.app.job.JobScheduler
 import android.content.Context
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
+import com.duckduckgo.app.brokensite.api.BrokenSiteSender
+import com.duckduckgo.app.brokensite.api.BrokenSiteService
+import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
 import com.duckduckgo.app.entities.api.EntityListService
-import com.duckduckgo.app.feedback.api.FeedbackSender
 import com.duckduckgo.app.feedback.api.FeedbackService
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
-import com.duckduckgo.app.feedback.api.SurveyService
+import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
+import com.duckduckgo.app.feedback.api.SubReasonApiMapper
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.api.ApiRequestInterceptor
 import com.duckduckgo.app.global.job.JobBuilder
@@ -31,9 +34,12 @@ import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeService
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.job.ConfigurationDownloader
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.api.ResourceSurrogateListService
+import com.duckduckgo.app.survey.api.SurveyService
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -77,6 +83,7 @@ class NetworkModule {
             .baseUrl(Url.API)
             .client(okHttpClient)
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
     }
@@ -114,20 +121,33 @@ class NetworkModule {
         retrofit.create(ResourceSurrogateListService::class.java)
 
     @Provides
-    fun feedbackService(@Named("api") retrofit: Retrofit): FeedbackService =
-        retrofit.create(FeedbackService::class.java)
+    fun brokenSiteService(@Named("api") retrofit: Retrofit): BrokenSiteService =
+        retrofit.create(BrokenSiteService::class.java)
 
     @Provides
     fun entityListService(@Named("api") retrofit: Retrofit): EntityListService =
         retrofit.create(EntityListService::class.java)
 
     @Provides
-    fun feedbackSender(statisticsStore: StatisticsDataStore, variantManager: VariantManager, feedbackSerice: FeedbackService): FeedbackSender =
-        FeedbackSubmitter(statisticsStore, variantManager, feedbackSerice)
+    fun brokenSiteSender(
+        statisticsStore: StatisticsDataStore,
+        variantManager: VariantManager,
+        brokenSiteSerice: BrokenSiteService
+    ): BrokenSiteSender =
+        BrokenSiteSubmitter(statisticsStore, variantManager, brokenSiteSerice)
 
     @Provides
     fun surveyService(@Named("api") retrofit: Retrofit): SurveyService =
         retrofit.create(SurveyService::class.java)
+
+    @Provides
+    fun feedbackSubmitter(feedbackService: FeedbackService, variantManager: VariantManager, apiKeyMapper: SubReasonApiMapper, pixel: Pixel): FeedbackSubmitter =
+        FireAndForgetFeedbackSubmitter(feedbackService, variantManager, apiKeyMapper, pixel)
+
+    @Provides
+    fun feedbackService(@Named("api") retrofit: Retrofit): FeedbackService =
+        retrofit.create(FeedbackService::class.java)
+
 
     @Provides
     @Singleton

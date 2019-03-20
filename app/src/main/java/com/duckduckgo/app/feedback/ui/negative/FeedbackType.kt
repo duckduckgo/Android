@@ -29,8 +29,7 @@ sealed class FeedbackType {
         OTHER
     }
 
-    interface SubReason : Serializable {
-    }
+    interface SubReason : Serializable
 
     enum class MissingBrowserFeaturesSubReasons : SubReason {
         NAVIGATION_ISSUES,

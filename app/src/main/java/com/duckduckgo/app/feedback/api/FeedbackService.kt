@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,34 +16,19 @@
 
 package com.duckduckgo.app.feedback.api
 
-import io.reactivex.Observable
-import okhttp3.ResponseBody
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.POST
+import kotlinx.coroutines.Deferred
+import retrofit2.Response
+import retrofit2.http.GET
+import retrofit2.http.Query
+
 
 interface FeedbackService {
 
-    object Platform {
-        const val ANDROID = "Android"
-    }
-
-    object Reason {
-        const val BROKEN_SITE = "broken_site"
-        const val GENERAL = "general"
-    }
-
-    @FormUrlEncoded
-    @POST("/feedback.js?type=app-feedback")
-    fun feedback(
-        @Field("reason") reason: String,
-        @Field("url") url: String,
-        @Field("comment") comment: String,
-        @Field("platform") platform: String,
-        @Field("os") api: Int,
-        @Field("manufacturer") manufacturer: String,
-        @Field("model") model: String,
-        @Field("v") appVersion: String,
-        @Field("atb") atb: String
-    ): Observable<ResponseBody>
+    @GET("https://duckduckgo.com/collect.js?type=app-feedback&platform=android")
+    fun submit(
+        @Query("category") category: String?,
+        @Query("subcategory") subcategory: String?,
+        @Query("comment") comment: String,
+        @Query("v") version: String
+    ): Deferred<Response<Void>>
 }
