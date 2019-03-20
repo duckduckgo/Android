@@ -21,6 +21,7 @@
     xmlns:toots="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/rootScrollView"
     android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout style="@style/FeedbackFragmentStyle">
@@ -31,7 +32,7 @@
             android:layout_height="48dp"
             android:layout_marginTop="@dimen/feedbackTitleMarginTop"
             android:importantForAccessibility="no"
-            android:src="@drawable/ic_negative_feedback"
+            android:src="@drawable/ic_sad_face"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

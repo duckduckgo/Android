@@ -30,7 +30,7 @@
             android:layout_height="48dp"
             android:layout_marginTop="@dimen/feedbackTitleMarginTop"
             android:importantForAccessibility="no"
-            android:src="@drawable/ic_positive_feedback"
+            android:src="@drawable/ic_happy_face"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
