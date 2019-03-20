@@ -21,6 +21,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/rootScrollView"
     android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout style="@style/FeedbackFragmentStyle">
@@ -60,7 +61,7 @@
             android:layout_width="0dp"
             android:layout_height="140dp"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="65dp"
+            android:layout_marginTop="@dimen/feedbackTitleMarginTop"
             android:layout_marginEnd="20dp"
             android:hint="@string/openEndedInputHint"
             app:hintTextAppearance="@style/FeedbackInputHintStyle"
@@ -82,6 +83,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
+            android:layout_marginTop="20dp"
             android:background="@drawable/button_contained_bg"
             android:foreground="?attr/selectableItemBackground"
             android:text="@string/submitFeedback"

@@ -45,7 +45,6 @@
             app:layout_constraintTop_toBottomOf="@id/emoticonImage"
             tools:text="Issue title shortform" />
 
-
         <TextView
             android:id="@+id/subtitle"
             android:layout_marginTop="5dp"
@@ -59,11 +58,12 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_marginTop="34dp"
+            android:layout_marginTop="@dimen/feedbackTitleMarginTop"
             app:layout_constraintTop_toBottomOf="@id/subtitle"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:clipToPadding="false"
             android:paddingBottom="2dp"
+            tools:itemCount="6"
+            tools:listitem="@layout/item_feedback_reason"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_height="wrap_content" />

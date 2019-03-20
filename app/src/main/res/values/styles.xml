@@ -287,8 +287,11 @@
         <item name="android:layout_marginTop">12dp</item>
         <item name="android:textAlignment">center</item>
         <item name="android:textStyle">normal</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginEnd">10dp</item>
         <item name="android:textColor">?attr/normalTextColor</item>
         <item name="android:textSize">15sp</item>
+        <item name="layout_constraintWidth_percent">0.8</item>
     </style>
 
     <style name="FeedbackTitle.FeedbackHappySadDisambiguationTitle">
@@ -301,8 +304,6 @@
     <style name="FeedbackTitle.FeedbackSubtitle.FeedbackHappySadDisambiguationSubtitle">
         <item name="android:textStyle">normal</item>
         <item name="android:layout_marginTop">9dp</item>
-        <item name="android:layout_marginStart">10dp</item>
-        <item name="android:layout_marginEnd">10dp</item>
     </style>
 
     <style name="FeedbackListSeparator">
