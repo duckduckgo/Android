@@ -20,6 +20,7 @@ import android.view.ContextMenu
 import android.view.MenuItem
 import android.webkit.WebView.HitTestResult
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.never
@@ -127,14 +128,16 @@ class WebViewLongPressHandlerTest {
     @Test
     fun whenUserSelectedDownloadImageOptionThenActionIsDownloadFileActionRequired() {
         whenever(mockMenuItem.itemId).thenReturn(WebViewLongPressHandler.CONTEXT_MENU_ID_DOWNLOAD_IMAGE)
-        val action = testee.userSelectedMenuItem("example.com", mockMenuItem)
+        val longPressTarget = LongPressTarget(url = "example.com", type = HitTestResult.SRC_ANCHOR_TYPE)
+        val action = testee.userSelectedMenuItem(longPressTarget, mockMenuItem)
         assertTrue(action is LongPressHandler.RequiredAction.DownloadFile)
     }
 
     @Test
     fun whenUserSelectedDownloadImageOptionThenDownloadFileWithCorrectUrlReturned() {
         whenever(mockMenuItem.itemId).thenReturn(WebViewLongPressHandler.CONTEXT_MENU_ID_DOWNLOAD_IMAGE)
-        val action = testee.userSelectedMenuItem("example.com", mockMenuItem) as LongPressHandler.RequiredAction.DownloadFile
+        val longPressTarget = LongPressTarget(url = "example.com", type = HitTestResult.SRC_ANCHOR_TYPE)
+        val action = testee.userSelectedMenuItem(longPressTarget, mockMenuItem) as LongPressHandler.RequiredAction.DownloadFile
         assertEquals("example.com", action.url)
     }
 
@@ -142,7 +145,8 @@ class WebViewLongPressHandlerTest {
     fun whenUserSelectedUnknownOptionThenNoActionRequiredReturned() {
         val unknownMenuId = 123
         whenever(mockMenuItem.itemId).thenReturn(unknownMenuId)
-        val action = testee.userSelectedMenuItem("example.com", mockMenuItem)
+        val longPressTarget = LongPressTarget(url = "example.com", type = HitTestResult.SRC_ANCHOR_TYPE)
+        val action = testee.userSelectedMenuItem(longPressTarget, mockMenuItem)
         assertTrue(action == LongPressHandler.RequiredAction.None)
     }
 
