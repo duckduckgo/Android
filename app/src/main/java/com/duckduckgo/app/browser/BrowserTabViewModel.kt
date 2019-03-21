@@ -505,7 +505,7 @@ class BrowserTabViewModel(
         autoCompleteViewState.value = AutoCompleteViewState(showSuggestions = false)
     }
 
-    fun userLongPressedInWebView(target: LongPressTarget, menu: ContextMenu, url: String? = null) {
+    fun userLongPressedInWebView(target: LongPressTarget, menu: ContextMenu) {
         Timber.i("Long pressed on ${target.type}, (url=${target.url})")
         longPressHandler.handleLongPress(target.type, target.url, menu)
     }
