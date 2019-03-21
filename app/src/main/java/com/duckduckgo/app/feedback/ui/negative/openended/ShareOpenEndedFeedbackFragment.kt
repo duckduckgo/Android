@@ -114,7 +114,7 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment() {
 
     private fun updateDisplayForNegativeFeedback(args: Bundle) {
         mainReason = args.getSerializable(MAIN_REASON_EXTRA) as MainReason
-        subReason = args.getSerializable(SUB_REASON_EXTRA) as SubReason
+        subReason = args.getSerializable(SUB_REASON_EXTRA) as SubReason?
 
         title.text = getDisplayText(mainReason!!)
         subtitle.text = getDisplayText(subReason)

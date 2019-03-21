@@ -155,6 +155,10 @@ class FeedbackTypeDisplay {
                 it[type] = FeedbackTypeSubReasonDisplay(type, R.string.searchNotGoodEnoughSubReasonFasterLoadTimes)
             }
 
+            BETTER_AUTOCOMPLETE.also { type ->
+                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.searchNotGoodEnoughSubReasonBetterAutocomplete)
+            }
+
             SEARCHING_IN_SPECIFIC_LANGUAGE.also { type ->
                 it[type] = FeedbackTypeSubReasonDisplay(type, R.string.searchNotGoodEnoughSubReasonSpecificLanguage)
             }
