@@ -18,7 +18,6 @@ package com.duckduckgo.app.feedback.ui.positive.initial
 
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
-import timber.log.Timber
 
 
 class PositiveFeedbackLandingViewModel : ViewModel() {
@@ -26,17 +25,14 @@ class PositiveFeedbackLandingViewModel : ViewModel() {
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     fun userSelectedToRateApp() {
-        Timber.i("User selected to rate app")
         command.value = Command.LaunchPlayStore
     }
 
-    fun userSelectedToProvideFeedback() {
-        Timber.i("User selected to provide feedback")
+    fun userSelectedToProvideFeedbackDetails() {
         command.value = Command.LaunchShareFeedbackPage
     }
 
-    fun userSelectedToCancel() {
-        Timber.i("User is cancelling")
+    fun userFinishedGivingPositiveFeedback() {
         command.value = Command.Exit
     }
 }

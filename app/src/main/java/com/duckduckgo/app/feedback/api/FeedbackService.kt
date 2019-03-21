@@ -28,7 +28,7 @@ interface FeedbackService {
     @FormUrlEncoded
     @POST("/feedback.js?type=app-feedback")
     fun submitFeedbackAsync(
-        @Field("reason") reason: String = "general",
+        @Field("reason") reason: String = REASON_GENERAL,
         @Field("rating") rating: String,
         @Field("category") category: String?,
         @Field("subcategory") subcategory: String?,
@@ -44,7 +44,7 @@ interface FeedbackService {
     @FormUrlEncoded
     @POST("/feedback.js?type=app-feedback")
     fun submitBrokenSiteAsync(
-        @Field("reason") reason: String = "broken_site",
+        @Field("reason") reason: String = REASON_BROKEN_SITE,
         @Field("comment") comment: String,
         @Field("platform") platform: String = PLATFORM,
         @Field("url") url: String? = null,
@@ -56,6 +56,8 @@ interface FeedbackService {
     ): Deferred<Response<Void>>
 
     companion object {
+        const val REASON_GENERAL = "general"
+        const val REASON_BROKEN_SITE = "broken_site"
         private const val PLATFORM = "Android"
     }
 }

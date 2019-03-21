@@ -91,8 +91,6 @@ class BrowserActivity : DuckDuckGoActivity() {
             renderer.renderBrowserViewState(it)
         })
         viewModel.awaitClearDataFinishedNotification()
-
-        startActivity(SettingsActivity.intent(this))
     }
 
     override fun onNewIntent(intent: Intent?) {

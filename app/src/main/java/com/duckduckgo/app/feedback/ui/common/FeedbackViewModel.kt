@@ -56,13 +56,12 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
             MainReason.OTHER -> NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason)
         }
         viewState.value = currentViewState.copy(
-            fragmentViewState = newState,
-            mainReason = mainReason,
-            subReason = null,
-            previousViewState = currentViewState.fragmentViewState
+                fragmentViewState = newState,
+                mainReason = mainReason,
+                subReason = null,
+                previousViewState = currentViewState.fragmentViewState
         )
     }
-
 
     fun onBackPressed() {
         when (currentViewState.fragmentViewState) {
@@ -108,13 +107,13 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
     fun userSelectedPositiveFeedback() {
         viewState.value = if (canShowRatingsButton()) {
             currentViewState.copy(
-                fragmentViewState = PositiveFeedbackStep1(NAVIGATION_FORWARDS),
-                previousViewState = currentViewState.fragmentViewState
+                    fragmentViewState = PositiveFeedbackStep1(NAVIGATION_FORWARDS),
+                    previousViewState = currentViewState.fragmentViewState
             )
         } else {
             currentViewState.copy(
-                fragmentViewState = PositiveShareFeedback(NAVIGATION_FORWARDS),
-                previousViewState = currentViewState.fragmentViewState
+                    fragmentViewState = PositiveShareFeedback(NAVIGATION_FORWARDS),
+                    previousViewState = currentViewState.fragmentViewState
             )
         }
     }
@@ -140,8 +139,8 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
 
     fun userSelectedNegativeFeedback() {
         viewState.value = currentViewState.copy(
-            fragmentViewState = NegativeFeedbackMainReason(NAVIGATION_FORWARDS),
-            previousViewState = currentViewState.fragmentViewState
+                fragmentViewState = NegativeFeedbackMainReason(NAVIGATION_FORWARDS),
+                previousViewState = currentViewState.fragmentViewState
         )
     }
 
@@ -151,10 +150,9 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
     }
 
     fun userSelectedToGiveFeedback() {
-        Timber.i("User gave feedback")
         viewState.value = currentViewState.copy(
-            fragmentViewState = PositiveShareFeedback(NAVIGATION_FORWARDS),
-            previousViewState = currentViewState.fragmentViewState
+                fragmentViewState = PositiveShareFeedback(NAVIGATION_FORWARDS),
+                previousViewState = currentViewState.fragmentViewState
         )
     }
 
@@ -176,6 +174,14 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
         command.value = Command.Exit(feedbackSubmitted = true)
     }
 
+    fun onProvidedPositiveFeedbackNoDetails() {
+        GlobalScope.launch (Dispatchers.IO) {
+            feedbackSubmitter.sendPositiveFeedback(null)
+        }
+
+        command.value = Command.Exit(feedbackSubmitted = true)
+    }
+
     fun onProvidedPositiveOpenEndedFeedback(feedback: String) {
 
         GlobalScope.launch(Dispatchers.IO) {
@@ -188,41 +194,49 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
     fun userSelectedNegativeFeedbackMissingBrowserSubReason(mainReason: MainReason, subReason: FeedbackType.MissingBrowserFeaturesSubReasons) {
         val newState = NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason, subReason)
         viewState.value = currentViewState.copy(
-            fragmentViewState = newState,
-            mainReason = mainReason,
-            subReason = subReason,
-            previousViewState = currentViewState.fragmentViewState
+                fragmentViewState = newState,
+                mainReason = mainReason,
+                subReason = subReason,
+                previousViewState = currentViewState.fragmentViewState
         )
     }
 
     fun userSelectedSubReasonSearchNotGoodEnough(mainReason: MainReason, subReason: FeedbackType.SearchNotGoodEnoughSubReasons) {
         val newState = NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason, subReason)
         viewState.value = currentViewState.copy(
-            fragmentViewState = newState,
-            mainReason = mainReason,
-            subReason = subReason,
-            previousViewState = currentViewState.fragmentViewState
+                fragmentViewState = newState,
+                mainReason = mainReason,
+                subReason = subReason,
+                previousViewState = currentViewState.fragmentViewState
         )
     }
 
     fun userSelectedSubReasonNeedMoreCustomization(mainReason: MainReason, subReason: FeedbackType.CustomizationSubReasons) {
         val newState = NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason, subReason)
         viewState.value = currentViewState.copy(
-            fragmentViewState = newState,
-            mainReason = mainReason,
-            subReason = subReason,
-            previousViewState = currentViewState.fragmentViewState
+                fragmentViewState = newState,
+                mainReason = mainReason,
+                subReason = subReason,
+                previousViewState = currentViewState.fragmentViewState
         )
     }
 
     fun userSelectedSubReasonAppIsSlowOrBuggy(mainReason: MainReason, subReason: FeedbackType.PerformanceSubReasons) {
         val newState = NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason, subReason)
         viewState.value = currentViewState.copy(
-            fragmentViewState = newState,
-            mainReason = mainReason,
-            subReason = subReason,
-            previousViewState = currentViewState.fragmentViewState
+                fragmentViewState = newState,
+                mainReason = mainReason,
+                subReason = subReason,
+                previousViewState = currentViewState.fragmentViewState
         )
+    }
+
+    fun userSelectedToRateApp() {
+        GlobalScope.launch(Dispatchers.IO){
+            feedbackSubmitter.sendUserRated()
+        }
+
+        command.value = Command.Exit(feedbackSubmitted = true)
     }
 
     companion object {
@@ -232,10 +246,10 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
 }
 
 data class ViewState(
-    val fragmentViewState: FragmentState,
-    val previousViewState: FragmentState? = null,
-    val mainReason: MainReason? = null,
-    val subReason: SubReason? = null
+        val fragmentViewState: FragmentState,
+        val previousViewState: FragmentState? = null,
+        val mainReason: MainReason? = null,
+        val subReason: SubReason? = null
 )
 
 sealed class FragmentState(open val direction: NavigationDirection) {
@@ -248,14 +262,15 @@ sealed class FragmentState(open val direction: NavigationDirection) {
 
     // negative flow
     data class NegativeFeedbackMainReason(override val direction: NavigationDirection) : FragmentState(direction)
+
     data class NegativeFeedbackSubReason(override val direction: NavigationDirection, val mainReason: MainReason) : FragmentState(direction)
     data class NegativeOpenEndedFeedback(override val direction: NavigationDirection, val mainReason: MainReason, val subReason: SubReason? = null) :
-        FragmentState(direction)
+            FragmentState(direction)
 
     data class NegativeWebSitesBrokenFeedback(
-        override val direction: NavigationDirection,
-        val mainReason: MainReason,
-        val subReason: SubReason? = null
+            override val direction: NavigationDirection,
+            val mainReason: MainReason,
+            val subReason: SubReason? = null
     ) : FragmentState(direction)
 }
 

@@ -25,7 +25,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import kotlinx.android.synthetic.main.content_feedback_positive_landing.*
-import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -34,7 +33,7 @@ class PositiveFeedbackLandingFragment : FeedbackFragment() {
     interface PositiveFeedbackLandingListener {
         fun userSelectedToRateApp()
         fun userSelectedToGiveFeedback()
-        fun userCancelled()
+        fun userGavePositiveFeedbackNoDetails()
     }
 
     private val viewModel by bindViewModel<PositiveFeedbackLandingViewModel>()
@@ -46,7 +45,6 @@ class PositiveFeedbackLandingFragment : FeedbackFragment() {
     lateinit var playStoreUtils: PlayStoreUtils
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        Timber.i("onCreateView")
         return inflater.inflate(R.layout.content_feedback_positive_landing, container, false)
     }
 
@@ -58,7 +56,7 @@ class PositiveFeedbackLandingFragment : FeedbackFragment() {
                     listener?.userSelectedToRateApp()
                 }
                 Command.Exit -> {
-                    listener?.userCancelled()
+                    listener?.userGavePositiveFeedbackNoDetails()
                 }
                 Command.LaunchShareFeedbackPage -> {
                     listener?.userSelectedToGiveFeedback()
@@ -69,8 +67,8 @@ class PositiveFeedbackLandingFragment : FeedbackFragment() {
 
     override fun configureListeners() {
         rateAppButton.setOnClickListener { viewModel.userSelectedToRateApp() }
-        shareFeedbackButton.setOnClickListener { viewModel.userSelectedToProvideFeedback() }
-        cancelButton.setOnClickListener { viewModel.userSelectedToCancel() }
+        shareFeedbackButton.setOnClickListener { viewModel.userSelectedToProvideFeedbackDetails() }
+        cancelButton.setOnClickListener { viewModel.userFinishedGivingPositiveFeedback() }
     }
 
     private fun launchPlayStore() {

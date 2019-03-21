@@ -20,7 +20,6 @@ import android.app.job.JobScheduler
 import android.content.Context
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
-import com.duckduckgo.app.brokensite.api.BrokenSiteService
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
 import com.duckduckgo.app.entities.api.EntityListService
 import com.duckduckgo.app.feedback.api.FeedbackService
@@ -61,9 +60,9 @@ class NetworkModule {
     fun apiOkHttpClient(context: Context, apiRequestInterceptor: ApiRequestInterceptor): OkHttpClient {
         val cache = Cache(context.cacheDir, CACHE_SIZE)
         return OkHttpClient.Builder()
-            .addInterceptor(apiRequestInterceptor)
-            .cache(cache)
-            .build()
+                .addInterceptor(apiRequestInterceptor)
+                .cache(cache)
+                .build()
     }
 
     @Provides
@@ -71,8 +70,8 @@ class NetworkModule {
     @Named("pixel")
     fun pixelOkHttpClient(apiRequestInterceptor: ApiRequestInterceptor): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(apiRequestInterceptor)
-            .build()
+                .addInterceptor(apiRequestInterceptor)
+                .build()
     }
 
     @Provides
@@ -80,12 +79,12 @@ class NetworkModule {
     @Named("api")
     fun apiRetrofit(@Named("api") okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(Url.API)
-            .client(okHttpClient)
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addCallAdapterFactory(CoroutineCallAdapterFactory())
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .build()
+                .baseUrl(Url.API)
+                .client(okHttpClient)
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addCallAdapterFactory(CoroutineCallAdapterFactory())
+                .addConverterFactory(MoshiConverterFactory.create(moshi))
+                .build()
     }
 
     @Provides
@@ -93,10 +92,10 @@ class NetworkModule {
     @Named("pixel")
     fun pixelRetrofit(@Named("pixel") okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(Url.PIXEL)
-            .client(okHttpClient)
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .build()
+                .baseUrl(Url.PIXEL)
+                .client(okHttpClient)
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build()
     }
 
     @Provides
@@ -106,55 +105,47 @@ class NetworkModule {
 
     @Provides
     fun trackerListService(@Named("api") retrofit: Retrofit): TrackerListService =
-        retrofit.create(TrackerListService::class.java)
+            retrofit.create(TrackerListService::class.java)
 
     @Provides
     fun httpsUpgradeService(@Named("api") retrofit: Retrofit): HttpsUpgradeService =
-        retrofit.create(HttpsUpgradeService::class.java)
+            retrofit.create(HttpsUpgradeService::class.java)
 
     @Provides
     fun autoCompleteService(@Named("api") retrofit: Retrofit): AutoCompleteService =
-        retrofit.create(AutoCompleteService::class.java)
+            retrofit.create(AutoCompleteService::class.java)
 
     @Provides
     fun surrogatesService(@Named("api") retrofit: Retrofit): ResourceSurrogateListService =
-        retrofit.create(ResourceSurrogateListService::class.java)
-
-    @Provides
-    fun brokenSiteService(@Named("api") retrofit: Retrofit): BrokenSiteService =
-        retrofit.create(BrokenSiteService::class.java)
+            retrofit.create(ResourceSurrogateListService::class.java)
 
     @Provides
     fun entityListService(@Named("api") retrofit: Retrofit): EntityListService =
-        retrofit.create(EntityListService::class.java)
+            retrofit.create(EntityListService::class.java)
 
     @Provides
-    fun brokenSiteSender(
-        statisticsStore: StatisticsDataStore,
-        variantManager: VariantManager,
-        brokenSiteSerice: BrokenSiteService
-    ): BrokenSiteSender =
-        BrokenSiteSubmitter(statisticsStore, variantManager, brokenSiteSerice)
+    fun brokenSiteSender(statisticsStore: StatisticsDataStore, variantManager: VariantManager, feedbackService: FeedbackService): BrokenSiteSender =
+            BrokenSiteSubmitter(statisticsStore, variantManager, feedbackService)
 
     @Provides
     fun surveyService(@Named("api") retrofit: Retrofit): SurveyService =
-        retrofit.create(SurveyService::class.java)
+            retrofit.create(SurveyService::class.java)
 
     @Provides
     fun feedbackSubmitter(feedbackService: FeedbackService, variantManager: VariantManager, apiKeyMapper: SubReasonApiMapper, statisticsStore: StatisticsDataStore, pixel: Pixel): FeedbackSubmitter =
-        FireAndForgetFeedbackSubmitter(feedbackService, variantManager, apiKeyMapper, statisticsStore, pixel)
+            FireAndForgetFeedbackSubmitter(feedbackService, variantManager, apiKeyMapper, statisticsStore, pixel)
 
     @Provides
     fun feedbackService(@Named("api") retrofit: Retrofit): FeedbackService =
-        retrofit.create(FeedbackService::class.java)
+            retrofit.create(FeedbackService::class.java)
 
 
     @Provides
     @Singleton
     fun appConfigurationSyncer(
-        jobBuilder: JobBuilder,
-        jobScheduler: JobScheduler,
-        appConfigurationDownloader: ConfigurationDownloader
+            jobBuilder: JobBuilder,
+            jobScheduler: JobScheduler,
+            appConfigurationDownloader: ConfigurationDownloader
     ): AppConfigurationSyncer {
         return AppConfigurationSyncer(jobBuilder, jobScheduler, appConfigurationDownloader)
     }

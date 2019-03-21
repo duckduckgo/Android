@@ -162,12 +162,15 @@ class FeedbackActivity : DuckDuckGoActivity(),
      * Positive feedback listeners
      */
     override fun userSelectedToRateApp() {
-        Timber.i("User gave rating")
-        animateFinish(feedbackSubmitted = true)
+        viewModel.userSelectedToRateApp()
     }
 
     override fun userSelectedToGiveFeedback() {
         viewModel.userSelectedToGiveFeedback()
+    }
+
+    override fun userGavePositiveFeedbackNoDetails() {
+        viewModel.onProvidedPositiveFeedbackNoDetails()
     }
 
     override fun onProvidedPositiveOpenEndedFeedback(feedback: String) {

@@ -16,14 +16,16 @@
 
 package com.duckduckgo.app.brokensite.api
 
-import android.annotation.SuppressLint
 import android.os.Build
-import com.duckduckgo.app.brokensite.api.BrokenSiteService.Platform
-import com.duckduckgo.app.brokensite.api.BrokenSiteService.Reason
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.feedback.api.FeedbackService
+import com.duckduckgo.app.feedback.api.FeedbackService.Companion.REASON_BROKEN_SITE
+import com.duckduckgo.app.feedback.api.FeedbackService.Companion.REASON_GENERAL
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 interface BrokenSiteSender {
@@ -32,38 +34,36 @@ interface BrokenSiteSender {
 }
 
 class BrokenSiteSubmitter(
-    private val statisticsStore: StatisticsDataStore,
-    private val variantManager: VariantManager,
-    private val service: BrokenSiteService
+        private val statisticsStore: StatisticsDataStore,
+        private val variantManager: VariantManager,
+        private val service: FeedbackService
 ) : BrokenSiteSender {
 
-    @SuppressLint("CheckResult")
     override fun submitGeneralFeedback(comment: String) {
-        submitFeedback(Reason.GENERAL, comment, "")
+        submitFeedback(comment = comment, reason = REASON_GENERAL)
     }
 
     override fun submitBrokenSiteFeedback(comment: String, url: String) {
-        submitFeedback(Reason.BROKEN_SITE, comment, url)
+        submitFeedback(comment, url, reason = REASON_BROKEN_SITE)
     }
 
-    private fun submitFeedback(type: String, comment: String, url: String) {
-        service.feedback(
-            type,
-            url,
-            comment,
-            Platform.ANDROID,
-            Build.VERSION.SDK_INT,
-            Build.MANUFACTURER,
-            Build.MODEL,
-            BuildConfig.VERSION_NAME,
-            atbWithVariant()
-        )
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                Timber.v("Feedback submission succeeded")
-            }, {
-                Timber.w("Feedback submission failed ${it.localizedMessage}")
-            })
+    private fun submitFeedback(comment: String, url: String? = null, reason: String) {
+        GlobalScope.launch(Dispatchers.IO) {
+
+            runCatching {
+                service.submitBrokenSiteAsync(
+                        reason = reason,
+                        url = url,
+                        comment = comment,
+                        api = Build.VERSION.SDK_INT,
+                        manufacturer = Build.MANUFACTURER,
+                        model = Build.MODEL,
+                        version = BuildConfig.VERSION_NAME,
+                        atb = atbWithVariant()).await()
+            }
+                    .onSuccess { Timber.v("Feedback submission succeeded") }
+                    .onFailure { Timber.w(it, "Feedback submission failed") }
+        }
     }
 
     private fun atbWithVariant(): String {

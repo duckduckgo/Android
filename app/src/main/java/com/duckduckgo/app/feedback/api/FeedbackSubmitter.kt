@@ -34,16 +34,17 @@ import java.util.*
 interface FeedbackSubmitter {
 
     suspend fun sendNegativeFeedback(mainReason: MainReason, subReason: SubReason?, openEnded: String)
-    suspend fun sendPositiveFeedback(openEnded: String)
+    suspend fun sendPositiveFeedback(openEnded: String?)
     suspend fun sendBrokenSiteFeedback(openEnded: String, brokenSite: String?)
+    suspend fun sendUserRated()
 }
 
 class FireAndForgetFeedbackSubmitter(
-    private val feedbackService: FeedbackService,
-    private val variantManager: VariantManager,
-    private val apiKeyMapper: SubReasonApiMapper,
-    private val statisticsDataStore: StatisticsDataStore,
-    private val pixel: Pixel
+        private val feedbackService: FeedbackService,
+        private val variantManager: VariantManager,
+        private val apiKeyMapper: SubReasonApiMapper,
+        private val statisticsDataStore: StatisticsDataStore,
+        private val pixel: Pixel
 ) : FeedbackSubmitter {
     override suspend fun sendNegativeFeedback(mainReason: MainReason, subReason: SubReason?, openEnded: String) {
         Timber.i("User provided negative feedback: {$openEnded}. mainReason = $mainReason, subReason = $subReason")
@@ -54,18 +55,20 @@ class FireAndForgetFeedbackSubmitter(
         sendPixel(pixelForNegativeFeedback(category, subcategory))
 
         runCatching { submitFeedbackAsync(openEnded, NEGATIVE_FEEDBACK, category, subcategory).await() }
-            .onSuccess { Timber.i("Successfully submitted feedback") }
-            .onFailure { Timber.w(it, "Failed to send feedback") }
+                .onSuccess { Timber.i("Successfully submitted feedback") }
+                .onFailure { Timber.w(it, "Failed to send feedback") }
     }
 
-    override suspend fun sendPositiveFeedback(openEnded: String) {
+    override suspend fun sendPositiveFeedback(openEnded: String?) {
         Timber.i("User provided positive feedback: {$openEnded}")
 
         sendPixel(pixelForPositiveFeedback())
 
-        runCatching { submitFeedbackAsync(openEnded, POSITIVE_FEEDBACK).await() }
-            .onSuccess { Timber.i("Successfully submitted feedback") }
-            .onFailure { Timber.w(it, "Failed to send feedback") }
+        if (!openEnded.isNullOrBlank()) {
+            runCatching { submitFeedbackAsync(openEnded, POSITIVE_FEEDBACK).await() }
+                    .onSuccess { Timber.i("Successfully submitted feedback") }
+                    .onFailure { Timber.w(it, "Failed to send feedback") }
+        }
     }
 
     override suspend fun sendBrokenSiteFeedback(openEnded: String, brokenSite: String?) {
@@ -78,43 +81,48 @@ class FireAndForgetFeedbackSubmitter(
         runCatching {
             submitBrokenSiteAsync(openEnded, brokenSite).await()
         }
-            .onSuccess { Timber.i("Successfully submitted broken site feedback") }
-            .onFailure { Timber.w(it, "Failed to send broken site feedback") }
+                .onSuccess { Timber.i("Successfully submitted broken sœite feedback") }
+                .onFailure { Timber.w(it, "Failed to send broken site feedback") }
+    }
+
+    override suspend fun sendUserRated() {
+        Timber.i("User indicated they'd rate the app")
+        sendPixel(pixelForPositiveFeedback())
     }
 
     private fun sendPixel(pixelName: String) {
-        Timber.i("will fire pixel: $pixelName")
+        Timber.d("Firing feedback pixel: $pixelName")
         pixel.fire(pixelName)
     }
 
     private fun submitFeedbackAsync(
-        openEnded: String,
-        rating: String,
-        category: String? = null,
-        subcategory: String? = null
+            openEnded: String,
+            rating: String,
+            category: String? = null,
+            subcategory: String? = null
     ): Deferred<Response<Void>> {
         return feedbackService.submitFeedbackAsync(
-            category = category,
-            subcategory = subcategory,
-            rating = rating,
-            comment = openEnded,
-            version = version(),
-            manufacturer = Build.MANUFACTURER,
-            model = Build.MODEL,
-            api = Build.VERSION.SDK_INT,
-            atb = atbWithVariant()
+                category = category,
+                subcategory = subcategory,
+                rating = rating,
+                comment = openEnded,
+                version = version(),
+                manufacturer = Build.MANUFACTURER,
+                model = Build.MODEL,
+                api = Build.VERSION.SDK_INT,
+                atb = atbWithVariant()
         )
     }
 
     private fun submitBrokenSiteAsync(openEnded: String, url: String?): Deferred<Response<Void>> {
         return feedbackService.submitBrokenSiteAsync(
-            comment = openEnded,
-            url = url,
-            version = version(),
-            manufacturer = Build.MANUFACTURER,
-            model = Build.MODEL,
-            api = Build.VERSION.SDK_INT,
-            atb = atbWithVariant()
+                comment = openEnded,
+                url = url,
+                version = version(),
+                manufacturer = Build.MANUFACTURER,
+                model = Build.MODEL,
+                api = Build.VERSION.SDK_INT,
+                atb = atbWithVariant()
         )
     }
 
@@ -130,21 +138,17 @@ class FireAndForgetFeedbackSubmitter(
     }
 
     private fun pixelForNegativeFeedback(category: String, subcategory: String): String {
-        val formattedPixel = String.format(Locale.US, FEEDBACK_NEGATIVE_SUBMISSION.pixelName, NEGATIVE_FEEDBACK, category, subcategory)
-        Timber.i("Formatted pixel as [$formattedPixel]")
-        return formattedPixel
+        return String.format(Locale.US, FEEDBACK_NEGATIVE_SUBMISSION.pixelName, NEGATIVE_FEEDBACK, category, subcategory)
     }
 
     private fun pixelForPositiveFeedback(): String {
-        val formattedPixel = String.format(Locale.US, Pixel.PixelName.FEEDBACK_POSITIVE_SUBMISSION.pixelName, POSITIVE_FEEDBACK)
-        Timber.i("Formatted pixel as [$formattedPixel]")
-        return formattedPixel
+        return String.format(Locale.US, Pixel.PixelName.FEEDBACK_POSITIVE_SUBMISSION.pixelName, POSITIVE_FEEDBACK)
     }
 
     private fun version(): String {
         val variantKey = variantManager.getVariant().key
         val formattedVariantKey = if (variantKey.isBlank()) " " else " $variantKey "
-        return "${BuildConfig.VERSION_NAME}$formattedVariantKey"
+        return "${BuildConfig.VERSION_NAME}$formattedVariantKey".trim()
     }
 
     private fun atbWithVariant(): String {
