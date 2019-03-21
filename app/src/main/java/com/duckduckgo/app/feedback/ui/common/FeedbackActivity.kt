@@ -83,57 +83,57 @@ class FeedbackActivity : DuckDuckGoActivity(),
 
         val state = viewState.fragmentViewState
         when (state) {
-            is FragmentState.InitialAppEnjoymentClarifier -> showInitialFeedbackView(state.direction)
-            is FragmentState.PositiveFeedbackStep1 -> showPositiveFeedbackView(state.direction)
-            is FragmentState.PositiveShareFeedback -> showSharePositiveFeedbackView(state.direction)
-            is FragmentState.NegativeFeedbackMainReason -> showNegativeFeedbackMainReasonView(state.direction)
-            is FragmentState.NegativeFeedbackSubReason -> showNegativeFeedbackSubReasonView(state.direction, state.mainReason)
-            is FragmentState.NegativeOpenEndedFeedback -> showNegativeOpenEndedFeedbackView(state.direction, state.mainReason, state.subReason)
-            is FragmentState.NegativeWebSitesBrokenFeedback -> showNegativeWebSiteBrokenView(state.direction)
+            is FragmentState.InitialAppEnjoymentClarifier -> showInitialFeedbackView(state.forwardDirection)
+            is FragmentState.PositiveFeedbackStep1 -> showPositiveFeedbackView(state.forwardDirection)
+            is FragmentState.PositiveShareFeedback -> showSharePositiveFeedbackView(state.forwardDirection)
+            is FragmentState.NegativeFeedbackMainReason -> showNegativeFeedbackMainReasonView(state.forwardDirection)
+            is FragmentState.NegativeFeedbackSubReason -> showNegativeFeedbackSubReasonView(state.forwardDirection, state.mainReason)
+            is FragmentState.NegativeOpenEndedFeedback -> showNegativeOpenEndedFeedbackView(state.forwardDirection, state.mainReason, state.subReason)
+            is FragmentState.NegativeWebSitesBrokenFeedback -> showNegativeWebSiteBrokenView(state.forwardDirection)
         }
     }
 
-    private fun showSharePositiveFeedbackView(direction: NavigationDirection) {
+    private fun showSharePositiveFeedbackView(forwardDirection: Boolean) {
         val fragment = ShareOpenEndedFeedbackFragment.instancePositiveFeedback()
-        updateFragment(fragment, direction)
+        updateFragment(fragment, forwardDirection)
     }
 
-    private fun showNegativeFeedbackMainReasonView(direction: NavigationDirection) {
+    private fun showNegativeFeedbackMainReasonView(forwardDirection: Boolean) {
         val fragment = MainReasonNegativeFeedbackFragment.instance()
-        updateFragment(fragment, direction)
+        updateFragment(fragment, forwardDirection)
     }
 
-    private fun showNegativeFeedbackSubReasonView(direction: NavigationDirection, mainReason: MainReason) {
+    private fun showNegativeFeedbackSubReasonView(forwardDirection: Boolean, mainReason: MainReason) {
         val fragment = SubReasonNegativeFeedbackFragment.instance(mainReason)
-        updateFragment(fragment, direction)
+        updateFragment(fragment, forwardDirection)
     }
 
-    private fun showNegativeOpenEndedFeedbackView(direction: NavigationDirection, mainReason: MainReason, subReason: SubReason? = null) {
+    private fun showNegativeOpenEndedFeedbackView(forwardDirection: Boolean, mainReason: MainReason, subReason: SubReason? = null) {
         val fragment = ShareOpenEndedFeedbackFragment.instanceNegativeFeedback(mainReason, subReason)
-        updateFragment(fragment, direction)
+        updateFragment(fragment, forwardDirection)
     }
 
-    private fun showInitialFeedbackView(direction: NavigationDirection) {
+    private fun showInitialFeedbackView(forwardDirection: Boolean) {
         val fragment = InitialFeedbackFragment.instance()
-        updateFragment(fragment, direction)
+        updateFragment(fragment, forwardDirection)
     }
 
-    private fun showPositiveFeedbackView(direction: NavigationDirection) {
+    private fun showPositiveFeedbackView(forwardDirection: Boolean) {
         val fragment = PositiveFeedbackLandingFragment.instance()
-        updateFragment(fragment, direction)
+        updateFragment(fragment, forwardDirection)
     }
 
-    private fun showNegativeWebSiteBrokenView(direction: NavigationDirection) {
+    private fun showNegativeWebSiteBrokenView(forwardDirection: Boolean) {
         val fragment = BrokenSiteNegativeFeedbackFragment.instance()
-        updateFragment(fragment, direction)
+        updateFragment(fragment, forwardDirection)
     }
 
-    private fun updateFragment(fragment: FeedbackFragment, direction: NavigationDirection) {
+    private fun updateFragment(fragment: FeedbackFragment, forwardDirection: Boolean) {
         val tag = fragment.javaClass.name
         if (supportFragmentManager.findFragmentByTag(tag) != null) return
 
         supportFragmentManager.transaction {
-            this.applyTransition(direction)
+            this.applyTransition(forwardDirection)
             replace(R.id.fragmentContainer, fragment, fragment.tag)
         }
     }
@@ -243,8 +243,8 @@ private fun FeedbackActivity.animateFinish(feedbackSubmitted: Boolean) {
     overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
 }
 
-private fun FragmentTransaction.applyTransition(direction: NavigationDirection) {
-    if (direction.isForward) {
+private fun FragmentTransaction.applyTransition(forwardDirection: Boolean) {
+    if (forwardDirection) {
         setCustomAnimations(R.anim.slide_from_right, R.anim.slide_to_left)
     } else {
         setCustomAnimations(R.anim.slide_from_left, R.anim.slide_to_right)

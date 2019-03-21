@@ -240,8 +240,8 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
     }
 
     companion object {
-        val NAVIGATION_FORWARDS = NavigationDirection(true)
-        val NAVIGATION_BACKWARDS = NavigationDirection(false)
+        const val NAVIGATION_FORWARDS = true
+        const val NAVIGATION_BACKWARDS = false
     }
 }
 
@@ -252,29 +252,27 @@ data class ViewState(
         val subReason: SubReason? = null
 )
 
-sealed class FragmentState(open val direction: NavigationDirection) {
-    data class InitialAppEnjoymentClarifier(override val direction: NavigationDirection) : FragmentState(direction)
+sealed class FragmentState(open val forwardDirection: Boolean) {
+    data class InitialAppEnjoymentClarifier(override val forwardDirection: Boolean) : FragmentState(forwardDirection)
 
     // positive flow
-    data class PositiveFeedbackStep1(override val direction: NavigationDirection) : FragmentState(direction)
+    data class PositiveFeedbackStep1(override val forwardDirection: Boolean) : FragmentState(forwardDirection)
 
-    data class PositiveShareFeedback(override val direction: NavigationDirection) : FragmentState(direction)
+    data class PositiveShareFeedback(override val forwardDirection: Boolean) : FragmentState(forwardDirection)
 
     // negative flow
-    data class NegativeFeedbackMainReason(override val direction: NavigationDirection) : FragmentState(direction)
+    data class NegativeFeedbackMainReason(override val forwardDirection: Boolean) : FragmentState(forwardDirection)
 
-    data class NegativeFeedbackSubReason(override val direction: NavigationDirection, val mainReason: MainReason) : FragmentState(direction)
-    data class NegativeOpenEndedFeedback(override val direction: NavigationDirection, val mainReason: MainReason, val subReason: SubReason? = null) :
-            FragmentState(direction)
+    data class NegativeFeedbackSubReason(override val forwardDirection: Boolean, val mainReason: MainReason) : FragmentState(forwardDirection)
+    data class NegativeOpenEndedFeedback(override val forwardDirection: Boolean, val mainReason: MainReason, val subReason: SubReason? = null) :
+            FragmentState(forwardDirection)
 
     data class NegativeWebSitesBrokenFeedback(
-            override val direction: NavigationDirection,
+            override val forwardDirection: Boolean,
             val mainReason: MainReason,
             val subReason: SubReason? = null
-    ) : FragmentState(direction)
+    ) : FragmentState(forwardDirection)
 }
-
-inline class NavigationDirection(val isForward: Boolean)
 
 sealed class Command {
     data class Exit(val feedbackSubmitted: Boolean) : Command()
