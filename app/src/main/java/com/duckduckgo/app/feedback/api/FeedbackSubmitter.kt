@@ -16,11 +16,17 @@
 
 package com.duckduckgo.app.feedback.api
 
+import android.os.Build
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
+import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FEEDBACK_NEGATIVE_SUBMISSION
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import kotlinx.coroutines.Deferred
+import retrofit2.Response
 import timber.log.Timber
 import java.util.*
 
@@ -29,56 +35,124 @@ interface FeedbackSubmitter {
 
     suspend fun sendNegativeFeedback(mainReason: MainReason, subReason: SubReason?, openEnded: String)
     suspend fun sendPositiveFeedback(openEnded: String)
+    suspend fun sendBrokenSiteFeedback(openEnded: String, brokenSite: String?)
 }
 
 class FireAndForgetFeedbackSubmitter(
     private val feedbackService: FeedbackService,
     private val variantManager: VariantManager,
     private val apiKeyMapper: SubReasonApiMapper,
+    private val statisticsDataStore: StatisticsDataStore,
     private val pixel: Pixel
 ) : FeedbackSubmitter {
     override suspend fun sendNegativeFeedback(mainReason: MainReason, subReason: SubReason?, openEnded: String) {
+        Timber.i("User provided negative feedback: {$openEnded}. mainReason = $mainReason, subReason = $subReason")
+
         val category = categoryFromMainReason(mainReason)
         val subcategory = apiKeyMapper.apiKeyFromSubReason(subReason)
 
-        kotlin.runCatching { feedbackService.submit(category, subcategory, openEnded, version()).await() }
+        sendPixel(pixelForNegativeFeedback(category, subcategory))
+
+        runCatching { submitFeedbackAsync(openEnded, NEGATIVE_FEEDBACK, category, subcategory).await() }
             .onSuccess { Timber.i("Successfully submitted feedback") }
             .onFailure { Timber.w(it, "Failed to send feedback") }
-
-        val pixelName = pixelFromReasons(category, subcategory)
-
-        Timber.i("will eventually fire pixel: $pixelName")
-        //pixel.fire(pixelName)
     }
 
     override suspend fun sendPositiveFeedback(openEnded: String) {
-        kotlin.runCatching { feedbackService.submit(null, null, openEnded, version()).await() }
+        Timber.i("User provided positive feedback: {$openEnded}")
+
+        sendPixel(pixelForPositiveFeedback())
+
+        runCatching { submitFeedbackAsync(openEnded, POSITIVE_FEEDBACK).await() }
             .onSuccess { Timber.i("Successfully submitted feedback") }
-            .onFailure { Timber.w("Failed to send feedback") }
+            .onFailure { Timber.w(it, "Failed to send feedback") }
+    }
+
+    override suspend fun sendBrokenSiteFeedback(openEnded: String, brokenSite: String?) {
+        Timber.i("User provided broken site report through feedback, url:{$brokenSite}, comment:{$openEnded}")
+
+        val category = categoryFromMainReason(WEBSITES_NOT_LOADING)
+        val subcategory = apiKeyMapper.apiKeyFromSubReason(null)
+        sendPixel(pixelForNegativeFeedback(category, subcategory))
+
+        runCatching {
+            submitBrokenSiteAsync(openEnded, brokenSite).await()
+        }
+            .onSuccess { Timber.i("Successfully submitted broken site feedback") }
+            .onFailure { Timber.w(it, "Failed to send broken site feedback") }
+    }
+
+    private fun sendPixel(pixelName: String) {
+        Timber.i("will fire pixel: $pixelName")
+        pixel.fire(pixelName)
+    }
+
+    private fun submitFeedbackAsync(
+        openEnded: String,
+        rating: String,
+        category: String? = null,
+        subcategory: String? = null
+    ): Deferred<Response<Void>> {
+        return feedbackService.submitFeedbackAsync(
+            category = category,
+            subcategory = subcategory,
+            rating = rating,
+            comment = openEnded,
+            version = version(),
+            manufacturer = Build.MANUFACTURER,
+            model = Build.MODEL,
+            api = Build.VERSION.SDK_INT,
+            atb = atbWithVariant()
+        )
+    }
+
+    private fun submitBrokenSiteAsync(openEnded: String, url: String?): Deferred<Response<Void>> {
+        return feedbackService.submitBrokenSiteAsync(
+            comment = openEnded,
+            url = url,
+            version = version(),
+            manufacturer = Build.MANUFACTURER,
+            model = Build.MODEL,
+            api = Build.VERSION.SDK_INT,
+            atb = atbWithVariant()
+        )
     }
 
     private fun categoryFromMainReason(mainReason: MainReason): String {
         return when (mainReason) {
-            MainReason.MISSING_BROWSING_FEATURES -> "browser_features"
-            MainReason.SEARCH_NOT_GOOD_ENOUGH -> "bad_results"
-            MainReason.NOT_ENOUGH_CUSTOMIZATIONS -> "customization"
-            MainReason.APP_IS_SLOW_OR_BUGGY -> "performance"
-            MainReason.OTHER -> "other"
-            else -> "unknown"
+            MISSING_BROWSING_FEATURES -> "browserFeatures"
+            WEBSITES_NOT_LOADING -> "brokenSites"
+            SEARCH_NOT_GOOD_ENOUGH -> "badResults"
+            NOT_ENOUGH_CUSTOMIZATIONS -> "customization"
+            APP_IS_SLOW_OR_BUGGY -> "performance"
+            OTHER -> "other"
         }
     }
 
-    private fun pixelFromReasons(category: String, subcategory: String): String {
-        val formattedPixel = String.format(Locale.US, Pixel.PixelName.FEEDBACK_SUBMISSION.pixelName, category, subcategory)
+    private fun pixelForNegativeFeedback(category: String, subcategory: String): String {
+        val formattedPixel = String.format(Locale.US, FEEDBACK_NEGATIVE_SUBMISSION.pixelName, NEGATIVE_FEEDBACK, category, subcategory)
         Timber.i("Formatted pixel as [$formattedPixel]")
         return formattedPixel
     }
 
-
+    private fun pixelForPositiveFeedback(): String {
+        val formattedPixel = String.format(Locale.US, Pixel.PixelName.FEEDBACK_POSITIVE_SUBMISSION.pixelName, POSITIVE_FEEDBACK)
+        Timber.i("Formatted pixel as [$formattedPixel]")
+        return formattedPixel
+    }
 
     private fun version(): String {
         val variantKey = variantManager.getVariant().key
         val formattedVariantKey = if (variantKey.isBlank()) " " else " $variantKey "
         return "${BuildConfig.VERSION_NAME}$formattedVariantKey"
+    }
+
+    private fun atbWithVariant(): String {
+        return statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
+    }
+
+    companion object {
+        private const val POSITIVE_FEEDBACK = "positive"
+        private const val NEGATIVE_FEEDBACK = "negative"
     }
 }

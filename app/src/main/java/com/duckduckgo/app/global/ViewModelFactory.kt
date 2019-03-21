@@ -99,7 +99,6 @@ class ViewModelFactory @Inject constructor(
     private val searchCountDao: SearchCountDao,
     private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
     private val playStoreUtils: PlayStoreUtils,
-    private val brokenSiteSubmitter: BrokenSiteSender,
     private val feedbackSubmitter: FeedbackSubmitter
 ) : ViewModelProvider.NewInstanceFactory() {
 
@@ -115,7 +114,7 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                 isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                 isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
-                isAssignableFrom(FeedbackViewModel::class.java) -> FeedbackViewModel(playStoreUtils, feedbackSubmitter, brokenSiteSubmitter)
+                isAssignableFrom(FeedbackViewModel::class.java) -> FeedbackViewModel(playStoreUtils, feedbackSubmitter)
                 isAssignableFrom(BrokenSiteViewModel::class.java) -> BrokenSiteViewModel(brokenSiteSender)
                 isAssignableFrom(SurveyViewModel::class.java) -> SurveyViewModel(surveyDao, statisticsStore, appInstallStore)
                 isAssignableFrom(AddWidgetInstructionsViewModel::class.java) -> AddWidgetInstructionsViewModel()

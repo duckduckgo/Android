@@ -18,17 +18,44 @@ package com.duckduckgo.app.feedback.api
 
 import kotlinx.coroutines.Deferred
 import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.Query
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
+import retrofit2.http.POST
 
 
 interface FeedbackService {
 
-    @GET("https://duckduckgo.com/collect.js?type=app-feedback&platform=android")
-    fun submit(
-        @Query("category") category: String?,
-        @Query("subcategory") subcategory: String?,
-        @Query("comment") comment: String,
-        @Query("v") version: String
+    @FormUrlEncoded
+    @POST("/feedback.js?type=app-feedback")
+    fun submitFeedbackAsync(
+        @Field("reason") reason: String = "general",
+        @Field("rating") rating: String,
+        @Field("category") category: String?,
+        @Field("subcategory") subcategory: String?,
+        @Field("comment") comment: String,
+        @Field("platform") platform: String = PLATFORM,
+        @Field("v") version: String,
+        @Field("os") api: Int,
+        @Field("manufacturer") manufacturer: String,
+        @Field("model") model: String,
+        @Field("atb") atb: String
     ): Deferred<Response<Void>>
+
+    @FormUrlEncoded
+    @POST("/feedback.js?type=app-feedback")
+    fun submitBrokenSiteAsync(
+        @Field("reason") reason: String = "broken_site",
+        @Field("comment") comment: String,
+        @Field("platform") platform: String = PLATFORM,
+        @Field("url") url: String? = null,
+        @Field("v") version: String,
+        @Field("os") api: Int,
+        @Field("manufacturer") manufacturer: String,
+        @Field("model") model: String,
+        @Field("atb") atb: String
+    ): Deferred<Response<Void>>
+
+    companion object {
+        private const val PLATFORM = "Android"
+    }
 }

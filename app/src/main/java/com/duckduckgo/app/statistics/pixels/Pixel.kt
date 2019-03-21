@@ -107,7 +107,8 @@ interface Pixel {
         APP_FEEDBACK_DIALOG_USER_DECLINED_FEEDBACK("mrp_f_d%d_n"),
         APP_FEEDBACK_DIALOG_USER_CANCELLED("mrp_f_d%d_c"),
 
-        FEEDBACK_SUBMISSION("mfbs")
+        FEEDBACK_POSITIVE_SUBMISSION("mfbs_%s_submit"),
+        FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s")
     }
 
     object PixelParameter {

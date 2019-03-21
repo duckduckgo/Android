@@ -18,7 +18,6 @@ package com.duckduckgo.app.feedback.ui.common
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.ui.common.FragmentState.*
@@ -33,10 +32,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
-class FeedbackViewModel(val playStoreUtils: PlayStoreUtils,
-                        val feedbackSubmitter: FeedbackSubmitter,
-                        val brokenSiteSubmitter: BrokenSiteSender
-) : ViewModel() {
+class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val feedbackSubmitter: FeedbackSubmitter) : ViewModel() {
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
 
@@ -163,7 +159,6 @@ class FeedbackViewModel(val playStoreUtils: PlayStoreUtils,
     }
 
     fun onProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String) {
-        Timber.i("User provided negative feedback: {$feedback}. mainReason = $mainReason, subReason = $subReason")
 
         GlobalScope.launch(Dispatchers.IO) {
             feedbackSubmitter.sendNegativeFeedback(mainReason, subReason, feedback)
@@ -173,11 +168,20 @@ class FeedbackViewModel(val playStoreUtils: PlayStoreUtils,
     }
 
     fun onProvidedBrokenSiteFeedback(feedback: String, brokenSite: String?) {
+
+        GlobalScope.launch(Dispatchers.IO) {
+            feedbackSubmitter.sendBrokenSiteFeedback(feedback, brokenSite)
+        }
+
         command.value = Command.Exit(feedbackSubmitted = true)
     }
 
     fun onProvidedPositiveOpenEndedFeedback(feedback: String) {
-        Timber.i("User provided positive feedback: {$feedback}")
+
+        GlobalScope.launch(Dispatchers.IO) {
+            feedbackSubmitter.sendPositiveFeedback(feedback)
+        }
+
         command.value = Command.Exit(feedbackSubmitted = true)
     }
 

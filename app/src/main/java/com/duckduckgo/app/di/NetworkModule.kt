@@ -141,8 +141,8 @@ class NetworkModule {
         retrofit.create(SurveyService::class.java)
 
     @Provides
-    fun feedbackSubmitter(feedbackService: FeedbackService, variantManager: VariantManager, apiKeyMapper: SubReasonApiMapper, pixel: Pixel): FeedbackSubmitter =
-        FireAndForgetFeedbackSubmitter(feedbackService, variantManager, apiKeyMapper, pixel)
+    fun feedbackSubmitter(feedbackService: FeedbackService, variantManager: VariantManager, apiKeyMapper: SubReasonApiMapper, statisticsStore: StatisticsDataStore, pixel: Pixel): FeedbackSubmitter =
+        FireAndForgetFeedbackSubmitter(feedbackService, variantManager, apiKeyMapper, statisticsStore, pixel)
 
     @Provides
     fun feedbackService(@Named("api") retrofit: Retrofit): FeedbackService =
