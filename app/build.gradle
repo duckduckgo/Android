@@ -5,8 +5,6 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
 
-apply plugin: 'org.jetbrains.kotlin.android.extensions'
-
 ext {
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
 }
@@ -75,10 +73,6 @@ android {
     } else {
         println "Signing properties not found at ${propertiesPath}, releases will NOT succeed"
         android.buildTypes.release.signingConfig = null
-    }
-
-    androidExtensions {
-        experimental = true
     }
 }
 

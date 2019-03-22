@@ -60,9 +60,9 @@ class NetworkModule {
     fun apiOkHttpClient(context: Context, apiRequestInterceptor: ApiRequestInterceptor): OkHttpClient {
         val cache = Cache(context.cacheDir, CACHE_SIZE)
         return OkHttpClient.Builder()
-                .addInterceptor(apiRequestInterceptor)
-                .cache(cache)
-                .build()
+            .addInterceptor(apiRequestInterceptor)
+            .cache(cache)
+            .build()
     }
 
     @Provides
@@ -70,8 +70,8 @@ class NetworkModule {
     @Named("pixel")
     fun pixelOkHttpClient(apiRequestInterceptor: ApiRequestInterceptor): OkHttpClient {
         return OkHttpClient.Builder()
-                .addInterceptor(apiRequestInterceptor)
-                .build()
+            .addInterceptor(apiRequestInterceptor)
+            .build()
     }
 
     @Provides
@@ -79,12 +79,12 @@ class NetworkModule {
     @Named("api")
     fun apiRetrofit(@Named("api") okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit.Builder()
-                .baseUrl(Url.API)
-                .client(okHttpClient)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addCallAdapterFactory(CoroutineCallAdapterFactory())
-                .addConverterFactory(MoshiConverterFactory.create(moshi))
-                .build()
+            .baseUrl(Url.API)
+            .client(okHttpClient)
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .addCallAdapterFactory(CoroutineCallAdapterFactory())
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
     }
 
     @Provides
@@ -92,10 +92,10 @@ class NetworkModule {
     @Named("pixel")
     fun pixelRetrofit(@Named("pixel") okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-                .baseUrl(Url.PIXEL)
-                .client(okHttpClient)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build()
+            .baseUrl(Url.PIXEL)
+            .client(okHttpClient)
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .build()
     }
 
     @Provides
@@ -143,9 +143,9 @@ class NetworkModule {
     @Provides
     @Singleton
     fun appConfigurationSyncer(
-            jobBuilder: JobBuilder,
-            jobScheduler: JobScheduler,
-            appConfigurationDownloader: ConfigurationDownloader
+        jobBuilder: JobBuilder,
+        jobScheduler: JobScheduler,
+        appConfigurationDownloader: ConfigurationDownloader
     ): AppConfigurationSyncer {
         return AppConfigurationSyncer(jobBuilder, jobScheduler, appConfigurationDownloader)
     }

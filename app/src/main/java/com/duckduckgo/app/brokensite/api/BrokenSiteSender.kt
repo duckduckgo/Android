@@ -52,14 +52,15 @@ class BrokenSiteSubmitter(
 
             runCatching {
                 service.submitBrokenSiteAsync(
-                        reason = reason,
-                        url = url,
-                        comment = comment,
-                        api = Build.VERSION.SDK_INT,
-                        manufacturer = Build.MANUFACTURER,
-                        model = Build.MODEL,
-                        version = BuildConfig.VERSION_NAME,
-                        atb = atbWithVariant()).await()
+                    reason = reason,
+                    url = url,
+                    comment = comment,
+                    api = Build.VERSION.SDK_INT,
+                    manufacturer = Build.MANUFACTURER,
+                    model = Build.MODEL,
+                    version = BuildConfig.VERSION_NAME,
+                    atb = atbWithVariant()
+                ).await()
             }
                 .onSuccess { Timber.v("Feedback submission succeeded") }
                 .onFailure { Timber.w(it, "Feedback submission failed") }
