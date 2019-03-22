@@ -25,19 +25,23 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackType
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.coroutine.DispatcherProvider
 import com.duckduckgo.app.playstore.PlayStoreUtils
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
-class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val feedbackSubmitter: FeedbackSubmitter) : ViewModel() {
+class FeedbackViewModel(
+    private val playStoreUtils: PlayStoreUtils,
+    private val feedbackSubmitter: FeedbackSubmitter,
+    private val dispatcherProvider: DispatcherProvider = DispatcherProvider.PRODUCTION
+) : ViewModel() {
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
 
     init {
-        viewState.value = ViewState(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_FORWARDS))
+        viewState.postValue(ViewState(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_FORWARDS)))
     }
 
     private val currentViewState: ViewState
@@ -68,12 +72,12 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
             is InitialAppEnjoymentClarifier -> {
                 command.value = Command.Exit(feedbackSubmitted = false)
             }
-            is PositiveFeedbackStep1 -> {
+            is PositiveFeedbackFirstStep -> {
                 viewState.value = currentViewState.copy(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_BACKWARDS))
             }
             is PositiveShareFeedback -> {
                 if (canShowRatingsButton()) {
-                    viewState.value = currentViewState.copy(fragmentViewState = PositiveFeedbackStep1(NAVIGATION_BACKWARDS))
+                    viewState.value = currentViewState.copy(fragmentViewState = PositiveFeedbackFirstStep(NAVIGATION_BACKWARDS))
                 } else {
                     viewState.value = currentViewState.copy(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_BACKWARDS))
                 }
@@ -107,7 +111,7 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
     fun userSelectedPositiveFeedback() {
         viewState.value = if (canShowRatingsButton()) {
             currentViewState.copy(
-                    fragmentViewState = PositiveFeedbackStep1(NAVIGATION_FORWARDS),
+                fragmentViewState = PositiveFeedbackFirstStep(NAVIGATION_FORWARDS),
                     previousViewState = currentViewState.fragmentViewState
             )
         } else {
@@ -156,9 +160,8 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
         )
     }
 
-    fun onProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String) {
-
-        GlobalScope.launch(Dispatchers.IO) {
+    fun userProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String) {
+        GlobalScope.launch(dispatcherProvider.IO) {
             feedbackSubmitter.sendNegativeFeedback(mainReason, subReason, feedback)
         }
 
@@ -166,32 +169,30 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
     }
 
     fun onProvidedBrokenSiteFeedback(feedback: String, brokenSite: String?) {
-
-        GlobalScope.launch(Dispatchers.IO) {
+        GlobalScope.launch(dispatcherProvider.IO) {
             feedbackSubmitter.sendBrokenSiteFeedback(feedback, brokenSite)
         }
 
         command.value = Command.Exit(feedbackSubmitted = true)
     }
 
-    fun onProvidedPositiveFeedbackNoDetails() {
-        GlobalScope.launch (Dispatchers.IO) {
+    fun userGavePositiveFeedbackNoDetails() {
+        GlobalScope.launch(dispatcherProvider.IO) {
             feedbackSubmitter.sendPositiveFeedback(null)
         }
 
         command.value = Command.Exit(feedbackSubmitted = true)
     }
 
-    fun onProvidedPositiveOpenEndedFeedback(feedback: String) {
-
-        GlobalScope.launch(Dispatchers.IO) {
+    fun userProvidedPositiveOpenEndedFeedback(feedback: String) {
+        GlobalScope.launch(dispatcherProvider.IO) {
             feedbackSubmitter.sendPositiveFeedback(feedback)
         }
 
         command.value = Command.Exit(feedbackSubmitted = true)
     }
 
-    fun userSelectedNegativeFeedbackMissingBrowserSubReason(mainReason: MainReason, subReason: FeedbackType.MissingBrowserFeaturesSubReasons) {
+    fun userSelectedSubReasonMissingBrowserFeatures(mainReason: MainReason, subReason: FeedbackType.MissingBrowserFeaturesSubReasons) {
         val newState = NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason, subReason)
         viewState.value = currentViewState.copy(
                 fragmentViewState = newState,
@@ -232,7 +233,7 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
     }
 
     fun userSelectedToRateApp() {
-        GlobalScope.launch(Dispatchers.IO){
+        GlobalScope.launch(dispatcherProvider.IO) {
             feedbackSubmitter.sendUserRated()
         }
 
@@ -256,13 +257,11 @@ sealed class FragmentState(open val forwardDirection: Boolean) {
     data class InitialAppEnjoymentClarifier(override val forwardDirection: Boolean) : FragmentState(forwardDirection)
 
     // positive flow
-    data class PositiveFeedbackStep1(override val forwardDirection: Boolean) : FragmentState(forwardDirection)
-
+    data class PositiveFeedbackFirstStep(override val forwardDirection: Boolean) : FragmentState(forwardDirection)
     data class PositiveShareFeedback(override val forwardDirection: Boolean) : FragmentState(forwardDirection)
 
     // negative flow
     data class NegativeFeedbackMainReason(override val forwardDirection: Boolean) : FragmentState(forwardDirection)
-
     data class NegativeFeedbackSubReason(override val forwardDirection: Boolean, val mainReason: MainReason) : FragmentState(forwardDirection)
     data class NegativeOpenEndedFeedback(override val forwardDirection: Boolean, val mainReason: MainReason, val subReason: SubReason? = null) :
             FragmentState(forwardDirection)

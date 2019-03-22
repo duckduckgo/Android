@@ -1,0 +1,294 @@
+/*
+ * Copyright (c) 2019 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.app.feedback.ui.common
+
+import androidx.lifecycle.Observer
+import androidx.test.annotation.UiThreadTest
+import com.duckduckgo.app.feedback.api.FeedbackSubmitter
+import com.duckduckgo.app.feedback.ui.common.FragmentState.*
+import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.*
+import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MissingBrowserFeaturesSubReasons.TAB_MANAGEMENT
+import com.duckduckgo.app.global.coroutine.DispatcherProvider
+import com.duckduckgo.app.playstore.PlayStoreUtils
+import com.nhaarman.mockitokotlin2.argumentCaptor
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import org.junit.After
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+
+@Suppress("RemoveExplicitTypeArguments")
+class FeedbackViewModelTest {
+
+    private lateinit var testee: FeedbackViewModel
+
+    private val playStoreUtils: PlayStoreUtils = mock()
+    private val feedbackSubmitter: FeedbackSubmitter = mock()
+
+    private val commandObserver: Observer<Command> = mock()
+    private val commandCaptor = argumentCaptor<Command>()
+
+    private val fragmentViewState
+        get() = testee.viewState.value?.fragmentViewState
+
+    @Before
+    @UiThreadTest
+    fun setup() {
+        testee = FeedbackViewModel(playStoreUtils, feedbackSubmitter, DispatcherProvider.TESTING)
+        testee.command.observeForever(commandObserver)
+    }
+
+    @After
+    @UiThreadTest
+    fun tearDown() {
+        testee.command.removeObserver(commandObserver)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenInitialisedThenFragmentStateIsForFirstStep() {
+        assertTrue(fragmentViewState is InitialAppEnjoymentClarifier)
+    }
+
+    @Test
+    @UiThreadTest
+    fun whenCanRateAppAndUserSelectsInitialHappyFaceThenFragmentStateIsFirstStepOfHappyFlow() {
+        configureRatingCanBeGiven()
+        testee.userSelectedPositiveFeedback()
+        assertTrue(fragmentViewState is FragmentState.PositiveFeedbackFirstStep)
+        verifyNavigatingForwards(fragmentViewState)
+    }
+
+    @Test
+    @UiThreadTest
+    fun whenCannotRateAppAndUserSelectsInitialHappyFaceThenFragmentStateSkipsStraightToSharingFeedback() {
+        configureRatingCannotBeGiven()
+        testee.userSelectedPositiveFeedback()
+        assertTrue(fragmentViewState is FragmentState.PositiveShareFeedback)
+        verifyNavigatingForwards(fragmentViewState)
+    }
+
+    @Test
+    fun whenCanRateAppAndUserNavigatesBackFromPositiveInitialFragmentThenFragmentStateIsInitialFragment() = runBlocking<Unit> {
+        configureRatingCanBeGiven()
+        withContext(Dispatchers.Main) {
+            testee.userSelectedPositiveFeedback()
+            testee.onBackPressed()
+        }
+
+        assertTrue(fragmentViewState is InitialAppEnjoymentClarifier)
+        verifyNavigatingBack(fragmentViewState)
+    }
+
+    @Test
+    fun whenCannotRateAppAndUserNavigatesBackFromPositiveInitialFragmentThenFragmentStateIsInitialFragment() = runBlocking<Unit> {
+        configureRatingCannotBeGiven()
+        withContext(Dispatchers.Main) {
+            testee.userSelectedPositiveFeedback()
+            testee.onBackPressed()
+        }
+
+        assertTrue(fragmentViewState is InitialAppEnjoymentClarifier)
+    }
+
+
+    @Test
+    fun whenUserChoosesNotToProvideFurtherDetailsForPositiveFeedbackThenSubmitted() = runBlocking<Unit> {
+        withContext(Dispatchers.Main) {
+            testee.userGavePositiveFeedbackNoDetails()
+        }
+
+        verify(feedbackSubmitter).sendPositiveFeedback(null)
+    }
+
+    @Test
+    fun whenUserChoosesNotToProvideFurtherDetailsForPositiveFeedbackThenExitCommandIssued() = runBlocking<Unit> {
+        withContext(Dispatchers.Main) {
+            testee.userGavePositiveFeedbackNoDetails()
+        }
+
+        val command = captureCommand() as Command.Exit
+        assertTrue(command.feedbackSubmitted)
+    }
+
+    @Test
+    fun whenUserProvidesFurtherDetailsForPositiveFeedbackThenFeedbackSubmitted() = runBlocking<Unit> {
+        withContext(Dispatchers.Main) {
+            testee.userProvidedPositiveOpenEndedFeedback("foo")
+        }
+
+        verify(feedbackSubmitter).sendPositiveFeedback("foo")
+    }
+
+    @Test
+    fun whenUserProvidesFurtherDetailsForPositiveFeedbackThenExitCommandIssued() = runBlocking<Unit> {
+        withContext(Dispatchers.Main) {
+            testee.userProvidedPositiveOpenEndedFeedback("foo")
+        }
+
+        val command = captureCommand() as Command.Exit
+        assertTrue(command.feedbackSubmitted)
+    }
+
+    @Test
+    @UiThreadTest
+    fun whenUserCancelsThenExitCommandIssued() {
+        testee.userWantsToCancel()
+        val command = captureCommand() as Command.Exit
+        assertFalse(command.feedbackSubmitted)
+    }
+
+    @Test
+    @UiThreadTest
+    fun whenUserSelectsInitialSadFaceThenFragmentStateIsFirstStepOfUnhappyFlow() {
+        testee.userSelectedNegativeFeedback()
+        assertTrue(fragmentViewState is NegativeFeedbackMainReason)
+        verifyNavigatingForwards(fragmentViewState)
+    }
+
+    @Test
+    @UiThreadTest
+    fun whenUserNavigatesBackFromNegativeMainReasonFragmentThenFragmentStateIsInitialFragment() {
+        testee.userSelectedNegativeFeedback()
+        testee.onBackPressed()
+        assertTrue(fragmentViewState is InitialAppEnjoymentClarifier)
+        verifyNavigatingBack(fragmentViewState)
+    }
+
+    @Test
+    @UiThreadTest
+    fun whenUserSelectsMainNegativeReasonMissingBrowserFeaturesThenFragmentStateIsSubReasonSelection() {
+        testee.userSelectedNegativeFeedbackMainReason(MISSING_BROWSING_FEATURES)
+        assertTrue(fragmentViewState is NegativeFeedbackSubReason)
+        verifyNavigatingForwards(fragmentViewState)
+    }
+
+    @Test
+    @UiThreadTest
+    fun whenUserSelectsMainNegativeReasonNotEnoughCustomizationsThenFragmentStateIsSubReasonSelection() {
+        testee.userSelectedNegativeFeedbackMainReason(NOT_ENOUGH_CUSTOMIZATIONS)
+        assertTrue(fragmentViewState is NegativeFeedbackSubReason)
+        verifyNavigatingForwards(fragmentViewState)
+    }
+
+    @Test
+    @UiThreadTest
+    fun whenUserSelectsMainNegativeReasonSearchNotGoodEnoughThenFragmentStateIsSubReasonSelection() {
+        testee.userSelectedNegativeFeedbackMainReason(SEARCH_NOT_GOOD_ENOUGH)
+        assertTrue(fragmentViewState is NegativeFeedbackSubReason)
+        verifyNavigatingForwards(fragmentViewState)
+    }
+
+    @Test
+    @UiThreadTest
+    fun whenUserSelectsMainNegativeReasonAppIsSlowOrBuggyThenFragmentStateIsSubReasonSelection() {
+        testee.userSelectedNegativeFeedbackMainReason(APP_IS_SLOW_OR_BUGGY)
+        assertTrue(fragmentViewState is NegativeFeedbackSubReason)
+        verifyNavigatingForwards(fragmentViewState)
+    }
+
+    @Test
+    @UiThreadTest
+    fun whenUserSelectsMainNegativeReasonOtherThenFragmentStateIsOpenEndedFeedback() {
+        testee.userSelectedNegativeFeedbackMainReason(OTHER)
+        assertTrue(fragmentViewState is NegativeOpenEndedFeedback)
+        verifyNavigatingForwards(fragmentViewState)
+    }
+
+    @Test
+    @UiThreadTest
+    fun whenUserSelectsMainNegativeReasonBrokenSiteThenFragmentStateIsSubReasonSelection() {
+        testee.userSelectedNegativeFeedbackMainReason(WEBSITES_NOT_LOADING)
+        assertTrue(fragmentViewState is NegativeWebSitesBrokenFeedback)
+        verifyNavigatingForwards(fragmentViewState)
+    }
+
+    @Test
+    @UiThreadTest
+    fun whenUserSelectsSubNegativeReasonThenFragmentStateIsOpenEndedFeedback() {
+        testee.userSelectedSubReasonMissingBrowserFeatures(MISSING_BROWSING_FEATURES, TAB_MANAGEMENT)
+        assertTrue(fragmentViewState is NegativeOpenEndedFeedback)
+        verifyNavigatingForwards(fragmentViewState)
+    }
+
+    @Test
+    @UiThreadTest
+    fun whenUserNavigatesBackFromSubReasonSelectionThenFragmentStateIsMainReasonSelection() {
+        testee.userSelectedNegativeFeedbackMainReason(MISSING_BROWSING_FEATURES)
+        testee.onBackPressed()
+        assertTrue(fragmentViewState is NegativeFeedbackMainReason)
+        verifyNavigatingBack(fragmentViewState)
+    }
+
+    @Test
+    @UiThreadTest
+    fun whenUserNavigatesBackFromOpenEndedFeedbackAndSubReasonIsValidStepThenFragmentStateIsSubReasonSelection() {
+        testee.userSelectedNegativeFeedbackMainReason(MISSING_BROWSING_FEATURES)
+        testee.userSelectedSubReasonMissingBrowserFeatures(MISSING_BROWSING_FEATURES, TAB_MANAGEMENT)
+        testee.onBackPressed()
+        assertTrue(fragmentViewState is NegativeFeedbackSubReason)
+        verifyNavigatingBack(fragmentViewState)
+    }
+
+    @Test
+    @UiThreadTest
+    fun whenUserNavigatesBackFromOpenEndedFeedbackAndSubReasonNotAValidStepThenFragmentStateIsMainReasonSelection() {
+        testee.userSelectedNegativeFeedbackMainReason(OTHER)
+        testee.onBackPressed()
+        assertTrue(fragmentViewState is NegativeFeedbackMainReason)
+        verifyNavigatingBack(fragmentViewState)
+    }
+
+    @Test
+    @UiThreadTest
+    fun whenUserNavigatesBackFromOpenEndedFeedbackThenFragmentStateIsSubReasonSelection() {
+        testee.userSelectedNegativeFeedbackMainReason(MISSING_BROWSING_FEATURES)
+        testee.userSelectedSubReasonMissingBrowserFeatures(MISSING_BROWSING_FEATURES, TAB_MANAGEMENT)
+        testee.onBackPressed()
+        assertTrue(fragmentViewState is NegativeFeedbackSubReason)
+        verifyNavigatingBack(fragmentViewState)
+    }
+
+    private fun verifyNavigatingForwards(fragmentViewState: FragmentState?) {
+        assertTrue(fragmentViewState?.forwardDirection == true)
+    }
+
+    private fun verifyNavigatingBack(fragmentViewState: FragmentState?) {
+        assertTrue(fragmentViewState?.forwardDirection == false)
+    }
+
+    private fun captureCommand(): Command {
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        return commandCaptor.lastValue
+    }
+
+    private fun configureRatingCanBeGiven() {
+        whenever(playStoreUtils.installedFromPlayStore()).thenReturn(true)
+        whenever(playStoreUtils.isPlayStoreInstalled()).thenReturn(true)
+    }
+
+    private fun configureRatingCannotBeGiven() {
+        whenever(playStoreUtils.installedFromPlayStore()).thenReturn(false)
+        whenever(playStoreUtils.isPlayStoreInstalled()).thenReturn(false)
+    }
+}

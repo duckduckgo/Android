@@ -37,8 +37,8 @@ import timber.log.Timber
 class ShareOpenEndedFeedbackFragment : FeedbackFragment() {
 
     interface OpenEndedFeedbackListener {
-        fun onProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String)
-        fun onProvidedPositiveOpenEndedFeedback(feedback: String)
+        fun userProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String)
+        fun userProvidedPositiveOpenEndedFeedback(feedback: String)
         fun userCancelled()
     }
 
@@ -63,10 +63,10 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment() {
                     listener?.userCancelled()
                 }
                 is Command.ExitAndSubmitNegativeFeedback -> {
-                    listener?.onProvidedNegativeOpenEndedFeedback(command.mainReason, command.subReason, command.feedback)
+                    listener?.userProvidedNegativeOpenEndedFeedback(command.mainReason, command.subReason, command.feedback)
                 }
                 is Command.ExitAndSubmitPositiveFeedback -> {
-                    listener?.onProvidedPositiveOpenEndedFeedback(command.feedback)
+                    listener?.userProvidedPositiveOpenEndedFeedback(command.feedback)
                 }
             }
         })

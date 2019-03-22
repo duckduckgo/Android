@@ -84,7 +84,7 @@ class FeedbackActivity : DuckDuckGoActivity(),
         val state = viewState.fragmentViewState
         when (state) {
             is FragmentState.InitialAppEnjoymentClarifier -> showInitialFeedbackView(state.forwardDirection)
-            is FragmentState.PositiveFeedbackStep1 -> showPositiveFeedbackView(state.forwardDirection)
+            is FragmentState.PositiveFeedbackFirstStep -> showPositiveFeedbackView(state.forwardDirection)
             is FragmentState.PositiveShareFeedback -> showSharePositiveFeedbackView(state.forwardDirection)
             is FragmentState.NegativeFeedbackMainReason -> showNegativeFeedbackMainReasonView(state.forwardDirection)
             is FragmentState.NegativeFeedbackSubReason -> showNegativeFeedbackSubReasonView(state.forwardDirection, state.mainReason)
@@ -170,19 +170,19 @@ class FeedbackActivity : DuckDuckGoActivity(),
     }
 
     override fun userGavePositiveFeedbackNoDetails() {
-        viewModel.onProvidedPositiveFeedbackNoDetails()
+        viewModel.userGavePositiveFeedbackNoDetails()
     }
 
-    override fun onProvidedPositiveOpenEndedFeedback(feedback: String) {
-        viewModel.onProvidedPositiveOpenEndedFeedback(feedback)
+    override fun userProvidedPositiveOpenEndedFeedback(feedback: String) {
+        viewModel.userProvidedPositiveOpenEndedFeedback(feedback)
     }
 
 
     /**
      * Negative feedback listeners
      */
-    override fun onProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String) {
-        viewModel.onProvidedNegativeOpenEndedFeedback(mainReason, subReason, feedback)
+    override fun userProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String) {
+        viewModel.userProvidedNegativeOpenEndedFeedback(mainReason, subReason, feedback)
     }
 
     /**
@@ -198,7 +198,7 @@ class FeedbackActivity : DuckDuckGoActivity(),
      */
 
     override fun userSelectedSubReasonMissingBrowserFeatures(mainReason: MainReason, subReason: MissingBrowserFeaturesSubReasons) {
-        viewModel.userSelectedNegativeFeedbackMissingBrowserSubReason(mainReason, subReason)
+        viewModel.userSelectedSubReasonMissingBrowserFeatures(mainReason, subReason)
     }
 
     override fun userSelectedSubReasonSearchNotGoodEnough(mainReason: MainReason, subReason: SearchNotGoodEnoughSubReasons) {
