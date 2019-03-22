@@ -19,7 +19,6 @@ package com.duckduckgo.app.global.model
 import android.net.Uri
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.isHttps
-import com.duckduckgo.app.global.performance.measureExecution
 import com.duckduckgo.app.privacy.model.Grade
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -65,9 +64,7 @@ class SiteMonitor(
 
     override val distinctTrackersByNetwork: Map<String, List<TrackingEvent>>
         get() {
-            val networks = measureExecution("got tracker networks") {
-                HashMap<String, MutableList<TrackingEvent>>().toMutableMap()
-            }
+            val networks = HashMap<String, MutableList<TrackingEvent>>().toMutableMap()
             for (event: TrackingEvent in trackingEvents.distinctBy { Uri.parse(it.trackerUrl).baseHost }) {
                 val network = event.trackerNetwork?.name ?: Uri.parse(event.trackerUrl).baseHost ?: event.trackerUrl
                 val events = networks[network] ?: ArrayList()
@@ -95,16 +92,14 @@ class SiteMonitor(
     }
 
     override fun trackerDetected(event: TrackingEvent) {
-        measureExecution("registered a tracker was detected") {
-            trackingEvents.add(event)
+        trackingEvents.add(event)
 
-            val entity = event.entity
-            val prevalence = prevalenceStore.findPrevalenceOf(entity)
-            if (event.blocked) {
-                gradeCalculator.addEntityBlocked(entity, prevalence)
-            } else {
-                gradeCalculator.addEntityNotBlocked(entity, prevalence)
-            }
+        val entity = event.entity
+        val prevalence = prevalenceStore.findPrevalenceOf(entity)
+        if (event.blocked) {
+            gradeCalculator.addEntityBlocked(entity, prevalence)
+        } else {
+            gradeCalculator.addEntityNotBlocked(entity, prevalence)
         }
     }
 
