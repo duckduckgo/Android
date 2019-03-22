@@ -33,6 +33,7 @@ interface FeedbackService {
         @Field("category") category: String?,
         @Field("subcategory") subcategory: String?,
         @Field("comment") comment: String,
+        @Field("url") url: String? = null,
         @Field("platform") platform: String = PLATFORM,
         @Field("v") version: String,
         @Field("os") api: Int,

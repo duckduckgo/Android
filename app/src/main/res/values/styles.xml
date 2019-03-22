@@ -237,9 +237,6 @@
         <item name="android:textColor">@color/cornflowerBlue</item>
     </style>
 
-
-    <style name="Theme.Bridge" parent="Theme.MaterialComponents.Light.Bridge" />
-
     <style name="FeedbackFragmentStyle" >
         <item name="android:background">?attr/colorPrimaryDark</item>
         <item name="android:layout_width">match_parent</item>
@@ -304,12 +301,6 @@
     <style name="FeedbackTitle.FeedbackSubtitle.FeedbackHappySadDisambiguationSubtitle">
         <item name="android:textStyle">normal</item>
         <item name="android:layout_marginTop">9dp</item>
-    </style>
-
-    <style name="FeedbackListSeparator">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">1dp</item>
-        <item name="android:background">@drawable/feedback_list_divider</item>
     </style>
 
 </resources>

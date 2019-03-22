@@ -54,9 +54,9 @@ class FireAndForgetFeedbackSubmitter(
 
         sendPixel(pixelForNegativeFeedback(category, subcategory))
 
-        runCatching { submitFeedbackAsync(openEnded, NEGATIVE_FEEDBACK, category, subcategory).await() }
-                .onSuccess { Timber.i("Successfully submitted feedback") }
-                .onFailure { Timber.w(it, "Failed to send feedback") }
+        runCatching { submitFeedbackAsync(openEnded = openEnded, rating = NEGATIVE_FEEDBACK, category = category, subcategory = subcategory).await() }
+            .onSuccess { Timber.i("Successfully submitted feedback") }
+            .onFailure { Timber.w(it, "Failed to send feedback") }
     }
 
     override suspend fun sendPositiveFeedback(openEnded: String?) {
@@ -65,9 +65,9 @@ class FireAndForgetFeedbackSubmitter(
         sendPixel(pixelForPositiveFeedback())
 
         if (!openEnded.isNullOrBlank()) {
-            runCatching { submitFeedbackAsync(openEnded, POSITIVE_FEEDBACK).await() }
-                    .onSuccess { Timber.i("Successfully submitted feedback") }
-                    .onFailure { Timber.w(it, "Failed to send feedback") }
+            runCatching { submitFeedbackAsync(openEnded = openEnded, rating = POSITIVE_FEEDBACK).await() }
+                .onSuccess { Timber.i("Successfully submitted feedback") }
+                .onFailure { Timber.w(it, "Failed to send feedback") }
         }
     }
 
@@ -79,10 +79,10 @@ class FireAndForgetFeedbackSubmitter(
         sendPixel(pixelForNegativeFeedback(category, subcategory))
 
         runCatching {
-            submitBrokenSiteAsync(openEnded, brokenSite).await()
+            submitFeedbackAsync(openEnded = openEnded, rating = NEGATIVE_FEEDBACK, url = brokenSite).await()
         }
-                .onSuccess { Timber.i("Successfully submitted broken site feedback") }
-                .onFailure { Timber.w(it, "Failed to send broken site feedback") }
+            .onSuccess { Timber.i("Successfully submitted broken site feedback") }
+            .onFailure { Timber.w(it, "Failed to send broken site feedback") }
     }
 
     override suspend fun sendUserRated() {
@@ -96,33 +96,23 @@ class FireAndForgetFeedbackSubmitter(
     }
 
     private fun submitFeedbackAsync(
-            openEnded: String,
-            rating: String,
-            category: String? = null,
-            subcategory: String? = null
+        openEnded: String,
+        rating: String,
+        category: String? = null,
+        subcategory: String? = null,
+        url: String? = null
     ): Deferred<Response<Void>> {
         return feedbackService.submitFeedbackAsync(
-                category = category,
-                subcategory = subcategory,
-                rating = rating,
-                comment = openEnded,
-                version = version(),
-                manufacturer = Build.MANUFACTURER,
-                model = Build.MODEL,
-                api = Build.VERSION.SDK_INT,
-                atb = atbWithVariant()
-        )
-    }
-
-    private fun submitBrokenSiteAsync(openEnded: String, url: String?): Deferred<Response<Void>> {
-        return feedbackService.submitBrokenSiteAsync(
-                comment = openEnded,
-                url = url,
-                version = version(),
-                manufacturer = Build.MANUFACTURER,
-                model = Build.MODEL,
-                api = Build.VERSION.SDK_INT,
-                atb = atbWithVariant()
+            category = category,
+            subcategory = subcategory,
+            rating = rating,
+            url = url,
+            comment = openEnded,
+            version = version(),
+            manufacturer = Build.MANUFACTURER,
+            model = Build.MODEL,
+            api = Build.VERSION.SDK_INT,
+            atb = atbWithVariant()
         )
     }
 

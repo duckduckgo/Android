@@ -66,8 +66,6 @@
 
     <string name="openEndedInputHint">How can we improve? (Optional)</string>
     <string name="submitFeedback">SUBMIT FEEDBACK</string>
-    <string name="appreciateYourFeedback">We appreciate your feedback</string>
-    <string name="anonymousFeedbackIsImportant">Your anonymous feedback is important to us</string>
 
     <string name="tellUsHowToImprove">Please tell us what we can improve.</string>
     <string name="thanksForTheFeedback">Thanks for the feedback!</string>

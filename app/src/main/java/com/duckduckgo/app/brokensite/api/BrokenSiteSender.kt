@@ -61,8 +61,8 @@ class BrokenSiteSubmitter(
                         version = BuildConfig.VERSION_NAME,
                         atb = atbWithVariant()).await()
             }
-                    .onSuccess { Timber.v("Feedback submission succeeded") }
-                    .onFailure { Timber.w(it, "Feedback submission failed") }
+                .onSuccess { Timber.v("Feedback submission succeeded") }
+                .onFailure { Timber.w(it, "Feedback submission failed") }
         }
     }
 
