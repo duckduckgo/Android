@@ -30,6 +30,7 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.os.Handler
 import android.text.Editable
 import android.view.*
 import android.view.View.*
@@ -39,6 +40,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebView.FindListener
+import android.webkit.WebView.HitTestResult
 import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.AnyThread
@@ -62,6 +64,7 @@ import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
+import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -614,14 +617,40 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     override fun onCreateContextMenu(menu: ContextMenu, view: View, menuInfo: ContextMenu.ContextMenuInfo?) {
         webView?.hitTestResult?.let {
-            viewModel.userLongPressedInWebView(it, menu)
+            viewModel.userLongPressedInWebView(getLongPressTarget(it), menu)
+        }
+    }
+
+    /**
+     * Use requestFocusNodeHref to get the a tag url for the touched image.
+     */
+    private fun getTargetUrlForImageSource(): String? {
+        val handler = Handler()
+        val message = handler.obtainMessage()
+
+        webView?.requestFocusNodeHref(message)
+
+        return message.data.getString(URL_BUNDLE_KEY)
+    }
+
+    private fun getLongPressTarget(hitTestResult: HitTestResult): LongPressTarget {
+        return if (hitTestResult.type == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
+            LongPressTarget(
+                url = getTargetUrlForImageSource() ?: hitTestResult.extra,
+                imageUrl = hitTestResult.extra,
+                type = hitTestResult.type
+            )
+        } else {
+            LongPressTarget(
+                url = hitTestResult.extra,
+                type = hitTestResult.type
+            )
         }
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         webView?.hitTestResult?.let {
-            val url = it.extra
-            if (viewModel.userSelectedItemFromLongPressMenu(url, item)) {
+            if (viewModel.userSelectedItemFromLongPressMenu(getLongPressTarget(it), item)) {
                 return true
             }
         }
@@ -856,6 +885,8 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
+
+        private const val URL_BUNDLE_KEY = "url"
 
         fun newInstance(tabId: String, query: String? = null): BrowserTabFragment {
             val fragment = BrowserTabFragment()
