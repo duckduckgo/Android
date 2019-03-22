@@ -28,7 +28,7 @@
     <string name="missingBrowserFeatureSubReasonOther">None of these</string>
 
     <string name="websiteNotLoadingTitleLong">Certainly websites don\'t load correctly</string>
-    <string name="websiteNotLoadingTitleShort">Website Loading Issues</string>
+    <string name="websiteNotLoadingTitleShort">Website loading Issues</string>
     <string name="websiteNotLoadingSubtitle">Which website is broken?"</string>
 
     <string name="searchNotGoodEnoughTitleLong">DuckDuckGo search isn\'t good enough</string>
