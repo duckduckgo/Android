@@ -146,9 +146,7 @@ class FireAndForgetFeedbackSubmitter(
     }
 
     private fun version(): String {
-        val variantKey = variantManager.getVariant().key
-        val formattedVariantKey = if (variantKey.isBlank()) " " else " $variantKey "
-        return "${BuildConfig.VERSION_NAME}$formattedVariantKey".trim()
+        return BuildConfig.VERSION_NAME
     }
 
     private fun atbWithVariant(): String {
