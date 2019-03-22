@@ -154,7 +154,6 @@ class FeedbackActivity : DuckDuckGoActivity(),
     }
 
     override fun userCancelled() {
-        Timber.i("User cancelled")
         viewModel.userWantsToCancel()
     }
 
@@ -217,7 +216,6 @@ class FeedbackActivity : DuckDuckGoActivity(),
      * Negative feedback, broken site
      */
     override fun onProvidedBrokenSiteFeedback(feedback: String, url: String?) {
-        Timber.w("Received broken site feedback for site: ($url): $feedback")
         viewModel.onProvidedBrokenSiteFeedback(feedback, url)
     }
 

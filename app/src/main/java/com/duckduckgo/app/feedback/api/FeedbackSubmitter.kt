@@ -81,7 +81,7 @@ class FireAndForgetFeedbackSubmitter(
         runCatching {
             submitBrokenSiteAsync(openEnded, brokenSite).await()
         }
-                .onSuccess { Timber.i("Successfully submitted broken sœite feedback") }
+                .onSuccess { Timber.i("Successfully submitted broken site feedback") }
                 .onFailure { Timber.w(it, "Failed to send broken site feedback") }
     }
 

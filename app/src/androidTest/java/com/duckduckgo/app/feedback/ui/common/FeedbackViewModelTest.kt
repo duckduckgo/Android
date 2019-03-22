@@ -89,24 +89,22 @@ class FeedbackViewModelTest {
     }
 
     @Test
-    fun whenCanRateAppAndUserNavigatesBackFromPositiveInitialFragmentThenFragmentStateIsInitialFragment() = runBlocking<Unit> {
+    @UiThreadTest
+    fun whenCanRateAppAndUserNavigatesBackFromPositiveInitialFragmentThenFragmentStateIsInitialFragment() {
         configureRatingCanBeGiven()
-        withContext(Dispatchers.Main) {
-            testee.userSelectedPositiveFeedback()
-            testee.onBackPressed()
-        }
+        testee.userSelectedPositiveFeedback()
+        testee.onBackPressed()
 
         assertTrue(fragmentViewState is InitialAppEnjoymentClarifier)
         verifyNavigatingBack(fragmentViewState)
     }
 
     @Test
-    fun whenCannotRateAppAndUserNavigatesBackFromPositiveInitialFragmentThenFragmentStateIsInitialFragment() = runBlocking<Unit> {
+    @UiThreadTest
+    fun whenCannotRateAppAndUserNavigatesBackFromPositiveInitialFragmentThenFragmentStateIsInitialFragment() {
         configureRatingCannotBeGiven()
-        withContext(Dispatchers.Main) {
-            testee.userSelectedPositiveFeedback()
-            testee.onBackPressed()
-        }
+        testee.userSelectedPositiveFeedback()
+        testee.onBackPressed()
 
         assertTrue(fragmentViewState is InitialAppEnjoymentClarifier)
     }
@@ -148,6 +146,30 @@ class FeedbackViewModelTest {
 
         val command = captureCommand() as Command.Exit
         assertTrue(command.feedbackSubmitted)
+    }
+
+    @Test
+    fun whenUserProvidesNegativeFeedbackThenFeedbackSubmitted() = runBlocking<Unit> {
+        withContext(Dispatchers.Main) {
+            testee.userProvidedNegativeOpenEndedFeedback(MISSING_BROWSING_FEATURES, TAB_MANAGEMENT, "foo")
+        }
+        verify(feedbackSubmitter).sendNegativeFeedback(MISSING_BROWSING_FEATURES, TAB_MANAGEMENT, "foo")
+    }
+
+    @Test
+    fun whenUserProvidesNegativeFeedbackNoSubReasonThenFeedbackSubmitted() = runBlocking<Unit> {
+        withContext(Dispatchers.Main) {
+            testee.userProvidedNegativeOpenEndedFeedback(MISSING_BROWSING_FEATURES, null, "foo")
+        }
+        verify(feedbackSubmitter).sendNegativeFeedback(MISSING_BROWSING_FEATURES, null, "foo")
+    }
+
+    @Test
+    fun whenUserProvidesNegativeFeedbackEmptyOpenEndedFeedbackThenFeedbackSubmitted() = runBlocking<Unit> {
+        withContext(Dispatchers.Main) {
+            testee.userProvidedNegativeOpenEndedFeedback(MISSING_BROWSING_FEATURES, null, "")
+        }
+        verify(feedbackSubmitter).sendNegativeFeedback(MISSING_BROWSING_FEATURES, null, "")
     }
 
     @Test
