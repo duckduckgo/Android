@@ -36,7 +36,6 @@ abstract class FeedbackFragment : Fragment() {
         super.onAttach(context)
     }
 
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         configureListeners()

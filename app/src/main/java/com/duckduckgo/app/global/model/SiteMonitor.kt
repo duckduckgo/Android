@@ -68,14 +68,11 @@ class SiteMonitor(
             val networks = measureExecution("got tracker networks") {
                 HashMap<String, MutableList<TrackingEvent>>().toMutableMap()
             }
-
-            measureExecution("totalled events") {
-                for (event: TrackingEvent in trackingEvents.distinctBy { Uri.parse(it.trackerUrl).baseHost }) {
-                    val network = event.trackerNetwork?.name ?: Uri.parse(event.trackerUrl).baseHost ?: event.trackerUrl
-                    val events = networks[network] ?: ArrayList()
-                    events.add(event)
-                    networks[network] = events
-                }
+            for (event: TrackingEvent in trackingEvents.distinctBy { Uri.parse(it.trackerUrl).baseHost }) {
+                val network = event.trackerNetwork?.name ?: Uri.parse(event.trackerUrl).baseHost ?: event.trackerUrl
+                val events = networks[network] ?: ArrayList()
+                events.add(event)
+                networks[network] = events
             }
             return networks
         }

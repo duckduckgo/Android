@@ -167,7 +167,6 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment() {
             val fragment = ShareOpenEndedFeedbackFragment()
             fragment.arguments = Bundle().also {
                 it.putBoolean(IS_POSITIVE_FEEDBACK_EXTRA, false)
-
                 it.putSerializable(MAIN_REASON_EXTRA, mainReason)
 
                 if (subReason != null) {

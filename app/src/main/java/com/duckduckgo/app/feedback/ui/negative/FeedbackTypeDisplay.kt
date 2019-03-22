@@ -183,11 +183,9 @@ class FeedbackTypeDisplay {
                 it[type] = FeedbackTypeSubReasonDisplay(type, R.string.needMoreCustomizationSubReasonWhichDataIsCleared)
             }
 
-
             WHEN_DATA_IS_CLEARED.also { type ->
                 it[type] = FeedbackTypeSubReasonDisplay(type, R.string.needMoreCustomizationSubReasonWhenDataIsCleared)
             }
-
 
             BOOKMARK_DISPLAY.also { type ->
                 it[type] = FeedbackTypeSubReasonDisplay(type, R.string.needMoreCustomizationSubReasonBookmarksDisplay)
