@@ -109,6 +109,7 @@
             android:parentActivityName=".BrowserActivity" />
         <activity
             android:name="com.duckduckgo.app.feedback.ui.common.FeedbackActivity"
+            android:windowSoftInputMode="adjustResize"
             android:label="@string/brokenSiteActivityTitle" />
         <activity
             android:name="com.duckduckgo.app.brokensite.BrokenSiteActivity"
