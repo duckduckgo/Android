@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.view.MenuItem
 import android.view.View
+import android.webkit.HttpAuthHandler
 import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
@@ -853,6 +854,40 @@ class BrowserTabViewModelTest {
         whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(true)
         testee.restoreWebViewState(null, "")
         assertFalse(globalLayoutViewState().isNewTabState)
+    }
+
+    @Test
+    fun whenAuthenticationIsRequiredThenRequiresAuthenticationCommandSent() {
+        val mockHandler = mock<HttpAuthHandler>()
+        val siteURL = "http://example.com/requires-auth"
+        testee.requiresAuthentication(siteURL, mockHandler)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue
+        assertTrue(command is Command.RequiresAuthentication)
+
+        val requiresAuthCommand = command as Command.RequiresAuthentication
+        assertEquals(siteURL, requiresAuthCommand.url)
+        assertSame(mockHandler, requiresAuthCommand.handler)
+    }
+
+    @Test
+    fun whenHandleAuthenticationThenHandlerCalledWithParameters() {
+        val mockHandler = mock<HttpAuthHandler>()
+        val username = "user"
+        val password = "password"
+        testee.handleAuthentication(mockHandler, username, password)
+
+        verify(mockHandler, atLeastOnce()).proceed(username, password)
+    }
+
+    @Test
+    fun whenAuthenticationCanceledThenNavigateCommandSentWithAboutBlank() {
+        testee.cancelAuthentication()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.lastValue
+        assertTrue(command is Navigate)
+        assertEquals("about:blank", (command as Navigate).url)
     }
 
     private fun changeUrl(url: String?) {

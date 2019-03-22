@@ -21,6 +21,7 @@ import android.net.Uri
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
+import android.webkit.HttpAuthHandler
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
@@ -46,6 +47,7 @@ import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
 import com.duckduckgo.app.cta.ui.CtaConfiguration
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.feedback.model.Survey
@@ -93,7 +95,7 @@ class BrowserTabViewModel(
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
     appConfigurationDao: AppConfigurationDao
-) : WebViewClientListener, SaveBookmarkListener, CoroutineScope, ViewModel() {
+) : WebViewClientListener, SaveBookmarkListener, CoroutineScope, HttpAuthenticationListener, ViewModel() {
 
     private val job = SupervisorJob()
 
@@ -170,6 +172,7 @@ class BrowserTabViewModel(
         class LaunchSurvey(val survey: Survey) : Command()
         object LaunchAddWidget : Command()
         object LaunchLegacyAddWidget : Command()
+        class RequiresAuthentication(val url: String, val handler: HttpAuthHandler) : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -329,6 +332,11 @@ class BrowserTabViewModel(
 
     override fun loadingFinished(url: String?) {
         Timber.v("Loading finished")
+
+        // Skip if url is BLANK_PAGE which is used to clear the page when 401 challenge is dismissed
+        if (url == BLANK_PAGE) {
+            return
+        }
 
         if (pendingUrl != null) {
             urlChanged(url)
@@ -692,6 +700,24 @@ class BrowserTabViewModel(
 
     override fun externalAppLinkClicked(appLink: IntentType) {
         command.value = HandleExternalAppLink(appLink)
+    }
+
+    override fun requiresAuthentication(siteURL: String, handler: HttpAuthHandler) {
+        Timber.v("requiresAuthentication for URL [$siteURL]")
+        command.value = RequiresAuthentication(siteURL, handler)
+    }
+
+    override fun handleAuthentication(handler: HttpAuthHandler, username: String, password: String) {
+        handler.proceed(username, password)
+    }
+
+    override fun cancelAuthentication() {
+        Timber.v("cancelAuthentication, loading about:blank")
+        command.value = Navigate(BLANK_PAGE)
+    }
+
+    companion object {
+        const val BLANK_PAGE = "about:blank"
     }
 }
 

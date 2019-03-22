@@ -35,6 +35,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.ERROR_CODE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.URL
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
+import java.net.URI
 import javax.inject.Inject
 import kotlin.concurrent.thread
 
@@ -164,6 +165,23 @@ class BrowserWebViewClient @Inject constructor(
             reportHttpsErrorIfInUpgradeList(uri, "SSL_ERROR_${error.primaryError}")
         }
         super.onReceivedSslError(view, handler, error)
+    }
+
+    @UiThread
+    override fun onReceivedHttpAuthRequest(view: WebView?, handler: HttpAuthHandler?, host: String?, realm: String?) {
+        Timber.v("onReceivedHttpAuthRequest ${view?.url} $realm, $host,  $currentUrl")
+
+        val siteURL = view?.url?.let {
+            "${URI(view.url).scheme}://$host"
+        } ?: host!!
+
+        if (handler != null) {
+            webViewClientListener?.let {
+                it.requiresAuthentication(siteURL, handler)
+            }
+        } else {
+            super.onReceivedHttpAuthRequest(view, handler, host, realm)
+        }
     }
 
     @AnyThread

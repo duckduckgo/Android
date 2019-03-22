@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.net.Uri
 import android.view.View
+import android.webkit.HttpAuthHandler
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import com.duckduckgo.app.browser.BrowserWebViewClient.BrowserNavigationOptions
@@ -41,4 +42,6 @@ interface WebViewClientListener {
     fun exitFullScreen()
     fun showFileChooser(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams)
     fun externalAppLinkClicked(appLink: SpecialUrlDetector.UrlType.IntentType)
+
+    fun requiresAuthentication(site: String, handler: HttpAuthHandler)
 }

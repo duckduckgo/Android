@@ -35,6 +35,7 @@ import android.text.Editable
 import android.view.*
 import android.view.View.*
 import android.view.inputmethod.EditorInfo
+import android.webkit.HttpAuthHandler
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
@@ -69,6 +70,7 @@ import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
+import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.CtaConfiguration
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -393,6 +395,7 @@ class BrowserTabFragment : Fragment(), FindListener {
             is Command.LaunchSurvey -> launchSurvey(it.survey)
             is Command.LaunchAddWidget -> launchAddWidget()
             is Command.LaunchLegacyAddWidget -> launchLegacyAddWidget()
+            is Command.RequiresAuthentication -> showAuthenticationDialog(it.url, it.handler)
         }
     }
 
@@ -463,6 +466,14 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private fun showToast(@StringRes messageId: Int) {
         context?.applicationContext?.longToast(messageId)
+    }
+
+    private fun showAuthenticationDialog(url: String, handler: HttpAuthHandler) {
+        val dialog = HttpAuthenticationDialogFragment.createHttpAuthenticationDialog(url)
+
+        dialog.show(activity?.supportFragmentManager, AUTHENTICATION_DIALOG_TAG)
+        dialog.listener = viewModel
+        dialog.handler = handler
     }
 
     private fun configureAutoComplete() {
@@ -887,6 +898,8 @@ class BrowserTabFragment : Fragment(), FindListener {
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
 
         private const val URL_BUNDLE_KEY = "url"
+
+        private const val AUTHENTICATION_DIALOG_TAG = "AUTH_DIALOG_TAG"
 
         fun newInstance(tabId: String, query: String? = null): BrowserTabFragment {
             val fragment = BrowserTabFragment()

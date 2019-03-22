@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.content.Context
+import android.webkit.HttpAuthHandler
 import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -70,6 +71,14 @@ class BrowserWebViewClientTest {
     fun whenOnPageFinishedCalledThenListenerInstructedToUpdateNavigationOptions() {
         testee.onPageFinished(webView, EXAMPLE_URL)
         verify(listener).navigationOptionsChanged(any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnReceivedHttpAuthRequestThenListenerNotified() {
+        val mockHandler = mock<HttpAuthHandler>()
+        testee.onReceivedHttpAuthRequest(webView, mockHandler, EXAMPLE_URL, EXAMPLE_URL)
+        verify(listener).requiresAuthentication(EXAMPLE_URL, mockHandler)
     }
 
     private class TestWebView(context: Context) : WebView(context)
