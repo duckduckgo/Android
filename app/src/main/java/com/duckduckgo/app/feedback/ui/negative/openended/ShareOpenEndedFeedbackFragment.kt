@@ -31,7 +31,6 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.Companion.mai
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.Companion.subReasons
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel.Command
 import kotlinx.android.synthetic.main.content_feedback_open_ended_feedback.*
-import timber.log.Timber
 
 
 class ShareOpenEndedFeedbackFragment : FeedbackFragment() {
@@ -78,7 +77,6 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment() {
         if (arguments == null) throw IllegalArgumentException("Missing required arguments")
 
         arguments?.let { args ->
-
             isPositiveFeedback = args.getBoolean(IS_POSITIVE_FEEDBACK_EXTRA)
 
             if (isPositiveFeedback) {
@@ -87,22 +85,6 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment() {
                 updateDisplayForNegativeFeedback(args)
             }
         }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        val inputState = openEndedFeedback.text.toString()
-        Timber.i("Saving view state - {$inputState}")
-        super.onSaveInstanceState(outState)
-        outState.putString("input", inputState)
-    }
-
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        Timber.i("restoring view state $savedInstanceState")
-
-        savedInstanceState?.getString("input")?.let {
-            openEndedFeedback.setText(it)
-        }
-        super.onViewStateRestored(savedInstanceState)
     }
 
     private fun updateDisplayForPositiveFeedback() {

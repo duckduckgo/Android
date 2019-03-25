@@ -56,7 +56,6 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
 
         recyclerAdapter = SubReasonAdapter(object : (FeedbackTypeSubReasonDisplay) -> Unit {
             override fun invoke(reason: FeedbackTypeSubReasonDisplay) {
-                Timber.i("Clicked reason: $reason")
                 when (reason.subReason) {
                     is MissingBrowserFeaturesSubReasons -> {
                         listener?.userSelectedSubReasonMissingBrowserFeatures(mainReason, reason.subReason)
