@@ -55,7 +55,14 @@ class FireAndForgetFeedbackSubmitter(
         sendPixel(pixelForNegativeFeedback(category, subcategory))
 
         GlobalScope.launch {
-            runCatching { submitFeedback(openEnded = openEnded, rating = NEGATIVE_FEEDBACK, category = category, subcategory = subcategory) }
+            runCatching {
+                submitFeedback(
+                    openEnded = openEnded,
+                    rating = NEGATIVE_FEEDBACK,
+                    category = category,
+                    subcategory = subcategory
+                )
+            }
                 .onSuccess { Timber.i("Successfully submitted feedback") }
                 .onFailure { Timber.w(it, "Failed to send feedback") }
         }
@@ -84,7 +91,12 @@ class FireAndForgetFeedbackSubmitter(
 
         GlobalScope.launch {
             runCatching {
-                submitFeedback(openEnded = openEnded, rating = NEGATIVE_FEEDBACK, url = brokenSite, category = category)
+                submitFeedback(
+                    reason = FeedbackService.REASON_BROKEN_SITE,
+                    rating = NEGATIVE_FEEDBACK,
+                    url = brokenSite,
+                    openEnded = openEnded,
+                    category = category)
             }
                 .onSuccess { Timber.i("Successfully submitted broken site feedback") }
                 .onFailure { Timber.w(it, "Failed to send broken site feedback") }
@@ -106,9 +118,11 @@ class FireAndForgetFeedbackSubmitter(
         rating: String,
         category: String? = null,
         subcategory: String? = null,
-        url: String? = null
+        url: String? = null,
+        reason: String = FeedbackService.REASON_GENERAL
     ) {
         feedbackService.submitFeedback(
+            reason = reason,
             category = category,
             subcategory = subcategory,
             rating = rating,
