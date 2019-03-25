@@ -85,8 +85,8 @@ ext {
     fragmentKtx = "1.0.0"
     constraintLayout = "2.0.0-alpha3"
     lifecycle = "2.0.0"
-    room = "2.1.0-alpha04"
-    workManager = "1.0.0-rc01"
+    room = "2.1.0-alpha05"
+    workManager = "2.0.0"
     legacySupport = "1.0.0"
     espressoCore = "3.1.1"
     coreTesting = "2.0.0"
@@ -158,7 +158,7 @@ dependencies {
     androidTestImplementation "androidx.room:room-testing:$room"
 
     // WorkManager
-    implementation "android.arch.work:work-runtime-ktx:$workManager"
+    implementation "androidx.work:work-runtime-ktx:$workManager"
 
     // Dagger
     kapt "com.google.dagger:dagger-android-processor:$dagger"
