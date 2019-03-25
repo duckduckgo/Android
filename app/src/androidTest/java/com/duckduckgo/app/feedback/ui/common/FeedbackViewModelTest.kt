@@ -22,7 +22,6 @@ import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.ui.common.FragmentState.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MissingBrowserFeaturesSubReasons.TAB_MANAGEMENT
-import com.duckduckgo.app.global.coroutine.DispatcherProvider
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.mock
@@ -54,7 +53,7 @@ class FeedbackViewModelTest {
     @Before
     @UiThreadTest
     fun setup() {
-        testee = FeedbackViewModel(playStoreUtils, feedbackSubmitter, DispatcherProvider.TESTING)
+        testee = FeedbackViewModel(playStoreUtils, feedbackSubmitter)
         testee.command.observeForever(commandObserver)
     }
 

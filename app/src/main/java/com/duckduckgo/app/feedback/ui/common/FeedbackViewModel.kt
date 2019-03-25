@@ -25,18 +25,15 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackType
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.global.coroutine.DispatcherProvider
 import com.duckduckgo.app.playstore.PlayStoreUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 
-class FeedbackViewModel(
-    private val playStoreUtils: PlayStoreUtils,
-    private val feedbackSubmitter: FeedbackSubmitter,
-    private val dispatcherProvider: DispatcherProvider = DispatcherProvider.PRODUCTION
-) : ViewModel() {
+class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val feedbackSubmitter: FeedbackSubmitter) : ViewModel() {
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
 
@@ -160,32 +157,32 @@ class FeedbackViewModel(
         )
     }
 
-    fun userProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String) {
-        GlobalScope.launch(dispatcherProvider.IO) {
+    suspend fun userProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String) {
+        withContext(Dispatchers.IO) {
             feedbackSubmitter.sendNegativeFeedback(mainReason, subReason, feedback)
         }
 
         command.value = Command.Exit(feedbackSubmitted = true)
     }
 
-    fun onProvidedBrokenSiteFeedback(feedback: String, brokenSite: String?) {
-        GlobalScope.launch(dispatcherProvider.IO) {
+    suspend fun onProvidedBrokenSiteFeedback(feedback: String, brokenSite: String?) {
+        withContext(Dispatchers.IO) {
             feedbackSubmitter.sendBrokenSiteFeedback(feedback, brokenSite)
         }
 
         command.value = Command.Exit(feedbackSubmitted = true)
     }
 
-    fun userGavePositiveFeedbackNoDetails() {
-        GlobalScope.launch(dispatcherProvider.IO) {
+    suspend fun userGavePositiveFeedbackNoDetails() {
+        withContext(Dispatchers.IO) {
             feedbackSubmitter.sendPositiveFeedback(null)
         }
 
         command.value = Command.Exit(feedbackSubmitted = true)
     }
 
-    fun userProvidedPositiveOpenEndedFeedback(feedback: String) {
-        GlobalScope.launch(dispatcherProvider.IO) {
+    suspend fun userProvidedPositiveOpenEndedFeedback(feedback: String) {
+        withContext(Dispatchers.IO) {
             feedbackSubmitter.sendPositiveFeedback(feedback)
         }
 
@@ -233,7 +230,7 @@ class FeedbackViewModel(
     }
 
     fun userSelectedToRateApp() {
-        GlobalScope.launch(dispatcherProvider.IO) {
+        GlobalScope.launch(Dispatchers.IO) {
             feedbackSubmitter.sendUserRated()
         }
 

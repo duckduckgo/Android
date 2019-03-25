@@ -34,7 +34,11 @@ import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedba
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import kotlinx.android.synthetic.main.include_toolbar.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.coroutines.CoroutineContext
 
 
 class FeedbackActivity : DuckDuckGoActivity(),
@@ -43,7 +47,10 @@ class FeedbackActivity : DuckDuckGoActivity(),
     ShareOpenEndedFeedbackFragment.OpenEndedFeedbackListener,
     MainReasonNegativeFeedbackFragment.MainReasonNegativeFeedbackListener,
     BrokenSiteNegativeFeedbackFragment.BrokenSiteFeedbackListener,
-    SubReasonNegativeFeedbackFragment.DisambiguationNegativeFeedbackListener {
+    SubReasonNegativeFeedbackFragment.DisambiguationNegativeFeedbackListener, CoroutineScope {
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main
 
     private val viewModel: FeedbackViewModel by bindViewModel()
 
@@ -169,11 +176,11 @@ class FeedbackActivity : DuckDuckGoActivity(),
     }
 
     override fun userGavePositiveFeedbackNoDetails() {
-        viewModel.userGavePositiveFeedbackNoDetails()
+        launch { viewModel.userGavePositiveFeedbackNoDetails() }
     }
 
     override fun userProvidedPositiveOpenEndedFeedback(feedback: String) {
-        viewModel.userProvidedPositiveOpenEndedFeedback(feedback)
+        launch { viewModel.userProvidedPositiveOpenEndedFeedback(feedback) }
     }
 
 
@@ -181,7 +188,7 @@ class FeedbackActivity : DuckDuckGoActivity(),
      * Negative feedback listeners
      */
     override fun userProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String) {
-        viewModel.userProvidedNegativeOpenEndedFeedback(mainReason, subReason, feedback)
+        launch { viewModel.userProvidedNegativeOpenEndedFeedback(mainReason, subReason, feedback) }
     }
 
     /**
@@ -216,7 +223,7 @@ class FeedbackActivity : DuckDuckGoActivity(),
      * Negative feedback, broken site
      */
     override fun onProvidedBrokenSiteFeedback(feedback: String, url: String?) {
-        viewModel.onProvidedBrokenSiteFeedback(feedback, url)
+        launch { viewModel.onProvidedBrokenSiteFeedback(feedback, url) }
     }
 
     companion object {
