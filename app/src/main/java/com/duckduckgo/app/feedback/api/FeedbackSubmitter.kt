@@ -64,7 +64,7 @@ class FireAndForgetFeedbackSubmitter(
 
         sendPixel(pixelForPositiveFeedback())
 
-        if (!openEnded.isNullOrBlank()) {
+        if (openEnded != null) {
             runCatching { submitFeedbackAsync(openEnded = openEnded, rating = POSITIVE_FEEDBACK).await() }
                 .onSuccess { Timber.i("Successfully submitted feedback") }
                 .onFailure { Timber.w(it, "Failed to send feedback") }
