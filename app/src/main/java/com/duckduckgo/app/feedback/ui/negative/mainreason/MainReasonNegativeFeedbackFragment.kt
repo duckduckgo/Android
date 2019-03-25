@@ -30,7 +30,6 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.FeedbackTypeMainReasonDisplay
 import kotlinx.android.synthetic.main.content_feedback_negative_disambiguation_main_reason.*
-import timber.log.Timber
 
 
 class MainReasonNegativeFeedbackFragment : FeedbackFragment() {
@@ -48,7 +47,6 @@ class MainReasonNegativeFeedbackFragment : FeedbackFragment() {
 
         recyclerAdapter = MainReasonAdapter(object : (FeedbackTypeMainReasonDisplay) -> Unit {
             override fun invoke(reason: FeedbackTypeMainReasonDisplay) {
-                Timber.i("Clicked reason: $reason")
                 listener?.userSelectedNegativeFeedbackMainReason(reason.mainReason)
             }
         })
@@ -65,7 +63,6 @@ class MainReasonNegativeFeedbackFragment : FeedbackFragment() {
             recyclerView.addItemDecoration(FeedbackItemDecoration(ContextCompat.getDrawable(it, R.drawable.feedback_list_divider)!!))
 
             val listValues = getMainReasonsDisplayText()
-            Timber.i("There are ${listValues.size} subReasons to show")
             recyclerAdapter.submitList(listValues)
         }
     }
@@ -75,10 +72,6 @@ class MainReasonNegativeFeedbackFragment : FeedbackFragment() {
         return FeedbackType.MainReason.values().mapNotNull {
             FeedbackTypeDisplay.mainReasons[it]
         }
-    }
-
-    override fun configureViewModelObservers() {
-
     }
 
     companion object {

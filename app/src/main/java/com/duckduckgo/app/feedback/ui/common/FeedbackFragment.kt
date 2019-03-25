@@ -42,7 +42,7 @@ abstract class FeedbackFragment : Fragment() {
         configureViewModelObservers()
     }
 
-    abstract fun configureViewModelObservers()
+    open fun configureViewModelObservers() {}
     open fun configureListeners() {}
 
     protected inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProviders.of(this, viewModelFactory).get(V::class.java) }

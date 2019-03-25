@@ -110,7 +110,6 @@ class FeedbackTypeDisplay {
                     R.string.otherMainReasonSubtitle
                 )
             }
-
         }
 
         val subReasons: Map<SubReason, FeedbackTypeSubReasonDisplay> = mutableMapOf<SubReason, FeedbackTypeSubReasonDisplay>().also {
@@ -211,6 +210,5 @@ class FeedbackTypeDisplay {
                 it[type] = FeedbackTypeSubReasonDisplay(type, R.string.appIsSlowOrBuggySubReasonOther, R.string.tellUsHowToImprove)
             }
         }
-
     }
 }

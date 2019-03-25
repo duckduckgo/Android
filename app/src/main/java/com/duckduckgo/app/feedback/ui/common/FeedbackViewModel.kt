@@ -158,35 +158,31 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
     }
 
     suspend fun userProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String) {
+        command.value = Command.Exit(feedbackSubmitted = true)
         withContext(Dispatchers.IO) {
             feedbackSubmitter.sendNegativeFeedback(mainReason, subReason, feedback)
         }
-
-        command.value = Command.Exit(feedbackSubmitted = true)
     }
 
     suspend fun onProvidedBrokenSiteFeedback(feedback: String, brokenSite: String?) {
+        command.value = Command.Exit(feedbackSubmitted = true)
         withContext(Dispatchers.IO) {
             feedbackSubmitter.sendBrokenSiteFeedback(feedback, brokenSite)
         }
-
-        command.value = Command.Exit(feedbackSubmitted = true)
     }
 
     suspend fun userGavePositiveFeedbackNoDetails() {
+        command.value = Command.Exit(feedbackSubmitted = true)
         withContext(Dispatchers.IO) {
             feedbackSubmitter.sendPositiveFeedback(null)
         }
-
-        command.value = Command.Exit(feedbackSubmitted = true)
     }
 
     suspend fun userProvidedPositiveOpenEndedFeedback(feedback: String) {
+        command.value = Command.Exit(feedbackSubmitted = true)
         withContext(Dispatchers.IO) {
             feedbackSubmitter.sendPositiveFeedback(feedback)
         }
-
-        command.value = Command.Exit(feedbackSubmitted = true)
     }
 
     fun userSelectedSubReasonMissingBrowserFeatures(mainReason: MainReason, subReason: FeedbackType.MissingBrowserFeaturesSubReasons) {
