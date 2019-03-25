@@ -51,7 +51,7 @@ class BrokenSiteSubmitter(
         GlobalScope.launch(Dispatchers.IO) {
 
             runCatching {
-                service.submitBrokenSiteAsync(
+                service.submitBrokenSite(
                     reason = reason,
                     url = url,
                     comment = comment,
@@ -60,7 +60,7 @@ class BrokenSiteSubmitter(
                     model = Build.MODEL,
                     version = BuildConfig.VERSION_NAME,
                     atb = atbWithVariant()
-                ).await()
+                ).execute()
             }
                 .onSuccess { Timber.v("Feedback submission succeeded") }
                 .onFailure { Timber.w(it, "Feedback submission failed") }

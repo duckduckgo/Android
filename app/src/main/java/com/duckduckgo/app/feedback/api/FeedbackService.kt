@@ -16,8 +16,7 @@
 
 package com.duckduckgo.app.feedback.api
 
-import kotlinx.coroutines.Deferred
-import retrofit2.Response
+import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
@@ -27,7 +26,7 @@ interface FeedbackService {
 
     @FormUrlEncoded
     @POST("/feedback.js?type=app-feedback")
-    fun submitFeedbackAsync(
+    fun submitFeedback(
         @Field("reason") reason: String = REASON_GENERAL,
         @Field("rating") rating: String,
         @Field("category") category: String?,
@@ -40,11 +39,11 @@ interface FeedbackService {
         @Field("manufacturer") manufacturer: String,
         @Field("model") model: String,
         @Field("atb") atb: String
-    ): Deferred<Response<Void>>
+    ): Call<Void>
 
     @FormUrlEncoded
     @POST("/feedback.js?type=app-feedback")
-    fun submitBrokenSiteAsync(
+    fun submitBrokenSite(
         @Field("reason") reason: String = REASON_BROKEN_SITE,
         @Field("comment") comment: String,
         @Field("platform") platform: String = PLATFORM,
@@ -54,7 +53,7 @@ interface FeedbackService {
         @Field("manufacturer") manufacturer: String,
         @Field("model") model: String,
         @Field("atb") atb: String
-    ): Deferred<Response<Void>>
+    ): Call<Void>
 
     companion object {
         const val REASON_GENERAL = "general"

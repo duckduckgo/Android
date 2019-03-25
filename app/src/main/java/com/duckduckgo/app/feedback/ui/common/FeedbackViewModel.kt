@@ -158,28 +158,28 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
     }
 
     suspend fun userProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String) {
-        command.value = Command.Exit(feedbackSubmitted = true)
+        command.postValue(Command.Exit(feedbackSubmitted = true))
         withContext(Dispatchers.IO) {
             feedbackSubmitter.sendNegativeFeedback(mainReason, subReason, feedback)
         }
     }
 
     suspend fun onProvidedBrokenSiteFeedback(feedback: String, brokenSite: String?) {
-        command.value = Command.Exit(feedbackSubmitted = true)
+        command.postValue(Command.Exit(feedbackSubmitted = true))
         withContext(Dispatchers.IO) {
             feedbackSubmitter.sendBrokenSiteFeedback(feedback, brokenSite)
         }
     }
 
     suspend fun userGavePositiveFeedbackNoDetails() {
-        command.value = Command.Exit(feedbackSubmitted = true)
+        command.postValue(Command.Exit(feedbackSubmitted = true))
         withContext(Dispatchers.IO) {
             feedbackSubmitter.sendPositiveFeedback(null)
         }
     }
 
     suspend fun userProvidedPositiveOpenEndedFeedback(feedback: String) {
-        command.value = Command.Exit(feedbackSubmitted = true)
+        command.postValue(Command.Exit(feedbackSubmitted = true))
         withContext(Dispatchers.IO) {
             feedbackSubmitter.sendPositiveFeedback(feedback)
         }
@@ -225,12 +225,11 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
         )
     }
 
-    fun userSelectedToRateApp() {
+    suspend fun userSelectedToRateApp() {
+        command.postValue(Command.Exit(feedbackSubmitted = true))
         GlobalScope.launch(Dispatchers.IO) {
             feedbackSubmitter.sendUserRated()
         }
-
-        command.value = Command.Exit(feedbackSubmitted = true)
     }
 
     companion object {

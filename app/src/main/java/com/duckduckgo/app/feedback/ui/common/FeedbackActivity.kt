@@ -34,11 +34,9 @@ import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedba
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import kotlinx.android.synthetic.main.include_toolbar.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import kotlin.coroutines.CoroutineContext
 
 
 class FeedbackActivity : DuckDuckGoActivity(),
@@ -47,10 +45,7 @@ class FeedbackActivity : DuckDuckGoActivity(),
     ShareOpenEndedFeedbackFragment.OpenEndedFeedbackListener,
     MainReasonNegativeFeedbackFragment.MainReasonNegativeFeedbackListener,
     BrokenSiteNegativeFeedbackFragment.BrokenSiteFeedbackListener,
-    SubReasonNegativeFeedbackFragment.DisambiguationNegativeFeedbackListener, CoroutineScope {
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main
+    SubReasonNegativeFeedbackFragment.DisambiguationNegativeFeedbackListener {
 
     private val viewModel: FeedbackViewModel by bindViewModel()
 
@@ -168,7 +163,7 @@ class FeedbackActivity : DuckDuckGoActivity(),
      * Positive feedback listeners
      */
     override fun userSelectedToRateApp() {
-        viewModel.userSelectedToRateApp()
+        GlobalScope.launch { viewModel.userSelectedToRateApp() }
     }
 
     override fun userSelectedToGiveFeedback() {
@@ -176,11 +171,11 @@ class FeedbackActivity : DuckDuckGoActivity(),
     }
 
     override fun userGavePositiveFeedbackNoDetails() {
-        launch { viewModel.userGavePositiveFeedbackNoDetails() }
+        GlobalScope.launch { viewModel.userGavePositiveFeedbackNoDetails() }
     }
 
     override fun userProvidedPositiveOpenEndedFeedback(feedback: String) {
-        launch { viewModel.userProvidedPositiveOpenEndedFeedback(feedback) }
+        GlobalScope.launch { viewModel.userProvidedPositiveOpenEndedFeedback(feedback) }
     }
 
 
@@ -188,7 +183,7 @@ class FeedbackActivity : DuckDuckGoActivity(),
      * Negative feedback listeners
      */
     override fun userProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String) {
-        launch { viewModel.userProvidedNegativeOpenEndedFeedback(mainReason, subReason, feedback) }
+        GlobalScope.launch { viewModel.userProvidedNegativeOpenEndedFeedback(mainReason, subReason, feedback) }
     }
 
     /**
@@ -223,7 +218,7 @@ class FeedbackActivity : DuckDuckGoActivity(),
      * Negative feedback, broken site
      */
     override fun onProvidedBrokenSiteFeedback(feedback: String, url: String?) {
-        launch { viewModel.onProvidedBrokenSiteFeedback(feedback, url) }
+        GlobalScope.launch { viewModel.onProvidedBrokenSiteFeedback(feedback, url) }
     }
 
     companion object {

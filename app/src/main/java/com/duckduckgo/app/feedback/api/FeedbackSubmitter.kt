@@ -25,8 +25,8 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FEEDBACK_NEGATIVE_SUBMISSION
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import kotlinx.coroutines.Deferred
-import retrofit2.Response
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 
@@ -54,9 +54,11 @@ class FireAndForgetFeedbackSubmitter(
 
         sendPixel(pixelForNegativeFeedback(category, subcategory))
 
-        runCatching { submitFeedbackAsync(openEnded = openEnded, rating = NEGATIVE_FEEDBACK, category = category, subcategory = subcategory).await() }
-            .onSuccess { Timber.i("Successfully submitted feedback") }
-            .onFailure { Timber.w(it, "Failed to send feedback") }
+        GlobalScope.launch {
+            runCatching { submitFeedback(openEnded = openEnded, rating = NEGATIVE_FEEDBACK, category = category, subcategory = subcategory) }
+                .onSuccess { Timber.i("Successfully submitted feedback") }
+                .onFailure { Timber.w(it, "Failed to send feedback") }
+        }
     }
 
     override suspend fun sendPositiveFeedback(openEnded: String?) {
@@ -65,9 +67,11 @@ class FireAndForgetFeedbackSubmitter(
         sendPixel(pixelForPositiveFeedback())
 
         if (openEnded != null) {
-            runCatching { submitFeedbackAsync(openEnded = openEnded, rating = POSITIVE_FEEDBACK).await() }
-                .onSuccess { Timber.i("Successfully submitted feedback") }
-                .onFailure { Timber.w(it, "Failed to send feedback") }
+            GlobalScope.launch {
+                runCatching { submitFeedback(openEnded = openEnded, rating = POSITIVE_FEEDBACK) }
+                    .onSuccess { Timber.i("Successfully submitted feedback") }
+                    .onFailure { Timber.w(it, "Failed to send feedback") }
+            }
         }
     }
 
@@ -78,11 +82,13 @@ class FireAndForgetFeedbackSubmitter(
         val subcategory = apiKeyMapper.apiKeyFromSubReason(null)
         sendPixel(pixelForNegativeFeedback(category, subcategory))
 
-        runCatching {
-            submitFeedbackAsync(openEnded = openEnded, rating = NEGATIVE_FEEDBACK, url = brokenSite).await()
+        GlobalScope.launch {
+            runCatching {
+                submitFeedback(openEnded = openEnded, rating = NEGATIVE_FEEDBACK, url = brokenSite, category = category)
+            }
+                .onSuccess { Timber.i("Successfully submitted broken site feedback") }
+                .onFailure { Timber.w(it, "Failed to send broken site feedback") }
         }
-            .onSuccess { Timber.i("Successfully submitted broken site feedback") }
-            .onFailure { Timber.w(it, "Failed to send broken site feedback") }
     }
 
     override suspend fun sendUserRated() {
@@ -95,14 +101,14 @@ class FireAndForgetFeedbackSubmitter(
         pixel.fire(pixelName)
     }
 
-    private fun submitFeedbackAsync(
+    private fun submitFeedback(
         openEnded: String,
         rating: String,
         category: String? = null,
         subcategory: String? = null,
         url: String? = null
-    ): Deferred<Response<Void>> {
-        return feedbackService.submitFeedbackAsync(
+    ) {
+        feedbackService.submitFeedback(
             category = category,
             subcategory = subcategory,
             rating = rating,
@@ -113,7 +119,7 @@ class FireAndForgetFeedbackSubmitter(
             model = Build.MODEL,
             api = Build.VERSION.SDK_INT,
             atb = atbWithVariant()
-        )
+        ).execute()
     }
 
     private fun categoryFromMainReason(mainReason: MainReason): String {
