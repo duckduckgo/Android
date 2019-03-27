@@ -37,7 +37,14 @@ interface StatisticsService {
     fun atb(@Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null): Observable<Atb>
 
     @GET("/atb.js")
-    fun updateAtb(
+    fun updateSearchAtb(
+        @Query(ParamKey.ATB) atb: String,
+        @Query(ParamKey.RETENTION_ATB) retentionAtb: String,
+        @Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null
+    ): Observable<Atb>
+
+    @GET("/atb.js?at=app_use")
+    fun updateAppAtb(
         @Query(ParamKey.ATB) atb: String,
         @Query(ParamKey.RETENTION_ATB) retentionAtb: String,
         @Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null

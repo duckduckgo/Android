@@ -63,24 +63,39 @@ class AtbIntegrationTest {
     }
 
     @Test
-    fun whenNoStatisticsStoredThenAtbInitializationSuccessfullyStoresAtbAndRetentionAtb() {
+    fun whenNoStatisticsStoredThenAtbInitializationSuccessfullyStoresAtb() {
         testee.initializeAtb()
         assertTrue(statisticsStore.hasInstallationStatistics)
         val atb = statisticsStore.atb
-        val retentionAtb = statisticsStore.retentionAtb
         assertNotNull(atb)
-        assertNotNull(retentionAtb)
-        assertEquals(atb?.version, retentionAtb)
         assertAtbExpectedFormatted(atb!!.version)
     }
 
     @Test
-    fun whenStatisticsAlreadyStoredThenRefreshSuccessfullyUpdatesRetentionAtbOnly() {
+    fun whenStatisticsAlreadyStoredThenRefreshSearchSuccessfullyUpdatesSearchRetentionAtbOnly() {
         statisticsStore.saveAtb(Atb("v100-1"))
-        testee.refreshRetentionAtb()
         assertTrue(statisticsStore.hasInstallationStatistics)
+
+        testee.refreshSearchRetentionAtb()
         val atb = statisticsStore.atb
-        val retentionAtb = statisticsStore.retentionAtb
+        val retentionAtb = statisticsStore.searchRetentionAtb
+        assertNotNull(atb)
+        assertNotNull(retentionAtb)
+
+        assertEquals("v100-1", atb!!.version)
+        assertNotEquals(atb.version, retentionAtb)
+        assertAtbExpectedFormatted(atb.version)
+        assertAtbExpectedFormatted(retentionAtb!!)
+    }
+
+    @Test
+    fun whenStatisticsAlreadyStoredThenRefreshAppSuccessfullyUpdatesAppRetentionAtbOnly() {
+        statisticsStore.saveAtb(Atb("v100-1"))
+        assertTrue(statisticsStore.hasInstallationStatistics)
+
+        testee.refreshAppRetentionAtb()
+        val atb = statisticsStore.atb
+        val retentionAtb = statisticsStore.appRetentionAtb
         assertNotNull(atb)
         assertNotNull(retentionAtb)
 
