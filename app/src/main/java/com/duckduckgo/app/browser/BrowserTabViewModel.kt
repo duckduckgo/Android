@@ -404,7 +404,7 @@ class BrowserTabViewModel(
         )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            statisticsUpdater.refreshRetentionAtb()
+            statisticsUpdater.refreshSearchRetentionAtb()
         }
         pendingUrl = null
         site = siteFactory.build(url)

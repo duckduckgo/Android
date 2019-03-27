@@ -23,7 +23,8 @@ interface StatisticsDataStore {
     val hasInstallationStatistics: Boolean
 
     var atb: Atb?
-    var retentionAtb: String?
+    var appRetentionAtb: String?
+    var searchRetentionAtb: String?
     var variant: String?
 
     var httpsUpgradesTotal: Int
