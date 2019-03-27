@@ -20,7 +20,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.doOnPreDraw
+import androidx.core.view.doOnNextLayout
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
@@ -123,8 +123,7 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment() {
     }
 
     override fun configureListeners() {
-
-        rootScrollView.doOnPreDraw {
+        rootScrollView.doOnNextLayout {
             openEndedFeedback.setOnTouchListener(LayoutScrollingTouchListener(rootScrollView, openEndedFeedbackContainer.y.toInt()))
         }
 

@@ -20,7 +20,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.doOnPreDraw
+import androidx.core.view.doOnNextLayout
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
@@ -58,7 +58,7 @@ class BrokenSiteNegativeFeedbackFragment : FeedbackFragment() {
     }
 
     override fun configureListeners() {
-        submitFeedbackButton.doOnPreDraw {
+        submitFeedbackButton.doOnNextLayout {
             brokenSiteInput.setOnTouchListener(LayoutScrollingTouchListener(rootScrollView, brokenSiteInputContainer.y.toInt()))
             openEndedFeedback.setOnTouchListener(LayoutScrollingTouchListener(rootScrollView, openEndedFeedbackContainer.y.toInt()))
         }
@@ -67,7 +67,8 @@ class BrokenSiteNegativeFeedbackFragment : FeedbackFragment() {
             val feedback = openEndedFeedback.text.toString()
             val brokenSite = brokenSiteInput.text.toString()
 
-            viewModel.userSubmittingFeedback(feedback, brokenSite) }
+            viewModel.userSubmittingFeedback(feedback, brokenSite)
+        }
     }
 
     companion object {
