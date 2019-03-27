@@ -110,11 +110,11 @@
         <activity
             android:name="com.duckduckgo.app.feedback.ui.common.FeedbackActivity"
             android:windowSoftInputMode="adjustResize"
-            android:label="@string/brokenSiteActivityTitle" />
+            android:label="@string/feedbackActivityTitle" />
         <activity
             android:name="com.duckduckgo.app.brokensite.BrokenSiteActivity"
             android:theme="@style/ModalCardTheme"
-            android:label="@string/brokenSiteActivityTitle" />
+            android:label="@string/brokenSiteHeading" />
         <activity
             android:name="com.duckduckgo.app.feedback.ui.SurveyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"

@@ -178,7 +178,6 @@
     <string name="no_suggestions">No Suggestions</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteActivityTitle">Share Your Feedback</string>
     <string name="brokenSiteReportBrokenSiteMenuItem">Report Broken Site</string>
     <string name="brokenSiteHeading">Report a Broken Site</string>
     <string name="brokenSiteModalDescription">Broken site reporting is completely anonymous and helps us improve the app!</string>

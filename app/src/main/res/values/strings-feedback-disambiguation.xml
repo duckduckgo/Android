@@ -15,7 +15,7 @@
   -->
 
 <resources>
-
+    <string name="feedbackActivityTitle">Share Your Feedback</string>
     <string name="missingBrowserFeaturesTitleLong">Browser features are missing or frustrating</string>
     <string name="missingBrowserFeaturesTitleShort">Browser Feature Issues</string>
     <string name="missingBrowserFeaturesSubtitle">Which browsing feature can we add or improve?</string>
