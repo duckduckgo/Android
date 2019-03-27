@@ -84,6 +84,7 @@ class PlayStoreAndroidUtils(val context: Context) : PlayStoreUtils {
 
     override fun launchPlayStore() {
         val intent = playStoreIntent()
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         try {
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
