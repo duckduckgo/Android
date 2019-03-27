@@ -17,17 +17,17 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     tools:context="com.duckduckgo.app.brokensite.BrokenSiteActivity">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/feedbackCardHorizontalMargin"
             android:layout_marginTop="@dimen/feedbackCardVerticalMargin"
@@ -56,7 +56,7 @@
                 android:layout_marginTop="30dp"
                 android:elevation="@dimen/modalCardHeaderElevation"
                 android:importantForAccessibility="no"
-                android:src="@drawable/ic_icon_heart_26dp"
+                android:src="@drawable/ic_icon_report_broken_site"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@id/titleSection" />
@@ -90,24 +90,21 @@
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="@dimen/modalCardDescriptionTextSize"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/title" />
 
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/brokenSiteSwitch"
+            <TextView
+                android:id="@+id/brokenDomainLabel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/feedbackFormFieldsMargin"
-                android:fontFamily="sans-serif-medium"
-                android:paddingStart="3dp"
-                android:paddingEnd="0dp"
-                android:text="@string/brokenSiteReportBrokenSite"
+                android:text="@string/brokenSiteDomainLabel"
                 android:textColor="@color/warmerGray"
-                android:textSize="@dimen/modalCardSwitchTextSize"
-                android:textStyle="normal"
+                android:textSize="15sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/description"
-                tools:checked="true" />
+                app:layout_constraintTop_toBottomOf="@id/description" />
 
             <EditText
                 android:id="@+id/brokenSiteUrl"
@@ -117,15 +114,13 @@
                 android:hint="@string/brokenSiteUrlHint"
                 android:imeOptions="flagNoExtractUi"
                 android:inputType="textUri"
-                android:paddingTop="16dp"
+                android:paddingTop="8dp"
                 android:paddingBottom="16dp"
                 android:singleLine="true"
                 android:textSize="@dimen/modalCardEditTextSize"
-                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/brokenSiteSwitch"
-                tools:visibility="visible" />
+                app:layout_constraintTop_toBottomOf="@id/brokenDomainLabel" />
 
             <EditText
                 android:id="@+id/feedbackMessage"
@@ -148,7 +143,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="30dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="30dp"
                 android:background="@drawable/button_contained_bg"

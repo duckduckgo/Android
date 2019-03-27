@@ -180,11 +180,12 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteActivityTitle">Share Your Feedback</string>
     <string name="brokenSiteReportBrokenSiteMenuItem">Report Broken Site</string>
-    <string name="brokenSiteHeading">Share Your Feedback</string>
-    <string name="brokenSiteModalDescription">Anonymously share your feedback to help us improve the DuckDuckGo Privacy Browser</string>
+    <string name="brokenSiteHeading">Report a Broken Site</string>
+    <string name="brokenSiteModalDescription">Broken site reporting is completely anonymous and helps us improve the app!</string>
     <string name="brokenSiteReportBrokenSite">Report a broken site</string>
     <string name="brokenSiteUrlHint">Enter URL</string>
-    <string name="brokenSiteMessageHint">How can the app be improved? What do you love? What\'s breaking? Please be as specific as possible.</string>
+    <string name="brokenSiteDomainLabel">Domain of broken site:</string>
+    <string name="brokenSiteMessageHint">Which content or functionality is breaking?</string>
     <string name="brokenSiteBrokenSiteHint">Which website content or functionality is breaking? Please be as specific as possible.</string>
     <string name="brokenSiteSubmitButton">Submit Feedback</string>
     <string name="brokenSiteSubmitted">Thank you! Feedback submitted</string>

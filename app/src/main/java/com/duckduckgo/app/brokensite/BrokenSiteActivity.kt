@@ -21,7 +21,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.widget.EditText
-import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.ViewState
@@ -48,17 +47,11 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     }
 
     private fun consumeIntentExtra() {
-        val brokenSite = intent.getBooleanExtra(BROKEN_SITE_EXTRA, false)
-        if (brokenSite) {
-            val url = intent.getStringExtra(URL_EXTRA)
-            viewModel.setInitialBrokenSite(url)
-        }
+        val url = intent.getStringExtra(URL_EXTRA)
+        viewModel.setInitialBrokenSite(url)
     }
 
     private fun configureListeners() {
-        brokenSiteSwitch.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.onBrokenSiteChanged(isChecked)
-        }
         feedbackMessage.addTextChangedListener(object : TextChangedWatcher() {
             override fun afterTextChanged(editable: Editable) {
                 viewModel.onFeedbackMessageChanged(editable.toString())
@@ -97,11 +90,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: ViewState) {
-        val messageHint = if (viewState.isBrokenSite) R.string.brokenSiteBrokenSiteHint else R.string.brokenSiteMessageHint
-        brokenSiteSwitch.isChecked = viewState.isBrokenSite
-        brokenSiteUrl.isVisible = viewState.showUrl
         brokenSiteUrl.updateText(viewState.url ?: "")
-        feedbackMessage.setHint(messageHint)
         submitButton.isEnabled = viewState.submitAllowed
     }
 
@@ -113,12 +102,10 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
 
     companion object {
 
-        private const val BROKEN_SITE_EXTRA = "BROKEN_SITE_EXTRA"
         private const val URL_EXTRA = "URL_EXTRA"
 
-        fun intent(context: Context, brokenSite: Boolean = false, url: String? = null): Intent {
+        fun intent(context: Context, url: String? = null): Intent {
             val intent = Intent(context, BrokenSiteActivity::class.java)
-            intent.putExtra(BROKEN_SITE_EXTRA, brokenSite)
             if (url != null) {
                 intent.putExtra(URL_EXTRA, url)
             }

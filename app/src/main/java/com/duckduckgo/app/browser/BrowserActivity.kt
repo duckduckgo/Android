@@ -267,7 +267,7 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     fun launchBrokenSiteFeedback(url: String?) {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(BrokenSiteActivity.intent(this, true, url), options)
+        startActivity(BrokenSiteActivity.intent(this, url), options)
     }
 
     fun launchSettings() {

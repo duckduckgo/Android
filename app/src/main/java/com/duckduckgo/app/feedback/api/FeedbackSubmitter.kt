@@ -92,7 +92,6 @@ class FireAndForgetFeedbackSubmitter(
         GlobalScope.launch {
             runCatching {
                 submitFeedback(
-                    reason = FeedbackService.REASON_BROKEN_SITE,
                     rating = NEGATIVE_FEEDBACK,
                     url = brokenSite,
                     openEnded = openEnded,

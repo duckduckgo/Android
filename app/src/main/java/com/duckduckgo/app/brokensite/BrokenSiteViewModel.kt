@@ -25,9 +25,7 @@ import com.duckduckgo.app.global.SingleLiveEvent
 class BrokenSiteViewModel(private val brokenSiteSender: BrokenSiteSender) : ViewModel() {
 
     data class ViewState(
-        val isBrokenSite: Boolean = false,
         val url: String? = null,
-        val showUrl: Boolean = false,
         val message: String? = null,
         val submitAllowed: Boolean = false
     )
@@ -49,21 +47,8 @@ class BrokenSiteViewModel(private val brokenSiteSender: BrokenSiteSender) : View
 
     fun setInitialBrokenSite(url: String?) {
         onBrokenSiteUrlChanged(url)
-        onBrokenSiteChanged(true)
-    }
 
-    fun onBrokenSiteChanged(isBroken: Boolean) {
-        if (isBroken == viewState.value?.isBrokenSite) {
-            return
-        }
-
-        viewState.value = viewState.value?.copy(
-            isBrokenSite = isBroken,
-            showUrl = isBroken,
-            submitAllowed = canSubmit(isBroken, viewValue.url, viewValue.message)
-        )
-
-        if (isBroken && viewValue.url.isNullOrBlank()) {
+        if (viewValue.url.isNullOrBlank()) {
             command.value = Command.FocusUrl
         } else {
             command.value = Command.FocusMessage
@@ -73,24 +58,24 @@ class BrokenSiteViewModel(private val brokenSiteSender: BrokenSiteSender) : View
     fun onBrokenSiteUrlChanged(newUrl: String?) {
         viewState.value = viewState.value?.copy(
             url = newUrl,
-            submitAllowed = canSubmit(viewValue.isBrokenSite, newUrl, viewValue.message)
+            submitAllowed = canSubmit(newUrl, viewValue.message)
         )
     }
 
     fun onFeedbackMessageChanged(newMessage: String?) {
         viewState.value = viewState.value?.copy(
             message = newMessage,
-            submitAllowed = canSubmit(viewValue.isBrokenSite, viewValue.url, newMessage)
+            submitAllowed = canSubmit(viewValue.url, newMessage)
         )
     }
 
-    private fun canSubmit(isBrokenSite: Boolean, url: String?, feedbackMessage: String?): Boolean {
+    private fun canSubmit(url: String?, feedbackMessage: String?): Boolean {
 
         if (feedbackMessage.isNullOrBlank()) {
             return false
         }
 
-        if (isBrokenSite && url.isNullOrBlank()) {
+        if (url.isNullOrBlank()) {
             return false
         }
 
@@ -98,17 +83,10 @@ class BrokenSiteViewModel(private val brokenSiteSender: BrokenSiteSender) : View
     }
 
     fun onSubmitPressed() {
-
         val message = viewValue.message ?: return
+        val url = viewValue.url ?: return
 
-        if (viewValue.isBrokenSite) {
-            val url = viewValue.url ?: return
-            brokenSiteSender.submitBrokenSiteFeedback(message, url)
-        } else {
-            brokenSiteSender.submitGeneralFeedback(message)
-        }
-
+        brokenSiteSender.submitBrokenSiteFeedback(message, url)
         command.value = Command.ConfirmAndFinish
     }
-
 }

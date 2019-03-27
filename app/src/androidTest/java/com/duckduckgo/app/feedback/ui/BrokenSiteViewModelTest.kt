@@ -57,83 +57,54 @@ class BrokenSiteViewModelTest {
     }
 
     @Test
-    fun whenBrokenUrlSwitchedOnWithNoUrlThenUrlFocused() {
-        testee.onBrokenSiteUrlChanged(null)
-        testee.onBrokenSiteChanged(true)
+    fun whenNoUrlProvidedThenUrlFocused() {
+        testee.setInitialBrokenSite(null)
         verify(mockCommandObserver).onChanged(Command.FocusUrl)
     }
 
     @Test
-    fun whenBrokenUrlSwitchedOnWithUrlThenMessageFocused() {
-        testee.onBrokenSiteUrlChanged(url)
-        testee.onBrokenSiteChanged(true)
+    fun whenUrlProvidedThenMessageFocused() {
+        testee.setInitialBrokenSite(url)
         verify(mockCommandObserver).onChanged(Command.FocusMessage)
     }
 
     @Test
-    fun whenBrokenUrlOnWithUrlAndMessageThenCanSubmit() {
-        testee.onBrokenSiteChanged(true)
+    fun whenUrlAndMessageNotEmptyThenCanSubmit() {
         testee.onBrokenSiteUrlChanged(url)
         testee.onFeedbackMessageChanged(message)
         assertTrue(viewState.submitAllowed)
     }
 
     @Test
-    fun whenBrokenUrlOnWithNullUrlThenCannotSubmit() {
-        testee.onBrokenSiteChanged(true)
+    fun whenNullUrlThenCannotSubmit() {
         testee.onBrokenSiteUrlChanged(null)
         testee.onFeedbackMessageChanged(message)
         assertFalse(viewState.submitAllowed)
     }
 
     @Test
-    fun whenBrokenUrlOnWithNullMessageThenCannotSubmit() {
-        testee.onBrokenSiteChanged(true)
-        testee.onBrokenSiteUrlChanged(url)
-        testee.onFeedbackMessageChanged(null)
-        assertFalse(viewState.submitAllowed)
-    }
-
-    @Test
-    fun whenBrokenUrlOnWithBlankUrlThenCannotSubmit() {
-        testee.onBrokenSiteChanged(true)
+    fun whenEmptyUrlThenCannotSubmit() {
         testee.onBrokenSiteUrlChanged(" ")
         testee.onFeedbackMessageChanged(message)
         assertFalse(viewState.submitAllowed)
     }
 
     @Test
-    fun whenBrokenUrlOnWithBlankMessageThenCannotSubmit() {
-        testee.onBrokenSiteChanged(true)
+    fun whenNullMessageThenCannotSubmit() {
+        testee.onBrokenSiteUrlChanged(url)
+        testee.onFeedbackMessageChanged(null)
+        assertFalse(viewState.submitAllowed)
+    }
+
+    @Test
+    fun whenEmptyMessageThenCannotSubmit() {
         testee.onBrokenSiteUrlChanged(url)
         testee.onFeedbackMessageChanged(" ")
         assertFalse(viewState.submitAllowed)
     }
 
     @Test
-    fun whenBrokenUrlOffWithMessageThenCanSubmit() {
-        testee.onBrokenSiteChanged(false)
-        testee.onFeedbackMessageChanged(message)
-        assertTrue(viewState.submitAllowed)
-    }
-
-    @Test
-    fun whenBrokenUrlOffWithNullMessageThenCannotSubmit() {
-        testee.onBrokenSiteChanged(false)
-        testee.onFeedbackMessageChanged(null)
-        assertFalse(viewState.submitAllowed)
-    }
-
-    @Test
-    fun whenBrokenUrlOffWithBlankMessageThenCannotSubmit() {
-        testee.onBrokenSiteChanged(false)
-        testee.onFeedbackMessageChanged(" ")
-        assertFalse(viewState.submitAllowed)
-    }
-
-    @Test
     fun whenCanSubmitBrokenSiteAndSubmitPressedThenFeedbackSubmitted() {
-        testee.onBrokenSiteChanged(true)
         testee.onBrokenSiteUrlChanged(url)
         testee.onFeedbackMessageChanged(message)
         testee.onSubmitPressed()
@@ -144,26 +115,8 @@ class BrokenSiteViewModelTest {
 
     @Test
     fun whenCannotSubmitBrokenSiteAndSubmitPressedThenFeedbackNotSubmitted() {
-        testee.onBrokenSiteChanged(true)
         testee.onSubmitPressed()
         verify(mockBrokenSiteSender, never()).submitBrokenSiteFeedback(any(), any())
-        verify(mockCommandObserver, never()).onChanged(Command.ConfirmAndFinish)
-    }
-
-    @Test
-    fun whenCanSubmitMessageAndSubmitPressedThenFeedbackSubmitted() {
-        testee.onBrokenSiteChanged(false)
-        testee.onFeedbackMessageChanged(message)
-        testee.onSubmitPressed()
-        verify(mockBrokenSiteSender).submitGeneralFeedback(message)
-        verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
-    }
-
-    @Test
-    fun whenCannotSubmitMessageAndSubmitPressedThenFeedbackNotSubmitted() {
-        testee.onBrokenSiteChanged(false)
-        testee.onSubmitPressed()
-        verify(mockBrokenSiteSender, never()).submitGeneralFeedback(any())
         verify(mockCommandObserver, never()).onChanged(Command.ConfirmAndFinish)
     }
 

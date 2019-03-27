@@ -19,8 +19,6 @@ package com.duckduckgo.app.brokensite.api
 import android.os.Build
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.feedback.api.FeedbackService
-import com.duckduckgo.app.feedback.api.FeedbackService.Companion.REASON_BROKEN_SITE
-import com.duckduckgo.app.feedback.api.FeedbackService.Companion.REASON_GENERAL
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import kotlinx.coroutines.Dispatchers
@@ -29,30 +27,20 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 interface BrokenSiteSender {
-    fun submitGeneralFeedback(comment: String)
     fun submitBrokenSiteFeedback(comment: String, url: String)
 }
 
 class BrokenSiteSubmitter(
-        private val statisticsStore: StatisticsDataStore,
-        private val variantManager: VariantManager,
-        private val service: FeedbackService
+    private val statisticsStore: StatisticsDataStore,
+    private val variantManager: VariantManager,
+    private val service: FeedbackService
 ) : BrokenSiteSender {
 
-    override fun submitGeneralFeedback(comment: String) {
-        submitFeedback(comment = comment, reason = REASON_GENERAL)
-    }
-
     override fun submitBrokenSiteFeedback(comment: String, url: String) {
-        submitFeedback(comment, url, reason = REASON_BROKEN_SITE)
-    }
-
-    private fun submitFeedback(comment: String, url: String? = null, reason: String) {
         GlobalScope.launch(Dispatchers.IO) {
 
             runCatching {
                 service.submitBrokenSite(
-                    reason = reason,
                     url = url,
                     comment = comment,
                     api = Build.VERSION.SDK_INT,

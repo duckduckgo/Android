@@ -128,7 +128,7 @@
     <style name="ModalCardTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/darkThemePrimary</item>
         <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
-        <item name="colorAccent">@color/midGreen</item>
+        <item name="colorAccent">@color/cornflowerBlue</item>
         <item name="android:windowBackground">@color/translucentDark</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
