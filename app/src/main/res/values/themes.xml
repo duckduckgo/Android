@@ -22,7 +22,7 @@
              such as the app launch color -->
         <item name="colorPrimary">@color/almostBlackDark</item>
         <item name="colorPrimaryDark">@color/almostBlackDark</item>
-
+        <item name="colorAccent">@color/cornflowerBlue</item>
         <item name="android:windowBackground">?attr/colorPrimaryDark</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -33,7 +33,6 @@
     <style name="AppTheme.BaseDark">
         <item name="colorPrimary">@color/darkThemePrimary</item>
         <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
-        <item name="colorAccent">@color/darkThemeAccent</item>
         <item name="daxLogoTextColor">@color/white</item>
         <item name="normalTextColor">@color/white</item>
         <item name="toolbarIconColor">@color/grayish</item>
@@ -87,7 +86,6 @@
     <style name="AppTheme.BaseLight">
         <item name="colorPrimary">@color/lightThemePrimary</item>
         <item name="colorPrimaryDark">@color/lightThemePrimaryDark</item>
-        <item name="colorAccent">@color/lightThemeAccent</item>
         <item name="daxLogoTextColor">@color/greyishBrownTwo</item>
         <item name="normalTextColor">@color/grayishBrown</item>
         <item name="toolbarIconColor">@color/grayishBrown</item>
