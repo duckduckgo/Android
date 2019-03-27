@@ -18,6 +18,12 @@ package com.duckduckgo.app.notification.model
 
 import com.duckduckgo.app.notification.NotificationRegistrar
 
+interface SchedulableNotification {
+    val specification: NotificationSpec
+    val launchIntent: String
+    val cancelIntent: String
+    suspend fun canShow(): Boolean
+}
 
 interface NotificationSpec {
     val systemId: Int
@@ -25,15 +31,8 @@ interface NotificationSpec {
     val channel: NotificationRegistrar.Channel
     val name: String
     val icon: Int
-    val title: Int
-    val description: Int
-}
-
-interface SchedulableNotification {
-    val specification: NotificationSpec
-    val launchIntent: String
-    val cancelIntent: String
-    suspend fun canShow(): Boolean
+    val title: String
+    val description: String
 }
 
 

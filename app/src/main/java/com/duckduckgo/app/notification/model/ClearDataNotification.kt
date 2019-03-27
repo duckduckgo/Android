@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.notification.model
 
+import android.content.Context
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
@@ -27,11 +28,12 @@ import timber.log.Timber
 
 
 class ClearDataNotification(
+    private val context: Context,
     private val notificationDao: NotificationDao,
     private val settingsDataStore: SettingsDataStore
 ) : SchedulableNotification {
 
-    override val specification = ClearDataSpecification()
+    override val specification = ClearDataSpecification(context)
 
     override val launchIntent: String
         get() = CLEAR_DATA_LAUNCH
@@ -55,14 +57,14 @@ class ClearDataNotification(
     }
 }
 
-class ClearDataSpecification : NotificationSpec {
+class ClearDataSpecification(private val context: Context) : NotificationSpec{
     override val systemId = 100
     override val id = "com.duckduckgo.privacytips.autoclear"
     override val channel = NotificationRegistrar.ChannelType.TUTORIALS
     override val name = "Update auto clear data"
     override val icon = R.drawable.notification_fire
-    override val title = R.string.clearNotificationTitle
-    override val description = R.string.clearNotificationDescription
+    override val title = context.getString(R.string.clearNotificationTitle)
+    override val description = context.getString(R.string.clearNotificationDescription)
 }
 
 

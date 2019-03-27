@@ -28,6 +28,7 @@ import android.webkit.*
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
+import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.HTTPS_UPGRADE_SITE_ERROR
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.APP_VERSION
@@ -44,6 +45,7 @@ class BrowserWebViewClient @Inject constructor(
     private val specialUrlDetector: SpecialUrlDetector,
     private val requestInterceptor: RequestInterceptor,
     private val httpsUpgrader: HttpsUpgrader,
+    private val privacyProtectionCountDao: PrivacyProtectionCountDao,
     private val statisticsDataStore: StatisticsDataStore,
     private val pixel: Pixel
 ) : WebViewClient() {
@@ -134,7 +136,7 @@ class BrowserWebViewClient @Inject constructor(
     @WorkerThread
     override fun shouldInterceptRequest(webView: WebView, request: WebResourceRequest): WebResourceResponse? {
         Timber.v("Intercepting resource ${request.url} on page $currentUrl")
-        return requestInterceptor.shouldIntercept(request, webView, currentUrl, webViewClientListener)
+        return requestInterceptor.shouldIntercept(request, webView, currentUrl, webViewClientListener, privacyProtectionCountDao)
     }
 
     @UiThread

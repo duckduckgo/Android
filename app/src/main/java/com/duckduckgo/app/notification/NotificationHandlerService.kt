@@ -21,6 +21,7 @@ import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.VisibleForTesting
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
@@ -53,8 +54,8 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     }
 
     private fun onAppLaunched() {
-        pixel.fire(Pixel.PixelName.APP_LAUNCH)
-        TaskStackBuilder.create(context).startActivities()
+        val intent = BrowserActivity.intent(context, newSearch = true)
+        startActivity(intent)
         pixel.fire(Pixel.PixelName.NOTIFICATION_LAUNCHED)
     }
 

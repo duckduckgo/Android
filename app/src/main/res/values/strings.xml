@@ -266,7 +266,11 @@
     <string name="clearNotificationDescription">Customize DuckDuckGo to automatically clear browsing data after every session.</string>
 
     <!-- Privacy Protection Notification -->
-    <string name="privacyProtectionNotificationTitle">We are protecting your privacy</string>
-    <string name="privacyProtectionNotificationDescription">DuckDuckGo has protected you from X trackers and encrypted Y requests</string>
+    <string name="privacyProtectionNotificationDefaultTitle">We\'re protecting your privacy</string>
+    <string name="privacyProtectionNotificationReportTitle">Your Privacy Report</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Using the DuckDuckGo app protects your data by blocking trackers and encrypting connections. Resume Browsing.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">You protected your data by securing %d unencrypted connections while using DuckDuckGo. Resume Browsing.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">You protected your data by blocking %d trackers while using DuckDuckGo. Resume Browsing.</string>
+    <string name="privacyProtectionNotificationBothDescription">You protected your data by blocking %d trackers and securing %d unencrypted connections while using DuckDuckGo. Resume Browsing.</string>
 
 </resources>

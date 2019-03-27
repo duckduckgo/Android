@@ -23,6 +23,7 @@ import androidx.work.WorkManager
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
+import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
@@ -44,11 +45,12 @@ class NotificationSchedulerTest {
     private val testScope = CoroutineScope(Dispatchers.Unconfined)
 
     private val mockNotificationsDao: NotificationDao = mock()
+    private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockVariantManager: VariantManager = mock()
 
-    private val clearNotification = ClearDataNotification(mockNotificationsDao, mockSettingsDataStore)
-    private val privacyNotification = PrivacyProtectionNotification(mockNotificationsDao)
+    private val clearNotification = ClearDataNotification(context, mockNotificationsDao, mockSettingsDataStore)
+    private val privacyNotification = PrivacyProtectionNotification(context, mockNotificationsDao, mockPrivacyProtectionCountDao)
 
     private lateinit var testee: NotificationScheduler
 

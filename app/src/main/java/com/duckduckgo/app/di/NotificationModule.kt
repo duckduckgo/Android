@@ -25,6 +25,7 @@ import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
+import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import dagger.Module
@@ -53,13 +54,21 @@ class NotificationModule {
     }
 
     @Provides
-    fun provideClearDataNotification(notificationDao: NotificationDao, settingsDataStore: SettingsDataStore): ClearDataNotification {
-        return ClearDataNotification(notificationDao, settingsDataStore)
+    fun provideClearDataNotification(
+        context: Context,
+        notificationDao: NotificationDao,
+        settingsDataStore: SettingsDataStore
+    ): ClearDataNotification {
+        return ClearDataNotification(context, notificationDao, settingsDataStore)
     }
 
     @Provides
-    fun providePrivacyProtectionNotification(notificationDao: NotificationDao): PrivacyProtectionNotification {
-        return PrivacyProtectionNotification(notificationDao)
+    fun providePrivacyProtectionNotification(
+        context: Context,
+        notificationDao: NotificationDao,
+        privacyProtectionCountDao: PrivacyProtectionCountDao
+    ): PrivacyProtectionNotification {
+        return PrivacyProtectionNotification(context, notificationDao, privacyProtectionCountDao)
     }
 
     @Provides
@@ -72,12 +81,14 @@ class NotificationModule {
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification
     ): NotificationScheduler {
-        return NotificationScheduler(notificationDao,
+        return NotificationScheduler(
+            notificationDao,
             notificationManager,
             settingsDataStore,
             variantManager,
             clearDataNotification,
-            privacyProtectionNotification)
+            privacyProtectionNotification
+        )
     }
 
     @Provides

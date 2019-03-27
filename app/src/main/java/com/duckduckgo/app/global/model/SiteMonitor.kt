@@ -19,6 +19,7 @@ package com.duckduckgo.app.global.model
 import android.net.Uri
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.isHttps
+import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.model.*
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
