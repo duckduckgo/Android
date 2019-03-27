@@ -80,12 +80,12 @@ class StatisticsRequester(
         }
 
         val fullAtb = atb.formatWithVariant(variantManager.getVariant())
-        var retentionAtb = store.searchRetentionAtb ?: atb.version
+        val retentionAtb = store.searchRetentionAtb ?: atb.version
 
         service.updateSearchAtb(fullAtb, retentionAtb)
             .subscribeOn(Schedulers.io())
             .subscribe({
-                Timber.v("Search atb refresh succeeded")
+                Timber.v("Search atb refresh succeeded, latest atb is ${it.version}")
                 store.searchRetentionAtb = it.version
             }, {
                 Timber.v("Search atb refresh failed with error ${it.localizedMessage}")
@@ -103,12 +103,12 @@ class StatisticsRequester(
         }
 
         val fullAtb = atb.formatWithVariant(variantManager.getVariant())
-        var retentionAtb = store.appRetentionAtb ?: atb.version
+        val retentionAtb = store.appRetentionAtb ?: atb.version
 
         service.updateAppAtb(fullAtb, retentionAtb)
             .subscribeOn(Schedulers.io())
             .subscribe({
-                Timber.v("App atb refresh succeeded")
+                Timber.v("App atb refresh succeeded, latest atb is ${it.version}\"")
                 store.appRetentionAtb = it.version
             }, {
                 Timber.v("App atb refresh failed with error ${it.localizedMessage}")
