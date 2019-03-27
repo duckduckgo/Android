@@ -108,7 +108,7 @@ class StatisticsRequester(
         service.updateAppAtb(fullAtb, retentionAtb)
             .subscribeOn(Schedulers.io())
             .subscribe({
-                Timber.v("App atb refresh succeeded, latest atb is ${it.version}\"")
+                Timber.v("App atb refresh succeeded, latest atb is ${it.version}")
                 store.appRetentionAtb = it.version
             }, {
                 Timber.v("App atb refresh failed with error ${it.localizedMessage}")
