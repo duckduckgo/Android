@@ -42,7 +42,7 @@ class BrokenSiteViewModelTest {
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        testee = com.duckduckgo.app.brokensite.BrokenSiteViewModel(mockBrokenSiteSender)
+        testee = BrokenSiteViewModel(mockBrokenSiteSender)
         testee.command.observeForever(mockCommandObserver)
     }
 

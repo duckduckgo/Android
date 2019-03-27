@@ -75,7 +75,7 @@ class FeedbackViewModelTest {
         configureRatingCanBeGiven()
         testee.userSelectedPositiveFeedback()
         assertTrue(fragmentViewState is FragmentState.PositiveFeedbackFirstStep)
-        verifyNavigatingForwards(fragmentViewState)
+        verifyForwardsNavigation(fragmentViewState)
     }
 
     @Test
@@ -84,7 +84,7 @@ class FeedbackViewModelTest {
         configureRatingCannotBeGiven()
         testee.userSelectedPositiveFeedback()
         assertTrue(fragmentViewState is FragmentState.PositiveShareFeedback)
-        verifyNavigatingForwards(fragmentViewState)
+        verifyForwardsNavigation(fragmentViewState)
     }
 
     @Test
@@ -95,7 +95,7 @@ class FeedbackViewModelTest {
         testee.onBackPressed()
 
         assertTrue(fragmentViewState is InitialAppEnjoymentClarifier)
-        verifyNavigatingBack(fragmentViewState)
+        verifyBackwardsNavigation(fragmentViewState)
     }
 
     @Test
@@ -184,7 +184,7 @@ class FeedbackViewModelTest {
     fun whenUserSelectsInitialSadFaceThenFragmentStateIsFirstStepOfUnhappyFlow() {
         testee.userSelectedNegativeFeedback()
         assertTrue(fragmentViewState is NegativeFeedbackMainReason)
-        verifyNavigatingForwards(fragmentViewState)
+        verifyForwardsNavigation(fragmentViewState)
     }
 
     @Test
@@ -193,7 +193,7 @@ class FeedbackViewModelTest {
         testee.userSelectedNegativeFeedback()
         testee.onBackPressed()
         assertTrue(fragmentViewState is InitialAppEnjoymentClarifier)
-        verifyNavigatingBack(fragmentViewState)
+        verifyBackwardsNavigation(fragmentViewState)
     }
 
     @Test
@@ -201,7 +201,7 @@ class FeedbackViewModelTest {
     fun whenUserSelectsMainNegativeReasonMissingBrowserFeaturesThenFragmentStateIsSubReasonSelection() {
         testee.userSelectedNegativeFeedbackMainReason(MISSING_BROWSING_FEATURES)
         assertTrue(fragmentViewState is NegativeFeedbackSubReason)
-        verifyNavigatingForwards(fragmentViewState)
+        verifyForwardsNavigation(fragmentViewState)
     }
 
     @Test
@@ -209,7 +209,7 @@ class FeedbackViewModelTest {
     fun whenUserSelectsMainNegativeReasonNotEnoughCustomizationsThenFragmentStateIsSubReasonSelection() {
         testee.userSelectedNegativeFeedbackMainReason(NOT_ENOUGH_CUSTOMIZATIONS)
         assertTrue(fragmentViewState is NegativeFeedbackSubReason)
-        verifyNavigatingForwards(fragmentViewState)
+        verifyForwardsNavigation(fragmentViewState)
     }
 
     @Test
@@ -217,7 +217,7 @@ class FeedbackViewModelTest {
     fun whenUserSelectsMainNegativeReasonSearchNotGoodEnoughThenFragmentStateIsSubReasonSelection() {
         testee.userSelectedNegativeFeedbackMainReason(SEARCH_NOT_GOOD_ENOUGH)
         assertTrue(fragmentViewState is NegativeFeedbackSubReason)
-        verifyNavigatingForwards(fragmentViewState)
+        verifyForwardsNavigation(fragmentViewState)
     }
 
     @Test
@@ -225,7 +225,7 @@ class FeedbackViewModelTest {
     fun whenUserSelectsMainNegativeReasonAppIsSlowOrBuggyThenFragmentStateIsSubReasonSelection() {
         testee.userSelectedNegativeFeedbackMainReason(APP_IS_SLOW_OR_BUGGY)
         assertTrue(fragmentViewState is NegativeFeedbackSubReason)
-        verifyNavigatingForwards(fragmentViewState)
+        verifyForwardsNavigation(fragmentViewState)
     }
 
     @Test
@@ -233,7 +233,7 @@ class FeedbackViewModelTest {
     fun whenUserSelectsMainNegativeReasonOtherThenFragmentStateIsOpenEndedFeedback() {
         testee.userSelectedNegativeFeedbackMainReason(OTHER)
         assertTrue(fragmentViewState is NegativeOpenEndedFeedback)
-        verifyNavigatingForwards(fragmentViewState)
+        verifyForwardsNavigation(fragmentViewState)
     }
 
     @Test
@@ -241,7 +241,7 @@ class FeedbackViewModelTest {
     fun whenUserSelectsMainNegativeReasonBrokenSiteThenFragmentStateIsSubReasonSelection() {
         testee.userSelectedNegativeFeedbackMainReason(WEBSITES_NOT_LOADING)
         assertTrue(fragmentViewState is NegativeWebSitesBrokenFeedback)
-        verifyNavigatingForwards(fragmentViewState)
+        verifyForwardsNavigation(fragmentViewState)
     }
 
     @Test
@@ -249,7 +249,7 @@ class FeedbackViewModelTest {
     fun whenUserSelectsSubNegativeReasonThenFragmentStateIsOpenEndedFeedback() {
         testee.userSelectedSubReasonMissingBrowserFeatures(MISSING_BROWSING_FEATURES, TAB_MANAGEMENT)
         assertTrue(fragmentViewState is NegativeOpenEndedFeedback)
-        verifyNavigatingForwards(fragmentViewState)
+        verifyForwardsNavigation(fragmentViewState)
     }
 
     @Test
@@ -258,7 +258,7 @@ class FeedbackViewModelTest {
         testee.userSelectedNegativeFeedbackMainReason(MISSING_BROWSING_FEATURES)
         testee.onBackPressed()
         assertTrue(fragmentViewState is NegativeFeedbackMainReason)
-        verifyNavigatingBack(fragmentViewState)
+        verifyBackwardsNavigation(fragmentViewState)
     }
 
     @Test
@@ -268,7 +268,7 @@ class FeedbackViewModelTest {
         testee.userSelectedSubReasonMissingBrowserFeatures(MISSING_BROWSING_FEATURES, TAB_MANAGEMENT)
         testee.onBackPressed()
         assertTrue(fragmentViewState is NegativeFeedbackSubReason)
-        verifyNavigatingBack(fragmentViewState)
+        verifyBackwardsNavigation(fragmentViewState)
     }
 
     @Test
@@ -277,7 +277,7 @@ class FeedbackViewModelTest {
         testee.userSelectedNegativeFeedbackMainReason(OTHER)
         testee.onBackPressed()
         assertTrue(fragmentViewState is NegativeFeedbackMainReason)
-        verifyNavigatingBack(fragmentViewState)
+        verifyBackwardsNavigation(fragmentViewState)
     }
 
     @Test
@@ -287,14 +287,14 @@ class FeedbackViewModelTest {
         testee.userSelectedSubReasonMissingBrowserFeatures(MISSING_BROWSING_FEATURES, TAB_MANAGEMENT)
         testee.onBackPressed()
         assertTrue(fragmentViewState is NegativeFeedbackSubReason)
-        verifyNavigatingBack(fragmentViewState)
+        verifyBackwardsNavigation(fragmentViewState)
     }
 
-    private fun verifyNavigatingForwards(fragmentViewState: FragmentState?) {
+    private fun verifyForwardsNavigation(fragmentViewState: FragmentState?) {
         assertTrue(fragmentViewState?.forwardDirection == true)
     }
 
-    private fun verifyNavigatingBack(fragmentViewState: FragmentState?) {
+    private fun verifyBackwardsNavigation(fragmentViewState: FragmentState?) {
         assertTrue(fragmentViewState?.forwardDirection == false)
     }
 
