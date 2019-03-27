@@ -172,10 +172,8 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            FEEDBACK_REQUEST_CODE -> {
-                handleFeedbackResult(resultCode)
-            }
+        if (requestCode == FEEDBACK_REQUEST_CODE) {
+            handleFeedbackResult(resultCode)
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
