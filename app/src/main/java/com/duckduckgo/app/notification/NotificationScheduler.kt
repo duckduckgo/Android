@@ -62,7 +62,7 @@ class NotificationScheduler @Inject constructor(
                 variant.hasFeature(NotificationClearDataDay1) && clearDataNotification.canShow() -> {
                     scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 1, timeUnit, scope)
                 }
-                variant.hasFeature(NotificationClearDataDay3) && clearDataNotification.canShow() -> {
+                !variant.hasFeature(NotificationSuppressClearDataDay3) && clearDataNotification.canShow() -> {
                     scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 3, timeUnit, scope)
                 }
                 else -> Timber.v("Notifications not enabled for this variant")
