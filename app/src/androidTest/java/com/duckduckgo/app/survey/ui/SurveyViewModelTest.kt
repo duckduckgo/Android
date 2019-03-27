@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.feedback.ui
+package com.duckduckgo.app.survey.ui
 
 import android.os.Build
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -22,14 +22,14 @@ import androidx.core.net.toUri
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.app.feedback.db.SurveyDao
-import com.duckduckgo.app.feedback.model.Survey
-import com.duckduckgo.app.feedback.model.Survey.Status.DONE
-import com.duckduckgo.app.feedback.model.Survey.Status.SCHEDULED
-import com.duckduckgo.app.feedback.ui.SurveyViewModel.Command
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.survey.db.SurveyDao
+import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.app.survey.model.Survey.Status.DONE
+import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
+import com.duckduckgo.app.survey.ui.SurveyViewModel.Command
 import com.nhaarman.mockitokotlin2.*
 import org.junit.After
 import org.junit.Assert.assertEquals

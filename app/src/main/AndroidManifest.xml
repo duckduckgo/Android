@@ -116,7 +116,7 @@
             android:theme="@style/ModalCardTheme"
             android:label="@string/brokenSiteHeading" />
         <activity
-            android:name="com.duckduckgo.app.feedback.ui.SurveyActivity"
+            android:name="com.duckduckgo.app.survey.ui.SurveyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/surveyActivityTitle"
             android:parentActivityName=".BrowserActivity"

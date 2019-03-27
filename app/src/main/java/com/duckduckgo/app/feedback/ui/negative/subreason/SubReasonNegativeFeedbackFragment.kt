@@ -129,7 +129,7 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
     }
 
     private fun appSlowOrBuggySubReasons(): List<FeedbackTypeSubReasonDisplay> {
-        return FeedbackType.PerformanceSubReasons.values().mapNotNull() {
+        return FeedbackType.PerformanceSubReasons.values().mapNotNull {
             FeedbackTypeDisplay.subReasons[it]
         }
     }

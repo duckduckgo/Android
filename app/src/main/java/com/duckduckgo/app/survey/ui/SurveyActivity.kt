@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.feedback.ui
+package com.duckduckgo.app.survey.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -24,15 +24,14 @@ import android.webkit.*
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.feedback.model.Survey
-import com.duckduckgo.app.feedback.ui.SurveyViewModel.Command
-import com.duckduckgo.app.feedback.ui.SurveyViewModel.Command.Close
-import com.duckduckgo.app.feedback.ui.SurveyViewModel.Command.LoadSurvey
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.SURVEY_SURVEY_DISMISSED
+import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.app.survey.ui.SurveyViewModel.Command
+import com.duckduckgo.app.survey.ui.SurveyViewModel.Command.*
 import kotlinx.android.synthetic.main.activity_user_survey.*
 import javax.inject.Inject
 
@@ -84,12 +83,8 @@ class SurveyActivity : DuckDuckGoActivity() {
     private fun processCommand(command: Command) {
         when (command) {
             is LoadSurvey -> loadSurvey(command.url)
-            is Command.ShowSurvey -> {
-                showSurvey()
-            }
-            is Command.ShowError -> {
-                showError()
-            }
+            is ShowSurvey -> showSurvey()
+            is ShowError -> showError()
             is Close -> finish()
         }
     }

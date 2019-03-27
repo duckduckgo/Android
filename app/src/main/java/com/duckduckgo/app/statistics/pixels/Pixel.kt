@@ -141,7 +141,7 @@ class ApiBasedPixel @Inject constructor(
             .subscribe({
                 Timber.v("Pixel sent: $pixelName")
             }, {
-                Timber.w(it, "Pixel failed: $pixelName")
+                Timber.w("Pixel failed: $pixelName")
             })
     }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.feedback.model
+package com.duckduckgo.app.survey.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

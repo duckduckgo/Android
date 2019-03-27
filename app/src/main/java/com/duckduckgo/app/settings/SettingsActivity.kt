@@ -160,7 +160,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
 
     private fun launchFeedback() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivityForResult(Intent(FeedbackActivity.intent(this)), FEEDBACK_RC, options)
+        startActivityForResult(Intent(FeedbackActivity.intent(this)), FEEDBACK_REQUEST_CODE, options)
     }
 
     override fun onAutomaticallyClearWhatOptionSelected(clearWhatSetting: ClearWhatOption) {
@@ -173,7 +173,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
-            FEEDBACK_RC -> {
+            FEEDBACK_REQUEST_CODE -> {
                 handleFeedbackResult(resultCode)
             }
         }
@@ -210,7 +210,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     companion object {
         private const val CLEAR_WHAT_DIALOG_TAG = "CLEAR_WHAT_DIALOG_FRAGMENT"
         private const val CLEAR_WHEN_DIALOG_TAG = "CLEAR_WHEN_DIALOG_FRAGMENT"
-        private const val FEEDBACK_RC = 100
+        private const val FEEDBACK_REQUEST_CODE = 100
 
         fun intent(context: Context): Intent {
             return Intent(context, SettingsActivity::class.java)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.feedback.ui
+package com.duckduckgo.app.survey.ui
 
 import android.os.Build
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.app.feedback.db.SurveyDao
-import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.survey.db.SurveyDao
+import com.duckduckgo.app.survey.model.Survey
 import io.reactivex.schedulers.Schedulers
 
 

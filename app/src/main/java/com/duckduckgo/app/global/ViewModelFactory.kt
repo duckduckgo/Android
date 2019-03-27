@@ -31,8 +31,6 @@ import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
-import com.duckduckgo.app.feedback.db.SurveyDao
-import com.duckduckgo.app.feedback.ui.SurveyViewModel
 import com.duckduckgo.app.feedback.ui.common.FeedbackViewModel
 import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragmentViewModel
 import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeedbackViewModel
@@ -60,6 +58,8 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.survey.db.SurveyDao
+import com.duckduckgo.app.survey.ui.SurveyViewModel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel
 import com.duckduckgo.app.usage.search.SearchCountDao

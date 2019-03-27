@@ -27,7 +27,6 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackType.PerformanceSubReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SearchNotGoodEnoughSubReasons.*
 
 fun MainReason.displayText(): FeedbackTypeDisplay.FeedbackTypeMainReasonDisplay? = FeedbackTypeDisplay.mainReasons[this]
-fun SubReason.displayText(): FeedbackTypeDisplay.FeedbackTypeSubReasonDisplay? = FeedbackTypeDisplay.subReasons[this]
 
 class FeedbackTypeDisplay {
 

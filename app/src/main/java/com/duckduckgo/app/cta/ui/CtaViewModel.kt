@@ -27,12 +27,12 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.CtaConfiguration.*
-import com.duckduckgo.app.feedback.db.SurveyDao
-import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.app.survey.db.SurveyDao
+import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
@@ -147,7 +147,7 @@ sealed class CtaConfiguration(
     open val cancelPixel: Pixel.PixelName
 ) {
 
-    data class Survey(val survey: com.duckduckgo.app.feedback.model.Survey) : CtaConfiguration(
+    data class Survey(val survey: com.duckduckgo.app.survey.model.Survey) : CtaConfiguration(
         CtaId.SURVEY,
         R.drawable.survey_cta_icon,
         R.string.surveyCtaTitle,

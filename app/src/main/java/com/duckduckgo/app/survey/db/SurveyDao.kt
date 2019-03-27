@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.feedback.db
+package com.duckduckgo.app.survey.db
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.duckduckgo.app.feedback.model.Survey
+import com.duckduckgo.app.survey.model.Survey
 
 @Dao
 abstract class SurveyDao {

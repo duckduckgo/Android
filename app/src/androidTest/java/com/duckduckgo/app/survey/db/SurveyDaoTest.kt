@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.feedback.db
+package com.duckduckgo.app.survey.db
 
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import com.duckduckgo.app.feedback.model.Survey
-import com.duckduckgo.app.feedback.model.Survey.Status.*
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.app.survey.model.Survey.Status.*
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
