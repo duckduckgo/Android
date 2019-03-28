@@ -16,10 +16,9 @@
 
 package com.duckduckgo.app.httpsupgrade
 
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.util.*
-import kotlin.collections.ArrayList
 
 
 class BloomFilterTest {
@@ -39,43 +38,8 @@ class BloomFilterTest {
         assertTrue(testee.contains("abc"))
     }
 
-    @Test
-    fun whenBloomFilterContainsItemsThenLookupResultsAreWithinRange() {
-
-        val bloomData = createRandomStrings(FILTER_ELEMENT_COUNT)
-        val testData = bloomData + createRandomStrings(ADDITIONAL_TEST_DATA_ELEMENT_COUNT)
-
-        testee = BloomFilter(bloomData.size, TARGET_ERROR_RATE)
-        bloomData.forEach { testee.add(it) }
-
-        var (falsePositives, truePositives, falseNegatives, trueNegatives) = arrayOf(0, 0, 0, 0)
-        for (element in testData) {
-            val result = testee.contains(element)
-            when {
-                bloomData.contains(element) && !result -> falseNegatives++
-                !bloomData.contains(element) && result -> falsePositives++
-                !bloomData.contains(element) && !result -> trueNegatives++
-                bloomData.contains(element) && result -> truePositives++
-            }
-        }
-
-        val errorRate = falsePositives.toDouble() / testData.size.toDouble()
-        assertEquals(0, falseNegatives)
-        assertEquals(bloomData.size, truePositives)
-        assertTrue(trueNegatives <= testData.size - bloomData.size)
-        assertTrue(errorRate <= ACCEPTABLE_ERROR_RATE)
-    }
-
-    private fun createRandomStrings(items: Int): ArrayList<String> {
-        val list = ArrayList<String>()
-        repeat(items) { list.add(UUID.randomUUID().toString()) }
-        return list
-    }
-
     companion object {
         const val FILTER_ELEMENT_COUNT = 5000
-        const val ADDITIONAL_TEST_DATA_ELEMENT_COUNT = 5000
         const val TARGET_ERROR_RATE = 0.001
-        const val ACCEPTABLE_ERROR_RATE = TARGET_ERROR_RATE * 2
     }
 }
