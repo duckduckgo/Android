@@ -19,7 +19,6 @@ package com.duckduckgo.app.global.rating
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.usage.search.SearchCountDao
-import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.runBlocking
@@ -49,14 +48,14 @@ class InitialPromptTypeDeciderTest {
             InstrumentationRegistry.getInstrumentation().targetContext
         )
 
-        whenever(mockPlayStoreUtils.isPlayStoreInstalled(any())).thenReturn(true)
-        whenever(mockPlayStoreUtils.installedFromPlayStore(any())).thenReturn(true)
+        whenever(mockPlayStoreUtils.isPlayStoreInstalled()).thenReturn(true)
+        whenever(mockPlayStoreUtils.installedFromPlayStore()).thenReturn(true)
         whenever(mockSearchCountDao.getSearchesMade()).thenReturn(Long.MAX_VALUE)
     }
 
     @Test
     fun whenPlayNotInstalledThenNoPromptShown() = runBlocking<Unit> {
-        whenever(mockPlayStoreUtils.isPlayStoreInstalled(any())).thenReturn(false)
+        whenever(mockPlayStoreUtils.isPlayStoreInstalled()).thenReturn(false)
         assertPromptNotShown(testee.determineInitialPromptType())
     }
 

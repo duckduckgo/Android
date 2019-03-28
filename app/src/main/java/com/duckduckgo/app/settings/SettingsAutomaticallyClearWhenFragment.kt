@@ -52,17 +52,19 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
             .setView(rootView)
             .setTitle(R.string.settingsAutomaticallyClearWhat)
             .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave) { _, _ ->
-                val radioGroup = dialog.findViewById(R.id.settingsClearWhenGroup) as RadioGroup
-                val selectedOption = when (radioGroup.checkedRadioButtonId) {
-                    R.id.settingInactive5Mins -> APP_EXIT_OR_5_MINS
-                    R.id.settingInactive15Mins -> APP_EXIT_OR_15_MINS
-                    R.id.settingInactive30Mins -> APP_EXIT_OR_30_MINS
-                    R.id.settingInactive60Mins -> APP_EXIT_OR_60_MINS
-                    R.id.settingInactive5Seconds -> APP_EXIT_OR_5_SECONDS
-                    else -> APP_EXIT_ONLY
+                dialog?.let {
+                    val radioGroup = it.findViewById(R.id.settingsClearWhenGroup) as RadioGroup
+                    val selectedOption = when (radioGroup.checkedRadioButtonId) {
+                        R.id.settingInactive5Mins -> APP_EXIT_OR_5_MINS
+                        R.id.settingInactive15Mins -> APP_EXIT_OR_15_MINS
+                        R.id.settingInactive30Mins -> APP_EXIT_OR_30_MINS
+                        R.id.settingInactive60Mins -> APP_EXIT_OR_60_MINS
+                        R.id.settingInactive5Seconds -> APP_EXIT_OR_5_SECONDS
+                        else -> APP_EXIT_ONLY
+                    }
+                    val listener = activity as Listener?
+                    listener?.onAutomaticallyClearWhenOptionSelected(selectedOption)
                 }
-                val listener = activity as Listener?
-                listener?.onAutomaticallyClearWhenOptionSelected(selectedOption)
             }
             .setNegativeButton(android.R.string.cancel) { _, _ -> }
 

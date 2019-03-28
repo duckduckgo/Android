@@ -71,7 +71,7 @@ sealed class OnboardingPageFragment : Fragment() {
         @Inject
         lateinit var defaultBrowserDetector: DefaultBrowserDetector
 
-        override fun onAttach(context: Context?) {
+        override fun onAttach(context: Context) {
             AndroidSupportInjection.inject(this)
             super.onAttach(context)
         }
