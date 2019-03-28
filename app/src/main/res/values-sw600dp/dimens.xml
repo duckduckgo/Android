@@ -24,7 +24,6 @@
 
     <dimen name="modalCardTitleTextSize">30sp</dimen>
     <dimen name="modalCardDescriptionTextSize">20sp</dimen>
-    <dimen name="modalCardSwitchTextSize">20sp</dimen>
     <dimen name="modalCardEditTextSize">20sp</dimen>
     <dimen name="modalCardMajorButtonTextSize">20sp</dimen>
 

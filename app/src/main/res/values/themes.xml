@@ -22,7 +22,7 @@
              such as the app launch color -->
         <item name="colorPrimary">@color/almostBlackDark</item>
         <item name="colorPrimaryDark">@color/almostBlackDark</item>
-
+        <item name="colorAccent">@color/cornflowerBlue</item>
         <item name="android:windowBackground">?attr/colorPrimaryDark</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -33,7 +33,6 @@
     <style name="AppTheme.BaseDark">
         <item name="colorPrimary">@color/darkThemePrimary</item>
         <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
-        <item name="colorAccent">@color/darkThemeAccent</item>
         <item name="daxLogoTextColor">@color/white</item>
         <item name="normalTextColor">@color/white</item>
         <item name="toolbarIconColor">@color/grayish</item>
@@ -58,6 +57,12 @@
         <item name="buttonOutlinedBorderColor">@color/brownishGrayTwo</item>
         <item name="callToActionTitleColor">@color/white</item>
         <item name="callToActionSubtitleColor">@color/grayishThree</item>
+
+        <item name="feedbackAnonymousFeedbackLabelColor">@color/grayish</item>
+        <item name="feedbackListItemBackgroundColor">@color/almostBlack</item>
+        <item name="feedbackListItemSeparatorColor">@color/charcoalGrey</item>
+        <item name="feedbackEditTextBackgroundColor">@color/almostBlack</item>
+        <item name="feedbackEditTextHintColor">@color/grayish</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -81,7 +86,6 @@
     <style name="AppTheme.BaseLight">
         <item name="colorPrimary">@color/lightThemePrimary</item>
         <item name="colorPrimaryDark">@color/lightThemePrimaryDark</item>
-        <item name="colorAccent">@color/lightThemeAccent</item>
         <item name="daxLogoTextColor">@color/greyishBrownTwo</item>
         <item name="normalTextColor">@color/grayishBrown</item>
         <item name="toolbarIconColor">@color/grayishBrown</item>
@@ -106,6 +110,12 @@
         <item name="buttonOutlinedBorderColor">@color/grayishThree</item>
         <item name="callToActionTitleColor">@color/almostBlack</item>
         <item name="callToActionSubtitleColor">@color/brownishGrayTwo</item>
+
+        <item name="feedbackAnonymousFeedbackLabelColor">@color/warmerGray</item>
+        <item name="feedbackListItemBackgroundColor">@color/whiteFive</item>
+        <item name="feedbackListItemSeparatorColor">@color/whiteSix</item>
+        <item name="feedbackEditTextBackgroundColor">@color/whiteFive</item>
+        <item name="feedbackEditTextHintColor">@color/warmerGray</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
@@ -116,7 +126,7 @@
     <style name="ModalCardTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/darkThemePrimary</item>
         <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
-        <item name="colorAccent">@color/midGreen</item>
+        <item name="colorAccent">@color/cornflowerBlue</item>
         <item name="android:windowBackground">@color/translucentDark</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:colorBackgroundCacheHint">@null</item>

@@ -177,17 +177,15 @@
     <string name="aboutMoreLink">More at duckduckgo.com/about</string>
     <string name="no_suggestions">No Suggestions</string>
 
-    <!-- Feedback Activity -->
-    <string name="feedbackActivityTitle">Feedback</string>
-    <string name="feedbackReportBrokenSiteMenuItem">Report Broken Site</string>
-    <string name="feedbackHeading">Share Your Feedback</string>
-    <string name="feedbackModalDescription">Anonymously share your feedback to help us improve the DuckDuckGo Privacy Browser</string>
-    <string name="feedbackReportBrokenSite">Report a broken site</string>
-    <string name="feedbackUrlHint">Enter URL</string>
-    <string name="feedbackMessageHint">How can the app be improved? What do you love? What\'s breaking? Please be as specific as possible.</string>
-    <string name="feedbackBrokenSiteHint">Which website content or functionality is breaking? Please be as specific as possible.</string>
-    <string name="feedbackSubmitButton">Submit Feedback</string>
-    <string name="feedbackSubmitted">Thank you! Feedback submitted</string>
+    <!-- Broken Site Activity -->
+    <string name="brokenSiteReportBrokenSiteMenuItem">Report Broken Site</string>
+    <string name="brokenSiteHeading">Report a Broken Site</string>
+    <string name="brokenSiteModalDescription">Broken site reporting is completely anonymous and helps us improve the app!</string>
+    <string name="brokenSiteUrlHint">Enter URL</string>
+    <string name="brokenSiteDomainLabel">Domain of broken site:</string>
+    <string name="brokenSiteMessageHint">Which content or functionality is breaking?</string>
+    <string name="brokenSiteSubmitButton">Submit Feedback</string>
+    <string name="brokenSiteSubmitted">Thank you! Feedback submitted</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bookmarks</string>

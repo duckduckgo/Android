@@ -95,8 +95,11 @@ class HttpsUpgraderImpl(
     @WorkerThread
     override fun reloadData() {
         dataReloadLock.lock()
-        httpsBloomFilter = bloomFactory.create()
-        dataReloadLock.unlock()
+        try {
+            httpsBloomFilter = bloomFactory.create()
+        } finally {
+            dataReloadLock.unlock()
+        }
     }
 
     companion object {

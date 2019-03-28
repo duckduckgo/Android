@@ -21,7 +21,6 @@ import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import com.duckduckgo.app.browser.R
 
 class PagerAdapter(fragmentManager: FragmentManager, private val viewModel: OnboardingViewModel) : FragmentPagerAdapter(fragmentManager) {
 
@@ -29,13 +28,18 @@ class PagerAdapter(fragmentManager: FragmentManager, private val viewModel: Onbo
         return viewModel.pageCount()
     }
 
-    override fun getItem(position: Int): OnboardingPageFragment? {
-        return viewModel.getItem(position)
+    override fun getItem(position: Int): OnboardingPageFragment {
+        return viewModel.getItem(position) ?: throw IllegalArgumentException("No items exists at position $position")
     }
 
     @ColorInt
     fun color(context: Context, currentPage: Int): Int {
-        val color = getItem(currentPage)?.backgroundColor() ?: R.color.lightOliveGreen
+        val color = getItem(currentPage).backgroundColor()
         return ContextCompat.getColor(context, color)
+    }
+
+    fun backgroundColor(position: Int): Int? {
+        val item = viewModel.getItem(position) ?: return null
+        return item.backgroundColor()
     }
 }

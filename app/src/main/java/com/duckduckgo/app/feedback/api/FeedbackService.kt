@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,34 +16,48 @@
 
 package com.duckduckgo.app.feedback.api
 
-import io.reactivex.Observable
-import okhttp3.ResponseBody
+import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
+
 interface FeedbackService {
-
-    object Platform {
-        const val ANDROID = "Android"
-    }
-
-    object Reason {
-        const val BROKEN_SITE = "broken_site"
-        const val GENERAL = "general"
-    }
 
     @FormUrlEncoded
     @POST("/feedback.js?type=app-feedback")
-    fun feedback(
-        @Field("reason") reason: String,
-        @Field("url") url: String,
+    fun submitFeedback(
+        @Field("reason") reason: String = REASON_GENERAL,
+        @Field("rating") rating: String,
+        @Field("category") category: String?,
+        @Field("subcategory") subcategory: String?,
         @Field("comment") comment: String,
-        @Field("platform") platform: String,
+        @Field("url") url: String? = null,
+        @Field("platform") platform: String = PLATFORM,
+        @Field("v") version: String,
         @Field("os") api: Int,
         @Field("manufacturer") manufacturer: String,
         @Field("model") model: String,
-        @Field("v") appVersion: String,
         @Field("atb") atb: String
-    ): Observable<ResponseBody>
+    ): Call<Void>
+
+    @FormUrlEncoded
+    @POST("/feedback.js?type=app-feedback")
+    fun submitBrokenSite(
+        @Field("reason") reason: String = REASON_BROKEN_SITE,
+        @Field("comment") comment: String,
+        @Field("platform") platform: String = PLATFORM,
+        @Field("url") url: String? = null,
+        @Field("v") version: String,
+        @Field("os") api: Int,
+        @Field("manufacturer") manufacturer: String,
+        @Field("model") model: String,
+        @Field("atb") atb: String
+    ): Call<Void>
+
+    companion object {
+        const val REASON_GENERAL = "general"
+        const val REASON_BROKEN_SITE = "broken_site"
+        private const val PLATFORM = "Android"
+    }
 }

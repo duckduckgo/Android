@@ -17,7 +17,7 @@
 package com.duckduckgo.app.job
 
 import com.duckduckgo.app.entities.api.EntityListDownloader
-import com.duckduckgo.app.feedback.api.SurveyDownloader
+import com.duckduckgo.app.survey.api.SurveyDownloader
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeDataDownloader

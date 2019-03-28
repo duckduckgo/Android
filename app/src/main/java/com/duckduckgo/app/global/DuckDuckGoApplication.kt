@@ -268,6 +268,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     fun onAppResumed() {
         notificationRegistrar.updateStatus()
         notificationScheduler.scheduleNextNotification()
+        statisticsUpdater.refreshAppRetentionAtb()
     }
 
     companion object {

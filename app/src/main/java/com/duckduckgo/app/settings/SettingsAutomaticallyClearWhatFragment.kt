@@ -45,14 +45,16 @@ class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
             .setView(rootView)
             .setTitle(R.string.settingsAutomaticallyClearWhat)
             .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave) { _, _ ->
-                val radioGroup = dialog.findViewById(R.id.settingsClearWhatGroup) as RadioGroup
-                val selectedOption = when (radioGroup.checkedRadioButtonId) {
-                    R.id.settingTabsOnly -> CLEAR_TABS_ONLY
-                    R.id.settingTabsAndData -> CLEAR_TABS_AND_DATA
-                    else -> CLEAR_NONE
+                dialog?.let {
+                    val radioGroup = it.findViewById(R.id.settingsClearWhatGroup) as RadioGroup
+                    val selectedOption = when (radioGroup.checkedRadioButtonId) {
+                        R.id.settingTabsOnly -> CLEAR_TABS_ONLY
+                        R.id.settingTabsAndData -> CLEAR_TABS_AND_DATA
+                        else -> CLEAR_NONE
+                    }
+                    val listener = activity as Listener?
+                    listener?.onAutomaticallyClearWhatOptionSelected(selectedOption)
                 }
-                val listener = activity as Listener?
-                listener?.onAutomaticallyClearWhatOptionSelected(selectedOption)
             }
             .setNegativeButton(android.R.string.cancel) { _, _ -> }
 
