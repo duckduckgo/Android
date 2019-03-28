@@ -31,12 +31,12 @@ import kotlinx.android.synthetic.main.item_feedback_reason.view.*
 class SubReasonAdapter(private val itemClickListener: (FeedbackTypeSubReasonDisplay) -> Unit) :
     ListAdapter<FeedbackTypeSubReasonDisplay, SubReasonAdapter.ViewHolder>(DiffCallback()) {
 
-    class DiffCallback<T> : DiffUtil.ItemCallback<T>() {
-        override fun areItemsTheSame(oldItem: T, newItem: T): Boolean {
+    class DiffCallback : DiffUtil.ItemCallback<FeedbackTypeSubReasonDisplay>() {
+        override fun areItemsTheSame(oldItem: FeedbackTypeSubReasonDisplay, newItem: FeedbackTypeSubReasonDisplay): Boolean {
             return oldItem == newItem
         }
 
-        override fun areContentsTheSame(oldItem: T, newItem: T): Boolean {
+        override fun areContentsTheSame(oldItem: FeedbackTypeSubReasonDisplay, newItem: FeedbackTypeSubReasonDisplay): Boolean {
             return oldItem == newItem
         }
     }

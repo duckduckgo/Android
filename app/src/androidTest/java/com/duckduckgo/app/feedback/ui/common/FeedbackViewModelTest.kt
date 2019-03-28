@@ -108,7 +108,6 @@ class FeedbackViewModelTest {
         assertTrue(fragmentViewState is InitialAppEnjoymentClarifier)
     }
 
-
     @Test
     fun whenUserChoosesNotToProvideFurtherDetailsForPositiveFeedbackThenSubmitted() = runBlocking<Unit> {
         withContext(Dispatchers.Main) {
