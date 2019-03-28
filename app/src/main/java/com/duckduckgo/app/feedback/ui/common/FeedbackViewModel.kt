@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.feedback.ui.common
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
+import com.duckduckgo.app.feedback.ui.common.Command.Exit
 import com.duckduckgo.app.feedback.ui.common.FragmentState.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
@@ -35,16 +35,15 @@ import timber.log.Timber
 
 class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val feedbackSubmitter: FeedbackSubmitter) : ViewModel() {
 
-    val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    val command: SingleLiveEvent<Command> = SingleLiveEvent()
+    val updateViewCommand: SingleLiveEvent<UpdateViewCommand> = SingleLiveEvent()
 
     init {
-        viewState.postValue(ViewState(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_FORWARDS)))
+        updateViewCommand.postValue(UpdateViewCommand(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_FORWARDS)))
     }
 
-    private val currentViewState: ViewState
-        get() = viewState.value!!
-
-    val command: SingleLiveEvent<Command> = SingleLiveEvent()
+    private val currentViewState: UpdateViewCommand
+        get() = updateViewCommand.value!!
 
 
     fun userSelectedNegativeFeedbackMainReason(mainReason: MainReason) {
@@ -56,7 +55,7 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
             MainReason.APP_IS_SLOW_OR_BUGGY -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
             MainReason.OTHER -> NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason)
         }
-        viewState.value = currentViewState.copy(
+        updateViewCommand.value = currentViewState.copy(
             fragmentViewState = newState,
             mainReason = mainReason,
             subReason = null,
@@ -65,30 +64,34 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
     }
 
     fun onBackPressed() {
+        var shouldHideKeyboard = false
         when (currentViewState.fragmentViewState) {
             is InitialAppEnjoymentClarifier -> {
-                command.value = Command.Exit(feedbackSubmitted = false)
+                command.value = Exit(feedbackSubmitted = false)
             }
             is PositiveFeedbackFirstStep -> {
-                viewState.value = currentViewState.copy(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_BACKWARDS))
+                updateViewCommand.value = currentViewState.copy(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_BACKWARDS))
             }
             is PositiveShareFeedback -> {
+                shouldHideKeyboard = true
                 if (canShowRatingsButton()) {
-                    viewState.value = currentViewState.copy(fragmentViewState = PositiveFeedbackFirstStep(NAVIGATION_BACKWARDS))
+                    updateViewCommand.value = currentViewState.copy(fragmentViewState = PositiveFeedbackFirstStep(NAVIGATION_BACKWARDS))
                 } else {
-                    viewState.value = currentViewState.copy(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_BACKWARDS))
+                    updateViewCommand.value = currentViewState.copy(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_BACKWARDS))
                 }
             }
             is NegativeFeedbackMainReason -> {
-                viewState.value = currentViewState.copy(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_BACKWARDS))
+                updateViewCommand.value = currentViewState.copy(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_BACKWARDS))
             }
             is NegativeFeedbackSubReason -> {
-                viewState.value = currentViewState.copy(fragmentViewState = NegativeFeedbackMainReason(NAVIGATION_BACKWARDS))
+                updateViewCommand.value = currentViewState.copy(fragmentViewState = NegativeFeedbackMainReason(NAVIGATION_BACKWARDS))
             }
             is NegativeWebSitesBrokenFeedback -> {
-                viewState.value = currentViewState.copy(fragmentViewState = NegativeFeedbackMainReason(NAVIGATION_BACKWARDS))
+                shouldHideKeyboard = true
+                updateViewCommand.value = currentViewState.copy(fragmentViewState = NegativeFeedbackMainReason(NAVIGATION_BACKWARDS))
             }
             is NegativeOpenEndedFeedback -> {
+                shouldHideKeyboard = true
                 val newViewState = when (currentViewState.previousViewState) {
                     is NegativeFeedbackSubReason -> {
                         NegativeFeedbackSubReason(NAVIGATION_BACKWARDS, currentViewState.mainReason!!)
@@ -100,13 +103,17 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
                         NegativeFeedbackMainReason(NAVIGATION_BACKWARDS)
                     }
                 }
-                viewState.value = currentViewState.copy(fragmentViewState = newViewState)
+                updateViewCommand.value = currentViewState.copy(fragmentViewState = newViewState)
             }
+        }
+
+        if (shouldHideKeyboard) {
+            command.value = Command.HideKeyboard
         }
     }
 
     fun userSelectedPositiveFeedback() {
-        viewState.value = if (canShowRatingsButton()) {
+        updateViewCommand.value = if (canShowRatingsButton()) {
             currentViewState.copy(
                 fragmentViewState = PositiveFeedbackFirstStep(NAVIGATION_FORWARDS),
                 previousViewState = currentViewState.fragmentViewState
@@ -139,47 +146,46 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
     }
 
     fun userSelectedNegativeFeedback() {
-        viewState.value = currentViewState.copy(
+        updateViewCommand.value = currentViewState.copy(
             fragmentViewState = NegativeFeedbackMainReason(NAVIGATION_FORWARDS),
             previousViewState = currentViewState.fragmentViewState
         )
     }
 
     fun userWantsToCancel() {
-        Timber.i("User is cancelling")
-        command.value = Command.Exit(feedbackSubmitted = false)
+        command.value = Exit(feedbackSubmitted = false)
     }
 
     fun userSelectedToGiveFeedback() {
-        viewState.value = currentViewState.copy(
+        updateViewCommand.value = currentViewState.copy(
             fragmentViewState = PositiveShareFeedback(NAVIGATION_FORWARDS),
             previousViewState = currentViewState.fragmentViewState
         )
     }
 
     suspend fun userProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String) {
-        command.postValue(Command.Exit(feedbackSubmitted = true))
+        command.postValue(Exit(feedbackSubmitted = true))
         withContext(Dispatchers.IO) {
             feedbackSubmitter.sendNegativeFeedback(mainReason, subReason, feedback)
         }
     }
 
     suspend fun onProvidedBrokenSiteFeedback(feedback: String, brokenSite: String?) {
-        command.postValue(Command.Exit(feedbackSubmitted = true))
+        command.postValue(Exit(feedbackSubmitted = true))
         withContext(Dispatchers.IO) {
             feedbackSubmitter.sendBrokenSiteFeedback(feedback, brokenSite)
         }
     }
 
     suspend fun userGavePositiveFeedbackNoDetails() {
-        command.postValue(Command.Exit(feedbackSubmitted = true))
+        command.postValue(Exit(feedbackSubmitted = true))
         withContext(Dispatchers.IO) {
             feedbackSubmitter.sendPositiveFeedback(null)
         }
     }
 
     suspend fun userProvidedPositiveOpenEndedFeedback(feedback: String) {
-        command.postValue(Command.Exit(feedbackSubmitted = true))
+        command.postValue(Exit(feedbackSubmitted = true))
         withContext(Dispatchers.IO) {
             feedbackSubmitter.sendPositiveFeedback(feedback)
         }
@@ -187,7 +193,7 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
 
     fun userSelectedSubReasonMissingBrowserFeatures(mainReason: MainReason, subReason: FeedbackType.MissingBrowserFeaturesSubReasons) {
         val newState = NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason, subReason)
-        viewState.value = currentViewState.copy(
+        updateViewCommand.value = currentViewState.copy(
             fragmentViewState = newState,
             mainReason = mainReason,
             subReason = subReason,
@@ -197,7 +203,7 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
 
     fun userSelectedSubReasonSearchNotGoodEnough(mainReason: MainReason, subReason: FeedbackType.SearchNotGoodEnoughSubReasons) {
         val newState = NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason, subReason)
-        viewState.value = currentViewState.copy(
+        updateViewCommand.value = currentViewState.copy(
             fragmentViewState = newState,
             mainReason = mainReason,
             subReason = subReason,
@@ -207,7 +213,7 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
 
     fun userSelectedSubReasonNeedMoreCustomization(mainReason: MainReason, subReason: FeedbackType.CustomizationSubReasons) {
         val newState = NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason, subReason)
-        viewState.value = currentViewState.copy(
+        updateViewCommand.value = currentViewState.copy(
             fragmentViewState = newState,
             mainReason = mainReason,
             subReason = subReason,
@@ -217,7 +223,7 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
 
     fun userSelectedSubReasonAppIsSlowOrBuggy(mainReason: MainReason, subReason: FeedbackType.PerformanceSubReasons) {
         val newState = NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason, subReason)
-        viewState.value = currentViewState.copy(
+        updateViewCommand.value = currentViewState.copy(
             fragmentViewState = newState,
             mainReason = mainReason,
             subReason = subReason,
@@ -226,7 +232,7 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
     }
 
     suspend fun userSelectedToRateApp() {
-        command.postValue(Command.Exit(feedbackSubmitted = true))
+        command.postValue(Exit(feedbackSubmitted = true))
         GlobalScope.launch(Dispatchers.IO) {
             feedbackSubmitter.sendUserRated()
         }
@@ -269,4 +275,12 @@ sealed class FragmentState(open val forwardDirection: Boolean) {
 
 sealed class Command {
     data class Exit(val feedbackSubmitted: Boolean) : Command()
+    object HideKeyboard : Command()
 }
+
+data class UpdateViewCommand(
+    val fragmentViewState: FragmentState,
+    val previousViewState: FragmentState? = null,
+    val mainReason: MainReason? = null,
+    val subReason: SubReason? = null
+)

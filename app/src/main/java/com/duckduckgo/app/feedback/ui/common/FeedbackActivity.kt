@@ -33,6 +33,7 @@ import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedFeedbackF
 import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.view.hideKeyboard
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -65,7 +66,7 @@ class FeedbackActivity : DuckDuckGoActivity(),
         viewModel.command.observe(this, Observer {
             it?.let { command -> processCommand(command) }
         })
-        viewModel.viewState.observe(this, Observer<ViewState> {
+        viewModel.updateViewCommand.observe(this, Observer {
             it?.let { viewState -> render(viewState) }
         })
     }
@@ -74,13 +75,12 @@ class FeedbackActivity : DuckDuckGoActivity(),
         Timber.v("Processing command: $command")
 
         when (command) {
-            is Command.Exit -> {
-                animateFinish(command.feedbackSubmitted)
-            }
+            is Command.Exit -> animateFinish(command.feedbackSubmitted)
+            is Command.HideKeyboard -> hideKeyboard()
         }
     }
 
-    private fun render(viewState: ViewState) {
+    private fun render(viewState: UpdateViewCommand) {
         Timber.v("ViewState is: $viewState")
 
         val state = viewState.fragmentViewState
@@ -178,7 +178,6 @@ class FeedbackActivity : DuckDuckGoActivity(),
         GlobalScope.launch { viewModel.userProvidedPositiveOpenEndedFeedback(feedback) }
     }
 
-
     /**
      * Negative feedback listeners
      */
@@ -192,7 +191,6 @@ class FeedbackActivity : DuckDuckGoActivity(),
     override fun userSelectedNegativeFeedbackMainReason(type: MainReason) {
         viewModel.userSelectedNegativeFeedbackMainReason(type)
     }
-
 
     /**
      * Negative feedback subReason selection
@@ -221,12 +219,14 @@ class FeedbackActivity : DuckDuckGoActivity(),
         GlobalScope.launch { viewModel.onProvidedBrokenSiteFeedback(feedback, url) }
     }
 
-    companion object {
+    private fun hideKeyboard() {
+        toolbar?.hideKeyboard()
+    }
 
+    companion object {
         fun intent(context: Context): Intent {
             return Intent(context, FeedbackActivity::class.java)
         }
-
     }
 }
 
