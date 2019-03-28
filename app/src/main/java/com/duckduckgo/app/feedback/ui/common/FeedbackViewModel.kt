@@ -164,28 +164,36 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
     }
 
     suspend fun userProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String) {
-        command.postValue(Exit(feedbackSubmitted = true))
+        withContext(Dispatchers.Main) {
+            command.value = Exit(feedbackSubmitted = true)
+        }
         withContext(Dispatchers.IO) {
             feedbackSubmitter.sendNegativeFeedback(mainReason, subReason, feedback)
         }
     }
 
     suspend fun onProvidedBrokenSiteFeedback(feedback: String, brokenSite: String?) {
-        command.postValue(Exit(feedbackSubmitted = true))
+        withContext(Dispatchers.Main) {
+            command.value = Exit(feedbackSubmitted = true)
+        }
         withContext(Dispatchers.IO) {
             feedbackSubmitter.sendBrokenSiteFeedback(feedback, brokenSite)
         }
     }
 
     suspend fun userGavePositiveFeedbackNoDetails() {
-        command.postValue(Exit(feedbackSubmitted = true))
+        withContext(Dispatchers.Main) {
+            command.value = Exit(feedbackSubmitted = true)
+        }
         withContext(Dispatchers.IO) {
             feedbackSubmitter.sendPositiveFeedback(null)
         }
     }
 
     suspend fun userProvidedPositiveOpenEndedFeedback(feedback: String) {
-        command.postValue(Exit(feedbackSubmitted = true))
+        withContext(Dispatchers.Main) {
+            command.value = Exit(feedbackSubmitted = true)
+        }
         withContext(Dispatchers.IO) {
             feedbackSubmitter.sendPositiveFeedback(feedback)
         }
@@ -232,7 +240,9 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
     }
 
     suspend fun userSelectedToRateApp() {
-        command.postValue(Exit(feedbackSubmitted = true))
+        withContext(Dispatchers.Main) {
+            command.value = Exit(feedbackSubmitted = true)
+        }
         GlobalScope.launch(Dispatchers.IO) {
             feedbackSubmitter.sendUserRated()
         }
