@@ -53,7 +53,7 @@ class SpecialUrlDetectorImpl : SpecialUrlDetector {
             HTTP_SCHEME, HTTPS_SCHEME -> UrlType.Web(uriString)
             ABOUT_SCHEME -> UrlType.Unknown(uriString)
             null -> UrlType.SearchQuery(uriString)
-            else -> buildIntent(uriString)
+            else -> checkForIntent(uriString)
         }
     }
 
@@ -66,6 +66,15 @@ class SpecialUrlDetectorImpl : SpecialUrlDetector {
     private fun buildSms(uriString: String) = UrlType.Sms(uriString.removePrefix("$SMS_SCHEME:"))
 
     private fun buildSmsTo(uriString: String) = UrlType.Sms(uriString.removePrefix("$SMSTO_SCHEME:"))
+
+    private fun checkForIntent(uriString: String): UrlType {
+        val validUriSchemeRegex = Regex("[a-z][a-zA-Z\\d+.-]+")
+        if (uriString.matches(validUriSchemeRegex)){
+            return buildIntent(uriString)
+        }
+
+        return UrlType.SearchQuery(uriString)
+    }
 
     private fun buildIntent(uriString: String): UrlType {
         return try {
