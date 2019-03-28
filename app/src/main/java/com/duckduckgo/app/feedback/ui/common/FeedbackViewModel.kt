@@ -164,36 +164,35 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
     }
 
     suspend fun userProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String) {
-        withContext(Dispatchers.Main) {
-            command.value = Exit(feedbackSubmitted = true)
-        }
+        command.value = Exit(feedbackSubmitted = true)
         withContext(Dispatchers.IO) {
             feedbackSubmitter.sendNegativeFeedback(mainReason, subReason, feedback)
         }
     }
 
     suspend fun onProvidedBrokenSiteFeedback(feedback: String, brokenSite: String?) {
-        withContext(Dispatchers.Main) {
-            command.value = Exit(feedbackSubmitted = true)
-        }
+        command.value = Exit(feedbackSubmitted = true)
         withContext(Dispatchers.IO) {
             feedbackSubmitter.sendBrokenSiteFeedback(feedback, brokenSite)
         }
     }
 
     suspend fun userGavePositiveFeedbackNoDetails() {
-        withContext(Dispatchers.Main) {
-            command.value = Exit(feedbackSubmitted = true)
-        }
+        command.value = Exit(feedbackSubmitted = true)
         withContext(Dispatchers.IO) {
             feedbackSubmitter.sendPositiveFeedback(null)
         }
     }
 
-    suspend fun userProvidedPositiveOpenEndedFeedback(feedback: String) {
-        withContext(Dispatchers.Main) {
-            command.value = Exit(feedbackSubmitted = true)
+    suspend fun userSelectedToRateApp() {
+        command.value = Exit(feedbackSubmitted = true)
+        GlobalScope.launch(Dispatchers.IO) {
+            feedbackSubmitter.sendUserRated()
         }
+    }
+
+    suspend fun userProvidedPositiveOpenEndedFeedback(feedback: String) {
+        command.value = Exit(feedbackSubmitted = true)
         withContext(Dispatchers.IO) {
             feedbackSubmitter.sendPositiveFeedback(feedback)
         }
@@ -237,15 +236,6 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
             subReason = subReason,
             previousViewState = currentViewState.fragmentViewState
         )
-    }
-
-    suspend fun userSelectedToRateApp() {
-        withContext(Dispatchers.Main) {
-            command.value = Exit(feedbackSubmitted = true)
-        }
-        GlobalScope.launch(Dispatchers.IO) {
-            feedbackSubmitter.sendUserRated()
-        }
     }
 
     companion object {

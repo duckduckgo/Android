@@ -35,6 +35,7 @@ import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFr
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.hideKeyboard
 import kotlinx.android.synthetic.main.include_toolbar.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -163,7 +164,7 @@ class FeedbackActivity : DuckDuckGoActivity(),
      * Positive feedback listeners
      */
     override fun userSelectedToRateApp() {
-        GlobalScope.launch { viewModel.userSelectedToRateApp() }
+        GlobalScope.launch(Dispatchers.Main) { viewModel.userSelectedToRateApp() }
     }
 
     override fun userSelectedToGiveFeedback() {
@@ -171,18 +172,18 @@ class FeedbackActivity : DuckDuckGoActivity(),
     }
 
     override fun userGavePositiveFeedbackNoDetails() {
-        GlobalScope.launch { viewModel.userGavePositiveFeedbackNoDetails() }
+        GlobalScope.launch(Dispatchers.Main) { viewModel.userGavePositiveFeedbackNoDetails() }
     }
 
     override fun userProvidedPositiveOpenEndedFeedback(feedback: String) {
-        GlobalScope.launch { viewModel.userProvidedPositiveOpenEndedFeedback(feedback) }
+        GlobalScope.launch(Dispatchers.Main) { viewModel.userProvidedPositiveOpenEndedFeedback(feedback) }
     }
 
     /**
      * Negative feedback listeners
      */
     override fun userProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String) {
-        GlobalScope.launch { viewModel.userProvidedNegativeOpenEndedFeedback(mainReason, subReason, feedback) }
+        GlobalScope.launch(Dispatchers.Main) { viewModel.userProvidedNegativeOpenEndedFeedback(mainReason, subReason, feedback) }
     }
 
     /**
@@ -216,7 +217,7 @@ class FeedbackActivity : DuckDuckGoActivity(),
      * Negative feedback, broken site
      */
     override fun onProvidedBrokenSiteFeedback(feedback: String, url: String?) {
-        GlobalScope.launch { viewModel.onProvidedBrokenSiteFeedback(feedback, url) }
+        GlobalScope.launch(Dispatchers.Main) { viewModel.onProvidedBrokenSiteFeedback(feedback, url) }
     }
 
     private fun hideKeyboard() {
