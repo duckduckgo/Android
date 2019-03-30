@@ -21,6 +21,7 @@ import android.webkit.HttpAuthHandler
 import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -77,8 +78,9 @@ class BrowserWebViewClientTest {
     @Test
     fun whenOnReceivedHttpAuthRequestThenListenerNotified() {
         val mockHandler = mock<HttpAuthHandler>()
+        val authenticationRequest = BasicAuthenticationRequest(mockHandler, EXAMPLE_URL, EXAMPLE_URL, EXAMPLE_URL)
         testee.onReceivedHttpAuthRequest(webView, mockHandler, EXAMPLE_URL, EXAMPLE_URL)
-        verify(listener).requiresAuthentication(EXAMPLE_URL, mockHandler)
+        verify(listener).requiresAuthentication(authenticationRequest)
     }
 
     private class TestWebView(context: Context) : WebView(context)

@@ -21,11 +21,12 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
-import android.webkit.HttpAuthHandler
 import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
+import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.global.view.hideKeyboard
 import com.duckduckgo.app.global.view.showKeyboard
 import org.jetbrains.anko.find
@@ -33,11 +34,11 @@ import org.jetbrains.anko.find
 class HttpAuthenticationDialogFragment : DialogFragment() {
 
     var listener: HttpAuthenticationListener? = null
-    lateinit var handler: HttpAuthHandler
+    lateinit var request: BasicAuthenticationRequest
 
     interface HttpAuthenticationListener {
-        fun handleAuthentication(handler: HttpAuthHandler, username: String, password: String)
-        fun cancelAuthentication()
+        fun handleAuthentication(request: BasicAuthenticationRequest, credentials: BasicAuthenticationCredentials)
+        fun cancelAuthentication(request: BasicAuthenticationRequest)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -45,7 +46,6 @@ class HttpAuthenticationDialogFragment : DialogFragment() {
         val usernameInput = rootView.find<EditText>(R.id.usernameInput)
         val passwordInput = rootView.find<EditText>(R.id.passwordInput)
         val informationText = rootView.find<TextView>(R.id.httpAuthInformationText)
-
 
         validateBundleArguments()
 
@@ -56,11 +56,12 @@ class HttpAuthenticationDialogFragment : DialogFragment() {
         val alertBuilder = AlertDialog.Builder(activity!!)
             .setView(rootView)
             .setPositiveButton(R.string.authenticationDialogPositiveButton) { _, _ ->
-                listener?.handleAuthentication(handler, usernameInput.text.toString(), passwordInput.text.toString())
+                listener?.handleAuthentication(request,
+                    BasicAuthenticationCredentials(username = usernameInput.text.toString(), password = passwordInput.text.toString()))
 
             }.setNegativeButton(R.string.authenticationDialogNegativeButton) { _, _ ->
                 rootView.hideKeyboard()
-                listener?.cancelAuthentication()
+                listener?.cancelAuthentication(request)
             }
             .setTitle(R.string.authenticationDialogTitle)
 

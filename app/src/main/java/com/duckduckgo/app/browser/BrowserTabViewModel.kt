@@ -21,7 +21,6 @@ import android.net.Uri
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
-import android.webkit.HttpAuthHandler
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
@@ -47,6 +46,8 @@ import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
+import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
 import com.duckduckgo.app.cta.ui.CtaConfiguration
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -120,7 +121,8 @@ class BrowserTabViewModel(
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
         val addToHomeEnabled: Boolean = false,
-        val addToHomeVisible: Boolean = false
+        val addToHomeVisible: Boolean = false,
+        val isFailedAuthentication: Boolean = false
     )
 
     data class OmnibarViewState(
@@ -172,7 +174,8 @@ class BrowserTabViewModel(
         class LaunchSurvey(val survey: Survey) : Command()
         object LaunchAddWidget : Command()
         object LaunchLegacyAddWidget : Command()
-        class RequiresAuthentication(val url: String, val handler: HttpAuthHandler) : Command()
+        class RequiresAuthentication(val request: BasicAuthenticationRequest) : Command()
+        class SaveCredentials(val request: BasicAuthenticationRequest, val credentials: BasicAuthenticationCredentials) : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -334,7 +337,7 @@ class BrowserTabViewModel(
         Timber.v("Loading finished")
 
         // Skip if url is BLANK_PAGE which is used to clear the page when 401 challenge is dismissed
-        if (url == BLANK_PAGE) {
+        if (url == BLANK_PAGE && currentBrowserViewState().isFailedAuthentication) {
             return
         }
 
@@ -383,21 +386,25 @@ class BrowserTabViewModel(
     private fun urlChanged(url: String?) {
         Timber.v("Url changed: $url")
 
+        val currentBrowserViewState = currentBrowserViewState()
         if (url == null) {
             findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = false)
 
-            val currentBrowserViewState = currentBrowserViewState()
             browserViewState.value = currentBrowserViewState.copy(
                 canAddBookmarks = false,
                 addToHomeEnabled = false,
-                addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported()
+                addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
+                isFailedAuthentication = false
             )
 
+            return
+        } else if (url == BLANK_PAGE && currentBrowserViewState.isFailedAuthentication) {
+            pendingUrl = null
             return
         }
 
 
-        val currentBrowserViewState = currentBrowserViewState()
+
         val currentOmnibarViewState = currentOmnibarViewState()
 
         omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url))
@@ -408,7 +415,8 @@ class BrowserTabViewModel(
             addToHomeEnabled = true,
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = true,
-            showPrivacyGrade = appConfigurationDownloaded
+            showPrivacyGrade = appConfigurationDownloaded,
+            isFailedAuthentication = false
         )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
@@ -702,17 +710,31 @@ class BrowserTabViewModel(
         command.value = HandleExternalAppLink(appLink)
     }
 
-    override fun requiresAuthentication(siteURL: String, handler: HttpAuthHandler) {
-        Timber.v("requiresAuthentication for URL [$siteURL]")
-        command.value = RequiresAuthentication(siteURL, handler)
+    override fun requiresAuthentication(request: BasicAuthenticationRequest) {
+        Timber.v("requiresAuthentication for [${request.site}]")
+        command.value = RequiresAuthentication(request)
     }
 
-    override fun handleAuthentication(handler: HttpAuthHandler, username: String, password: String) {
-        handler.proceed(username, password)
+    override fun handleAuthentication(request: BasicAuthenticationRequest, credentials: BasicAuthenticationCredentials) {
+        request.handler.proceed(credentials.username, credentials.password)
+        // Attempt to save the credentials
+        command.value = SaveCredentials(request, credentials)
     }
 
-    override fun cancelAuthentication() {
+    override fun cancelAuthentication(request: BasicAuthenticationRequest) {
         Timber.v("cancelAuthentication, loading about:blank")
+        request.handler.cancel()
+
+        val currentBrowserViewState = currentBrowserViewState()
+        browserViewState.value = currentBrowserViewState.copy(
+            canAddBookmarks = false,
+            showPrivacyGrade = false,
+            showClearButton = false,
+            canSharePage = false,
+            addToHomeEnabled = false,
+            addToHomeVisible = false,
+            isFailedAuthentication = true)
+
         command.value = Navigate(BLANK_PAGE)
     }
 

@@ -26,6 +26,7 @@ import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import android.webkit.*
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -171,16 +172,50 @@ class BrowserWebViewClient @Inject constructor(
     override fun onReceivedHttpAuthRequest(view: WebView?, handler: HttpAuthHandler?, host: String?, realm: String?) {
         Timber.v("onReceivedHttpAuthRequest ${view?.url} $realm, $host,  $currentUrl")
 
-        val siteURL = view?.url?.let {
-            "${URI(view.url).scheme}://$host"
-        } ?: host!!
-
         if (handler != null) {
-            webViewClientListener?.let {
-                it.requiresAuthentication(siteURL, handler)
+            Timber.v("onReceivedHttpAuthRequest - useHttpAuthUsernamePassword [${handler.useHttpAuthUsernamePassword()}")
+            if (handler.useHttpAuthUsernamePassword()) {
+                val webViewDatabase = WebViewDatabase.getInstance(view?.context)
+
+                val credentials = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    webViewDatabase.getHttpAuthUsernamePassword(host.orEmpty(), realm.orEmpty())
+                } else {
+                    @Suppress("DEPRECATION")
+                    view?.getHttpAuthUsernamePassword(host.orEmpty(), realm.orEmpty())
+                }
+
+                credentials?.let {
+                    handler.proceed(credentials[0], credentials[1])
+                } ?: showAuthenticationDialog(view, handler, host, realm)
+            } else {
+                showAuthenticationDialog(view, handler, host, realm)
             }
         } else {
             super.onReceivedHttpAuthRequest(view, handler, host, realm)
+        }
+    }
+
+    private fun showAuthenticationDialog(
+        view: WebView?,
+        handler: HttpAuthHandler,
+        host: String?,
+        realm: String?
+    ) {
+        webViewClientListener?.let {
+            Timber.v("showAuthenticationDialog - $host, $realm")
+
+            val siteURL = view?.url?.let {
+                "${URI(view.url).scheme}://$host"
+            } ?: host.orEmpty()
+
+            val request = BasicAuthenticationRequest(
+                handler = handler,
+                host = host.orEmpty(),
+                realm = realm.orEmpty(),
+                site = siteURL
+            )
+
+            it.requiresAuthentication(request)
         }
     }
 
