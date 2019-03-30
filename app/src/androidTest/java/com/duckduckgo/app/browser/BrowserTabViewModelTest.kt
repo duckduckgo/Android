@@ -43,7 +43,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.feedback.db.SurveyDao
+import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
@@ -440,7 +440,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUrlChangedWithDuckDuckGoUrlContainingQueryThenAtbRefreshed() {
         changeUrl("http://duckduckgo.com?q=test")
-        verify(mockStatisticsUpdater).refreshRetentionAtb()
+        verify(mockStatisticsUpdater).refreshSearchRetentionAtb()
     }
 
     @Test

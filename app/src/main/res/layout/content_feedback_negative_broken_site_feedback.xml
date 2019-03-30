@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2019 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:toots="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/rootScrollView"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout style="@style/FeedbackFragmentStyle">
+
+        <ImageView
+            android:id="@+id/emoticonImage"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="@dimen/feedbackTitleMarginTop"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_sad_face"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/title"
+            style="@style/FeedbackTitle"
+            android:layout_marginTop="12dp"
+            android:text="@string/websiteNotLoadingTitleShort"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/emoticonImage" />
+
+        <TextView
+            android:id="@+id/subtitle"
+            style="@style/FeedbackTitle.FeedbackSubtitle"
+            android:text="@string/whichBrokenSites"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/brokenSiteInputContainer"
+            style="@style/FeedbackInputBoxStyle"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="65dp"
+            android:layout_marginEnd="20dp"
+            android:hint="@string/whichBrokenSitesHint"
+            app:hintTextAppearance="@style/FeedbackInputHintStyle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/subtitle">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/brokenSiteInput"
+                style="@style/FeedbackEditTextInputStyle"
+                android:gravity="center_vertical"
+                android:inputType="textUri|textNoSuggestions"
+                android:paddingBottom="20dp"
+                toots:text="https://example.com" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/openEndedFeedbackContainer"
+            style="@style/FeedbackInputBoxStyle"
+            android:layout_width="0dp"
+            android:layout_height="140dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="20dp"
+            android:hint="@string/openEndedInputHint"
+            app:hintTextAppearance="@style/FeedbackInputHintStyle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/brokenSiteInputContainer">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/openEndedFeedback"
+                style="@style/FeedbackEditTextInputStyle"
+                android:nextFocusDown="@string/submitFeedback" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <Button
+            android:id="@+id/submitFeedbackButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/button_contained_bg"
+            android:foreground="?attr/selectableItemBackground"
+            android:text="@string/submitFeedback"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/openEndedFeedbackContainer"
+            app:layout_constraintVertical_bias="0.9" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

@@ -71,8 +71,8 @@ class RatingModule {
     }
 
     @Provides
-    fun playStoreUtils(): PlayStoreUtils {
-        return PlayStoreAndroidUtils()
+    fun playStoreUtils(context: Context): PlayStoreUtils {
+        return PlayStoreAndroidUtils(context)
     }
 
     @Singleton

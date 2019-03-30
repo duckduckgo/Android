@@ -124,7 +124,7 @@
             <TextView
                 android:id="@+id/brokenSitePopupMenuItem"
                 style="@style/BrowserTextMenuItem"
-                android:text="@string/feedbackReportBrokenSiteMenuItem" />
+                android:text="@string/brokenSiteReportBrokenSiteMenuItem" />
 
             <TextView
                 android:id="@+id/settingsPopupMenuItem"

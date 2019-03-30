@@ -39,6 +39,8 @@ import android.view.inputmethod.EditorInfo
 import android.webkit.*
 import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
+import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
+import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
 import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.AnyThread
@@ -74,13 +76,13 @@ import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.CtaConfiguration
 import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.feedback.model.Survey
-import com.duckduckgo.app.feedback.ui.SurveyActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
@@ -190,7 +192,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private val logoHidingLayoutChangeListener by lazy { LogoHidingLayoutChangeListener(ddgLogo) }
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
     }
@@ -547,9 +549,9 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private fun configureOmnibarTextInput() {
         omnibarTextInput.onFocusChangeListener =
-                View.OnFocusChangeListener { _, hasFocus: Boolean ->
-                    viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), hasFocus, false)
-                }
+            View.OnFocusChangeListener { _, hasFocus: Boolean ->
+                viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), hasFocus, false)
+            }
 
         omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
             override fun onBackKey(): Boolean {
@@ -639,7 +641,8 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     override fun onCreateContextMenu(menu: ContextMenu, view: View, menuInfo: ContextMenu.ContextMenuInfo?) {
         webView?.hitTestResult?.let {
-            viewModel.userLongPressedInWebView(getLongPressTarget(it), menu)
+            val target = getLongPressTarget(it) ?: return
+            viewModel.userLongPressedInWebView(target, menu)
         }
     }
 
@@ -655,15 +658,16 @@ class BrowserTabFragment : Fragment(), FindListener {
         return message.data.getString(URL_BUNDLE_KEY)
     }
 
-    private fun getLongPressTarget(hitTestResult: HitTestResult): LongPressTarget {
-        return if (hitTestResult.type == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
-            LongPressTarget(
+    private fun getLongPressTarget(hitTestResult: HitTestResult): LongPressTarget? {
+        return when {
+            hitTestResult.extra == null -> null
+            hitTestResult.type == UNKNOWN_TYPE -> null
+            hitTestResult.type == SRC_IMAGE_ANCHOR_TYPE -> LongPressTarget(
                 url = getTargetUrlForImageSource() ?: hitTestResult.extra,
                 imageUrl = hitTestResult.extra,
                 type = hitTestResult.type
             )
-        } else {
-            LongPressTarget(
+            else -> LongPressTarget(
                 url = hitTestResult.extra,
                 type = hitTestResult.type
             )
@@ -672,7 +676,8 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         webView?.hitTestResult?.let {
-            if (viewModel.userSelectedItemFromLongPressMenu(getLongPressTarget(it), item)) {
+            val target = getLongPressTarget(it)
+            if (target != null && viewModel.userSelectedItemFromLongPressMenu(target, item)) {
                 return true
             }
         }

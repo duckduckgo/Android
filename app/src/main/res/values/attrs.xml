@@ -40,5 +40,10 @@
     <attr name="buttonOutlinedTextColor" format="color" />
     <attr name="callToActionTitleColor" format="color" />
     <attr name="callToActionSubtitleColor" format="color" />
+    <attr name="feedbackAnonymousFeedbackLabelColor" format="color" />
+    <attr name="feedbackListItemBackgroundColor" format="color" />
+    <attr name="feedbackListItemSeparatorColor" format="color" />
+    <attr name="feedbackEditTextBackgroundColor" format="color" />
+    <attr name="feedbackEditTextHintColor" format="color" />
 
 </resources>
