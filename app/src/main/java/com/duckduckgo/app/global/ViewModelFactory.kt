@@ -21,6 +21,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
+import com.duckduckgo.app.brokensite.BrokenSiteViewModel
+import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
@@ -28,10 +30,12 @@ import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.feedback.api.FeedbackSender
-import com.duckduckgo.app.feedback.db.SurveyDao
-import com.duckduckgo.app.feedback.ui.FeedbackViewModel
-import com.duckduckgo.app.feedback.ui.SurveyViewModel
+import com.duckduckgo.app.feedback.api.FeedbackSubmitter
+import com.duckduckgo.app.feedback.ui.common.FeedbackViewModel
+import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragmentViewModel
+import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeedbackViewModel
+import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel
+import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingViewModel
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -41,6 +45,7 @@ import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
+import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.store.PrivacySettingsSharedPreferences
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel
@@ -53,6 +58,8 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.survey.db.SurveyDao
+import com.duckduckgo.app.survey.ui.SurveyViewModel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel
 import com.duckduckgo.app.usage.search.SearchCountDao
@@ -80,7 +87,7 @@ class ViewModelFactory @Inject constructor(
     private val webViewLongPressHandler: LongPressHandler,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val variantManager: VariantManager,
-    private val feedbackSender: FeedbackSender,
+    private val brokenSiteSender: BrokenSiteSender,
     private val webViewSessionStorage: WebViewSessionStorage,
     private val specialUrlDetector: SpecialUrlDetector,
     private val faviconDownloader: FaviconDownloader,
@@ -90,7 +97,9 @@ class ViewModelFactory @Inject constructor(
     private val ctaViewModel: CtaViewModel,
     private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
     private val searchCountDao: SearchCountDao,
-    private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder
+    private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
+    private val playStoreUtils: PlayStoreUtils,
+    private val feedbackSubmitter: FeedbackSubmitter
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -105,11 +114,17 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                 isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                 isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
-                isAssignableFrom(FeedbackViewModel::class.java) -> FeedbackViewModel(feedbackSender)
+                isAssignableFrom(FeedbackViewModel::class.java) -> FeedbackViewModel(playStoreUtils, feedbackSubmitter)
+                isAssignableFrom(BrokenSiteViewModel::class.java) -> BrokenSiteViewModel(brokenSiteSender)
                 isAssignableFrom(SurveyViewModel::class.java) -> SurveyViewModel(surveyDao, statisticsStore, appInstallStore)
                 isAssignableFrom(AddWidgetInstructionsViewModel::class.java) -> AddWidgetInstructionsViewModel()
                 isAssignableFrom(SettingsViewModel::class.java) -> settingsViewModel()
                 isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel(bookmarksDao)
+                isAssignableFrom(InitialFeedbackFragmentViewModel::class.java) -> InitialFeedbackFragmentViewModel()
+                isAssignableFrom(PositiveFeedbackLandingViewModel::class.java) -> PositiveFeedbackLandingViewModel()
+                isAssignableFrom(ShareOpenEndedNegativeFeedbackViewModel::class.java) -> ShareOpenEndedNegativeFeedbackViewModel()
+                isAssignableFrom(BrokenSiteNegativeFeedbackViewModel::class.java) -> BrokenSiteNegativeFeedbackViewModel()
+
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
         } as T

@@ -107,6 +107,9 @@ interface Pixel {
         APP_FEEDBACK_DIALOG_USER_GAVE_FEEDBACK("mrp_f_d%d_y"),
         APP_FEEDBACK_DIALOG_USER_DECLINED_FEEDBACK("mrp_f_d%d_n"),
         APP_FEEDBACK_DIALOG_USER_CANCELLED("mrp_f_d%d_c"),
+
+        FEEDBACK_POSITIVE_SUBMISSION("mfbs_%s_submit"),
+        FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s")
     }
 
     object PixelParameter {
@@ -139,7 +142,7 @@ class ApiBasedPixel @Inject constructor(
             .subscribe({
                 Timber.v("Pixel sent: $pixelName")
             }, {
-                Timber.w("Pixel failed: $pixelName", it)
+                Timber.w("Pixel failed: $pixelName")
             })
     }
 

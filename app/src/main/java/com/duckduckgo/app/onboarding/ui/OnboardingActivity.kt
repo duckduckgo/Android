@@ -19,9 +19,9 @@ package com.duckduckgo.app.onboarding.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
-import android.view.View
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.ColorCombiner
@@ -67,7 +67,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
         val pageListener = ColorChangingPageListener(colorCombiner, object : NewColorListener {
             override fun update(@ColorInt color: Int) = updateColor(color)
             override fun getColorForPage(position: Int): Int? {
-                val color = viewPageAdapter.getItem(position)?.backgroundColor() ?: return null
+                val color = viewPageAdapter.backgroundColor(position) ?: return null
                 return ContextCompat.getColor(this@OnboardingActivity, color)
             }
         })

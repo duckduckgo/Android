@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2019 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    tools:context="com.duckduckgo.app.brokensite.BrokenSiteActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/feedbackCardHorizontalMargin"
+            android:layout_marginTop="@dimen/feedbackCardVerticalMargin"
+            android:layout_marginEnd="@dimen/feedbackCardHorizontalMargin"
+            android:layout_marginBottom="@dimen/feedbackCardVerticalMargin"
+            android:background="@drawable/notification_info_bottom_background"
+            android:paddingBottom="30dp">
+
+            <View
+                android:id="@+id/titleSection"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@drawable/notification_info_top_background"
+                android:elevation="4dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="@+id/description"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="30dp"
+                android:elevation="@dimen/modalCardHeaderElevation"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_icon_report_broken_site"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/titleSection" />
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:elevation="@dimen/modalCardHeaderElevation"
+                android:text="@string/brokenSiteHeading"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="@dimen/modalCardTitleTextSize"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/icon" />
+
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="19dp"
+                android:elevation="@dimen/modalCardHeaderElevation"
+                android:lineSpacingExtra="4sp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="30dp"
+                android:text="@string/brokenSiteModalDescription"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="@dimen/modalCardDescriptionTextSize"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/title" />
+
+            <TextView
+                android:id="@+id/brokenDomainLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/feedbackFormFieldsMargin"
+                android:text="@string/brokenSiteDomainLabel"
+                android:textColor="@color/warmerGray"
+                android:textSize="15sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/description" />
+
+            <EditText
+                android:id="@+id/brokenSiteUrl"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/feedbackFormFieldsMargin"
+                android:hint="@string/brokenSiteUrlHint"
+                android:imeOptions="flagNoExtractUi"
+                android:inputType="textUri"
+                android:paddingTop="8dp"
+                android:paddingBottom="16dp"
+                android:singleLine="true"
+                android:textSize="@dimen/modalCardEditTextSize"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/brokenDomainLabel" />
+
+            <EditText
+                android:id="@+id/feedbackMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/feedbackFormFieldsMargin"
+                android:hint="@string/brokenSiteMessageHint"
+                android:imeOptions="flagNoExtractUi"
+                android:inputType="textMultiLine"
+                android:lineSpacingExtra="5sp"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:textSize="@dimen/modalCardEditTextSize"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/brokenSiteUrl" />
+
+            <Button
+                android:id="@+id/submitButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="30dp"
+                android:background="@drawable/button_contained_bg"
+                android:text="@string/brokenSiteSubmitButton"
+                android:textColor="@color/white"
+                android:textSize="@dimen/modalCardMajorButtonTextSize"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/feedbackMessage" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+
+</ScrollView>
+

@@ -30,6 +30,7 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.os.Handler
 import android.text.Editable
 import android.view.*
 import android.view.View.*
@@ -39,6 +40,9 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebView.FindListener
+import android.webkit.WebView.HitTestResult
+import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
+import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
 import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.AnyThread
@@ -62,6 +66,7 @@ import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
+import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -69,13 +74,13 @@ import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.CtaConfiguration
 import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.feedback.model.Survey
-import com.duckduckgo.app.feedback.ui.SurveyActivity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
@@ -185,7 +190,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private val logoHidingLayoutChangeListener by lazy { LogoHidingLayoutChangeListener(ddgLogo) }
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
     }
@@ -522,9 +527,9 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private fun configureOmnibarTextInput() {
         omnibarTextInput.onFocusChangeListener =
-                View.OnFocusChangeListener { _, hasFocus: Boolean ->
-                    viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), hasFocus, false)
-                }
+            View.OnFocusChangeListener { _, hasFocus: Boolean ->
+                viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), hasFocus, false)
+            }
 
         omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
             override fun onBackKey(): Boolean {
@@ -614,14 +619,43 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     override fun onCreateContextMenu(menu: ContextMenu, view: View, menuInfo: ContextMenu.ContextMenuInfo?) {
         webView?.hitTestResult?.let {
-            viewModel.userLongPressedInWebView(it, menu)
+            val target = getLongPressTarget(it) ?: return
+            viewModel.userLongPressedInWebView(target, menu)
+        }
+    }
+
+    /**
+     * Use requestFocusNodeHref to get the a tag url for the touched image.
+     */
+    private fun getTargetUrlForImageSource(): String? {
+        val handler = Handler()
+        val message = handler.obtainMessage()
+
+        webView?.requestFocusNodeHref(message)
+
+        return message.data.getString(URL_BUNDLE_KEY)
+    }
+
+    private fun getLongPressTarget(hitTestResult: HitTestResult): LongPressTarget? {
+        return when {
+            hitTestResult.extra == null -> null
+            hitTestResult.type == UNKNOWN_TYPE -> null
+            hitTestResult.type == SRC_IMAGE_ANCHOR_TYPE -> LongPressTarget(
+                url = getTargetUrlForImageSource() ?: hitTestResult.extra,
+                imageUrl = hitTestResult.extra,
+                type = hitTestResult.type
+            )
+            else -> LongPressTarget(
+                url = hitTestResult.extra,
+                type = hitTestResult.type
+            )
         }
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         webView?.hitTestResult?.let {
-            val url = it.extra
-            if (viewModel.userSelectedItemFromLongPressMenu(url, item)) {
+            val target = getLongPressTarget(it)
+            if (target != null && viewModel.userSelectedItemFromLongPressMenu(target, item)) {
                 return true
             }
         }
@@ -856,6 +890,8 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
+
+        private const val URL_BUNDLE_KEY = "url"
 
         fun newInstance(tabId: String, query: String? = null): BrowserTabFragment {
             val fragment = BrowserTabFragment()

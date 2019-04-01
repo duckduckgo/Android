@@ -43,11 +43,11 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
+import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.ui.CtaConfiguration
 import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.feedback.model.Survey
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
@@ -59,6 +59,7 @@ import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -403,7 +404,7 @@ class BrowserTabViewModel(
         )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            statisticsUpdater.refreshRetentionAtb()
+            statisticsUpdater.refreshSearchRetentionAtb()
         }
         pendingUrl = null
         site = siteFactory.build(url)
@@ -504,12 +505,12 @@ class BrowserTabViewModel(
         autoCompleteViewState.value = AutoCompleteViewState(showSuggestions = false)
     }
 
-    fun userLongPressedInWebView(target: WebView.HitTestResult, menu: ContextMenu) {
-        Timber.i("Long pressed on ${target.type}, (extra=${target.extra})")
-        longPressHandler.handleLongPress(target.type, target.extra, menu)
+    fun userLongPressedInWebView(target: LongPressTarget, menu: ContextMenu) {
+        Timber.i("Long pressed on ${target.type}, (url=${target.url})")
+        longPressHandler.handleLongPress(target.type, target.url, menu)
     }
 
-    fun userSelectedItemFromLongPressMenu(longPressTarget: String, item: MenuItem): Boolean {
+    fun userSelectedItemFromLongPressMenu(longPressTarget: LongPressTarget, item: MenuItem): Boolean {
 
         val requiredAction = longPressHandler.userSelectedMenuItem(longPressTarget, item)
 

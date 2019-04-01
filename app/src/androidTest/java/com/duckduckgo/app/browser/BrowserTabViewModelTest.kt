@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.view.MenuItem
 import android.view.View
+import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -34,11 +35,12 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
+import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.feedback.db.SurveyDao
+import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
@@ -435,7 +437,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUrlChangedWithDuckDuckGoUrlContainingQueryThenAtbRefreshed() {
         changeUrl("http://duckduckgo.com?q=test")
-        verify(mockStatisticsUpdater).refreshRetentionAtb()
+        verify(mockStatisticsUpdater).refreshSearchRetentionAtb()
     }
 
     @Test
@@ -695,11 +697,12 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSelectsDownloadImageOptionFromContextMenuThenDownloadFileCommandIssued() {
-        whenever(mockLongPressHandler.userSelectedMenuItem(anyString(), any()))
+        whenever(mockLongPressHandler.userSelectedMenuItem(any(), any()))
             .thenReturn(DownloadFile("example.com"))
 
         val mockMenuItem: MenuItem = mock()
-        testee.userSelectedItemFromLongPressMenu("example.com", mockMenuItem)
+        val longPressTarget = LongPressTarget(url = "example.com", type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
+        testee.userSelectedItemFromLongPressMenu(longPressTarget, mockMenuItem)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.DownloadImage)
 
@@ -781,7 +784,8 @@ class BrowserTabViewModelTest {
     fun whenUserSelectsOpenTabThenTabCommandSent() {
         whenever(mockLongPressHandler.userSelectedMenuItem(any(), any())).thenReturn(OpenInNewTab("http://example.com"))
         val mockMenItem: MenuItem = mock()
-        testee.userSelectedItemFromLongPressMenu("http://example.com", mockMenItem)
+        val longPressTarget = LongPressTarget(url = "http://example.com", type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
+        testee.userSelectedItemFromLongPressMenu(longPressTarget, mockMenItem)
         val command = captureCommands().value as Command.OpenInNewTab
         assertEquals("http://example.com", command.query)
     }
