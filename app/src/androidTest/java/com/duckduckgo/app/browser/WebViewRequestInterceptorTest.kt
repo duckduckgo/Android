@@ -242,7 +242,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             currentUrl = "foo.com",
             webView = webView,
-            webViewClientListener = null,
+            webViewClientListener = mockListener,
             privacyProtectionCountDao = mockPrivacyProtectionCountDao
         )
 
