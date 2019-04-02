@@ -54,12 +54,13 @@ class ClearDataNotification(
     }
 }
 
-class ClearDataSpecification(context: Context) : NotificationSpec, Serializable {
+class ClearDataSpecification(private val context: Context) : NotificationSpec {
     override val channel = NotificationRegistrar.ChannelType.TUTORIALS
     override val systemId = NotificationRegistrar.NotificationId.ClearData
     override val name = "Update auto clear data"
     override val icon = R.drawable.notification_fire
     override val title: String = context.getString(R.string.clearNotificationTitle)
     override val description: String = context.getString(R.string.clearNotificationDescription)
+    override val launchButton: String? = null
     override val pixelSuffix = "cd"
 }

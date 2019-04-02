@@ -21,6 +21,7 @@ import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.VisibleForTesting
+import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
@@ -40,6 +41,9 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     @Inject
     lateinit var context: Context
 
+    @Inject
+    lateinit var notificationManager: NotificationManagerCompat
+
     lateinit var pixelSuffix: String
 
     override fun onCreate() {
@@ -48,32 +52,46 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     }
 
     @VisibleForTesting
-    public override fun onHandleIntent(workIntent: Intent) {
-        pixelSuffix = workIntent.getStringExtra(PIXEL_SUFFIX_EXTRA)
-        when (workIntent.type) {
+    public override fun onHandleIntent(intent: Intent) {
+        pixelSuffix = intent.getStringExtra(PIXEL_SUFFIX_EXTRA)
+        when (intent.type) {
             APP_LAUNCH -> onAppLaunched()
             CLEAR_DATA_LAUNCH -> onClearDataLaunched()
             CANCEL -> onCancelled()
         }
+        val notificationId = intent.getIntExtra(NOTIFICATION_SYSTEM_ID_EXTRA, 0)
+        clearNotification(notificationId)
+        closeNotificationPanel()
     }
 
     private fun onAppLaunched() {
         val intent = BrowserActivity.intent(context, newSearch = true)
-        startActivity(intent)
+        TaskStackBuilder.create(context)
+            .addNextIntentWithParentStack(intent)
+            .startActivities()
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
     }
 
     private fun onClearDataLaunched() {
         Timber.i("Clear Data Launched!")
-        val settingsIntent = SettingsActivity.intent(context)
+        val intent = SettingsActivity.intent(context)
         TaskStackBuilder.create(context)
-            .addNextIntentWithParentStack(settingsIntent)
+            .addNextIntentWithParentStack(intent)
             .startActivities()
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
     }
 
     private fun onCancelled() {
         pixel.fire("${NOTIFICATION_CANCELLED.pixelName}_$pixelSuffix")
+    }
+
+    private fun clearNotification(notificationId: Int) {
+        notificationManager.cancel(notificationId)
+    }
+
+    private fun closeNotificationPanel() {
+        val it = Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
+        context.sendBroadcast(it)
     }
 
     object NotificationEvent {
@@ -84,5 +102,6 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
 
     companion object {
         const val PIXEL_SUFFIX_EXTRA = "PIXEL_SUFFIX_EXTRA"
+        const val NOTIFICATION_SYSTEM_ID_EXTRA = "NOTIFICATION_SYSTEM_ID"
     }
 }

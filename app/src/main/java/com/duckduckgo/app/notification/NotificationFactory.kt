@@ -37,12 +37,13 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
             .setPriority(specification.channel.priority)
             .setSmallIcon(specification.icon)
             .setContentTitle(specification.title)
-            .setAutoCancel(true)
             .setStyle(NotificationCompat.BigTextStyle().bigText(specification.description))
-            .setColor(ContextCompat.getColor(context, R.color.orange))
-            .setAutoCancel(true)
+            .setColor(ContextCompat.getColor(context, R.color.cornflowerDark))
             .setContentIntent(launchIntent)
             .setDeleteIntent(cancelIntent)
+            .apply {
+                specification.launchButton?.let { this.addAction(specification.icon, it, launchIntent) }
+            }
             .build()
     }
 }

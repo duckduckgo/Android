@@ -55,6 +55,7 @@ class PrivacyProtectionNotificationSpecification(
     override val systemId = NotificationRegistrar.NotificationId.PrivacyProtection
     override val name = "Privacy protection"
     override val icon = R.drawable.notification_sheild_lock
+    override val launchButton: String = context.getString(R.string.privacyProtectionNotificationLaunchButton)
 
     private val trackers = runBlocking { privacyProtectionCountDao.getTrackersBlockedCount().toInt() }
     private val upgrades = runBlocking { privacyProtectionCountDao.getUpgradeCount().toInt() }

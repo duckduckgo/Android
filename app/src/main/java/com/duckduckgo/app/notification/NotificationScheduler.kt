@@ -22,9 +22,11 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.*
+import com.duckduckgo.app.notification.NotificationHandlerService.Companion.NOTIFICATION_SYSTEM_ID_EXTRA
 import com.duckduckgo.app.notification.NotificationHandlerService.Companion.PIXEL_SUFFIX_EXTRA
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
+import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.*
@@ -97,8 +99,8 @@ class NotificationScheduler @Inject constructor(
             }
 
             val specification = notification.specification
-            val launchIntent = pendingNotificationHandlerIntent(context, notification.launchIntent, specification.pixelSuffix)
-            val cancelIntent = pendingNotificationHandlerIntent(context, notification.cancelIntent, specification.pixelSuffix)
+            val launchIntent = pendingNotificationHandlerIntent(context, notification.launchIntent, specification)
+            val cancelIntent = pendingNotificationHandlerIntent(context, notification.cancelIntent, specification)
             val systemNotification = factory.createNotification(specification, launchIntent, cancelIntent)
             notificationDao.insert(Notification(notification.id))
             manager.notify(specification.systemId, systemNotification)
@@ -107,10 +109,11 @@ class NotificationScheduler @Inject constructor(
             return Result.success()
         }
 
-        private fun pendingNotificationHandlerIntent(context: Context, eventType: String, pixelSuffix: String): PendingIntent {
+        private fun pendingNotificationHandlerIntent(context: Context, eventType: String, specification: NotificationSpec): PendingIntent {
             val intent = Intent(context, NotificationHandlerService::class.java)
             intent.type = eventType
-            intent.putExtra(PIXEL_SUFFIX_EXTRA, pixelSuffix)
+            intent.putExtra(PIXEL_SUFFIX_EXTRA, specification.pixelSuffix)
+            intent.putExtra(NOTIFICATION_SYSTEM_ID_EXTRA, specification.systemId)
             return getService(context, 0, intent, 0)!!
         }
     }

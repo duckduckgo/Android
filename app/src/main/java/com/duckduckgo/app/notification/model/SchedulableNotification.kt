@@ -33,6 +33,7 @@ interface NotificationSpec {
     val icon: Int
     val title: String
     val description: String
+    val launchButton: String?
     val pixelSuffix: String
 }
 
