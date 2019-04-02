@@ -35,11 +35,9 @@ class PrivacyProtectionNotification(
     override val specification
         get() = PrivacyProtectionNotificationSpecification(context, privacyProtectionCountDao)
 
-    override val launchIntent: String
-        get() = APP_LAUNCH
+    override val launchIntent: String = APP_LAUNCH
 
-    override val cancelIntent: String
-        get() = CANCEL
+    override val cancelIntent: String = CANCEL
 
     override suspend fun canShow(): Boolean {
         return !notificationDao.exists(specification.id)
@@ -62,7 +60,7 @@ class PrivacyProtectionNotificationSpecification(
             val trackers = runBlocking { privacyProtectionCountDao.getTrackersBlockedCount().toInt() }
             val upgrades = runBlocking { privacyProtectionCountDao.getUpgradeCount().toInt() }
             return when {
-                trackers < TRACKER_THRESHOLD && upgrades < UPGADE_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationDefaultTitle)
+                trackers < TRACKER_THRESHOLD && upgrades < UPGRADE_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationDefaultTitle)
                 else -> context.getString(R.string.privacyProtectionNotificationReportTitle)
             }
         }
@@ -72,15 +70,15 @@ class PrivacyProtectionNotificationSpecification(
             val trackers = runBlocking { privacyProtectionCountDao.getTrackersBlockedCount().toInt() }
             val upgrades = runBlocking { privacyProtectionCountDao.getUpgradeCount().toInt() }
             return when {
-                trackers < TRACKER_THRESHOLD && upgrades < UPGADE_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationDefaultDescription)
+                trackers < TRACKER_THRESHOLD && upgrades < UPGRADE_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationDefaultDescription)
                 trackers < TRACKER_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationUpgadeDescription, upgrades)
-                upgrades < UPGADE_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationTrackerDescription, trackers)
+                upgrades < UPGRADE_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationTrackerDescription, trackers)
                 else -> context.getString(R.string.privacyProtectionNotificationBothDescription, trackers, upgrades)
             }
         }
 
     companion object {
-        private val TRACKER_THRESHOLD = 2
-        private val UPGADE_THRESHOLD = 2
+        private const val TRACKER_THRESHOLD = 2
+        private const val UPGRADE_THRESHOLD = 2
     }
 }

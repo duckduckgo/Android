@@ -74,17 +74,11 @@ class NotificationModule {
     @Provides
     @Singleton
     fun providesNotificationScheduler(
-        notificationDao: NotificationDao,
-        notificationManager: NotificationManagerCompat,
-        settingsDataStore: SettingsDataStore,
         variantManager: VariantManager,
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification
     ): NotificationScheduler {
         return NotificationScheduler(
-            notificationDao,
-            notificationManager,
-            settingsDataStore,
             variantManager,
             clearDataNotification,
             privacyProtectionNotification

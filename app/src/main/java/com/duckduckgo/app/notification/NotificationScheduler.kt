@@ -23,11 +23,8 @@ import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.*
 import com.duckduckgo.app.notification.db.NotificationDao
-import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.Notification
-import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotification
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.*
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -41,12 +38,9 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class NotificationScheduler @Inject constructor(
-    val dao: NotificationDao,
-    val manager: NotificationManagerCompat,
-    val settingsDataStore: SettingsDataStore,
-    val variantManager: VariantManager,
-    val clearDataNotification: ClearDataNotification,
-    val privacyNotification: PrivacyProtectionNotification
+    private val variantManager: VariantManager,
+    private val clearDataNotification: SchedulableNotification,
+    private val privacyNotification: SchedulableNotification
 ) {
     fun scheduleNextNotification(scope: CoroutineScope = GlobalScope) {
 
@@ -54,7 +48,7 @@ class NotificationScheduler @Inject constructor(
         val variant = variantManager.getVariant()
 
         val timeUnit = TimeUnit.DAYS
-        GlobalScope.launch {
+        scope.launch {
             when {
                 variant.hasFeature(NotificationPrivacyDay1) && privacyNotification.canShow() -> {
                     scheduleNotification(OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(), 1, timeUnit, scope)
@@ -112,7 +106,7 @@ class NotificationScheduler @Inject constructor(
             return Result.success()
         }
 
-        fun pendingNotificationHandlerIntent(context: Context, eventType: String): PendingIntent {
+        private fun pendingNotificationHandlerIntent(context: Context, eventType: String): PendingIntent {
             val intent = Intent(context, NotificationHandlerService::class.java)
             intent.type = eventType
             return getService(context, 0, intent, 0)!!

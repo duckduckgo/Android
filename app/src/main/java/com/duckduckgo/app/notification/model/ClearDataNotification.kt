@@ -28,18 +28,14 @@ import timber.log.Timber
 
 
 class ClearDataNotification(
-    private val context: Context,
+    context: Context,
     private val notificationDao: NotificationDao,
     private val settingsDataStore: SettingsDataStore
 ) : SchedulableNotification {
 
     override val specification = ClearDataSpecification(context)
-
-    override val launchIntent: String
-        get() = CLEAR_DATA_LAUNCH
-
-    override val cancelIntent: String
-        get() = CANCEL
+    override val launchIntent = CLEAR_DATA_LAUNCH
+    override val cancelIntent = CANCEL
 
     override suspend fun canShow(): Boolean {
 
@@ -57,14 +53,14 @@ class ClearDataNotification(
     }
 }
 
-class ClearDataSpecification(private val context: Context) : NotificationSpec{
+class ClearDataSpecification(private val context: Context) : NotificationSpec {
     override val systemId = 100
     override val id = "com.duckduckgo.privacytips.autoclear"
     override val channel = NotificationRegistrar.ChannelType.TUTORIALS
     override val name = "Update auto clear data"
     override val icon = R.drawable.notification_fire
-    override val title = context.getString(R.string.clearNotificationTitle)
-    override val description = context.getString(R.string.clearNotificationDescription)
+    override val title: String = context.getString(R.string.clearNotificationTitle)
+    override val description: String = context.getString(R.string.clearNotificationDescription)
 }
 
 
