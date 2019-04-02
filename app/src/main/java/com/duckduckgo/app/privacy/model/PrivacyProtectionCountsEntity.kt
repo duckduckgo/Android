@@ -20,7 +20,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "privacy_protection_count") data class PrivacyProtectionCountsEntity(
+@Entity(tableName = "privacy_protection_count")
+data class PrivacyProtectionCountsEntity(
     @PrimaryKey val key: String = SINGLETON_KEY,
 
     @ColumnInfo(name = "blocked_tracker_count")

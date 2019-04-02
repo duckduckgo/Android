@@ -16,11 +16,9 @@
 
 package com.duckduckgo.app.notification
 
-import androidx.core.app.NotificationManagerCompat
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT

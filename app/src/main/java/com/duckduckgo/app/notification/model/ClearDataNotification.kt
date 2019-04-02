@@ -25,7 +25,6 @@ import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import timber.log.Timber
-import java.io.Serializable
 
 class ClearDataNotification(
     private val context: Context,

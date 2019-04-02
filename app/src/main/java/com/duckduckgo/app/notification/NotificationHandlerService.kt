@@ -28,7 +28,8 @@ import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEv
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_CANCELLED
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_LAUNCHED
 import dagger.android.AndroidInjection
 import timber.log.Timber
 import javax.inject.Inject

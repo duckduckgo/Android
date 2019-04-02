@@ -16,14 +16,13 @@
 
 package com.duckduckgo.app.browser
 
-import androidx.annotation.WorkerThread
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
+import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.isHttp
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
-import com.duckduckgo.app.privacy.model.PrivacyProtectionCountsEntity
 import com.duckduckgo.app.privacy.model.TrustedSites
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.trackerdetection.TrackerDetector

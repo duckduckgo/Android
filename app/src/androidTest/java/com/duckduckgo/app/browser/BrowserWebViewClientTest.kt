@@ -48,7 +48,15 @@ class BrowserWebViewClientTest {
     @Before
     fun setup() {
         webView = TestWebView(InstrumentationRegistry.getInstrumentation().targetContext)
-        testee = BrowserWebViewClient(requestRewriter, specialUrlDetector, requestInterceptor, httpsUpgrader, privacyProtectionCountDao, statisticsDataStore, pixel)
+        testee = BrowserWebViewClient(
+            requestRewriter,
+            specialUrlDetector,
+            requestInterceptor,
+            httpsUpgrader,
+            privacyProtectionCountDao,
+            statisticsDataStore,
+            pixel
+        )
         testee.webViewClientListener = listener
     }
 
