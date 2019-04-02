@@ -27,6 +27,7 @@ import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEv
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import dagger.android.AndroidInjection
 import timber.log.Timber
 import javax.inject.Inject
@@ -39,6 +40,8 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     @Inject
     lateinit var context: Context
 
+    lateinit var pixelSuffix: String
+
     override fun onCreate() {
         super.onCreate()
         AndroidInjection.inject(this)
@@ -46,6 +49,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
 
     @VisibleForTesting
     public override fun onHandleIntent(workIntent: Intent) {
+        pixelSuffix = workIntent.getStringExtra(PIXEL_SUFFIX_EXTRA)
         when (workIntent.type) {
             APP_LAUNCH -> onAppLaunched()
             CLEAR_DATA_LAUNCH -> onClearDataLaunched()
@@ -56,7 +60,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     private fun onAppLaunched() {
         val intent = BrowserActivity.intent(context, newSearch = true)
         startActivity(intent)
-        pixel.fire(Pixel.PixelName.NOTIFICATION_LAUNCHED)
+        pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
     }
 
     private fun onClearDataLaunched() {
@@ -65,16 +69,20 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         TaskStackBuilder.create(context)
             .addNextIntentWithParentStack(settingsIntent)
             .startActivities()
-        pixel.fire(Pixel.PixelName.NOTIFICATION_LAUNCHED)
+        pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
     }
 
     private fun onCancelled() {
-        pixel.fire(Pixel.PixelName.NOTIFICATION_CANCELLED)
+        pixel.fire("${NOTIFICATION_CANCELLED.pixelName}_$pixelSuffix")
     }
 
     object NotificationEvent {
         const val APP_LAUNCH = "com.duckduckgo.notification.launch.app"
         const val CLEAR_DATA_LAUNCH = "com.duckduckgo.notification.launch.clearData"
         const val CANCEL = "com.duckduckgo.notification.cancel"
+    }
+
+    companion object {
+        const val PIXEL_SUFFIX_EXTRA = "PIXEL_SUFFIX_EXTRA"
     }
 }

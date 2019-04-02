@@ -45,6 +45,11 @@ class NotificationRegistrar @Inject constructor(
         val priority: Int
     )
 
+    object NotificationId {
+        val ClearData = 100
+        val PrivacyProtection = 101
+    }
+
     object ChannelType {
         val FILE_DOWNLOADING = Channel(
             "com.duckduckgo.downloading",

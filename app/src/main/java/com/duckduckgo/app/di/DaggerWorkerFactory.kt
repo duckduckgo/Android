@@ -24,7 +24,6 @@ import androidx.work.WorkerParameters
 import com.duckduckgo.app.fire.DataClearingWorker
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.notification.NotificationFactory
-import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.notification.NotificationScheduler.*
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
@@ -70,7 +69,7 @@ class DaggerWorkerFactory(
         worker.notificationDao = notificationDao
         worker.factory = notificationFactory
         worker.pixel = pixel
-        worker.schedulableNotification = clearDataNotification
+        worker.notification = clearDataNotification
     }
 
     private fun injectPrivacyNotificationWorker(worker: PrivacyNotificationWorker) {
@@ -78,7 +77,7 @@ class DaggerWorkerFactory(
         worker.notificationDao = notificationDao
         worker.factory = notificationFactory
         worker.pixel = pixel
-        worker.schedulableNotification = privacyProtectionNotification
+        worker.notification = privacyProtectionNotification
     }
 
 }

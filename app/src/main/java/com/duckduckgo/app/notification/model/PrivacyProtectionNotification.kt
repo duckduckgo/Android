@@ -32,6 +32,8 @@ class PrivacyProtectionNotification(
     private val privacyProtectionCountDao: PrivacyProtectionCountDao
 ) : SchedulableNotification {
 
+    override val id = "com.duckduckgo.privacy.privacyprotection"
+
     override val specification
         get() = PrivacyProtectionNotificationSpecification(context, privacyProtectionCountDao)
 
@@ -40,42 +42,36 @@ class PrivacyProtectionNotification(
     override val cancelIntent: String = CANCEL
 
     override suspend fun canShow(): Boolean {
-        return !notificationDao.exists(specification.id)
+        return !notificationDao.exists(id)
     }
 }
 
 class PrivacyProtectionNotificationSpecification(
-    private val context: Context,
+    context: Context,
     private val privacyProtectionCountDao: PrivacyProtectionCountDao
 ) : NotificationSpec {
 
-    override val systemId = 101
-    override val id = "com.duckduckgo.privacy.privacyprotection"
     override val channel = NotificationRegistrar.ChannelType.TUTORIALS
+    override val systemId = NotificationRegistrar.NotificationId.PrivacyProtection
     override val name = "Privacy protection"
     override val icon = R.drawable.notification_sheild_lock
 
-    override val title: String
-        get() {
-            val trackers = runBlocking { privacyProtectionCountDao.getTrackersBlockedCount().toInt() }
-            val upgrades = runBlocking { privacyProtectionCountDao.getUpgradeCount().toInt() }
-            return when {
-                trackers < TRACKER_THRESHOLD && upgrades < UPGRADE_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationDefaultTitle)
-                else -> context.getString(R.string.privacyProtectionNotificationReportTitle)
-            }
-        }
+    private val trackers = runBlocking { privacyProtectionCountDao.getTrackersBlockedCount().toInt() }
+    private val upgrades = runBlocking { privacyProtectionCountDao.getUpgradeCount().toInt() }
 
-    override val description: String
-        get() {
-            val trackers = runBlocking { privacyProtectionCountDao.getTrackersBlockedCount().toInt() }
-            val upgrades = runBlocking { privacyProtectionCountDao.getUpgradeCount().toInt() }
-            return when {
-                trackers < TRACKER_THRESHOLD && upgrades < UPGRADE_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationDefaultDescription)
-                trackers < TRACKER_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationUpgadeDescription, upgrades)
-                upgrades < UPGRADE_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationTrackerDescription, trackers)
-                else -> context.getString(R.string.privacyProtectionNotificationBothDescription, trackers, upgrades)
-            }
-        }
+    override val title: String = when {
+        trackers < TRACKER_THRESHOLD && upgrades < UPGRADE_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationDefaultTitle)
+        else -> context.getString(R.string.privacyProtectionNotificationReportTitle)
+    }
+
+    override val description: String = when {
+        trackers < TRACKER_THRESHOLD && upgrades < UPGRADE_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationDefaultDescription)
+        trackers < TRACKER_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationUpgadeDescription, upgrades)
+        upgrades < UPGRADE_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationTrackerDescription, trackers)
+        else -> context.getString(R.string.privacyProtectionNotificationBothDescription, trackers, upgrades)
+    }
+
+    override val pixelSuffix: String = "pp_${trackers}_$upgrades"
 
     companion object {
         private const val TRACKER_THRESHOLD = 2

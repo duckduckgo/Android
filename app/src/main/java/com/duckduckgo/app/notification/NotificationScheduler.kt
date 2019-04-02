@@ -22,6 +22,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.*
+import com.duckduckgo.app.notification.NotificationHandlerService.Companion.PIXEL_SUFFIX_EXTRA
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.SchedulableNotification
@@ -83,32 +84,33 @@ class NotificationScheduler @Inject constructor(
 
         lateinit var manager: NotificationManagerCompat
         lateinit var factory: NotificationFactory
-        lateinit var schedulableNotification: SchedulableNotification
+        lateinit var notification: SchedulableNotification
         lateinit var notificationDao: NotificationDao
         lateinit var pixel: Pixel
 
         override fun doWork(): Result {
 
-            val canShow = runBlocking { schedulableNotification.canShow() }
+            val canShow = runBlocking { notification.canShow() }
             if (!canShow) {
                 Timber.v("Notification no longer showable")
                 return Result.success()
             }
 
-            val specification = schedulableNotification.specification
-            val launchIntent = pendingNotificationHandlerIntent(context, schedulableNotification.launchIntent)
-            val cancelIntent = pendingNotificationHandlerIntent(context, schedulableNotification.cancelIntent)
-            val notification = factory.createNotification(specification, launchIntent, cancelIntent)
-            notificationDao.insert(Notification(specification.id))
-            manager.notify(specification.systemId, notification)
+            val specification = notification.specification
+            val launchIntent = pendingNotificationHandlerIntent(context, notification.launchIntent, specification.pixelSuffix)
+            val cancelIntent = pendingNotificationHandlerIntent(context, notification.cancelIntent, specification.pixelSuffix)
+            val systemNotification = factory.createNotification(specification, launchIntent, cancelIntent)
+            notificationDao.insert(Notification(notification.id))
+            manager.notify(specification.systemId, systemNotification)
 
-            pixel.fire(NOTIFICATION_SHOWN)
+            pixel.fire("${NOTIFICATION_SHOWN.pixelName}_${specification.pixelSuffix}")
             return Result.success()
         }
 
-        private fun pendingNotificationHandlerIntent(context: Context, eventType: String): PendingIntent {
+        private fun pendingNotificationHandlerIntent(context: Context, eventType: String, pixelSuffix: String): PendingIntent {
             val intent = Intent(context, NotificationHandlerService::class.java)
             intent.type = eventType
+            intent.putExtra(PIXEL_SUFFIX_EXTRA, pixelSuffix)
             return getService(context, 0, intent, 0)!!
         }
     }

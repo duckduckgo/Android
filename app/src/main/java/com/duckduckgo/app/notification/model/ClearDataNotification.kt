@@ -25,21 +25,22 @@ import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import timber.log.Timber
-
+import java.io.Serializable
 
 class ClearDataNotification(
-    context: Context,
+    private val context: Context,
     private val notificationDao: NotificationDao,
     private val settingsDataStore: SettingsDataStore
 ) : SchedulableNotification {
 
-    override val specification = ClearDataSpecification(context)
+    override val id = "com.duckduckgo.privacytips.autoclear"
+    override val specification get() = ClearDataSpecification(context)
     override val launchIntent = CLEAR_DATA_LAUNCH
     override val cancelIntent = CANCEL
 
     override suspend fun canShow(): Boolean {
 
-        if (notificationDao.exists(specification.id)) {
+        if (notificationDao.exists(id)) {
             Timber.v("Notification already seen")
             return false
         }
@@ -53,14 +54,12 @@ class ClearDataNotification(
     }
 }
 
-class ClearDataSpecification(private val context: Context) : NotificationSpec {
-    override val systemId = 100
-    override val id = "com.duckduckgo.privacytips.autoclear"
+class ClearDataSpecification(context: Context) : NotificationSpec, Serializable {
     override val channel = NotificationRegistrar.ChannelType.TUTORIALS
+    override val systemId = NotificationRegistrar.NotificationId.ClearData
     override val name = "Update auto clear data"
     override val icon = R.drawable.notification_fire
     override val title: String = context.getString(R.string.clearNotificationTitle)
     override val description: String = context.getString(R.string.clearNotificationDescription)
+    override val pixelSuffix = "cd"
 }
-
-
