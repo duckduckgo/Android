@@ -17,6 +17,7 @@
 package com.duckduckgo.app.notification
 
 import android.content.Intent
+import androidx.core.app.NotificationManagerCompat
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.notification.NotificationHandlerService.Companion.PIXEL_SUFFIX_EXTRA
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
@@ -40,6 +41,7 @@ class NotificationHandlerServiceTest {
     fun before() {
         testee.pixel = mockPixel
         testee.context = context
+        testee.notificationManager = NotificationManagerCompat.from(context)
     }
 
     @Test
