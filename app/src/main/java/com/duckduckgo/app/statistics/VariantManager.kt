@@ -46,8 +46,10 @@ interface VariantManager {
             Variant(key = "me", weight = 1.0, features = listOf(NotificationPrivacyDay1, NotificationSuppressClearDataDay3)),
             Variant(key = "mi", weight = 1.0, features = listOf(NotificationClearDataDay1, NotificationSuppressClearDataDay3)),
 
+            // Notification None
+            Variant(key = "mf", weight = 1.0, features = listOf(NotificationSuppressClearDataDay3)),
+
             // Notification Add New
-            Variant(key = "mf", weight = 1.0, features = listOf()),
             Variant(key = "mk", weight = 1.0, features = listOf(NotificationPrivacyDay1))
         )
     }
