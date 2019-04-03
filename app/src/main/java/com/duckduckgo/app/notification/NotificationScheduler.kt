@@ -32,10 +32,6 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.*
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_SHOWN
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -45,44 +41,40 @@ class NotificationScheduler @Inject constructor(
     private val clearDataNotification: SchedulableNotification,
     private val privacyNotification: SchedulableNotification
 ) {
-    fun scheduleNextNotification(scope: CoroutineScope = GlobalScope) {
+    suspend fun scheduleNextNotification() {
 
         WorkManager.getInstance().cancelAllWorkByTag(WORK_REQUEST_TAG)
         val variant = variantManager.getVariant()
 
         val timeUnit = TimeUnit.DAYS
-        scope.launch {
-            when {
-                variant.hasFeature(NotificationPrivacyDay1) && privacyNotification.canShow() -> {
-                    scheduleNotification(OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(), 1, timeUnit, scope)
-                }
-                variant.hasFeature(NotificationClearDataDay1) && clearDataNotification.canShow() -> {
-                    scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 1, timeUnit, scope)
-                }
-                !variant.hasFeature(NotificationSuppressClearDataDay3) && clearDataNotification.canShow() -> {
-                    scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 3, timeUnit, scope)
-                }
-                else -> Timber.v("Notifications not enabled for this variant")
+        when {
+            variant.hasFeature(NotificationPrivacyDay1) && privacyNotification.canShow() -> {
+                scheduleNotification(OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(), 1, timeUnit)
             }
+            variant.hasFeature(NotificationClearDataDay1) && clearDataNotification.canShow() -> {
+                scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 1, timeUnit)
+            }
+            !variant.hasFeature(NotificationSuppressClearDataDay3) && clearDataNotification.canShow() -> {
+                scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 3, timeUnit)
+            }
+            else -> Timber.v("Notifications not enabled for this variant")
         }
     }
 
-    private fun scheduleNotification(builder: OneTimeWorkRequest.Builder, duration: Long, unit: TimeUnit, scope: CoroutineScope) {
-        scope.launch {
-            Timber.v("Scheduling notification")
-            val request = builder
-                .addTag(WORK_REQUEST_TAG)
-                .setInitialDelay(duration, unit)
-                .build()
+    private fun scheduleNotification(builder: OneTimeWorkRequest.Builder, duration: Long, unit: TimeUnit) {
+        Timber.v("Scheduling notification")
+        val request = builder
+            .addTag(WORK_REQUEST_TAG)
+            .setInitialDelay(duration, unit)
+            .build()
 
-            WorkManager.getInstance().enqueue(request)
-        }
+        WorkManager.getInstance().enqueue(request)
     }
 
     class ClearDataNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
     class PrivacyNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
 
-    open class SchedulableNotificationWorker(val context: Context, params: WorkerParameters) : Worker(context, params) {
+    open class SchedulableNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
         lateinit var manager: NotificationManagerCompat
         lateinit var factory: NotificationFactory
@@ -90,9 +82,9 @@ class NotificationScheduler @Inject constructor(
         lateinit var notificationDao: NotificationDao
         lateinit var pixel: Pixel
 
-        override fun doWork(): Result {
+        override suspend fun doWork(): Result {
 
-            val canShow = runBlocking { notification.canShow() }
+            val canShow = notification.canShow()
             if (!canShow) {
                 Timber.v("Notification no longer showable")
                 return Result.success()

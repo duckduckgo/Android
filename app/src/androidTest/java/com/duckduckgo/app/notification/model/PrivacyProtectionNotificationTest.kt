@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("RemoveExplicitTypeArguments")
+
 package com.duckduckgo.app.notification.model
 
 import androidx.test.platform.app.InstrumentationRegistry
@@ -42,14 +44,14 @@ class PrivacyProtectionNotificationTest {
     }
 
     @Test
-    fun whenNotificationNotSeenThenCanShowIsTrue() {
+    fun whenNotificationNotSeenThenCanShowIsTrue() = runBlocking<Unit> {
         whenever(notificationsDao.exists(any())).thenReturn(false)
-        assertTrue(runBlocking { testee.canShow() })
+        assertTrue(testee.canShow())
     }
 
     @Test
-    fun whenNotificationAlreadySeenThenCanShowIsFalse() {
+    fun whenNotificationAlreadySeenThenCanShowIsFalse() = runBlocking<Unit> {
         whenever(notificationsDao.exists(any())).thenReturn(true)
-        assertFalse(runBlocking { testee.canShow() })
+        assertFalse(testee.canShow())
     }
 }

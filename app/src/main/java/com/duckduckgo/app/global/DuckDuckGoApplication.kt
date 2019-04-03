@@ -56,6 +56,8 @@ import dagger.android.HasActivityInjector
 import dagger.android.HasServiceInjector
 import dagger.android.support.HasSupportFragmentInjector
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import timber.log.Timber
 import javax.inject.Inject
@@ -267,7 +269,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onAppResumed() {
         notificationRegistrar.updateStatus()
-        notificationScheduler.scheduleNextNotification()
+        GlobalScope.launch { notificationScheduler.scheduleNextNotification() }
         statisticsUpdater.refreshAppRetentionAtb()
     }
 

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("RemoveExplicitTypeArguments")
+
 package com.duckduckgo.app.notification.model
 
 import androidx.test.platform.app.InstrumentationRegistry
@@ -43,23 +45,23 @@ class ClearDataNotificationTest {
     }
 
     @Test
-    fun whenNotificationNotSeenAndOptionNotSetThenCanShowIsTrue() {
+    fun whenNotificationNotSeenAndOptionNotSetThenCanShowIsTrue() = runBlocking<Unit> {
         whenever(notificationsDao.exists(any())).thenReturn(false)
         whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_NONE)
-        assertTrue(runBlocking { testee.canShow() })
+        assertTrue(testee.canShow())
     }
 
     @Test
-    fun whenNotificationNotSeenButOptionAlreadySetThenCanShowIsFalse() {
+    fun whenNotificationNotSeenButOptionAlreadySetThenCanShowIsFalse() = runBlocking<Unit> {
         whenever(notificationsDao.exists(any())).thenReturn(false)
         whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_TABS_ONLY)
-        assertFalse(runBlocking { testee.canShow() })
+        assertFalse(testee.canShow())
     }
 
     @Test
-    fun whenNotificationAlreadySeenAndOptionNotSetThenCanShowIsFalse() {
+    fun whenNotificationAlreadySeenAndOptionNotSetThenCanShowIsFalse() = runBlocking<Unit> {
         whenever(notificationsDao.exists(any())).thenReturn(true)
         whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_NONE)
-        assertFalse(runBlocking { testee.canShow() })
+        assertFalse(testee.canShow())
     }
 }

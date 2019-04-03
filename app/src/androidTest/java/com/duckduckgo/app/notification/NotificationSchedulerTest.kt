@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
+
+@file:Suppress("RemoveExplicitTypeArguments")
+
 package com.duckduckgo.app.notification
 
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.duckduckgo.app.notification.model.SchedulableNotification
@@ -25,8 +27,6 @@ import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -34,9 +34,6 @@ import org.junit.Before
 import org.junit.Test
 
 class NotificationSchedulerTest {
-
-    private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val testScope = CoroutineScope(Dispatchers.Unconfined)
 
     private val variantManager: VariantManager = mock()
     private val clearNotification: SchedulableNotification = mock()
@@ -55,16 +52,16 @@ class NotificationSchedulerTest {
     }
 
     @Test
-    fun whenClearNotificationCanShowThenNotificationScheduled() {
-        whenever(runBlocking { clearNotification.canShow() }).thenReturn(true)
-        testee.scheduleNextNotification(testScope)
+    fun whenClearNotificationCanShowThenNotificationScheduled() = runBlocking<Unit> {
+        whenever(clearNotification.canShow()).thenReturn(true)
+        testee.scheduleNextNotification()
         assertTrue(notificationScheduled())
     }
 
     @Test
-    fun whenClearNotificationCannotShowThenNotificationNotScheduled() {
-        whenever(runBlocking { clearNotification.canShow() }).thenReturn(false)
-        testee.scheduleNextNotification(testScope)
+    fun whenClearNotificationCannotShowThenNotificationNotScheduled() = runBlocking<Unit> {
+        whenever(clearNotification.canShow()).thenReturn(false)
+        testee.scheduleNextNotification()
         assertFalse(notificationScheduled())
     }
 
