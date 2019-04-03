@@ -46,16 +46,15 @@ class NotificationScheduler @Inject constructor(
         WorkManager.getInstance().cancelAllWorkByTag(WORK_REQUEST_TAG)
         val variant = variantManager.getVariant()
 
-        val timeUnit = TimeUnit.DAYS
         when {
             variant.hasFeature(NotificationPrivacyDay1) && privacyNotification.canShow() -> {
-                scheduleNotification(OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(), 1, timeUnit)
+                scheduleNotification(OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(), 1, TimeUnit.DAYS)
             }
             variant.hasFeature(NotificationClearDataDay1) && clearDataNotification.canShow() -> {
-                scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 1, timeUnit)
+                scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 1, TimeUnit.DAYS)
             }
             !variant.hasFeature(NotificationSuppressClearDataDay3) && clearDataNotification.canShow() -> {
-                scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 3, timeUnit)
+                scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 3, TimeUnit.DAYS)
             }
             else -> Timber.v("Notifications not enabled for this variant")
         }
