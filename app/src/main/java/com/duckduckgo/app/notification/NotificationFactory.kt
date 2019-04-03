@@ -33,7 +33,8 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
         launchIntent: PendingIntent,
         cancelIntent: PendingIntent
     ): Notification {
-        return NotificationCompat.Builder(context, specification.channel.id)
+
+        val builder = NotificationCompat.Builder(context, specification.channel.id)
             .setPriority(specification.channel.priority)
             .setSmallIcon(specification.icon)
             .setContentTitle(specification.title)
@@ -41,9 +42,11 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
             .setColor(ContextCompat.getColor(context, R.color.cornflowerDark))
             .setContentIntent(launchIntent)
             .setDeleteIntent(cancelIntent)
-            .apply {
-                specification.launchButton?.let { this.addAction(specification.icon, it, launchIntent) }
-            }
-            .build()
+
+        specification.launchButton?.let {
+            builder.addAction(specification.icon, it, launchIntent)
+        }
+        
+        return builder.build()
     }
 }
