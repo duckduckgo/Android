@@ -45,8 +45,6 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     @Inject
     lateinit var notificationManager: NotificationManagerCompat
 
-    lateinit var pixelSuffix: String
-
     override fun onCreate() {
         super.onCreate()
         AndroidInjection.inject(this)
@@ -54,18 +52,18 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
 
     @VisibleForTesting
     public override fun onHandleIntent(intent: Intent) {
-        pixelSuffix = intent.getStringExtra(PIXEL_SUFFIX_EXTRA)
+        val pixelSuffix = intent.getStringExtra(PIXEL_SUFFIX_EXTRA)
         when (intent.type) {
-            APP_LAUNCH -> onAppLaunched()
-            CLEAR_DATA_LAUNCH -> onClearDataLaunched()
-            CANCEL -> onCancelled()
+            APP_LAUNCH -> onAppLaunched(pixelSuffix)
+            CLEAR_DATA_LAUNCH -> onClearDataLaunched(pixelSuffix)
+            CANCEL -> onCancelled(pixelSuffix)
         }
         val notificationId = intent.getIntExtra(NOTIFICATION_SYSTEM_ID_EXTRA, 0)
         clearNotification(notificationId)
         closeNotificationPanel()
     }
 
-    private fun onAppLaunched() {
+    private fun onAppLaunched(pixelSuffix: String) {
         val intent = BrowserActivity.intent(context, newSearch = true)
         TaskStackBuilder.create(context)
             .addNextIntentWithParentStack(intent)
@@ -73,7 +71,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
     }
 
-    private fun onClearDataLaunched() {
+    private fun onClearDataLaunched(pixelSuffix: String) {
         Timber.i("Clear Data Launched!")
         val intent = SettingsActivity.intent(context)
         TaskStackBuilder.create(context)
@@ -82,7 +80,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
     }
 
-    private fun onCancelled() {
+    private fun onCancelled(pixelSuffix: String) {
         pixel.fire("${NOTIFICATION_CANCELLED.pixelName}_$pixelSuffix")
     }
 
