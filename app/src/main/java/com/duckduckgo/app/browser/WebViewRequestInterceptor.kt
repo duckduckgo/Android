@@ -36,15 +36,16 @@ interface RequestInterceptor {
         request: WebResourceRequest,
         webView: WebView,
         currentUrl: String?,
-        webViewClientListener: WebViewClientListener?,
-        privacyProtectionCountDao: PrivacyProtectionCountDao
+        webViewClientListener: WebViewClientListener?
     ): WebResourceResponse?
 }
 
 class WebViewRequestInterceptor(
     private val resourceSurrogates: ResourceSurrogates,
     private val trackerDetector: TrackerDetector,
-    private val httpsUpgrader: HttpsUpgrader
+    private val httpsUpgrader: HttpsUpgrader,
+    private val privacyProtectionCountDao: PrivacyProtectionCountDao
+
 ) : RequestInterceptor {
 
     /**
@@ -61,8 +62,7 @@ class WebViewRequestInterceptor(
         request: WebResourceRequest,
         webView: WebView,
         currentUrl: String?,
-        webViewClientListener: WebViewClientListener?,
-        privacyProtectionCountDao: PrivacyProtectionCountDao
+        webViewClientListener: WebViewClientListener?
     ): WebResourceResponse? {
         val url = request.url
 

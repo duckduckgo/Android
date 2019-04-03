@@ -21,7 +21,6 @@ import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
-import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockitokotlin2.any
@@ -40,7 +39,6 @@ class BrowserWebViewClientTest {
     private val requestInterceptor: RequestInterceptor = mock()
     private val httpsUpgrader: HttpsUpgrader = mock()
     private val statisticsDataStore: StatisticsDataStore = mock()
-    private val privacyProtectionCountDao: PrivacyProtectionCountDao = mock()
     private val pixel: Pixel = mock()
     private val listener: WebViewClientListener = mock()
 
@@ -53,7 +51,6 @@ class BrowserWebViewClientTest {
             specialUrlDetector,
             requestInterceptor,
             httpsUpgrader,
-            privacyProtectionCountDao,
             statisticsDataStore,
             pixel
         )

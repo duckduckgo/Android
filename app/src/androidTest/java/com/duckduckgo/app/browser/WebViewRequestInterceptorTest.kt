@@ -55,7 +55,8 @@ class WebViewRequestInterceptorTest {
         testee = WebViewRequestInterceptor(
             trackerDetector = mockTrackerDetector,
             httpsUpgrader = mockHttpsUpgrader,
-            resourceSurrogates = mockResourceSurrogates
+            resourceSurrogates = mockResourceSurrogates,
+            privacyProtectionCountDao = mockPrivacyProtectionCountDao
         )
 
         val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -70,8 +71,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             currentUrl = null,
             webView = webView,
-            webViewClientListener = null,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao
+            webViewClientListener = null
         )
 
         verify(mockHttpsUpgrader).upgrade(any())
@@ -84,8 +84,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             currentUrl = null,
             webView = webView,
-            webViewClientListener = null,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao
+            webViewClientListener = null
         )
 
         assertCancelledResponse(response)
@@ -99,8 +98,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             currentUrl = null,
             webView = webView,
-            webViewClientListener = null,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao
+            webViewClientListener = null
         )
 
         verify(mockHttpsUpgrader, never()).upgrade(any())
@@ -114,8 +112,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             currentUrl = null,
             webView = webView,
-            webViewClientListener = null,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao
+            webViewClientListener = null
         )
 
         verify(mockHttpsUpgrader, never()).upgrade(any())
@@ -128,8 +125,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             currentUrl = null,
             webView = webView,
-            webViewClientListener = null,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao
+            webViewClientListener = null
         )
 
         verify(mockHttpsUpgrader, never()).upgrade(any())
@@ -142,8 +138,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             currentUrl = null,
             webView = webView,
-            webViewClientListener = null,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao
+            webViewClientListener = null
         )
         assertRequestCanContinueToLoad(response)
     }
@@ -155,8 +150,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             currentUrl = "duckduckgo.com/a/b/c?q=123",
             webView = webView,
-            webViewClientListener = null,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao
+            webViewClientListener = null
         )
 
         assertRequestCanContinueToLoad(response)
@@ -169,8 +163,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             currentUrl = "donttrack.us/a/b/c?q=123",
             webView = webView,
-            webViewClientListener = null,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao
+            webViewClientListener = null
         )
 
         assertRequestCanContinueToLoad(response)
@@ -183,8 +176,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             currentUrl = "spreadprivacy.com/a/b/c?q=123",
             webView = webView,
-            webViewClientListener = null,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao
+            webViewClientListener = null
         )
 
         assertRequestCanContinueToLoad(response)
@@ -197,8 +189,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             currentUrl = "duckduckhack.com/a/b/c?q=123",
             webView = webView,
-            webViewClientListener = null,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao
+            webViewClientListener = null
         )
 
         assertRequestCanContinueToLoad(response)
@@ -211,8 +202,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             currentUrl = "privatebrowsingmyths.com/a/b/c?q=123",
             webView = webView,
-            webViewClientListener = null,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao
+            webViewClientListener = null
         )
 
         assertRequestCanContinueToLoad(response)
@@ -225,8 +215,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             currentUrl = "duck.co/a/b/c?q=123",
             webView = webView,
-            webViewClientListener = null,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao
+            webViewClientListener = null
         )
 
         assertRequestCanContinueToLoad(response)
@@ -242,8 +231,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             currentUrl = "foo.com",
             webView = webView,
-            webViewClientListener = mockListener,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao
+            webViewClientListener = mockListener
         )
 
         verify(mockListener).pageHasHttpResources(anyString())
@@ -260,8 +248,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             currentUrl = "foo.com",
             webView = webView,
-            webViewClientListener = mockListener,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao
+            webViewClientListener = mockListener
         )
 
         verify(mockListener, never()).pageHasHttpResources(anyString())
@@ -279,8 +266,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             currentUrl = "foo.com",
             webView = webView,
-            webViewClientListener = null,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao
+            webViewClientListener = null
         )
 
         assertCancelledResponse(response)
@@ -301,8 +287,7 @@ class WebViewRequestInterceptorTest {
             request = mockRequest,
             currentUrl = "foo.com",
             webView = webView,
-            webViewClientListener = null,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao
+            webViewClientListener = null
         )
 
         assertEquals(availableSurrogate.jsFunction.byteInputStream().read(), response!!.data.read())
