@@ -33,7 +33,6 @@ class ClearDataNotification(
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.privacytips.autoclear"
-    override val specification get() = ClearDataSpecification(context)
     override val launchIntent = CLEAR_DATA_LAUNCH
     override val cancelIntent = CANCEL
 
@@ -51,9 +50,13 @@ class ClearDataNotification(
 
         return true
     }
+
+    override suspend fun buildSpecification(): NotificationSpec {
+        return ClearDataSpecification(context)
+    }
 }
 
-class ClearDataSpecification(private val context: Context) : NotificationSpec {
+class ClearDataSpecification(context: Context) : NotificationSpec {
     override val channel = NotificationRegistrar.ChannelType.TUTORIALS
     override val systemId = NotificationRegistrar.NotificationId.ClearData
     override val name = "Update auto clear data"

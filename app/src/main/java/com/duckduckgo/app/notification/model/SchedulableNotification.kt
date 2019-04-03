@@ -20,10 +20,10 @@ import com.duckduckgo.app.notification.NotificationRegistrar
 
 interface SchedulableNotification {
     val id: String
-    val specification: NotificationSpec
     val launchIntent: String
     val cancelIntent: String
     suspend fun canShow(): Boolean
+    suspend fun buildSpecification(): NotificationSpec
 }
 
 interface NotificationSpec {
@@ -36,5 +36,4 @@ interface NotificationSpec {
     val launchButton: String?
     val pixelSuffix: String
 }
-
 

@@ -23,7 +23,6 @@ import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEv
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
-import kotlinx.coroutines.runBlocking
 
 
 class PrivacyProtectionNotification(
@@ -34,9 +33,6 @@ class PrivacyProtectionNotification(
 
     override val id = "com.duckduckgo.privacy.privacyprotection"
 
-    override val specification
-        get() = PrivacyProtectionNotificationSpecification(context, privacyProtectionCountDao)
-
     override val launchIntent: String = APP_LAUNCH
 
     override val cancelIntent: String = CANCEL
@@ -44,21 +40,21 @@ class PrivacyProtectionNotification(
     override suspend fun canShow(): Boolean {
         return !notificationDao.exists(id)
     }
+
+    override suspend fun buildSpecification(): NotificationSpec {
+        val trackers = privacyProtectionCountDao.getTrackersBlockedCount().toInt()
+        val upgrades = privacyProtectionCountDao.getUpgradeCount().toInt()
+        return PrivacyProtectionNotificationSpecification(context, trackers, upgrades)
+    }
 }
 
-class PrivacyProtectionNotificationSpecification(
-    context: Context,
-    private val privacyProtectionCountDao: PrivacyProtectionCountDao
-) : NotificationSpec {
+class PrivacyProtectionNotificationSpecification(context: Context, trackers: Int, upgrades: Int) : NotificationSpec {
 
     override val channel = NotificationRegistrar.ChannelType.TUTORIALS
     override val systemId = NotificationRegistrar.NotificationId.PrivacyProtection
     override val name = "Privacy protection"
     override val icon = R.drawable.notification_sheild_lock
     override val launchButton: String = context.getString(R.string.privacyProtectionNotificationLaunchButton)
-
-    private val trackers = runBlocking { privacyProtectionCountDao.getTrackersBlockedCount().toInt() }
-    private val upgrades = runBlocking { privacyProtectionCountDao.getUpgradeCount().toInt() }
 
     override val title: String = when {
         trackers < TRACKER_THRESHOLD && upgrades < UPGRADE_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationDefaultTitle)

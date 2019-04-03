@@ -46,7 +46,7 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
         specification.launchButton?.let {
             builder.addAction(specification.icon, it, launchIntent)
         }
-        
+
         return builder.build()
     }
 }

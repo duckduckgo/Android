@@ -83,13 +83,12 @@ class NotificationScheduler @Inject constructor(
 
         override suspend fun doWork(): Result {
 
-            val canShow = notification.canShow()
-            if (!canShow) {
+            if (!notification.canShow()) {
                 Timber.v("Notification no longer showable")
                 return Result.success()
             }
 
-            val specification = notification.specification
+            val specification = notification.buildSpecification()
             val launchIntent = pendingNotificationHandlerIntent(context, notification.launchIntent, specification)
             val cancelIntent = pendingNotificationHandlerIntent(context, notification.cancelIntent, specification)
             val systemNotification = factory.createNotification(specification, launchIntent, cancelIntent)
