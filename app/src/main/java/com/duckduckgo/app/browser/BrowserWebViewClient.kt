@@ -173,7 +173,7 @@ class BrowserWebViewClient @Inject constructor(
         Timber.v("onReceivedHttpAuthRequest ${view?.url} $realm, $host,  $currentUrl")
 
         if (handler != null) {
-            Timber.v("onReceivedHttpAuthRequest - useHttpAuthUsernamePassword [${handler.useHttpAuthUsernamePassword()}")
+            Timber.v("onReceivedHttpAuthRequest - useHttpAuthUsernamePassword [${handler.useHttpAuthUsernamePassword()}]")
             if (handler.useHttpAuthUsernamePassword()) {
                 val webViewDatabase = WebViewDatabase.getInstance(view?.context)
 

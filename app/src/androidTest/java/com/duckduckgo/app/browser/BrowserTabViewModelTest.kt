@@ -885,16 +885,6 @@ class BrowserTabViewModelTest {
         verify(mockHandler, atLeastOnce()).proceed(username, password)
     }
 
-    @Test
-    fun whenAuthenticationCanceledThenNavigateCommandSentWithAboutBlank() {
-        val authenticationRequest = BasicAuthenticationRequest(mock(), "example.com", "test realm", "")
-        testee.cancelAuthentication(authenticationRequest)
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val command = commandCaptor.lastValue
-        assertTrue(command is Navigate)
-        assertEquals("about:blank", (command as Navigate).url)
-    }
-
     private fun changeUrl(url: String?) {
         testee.loadingStarted(url)
         testee.progressChanged(url, 100)

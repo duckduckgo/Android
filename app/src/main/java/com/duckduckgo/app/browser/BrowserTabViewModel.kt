@@ -121,8 +121,7 @@ class BrowserTabViewModel(
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
         val addToHomeEnabled: Boolean = false,
-        val addToHomeVisible: Boolean = false,
-        val isFailedAuthentication: Boolean = false
+        val addToHomeVisible: Boolean = false
     )
 
     data class OmnibarViewState(
@@ -336,11 +335,6 @@ class BrowserTabViewModel(
     override fun loadingFinished(url: String?) {
         Timber.v("Loading finished")
 
-        // Skip if url is BLANK_PAGE which is used to clear the page when 401 challenge is dismissed
-        if (url == BLANK_PAGE && currentBrowserViewState().isFailedAuthentication) {
-            return
-        }
-
         if (pendingUrl != null) {
             urlChanged(url)
         }
@@ -386,25 +380,21 @@ class BrowserTabViewModel(
     private fun urlChanged(url: String?) {
         Timber.v("Url changed: $url")
 
-        val currentBrowserViewState = currentBrowserViewState()
         if (url == null) {
             findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = false)
 
+            val currentBrowserViewState = currentBrowserViewState()
             browserViewState.value = currentBrowserViewState.copy(
                 canAddBookmarks = false,
                 addToHomeEnabled = false,
-                addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
-                isFailedAuthentication = false
+                addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported()
             )
 
-            return
-        } else if (url == BLANK_PAGE && currentBrowserViewState.isFailedAuthentication) {
-            pendingUrl = null
             return
         }
 
 
-
+        val currentBrowserViewState = currentBrowserViewState()
         val currentOmnibarViewState = currentOmnibarViewState()
 
         omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url))
@@ -415,8 +405,7 @@ class BrowserTabViewModel(
             addToHomeEnabled = true,
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = true,
-            showPrivacyGrade = appConfigurationDownloaded,
-            isFailedAuthentication = false
+            showPrivacyGrade = appConfigurationDownloaded
         )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
@@ -724,22 +713,6 @@ class BrowserTabViewModel(
     override fun cancelAuthentication(request: BasicAuthenticationRequest) {
         Timber.v("cancelAuthentication, loading about:blank")
         request.handler.cancel()
-
-        val currentBrowserViewState = currentBrowserViewState()
-        browserViewState.value = currentBrowserViewState.copy(
-            canAddBookmarks = false,
-            showPrivacyGrade = false,
-            showClearButton = false,
-            canSharePage = false,
-            addToHomeEnabled = false,
-            addToHomeVisible = false,
-            isFailedAuthentication = true)
-
-        command.value = Navigate(BLANK_PAGE)
-    }
-
-    companion object {
-        const val BLANK_PAGE = "about:blank"
     }
 }
 
