@@ -700,18 +700,15 @@ class BrowserTabViewModel(
     }
 
     override fun requiresAuthentication(request: BasicAuthenticationRequest) {
-        Timber.v("requiresAuthentication for [${request.site}]")
         command.value = RequiresAuthentication(request)
     }
 
     override fun handleAuthentication(request: BasicAuthenticationRequest, credentials: BasicAuthenticationCredentials) {
         request.handler.proceed(credentials.username, credentials.password)
-        // Attempt to save the credentials
         command.value = SaveCredentials(request, credentials)
     }
 
     override fun cancelAuthentication(request: BasicAuthenticationRequest) {
-        Timber.v("cancelAuthentication, loading about:blank")
         request.handler.cancel()
     }
 }

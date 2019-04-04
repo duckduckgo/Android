@@ -15,10 +15,10 @@
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingTop="20dp">
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="match_parent" xmlns:tools="http://schemas.android.com/tools"
+                                                   android:paddingTop="20dp">
 
 
     <TextView
@@ -44,7 +44,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/authenticationDialogUsernameHint"
-            android:inputType="text" />
+            android:inputType="text"
+            android:importantForAutofill="yes"
+            android:autofillHints="username"
+            tools:ignore="UnusedAttribute" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -61,7 +64,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/authenticationDialogPasswordHint"
-            android:inputType="textWebPassword" />
+            android:inputType="textWebPassword"
+            android:importantForAutofill="yes"
+            android:autofillHints="password"
+            tools:ignore="UnusedAttribute" />
 
     </com.google.android.material.textfield.TextInputLayout>
 

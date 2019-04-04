@@ -80,9 +80,8 @@ class HttpAuthenticationDialogFragment : DialogFragment() {
         }
     }
 
-    private fun showKeyboard(titleInput: EditText, alert: androidx.appcompat.app.AlertDialog) {
-        titleInput.setSelection(titleInput.text.length)
-        titleInput.showKeyboard()
+    private fun showKeyboard(editText: EditText, alert: androidx.appcompat.app.AlertDialog) {
+        editText.showKeyboard()
         alert.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
     }
 

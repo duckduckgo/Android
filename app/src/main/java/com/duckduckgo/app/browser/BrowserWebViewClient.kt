@@ -175,23 +175,33 @@ class BrowserWebViewClient @Inject constructor(
         if (handler != null) {
             Timber.v("onReceivedHttpAuthRequest - useHttpAuthUsernamePassword [${handler.useHttpAuthUsernamePassword()}]")
             if (handler.useHttpAuthUsernamePassword()) {
-                val webViewDatabase = WebViewDatabase.getInstance(view?.context)
+                val credentials = buildAuthenticationCredentials(host.orEmpty(), realm.orEmpty(), view)
 
-                val credentials = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    webViewDatabase.getHttpAuthUsernamePassword(host.orEmpty(), realm.orEmpty())
-                } else {
-                    @Suppress("DEPRECATION")
-                    view?.getHttpAuthUsernamePassword(host.orEmpty(), realm.orEmpty())
-                }
-
-                credentials?.let {
+                if (credentials != null) {
                     handler.proceed(credentials[0], credentials[1])
-                } ?: showAuthenticationDialog(view, handler, host, realm)
+                } else {
+                    showAuthenticationDialog(view, handler, host, realm)
+                }
             } else {
                 showAuthenticationDialog(view, handler, host, realm)
             }
         } else {
             super.onReceivedHttpAuthRequest(view, handler, host, realm)
+        }
+    }
+
+    private fun buildAuthenticationCredentials(
+        host: String,
+        realm: String,
+        view: WebView?
+    ): Array<out String>? {
+        val webViewDatabase = WebViewDatabase.getInstance(view?.context)
+
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            webViewDatabase.getHttpAuthUsernamePassword(host, realm)
+        } else {
+            @Suppress("DEPRECATION")
+            view?.getHttpAuthUsernamePassword(host, realm)
         }
     }
 
@@ -204,9 +214,7 @@ class BrowserWebViewClient @Inject constructor(
         webViewClientListener?.let {
             Timber.v("showAuthenticationDialog - $host, $realm")
 
-            val siteURL = view?.url?.let {
-                "${URI(view.url).scheme}://$host"
-            } ?: host.orEmpty()
+            val siteURL = if (view?.url != null) "${URI(view.url).scheme}://$host" else host.orEmpty()
 
             val request = BasicAuthenticationRequest(
                 handler = handler,
