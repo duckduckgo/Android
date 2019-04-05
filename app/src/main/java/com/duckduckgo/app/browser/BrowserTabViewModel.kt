@@ -46,6 +46,9 @@ import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
+import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
+import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
 import com.duckduckgo.app.cta.ui.CtaConfiguration
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.global.*
@@ -93,7 +96,7 @@ class BrowserTabViewModel(
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
     appConfigurationDao: AppConfigurationDao
-) : WebViewClientListener, SaveBookmarkListener, CoroutineScope, ViewModel() {
+) : WebViewClientListener, SaveBookmarkListener, CoroutineScope, HttpAuthenticationListener, ViewModel() {
 
     private val job = SupervisorJob()
 
@@ -170,6 +173,8 @@ class BrowserTabViewModel(
         class LaunchSurvey(val survey: Survey) : Command()
         object LaunchAddWidget : Command()
         object LaunchLegacyAddWidget : Command()
+        class RequiresAuthentication(val request: BasicAuthenticationRequest) : Command()
+        class SaveCredentials(val request: BasicAuthenticationRequest, val credentials: BasicAuthenticationCredentials) : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -692,6 +697,19 @@ class BrowserTabViewModel(
 
     override fun externalAppLinkClicked(appLink: IntentType) {
         command.value = HandleExternalAppLink(appLink)
+    }
+
+    override fun requiresAuthentication(request: BasicAuthenticationRequest) {
+        command.value = RequiresAuthentication(request)
+    }
+
+    override fun handleAuthentication(request: BasicAuthenticationRequest, credentials: BasicAuthenticationCredentials) {
+        request.handler.proceed(credentials.username, credentials.password)
+        command.value = SaveCredentials(request, credentials)
+    }
+
+    override fun cancelAuthentication(request: BasicAuthenticationRequest) {
+        request.handler.cancel()
     }
 }
 

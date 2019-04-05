@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser
 
-import android.content.Context
 import android.os.Build
 import android.webkit.WebStorage
 import android.webkit.WebView
@@ -28,7 +27,7 @@ import javax.inject.Inject
 
 interface WebDataManager {
     suspend fun clearExternalCookies()
-    fun clearData(webView: WebView, webStorage: WebStorage, context: Context)
+    fun clearData(webView: WebView, webStorage: WebStorage, webViewDatabase: WebViewDatabase)
     fun clearWebViewSessions()
 }
 
@@ -37,15 +36,17 @@ class WebViewDataManager @Inject constructor(
     private val cookieManager: DuckDuckGoCookieManager
 ) : WebDataManager {
 
-    override fun clearData(webView: WebView, webStorage: WebStorage, context: Context) {
+    override fun clearData(webView: WebView, webStorage: WebStorage, webViewDatabase: WebViewDatabase) {
         clearCache(webView)
         clearHistory(webView)
         clearWebStorage(webStorage)
         clearFormData(webView)
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            clearFormData(WebViewDatabase.getInstance(context))
+            clearFormData(webViewDatabase)
         }
+
+        clearAuthentication(webViewDatabase)
     }
 
     private fun clearCache(webView: WebView) {
@@ -80,6 +81,10 @@ class WebViewDataManager @Inject constructor(
         measureExecution("Cleared legacy form data") {
             webViewDatabase.clearFormData()
         }
+    }
+
+    private fun clearAuthentication(webViewDatabase: WebViewDatabase) {
+        webViewDatabase.clearHttpAuthUsernamePassword()
     }
 
     override suspend fun clearExternalCookies() {

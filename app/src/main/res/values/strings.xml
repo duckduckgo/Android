@@ -263,4 +263,13 @@
     <string name="clearNotificationTitle">Data clearing set to manual</string>
     <string name="clearNotificationDescription">Customize DuckDuckGo to automatically clear browsing data after every session.</string>
 
+    <!-- Authentication -->
+    <string name="authenticationDialogTitle">Sign In</string>
+    <string name="authenticationDialogMessage">%s requires a username and password.</string>
+    <string name="authenticationDialogPositiveButton">Sign In</string>
+    <string name="authenticationDialogNegativeButton">Cancel</string>
+    <string name="authenticationDialogUsernameHint">Username</string>
+    <string name="authenticationDialogPasswordHint">Password</string>
+
+
 </resources>

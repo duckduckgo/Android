@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import android.content.Context
 import android.webkit.WebStorage
 import android.webkit.WebView
+import android.webkit.WebViewDatabase
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
@@ -41,10 +42,15 @@ class WebViewDataManagerTest {
     fun whenDataClearedThenCacheHistoryAndStorageDataCleared() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val webView = TestWebView(context)
-        testee.clearData(webView, mockStorage, context)
+        val mockWebViewDatabase = mock<WebViewDatabase>()
+
+        testee.clearData(webView, mockStorage, mockWebViewDatabase)
+
         assertTrue(webView.historyCleared)
         assertTrue(webView.cacheCleared)
+        assertTrue(webView.clearedFormData)
         verify(mockStorage).deleteAllData()
+        verify(mockWebViewDatabase).clearHttpAuthUsernamePassword()
     }
 
     @Test
@@ -57,6 +63,7 @@ class WebViewDataManagerTest {
 
         var historyCleared: Boolean = false
         var cacheCleared: Boolean = false
+        var clearedFormData: Boolean = false
 
         override fun clearHistory() {
             super.clearHistory()
@@ -70,6 +77,11 @@ class WebViewDataManagerTest {
             if (includeDiskFiles) {
                 cacheCleared = true
             }
+        }
+
+        override fun clearFormData() {
+            super.clearFormData()
+            clearedFormData = true
         }
     }
 }
