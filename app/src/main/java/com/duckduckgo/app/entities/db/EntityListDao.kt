@@ -24,6 +24,9 @@ abstract class EntityListDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertAll(entities: List<EntityListEntity>)
 
+    @Query("select * from entity_list where domainName=:domainName")
+    abstract fun get(domainName: String): EntityListEntity?
+
     @Query("select * from entity_list")
     abstract fun getAll(): List<EntityListEntity>
 
