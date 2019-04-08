@@ -16,24 +16,40 @@
 
 package com.duckduckgo.app.entities
 
+import androidx.annotation.WorkerThread
+import androidx.core.net.toUri
+import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.entities.db.EntityListEntity
-import com.duckduckgo.app.global.UriString
-import timber.log.Timber
+import com.duckduckgo.app.global.uri.removeOneSubdomain
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class EntityMapping @Inject constructor() {
+class EntityMapping @Inject constructor(private val entityListDao: EntityListDao) {
 
     var entities: List<EntityListEntity> = emptyList()
 
-    fun updateEntities(entities: List<EntityListEntity>) {
-        Timber.d("updateEntities")
-        this.entities = entities
-    }
-
     fun entityForUrl(url: String): EntityListEntity? {
-        return entities.find { UriString.sameOrSubdomain(url, it.domainName) }
+        //return entities.find { UriString.sameOrSubdomain(url, it.domainName) }
+        return entityForUrl2(url)
     }
 
+    @WorkerThread
+    fun entityForUrl2(url: String): EntityListEntity? {
+        val uri = url.toUri()
+        val host = uri.host ?: return null
+
+        // try searching for exact domain
+        val direct = lookUpEntityInDatabase(host)
+        if (direct != null) return direct
+
+        // remove the first subdomain, and try again
+        val parentDomain = url.toUri().removeOneSubdomain() ?: return null
+        return entityForUrl2(parentDomain)
+    }
+
+    @WorkerThread
+    private fun lookUpEntityInDatabase(url: String): EntityListEntity? {
+        return entityListDao.get(url)
+    }
 }
