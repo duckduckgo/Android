@@ -22,6 +22,4 @@ interface TermsOfServiceStore {
 
     val terms: List<TermsOfService>
 
-    fun retrieveTerms(url: String): TermsOfService?
-
 }

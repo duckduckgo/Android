@@ -18,9 +18,7 @@ package com.duckduckgo.app.privacy.store
 
 import android.content.Context
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.privacy.model.TermsOfService
-import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -34,11 +32,7 @@ import javax.inject.Singleton
  * we'll store the content in a db rather than a raw file.
  */
 @Singleton
-class TermsOfServiceRawStore @Inject constructor(
-    moshi: Moshi,
-    context: Context,
-    private val trackerNetworks: TrackerNetworks
-) : TermsOfServiceStore {
+class TermsOfServiceRawStore @Inject constructor(moshi: Moshi, context: Context) : TermsOfServiceStore {
 
     private var data: List<TermsOfService> = ArrayList()
 
@@ -53,18 +47,4 @@ class TermsOfServiceRawStore @Inject constructor(
 
     override val terms: List<TermsOfService>
         get() = data
-
-    override fun retrieveTerms(url: String): TermsOfService? {
-        val entry = data.find { it.name != null && UriString.sameOrSubdomain(url, it.name) }
-        if (entry != null) {
-            return entry
-        }
-
-        val network = trackerNetworks.network(url)
-        if (network != null) {
-            return data.find { it.name == network.name }
-        }
-
-        return null
-    }
 }
