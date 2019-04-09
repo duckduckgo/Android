@@ -20,6 +20,7 @@ import android.content.Context
 import android.util.Log
 import android.webkit.WebStorage
 import android.webkit.WebView
+import android.webkit.WebViewDatabase
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.WebDataManager
@@ -106,7 +107,7 @@ class ClearPersonalDataAction @Inject constructor(
                 measureExecution("Incremented data-clear pixel count") { clearingStore.incrementCount() }
             }
 
-            dataManager.clearData(createWebView(), createWebStorage(), context)
+            dataManager.clearData(createWebView(), createWebStorage(), WebViewDatabase.getInstance(context))
             dataManager.clearExternalCookies()
         }
     }

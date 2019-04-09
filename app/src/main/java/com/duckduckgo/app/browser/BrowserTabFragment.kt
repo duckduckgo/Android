@@ -28,6 +28,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
@@ -35,10 +36,7 @@ import android.text.Editable
 import android.view.*
 import android.view.View.*
 import android.view.inputmethod.EditorInfo
-import android.webkit.ValueCallback
-import android.webkit.WebChromeClient
-import android.webkit.WebSettings
-import android.webkit.WebView
+import android.webkit.*
 import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
 import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
@@ -71,6 +69,9 @@ import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
+import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
+import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
+import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.CtaConfiguration
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -395,6 +396,8 @@ class BrowserTabFragment : Fragment(), FindListener {
             is Command.LaunchSurvey -> launchSurvey(it.survey)
             is Command.LaunchAddWidget -> launchAddWidget()
             is Command.LaunchLegacyAddWidget -> launchLegacyAddWidget()
+            is Command.RequiresAuthentication -> showAuthenticationDialog(it.request)
+            is Command.SaveCredentials -> saveBasicAuthCredentials(it.request, it.credentials)
         }
     }
 
@@ -465,6 +468,24 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private fun showToast(@StringRes messageId: Int) {
         context?.applicationContext?.longToast(messageId)
+    }
+
+    private fun showAuthenticationDialog(request: BasicAuthenticationRequest) {
+        val dialog = HttpAuthenticationDialogFragment.createHttpAuthenticationDialog(request.site)
+
+        dialog.show(activity?.supportFragmentManager, AUTHENTICATION_DIALOG_TAG)
+        dialog.listener = viewModel
+        dialog.request = request
+    }
+
+    private fun saveBasicAuthCredentials(request: BasicAuthenticationRequest, credentials: BasicAuthenticationCredentials) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val webViewDatabase = WebViewDatabase.getInstance(context)
+            webViewDatabase.setHttpAuthUsernamePassword(request.host, request.realm, credentials.username, credentials.password)
+        } else {
+            @Suppress("DEPRECATION")
+            webView?.setHttpAuthUsernamePassword(request.host, request.realm, credentials.username, credentials.password)
+        }
     }
 
     private fun configureAutoComplete() {
@@ -892,6 +913,8 @@ class BrowserTabFragment : Fragment(), FindListener {
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
 
         private const val URL_BUNDLE_KEY = "url"
+
+        private const val AUTHENTICATION_DIALOG_TAG = "AUTH_DIALOG_TAG"
 
         fun newInstance(tabId: String, query: String? = null): BrowserTabFragment {
             val fragment = BrowserTabFragment()
