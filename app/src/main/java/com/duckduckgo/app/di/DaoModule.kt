@@ -61,4 +61,7 @@ class DaoModule {
 
     @Provides
     fun notification(database: AppDatabase) = database.notificationDao()
+
+    @Provides
+    fun privacyProtectionCounts(database: AppDatabase) = database.privacyProtectionCountsDao()
 }

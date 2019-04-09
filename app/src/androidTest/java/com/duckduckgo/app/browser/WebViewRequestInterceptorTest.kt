@@ -23,6 +23,7 @@ import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
+import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.TrackerDetector
@@ -32,21 +33,17 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
-import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
 class WebViewRequestInterceptorTest {
 
     private lateinit var testee: WebViewRequestInterceptor
 
-    @Mock
-    private lateinit var mockTrackerDetector: TrackerDetector
-    @Mock
-    private lateinit var mockHttpsUpgrader: HttpsUpgrader
-    @Mock
-    private lateinit var mockResourceSurrogates: ResourceSurrogates
-    @Mock
-    private lateinit var mockRequest: WebResourceRequest
+    private var mockTrackerDetector: TrackerDetector = mock()
+    private var mockHttpsUpgrader: HttpsUpgrader = mock()
+    private var mockResourceSurrogates: ResourceSurrogates = mock()
+    private var mockRequest: WebResourceRequest = mock()
+    private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
 
     private lateinit var webView: WebView
 
@@ -58,7 +55,8 @@ class WebViewRequestInterceptorTest {
         testee = WebViewRequestInterceptor(
             trackerDetector = mockTrackerDetector,
             httpsUpgrader = mockHttpsUpgrader,
-            resourceSurrogates = mockResourceSurrogates
+            resourceSurrogates = mockResourceSurrogates,
+            privacyProtectionCountDao = mockPrivacyProtectionCountDao
         )
 
         val context = InstrumentationRegistry.getInstrumentation().targetContext

@@ -39,7 +39,9 @@ import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
+import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.db.SiteVisitedEntity
+import com.duckduckgo.app.privacy.model.PrivacyProtectionCountsEntity
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.db.TabsDao
@@ -53,7 +55,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 10, entities = [
+    exportSchema = true, version = 11, entities = [
         DisconnectTracker::class,
         HttpsBloomFilterSpec::class,
         HttpsWhitelistedDomain::class,
@@ -69,7 +71,8 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         SearchCountEntity::class,
         AppDaysUsedEntity::class,
         AppEnjoymentEntity::class,
-        Notification::class
+        Notification::class,
+        PrivacyProtectionCountsEntity::class
     ]
 )
 
@@ -95,6 +98,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun appsDaysUsedDao(): AppDaysUsedDao
     abstract fun appEnjoymentDao(): AppEnjoymentDao
     abstract fun notificationDao(): NotificationDao
+    abstract fun privacyProtectionCountsDao(): PrivacyProtectionCountDao
 
     companion object {
         val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
@@ -170,7 +174,12 @@ abstract class AppDatabase : RoomDatabase() {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `app_days_used` (`date` TEXT NOT NULL, PRIMARY KEY(`date`))")
                 database.execSQL("CREATE TABLE IF NOT EXISTS `app_enjoyment` (`eventType` INTEGER NOT NULL, `promptCount` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `primaryKey` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)")
             }
+        }
 
+        val MIGRATION_10_TO_11: Migration = object : Migration(10, 11) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `privacy_protection_count` (`key` TEXT NOT NULL, `blocked_tracker_count` INTEGER NOT NULL, `upgrade_count` INTEGER NOT NULL, PRIMARY KEY(`key`))")
+            }
         }
 
         val ALL_MIGRATIONS: List<Migration>
@@ -183,7 +192,8 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_6_TO_7,
                 MIGRATION_7_TO_8,
                 MIGRATION_8_TO_9,
-                MIGRATION_9_TO_10
+                MIGRATION_9_TO_10,
+                MIGRATION_10_TO_11
             )
     }
 }

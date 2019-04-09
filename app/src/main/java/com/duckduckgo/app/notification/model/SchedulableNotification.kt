@@ -16,13 +16,24 @@
 
 package com.duckduckgo.app.notification.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import com.duckduckgo.app.notification.NotificationRegistrar
 
-@Entity(
-    tableName = "notification"
-)
-data class Notification(
-    @PrimaryKey
-    val notificationId: String
-)
+interface SchedulableNotification {
+    val id: String
+    val launchIntent: String
+    val cancelIntent: String
+    suspend fun canShow(): Boolean
+    suspend fun buildSpecification(): NotificationSpec
+}
+
+interface NotificationSpec {
+    val channel: NotificationRegistrar.Channel
+    val systemId: Int
+    val name: String
+    val icon: Int
+    val title: String
+    val description: String
+    val launchButton: String?
+    val pixelSuffix: String
+}
+

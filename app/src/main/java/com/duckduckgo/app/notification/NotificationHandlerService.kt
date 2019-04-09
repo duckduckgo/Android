@@ -21,10 +21,15 @@ import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.VisibleForTesting
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_CANCELLED
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCHED
+import androidx.core.app.NotificationManagerCompat
+import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_CANCELLED
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_LAUNCHED
 import dagger.android.AndroidInjection
 import timber.log.Timber
 import javax.inject.Inject
@@ -37,34 +42,65 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     @Inject
     lateinit var context: Context
 
+    @Inject
+    lateinit var notificationManager: NotificationManagerCompat
+
     override fun onCreate() {
         super.onCreate()
         AndroidInjection.inject(this)
     }
 
     @VisibleForTesting
-    public override fun onHandleIntent(workIntent: Intent) {
-        when (workIntent.type) {
-            CLEAR_DATA_LAUNCHED -> onClearDataLaunched()
-            CLEAR_DATA_CANCELLED -> onClearDataCancelled()
+    public override fun onHandleIntent(intent: Intent) {
+        val pixelSuffix = intent.getStringExtra(PIXEL_SUFFIX_EXTRA)
+        when (intent.type) {
+            APP_LAUNCH -> onAppLaunched(pixelSuffix)
+            CLEAR_DATA_LAUNCH -> onClearDataLaunched(pixelSuffix)
+            CANCEL -> onCancelled(pixelSuffix)
         }
+        val notificationId = intent.getIntExtra(NOTIFICATION_SYSTEM_ID_EXTRA, 0)
+        clearNotification(notificationId)
+        closeNotificationPanel()
     }
 
-    private fun onClearDataLaunched() {
-        Timber.i("Launched!")
-        val settingsIntent = SettingsActivity.intent(context)
+    private fun onAppLaunched(pixelSuffix: String) {
+        val intent = BrowserActivity.intent(context, newSearch = true)
         TaskStackBuilder.create(context)
-            .addNextIntentWithParentStack(settingsIntent)
+            .addNextIntentWithParentStack(intent)
             .startActivities()
-        pixel.fire(Pixel.PixelName.NOTIFICATION_LAUNCHED)
+        pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
     }
 
-    private fun onClearDataCancelled() {
-        pixel.fire(Pixel.PixelName.NOTIFICATION_CANCELLED)
+    private fun onClearDataLaunched(pixelSuffix: String) {
+        Timber.i("Clear Data Launched!")
+        val intent = SettingsActivity.intent(context)
+        TaskStackBuilder.create(context)
+            .addNextIntentWithParentStack(intent)
+            .startActivities()
+        pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
+    }
+
+    private fun onCancelled(pixelSuffix: String) {
+        pixel.fire("${NOTIFICATION_CANCELLED.pixelName}_$pixelSuffix")
+    }
+
+    private fun clearNotification(notificationId: Int) {
+        notificationManager.cancel(notificationId)
+    }
+
+    private fun closeNotificationPanel() {
+        val it = Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
+        context.sendBroadcast(it)
     }
 
     object NotificationEvent {
-        const val CLEAR_DATA_LAUNCHED = "com.duckduckgo.notification.cleardata.launched"
-        const val CLEAR_DATA_CANCELLED = "com.duckduckgo.notification.cleardata.cancelled"
+        const val APP_LAUNCH = "com.duckduckgo.notification.launch.app"
+        const val CLEAR_DATA_LAUNCH = "com.duckduckgo.notification.launch.clearData"
+        const val CANCEL = "com.duckduckgo.notification.cancel"
+    }
+
+    companion object {
+        const val PIXEL_SUFFIX_EXTRA = "PIXEL_SUFFIX_EXTRA"
+        const val NOTIFICATION_SYSTEM_ID_EXTRA = "NOTIFICATION_SYSTEM_ID"
     }
 }

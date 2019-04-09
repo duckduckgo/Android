@@ -257,12 +257,21 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelFileDownloading">File Downloading</string>
     <string name="notificationChannelFileDownloaded">File Downloaded</string>
-    <string name="notificationChannelPrivacyTips">Privacy Tips</string>
+    <string name="notificationChannelTutorials">Tutorials</string>
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Data clearing set to manual</string>
     <string name="clearNotificationDescription">Customize DuckDuckGo to automatically clear browsing data after every session.</string>
 
+    <!-- Privacy Protection Notification -->
+    <string name="privacyProtectionNotificationDefaultTitle">We\'re protecting your privacy</string>
+    <string name="privacyProtectionNotificationReportTitle">Your Privacy Report</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Using the DuckDuckGo app protects your data by blocking trackers and encrypting connections.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">You protected your data by securing %d unencrypted connections while using DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">You protected your data by blocking %d trackers while using DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationBothDescription">You protected your data by blocking %d trackers and securing %d unencrypted connections while using DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationLaunchButton">Resume Browsing</string>
+    
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Sign In</string>
     <string name="authenticationDialogMessage">%s requires a username and password.</string>
@@ -270,6 +279,5 @@
     <string name="authenticationDialogNegativeButton">Cancel</string>
     <string name="authenticationDialogUsernameHint">Username</string>
     <string name="authenticationDialogPasswordHint">Password</string>
-
 
 </resources>

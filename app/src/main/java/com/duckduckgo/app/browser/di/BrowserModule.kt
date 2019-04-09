@@ -30,6 +30,7 @@ import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.fire.WebViewCookieManager
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
+import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -87,8 +88,9 @@ class BrowserModule {
     fun webViewRequestInterceptor(
         resourceSurrogates: ResourceSurrogates,
         trackerDetector: TrackerDetector,
-        httpsUpgrader: HttpsUpgrader
-    ): RequestInterceptor = WebViewRequestInterceptor(resourceSurrogates, trackerDetector, httpsUpgrader)
+        httpsUpgrader: HttpsUpgrader,
+        privacyProtectionCountDao: PrivacyProtectionCountDao
+    ): RequestInterceptor = WebViewRequestInterceptor(resourceSurrogates, trackerDetector, httpsUpgrader, privacyProtectionCountDao)
 
     @Provides
     fun cookieManager(cookieManager: CookieManager): DuckDuckGoCookieManager {

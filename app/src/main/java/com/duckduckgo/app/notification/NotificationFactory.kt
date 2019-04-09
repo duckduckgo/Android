@@ -23,25 +23,30 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.notification.model.NotificationSpec
 import javax.inject.Inject
 
 class NotificationFactory @Inject constructor(val context: Context, val manager: NotificationManagerCompat) {
 
     fun createNotification(
-        specification: NotificationScheduler.NotificationSpec,
+        specification: NotificationSpec,
         launchIntent: PendingIntent,
         cancelIntent: PendingIntent
     ): Notification {
-        return NotificationCompat.Builder(context, specification.channel.id)
+
+        val builder = NotificationCompat.Builder(context, specification.channel.id)
             .setPriority(specification.channel.priority)
             .setSmallIcon(specification.icon)
-            .setContentTitle(context.getString(specification.title))
-            .setAutoCancel(true)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(context.getString(specification.description)))
-            .setColor(ContextCompat.getColor(context, R.color.orange))
-            .setAutoCancel(true)
+            .setContentTitle(specification.title)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(specification.description))
+            .setColor(ContextCompat.getColor(context, R.color.cornflowerDark))
             .setContentIntent(launchIntent)
             .setDeleteIntent(cancelIntent)
-            .build()
+
+        specification.launchButton?.let {
+            builder.addAction(specification.icon, it, launchIntent)
+        }
+
+        return builder.build()
     }
 }
