@@ -45,6 +45,11 @@ class NotificationRegistrar @Inject constructor(
         val priority: Int
     )
 
+    object NotificationId {
+        const val ClearData = 100
+        const val PrivacyProtection = 101
+    }
+
     object ChannelType {
         val FILE_DOWNLOADING = Channel(
             "com.duckduckgo.downloading",
@@ -56,9 +61,9 @@ class NotificationRegistrar @Inject constructor(
             R.string.notificationChannelFileDownloaded,
             NotificationManagerCompat.IMPORTANCE_LOW
         )
-        val PRIVACY_TIPS = Channel(
-            "com.duckduckgo.privacytips",
-            R.string.notificationChannelPrivacyTips,
+        val TUTORIALS = Channel(
+            "com.duckduckgo.tutorials",
+            R.string.notificationChannelTutorials,
             NotificationManagerCompat.IMPORTANCE_DEFAULT
         )
     }
@@ -66,7 +71,7 @@ class NotificationRegistrar @Inject constructor(
     private val channels = (listOf(
         ChannelType.FILE_DOWNLOADING,
         ChannelType.FILE_DOWNLOADED,
-        ChannelType.PRIVACY_TIPS
+        ChannelType.TUTORIALS
     ))
 
     fun registerApp() {

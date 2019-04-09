@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.notification.model
+package com.duckduckgo.app.browser.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import android.webkit.HttpAuthHandler
 
-@Entity(
-    tableName = "notification"
-)
-data class Notification(
-    @PrimaryKey
-    val notificationId: String
-)
+data class BasicAuthenticationRequest(val handler: HttpAuthHandler, val host: String, val realm: String, val site: String)
+data class BasicAuthenticationCredentials(val username: String, val password: String)

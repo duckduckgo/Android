@@ -16,12 +16,13 @@
 
 package com.duckduckgo.app.browser
 
-import androidx.annotation.WorkerThread
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
+import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.isHttp
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
+import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.model.TrustedSites
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.trackerdetection.TrackerDetector
@@ -42,7 +43,9 @@ interface RequestInterceptor {
 class WebViewRequestInterceptor(
     private val resourceSurrogates: ResourceSurrogates,
     private val trackerDetector: TrackerDetector,
-    private val httpsUpgrader: HttpsUpgrader
+    private val httpsUpgrader: HttpsUpgrader,
+    private val privacyProtectionCountDao: PrivacyProtectionCountDao
+
 ) : RequestInterceptor {
 
     /**
@@ -66,6 +69,7 @@ class WebViewRequestInterceptor(
         if (shouldUpgrade(request)) {
             val newUri = httpsUpgrader.upgrade(url)
             webView.post { webView.loadUrl(newUri.toString()) }
+            privacyProtectionCountDao.incrementUpgradeCount()
             return WebResourceResponse(null, null, null)
         }
 
@@ -88,6 +92,7 @@ class WebViewRequestInterceptor(
             }
 
             Timber.d("Blocking request $url")
+            privacyProtectionCountDao.incrementBlockedTrackerCount()
             return WebResourceResponse(null, null, null)
         }
 

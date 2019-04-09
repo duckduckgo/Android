@@ -1,5 +1,5 @@
 ## What's new in this release?
-In this release, we improved the options available when long pressing some links and added an enhanced flow for providing us with feedback.
+In this release, we tweaked our favicon service and added HTTP basic authentication to let you logon to websites that use this.
 
 ## Have feedback?
 You can always reach us at https://duckduckgo.com/feedback.

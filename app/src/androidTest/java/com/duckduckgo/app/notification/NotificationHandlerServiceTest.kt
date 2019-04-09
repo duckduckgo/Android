@@ -17,9 +17,11 @@
 package com.duckduckgo.app.notification
 
 import android.content.Intent
+import androidx.core.app.NotificationManagerCompat
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_CANCELLED
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCHED
+import com.duckduckgo.app.notification.NotificationHandlerService.Companion.PIXEL_SUFFIX_EXTRA
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
@@ -39,21 +41,24 @@ class NotificationHandlerServiceTest {
     fun before() {
         testee.pixel = mockPixel
         testee.context = context
+        testee.notificationManager = NotificationManagerCompat.from(context)
     }
 
     @Test
     fun whenIntentIsClearDataLaunchedThenCorrespondingPixelIsFired() {
         val intent = Intent(context, NotificationHandlerService::class.java)
-        intent.type = CLEAR_DATA_LAUNCHED
+        intent.type = CLEAR_DATA_LAUNCH
+        intent.putExtra(PIXEL_SUFFIX_EXTRA, "abc")
         testee.onHandleIntent(intent)
-        verify(mockPixel).fire(eq(Pixel.PixelName.NOTIFICATION_LAUNCHED), any())
+        verify(mockPixel).fire(eq("mnot_l_abc"), any())
     }
 
     @Test
     fun whenIntentIsClearDataCancelledThenCorrespondingPixelIsFired() {
         val intent = Intent(context, NotificationHandlerService::class.java)
-        intent.type = CLEAR_DATA_CANCELLED
+        intent.type = CANCEL
+        intent.putExtra(PIXEL_SUFFIX_EXTRA, "abc")
         testee.onHandleIntent(intent)
-        verify(mockPixel).fire(eq(Pixel.PixelName.NOTIFICATION_CANCELLED), any())
+        verify(mockPixel).fire(eq("mnot_c_abc"), any())
     }
 }

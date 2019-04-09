@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.view.MenuItem
 import android.view.View
+import android.webkit.HttpAuthHandler
 import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
@@ -38,9 +39,10 @@ import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
+import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
@@ -54,6 +56,7 @@ import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
@@ -853,6 +856,33 @@ class BrowserTabViewModelTest {
         whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(true)
         testee.restoreWebViewState(null, "")
         assertFalse(globalLayoutViewState().isNewTabState)
+    }
+
+    @Test
+    fun whenAuthenticationIsRequiredThenRequiresAuthenticationCommandSent() {
+        val mockHandler = mock<HttpAuthHandler>()
+        val siteURL = "http://example.com/requires-auth"
+        val authenticationRequest = BasicAuthenticationRequest(mockHandler, "example.com", "test realm", siteURL)
+        testee.requiresAuthentication(authenticationRequest)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue
+        assertTrue(command is Command.RequiresAuthentication)
+
+        val requiresAuthCommand = command as Command.RequiresAuthentication
+        assertSame(authenticationRequest, requiresAuthCommand.request)
+    }
+
+    @Test
+    fun whenHandleAuthenticationThenHandlerCalledWithParameters() {
+        val mockHandler = mock<HttpAuthHandler>()
+        val username = "user"
+        val password = "password"
+        val authenticationRequest = BasicAuthenticationRequest(mockHandler, "example.com", "test realm", "")
+        val credentials = BasicAuthenticationCredentials(username = username, password = password)
+        testee.handleAuthentication(request = authenticationRequest, credentials = credentials)
+
+        verify(mockHandler, atLeastOnce()).proceed(username, password)
     }
 
     private fun changeUrl(url: String?) {

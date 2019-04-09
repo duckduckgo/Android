@@ -21,11 +21,12 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslError
 import android.os.Build
+import android.webkit.*
 import androidx.annotation.AnyThread
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
-import android.webkit.*
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -35,6 +36,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.ERROR_CODE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.URL
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
+import java.net.URI
 import javax.inject.Inject
 import kotlin.concurrent.thread
 
@@ -164,6 +166,65 @@ class BrowserWebViewClient @Inject constructor(
             reportHttpsErrorIfInUpgradeList(uri, "SSL_ERROR_${error.primaryError}")
         }
         super.onReceivedSslError(view, handler, error)
+    }
+
+    @UiThread
+    override fun onReceivedHttpAuthRequest(view: WebView?, handler: HttpAuthHandler?, host: String?, realm: String?) {
+        Timber.v("onReceivedHttpAuthRequest ${view?.url} $realm, $host,  $currentUrl")
+
+        if (handler != null) {
+            Timber.v("onReceivedHttpAuthRequest - useHttpAuthUsernamePassword [${handler.useHttpAuthUsernamePassword()}]")
+            if (handler.useHttpAuthUsernamePassword()) {
+                val credentials = buildAuthenticationCredentials(host.orEmpty(), realm.orEmpty(), view)
+
+                if (credentials != null) {
+                    handler.proceed(credentials[0], credentials[1])
+                } else {
+                    showAuthenticationDialog(view, handler, host, realm)
+                }
+            } else {
+                showAuthenticationDialog(view, handler, host, realm)
+            }
+        } else {
+            super.onReceivedHttpAuthRequest(view, handler, host, realm)
+        }
+    }
+
+    private fun buildAuthenticationCredentials(
+        host: String,
+        realm: String,
+        view: WebView?
+    ): Array<out String>? {
+        val webViewDatabase = WebViewDatabase.getInstance(view?.context)
+
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            webViewDatabase.getHttpAuthUsernamePassword(host, realm)
+        } else {
+            @Suppress("DEPRECATION")
+            view?.getHttpAuthUsernamePassword(host, realm)
+        }
+    }
+
+    private fun showAuthenticationDialog(
+        view: WebView?,
+        handler: HttpAuthHandler,
+        host: String?,
+        realm: String?
+    ) {
+        webViewClientListener?.let {
+            Timber.v("showAuthenticationDialog - $host, $realm")
+
+            val siteURL = if (view?.url != null) "${URI(view.url).scheme}://$host" else host.orEmpty()
+
+            val request = BasicAuthenticationRequest(
+                handler = handler,
+                host = host.orEmpty(),
+                realm = realm.orEmpty(),
+                site = siteURL
+            )
+
+            it.requiresAuthentication(request)
+        }
     }
 
     @AnyThread
