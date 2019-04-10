@@ -46,6 +46,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_LAUNCH
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.usage.app.AppDaysUsedRecorder
@@ -85,6 +86,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     @Inject
     lateinit var statisticsUpdater: StatisticsUpdater
+
+    @Inject
+    lateinit var statisticsDataStore: StatisticsDataStore
 
     @Inject
     lateinit var appInstallStore: AppInstallStore
@@ -152,7 +156,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         }
 
         recordInstallationTimestamp()
-        initializeStatistics()
         initializeTheme(settingsDataStore)
         loadTrackerData()
         configureDataDownloader()
@@ -211,10 +214,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         daggerAppComponent.inject(this)
     }
 
-    private fun initializeStatistics() {
-        statisticsUpdater.initializeAtb()
-    }
-
     private fun initializeHttpsUpgrader() {
         thread { httpsUpgrader.reloadData() }
     }
@@ -270,7 +269,12 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     fun onAppResumed() {
         notificationRegistrar.updateStatus()
         GlobalScope.launch { notificationScheduler.scheduleNextNotification() }
-        statisticsUpdater.refreshAppRetentionAtb()
+
+        if (statisticsDataStore.hasInstallationStatistics) {
+            statisticsUpdater.refreshAppRetentionAtb()
+        } else {
+            statisticsUpdater.initializeAtb()
+        }
     }
 
     companion object {
