@@ -149,7 +149,6 @@ class BrowserTabViewModel(
     )
 
     sealed class Command {
-        object LandingPage : Command()
         object Refresh : Command()
         class Navigate(val url: String) : Command()
         class OpenInNewTab(val query: String) : Command()

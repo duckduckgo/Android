@@ -342,7 +342,6 @@ class BrowserTabFragment : Fragment(), FindListener {
             is Command.Navigate -> {
                 navigate(it.url)
             }
-            Command.LandingPage -> resetTabState()
             is Command.DialNumber -> {
                 val intent = Intent(Intent.ACTION_DIAL)
                 intent.data = Uri.parse("tel:${it.telephoneNumber}")
