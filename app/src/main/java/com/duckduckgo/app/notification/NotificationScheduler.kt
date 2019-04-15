@@ -70,7 +70,11 @@ class NotificationScheduler @Inject constructor(
         WorkManager.getInstance().enqueue(request)
     }
 
-    class ClearDataNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
+    // Legacy code. Unused class required for users who already have this notification scheduled from previous version. We can delete this in a
+    // couple of weeks once old notifications have cleared. We should also remove "open" access from ClearDataNotificationWorker.
+    class ShowClearDataNotification(context: Context, params: WorkerParameters): ClearDataNotificationWorker(context, params)
+
+    open class ClearDataNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
     class PrivacyNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
 
     open class SchedulableNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
