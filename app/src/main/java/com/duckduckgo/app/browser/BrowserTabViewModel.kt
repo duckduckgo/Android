@@ -326,7 +326,7 @@ class BrowserTabViewModel(
 
     override fun navigationOptionsChanged(navigationOptions: BrowserNavigationOptions) {
         browserViewState.value = currentBrowserViewState().copy(
-            canGoBack = navigationOptions.canGoBack,
+            canGoBack = true,
             canGoForward = navigationOptions.canGoForward
         )
     }
@@ -600,11 +600,14 @@ class BrowserTabViewModel(
         }
     }
 
-    fun resetView() {
+    fun goHome() {
         pendingUrl = null
         site = null
         onSiteChanged()
-        initializeViewStates()
+        browserViewState.value = currentBrowserViewState().copy(
+            canGoBack = false,
+            canGoForward = true
+        )
     }
 
     private fun initializeViewStates() {

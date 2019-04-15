@@ -64,13 +64,13 @@ import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
+import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
+import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
-import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
-import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.CtaConfiguration
@@ -240,8 +240,19 @@ class BrowserTabFragment : Fragment(), FindListener {
         popupMenu = BrowserPopupMenu(layoutInflater)
         val view = popupMenu.contentView
         popupMenu.apply {
-            onMenuItemClicked(view.forwardPopupMenuItem) { webView?.goForward() }
-            onMenuItemClicked(view.backPopupMenuItem) { webView?.goBack() }
+            onMenuItemClicked(view.forwardPopupMenuItem) {
+                val web = webView ?: return@onMenuItemClicked
+                if (web.isVisible) {
+                    web.goForward()
+                } else {
+                    refresh()
+                    web.show()
+                }
+            }
+            onMenuItemClicked(view.backPopupMenuItem) {
+                val web = webView ?: return@onMenuItemClicked
+                if (web.canGoBack()) web.goBack() else onBackPressed()
+            }
             onMenuItemClicked(view.refreshPopupMenuItem) { webView?.reload() }
             onMenuItemClicked(view.newTabPopupMenuItem) { browserActivity?.launchNewTab() }
             onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
@@ -768,11 +779,10 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
     }
 
-    private fun resetTabState() {
+    private fun goHome() {
         omnibarTextInput.text?.clear()
-        viewModel.resetView()
-        destroyWebView()
-        configureWebView()
+        viewModel.goHome()
+        webView?.hide()
         showKeyboard()
         appBarLayout.setExpanded(true)
     }
@@ -784,7 +794,7 @@ class BrowserTabFragment : Fragment(), FindListener {
                 true
             }
             webView?.visibility == VISIBLE -> {
-                resetTabState()
+                goHome()
                 true
             }
             else -> false
@@ -1024,8 +1034,8 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         private fun renderPopupMenus(browserShowing: Boolean, viewState: BrowserViewState) {
             popupMenu.contentView.apply {
-                backPopupMenuItem.isEnabled = browserShowing && viewState.canGoBack
-                forwardPopupMenuItem.isEnabled = browserShowing && viewState.canGoForward
+                backPopupMenuItem.isEnabled = viewState.canGoBack
+                forwardPopupMenuItem.isEnabled = viewState.canGoForward
                 refreshPopupMenuItem.isEnabled = browserShowing
                 newTabPopupMenuItem.isEnabled = browserShowing
                 addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
