@@ -20,6 +20,7 @@ import android.net.Uri
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.UrlScheme
 import com.duckduckgo.app.global.isHttps
+import com.duckduckgo.app.global.toHttps
 import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import timber.log.Timber
@@ -34,7 +35,7 @@ interface HttpsUpgrader {
     fun isInUpgradeList(uri: Uri): Boolean
 
     fun upgrade(uri: Uri): Uri {
-        return uri.buildUpon().scheme(UrlScheme.https).build()
+        return uri.toHttps
     }
 
     @WorkerThread

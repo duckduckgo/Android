@@ -40,6 +40,12 @@ val Uri.isHttp: Boolean
 val Uri.isHttps: Boolean
     get() = scheme?.equals(UrlScheme.https, true) ?: false
 
+val Uri.toHttps
+    get() = buildUpon().scheme(UrlScheme.https).build()
+
+val Uri.toHttpsString
+    get() = toHttps.toString()
+
 val Uri.hasIpHost: Boolean
     get() {
         val ipRegex = Regex("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")

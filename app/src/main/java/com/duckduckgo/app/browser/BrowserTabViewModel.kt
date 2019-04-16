@@ -150,7 +150,7 @@ class BrowserTabViewModel(
 
     sealed class Command {
         object Refresh : Command()
-        class Navigate(val url: String) : Command()
+        class Navigate(val url: String, val resetNavigation: Boolean = false) : Command()
         class OpenInNewTab(val query: String) : Command()
         class OpenInNewBackgroundTab(val query: String) : Command()
         class DialNumber(val telephoneNumber: String) : Command()
@@ -208,6 +208,7 @@ class BrowserTabViewModel(
     private var siteLiveData = MutableLiveData<Site>()
     private var site: Site? = null
     private lateinit var tabId: String
+    private var navigationOptions: BrowserNavigationOptions? = null
 
     init {
         initializeViewStates()
@@ -281,7 +282,7 @@ class BrowserTabViewModel(
         if (type is IntentType) {
             externalAppLinkClicked(type)
         } else {
-            command.value = Navigate(queryUrlConverter.convertQueryToUrl(trimmedInput))
+            command.value = Navigate(queryUrlConverter.convertQueryToUrl(trimmedInput), !currentBrowserViewState().browserShowing)
         }
 
         globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
@@ -324,10 +325,11 @@ class BrowserTabViewModel(
         onSiteChanged()
     }
 
-    override fun navigationOptionsChanged(navigationOptions: BrowserNavigationOptions) {
+    override fun navigationOptionsChanged(navigation: BrowserNavigationOptions) {
+        navigationOptions = navigation
         browserViewState.value = currentBrowserViewState().copy(
             canGoBack = true,
-            canGoForward = navigationOptions.canGoForward
+            canGoForward = navigation.canGoForward
         )
     }
 
@@ -605,9 +607,20 @@ class BrowserTabViewModel(
         site = null
         onSiteChanged()
         browserViewState.value = currentBrowserViewState().copy(
+            browserShowing = false,
             canGoBack = false,
             canGoForward = true
         )
+        omnibarViewState.value = currentOmnibarViewState().copy(
+            omnibarText = ""
+        )
+    }
+
+    fun goToWeb() {
+        browserViewState.value = currentBrowserViewState().copy(
+            browserShowing = true
+        )
+        command.value = Refresh
     }
 
     private fun initializeViewStates() {

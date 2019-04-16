@@ -49,6 +49,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.core.net.toUri
 import androidx.core.view.isEmpty
 import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
@@ -76,6 +77,8 @@ import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.CtaConfiguration
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.toHttps
+import com.duckduckgo.app.global.toHttpsString
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
@@ -245,15 +248,14 @@ class BrowserTabFragment : Fragment(), FindListener {
                 if (web.isVisible) {
                     web.goForward()
                 } else {
-                    refresh()
-                    web.show()
+                    viewModel.goToWeb()
                 }
             }
             onMenuItemClicked(view.backPopupMenuItem) {
                 val web = webView ?: return@onMenuItemClicked
                 if (web.canGoBack()) web.goBack() else onBackPressed()
             }
-            onMenuItemClicked(view.refreshPopupMenuItem) { webView?.reload() }
+            onMenuItemClicked(view.refreshPopupMenuItem) { refresh() }
             onMenuItemClicked(view.newTabPopupMenuItem) { browserActivity?.launchNewTab() }
             onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
             onMenuItemClicked(view.addBookmarksPopupMenuItem) { addBookmark() }
@@ -327,13 +329,32 @@ class BrowserTabFragment : Fragment(), FindListener {
         })
     }
 
+    private fun showHome() {
+        appBarLayout.setExpanded(true)
+        logoHidingLayoutChangeListener.callToActionView = ctaContainer
+        webView?.onPause()
+        webView?.hide()
+        omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
+        showKeyboard()
+    }
+
+    private fun showBrowser() {
+        webView?.show()
+        webView?.onResume()
+        omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
+    }
+
     fun submitQuery(query: String) {
         viewModel.onUserSubmittedQuery(query)
     }
 
-    private fun navigate(url: String) {
+    private fun navigate(url: String, resetNavigation: Boolean) {
         hideKeyboard()
         renderer.hideFindInPage()
+        val navigationCount = webView?.copyBackForwardList()?.size ?: 0
+        if (resetNavigation && navigationCount > 0) {
+            resetWebView()
+        }
         webView?.loadUrl(url)
     }
 
@@ -351,7 +372,7 @@ class BrowserTabFragment : Fragment(), FindListener {
                 openInNewBackgroundTab()
             }
             is Command.Navigate -> {
-                navigate(it.url)
+                navigate(it.url, it.resetNavigation)
             }
             is Command.DialNumber -> {
                 val intent = Intent(Intent.ACTION_DIAL)
@@ -558,7 +579,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private fun configureOmnibarTextInput() {
         omnibarTextInput.onFocusChangeListener =
-            View.OnFocusChangeListener { _, hasFocus: Boolean ->
+            OnFocusChangeListener { _, hasFocus: Boolean ->
                 viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), hasFocus, false)
             }
 
@@ -779,26 +800,37 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
     }
 
-    private fun goHome() {
-        omnibarTextInput.text?.clear()
-        viewModel.goHome()
-        webView?.hide()
-        showKeyboard()
-        appBarLayout.setExpanded(true)
-    }
-
     fun onBackPressed(): Boolean {
+        val webView = webView ?: return false
+        val isHttpsUpgrade = webView.isHttpsUpgrade()
         return when {
-            webView?.canGoBack() == true -> {
-                webView?.goBack()
+            webView.canGoBack() && !isHttpsUpgrade  -> {
+                webView.goBack()
+                true
+            }
+            isHttpsUpgrade && webView.canGoBackOrForward(-2) -> {
+                webView.goBackOrForward(-2)
                 true
             }
             webView?.visibility == VISIBLE -> {
-                goHome()
+                viewModel.goHome()
                 true
             }
             else -> false
         }
+    }
+
+    private fun WebView.isHttpsUpgrade(): Boolean {
+        val list = copyBackForwardList()
+        if (list.currentIndex < 1) return false
+        val current = list.currentItem.originalUrl
+        val previous = list.getItemAtIndex(list.currentIndex-1).originalUrl
+        return current == previous.toUri().toHttpsString
+    }
+
+    private fun resetWebView() {
+        destroyWebView()
+        configureWebView()
     }
 
     override fun onDestroy() {
@@ -1001,18 +1033,19 @@ class BrowserTabFragment : Fragment(), FindListener {
             }
         }
 
+        // TODO move this out into model
         fun renderBrowserViewState(viewState: BrowserViewState) {
             renderIfChanged(viewState, lastSeenBrowserViewState) {
+                val browserShowing = viewState.browserShowing
+                val browserShowingChanged = viewState.browserShowing != lastSeenBrowserViewState?.browserShowing
                 lastSeenBrowserViewState = viewState
 
-                val browserShowing = viewState.browserShowing
-                if (browserShowing) {
-                    webView?.show()
-                    omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
-                } else {
-                    logoHidingLayoutChangeListener.callToActionView = ctaContainer
-                    webView?.hide()
-                    omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
+                if (browserShowingChanged) {
+                    if (browserShowing) {
+                        showBrowser()
+                    } else {
+                        showHome()
+                    }
                 }
 
                 toggleDesktopSiteMode(viewState.isDesktopBrowsingMode)
