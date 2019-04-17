@@ -65,7 +65,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     }
 
     private val autocompleteToggleListener = OnCheckedChangeListener { _, isChecked ->
-        viewModel.onPlayMediaRequireGestureChanged(isChecked)
+        viewModel.onAutocompleteSettingChanged(isChecked)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
