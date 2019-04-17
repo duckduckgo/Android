@@ -79,6 +79,7 @@ import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyActivity
@@ -139,6 +140,9 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     @Inject
     lateinit var omnibarScrolling: OmnibarScrolling
+
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
 
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
@@ -233,6 +237,11 @@ class BrowserTabFragment : Fragment(), FindListener {
         super.onResume()
         addTextChangedListeners()
         appBarLayout.setExpanded(true)
+
+        webView?.let {
+            setMedialPlaybackRequiresGesture(it.settings)
+        }
+
         viewModel.onViewVisible()
     }
 
@@ -605,6 +614,7 @@ class BrowserTabFragment : Fragment(), FindListener {
                 builtInZoomControls = true
                 displayZoomControls = false
                 mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+                setMedialPlaybackRequiresGesture(this)
                 disableWebSql(this)
                 setSupportZoom(true)
             }
@@ -626,6 +636,10 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
     }
 
+
+    private fun setMedialPlaybackRequiresGesture(settings: WebSettings) {
+        settings.mediaPlaybackRequiresUserGesture = settingsDataStore.playMediaRequiresGesture
+    }
     /**
      * Explicitly disable database to try protect against Magellan WebSQL/SQLite vulnerability
      */

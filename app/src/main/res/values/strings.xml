@@ -150,6 +150,7 @@
     <string name="settingsAboutDuckduckgo">About DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Leave Feedback</string>
+    <string name="settingsPlayMediaRequiresGesture">Require gesture for media playback</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Save</string>

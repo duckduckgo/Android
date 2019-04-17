@@ -46,7 +46,8 @@ class SettingsViewModel @Inject constructor(
         val autoCompleteSuggestionsEnabled: Boolean = true,
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false,
-        val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY)
+        val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
+        val playMediaWithoutGesture: Boolean = false
     )
 
     data class AutomaticallyClearData(
@@ -76,6 +77,7 @@ class SettingsViewModel @Inject constructor(
         val defaultBrowserAlready = defaultWebBrowserCapability.isCurrentlyConfiguredAsDefaultBrowser()
         val variant = variantManager.getVariant()
         val isLightTheme = settingsDataStore.theme == DuckDuckGoTheme.LIGHT
+        val playMediaWithoutGesture = settingsDataStore.playMediaRequiresGesture
         val automaticallyClearWhat = settingsDataStore.automaticallyClearWhatOption
         val automaticallyClearWhen = settingsDataStore.automaticallyClearWhenOption
         val automaticallyClearWhenEnabled = isAutomaticallyClearingDataWhenSettingEnabled(automaticallyClearWhat)
@@ -87,7 +89,8 @@ class SettingsViewModel @Inject constructor(
             isAppDefaultBrowser = defaultBrowserAlready,
             showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
             version = obtainVersion(variant.key),
-            automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled)
+            automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled),
+            playMediaWithoutGesture = playMediaWithoutGesture
         )
     }
 
@@ -110,6 +113,13 @@ class SettingsViewModel @Inject constructor(
         settingsDataStore.autoCompleteSuggestionsEnabled = enabled
 
         viewState.value = currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)
+    }
+
+    fun onPlayMediaRequireGestureChanged(enabled: Boolean) {
+        Timber.i("User play media gesture setting, is now enabled: $enabled")
+        settingsDataStore.playMediaRequiresGesture = enabled
+
+        viewState.value = currentViewState().copy(playMediaWithoutGesture = enabled)
     }
 
     private fun obtainVersion(variantKey: String): String {

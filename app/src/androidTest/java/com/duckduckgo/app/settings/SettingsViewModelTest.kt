@@ -160,6 +160,18 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun whenPlayMediaRequiresGestureSwitchedOnThenDataStoreIsUpdated() {
+        testee.onPlayMediaRequireGestureChanged(true)
+        verify(mockAppSettingsDataStore).playMediaRequiresGesture = true
+    }
+
+    @Test
+    fun whenPlayMediaRequiresGestureSwitchedOffThenDataStoreIsUpdated() {
+        testee.onPlayMediaRequireGestureChanged(false)
+        verify(mockAppSettingsDataStore).playMediaRequiresGesture = false
+    }
+
+    @Test
     fun whenLeaveFeedBackRequestedThenCommandIsLaunchFeedback() {
         testee.userRequestedToSendFeedback()
         testee.command.blockingObserve()

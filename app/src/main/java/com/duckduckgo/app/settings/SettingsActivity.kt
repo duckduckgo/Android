@@ -56,12 +56,16 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
 
     private val defaultBrowserChangeListener = OnCheckedChangeListener { _, _ -> launchDefaultAppScreen() }
 
+    private val playMediaRequiresGestureChangeListener = OnCheckedChangeListener { _, isChecked ->
+        viewModel.onPlayMediaRequireGestureChanged(isChecked)
+    }
+
     private val lightThemeToggleListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onLightThemeToggled(isChecked)
     }
 
     private val autocompleteToggleListener = OnCheckedChangeListener { _, isChecked ->
-        viewModel.onAutocompleteSettingChanged(isChecked)
+        viewModel.onPlayMediaRequireGestureChanged(isChecked)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,6 +90,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
         lightThemeToggle.setOnCheckedChangeListener(lightThemeToggleListener)
         autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
         setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
+        setPlayMediaRequireGesture.setOnCheckedChangeListener(playMediaRequiresGestureChangeListener)
         automaticallyClearWhatSetting.setOnClickListener { launchAutomaticallyClearWhatDialog() }
         automaticallyClearWhenSetting.setOnClickListener { launchAutomaticallyClearWhenDialog() }
     }
@@ -96,6 +101,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
                 version.setSubtitle(it.version)
                 lightThemeToggle.quietlySetIsChecked(it.lightThemeEnabled, lightThemeToggleListener)
                 autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
+                setPlayMediaRequireGesture.quietlySetIsChecked(it.playMediaWithoutGesture, playMediaRequiresGestureChangeListener)
                 updateDefaultBrowserViewVisibility(it)
                 updateAutomaticClearDataOptions(it.automaticallyClearData)
             }

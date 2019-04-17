@@ -42,6 +42,7 @@ interface SettingsDataStore {
     var automaticallyClearWhenOption: ClearWhenOption
     var appBackgroundedTimestamp: Long
     var appNotificationsEnabled: Boolean
+    var playMediaRequiresGesture: Boolean
     fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean
     fun isCurrentlySelected(clearWhenOption: ClearWhenOption): Boolean
     fun hasBackgroundTimestampRecorded(): Boolean
@@ -90,6 +91,10 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         get() = preferences.getBoolean(KEY_APP_NOTIFICATIONS_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_APP_NOTIFICATIONS_ENABLED, enabled) }
 
+    override var playMediaRequiresGesture: Boolean
+        get() = preferences.getBoolean(KEY_PLAY_MEDIA_REQUIRES_GESTURE, true)
+        set(enabled) = preferences.edit { putBoolean(KEY_PLAY_MEDIA_REQUIRES_GESTURE, enabled) }
+
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
     override fun clearAppBackgroundTimestamp() = preferences.edit { remove(KEY_APP_BACKGROUNDED_TIMESTAMP) }
 
@@ -123,6 +128,7 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         const val KEY_AUTOCOMPLETE_ENABLED = "AUTOCOMPLETE_ENABLED"
         const val KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION = "AUTOMATICALLY_CLEAR_WHAT_OPTION"
         const val KEY_AUTOMATICALLY_CLEAR_WHEN_OPTION = "AUTOMATICALLY_CLEAR_WHEN_OPTION"
+        const val KEY_PLAY_MEDIA_REQUIRES_GESTURE = "PLAY_MEDIA_REQUIRES_GESTURE"
         const val KEY_APP_BACKGROUNDED_TIMESTAMP = "APP_BACKGROUNDED_TIMESTAMP"
         const val KEY_APP_NOTIFICATIONS_ENABLED = "APP_NOTIFCATIONS_ENABLED"
         const val KEY_APP_USED_SINCE_LAST_CLEAR = "APP_USED_SINCE_LAST_CLEAR"

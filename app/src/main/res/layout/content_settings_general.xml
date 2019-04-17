@@ -55,5 +55,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/autocompleteToggle" />
 
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/setPlayMediaRequireGesture"
+        style="@style/SettingsSwitch"
+        android:text="@string/settingsPlayMediaRequiresGesture"
+        android:theme="@style/SettingsSwitchTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/setAsDefaultBrowserSetting" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
