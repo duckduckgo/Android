@@ -202,7 +202,7 @@ class BrowserTabViewModelTest {
             searchCountDao = mockSearchCountDao
         )
 
-        testee.loadData("abc", null)
+        testee.loadData("abc", null, false)
         testee.command.observeForever(mockCommandObserver)
 
         whenever(mockOmnibarConverter.convertQueryToUrl(any())).thenReturn("duckduckgo.com")

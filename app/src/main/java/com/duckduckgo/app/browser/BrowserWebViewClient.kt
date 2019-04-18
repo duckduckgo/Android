@@ -28,6 +28,7 @@ import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.global.isHttps
+import com.duckduckgo.app.global.toHttpsString
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.HTTPS_UPGRADE_SITE_ERROR
@@ -114,7 +115,7 @@ class BrowserWebViewClient @Inject constructor(
 
         webViewClientListener?.let {
             it.loadingStarted(url)
-            it.navigationOptionsChanged(determineNavigationOptions(webView))
+            it.navigationOptionsChanged(BrowserNavigationOptions(webView.copyBackForwardList()))
         }
 
         val uri = if (currentUrl != null) Uri.parse(currentUrl) else null
@@ -129,7 +130,7 @@ class BrowserWebViewClient @Inject constructor(
         currentUrl = url
         webViewClientListener?.let {
             it.loadingFinished(url)
-            it.navigationOptionsChanged(determineNavigationOptions(webView))
+            it.navigationOptionsChanged(BrowserNavigationOptions(webView.copyBackForwardList()))
         }
     }
 
@@ -268,12 +269,19 @@ class BrowserWebViewClient @Inject constructor(
         return true
     }
 
-    private fun determineNavigationOptions(webView: WebView): BrowserNavigationOptions {
-        val canGoBack = webView.canGoBack()
-        val canGoForward = webView.canGoForward()
-        return BrowserNavigationOptions(canGoBack, canGoForward)
+    data class BrowserNavigationOptions(val stack: WebBackForwardList) {
+
+        val stepsToPreviousPage: Int = if (stack.isHttpsUpgrade) 2 else 1
+        val canGoBack: Boolean = stack.currentIndex >= stepsToPreviousPage
+        val canGoForward: Boolean = stack.currentIndex + 1 < stack.size
+        val hasNavigationHistory = stack.size != 0
+
+        private val WebBackForwardList.isHttpsUpgrade: Boolean
+            get() {
+                if (currentIndex < 1) return false
+                val current = currentItem.originalUrl
+                val previous = getItemAtIndex(currentIndex - 1).originalUrl
+                return current == previous.toUri().toHttpsString
+            }
     }
-
-    data class BrowserNavigationOptions(val canGoBack: Boolean, val canGoForward: Boolean)
-
 }

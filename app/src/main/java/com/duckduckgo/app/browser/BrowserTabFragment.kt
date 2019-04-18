@@ -49,7 +49,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.ShortcutManagerCompat
-import androidx.core.net.toUri
 import androidx.core.view.isEmpty
 import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
@@ -77,8 +76,6 @@ import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.CtaConfiguration
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.global.ViewModelFactory
-import com.duckduckgo.app.global.toHttps
-import com.duckduckgo.app.global.toHttpsString
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
@@ -145,9 +142,11 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
-    private val initialUrl get() = arguments!![URL_EXTRA_ARG] as String?
-
     lateinit var userAgentProvider: UserAgentProvider
+
+    private val initialUrl get() = arguments!!.getString(URL_EXTRA_ARG)
+
+    private val skipHome get() = arguments!!.getBoolean(SKIP_HOME_ARG)
 
     private lateinit var popupMenu: BrowserPopupMenu
 
@@ -162,7 +161,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProviders.of(this, viewModelFactory).get(BrowserTabViewModel::class.java)
-        viewModel.loadData(tabId, initialUrl)
+        viewModel.loadData(tabId, initialUrl, skipHome)
         viewModel
     }
 
@@ -243,18 +242,8 @@ class BrowserTabFragment : Fragment(), FindListener {
         popupMenu = BrowserPopupMenu(layoutInflater)
         val view = popupMenu.contentView
         popupMenu.apply {
-            onMenuItemClicked(view.forwardPopupMenuItem) {
-                val web = webView ?: return@onMenuItemClicked
-                if (web.isVisible) {
-                    web.goForward()
-                } else {
-                    viewModel.goToWeb()
-                }
-            }
-            onMenuItemClicked(view.backPopupMenuItem) {
-                val web = webView ?: return@onMenuItemClicked
-                if (web.canGoBack()) web.goBack() else onBackPressed()
-            }
+            onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
+            onMenuItemClicked(view.backPopupMenuItem) { if (!viewModel.onUserPressedBack()) onBackPressed() }
             onMenuItemClicked(view.refreshPopupMenuItem) { refresh() }
             onMenuItemClicked(view.newTabPopupMenuItem) { browserActivity?.launchNewTab() }
             onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
@@ -348,13 +337,9 @@ class BrowserTabFragment : Fragment(), FindListener {
         viewModel.onUserSubmittedQuery(query)
     }
 
-    private fun navigate(url: String, resetNavigation: Boolean) {
+    private fun navigate(url: String) {
         hideKeyboard()
         renderer.hideFindInPage()
-        val navigationCount = webView?.copyBackForwardList()?.size ?: 0
-        if (resetNavigation && navigationCount > 0) {
-            resetWebView()
-        }
         webView?.loadUrl(url)
     }
 
@@ -372,7 +357,16 @@ class BrowserTabFragment : Fragment(), FindListener {
                 openInNewBackgroundTab()
             }
             is Command.Navigate -> {
-                navigate(it.url, it.resetNavigation)
+                navigate(it.url)
+            }
+            is Command.NavigateBack -> {
+                webView?.goBackOrForward(-it.steps)
+            }
+            Command.NavigateForward -> {
+                webView?.goForward()
+            }
+            Command.ResetHistory -> {
+                resetWebView()
             }
             is Command.DialNumber -> {
                 val intent = Intent(Intent.ACTION_DIAL)
@@ -801,31 +795,7 @@ class BrowserTabFragment : Fragment(), FindListener {
     }
 
     fun onBackPressed(): Boolean {
-        val webView = webView ?: return false
-        val isHttpsUpgrade = webView.isHttpsUpgrade()
-        return when {
-            webView.canGoBack() && !isHttpsUpgrade  -> {
-                webView.goBack()
-                true
-            }
-            isHttpsUpgrade && webView.canGoBackOrForward(-2) -> {
-                webView.goBackOrForward(-2)
-                true
-            }
-            webView?.visibility == VISIBLE -> {
-                viewModel.goHome()
-                true
-            }
-            else -> false
-        }
-    }
-
-    private fun WebView.isHttpsUpgrade(): Boolean {
-        val list = copyBackForwardList()
-        if (list.currentIndex < 1) return false
-        val current = list.currentItem.originalUrl
-        val previous = list.getItemAtIndex(list.currentIndex-1).originalUrl
-        return current == previous.toUri().toHttpsString
+        return viewModel.onUserPressedBack()
     }
 
     private fun resetWebView() {
@@ -946,8 +916,10 @@ class BrowserTabFragment : Fragment(), FindListener {
     companion object {
 
         private const val TAB_ID_ARG = "TAB_ID_ARG"
-        private const val ADD_BOOKMARK_FRAGMENT_TAG = "ADD_BOOKMARK"
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
+        private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
+
+        private const val ADD_BOOKMARK_FRAGMENT_TAG = "ADD_BOOKMARK"
         private const val KEYBOARD_DELAY = 200L
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
@@ -957,10 +929,11 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         private const val AUTHENTICATION_DIALOG_TAG = "AUTH_DIALOG_TAG"
 
-        fun newInstance(tabId: String, query: String? = null): BrowserTabFragment {
+        fun newInstance(tabId: String, skipHome: Boolean, query: String? = null): BrowserTabFragment {
             val fragment = BrowserTabFragment()
             val args = Bundle()
             args.putString(TAB_ID_ARG, tabId)
+            args.putBoolean(SKIP_HOME_ARG, skipHome)
             query.let {
                 args.putString(URL_EXTRA_ARG, query)
             }
@@ -1163,7 +1136,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
 
         fun hideFindInPage() {
-            if (findInPageContainer.visibility != View.GONE) {
+            if (findInPageContainer.visibility != GONE) {
                 focusDummy.requestFocus()
                 findInPageContainer.gone()
                 findInPageInput.hideKeyboard()
@@ -1172,7 +1145,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         private fun showFindInPageView(viewState: FindInPageViewState) {
 
-            if (findInPageContainer.visibility != View.VISIBLE) {
+            if (findInPageContainer.visibility != VISIBLE) {
                 findInPageContainer.show()
                 findInPageInput.postDelayed(KEYBOARD_DELAY) {
                     findInPageInput?.showKeyboard()

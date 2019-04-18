@@ -188,7 +188,7 @@ class BrowserViewModel(
     }
 
     override fun onUserCancelledAppEnjoymentDialog(promptCount: PromptCount) {
-        launch { appEnjoymentUserEventRecorder.onUserDeclinedToSayIfEnjoyingApp(promptCount)}
+        launch { appEnjoymentUserEventRecorder.onUserDeclinedToSayIfEnjoyingApp(promptCount) }
     }
 
     override fun onUserCancelledRateAppDialog(promptCount: PromptCount) {
@@ -198,5 +198,4 @@ class BrowserViewModel(
     override fun onUserCancelledGiveFeedbackDialog(promptCount: PromptCount) {
         onUserDeclinedToGiveFeedback(promptCount)
     }
-
 }

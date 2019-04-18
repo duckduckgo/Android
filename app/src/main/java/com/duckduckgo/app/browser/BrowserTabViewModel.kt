@@ -43,11 +43,11 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
+import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
+import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
-import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
-import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
 import com.duckduckgo.app.cta.ui.CtaConfiguration
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -150,9 +150,12 @@ class BrowserTabViewModel(
 
     sealed class Command {
         object Refresh : Command()
-        class Navigate(val url: String, val resetNavigation: Boolean = false) : Command()
+        class Navigate(val url: String) : Command()
+        class NavigateBack(val steps: Int) : Command()
+        object NavigateForward : Command()
         class OpenInNewTab(val query: String) : Command()
         class OpenInNewBackgroundTab(val query: String) : Command()
+        object ResetHistory : Command()
         class DialNumber(val telephoneNumber: String) : Command()
         class SendSms(val telephoneNumber: String) : Command()
         class SendEmail(val emailAddress: String) : Command()
@@ -208,6 +211,7 @@ class BrowserTabViewModel(
     private var siteLiveData = MutableLiveData<Site>()
     private var site: Site? = null
     private lateinit var tabId: String
+    private var skipHome = false
     private var navigationOptions: BrowserNavigationOptions? = null
 
     init {
@@ -217,8 +221,9 @@ class BrowserTabViewModel(
         configureAutoComplete()
     }
 
-    fun loadData(tabId: String, initialUrl: String?) {
+    fun loadData(tabId: String, initialUrl: String?, skipHome: Boolean) {
         this.tabId = tabId
+        this.skipHome = skipHome
         siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
 
@@ -282,7 +287,10 @@ class BrowserTabViewModel(
         if (type is IntentType) {
             externalAppLinkClicked(type)
         } else {
-            command.value = Navigate(queryUrlConverter.convertQueryToUrl(trimmedInput), !currentBrowserViewState().browserShowing)
+            if (shouldClearHistoryOnNewQuery()) {
+                command.value = ResetHistory
+            }
+            command.value = Navigate(queryUrlConverter.convertQueryToUrl(trimmedInput))
         }
 
         globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
@@ -290,6 +298,52 @@ class BrowserTabViewModel(
         omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = trimmedInput)
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
         autoCompleteViewState.value = AutoCompleteViewState(false)
+    }
+
+    private fun shouldClearHistoryOnNewQuery(): Boolean {
+        val navigation = navigationOptions ?: return false
+        return !currentBrowserViewState().browserShowing && navigation.hasNavigationHistory
+    }
+
+    fun onUserPressedForward() {
+        if (!currentBrowserViewState().browserShowing) {
+            browserViewState.value = currentBrowserViewState().copy(browserShowing = true)
+            command.value = Refresh
+        } else {
+            command.value = NavigateForward
+        }
+    }
+
+    fun onUserPressedBack(): Boolean {
+        val navigation = navigationOptions
+        if (!currentBrowserViewState().browserShowing || navigation == null) {
+            return false
+        }
+
+        if (navigation.canGoBack) {
+            command.value = NavigateBack(navigation.stepsToPreviousPage)
+            return true
+        } else if (!skipHome) {
+            navigateHome()
+            return true
+        }
+
+        skipHome = false
+        return false
+    }
+
+    private fun navigateHome() {
+        pendingUrl = null
+        site = null
+        onSiteChanged()
+        browserViewState.value = currentBrowserViewState().copy(
+            browserShowing = false,
+            canGoBack = false,
+            canGoForward = true
+        )
+        omnibarViewState.value = currentOmnibarViewState().copy(
+            omnibarText = ""
+        )
     }
 
     override fun progressChanged(progressedUrl: String?, newProgress: Int) {
@@ -600,27 +654,6 @@ class BrowserTabViewModel(
         } else {
             command.value = Refresh
         }
-    }
-
-    fun goHome() {
-        pendingUrl = null
-        site = null
-        onSiteChanged()
-        browserViewState.value = currentBrowserViewState().copy(
-            browserShowing = false,
-            canGoBack = false,
-            canGoForward = true
-        )
-        omnibarViewState.value = currentOmnibarViewState().copy(
-            omnibarText = ""
-        )
-    }
-
-    fun goToWeb() {
-        browserViewState.value = currentBrowserViewState().copy(
-            browserShowing = true
-        )
-        command.value = Refresh
     }
 
     private fun initializeViewStates() {
