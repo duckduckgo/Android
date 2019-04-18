@@ -243,7 +243,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         val view = popupMenu.contentView
         popupMenu.apply {
             onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
-            onMenuItemClicked(view.backPopupMenuItem) { if (!viewModel.onUserPressedBack()) onBackPressed() }
+            onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
             onMenuItemClicked(view.refreshPopupMenuItem) { refresh() }
             onMenuItemClicked(view.newTabPopupMenuItem) { browserActivity?.launchNewTab() }
             onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
@@ -913,6 +913,10 @@ class BrowserTabFragment : Fragment(), FindListener {
         startActivity(AddWidgetInstructionsActivity.intent(context), options)
     }
 
+    fun resetHome() {
+        viewModel.skipHome = false
+    }
+
     companion object {
 
         private const val TAB_ID_ARG = "TAB_ID_ARG"
@@ -1006,7 +1010,6 @@ class BrowserTabFragment : Fragment(), FindListener {
             }
         }
 
-        // TODO move this out into model
         fun renderBrowserViewState(viewState: BrowserViewState) {
             renderIfChanged(viewState, lastSeenBrowserViewState) {
                 val browserShowing = viewState.browserShowing

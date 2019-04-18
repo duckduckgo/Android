@@ -138,6 +138,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
         val transaction = supportFragmentManager.beginTransaction()
         currentTab?.let {
+            it.resetHome()
             transaction.hide(it)
         }
         transaction.show(fragment)

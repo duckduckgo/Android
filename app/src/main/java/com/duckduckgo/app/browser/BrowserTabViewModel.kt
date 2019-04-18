@@ -187,6 +187,7 @@ class BrowserTabViewModel(
     val findInPageViewState: MutableLiveData<FindInPageViewState> = MutableLiveData()
     val ctaViewState: MutableLiveData<CtaViewModel.CtaViewState> = ctaViewModel.ctaViewState
 
+    var skipHome = false
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
     val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
@@ -211,7 +212,6 @@ class BrowserTabViewModel(
     private var siteLiveData = MutableLiveData<Site>()
     private var site: Site? = null
     private lateinit var tabId: String
-    private var skipHome = false
     private var navigationOptions: BrowserNavigationOptions? = null
 
     init {
@@ -316,6 +316,7 @@ class BrowserTabViewModel(
 
     fun onUserPressedBack(): Boolean {
         val navigation = navigationOptions
+
         if (!currentBrowserViewState().browserShowing || navigation == null) {
             return false
         }
@@ -336,18 +337,21 @@ class BrowserTabViewModel(
         pendingUrl = null
         site = null
         onSiteChanged()
+
+        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = "")
+        loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
         browserViewState.value = currentBrowserViewState().copy(
             browserShowing = false,
             canGoBack = false,
             canGoForward = true
         )
-        omnibarViewState.value = currentOmnibarViewState().copy(
-            omnibarText = ""
-        )
     }
 
     override fun progressChanged(progressedUrl: String?, newProgress: Int) {
         Timber.v("Loading in progress $newProgress")
+
+        if (!currentBrowserViewState().browserShowing) return
+
         val progress = currentLoadingViewState()
         loadingViewState.value = progress.copy(progress = newProgress)
 
@@ -372,6 +376,7 @@ class BrowserTabViewModel(
 
     override fun loadingStarted(url: String?) {
         Timber.v("Loading started")
+        if (!currentBrowserViewState().browserShowing) return
         val progress = currentLoadingViewState()
         loadingViewState.value = progress.copy(isLoading = true)
         pendingUrl = url
@@ -381,6 +386,9 @@ class BrowserTabViewModel(
 
     override fun navigationOptionsChanged(navigation: BrowserNavigationOptions) {
         navigationOptions = navigation
+
+        if (!currentBrowserViewState().browserShowing) return
+
         browserViewState.value = currentBrowserViewState().copy(
             canGoBack = true,
             canGoForward = navigation.canGoForward
@@ -389,6 +397,8 @@ class BrowserTabViewModel(
 
     override fun loadingFinished(url: String?) {
         Timber.v("Loading finished")
+
+        if (!currentBrowserViewState().browserShowing) return
 
         if (pendingUrl != null) {
             urlChanged(url)
