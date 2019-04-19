@@ -267,8 +267,12 @@ class BrowserTabViewModel(
     }
 
     fun onViewVisible() {
-        command.value = if (url == null) ShowKeyboard else Command.HideKeyboard
+        command.value = if (url == null) ShowKeyboard else HideKeyboard
         ctaViewModel.refreshCta()
+    }
+
+    fun onViewHidden() {
+        skipHome = false
     }
 
     fun onUserSubmittedQuery(input: String) {
@@ -329,7 +333,6 @@ class BrowserTabViewModel(
             return true
         }
 
-        skipHome = false
         return false
     }
 

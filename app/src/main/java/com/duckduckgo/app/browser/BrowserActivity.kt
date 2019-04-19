@@ -74,8 +74,6 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     private lateinit var renderer: BrowserStateRenderer
 
-    private var skipHome = false
-
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.daggerInject()
@@ -108,9 +106,9 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun openNewTab(tabId: String, url: String? = null) {
+    private fun openNewTab(tabId: String, url: String? = null, skipHome: Boolean) {
         Timber.i("Opening new tab, url: $url, tabId: $tabId")
-        val fragment = BrowserTabFragment.newInstance(tabId, skipHome, url)
+        val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome)
         val transaction = supportFragmentManager.beginTransaction()
         val tab = currentTab
         if (tab == null) {
@@ -121,7 +119,6 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
         transaction.commit()
         currentTab = fragment
-        skipHome = false
     }
 
     private fun selectTab(tab: TabEntity?) {
@@ -133,12 +130,11 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
         if (fragment == null) {
-            openNewTab(tab.tabId, tab.url)
+            openNewTab(tab.tabId, tab.url, tab.skipHome)
             return
         }
         val transaction = supportFragmentManager.beginTransaction()
         currentTab?.let {
-            it.resetHome()
             transaction.hide(it)
         }
         transaction.show(fragment)
@@ -186,8 +182,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         val sharedText = intent.intentText
         if (sharedText != null) {
             Timber.w("opening in new tab requested for $sharedText")
-            skipHome = true
-            viewModel.onOpenInNewTabRequested(sharedText)
+            viewModel.onOpenInNewTabRequested(sharedText, true)
             return
         }
     }

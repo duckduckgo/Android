@@ -31,6 +31,7 @@ data class TabEntity(
     @PrimaryKey var tabId: String,
     var url: String? = null,
     var title: String? = null,
+    var skipHome: Boolean = false,
     var viewed: Boolean = true,
     var position: Int
 )

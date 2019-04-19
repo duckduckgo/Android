@@ -776,6 +776,7 @@ class BrowserTabFragment : Fragment(), FindListener {
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
         if (hidden) {
+            viewModel.onViewHidden()
             webView?.onPause()
         } else {
             webView?.onResume()
@@ -913,10 +914,6 @@ class BrowserTabFragment : Fragment(), FindListener {
         startActivity(AddWidgetInstructionsActivity.intent(context), options)
     }
 
-    fun resetHome() {
-        viewModel.skipHome = false
-    }
-
     companion object {
 
         private const val TAB_ID_ARG = "TAB_ID_ARG"
@@ -933,7 +930,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         private const val AUTHENTICATION_DIALOG_TAG = "AUTH_DIALOG_TAG"
 
-        fun newInstance(tabId: String, skipHome: Boolean, query: String? = null): BrowserTabFragment {
+        fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
             val fragment = BrowserTabFragment()
             val args = Bundle()
             args.putString(TAB_ID_ARG, tabId)
