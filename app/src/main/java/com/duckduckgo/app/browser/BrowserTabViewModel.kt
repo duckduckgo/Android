@@ -28,10 +28,7 @@ import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
@@ -56,6 +53,7 @@ import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.global.performance.measureExecution
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.SiteVisitedEntity
@@ -70,11 +68,9 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import timber.log.Timber
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
@@ -102,6 +98,8 @@ class BrowserTabViewModel(
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
+
+    private val siteBuilderDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
     data class GlobalLayoutViewState(
         val isNewTabState: Boolean = true
@@ -223,13 +221,39 @@ class BrowserTabViewModel(
         site = siteLiveData.value
 
         initialUrl?.let {
-            site = siteFactory.build(it)
+            viewModelScope.launch { buildNewSiteFactory(it) }
         }
     }
 
     fun onViewReady() {
         url?.let {
             onUserSubmittedQuery(it)
+        }
+    }
+
+    private var buildingSiteFactoryJob: Job? = null
+
+    private fun buildNewSiteFactory(url: String) {
+
+        if (buildingSiteFactoryJob != null) {
+            Timber.i("Cancelling existing work to build sitefactory")
+            buildingSiteFactoryJob?.cancel()
+        }
+
+        //withContext(siteBuilderDispatcher) {
+        site = siteFactory.build(url)
+        onSiteChanged()
+
+        buildingSiteFactoryJob = viewModelScope.launch(Dispatchers.Default) {
+            delay(5000)
+            val siteMonitor = siteFactory.buildSiteMonitor(url)
+            if (site?.url == url) {
+                Timber.i("Urls still match, can update the underlying Site SiteMonitor")
+                site?.siteMonitor = siteMonitor
+                onSiteChanged()
+            } else {
+                Timber.w("URLS have changed; discarding SiteMonitor")
+            }
         }
     }
 
@@ -274,7 +298,7 @@ class BrowserTabViewModel(
         command.value = HideKeyboard
         val trimmedInput = input.trim()
 
-        launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO) {
             searchCountDao.incrementSearchCount()
         }
 
@@ -293,14 +317,17 @@ class BrowserTabViewModel(
     }
 
     override fun progressChanged(progressedUrl: String?, newProgress: Int) {
-        Timber.v("Loading in progress $newProgress")
-        val progress = currentLoadingViewState()
-        loadingViewState.value = progress.copy(progress = newProgress)
+        measureExecution("progressChanged") {
 
-        if (progressedUrl == pendingUrl) {
-            // We change the url here rather than loadingStarted to protect against phishing
-            // See https://github.com/duckduckgo/Android/pull/390
-            urlChanged(pendingUrl)
+            Timber.v("Loading in progress $newProgress")
+            val progress = currentLoadingViewState()
+            loadingViewState.value = progress.copy(progress = newProgress)
+
+            if (progressedUrl == pendingUrl) {
+                // We change the url here rather than loadingStarted to protect against phishing
+                // See https://github.com/duckduckgo/Android/pull/390
+                urlChanged(pendingUrl)
+            }
         }
     }
 
@@ -358,7 +385,7 @@ class BrowserTabViewModel(
     }
 
     override fun titleReceived(title: String) {
-        site?.title = title
+        site?.siteMonitor?.title = (title)
         onSiteChanged()
     }
 
@@ -393,27 +420,30 @@ class BrowserTabViewModel(
             return
         }
 
-
         val currentBrowserViewState = currentBrowserViewState()
         val currentOmnibarViewState = currentOmnibarViewState()
 
-        omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url))
-        findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
-        browserViewState.value = currentBrowserViewState.copy(
-            browserShowing = true,
-            canAddBookmarks = true,
-            addToHomeEnabled = true,
-            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
-            canSharePage = true,
-            showPrivacyGrade = appConfigurationDownloaded
-        )
+        measureExecution("xxx") {
+            omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url)))
+            findInPageViewState.postValue(FindInPageViewState(visible = false, canFindInPage = true))
+            browserViewState.postValue(
+                currentBrowserViewState.copy(
+                    browserShowing = true,
+                    canAddBookmarks = true,
+                    addToHomeEnabled = true,
+                    addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
+                    canSharePage = true,
+                    showPrivacyGrade = appConfigurationDownloaded
+                )
+            )
+        }
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             statisticsUpdater.refreshSearchRetentionAtb()
         }
         pendingUrl = null
-        site = siteFactory.build(url)
-        onSiteChanged()
+
+        buildNewSiteFactory(url)
     }
 
     private fun omnibarTextForUrl(url: String): String {
@@ -425,7 +455,10 @@ class BrowserTabViewModel(
 
     override fun trackerDetected(event: TrackingEvent) {
         if (event.documentUrl == url) {
-            site?.trackerDetected(event)
+            if(site?.siteMonitor == null) {
+                Timber.w("Dropped a tracker $event")
+            }
+            site?.siteMonitor?.trackerDetected(event)
             onSiteChanged()
         }
         updateNetworkLeaderboard(event)
@@ -440,15 +473,18 @@ class BrowserTabViewModel(
 
     override fun pageHasHttpResources(page: String?) {
         if (page == url) {
-            site?.hasHttpResources = true
+            site?.siteMonitor?.hasHttpResources = true
             onSiteChanged()
         }
     }
 
     private fun onSiteChanged() {
         siteLiveData.postValue(site)
-        privacyGrade.postValue(site?.improvedGrade)
-        tabRepository.update(tabId, site)
+        privacyGrade.postValue(site?.siteMonitor?.improvedGrade)
+
+        viewModelScope.launch(Dispatchers.IO) {
+            tabRepository.update(tabId, site)
+        }
     }
 
     override fun showFileChooser(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams) {
@@ -525,7 +561,7 @@ class BrowserTabViewModel(
                 true
             }
             is RequiredAction.OpenInNewBackgroundTab -> {
-                openInNewBackgroundTab(requiredAction.url)
+                viewModelScope.launch { openInNewBackgroundTab(requiredAction.url) }
                 true
             }
             is RequiredAction.DownloadFile -> {
@@ -546,7 +582,7 @@ class BrowserTabViewModel(
         }
     }
 
-    fun openInNewBackgroundTab(url: String) {
+    suspend fun openInNewBackgroundTab(url: String) {
         tabRepository.addNewTabAfterExistingTab(url, tabId)
         command.value = OpenInNewBackgroundTab(url)
     }

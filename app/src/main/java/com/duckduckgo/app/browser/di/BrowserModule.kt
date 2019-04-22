@@ -53,6 +53,18 @@ class BrowserModule {
     }
 
     @Provides
+    fun browserWebViewClient(
+        requestRewriter: RequestRewriter,
+        specialUrlDetector: SpecialUrlDetector,
+        requestInterceptor: RequestInterceptor,
+        httpsUpgrader: HttpsUpgrader,
+        statisticsDataStore: StatisticsDataStore,
+        pixel: Pixel
+    ): BrowserWebViewClient {
+        return BrowserWebViewClient(requestRewriter, specialUrlDetector, requestInterceptor, httpsUpgrader, statisticsDataStore, pixel)
+    }
+
+    @Provides
     fun webViewLongPressHandler(context: Context, pixel: Pixel): LongPressHandler {
         return WebViewLongPressHandler(context, pixel)
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacy.store
+package com.duckduckgo.app.global.initialization
 
-import com.duckduckgo.app.global.initialization.Initializable
-import com.duckduckgo.app.privacy.model.TermsOfService
 
-interface TermsOfServiceStore : Initializable {
+interface Initializable {
 
-    val terms: List<TermsOfService>
+    suspend fun initialize()
 
 }

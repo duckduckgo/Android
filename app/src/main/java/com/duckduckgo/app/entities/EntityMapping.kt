@@ -29,13 +29,8 @@ class EntityMapping @Inject constructor(private val entityListDao: EntityListDao
 
     var entities: List<EntityListEntity> = emptyList()
 
-    fun entityForUrl(url: String): EntityListEntity? {
-        //return entities.find { UriString.sameOrSubdomain(url, it.domainName) }
-        return entityForUrl2(url)
-    }
-
     @WorkerThread
-    fun entityForUrl2(url: String): EntityListEntity? {
+    fun entityForUrl(url: String): EntityListEntity? {
         val uri = url.toUri()
         val host = uri.host ?: return null
 
@@ -44,8 +39,9 @@ class EntityMapping @Inject constructor(private val entityListDao: EntityListDao
         if (direct != null) return direct
 
         // remove the first subdomain, and try again
-        val parentDomain = url.toUri().removeOneSubdomain() ?: return null
-        return entityForUrl2(parentDomain)
+        val parentDomain = uri.removeOneSubdomain() ?: return null
+        return entityForUrl(parentDomain)
+
     }
 
     @WorkerThread

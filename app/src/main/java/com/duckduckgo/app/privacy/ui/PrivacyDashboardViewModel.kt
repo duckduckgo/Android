@@ -16,12 +16,13 @@
 
 package com.duckduckgo.app.privacy.ui
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.model.SiteDetails
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao.NetworkTally
 import com.duckduckgo.app.privacy.model.HttpsStatus
@@ -104,10 +105,11 @@ class PrivacyDashboardViewModel(
 
     fun onSiteChanged(site: Site?) {
         this.site = site
-        if (site == null) {
+        val siteDetails = site?.siteMonitor
+        if (site == null || siteDetails == null) {
             resetViewState()
         } else {
-            updateSite(site)
+            updateSite(siteDetails)
         }
     }
 
@@ -128,7 +130,7 @@ class PrivacyDashboardViewModel(
         )
     }
 
-    private fun updateSite(site: Site) {
+    private fun updateSite(site: SiteDetails) {
         viewState.value = viewState.value?.copy(
             domain = site.uri?.host ?: "",
             beforeGrade = site.grade,

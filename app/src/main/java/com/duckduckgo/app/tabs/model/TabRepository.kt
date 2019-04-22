@@ -29,22 +29,22 @@ interface TabRepository {
     /**
      * @return tabId of new record
      */
-    fun add(url: String? = null, isDefaultTab: Boolean = false): String
+    suspend fun add(url: String? = null, isDefaultTab: Boolean = false): String
 
-    fun addNewTabAfterExistingTab(url: String? = null, tabId: String)
+    suspend fun addNewTabAfterExistingTab(url: String? = null, tabId: String)
 
-    fun add(tabId: String, data: MutableLiveData<Site>, isDefaultTab: Boolean = false)
+    suspend fun add(tabId: String, data: MutableLiveData<Site>, isDefaultTab: Boolean = false)
 
-    fun update(tabId: String, site: Site?)
+    suspend fun update(tabId: String, site: Site?)
 
     /**
      * @return record if it exists, otherwise a new one
      */
     fun retrieveSiteData(tabId: String): MutableLiveData<Site>
 
-    fun delete(tab: TabEntity)
+    suspend fun delete(tab: TabEntity)
 
     fun deleteAll()
 
-    fun select(tabId: String)
+    suspend fun select(tabId: String)
 }

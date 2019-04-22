@@ -20,7 +20,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.model.PrivacyPractices
-import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.*
+import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 
 class PrivacyPracticesViewModel : ViewModel() {
 
@@ -47,15 +47,16 @@ class PrivacyPracticesViewModel : ViewModel() {
     }
 
     fun onSiteChanged(site: Site?) {
-        if (site == null) {
+        val siteMonitor = site?.siteMonitor
+        if (siteMonitor == null) {
             resetViewState()
             return
         }
         viewState.value = viewState.value?.copy(
-            domain = site.uri?.host ?: "",
-            practices = site.privacyPractices.summary,
-            goodTerms = site.privacyPractices.goodReasons,
-            badTerms = site.privacyPractices.badReasons
+            domain = siteMonitor.uri?.host ?: "",
+            practices = siteMonitor.privacyPractices.summary,
+            goodTerms = siteMonitor.privacyPractices.goodReasons,
+            badTerms = siteMonitor.privacyPractices.badReasons
         )
     }
 }

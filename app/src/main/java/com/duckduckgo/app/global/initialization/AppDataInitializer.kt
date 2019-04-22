@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacy.store
+package com.duckduckgo.app.global.initialization
 
-import com.duckduckgo.app.global.initialization.Initializable
-import com.duckduckgo.app.privacy.model.TermsOfService
+import com.duckduckgo.app.privacy.store.TermsOfServiceStore
+import timber.log.Timber
+import javax.inject.Inject
 
-interface TermsOfServiceStore : Initializable {
 
-    val terms: List<TermsOfService>
+class AppDataInitializer @Inject constructor(private val termsOfServiceStore: TermsOfServiceStore) {
 
+    suspend fun initialize() {
+        Timber.i("Started to initialize app data")
+        termsOfServiceStore.initialize()
+        Timber.i("Finished initializing app data")
+    }
 }

@@ -49,31 +49,6 @@ class EntityListDaoTest {
     }
 
     @Test
-    fun whenListIsUpdatedThenEntitiesAreUpdated() {
-
-        val list = listOf(
-            EntityListEntity("domain", "entity"),
-            EntityListEntity("domain2", "entity2"),
-            EntityListEntity("domain3", "entity3")
-        )
-
-        entityListDao.updateAll(list)
-
-        val updates = listOf(
-            EntityListEntity("domain", "entity3"),
-            EntityListEntity("domain2", "entity4"),
-            EntityListEntity("domain3", "entity5")
-        )
-
-        entityListDao.updateAll(updates)
-
-        val all = entityListDao.getAll()
-
-        assertEquals(updates, all)
-    }
-
-
-    @Test
     fun whenEntitiesWithSameDomainAddedThenOnlySingleEntryForDomainExists() {
 
         val list = listOf(

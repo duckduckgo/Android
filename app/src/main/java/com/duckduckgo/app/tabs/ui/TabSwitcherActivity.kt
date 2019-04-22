@@ -34,10 +34,13 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DisplayMessage
 import kotlinx.android.synthetic.main.content_tab_switcher.*
 import kotlinx.android.synthetic.main.include_toolbar.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.longToast
 import javax.inject.Inject
 
-class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitchedListener {
+class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitchedListener, CoroutineScope by MainScope() {
 
     @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
@@ -109,20 +112,22 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     }
 
     override fun onNewTabRequested() {
-        viewModel.onNewTabRequested()
+        launch { viewModel.onNewTabRequested() }
     }
 
     override fun onTabSelected(tab: TabEntity) {
-        viewModel.onTabSelected(tab)
+        launch { viewModel.onTabSelected(tab) }
     }
 
     override fun onTabDeleted(tab: TabEntity) {
-        viewModel.onTabDeleted(tab)
+        launch { viewModel.onTabDeleted(tab) }
     }
 
     private fun closeAllTabs() {
-        viewModel.tabs.value?.forEach {
-            viewModel.onTabDeleted(it)
+        launch {
+            viewModel.tabs.value?.forEach {
+                viewModel.onTabDeleted(it)
+            }
         }
     }
 

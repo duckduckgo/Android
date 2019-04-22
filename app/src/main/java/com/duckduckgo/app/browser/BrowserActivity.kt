@@ -45,13 +45,15 @@ import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import kotlinx.android.synthetic.main.activity_browser.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.longToast
 import timber.log.Timber
 import javax.inject.Inject
 
-class BrowserActivity : DuckDuckGoActivity() {
+class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
@@ -122,7 +124,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun selectTab(tab: TabEntity?) {
-        Timber.i("Select tab: $tab")
+        Timber.v("Select tab: $tab")
 
         if (tab == null) return
 
@@ -175,14 +177,14 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         if (launchNewSearch(intent)) {
             Timber.w("new tab requested")
-            viewModel.onNewTabRequested()
+            launch { viewModel.onNewTabRequested() }
             return
         }
 
         val sharedText = intent.intentText
         if (sharedText != null) {
             Timber.w("opening in new tab requested for $sharedText")
-            viewModel.onOpenInNewTabRequested(sharedText)
+            launch { viewModel.onOpenInNewTabRequested(sharedText) }
             return
         }
     }
@@ -196,7 +198,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         })
         viewModel.tabs.observe(this, Observer {
             clearStaleTabs(it)
-            viewModel.onTabsUpdated(it)
+            launch { viewModel.onTabsUpdated(it) }
         })
     }
 
@@ -258,11 +260,11 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchNewTab() {
-        viewModel.onNewTabRequested()
+        launch { viewModel.onNewTabRequested() }
     }
 
     fun openInNewTab(query: String) {
-        viewModel.onOpenInNewTabRequested(query)
+        launch { viewModel.onOpenInNewTabRequested(query) }
     }
 
     fun launchBrokenSiteFeedback(url: String?) {

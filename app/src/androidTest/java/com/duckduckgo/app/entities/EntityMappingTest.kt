@@ -41,7 +41,7 @@ class EntityMappingTest {
     fun whenUrlContainsOneUnmatchingDomainThenNoValueIsReturned() {
         val url = "a.com"
         whenever(mockDao.get(url)).thenReturn(null)
-        val entity = testee.entityForUrl2("https://$url")
+        val entity = testee.entityForUrl("https://$url")
         assertNull(entity)
         verify(mockDao).get("a.com")
     }
@@ -50,14 +50,14 @@ class EntityMappingTest {
     fun whenUrlContainsOneMatchingDomainThenValueIsReturned() {
         val url = "a.com"
         whenever(mockDao.get(url)).thenReturn(anEntity())
-        val entity = testee.entityForUrl2("https://$url")
+        val entity = testee.entityForUrl("https://$url")
         assertNotNull(entity)
     }
 
     @Test
     fun whenUrlContainsOneMatchingDomainThenDomainIsSearchedFor() {
         val url = "a.com"
-        testee.entityForUrl2("https://$url")
+        testee.entityForUrl("https://$url")
         verify(mockDao).get("a.com")
         verify(mockDao, never()).get("com")
     }
@@ -66,7 +66,7 @@ class EntityMappingTest {
     fun whenUrlContainsOneUnmatchingSubDomainAndOneMatchingDomainThenValueIsReturned() {
         val url = "a.b.com"
         whenever(mockDao.get(url)).thenReturn(anEntity())
-        val entity = testee.entityForUrl2("https://$url")
+        val entity = testee.entityForUrl("https://$url")
         assertNotNull(entity)
         verify(mockDao).get("a.b.com")
     }
@@ -74,7 +74,7 @@ class EntityMappingTest {
     @Test
     fun whenUrlContainsOneMultipartTldThenTldIsSearchedForInDb() {
         val url = "a.co.uk"
-        testee.entityForUrl2("https://$url")
+        testee.entityForUrl("https://$url")
         verify(mockDao).get("a.co.uk")
         verify(mockDao).get("co.uk")
     }
@@ -86,7 +86,7 @@ class EntityMappingTest {
         whenever(mockDao.get("b.c.com")).thenReturn(null)
         whenever(mockDao.get("c.com")).thenReturn(null)
 
-        val entity = testee.entityForUrl2("https://$url")
+        val entity = testee.entityForUrl("https://$url")
         assertNull(entity)
         verify(mockDao).get("a.b.c.com")
         verify(mockDao).get("b.c.com")
@@ -101,7 +101,7 @@ class EntityMappingTest {
         whenever(mockDao.get("b.c.com")).thenReturn(anEntity())
         whenever(mockDao.get("c.com")).thenReturn(null)
 
-        val entity = testee.entityForUrl2("https://$url")
+        val entity = testee.entityForUrl("https://$url")
         assertNotNull(entity)
 
         verify(mockDao).get("a.b.c.com")

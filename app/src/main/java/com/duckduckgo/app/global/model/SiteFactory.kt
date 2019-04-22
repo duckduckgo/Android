@@ -16,27 +16,50 @@
 
 package com.duckduckgo.app.global.model
 
+import com.duckduckgo.app.global.performance.measureExecution
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 
 
 @Singleton
 class SiteFactory @Inject constructor(
     private val privacyPractices: PrivacyPractices,
-    private val trackerNetworks: TrackerNetworks,
+    @Named("newTrackerNetworks") private val trackerNetworks: TrackerNetworks,
     private val prevalenceStore: PrevalenceStore
 ) {
 
-    fun build(url: String, title: String? = null): Site {
-        val practices = privacyPractices.privacyPracticesFor(url)
-        val memberNetwork = trackerNetworks.network(url)
-        val site = SiteMonitor(url, practices, memberNetwork, prevalenceStore)
-        title?.let {
-            site.title = it
+//    fun build(url: String, title: String? = null): Site {
+//        return measureExecution("siteFactory.build") {
+//            val practices = measureExecution("privacyPractices") { privacyPractices.privacyPracticesFor(url) }
+//            val memberNetwork = measureExecution("trackerNetworks") { trackerNetworks.network(url) }
+//            val site = measureExecution("Build SiteMonitor") { SiteMonitor(url, practices, memberNetwork, prevalenceStore) }
+//            val site2 = measureExecution("Build SiteMonitor2") { UpdateableSiteMonitor(url) }
+//            title?.let {
+//                site.title = it
+//            }
+//            return@measureExecution site
+//        }
+//    }
+
+    fun buildSiteMonitor(url: String): SiteMonitor {
+        return measureExecution("Built site monitor for $url") {
+
+            val practices = privacyPractices.privacyPracticesFor(url)
+            val memberNetwork = trackerNetworks.network(url)
+            return@measureExecution SiteMonitor(url, practices, memberNetwork, prevalenceStore)
         }
+    }
+
+
+    fun build(url: String): Site {
+        val site = Site(url)
+
+        //site.siteMonitor = SiteMonitor(url, UNKNOWN, null, prevalenceStore)
+
         return site
     }
 

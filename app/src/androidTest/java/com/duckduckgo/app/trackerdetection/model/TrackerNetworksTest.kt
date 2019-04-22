@@ -16,13 +16,18 @@
 
 package com.duckduckgo.app.trackerdetection.model
 
+import androidx.room.Room
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.entities.EntityMapping
+import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.entities.db.EntityListEntity
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Before
 import org.junit.Test
 
 class TrackerNetworksTest {
@@ -37,11 +42,25 @@ class TrackerNetworksTest {
     }
 
     private var mockPrevalenceStore: PrevalenceStore = mock()
+    private lateinit var entityListDao: EntityListDao
 
-    private var entityMapping = EntityMapping()
+    private lateinit var entityMapping: EntityMapping
+    private lateinit var db: AppDatabase
+
 
     private val testee: TrackerNetworks by lazy {
         TrackerNetworksImpl(mockPrevalenceStore, entityMapping)
+    }
+
+    @Before
+    fun setup() {
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+
+        entityListDao = db.networkEntityDao()
+
+        entityMapping = EntityMapping(entityListDao)
     }
 
     @Test
@@ -54,7 +73,8 @@ class TrackerNetworksTest {
         testee.updateTrackers(data)
 
         val entities = listOf(EntityListEntity("tracker.com", networkName), EntityListEntity("network.com", networkName))
-        entityMapping.updateEntities(entities)
+        entityListDao.insertAll(entities)
+        //entityListDao.insertAll(entities)
 
         assertEquals(category, testee.network("http://tracker.com/script.js")?.category)
         assertEquals(otherCategory, testee.network("http://network.com/script.js")?.category)
@@ -66,7 +86,7 @@ class TrackerNetworksTest {
         val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl))
         testee.updateTrackers(data)
         val entities = listOf(EntityListEntity("tracker.com", networkName), EntityListEntity("network.com", networkName))
-        entityMapping.updateEntities(entities)
+        entityListDao.insertAll(entities)
         val expected = TrackerNetwork(networkName, category)
         assertEquals(expected, testee.network("http://tracker.com/script.js"))
     }
@@ -79,7 +99,7 @@ class TrackerNetworksTest {
         )
         testee.updateTrackers(trackers)
         val entities = listOf(EntityListEntity("tracker.com", networkName), EntityListEntity("network.com", networkName))
-        entityMapping.updateEntities(entities)
+        entityListDao.insertAll(entities)
         val expected = TrackerNetwork(networkName, category)
         assertEquals(expected, testee.network("http://www.network.com/index.html"))
     }
@@ -96,7 +116,7 @@ class TrackerNetworksTest {
         val data = listOf(DisconnectTracker("tracker.com", category, networkName, networkUrl))
         testee.updateTrackers(data)
         val entities = listOf(EntityListEntity("tracker.com", networkName), EntityListEntity("network.com", networkName))
-        entityMapping.updateEntities(entities)
+        entityListDao.insertAll(entities)
         val expected = TrackerNetwork(networkName, category)
         assertEquals(expected, testee.network("http://subdomain.tracker.com/script.js"))
     }
@@ -109,7 +129,7 @@ class TrackerNetworksTest {
         )
         testee.updateTrackers(data)
         val entities = listOf(EntityListEntity("tracker.com", networkName), EntityListEntity("network.com", networkName))
-        entityMapping.updateEntities(entities)
+        entityListDao.insertAll(entities)
         val expected = TrackerNetwork(networkName, category)
         assertEquals(expected, testee.network("http://www.subdomain.network.com/index.html"))
     }
@@ -139,9 +159,10 @@ class TrackerNetworksTest {
             EntityListEntity("tracker.com", majorNetworkName),
             EntityListEntity("network.com", majorNetworkName)
         )
-        entityMapping.updateEntities(entities)
+        entityListDao.insertAll(entities)
 
         val expected = TrackerNetwork(majorNetworkName, category, true)
         assertEquals(expected, testee.network("http://tracker.com/script.js"))
     }
+
 }

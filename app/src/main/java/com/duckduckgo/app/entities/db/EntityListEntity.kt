@@ -22,4 +22,7 @@ import androidx.room.PrimaryKey
 @Entity(
     tableName = "entity_list"
 )
-data class EntityListEntity(@PrimaryKey val domainName: String, val entityName: String)
+data class EntityListEntity(
+    @PrimaryKey val domainName: String,
+    val entityName: String
+)

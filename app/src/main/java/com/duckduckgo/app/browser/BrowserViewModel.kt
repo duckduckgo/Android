@@ -120,15 +120,15 @@ class BrowserViewModel(
     }
 
 
-    fun onNewTabRequested(isDefaultTab: Boolean = false) {
+    suspend fun onNewTabRequested(isDefaultTab: Boolean = false) {
         tabRepository.add(isDefaultTab = isDefaultTab)
     }
 
-    fun onOpenInNewTabRequested(query: String) {
+    suspend fun onOpenInNewTabRequested(query: String) {
         tabRepository.add(queryUrlConverter.convertQueryToUrl(query), isDefaultTab = false)
     }
 
-    fun onTabsUpdated(tabs: List<TabEntity>?) {
+    suspend fun onTabsUpdated(tabs: List<TabEntity>?) {
         if (tabs == null || tabs.isEmpty()) {
             Timber.i("Tabs list is null or empty; adding default tab")
             tabRepository.add(isDefaultTab = true)
@@ -188,7 +188,7 @@ class BrowserViewModel(
     }
 
     override fun onUserCancelledAppEnjoymentDialog(promptCount: PromptCount) {
-        launch { appEnjoymentUserEventRecorder.onUserDeclinedToSayIfEnjoyingApp(promptCount)}
+        launch { appEnjoymentUserEventRecorder.onUserDeclinedToSayIfEnjoyingApp(promptCount) }
     }
 
     override fun onUserCancelledRateAppDialog(promptCount: PromptCount) {

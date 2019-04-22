@@ -23,7 +23,7 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 
-interface Site {
+interface SiteDetails {
 
     val url: String
     val privacyPractices: PrivacyPractices.Practices
@@ -43,4 +43,8 @@ interface Site {
     val grade: PrivacyGrade
     val improvedGrade: PrivacyGrade
 
+}
+
+class Site(val url: String) {
+    var siteMonitor: SiteMonitor? = null
 }

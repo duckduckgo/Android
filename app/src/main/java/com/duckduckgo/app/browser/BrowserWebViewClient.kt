@@ -28,6 +28,7 @@ import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.global.isHttps
+import com.duckduckgo.app.global.performance.measureExecution
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.HTTPS_UPGRADE_SITE_ERROR
@@ -35,13 +36,13 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.APP_VERSION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.ERROR_CODE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.URL
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.net.URI
-import javax.inject.Inject
 import kotlin.concurrent.thread
 
 
-class BrowserWebViewClient @Inject constructor(
+class BrowserWebViewClient(
     private val requestRewriter: RequestRewriter,
     private val specialUrlDetector: SpecialUrlDetector,
     private val requestInterceptor: RequestInterceptor,
@@ -108,39 +109,114 @@ class BrowserWebViewClient @Inject constructor(
         webViewClientListener?.externalAppLinkClicked(urlType)
     }
 
+    @UiThread
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
-        Timber.d("\nonPageStarted {\nurl: $url\nwebView.url: ${webView.url}\n}\n")
-        currentUrl = url
 
-        webViewClientListener?.let {
-            it.loadingStarted(url)
-            it.navigationOptionsChanged(determineNavigationOptions(webView))
-        }
+        measureExecution("onPageStarted") {
 
-        val uri = if (currentUrl != null) Uri.parse(currentUrl) else null
-        if (uri != null) {
-            reportHttpsIfInUpgradeList(uri)
+            currentUrl = url
+
+            webViewClientListener?.let {
+                it.loadingStarted(url)
+                it.navigationOptionsChanged(determineNavigationOptions(webView))
+            }
+
+            val uri = if (currentUrl != null) Uri.parse(currentUrl) else null
+            if (uri != null) {
+                reportHttpsIfInUpgradeList(uri)
+            }
         }
     }
 
+    @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
-        Timber.d("onPageFinished $url")
-
-        currentUrl = url
-        webViewClientListener?.let {
-            it.loadingFinished(url)
-            it.navigationOptionsChanged(determineNavigationOptions(webView))
+        measureExecution("onPageFinished") {
+            currentUrl = url
+            webViewClientListener?.let {
+                it.loadingFinished(url)
+                it.navigationOptionsChanged(determineNavigationOptions(webView))
+            }
         }
     }
+
+//    suspend fun onPageFinishedAsync(webView: WebView, url: String?) {
+//        measureExecution("onPageFinished") {
+//            currentUrl = url
+//            webViewClientListener?.let {
+//                it.loadingFinished(url)
+//                it.navigationOptionsChanged(determineNavigationOptions(webView))
+//            }
+//        }
+//    }
+
+
+//    @Deprecated(DEPRECATED_METHOD_SUGGESTION, ReplaceWith("onPageStartedAsync(webView, url)"))
+//    @UiThread
+//    override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
+//
+//        //launch(coroutineContext) {
+//        //onPageStartedAsync(webView, url)
+//
+//        //  delay(2000)
+//
+//        measureExecution("onPageStarted") {
+//
+//            currentUrl = url
+//
+//            webViewClientListener?.let {
+//                it.loadingStarted(url)
+//                it.navigationOptionsChanged(determineNavigationOptions(webView))
+//            }
+//
+//            val uri = if (currentUrl != null) Uri.parse(currentUrl) else null
+//            if (uri != null) {
+//                reportHttpsIfInUpgradeList(uri)
+//            }
+//            //}
+//        }
+//    }
+
+//    suspend fun onPageStartedAsync(webView: WebView, url: String?) {
+//        measureExecution("onPageStarted") {
+//
+//            currentUrl = url
+//
+//            webViewClientListener?.let {
+//                it.loadingStarted(url)
+//                it.navigationOptionsChanged(determineNavigationOptions(webView))
+//            }
+//
+//            val uri = if (currentUrl != null) Uri.parse(currentUrl) else null
+//            if (uri != null) {
+//                reportHttpsIfInUpgradeList(uri)
+//            }
+//        }
+//    }
+
+//    @Deprecated(DEPRECATED_METHOD_SUGGESTION, ReplaceWith("onPageFinishedAsync(webView, url)"))
+//    @UiThread
+//    override fun onPageFinished(webView: WebView, url: String?) {
+//        launch(Dispatchers.Main) { onPageFinishedAsync(webView, url) }
+//    }
+//
+//    suspend fun onPageFinishedAsync(webView: WebView, url: String?) {
+//        measureExecution("onPageFinished") {
+//            currentUrl = url
+//            webViewClientListener?.let {
+//                it.loadingFinished(url)
+//                it.navigationOptionsChanged(determineNavigationOptions(webView))
+//            }
+//        }
+//    }
 
     @WorkerThread
     override fun shouldInterceptRequest(webView: WebView, request: WebResourceRequest): WebResourceResponse? {
         Timber.v("Intercepting resource ${request.url} on page $currentUrl")
-        return requestInterceptor.shouldIntercept(request, webView, currentUrl, webViewClientListener)
+        return runBlocking { requestInterceptor.shouldIntercept(request, webView, currentUrl, webViewClientListener) }
     }
 
     @UiThread
-    @Suppress("OverridingDeprecatedMember")
+    @Suppress("OverridingDeprecatedMember", "DEPRECATION")
     override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             val url = failingUrl.toUri()
@@ -276,4 +352,8 @@ class BrowserWebViewClient @Inject constructor(
 
     data class BrowserNavigationOptions(val canGoBack: Boolean, val canGoForward: Boolean)
 
+
+    companion object {
+        private const val DEPRECATED_METHOD_SUGGESTION = "This is a required callback, but anywhere we can, we should use suspendable version instead"
+    }
 }

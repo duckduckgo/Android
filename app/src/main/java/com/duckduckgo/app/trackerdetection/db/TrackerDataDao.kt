@@ -35,6 +35,10 @@ abstract class TrackerDataDao {
     @Query("select * from disconnect_tracker")
     abstract fun getAll(): List<DisconnectTracker>
 
+    @Query("select * from disconnect_tracker where url = :url")
+    abstract fun get(url: String): DisconnectTracker?
+
+
     @Query("select count(*) from disconnect_tracker")
     abstract fun count(): Int
 

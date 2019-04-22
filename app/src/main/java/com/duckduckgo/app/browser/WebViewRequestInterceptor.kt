@@ -32,7 +32,7 @@ import timber.log.Timber
 interface RequestInterceptor {
 
     @WorkerThread
-    fun shouldIntercept(
+    suspend fun shouldIntercept(
         request: WebResourceRequest,
         webView: WebView,
         currentUrl: String?,
@@ -58,7 +58,7 @@ class WebViewRequestInterceptor(
      * caution when accessing private data or the view system.
      */
     @WorkerThread
-    override fun shouldIntercept(
+    override suspend fun shouldIntercept(
         request: WebResourceRequest,
         webView: WebView,
         currentUrl: String?,
@@ -102,7 +102,7 @@ class WebViewRequestInterceptor(
     private fun shouldUpgrade(request: WebResourceRequest) =
         request.isForMainFrame && request.url != null && httpsUpgrader.shouldUpgrade(request.url)
 
-    private fun shouldBlock(request: WebResourceRequest, documentUrl: String?, webViewClientListener: WebViewClientListener?): Boolean {
+    private suspend fun shouldBlock(request: WebResourceRequest, documentUrl: String?, webViewClientListener: WebViewClientListener?): Boolean {
         val url = request.url.toString()
 
         if (request.isForMainFrame || documentUrl == null) {

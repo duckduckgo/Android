@@ -22,13 +22,14 @@ import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Named
 
 @WorkerThread
 class TrackerDataLoader @Inject constructor(
     private val trackerDetector: TrackerDetector,
     private val binaryDataStore: BinaryDataStore,
     private val trackerDataDao: TrackerDataDao,
-    private val networkTrackers: TrackerNetworks
+    @Named("oldTrackerNetworks") private val networkTrackers: TrackerNetworks
 ) {
 
     fun loadData() {

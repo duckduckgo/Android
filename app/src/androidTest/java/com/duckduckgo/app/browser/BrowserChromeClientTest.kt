@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("RemoveExplicitTypeArguments")
+
 package com.duckduckgo.app.browser
 
 import android.content.Context
@@ -26,6 +28,7 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 
@@ -76,37 +79,37 @@ class BrowserChromeClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnProgressChangedCalledThenListenerInstructedToUpdateProgress() {
-        testee.onProgressChanged(webView, 10)
+    fun whenOnProgressChangedCalledThenListenerInstructedToUpdateProgress() = runBlocking<Unit> {
+        testee.onProgressChangedAsync(webView, 10)
         verify(mockWebViewClientListener).progressChanged(webView.stubUrl, 10)
     }
 
     @UiThreadTest
     @Test
-    fun whenOnProgressChangedCalledButNoUrlChangeThenListenerInstructedToUpdateProgressASecondTime() {
+    fun whenOnProgressChangedCalledButNoUrlChangeThenListenerInstructedToUpdateProgressASecondTime() = runBlocking<Unit> {
         webView.stubUrl = "foo.com"
-        testee.onProgressChanged(webView, 10)
-        testee.onProgressChanged(webView, 20)
+        testee.onProgressChangedAsync(webView, 10)
+        testee.onProgressChangedAsync(webView, 20)
         verify(mockWebViewClientListener, times(2)).progressChanged(any(), any())
     }
 
     @UiThreadTest
     @Test
-    fun whenOnProgressChangedCalledAfterUrlChangeThenListenerInstructedToUpdateProgressAgain() {
+    fun whenOnProgressChangedCalledAfterUrlChangeThenListenerInstructedToUpdateProgressAgain() = runBlocking<Unit> {
         webView.stubUrl = "foo.com"
-        testee.onProgressChanged(webView, 10)
-        testee.onProgressChanged(webView, 20)
+        testee.onProgressChangedAsync(webView, 10)
+        testee.onProgressChangedAsync(webView, 20)
         webView.stubUrl = "bar.com"
-        testee.onProgressChanged(webView, 30)
+        testee.onProgressChangedAsync(webView, 30)
         verify(mockWebViewClientListener, times(3)).progressChanged(any(), any())
     }
 
     @UiThreadTest
     @Test
-    fun whenOnProgressChangedCalledThenPassedOnToWebClient() {
+    fun whenOnProgressChangedCalledThenPassedOnToWebClient() = runBlocking<Unit> {
         val url = "https://example.com"
         webView.stubUrl = url
-        testee.onProgressChanged(webView, 10)
+        testee.onProgressChangedAsync(webView, 10)
         verify(mockWebViewClientListener).progressChanged(url, 10)
     }
 

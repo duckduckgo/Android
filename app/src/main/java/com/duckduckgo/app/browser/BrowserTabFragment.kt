@@ -76,6 +76,7 @@ import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.CtaConfiguration
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.performance.measureExecution
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
@@ -94,6 +95,8 @@ import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
@@ -102,7 +105,7 @@ import javax.inject.Inject
 import kotlin.concurrent.thread
 
 
-class BrowserTabFragment : Fragment(), FindListener {
+class BrowserTabFragment : Fragment(), FindListener, CoroutineScope by MainScope() {
 
     @Inject
     lateinit var webViewClient: BrowserWebViewClient
@@ -525,6 +528,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
 
         viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
+            Timber.i("Observed grade: $it")
             it?.let {
                 val drawable = context?.getDrawable(it.icon()) ?: return@let
                 privacyGradeButton?.setImageDrawable(drawable)
@@ -996,20 +1000,23 @@ class BrowserTabFragment : Fragment(), FindListener {
             renderIfChanged(viewState, lastSeenBrowserViewState) {
                 lastSeenBrowserViewState = viewState
 
-                val browserShowing = viewState.browserShowing
-                if (browserShowing) {
-                    webView?.show()
-                    omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
-                } else {
-                    logoHidingLayoutChangeListener.callToActionView = ctaContainer
-                    webView?.hide()
-                    omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
-                }
+                measureExecution("renderBrowserViewState") {
 
-                toggleDesktopSiteMode(viewState.isDesktopBrowsingMode)
-                renderToolbarMenus(viewState)
-                renderPopupMenus(browserShowing, viewState)
-                renderFullscreenMode(viewState)
+                    val browserShowing = viewState.browserShowing
+                    if (browserShowing) {
+                        webView?.show()
+                        omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
+                    } else {
+                        logoHidingLayoutChangeListener.callToActionView = ctaContainer
+                        webView?.hide()
+                        omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
+                    }
+
+                    toggleDesktopSiteMode(viewState.isDesktopBrowsingMode)
+                    renderToolbarMenus(viewState)
+                    renderPopupMenus(browserShowing, viewState)
+                    renderFullscreenMode(viewState)
+                }
             }
         }
 
@@ -1054,13 +1061,16 @@ class BrowserTabFragment : Fragment(), FindListener {
 
             lastSeenFindInPageViewState = viewState
 
-            if (viewState.visible) {
-                showFindInPageView(viewState)
-            } else {
-                hideFindInPage()
-            }
+            measureExecution("renderFindInPageState") {
 
-            popupMenu.contentView.findInPageMenuItem?.isEnabled = viewState.canFindInPage
+                if (viewState.visible) {
+                    showFindInPageView(viewState)
+                } else {
+                    hideFindInPage()
+                }
+
+                popupMenu.contentView.findInPageMenuItem?.isEnabled = viewState.canFindInPage
+            }
         }
 
         fun renderTabIcon(tabs: List<TabEntity>) {

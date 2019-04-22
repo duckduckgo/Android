@@ -19,6 +19,7 @@ package com.duckduckgo.app.privacy.ui
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.model.SiteMonitor
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
@@ -50,10 +51,11 @@ class ScorecardViewModel(private val settingsStore: PrivacySettingsStore) : View
 
     fun onSiteChanged(site: Site?) {
         this.site = site
-        if (site == null) {
+        val siteMonitor = site?.siteMonitor
+        if (site == null || siteMonitor == null) {
             resetViewState()
         } else {
-            updateSite(site)
+            updateSite(siteMonitor)
         }
     }
 
@@ -73,7 +75,7 @@ class ScorecardViewModel(private val settingsStore: PrivacySettingsStore) : View
         )
     }
 
-    private fun updateSite(site: Site) {
+    private fun updateSite(site: SiteMonitor) {
         viewState.value = viewState.value?.copy(
             domain = site.uri?.host ?: "",
             beforeGrade = site.grade,

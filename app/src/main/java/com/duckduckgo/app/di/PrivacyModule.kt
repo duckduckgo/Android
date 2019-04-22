@@ -18,7 +18,6 @@ package com.duckduckgo.app.di
 
 import android.content.Context
 import com.duckduckgo.app.browser.WebDataManager
-import com.duckduckgo.app.entities.EntityMapping
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
@@ -36,8 +35,7 @@ class PrivacyModule {
 
     @Provides
     @Singleton
-    fun privacyPractices(termsOfServiceStore: TermsOfServiceStore, entityMapping: EntityMapping): PrivacyPractices =
-        PrivacyPracticesImpl(termsOfServiceStore, entityMapping)
+    fun privacyPractices(termsOfServiceStore: TermsOfServiceStore): PrivacyPractices = PrivacyPracticesImpl(termsOfServiceStore)
 
     @Provides
     fun clearDataAction(

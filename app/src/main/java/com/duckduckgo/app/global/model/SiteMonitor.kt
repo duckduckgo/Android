@@ -33,7 +33,7 @@ class SiteMonitor(
     override val privacyPractices: PrivacyPractices.Practices,
     override val memberNetwork: TrackerNetwork? = null,
     val prevalenceStore: PrevalenceStore
-) : Site {
+) : SiteDetails {
 
     private val gradeCalculator = Grade()
 

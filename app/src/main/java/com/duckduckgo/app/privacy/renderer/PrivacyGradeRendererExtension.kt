@@ -21,7 +21,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 
 @DrawableRes
-fun PrivacyGrade.icon(): Int {
+fun PrivacyGrade?.icon(): Int {
     return when (this) {
         PrivacyGrade.A -> R.drawable.privacygrade_icon_a
         PrivacyGrade.B_PLUS -> R.drawable.privacygrade_icon_b_plus
@@ -30,6 +30,7 @@ fun PrivacyGrade.icon(): Int {
         PrivacyGrade.C -> R.drawable.privacygrade_icon_c
         PrivacyGrade.D -> R.drawable.privacygrade_icon_d
         PrivacyGrade.UNKNOWN -> R.drawable.privacygrade_icon_unknown
+        else -> R.drawable.privacygrade_icon_unknown
     }
 }
 
