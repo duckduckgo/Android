@@ -17,12 +17,12 @@
 package com.duckduckgo.app.di
 
 import com.duckduckgo.app.entities.api.EntityListDownloader
-import com.duckduckgo.app.survey.api.SurveyDownloader
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeDataDownloader
 import com.duckduckgo.app.job.AppConfigurationDownloader
 import com.duckduckgo.app.job.ConfigurationDownloader
 import com.duckduckgo.app.surrogates.api.ResourceSurrogateListDownloader
+import com.duckduckgo.app.survey.api.SurveyDownloader
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import dagger.Module
 import dagger.Provides

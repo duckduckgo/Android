@@ -64,7 +64,7 @@ fun Uri.toDesktopUri(): Uri {
     return Uri.parse(newUrl)
 }
 
-private const val faviconBaseUrlFormat = "https://icons.duckduckgo.com/ip3/%s.ico"
+private const val faviconBaseUrlFormat = "https://proxy.duckduckgo.com/ip3/%s.ico"
 
 fun Uri?.faviconLocation(): Uri? {
     val host = this?.host

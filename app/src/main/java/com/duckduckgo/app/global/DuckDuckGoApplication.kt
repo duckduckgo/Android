@@ -40,12 +40,13 @@ import com.duckduckgo.app.global.rating.AppEnjoymentLifecycleObserver
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.AppConfigurationSyncer
-import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.notification.NotificationRegistrar
+import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_LAUNCH
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.usage.app.AppDaysUsedRecorder
@@ -56,6 +57,8 @@ import dagger.android.HasActivityInjector
 import dagger.android.HasServiceInjector
 import dagger.android.support.HasSupportFragmentInjector
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import timber.log.Timber
 import javax.inject.Inject
@@ -83,6 +86,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     @Inject
     lateinit var statisticsUpdater: StatisticsUpdater
+
+    @Inject
+    lateinit var statisticsDataStore: StatisticsDataStore
 
     @Inject
     lateinit var appInstallStore: AppInstallStore
@@ -150,7 +156,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         }
 
         recordInstallationTimestamp()
-        initializeStatistics()
         initializeTheme(settingsDataStore)
         loadTrackerData()
         configureDataDownloader()
@@ -209,10 +214,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         daggerAppComponent.inject(this)
     }
 
-    private fun initializeStatistics() {
-        statisticsUpdater.initializeAtb()
-    }
-
     private fun initializeHttpsUpgrader() {
         thread { httpsUpgrader.reloadData() }
     }
@@ -267,8 +268,13 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onAppResumed() {
         notificationRegistrar.updateStatus()
-        notificationScheduler.scheduleNextNotification()
-        statisticsUpdater.refreshAppRetentionAtb()
+        GlobalScope.launch { notificationScheduler.scheduleNextNotification() }
+
+        if (statisticsDataStore.hasInstallationStatistics) {
+            statisticsUpdater.refreshAppRetentionAtb()
+        } else {
+            statisticsUpdater.initializeAtb()
+        }
     }
 
     companion object {

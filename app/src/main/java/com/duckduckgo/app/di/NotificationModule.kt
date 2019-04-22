@@ -23,6 +23,9 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.notification.model.ClearDataNotification
+import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
+import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import dagger.Module
@@ -51,13 +54,35 @@ class NotificationModule {
     }
 
     @Provides
+    fun provideClearDataNotification(
+        context: Context,
+        notificationDao: NotificationDao,
+        settingsDataStore: SettingsDataStore
+    ): ClearDataNotification {
+        return ClearDataNotification(context, notificationDao, settingsDataStore)
+    }
+
+    @Provides
+    fun providePrivacyProtectionNotification(
+        context: Context,
+        notificationDao: NotificationDao,
+        privacyProtectionCountDao: PrivacyProtectionCountDao
+    ): PrivacyProtectionNotification {
+        return PrivacyProtectionNotification(context, notificationDao, privacyProtectionCountDao)
+    }
+
+    @Provides
     @Singleton
     fun providesNotificationScheduler(
-        notificationDao: NotificationDao,
-        notificationManager: NotificationManagerCompat,
-        settingsDataStore: SettingsDataStore
+        variantManager: VariantManager,
+        clearDataNotification: ClearDataNotification,
+        privacyProtectionNotification: PrivacyProtectionNotification
     ): NotificationScheduler {
-        return NotificationScheduler(notificationDao, notificationManager, settingsDataStore)
+        return NotificationScheduler(
+            variantManager,
+            clearDataNotification,
+            privacyProtectionNotification
+        )
     }
 
     @Provides

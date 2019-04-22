@@ -74,11 +74,12 @@ interface Pixel {
         ADD_WIDGET_INSTRUCTIONS_ADDED(pixelName = "maw_ia"),
         ADD_WIDGET_INSTRUCTIONS_DELETED(pixelName = "maw_id"),
 
-        NOTIFICATIONS_ENABLED("mnot_e"),
-        NOTIFICATIONS_DISABLED("mnot_d"),
-        NOTIFICATIONS_SHOWN("mnot_s"),
+        NOTIFICATION_SHOWN("mnot_s"),
         NOTIFICATION_LAUNCHED("mnot_l"),
         NOTIFICATION_CANCELLED("mnot_c"),
+
+        NOTIFICATIONS_ENABLED("mnot_e"),
+        NOTIFICATIONS_DISABLED("mnot_d"),
 
         AUTOMATIC_CLEAR_DATA_WHAT_SHOWN("macwhat_s"),
         AUTOMATIC_CLEAR_DATA_WHAT_OPTION_NONE("macwhat_n"),

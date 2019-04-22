@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
+
+@file:Suppress("RemoveExplicitTypeArguments")
+
 package com.duckduckgo.app.notification
 
-import androidx.core.app.NotificationManagerCompat
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.duckduckgo.app.notification.db.NotificationDao
-import com.duckduckgo.app.settings.clear.ClearWhatOption
-import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.notification.model.SchedulableNotification
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -35,48 +35,34 @@ import org.junit.Test
 
 class NotificationSchedulerTest {
 
-    private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val notifcationManagerCompat = NotificationManagerCompat.from(context)
-    private val testScope = CoroutineScope(Dispatchers.Unconfined)
-
-    private val mockNotificationsDao: NotificationDao = mock()
-    private val mockSettingsDataStore: SettingsDataStore = mock()
+    private val variantManager: VariantManager = mock()
+    private val clearNotification: SchedulableNotification = mock()
+    private val privacyNotification: SchedulableNotification = mock()
 
     private lateinit var testee: NotificationScheduler
 
     @Before
     fun before() {
+        whenever(variantManager.getVariant(any())).thenReturn(DEFAULT_VARIANT)
         testee = NotificationScheduler(
-            mockNotificationsDao,
-            notifcationManagerCompat,
-            mockSettingsDataStore
+            variantManager,
+            clearNotification,
+            privacyNotification
         )
     }
 
     @Test
-    fun whenNotificationtNotSeenAndOptionNotSetThenNotificationScheduled() {
-        setup(false, ClearWhatOption.CLEAR_NONE)
-        testee.scheduleNextNotification(testScope)
+    fun whenClearNotificationCanShowThenNotificationScheduled() = runBlocking<Unit> {
+        whenever(clearNotification.canShow()).thenReturn(true)
+        testee.scheduleNextNotification()
         assertTrue(notificationScheduled())
     }
 
     @Test
-    fun whenNotificationNotSeenAndClearOptionsAlreadySetThenNotificationNotScheduled() {
-        setup(false, ClearWhatOption.CLEAR_TABS_ONLY)
-        testee.scheduleNextNotification(testScope)
+    fun whenClearNotificationCannotShowThenNotificationNotScheduled() = runBlocking<Unit> {
+        whenever(clearNotification.canShow()).thenReturn(false)
+        testee.scheduleNextNotification()
         assertFalse(notificationScheduled())
-    }
-
-    @Test
-    fun whenNotificationAlreadySeenAndOptionNotSetThenNotificationNotScheduled() {
-        setup(true, ClearWhatOption.CLEAR_NONE)
-        testee.scheduleNextNotification(testScope)
-        assertFalse(notificationScheduled())
-    }
-
-    private fun setup(notificationSeen: Boolean, clearWhatOption: ClearWhatOption) {
-        whenever(mockNotificationsDao.exists(any())).thenReturn(notificationSeen)
-        whenever(mockSettingsDataStore.automaticallyClearWhatOption).thenReturn(clearWhatOption)
     }
 
     private fun notificationScheduled(): Boolean {
