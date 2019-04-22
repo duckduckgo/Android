@@ -340,13 +340,16 @@ class BrowserActivity : DuckDuckGoActivity() {
                 return
             }
 
-            if (!processedOriginalIntent && instanceStateBundles?.originalInstanceState == null) {
+            if (!processedOriginalIntent && instanceStateBundles?.originalInstanceState == null && !intent.launchedFromRecents) {
                 Timber.i("Original instance state is null, so will inspect intent for actions to take. $intent")
                 launchNewSearchOrQuery(intent)
                 processedOriginalIntent = true
             }
         }
     }
+
+    private val Intent.launchedFromRecents: Boolean
+        get() = (flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) == Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY
 
     private fun showAppEnjoymentPrompt(prompt: DialogFragment) {
         currentAppEnjoymentFragment?.dismiss()
