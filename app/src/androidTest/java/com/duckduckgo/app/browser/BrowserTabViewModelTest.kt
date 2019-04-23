@@ -257,6 +257,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewBecomesVisibleWithoutActiveSiteThenKeyboardShown() {
+        changeUrl(null)
         testee.onViewVisible()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
@@ -530,7 +531,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowserShowingAndViewModelGetsProgressUpdateThenViewStateIsUpdated() {
+    fun whenBrowsingAndViewModelGetsProgressUpdateThenViewStateIsUpdated() {
         isBrowsing(true)
 
         testee.progressChanged("", 0)
@@ -541,6 +542,14 @@ class BrowserTabViewModelTest {
 
         testee.progressChanged("", 100)
         assertEquals(100, loadingViewState().progress)
+    }
+
+
+    @Test
+    fun whenNotBrowserAndViewModelGetsProgressUpdateThenViewStateIsNotUpdated() {
+        isBrowsing(false)
+        testee.progressChanged("", 10)
+        assertEquals(0, loadingViewState().progress)
     }
 
     @Test
@@ -854,7 +863,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenHomeShowingThenBackButtonInactiveIrrespectiveOfWhetherBrowserCanGoBack() {
+    fun whenHomeShowingThenBackButtonInactiveEvenIfBrowserCanGoBack() {
         setupNavigation(isBrowsing = false, canGoBack = false)
         assertFalse(browserViewState().canGoBack)
 
@@ -896,11 +905,9 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserBrowsingPressesBackAndBrowserCanGoBackThenNavigatesBackStepsToPreviousPageAndHandledTrue() {
+    fun whenUserBrowsingPressesBackAndBrowserCanGoBackThenNavigatesToPreviousPageAndHandledTrue() {
         setupNavigation(isBrowsing = true, canGoBack = true, stepsToPreviousPage = 2)
-
-        val handled = testee.onUserPressedBack()
-        assertTrue(handled)
+        assertTrue(testee.onUserPressedBack())
 
         val backCommand = captureCommands().lastValue as Command.NavigateBack
         assertNotNull(backCommand)
@@ -910,9 +917,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserBrowsingPressesBackAndBrowserCannotGoBackAndHomeNotSkippedThenHomeShownAndHandledTrue() {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
-
-        val handled = testee.onUserPressedBack()
-        assertTrue(handled)
+        assertTrue(testee.onUserPressedBack())
         assertFalse(browserViewState().browserShowing)
         assertEquals("", omnibarViewState().omnibarText)
     }
@@ -920,16 +925,13 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserBrowsingPressesBackAndBrowserCannotGoBackAndHomeIsSkippedThenHandledFalse() {
         setupNavigation(skipHome = true, isBrowsing = false, canGoBack = false)
-
-        val handled = testee.onUserPressedBack()
-        assertFalse(handled)
+        assertFalse(testee.onUserPressedBack())
     }
 
     @Test
     fun whenUserOnHomePressesBackThenReturnsHandledFalse() {
         isBrowsing(false)
-        val handled = testee.onUserPressedBack()
-        assertFalse(handled)
+        assertFalse(testee.onUserPressedBack())
     }
 
     @Test
