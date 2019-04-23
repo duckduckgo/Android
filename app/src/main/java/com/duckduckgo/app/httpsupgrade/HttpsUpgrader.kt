@@ -18,7 +18,6 @@ package com.duckduckgo.app.httpsupgrade
 
 import android.net.Uri
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.global.UrlScheme
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.global.toHttps
 import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory

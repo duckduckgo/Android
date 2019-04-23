@@ -526,7 +526,7 @@ class BrowserTabViewModel(
     }
 
     override fun showFileChooser(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams) {
-        command.value = Command.ShowFileChooser(filePathCallback, fileChooserParams)
+        command.value = ShowFileChooser(filePathCallback, fileChooserParams)
     }
 
     private fun currentAutoCompleteViewState(): AutoCompleteViewState = autoCompleteViewState.value!!
