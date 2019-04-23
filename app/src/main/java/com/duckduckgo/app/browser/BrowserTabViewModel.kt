@@ -318,10 +318,16 @@ class BrowserTabViewModel(
         }
     }
 
+    /**
+     * Handles back navigation. Returns false if navigation could not be
+     * handled at this level, giving system an opportunity to handle it
+     *
+     * @return true if navigation handled, otherwise false
+     */
     fun onUserPressedBack(): Boolean {
-        val navigation = navigationOptions
+        val navigation = navigationOptions ?: return false
 
-        if (!currentBrowserViewState().browserShowing || navigation == null) {
+        if (!currentBrowserViewState().browserShowing) {
             return false
         }
 
@@ -341,13 +347,13 @@ class BrowserTabViewModel(
         site = null
         onSiteChanged()
 
-        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = "")
-        loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
         browserViewState.value = currentBrowserViewState().copy(
             browserShowing = false,
             canGoBack = false,
             canGoForward = true
         )
+        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = "")
+        loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
     }
 
     override fun progressChanged(progressedUrl: String?, newProgress: Int) {
@@ -393,7 +399,7 @@ class BrowserTabViewModel(
         if (!currentBrowserViewState().browserShowing) return
 
         browserViewState.value = currentBrowserViewState().copy(
-            canGoBack = true,
+            canGoBack = navigation.canGoBack || !skipHome,
             canGoForward = navigation.canGoForward
         )
     }

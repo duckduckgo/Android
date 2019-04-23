@@ -115,7 +115,7 @@ class BrowserWebViewClient @Inject constructor(
 
         webViewClientListener?.let {
             it.loadingStarted(url)
-            it.navigationOptionsChanged(BrowserNavigationOptions(webView.copyBackForwardList()))
+            it.navigationOptionsChanged(WebViewNavigationOptions(webView.copyBackForwardList()))
         }
 
         val uri = if (currentUrl != null) Uri.parse(currentUrl) else null
@@ -130,7 +130,7 @@ class BrowserWebViewClient @Inject constructor(
         currentUrl = url
         webViewClientListener?.let {
             it.loadingFinished(url)
-            it.navigationOptionsChanged(BrowserNavigationOptions(webView.copyBackForwardList()))
+            it.navigationOptionsChanged(WebViewNavigationOptions(webView.copyBackForwardList()))
         }
     }
 
@@ -269,12 +269,19 @@ class BrowserWebViewClient @Inject constructor(
         return true
     }
 
-    data class BrowserNavigationOptions(val stack: WebBackForwardList) {
+    interface BrowserNavigationOptions {
+        val stepsToPreviousPage: Int
+        val canGoBack: Boolean
+        val canGoForward: Boolean
+        val hasNavigationHistory: Boolean
+    }
 
-        val stepsToPreviousPage: Int = if (stack.isHttpsUpgrade) 2 else 1
-        val canGoBack: Boolean = stack.currentIndex >= stepsToPreviousPage
-        val canGoForward: Boolean = stack.currentIndex + 1 < stack.size
-        val hasNavigationHistory = stack.size != 0
+    data class WebViewNavigationOptions(val stack: WebBackForwardList): BrowserNavigationOptions {
+
+        override val stepsToPreviousPage: Int = if (stack.isHttpsUpgrade) 2 else 1
+        override val canGoBack: Boolean = stack.currentIndex >= stepsToPreviousPage
+        override val canGoForward: Boolean = stack.currentIndex + 1 < stack.size
+        override val hasNavigationHistory = stack.size != 0
 
         private val WebBackForwardList.isHttpsUpgrade: Boolean
             get() {

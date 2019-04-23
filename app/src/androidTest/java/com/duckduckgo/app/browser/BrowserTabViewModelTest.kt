@@ -206,7 +206,6 @@ class BrowserTabViewModelTest {
         testee.command.observeForever(mockCommandObserver)
 
         whenever(mockOmnibarConverter.convertQueryToUrl(any())).thenReturn("duckduckgo.com")
-
     }
 
     @After
@@ -787,6 +786,111 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenHomeShowingAndNeverBrowsedThenForwardButtonInactive() {
+        setupNavigation(isBrowsing = false)
+        assertFalse(browserViewState().canGoForward)
+    }
+
+    @Test
+    fun whenHomeShowingByPressingBackOnBrowserThenForwardButtonActive() {
+        setupNavigation(isBrowsing = true)
+        testee.onUserPressedBack()
+        assertFalse(browserViewState().browserShowing)
+        assertTrue(browserViewState().canGoForward)
+    }
+
+    @Test
+    fun whenBrowserShowingAndCanGoForwardThenForwardButtonActive() {
+        setupNavigation(isBrowsing = true, canGoForward = true)
+        assertTrue(browserViewState().canGoForward)
+    }
+
+    @Test
+    fun whenBrowserShowingAndCannotGoForwardThenForwardButtonInactive() {
+        setupNavigation(isBrowsing = true, canGoForward = false)
+        assertFalse(browserViewState().canGoForward)
+    }
+
+    @Test
+    fun whenHomeShowingThenBackButtonInactiveIrrespectiveOfWhetherBrowserCanGoBack() {
+        setupNavigation(isBrowsing = false, canGoBack = false)
+        assertFalse(browserViewState().canGoBack)
+
+        setupNavigation(isBrowsing = false, canGoBack = true)
+        assertFalse(browserViewState().canGoBack)
+    }
+
+    @Test
+    fun whenBrowserShowingAndCanGoBackThenBackButtonActive() {
+        setupNavigation(isBrowsing = true, canGoBack = true)
+        assertTrue(browserViewState().canGoBack)
+    }
+
+    @Test
+    fun whenBrowserShowingAndCannotGoBackAndSkipHomeThenBackButtonInactive() {
+        setupNavigation(skipHome = true, isBrowsing = true, canGoBack = false)
+        assertFalse(browserViewState().canGoBack)
+    }
+
+    @Test
+    fun whenBrowserShowingAndCannotGoBackAndNotSkipHomeThenBackButtonActive() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(browserViewState().canGoBack)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesForwardThenNavigatesForward() {
+        isBrowsing(true)
+        testee.onUserPressedForward()
+        assertTrue(captureCommands().lastValue == Command.NavigateForward)
+    }
+
+    @Test
+    fun whenUserOnHomePressesForwardThenBrowserShownAndPageRefreshed() {
+        isBrowsing(false)
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().browserShowing)
+        assertTrue(captureCommands().lastValue == Command.Refresh)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndBrowserCanGoBackThenNavigatesBackStepsToPreviousPageAndHandledTrue() {
+        setupNavigation(isBrowsing = true, canGoBack = true, stepsToPreviousPage = 2)
+
+        val handled = testee.onUserPressedBack()
+        assertTrue(handled)
+
+        val backCommand = captureCommands().lastValue as Command.NavigateBack
+        assertNotNull(backCommand)
+        assertEquals(2, backCommand.steps)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndBrowserCannotGoBackAndHomeNotSkippedThenHomeShownAndHandledTrue() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+
+        val handled = testee.onUserPressedBack()
+        assertTrue(handled)
+        assertFalse(browserViewState().browserShowing)
+        assertEquals("", omnibarViewState().omnibarText)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndBrowserCannotGoBackAndHomeIsSkippedThenHandledFalse() {
+        setupNavigation(skipHome = true, isBrowsing = false, canGoBack = false)
+
+        val handled = testee.onUserPressedBack()
+        assertFalse(handled)
+    }
+
+    @Test
+    fun whenUserOnHomePressesBackThenReturnsHandledFalse() {
+        isBrowsing(false)
+        val handled = testee.onUserPressedBack()
+        assertFalse(handled)
+    }
+
+    @Test
     fun whenUserSelectsDesktopSiteWhenOnMobileSpecificSiteThenUrlModified() {
         testee.desktopSiteModeToggled("http://m.example.com", desktopSiteRequested = true)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -923,6 +1027,16 @@ class BrowserTabViewModelTest {
 
     private fun isBrowsing(isBrowsing: Boolean) {
         testee.browserViewState.value = browserViewState().copy(browserShowing = isBrowsing)
+    }
+
+    private fun setupNavigation(skipHome: Boolean = false, isBrowsing: Boolean, canGoForward: Boolean = false, canGoBack: Boolean = false, stepsToPreviousPage:Int = 0) {
+        testee.skipHome = skipHome
+        isBrowsing(isBrowsing)
+        val nav: BrowserWebViewClient.BrowserNavigationOptions = mock()
+        whenever(nav.canGoForward).thenReturn(canGoForward)
+        whenever(nav.canGoBack).thenReturn(canGoBack)
+        whenever(nav.stepsToPreviousPage).thenReturn(stepsToPreviousPage)
+        testee.navigationOptionsChanged(nav)
     }
 
     private fun changeUrl(url: String?) {
