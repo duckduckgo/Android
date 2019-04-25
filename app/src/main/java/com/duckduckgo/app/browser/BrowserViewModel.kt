@@ -124,8 +124,8 @@ class BrowserViewModel(
         tabRepository.add(isDefaultTab = isDefaultTab)
     }
 
-    fun onOpenInNewTabRequested(query: String) {
-        tabRepository.add(queryUrlConverter.convertQueryToUrl(query), isDefaultTab = false)
+    fun onOpenInNewTabRequested(query: String, skipHome: Boolean = false) {
+        tabRepository.add(queryUrlConverter.convertQueryToUrl(query), skipHome, isDefaultTab = false)
     }
 
     fun onTabsUpdated(tabs: List<TabEntity>?) {
@@ -188,7 +188,7 @@ class BrowserViewModel(
     }
 
     override fun onUserCancelledAppEnjoymentDialog(promptCount: PromptCount) {
-        launch { appEnjoymentUserEventRecorder.onUserDeclinedToSayIfEnjoyingApp(promptCount)}
+        launch { appEnjoymentUserEventRecorder.onUserDeclinedToSayIfEnjoyingApp(promptCount) }
     }
 
     override fun onUserCancelledRateAppDialog(promptCount: PromptCount) {
@@ -198,5 +198,4 @@ class BrowserViewModel(
     override fun onUserCancelledGiveFeedbackDialog(promptCount: PromptCount) {
         onUserDeclinedToGiveFeedback(promptCount)
     }
-
 }

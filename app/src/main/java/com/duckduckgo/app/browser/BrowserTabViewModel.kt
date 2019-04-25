@@ -43,11 +43,11 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
+import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
+import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
-import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
-import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
 import com.duckduckgo.app.cta.ui.CtaConfiguration
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -149,11 +149,13 @@ class BrowserTabViewModel(
     )
 
     sealed class Command {
-        object LandingPage : Command()
         object Refresh : Command()
         class Navigate(val url: String) : Command()
+        class NavigateBack(val steps: Int) : Command()
+        object NavigateForward : Command()
         class OpenInNewTab(val query: String) : Command()
         class OpenInNewBackgroundTab(val query: String) : Command()
+        object ResetHistory : Command()
         class DialNumber(val telephoneNumber: String) : Command()
         class SendSms(val telephoneNumber: String) : Command()
         class SendEmail(val emailAddress: String) : Command()
@@ -185,6 +187,7 @@ class BrowserTabViewModel(
     val findInPageViewState: MutableLiveData<FindInPageViewState> = MutableLiveData()
     val ctaViewState: MutableLiveData<CtaViewModel.CtaViewState> = ctaViewModel.ctaViewState
 
+    var skipHome = false
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
     val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
@@ -209,6 +212,7 @@ class BrowserTabViewModel(
     private var siteLiveData = MutableLiveData<Site>()
     private var site: Site? = null
     private lateinit var tabId: String
+    private var navigationOptions: BrowserNavigationOptions? = null
 
     init {
         initializeViewStates()
@@ -217,8 +221,9 @@ class BrowserTabViewModel(
         configureAutoComplete()
     }
 
-    fun loadData(tabId: String, initialUrl: String?) {
+    fun loadData(tabId: String, initialUrl: String?, skipHome: Boolean) {
         this.tabId = tabId
+        this.skipHome = skipHome
         siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
 
@@ -262,8 +267,12 @@ class BrowserTabViewModel(
     }
 
     fun onViewVisible() {
-        command.value = if (url == null) ShowKeyboard else Command.HideKeyboard
+        command.value = if (url == null) ShowKeyboard else HideKeyboard
         ctaViewModel.refreshCta()
+    }
+
+    fun onViewHidden() {
+        skipHome = false
     }
 
     fun onUserSubmittedQuery(input: String) {
@@ -282,6 +291,9 @@ class BrowserTabViewModel(
         if (type is IntentType) {
             externalAppLinkClicked(type)
         } else {
+            if (shouldClearHistoryOnNewQuery()) {
+                command.value = ResetHistory
+            }
             command.value = Navigate(queryUrlConverter.convertQueryToUrl(trimmedInput))
         }
 
@@ -292,8 +304,63 @@ class BrowserTabViewModel(
         autoCompleteViewState.value = AutoCompleteViewState(false)
     }
 
+    private fun shouldClearHistoryOnNewQuery(): Boolean {
+        val navigation = navigationOptions ?: return false
+        return !currentBrowserViewState().browserShowing && navigation.hasNavigationHistory
+    }
+
+    fun onUserPressedForward() {
+        if (!currentBrowserViewState().browserShowing) {
+            browserViewState.value = currentBrowserViewState().copy(browserShowing = true)
+            command.value = Refresh
+        } else {
+            command.value = NavigateForward
+        }
+    }
+
+    /**
+     * Handles back navigation. Returns false if navigation could not be
+     * handled at this level, giving system an opportunity to handle it
+     *
+     * @return true if navigation handled, otherwise false
+     */
+    fun onUserPressedBack(): Boolean {
+        val navigation = navigationOptions ?: return false
+
+        if (!currentBrowserViewState().browserShowing) {
+            return false
+        }
+
+        if (navigation.canGoBack) {
+            command.value = NavigateBack(navigation.stepsToPreviousPage)
+            return true
+        } else if (!skipHome) {
+            navigateHome()
+            return true
+        }
+
+        return false
+    }
+
+    private fun navigateHome() {
+        pendingUrl = null
+        site = null
+        onSiteChanged()
+
+        browserViewState.value = currentBrowserViewState().copy(
+            browserShowing = false,
+            canGoBack = false,
+            canGoForward = true
+        )
+        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = "")
+        loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
+    }
+
     override fun progressChanged(progressedUrl: String?, newProgress: Int) {
         Timber.v("Loading in progress $newProgress")
+
+        if (!currentBrowserViewState().browserShowing) return
+
         val progress = currentLoadingViewState()
         loadingViewState.value = progress.copy(progress = newProgress)
 
@@ -318,6 +385,7 @@ class BrowserTabViewModel(
 
     override fun loadingStarted(url: String?) {
         Timber.v("Loading started")
+        if (!currentBrowserViewState().browserShowing) return
         val progress = currentLoadingViewState()
         loadingViewState.value = progress.copy(isLoading = true)
         pendingUrl = url
@@ -325,15 +393,21 @@ class BrowserTabViewModel(
         onSiteChanged()
     }
 
-    override fun navigationOptionsChanged(navigationOptions: BrowserNavigationOptions) {
+    override fun navigationOptionsChanged(navigation: BrowserNavigationOptions) {
+        navigationOptions = navigation
+
+        if (!currentBrowserViewState().browserShowing) return
+
         browserViewState.value = currentBrowserViewState().copy(
-            canGoBack = navigationOptions.canGoBack,
-            canGoForward = navigationOptions.canGoForward
+            canGoBack = navigation.canGoBack || !skipHome,
+            canGoForward = navigation.canGoForward
         )
     }
 
     override fun loadingFinished(url: String?) {
         Timber.v("Loading finished")
+
+        if (!currentBrowserViewState().browserShowing) return
 
         if (pendingUrl != null) {
             urlChanged(url)
@@ -452,7 +526,7 @@ class BrowserTabViewModel(
     }
 
     override fun showFileChooser(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams) {
-        command.value = Command.ShowFileChooser(filePathCallback, fileChooserParams)
+        command.value = ShowFileChooser(filePathCallback, fileChooserParams)
     }
 
     private fun currentAutoCompleteViewState(): AutoCompleteViewState = autoCompleteViewState.value!!
@@ -599,13 +673,6 @@ class BrowserTabViewModel(
         } else {
             command.value = Refresh
         }
-    }
-
-    fun resetView() {
-        pendingUrl = null
-        site = null
-        onSiteChanged()
-        initializeViewStates()
     }
 
     private fun initializeViewStates() {

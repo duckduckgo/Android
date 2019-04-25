@@ -35,10 +35,16 @@ val Uri.baseHost: String?
     get() = withScheme().host?.removePrefix("www.")
 
 val Uri.isHttp: Boolean
-    get() = scheme?.equals(UrlScheme.http, true) ?: false
+    get() = scheme?.equals(http, true) ?: false
 
 val Uri.isHttps: Boolean
     get() = scheme?.equals(UrlScheme.https, true) ?: false
+
+val Uri.toHttps: Uri
+    get() = buildUpon().scheme(UrlScheme.https).build()
+
+val Uri.toHttpsString
+    get() = toHttps.toString()
 
 val Uri.hasIpHost: Boolean
     get() {
@@ -61,7 +67,7 @@ fun Uri.toDesktopUri(): Uri {
         url.replaceFirst(prefix, "")
     }
 
-    return Uri.parse(newUrl)
+    return parse(newUrl)
 }
 
 private const val faviconBaseUrlFormat = "https://proxy.duckduckgo.com/ip3/%s.ico"
@@ -69,5 +75,5 @@ private const val faviconBaseUrlFormat = "https://proxy.duckduckgo.com/ip3/%s.ic
 fun Uri?.faviconLocation(): Uri? {
     val host = this?.host
     if (host.isNullOrBlank()) return null
-    return Uri.parse(String.format(faviconBaseUrlFormat, host))
+    return parse(String.format(faviconBaseUrlFormat, host))
 }
