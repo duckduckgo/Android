@@ -25,7 +25,6 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
-import com.duckduckgo.app.widget.ui.supportsAutomaticWidgetAdd
 
 
 class SearchWidgetLight : SearchWidget(R.layout.search_widget_light)
@@ -34,8 +33,7 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
 
     override fun onEnabled(context: Context) {
         val application = context.applicationContext as? DuckDuckGoApplication
-        val pixelType = if (context.supportsAutomaticWidgetAdd) ADD_WIDGET_AUTO_ADDED else ADD_WIDGET_INSTRUCTIONS_ADDED
-        application?.pixel?.fire(pixelType)
+        application?.pixel?.fire(WIDGET_ADDED)
         super.onEnabled(context)
     }
 
@@ -59,7 +57,6 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray?) {
         val application = context.applicationContext as? DuckDuckGoApplication
-        val pixelType = if (context.supportsAutomaticWidgetAdd) ADD_WIDGET_AUTO_DELETED else ADD_WIDGET_INSTRUCTIONS_DELETED
-        application?.pixel?.fire(pixelType)
+        application?.pixel?.fire(WIDGET_DELETED)
     }
 }

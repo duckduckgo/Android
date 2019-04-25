@@ -106,13 +106,16 @@ class CtaViewModel @Inject constructor(
     }
 
     fun onCtaShown() {
-        val cta = currentViewState.cta ?: return
-        pixel.fire(cta.shownPixel)
+        currentViewState.cta?.shownPixel?.let {
+            pixel.fire(it)
+        }
     }
 
     fun onCtaDismissed() {
         val cta = currentViewState.cta ?: return
-        pixel.fire(cta.cancelPixel)
+        cta.cancelPixel?.let {
+            pixel.fire(it)
+        }
 
         Schedulers.io().scheduleDirect {
             when (cta) {
@@ -130,8 +133,9 @@ class CtaViewModel @Inject constructor(
     }
 
     fun onCtaLaunched() {
-        val cta = currentViewState.cta ?: return
-        pixel.fire(cta.okPixel)
+        currentViewState.cta?.okPixel?.let {
+            pixel.fire(it)
+        }
     }
 }
 
@@ -142,9 +146,9 @@ sealed class CtaConfiguration(
     @StringRes open val description: Int,
     @StringRes open val okButton: Int,
     @StringRes open val dismissButton: Int,
-    open val shownPixel: Pixel.PixelName,
-    open val okPixel: Pixel.PixelName,
-    open val cancelPixel: Pixel.PixelName
+    open val shownPixel: Pixel.PixelName?,
+    open val okPixel: Pixel.PixelName?,
+    open val cancelPixel: Pixel.PixelName?
 ) {
 
     data class Survey(val survey: com.duckduckgo.app.survey.model.Survey) : CtaConfiguration(
@@ -166,9 +170,9 @@ sealed class CtaConfiguration(
         R.string.addWidgetCtaDescription,
         R.string.addWidgetCtaAutoLaunchButton,
         R.string.addWidgetCtaDismissButton,
-        ADD_WIDGET_AUTO_CTA_SHOWN,
-        ADD_WIDGET_AUTO_CTA_LAUNCHED,
-        ADD_WIDGET_AUTO_CTA_DISMISSED
+        null,
+        null,
+        null
     )
 
     object AddWidgetInstructions : CtaConfiguration(
@@ -178,9 +182,9 @@ sealed class CtaConfiguration(
         R.string.addWidgetCtaDescription,
         R.string.addWidgetCtaInstructionsLaunchButton,
         R.string.addWidgetCtaDismissButton,
-        ADD_WIDGET_INSTRUCTIONS_CTA_SHOWN,
-        ADD_WIDGET_INSTRUCTIONS_CTA_LAUNCHED,
-        ADD_WIDGET_INSTRUCTIONS_CTA_DISMISSED
+        null,
+        null,
+        null
     )
 
     fun apply(view: View) {

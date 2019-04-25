@@ -42,6 +42,8 @@ interface Pixel {
         DEFAULT_BROWSER_INFO_VIEWED("mdb_v"),
         DEFAULT_BROWSER_SET("mdb_s"),
         DEFAULT_BROWSER_NOT_SET("mdb_n"),
+        WIDGET_ADDED(pixelName = "maw_a"),
+        WIDGET_DELETED(pixelName = "maw_d"),
 
         LONG_PRESS("mlp"),
         LONG_PRESS_DOWNLOAD_IMAGE("mlp_i"),
@@ -61,18 +63,6 @@ interface Pixel {
         SURVEY_CTA_DISMISSED(pixelName = "mus_cd"),
         SURVEY_CTA_LAUNCHED(pixelName = "mus_cl"),
         SURVEY_SURVEY_DISMISSED(pixelName = "mus_sd"),
-
-        ADD_WIDGET_AUTO_CTA_SHOWN(pixelName = "maw_acs"),
-        ADD_WIDGET_AUTO_CTA_DISMISSED(pixelName = "maw_acd"),
-        ADD_WIDGET_AUTO_CTA_LAUNCHED(pixelName = "maw_acl"),
-        ADD_WIDGET_AUTO_ADDED(pixelName = "maw_aa"),
-        ADD_WIDGET_AUTO_DELETED(pixelName = "maw_ad"),
-
-        ADD_WIDGET_INSTRUCTIONS_CTA_SHOWN(pixelName = "maw_ics"),
-        ADD_WIDGET_INSTRUCTIONS_CTA_DISMISSED(pixelName = "maw_icd"),
-        ADD_WIDGET_INSTRUCTIONS_CTA_LAUNCHED(pixelName = "maw_icl"),
-        ADD_WIDGET_INSTRUCTIONS_ADDED(pixelName = "maw_ia"),
-        ADD_WIDGET_INSTRUCTIONS_DELETED(pixelName = "maw_id"),
 
         NOTIFICATION_SHOWN("mnot_s"),
         NOTIFICATION_LAUNCHED("mnot_l"),
