@@ -64,13 +64,13 @@ import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
+import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
+import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
-import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
-import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.CtaConfiguration
@@ -142,9 +142,11 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
-    private val initialUrl get() = arguments!![URL_EXTRA_ARG] as String?
-
     lateinit var userAgentProvider: UserAgentProvider
+
+    private val initialUrl get() = arguments!!.getString(URL_EXTRA_ARG)
+
+    private val skipHome get() = arguments!!.getBoolean(SKIP_HOME_ARG)
 
     private lateinit var popupMenu: BrowserPopupMenu
 
@@ -159,7 +161,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProviders.of(this, viewModelFactory).get(BrowserTabViewModel::class.java)
-        viewModel.loadData(tabId, initialUrl)
+        viewModel.loadData(tabId, initialUrl, skipHome)
         viewModel
     }
 
@@ -240,9 +242,9 @@ class BrowserTabFragment : Fragment(), FindListener {
         popupMenu = BrowserPopupMenu(layoutInflater)
         val view = popupMenu.contentView
         popupMenu.apply {
-            onMenuItemClicked(view.forwardPopupMenuItem) { webView?.goForward() }
-            onMenuItemClicked(view.backPopupMenuItem) { webView?.goBack() }
-            onMenuItemClicked(view.refreshPopupMenuItem) { webView?.reload() }
+            onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
+            onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
+            onMenuItemClicked(view.refreshPopupMenuItem) { refresh() }
             onMenuItemClicked(view.newTabPopupMenuItem) { browserActivity?.launchNewTab() }
             onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
             onMenuItemClicked(view.addBookmarksPopupMenuItem) { addBookmark() }
@@ -316,6 +318,21 @@ class BrowserTabFragment : Fragment(), FindListener {
         })
     }
 
+    private fun showHome() {
+        appBarLayout.setExpanded(true)
+        logoHidingLayoutChangeListener.callToActionView = ctaContainer
+        webView?.onPause()
+        webView?.hide()
+        omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
+        showKeyboard()
+    }
+
+    private fun showBrowser() {
+        webView?.show()
+        webView?.onResume()
+        omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
+    }
+
     fun submitQuery(query: String) {
         viewModel.onUserSubmittedQuery(query)
     }
@@ -342,7 +359,15 @@ class BrowserTabFragment : Fragment(), FindListener {
             is Command.Navigate -> {
                 navigate(it.url)
             }
-            Command.LandingPage -> resetTabState()
+            is Command.NavigateBack -> {
+                webView?.goBackOrForward(-it.steps)
+            }
+            Command.NavigateForward -> {
+                webView?.goForward()
+            }
+            Command.ResetHistory -> {
+                resetWebView()
+            }
             is Command.DialNumber -> {
                 val intent = Intent(Intent.ACTION_DIAL)
                 intent.data = Uri.parse("tel:${it.telephoneNumber}")
@@ -548,7 +573,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
     private fun configureOmnibarTextInput() {
         omnibarTextInput.onFocusChangeListener =
-            View.OnFocusChangeListener { _, hasFocus: Boolean ->
+            OnFocusChangeListener { _, hasFocus: Boolean ->
                 viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), hasFocus, false)
             }
 
@@ -751,6 +776,7 @@ class BrowserTabFragment : Fragment(), FindListener {
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
         if (hidden) {
+            viewModel.onViewHidden()
             webView?.onPause()
         } else {
             webView?.onResume()
@@ -769,27 +795,13 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
     }
 
-    private fun resetTabState() {
-        omnibarTextInput.text?.clear()
-        viewModel.resetView()
-        destroyWebView()
-        configureWebView()
-        showKeyboard()
-        appBarLayout.setExpanded(true)
+    fun onBackPressed(): Boolean {
+        return viewModel.onUserPressedBack()
     }
 
-    fun onBackPressed(): Boolean {
-        return when {
-            webView?.canGoBack() == true -> {
-                webView?.goBack()
-                true
-            }
-            webView?.visibility == VISIBLE -> {
-                resetTabState()
-                true
-            }
-            else -> false
-        }
+    private fun resetWebView() {
+        destroyWebView()
+        configureWebView()
     }
 
     override fun onDestroy() {
@@ -905,8 +917,10 @@ class BrowserTabFragment : Fragment(), FindListener {
     companion object {
 
         private const val TAB_ID_ARG = "TAB_ID_ARG"
-        private const val ADD_BOOKMARK_FRAGMENT_TAG = "ADD_BOOKMARK"
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
+        private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
+
+        private const val ADD_BOOKMARK_FRAGMENT_TAG = "ADD_BOOKMARK"
         private const val KEYBOARD_DELAY = 200L
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
@@ -916,10 +930,11 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         private const val AUTHENTICATION_DIALOG_TAG = "AUTH_DIALOG_TAG"
 
-        fun newInstance(tabId: String, query: String? = null): BrowserTabFragment {
+        fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
             val fragment = BrowserTabFragment()
             val args = Bundle()
             args.putString(TAB_ID_ARG, tabId)
+            args.putBoolean(SKIP_HOME_ARG, skipHome)
             query.let {
                 args.putString(URL_EXTRA_ARG, query)
             }
@@ -994,16 +1009,16 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         fun renderBrowserViewState(viewState: BrowserViewState) {
             renderIfChanged(viewState, lastSeenBrowserViewState) {
+                val browserShowing = viewState.browserShowing
+                val browserShowingChanged = viewState.browserShowing != lastSeenBrowserViewState?.browserShowing
                 lastSeenBrowserViewState = viewState
 
-                val browserShowing = viewState.browserShowing
-                if (browserShowing) {
-                    webView?.show()
-                    omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
-                } else {
-                    logoHidingLayoutChangeListener.callToActionView = ctaContainer
-                    webView?.hide()
-                    omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
+                if (browserShowingChanged) {
+                    if (browserShowing) {
+                        showBrowser()
+                    } else {
+                        showHome()
+                    }
                 }
 
                 toggleDesktopSiteMode(viewState.isDesktopBrowsingMode)
@@ -1025,8 +1040,8 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         private fun renderPopupMenus(browserShowing: Boolean, viewState: BrowserViewState) {
             popupMenu.contentView.apply {
-                backPopupMenuItem.isEnabled = browserShowing && viewState.canGoBack
-                forwardPopupMenuItem.isEnabled = browserShowing && viewState.canGoForward
+                backPopupMenuItem.isEnabled = viewState.canGoBack
+                forwardPopupMenuItem.isEnabled = viewState.canGoForward
                 refreshPopupMenuItem.isEnabled = browserShowing
                 newTabPopupMenuItem.isEnabled = browserShowing
                 addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
@@ -1121,7 +1136,7 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
 
         fun hideFindInPage() {
-            if (findInPageContainer.visibility != View.GONE) {
+            if (findInPageContainer.visibility != GONE) {
                 focusDummy.requestFocus()
                 findInPageContainer.gone()
                 findInPageInput.hideKeyboard()
@@ -1130,7 +1145,7 @@ class BrowserTabFragment : Fragment(), FindListener {
 
         private fun showFindInPageView(viewState: FindInPageViewState) {
 
-            if (findInPageContainer.visibility != View.VISIBLE) {
+            if (findInPageContainer.visibility != VISIBLE) {
                 findInPageContainer.show()
                 findInPageInput.postDelayed(KEYBOARD_DELAY) {
                     findInPageInput?.showKeyboard()

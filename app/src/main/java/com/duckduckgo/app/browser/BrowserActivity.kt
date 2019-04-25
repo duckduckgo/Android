@@ -106,9 +106,9 @@ class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun openNewTab(tabId: String, url: String? = null) {
+    private fun openNewTab(tabId: String, url: String? = null, skipHome: Boolean) {
         Timber.i("Opening new tab, url: $url, tabId: $tabId")
-        val fragment = BrowserTabFragment.newInstance(tabId, url)
+        val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome)
         val transaction = supportFragmentManager.beginTransaction()
         val tab = currentTab
         if (tab == null) {
@@ -130,7 +130,7 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
         if (fragment == null) {
-            openNewTab(tab.tabId, tab.url)
+            openNewTab(tab.tabId, tab.url, tab.skipHome)
             return
         }
         val transaction = supportFragmentManager.beginTransaction()
@@ -182,7 +182,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         val sharedText = intent.intentText
         if (sharedText != null) {
             Timber.w("opening in new tab requested for $sharedText")
-            viewModel.onOpenInNewTabRequested(sharedText)
+            viewModel.onOpenInNewTabRequested(sharedText, true)
             return
         }
     }

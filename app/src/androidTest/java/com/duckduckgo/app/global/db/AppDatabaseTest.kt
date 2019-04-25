@@ -24,8 +24,7 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.blockingObserve
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 
@@ -80,11 +79,9 @@ class AppDatabaseTest {
 
     @Test
     fun whenMigratingFromVersion4To5ThenTabsAreConsideredViewed() {
-
         testHelper.createDatabase(TEST_DB_NAME, 4).use {
             it.execSQL("INSERT INTO `tabs` values ('tabid1', 'url', 'title') ")
         }
-
         assertTrue(database().tabsDao().tabs()[0].viewed)
     }
 
@@ -116,6 +113,19 @@ class AppDatabaseTest {
     @Test
     fun whenMigratingFromVersion10To11ThenValidationSucceeds() {
         createDatabaseAndMigrate(10, 11, AppDatabase.MIGRATION_10_TO_11)
+    }
+
+    @Test
+    fun whenMigratingFromVersion11To12ThenValidationSucceeds() {
+        createDatabaseAndMigrate(11, 12, AppDatabase.MIGRATION_11_TO_12)
+    }
+
+    @Test
+    fun whenMigratingFromVersion11To12ThenTabsDoNotSkipHome() {
+        testHelper.createDatabase(TEST_DB_NAME, 11).use {
+            it.execSQL("INSERT INTO `tabs` values ('tabid1', 'url', 'title', 1, 0) ")
+        }
+        assertFalse(database().tabsDao().tabs()[0].skipHome)
     }
 
     private fun createDatabase(version: Int) {
