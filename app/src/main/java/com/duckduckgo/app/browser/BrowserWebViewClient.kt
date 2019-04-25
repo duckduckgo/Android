@@ -276,7 +276,7 @@ class BrowserWebViewClient @Inject constructor(
         val hasNavigationHistory: Boolean
     }
 
-    data class WebViewNavigationOptions(val stack: WebBackForwardList): BrowserNavigationOptions {
+    data class WebViewNavigationOptions(val stack: WebBackForwardList) : BrowserNavigationOptions {
 
         override val stepsToPreviousPage: Int = if (stack.isHttpsUpgrade) 2 else 1
         override val canGoBack: Boolean = stack.currentIndex >= stepsToPreviousPage
@@ -286,7 +286,7 @@ class BrowserWebViewClient @Inject constructor(
         private val WebBackForwardList.isHttpsUpgrade: Boolean
             get() {
                 if (currentIndex < 1) return false
-                val current = currentItem.originalUrl
+                val current = currentItem.originalUrl ?: return false
                 val previous = getItemAtIndex(currentIndex - 1).originalUrl
                 return current == previous.toUri().toHttpsString
             }
