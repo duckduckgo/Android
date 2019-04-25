@@ -1,5 +1,5 @@
 ## What's new in this release?
-In this release, we tweaked our favicon service, added HTTP basic authentication to let you logon to websites that use this and made some stability enhancements.
+In this release, we improved our back behavior and fixed an issue that could sometimes open a duplicate shared tab.
 
 ## Have feedback?
 You can always reach us at https://duckduckgo.com/feedback.
