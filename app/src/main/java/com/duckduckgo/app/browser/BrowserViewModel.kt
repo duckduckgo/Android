@@ -124,8 +124,8 @@ class BrowserViewModel(
         tabRepository.add(isDefaultTab = isDefaultTab)
     }
 
-    suspend fun onOpenInNewTabRequested(query: String) {
-        tabRepository.add(queryUrlConverter.convertQueryToUrl(query), isDefaultTab = false)
+    suspend fun onOpenInNewTabRequested(query: String, skipHome: Boolean = false) {
+        tabRepository.add(queryUrlConverter.convertQueryToUrl(query), skipHome, isDefaultTab = false)
     }
 
     suspend fun onTabsUpdated(tabs: List<TabEntity>?) {
@@ -198,5 +198,4 @@ class BrowserViewModel(
     override fun onUserCancelledGiveFeedbackDialog(promptCount: PromptCount) {
         onUserDeclinedToGiveFeedback(promptCount)
     }
-
 }

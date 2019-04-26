@@ -31,7 +31,7 @@ interface WebViewClientListener {
     fun progressChanged(progressedUrl: String?, newProgress: Int)
     fun loadingFinished(url: String? = null)
     fun titleReceived(title: String)
-    fun navigationOptionsChanged(navigationOptions: BrowserNavigationOptions)
+    fun navigationOptionsChanged(navigation: BrowserNavigationOptions)
     fun trackerDetected(event: TrackingEvent)
     fun pageHasHttpResources(page: String?)
 

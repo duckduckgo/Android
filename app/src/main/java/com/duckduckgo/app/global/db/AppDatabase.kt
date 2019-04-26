@@ -55,7 +55,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 11, entities = [
+    exportSchema = true, version = 12, entities = [
         DisconnectTracker::class,
         HttpsBloomFilterSpec::class,
         HttpsWhitelistedDomain::class,
@@ -182,6 +182,12 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_11_TO_12: Migration = object : Migration(11, 12) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE `tabs` ADD COLUMN `skipHome` INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
         val ALL_MIGRATIONS: List<Migration>
             get() = listOf(
                 MIGRATION_1_TO_2,
@@ -193,7 +199,8 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_7_TO_8,
                 MIGRATION_8_TO_9,
                 MIGRATION_9_TO_10,
-                MIGRATION_10_TO_11
+                MIGRATION_10_TO_11,
+                MIGRATION_11_TO_12
             )
     }
 }

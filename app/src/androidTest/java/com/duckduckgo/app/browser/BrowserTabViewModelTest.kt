@@ -207,7 +207,7 @@ class BrowserTabViewModelTest {
             searchCountDao = mockSearchCountDao
         )
 
-        testee.loadData("abc", null)
+        testee.loadData("abc", null, false)
         testee.command.observeForever(mockCommandObserver)
 
         whenever(mockOmnibarConverter.convertQueryToUrl(any())).thenReturn("duckduckgo.com")
@@ -321,30 +321,52 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenViewModelNotifiedThatWebViewIsLoadingThenViewStateIsUpdated() = runBlocking<Unit> {
+    fun whenBrowsingAndViewModelNotifiedThatWebViewIsLoadingThenViewStateIsUpdated() {
+        isBrowsing(true)
         testee.loadingStarted("http://example.com")
         assertTrue(loadingViewState().isLoading)
     }
 
     @Test
-    fun whenViewModelNotifiedThatWebViewHasFinishedLoadingThenViewStateIsUpdated() = runBlocking<Unit> {
+    fun whenNotBrowsingAndViewModelNotifiedThatWebViewIsLoadingThenViewStateIsNotUpdated() {
+        isBrowsing(false)
+        testee.loadingStarted("http://example.com")
+        assertFalse(loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenBrowsingAndViewModelNotifiedThatWebViewHasFinishedLoadingThenViewStateIsUpdated() {
+        isBrowsing(true)
+        testee.loadingStarted("http://example.com")
         testee.loadingFinished(null)
         assertFalse(loadingViewState().isLoading)
     }
 
     @Test
-    fun whenLoadingFinishedAndInitialUrlNeverProgressedThenUrlUpdated() = runBlocking<Unit> {
+    fun whenBrowsingAndLoadingFinishedAndInitialUrlNeverProgressedThenUrlUpdated() = runBlocking<Unit> {
         val initialUrl = "http://foo.com/abc"
         val finalUrl = "http://bar.com/abc"
+        isBrowsing(true)
         testee.loadingStarted(initialUrl)
         testee.loadingFinished(finalUrl)
         assertEquals(finalUrl, testee.url)
     }
 
     @Test
-    fun whenLoadingFinishedAndInitialUrlProgressedThenUrlNotUpdated() = runBlocking<Unit> {
+    fun whenNotBrowsingAndLoadingFinishedAndInitialUrlNeverProgressedThenUrlNotUpdated() {
+        val initialUrl = "http://foo.com/abc"
+        val finalUrl = "http://bar.com/abc"
+        isBrowsing(false)
+        testee.loadingStarted(initialUrl)
+        testee.loadingFinished(finalUrl)
+        assertNull(testee.url)
+    }
+
+    @Test
+    fun whenBrowsingAndLoadingFinishedAndInitialUrlProgressedThenUrlNotUpdated() = runBlocking<Unit> {
         val initialUrl = "http://foo.com/abc"
         val finalUrl = "http://foo.com/xyz"
+        isBrowsing(true)
         testee.loadingStarted(initialUrl)
         testee.progressChanged(initialUrl, 10)
         testee.loadingFinished(finalUrl)
@@ -352,24 +374,62 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLoadingFinishedWithUrlThenSiteVisitedEntryAddedToLeaderboardDao() = runBlocking<Unit> {
+    fun whenNotBrowsingAndLoadingFinishedAndInitialUrlProgressedThenUrlNotUpdated() {
+        val initialUrl = "http://foo.com/abc"
+        val finalUrl = "http://foo.com/xyz"
+        isBrowsing(false)
+        testee.loadingStarted(initialUrl)
+        testee.progressChanged(initialUrl, 10)
+        testee.loadingFinished(finalUrl)
+        assertNull(testee.url)
+    }
+
+    @Test
+    fun whenBrowsingAndLoadingFinishedWithUrlThenSiteVisitedEntryAddedToLeaderboardDao() {
+        isBrowsing(true)
         testee.loadingStarted("http://example.com/abc")
         testee.loadingFinished("http://example.com/abc")
         verify(mockNetworkLeaderboardDao).insert(SiteVisitedEntity("example.com"))
     }
 
     @Test
-    fun whenLoadingFinishedWithUrlThenOmnibarTextUpdatedToMatch() = runBlocking<Unit> {
+    fun whenNotBrowsingAndLoadingFinishedWithUrlThenSiteVisitedEntryNotAddedToLeaderboardDao() {
+        isBrowsing(false)
+        testee.loadingStarted("http://example.com/abc")
+        testee.loadingFinished("http://example.com/abc")
+        verify(mockNetworkLeaderboardDao, never()).insert(SiteVisitedEntity("example.com"))
+    }
+
+    @Test
+    fun whenBrowsingAndLoadingFinishedWithUrlThenOmnibarTextUpdatedToMatch() {
+        isBrowsing(true)
         val exampleUrl = "http://example.com/abc"
         testee.loadingFinished(exampleUrl)
         assertEquals(exampleUrl, omnibarViewState().omnibarText)
     }
 
     @Test
-    fun whenLoadingFinishedWithQueryUrlThenOmnibarTextUpdatedToShowQuery() = runBlocking<Unit> {
+    fun whenNotBrowsingAndLoadingFinishedWithUrlThenOmnibarTextRemainsBlank() {
+        isBrowsing(false)
+        val exampleUrl = "http://example.com/abc"
+        testee.loadingFinished(exampleUrl)
+        assertEquals("", omnibarViewState().omnibarText)
+    }
+
+    @Test
+    fun whenBrowsingAndLoadingFinishedWithQueryUrlThenOmnibarTextUpdatedToShowQuery() {
+        isBrowsing(true)
         val queryUrl = "http://duckduckgo.com?q=test"
         testee.loadingFinished(queryUrl)
         assertEquals("test", omnibarViewState().omnibarText)
+    }
+
+    @Test
+    fun whenNotBrowsingAndLoadingFinishedWithQueryUrlThenOmnibarTextextRemainsBlank() {
+        isBrowsing(false)
+        val queryUrl = "http://duckduckgo.com?q=test"
+        testee.loadingFinished(queryUrl)
+        assertEquals("", omnibarViewState().omnibarText)
     }
 
     @Test
@@ -410,11 +470,21 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlStartsLoadingWithProgressChangeThenUrlUpdated() = runBlocking<Unit> {
+    fun whenBrowsingAndUrlStartsLoadingWithProgressChangeThenUrlUpdated() = runBlocking<Unit> {
         val url = "foo.com"
+        isBrowsing(true)
         testee.loadingStarted(url)
         testee.progressChanged(url, 10)
         assertEquals(url, testee.url)
+    }
+
+    @Test
+    fun whenNotBrowsingAndUrlStartsLoadingWithProgressChangeThenUrlNotUpdated() {
+        val url = "foo.com"
+        isBrowsing(false)
+        testee.loadingStarted(url)
+        testee.progressChanged(url, 10)
+        assertNull(testee.url)
     }
 
     @Test
@@ -430,9 +500,15 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlChangedThenViewStateIsUpdated() = runBlocking<Unit> {
-        changeUrl("duckduckgo.com")
+    fun whenBrowsingAndUrlChangedThenViewStateIsUpdated() = runBlocking<Unit> {
+        changeUrl("duckduckgo.com", true)
         assertEquals("duckduckgo.com", omnibarViewState().omnibarText)
+    }
+
+    @Test
+    fun whenNotBrowsingAndUrlChangedThenUrlIsNotUpdated() {
+        changeUrl("duckduckgo.com", false)
+        assertEquals("", omnibarViewState().omnibarText)
     }
 
     @Test
@@ -460,7 +536,9 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenViewModelGetsProgressUpdateThenViewStateIsUpdated() = runBlocking<Unit> {
+    fun whenBrowsingAndViewModelGetsProgressUpdateThenViewStateIsUpdated() {
+        isBrowsing(true)
+
         testee.progressChanged("", 0)
         assertEquals(0, loadingViewState().progress)
 
@@ -469,6 +547,14 @@ class BrowserTabViewModelTest {
 
         testee.progressChanged("", 100)
         assertEquals(100, loadingViewState().progress)
+    }
+
+
+    @Test
+    fun whenNotBrowserAndViewModelGetsProgressUpdateThenViewStateIsNotUpdated() {
+        isBrowsing(false)
+        testee.progressChanged("", 10)
+        assertEquals(0, loadingViewState().progress)
     }
 
     @Test
@@ -756,6 +842,104 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenHomeShowingAndNeverBrowsedThenForwardButtonInactive() {
+        setupNavigation(isBrowsing = false)
+        assertFalse(browserViewState().canGoForward)
+    }
+
+    @Test
+    fun whenHomeShowingByPressingBackOnBrowserThenForwardButtonActive() {
+        setupNavigation(isBrowsing = true)
+        testee.onUserPressedBack()
+        assertFalse(browserViewState().browserShowing)
+        assertTrue(browserViewState().canGoForward)
+    }
+
+    @Test
+    fun whenBrowserShowingAndCanGoForwardThenForwardButtonActive() {
+        setupNavigation(isBrowsing = true, canGoForward = true)
+        assertTrue(browserViewState().canGoForward)
+    }
+
+    @Test
+    fun whenBrowserShowingAndCannotGoForwardThenForwardButtonInactive() {
+        setupNavigation(isBrowsing = true, canGoForward = false)
+        assertFalse(browserViewState().canGoForward)
+    }
+
+    @Test
+    fun whenHomeShowingThenBackButtonInactiveEvenIfBrowserCanGoBack() {
+        setupNavigation(isBrowsing = false, canGoBack = false)
+        assertFalse(browserViewState().canGoBack)
+
+        setupNavigation(isBrowsing = false, canGoBack = true)
+        assertFalse(browserViewState().canGoBack)
+    }
+
+    @Test
+    fun whenBrowserShowingAndCanGoBackThenBackButtonActive() {
+        setupNavigation(isBrowsing = true, canGoBack = true)
+        assertTrue(browserViewState().canGoBack)
+    }
+
+    @Test
+    fun whenBrowserShowingAndCannotGoBackAndSkipHomeThenBackButtonInactive() {
+        setupNavigation(skipHome = true, isBrowsing = true, canGoBack = false)
+        assertFalse(browserViewState().canGoBack)
+    }
+
+    @Test
+    fun whenBrowserShowingAndCannotGoBackAndNotSkipHomeThenBackButtonActive() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(browserViewState().canGoBack)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesForwardThenNavigatesForward() {
+        isBrowsing(true)
+        testee.onUserPressedForward()
+        assertTrue(captureCommands().lastValue == Command.NavigateForward)
+    }
+
+    @Test
+    fun whenUserOnHomePressesForwardThenBrowserShownAndPageRefreshed() {
+        isBrowsing(false)
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().browserShowing)
+        assertTrue(captureCommands().lastValue == Command.Refresh)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndBrowserCanGoBackThenNavigatesToPreviousPageAndHandledTrue() {
+        setupNavigation(isBrowsing = true, canGoBack = true, stepsToPreviousPage = 2)
+        assertTrue(testee.onUserPressedBack())
+
+        val backCommand = captureCommands().lastValue as Command.NavigateBack
+        assertNotNull(backCommand)
+        assertEquals(2, backCommand.steps)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndBrowserCannotGoBackAndHomeNotSkippedThenHomeShownAndHandledTrue() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().browserShowing)
+        assertEquals("", omnibarViewState().omnibarText)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndBrowserCannotGoBackAndHomeIsSkippedThenHandledFalse() {
+        setupNavigation(skipHome = true, isBrowsing = false, canGoBack = false)
+        assertFalse(testee.onUserPressedBack())
+    }
+
+    @Test
+    fun whenUserOnHomePressesBackThenReturnsHandledFalse() {
+        isBrowsing(false)
+        assertFalse(testee.onUserPressedBack())
+    }
+
+    @Test
     fun whenUserSelectsDesktopSiteWhenOnMobileSpecificSiteThenUrlModified() {
         testee.desktopSiteModeToggled("http://m.example.com", desktopSiteRequested = true)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -806,6 +990,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOnSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithUrl() = runBlocking<Unit> {
+        isBrowsing(true)
         changeUrl("foo.com")
         testee.onBrokenSiteSelected()
         val command = captureCommands().value as Command.BrokenSiteFeedback
@@ -889,7 +1074,22 @@ class BrowserTabViewModelTest {
         verify(mockHandler, atLeastOnce()).proceed(username, password)
     }
 
-    private suspend fun changeUrl(url: String?) {
+    private fun isBrowsing(isBrowsing: Boolean) {
+        testee.browserViewState.value = browserViewState().copy(browserShowing = isBrowsing)
+    }
+
+    private fun setupNavigation(skipHome: Boolean = false, isBrowsing: Boolean, canGoForward: Boolean = false, canGoBack: Boolean = false, stepsToPreviousPage:Int = 0) {
+        testee.skipHome = skipHome
+        isBrowsing(isBrowsing)
+        val nav: BrowserWebViewClient.BrowserNavigationOptions = mock()
+        whenever(nav.canGoForward).thenReturn(canGoForward)
+        whenever(nav.canGoBack).thenReturn(canGoBack)
+        whenever(nav.stepsToPreviousPage).thenReturn(stepsToPreviousPage)
+        testee.navigationOptionsChanged(nav)
+    }
+
+    private suspend fun changeUrl(url: String?, isBrowsing: Boolean = true) {
+        isBrowsing(isBrowsing)
         testee.loadingStarted(url)
         testee.progressChanged(url, 100)
     }

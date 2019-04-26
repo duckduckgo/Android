@@ -115,12 +115,12 @@ class BrowserViewModelTest {
     @Test
     fun whenTabsUpdatedAndNoTabsThenNewTabAddedToRepository() = runBlocking<Unit> {
         testee.onTabsUpdated(ArrayList())
-        verify(mockTabRepository).add(null, true)
+        verify(mockTabRepository).add(null, false, true)
     }
 
     @Test
     fun whenTabsUpdatedWithTabsThenNewTabNotLaunched() = runBlocking {
-        testee.onTabsUpdated(asList(TabEntity(TAB_ID, "", "", true, 0)))
+        testee.onTabsUpdated(asList(TabEntity(TAB_ID, "", "", false, true, 0)))
         verify(mockCommandObserver, never()).onChanged(any())
     }
 
