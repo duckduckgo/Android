@@ -796,6 +796,7 @@ class BrowserTabFragment : Fragment(), FindListener {
     }
 
     fun onBackPressed(): Boolean {
+        if (!isAdded) return false
         return viewModel.onUserPressedBack()
     }
 
