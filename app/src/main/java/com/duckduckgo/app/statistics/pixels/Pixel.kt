@@ -39,11 +39,11 @@ interface Pixel {
         PRIVACY_DASHBOARD_PRIVACY_PRACTICES("mp_p"),
         PRIVACY_DASHBOARD_NETWORKS("mp_n"),
 
-        DEFAULT_BROWSER_INFO_VIEWED("mdb_v"),
-        DEFAULT_BROWSER_SET("mdb_s"),
-        DEFAULT_BROWSER_NOT_SET("mdb_n"),
-        WIDGET_ADDED(pixelName = "maw_a"),
-        WIDGET_DELETED(pixelName = "maw_d"),
+        DEFAULT_BROWSER_SET("m_b_s"),
+        DEFAULT_BROWSER_UNSET("m_b_u"),
+        WIDGET_ADDED(pixelName = "m_w_a"),
+        WIDGET_DELETED(pixelName = "m_w_d"),
+        WIDGET_LAUNCHED(pixelName = "m_w_l"),
 
         LONG_PRESS("mlp"),
         LONG_PRESS_DOWNLOAD_IMAGE("mlp_i"),

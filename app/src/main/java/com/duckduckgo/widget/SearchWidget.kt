@@ -24,7 +24,9 @@ import android.widget.RemoteViews
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.WIDGET_ADDED
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.WIDGET_DELETED
+import com.duckduckgo.app.widget.ui.AppWidgetCapabilities
 
 
 class SearchWidgetLight : SearchWidget(R.layout.search_widget_light)
@@ -32,9 +34,11 @@ class SearchWidgetLight : SearchWidget(R.layout.search_widget_light)
 open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetProvider() {
 
     override fun onEnabled(context: Context) {
-        val application = context.applicationContext as? DuckDuckGoApplication
-        application?.pixel?.fire(WIDGET_ADDED)
-        super.onEnabled(context)
+        val application = context.applicationContext as? DuckDuckGoApplication ?: return
+        if (!application.appInstallStore.widgetInstalled) {
+            application.appInstallStore.widgetInstalled = true
+            application.pixel.fire(WIDGET_ADDED)
+        }
     }
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
@@ -51,12 +55,16 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
     }
 
     private fun buildPendingIntent(context: Context): PendingIntent {
-        val intent = BrowserActivity.intent(context, newSearch = true)
+        val intent = BrowserActivity.intent(context, widgetSearch = true)
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray?) {
-        val application = context.applicationContext as? DuckDuckGoApplication
-        application?.pixel?.fire(WIDGET_DELETED)
+        val application = context.applicationContext as? DuckDuckGoApplication ?: return
+        val widgetCapabilities = AppWidgetCapabilities(context)
+        if (application.appInstallStore.widgetInstalled && !widgetCapabilities.hasInstalledWidgets) {
+            application.appInstallStore.widgetInstalled = false
+            application?.pixel?.fire(WIDGET_DELETED)
+        }
     }
 }
