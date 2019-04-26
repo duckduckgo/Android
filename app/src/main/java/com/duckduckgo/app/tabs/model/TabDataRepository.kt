@@ -23,22 +23,29 @@ import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.db.TabsDao
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.withContext
+import io.reactivex.Scheduler
+import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
-import java.util.concurrent.Executors
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.CoroutineContext
 
 @Singleton
-class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, private val siteFactory: SiteFactory) : TabRepository {
+class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, private val siteFactory: SiteFactory) : CoroutineScope, TabRepository {
+
+    override val coroutineContext: CoroutineContext
+        get() = SupervisorJob() + Dispatchers.IO
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs()
-    override val liveSelectedTab: LiveData<TabEntity> = tabsDao.liveSelectedTab()
-    private val siteData: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
 
-    private val singleThreadedExecutor = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+    override val liveSelectedTab: LiveData<TabEntity> = tabsDao.liveSelectedTab()
+
+    private val siteData: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
 
     override suspend fun add(url: String?, isDefaultTab: Boolean): String {
         val tabId = generateTabId()
@@ -51,31 +58,39 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
     private fun buildSiteData(url: String?): MutableLiveData<Site> {
         val data = MutableLiveData<Site>()
         url?.let {
-            val siteMonitor = siteFactory.build(it)
-            data.value = siteMonitor
+
+            launch {
+                val siteMonitor = siteFactory.buildSite(it).also { newSite ->
+                    launch(Dispatchers.IO) {
+                        siteFactory.loadFullSiteDetails(newSite)
+                        data.postValue(newSite)
+                    }
+                }
+                data.postValue(siteMonitor)
+            }
         }
         return data
     }
 
     override suspend fun add(tabId: String, data: MutableLiveData<Site>, isDefaultTab: Boolean) {
         siteData[tabId] = data
-        withContext(singleThreadedExecutor) {
+        databaseExecutor().scheduleDirect {
 
             Timber.i("Trying to add tab, is default? $isDefaultTab, current tabs count: ${tabsDao.tabs().size}")
 
             if (isDefaultTab && tabsDao.tabs().isNotEmpty()) {
                 Timber.i("Default tab being added but there are already tabs; will not add this tab")
-                return@withContext
+                return@scheduleDirect
             }
 
             Timber.i("About to add a new tab, isDefaultTab: $isDefaultTab. $tabId")
             val position = tabsDao.lastTab()?.position ?: 0
-            tabsDao.addAndSelectTab(TabEntity(tabId, data.value?.url, data.value?.siteMonitor?.title, true, position))
+            tabsDao.addAndSelectTab(TabEntity(tabId, data.value?.url, data.value?.title, true, position))
         }
     }
 
     override suspend fun addNewTabAfterExistingTab(url: String?, tabId: String) {
-        withContext(singleThreadedExecutor) {
+        databaseExecutor().scheduleDirect {
             val position = tabsDao.tab(tabId)?.position ?: -1
             val uri = Uri.parse(url)
             val title = uri.host?.removePrefix("www.") ?: url
@@ -85,9 +100,9 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
     }
 
     override suspend fun update(tabId: String, site: Site?) {
-        withContext(singleThreadedExecutor) {
+        databaseExecutor().scheduleDirect {
             val position = tabsDao.tab(tabId)?.position ?: 0
-            val tab = TabEntity(tabId, site?.url, site?.siteMonitor?.title, true, position)
+            val tab = TabEntity(tabId, site?.url, site?.title, true, position)
             tabsDao.updateTab(tab)
         }
     }
@@ -104,7 +119,7 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
     }
 
     override suspend fun delete(tab: TabEntity) {
-        withContext(singleThreadedExecutor) {
+        databaseExecutor().scheduleDirect {
             tabsDao.deleteTabAndUpdateSelection(tab)
         }
         siteData.remove(tab.tabId)
@@ -117,9 +132,21 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
     }
 
     override suspend fun select(tabId: String) {
-        withContext(singleThreadedExecutor) {
+        databaseExecutor().scheduleDirect {
             val selection = TabSelectionEntity(tabId = tabId)
             tabsDao.insertTabSelection(selection)
         }
+    }
+
+    /**
+     * In this class we typically delegate DB work to a scheduler
+     * Historically, this was the IO scheduler, which can use multiple threads to do the work
+     * However, this presented the possibility of race conditions. One such case was when the blank tab was shown to the user and the URL
+     * they actually wanted was opened in a background tab.
+     *
+     * While there are likely even better ways of doing this, moving to a single-threaded executor is likely good enough to fix this for now
+     */
+    private fun databaseExecutor(): Scheduler {
+        return Schedulers.single()
     }
 }

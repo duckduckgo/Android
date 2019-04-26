@@ -53,6 +53,8 @@ class BrowserWebViewClient(
 
     var webViewClientListener: WebViewClientListener? = null
 
+    var pageLoadTimerStartTime: Long = 0
+
     private var currentUrl: String? = null
 
     /**
@@ -111,20 +113,18 @@ class BrowserWebViewClient(
 
     @UiThread
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
+        pageLoadTimerStartTime = System.currentTimeMillis()
 
-        measureExecution("onPageStarted") {
+        currentUrl = url
 
-            currentUrl = url
+        webViewClientListener?.let {
+            it.loadingStarted(url)
+            it.navigationOptionsChanged(determineNavigationOptions(webView))
+        }
 
-            webViewClientListener?.let {
-                it.loadingStarted(url)
-                it.navigationOptionsChanged(determineNavigationOptions(webView))
-            }
-
-            val uri = if (currentUrl != null) Uri.parse(currentUrl) else null
-            if (uri != null) {
-                reportHttpsIfInUpgradeList(uri)
-            }
+        val uri = if (currentUrl != null) Uri.parse(currentUrl) else null
+        if (uri != null) {
+            reportHttpsIfInUpgradeList(uri)
         }
     }
 
@@ -136,6 +136,8 @@ class BrowserWebViewClient(
                 it.loadingFinished(url)
                 it.navigationOptionsChanged(determineNavigationOptions(webView))
             }
+
+            Timber.i("Page Load Time: ${System.currentTimeMillis() - pageLoadTimerStartTime}ms")
         }
     }
 

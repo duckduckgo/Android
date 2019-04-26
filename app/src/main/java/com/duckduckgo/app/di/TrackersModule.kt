@@ -21,10 +21,8 @@ import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworksDirectDbLookup
-import com.duckduckgo.app.trackerdetection.model.TrackerNetworksImpl
 import dagger.Module
 import dagger.Provides
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -32,13 +30,6 @@ internal class TrackersModule {
 
     @Provides
     @Singleton
-    @Named("oldTrackerNetworks")
-    fun oldTrackerNetworksImpl(prevalenceStore: PrevalenceStore, entityMapping: EntityMapping): TrackerNetworks =
-        TrackerNetworksImpl(prevalenceStore, entityMapping)
-
-    @Provides
-    @Singleton
-    @Named("newTrackerNetworks")
     fun newTrackerNetworksImpl(prevalenceStore: PrevalenceStore, entityMapping: EntityMapping, trackerDataDao: TrackerDataDao): TrackerNetworks =
         TrackerNetworksDirectDbLookup(prevalenceStore, entityMapping, trackerDataDao)
 

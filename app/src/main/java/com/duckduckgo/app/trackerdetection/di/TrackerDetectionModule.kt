@@ -22,7 +22,6 @@ import com.duckduckgo.app.trackerdetection.TrackerDetectorImpl
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import dagger.Module
 import dagger.Provides
-import javax.inject.Named
 import javax.inject.Singleton
 
 
@@ -31,11 +30,7 @@ class TrackerDetectionModule {
 
     @Provides
     @Singleton
-    fun trackerDetector(
-        @Named("oldTrackerNetworks") oldNetworkTrackers: TrackerNetworks,
-        @Named("newTrackerNetworks") newNetworkTrackers: TrackerNetworks,
-        settings: PrivacySettingsStore
-    ): TrackerDetector {
-        return TrackerDetectorImpl(oldNetworkTrackers, newNetworkTrackers, settings)
+    fun trackerDetector(networkTrackers: TrackerNetworks, settings: PrivacySettingsStore): TrackerDetector {
+        return TrackerDetectorImpl(networkTrackers, settings)
     }
 }

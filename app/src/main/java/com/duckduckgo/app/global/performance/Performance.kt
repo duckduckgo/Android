@@ -21,15 +21,14 @@ import com.duckduckgo.app.global.isAndroidMainThread
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
+
 inline fun <T> measureExecution(logMessage: String, logLevel: Int = Log.DEBUG, function: () -> T): T {
     val startTime = System.nanoTime()
     return function.invoke().also {
         val difference = System.nanoTime() - startTime
-//        Timber.log(
-//            logLevel,
-//            "Main Thread: ${Thread.currentThread().isAndroidMainThread()} - $logMessage; took ${TimeUnit.NANOSECONDS.toMillis(difference)}ms"
-//        )
-        val mainThreadLog = if (Thread.currentThread().isAndroidMainThread()) "Main thread: true," else ""
-        Timber.log(logLevel, "${mainThreadLog}took ${TimeUnit.NANOSECONDS.toMillis(difference).toString().padEnd(6, ' ')}ms, $logMessage,(value={$it)")
+        Timber.log(
+            logLevel,
+            "Main Thread: ${Thread.currentThread().isAndroidMainThread()}, $logMessage; took ${TimeUnit.NANOSECONDS.toMillis(difference)}ms"
+        )
     }
 }

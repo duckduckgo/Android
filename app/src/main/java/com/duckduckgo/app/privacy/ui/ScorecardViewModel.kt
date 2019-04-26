@@ -19,7 +19,6 @@ package com.duckduckgo.app.privacy.ui
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.global.model.SiteMonitor
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
@@ -51,11 +50,10 @@ class ScorecardViewModel(private val settingsStore: PrivacySettingsStore) : View
 
     fun onSiteChanged(site: Site?) {
         this.site = site
-        val siteMonitor = site?.siteMonitor
-        if (site == null || siteMonitor == null) {
+        if (site == null) {
             resetViewState()
         } else {
-            updateSite(siteMonitor)
+            updateSite(site)
         }
     }
 
@@ -75,18 +73,22 @@ class ScorecardViewModel(private val settingsStore: PrivacySettingsStore) : View
         )
     }
 
-    private fun updateSite(site: SiteMonitor) {
+    private fun updateSite(site: Site) {
+        val grades = site.calculateGrades()
+        val grade = grades.grade
+        val improvedGrade = grades.improvedGrade
+
         viewState.value = viewState.value?.copy(
             domain = site.uri?.host ?: "",
-            beforeGrade = site.grade,
-            afterGrade = site.improvedGrade,
+            beforeGrade = grade,
+            afterGrade = improvedGrade,
             trackerCount = site.trackerCount,
             majorNetworkCount = site.majorNetworkCount,
             httpsStatus = site.https,
             allTrackersBlocked = site.allTrackersBlocked,
             practices = site.privacyPractices.summary,
             showIsMemberOfMajorNetwork = site.memberNetwork?.isMajor ?: false,
-            showEnhancedGrade = site.grade != site.improvedGrade
+            showEnhancedGrade = grade != improvedGrade
         )
     }
 }

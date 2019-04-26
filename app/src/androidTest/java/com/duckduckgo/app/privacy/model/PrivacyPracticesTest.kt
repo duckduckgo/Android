@@ -16,11 +16,6 @@
 
 package com.duckduckgo.app.privacy.model
 
-import androidx.room.Room
-import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.entities.db.EntityListDao
-import com.duckduckgo.app.entities.db.EntityListEntity
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Practices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.GOOD
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
@@ -37,14 +32,10 @@ class PrivacyPracticesTest {
 
     @Mock
     lateinit var mockTermsStore: TermsOfServiceStore
-    private lateinit var entityListDao: EntityListDao
 
     @Before
     fun before() {
         initMocks(this)
-
-        val db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java).build()
-        entityListDao = db.networkEntityDao()
     }
 
     @Test
@@ -72,15 +63,6 @@ class PrivacyPracticesTest {
             )
         )
 
-        entityListDao.insertAll(
-            listOf(
-                EntityListEntity("sibling1.com", "Network"),
-                EntityListEntity("sibling2.com", "Network"),
-                EntityListEntity("sibling3.com", "Network"),
-                EntityListEntity("sibling4.com", "Network")
-            )
-        )
-
         val testee = PrivacyPracticesImpl(mockTermsStore)
         assertEquals(10, testee.privacyPracticesFor("http://www.sibling1.com").score)
     }
@@ -88,10 +70,6 @@ class PrivacyPracticesTest {
     @Test
     fun whenUrlHasMatchingEntityWithTermsThenPracticesAreReturned() = runBlocking {
         whenever(mockTermsStore.terms).thenReturn(listOf(TermsOfService("example.com", classification = "A")))
-
-        entityListDao.insertAll(
-            listOf(EntityListEntity("example.com", "Network"))
-        )
 
         val testee = PrivacyPracticesImpl(mockTermsStore)
 

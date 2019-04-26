@@ -17,9 +17,17 @@
 package com.duckduckgo.app.privacy.model
 
 import com.duckduckgo.app.privacy.model.Grade.Grading.*
+import com.duckduckgo.app.privacy.model.Grade.Scores.ScoresAvailable
+import com.duckduckgo.app.privacy.model.Grade.Scores.ScoresUnavailable
+import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.squareup.moshi.Json
+import timber.log.Timber
 
-class Grade {
+class Grade(
+    val https: Boolean = false,
+    val httpsAutoUpgrade: Boolean = false,
+    val prevalenceStore: PrevalenceStore
+) {
 
     enum class Grading {
 
@@ -32,9 +40,9 @@ class Grade {
         C,
         D,
         @Json(name = "D-")
-        D_MINUS
+        D_MINUS,
+        UNKNOWN
     }
-
 
     data class Score(
         val grade: Grading,
@@ -44,21 +52,38 @@ class Grade {
         val privacyScore: Int
     )
 
-    data class Scores(
-        val site: Score,
-        val enhanced: Score
-    )
 
-    var https: Boolean = false
-    var httpsAutoUpgrade: Boolean = false
+    sealed class Scores {
+
+        data class ScoresAvailable(
+            val site: Score,
+            val enhanced: Score
+        ) : Scores()
+
+        object ScoresUnavailable : Scores()
+    }
+
     var privacyScore: Int? = null
 
-    val scores: Grade.Scores get() = calculate()
-
+    private var fullSiteDetailsAvailable: Boolean = false
     private var entitiesNotBlocked: Map<String, Double> = mapOf()
     private var entitiesBlocked: Map<String, Double> = mapOf()
 
-    private fun calculate(): Grade.Scores {
+    fun updateData(privacyScore: Int?, parentEntity: String?, prevalence: Double?) {
+        this.privacyScore = privacyScore
+        parentEntity?.let {
+            setParentEntityAndPrevalence(parentEntity, prevalence)
+        }
+
+        fullSiteDetailsAvailable = true
+    }
+
+    fun calculateScore(): Scores {
+
+        if (!fullSiteDetailsAvailable) {
+            Timber.i("Full site details are unavailable")
+            return scoresUnavailable()
+        }
 
         // HTTPS
         val siteHttpsScore: Int
@@ -110,8 +135,10 @@ class Grade {
             trackerScore = enhancedTrackerScore
         )
 
-        return Scores(site = site, enhanced = enhanced)
+        return ScoresAvailable(site = site, enhanced = enhanced)
     }
+
+    private fun scoresUnavailable() = ScoresUnavailable
 
     private fun gradeForScore(score: Int): Grading {
         return when {
@@ -147,7 +174,7 @@ class Grade {
         }
     }
 
-    fun setParentEntityAndPrevalence(parentEntity: String?, prevalence: Double?) {
+    private fun setParentEntityAndPrevalence(parentEntity: String?, prevalence: Double?) {
         parentEntity ?: return
         addEntityNotBlocked(parentEntity, prevalence)
     }

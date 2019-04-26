@@ -47,16 +47,15 @@ class PrivacyPracticesViewModel : ViewModel() {
     }
 
     fun onSiteChanged(site: Site?) {
-        val siteMonitor = site?.siteMonitor
-        if (siteMonitor == null) {
+        if (site == null) {
             resetViewState()
             return
         }
         viewState.value = viewState.value?.copy(
-            domain = siteMonitor.uri?.host ?: "",
-            practices = siteMonitor.privacyPractices.summary,
-            goodTerms = siteMonitor.privacyPractices.goodReasons,
-            badTerms = siteMonitor.privacyPractices.badReasons
+            domain = site.uri?.host ?: "",
+            practices = site.privacyPractices.summary,
+            goodTerms = site.privacyPractices.goodReasons,
+            badTerms = site.privacyPractices.badReasons
         )
     }
 }

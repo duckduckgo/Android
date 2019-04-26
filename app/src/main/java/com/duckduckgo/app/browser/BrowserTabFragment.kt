@@ -64,13 +64,13 @@ import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
+import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
+import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
-import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
-import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.CtaConfiguration
@@ -529,9 +529,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope by MainScope
 
         viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
             Timber.i("Observed grade: $it")
-            it?.let {
-                val drawable = context?.getDrawable(it.icon()) ?: return@let
+            it?.let { privacyGrade ->
+                val drawable = context?.getDrawable(privacyGrade.icon()) ?: return@let
                 privacyGradeButton?.setImageDrawable(drawable)
+                privacyGradeButton?.isEnabled = privacyGrade != PrivacyGrade.UNKNOWN
             }
         })
     }

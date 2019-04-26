@@ -29,13 +29,13 @@ interface PrivacyPractices {
         UNKNOWN
     }
 
-    data class Practices(val score: Int, val summary: PrivacyPractices.Summary, val goodReasons: List<String>, val badReasons: List<String>)
+    data class Practices(val score: Int, val summary: Summary, val goodReasons: List<String>, val badReasons: List<String>)
 
-    fun privacyPracticesFor(url: String): PrivacyPractices.Practices
+    fun privacyPracticesFor(url: String): Practices
 
     companion object {
 
-        val UNKNOWN = PrivacyPractices.Practices(2, PrivacyPractices.Summary.UNKNOWN, emptyList(), emptyList())
+        val UNKNOWN = Practices(2, Summary.UNKNOWN, emptyList(), emptyList())
 
     }
 

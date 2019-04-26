@@ -24,7 +24,6 @@ import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import timber.log.Timber
 import java.util.concurrent.CopyOnWriteArrayList
-import javax.inject.Named
 
 interface TrackerDetector {
     fun addClient(client: Client)
@@ -32,8 +31,7 @@ interface TrackerDetector {
 }
 
 class TrackerDetectorImpl(
-    @Named("oldTrackerNetworks") private val oldNetworkTrackers: TrackerNetworks,
-    @Named("newTrackerNetworks") private val newNetworkTrackers: TrackerNetworks,
+    private val networkTrackers: TrackerNetworks,
     private val settings: PrivacySettingsStore
 ) : TrackerDetector {
 
@@ -78,8 +76,7 @@ class TrackerDetectorImpl(
         }
         if (matches) {
             Timber.v("$documentUrl resource $url WAS identified as a tracker")
-            val networkTrackers = measureExecution("oldNetworkTrackers") { oldNetworkTrackers.network(url) }
-            measureExecution("newNetworkTrackers") { newNetworkTrackers.network(url) }
+            val networkTrackers = networkTrackers.network(url)
             return TrackingEvent(documentUrl, url, networkTrackers, settings.privacyOn)
         }
 
@@ -93,17 +90,9 @@ class TrackerDetectorImpl(
     private fun sameNetworkName(firstUrl: String, secondUrl: String): Boolean {
         // mean=391,worst=1005
 
-        measureExecution("sameNetworkNameNew") {
-            val firstNetwork = newNetworkTrackers.network(firstUrl) ?: return@measureExecution false
-            val secondNetwork = newNetworkTrackers.network(secondUrl) ?: return@measureExecution false
-            return@measureExecution firstNetwork.name == secondNetwork.name
-        }
-
-        return measureExecution("sameNetworkNameOld") {
-            val firstNetwork = oldNetworkTrackers.network(firstUrl) ?: return@measureExecution false
-            val secondNetwork = oldNetworkTrackers.network(secondUrl) ?: return@measureExecution false
-            return@measureExecution firstNetwork.name == secondNetwork.name
-        }
+        val firstNetwork = networkTrackers.network(firstUrl) ?: return false
+        val secondNetwork = networkTrackers.network(secondUrl) ?: return false
+        return firstNetwork.name == secondNetwork.name
     }
 
 

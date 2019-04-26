@@ -46,16 +46,15 @@ class TrackerNetworksViewModel : ViewModel() {
     }
 
     fun onSiteChanged(site: Site?) {
-        val siteMonitor = site?.siteMonitor
-        if (site == null || siteMonitor == null) {
+        if (site == null) {
             resetViewState()
             return
         }
         viewState.value = viewState.value?.copy(
-            domain = siteMonitor.uri?.host ?: "",
-            trackerCount = siteMonitor.trackerCount,
-            allTrackersBlocked = siteMonitor.allTrackersBlocked,
-            trackingEventsByNetwork = siteMonitor.distinctTrackersByNetwork
+            domain = site.uri?.host ?: "",
+            trackerCount = site.trackerCount,
+            allTrackersBlocked = site.allTrackersBlocked,
+            trackingEventsByNetwork = site.distinctTrackersByNetwork
         )
     }
 }
