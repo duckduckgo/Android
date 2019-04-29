@@ -20,24 +20,46 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
+import android.content.Intent
 import android.widget.RemoteViews
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
+import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.WIDGET_ADDED
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.WIDGET_DELETED
 import com.duckduckgo.app.widget.ui.AppWidgetCapabilities
+import javax.inject.Inject
 
 
 class SearchWidgetLight : SearchWidget(R.layout.search_widget_light)
 
 open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetProvider() {
 
+    @Inject
+    lateinit var appInstallStore: AppInstallStore
+
+    @Inject
+    lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var widgetCapabilities: AppWidgetCapabilities
+
+    override fun onReceive(context: Context, intent: Intent?) {
+        inject(context)
+        super.onReceive(context, intent)
+    }
+
+    private fun inject(context: Context) {
+        val application = context.applicationContext as DuckDuckGoApplication
+        application.daggerAppComponent.inject(this)
+    }
+
     override fun onEnabled(context: Context) {
-        val application = context.applicationContext as? DuckDuckGoApplication ?: return
-        if (!application.appInstallStore.widgetInstalled) {
-            application.appInstallStore.widgetInstalled = true
-            application.pixel.fire(WIDGET_ADDED)
+        if (!appInstallStore.widgetInstalled) {
+            appInstallStore.widgetInstalled = true
+            pixel.fire(WIDGET_ADDED)
         }
     }
 
@@ -60,11 +82,9 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
     }
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray?) {
-        val application = context.applicationContext as? DuckDuckGoApplication ?: return
-        val widgetCapabilities = AppWidgetCapabilities(context)
-        if (application.appInstallStore.widgetInstalled && !widgetCapabilities.hasInstalledWidgets) {
-            application.appInstallStore.widgetInstalled = false
-            application?.pixel?.fire(WIDGET_DELETED)
+        if (appInstallStore.widgetInstalled && !widgetCapabilities.hasInstalledWidgets) {
+            appInstallStore.widgetInstalled = false
+            pixel.fire(WIDGET_DELETED)
         }
     }
 }
