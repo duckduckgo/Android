@@ -16,11 +16,13 @@
 
 package com.duckduckgo.app.privacy.model
 
+import com.duckduckgo.app.entities.EntityMapping
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
+import com.duckduckgo.app.global.initialization.Initializable
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import javax.inject.Inject
 
-interface PrivacyPractices {
+interface PrivacyPractices : Initializable {
 
     enum class Summary {
         POOR,
@@ -41,11 +43,38 @@ interface PrivacyPractices {
 
 }
 
-class PrivacyPracticesImpl @Inject constructor(private val termsOfServiceStore: TermsOfServiceStore) : PrivacyPractices {
+class PrivacyPracticesImpl @Inject constructor(
+    private val termsOfServiceStore: TermsOfServiceStore,
+    private val entityMapping: EntityMapping
+) : PrivacyPractices {
+
+
+    private var entityScores: Map<String, Int> = mapOf()
+
+    override suspend fun initialize() {
+        val entityScores: MutableMap<String, Int> = mutableMapOf()
+
+        termsOfServiceStore.terms.forEach {
+            val url = it.name ?: return@forEach
+            val derivedScore = it.derivedScore
+
+            entityMapping.entityForUrl(url)?.let {
+
+                val entityScore = entityScores[it.entityName]
+                if (entityScore == null || entityScore < derivedScore) {
+                    entityScores[it.entityName] = derivedScore
+                }
+
+            }
+        }
+
+        this.entityScores = entityScores
+    }
 
     override fun privacyPracticesFor(url: String): PrivacyPractices.Practices {
+        val entity = entityMapping.entityForUrl(url)
         val terms = termsOfServiceStore.terms.find { sameOrSubdomain(url, it.name ?: "") } ?: return PrivacyPractices.UNKNOWN
-        val score = terms.derivedScore
+        val score = entityScores[entity?.entityName] ?: terms.derivedScore
         return PrivacyPractices.Practices(score, terms.practices, terms.goodPrivacyTerms, terms.badPrivacyTerms)
     }
 

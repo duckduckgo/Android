@@ -20,6 +20,7 @@ import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.entities.db.EntityListEntity
+import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.uri.removeOneSubdomain
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -32,7 +33,7 @@ class EntityMapping @Inject constructor(private val entityListDao: EntityListDao
     @WorkerThread
     fun entityForUrl(url: String): EntityListEntity? {
         val uri = url.toUri()
-        val host = uri.host ?: return null
+        val host = uri.baseHost ?: return null
 
         // try searching for exact domain
         val direct = lookUpEntityInDatabase(host)

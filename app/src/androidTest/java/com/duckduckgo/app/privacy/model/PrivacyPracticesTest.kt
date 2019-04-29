@@ -16,6 +16,12 @@
 
 package com.duckduckgo.app.privacy.model
 
+import androidx.room.Room
+import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.entities.EntityMapping
+import com.duckduckgo.app.entities.db.EntityListDao
+import com.duckduckgo.app.entities.db.EntityListEntity
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Practices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.GOOD
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
@@ -23,7 +29,6 @@ import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations.initMocks
@@ -33,9 +38,21 @@ class PrivacyPracticesTest {
     @Mock
     lateinit var mockTermsStore: TermsOfServiceStore
 
+    private lateinit var entityDao: EntityListDao
+
+    private lateinit var entityMapping: EntityMapping
+
+    private lateinit var testee: PrivacyPracticesImpl
+
     @Before
     fun before() {
         initMocks(this)
+
+        entityDao = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
+            .build()
+            .networkEntityDao()
+
+        entityMapping = EntityMapping(entityDao)
     }
 
     @Test
@@ -46,12 +63,10 @@ class PrivacyPracticesTest {
             )
         )
 
-        val testee = PrivacyPracticesImpl(mockTermsStore)
-
+        testee = PrivacyPracticesImpl(mockTermsStore, entityMapping)
         assertEquals(10, testee.privacyPracticesFor("http://www.example.com").score)
     }
 
-    @Ignore("Need to review if this test is still valid; it might have been relying on the cached implementation")
     @Test
     fun whenUrlHasParentEntityThenItsScoreIsWorstInNetwork() = runBlocking {
         whenever(mockTermsStore.terms).thenReturn(
@@ -63,7 +78,18 @@ class PrivacyPracticesTest {
             )
         )
 
-        val testee = PrivacyPracticesImpl(mockTermsStore)
+        entityDao.insertAll(
+            listOf(
+                EntityListEntity("sibling1.com", "Network"),
+                EntityListEntity("sibling2.com", "Network"),
+                EntityListEntity("sibling3.com", "Network"),
+                EntityListEntity("sibling4.com", "Network")
+            )
+        )
+
+        testee = PrivacyPracticesImpl(mockTermsStore, entityMapping)
+        testee.initialize()
+
         assertEquals(10, testee.privacyPracticesFor("http://www.sibling1.com").score)
     }
 
@@ -71,7 +97,7 @@ class PrivacyPracticesTest {
     fun whenUrlHasMatchingEntityWithTermsThenPracticesAreReturned() = runBlocking {
         whenever(mockTermsStore.terms).thenReturn(listOf(TermsOfService("example.com", classification = "A")))
 
-        val testee = PrivacyPracticesImpl(mockTermsStore)
+        testee = PrivacyPracticesImpl(mockTermsStore, entityMapping)
 
         val expected = Practices(score = 0, summary = GOOD, goodReasons = emptyList(), badReasons = emptyList())
         assertEquals(expected, testee.privacyPracticesFor("http://www.example.com"))
@@ -79,7 +105,7 @@ class PrivacyPracticesTest {
 
     @Test
     fun whenInitialisedWithEmptyTermsStoreAndEntityListThenReturnsUnknownForUrl() = runBlocking {
-        val testee = PrivacyPracticesImpl(mockTermsStore)
+        testee = PrivacyPracticesImpl(mockTermsStore, entityMapping)
         assertEquals(PrivacyPractices.UNKNOWN, testee.privacyPracticesFor("http://www.example.com"))
     }
 }
