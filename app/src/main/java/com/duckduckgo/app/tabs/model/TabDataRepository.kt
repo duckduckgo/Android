@@ -39,9 +39,9 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
 
     private val siteData: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
 
-    override fun add(url: String?, isDefaultTab: Boolean): String {
+    override fun add(url: String?, skipHome: Boolean, isDefaultTab: Boolean): String {
         val tabId = generateTabId()
-        add(tabId, buildSiteData(url), isDefaultTab = isDefaultTab)
+        add(tabId, buildSiteData(url), skipHome = skipHome, isDefaultTab = isDefaultTab)
         return tabId
     }
 
@@ -56,7 +56,7 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
         return data
     }
 
-    override fun add(tabId: String, data: MutableLiveData<Site>, isDefaultTab: Boolean) {
+    override fun add(tabId: String, data: MutableLiveData<Site>, skipHome: Boolean, isDefaultTab: Boolean) {
         siteData[tabId] = data
         databaseExecutor().scheduleDirect {
 
@@ -69,7 +69,7 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
 
             Timber.i("About to add a new tab, isDefaultTab: $isDefaultTab. $tabId")
             val position = tabsDao.lastTab()?.position ?: 0
-            tabsDao.addAndSelectTab(TabEntity(tabId, data.value?.url, data.value?.title, true, position))
+            tabsDao.addAndSelectTab(TabEntity(tabId, data.value?.url, data.value?.title, skipHome, true, position))
         }
     }
 
@@ -78,15 +78,16 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
             val position = tabsDao.tab(tabId)?.position ?: -1
             val uri = Uri.parse(url)
             val title = uri.host?.removePrefix("www.") ?: url
-            val tab = TabEntity(generateTabId(), url, title, false, position + 1)
+            val tab = TabEntity(generateTabId(), url, title, false, false, position + 1)
             tabsDao.insertTabAtPosition(tab)
         }
     }
 
     override fun update(tabId: String, site: Site?) {
         databaseExecutor().scheduleDirect {
-            val position = tabsDao.tab(tabId)?.position ?: 0
-            val tab = TabEntity(tabId, site?.url, site?.title, true, position)
+            val current = tabsDao.tab(tabId)
+            val position = current?.position ?: 0
+            val tab = TabEntity(tabId, site?.url, site?.title, false, true, position = position)
             tabsDao.updateTab(tab)
         }
     }
