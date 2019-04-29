@@ -506,7 +506,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNotBrowsingAndUrlChangedThenUrlIsNotUpdated() {
+    fun whenNotBrowsingAndUrlChangedThenUrlIsNotUpdated() = runBlocking<Unit> {
         changeUrl("duckduckgo.com", false)
         assertEquals("", omnibarViewState().omnibarText)
     }
