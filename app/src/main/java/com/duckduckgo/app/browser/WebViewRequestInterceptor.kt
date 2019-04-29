@@ -84,7 +84,6 @@ class WebViewRequestInterceptor(
         }
 
         if (shouldBlock(request, documentUrl, webViewClientListener)) {
-
             val surrogate = resourceSurrogates.get(url)
             if (surrogate.responseAvailable) {
                 Timber.d("Surrogate found for $url")
@@ -102,7 +101,7 @@ class WebViewRequestInterceptor(
     private fun shouldUpgrade(request: WebResourceRequest) =
         request.isForMainFrame && request.url != null && httpsUpgrader.shouldUpgrade(request.url)
 
-    private suspend fun shouldBlock(request: WebResourceRequest, documentUrl: String?, webViewClientListener: WebViewClientListener?): Boolean {
+    private fun shouldBlock(request: WebResourceRequest, documentUrl: String?, webViewClientListener: WebViewClientListener?): Boolean {
         val url = request.url.toString()
 
         if (request.isForMainFrame || documentUrl == null) {
