@@ -27,8 +27,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.WIDGET_ADDED
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.WIDGET_DELETED
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.WIDGETS_ADDED
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.WIDGETS_DELETED
 import com.duckduckgo.app.widget.ui.AppWidgetCapabilities
 import javax.inject.Inject
 
@@ -59,7 +59,7 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
     override fun onEnabled(context: Context) {
         if (!appInstallStore.widgetInstalled) {
             appInstallStore.widgetInstalled = true
-            pixel.fire(WIDGET_ADDED)
+            pixel.fire(WIDGETS_ADDED)
         }
     }
 
@@ -84,7 +84,7 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
     override fun onDeleted(context: Context, appWidgetIds: IntArray?) {
         if (appInstallStore.widgetInstalled && !widgetCapabilities.hasInstalledWidgets) {
             appInstallStore.widgetInstalled = false
-            pixel.fire(WIDGET_DELETED)
+            pixel.fire(WIDGETS_DELETED)
         }
     }
 }

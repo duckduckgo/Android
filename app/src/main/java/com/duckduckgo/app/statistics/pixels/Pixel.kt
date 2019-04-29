@@ -41,8 +41,8 @@ interface Pixel {
 
         DEFAULT_BROWSER_SET("m_b_s"),
         DEFAULT_BROWSER_UNSET("m_b_u"),
-        WIDGET_ADDED(pixelName = "m_w_a"),
-        WIDGET_DELETED(pixelName = "m_w_d"),
+        WIDGETS_ADDED(pixelName = "m_w_a"),
+        WIDGETS_DELETED(pixelName = "m_w_d"),
         WIDGET_LAUNCHED(pixelName = "m_w_l"),
 
         LONG_PRESS("mlp"),
