@@ -801,6 +801,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope by MainScope
     }
 
     fun onBackPressed(): Boolean {
+        if (!isAdded) return false
         return viewModel.onUserPressedBack()
     }
 
