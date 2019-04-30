@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("unused")
+
 package com.duckduckgo.app.global.performance
 
 import android.util.Log

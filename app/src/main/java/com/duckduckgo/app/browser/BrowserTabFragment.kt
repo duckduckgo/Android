@@ -76,7 +76,6 @@ import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.CtaConfiguration
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.global.ViewModelFactory
-import com.duckduckgo.app.global.performance.measureExecution
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
@@ -1021,23 +1020,21 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         fun renderBrowserViewState(viewState: BrowserViewState) {
             renderIfChanged(viewState, lastSeenBrowserViewState) {
                 val browserShowing = viewState.browserShowing
-                measureExecution("renderBrowserViewState") {
 
-                    val browserShowingChanged = viewState.browserShowing != lastSeenBrowserViewState?.browserShowing
-                    lastSeenBrowserViewState = viewState
-                    if (browserShowingChanged) {
-                        if (browserShowing) {
-                            showBrowser()
-                        } else {
-                            showHome()
-                        }
+                val browserShowingChanged = viewState.browserShowing != lastSeenBrowserViewState?.browserShowing
+                lastSeenBrowserViewState = viewState
+                if (browserShowingChanged) {
+                    if (browserShowing) {
+                        showBrowser()
+                    } else {
+                        showHome()
                     }
-
-                    toggleDesktopSiteMode(viewState.isDesktopBrowsingMode)
-                    renderToolbarMenus(viewState)
-                    renderPopupMenus(browserShowing, viewState)
-                    renderFullscreenMode(viewState)
                 }
+
+                toggleDesktopSiteMode(viewState.isDesktopBrowsingMode)
+                renderToolbarMenus(viewState)
+                renderPopupMenus(browserShowing, viewState)
+                renderFullscreenMode(viewState)
             }
         }
 
@@ -1082,16 +1079,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
             lastSeenFindInPageViewState = viewState
 
-            measureExecution("renderFindInPageState") {
-
-                if (viewState.visible) {
-                    showFindInPageView(viewState)
-                } else {
-                    hideFindInPage()
-                }
-
-                popupMenu.contentView.findInPageMenuItem?.isEnabled = viewState.canFindInPage
+            if (viewState.visible) {
+                showFindInPageView(viewState)
+            } else {
+                hideFindInPage()
             }
+
+            popupMenu.contentView.findInPageMenuItem?.isEnabled = viewState.canFindInPage
         }
 
         fun renderTabIcon(tabs: List<TabEntity>) {

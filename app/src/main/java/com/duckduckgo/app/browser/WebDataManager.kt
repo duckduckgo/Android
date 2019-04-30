@@ -22,7 +22,6 @@ import android.webkit.WebView
 import android.webkit.WebViewDatabase
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
-import com.duckduckgo.app.global.performance.measureExecution
 import javax.inject.Inject
 
 interface WebDataManager {
@@ -50,27 +49,19 @@ class WebViewDataManager @Inject constructor(
     }
 
     private fun clearCache(webView: WebView) {
-        measureExecution("Cleared global WebView cache") {
-            webView.clearCache(true)
-        }
+        webView.clearCache(true)
     }
 
     private fun clearHistory(webView: WebView) {
-        measureExecution("Cleared history") {
-            webView.clearHistory()
-        }
+        webView.clearHistory()
     }
 
     private fun clearWebStorage(webStorage: WebStorage) {
-        measureExecution("Cleared web storage") {
-            webStorage.deleteAllData()
-        }
+        webStorage.deleteAllData()
     }
 
     private fun clearFormData(webView: WebView) {
-        measureExecution("Cleared web view form data") {
-            webView.clearFormData()
-        }
+        webView.clearFormData()
     }
 
     /**
@@ -78,9 +69,7 @@ class WebViewDataManager @Inject constructor(
      */
     @Suppress("DEPRECATION")
     private fun clearFormData(webViewDatabase: WebViewDatabase) {
-        measureExecution("Cleared legacy form data") {
-            webViewDatabase.clearFormData()
-        }
+        webViewDatabase.clearFormData()
     }
 
     private fun clearAuthentication(webViewDatabase: WebViewDatabase) {
@@ -88,14 +77,10 @@ class WebViewDataManager @Inject constructor(
     }
 
     override suspend fun clearExternalCookies() {
-        measureExecution("Cleared cookies") {
-            cookieManager.removeExternalCookies()
-        }
+        cookieManager.removeExternalCookies()
     }
 
     override fun clearWebViewSessions() {
-        measureExecution("Cleared web view sessions") {
-            webViewSessionStorage.deleteAllSessions()
-        }
+        webViewSessionStorage.deleteAllSessions()
     }
 }
