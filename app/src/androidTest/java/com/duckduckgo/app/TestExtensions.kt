@@ -19,12 +19,8 @@ package com.duckduckgo.app
 import androidx.annotation.UiThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.di.TestAppComponent
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.runBlocking
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -48,8 +44,4 @@ fun getApp(): TestApplication {
 
 fun getDaggerComponent(): TestAppComponent {
     return getApp().daggerAppComponent as TestAppComponent
-}
-
-fun ViewModel.awaitCoroutineCompletion() = runBlocking {
-    viewModelScope.coroutineContext[Job]?.children?.forEach { it.join() }
 }

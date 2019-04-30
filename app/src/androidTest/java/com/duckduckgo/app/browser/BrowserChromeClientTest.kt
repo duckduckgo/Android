@@ -28,7 +28,6 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
-import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 
@@ -79,37 +78,37 @@ class BrowserChromeClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnProgressChangedCalledThenListenerInstructedToUpdateProgress() = runBlocking<Unit> {
-        testee.onProgressChangedAsync(webView, 10)
+    fun whenOnProgressChangedCalledThenListenerInstructedToUpdateProgress() {
+        testee.onProgressChanged(webView, 10)
         verify(mockWebViewClientListener).progressChanged(webView.stubUrl, 10)
     }
 
     @UiThreadTest
     @Test
-    fun whenOnProgressChangedCalledButNoUrlChangeThenListenerInstructedToUpdateProgressASecondTime() = runBlocking<Unit> {
+    fun whenOnProgressChangedCalledButNoUrlChangeThenListenerInstructedToUpdateProgressASecondTime() {
         webView.stubUrl = "foo.com"
-        testee.onProgressChangedAsync(webView, 10)
-        testee.onProgressChangedAsync(webView, 20)
+        testee.onProgressChanged(webView, 10)
+        testee.onProgressChanged(webView, 20)
         verify(mockWebViewClientListener, times(2)).progressChanged(any(), any())
     }
 
     @UiThreadTest
     @Test
-    fun whenOnProgressChangedCalledAfterUrlChangeThenListenerInstructedToUpdateProgressAgain() = runBlocking<Unit> {
+    fun whenOnProgressChangedCalledAfterUrlChangeThenListenerInstructedToUpdateProgressAgain() {
         webView.stubUrl = "foo.com"
-        testee.onProgressChangedAsync(webView, 10)
-        testee.onProgressChangedAsync(webView, 20)
+        testee.onProgressChanged(webView, 10)
+        testee.onProgressChanged(webView, 20)
         webView.stubUrl = "bar.com"
-        testee.onProgressChangedAsync(webView, 30)
+        testee.onProgressChanged(webView, 30)
         verify(mockWebViewClientListener, times(3)).progressChanged(any(), any())
     }
 
     @UiThreadTest
     @Test
-    fun whenOnProgressChangedCalledThenPassedOnToWebClient() = runBlocking<Unit> {
+    fun whenOnProgressChangedCalledThenPassedOnToWebClient() {
         val url = "https://example.com"
         webView.stubUrl = url
-        testee.onProgressChangedAsync(webView, 10)
+        testee.onProgressChanged(webView, 10)
         verify(mockWebViewClientListener).progressChanged(url, 10)
     }
 

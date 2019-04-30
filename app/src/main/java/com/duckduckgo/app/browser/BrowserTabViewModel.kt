@@ -54,7 +54,6 @@ import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
-import com.duckduckgo.app.global.performance.measureExecution
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.SiteVisitedEntity
@@ -366,18 +365,15 @@ class BrowserTabViewModel(
     }
 
     override fun progressChanged(progressedUrl: String?, newProgress: Int) {
-        measureExecution("progressChanged") {
+        Timber.v("Loading in progress $newProgress")
+        if (!currentBrowserViewState().browserShowing) return
+        val progress = currentLoadingViewState()
+        loadingViewState.value = progress.copy(progress = newProgress)
 
-            Timber.v("Loading in progress $newProgress")
-            if (!currentBrowserViewState().browserShowing) return
-            val progress = currentLoadingViewState()
-            loadingViewState.value = progress.copy(progress = newProgress)
-
-            if (progressedUrl == pendingUrl) {
-                // We change the url here rather than loadingStarted to protect against phishing
-                // See https://github.com/duckduckgo/Android/pull/390
-                urlChanged(pendingUrl)
-            }
+        if (progressedUrl == pendingUrl) {
+            // We change the url here rather than loadingStarted to protect against phishing
+            // See https://github.com/duckduckgo/Android/pull/390
+            urlChanged(pendingUrl)
         }
     }
 
