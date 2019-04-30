@@ -34,8 +34,8 @@ class DefaultBrowserObserver(
         if (appInstallStore.defaultBrowser != isDefaultBrowser) {
             appInstallStore.defaultBrowser = isDefaultBrowser
             when {
-                isDefaultBrowser -> pixel.fire(Pixel.PixelName.DEFAULT_BROWSER_SET, includeLocal = true)
-                else -> pixel.fire(Pixel.PixelName.DEFAULT_BROWSER_UNSET, includeLocal = true)
+                isDefaultBrowser -> pixel.fire(Pixel.PixelName.DEFAULT_BROWSER_SET, includeLocale = true)
+                else -> pixel.fire(Pixel.PixelName.DEFAULT_BROWSER_UNSET, includeLocale = true)
             }
         }
 

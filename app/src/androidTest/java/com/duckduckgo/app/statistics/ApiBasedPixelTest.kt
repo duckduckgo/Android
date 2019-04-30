@@ -133,7 +133,7 @@ class ApiBasedPixelTest {
         val pixel = ApiBasedPixel(mockPixelService, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo)
         val params = mapOf("param1" to "value1")
         val localeParams = mapOf("lg" to "es", "co" to "us")
-        pixel.fire(PRIVACY_DASHBOARD_OPENED, params, addLocale = true)
+        pixel.fire(PRIVACY_DASHBOARD_OPENED, params, includeLocale = true)
         verify(mockPixelService).fire("mp", "phone", "atbvariant", params.plus(localeParams))
     }
 
@@ -148,7 +148,7 @@ class ApiBasedPixelTest {
 
         val pixel = ApiBasedPixel(mockPixelService, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo)
         val localeParams = mapOf("lg" to "es", "co" to "us")
-        pixel.fire(PRIVACY_DASHBOARD_OPENED, addLocale = true)
+        pixel.fire(PRIVACY_DASHBOARD_OPENED, includeLocale = true)
         verify(mockPixelService).fire("mp", "phone", "atbvariant", localeParams)
     }
 }

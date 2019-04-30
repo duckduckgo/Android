@@ -40,8 +40,8 @@ interface Pixel {
         PRIVACY_DASHBOARD_PRIVACY_PRACTICES("mp_p"),
         PRIVACY_DASHBOARD_NETWORKS("mp_n"),
 
-        DEFAULT_BROWSER_SET("m_b_s"),
-        DEFAULT_BROWSER_UNSET("m_b_u"),
+        DEFAULT_BROWSER_SET("m_db_s"),
+        DEFAULT_BROWSER_UNSET("m_db_u"),
         WIDGETS_ADDED(pixelName = "m_w_a"),
         WIDGETS_DELETED(pixelName = "m_w_d"),
         WIDGET_LAUNCHED(pixelName = "m_w_l"),
@@ -111,8 +111,8 @@ interface Pixel {
         const val APP_VERSION = "app_version"
     }
 
-    fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap(), includeLocal: Boolean = false)
-    fun fire(pixelName: String, parameters: Map<String, String?> = emptyMap(), includeLocal: Boolean = false)
+    fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap(), includeLocale: Boolean = false)
+    fun fire(pixelName: String, parameters: Map<String, String?> = emptyMap(), includeLocale: Boolean = false)
     fun fireCompletable(pixelName: String, parameters: Map<String, String?>): Completable
 
 }
@@ -124,12 +124,12 @@ class ApiBasedPixel @Inject constructor(
     private val deviceInfo: DeviceInfo
 ) : Pixel {
 
-    override fun fire(pixel: Pixel.PixelName, parameters: Map<String, String?>, addLocale: Boolean) {
-        fire(pixel.pixelName, parameters, addLocale)
+    override fun fire(pixel: Pixel.PixelName, parameters: Map<String, String?>, includeLocale: Boolean) {
+        fire(pixel.pixelName, parameters, includeLocale)
     }
 
-    override fun fire(pixelName: String, parameters: Map<String, String?>, addLocale: Boolean) {
-        val locale = if (addLocale) localeMap else emptyMap()
+    override fun fire(pixelName: String, parameters: Map<String, String?>, includeLocale: Boolean) {
+        val locale = if (includeLocale) localeMap else emptyMap()
 
         fireCompletable(pixelName, parameters.plus(locale))
             .subscribeOn(Schedulers.io())
