@@ -49,7 +49,7 @@ class AppInstallSharedPreferences @Inject constructor(private val context: Conte
 
     override var defaultBrowser: Boolean
         get() = preferences.getBoolean(KEY_DEFAULT_BROWSER, false)
-        set(widgetInstalled) = preferences.edit { putBoolean(KEY_DEFAULT_BROWSER, widgetInstalled) }
+        set(defaultBrowser) = preferences.edit { putBoolean(KEY_DEFAULT_BROWSER, defaultBrowser) }
 
     override fun hasInstallTimestampRecorded(): Boolean = preferences.contains(KEY_TIMESTAMP_UTC)
 
