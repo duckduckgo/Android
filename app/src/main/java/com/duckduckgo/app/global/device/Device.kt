@@ -48,5 +48,5 @@ class ContextDeviceInfo @Inject constructor(private val context: Context) : Devi
         get() = Locale.getDefault().country
 
     override val language: String
-        get() = Locale.getDefault().isO3Language
+        get() = Locale.getDefault().language
 }
