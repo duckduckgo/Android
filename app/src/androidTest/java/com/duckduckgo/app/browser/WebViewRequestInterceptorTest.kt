@@ -300,7 +300,7 @@ class WebViewRequestInterceptorTest {
         assertNull(response)
     }
 
-    private fun configureShouldBlock() = runBlocking<Unit> {
+    private fun configureShouldBlock() {
         val blockTrackingEvent = TrackingEvent(
             blocked = true,
             documentUrl = "",
