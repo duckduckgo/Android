@@ -28,7 +28,6 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -58,16 +57,8 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
     private fun buildSiteData(url: String?): MutableLiveData<Site> {
         val data = MutableLiveData<Site>()
         url?.let {
-
-            launch {
-                val siteMonitor = siteFactory.buildSite(it).also { newSite ->
-                    launch(Dispatchers.IO) {
-                        siteFactory.loadFullSiteDetails(newSite)
-                        data.postValue(newSite)
-                    }
-                }
-                data.postValue(siteMonitor)
-            }
+            val siteMonitor = siteFactory.buildSite(it)
+            data.postValue(siteMonitor)
         }
         return data
     }

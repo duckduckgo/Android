@@ -28,7 +28,6 @@ import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.global.isHttps
-import com.duckduckgo.app.global.performance.measureExecution
 import com.duckduckgo.app.global.toHttpsString
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -54,9 +53,8 @@ class BrowserWebViewClient(
 
     var webViewClientListener: WebViewClientListener? = null
 
-    var pageLoadTimerStartTime: Long = 0
-
     private var currentUrl: String? = null
+    private var tempTimer = 0L
 
     /**
      * This is the new method of url overriding available from API 24 onwards
@@ -114,8 +112,8 @@ class BrowserWebViewClient(
 
     @UiThread
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
-        pageLoadTimerStartTime = System.currentTimeMillis()
-
+        tempTimer = System.currentTimeMillis()
+        Timber.d("\nonPageStarted {\nurl: $url\nwebView.url: ${webView.url}\n}\n")
         currentUrl = url
 
         webViewClientListener?.let {
@@ -131,15 +129,13 @@ class BrowserWebViewClient(
 
     @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
-        measureExecution("onPageFinished") {
-            currentUrl = url
-            webViewClientListener?.let {
-                it.loadingFinished(url)
-                it.navigationOptionsChanged(WebViewNavigationOptions(webView.copyBackForwardList()))
-            }
-
-            Timber.i("Page Load Time: ${System.currentTimeMillis() - pageLoadTimerStartTime}ms")
+        currentUrl = url
+        webViewClientListener?.let {
+            it.loadingFinished(url)
+            it.navigationOptionsChanged(WebViewNavigationOptions(webView.copyBackForwardList()))
         }
+
+        Timber.i("Page Load Time: ${System.currentTimeMillis() - tempTimer}ms for $url")
     }
 
 //    suspend fun onPageFinishedAsync(webView: WebView, url: String?) {

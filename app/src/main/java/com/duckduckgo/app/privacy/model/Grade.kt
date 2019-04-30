@@ -63,7 +63,7 @@ class Grade(
         object ScoresUnavailable : Scores()
     }
 
-    var privacyScore: Int? = null
+    private var privacyScore: Int? = null
 
     private var fullSiteDetailsAvailable: Boolean = false
     private var entitiesNotBlocked: Map<String, Double> = mapOf()
@@ -81,7 +81,7 @@ class Grade(
     fun calculateScore(): Scores {
 
         if (!fullSiteDetailsAvailable) {
-            Timber.i("Full site details are unavailable")
+            Timber.d("Full site details are not available")
             return scoresUnavailable()
         }
 

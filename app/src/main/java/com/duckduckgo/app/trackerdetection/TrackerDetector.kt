@@ -17,7 +17,6 @@
 package com.duckduckgo.app.trackerdetection
 
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
-import com.duckduckgo.app.global.performance.measureExecution
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.trackerdetection.model.ResourceType
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
@@ -47,32 +46,24 @@ class TrackerDetectorImpl(
 
     override fun evaluate(url: String, documentUrl: String, resourceType: ResourceType): TrackingEvent? {
 
-        // mean=4, worst=57
-        val whitelisted = measureExecution("whitelisted") {
-            clients.any { it.name.type == Client.ClientType.WHITELIST && it.matches(url, documentUrl, resourceType) }
-        }
+        val whitelisted = clients.any { it.name.type == Client.ClientType.WHITELIST && it.matches(url, documentUrl, resourceType) }
         if (whitelisted) {
             Timber.v("$documentUrl resource $url is whitelisted")
             return null
         }
 
-        // fast when it IS a first party; slow when not
-        // mean=407, worst=1327
-        val isFirstParty = measureExecution(logMessage = "firstParty") { firstParty(url, documentUrl) }
+        val isFirstParty = firstParty(url, documentUrl)
         if (isFirstParty) {
             Timber.v("$url is a first party url")
             return null
         }
 
-        // mean = 100-170 (slightly quicker when it does match)
-        val matches = measureExecution("matchesBlocker") {
-            clients.any {
-                it.name.type == Client.ClientType.BLOCKING && it.matches(
-                    url,
-                    documentUrl,
-                    resourceType
-                )
-            }
+        val matches = clients.any {
+            it.name.type == Client.ClientType.BLOCKING && it.matches(
+                url,
+                documentUrl,
+                resourceType
+            )
         }
         if (matches) {
             Timber.v("$documentUrl resource $url WAS identified as a tracker")
@@ -88,8 +79,6 @@ class TrackerDetectorImpl(
         sameOrSubdomain(firstUrl, secondUrl) || sameOrSubdomain(secondUrl, firstUrl) || sameNetworkName(firstUrl, secondUrl)
 
     private fun sameNetworkName(firstUrl: String, secondUrl: String): Boolean {
-        // mean=391,worst=1005
-
         val firstNetwork = networkTrackers.network(firstUrl) ?: return false
         val secondNetwork = networkTrackers.network(secondUrl) ?: return false
         return firstNetwork.name == secondNetwork.name

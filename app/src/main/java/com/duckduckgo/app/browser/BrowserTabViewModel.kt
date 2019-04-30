@@ -237,10 +237,11 @@ class BrowserTabViewModel(
             buildingSiteFactoryJob?.cancel()
         }
 
-        site = siteFactory.buildSite(url).also { newSite ->
-            buildingSiteFactoryJob = viewModelScope.launch(Dispatchers.IO) {
-                siteFactory.loadFullSiteDetails(newSite)
-                privacyGrade.postValue(site?.calculateGrades()?.improvedGrade)
+        site = siteFactory.buildSite(url)
+        buildingSiteFactoryJob = viewModelScope.launch(Dispatchers.IO) {
+            site?.let {
+                siteFactory.loadFullSiteDetails(it)
+                onSiteChanged()
             }
         }
     }
@@ -510,9 +511,6 @@ class BrowserTabViewModel(
 
     override fun trackerDetected(event: TrackingEvent) {
         if (event.documentUrl == url) {
-            if (site == null) {
-                Timber.w("Dropped a tracker $event")
-            }
             site?.trackerDetected(event)
             onSiteChanged()
         }
