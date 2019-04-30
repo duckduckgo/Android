@@ -253,7 +253,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenViewBecomesVisibleWithActiveSiteThenKeyboardHidden() = runBlocking<Unit> {
+    fun whenViewBecomesVisibleWithActiveSiteThenKeyboardHidden() {
         changeUrl("http://exmaple.com")
         testee.onViewVisible()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -261,7 +261,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenViewBecomesVisibleWithoutActiveSiteThenKeyboardShown() = runBlocking<Unit> {
+    fun whenViewBecomesVisibleWithoutActiveSiteThenKeyboardShown() {
         changeUrl(null)
         testee.onViewVisible()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -275,13 +275,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlPresentThenAddBookmarkButtonEnabled() = runBlocking<Unit> {
+    fun whenUrlPresentThenAddBookmarkButtonEnabled() {
         changeUrl("www.example.com")
         assertTrue(browserViewState().canAddBookmarks)
     }
 
     @Test
-    fun whenNoUrlThenAddBookmarkButtonDisabled() = runBlocking<Unit> {
+    fun whenNoUrlThenAddBookmarkButtonDisabled() {
         changeUrl(null)
         assertFalse(browserViewState().canAddBookmarks)
     }
@@ -295,7 +295,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenTrackerDetectedThenNetworkLeaderboardUpdated() = runBlocking<Unit> {
+    fun whenTrackerDetectedThenNetworkLeaderboardUpdated() {
         val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", TrackerNetwork("Network1", "www.tracker.com"), false)
         testee.trackerDetected(event)
         verify(mockNetworkLeaderboardDao).insert(NetworkLeaderboardEntry("Network1", "www.example.com"))
@@ -343,7 +343,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowsingAndLoadingFinishedAndInitialUrlNeverProgressedThenUrlUpdated() = runBlocking<Unit> {
+    fun whenBrowsingAndLoadingFinishedAndInitialUrlNeverProgressedThenUrlUpdated() {
         val initialUrl = "http://foo.com/abc"
         val finalUrl = "http://bar.com/abc"
         isBrowsing(true)
@@ -363,7 +363,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowsingAndLoadingFinishedAndInitialUrlProgressedThenUrlNotUpdated() = runBlocking<Unit> {
+    fun whenBrowsingAndLoadingFinishedAndInitialUrlProgressedThenUrlNotUpdated() {
         val initialUrl = "http://foo.com/abc"
         val finalUrl = "http://foo.com/xyz"
         isBrowsing(true)
@@ -433,7 +433,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLoadingFinishedWithNoUrlThenOmnibarTextUpdatedToMatch() = runBlocking<Unit> {
+    fun whenLoadingFinishedWithNoUrlThenOmnibarTextUpdatedToMatch() {
         val exampleUrl = "http://example.com/abc"
         changeUrl(exampleUrl)
         testee.loadingFinished(null)
@@ -441,13 +441,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLoadingFinishedWithNoUrlThenSiteVisitedEntryNotAddedToLeaderboardDao() = runBlocking<Unit> {
+    fun whenLoadingFinishedWithNoUrlThenSiteVisitedEntryNotAddedToLeaderboardDao() {
         testee.loadingFinished(null)
         verify(mockNetworkLeaderboardDao, never()).insert(SiteVisitedEntity("example.com"))
     }
 
     @Test
-    fun whenTrackerDetectedThenSiteVisitedEntryAddedToLeaderboardDao() = runBlocking<Unit> {
+    fun whenTrackerDetectedThenSiteVisitedEntryAddedToLeaderboardDao() {
         testee.trackerDetected(TrackingEvent("http://example.com/abc", "http://tracker.com", TrackerNetwork("Network", "http:// netwotk.com"), true))
         verify(mockNetworkLeaderboardDao).insert(SiteVisitedEntity("example.com"))
     }
@@ -470,7 +470,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowsingAndUrlStartsLoadingWithProgressChangeThenUrlUpdated() = runBlocking<Unit> {
+    fun whenBrowsingAndUrlStartsLoadingWithProgressChangeThenUrlUpdated() {
         val url = "foo.com"
         isBrowsing(true)
         testee.loadingStarted(url)
@@ -488,49 +488,49 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlStartsLoadingButProgressHasNotChangedThenUrlNotUpdated() = runBlocking<Unit> {
+    fun whenUrlStartsLoadingButProgressHasNotChangedThenUrlNotUpdated() {
         testee.loadingStarted("foo.com")
         assertNull(testee.url)
     }
 
     @Test
-    fun whenUrlHasNotStartedLoadingAndProgressChangeThenUrlNotUpdated() = runBlocking<Unit> {
+    fun whenUrlHasNotStartedLoadingAndProgressChangeThenUrlNotUpdated() {
         testee.progressChanged("foo.com", 10)
         assertNull(testee.url)
     }
 
     @Test
-    fun whenBrowsingAndUrlChangedThenViewStateIsUpdated() = runBlocking<Unit> {
+    fun whenBrowsingAndUrlChangedThenViewStateIsUpdated() {
         changeUrl("duckduckgo.com", true)
         assertEquals("duckduckgo.com", omnibarViewState().omnibarText)
     }
 
     @Test
-    fun whenNotBrowsingAndUrlChangedThenUrlIsNotUpdated() = runBlocking<Unit> {
+    fun whenNotBrowsingAndUrlChangedThenUrlIsNotUpdated() {
         changeUrl("duckduckgo.com", false)
         assertEquals("", omnibarViewState().omnibarText)
     }
 
     @Test
-    fun whenUrlChangedWithDuckDuckGoUrlContainingQueryThenUrlRewrittenToContainQuery() = runBlocking<Unit> {
+    fun whenUrlChangedWithDuckDuckGoUrlContainingQueryThenUrlRewrittenToContainQuery() {
         changeUrl("http://duckduckgo.com?q=test")
         assertEquals("test", omnibarViewState().omnibarText)
     }
 
     @Test
-    fun whenUrlChangedWithDuckDuckGoUrlContainingQueryThenAtbRefreshed() = runBlocking<Unit> {
+    fun whenUrlChangedWithDuckDuckGoUrlContainingQueryThenAtbRefreshed() {
         changeUrl("http://duckduckgo.com?q=test")
         verify(mockStatisticsUpdater).refreshSearchRetentionAtb()
     }
 
     @Test
-    fun whenUrlChangedWithDuckDuckGoUrlNotContainingQueryThenFullUrlShown() = runBlocking<Unit> {
+    fun whenUrlChangedWithDuckDuckGoUrlNotContainingQueryThenFullUrlShown() {
         changeUrl("http://duckduckgo.com")
         assertEquals("http://duckduckgo.com", omnibarViewState().omnibarText)
     }
 
     @Test
-    fun whenUrlChangedWithNonDuckDuckGoUrlThenFullUrlShown() = runBlocking<Unit> {
+    fun whenUrlChangedWithNonDuckDuckGoUrlThenFullUrlShown() {
         changeUrl("http://example.com")
         assertEquals("http://example.com", omnibarViewState().omnibarText)
     }
@@ -571,7 +571,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenEnoughTrackersDetectedThenPrivacyGradeIsUpdated() = runBlocking<Unit> {
+    fun whenEnoughTrackersDetectedThenPrivacyGradeIsUpdated() {
         val grade = testee.privacyGrade.value
         changeUrl("https://example.com")
         for (i in 1..10) {
@@ -586,14 +586,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlUpdatedAfterConfigDownloadThenPrivacyGradeIsShown() = runBlocking<Unit> {
+    fun whenUrlUpdatedAfterConfigDownloadThenPrivacyGradeIsShown() {
         testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
         changeUrl("")
         assertTrue(browserViewState().showPrivacyGrade)
     }
 
     @Test
-    fun whenUrlUpdatedBeforeConfigDownloadThenPrivacyGradeIsShown() = runBlocking<Unit> {
+    fun whenUrlUpdatedBeforeConfigDownloadThenPrivacyGradeIsShown() {
         testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = false))
         changeUrl("")
         assertFalse(browserViewState().showPrivacyGrade)
@@ -1088,7 +1088,7 @@ class BrowserTabViewModelTest {
         testee.navigationOptionsChanged(nav)
     }
 
-    private suspend fun changeUrl(url: String?, isBrowsing: Boolean = true) {
+    private fun changeUrl(url: String?, isBrowsing: Boolean = true) {
         isBrowsing(isBrowsing)
         testee.loadingStarted(url)
         testee.progressChanged(url, 100)
