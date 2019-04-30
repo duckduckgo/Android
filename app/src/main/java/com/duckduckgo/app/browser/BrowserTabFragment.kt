@@ -96,16 +96,21 @@ import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import kotlin.concurrent.thread
+import kotlin.coroutines.CoroutineContext
 
 
-class BrowserTabFragment : Fragment(), FindListener, CoroutineScope by MainScope() {
+class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
+
+    override val coroutineContext: CoroutineContext
+        get() = SupervisorJob() + Dispatchers.Main
 
     @Inject
     lateinit var webViewClient: BrowserWebViewClient
@@ -1019,12 +1024,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope by MainScope
                 measureExecution("renderBrowserViewState") {
 
                     val browserShowingChanged = viewState.browserShowing != lastSeenBrowserViewState?.browserShowing
-                lastSeenBrowserViewState = viewState
+                    lastSeenBrowserViewState = viewState
                     if (browserShowingChanged) {
                         if (browserShowing) {
-                        showBrowser()
-                    } else {
-                        showHome()
+                            showBrowser()
+                        } else {
+                            showHome()
                         }
                     }
 

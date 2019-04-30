@@ -104,11 +104,10 @@ class PrivacyDashboardViewModel(
 
     fun onSiteChanged(site: Site?) {
         this.site = site
-        val siteDetails = site
-        if (site == null || siteDetails == null) {
+        if (site == null) {
             resetViewState()
         } else {
-            updateSite(siteDetails)
+            updateSite(site)
         }
     }
 

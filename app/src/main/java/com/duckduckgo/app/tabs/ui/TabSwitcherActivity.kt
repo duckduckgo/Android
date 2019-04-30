@@ -35,12 +35,17 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DisplayMessage
 import kotlinx.android.synthetic.main.content_tab_switcher.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.longToast
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
-class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitchedListener, CoroutineScope by MainScope() {
+class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitchedListener, CoroutineScope {
+
+    override val coroutineContext: CoroutineContext
+        get() = SupervisorJob() + Dispatchers.Main
 
     @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction

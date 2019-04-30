@@ -46,14 +46,12 @@ class TrackerDetectorImpl(
 
     override fun evaluate(url: String, documentUrl: String, resourceType: ResourceType): TrackingEvent? {
 
-        val whitelisted = clients.any { it.name.type == Client.ClientType.WHITELIST && it.matches(url, documentUrl, resourceType) }
-        if (whitelisted) {
+        if (whitelisted(url, documentUrl, resourceType)) {
             Timber.v("$documentUrl resource $url is whitelisted")
             return null
         }
 
-        val isFirstParty = firstParty(url, documentUrl)
-        if (isFirstParty) {
+        if (firstParty(url, documentUrl)) {
             Timber.v("$url is a first party url")
             return null
         }
@@ -67,12 +65,15 @@ class TrackerDetectorImpl(
         }
         if (matches) {
             Timber.v("$documentUrl resource $url WAS identified as a tracker")
-            val networkTrackers = networkTrackers.network(url)
-            return TrackingEvent(documentUrl, url, networkTrackers, settings.privacyOn)
+            return TrackingEvent(documentUrl, url, networkTrackers.network(url), settings.privacyOn)
         }
 
         Timber.v("$documentUrl resource $url was not identified as a tracker")
         return null
+    }
+
+    private fun whitelisted(url: String, documentUrl: String, resourceType: ResourceType): Boolean {
+        return clients.any { it.name.type == Client.ClientType.WHITELIST && it.matches(url, documentUrl, resourceType) }
     }
 
     private fun firstParty(firstUrl: String, secondUrl: String): Boolean =

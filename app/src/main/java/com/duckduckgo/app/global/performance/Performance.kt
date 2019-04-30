@@ -17,7 +17,6 @@
 package com.duckduckgo.app.global.performance
 
 import android.util.Log
-import com.duckduckgo.app.global.isAndroidMainThread
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -26,9 +25,6 @@ inline fun <T> measureExecution(logMessage: String, logLevel: Int = Log.DEBUG, f
     val startTime = System.nanoTime()
     return function.invoke().also {
         val difference = System.nanoTime() - startTime
-        Timber.log(
-            logLevel,
-            "Main Thread: ${Thread.currentThread().isAndroidMainThread()}, $logMessage; took ${TimeUnit.NANOSECONDS.toMillis(difference)}ms"
-        )
+        Timber.log(logLevel, "$logMessage; took ${TimeUnit.NANOSECONDS.toMillis(difference)}ms")
     }
 }

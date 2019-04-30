@@ -51,8 +51,5 @@ class TermsOfServiceRawStore @Inject constructor(private val moshi: Moshi, priva
     }
 
     override val terms: List<TermsOfService>
-        get() {
-            Timber.i("Accessing ToS data; is initialized? $initialized")
-            return data
-        }
+        get() = data
 }

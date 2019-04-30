@@ -45,7 +45,6 @@ private fun removeFirstSubdomain(splitDomains: List<String>): String {
     return sb.toString()
 }
 
-@Suppress("UnstableApiUsage")
 private fun isValid(uri: String): Boolean {
     if (!uri.contains(".")) {
         return false

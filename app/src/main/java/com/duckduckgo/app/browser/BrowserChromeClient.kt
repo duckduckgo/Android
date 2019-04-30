@@ -22,12 +22,18 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 
-class BrowserChromeClient @Inject constructor() : WebChromeClient(), CoroutineScope by MainScope() {
+class BrowserChromeClient @Inject constructor() : WebChromeClient(), CoroutineScope {
+
+    override val coroutineContext: CoroutineContext
+        get() = SupervisorJob() + Dispatchers.Main
+
 
     var webViewClientListener: WebViewClientListener? = null
 
