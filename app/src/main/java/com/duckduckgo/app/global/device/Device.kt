@@ -42,11 +42,11 @@ class ContextDeviceInfo @Inject constructor(private val context: Context) : Devi
         context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
     }
 
-    override val language by lazy {
+    override val language: String by lazy {
         Locale.getDefault().language
     }
 
-    override val country by lazy {
+    override val country: String by lazy {
         val telephonyCountry = telephonyManager.networkCountryIso
         val deviceCountry = if (telephonyCountry.isNotBlank()) telephonyCountry else Locale.getDefault().country
         deviceCountry.toLowerCase()

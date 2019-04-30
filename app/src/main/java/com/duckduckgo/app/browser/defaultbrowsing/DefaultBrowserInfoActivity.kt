@@ -73,7 +73,7 @@ class DefaultBrowserInfoActivity : DuckDuckGoActivity() {
         when (requestCode) {
             DEFAULT_BROWSER_REQUEST_CODE -> {
                 val wasSet = if (defaultBrowserDetector.isDefaultBrowser()) "was" else "was not"
-                Timber.i("User returned from default settings; DDG ${wasSet} set as the default")
+                Timber.i("User returned from default settings; DDG $wasSet set as the default")
             }
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
