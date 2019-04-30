@@ -51,10 +51,10 @@ class BrowserViewModelTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @Mock
-    private lateinit var mockCommandObserver: Observer<BrowserViewModel.Command>
+    private lateinit var mockCommandObserver: Observer<Command>
 
     @Captor
-    private lateinit var commandCaptor: ArgumentCaptor<BrowserViewModel.Command>
+    private lateinit var commandCaptor: ArgumentCaptor<Command>
 
     @Mock
     private lateinit var mockTabRepository: TabRepository

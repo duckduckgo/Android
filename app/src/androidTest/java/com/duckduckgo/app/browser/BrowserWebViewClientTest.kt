@@ -29,7 +29,6 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineContext
 import org.junit.Before
 import org.junit.Test
 
@@ -45,8 +44,6 @@ class BrowserWebViewClientTest {
     private val statisticsDataStore: StatisticsDataStore = mock()
     private val pixel: Pixel = mock()
     private val listener: WebViewClientListener = mock()
-
-    val testContext = TestCoroutineContext()
 
     @UiThreadTest
     @Before
@@ -67,8 +64,6 @@ class BrowserWebViewClientTest {
     @Test
     fun whenOnPageStartedCalledThenListenerNotified() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
-        //testContext.advanceTimeBy(5000, TimeUnit.SECONDS)
-        //testee.coroutineContext[Job]?.children?.forEach { childJob -> childJob.join() }
         verify(listener).loadingStarted(EXAMPLE_URL)
     }
 
