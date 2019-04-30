@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.statistics.pixels
 
+import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.PixelService
@@ -39,9 +40,11 @@ interface Pixel {
         PRIVACY_DASHBOARD_PRIVACY_PRACTICES("mp_p"),
         PRIVACY_DASHBOARD_NETWORKS("mp_n"),
 
-        DEFAULT_BROWSER_INFO_VIEWED("mdb_v"),
-        DEFAULT_BROWSER_SET("mdb_s"),
-        DEFAULT_BROWSER_NOT_SET("mdb_n"),
+        DEFAULT_BROWSER_SET("m_db_s"),
+        DEFAULT_BROWSER_UNSET("m_db_u"),
+        WIDGETS_ADDED(pixelName = "m_w_a"),
+        WIDGETS_DELETED(pixelName = "m_w_d"),
+        WIDGET_LAUNCHED(pixelName = "m_w_l"),
 
         LONG_PRESS("mlp"),
         LONG_PRESS_DOWNLOAD_IMAGE("mlp_i"),
@@ -61,18 +64,6 @@ interface Pixel {
         SURVEY_CTA_DISMISSED(pixelName = "mus_cd"),
         SURVEY_CTA_LAUNCHED(pixelName = "mus_cl"),
         SURVEY_SURVEY_DISMISSED(pixelName = "mus_sd"),
-
-        ADD_WIDGET_AUTO_CTA_SHOWN(pixelName = "maw_acs"),
-        ADD_WIDGET_AUTO_CTA_DISMISSED(pixelName = "maw_acd"),
-        ADD_WIDGET_AUTO_CTA_LAUNCHED(pixelName = "maw_acl"),
-        ADD_WIDGET_AUTO_ADDED(pixelName = "maw_aa"),
-        ADD_WIDGET_AUTO_DELETED(pixelName = "maw_ad"),
-
-        ADD_WIDGET_INSTRUCTIONS_CTA_SHOWN(pixelName = "maw_ics"),
-        ADD_WIDGET_INSTRUCTIONS_CTA_DISMISSED(pixelName = "maw_icd"),
-        ADD_WIDGET_INSTRUCTIONS_CTA_LAUNCHED(pixelName = "maw_icl"),
-        ADD_WIDGET_INSTRUCTIONS_ADDED(pixelName = "maw_ia"),
-        ADD_WIDGET_INSTRUCTIONS_DELETED(pixelName = "maw_id"),
 
         NOTIFICATION_SHOWN("mnot_s"),
         NOTIFICATION_LAUNCHED("mnot_l"),
@@ -120,8 +111,8 @@ interface Pixel {
         const val APP_VERSION = "app_version"
     }
 
-    fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap())
-    fun fire(pixelName: String, parameters: Map<String, String?> = emptyMap())
+    fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap(), includeLocale: Boolean = false)
+    fun fire(pixelName: String, parameters: Map<String, String?> = emptyMap(), includeLocale: Boolean = false)
     fun fireCompletable(pixelName: String, parameters: Map<String, String?>): Completable
 
 }
@@ -132,12 +123,15 @@ class ApiBasedPixel @Inject constructor(
     private val variantManager: VariantManager,
     private val deviceInfo: DeviceInfo
 ) : Pixel {
-    override fun fire(pixel: Pixel.PixelName, parameters: Map<String, String?>) {
-        fire(pixel.pixelName, parameters)
+
+    override fun fire(pixel: Pixel.PixelName, parameters: Map<String, String?>, includeLocale: Boolean) {
+        fire(pixel.pixelName, parameters, includeLocale)
     }
 
-    override fun fire(pixelName: String, parameters: Map<String, String?>) {
-        fireCompletable(pixelName, parameters)
+    override fun fire(pixelName: String, parameters: Map<String, String?>, includeLocale: Boolean) {
+        val locale = if (includeLocale) localeMap else emptyMap()
+
+        fireCompletable(pixelName, parameters.plus(locale))
             .subscribeOn(Schedulers.io())
             .subscribe({
                 Timber.v("Pixel sent: $pixelName")
@@ -145,6 +139,12 @@ class ApiBasedPixel @Inject constructor(
                 Timber.w("Pixel failed: $pixelName")
             })
     }
+
+    private val localeMap
+        get() = mapOf(
+            AppUrl.ParamKey.COUNTRY to deviceInfo.country,
+            AppUrl.ParamKey.LANGUAGE to deviceInfo.language
+        )
 
     override fun fireCompletable(pixelName: String, parameters: Map<String, String?>): Completable {
         val atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""

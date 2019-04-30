@@ -29,7 +29,7 @@ import javax.inject.Inject
 
 interface DefaultBrowserDetector {
     fun deviceSupportsDefaultBrowserConfiguration(): Boolean
-    fun isCurrentlyConfiguredAsDefaultBrowser(): Boolean
+    fun isDefaultBrowser(): Boolean
 }
 
 class AndroidDefaultBrowserDetector @Inject constructor(private val context: Context) : DefaultBrowserDetector {
@@ -38,7 +38,7 @@ class AndroidDefaultBrowserDetector @Inject constructor(private val context: Con
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
     }
 
-    override fun isCurrentlyConfiguredAsDefaultBrowser(): Boolean {
+    override fun isDefaultBrowser(): Boolean {
         val intent = Intent(ACTION_VIEW, Uri.parse("https://"))
         val resolutionInfo: ResolveInfo? = context.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
         val defaultAlready = resolutionInfo?.activityInfo?.packageName == BuildConfig.APPLICATION_ID

@@ -23,12 +23,10 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import androidx.annotation.RequiresApi
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import kotlinx.android.synthetic.main.activity_default_browser_info.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -38,17 +36,10 @@ class DefaultBrowserInfoActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var defaultBrowserDetector: DefaultBrowserDetector
 
-    @Inject
-    lateinit var pixel: Pixel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_default_browser_info)
         configureUiEventHandlers()
-
-        if (savedInstanceState == null) {
-            pixel.fire(DEFAULT_BROWSER_INFO_VIEWED)
-        }
     }
 
     @TargetApi(Build.VERSION_CODES.N)
@@ -73,7 +64,7 @@ class DefaultBrowserInfoActivity : DuckDuckGoActivity() {
     override fun onResume() {
         super.onResume()
 
-        if (defaultBrowserDetector.isCurrentlyConfiguredAsDefaultBrowser()) {
+        if (defaultBrowserDetector.isDefaultBrowser()) {
             finish()
         }
     }
@@ -81,19 +72,10 @@ class DefaultBrowserInfoActivity : DuckDuckGoActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             DEFAULT_BROWSER_REQUEST_CODE -> {
-                fireDefaultBrowserPixel()
+                val wasSet = if (defaultBrowserDetector.isDefaultBrowser()) "was" else "was not"
+                Timber.i("User returned from default settings; DDG $wasSet set as the default")
             }
             else -> super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
-
-    private fun fireDefaultBrowserPixel() {
-        if (defaultBrowserDetector.isCurrentlyConfiguredAsDefaultBrowser()) {
-            Timber.i("User returned from default settings; DDG is now the default")
-            pixel.fire(DEFAULT_BROWSER_SET)
-        } else {
-            Timber.i("User returned from default settings; DDG was not set default")
-            pixel.fire(DEFAULT_BROWSER_NOT_SET)
         }
     }
 

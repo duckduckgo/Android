@@ -51,10 +51,10 @@ class StubStatisticsModule {
     fun stubPixel(): Pixel {
         return object : Pixel {
 
-            override fun fire(pixel: Pixel.PixelName, parameters: Map<String, String?>) {
+            override fun fire(pixel: Pixel.PixelName, parameters: Map<String, String?>, includeLocale: Boolean) {
             }
 
-            override fun fire(pixelName: String, parameters: Map<String, String?>) {
+            override fun fire(pixelName: String, parameters: Map<String, String?>, includeLocale: Boolean) {
 
             }
 

@@ -56,7 +56,7 @@ class NotificationRegistrarTest {
     fun whenNotificationsPreviouslyOffAndNowOnThenPixelIsFiredAndSettingsUpdated() {
         whenever(mockSettingsDataStore.appNotificationsEnabled).thenReturn(false)
         testee.updateStatus(true)
-        verify(mockPixel).fire(eq(Pixel.PixelName.NOTIFICATIONS_ENABLED), any())
+        verify(mockPixel).fire(eq(Pixel.PixelName.NOTIFICATIONS_ENABLED), any(), eq(false))
         verify(mockSettingsDataStore).appNotificationsEnabled = true
     }
 
@@ -64,7 +64,7 @@ class NotificationRegistrarTest {
     fun whenNotificationsPreviouslyOffAndStillOffThenNoPixelIsFiredAndSettingsUnchanged() {
         whenever(mockSettingsDataStore.appNotificationsEnabled).thenReturn(false)
         testee.updateStatus(false)
-        verify(mockPixel, never()).fire(any<Pixel.PixelName>(), any())
+        verify(mockPixel, never()).fire(any<Pixel.PixelName>(), any(), eq(false))
         verify(mockSettingsDataStore, never()).appNotificationsEnabled = true
     }
 
@@ -72,7 +72,7 @@ class NotificationRegistrarTest {
     fun whenNotificationsPreviouslyOnAndStillOnThenNoPixelIsFiredAndSettingsUnchanged() {
         whenever(mockSettingsDataStore.appNotificationsEnabled).thenReturn(true)
         testee.updateStatus(true)
-        verify(mockPixel, never()).fire(any<Pixel.PixelName>(), any())
+        verify(mockPixel, never()).fire(any<Pixel.PixelName>(), any(), eq(false))
         verify(mockSettingsDataStore, never()).appNotificationsEnabled = false
     }
 
@@ -80,7 +80,7 @@ class NotificationRegistrarTest {
     fun whenNotificationsPreviouslyOnAndNowOffPixelIsFiredAndSettingsUpdated() {
         whenever(mockSettingsDataStore.appNotificationsEnabled).thenReturn(true)
         testee.updateStatus(false)
-        verify(mockPixel).fire(eq(Pixel.PixelName.NOTIFICATIONS_DISABLED), any())
+        verify(mockPixel).fire(eq(Pixel.PixelName.NOTIFICATIONS_DISABLED), any(), eq(false))
         verify(mockSettingsDataStore).appNotificationsEnabled = false
     }
 }
