@@ -169,7 +169,7 @@ class SettingsViewModelTest {
 
     @Test
     fun whenDefaultBrowserAppAlreadySetToOursThenIsDefaultBrowserFlagIsTrue() {
-        whenever(mockDefaultBrowserDetector.isCurrentlyConfiguredAsDefaultBrowser()).thenReturn(true)
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
         testee.start()
         val viewState = latestViewState()
         assertTrue(viewState.isAppDefaultBrowser)
@@ -177,7 +177,7 @@ class SettingsViewModelTest {
 
     @Test
     fun whenDefaultBrowserAppNotSetToOursThenIsDefaultBrowserFlagIsFalse() {
-        whenever(mockDefaultBrowserDetector.isCurrentlyConfiguredAsDefaultBrowser()).thenReturn(false)
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         testee.start()
         val viewState = latestViewState()
         assertFalse(viewState.isAppDefaultBrowser)

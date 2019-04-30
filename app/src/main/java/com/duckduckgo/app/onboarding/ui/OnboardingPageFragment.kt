@@ -30,6 +30,7 @@ import androidx.fragment.app.Fragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
+import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import dagger.android.support.AndroidSupportInjection
@@ -69,6 +70,9 @@ sealed class OnboardingPageFragment : Fragment() {
         lateinit var pixel: Pixel
 
         @Inject
+        lateinit var installStore: AppInstallStore
+
+        @Inject
         lateinit var defaultBrowserDetector: DefaultBrowserDetector
 
         override fun onAttach(context: Context) {
@@ -79,13 +83,6 @@ sealed class OnboardingPageFragment : Fragment() {
         override fun onActivityCreated(savedInstanceState: Bundle?) {
             super.onActivityCreated(savedInstanceState)
             launchSettingsButton.setOnClickListener { onLaunchDefaultBrowserSettingsClicked() }
-        }
-
-        override fun setUserVisibleHint(isVisibleToUser: Boolean) {
-            super.setUserVisibleHint(isVisibleToUser)
-            if (isVisibleToUser) {
-                pixel.fire(DEFAULT_BROWSER_INFO_VIEWED)
-            }
         }
 
         private fun onLaunchDefaultBrowserSettingsClicked() {
@@ -102,19 +99,20 @@ sealed class OnboardingPageFragment : Fragment() {
         override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
             when (requestCode) {
                 DEFAULT_BROWSER_REQUEST_CODE -> {
-                    fireDefaultBrowserPixel()
+                    handleDefaultBrowserResult()
                 }
                 else -> super.onActivityResult(requestCode, resultCode, data)
             }
         }
 
-        private fun fireDefaultBrowserPixel() {
-            if (defaultBrowserDetector.isCurrentlyConfiguredAsDefaultBrowser()) {
-                Timber.i("User returned from default settings; DDG is now the default")
-                pixel.fire(DEFAULT_BROWSER_SET)
-            } else {
-                Timber.i("User returned from default settings; DDG was not set default")
-                pixel.fire(DEFAULT_BROWSER_NOT_SET)
+        private fun handleDefaultBrowserResult() {
+            val isDefault = defaultBrowserDetector.isDefaultBrowser()
+            val setText = if (isDefault) "was" else "was not"
+            Timber.i("User returned from default settings; DDG $setText set as default")
+
+            if (isDefault) {
+                installStore.defaultBrowser = true
+                pixel.fire(DEFAULT_BROWSER_SET, includeLocale = true)
             }
         }
 

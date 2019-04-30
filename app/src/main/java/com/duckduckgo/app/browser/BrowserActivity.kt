@@ -42,6 +42,7 @@ import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import kotlinx.android.synthetic.main.activity_browser.*
@@ -58,6 +59,9 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var dataClearer: DataClearer
+
+    @Inject
+    lateinit var pixel: Pixel
 
     @Inject
     lateinit var playStoreUtils: PlayStoreUtils
@@ -173,6 +177,13 @@ class BrowserActivity : DuckDuckGoActivity() {
             Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
         }
 
+        if (launchedFromWidget(intent)) {
+            Timber.w("new tab requested from widget")
+            pixel.fire(Pixel.PixelName.WIDGET_LAUNCHED, includeLocale = true)
+            viewModel.onNewTabRequested()
+            return
+        }
+
         if (launchNewSearch(intent)) {
             Timber.w("new tab requested")
             viewModel.onNewTabRequested()
@@ -232,6 +243,10 @@ class BrowserActivity : DuckDuckGoActivity() {
             is Command.ShowAppFeedbackPrompt -> showAppEnjoymentPrompt(GiveFeedbackDialogFragment.create(command.promptCount, viewModel))
             is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this))
         }
+    }
+
+    private fun launchedFromWidget(intent: Intent): Boolean {
+        return intent.getBooleanExtra(WIDGET_SEARCH_EXTRA, false)
     }
 
     private fun launchNewSearch(intent: Intent): Boolean {
@@ -294,15 +309,17 @@ class BrowserActivity : DuckDuckGoActivity() {
 
     companion object {
 
-        fun intent(context: Context, queryExtra: String? = null, newSearch: Boolean = false, launchedFromFireAction: Boolean = false): Intent {
+        fun intent(context: Context, queryExtra: String? = null, newSearch: Boolean = false, widgetSearch: Boolean = false, launchedFromFireAction: Boolean = false): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
             intent.putExtra(NEW_SEARCH_EXTRA, newSearch)
+            intent.putExtra(WIDGET_SEARCH_EXTRA, widgetSearch)
             intent.putExtra(LAUNCHED_FROM_FIRE_EXTRA, launchedFromFireAction)
             return intent
         }
 
         const val NEW_SEARCH_EXTRA = "NEW_SEARCH_EXTRA"
+        const val WIDGET_SEARCH_EXTRA = "WIDGET_SEARCH_EXTRA"
         const val PERFORM_FIRE_ON_ENTRY_EXTRA = "PERFORM_FIRE_ON_ENTRY_EXTRA"
         const val LAUNCHED_FROM_FIRE_EXTRA = "LAUNCHED_FROM_FIRE_EXTRA"
 
