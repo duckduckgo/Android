@@ -29,11 +29,11 @@ interface DeviceInfo {
         TABLET("tablet")
     }
 
-    fun formFactor(): FormFactor
-
     val language: String
 
     val country: String
+
+    fun formFactor(): FormFactor
 }
 
 class ContextDeviceInfo @Inject constructor(private val context: Context) : DeviceInfo {
