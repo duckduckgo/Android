@@ -46,8 +46,6 @@ sealed class OnboardingPageFragment : Fragment() {
     @LayoutRes
     abstract fun layoutResource(): Int
 
-    lateinit var installStore: AppInstallStore
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -70,6 +68,9 @@ sealed class OnboardingPageFragment : Fragment() {
 
         @Inject
         lateinit var pixel: Pixel
+
+        @Inject
+        lateinit var installStore: AppInstallStore
 
         @Inject
         lateinit var defaultBrowserDetector: DefaultBrowserDetector
