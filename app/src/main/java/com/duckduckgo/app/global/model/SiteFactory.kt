@@ -52,7 +52,7 @@ class SiteFactory @Inject constructor(
     fun loadFullSiteDetails(site: Site) {
         val practices = privacyPractices.privacyPracticesFor(site.url)
         val memberNetwork = trackerNetworks.network(site.url)
-        val prevalence = prevalenceStore.findPrevalenceOf(site.url)
+        val prevalence = prevalenceStore.findPrevalenceOf(memberNetwork?.name)
         val siteDetails = SiteDetails(site.url, practices, memberNetwork, prevalence)
         site.updateData(siteDetails)
     }
