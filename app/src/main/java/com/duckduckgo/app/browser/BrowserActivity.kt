@@ -179,7 +179,7 @@ class BrowserActivity : DuckDuckGoActivity() {
 
         if (launchedFromWidget(intent)) {
             Timber.w("new tab requested from widget")
-            pixel.fire(Pixel.PixelName.WIDGET_LAUNCHED)
+            pixel.fire(Pixel.PixelName.WIDGET_LAUNCHED, includeLocal = true)
             viewModel.onNewTabRequested()
             return
         }

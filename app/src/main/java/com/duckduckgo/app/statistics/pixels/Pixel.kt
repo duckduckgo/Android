@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.statistics.pixels
 
+import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.PixelService
@@ -110,8 +111,8 @@ interface Pixel {
         const val APP_VERSION = "app_version"
     }
 
-    fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap())
-    fun fire(pixelName: String, parameters: Map<String, String?> = emptyMap())
+    fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap(), includeLocal: Boolean = false)
+    fun fire(pixelName: String, parameters: Map<String, String?> = emptyMap(), includeLocal: Boolean = false)
     fun fireCompletable(pixelName: String, parameters: Map<String, String?>): Completable
 
 }
@@ -122,12 +123,15 @@ class ApiBasedPixel @Inject constructor(
     private val variantManager: VariantManager,
     private val deviceInfo: DeviceInfo
 ) : Pixel {
-    override fun fire(pixel: Pixel.PixelName, parameters: Map<String, String?>) {
-        fire(pixel.pixelName, parameters)
+
+    override fun fire(pixel: Pixel.PixelName, parameters: Map<String, String?>, addLocale: Boolean) {
+        fire(pixel.pixelName, parameters, addLocale)
     }
 
-    override fun fire(pixelName: String, parameters: Map<String, String?>) {
-        fireCompletable(pixelName, parameters)
+    override fun fire(pixelName: String, parameters: Map<String, String?>, addLocale: Boolean) {
+        val locale = if (addLocale) localeMap else emptyMap()
+
+        fireCompletable(pixelName, parameters.plus(locale))
             .subscribeOn(Schedulers.io())
             .subscribe({
                 Timber.v("Pixel sent: $pixelName")
@@ -135,6 +139,12 @@ class ApiBasedPixel @Inject constructor(
                 Timber.w("Pixel failed: $pixelName")
             })
     }
+
+    private val localeMap
+        get() = mapOf(
+            AppUrl.ParamKey.COUNTRY to deviceInfo.country,
+            AppUrl.ParamKey.LANGUAGE to deviceInfo.language
+        )
 
     override fun fireCompletable(pixelName: String, parameters: Map<String, String?>): Completable {
         val atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""

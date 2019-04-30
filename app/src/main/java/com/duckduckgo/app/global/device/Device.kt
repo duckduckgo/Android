@@ -18,20 +18,21 @@ package com.duckduckgo.app.global.device
 
 import android.content.Context
 import android.util.TypedValue
+import java.util.*
 import javax.inject.Inject
-
 
 interface DeviceInfo {
 
     enum class FormFactor(val description: String) {
-
         PHONE("phone"),
         TABLET("tablet")
-
     }
 
     fun formFactor(): FormFactor
 
+    val country: String
+
+    val language: String
 }
 
 class ContextDeviceInfo @Inject constructor(private val context: Context) : DeviceInfo {
@@ -43,4 +44,9 @@ class ContextDeviceInfo @Inject constructor(private val context: Context) : Devi
         return if (smallestSize >= tabletSize) DeviceInfo.FormFactor.TABLET else DeviceInfo.FormFactor.PHONE
     }
 
+    override val country: String
+        get() = Locale.getDefault().country
+
+    override val language: String
+        get() = Locale.getDefault().isO3Language
 }

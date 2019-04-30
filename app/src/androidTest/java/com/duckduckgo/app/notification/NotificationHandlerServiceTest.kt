@@ -50,7 +50,7 @@ class NotificationHandlerServiceTest {
         intent.type = CLEAR_DATA_LAUNCH
         intent.putExtra(PIXEL_SUFFIX_EXTRA, "abc")
         testee.onHandleIntent(intent)
-        verify(mockPixel).fire(eq("mnot_l_abc"), any())
+        verify(mockPixel).fire(eq("mnot_l_abc"), any(), eq(false))
     }
 
     @Test
@@ -59,6 +59,6 @@ class NotificationHandlerServiceTest {
         intent.type = CANCEL
         intent.putExtra(PIXEL_SUFFIX_EXTRA, "abc")
         testee.onHandleIntent(intent)
-        verify(mockPixel).fire(eq("mnot_c_abc"), any())
+        verify(mockPixel).fire(eq("mnot_c_abc"), any(), eq(false))
     }
 }

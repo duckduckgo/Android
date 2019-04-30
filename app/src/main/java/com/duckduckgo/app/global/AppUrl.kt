@@ -34,7 +34,8 @@ class AppUrl {
         const val ATB = "atb"
         const val RETENTION_ATB = "set_atb"
         const val DEV_MODE = "test"
-        const val FORM_FACTOR = "f"
+        const val LANGUAGE = "lg"
+        const val COUNTRY = "co"
     }
 
     object ParamValue {

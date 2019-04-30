@@ -111,7 +111,7 @@ sealed class OnboardingPageFragment : Fragment() {
 
             if (isDefault) {
                 installStore.defaultBrowser = true
-                pixel.fire(DEFAULT_BROWSER_SET)
+                pixel.fire(DEFAULT_BROWSER_SET, includeLocal = true)
             }
         }
 
