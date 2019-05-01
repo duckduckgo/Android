@@ -183,7 +183,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
         if (launchedFromWidget(intent)) {
             Timber.w("new tab requested from widget")
             pixel.fire(Pixel.PixelName.WIDGET_LAUNCHED, includeLocale = true)
-            viewModel.onNewTabRequested()
+            launch { viewModel.onNewTabRequested() }
             return
         }
 
