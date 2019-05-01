@@ -20,23 +20,47 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
+import android.content.Intent
 import android.widget.RemoteViews
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
-import com.duckduckgo.app.widget.ui.supportsAutomaticWidgetAdd
+import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.WIDGETS_ADDED
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.WIDGETS_DELETED
+import com.duckduckgo.app.widget.ui.AppWidgetCapabilities
+import javax.inject.Inject
 
 
 class SearchWidgetLight : SearchWidget(R.layout.search_widget_light)
 
 open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetProvider() {
 
+    @Inject
+    lateinit var appInstallStore: AppInstallStore
+
+    @Inject
+    lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var widgetCapabilities: AppWidgetCapabilities
+
+    override fun onReceive(context: Context, intent: Intent?) {
+        inject(context)
+        super.onReceive(context, intent)
+    }
+
+    private fun inject(context: Context) {
+        val application = context.applicationContext as DuckDuckGoApplication
+        application.daggerAppComponent.inject(this)
+    }
+
     override fun onEnabled(context: Context) {
-        val application = context.applicationContext as? DuckDuckGoApplication
-        val pixelType = if (context.supportsAutomaticWidgetAdd) ADD_WIDGET_AUTO_ADDED else ADD_WIDGET_INSTRUCTIONS_ADDED
-        application?.pixel?.fire(pixelType)
-        super.onEnabled(context)
+        if (!appInstallStore.widgetInstalled) {
+            appInstallStore.widgetInstalled = true
+            pixel.fire(WIDGETS_ADDED, includeLocale = true)
+        }
     }
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
@@ -53,13 +77,14 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
     }
 
     private fun buildPendingIntent(context: Context): PendingIntent {
-        val intent = BrowserActivity.intent(context, newSearch = true)
+        val intent = BrowserActivity.intent(context, widgetSearch = true)
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray?) {
-        val application = context.applicationContext as? DuckDuckGoApplication
-        val pixelType = if (context.supportsAutomaticWidgetAdd) ADD_WIDGET_AUTO_DELETED else ADD_WIDGET_INSTRUCTIONS_DELETED
-        application?.pixel?.fire(pixelType)
+        if (appInstallStore.widgetInstalled && !widgetCapabilities.hasInstalledWidgets) {
+            appInstallStore.widgetInstalled = false
+            pixel.fire(WIDGETS_DELETED, includeLocale = true)
+        }
     }
 }

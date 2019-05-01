@@ -28,6 +28,7 @@ import com.duckduckgo.app.onboarding.di.OnboardingModule
 import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
 import com.duckduckgo.app.trackerdetection.di.TrackerDetectionModule
 import com.duckduckgo.app.usage.di.AppUsageModule
+import com.duckduckgo.widget.SearchWidget
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjector
@@ -75,4 +76,6 @@ interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 
         fun build(): AppComponent
     }
+
+    fun inject(searchWidget: SearchWidget)
 }

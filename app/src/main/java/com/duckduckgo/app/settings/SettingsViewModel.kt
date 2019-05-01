@@ -73,7 +73,7 @@ class SettingsViewModel @Inject constructor(
 
     fun start() {
 
-        val defaultBrowserAlready = defaultWebBrowserCapability.isCurrentlyConfiguredAsDefaultBrowser()
+        val defaultBrowserAlready = defaultWebBrowserCapability.isDefaultBrowser()
         val variant = variantManager.getVariant()
         val isLightTheme = settingsDataStore.theme == DuckDuckGoTheme.LIGHT
         val automaticallyClearWhat = settingsDataStore.automaticallyClearWhatOption

@@ -29,6 +29,7 @@ import androidx.work.Configuration
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.fire.DataClearer
@@ -84,6 +85,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     @Inject
     lateinit var appConfigurationSyncer: AppConfigurationSyncer
+
+    @Inject
+    lateinit var defaultBrowserObserver: DefaultBrowserObserver
 
     @Inject
     lateinit var statisticsUpdater: StatisticsUpdater
@@ -152,6 +156,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
             it.addObserver(this)
             it.addObserver(dataClearer)
             it.addObserver(appDaysUsedRecorder)
+            it.addObserver(defaultBrowserObserver)
             it.addObserver(appEnjoymentLifecycleObserver)
         }
 
