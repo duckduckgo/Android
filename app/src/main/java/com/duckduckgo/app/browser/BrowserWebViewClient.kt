@@ -290,13 +290,9 @@ class BrowserWebViewClient(
         private val WebBackForwardList.isHttpsUpgrade: Boolean
             get() {
                 if (currentIndex < 1) return false
-                val current = currentItem.originalUrl ?: return false
+                val current = currentItem?.originalUrl ?: return false
                 val previous = getItemAtIndex(currentIndex - 1).originalUrl
                 return current == previous.toUri().toHttpsString
             }
-    }
-
-    companion object {
-        private const val DEPRECATED_METHOD_SUGGESTION = "This is a required callback, but anywhere we can, we should use suspendable version instead"
     }
 }
