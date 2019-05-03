@@ -20,7 +20,6 @@ import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.entities.db.EntityListEntity
 import com.duckduckgo.app.global.api.isCached
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import io.reactivex.Completable
 import timber.log.Timber
 import java.io.IOException
@@ -33,7 +32,6 @@ class NetworkEntityJson(val properties: Array<String>, val resources: Array<Stri
 class EntityListDownloader @Inject constructor(
     private val entityListService: EntityListService,
     private val entityListDao: EntityListDao,
-    private val trackerDataLoader: TrackerDataLoader,
     private val appDatabase: AppDatabase
 ) {
 
@@ -64,7 +62,6 @@ class EntityListDownloader @Inject constructor(
                 appDatabase.runInTransaction {
                     Timber.d("Updating entity list with ${entities.size} entries")
                     entityListDao.updateAll(entities)
-                    trackerDataLoader.loadEntityListData()
                 }
 
             } else {

@@ -16,9 +16,7 @@
 
 package com.duckduckgo.app.fire
 
-import android.util.Log
 import android.webkit.CookieManager
-import com.duckduckgo.app.global.performance.measureExecution
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -75,8 +73,6 @@ class WebViewCookieManager(
     }
 
     override fun flush() {
-        measureExecution("Finished cookie manager flush", Log.VERBOSE) {
-            cookieManager.flush()
-        }
+        cookieManager.flush()
     }
 }

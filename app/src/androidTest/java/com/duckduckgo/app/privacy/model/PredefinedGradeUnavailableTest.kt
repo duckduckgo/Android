@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,25 +18,24 @@
 package com.duckduckgo.app.privacy.model
 
 import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.app.privacy.store.PrevalenceStore
+import com.nhaarman.mockitokotlin2.mock
 import com.squareup.moshi.Moshi
-import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import timber.log.Timber
 
 @RunWith(Parameterized::class)
-class PredefinedGradeTest(private val testCase: GradeTestCase) {
+class PredefinedGradeUnavailableTest(private val testCase: GradeTestCase) {
+
+    private var mockPrevalenceStore: PrevalenceStore = mock()
 
     @Test
     fun predefinedGradeTests() {
-        val grade = Grade()
 
-        grade.https = testCase.input.https
-        grade.httpsAutoUpgrade = testCase.input.httpsAutoUpgrade
-        grade.privacyScore = testCase.input.privacyScore
-
-        grade.setParentEntityAndPrevalence(testCase.input.parentEntity, testCase.input.parentTrackerPrevalence)
+        val grade = Grade(testCase.input.https, testCase.input.httpsAutoUpgrade, prevalenceStore = mockPrevalenceStore)
 
         for (tracker in testCase.input.trackers) {
 
@@ -49,7 +48,19 @@ class PredefinedGradeTest(private val testCase: GradeTestCase) {
         }
 
         Timber.d("testCase ${testCase.url}")
-        assertEquals(testCase.url, testCase.expected.site, grade.scores.site)
+        assertTrue(grade.calculateScore() is Grade.Scores.ScoresUnavailable)
+    }
+
+    class GradeTestCase(val expected: Grade.Scores.ScoresAvailable, val input: Input, val url: String) {
+
+        class Input(
+            val https: Boolean,
+            val httpsAutoUpgrade: Boolean,
+            val trackers: Array<Tracker>
+        )
+
+        class Tracker(val blocked: Boolean, val parentEntity: String, val prevalence: Double?)
+
     }
 
     companion object {
@@ -64,20 +75,5 @@ class PredefinedGradeTest(private val testCase: GradeTestCase) {
         }
 
     }
-
 }
 
-class GradeTestCase(val expected: Grade.Scores, val input: Input, val url: String) {
-
-    class Input(
-        val https: Boolean,
-        val httpsAutoUpgrade: Boolean,
-        val parentEntity: String?,
-        val parentTrackerPrevalence: Double?,
-        val privacyScore: Int?,
-        val trackers: Array<Tracker>
-    )
-
-    class Tracker(val blocked: Boolean, val parentEntity: String, val prevalence: Double?)
-
-}

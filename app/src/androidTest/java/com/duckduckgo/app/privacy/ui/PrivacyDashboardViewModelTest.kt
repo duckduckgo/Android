@@ -211,8 +211,7 @@ class PrivacyDashboardViewModelTest {
         whenever(site.trackerCount).thenReturn(trackerCount)
         whenever(site.allTrackersBlocked).thenReturn(allTrackersBlocked)
         whenever(site.privacyPractices).thenReturn(privacyPractices)
-        whenever(site.grade).thenReturn(grade)
-        whenever(site.improvedGrade).thenReturn(improvedGrade)
+        whenever(site.calculateGrades()).thenReturn(Site.SiteGrades(grade, improvedGrade))
         return site
     }
 

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("RemoveExplicitTypeArguments")
+
 package com.duckduckgo.app.browser
 
 import android.content.Context

@@ -46,13 +46,16 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import kotlinx.android.synthetic.main.activity_browser.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.jetbrains.anko.longToast
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
-class BrowserActivity : DuckDuckGoActivity() {
+class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
+
+    override val coroutineContext: CoroutineContext
+        get() = SupervisorJob() + Dispatchers.Main
 
     @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
@@ -126,7 +129,7 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun selectTab(tab: TabEntity?) {
-        Timber.i("Select tab: $tab")
+        Timber.v("Select tab: $tab")
 
         if (tab == null) return
 
@@ -180,20 +183,20 @@ class BrowserActivity : DuckDuckGoActivity() {
         if (launchedFromWidget(intent)) {
             Timber.w("new tab requested from widget")
             pixel.fire(Pixel.PixelName.WIDGET_LAUNCHED, includeLocale = true)
-            viewModel.onNewTabRequested()
+            launch { viewModel.onNewTabRequested() }
             return
         }
 
         if (launchNewSearch(intent)) {
             Timber.w("new tab requested")
-            viewModel.onNewTabRequested()
+            launch { viewModel.onNewTabRequested() }
             return
         }
 
         val sharedText = intent.intentText
         if (sharedText != null) {
             Timber.w("opening in new tab requested for $sharedText")
-            viewModel.onOpenInNewTabRequested(sharedText, true)
+            launch { viewModel.onOpenInNewTabRequested(sharedText, true) }
             return
         }
     }
@@ -207,7 +210,7 @@ class BrowserActivity : DuckDuckGoActivity() {
         })
         viewModel.tabs.observe(this, Observer {
             clearStaleTabs(it)
-            viewModel.onTabsUpdated(it)
+            launch { viewModel.onTabsUpdated(it) }
         })
     }
 
@@ -273,11 +276,11 @@ class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchNewTab() {
-        viewModel.onNewTabRequested()
+        launch { viewModel.onNewTabRequested() }
     }
 
     fun openInNewTab(query: String) {
-        viewModel.onOpenInNewTabRequested(query)
+        launch { viewModel.onOpenInNewTabRequested(query) }
     }
 
     fun launchBrokenSiteFeedback(url: String?) {

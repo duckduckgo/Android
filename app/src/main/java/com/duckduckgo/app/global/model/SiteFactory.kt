@@ -16,8 +16,11 @@
 
 package com.duckduckgo.app.global.model
 
+import androidx.annotation.AnyThread
+import androidx.annotation.WorkerThread
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.PrevalenceStore
+import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,14 +33,40 @@ class SiteFactory @Inject constructor(
     private val prevalenceStore: PrevalenceStore
 ) {
 
-    fun build(url: String, title: String? = null): Site {
-        val practices = privacyPractices.privacyPracticesFor(url)
-        val memberNetwork = trackerNetworks.network(url)
-        val site = SiteMonitor(url, practices, memberNetwork, prevalenceStore)
-        title?.let {
-            site.title = it
-        }
-        return site
+    /**
+     * Builds a Site with minimal details; this is quick to build but won't contain the full details needed for all functionality
+     *
+     * @see [loadFullSiteDetails] to ensure full privacy details are loaded
+     */
+    @AnyThread
+    fun buildSite(url: String, title: String? = null): Site {
+        return SiteMonitor(url, title, prevalenceStore)
     }
 
+    /**
+     * Updates the given Site with the full details
+     *
+     * This can be expensive to execute.
+     */
+    @WorkerThread
+    fun loadFullSiteDetails(site: Site) {
+        val practices = privacyPractices.privacyPracticesFor(site.url)
+        val memberNetwork = trackerNetworks.network(site.url)
+        val prevalence = determinePrevalence(memberNetwork)
+        val siteDetails = SitePrivacyData(site.url, practices, memberNetwork, prevalence)
+        site.updatePrivacyData(siteDetails)
+    }
+
+    private fun determinePrevalence(memberNetwork: TrackerNetwork?): Double? {
+        if (memberNetwork == null) {
+            return null
+        }
+        return prevalenceStore.findPrevalenceOf(memberNetwork.name)
+    }
+
+    data class SitePrivacyData(
+        val url: String, val practices: PrivacyPractices.Practices,
+        val memberNetwork: TrackerNetwork?,
+        val prevalence: Double?
+    )
 }

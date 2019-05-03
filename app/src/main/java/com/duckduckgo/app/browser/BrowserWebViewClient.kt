@@ -28,7 +28,7 @@ import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.global.isHttps
-import com.duckduckgo.app.global.toHttpsString
+import com.duckduckgo.app.global.isHttpsVersionOfUri
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.HTTPS_UPGRADE_SITE_ERROR
@@ -36,13 +36,13 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.APP_VERSION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.ERROR_CODE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.URL
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.net.URI
-import javax.inject.Inject
 import kotlin.concurrent.thread
 
 
-class BrowserWebViewClient @Inject constructor(
+class BrowserWebViewClient(
     private val requestRewriter: RequestRewriter,
     private val specialUrlDetector: SpecialUrlDetector,
     private val requestInterceptor: RequestInterceptor,
@@ -54,6 +54,7 @@ class BrowserWebViewClient @Inject constructor(
     var webViewClientListener: WebViewClientListener? = null
 
     private var currentUrl: String? = null
+    private var tempTimer = 0L
 
     /**
      * This is the new method of url overriding available from API 24 onwards
@@ -109,7 +110,9 @@ class BrowserWebViewClient @Inject constructor(
         webViewClientListener?.externalAppLinkClicked(urlType)
     }
 
+    @UiThread
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
+        tempTimer = System.currentTimeMillis()
         Timber.d("\nonPageStarted {\nurl: $url\nwebView.url: ${webView.url}\n}\n")
         currentUrl = url
 
@@ -124,24 +127,25 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
+    @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
-        Timber.d("onPageFinished $url")
-
         currentUrl = url
         webViewClientListener?.let {
             it.loadingFinished(url)
             it.navigationOptionsChanged(WebViewNavigationOptions(webView.copyBackForwardList()))
         }
+
+        Timber.i("Page Load Time: ${System.currentTimeMillis() - tempTimer}ms for $url")
     }
 
     @WorkerThread
     override fun shouldInterceptRequest(webView: WebView, request: WebResourceRequest): WebResourceResponse? {
         Timber.v("Intercepting resource ${request.url} on page $currentUrl")
-        return requestInterceptor.shouldIntercept(request, webView, currentUrl, webViewClientListener)
+        return runBlocking { requestInterceptor.shouldIntercept(request, webView, currentUrl, webViewClientListener) }
     }
 
     @UiThread
-    @Suppress("OverridingDeprecatedMember")
+    @Suppress("OverridingDeprecatedMember", "DEPRECATION")
     override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             val url = failingUrl.toUri()
@@ -286,9 +290,9 @@ class BrowserWebViewClient @Inject constructor(
         private val WebBackForwardList.isHttpsUpgrade: Boolean
             get() {
                 if (currentIndex < 1) return false
-                val current = currentItem.originalUrl ?: return false
-                val previous = getItemAtIndex(currentIndex - 1).originalUrl
-                return current == previous.toUri().toHttpsString
+                val current = currentItem?.originalUrl?.toUri() ?: return false
+                val previous = getItemAtIndex(currentIndex - 1).originalUrl?.toUri() ?: return false
+                return current.isHttpsVersionOfUri(previous)
             }
     }
 }

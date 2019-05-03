@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("RemoveExplicitTypeArguments")
+
 package com.duckduckgo.app.browser
 
 import android.view.MenuItem
@@ -36,11 +38,11 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
+import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
+import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
-import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
-import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.global.db.AppConfigurationDao
@@ -64,6 +66,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -178,9 +181,11 @@ class BrowserTabViewModelTest {
         )
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore)
-        whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
-        whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
-        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+        runBlocking<Unit> {
+            whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
+            whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
+            whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+        }
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -237,7 +242,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOpenInNewBackgroundRequestedThenTabRepositoryUpdatedAndCommandIssued() {
+    fun whenOpenInNewBackgroundRequestedThenTabRepositoryUpdatedAndCommandIssued() = runBlocking<Unit> {
         val url = "http://www.example.com"
         testee.openInNewBackgroundTab(url)
 
@@ -553,13 +558,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLoadingStartedThenPrivacyGradeIsCleared() {
+    fun whenLoadingStartedThenPrivacyGradeIsCleared() = runBlocking<Unit> {
         testee.loadingStarted("http://example.com")
         assertNull(testee.privacyGrade.value)
     }
 
     @Test
-    fun whenUrlChangedThenPrivacyGradeIsReset() {
+    fun whenUrlChangedThenPrivacyGradeIsReset() = runBlocking<Unit> {
         val grade = testee.privacyGrade.value
         changeUrl("https://example.com")
         assertNotEquals(grade, testee.privacyGrade.value)
@@ -984,7 +989,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithUrl() {
+    fun whenOnSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithUrl() = runBlocking<Unit> {
         isBrowsing(true)
         changeUrl("foo.com")
         testee.onBrokenSiteSelected()

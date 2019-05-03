@@ -39,7 +39,7 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
 
     private val siteData: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
 
-    override fun add(url: String?, skipHome: Boolean, isDefaultTab: Boolean): String {
+    override suspend fun add(url: String?, skipHome: Boolean, isDefaultTab: Boolean): String {
         val tabId = generateTabId()
         add(tabId, buildSiteData(url), skipHome = skipHome, isDefaultTab = isDefaultTab)
         return tabId
@@ -50,13 +50,13 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
     private fun buildSiteData(url: String?): MutableLiveData<Site> {
         val data = MutableLiveData<Site>()
         url?.let {
-            val siteMonitor = siteFactory.build(it)
-            data.value = siteMonitor
+            val siteMonitor = siteFactory.buildSite(it)
+            data.postValue(siteMonitor)
         }
         return data
     }
 
-    override fun add(tabId: String, data: MutableLiveData<Site>, skipHome: Boolean, isDefaultTab: Boolean) {
+    override suspend fun add(tabId: String, data: MutableLiveData<Site>, skipHome: Boolean, isDefaultTab: Boolean) {
         siteData[tabId] = data
         databaseExecutor().scheduleDirect {
 
@@ -73,7 +73,7 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
         }
     }
 
-    override fun addNewTabAfterExistingTab(url: String?, tabId: String) {
+    override suspend fun addNewTabAfterExistingTab(url: String?, tabId: String) {
         databaseExecutor().scheduleDirect {
             val position = tabsDao.tab(tabId)?.position ?: -1
             val uri = Uri.parse(url)
@@ -83,7 +83,7 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
         }
     }
 
-    override fun update(tabId: String, site: Site?) {
+    override suspend fun update(tabId: String, site: Site?) {
         databaseExecutor().scheduleDirect {
             val current = tabsDao.tab(tabId)
             val position = current?.position ?: 0
@@ -103,7 +103,7 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
         return data
     }
 
-    override fun delete(tab: TabEntity) {
+    override suspend fun delete(tab: TabEntity) {
         databaseExecutor().scheduleDirect {
             tabsDao.deleteTabAndUpdateSelection(tab)
         }
@@ -116,7 +116,7 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
         siteData.clear()
     }
 
-    override fun select(tabId: String) {
+    override suspend fun select(tabId: String) {
         databaseExecutor().scheduleDirect {
             val selection = TabSelectionEntity(tabId = tabId)
             tabsDao.insertTabSelection(selection)

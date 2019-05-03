@@ -27,6 +27,9 @@ abstract class EntityListDao {
     @Query("select * from entity_list")
     abstract fun getAll(): List<EntityListEntity>
 
+    @Query("select * from entity_list where domainName=:domainName")
+    abstract fun get(domainName: String): EntityListEntity?
+
     @Query("delete from entity_list")
     abstract fun deleteAll()
 

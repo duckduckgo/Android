@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("RemoveExplicitTypeArguments")
+
 package com.duckduckgo.app.browser
 
 import android.net.Uri
@@ -29,6 +31,7 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -65,7 +68,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUrlShouldBeUpgradedThenUpgraderInvoked() {
+    fun whenUrlShouldBeUpgradedThenUpgraderInvoked() = runBlocking<Unit> {
         configureShouldUpgrade()
         testee.shouldIntercept(
             request = mockRequest,
@@ -78,7 +81,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUrlShouldBeUpgradedThenCancelledResponseReturned() {
+    fun whenUrlShouldBeUpgradedThenCancelledResponseReturned() = runBlocking<Unit> {
         configureShouldUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -91,7 +94,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUrlShouldBeUpgradedButNotOnMainFrameThenNotUpgraded() {
+    fun whenUrlShouldBeUpgradedButNotOnMainFrameThenNotUpgraded() = runBlocking<Unit> {
         configureShouldUpgrade()
         whenever(mockRequest.isForMainFrame).thenReturn(false)
         testee.shouldIntercept(
@@ -105,7 +108,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUrlShouldBeUpgradedButUrlIsNullThenNotUpgraded() {
+    fun whenUrlShouldBeUpgradedButUrlIsNullThenNotUpgraded() = runBlocking<Unit> {
         configureShouldUpgrade()
         whenever(mockRequest.url).thenReturn(null)
         testee.shouldIntercept(
@@ -119,7 +122,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUrlShouldNotBeUpgradedThenUpgraderNotInvoked() {
+    fun whenUrlShouldNotBeUpgradedThenUpgraderNotInvoked() = runBlocking<Unit> {
         whenever(mockHttpsUpgrader.shouldUpgrade(any())).thenReturn(false)
         testee.shouldIntercept(
             request = mockRequest,
@@ -132,7 +135,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenCurrentUrlIsNullThenShouldContinueToLoad() {
+    fun whenCurrentUrlIsNullThenShouldContinueToLoad() = runBlocking<Unit> {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -144,7 +147,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsTrustedSite_DuckDuckGo_ThenShouldContinueToLoad() {
+    fun whenIsTrustedSite_DuckDuckGo_ThenShouldContinueToLoad() = runBlocking<Unit> {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -157,7 +160,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsTrustedSite_DontTrack_ThenShouldContinueToLoad() {
+    fun whenIsTrustedSite_DontTrack_ThenShouldContinueToLoad() = runBlocking<Unit> {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -170,7 +173,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsTrustedSite_SpreadPrivacy_ThenShouldContinueToLoad() {
+    fun whenIsTrustedSite_SpreadPrivacy_ThenShouldContinueToLoad() = runBlocking<Unit> {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -183,7 +186,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsTrustedSite_DuckDuckHack_ThenShouldContinueToLoad() {
+    fun whenIsTrustedSite_DuckDuckHack_ThenShouldContinueToLoad() = runBlocking<Unit> {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -196,7 +199,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsTrustedSite_PrivateBrowsingMyths_ThenShouldContinueToLoad() {
+    fun whenIsTrustedSite_PrivateBrowsingMyths_ThenShouldContinueToLoad() = runBlocking<Unit> {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -209,7 +212,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsTrustedSite_DuckDotCo_ThenShouldContinueToLoad() {
+    fun whenIsTrustedSite_DuckDotCo_ThenShouldContinueToLoad() = runBlocking<Unit> {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -222,7 +225,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsHttpRequestThenHttpRequestListenerCalled() {
+    fun whenIsHttpRequestThenHttpRequestListenerCalled() = runBlocking<Unit> {
         configureShouldNotUpgrade()
         whenever(mockRequest.url).thenReturn(Uri.parse("http://example.com"))
         val mockListener = mock<WebViewClientListener>()
@@ -239,7 +242,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsHttpsRequestThenHttpRequestListenerNotCalled() {
+    fun whenIsHttpsRequestThenHttpRequestListenerNotCalled() = runBlocking<Unit> {
         configureShouldNotUpgrade()
         whenever(mockRequest.url).thenReturn(Uri.parse("https://example.com"))
         val mockListener = mock<WebViewClientListener>()
@@ -257,7 +260,7 @@ class WebViewRequestInterceptorTest {
 
 
     @Test
-    fun whenRequestShouldBlockAndNoSurrogateThenCancellingResponseReturned() {
+    fun whenRequestShouldBlockAndNoSurrogateThenCancellingResponseReturned() = runBlocking<Unit> {
         whenever(mockResourceSurrogates.get(any())).thenReturn(SurrogateResponse(responseAvailable = false))
 
         configureShouldNotUpgrade()
@@ -273,7 +276,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenRequestShouldBlockButThereIsASurrogateThen() {
+    fun whenRequestShouldBlockButThereIsASurrogateThen() = runBlocking<Unit> {
         val availableSurrogate = SurrogateResponse(
             responseAvailable = true,
             mimeType = "application/javascript",
@@ -308,13 +311,13 @@ class WebViewRequestInterceptorTest {
         whenever(mockTrackerDetector.evaluate(any(), any(), any())).thenReturn(blockTrackingEvent)
     }
 
-    private fun configureShouldUpgrade() {
+    private fun configureShouldUpgrade() = runBlocking<Unit> {
         whenever(mockHttpsUpgrader.shouldUpgrade(any())).thenReturn(true)
         whenever(mockRequest.url).thenReturn(validUri())
         whenever(mockRequest.isForMainFrame).thenReturn(true)
     }
 
-    private fun configureShouldNotUpgrade() {
+    private fun configureShouldNotUpgrade() = runBlocking<Unit> {
         whenever(mockHttpsUpgrader.shouldUpgrade(any())).thenReturn(false)
 
         whenever(mockRequest.url).thenReturn(validUri())

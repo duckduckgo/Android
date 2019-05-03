@@ -43,14 +43,15 @@ val Uri.isHttps: Boolean
 val Uri.toHttps: Uri
     get() = buildUpon().scheme(UrlScheme.https).build()
 
-val Uri.toHttpsString
-    get() = toHttps.toString()
-
 val Uri.hasIpHost: Boolean
     get() {
         val ipRegex = Regex("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
         return baseHost?.matches(ipRegex) ?: false
     }
+
+fun Uri.isHttpsVersionOfUri(other: Uri): Boolean {
+    return isHttps && other.isHttp && other.toHttps == this
+}
 
 private val MOBILE_URL_PREFIXES = listOf("m.", "mobile.")
 

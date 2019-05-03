@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-@file:Suppress("unused")
+package com.duckduckgo.app.global.initialization
 
-package com.duckduckgo.app.global.performance
-
-import android.util.Log
+import com.duckduckgo.app.privacy.model.PrivacyPractices
+import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 
-inline fun <T> measureExecution(logMessage: String, logLevel: Int = Log.DEBUG, function: () -> T): T {
-    val startTime = System.nanoTime()
-    return function.invoke().also {
-        val difference = System.nanoTime() - startTime
-        Timber.log(logLevel, "$logMessage; took ${TimeUnit.NANOSECONDS.toMillis(difference)}ms")
+class AppDataLoader @Inject constructor(
+    private val termsOfServiceStore: TermsOfServiceStore,
+    private val privacyPractices: PrivacyPractices
+) {
+
+    suspend fun loadData() {
+        Timber.i("Started to load app data")
+        termsOfServiceStore.loadData()
+        privacyPractices.loadData()
+        Timber.i("Finished loading app data")
     }
 }
