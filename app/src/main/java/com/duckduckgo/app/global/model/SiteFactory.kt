@@ -53,8 +53,8 @@ class SiteFactory @Inject constructor(
         val practices = privacyPractices.privacyPracticesFor(site.url)
         val memberNetwork = trackerNetworks.network(site.url)
         val prevalence = determinePrevalence(memberNetwork)
-        val siteDetails = SiteDetails(site.url, practices, memberNetwork, prevalence)
-        site.updateData(siteDetails)
+        val siteDetails = SitePrivacyData(site.url, practices, memberNetwork, prevalence)
+        site.updatePrivacyData(siteDetails)
     }
 
     private fun determinePrevalence(memberNetwork: TrackerNetwork?): Double? {
@@ -64,7 +64,7 @@ class SiteFactory @Inject constructor(
         return prevalenceStore.findPrevalenceOf(memberNetwork.name)
     }
 
-    data class SiteDetails(
+    data class SitePrivacyData(
         val url: String, val practices: PrivacyPractices.Practices,
         val memberNetwork: TrackerNetwork?,
         val prevalence: Double?

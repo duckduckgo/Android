@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.model
 
 import android.net.Uri
+import com.duckduckgo.app.global.model.SiteFactory.SitePrivacyData
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
@@ -39,7 +40,7 @@ interface Site {
     val allTrackersBlocked: Boolean
     var hasHttpResources: Boolean
     fun trackerDetected(event: TrackingEvent)
-    fun updateData(siteDetails: SiteFactory.SiteDetails)
+    fun updatePrivacyData(sitePrivacyData: SitePrivacyData)
 
     fun calculateGrades(): SiteGrades
 

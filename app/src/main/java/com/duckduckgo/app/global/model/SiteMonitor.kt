@@ -21,6 +21,7 @@ import android.net.Uri
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.global.model.Site.SiteGrades
+import com.duckduckgo.app.global.model.SiteFactory.SitePrivacyData
 import com.duckduckgo.app.privacy.model.Grade
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -79,10 +80,10 @@ class SiteMonitor(
     override val allTrackersBlocked: Boolean
         get() = trackingEvents.none { !it.blocked }
 
-    override fun updateData(siteDetails: SiteFactory.SiteDetails) {
-        this.privacyPractices = siteDetails.practices
-        this.memberNetwork = siteDetails.memberNetwork
-        gradeCalculator.updateData(privacyPractices.score, memberNetwork?.name, siteDetails.prevalence)
+    override fun updatePrivacyData(sitePrivacyData: SitePrivacyData) {
+        this.privacyPractices = sitePrivacyData.practices
+        this.memberNetwork = sitePrivacyData.memberNetwork
+        gradeCalculator.updateData(privacyPractices.score, memberNetwork?.name, sitePrivacyData.prevalence)
     }
 
     private fun httpsStatus(): HttpsStatus {
