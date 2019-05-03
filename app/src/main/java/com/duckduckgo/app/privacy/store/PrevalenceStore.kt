@@ -18,6 +18,6 @@ package com.duckduckgo.app.privacy.store
 
 interface PrevalenceStore {
 
-    fun findPrevalenceOf(entity: String?): Double?
+    fun findPrevalenceOf(entity: String): Double?
 
 }

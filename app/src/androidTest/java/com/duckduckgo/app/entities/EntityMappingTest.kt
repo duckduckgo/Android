@@ -38,7 +38,7 @@ class EntityMappingTest {
     }
 
     @Test
-    fun whenUrlContainsOneUnmatchingDomainThenNoValueIsReturned() {
+    fun whenUrlContainsOneUnmatchedDomainThenNoValueIsReturned() {
         val url = "a.com"
         whenever(mockDao.get(url)).thenReturn(null)
         val entity = testee.entityForUrl("https://$url")
@@ -63,7 +63,7 @@ class EntityMappingTest {
     }
 
     @Test
-    fun whenUrlContainsOneUnmatchingSubDomainAndOneMatchingDomainThenValueIsReturned() {
+    fun whenUrlContainsOneUnmatchedSubDomainAndOneMatchingDomainThenValueIsReturned() {
         val url = "a.b.com"
         whenever(mockDao.get(url)).thenReturn(anEntity())
         val entity = testee.entityForUrl("https://$url")
@@ -80,7 +80,7 @@ class EntityMappingTest {
     }
 
     @Test
-    fun whenUrlContainsManyUnmatchingSubdomainsThenAllIntermediateValuesAreSearchedFor() {
+    fun whenUrlContainsManyUnmatchedSubdomainsThenAllIntermediateValuesAreSearchedFor() {
         val url = "a.b.c.com"
         whenever(mockDao.get("a.b.c.com")).thenReturn(null)
         whenever(mockDao.get("b.c.com")).thenReturn(null)
