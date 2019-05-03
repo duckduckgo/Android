@@ -53,6 +53,8 @@ class PrivacyPracticesTest {
             .networkEntityDao()
 
         entityMapping = EntityMapping(entityDao)
+
+        testee = PrivacyPracticesImpl(mockTermsStore, entityMapping)
     }
 
     @Test
@@ -63,7 +65,6 @@ class PrivacyPracticesTest {
             )
         )
 
-        testee = PrivacyPracticesImpl(mockTermsStore, entityMapping)
         assertEquals(10, testee.privacyPracticesFor("http://www.example.com").score)
     }
 
@@ -87,7 +88,6 @@ class PrivacyPracticesTest {
             )
         )
 
-        testee = PrivacyPracticesImpl(mockTermsStore, entityMapping)
         testee.initialize()
 
         assertEquals(10, testee.privacyPracticesFor("http://www.sibling1.com").score)
@@ -96,16 +96,12 @@ class PrivacyPracticesTest {
     @Test
     fun whenUrlHasMatchingEntityWithTermsThenPracticesAreReturned() = runBlocking {
         whenever(mockTermsStore.terms).thenReturn(listOf(TermsOfService("example.com", classification = "A")))
-
-        testee = PrivacyPracticesImpl(mockTermsStore, entityMapping)
-
         val expected = Practices(score = 0, summary = GOOD, goodReasons = emptyList(), badReasons = emptyList())
         assertEquals(expected, testee.privacyPracticesFor("http://www.example.com"))
     }
 
     @Test
     fun whenInitialisedWithEmptyTermsStoreAndEntityListThenReturnsUnknownForUrl() = runBlocking {
-        testee = PrivacyPracticesImpl(mockTermsStore, entityMapping)
         assertEquals(PrivacyPractices.UNKNOWN, testee.privacyPracticesFor("http://www.example.com"))
     }
 }
