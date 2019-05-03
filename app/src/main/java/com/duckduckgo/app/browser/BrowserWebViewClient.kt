@@ -28,7 +28,7 @@ import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.global.isHttps
-import com.duckduckgo.app.global.toHttpsString
+import com.duckduckgo.app.global.isHttpsVersionOfUri
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.HTTPS_UPGRADE_SITE_ERROR
@@ -290,9 +290,9 @@ class BrowserWebViewClient(
         private val WebBackForwardList.isHttpsUpgrade: Boolean
             get() {
                 if (currentIndex < 1) return false
-                val current = currentItem?.originalUrl ?: return false
-                val previous = getItemAtIndex(currentIndex - 1).originalUrl
-                return current == previous.toUri().toHttpsString
+                val current = currentItem?.originalUrl?.toUri() ?: return false
+                val previous = getItemAtIndex(currentIndex - 1).originalUrl?.toUri() ?: return false
+                return current.isHttpsVersionOfUri(previous)
             }
     }
 }

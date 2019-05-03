@@ -87,6 +87,34 @@ class UriExtensionTest {
     }
 
     @Test
+    fun whenUriIsHttpsAndOtherIsHttpButOtherwiseIdenticalThenIsHttpsVersionOfOtherIsTrue() {
+        val uri = Uri.parse("https://example.com")
+        val other = Uri.parse("http://example.com")
+        assertTrue(uri.isHttpsVersionOfUri(other))
+    }
+
+    @Test
+    fun whenUriIsHttpsAndOtherIsHttpButNotOtherwiseIdenticalThenIsHttpsVersionOfOtherIsFalse() {
+        val uri = Uri.parse("https://example.com")
+        val other = Uri.parse("http://example.com/path")
+        assertFalse(uri.isHttpsVersionOfUri(other))
+    }
+
+    @Test
+    fun whenUriIsHttpThenIsHttpsVersionOfOtherIsFalse() {
+        val uri = Uri.parse("http://example.com")
+        val other = Uri.parse("http://example.com")
+        assertFalse(uri.isHttpsVersionOfUri(other))
+    }
+
+    @Test
+    fun whenUriIsHttpsAndOtherIsHttpsThenIsHttpsVersionOfOtherIsFalse() {
+        val uri = Uri.parse("https://example.com")
+        val other = Uri.parse("https://example.com")
+        assertFalse(uri.isHttpsVersionOfUri(other))
+    }
+
+    @Test
     fun whenUriIsMalformedThenIsHtpsIsFalse() {
         assertFalse(Uri.parse("[example com]").isHttps)
     }
