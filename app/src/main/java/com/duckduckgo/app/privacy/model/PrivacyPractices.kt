@@ -18,11 +18,11 @@ package com.duckduckgo.app.privacy.model
 
 import com.duckduckgo.app.entities.EntityMapping
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
-import com.duckduckgo.app.global.initialization.Initializable
+import com.duckduckgo.app.global.initialization.DataLoadable
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import javax.inject.Inject
 
-interface PrivacyPractices : Initializable {
+interface PrivacyPractices : DataLoadable {
 
     enum class Summary {
         POOR,
@@ -51,7 +51,7 @@ class PrivacyPracticesImpl @Inject constructor(
 
     private var entityScores: Map<String, Int> = mapOf()
 
-    override suspend fun initialize() {
+    override suspend fun loadData() {
         val entityScores: MutableMap<String, Int> = mutableMapOf()
 
         termsOfServiceStore.terms.forEach {

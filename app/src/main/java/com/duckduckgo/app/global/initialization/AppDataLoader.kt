@@ -16,9 +16,21 @@
 
 package com.duckduckgo.app.global.initialization
 
+import com.duckduckgo.app.privacy.model.PrivacyPractices
+import com.duckduckgo.app.privacy.store.TermsOfServiceStore
+import timber.log.Timber
+import javax.inject.Inject
 
-interface Initializable {
 
-    suspend fun initialize()
+class AppDataLoader @Inject constructor(
+    private val termsOfServiceStore: TermsOfServiceStore,
+    private val privacyPractices: PrivacyPractices
+) {
 
+    suspend fun loadData() {
+        Timber.i("Started to load app data")
+        termsOfServiceStore.loadData()
+        privacyPractices.loadData()
+        Timber.i("Finished loading app data")
+    }
 }

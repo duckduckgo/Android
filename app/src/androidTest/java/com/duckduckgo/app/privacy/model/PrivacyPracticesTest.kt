@@ -88,7 +88,7 @@ class PrivacyPracticesTest {
             )
         )
 
-        testee.initialize()
+        testee.loadData()
 
         assertEquals(10, testee.privacyPracticesFor("http://www.sibling1.com").score)
     }

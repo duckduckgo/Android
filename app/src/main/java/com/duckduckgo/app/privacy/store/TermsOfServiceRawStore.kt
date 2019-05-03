@@ -39,7 +39,7 @@ class TermsOfServiceRawStore @Inject constructor(private val moshi: Moshi, priva
     private var data: List<TermsOfService> = ArrayList()
     private var initialized: Boolean = false
 
-    override suspend fun initialize() {
+    override suspend fun loadData() {
         withContext(Dispatchers.IO) {
             val json = context.resources.openRawResource(R.raw.tosdr).bufferedReader().use { it.readText() }
             val type = Types.newParameterizedType(List::class.java, TermsOfService::class.java)

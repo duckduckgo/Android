@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.privacy.store
 
-import com.duckduckgo.app.global.initialization.Initializable
+import com.duckduckgo.app.global.initialization.DataLoadable
 import com.duckduckgo.app.privacy.model.TermsOfService
 
-interface TermsOfServiceStore : Initializable {
+interface TermsOfServiceStore : DataLoadable {
 
     val terms: List<TermsOfService>
 
