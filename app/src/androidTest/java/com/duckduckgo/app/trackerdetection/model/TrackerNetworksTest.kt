@@ -51,7 +51,7 @@ class TrackerNetworksTest {
 
 
     private val testee: TrackerNetworks by lazy {
-        TrackerNetworksDirectDbLookup(mockPrevalenceStore, entityMapping, trackerDataDao)
+        TrackerNetworksLookup(mockPrevalenceStore, entityMapping, trackerDataDao)
     }
 
     @Before

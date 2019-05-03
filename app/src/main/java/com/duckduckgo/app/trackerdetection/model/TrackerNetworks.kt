@@ -28,7 +28,7 @@ interface TrackerNetworks {
 
 }
 
-class TrackerNetworksDirectDbLookup(
+class TrackerNetworksLookup(
     private val prevalenceStore: PrevalenceStore,
     private val entityMapping: EntityMapping,
     private val trackerDataDao: TrackerDataDao
