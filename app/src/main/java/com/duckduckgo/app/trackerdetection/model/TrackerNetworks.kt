@@ -19,7 +19,7 @@ package com.duckduckgo.app.trackerdetection.model
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.entities.EntityMapping
-import com.duckduckgo.app.global.uri.removeOneSubdomain
+import com.duckduckgo.app.global.uri.removeSubdomain
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 
@@ -59,7 +59,7 @@ class TrackerNetworksDirectDbLookup(
         }
 
         // remove the first subdomain, and try again
-        val parentDomain = uri.removeOneSubdomain() ?: return null
+        val parentDomain = uri.removeSubdomain() ?: return null
         return recursivelyFindMatchingTracker(parentDomain)
     }
 

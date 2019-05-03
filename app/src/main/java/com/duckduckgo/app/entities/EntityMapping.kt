@@ -21,7 +21,7 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.entities.db.EntityListEntity
 import com.duckduckgo.app.global.baseHost
-import com.duckduckgo.app.global.uri.removeOneSubdomain
+import com.duckduckgo.app.global.uri.removeSubdomain
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -40,7 +40,7 @@ class EntityMapping @Inject constructor(private val entityListDao: EntityListDao
         if (direct != null) return direct
 
         // remove the first subdomain, and try again
-        val parentDomain = uri.removeOneSubdomain() ?: return null
+        val parentDomain = uri.removeSubdomain() ?: return null
         return entityForUrl(parentDomain)
 
     }

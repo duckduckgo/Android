@@ -26,64 +26,64 @@ class UriSubdomainRemoverTest {
 
     @Test
     fun whenRemovingASubdomainWhenTwoAvailableThenOneIsReturned() {
-        val converted = Uri.parse("https://a.example.com").removeOneSubdomain()
+        val converted = Uri.parse("https://a.example.com").removeSubdomain()
         assertEquals("https://example.com", converted)
     }
 
     @Test
-    fun whenRemovingASubdomainWhenFiveAvailableThenFourIsReturned() {
-        val converted = Uri.parse("https://a.b.c.d.example.com").removeOneSubdomain()
+    fun whenRemovingASubdomainWhenFiveAvailableThenFourAreReturned() {
+        val converted = Uri.parse("https://a.b.c.d.example.com").removeSubdomain()
         assertEquals("https://b.c.d.example.com", converted)
     }
 
     @Test
     fun whenRemovingMultipleSubdomainCanKeepCalling() {
         val converted = Uri.parse("https://a.b.c.d.example.com")
-            .removeOneSubdomain()!!
-            .toUri().removeOneSubdomain()!!
-            .toUri().removeOneSubdomain()
+            .removeSubdomain()!!
+            .toUri().removeSubdomain()!!
+            .toUri().removeSubdomain()
         assertEquals("https://d.example.com", converted)
     }
 
     @Test
     fun whenRemovingASubdomainWhenOnlyOneExistsThenReturnsNull() {
-        val converted = Uri.parse("https://example.com").removeOneSubdomain()
+        val converted = Uri.parse("https://example.com").removeSubdomain()
         assertNull(converted)
     }
 
     @Test
     fun whenRemovingASubdomainWhenOnlyOneExistsButHasMultipartTldCoUkThenReturnsNull() {
-        val converted = Uri.parse("https://co.uk").removeOneSubdomain()
+        val converted = Uri.parse("https://co.uk").removeSubdomain()
         assertNull(converted)
     }
 
     @Test
     fun whenRemovingASubdomainWhenOnlyOneExistsButHasMultipartTldCoNzThenReturnsMultipartTld() {
-        val converted = Uri.parse("https://co.za").removeOneSubdomain()
+        val converted = Uri.parse("https://co.za").removeSubdomain()
         assertNull(converted)
     }
 
     @Test
     fun whenRemovingASubdomainWhenOnlyOneExistsButHasRecentTldThenReturnsNull() {
-        val converted = Uri.parse("https://example.dev").removeOneSubdomain()
+        val converted = Uri.parse("https://example.dev").removeSubdomain()
         assertNull(converted)
     }
 
     @Test
     fun whenRemovingASubdomainWhenOnlyOneExistsButHasUnknownTldThenReturnsNull() {
-        val converted = Uri.parse("https://example.nonexistent").removeOneSubdomain()
+        val converted = Uri.parse("https://example.nonexistent").removeSubdomain()
         assertNull(converted)
     }
 
     @Test
     fun whenRemovingASubdomainWhenUnknownTldThenReturnsNonExistantTld() {
-        val converted = Uri.parse("https://foo.example.nonexistent").removeOneSubdomain()
+        val converted = Uri.parse("https://foo.example.nonexistent").removeSubdomain()
         assertEquals("https://example.nonexistent", converted)
     }
 
     @Test
     fun whenRemovingSubdomainWhenUriIpAddressThenReturnsNull() {
-        val converted = Uri.parse("127.0.0.1").removeOneSubdomain()
+        val converted = Uri.parse("127.0.0.1").removeSubdomain()
         assertNull(converted)
     }
 }

@@ -19,10 +19,10 @@ package com.duckduckgo.app.global.uri
 import android.net.Uri
 
 
-fun Uri.removeOneSubdomain(): String? {
+fun Uri.removeSubdomain(): String? {
     val host = host ?: return null
 
-    val splitDomains = splitSubdomains(host)
+    val splitDomains = host.split(".")
     if (splitDomains.isEmpty()) return null
 
     val newHost = removeFirstSubdomain(splitDomains)
@@ -32,17 +32,9 @@ fun Uri.removeOneSubdomain(): String? {
 }
 
 private fun removeFirstSubdomain(splitDomains: List<String>): String {
-    val sb = StringBuilder()
-
-    for (i in 1 until splitDomains.size) {
-        sb.append(splitDomains[i])
-
-        if (i < splitDomains.size - 1) {
-            sb.append(".")
-        }
-    }
-
-    return sb.toString()
+    return splitDomains
+        .drop(1)
+        .joinToString(".")
 }
 
 private fun isValid(uri: String): Boolean {
@@ -58,8 +50,4 @@ private fun Uri.appendScheme(newHost: String): String? {
     } else {
         "$scheme://$newHost"
     }
-}
-
-private fun splitSubdomains(host: String): List<String> {
-    return host.split(".")
 }
