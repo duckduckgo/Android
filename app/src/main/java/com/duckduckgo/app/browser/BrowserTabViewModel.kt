@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
 import android.view.ContextMenu
@@ -28,10 +29,7 @@ import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
@@ -70,13 +68,11 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.CoroutineContext
 
 class BrowserTabViewModel(
     private val statisticsUpdater: StatisticsUpdater,
@@ -96,12 +92,9 @@ class BrowserTabViewModel(
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
     appConfigurationDao: AppConfigurationDao
-) : WebViewClientListener, SaveBookmarkListener, CoroutineScope, HttpAuthenticationListener, ViewModel() {
+) : WebViewClientListener, SaveBookmarkListener, HttpAuthenticationListener, ViewModel() {
 
-    private val job = SupervisorJob()
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + job
+    private var buildingSiteFactoryJob: Job? = null
 
     data class GlobalLayoutViewState(
         val isNewTabState: Boolean = true
@@ -227,9 +220,7 @@ class BrowserTabViewModel(
         siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
 
-        initialUrl?.let {
-            site = siteFactory.build(it)
-        }
+        initialUrl?.let { buildSiteFactory(it) }
     }
 
     fun onViewReady() {
@@ -238,6 +229,23 @@ class BrowserTabViewModel(
         }
     }
 
+    private fun buildSiteFactory(url: String) {
+
+        if (buildingSiteFactoryJob?.isCompleted == false) {
+            Timber.i("Cancelling existing work to build SiteMonitor for $url")
+            buildingSiteFactoryJob?.cancel()
+        }
+
+        site = siteFactory.buildSite(url)
+        buildingSiteFactoryJob = viewModelScope.launch(Dispatchers.IO) {
+            site?.let {
+                siteFactory.loadFullSiteDetails(it)
+                onSiteChanged()
+            }
+        }
+    }
+
+    @SuppressLint("CheckResult")
     private fun configureAutoComplete() {
         autoCompletePublishSubject
             .debounce(300, TimeUnit.MILLISECONDS)
@@ -283,7 +291,7 @@ class BrowserTabViewModel(
         command.value = HideKeyboard
         val trimmedInput = input.trim()
 
-        launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO) {
             searchCountDao.incrementSearchCount()
         }
 
@@ -358,9 +366,7 @@ class BrowserTabViewModel(
 
     override fun progressChanged(progressedUrl: String?, newProgress: Int) {
         Timber.v("Loading in progress $newProgress")
-
         if (!currentBrowserViewState().browserShowing) return
-
         val progress = currentLoadingViewState()
         loadingViewState.value = progress.copy(progress = newProgress)
 
@@ -432,7 +438,7 @@ class BrowserTabViewModel(
     }
 
     override fun titleReceived(title: String) {
-        site?.title = title
+        site?.title = (title)
         onSiteChanged()
     }
 
@@ -467,26 +473,28 @@ class BrowserTabViewModel(
             return
         }
 
-
         val currentBrowserViewState = currentBrowserViewState()
         val currentOmnibarViewState = currentOmnibarViewState()
 
-        omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url))
-        findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
-        browserViewState.value = currentBrowserViewState.copy(
-            browserShowing = true,
-            canAddBookmarks = true,
-            addToHomeEnabled = true,
-            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
-            canSharePage = true,
-            showPrivacyGrade = appConfigurationDownloaded
+        omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url)))
+        findInPageViewState.postValue(FindInPageViewState(visible = false, canFindInPage = true))
+        browserViewState.postValue(
+            currentBrowserViewState.copy(
+                browserShowing = true,
+                canAddBookmarks = true,
+                addToHomeEnabled = true,
+                addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
+                canSharePage = true,
+                showPrivacyGrade = appConfigurationDownloaded
+            )
         )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             statisticsUpdater.refreshSearchRetentionAtb()
         }
         pendingUrl = null
-        site = siteFactory.build(url)
+
+        buildSiteFactory(url)
         onSiteChanged()
     }
 
@@ -521,8 +529,11 @@ class BrowserTabViewModel(
 
     private fun onSiteChanged() {
         siteLiveData.postValue(site)
-        privacyGrade.postValue(site?.improvedGrade)
-        tabRepository.update(tabId, site)
+        privacyGrade.postValue(site?.calculateGrades()?.improvedGrade)
+
+        viewModelScope.launch(Dispatchers.IO) {
+            tabRepository.update(tabId, site)
+        }
     }
 
     override fun showFileChooser(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams) {
@@ -599,7 +610,7 @@ class BrowserTabViewModel(
                 true
             }
             is RequiredAction.OpenInNewBackgroundTab -> {
-                openInNewBackgroundTab(requiredAction.url)
+                viewModelScope.launch { openInNewBackgroundTab(requiredAction.url) }
                 true
             }
             is RequiredAction.DownloadFile -> {
@@ -620,7 +631,7 @@ class BrowserTabViewModel(
         }
     }
 
-    fun openInNewBackgroundTab(url: String) {
+    suspend fun openInNewBackgroundTab(url: String) {
         tabRepository.addNewTabAfterExistingTab(url, tabId)
         command.value = OpenInNewBackgroundTab(url)
     }
@@ -725,6 +736,7 @@ class BrowserTabViewModel(
         }
     }
 
+    @SuppressLint("CheckResult")
     fun userRequestedToPinPageToHome(currentPage: String) {
         val title = if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentPage)) {
             duckDuckGoUrlDetector.extractQuery(currentPage) ?: currentPage

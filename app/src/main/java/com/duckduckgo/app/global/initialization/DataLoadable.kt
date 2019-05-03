@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.entities.db
+package com.duckduckgo.app.global.initialization
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 
-@Entity(
-    tableName = "entity_list"
-)
-data class EntityListEntity(
-    @PrimaryKey val domainName: String,
-    val entityName: String
-)
+interface DataLoadable {
+
+    suspend fun loadData()
+
+}

@@ -16,11 +16,11 @@
 
 package com.duckduckgo.app.privacy.ui
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao.NetworkTally
@@ -129,10 +129,12 @@ class PrivacyDashboardViewModel(
     }
 
     private fun updateSite(site: Site) {
+        val grades = site.calculateGrades()
+
         viewState.value = viewState.value?.copy(
             domain = site.uri?.host ?: "",
-            beforeGrade = site.grade,
-            afterGrade = site.improvedGrade,
+            beforeGrade = grades.grade,
+            afterGrade = grades.improvedGrade,
             httpsStatus = site.https,
             trackerCount = site.trackerCount,
             allTrackersBlocked = site.allTrackersBlocked,

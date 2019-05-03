@@ -36,6 +36,7 @@ import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.global.Theming.initializeTheme
+import com.duckduckgo.app.global.initialization.AppDataLoader
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.rating.AppEnjoymentLifecycleObserver
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
@@ -130,6 +131,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     @Inject
     lateinit var appDaysUsedRecorder: AppDaysUsedRecorder
 
+    @Inject
+    lateinit var appDataLoader: AppDataLoader
+
     private var launchedByFireAction: Boolean = false
 
     open lateinit var daggerAppComponent: AppComponent
@@ -169,6 +173,8 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
         initializeHttpsUpgrader()
         submitUnsentFirePixels()
+
+        GlobalScope.launch { appDataLoader.loadData() }
     }
 
     private fun configureWorkManager() {

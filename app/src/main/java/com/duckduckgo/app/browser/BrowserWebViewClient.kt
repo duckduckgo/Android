@@ -36,13 +36,13 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.APP_VERSION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.ERROR_CODE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.URL
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.net.URI
-import javax.inject.Inject
 import kotlin.concurrent.thread
 
 
-class BrowserWebViewClient @Inject constructor(
+class BrowserWebViewClient(
     private val requestRewriter: RequestRewriter,
     private val specialUrlDetector: SpecialUrlDetector,
     private val requestInterceptor: RequestInterceptor,
@@ -54,6 +54,7 @@ class BrowserWebViewClient @Inject constructor(
     var webViewClientListener: WebViewClientListener? = null
 
     private var currentUrl: String? = null
+    private var tempTimer = 0L
 
     /**
      * This is the new method of url overriding available from API 24 onwards
@@ -109,7 +110,9 @@ class BrowserWebViewClient @Inject constructor(
         webViewClientListener?.externalAppLinkClicked(urlType)
     }
 
+    @UiThread
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
+        tempTimer = System.currentTimeMillis()
         Timber.d("\nonPageStarted {\nurl: $url\nwebView.url: ${webView.url}\n}\n")
         currentUrl = url
 
@@ -124,24 +127,25 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
+    @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
-        Timber.d("onPageFinished $url")
-
         currentUrl = url
         webViewClientListener?.let {
             it.loadingFinished(url)
             it.navigationOptionsChanged(WebViewNavigationOptions(webView.copyBackForwardList()))
         }
+
+        Timber.i("Page Load Time: ${System.currentTimeMillis() - tempTimer}ms for $url")
     }
 
     @WorkerThread
     override fun shouldInterceptRequest(webView: WebView, request: WebResourceRequest): WebResourceResponse? {
         Timber.v("Intercepting resource ${request.url} on page $currentUrl")
-        return requestInterceptor.shouldIntercept(request, webView, currentUrl, webViewClientListener)
+        return runBlocking { requestInterceptor.shouldIntercept(request, webView, currentUrl, webViewClientListener) }
     }
 
     @UiThread
-    @Suppress("OverridingDeprecatedMember")
+    @Suppress("OverridingDeprecatedMember", "DEPRECATION")
     override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             val url = failingUrl.toUri()

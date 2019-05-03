@@ -72,7 +72,6 @@ class EntityListDaoTest {
         assertEquals(updates, all)
     }
 
-
     @Test
     fun whenEntitiesWithSameDomainAddedThenOnlySingleEntryForDomainExists() {
 

@@ -31,6 +31,7 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -50,10 +51,10 @@ class BrowserViewModelTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @Mock
-    private lateinit var mockCommandObserver: Observer<BrowserViewModel.Command>
+    private lateinit var mockCommandObserver: Observer<Command>
 
     @Captor
-    private lateinit var commandCaptor: ArgumentCaptor<BrowserViewModel.Command>
+    private lateinit var commandCaptor: ArgumentCaptor<Command>
 
     @Mock
     private lateinit var mockTabRepository: TabRepository
@@ -86,8 +87,11 @@ class BrowserViewModelTest {
             appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder
         )
         testee.command.observeForever(mockCommandObserver)
-        whenever(mockTabRepository.add()).thenReturn(TAB_ID)
-        whenever(mockOmnibarEntryConverter.convertQueryToUrl(any())).then { it.arguments.first() }
+
+        runBlocking<Unit> {
+            whenever(mockTabRepository.add()).thenReturn(TAB_ID)
+            whenever(mockOmnibarEntryConverter.convertQueryToUrl(any())).then { it.arguments.first() }
+        }
     }
 
     @After
@@ -96,26 +100,26 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenNewTabRequestedThenTabAddedToRepository() {
+    fun whenNewTabRequestedThenTabAddedToRepository() = runBlocking<Unit> {
         testee.onNewTabRequested()
         verify(mockTabRepository).add()
     }
 
     @Test
-    fun whenOpenInNewTabRequestedThenTabAddedToRepository() {
+    fun whenOpenInNewTabRequestedThenTabAddedToRepository() = runBlocking<Unit> {
         val url = "http://example.com"
         testee.onOpenInNewTabRequested(url)
         verify(mockTabRepository).add(url)
     }
 
     @Test
-    fun whenTabsUpdatedAndNoTabsThenNewTabAddedToRepository() {
+    fun whenTabsUpdatedAndNoTabsThenNewTabAddedToRepository() = runBlocking<Unit> {
         testee.onTabsUpdated(ArrayList())
         verify(mockTabRepository).add(null, false, true)
     }
 
     @Test
-    fun whenTabsUpdatedWithTabsThenNewTabNotLaunched() {
+    fun whenTabsUpdatedWithTabsThenNewTabNotLaunched() = runBlocking {
         testee.onTabsUpdated(asList(TabEntity(TAB_ID, "", "", false, true, 0)))
         verify(mockCommandObserver, never()).onChanged(any())
     }

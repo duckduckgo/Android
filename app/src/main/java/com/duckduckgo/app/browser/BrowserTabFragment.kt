@@ -94,15 +94,22 @@ import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import kotlin.concurrent.thread
+import kotlin.coroutines.CoroutineContext
 
 
-class BrowserTabFragment : Fragment(), FindListener {
+class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
+
+    override val coroutineContext: CoroutineContext
+        get() = SupervisorJob() + Dispatchers.Main
 
     @Inject
     lateinit var webViewClient: BrowserWebViewClient
@@ -550,9 +557,11 @@ class BrowserTabFragment : Fragment(), FindListener {
         }
 
         viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
-            it?.let {
-                val drawable = context?.getDrawable(it.icon()) ?: return@let
+            Timber.i("Observed grade: $it")
+            it?.let { privacyGrade ->
+                val drawable = context?.getDrawable(privacyGrade.icon()) ?: return@let
                 privacyGradeButton?.setImageDrawable(drawable)
+                privacyGradeButton?.isEnabled = privacyGrade != PrivacyGrade.UNKNOWN
             }
         })
     }
@@ -1011,9 +1020,9 @@ class BrowserTabFragment : Fragment(), FindListener {
         fun renderBrowserViewState(viewState: BrowserViewState) {
             renderIfChanged(viewState, lastSeenBrowserViewState) {
                 val browserShowing = viewState.browserShowing
+
                 val browserShowingChanged = viewState.browserShowing != lastSeenBrowserViewState?.browserShowing
                 lastSeenBrowserViewState = viewState
-
                 if (browserShowingChanged) {
                     if (browserShowing) {
                         showBrowser()

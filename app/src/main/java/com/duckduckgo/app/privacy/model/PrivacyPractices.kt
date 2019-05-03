@@ -18,10 +18,11 @@ package com.duckduckgo.app.privacy.model
 
 import com.duckduckgo.app.entities.EntityMapping
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
+import com.duckduckgo.app.global.initialization.DataLoadable
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import javax.inject.Inject
 
-interface PrivacyPractices {
+interface PrivacyPractices : DataLoadable {
 
     enum class Summary {
         POOR,
@@ -30,13 +31,13 @@ interface PrivacyPractices {
         UNKNOWN
     }
 
-    data class Practices(val score: Int, val summary: PrivacyPractices.Summary, val goodReasons: List<String>, val badReasons: List<String>)
+    data class Practices(val score: Int, val summary: Summary, val goodReasons: List<String>, val badReasons: List<String>)
 
-    fun privacyPracticesFor(url: String): PrivacyPractices.Practices
+    fun privacyPracticesFor(url: String): Practices
 
     companion object {
 
-        val UNKNOWN = PrivacyPractices.Practices(2, PrivacyPractices.Summary.UNKNOWN, emptyList(), emptyList())
+        val UNKNOWN = Practices(2, Summary.UNKNOWN, emptyList(), emptyList())
 
     }
 
@@ -50,11 +51,7 @@ class PrivacyPracticesImpl @Inject constructor(
 
     private var entityScores: Map<String, Int> = mapOf()
 
-    init {
-        refreshScores()
-    }
-
-    private fun refreshScores() {
+    override suspend fun loadData() {
         val entityScores: MutableMap<String, Int> = mutableMapOf()
 
         termsOfServiceStore.terms.forEach {

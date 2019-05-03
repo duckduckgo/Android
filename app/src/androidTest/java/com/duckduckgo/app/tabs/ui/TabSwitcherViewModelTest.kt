@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("RemoveExplicitTypeArguments")
+
 package com.duckduckgo.app.tabs.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -24,6 +26,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -53,13 +56,15 @@ class TabSwitcherViewModelTest {
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        whenever(mockTabRepository.add()).thenReturn("TAB_ID")
-        testee = TabSwitcherViewModel(mockTabRepository, WebViewSessionInMemoryStorage())
-        testee.command.observeForever(mockCommandObserver)
+        runBlocking {
+            whenever(mockTabRepository.add()).thenReturn("TAB_ID")
+            testee = TabSwitcherViewModel(mockTabRepository, WebViewSessionInMemoryStorage())
+            testee.command.observeForever(mockCommandObserver)
+        }
     }
 
     @Test
-    fun whenNewTabRequestedThenRepositoryNotifiedAndSwitcherClosed() {
+    fun whenNewTabRequestedThenRepositoryNotifiedAndSwitcherClosed() = runBlocking<Unit> {
         testee.onNewTabRequested()
         verify(mockTabRepository).add()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
@@ -67,7 +72,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenTabSelectedThenRepositoryNotifiedAndSwitcherClosed() {
+    fun whenTabSelectedThenRepositoryNotifiedAndSwitcherClosed() = runBlocking<Unit> {
         testee.onTabSelected(TabEntity("abc", "", "", position = 0))
         verify(mockTabRepository).select(eq("abc"))
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
@@ -75,7 +80,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenTabDeletedThenRepositoryNotified() {
+    fun whenTabDeletedThenRepositoryNotified()  = runBlocking<Unit>{
         val entity = TabEntity("abc", "", "", position = 0)
         testee.onTabDeleted(entity)
         verify(mockTabRepository).delete(entity)

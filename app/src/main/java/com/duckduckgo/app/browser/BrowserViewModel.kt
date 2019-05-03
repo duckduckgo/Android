@@ -120,15 +120,15 @@ class BrowserViewModel(
     }
 
 
-    fun onNewTabRequested(isDefaultTab: Boolean = false) {
+    suspend fun onNewTabRequested(isDefaultTab: Boolean = false) {
         tabRepository.add(isDefaultTab = isDefaultTab)
     }
 
-    fun onOpenInNewTabRequested(query: String, skipHome: Boolean = false) {
+    suspend fun onOpenInNewTabRequested(query: String, skipHome: Boolean = false) {
         tabRepository.add(queryUrlConverter.convertQueryToUrl(query), skipHome, isDefaultTab = false)
     }
 
-    fun onTabsUpdated(tabs: List<TabEntity>?) {
+    suspend fun onTabsUpdated(tabs: List<TabEntity>?) {
         if (tabs == null || tabs.isEmpty()) {
             Timber.i("Tabs list is null or empty; adding default tab")
             tabRepository.add(isDefaultTab = true)

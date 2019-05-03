@@ -28,6 +28,7 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 
@@ -68,7 +69,7 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageFinishedCalledThenListenerNotified() {
+    fun whenOnPageFinishedCalledThenListenerNotified() = runBlocking {
         testee.onPageFinished(webView, EXAMPLE_URL)
         verify(listener).loadingFinished(EXAMPLE_URL)
     }

@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
+
 package com.duckduckgo.app.global.model
 
 import android.net.Uri
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.isHttps
+import com.duckduckgo.app.global.model.Site.SiteGrades
+import com.duckduckgo.app.global.model.SiteFactory.SitePrivacyData
 import com.duckduckgo.app.privacy.model.Grade
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -30,27 +33,24 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 class SiteMonitor(
     override val url: String,
-    override val privacyPractices: PrivacyPractices.Practices,
-    override val memberNetwork: TrackerNetwork? = null,
+    override var title: String?,
     val prevalenceStore: PrevalenceStore
+
 ) : Site {
 
-    private val gradeCalculator = Grade()
+    override var privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN
+    override var memberNetwork: TrackerNetwork? = null
+    private val gradeCalculator: Grade
 
     init {
-        gradeCalculator.https = uri?.isHttps ?: false
-        gradeCalculator.httpsAutoUpgrade = gradeCalculator.https // not support yet, don't penalise sites for now
-        gradeCalculator.privacyScore = privacyPractices.score
+        val isHttps = https != HttpsStatus.NONE
 
-        memberNetwork?.let {
-            gradeCalculator.setParentEntityAndPrevalence(it.name, prevalenceStore.findPrevalenceOf(it.name))
-        }
+        // httpsAutoUpgrade is not supported yet; for now, keep it equal to isHttps and don't penalise sites
+        gradeCalculator = Grade(https = isHttps, httpsAutoUpgrade = isHttps, prevalenceStore = prevalenceStore)
     }
 
     override val uri: Uri?
         get() = Uri.parse(url)
-
-    override var title: String? = null
 
     override val https: HttpsStatus
         get() = httpsStatus()
@@ -80,6 +80,12 @@ class SiteMonitor(
     override val allTrackersBlocked: Boolean
         get() = trackingEvents.none { !it.blocked }
 
+    override fun updatePrivacyData(sitePrivacyData: SitePrivacyData) {
+        this.privacyPractices = sitePrivacyData.practices
+        this.memberNetwork = sitePrivacyData.memberNetwork
+        gradeCalculator.updateData(privacyPractices.score, memberNetwork?.name, sitePrivacyData.prevalence)
+    }
+
     private fun httpsStatus(): HttpsStatus {
 
         val uri = uri ?: return HttpsStatus.NONE
@@ -96,6 +102,7 @@ class SiteMonitor(
 
         val entity = event.entity
         val prevalence = prevalenceStore.findPrevalenceOf(entity)
+
         if (event.blocked) {
             gradeCalculator.addEntityBlocked(entity, prevalence)
         } else {
@@ -103,11 +110,26 @@ class SiteMonitor(
         }
     }
 
-    override val grade: PrivacyGrade
-        get() = privacyGrade(gradeCalculator.scores.site.grade)
+    override fun calculateGrades(): SiteGrades {
+        val scores = gradeCalculator.calculateScore()
+        val privacyGradeOriginal = privacyGrade(scores)
+        val privacyGradeImproved = privacyGradeImproved(scores)
+        return SiteGrades(privacyGradeOriginal, privacyGradeImproved)
+    }
 
-    override val improvedGrade: PrivacyGrade
-        get() = privacyGrade(gradeCalculator.scores.enhanced.grade)
+    private fun privacyGrade(scores: Grade.Scores): PrivacyGrade {
+        return when (scores) {
+            Grade.Scores.ScoresUnavailable -> PrivacyGrade.UNKNOWN
+            is Grade.Scores.ScoresAvailable -> privacyGrade(scores.site.grade)
+        }
+    }
+
+    private fun privacyGradeImproved(scores: Grade.Scores): PrivacyGrade {
+        return when (scores) {
+            Grade.Scores.ScoresUnavailable -> PrivacyGrade.UNKNOWN
+            is Grade.Scores.ScoresAvailable -> privacyGrade(scores.enhanced.grade)
+        }
+    }
 
     private fun privacyGrade(grade: Grade.Grading): PrivacyGrade {
         return when (grade) {
@@ -118,7 +140,7 @@ class SiteMonitor(
             Grade.Grading.C -> PrivacyGrade.C
             Grade.Grading.D -> PrivacyGrade.D
             Grade.Grading.D_MINUS -> PrivacyGrade.D
+            Grade.Grading.UNKNOWN -> PrivacyGrade.UNKNOWN
         }
     }
-
 }

@@ -32,7 +32,7 @@ import timber.log.Timber
 interface RequestInterceptor {
 
     @WorkerThread
-    fun shouldIntercept(
+    suspend fun shouldIntercept(
         request: WebResourceRequest,
         webView: WebView,
         currentUrl: String?,
@@ -58,7 +58,7 @@ class WebViewRequestInterceptor(
      * caution when accessing private data or the view system.
      */
     @WorkerThread
-    override fun shouldIntercept(
+    override suspend fun shouldIntercept(
         request: WebResourceRequest,
         webView: WebView,
         currentUrl: String?,
@@ -84,7 +84,6 @@ class WebViewRequestInterceptor(
         }
 
         if (shouldBlock(request, documentUrl, webViewClientListener)) {
-
             val surrogate = resourceSurrogates.get(url)
             if (surrogate.responseAvailable) {
                 Timber.d("Surrogate found for $url")
