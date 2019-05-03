@@ -36,7 +36,7 @@ class SiteFactory @Inject constructor(
     /**
      * Builds a Site with minimal details; this is quick to build but won't contain the full details needed for all functionality
      *
-     * @see [loadFullSiteDetails] for ensuring the full details are loaded
+     * @see [loadFullSiteDetails] to ensure full privacy details are loaded
      */
     @AnyThread
     fun buildSite(url: String, title: String? = null): Site {
