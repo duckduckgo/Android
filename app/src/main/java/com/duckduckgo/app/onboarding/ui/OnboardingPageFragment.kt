@@ -32,7 +32,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.DEFAULT_BROWSER_SET
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
 import timber.log.Timber
@@ -51,6 +51,11 @@ sealed class OnboardingPageFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? = inflater.inflate(layoutResource(), container, false)
+
+    class UnifiedWelcomePage : OnboardingPageFragment() {
+        override fun layoutResource(): Int = R.layout.content_onboarding_unified_welcome
+        override fun backgroundColor(): Int = R.color.white
+    }
 
     class ProtectDataPage : OnboardingPageFragment() {
         override fun layoutResource(): Int = R.layout.content_onboarding_protect_data

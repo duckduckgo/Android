@@ -20,7 +20,7 @@
     <dimen name="onboardingButtonTextSize">14sp</dimen>
     <dimen name="onboardingButtonPadding">10dp</dimen>
     <dimen name="onboardingTitleTextSize">21sp</dimen>
-    <dimen name="onboardingSubtitleTextSize">16sp</dimen>
+    <dimen name="onboardingSubtitleTextSize">17sp</dimen>
 
     <dimen name="modalCardTitleTextSize">20sp</dimen>
     <dimen name="modalCardDescriptionTextSize">14sp</dimen>
@@ -34,5 +34,6 @@
     <dimen name="feedbackTitleMarginTop">30dp</dimen>
 
     <dimen name="settingsItemHorizontalPadding">20dp</dimen>
+    <dimen name="onboardingTitleMarginTop">20dp</dimen>
 
 </resources>

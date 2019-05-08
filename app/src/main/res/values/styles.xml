@@ -183,6 +183,10 @@
         <item name="android:stateListAnimator">@null</item>
     </style>
 
+    <style name="OnboardingButtonPrimaryCta" parent="OnboardingButtonStyle">
+
+    </style>
+
     <style name="OnboardingButtonProtectData" parent="OnboardingButtonStyle">
         <item name="colorAccent">@color/muddyGreen</item>
     </style>
@@ -201,26 +205,36 @@
     </style>
 
     <style name="OnboardingTextTitle">
-        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:gravity">center_horizontal</item>
-        <item name="android:paddingBottom">20dp</item>
-        <item name="android:paddingTop">20dp</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="android:textSize">@dimen/onboardingTitleTextSize</item>
-        <item name="android:textStyle">normal</item>
+        <item name="android:layout_marginTop">@dimen/onboardingTitleMarginTop</item>
+        <item name="android:fontFamily">sans-serif-black</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">@color/almostBlack</item>
+        <item name="android:textSize">34sp</item>
     </style>
 
     <style name="OnboardingTextSubtitle">
-        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:gravity">center_horizontal</item>
-        <item name="android:lineSpacingExtra">4sp</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:lineSpacingExtra">5sp</item>
+        <item name="android:textColor">@color/brownishGrayTwo</item>
         <item name="android:textSize">@dimen/onboardingSubtitleTextSize</item>
-        <item name="android:textStyle">normal</item>
+        <item name="android:layout_marginTop">8dp</item>
+    </style>
+
+    <style name="OnboardingListItemImage" >
+        <item name="android:layout_width">64dp</item>
+        <item name="android:layout_height">64dp</item>
+    </style>
+
+    <style name="OnboardingListItem">
+        <item name="android:paddingStart">2dp</item>
+        <item name="android:paddingEnd">2dp</item>
+        <item name="android:paddingBottom">10dp</item>
     </style>
 
     <style name="OnboardingTextSubtitle.Subtitle2">

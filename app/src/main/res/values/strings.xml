@@ -14,6 +14,18 @@
     <string name="onboardingDefaultBrowserGoToSettingsAction">Go to Settings</string>
     <string name="onboardingContinue">Continue</string>
 
+    <!-- Unified Welcome Page -->
+    <string name="unifiedOnboardingTitle">Welcome to DuckDuckGo!</string>
+    <string name="unifiedOnboardingSubtitle">Protecting your data has never been this easy.</string>
+    <string name="unifiedOnboardingBrowsingProtectionTitle">Browsing Protection</string>
+    <string name="unifiedOnboardingBrowsingProtectionSubtitle">Block trackers and browse securely by default.</string>
+    <string name="unifiedOnboardingPrivateSearchTitle">Private Search</string>
+    <string name="unifiedOnboardingPrivateSearchSubtitle">With DuckDuckGo, your searches are always private.</string>
+    <string name="unifiedOnboardingDataClearingTitle">Data Clearing</string>
+    <string name="unifiedOnboardingDataClearingSubtitle">Erase your browsing data with the tap of a button.</string>
+    <string name="unifiedOnboardingCustomizationTitle">Customization</string>
+    <string name="unifiedOnboardingCustomizationSubtitle">Pick a theme and customize privacy features.</string>
+
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Can\'t launch default app settings screen</string>
     <string name="defaultBrowserInfoTitle">Make Us Your Default Browser</string>
@@ -279,5 +291,6 @@
     <string name="authenticationDialogNegativeButton">Cancel</string>
     <string name="authenticationDialogUsernameHint">Username</string>
     <string name="authenticationDialogPasswordHint">Password</string>
+
 
 </resources>

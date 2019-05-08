@@ -26,7 +26,7 @@ class OnboardingViewModel(
 ) : ViewModel() {
 
     fun pageCount(): Int {
-        return if (shouldShowDefaultBrowserPage()) 3 else 2
+        return if (shouldShowDefaultBrowserPage()) 2 else 1
     }
 
     fun onOnboardingDone() {
@@ -35,9 +35,8 @@ class OnboardingViewModel(
 
     fun getItem(position: Int): OnboardingPageFragment? {
         return when (position) {
-            0 -> OnboardingPageFragment.ProtectDataPage()
-            1 -> OnboardingPageFragment.NoTracePage()
-            2 -> {
+            0 -> OnboardingPageFragment.UnifiedWelcomePage()
+            1 -> {
                 return if (shouldShowDefaultBrowserPage()) {
                     OnboardingPageFragment.DefaultBrowserPage()
                 } else null
