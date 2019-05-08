@@ -173,17 +173,23 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">@dimen/onboardingButtonTextSize</item>
+        <item name="android:minHeight">56dp</item>
         <item name="android:paddingTop">@dimen/onboardingButtonPadding</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:paddingBottom">@dimen/onboardingButtonPadding</item>
-        <item name="android:layout_marginBottom">20dp</item>
-        <item name="android:text">@string/onboardingContinue</item>
-        <item name="android:textAllCaps">false</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="cornerRadius">4dp</item>
         <item name="layout_constraintBottom_toBottomOf">parent</item>
         <item name="android:stateListAnimator">@null</item>
+        <item name="layout_constraintWidth_max">500dp</item>
+        <item name="layout_constraintWidth_percent">0.8</item>
     </style>
 
-    <style name="OnboardingButtonPrimaryCta" parent="OnboardingButtonStyle">
+    <style name="OnboardingButtonPrimaryCta" parent="OnboardingButtonStyle" >
+        <item name="android:layout_marginBottom">20dp</item>
+    </style>
+
+    <style name="OnboardingButtonSecondaryCta" parent="OnboardingButtonStyle">
 
     </style>
 

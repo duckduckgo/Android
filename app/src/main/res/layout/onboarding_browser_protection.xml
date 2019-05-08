@@ -32,7 +32,7 @@
         app:layout_constraintTop_toBottomOf="@id/subtitle">
 
         <TextView
-            android:id="@+id/browsingProtectionTitle"
+            android:id="@+id/privateSearchTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -47,7 +47,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/browsingProtectionSubtitle"
+            android:id="@+id/privateSearchSubtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -56,15 +56,8 @@
             android:textColor="@color/brownishGrayTwo"
             android:textSize="15sp"
             android:textStyle="normal"
-            app:layout_constraintStart_toStartOf="@+id/browsingProtectionTitle"
-            app:layout_constraintTop_toBottomOf="@id/browsingProtectionTitle" />
-
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/browsingProtectionEndBarrier"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:barrierDirection="end"
-            app:constraint_referenced_ids="browsingProtectionSubtitle,browsingProtectionTitle" />
+            app:layout_constraintStart_toStartOf="@+id/privateSearchTitle"
+            app:layout_constraintTop_toBottomOf="@id/privateSearchTitle" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

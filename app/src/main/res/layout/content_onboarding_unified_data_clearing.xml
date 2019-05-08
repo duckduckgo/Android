@@ -28,7 +28,7 @@
         style="@style/OnboardingListItem"
         app:layout_constraintEnd_toEndOf="@id/browsingProtectionGroup"
         app:layout_constraintStart_toStartOf="@id/browsingProtectionGroup"
-        app:layout_constraintTop_toBottomOf="@id/privateSearchGroup">
+        app:layout_constraintTop_toBottomOf="@id/browsingProtectionGroup">
 
         <TextView
             android:id="@+id/dataClearingTitle"

@@ -44,49 +44,49 @@
             <TextView
                 android:id="@+id/title"
                 style="@style/OnboardingTextTitle"
-                android:text="@string/unifiedOnboardingTitle"
-                app:layout_constraintWidth_max="350dp"
                 android:paddingStart="6dp"
                 android:paddingEnd="6dp"
+                android:text="@string/unifiedOnboardingTitle"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_max="350dp" />
 
             <TextView
                 android:id="@+id/subtitle"
                 style="@style/OnboardingTextSubtitle"
-                app:layout_constraintWidth_max="250dp"
                 android:paddingStart="6dp"
                 android:paddingEnd="6dp"
                 android:text="@string/unifiedOnboardingSubtitle"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/title" />
+                app:layout_constraintTop_toBottomOf="@id/title"
+                app:layout_constraintWidth_max="250dp" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/contentContainer"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                tools:background="#FF7"
-                app:layout_constraintVertical_bias="0.3"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/subtitle"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintVertical_bias="0.3"
                 app:layout_constraintWidth_max="350dp"
-                app:layout_constraintWidth_percent="0.8">
+                app:layout_constraintWidth_percent="0.8"
+                tools:background="#FF7">
 
                 <ImageView
                     android:id="@+id/browsingProtectionIcon"
                     style="@style/OnboardingListItemImage"
                     android:layout_marginStart="20dp"
                     android:importantForAccessibility="no"
-                    android:src="@drawable/ic_icon_block_trackers_alt"
-                    app:layout_constraintBottom_toBottomOf="@id/browsingProtectionGroup"
+                    android:src="@drawable/ic_icon_search_privately"
+                    app:layout_constraintBottom_toBottomOf="@id/privateSearchGroup"
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/browsingProtectionGroup" />
+                    app:layout_constraintTop_toTopOf="@id/privateSearchGroup" />
 
                 <include layout="@layout/content_onboarding_unified_browsing_protection" />
 
@@ -94,12 +94,11 @@
                     android:id="@+id/privateSearchIcon"
                     style="@style/OnboardingListItemImage"
                     android:importantForAccessibility="no"
-                    android:src="@drawable/ic_icon_search_privately"
-                    app:layout_constraintBottom_toBottomOf="@id/privateSearchGroup"
+                    android:src="@drawable/ic_icon_block_trackers_alt"
+                    app:layout_constraintBottom_toBottomOf="@id/browsingProtectionGroup"
                     app:layout_constraintEnd_toEndOf="@+id/browsingProtectionIcon"
                     app:layout_constraintStart_toStartOf="@id/browsingProtectionIcon"
-                    app:layout_constraintTop_toTopOf="@id/privateSearchGroup" />
-
+                    app:layout_constraintTop_toTopOf="@id/browsingProtectionGroup" />
 
                 <include layout="@layout/content_onboarding_unified_private_search" />
 
@@ -140,17 +139,11 @@
         style="@style/OnboardingButtonPrimaryCta"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:minHeight="56dp"
         android:onClick="onContinueClicked"
-        android:textAllCaps="true"
-        android:textSize="15sp"
         android:theme="@style/OnboardingButtonPrimaryCta"
-        app:cornerRadius="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintWidth_max="500dp"
-        app:layout_constraintWidth_percent="0.8" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

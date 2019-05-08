@@ -20,23 +20,23 @@
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/privateSearchGroup"
+        android:id="@+id/browsingProtectionGroup"
+        style="@style/OnboardingListItem"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        style="@style/OnboardingListItem"
-        app:layout_constraintEnd_toEndOf="@id/browsingProtectionGroup"
-        app:layout_constraintStart_toStartOf="@id/browsingProtectionGroup"
-        app:layout_constraintTop_toBottomOf="@id/browsingProtectionGroup"
+        app:layout_constraintEnd_toEndOf="@id/privateSearchGroup"
+        app:layout_constraintStart_toStartOf="@id/privateSearchGroup"
+        app:layout_constraintTop_toBottomOf="@id/privateSearchGroup"
         tools:background="#4F0">
 
         <TextView
-            android:id="@+id/privateSearchTitle"
+            android:id="@+id/browsingProtectionTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:fontFamily="sans-serif"
             android:lineSpacingExtra="3sp"
-            android:text="@string/unifiedOnboardingPrivateSearchTitle"
+            android:text="@string/unifiedOnboardingBrowsingProtectionTitle"
             android:textColor="@color/almostBlack"
             android:textSize="17sp"
             android:textStyle="bold"
@@ -44,16 +44,16 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/privateSearchSubtitle"
+            android:id="@+id/browsingProtectionSubtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
-            android:text="@string/unifiedOnboardingPrivateSearchSubtitle"
+            android:text="@string/unifiedOnboardingBrowsingProtectionSubtitle"
             android:textColor="@color/brownishGrayTwo"
             android:textSize="15sp"
             android:textStyle="normal"
-            app:layout_constraintStart_toStartOf="@+id/privateSearchTitle"
-            app:layout_constraintTop_toBottomOf="@id/privateSearchTitle" />
+            app:layout_constraintStart_toStartOf="@+id/browsingProtectionTitle"
+            app:layout_constraintTop_toBottomOf="@id/browsingProtectionTitle" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
