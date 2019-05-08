@@ -9,10 +9,11 @@
     <string name="onboardingNoTraceTitle">Leave No Trace</string>
     <string name="onboardingNoTraceDescription1">Tap the Fire Button to erase your tabs and browsing history.</string>
     <string name="onboardingNoTraceDescription2">Your data is toast!</string>
-    <string name="onboardingDefaultBrowserTitle">Set Us As Your Default Browser</string>
-    <string name="onboardingDefaultBrowserDescription">You can set DuckDuckGo as your default browser app in Settings.</string>
+    <string name="onboardingDefaultBrowserTitle">Make Privacy Your Default</string>
+    <string name="onboardingDefaultBrowserDescription">Visit Settings to search and browse with DuckDuckGo every time.</string>
     <string name="onboardingDefaultBrowserGoToSettingsAction">Go to Settings</string>
     <string name="onboardingContinue">Continue</string>
+    <string name="onboardingContinueLastPage">Start Browsing</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitle">Welcome to DuckDuckGo!</string>

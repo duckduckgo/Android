@@ -20,59 +20,82 @@
     android:id="@+id/longDescriptionContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingStart="44dp"
-    android:paddingEnd="44dp"
     android:tag="onboardingDefaultBrowser"
-    tools:background="@color/eastBay"
+    tools:background="@color/white"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
     <ImageView
         android:id="@+id/defaultBrowserImage"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="42dp"
+        android:layout_marginBottom="42dp"
         android:importantForAccessibility="no"
         android:paddingTop="20dp"
-        android:src="@drawable/onboarding_image_default_browser"
-        app:layout_constraintBottom_toTopOf="@id/textContainer"
+        android:src="@drawable/set_as_default_browser_illustration"
+        app:layout_constraintBottom_toTopOf="@id/privateSearchTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5" />
 
-    <LinearLayout
-        android:id="@+id/textContainer"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/privateSearchTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif"
+        android:lineSpacingExtra="3sp"
+        android:text="@string/onboardingDefaultBrowserTitle"
+        android:textAlignment="center"
+        android:textColor="@color/almostBlack"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/privateSearchSubtitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/privateSearchSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:fontFamily="sans-serif"
+        android:text="@string/onboardingDefaultBrowserDescription"
+        android:textAlignment="center"
+        android:textColor="@color/brownishGrayTwo"
+        android:textSize="15sp"
+        android:textStyle="normal"
+        app:layout_constraintBottom_toTopOf="@id/continueButton"
+        app:layout_constraintEnd_toEndOf="@id/privateSearchTitle"
+        app:layout_constraintStart_toStartOf="@id/privateSearchTitle"
+        app:layout_constraintWidth_max="500dp"
+        app:layout_constraintWidth_percent="0.8" />
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/continueButton"
+        style="@style/OnboardingButtonPrimaryCta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:onClick="onContinueClicked"
+        android:text="@string/onboardingContinue"
+        android:theme="@style/OnboardingButtonPrimaryCta"
+        app:layout_constraintBottom_toTopOf="@+id/launchSettingsButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/launchSettingsButton"
+        style="@style/OnboardingButtonSecondaryCta"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        android:gravity="center"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/launchSettingsButton"
-        app:layout_constraintTop_toBottomOf="@id/defaultBrowserImage">
-
-        <TextView
-            style="@style/OnboardingTextTitle"
-            android:text="@string/onboardingDefaultBrowserTitle" />
-
-
-        <TextView
-            style="@style/OnboardingTextSubtitle"
-            android:text="@string/onboardingDefaultBrowserDescription" />
-
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/launchSettingsButton"
-        style="@style/OnboardingButtonDefaultBrowserLaunchSettings"
         android:text="@string/onboardingDefaultBrowserGoToSettingsAction"
-        android:theme="@style/OnboardingButtonDefaultBrowserLaunchSettings"
-        app:layout_constraintBottom_toTopOf="@+id/continueButton" />
-
-    <Button
-        android:id="@+id/continueButton"
-        style="@style/OnboardingButtonDefaultBrowser"
-        android:onClick="onContinueClicked"
-        android:theme="@style/OnboardingButtonDefaultBrowser" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

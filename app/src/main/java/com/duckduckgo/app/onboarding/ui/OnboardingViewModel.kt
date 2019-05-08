@@ -16,7 +16,9 @@
 
 package com.duckduckgo.app.onboarding.ui
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 
@@ -42,6 +44,15 @@ class OnboardingViewModel(
                 } else null
             }
             else -> null
+        }
+    }
+
+    @StringRes
+    fun getContinueButtonTextResourceId(position: Int): Int {
+        return if (position == pageCount() - 1) {
+            R.string.onboardingContinueLastPage
+        } else {
+            R.string.onboardingContinue
         }
     }
 

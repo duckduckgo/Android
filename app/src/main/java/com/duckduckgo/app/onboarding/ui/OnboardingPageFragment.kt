@@ -26,6 +26,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorRes
 import androidx.annotation.LayoutRes
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
@@ -46,30 +47,28 @@ sealed class OnboardingPageFragment : Fragment() {
     @LayoutRes
     abstract fun layoutResource(): Int
 
+    @StringRes
+    var continueButtonTextResId: Int = R.string.onboardingContinue
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? = inflater.inflate(layoutResource(), container, false)
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        continueButton.setText(continueButtonTextResId)
+    }
+
     class UnifiedWelcomePage : OnboardingPageFragment() {
         override fun layoutResource(): Int = R.layout.content_onboarding_unified_welcome
         override fun backgroundColor(): Int = R.color.white
     }
 
-    class ProtectDataPage : OnboardingPageFragment() {
-        override fun layoutResource(): Int = R.layout.content_onboarding_protect_data
-        override fun backgroundColor(): Int = R.color.lightOliveGreen
-    }
-
-    class NoTracePage : OnboardingPageFragment() {
-        override fun layoutResource(): Int = R.layout.content_onboarding_no_trace
-        override fun backgroundColor(): Int = R.color.cornflowerBlue
-    }
-
     class DefaultBrowserPage : OnboardingPageFragment() {
         override fun layoutResource(): Int = R.layout.content_onboarding_default_browser
-        override fun backgroundColor(): Int = R.color.eastBay
+        override fun backgroundColor(): Int = R.color.white
 
         @Inject
         lateinit var pixel: Pixel

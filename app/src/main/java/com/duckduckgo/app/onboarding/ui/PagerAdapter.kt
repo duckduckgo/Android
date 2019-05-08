@@ -29,7 +29,13 @@ class PagerAdapter(fragmentManager: FragmentManager, private val viewModel: Onbo
     }
 
     override fun getItem(position: Int): OnboardingPageFragment {
-        return viewModel.getItem(position) ?: throw IllegalArgumentException("No items exists at position $position")
+        val item = viewModel.getItem(position)
+        item?.continueButtonTextResId = continueButtonTextId(position)
+        return item ?: throw IllegalArgumentException("No items exists at position $position")
+    }
+
+    private fun continueButtonTextId(position: Int): Int {
+        return viewModel.getContinueButtonTextResourceId(position)
     }
 
     @ColorInt

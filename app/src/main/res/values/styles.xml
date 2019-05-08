@@ -168,46 +168,31 @@
         <item name="android:color">@color/browser_menu_text</item>
     </style>
 
-    <style name="OnboardingButtonStyle" parent="Widget.AppCompat.Button.Colored">
+    <style name="OnboardingButtonPrimaryCta" parent="Widget.AppCompat.Button.Colored">
         <item name="android:elevation">0dp</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">@dimen/onboardingButtonTextSize</item>
-        <item name="android:minHeight">56dp</item>
-        <item name="android:paddingTop">@dimen/onboardingButtonPadding</item>
         <item name="android:textColor">@color/white</item>
-        <item name="android:paddingBottom">@dimen/onboardingButtonPadding</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="cornerRadius">4dp</item>
+        <item name="layout_constraintWidth_max">500dp</item>
+        <item name="layout_constraintWidth_percent">0.8</item>
+        <item name="backgroundTint">@color/cornflowerBlue</item>
+    </style>
+
+    <style name="OnboardingButtonSecondaryCta" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:layout_marginBottom">16dp</item>
+        <item name="rippleColor">#DDD</item>
+        <item name="strokeColor">@color/cornflowerBlue</item>
+        <item name="strokeWidth">2dp</item>
+        <item name="android:textSize">@dimen/onboardingButtonTextSize</item>
+        <item name="android:textColor">@color/cornflowerDark</item>
         <item name="android:textAllCaps">true</item>
         <item name="cornerRadius">4dp</item>
         <item name="layout_constraintBottom_toBottomOf">parent</item>
-        <item name="android:stateListAnimator">@null</item>
         <item name="layout_constraintWidth_max">500dp</item>
         <item name="layout_constraintWidth_percent">0.8</item>
-    </style>
-
-    <style name="OnboardingButtonPrimaryCta" parent="OnboardingButtonStyle" >
-        <item name="android:layout_marginBottom">20dp</item>
-    </style>
-
-    <style name="OnboardingButtonSecondaryCta" parent="OnboardingButtonStyle">
-
-    </style>
-
-    <style name="OnboardingButtonProtectData" parent="OnboardingButtonStyle">
-        <item name="colorAccent">@color/muddyGreen</item>
-    </style>
-
-    <style name="OnboardingButtonNoTrace" parent="OnboardingButtonStyle">
-        <item name="colorAccent">@color/denimBlue</item>
-    </style>
-
-    <style name="OnboardingButtonDefaultBrowser" parent="OnboardingButtonStyle">
-        <item name="colorAccent">@color/portGore</item>
-    </style>
-
-    <style name="OnboardingButtonDefaultBrowserLaunchSettings" parent="OnboardingButtonStyle">
-        <item name="colorAccent">@color/eastSide</item>
-        <item name="android:layout_marginBottom">10dp</item>
     </style>
 
     <style name="OnboardingTextTitle">
@@ -232,7 +217,7 @@
         <item name="android:layout_marginTop">8dp</item>
     </style>
 
-    <style name="OnboardingListItemImage" >
+    <style name="OnboardingListItemImage">
         <item name="android:layout_width">64dp</item>
         <item name="android:layout_height">64dp</item>
     </style>
@@ -248,7 +233,7 @@
         <item name="android:lineSpacingExtra">6sp</item>
     </style>
 
-    <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert" >
+    <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="buttonBarNegativeButtonStyle">@style/AlertDialogButtonStyle</item>
         <item name="buttonBarPositiveButtonStyle">@style/AlertDialogButtonStyle</item>
     </style>
@@ -257,7 +242,7 @@
         <item name="android:textColor">@color/cornflowerBlue</item>
     </style>
 
-    <style name="FeedbackFragmentStyle" >
+    <style name="FeedbackFragmentStyle">
         <item name="android:background">?attr/colorPrimaryDark</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
