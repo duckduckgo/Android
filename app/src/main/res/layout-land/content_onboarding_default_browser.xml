@@ -31,21 +31,19 @@
         android:layout_marginTop="42dp"
         android:layout_marginBottom="42dp"
         android:importantForAccessibility="no"
-        android:layout_margin="40dp"
-        app:layout_constraintWidth_max="300dp"
         android:src="@drawable/set_as_default_browser_illustration"
-        app:layout_constraintBottom_toTopOf="@id/privateSearchTitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_constraintWidth_percent="0.4"
+        app:layout_constraintWidth_max="300dp"
+        app:layout_constraintEnd_toStartOf="@id/privateSearchTitle"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintBottom_toTopOf="@id/continueButton"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/privateSearchTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:fontFamily="sans-serif"
         android:lineSpacingExtra="3sp"
         android:text="@string/onboardingDefaultBrowserTitle"
@@ -53,26 +51,29 @@
         android:textColor="@color/almostBlack"
         android:textSize="17sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/privateSearchSubtitle"
+        app:layout_constraintVertical_chainStyle="packed"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toEndOf="@id/defaultBrowserImage"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/privateSearchSubtitle"/>
 
     <TextView
         android:id="@+id/privateSearchSubtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
+        android:layout_marginTop="8dp"
         android:fontFamily="sans-serif"
         android:text="@string/onboardingDefaultBrowserDescription"
         android:textAlignment="center"
         android:textColor="@color/brownishGrayTwo"
         android:textSize="15sp"
         android:textStyle="normal"
+        app:layout_constraintTop_toBottomOf="@id/privateSearchTitle"
         app:layout_constraintBottom_toTopOf="@id/continueButton"
         app:layout_constraintEnd_toEndOf="@id/privateSearchTitle"
         app:layout_constraintStart_toStartOf="@id/privateSearchTitle"
-        app:layout_constraintWidth_max="500dp"
-        app:layout_constraintWidth_percent="0.8" />
+        app:layout_constraintWidth_max="500dp" />
+
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/continueButton"
@@ -97,5 +98,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
