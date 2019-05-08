@@ -17,14 +17,14 @@
 package com.duckduckgo.app.onboarding.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 
@@ -50,29 +50,45 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun whenFirstPageRequestedThenProtectDataReturned() {
+    fun whenFirstPageRequestedThenUnifiedWelcomePageReturned() {
         val page = testee.getItem(0)
-        assertTrue(page is OnboardingPageFragment.ProtectDataPage)
+        assertTrue(page is OnboardingPageFragment.UnifiedWelcomePage)
     }
 
     @Test
-    fun whenSecondPageRequestedThenNoTracePageReturned() {
+    fun whenSecondPageRequestedWithDefaultBrowserCapableThenDefaultBrowserPageReturned() {
+        configureDeviceSupportsDefaultBrowser()
         val page = testee.getItem(1)
-        assertTrue(page is OnboardingPageFragment.NoTracePage)
-    }
-
-    @Test
-    fun whenThirdPageRequestedWithDefaultBrowserCapableThenDefaultBrowserPageReturned() {
-        whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(true)
-        val page = testee.getItem(2)
         assertTrue(page is OnboardingPageFragment.DefaultBrowserPage)
     }
 
     @Test
-    fun whenThirdPageRequestedButDefaultBrowserNotCapableThenNoPageReturned() {
-        whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(false)
-        val page = testee.getItem(2)
+    fun whenSecondPageRequestedButDefaultBrowserNotCapableThenNoPageReturned() {
+        configureDeviceDoesNotSupportDefaultBrowser()
+        val page = testee.getItem(1)
         assertNull(page)
+    }
+
+    @Test
+    fun whenDefaultBrowserSupportedThenFirstPageShowsContinueTextOnButton() {
+        configureDeviceSupportsDefaultBrowser()
+        val resourceId = testee.getContinueButtonTextResourceId(0)
+        assertEquals(R.string.onboardingContinue, resourceId)
+    }
+
+    @Test
+    fun whenDefaultBrowserNotSupportedThenFirstPageShowsFinalTextOnButton() {
+        configureDeviceDoesNotSupportDefaultBrowser()
+        val resourceId = testee.getContinueButtonTextResourceId(0)
+        assertEquals(R.string.onboardingContinueLastPage, resourceId)
+    }
+
+    private fun configureDeviceSupportsDefaultBrowser() {
+        whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(true)
+    }
+
+    private fun configureDeviceDoesNotSupportDefaultBrowser() {
+        whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(false)
     }
 
 }
