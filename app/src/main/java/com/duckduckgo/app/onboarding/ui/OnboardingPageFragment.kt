@@ -33,8 +33,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.DEFAULT_BROWSER_SET
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SETTINGS_LAUNCHED
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.continueButton
@@ -138,7 +137,7 @@ sealed class OnboardingPageFragment : Fragment() {
             }
             continueButton.setOnClickListener {
                 if (!userLaunchedDefaultBrowserSettings) {
-                    pixel.fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
+                    pixel.fire(ONBOARDING_DEFAULT_BROWSER_SKIPPED)
                 }
                 onContinuePressed()
             }
