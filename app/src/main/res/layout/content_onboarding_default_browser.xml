@@ -80,7 +80,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
-        android:onClick="onContinueClicked"
         android:text="@string/onboardingContinue"
         android:theme="@style/OnboardingButtonPrimaryCta"
         app:layout_constraintBottom_toTopOf="@+id/launchSettingsButton"

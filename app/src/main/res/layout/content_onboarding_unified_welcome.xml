@@ -139,7 +139,6 @@
         style="@style/OnboardingButtonPrimaryCta"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:onClick="onContinueClicked"
         android:theme="@style/OnboardingButtonPrimaryCta"
         android:text="@string/onboardingContinue"
         android:layout_marginBottom="20dp"

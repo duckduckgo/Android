@@ -34,6 +34,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.DEFAULT_BROWSER_SET
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SETTINGS_LAUNCHED
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.continueButton
@@ -62,6 +63,11 @@ sealed class OnboardingPageFragment : Fragment() {
     private fun extractContinueButtonTextResourceId() =
         arguments?.getInt(CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA, R.string.onboardingContinue) ?: R.string.onboardingContinue
 
+    fun onContinuePressed() {
+        val onboardingActivity = activity as OnboardingActivity
+        onboardingActivity.onContinueClicked()
+    }
+
     companion object {
         private const val CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA = "CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA"
         private const val TITLE_TEXT_RESOURCE_ID_EXTRA = "TITLE_TEXT_RESOURCE_ID_EXTRA"
@@ -76,6 +82,8 @@ sealed class OnboardingPageFragment : Fragment() {
 
             val titleText = extractTitleText()
             title.setText(titleText)
+
+            continueButton.setOnClickListener { onContinuePressed() }
         }
 
         @StringRes
@@ -111,6 +119,8 @@ sealed class OnboardingPageFragment : Fragment() {
         @Inject
         lateinit var defaultBrowserDetector: DefaultBrowserDetector
 
+        private var userLaunchedDefaultBrowserSettings = false
+
         override fun onAttach(context: Context) {
             AndroidSupportInjection.inject(this)
             super.onAttach(context)
@@ -118,10 +128,31 @@ sealed class OnboardingPageFragment : Fragment() {
 
         override fun onActivityCreated(savedInstanceState: Bundle?) {
             super.onActivityCreated(savedInstanceState)
-            launchSettingsButton.setOnClickListener { onLaunchDefaultBrowserSettingsClicked() }
+
+            if (savedInstanceState != null) {
+                userLaunchedDefaultBrowserSettings = savedInstanceState.getBoolean(SAVED_STATE_LAUNCHED_SETTINGS)
+            }
+
+            launchSettingsButton.setOnClickListener {
+                onLaunchDefaultBrowserSettingsClicked()
+            }
+            continueButton.setOnClickListener {
+                if (!userLaunchedDefaultBrowserSettings) {
+                    pixel.fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
+                }
+                onContinuePressed()
+            }
+        }
+
+        override fun onSaveInstanceState(outState: Bundle) {
+            super.onSaveInstanceState(outState)
+
+            outState.putBoolean(SAVED_STATE_LAUNCHED_SETTINGS, userLaunchedDefaultBrowserSettings)
         }
 
         private fun onLaunchDefaultBrowserSettingsClicked() {
+            userLaunchedDefaultBrowserSettings = true
+            pixel.fire(ONBOARDING_DEFAULT_BROWSER_SETTINGS_LAUNCHED)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 val intent = DefaultBrowserSystemSettings.intent()
                 try {
@@ -154,6 +185,7 @@ sealed class OnboardingPageFragment : Fragment() {
 
         companion object {
             private const val DEFAULT_BROWSER_REQUEST_CODE = 100
+            private const val SAVED_STATE_LAUNCHED_SETTINGS = "SAVED_STATE_LAUNCHED_SETTINGS"
 
             fun instance(@StringRes continueButtonTextResourceId: Int): DefaultBrowserPage {
                 val bundle = Bundle()

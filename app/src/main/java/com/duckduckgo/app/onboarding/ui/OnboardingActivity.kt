@@ -19,7 +19,6 @@ package com.duckduckgo.app.onboarding.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.browser.R
@@ -51,7 +50,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
     }
 
     @Suppress("UNUSED_PARAMETER")
-    fun onContinueClicked(view: View) {
+    fun onContinueClicked() {
         val next = viewPager.currentItem + 1
         if (next < viewPager.adapter!!.count) {
             viewPager.setCurrentItem(next, true)
