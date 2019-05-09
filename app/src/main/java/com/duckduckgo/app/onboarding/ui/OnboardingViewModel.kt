@@ -39,25 +39,29 @@ class OnboardingViewModel(
         return count
     }
 
+    fun getItem(position: Int, isFreshAppInstall: Boolean): OnboardingPageFragment? {
+        val continueButtonTextResourceId = getContinueButtonTextResourceId(position, isFreshAppInstall)
+        return when (position) {
+            0 -> buildFragmentForFirstPage(isFreshAppInstall, continueButtonTextResourceId)
+            1 -> buildFragmentForSecondPage(isFreshAppInstall, continueButtonTextResourceId)
+            else -> null
+        }
+    }
+
     fun onOnboardingDone() {
         onboardingStore.onboardingShown()
     }
 
-    fun getItem(position: Int, isFreshAppInstall: Boolean): OnboardingPageFragment? {
-        val continueButtonTextResourceId = getContinueButtonTextResourceId(position, isFreshAppInstall)
-        return when (position) {
-            0 -> {
-                val titleTextResourceId =
-                    if (isFreshAppInstall) R.string.unifiedOnboardingTitleFirstVisit else R.string.unifiedOnboardingTitleSubsequentVisits
-                OnboardingPageFragment.UnifiedWelcomePage.instance(continueButtonTextResourceId, titleTextResourceId)
-            }
-            1 -> {
-                return if (shouldShowDefaultBrowserPage(isFreshAppInstall)) {
-                    OnboardingPageFragment.DefaultBrowserPage.instance(continueButtonTextResourceId)
-                } else null
-            }
-            else -> null
-        }
+    private fun buildFragmentForFirstPage(isFreshAppInstall: Boolean, continueButtonTextResourceId: Int): OnboardingPageFragment.UnifiedWelcomePage {
+        val titleTextResourceId =
+            if (isFreshAppInstall) R.string.unifiedOnboardingTitleFirstVisit else R.string.unifiedOnboardingTitleSubsequentVisits
+        return OnboardingPageFragment.UnifiedWelcomePage.instance(continueButtonTextResourceId, titleTextResourceId)
+    }
+
+    private fun buildFragmentForSecondPage(isFreshAppInstall: Boolean, continueButtonTextResourceId: Int): OnboardingPageFragment? {
+        return if (shouldShowDefaultBrowserPage(isFreshAppInstall)) {
+            OnboardingPageFragment.DefaultBrowserPage.instance(continueButtonTextResourceId)
+        } else null
     }
 
     @StringRes
