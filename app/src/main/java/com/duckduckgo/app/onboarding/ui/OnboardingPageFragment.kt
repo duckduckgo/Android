@@ -99,9 +99,9 @@ sealed class OnboardingPageFragment : Fragment() {
                 bundle.putInt(CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA, continueButtonTextResourceId)
                 bundle.putInt(TITLE_TEXT_RESOURCE_ID_EXTRA, titleResourceId)
 
-                return UnifiedWelcomePage().also {
-                    it.arguments = bundle
-                }
+                val fragment = UnifiedWelcomePage()
+                fragment.arguments = bundle
+                return fragment
             }
         }
     }
@@ -191,9 +191,9 @@ sealed class OnboardingPageFragment : Fragment() {
                 val bundle = Bundle()
                 bundle.putInt(CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA, continueButtonTextResourceId)
 
-                return DefaultBrowserPage().also {
-                    it.arguments = bundle
-                }
+                val fragment = DefaultBrowserPage()
+                fragment.arguments = bundle
+                return fragment
             }
 
         }

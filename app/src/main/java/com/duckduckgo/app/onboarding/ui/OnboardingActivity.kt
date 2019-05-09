@@ -49,7 +49,6 @@ class OnboardingActivity : DuckDuckGoActivity() {
         super.onResume()
     }
 
-    @Suppress("UNUSED_PARAMETER")
     fun onContinueClicked() {
         val next = viewPager.currentItem + 1
         if (next < viewPager.adapter!!.count) {
