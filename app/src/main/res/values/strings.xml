@@ -13,10 +13,12 @@
     <string name="onboardingDefaultBrowserDescription">Visit Settings to search and browse with DuckDuckGo every time.</string>
     <string name="onboardingDefaultBrowserGoToSettingsAction">Go to Settings</string>
     <string name="onboardingContinue">Continue</string>
-    <string name="onboardingContinueLastPage">Start Browsing</string>
+    <string name="onboardingContinueFinalPage">Start Browsing</string>
+    <string name="onboardingBackButton">Back</string>
 
     <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitle">Welcome to DuckDuckGo!</string>
+    <string name="unifiedOnboardingTitleFirstVisit">Welcome to DuckDuckGo!</string>
+    <string name="unifiedOnboardingTitleSubsequentVisits">DuckDuckGo Privacy Browser</string>
     <string name="unifiedOnboardingSubtitle">Stay private as you search and browse the web.</string>
     <string name="unifiedOnboardingPrivateSearchTitle">Private Search</string>
     <string name="unifiedOnboardingPrivateSearchSubtitle">With DuckDuckGo, your searches are always private.</string>

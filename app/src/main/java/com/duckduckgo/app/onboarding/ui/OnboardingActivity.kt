@@ -42,7 +42,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_onboarding)
-        configurePager()
+        configurePager(intent.getBooleanExtra(IS_FRESH_INSTALL_EXTRA, true))
     }
 
     override fun onResume() {
@@ -61,9 +61,9 @@ class OnboardingActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun configurePager() {
+    private fun configurePager(isFreshAppInstall: Boolean) {
 
-        viewPageAdapter = PagerAdapter(supportFragmentManager, viewModel)
+        viewPageAdapter = PagerAdapter(supportFragmentManager, viewModel, isFreshAppInstall)
         viewPager.adapter = viewPageAdapter
         val pageListener = ColorChangingPageListener(colorCombiner, object : NewColorListener {
             override fun update(@ColorInt color: Int) = updateColor(color)
@@ -81,8 +81,13 @@ class OnboardingActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, OnboardingActivity::class.java)
+
+        private const val IS_FRESH_INSTALL_EXTRA = "IS_FRESH_INSTALL_EXTRA"
+
+        fun intent(context: Context, isFreshAppInstall: Boolean): Intent {
+            val intent = Intent(context, OnboardingActivity::class.java)
+            intent.putExtra(IS_FRESH_INSTALL_EXTRA, isFreshAppInstall)
+            return intent
         }
     }
 }

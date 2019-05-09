@@ -79,7 +79,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     }
 
     private fun configureUiEventHandlers() {
-        onboarding.setOnClickListener { startActivity(OnboardingActivity.intent(this)) }
+        onboarding.setOnClickListener { startActivity(OnboardingActivity.intent(this, isFreshAppInstall = false)) }
         about.setOnClickListener { startActivity(AboutDuckDuckGoActivity.intent(this)) }
         provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
 

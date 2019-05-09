@@ -36,6 +36,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.DEFAULT_BROWSER_SET
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
+import kotlinx.android.synthetic.main.content_onboarding_default_browser.continueButton
+import kotlinx.android.synthetic.main.content_onboarding_unified_welcome.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -62,16 +64,32 @@ sealed class OnboardingPageFragment : Fragment() {
 
     companion object {
         private const val CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA = "CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA"
+        private const val TITLE_TEXT_RESOURCE_ID_EXTRA = "TITLE_TEXT_RESOURCE_ID_EXTRA"
     }
 
     class UnifiedWelcomePage : OnboardingPageFragment() {
         override fun layoutResource(): Int = R.layout.content_onboarding_unified_welcome
         override fun backgroundColor(): Int = R.color.white
 
+        override fun onActivityCreated(savedInstanceState: Bundle?) {
+            super.onActivityCreated(savedInstanceState)
+
+            val titleText = extractTitleText()
+            title.setText(titleText)
+        }
+
+        @StringRes
+        private fun extractTitleText(): Int {
+            return arguments?.getInt(TITLE_TEXT_RESOURCE_ID_EXTRA, R.string.unifiedOnboardingTitleFirstVisit)
+                ?: R.string.unifiedOnboardingTitleFirstVisit
+        }
+
         companion object {
-            fun instance(@StringRes continueButtonTextResourceId: Int): UnifiedWelcomePage {
+
+            fun instance(@StringRes continueButtonTextResourceId: Int, @StringRes titleResourceId: Int): UnifiedWelcomePage {
                 val bundle = Bundle()
                 bundle.putInt(CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA, continueButtonTextResourceId)
+                bundle.putInt(TITLE_TEXT_RESOURCE_ID_EXTRA, titleResourceId)
 
                 return UnifiedWelcomePage().also {
                     it.arguments = bundle

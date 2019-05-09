@@ -46,7 +46,7 @@
                 style="@style/OnboardingTextTitle"
                 android:paddingStart="6dp"
                 android:paddingEnd="6dp"
-                android:text="@string/unifiedOnboardingTitle"
+                tools:text="@string/unifiedOnboardingTitleFirstVisit"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
