@@ -36,11 +36,12 @@ class OnboardingViewModel(
     }
 
     fun getItem(position: Int): OnboardingPageFragment? {
+        val continueButtonTextResourceId = getContinueButtonTextResourceId(position)
         return when (position) {
-            0 -> OnboardingPageFragment.UnifiedWelcomePage()
+            0 -> OnboardingPageFragment.UnifiedWelcomePage.instance(continueButtonTextResourceId)
             1 -> {
                 return if (shouldShowDefaultBrowserPage()) {
-                    OnboardingPageFragment.DefaultBrowserPage()
+                    OnboardingPageFragment.DefaultBrowserPage.instance(continueButtonTextResourceId)
                 } else null
             }
             else -> null

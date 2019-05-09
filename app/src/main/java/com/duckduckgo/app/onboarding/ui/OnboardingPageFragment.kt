@@ -47,23 +47,37 @@ sealed class OnboardingPageFragment : Fragment() {
     @LayoutRes
     abstract fun layoutResource(): Int
 
-    @StringRes
-    var continueButtonTextResId: Int = R.string.onboardingContinue
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? = inflater.inflate(layoutResource(), container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+        inflater.inflate(layoutResource(), container, false)
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        continueButton.setText(continueButtonTextResId)
+
+        val continueButtonText = extractContinueButtonTextResourceId()
+        continueButton.setText(continueButtonText)
+    }
+
+    private fun extractContinueButtonTextResourceId() =
+        arguments?.getInt(CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA, R.string.onboardingContinue) ?: R.string.onboardingContinue
+
+    companion object {
+        private const val CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA = "CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA"
     }
 
     class UnifiedWelcomePage : OnboardingPageFragment() {
         override fun layoutResource(): Int = R.layout.content_onboarding_unified_welcome
         override fun backgroundColor(): Int = R.color.white
+
+        companion object {
+            fun instance(@StringRes continueButtonTextResourceId: Int): UnifiedWelcomePage {
+                val bundle = Bundle()
+                bundle.putInt(CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA, continueButtonTextResourceId)
+
+                return UnifiedWelcomePage().also {
+                    it.arguments = bundle
+                }
+            }
+        }
     }
 
     class DefaultBrowserPage : OnboardingPageFragment() {
@@ -122,6 +136,16 @@ sealed class OnboardingPageFragment : Fragment() {
 
         companion object {
             private const val DEFAULT_BROWSER_REQUEST_CODE = 100
+
+            fun instance(@StringRes continueButtonTextResourceId: Int): DefaultBrowserPage {
+                val bundle = Bundle()
+                bundle.putInt(CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA, continueButtonTextResourceId)
+
+                return DefaultBrowserPage().also {
+                    it.arguments = bundle
+                }
+            }
+
         }
     }
 }
