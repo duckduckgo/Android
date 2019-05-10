@@ -503,11 +503,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun showAuthenticationDialog(request: BasicAuthenticationRequest) {
-        val dialog = HttpAuthenticationDialogFragment.createHttpAuthenticationDialog(request.site)
-
-        dialog.show(activity?.supportFragmentManager, AUTHENTICATION_DIALOG_TAG)
-        dialog.listener = viewModel
-        dialog.request = request
+        activity?.supportFragmentManager?.let { fragmentManager ->
+            val dialog = HttpAuthenticationDialogFragment.createHttpAuthenticationDialog(request.site)
+            dialog.show(fragmentManager, AUTHENTICATION_DIALOG_TAG)
+            dialog.listener = viewModel
+            dialog.request = request
+        }
     }
 
     private fun saveBasicAuthCredentials(request: BasicAuthenticationRequest, credentials: BasicAuthenticationCredentials) {

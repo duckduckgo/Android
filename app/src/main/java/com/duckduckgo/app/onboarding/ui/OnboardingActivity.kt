@@ -19,7 +19,6 @@ package com.duckduckgo.app.onboarding.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.browser.R
@@ -42,7 +41,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_onboarding)
-        configurePager()
+        configurePager(intent.getBooleanExtra(IS_FRESH_INSTALL_EXTRA, true))
     }
 
     override fun onResume() {
@@ -50,7 +49,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
         super.onResume()
     }
 
-    fun onContinueClicked(view: View) {
+    fun onContinueClicked() {
         val next = viewPager.currentItem + 1
         if (next < viewPager.adapter!!.count) {
             viewPager.setCurrentItem(next, true)
@@ -60,9 +59,9 @@ class OnboardingActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun configurePager() {
+    private fun configurePager(isFreshAppInstall: Boolean) {
 
-        viewPageAdapter = PagerAdapter(supportFragmentManager, viewModel)
+        viewPageAdapter = PagerAdapter(supportFragmentManager, viewModel, isFreshAppInstall)
         viewPager.adapter = viewPageAdapter
         val pageListener = ColorChangingPageListener(colorCombiner, object : NewColorListener {
             override fun update(@ColorInt color: Int) = updateColor(color)
@@ -80,8 +79,13 @@ class OnboardingActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, OnboardingActivity::class.java)
+
+        private const val IS_FRESH_INSTALL_EXTRA = "IS_FRESH_INSTALL_EXTRA"
+
+        fun intent(context: Context, isFreshAppInstall: Boolean): Intent {
+            val intent = Intent(context, OnboardingActivity::class.java)
+            intent.putExtra(IS_FRESH_INSTALL_EXTRA, isFreshAppInstall)
+            return intent
         }
     }
 }

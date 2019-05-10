@@ -4,21 +4,28 @@
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingProtectDataTitle">Protect Your Data</string>
-    <string name="onboardingProtectDataDescription">Tap the Privacy Grade to reveal who we caught trying to track you.\n</string>
-    <string name="onboardingNoTraceTitle">Leave No Trace</string>
-    <string name="onboardingNoTraceDescription1">Tap the Fire Button to erase your tabs and browsing history.</string>
-    <string name="onboardingNoTraceDescription2">Your data is toast!</string>
-    <string name="onboardingDefaultBrowserTitle">Make Us Your Default</string>
-    <string name="onboardingDefaultBrowserDescription">Make DuckDuckGo your default Browser app in settings.</string>
+    <string name="onboardingDefaultBrowserTitle">Make Privacy Your Default</string>
+    <string name="onboardingDefaultBrowserDescription">Visit Settings to search and browse with DuckDuckGo every time.</string>
     <string name="onboardingDefaultBrowserGoToSettingsAction">Go to Settings</string>
     <string name="onboardingContinue">Continue</string>
+    <string name="onboardingContinueFinalPage">Start Browsing</string>
+    <string name="onboardingBackButton">Back</string>
+
+    <!-- Unified Welcome Page -->
+    <string name="unifiedOnboardingTitleFirstVisit">Welcome to\nDuckDuckGo!</string>
+    <string name="unifiedOnboardingTitleSubsequentVisits">DuckDuckGo Privacy Browser</string>
+    <string name="unifiedOnboardingSubtitle">Stay private as you search and browse the web.</string>
+    <string name="unifiedOnboardingPrivateSearchTitle">Private Search</string>
+    <string name="unifiedOnboardingPrivateSearchSubtitle">With DuckDuckGo, your searches are always private.</string>
+    <string name="unifiedOnboardingBrowsingProtectionTitle">Browsing Protection</string>
+    <string name="unifiedOnboardingBrowsingProtectionSubtitle">Block trackers and browse securely by default.</string>
+    <string name="unifiedOnboardingDataClearingTitle">Data Clearing</string>
+    <string name="unifiedOnboardingDataClearingSubtitle">Erase your browsing data with the tap of a button.</string>
+    <string name="unifiedOnboardingCustomizationTitle">Customization</string>
+    <string name="unifiedOnboardingCustomizationSubtitle">Pick a theme and customize privacy features.</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Can\'t launch default app settings screen</string>
-    <string name="defaultBrowserInfoTitle">Make Us Your Default Browser</string>
-    <string name="defaultBrowserInfoMessage">Make DuckDuckGo the default browser in your Device Settings for full-time tracking protection.</string>
-    <string name="dismissDefaultBrowserInfo">Dismiss default browser info</string>
     <string name="settingsDefaultBrowserEnabled">Set as Default Browser</string>
 
     <!-- Browser Activity -->
@@ -279,5 +286,6 @@
     <string name="authenticationDialogNegativeButton">Cancel</string>
     <string name="authenticationDialogUsernameHint">Username</string>
     <string name="authenticationDialogPasswordHint">Password</string>
+
 
 </resources>

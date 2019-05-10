@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.launch
 
-import androidx.lifecycle.Observer
 import android.os.Bundle
+import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -55,7 +55,7 @@ class LaunchActivity : DuckDuckGoActivity() {
         startActivity(BrowserActivity.intent(this))
 
         if (showOnboarding) {
-            startActivity(OnboardingActivity.intent(this))
+            startActivity(OnboardingActivity.intent(this, isFreshAppInstall = true))
         }
 
         finish()
