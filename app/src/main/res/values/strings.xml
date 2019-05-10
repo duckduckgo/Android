@@ -12,7 +12,7 @@
     <string name="onboardingBackButton">Back</string>
 
     <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Welcome to DuckDuckGo!</string>
+    <string name="unifiedOnboardingTitleFirstVisit">Welcome to\nDuckDuckGo!</string>
     <string name="unifiedOnboardingTitleSubsequentVisits">DuckDuckGo Privacy Browser</string>
     <string name="unifiedOnboardingSubtitle">Stay private as you search and browse the web.</string>
     <string name="unifiedOnboardingPrivateSearchTitle">Private Search</string>

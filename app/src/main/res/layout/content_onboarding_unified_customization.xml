@@ -21,9 +21,9 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/customizationGroup"
+        style="@style/OnboardingListItem"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        style="@style/OnboardingListItem"
         app:layout_constraintEnd_toEndOf="@id/privateSearchGroup"
         app:layout_constraintStart_toStartOf="@id/privateSearchGroup"
         app:layout_constraintTop_toBottomOf="@id/dataClearingGroup"
@@ -31,27 +31,15 @@
 
         <TextView
             android:id="@+id/customizationTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:fontFamily="sans-serif"
-            android:lineSpacingExtra="3sp"
+            style="@style/OnboardingListItemTitle"
             android:text="@string/unifiedOnboardingCustomizationTitle"
-            android:textColor="@color/almostBlack"
-            android:textSize="17sp"
-            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/customizationSubtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
+            style="@style/OnboardingListItemSubtitle"
             android:text="@string/unifiedOnboardingCustomizationSubtitle"
-            android:textColor="@color/brownishGrayTwo"
-            android:textSize="15sp"
-            android:textStyle="normal"
             app:layout_constraintStart_toStartOf="@+id/customizationTitle"
             app:layout_constraintTop_toBottomOf="@id/customizationTitle" />
 

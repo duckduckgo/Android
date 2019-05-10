@@ -25,36 +25,40 @@
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
     <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginBottom="10dp"
         android:fillViewport="true"
         app:layout_constraintBottom_toTopOf="@id/continueButton"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_max="600dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:background="#567">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             tools:background="#F00">
 
             <TextView
                 android:id="@+id/title"
                 style="@style/OnboardingTextTitle"
+                android:layout_margin="10dp"
                 android:paddingStart="6dp"
                 android:paddingEnd="6dp"
-                tools:text="@string/unifiedOnboardingTitleFirstVisit"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_max="350dp" />
+                app:layout_constraintWidth_max="350dp"
+                tools:text="@string/unifiedOnboardingTitleFirstVisit" />
 
             <TextView
                 android:id="@+id/subtitle"
                 style="@style/OnboardingTextSubtitle"
+                android:layout_margin="10dp"
                 android:paddingStart="6dp"
                 android:paddingEnd="6dp"
                 android:text="@string/unifiedOnboardingSubtitle"
@@ -68,11 +72,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/subtitle"
-                app:layout_constraintVertical_bias="0.3"
                 app:layout_constraintWidth_max="350dp"
                 app:layout_constraintWidth_percent="0.8"
                 tools:background="#FF7">
@@ -80,7 +84,6 @@
                 <ImageView
                     android:id="@+id/browsingProtectionIcon"
                     style="@style/OnboardingListItemImage"
-                    android:layout_marginStart="20dp"
                     android:importantForAccessibility="no"
                     android:src="@drawable/ic_icon_search_privately"
                     app:layout_constraintBottom_toBottomOf="@id/privateSearchGroup"
@@ -126,25 +129,26 @@
 
                 <include layout="@layout/content_onboarding_unified_customization" />
 
-
             </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
-
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/continueButton"
         style="@style/OnboardingButtonPrimaryCta"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:theme="@style/OnboardingButtonPrimaryCta"
-        android:text="@string/onboardingContinue"
         android:layout_marginBottom="20dp"
+        android:text="@string/onboardingContinue"
+        android:theme="@style/OnboardingButtonPrimaryCta"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scrollView"
+        app:layout_constraintWidth_max="400dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
