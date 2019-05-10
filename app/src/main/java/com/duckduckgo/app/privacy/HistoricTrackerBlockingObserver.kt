@@ -33,7 +33,7 @@ class HistoricTrackerBlockingObserver(
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun onApplicationCreated() {
 
-        if (appInstallStore.daysInstalled() > 0 && !privacySettingsStore.historicTrackerOptionRecorded ) {
+        if (isHistoricUser() && !privacySettingsStore.historicTrackerOptionRecorded) {
             when (privacySettingsStore.privacyOn) {
                 true -> pixel.fire(Pixel.PixelName.TRACKER_BLOCKER_HISTORICAL_ON)
                 false -> pixel.fire(Pixel.PixelName.TRACKER_BLOCKER_HISTORICAL_OFF)
@@ -41,6 +41,9 @@ class HistoricTrackerBlockingObserver(
         }
 
         privacySettingsStore.historicTrackerOptionRecorded = true
+    }
 
+    private fun isHistoricUser() : Boolean {
+        return appInstallStore.hasInstallTimestampRecorded() && appInstallStore.daysInstalled() > 0
     }
 }
