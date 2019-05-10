@@ -168,30 +168,27 @@
         <item name="android:color">@color/browser_menu_text</item>
     </style>
 
-    <style name="OnboardingButtonPrimaryCta" parent="Widget.AppCompat.Button.Colored">
-        <item name="android:elevation">0dp</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">@dimen/onboardingButtonTextSize</item>
+    <style name="OnboardingButtonPrimaryCta">
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="android:background">@drawable/button_contained_bg</item>
+        <item name="android:layout_marginBottom">20dp</item>
+        <item name="android:textSize">15sp</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textAllCaps">true</item>
-        <item name="cornerRadius">4dp</item>
-        <item name="layout_constraintWidth_max">500dp</item>
+        <item name="layout_constraintWidth_max">400dp</item>
         <item name="layout_constraintWidth_percent">0.8</item>
         <item name="backgroundTint">@color/cornflowerBlue</item>
     </style>
 
-    <style name="OnboardingButtonSecondaryCta" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="android:layout_marginBottom">16dp</item>
-        <item name="rippleColor">#DDD</item>
-        <item name="strokeColor">@color/cornflowerBlue</item>
-        <item name="strokeWidth">2dp</item>
-        <item name="android:textSize">@dimen/onboardingButtonTextSize</item>
+    <style name="OnboardingButtonSecondaryCta">
+        <item name="android:background">@drawable/onboarding_secondary_cta_button_outlined_bg</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="android:layout_marginBottom">20dp</item>
+        <item name="android:textSize">15sp</item>
         <item name="android:textColor">@color/cornflowerDark</item>
         <item name="android:textAllCaps">true</item>
-        <item name="cornerRadius">4dp</item>
         <item name="layout_constraintBottom_toBottomOf">parent</item>
-        <item name="layout_constraintWidth_max">500dp</item>
+        <item name="layout_constraintWidth_max">400dp</item>
         <item name="layout_constraintWidth_percent">0.8</item>
     </style>
 

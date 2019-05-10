@@ -32,7 +32,6 @@
         android:fillViewport="true"
         app:layout_constraintBottom_toTopOf="@id/continueButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_max="600dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
@@ -136,19 +135,18 @@
 
     </ScrollView>
 
-    <com.google.android.material.button.MaterialButton
+    <Button
         android:id="@+id/continueButton"
-        style="@style/OnboardingButtonPrimaryCta"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
         android:text="@string/onboardingContinue"
-        android:theme="@style/OnboardingButtonPrimaryCta"
+        style="@style/OnboardingButtonPrimaryCta"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_min="48dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/scrollView"
-        app:layout_constraintWidth_max="400dp" />
+        />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
