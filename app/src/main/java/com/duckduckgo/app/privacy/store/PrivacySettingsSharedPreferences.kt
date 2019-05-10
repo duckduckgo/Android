@@ -31,6 +31,14 @@ class PrivacySettingsSharedPreferences @Inject constructor(private val context: 
             editor.apply()
         }
 
+    override var historicTrackerOptionRecorded: Boolean
+        get() = preferences.getBoolean(KEY_PRIVACY_HISTORIC_TRACKING_OPTION_RECORDED, false)
+        set(recorded) {
+            val editor = preferences.edit()
+            editor.putBoolean(KEY_PRIVACY_HISTORIC_TRACKING_OPTION_RECORDED, recorded)
+            editor.apply()
+        }
+
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, MODE_PRIVATE)
 
@@ -38,5 +46,7 @@ class PrivacySettingsSharedPreferences @Inject constructor(private val context: 
     companion object {
         private const val FILENAME = "com.duckduckgo.app.privacymonitor.settings"
         private const val KEY_PRIVACY_ON = "com.duckduckgo.app.privacymonitor.privacyon"
+        private const val KEY_PRIVACY_HISTORIC_TRACKING_OPTION_RECORDED = "com.duckduckgo.app.privacymonitor.historictrackingoptionrecorded"
+
     }
 }
