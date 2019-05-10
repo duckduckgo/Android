@@ -18,4 +18,5 @@ package com.duckduckgo.app.privacy.store
 
 interface PrivacySettingsStore {
     var privacyOn: Boolean
+    var historicTrackerOptionRecorded: Boolean
 }

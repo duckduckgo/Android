@@ -30,12 +30,12 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.PRIVACY_DASHBOARD_OPENED
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 
 class PrivacyDashboardViewModel(
     private val settingsStore: PrivacySettingsStore,
     networkLeaderboardDao: NetworkLeaderboardDao,
-    pixel: Pixel
+    private val pixel: Pixel
 ) : ViewModel() {
 
     data class ViewState(
@@ -144,7 +144,11 @@ class PrivacyDashboardViewModel(
 
     fun onPrivacyToggled(enabled: Boolean) {
         if (enabled != viewState.value?.toggleEnabled) {
+
             settingsStore.privacyOn = enabled
+            val pixelName = if (enabled) TRACKER_BLOCKER_DASHBOARD_TURNED_ON else TRACKER_BLOCKER_DASHBOARD_TURNED_OFF
+            pixel.fire(pixelName)
+
             viewState.value = viewState.value?.copy(
                 toggleEnabled = enabled,
                 shouldReloadPage = shouldReloadPage

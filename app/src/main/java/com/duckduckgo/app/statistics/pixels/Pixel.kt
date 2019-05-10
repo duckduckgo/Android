@@ -40,6 +40,11 @@ interface Pixel {
         PRIVACY_DASHBOARD_PRIVACY_PRACTICES("mp_p"),
         PRIVACY_DASHBOARD_NETWORKS("mp_n"),
 
+        TRACKER_BLOCKER_HISTORICAL_ON(pixelName = "m_tb_on_h"),
+        TRACKER_BLOCKER_HISTORICAL_OFF(pixelName = "m_tb_off_h"),
+        TRACKER_BLOCKER_DASHBOARD_TURNED_ON(pixelName = "m_tb_on_pd"),
+        TRACKER_BLOCKER_DASHBOARD_TURNED_OFF(pixelName = "m_tb_off_pd"),
+
         DEFAULT_BROWSER_SET("m_db_s"),
         DEFAULT_BROWSER_UNSET("m_db_u"),
         WIDGETS_ADDED(pixelName = "m_w_a"),
