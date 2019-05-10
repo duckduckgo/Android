@@ -47,3 +47,6 @@ fastlane/report.xml
 
 # Bitrise configuration
 bitrise.yml
+
+# NDK files
+**/.cxx
