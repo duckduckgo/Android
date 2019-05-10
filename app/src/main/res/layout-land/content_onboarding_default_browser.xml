@@ -75,42 +75,27 @@
         app:layout_constraintTop_toBottomOf="@id/privateSearchTitle"
         app:layout_constraintWidth_max="500dp" />
 
-
     <Button
         android:id="@+id/continueButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/button_contained_bg"
-        android:foreground="?attr/selectableItemBackground"
         android:text="@string/onboardingContinue"
-        android:textColor="@color/white"
-        android:textSize="15sp"
+        style="@style/OnboardingButtonPrimaryCta"
         app:layout_constraintBottom_toTopOf="@+id/launchSettingsButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintWidth_max="400dp" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 
     <Button
         android:id="@+id/launchSettingsButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/report_broken_site_button_outlined_bg"
-        android:foreground="?attr/selectableItemBackground"
+        style="@style/OnboardingButtonSecondaryCta"
         android:text="@string/onboardingDefaultBrowserGoToSettingsAction"
-        android:textColor="@color/cornflowerBlue"
-        android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintWidth_max="400dp"
-        app:layout_constraintWidth_percent="0.8" />
+        app:layout_constraintStart_toStartOf="parent" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
