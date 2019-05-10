@@ -133,9 +133,6 @@
             android:name="com.duckduckgo.app.bookmarks.ui.BookmarksActivity"
             android:label="@string/bookmarksActivityTitle" />
         <activity
-            android:name=".defaultbrowsing.DefaultBrowserInfoActivity"
-            android:theme="@style/ModalCardTheme" />
-        <activity
             android:name="com.duckduckgo.app.fire.FireActivity"
             android:process="@string/fireProcessName" />
 

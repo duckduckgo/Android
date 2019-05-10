@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (c) 2019 DuckDuckGo
   ~
@@ -15,7 +14,10 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <dimen name="feedbackTitleMarginTop">20dp</dimen>
-    <dimen name="onboardingTitleMarginTop">8dp</dimen>
-</resources>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <stroke
+        android:width="1.5dp"
+        android:color="@color/cornflowerBlue" />
+
+    <corners android:radius="4dp" />
+</shape>
