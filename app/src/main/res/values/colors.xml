@@ -48,6 +48,7 @@
     <color name="grayishTwo">#939393</color>
     <color name="grayishThree">#ddd</color>
     <color name="warmGray">#999999</color>
+    <color name="warGreyTwo">#888888</color>
     <color name="warmerGray">#777777</color>
     <color name="paleBrownishGray">#b0b0b0</color>
     <color name="brownishGray">#5c5c5c</color>
@@ -80,5 +81,6 @@
     <color name="portGore">#2f1f51</color>
 
     <color name="translucentDark">#b000</color>
+    <color name="gunmetal">#494d56</color>
 
 </resources>
