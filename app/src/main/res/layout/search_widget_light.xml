@@ -21,7 +21,8 @@
     android:layout_width="match_parent"
     android:layout_height="44dp"
     android:layout_gravity="center"
-    android:layout_margin="4dp"
+    android:layout_margin="5dp"
+    android:elevation="2dp"
     android:background="@drawable/search_widget_background_light"
     android:orientation="horizontal">
 
