@@ -32,7 +32,7 @@ class VariantManagerTest {
     }
 
     @Test
-    fun serpExperimentalGroupVariantSuppressed() {
+    fun serpExperimentalVariantSuppressed() {
         val variant = variants.firstOrNull { it.key == "se" }
         assertEqualsDouble(0.0, variant!!.weight)
         assertEquals(0, variant.features.size)
