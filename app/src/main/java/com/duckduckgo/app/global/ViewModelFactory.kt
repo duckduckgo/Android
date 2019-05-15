@@ -44,7 +44,9 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
+import com.duckduckgo.app.onboarding.ui.page.TrackerBlockingSelectionViewModel
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.store.PrivacySettingsSharedPreferences
@@ -99,14 +101,15 @@ class ViewModelFactory @Inject constructor(
     private val searchCountDao: SearchCountDao,
     private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
     private val playStoreUtils: PlayStoreUtils,
-    private val feedbackSubmitter: FeedbackSubmitter
+    private val feedbackSubmitter: FeedbackSubmitter,
+    private val onboardingPageManager: OnboardingPageManager
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
         with(modelClass) {
             when {
                 isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboaringStore)
-                isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore, defaultBrowserDetector)
+                isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore, onboardingPageManager)
                 isAssignableFrom(BrowserViewModel::class.java) -> browserViewModel()
                 isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
                 isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository, webViewSessionStorage)
@@ -124,6 +127,7 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(PositiveFeedbackLandingViewModel::class.java) -> PositiveFeedbackLandingViewModel()
                 isAssignableFrom(ShareOpenEndedNegativeFeedbackViewModel::class.java) -> ShareOpenEndedNegativeFeedbackViewModel()
                 isAssignableFrom(BrokenSiteNegativeFeedbackViewModel::class.java) -> BrokenSiteNegativeFeedbackViewModel()
+                isAssignableFrom(TrackerBlockingSelectionViewModel::class.java) -> TrackerBlockingSelectionViewModel(privacySettingsStore)
 
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }

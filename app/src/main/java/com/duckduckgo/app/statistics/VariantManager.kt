@@ -29,6 +29,8 @@ interface VariantManager {
         object NotificationPrivacyDay1 : VariantFeature()
         object NotificationClearDataDay1 : VariantFeature()
         object NotificationSuppressClearDataDay3 : VariantFeature()
+
+        object ShowOnboardingTrackerBlockerOptIn : VariantFeature()
     }
 
     companion object {
@@ -50,7 +52,9 @@ interface VariantManager {
             Variant(key = "mf", weight = 1.0, features = listOf(NotificationSuppressClearDataDay3)),
 
             // Notification Add New
-            Variant(key = "mk", weight = 1.0, features = listOf(NotificationPrivacyDay1))
+            Variant(key = "mk", weight = 1.0, features = listOf(NotificationPrivacyDay1)),
+
+            Variant(key="??", weight = 100000.0, features = listOf(ShowOnboardingTrackerBlockerOptIn))
         )
     }
 

@@ -19,20 +19,13 @@ package com.duckduckgo.app.onboarding.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.annotation.ColorInt
-import androidx.core.content.ContextCompat
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.view.ColorCombiner
-import com.duckduckgo.app.onboarding.ui.ColorChangingPageListener.NewColorListener
+import com.duckduckgo.app.onboarding.ui.page.TrackerBlockerOptInPage
 import kotlinx.android.synthetic.main.activity_onboarding.*
-import javax.inject.Inject
 
 
-class OnboardingActivity : DuckDuckGoActivity() {
-
-    @Inject
-    lateinit var colorCombiner: ColorCombiner
+class OnboardingActivity : DuckDuckGoActivity(), TrackerBlockerOptInPage.TrackerBlockingDecisionListener {
 
     private lateinit var viewPageAdapter: PagerAdapter
 
@@ -42,11 +35,6 @@ class OnboardingActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_onboarding)
         configurePager(intent.getBooleanExtra(IS_FRESH_INSTALL_EXTRA, true))
-    }
-
-    override fun onResume() {
-        updateColor(viewPageAdapter.color(this, viewPager.currentItem))
-        super.onResume()
     }
 
     fun onContinueClicked() {
@@ -60,22 +48,22 @@ class OnboardingActivity : DuckDuckGoActivity() {
     }
 
     private fun configurePager(isFreshAppInstall: Boolean) {
+        viewModel.initializePages(isFreshAppInstall)
 
-        viewPageAdapter = PagerAdapter(supportFragmentManager, viewModel, isFreshAppInstall)
+        viewPageAdapter = PagerAdapter(supportFragmentManager, viewModel)
+        viewPager.offscreenPageLimit = 1
         viewPager.adapter = viewPageAdapter
-        val pageListener = ColorChangingPageListener(colorCombiner, object : NewColorListener {
-            override fun update(@ColorInt color: Int) = updateColor(color)
-            override fun getColorForPage(position: Int): Int? {
-                val color = viewPageAdapter.backgroundColor(position) ?: return null
-                return ContextCompat.getColor(this@OnboardingActivity, color)
-            }
-        })
-
-        viewPager.addOnPageChangeListener(pageListener)
+        viewPager.setSwipingEnabled(false)
     }
 
-    private fun updateColor(@ColorInt color: Int) {
-        viewPager.setBackgroundColor(color)
+    override fun onUserEnabledTrackerBlocking() {
+        viewPageAdapter.notifyDataSetChanged()
+        onContinueClicked()
+    }
+
+    override fun onUserDisabledTrackerBlocking() {
+        viewPageAdapter.notifyDataSetChanged()
+        onContinueClicked()
     }
 
     companion object {

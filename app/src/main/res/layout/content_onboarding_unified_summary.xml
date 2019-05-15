@@ -84,11 +84,11 @@
                     android:id="@+id/browsingProtectionIcon"
                     style="@style/OnboardingListItemImage"
                     android:importantForAccessibility="no"
-                    android:src="@drawable/icon_block_trackers_alt"
-                    app:layout_constraintBottom_toBottomOf="@id/privateSearchGroup"
+                    android:src="@drawable/icon_tracker_blocking_enabled"
+                    app:layout_constraintBottom_toBottomOf="@id/browserProtectionGroup"
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/privateSearchGroup" />
+                    app:layout_constraintTop_toTopOf="@id/browserProtectionGroup" />
 
                 <include layout="@layout/content_onboarding_unified_browsing_protection" />
 
@@ -97,10 +97,10 @@
                     style="@style/OnboardingListItemImage"
                     android:importantForAccessibility="no"
                     android:src="@drawable/icon_search_privately"
-                    app:layout_constraintBottom_toBottomOf="@id/browsingProtectionGroup"
+                    app:layout_constraintBottom_toBottomOf="@id/privateSearchGroup"
                     app:layout_constraintEnd_toEndOf="@+id/browsingProtectionIcon"
                     app:layout_constraintStart_toStartOf="@id/browsingProtectionIcon"
-                    app:layout_constraintTop_toTopOf="@id/browsingProtectionGroup" />
+                    app:layout_constraintTop_toTopOf="@id/privateSearchGroup" />
 
                 <include layout="@layout/content_onboarding_unified_private_search" />
 

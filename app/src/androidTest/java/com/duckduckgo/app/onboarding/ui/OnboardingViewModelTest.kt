@@ -17,14 +17,15 @@
 package com.duckduckgo.app.onboarding.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
+import com.duckduckgo.app.onboarding.ui.page.UnifiedSummaryPage
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Assert.*
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -36,10 +37,10 @@ class OnboardingViewModelTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private var onboardingStore: OnboardingStore = mock()
-    private var mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
+    private val mockPageLayout: OnboardingPageManager = mock()
 
     private val testee: OnboardingViewModel by lazy {
-        OnboardingViewModel(onboardingStore, mockDefaultBrowserDetector)
+        OnboardingViewModel(onboardingStore, mockPageLayout)
     }
 
     @Test
@@ -51,70 +52,48 @@ class OnboardingViewModelTest {
 
     @Test
     fun whenFreshInstallFirstPageRequestedThenUnifiedWelcomePageReturned() {
-        val page = testee.getItem(0, isFreshAppInstall = true)
-        assertTrue(page is OnboardingPageFragment.UnifiedWelcomePage)
+        testee.initializePages(isFreshAppInstall = true)
+        val page = testee.getItem(0)
+        assertTrue(page is UnifiedSummaryPage)
     }
 
     @Test
     fun whenNotFreshInstallFirstPageRequestedThenUnifiedWelcomePageReturned() {
-        val page = testee.getItem(0, isFreshAppInstall = false)
-        assertTrue(page is OnboardingPageFragment.UnifiedWelcomePage)
+        testee.initializePages(isFreshAppInstall = false)
+        val page = testee.getItem(0)
+        assertTrue(page is UnifiedSummaryPage)
     }
 
     @Test
     fun whenFreshInstallSecondPageRequestedWithDefaultBrowserCapableThenDefaultBrowserPageReturned() {
         configureDeviceSupportsDefaultBrowser()
-        val page = testee.getItem(1, isFreshAppInstall = true)
-        assertTrue(page is OnboardingPageFragment.DefaultBrowserPage)
+        testee.initializePages(isFreshAppInstall = true)
+        val page = testee.getItem(1)
+        assertTrue(page is DefaultBrowserPage)
     }
 
     @Test
     fun whenNotFreshInstallSecondPageRequestedWithDefaultBrowserCapableThenNoPageReturned() {
         configureDeviceSupportsDefaultBrowser()
-        val page = testee.getItem(1, isFreshAppInstall = false)
+        testee.initializePages(isFreshAppInstall = false)
+        val page = testee.getItem(1)
         assertNull(page)
     }
 
     @Test
     fun whenFreshInstallSecondPageRequestedButDefaultBrowserNotCapableThenNoPageReturned() {
         configureDeviceDoesNotSupportDefaultBrowser()
-        val page = testee.getItem(1, isFreshAppInstall = true)
+        testee.initializePages(isFreshAppInstall = true)
+        val page = testee.getItem(1)
         assertNull(page)
     }
 
     @Test
     fun whenNotFreshInstallSecondPageRequestedButDefaultBrowserNotCapableThenNoPageReturned() {
         configureDeviceDoesNotSupportDefaultBrowser()
-        val page = testee.getItem(1, isFreshAppInstall = false)
+        testee.initializePages(isFreshAppInstall = false)
+        val page = testee.getItem(1)
         assertNull(page)
-    }
-
-    @Test
-    fun whenDefaultBrowserSupportedThenFirstPageShowsContinueTextOnButton() {
-        configureDeviceSupportsDefaultBrowser()
-        val resourceId = testee.getContinueButtonTextResourceId(0, isFreshAppInstall = true)
-        assertEquals(R.string.onboardingContinue, resourceId)
-    }
-
-    @Test
-    fun whenFreshInstallDefaultBrowserNotSupportedThenFirstPageShowsFinalTextOnButton() {
-        configureDeviceDoesNotSupportDefaultBrowser()
-        val resourceId = testee.getContinueButtonTextResourceId(0, isFreshAppInstall = true)
-        assertEquals(R.string.onboardingContinueFinalPage, resourceId)
-    }
-
-    @Test
-    fun whenNotFreshInstallDefaultBrowserSupportedThenFirstPageShowsBackTextOnButton() {
-        configureDeviceSupportsDefaultBrowser()
-        val resourceId = testee.getContinueButtonTextResourceId(0, isFreshAppInstall = false)
-        assertEquals(R.string.onboardingBackButton, resourceId)
-    }
-
-    @Test
-    fun whenNotFreshInstallDefaultBrowserNotSupportedThenFirstPageShowsBackTextOnButton() {
-        configureDeviceDoesNotSupportDefaultBrowser()
-        val resourceId = testee.getContinueButtonTextResourceId(0, isFreshAppInstall = false)
-        assertEquals(R.string.onboardingBackButton, resourceId)
     }
 
     private fun configureDeviceSupportsDefaultBrowser() {

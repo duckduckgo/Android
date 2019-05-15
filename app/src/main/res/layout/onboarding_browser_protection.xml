@@ -32,7 +32,7 @@
         app:layout_constraintTop_toBottomOf="@id/subtitle">
 
         <TextView
-            android:id="@+id/privateSearchTitle"
+            android:id="@+id/browserProtectionTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -47,17 +47,17 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/privateSearchSubtitle"
+            android:id="@+id/browserProtectionSubtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:fontFamily="sans-serif"
-            android:text="@string/unifiedOnboardingBrowsingProtectionSubtitle"
+            android:text="@string/unifiedOnboardingBrowsingProtectionEnabledSubtitle"
             android:textColor="@color/brownishGrayTwo"
             android:textSize="15sp"
             android:textStyle="normal"
-            app:layout_constraintStart_toStartOf="@+id/privateSearchTitle"
-            app:layout_constraintTop_toBottomOf="@id/privateSearchTitle" />
+            app:layout_constraintStart_toStartOf="@+id/browserProtectionTitle"
+            app:layout_constraintTop_toBottomOf="@id/browserProtectionTitle" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

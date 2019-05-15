@@ -22,7 +22,7 @@
     android:background="@color/white"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
-    <androidx.viewpager.widget.ViewPager
+    <com.duckduckgo.app.onboarding.ui.page.viewpager.SwipeRestrictingViewPager
         android:id="@+id/viewPager"
         android:layout_width="0dp"
         android:layout_height="0dp"

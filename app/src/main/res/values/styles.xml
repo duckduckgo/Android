@@ -239,10 +239,21 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/brownishGrayTwo</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">15sp</item>
     </style>
+
+    <style name="OnboardingConfirmationDialogTitle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">13dp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/almostBlack</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textSize">21sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 
     <style name="OnboardingTextSubtitle.Subtitle2">
         <item name="android:paddingTop">16dp</item>

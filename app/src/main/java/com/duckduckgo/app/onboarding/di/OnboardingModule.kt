@@ -16,7 +16,10 @@
 
 package com.duckduckgo.app.onboarding.di
 
-import com.duckduckgo.app.global.view.ColorCombiner
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder
+import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
+import com.duckduckgo.app.statistics.VariantManager
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -26,6 +29,17 @@ import javax.inject.Singleton
 class OnboardingModule {
 
     @Provides
+    fun onboardingPageManger(
+        variantManager: VariantManager,
+        onboardingPageBuilder: OnboardingPageBuilder,
+        defaultBrowserDetector: DefaultBrowserDetector
+    ): OnboardingPageManager {
+        return OnboardingPageManager(variantManager, onboardingPageBuilder, defaultBrowserDetector)
+    }
+
+    @Provides
     @Singleton
-    fun colorCombiner() = ColorCombiner()
+    fun onboardingPageBuilder(): OnboardingPageBuilder {
+        return OnboardingPageBuilder()
+    }
 }

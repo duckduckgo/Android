@@ -8,6 +8,7 @@
     <string name="onboardingDefaultBrowserDescription">Visit Settings to search and browse with DuckDuckGo every time.</string>
     <string name="onboardingDefaultBrowserGoToSettingsAction">Go to Settings</string>
     <string name="onboardingContinue">Continue</string>
+    <string name="onboardingGoBack">Go back</string>
     <string name="onboardingContinueFinalPage">Start Browsing</string>
     <string name="onboardingBackButton">Back</string>
 
@@ -18,11 +19,23 @@
     <string name="unifiedOnboardingPrivateSearchTitle">Private Search</string>
     <string name="unifiedOnboardingPrivateSearchSubtitle">With DuckDuckGo, your searches are always private.</string>
     <string name="unifiedOnboardingBrowsingProtectionTitle">Browsing Protection</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitle">Block trackers and browse securely by default.</string>
+    <string name="unifiedOnboardingBrowsingProtectionEnabledSubtitle">Block trackers and browse securely by default.</string>
+    <string name="unifiedOnboardingBrowsingProtectionDisabledSubtitle">You haven\'t activated tracker blocking yet.</string>
     <string name="unifiedOnboardingDataClearingTitle">Data Clearing</string>
     <string name="unifiedOnboardingDataClearingSubtitle">Erase your browsing data with the tap of a button.</string>
     <string name="unifiedOnboardingCustomizationTitle">Customization</string>
     <string name="unifiedOnboardingCustomizationSubtitle">Pick a theme and customize privacy features.</string>
+
+    <!-- Tracker Block Opt-in -->
+    <string name="trackerBlockingOptInSubtitle">First, let\'s talk about trackers</string>
+    <string name="onboardingTrackerOptInItemTitle">We Can Block Trackers</string>
+    <string name="onboardingTrackerOptInItemSubtitle">Do you want to activate tracker blocking to keep third party advertisers from tracking you while you browse?</string>
+    <string name="onboardingAcceptTrackerBlockingActivation">Activate tracker blocking</string>
+    <string name="onboardingDeclineTrackerBlockingActivation">Nah, let them track me</string>
+    <string name="onboardingOptedInConfirmationTitle">Tracker blocking is now activated!</string>
+    <string name="onboardingOptedInConfirmationSubtitle">Third party trackers will now be blocked by default while you browse</string>
+    <string name="onboardingOptedOutConfirmationTitle">Continue without tracker blocking?</string>
+    <string name="onboardingOptedOutConfirmationSubtitle">Without tracker blocking activated, we won\'t be able to protect you from third party advertising trackers.\n\nAre you sure you want to continue?</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Can\'t launch default app settings screen</string>

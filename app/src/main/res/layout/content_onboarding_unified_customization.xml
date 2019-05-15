@@ -24,8 +24,8 @@
         style="@style/OnboardingListItem"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="@id/privateSearchGroup"
-        app:layout_constraintStart_toStartOf="@id/privateSearchGroup"
+        app:layout_constraintEnd_toEndOf="@id/browserProtectionGroup"
+        app:layout_constraintStart_toStartOf="@id/browserProtectionGroup"
         app:layout_constraintTop_toBottomOf="@id/dataClearingGroup"
         tools:background="#5D7">
 

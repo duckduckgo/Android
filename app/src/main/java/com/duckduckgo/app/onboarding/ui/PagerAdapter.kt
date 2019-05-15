@@ -21,16 +21,17 @@ import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 
-class PagerAdapter(fragmentManager: FragmentManager, private val viewModel: OnboardingViewModel, private val isFreshAppInstall: Boolean) :
+class PagerAdapter(fragmentManager: FragmentManager, private val viewModel: OnboardingViewModel) :
     FragmentPagerAdapter(fragmentManager) {
 
     override fun getCount(): Int {
-        return viewModel.pageCount(isFreshAppInstall)
+        return viewModel.pageCount()
     }
 
     override fun getItem(position: Int): OnboardingPageFragment {
-        return viewModel.getItem(position, isFreshAppInstall) ?: throw IllegalArgumentException("No items exists at position $position")
+        return viewModel.getItem(position) ?: throw IllegalArgumentException("No items exists at position $position")
     }
 
     @ColorInt
@@ -40,7 +41,7 @@ class PagerAdapter(fragmentManager: FragmentManager, private val viewModel: Onbo
     }
 
     fun backgroundColor(position: Int): Int? {
-        val item = viewModel.getItem(position, isFreshAppInstall) ?: return null
+        val item = viewModel.getItem(position) ?: return null
         return item.backgroundColor()
     }
 }
