@@ -38,12 +38,12 @@ interface VariantManager {
 
         val ACTIVE_VARIANTS = listOf(
 
-            // SERP experimental groups. "sc" may be used as a shared control in the future if we can filter retention by app version
+            // SERP variants. "sc" may be used as a shared control in the future if we can filter by app version
             // Currently set to 0.0 to free up allocations for new projects
             Variant(key = "sc", weight = 0.0, features = emptyList()),
             Variant(key = "se", weight = 0.0, features = emptyList()),
 
-            // Notification experiments
+            // Notification variants
             // Currently set to 0.0 to free up allocations for new projects
             Variant(key = "me", weight = 0.0, features = listOf(NotificationPrivacyDay1, NotificationSuppressClearDataDay3)),
             Variant(key = "mi", weight = 0.0, features = listOf(NotificationClearDataDay1, NotificationSuppressClearDataDay3)),
