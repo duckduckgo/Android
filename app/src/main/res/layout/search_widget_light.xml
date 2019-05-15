@@ -56,6 +56,6 @@
         android:layout_centerVertical="true"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
-        android:src="@drawable/ic_widget_loupe_24dp" />
+        android:src="@drawable/ic_widget_loupe_gunmetal_24dp" />
 
 </RelativeLayout>
