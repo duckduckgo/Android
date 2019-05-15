@@ -33,12 +33,20 @@ interface Pixel {
         APP_LAUNCH("ml"),
         FORGET_ALL_EXECUTED("mf"),
 
+        ONBOARDING_DEFAULT_BROWSER_SETTINGS_LAUNCHED("m_odb_l"),
+        ONBOARDING_DEFAULT_BROWSER_SKIPPED("m_odb_s"),
+
         PRIVACY_DASHBOARD_OPENED("mp"),
         PRIVACY_DASHBOARD_SCORECARD("mp_c"),
         PRIVACY_DASHBOARD_ENCRYPTION("mp_e"),
         PRIVACY_DASHBOARD_GLOBAL_STATS("mp_s"),
         PRIVACY_DASHBOARD_PRIVACY_PRACTICES("mp_p"),
         PRIVACY_DASHBOARD_NETWORKS("mp_n"),
+
+        TRACKER_BLOCKER_HISTORICAL_ON(pixelName = "m_tb_on_h"),
+        TRACKER_BLOCKER_HISTORICAL_OFF(pixelName = "m_tb_off_h"),
+        TRACKER_BLOCKER_DASHBOARD_TURNED_ON(pixelName = "m_tb_on_pd"),
+        TRACKER_BLOCKER_DASHBOARD_TURNED_OFF(pixelName = "m_tb_off_pd"),
 
         DEFAULT_BROWSER_SET("m_db_s"),
         DEFAULT_BROWSER_UNSET("m_db_u"),

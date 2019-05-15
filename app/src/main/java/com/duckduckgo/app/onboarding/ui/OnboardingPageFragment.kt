@@ -26,6 +26,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorRes
 import androidx.annotation.LayoutRes
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
@@ -35,6 +36,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
+import kotlinx.android.synthetic.main.content_onboarding_default_browser.continueButton
+import kotlinx.android.synthetic.main.content_onboarding_unified_welcome.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -46,25 +49,65 @@ sealed class OnboardingPageFragment : Fragment() {
     @LayoutRes
     abstract fun layoutResource(): Int
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? = inflater.inflate(layoutResource(), container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+        inflater.inflate(layoutResource(), container, false)
 
-    class ProtectDataPage : OnboardingPageFragment() {
-        override fun layoutResource(): Int = R.layout.content_onboarding_protect_data
-        override fun backgroundColor(): Int = R.color.lightOliveGreen
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        val continueButtonText = extractContinueButtonTextResourceId()
+        continueButton.setText(continueButtonText)
     }
 
-    class NoTracePage : OnboardingPageFragment() {
-        override fun layoutResource(): Int = R.layout.content_onboarding_no_trace
-        override fun backgroundColor(): Int = R.color.cornflowerBlue
+    private fun extractContinueButtonTextResourceId() =
+        arguments?.getInt(CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA, R.string.onboardingContinue) ?: R.string.onboardingContinue
+
+    fun onContinuePressed() {
+        val onboardingActivity = activity as OnboardingActivity
+        onboardingActivity.onContinueClicked()
+    }
+
+    companion object {
+        private const val CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA = "CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA"
+        private const val TITLE_TEXT_RESOURCE_ID_EXTRA = "TITLE_TEXT_RESOURCE_ID_EXTRA"
+    }
+
+    class UnifiedWelcomePage : OnboardingPageFragment() {
+        override fun layoutResource(): Int = R.layout.content_onboarding_unified_welcome
+        override fun backgroundColor(): Int = R.color.white
+
+        override fun onActivityCreated(savedInstanceState: Bundle?) {
+            super.onActivityCreated(savedInstanceState)
+
+            val titleText = extractTitleText()
+            title.setText(titleText)
+
+            continueButton.setOnClickListener { onContinuePressed() }
+        }
+
+        @StringRes
+        private fun extractTitleText(): Int {
+            return arguments?.getInt(TITLE_TEXT_RESOURCE_ID_EXTRA, R.string.unifiedOnboardingTitleFirstVisit)
+                ?: R.string.unifiedOnboardingTitleFirstVisit
+        }
+
+        companion object {
+
+            fun instance(@StringRes continueButtonTextResourceId: Int, @StringRes titleResourceId: Int): UnifiedWelcomePage {
+                val bundle = Bundle()
+                bundle.putInt(CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA, continueButtonTextResourceId)
+                bundle.putInt(TITLE_TEXT_RESOURCE_ID_EXTRA, titleResourceId)
+
+                val fragment = UnifiedWelcomePage()
+                fragment.arguments = bundle
+                return fragment
+            }
+        }
     }
 
     class DefaultBrowserPage : OnboardingPageFragment() {
         override fun layoutResource(): Int = R.layout.content_onboarding_default_browser
-        override fun backgroundColor(): Int = R.color.eastBay
+        override fun backgroundColor(): Int = R.color.white
 
         @Inject
         lateinit var pixel: Pixel
@@ -75,6 +118,8 @@ sealed class OnboardingPageFragment : Fragment() {
         @Inject
         lateinit var defaultBrowserDetector: DefaultBrowserDetector
 
+        private var userLaunchedDefaultBrowserSettings = false
+
         override fun onAttach(context: Context) {
             AndroidSupportInjection.inject(this)
             super.onAttach(context)
@@ -82,10 +127,31 @@ sealed class OnboardingPageFragment : Fragment() {
 
         override fun onActivityCreated(savedInstanceState: Bundle?) {
             super.onActivityCreated(savedInstanceState)
-            launchSettingsButton.setOnClickListener { onLaunchDefaultBrowserSettingsClicked() }
+
+            if (savedInstanceState != null) {
+                userLaunchedDefaultBrowserSettings = savedInstanceState.getBoolean(SAVED_STATE_LAUNCHED_SETTINGS)
+            }
+
+            launchSettingsButton.setOnClickListener {
+                onLaunchDefaultBrowserSettingsClicked()
+            }
+            continueButton.setOnClickListener {
+                if (!userLaunchedDefaultBrowserSettings) {
+                    pixel.fire(ONBOARDING_DEFAULT_BROWSER_SKIPPED)
+                }
+                onContinuePressed()
+            }
+        }
+
+        override fun onSaveInstanceState(outState: Bundle) {
+            super.onSaveInstanceState(outState)
+
+            outState.putBoolean(SAVED_STATE_LAUNCHED_SETTINGS, userLaunchedDefaultBrowserSettings)
         }
 
         private fun onLaunchDefaultBrowserSettingsClicked() {
+            userLaunchedDefaultBrowserSettings = true
+            pixel.fire(ONBOARDING_DEFAULT_BROWSER_SETTINGS_LAUNCHED)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 val intent = DefaultBrowserSystemSettings.intent()
                 try {
@@ -118,6 +184,17 @@ sealed class OnboardingPageFragment : Fragment() {
 
         companion object {
             private const val DEFAULT_BROWSER_REQUEST_CODE = 100
+            private const val SAVED_STATE_LAUNCHED_SETTINGS = "SAVED_STATE_LAUNCHED_SETTINGS"
+
+            fun instance(@StringRes continueButtonTextResourceId: Int): DefaultBrowserPage {
+                val bundle = Bundle()
+                bundle.putInt(CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA, continueButtonTextResourceId)
+
+                val fragment = DefaultBrowserPage()
+                fragment.arguments = bundle
+                return fragment
+            }
+
         }
     }
 }
