@@ -25,7 +25,6 @@ import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_onboarding_unified_browsing_protection.*
 import kotlinx.android.synthetic.main.content_onboarding_unified_summary.*
-import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -49,11 +48,12 @@ class UnifiedSummaryPage : OnboardingPageFragment() {
 
         extractContinueButtonTextResourceId()?.let { continueButton.setText(it) }
         continueButton.setOnClickListener { onContinuePressed() }
+
+        updateUiToReflectTrackingState()
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser)
-        Timber.i("Visible to user")
         if (isVisibleToUser) {
             updateUiToReflectTrackingState()
         }
@@ -65,7 +65,14 @@ class UnifiedSummaryPage : OnboardingPageFragment() {
             ?: R.string.unifiedOnboardingTitleFirstVisit
     }
 
+    /**
+     * Updates the UI elements to reflect whether tracker protection is currently on or off
+     *
+     * Note, this might be called before the usual fragment lifecycle has had a chance to run, so need to guard against that by null checking view.
+     */
     private fun updateUiToReflectTrackingState() {
+        if (view == null) return
+
         val resources = if (privacySettingsStore.privacyOn) {
             TrackerBlockingUiResources(R.drawable.icon_tracker_blocking_enabled, R.string.unifiedOnboardingBrowsingProtectionEnabledSubtitle)
         } else {

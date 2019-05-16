@@ -19,6 +19,7 @@ package com.duckduckgo.app.onboarding.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.onboarding.ui.page.TrackerBlockerOptInPage
@@ -43,6 +44,7 @@ class OnboardingActivity : DuckDuckGoActivity(), TrackerBlockerOptInPage.Tracker
             viewPager.setCurrentItem(next, true)
         } else {
             viewModel.onOnboardingDone()
+            startActivity(BrowserActivity.intent(this))
             finish()
         }
     }
@@ -64,6 +66,15 @@ class OnboardingActivity : DuckDuckGoActivity(), TrackerBlockerOptInPage.Tracker
     override fun onUserDisabledTrackerBlocking() {
         viewPageAdapter.notifyDataSetChanged()
         onContinueClicked()
+    }
+
+    override fun onBackPressed() {
+        val currentPage = viewPager.currentItem
+        if (currentPage == 0) {
+            finish()
+        } else {
+            viewPager.setCurrentItem(currentPage - 1, true)
+        }
     }
 
     companion object {

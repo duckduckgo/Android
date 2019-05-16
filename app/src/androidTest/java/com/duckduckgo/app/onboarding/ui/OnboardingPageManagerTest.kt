@@ -18,11 +18,11 @@ package com.duckduckgo.app.onboarding.ui
 
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Assert.*
-
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
@@ -35,27 +35,34 @@ class OnboardingPageManagerTest {
 
     @Before
     fun setup() {
-        testee = OnboardingPageManager(variantManager, onboardingPageBuilder, mockDefaultBrowserDetector)
+        testee = OnboardingPageManagerWithTrackerBlocking(variantManager, onboardingPageBuilder, mockDefaultBrowserDetector)
     }
 
     @Test
-    fun whenDefaultBrowserSupportedThenFirstPageShowsContinueTextOnButton() {
+    fun whenDefaultBrowserSupportedAndTrackerBlockingOptInSupportedThenFirstPageShowsContinueTextOnButton() {
         configureDeviceSupportsDefaultBrowser()
-        testee.buildPageBlueprints(isFreshAppInstall = true)
-        val resourceId = testee.getContinueButtonTextResourceId(0)
+        configureShouldShowTrackerBlockerOptIn()
+        val isFreshInstall = true
+        testee.buildPageBlueprints(isFreshAppInstall = isFreshInstall)
+        val resourceId = testee.getContinueButtonTextResourceId(0, isFreshAppInstall = isFreshInstall)
         assertEquals(R.string.onboardingContinue, resourceId)
     }
 
     @Test
-    fun whenFreshInstallDefaultBrowserNotSupportedThenFirstPageShowsFinalTextOnButton() {
+    fun whenFreshInstallDefaultBrowserNotSupportedAndTrackerBlockingOptInNotSupportedThenFirstPageShowsFinalTextOnButton() {
         configureDeviceDoesNotSupportDefaultBrowser()
-        val resourceId = testee.getContinueButtonTextResourceId(0, isFreshAppInstall = true)
+        configureShouldNotShowTrackerBlockerOptIn()
+        val isFreshAppInstall = true
+        testee.buildPageBlueprints(isFreshAppInstall)
+        val resourceId = testee.getContinueButtonTextResourceId(0, isFreshAppInstall = isFreshAppInstall)
         assertEquals(R.string.onboardingContinueFinalPage, resourceId)
     }
 
     @Test
     fun whenNotFreshInstallDefaultBrowserSupportedThenFirstPageShowsBackTextOnButton() {
         configureDeviceSupportsDefaultBrowser()
+        val isFreshAppInstall = false
+        testee.buildPageBlueprints(isFreshAppInstall)
         val resourceId = testee.getContinueButtonTextResourceId(0, isFreshAppInstall = false)
         assertEquals(R.string.onboardingBackButton, resourceId)
     }
@@ -65,6 +72,19 @@ class OnboardingPageManagerTest {
         configureDeviceDoesNotSupportDefaultBrowser()
         val resourceId = testee.getContinueButtonTextResourceId(0, isFreshAppInstall = false)
         assertEquals(R.string.onboardingBackButton, resourceId)
+    }
+
+    private fun configureShouldNotShowTrackerBlockerOptIn() {
+        whenever(variantManager.getVariant()).thenReturn(Variant("test", features = emptyList()))
+    }
+
+    private fun configureShouldShowTrackerBlockerOptIn() {
+        whenever(variantManager.getVariant()).thenReturn(
+            Variant(
+                "test",
+                features = listOf(VariantManager.VariantFeature.TrackerBlockingOnboardingOptIn)
+            )
+        )
     }
 
     private fun configureDeviceSupportsDefaultBrowser() {
