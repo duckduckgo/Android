@@ -19,10 +19,13 @@ package com.duckduckgo.app.onboarding.ui
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Rule
 import org.junit.Test
 
@@ -34,18 +37,21 @@ class OnboardingViewModelTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private var onboardingStore: OnboardingStore = mock()
+    private var privacySettingsStore: PrivacySettingsStore = mock()
 
     private val variantManager: VariantManager = mock()
     private val mockDefaultBrowserCapabilityDetector: DefaultBrowserDetector = mock()
+    private val pixelSender: Pixel = mock()
     private val mockPageLayout: OnboardingPageManager =
         OnboardingPageManagerWithTrackerBlocking(variantManager, OnboardingFragmentPageBuilder(), mockDefaultBrowserCapabilityDetector)
 
     private val testee: OnboardingViewModel by lazy {
-        OnboardingViewModel(onboardingStore, mockPageLayout)
+        OnboardingViewModel(onboardingStore, privacySettingsStore, mockPageLayout, variantManager, pixelSender)
     }
 
     @Test
     fun whenOnboardingDoneThenStoreNotifiedThatOnboardingShown() {
+        whenever(variantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
         verify(onboardingStore, never()).onboardingShown()
         testee.onOnboardingDone()
         verify(onboardingStore).onboardingShown()

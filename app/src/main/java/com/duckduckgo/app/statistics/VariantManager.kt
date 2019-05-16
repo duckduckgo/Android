@@ -53,7 +53,8 @@ interface VariantManager {
             Variant(key = "mk", weight = 0.0, features = listOf(NotificationPrivacyDay1)),
 
             // tracker blocker opt in variants
-            Variant(key = "to be decided - 1", weight = 1.0, features = listOf(TrackerBlockingOnboardingOptIn))
+            Variant(key = "mm", weight = 1.0, features = listOf(TrackerBlockingOnboardingOptIn)),
+            Variant(key = "mn", weight = 1.0, features = emptyList())
         )
     }
 

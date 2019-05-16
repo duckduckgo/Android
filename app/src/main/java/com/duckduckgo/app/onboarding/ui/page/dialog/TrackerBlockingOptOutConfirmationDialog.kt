@@ -17,16 +17,19 @@
 package com.duckduckgo.app.onboarding.ui.page.dialog
 
 import android.app.Dialog
+import android.content.DialogInterface
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.dialog.BackKeyListener
 
 
 class TrackerBlockingOptOutConfirmationDialog : DialogFragment() {
 
     interface OptOutConfirmationDialogListener {
         fun continueWithoutTrackerBlocking()
+        fun userCancelledOptOutConfirmationDialog()
     }
 
     var listener: OptOutConfirmationDialogListener? = null
@@ -39,8 +42,15 @@ class TrackerBlockingOptOutConfirmationDialog : DialogFragment() {
                 listener?.continueWithoutTrackerBlocking()
             }
             .setNegativeButton(R.string.onboardingGoBack) { _, _ ->
-                // do nothing
+                listener?.userCancelledOptOutConfirmationDialog()
             }
+            .setOnKeyListener(BackKeyListener {
+                listener?.userCancelledOptOutConfirmationDialog()
+            })
             .create()
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        listener?.userCancelledOptOutConfirmationDialog()
     }
 }

@@ -23,6 +23,8 @@ import androidx.lifecycle.ViewModelProviders
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.onboarding.ui.page.dialog.TrackerBlockingOptOutConfirmationDialog
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_onboarding_tracker_blocking_opt_in.*
 import javax.inject.Inject
@@ -37,6 +39,9 @@ class TrackerBlockerOptInPage : OnboardingPageFragment(), TrackerBlockingOptOutC
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
+
+    @Inject
+    lateinit var pixel: Pixel
 
     private val viewModel by bindViewModel<TrackerBlockingSelectionViewModel>()
 
@@ -59,15 +64,24 @@ class TrackerBlockerOptInPage : OnboardingPageFragment(), TrackerBlockingOptOutC
     private fun onTrackerBlockingEnabledPress() {
         viewModel.onTrackerBlockingEnabled()
         activityListener?.onUserEnabledTrackerBlocking()
+
+        pixel.fire(PixelName.ONBOARDING_TRACKER_BLOCKING_USER_OPTED_IN)
     }
 
     private fun onTrackerBlockingDisabledPress() {
         showTrackerBlockingDisabledConfirmation()
+        pixel.fire(PixelName.ONBOARDING_TRACKER_BLOCKING_USER_DECLINED)
+    }
+
+    override fun userCancelledOptOutConfirmationDialog() {
+        pixel.fire(PixelName.ONBOARDING_TRACKER_BLOCKING_OPT_OUT_DIALOG_CANCELLED)
     }
 
     override fun continueWithoutTrackerBlocking() {
         viewModel.onTrackerBlockingDisabled()
         activityListener?.onUserDisabledTrackerBlocking()
+
+        pixel.fire(PixelName.ONBOARDING_TRACKER_BLOCKING_OPT_OUT_DIALOG_CONTINUE_ANYWAY)
     }
 
     private fun showTrackerBlockingDisabledConfirmation() {

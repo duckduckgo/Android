@@ -73,7 +73,7 @@ import javax.inject.Inject
 class ViewModelFactory @Inject constructor(
     private val statisticsUpdater: StatisticsUpdater,
     private val statisticsStore: StatisticsDataStore,
-    private val onboaringStore: OnboardingStore,
+    private val onboardingStore: OnboardingStore,
     private val appInstallStore: AppInstallStore,
     private val queryUrlConverter: QueryUrlConverter,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
@@ -108,8 +108,8 @@ class ViewModelFactory @Inject constructor(
     override fun <T : ViewModel> create(modelClass: Class<T>) =
         with(modelClass) {
             when {
-                isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboaringStore)
-                isAssignableFrom(OnboardingViewModel::class.java) -> OnboardingViewModel(onboaringStore, onboardingPageManager)
+                isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboardingStore)
+                isAssignableFrom(OnboardingViewModel::class.java) -> onboardingViewModel()
                 isAssignableFrom(BrowserViewModel::class.java) -> browserViewModel()
                 isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
                 isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository, webViewSessionStorage)
@@ -132,6 +132,8 @@ class ViewModelFactory @Inject constructor(
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
         } as T
+
+    private fun onboardingViewModel() = OnboardingViewModel(onboardingStore, privacySettingsStore, onboardingPageManager, variantManager, pixel)
 
     private fun settingsViewModel(): SettingsViewModel {
         return SettingsViewModel(
