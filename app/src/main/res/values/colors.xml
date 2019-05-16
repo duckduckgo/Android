@@ -32,6 +32,7 @@
 
     <!-- Universal -->
     <color name="white">#ffffff</color>
+    <color name="whiteSemiTransparent">#d6ffffff</color>
     <color name="whiteTwo">#e4e4e4</color>
     <color name="whiteThree">#f5f5f5</color>
     <color name="whiteFour">#f1f1f1</color>
@@ -41,6 +42,7 @@
     <color name="almostBlack">#333333</color>
 
     <color name="charcoalGrey">#383838</color>
+    <color name="charcoalGreyTwoSemiTransparent">#d6333339</color>
     <color name="grayishBrown">#494949</color>
     <color name="greyishBrownTwo">#444444</color>
     <color name="midGray">#555</color>
@@ -48,7 +50,9 @@
     <color name="grayishTwo">#939393</color>
     <color name="grayishThree">#ddd</color>
     <color name="warmGray">#999999</color>
+    <color name="warGreyTwo">#888888</color>
     <color name="warmerGray">#777777</color>
+    <color name="silver">#c0c2c9</color>
     <color name="paleBrownishGray">#b0b0b0</color>
     <color name="brownishGray">#5c5c5c</color>
     <color name="brownishGrayTwo">#666666</color>
@@ -72,5 +76,6 @@
 
 
     <color name="translucentDark">#b000</color>
+    <color name="gunmetal">#494d56</color>
 
 </resources>
