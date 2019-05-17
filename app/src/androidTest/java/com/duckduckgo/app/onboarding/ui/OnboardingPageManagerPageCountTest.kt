@@ -80,7 +80,6 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
         }
     }
 
-
     private fun configureDeviceSupportsDefaultBrowser() {
         whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(true)
     }
