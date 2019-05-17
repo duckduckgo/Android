@@ -30,7 +30,7 @@
         android:layout_height="0dp"
         android:layout_marginBottom="10dp"
         android:fillViewport="true"
-        app:layout_constraintBottom_toTopOf="@id/continueButton"
+        app:layout_constraintBottom_toTopOf="@id/acceptTrackerBlocking"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -40,7 +40,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:background="#F00">
+            tools:background="#9BF">
 
             <TextView
                 android:id="@+id/title"
@@ -48,19 +48,20 @@
                 android:layout_margin="10dp"
                 android:paddingStart="6dp"
                 android:paddingEnd="6dp"
+                android:text="@string/unifiedOnboardingTitleFirstVisit"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_max="350dp"
-                tools:text="@string/unifiedOnboardingTitleFirstVisit" />
+                app:layout_constraintWidth_max="350dp" />
 
             <TextView
                 android:id="@+id/subtitle"
                 style="@style/OnboardingTextSubtitle"
                 android:layout_margin="10dp"
                 android:paddingStart="6dp"
+                android:visibility="gone"
                 android:paddingEnd="6dp"
-                android:text="@string/unifiedOnboardingSubtitle"
+                android:text="@string/trackerBlockingOptInSubtitle"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/title"
@@ -77,56 +78,45 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/subtitle"
                 app:layout_constraintWidth_max="350dp"
-                app:layout_constraintWidth_percent="0.8"
-                tools:background="#FF7">
+                app:layout_constraintWidth_percent="0.8">
 
                 <ImageView
-                    android:id="@+id/browsingProtectionIcon"
-                    style="@style/OnboardingListItemImage"
+                    android:id="@+id/blockTrackersIcon"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    app:layout_constraintWidth_max="160dp"
+                    app:layout_constraintDimensionRatio="1"
                     android:importantForAccessibility="no"
-                    android:src="@drawable/icon_block_trackers_alt"
-                    app:layout_constraintBottom_toBottomOf="@id/privateSearchGroup"
-                    app:layout_constraintHorizontal_chainStyle="packed"
+                    android:src="@drawable/icon_tracker_blocker_robot"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/privateSearchGroup" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                <include layout="@layout/content_onboarding_unified_browsing_protection" />
+                <TextView
+                    android:id="@+id/optInReasonTitle"
+                    style="@style/OnboardingListItemTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/onboardingTrackerOptInItemTitle"
+                    android:textAlignment="center"
+                    android:layout_marginTop="25dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/blockTrackersIcon" />
 
-                <ImageView
-                    android:id="@+id/privateSearchIcon"
-                    style="@style/OnboardingListItemImage"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/icon_search_privately"
-                    app:layout_constraintBottom_toBottomOf="@id/browsingProtectionGroup"
-                    app:layout_constraintEnd_toEndOf="@+id/browsingProtectionIcon"
-                    app:layout_constraintStart_toStartOf="@id/browsingProtectionIcon"
-                    app:layout_constraintTop_toTopOf="@id/browsingProtectionGroup" />
 
-                <include layout="@layout/content_onboarding_unified_private_search" />
+                <TextView
+                    android:id="@+id/optInReasonSubtitle"
+                    style="@style/OnboardingListItemSubtitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/onboardingTrackerOptInItemSubtitle"
+                    android:textAlignment="center"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/optInReasonTitle" />
 
-                <ImageView
-                    android:id="@+id/dataClearingIcon"
-                    style="@style/OnboardingListItemImage"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/icon_flame"
-                    app:layout_constraintBottom_toBottomOf="@id/dataClearingGroup"
-                    app:layout_constraintEnd_toEndOf="@+id/browsingProtectionIcon"
-                    app:layout_constraintStart_toStartOf="@id/browsingProtectionIcon"
-                    app:layout_constraintTop_toTopOf="@id/dataClearingGroup" />
-
-                <include layout="@layout/content_onboarding_unified_data_clearing" />
-
-                <ImageView
-                    android:id="@+id/customizationIcon"
-                    style="@style/OnboardingListItemImage"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/icon_customize"
-                    app:layout_constraintBottom_toBottomOf="@id/customizationGroup"
-                    app:layout_constraintEnd_toEndOf="@+id/browsingProtectionIcon"
-                    app:layout_constraintStart_toStartOf="@id/browsingProtectionIcon"
-                    app:layout_constraintTop_toTopOf="@id/customizationGroup" />
-
-                <include layout="@layout/content_onboarding_unified_customization" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -136,17 +126,25 @@
     </ScrollView>
 
     <Button
-        android:id="@+id/continueButton"
+        android:id="@+id/acceptTrackerBlocking"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/onboardingContinue"
+        android:text="@string/onboardingAcceptTrackerBlockingActivation"
         style="@style/OnboardingButtonPrimaryCta"
+        app:layout_constraintBottom_toTopOf="@+id/declineTrackerBlocking"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <Button
+        android:id="@+id/declineTrackerBlocking"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/OnboardingButtonSecondaryCta"
+        android:text="@string/onboardingDeclineTrackerBlockingActivation"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_min="48dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/scrollView"
-        />
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

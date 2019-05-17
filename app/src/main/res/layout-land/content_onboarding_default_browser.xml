@@ -35,13 +35,13 @@
         android:src="@drawable/set_as_default_browser_illustration"
         app:layout_constraintBottom_toTopOf="@id/continueButton"
         app:layout_constraintDimensionRatio="1"
-        app:layout_constraintEnd_toStartOf="@id/privateSearchTitle"
+        app:layout_constraintEnd_toStartOf="@id/browserProtectionTitle"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="@id/continueButton"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/privateSearchTitle"
+        android:id="@+id/browserProtectionTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -52,14 +52,14 @@
         android:textColor="@color/almostBlack"
         android:textSize="17sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/privateSearchSubtitle"
+        app:layout_constraintBottom_toTopOf="@id/browserProtectionSubtitle"
         app:layout_constraintEnd_toEndOf="@id/continueButton"
         app:layout_constraintStart_toEndOf="@id/defaultBrowserImage"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed" />
 
     <TextView
-        android:id="@+id/privateSearchSubtitle"
+        android:id="@+id/browserProtectionSubtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -70,9 +70,9 @@
         android:textSize="15sp"
         android:textStyle="normal"
         app:layout_constraintBottom_toTopOf="@id/continueButton"
-        app:layout_constraintEnd_toEndOf="@id/privateSearchTitle"
-        app:layout_constraintStart_toStartOf="@id/privateSearchTitle"
-        app:layout_constraintTop_toBottomOf="@id/privateSearchTitle"
+        app:layout_constraintEnd_toEndOf="@id/browserProtectionTitle"
+        app:layout_constraintStart_toStartOf="@id/browserProtectionTitle"
+        app:layout_constraintTop_toBottomOf="@id/browserProtectionTitle"
         app:layout_constraintWidth_max="500dp" />
 
     <Button

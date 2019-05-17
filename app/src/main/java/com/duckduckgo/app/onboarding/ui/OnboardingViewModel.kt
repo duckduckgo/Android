@@ -16,69 +16,47 @@
 
 package com.duckduckgo.app.onboarding.ui
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
+import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.pixels.Pixel
 
 class OnboardingViewModel(
     private val onboardingStore: OnboardingStore,
-    private val defaultWebBrowserCapability: DefaultBrowserDetector
+    private val privacySettingsStore: PrivacySettingsStore,
+    private val pageLayoutManager: OnboardingPageManager,
+    private val variantManager: VariantManager,
+    private val pixel: Pixel
 ) : ViewModel() {
 
-    fun pageCount(isFreshAppInstall: Boolean): Int {
-
-        // always show first welcome screen
-        var count = 1
-
-        if (shouldShowDefaultBrowserPage(isFreshAppInstall)) {
-            count++
-        }
-
-        return count
+    fun initializePages() {
+        pageLayoutManager.buildPageBlueprints()
     }
 
-    fun getItem(position: Int, isFreshAppInstall: Boolean): OnboardingPageFragment? {
-        val continueButtonTextResourceId = getContinueButtonTextResourceId(position, isFreshAppInstall)
-        return when (position) {
-            0 -> buildFragmentForFirstPage(isFreshAppInstall, continueButtonTextResourceId)
-            1 -> buildFragmentForSecondPage(isFreshAppInstall, continueButtonTextResourceId)
-            else -> null
-        }
+    fun pageCount(): Int {
+        return pageLayoutManager.pageCount()
+    }
+
+    fun getItem(position: Int): OnboardingPageFragment? {
+        return pageLayoutManager.buildPage(position)
     }
 
     fun onOnboardingDone() {
         onboardingStore.onboardingShown()
+        fireTrackerBlockingFinalStatePixel()
+
     }
 
-    private fun buildFragmentForFirstPage(isFreshAppInstall: Boolean, continueButtonTextResourceId: Int): OnboardingPageFragment.UnifiedWelcomePage {
-        val titleTextResourceId =
-            if (isFreshAppInstall) R.string.unifiedOnboardingTitleFirstVisit else R.string.unifiedOnboardingTitleSubsequentVisits
-        return OnboardingPageFragment.UnifiedWelcomePage.instance(continueButtonTextResourceId, titleTextResourceId)
-    }
-
-    private fun buildFragmentForSecondPage(isFreshAppInstall: Boolean, continueButtonTextResourceId: Int): OnboardingPageFragment? {
-        return if (shouldShowDefaultBrowserPage(isFreshAppInstall)) {
-            OnboardingPageFragment.DefaultBrowserPage.instance(continueButtonTextResourceId)
-        } else null
-    }
-
-    @StringRes
-    fun getContinueButtonTextResourceId(position: Int, isFreshAppInstall: Boolean): Int {
-        if (!isFreshAppInstall) {
-            return R.string.onboardingBackButton
+    private fun fireTrackerBlockingFinalStatePixel() {
+        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.TrackerBlockingOnboardingOptIn)) {
+            val pixelName = if (privacySettingsStore.privacyOn) {
+                Pixel.PixelName.ONBOARDING_TRACKER_BLOCKING_FINAL_ONBOARDING_STATE_ENABLED
+            } else {
+                Pixel.PixelName.ONBOARDING_TRACKER_BLOCKING_FINAL_ONBOARDING_STATE_DISABLED
+            }
+            pixel.fire(pixelName)
         }
-        return if (isFinalPage(position, isFreshAppInstall)) {
-            R.string.onboardingContinueFinalPage
-        } else {
-            R.string.onboardingContinue
-        }
-    }
-
-    private fun isFinalPage(position: Int, isFreshAppInstall: Boolean) = position == pageCount(isFreshAppInstall) - 1
-
-    private fun shouldShowDefaultBrowserPage(isFreshAppInstall: Boolean): Boolean {
-        return isFreshAppInstall && defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration()
     }
 }
