@@ -17,7 +17,6 @@
   -->
 
 <resources>
-    <dimen name="onboardingButtonTextSize">18sp</dimen>
     <dimen name="onboardingSubtitleTextSize">20sp</dimen>
 
     <dimen name="modalCardTitleTextSize">30sp</dimen>

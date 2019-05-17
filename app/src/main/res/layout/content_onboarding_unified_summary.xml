@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2019 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/longDescriptionContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:tag="onboardingProtect"
+    tools:background="@color/white"
+    tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="10dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@id/continueButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:background="#567">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:background="#F00">
+
+            <TextView
+                android:id="@+id/title"
+                style="@style/OnboardingTextTitle"
+                android:layout_margin="10dp"
+                android:text="@string/unifiedOnboardingTitleFirstVisit"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_max="280dp" />
+
+            <TextView
+                android:id="@+id/subtitle"
+                style="@style/OnboardingTextSubtitle"
+                android:layout_margin="10dp"
+                android:text="@string/unifiedOnboardingSubtitleTrackerBlockingEnabled"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/title"
+                app:layout_constraintWidth_max="280dp" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/contentContainer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/subtitle"
+                app:layout_constraintWidth_max="350dp"
+                app:layout_constraintWidth_percent="0.8"
+                tools:background="#FF7">
+
+                <ImageView
+                    android:id="@+id/browsingProtectionIcon"
+                    style="@style/OnboardingListItemImage"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/icon_tracker_blocking_enabled"
+                    app:layout_constraintBottom_toBottomOf="@id/browserProtectionGroup"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/browserProtectionGroup" />
+
+                <include layout="@layout/content_onboarding_unified_browsing_protection" />
+
+                <ImageView
+                    android:id="@+id/privateSearchIcon"
+                    style="@style/OnboardingListItemImage"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/icon_search_privately"
+                    app:layout_constraintBottom_toBottomOf="@id/privateSearchGroup"
+                    app:layout_constraintEnd_toEndOf="@+id/browsingProtectionIcon"
+                    app:layout_constraintStart_toStartOf="@id/browsingProtectionIcon"
+                    app:layout_constraintTop_toTopOf="@id/privateSearchGroup" />
+
+                <include layout="@layout/content_onboarding_unified_private_search" />
+
+                <ImageView
+                    android:id="@+id/dataClearingIcon"
+                    style="@style/OnboardingListItemImage"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/icon_flame"
+                    app:layout_constraintBottom_toBottomOf="@id/dataClearingGroup"
+                    app:layout_constraintEnd_toEndOf="@+id/browsingProtectionIcon"
+                    app:layout_constraintStart_toStartOf="@id/browsingProtectionIcon"
+                    app:layout_constraintTop_toTopOf="@id/dataClearingGroup" />
+
+                <include layout="@layout/content_onboarding_unified_data_clearing" />
+
+                <ImageView
+                    android:id="@+id/customizationIcon"
+                    style="@style/OnboardingListItemImage"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/icon_customize"
+                    app:layout_constraintBottom_toBottomOf="@id/customizationGroup"
+                    app:layout_constraintEnd_toEndOf="@+id/browsingProtectionIcon"
+                    app:layout_constraintStart_toStartOf="@id/browsingProtectionIcon"
+                    app:layout_constraintTop_toTopOf="@id/customizationGroup" />
+
+                <include layout="@layout/content_onboarding_unified_customization" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+    <Button
+        android:id="@+id/continueButton"
+        style="@style/OnboardingButtonPrimaryCta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/onboardingContinue"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_min="48dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scrollView" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

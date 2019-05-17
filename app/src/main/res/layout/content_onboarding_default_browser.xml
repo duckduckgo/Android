@@ -33,7 +33,7 @@
         android:layout_marginBottom="42dp"
         android:importantForAccessibility="no"
         android:src="@drawable/set_as_default_browser_illustration"
-        app:layout_constraintBottom_toTopOf="@id/privateSearchTitle"
+        app:layout_constraintBottom_toTopOf="@id/browserProtectionTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -42,7 +42,7 @@
         app:layout_constraintWidth_max="300dp" />
 
     <TextView
-        android:id="@+id/privateSearchTitle"
+        android:id="@+id/browserProtectionTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -53,12 +53,12 @@
         android:textColor="@color/almostBlack"
         android:textSize="17sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/privateSearchSubtitle"
+        app:layout_constraintBottom_toTopOf="@id/browserProtectionSubtitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/privateSearchSubtitle"
+        android:id="@+id/browserProtectionSubtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
@@ -69,27 +69,26 @@
         android:textSize="15sp"
         android:textStyle="normal"
         app:layout_constraintBottom_toTopOf="@id/continueButton"
-        app:layout_constraintEnd_toEndOf="@id/privateSearchTitle"
-        app:layout_constraintStart_toStartOf="@id/privateSearchTitle"
+        app:layout_constraintEnd_toEndOf="@id/browserProtectionTitle"
+        app:layout_constraintStart_toStartOf="@id/browserProtectionTitle"
         app:layout_constraintWidth_max="500dp"
         app:layout_constraintWidth_percent="0.8" />
 
     <Button
         android:id="@+id/continueButton"
+        style="@style/OnboardingButtonPrimaryCta"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/onboardingContinue"
-        style="@style/OnboardingButtonPrimaryCta"
         app:layout_constraintBottom_toTopOf="@+id/launchSettingsButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-
     <Button
         android:id="@+id/launchSettingsButton"
+        style="@style/OnboardingButtonSecondaryCta"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        style="@style/OnboardingButtonSecondaryCta"
         android:text="@string/onboardingDefaultBrowserGoToSettingsAction"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

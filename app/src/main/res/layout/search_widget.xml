@@ -14,27 +14,48 @@
   ~ limitations under the License.
   -->
 
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
     android:id="@+id/widgetContainer"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_width="match_parent"
+    android:layout_height="44dp"
+    android:layout_gravity="center"
+    android:layout_margin="5dp"
+    android:elevation="2dp"
+    android:background="@drawable/search_widget_background"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:src="@drawable/logo_mini" />
 
     <TextView
         android:id="@+id/searchInputBox"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_centerInParent="true"
-        android:layout_marginStart="2dp"
-        android:layout_marginEnd="2dp"
-        android:background="@drawable/search_widget_background"
-        android:backgroundTint="@color/almostBlackDark"
-        android:drawableEnd="@drawable/logo_mini"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@+id/search"
+        android:layout_toEndOf="@+id/logo"
         android:fontFamily="sans-serif-medium"
-        android:gravity="center_vertical"
-        android:paddingStart="24dp"
-        android:paddingEnd="16dp"
         android:text="@string/searchWidgetTextHint"
-        android:textColor="@color/whiteTwo"
-        android:textSize="15sp" />
+        android:textColor="@color/silver"
+        android:textSize="14sp" />
+
+    <ImageView
+        android:id="@+id/search"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:src="@drawable/ic_widget_loupe_silver_24dp" />
 
 </RelativeLayout>

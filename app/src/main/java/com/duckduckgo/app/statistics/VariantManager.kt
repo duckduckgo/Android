@@ -29,6 +29,8 @@ interface VariantManager {
         object NotificationPrivacyDay1 : VariantFeature()
         object NotificationClearDataDay1 : VariantFeature()
         object NotificationSuppressClearDataDay3 : VariantFeature()
+
+        object TrackerBlockingOnboardingOptIn : VariantFeature()
     }
 
     companion object {
@@ -38,19 +40,21 @@ interface VariantManager {
 
         val ACTIVE_VARIANTS = listOf(
 
-            // Shared control. You can use this as your control unless you are experimenting on
-            // a subgroup e.g a device API or specific language
-            Variant(key = "sc", weight = 1.0, features = emptyList()),
+            // SERP variants. "sc" may be used as a shared control in the future if we can filter by app version
+            // Currently set to 0.0 to free up allocations for new projects
+            Variant(key = "sc", weight = 0.0, features = emptyList()),
+            Variant(key = "se", weight = 0.0, features = emptyList()),
 
-            // Notification Content
-            Variant(key = "me", weight = 1.0, features = listOf(NotificationPrivacyDay1, NotificationSuppressClearDataDay3)),
-            Variant(key = "mi", weight = 1.0, features = listOf(NotificationClearDataDay1, NotificationSuppressClearDataDay3)),
+            // Notification variants
+            // Currently set to 0.0 to free up allocations for new projects
+            Variant(key = "me", weight = 0.0, features = listOf(NotificationPrivacyDay1, NotificationSuppressClearDataDay3)),
+            Variant(key = "mi", weight = 0.0, features = listOf(NotificationClearDataDay1, NotificationSuppressClearDataDay3)),
+            Variant(key = "mf", weight = 0.0, features = listOf(NotificationSuppressClearDataDay3)),
+            Variant(key = "mk", weight = 0.0, features = listOf(NotificationPrivacyDay1)),
 
-            // Notification None
-            Variant(key = "mf", weight = 1.0, features = listOf(NotificationSuppressClearDataDay3)),
-
-            // Notification Add New
-            Variant(key = "mk", weight = 1.0, features = listOf(NotificationPrivacyDay1))
+            // tracker blocker opt in variants
+            Variant(key = "mm", weight = 1.0, features = emptyList()),
+            Variant(key = "mn", weight = 1.0, features = listOf(TrackerBlockingOnboardingOptIn))
         )
     }
 
@@ -98,6 +102,10 @@ class ExperimentationVariantManager(
     }
 
     private fun generateVariant(activeVariants: List<Variant>): Variant {
+        val weightSum = activeVariants.sumByDouble { it.weight }
+        if (weightSum == 0.0) {
+            return DEFAULT_VARIANT
+        }
         val randomizedIndex = indexRandomizer.random(activeVariants)
         return activeVariants[randomizedIndex]
     }

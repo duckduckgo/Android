@@ -20,25 +20,25 @@
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/browsingProtectionGroup"
+        android:id="@+id/privateSearchGroup"
         style="@style/OnboardingListItem"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="@id/privateSearchGroup"
-        app:layout_constraintStart_toStartOf="@id/privateSearchGroup"
-        app:layout_constraintTop_toBottomOf="@id/privateSearchGroup"
+        app:layout_constraintEnd_toEndOf="@id/browserProtectionGroup"
+        app:layout_constraintStart_toStartOf="@id/browserProtectionGroup"
+        app:layout_constraintTop_toBottomOf="@id/browserProtectionGroup"
         tools:background="#4F0">
 
         <TextView
             android:id="@+id/browsingProtectionTitle"
-            android:text="@string/unifiedOnboardingBrowsingProtectionTitle"
+            android:text="@string/unifiedOnboardingPrivateSearchTitle"
             style="@style/OnboardingListItemTitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/browsingProtectionSubtitle"
-            android:text="@string/unifiedOnboardingBrowsingProtectionSubtitle"
+            android:text="@string/unifiedOnboardingPrivateSearchSubtitle"
             style="@style/OnboardingListItemSubtitle"
             app:layout_constraintStart_toStartOf="@+id/browsingProtectionTitle"
             app:layout_constraintTop_toBottomOf="@id/browsingProtectionTitle" />

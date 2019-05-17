@@ -17,9 +17,7 @@
 package com.duckduckgo.app.browser.rating.ui
 
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
-import android.view.KeyEvent
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -53,21 +51,4 @@ abstract class EnjoymentDialog : DialogFragment() {
     companion object {
         const val PROMPT_COUNT_BUNDLE_KEY = "PROMPT_COUNT"
     }
-
-    inner class BackKeyListener(private val onBackPressed: () -> Unit) : DialogInterface.OnKeyListener {
-
-        override fun onKey(dialog: DialogInterface?, keyCode: Int, event: KeyEvent?): Boolean {
-            if (isBackKey(keyCode, event)) {
-                onBackPressed.invoke()
-                dialog?.dismiss()
-                return true
-            }
-            return false
-        }
-
-        private fun isBackKey(keyCode: Int, event: KeyEvent?): Boolean {
-            return (keyCode == KeyEvent.KEYCODE_BACK && event?.action == KeyEvent.ACTION_UP)
-        }
-    }
-
 }

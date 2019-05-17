@@ -24,25 +24,26 @@
     <TextView
         android:id="@+id/settingsOtherTitle"
         style="@style/SettingsSectionTitle"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:text="@string/settingsHeadingOther" />
 
     <TextView
         android:id="@+id/about"
         style="@style/SettingsItemClickable"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:text="@string/settingsAboutDuckduckgo"
         app:layout_constraintTop_toBottomOf="@id/settingsOtherTitle" />
-
-    <TextView
-        android:id="@+id/onboarding"
-        style="@style/SettingsItemClickable"
-        android:text="@string/settingsOnboarding"
-        app:layout_constraintTop_toBottomOf="@id/about" />
 
     <TextView
         android:id="@+id/provideFeedback"
         style="@style/SettingsItemClickable"
         android:text="@string/leaveFeedback"
-        app:layout_constraintTop_toBottomOf="@id/onboarding" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/about" />
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
         android:id="@+id/version"
