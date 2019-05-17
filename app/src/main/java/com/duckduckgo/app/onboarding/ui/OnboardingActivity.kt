@@ -35,7 +35,7 @@ class OnboardingActivity : DuckDuckGoActivity(), TrackerBlockerOptInPage.Tracker
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_onboarding)
-        configurePager(intent.getBooleanExtra(IS_FRESH_INSTALL_EXTRA, true))
+        configurePager()
     }
 
     fun onContinueClicked() {
@@ -49,8 +49,8 @@ class OnboardingActivity : DuckDuckGoActivity(), TrackerBlockerOptInPage.Tracker
         }
     }
 
-    private fun configurePager(isFreshAppInstall: Boolean) {
-        viewModel.initializePages(isFreshAppInstall)
+    private fun configurePager() {
+        viewModel.initializePages()
 
         viewPageAdapter = PagerAdapter(supportFragmentManager, viewModel)
         viewPager.offscreenPageLimit = 1
@@ -79,12 +79,8 @@ class OnboardingActivity : DuckDuckGoActivity(), TrackerBlockerOptInPage.Tracker
 
     companion object {
 
-        private const val IS_FRESH_INSTALL_EXTRA = "IS_FRESH_INSTALL_EXTRA"
-
-        fun intent(context: Context, isFreshAppInstall: Boolean): Intent {
-            val intent = Intent(context, OnboardingActivity::class.java)
-            intent.putExtra(IS_FRESH_INSTALL_EXTRA, isFreshAppInstall)
-            return intent
+        fun intent(context: Context): Intent {
+            return Intent(context, OnboardingActivity::class.java)
         }
     }
 }

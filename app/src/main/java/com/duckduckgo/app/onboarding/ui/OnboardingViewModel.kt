@@ -31,8 +31,8 @@ class OnboardingViewModel(
     private val pixel: Pixel
 ) : ViewModel() {
 
-    fun initializePages(isFreshAppInstall: Boolean) {
-        pageLayoutManager.buildPageBlueprints(isFreshAppInstall)
+    fun initializePages() {
+        pageLayoutManager.buildPageBlueprints()
     }
 
     fun pageCount(): Int {

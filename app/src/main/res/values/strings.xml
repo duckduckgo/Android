@@ -10,17 +10,16 @@
     <string name="onboardingContinue">Continue</string>
     <string name="onboardingGoBack">Go back</string>
     <string name="onboardingContinueFinalPage">Start Browsing</string>
-    <string name="onboardingBackButton">Back</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Welcome to\nDuckDuckGo!</string>
-    <string name="unifiedOnboardingTitleSubsequentVisits">DuckDuckGo Privacy Browser</string>
-    <string name="unifiedOnboardingSubtitle">Stay private as you search and browse the web.</string>
+    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Stay private as you search and browse the web.</string>
+    <string name="unifiedOnboardingSubtitleTrackerBlockingDisabled">For full browsing protection, go back to activate tracker blocking.</string>
     <string name="unifiedOnboardingPrivateSearchTitle">Private Search</string>
     <string name="unifiedOnboardingPrivateSearchSubtitle">With DuckDuckGo, your searches are always private.</string>
     <string name="unifiedOnboardingBrowsingProtectionTitle">Browsing Protection</string>
-    <string name="unifiedOnboardingBrowsingProtectionEnabledSubtitle">Block trackers and browse securely by default.</string>
-    <string name="unifiedOnboardingBrowsingProtectionDisabledSubtitle">You haven\'t activated tracker blocking yet.</string>
+    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Block trackers and browse securely by default.</string>
+    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingDisabled">Without tracker blocking you don\'t have full browsing protection.</string>
     <string name="unifiedOnboardingDataClearingTitle">Data Clearing</string>
     <string name="unifiedOnboardingDataClearingSubtitle">Erase your browsing data with the tap of a button.</string>
     <string name="unifiedOnboardingCustomizationTitle">Customization</string>
@@ -28,14 +27,12 @@
 
     <!-- Tracker Block Opt-in -->
     <string name="trackerBlockingOptInSubtitle">First, let\'s talk about trackers</string>
-    <string name="onboardingTrackerOptInItemTitle">We Can Block Trackers</string>
-    <string name="onboardingTrackerOptInItemSubtitle">Do you want to activate tracker blocking to keep third party advertisers from tracking you while you browse?</string>
+    <string name="onboardingTrackerOptInItemTitle">Activate tracker blocking to get started.</string>
+    <string name="onboardingTrackerOptInItemSubtitle">Activate tracker blocking now and DuckDuckGo Privacy Browser will stop advertisers from tracking you while you browse.</string>
     <string name="onboardingAcceptTrackerBlockingActivation">Activate tracker blocking</string>
     <string name="onboardingDeclineTrackerBlockingActivation">Nah, let them track me</string>
-    <string name="onboardingOptedInConfirmationTitle">Tracker blocking is now activated!</string>
-    <string name="onboardingOptedInConfirmationSubtitle">Third party trackers will now be blocked by default while you browse</string>
     <string name="onboardingOptedOutConfirmationTitle">Continue without tracker blocking?</string>
-    <string name="onboardingOptedOutConfirmationSubtitle">Without tracker blocking activated, we won\'t be able to protect you from third party advertising trackers.\n\nAre you sure you want to continue?</string>
+    <string name="onboardingOptedOutConfirmationSubtitle">Without tracker blocking activated, you won\'t be protected from third-party trackers while you browse.\n\nAre you sure you want to continue?</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Can\'t launch default app settings screen</string>
@@ -166,7 +163,6 @@
     <string name="settingsHeadingOther">Other</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
     <string name="settingsLightTheme">Light Theme</string>
-    <string name="settingsOnboarding">Privacy Features</string>
     <string name="settingsAboutDuckduckgo">About DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Leave Feedback</string>

@@ -29,10 +29,10 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.TrackerBlockingOnboardingOptIn
 
 interface OnboardingPageManager {
-    fun pageCount() : Int
-    fun buildPageBlueprints(isFreshAppInstall: Boolean)
+    fun pageCount(): Int
+    fun buildPageBlueprints()
     fun buildPage(position: Int): OnboardingPageFragment?
-    fun getContinueButtonTextResourceId(position: Int, isFreshAppInstall: Boolean): Int
+    fun getContinueButtonTextResourceId(position: Int): Int
 }
 
 class OnboardingPageManagerWithTrackerBlocking(
@@ -42,29 +42,26 @@ class OnboardingPageManagerWithTrackerBlocking(
 ) : OnboardingPageManager {
 
     private val pages = mutableListOf<OnboardingPageBlueprint>()
-    private var isFreshAppInstall = false
 
     override fun pageCount() = pages.size
 
-    override fun buildPageBlueprints(isFreshAppInstall: Boolean) {
+    override fun buildPageBlueprints() {
         pages.clear()
 
-        this.isFreshAppInstall = isFreshAppInstall
-
-        if (shouldShowTrackerBlockingOptIn(isFreshAppInstall)) {
+        if (shouldShowTrackerBlockingOptIn()) {
             pages.add(TrackerBlockingOptInBlueprint())
         }
 
         if (shouldShowSummaryPage()) {
-            pages.add(SummaryPageBlueprint(isFreshAppInstall))
+            pages.add(SummaryPageBlueprint())
         }
 
-        if (shouldShowDefaultBrowserPage(isFreshAppInstall)) {
+        if (shouldShowDefaultBrowserPage()) {
             pages.add((DefaultBrowserBlueprint()))
         }
 
         pages.forEachIndexed { index, pageBlueprint ->
-            pageBlueprint.continueButtonTextResourceId = getContinueButtonTextResourceId(index, isFreshAppInstall)
+            pageBlueprint.continueButtonTextResourceId = getContinueButtonTextResourceId(index)
         }
     }
 
@@ -78,10 +75,7 @@ class OnboardingPageManagerWithTrackerBlocking(
     }
 
     @StringRes
-    override fun getContinueButtonTextResourceId(position: Int, isFreshAppInstall: Boolean): Int {
-        if (!isFreshAppInstall) {
-            return R.string.onboardingBackButton
-        }
+    override fun getContinueButtonTextResourceId(position: Int): Int {
         return if (isFinalPage(position)) {
             R.string.onboardingContinueFinalPage
         } else {
@@ -94,12 +88,12 @@ class OnboardingPageManagerWithTrackerBlocking(
         return true
     }
 
-    private fun shouldShowDefaultBrowserPage(isFreshAppInstall: Boolean): Boolean {
-        return isFreshAppInstall && defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration()
+    private fun shouldShowDefaultBrowserPage(): Boolean {
+        return defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration()
     }
 
-    private fun shouldShowTrackerBlockingOptIn(isFreshAppInstall: Boolean): Boolean {
-        return isFreshAppInstall && variantManager.getVariant().hasFeature(TrackerBlockingOnboardingOptIn)
+    private fun shouldShowTrackerBlockingOptIn(): Boolean {
+        return variantManager.getVariant().hasFeature(TrackerBlockingOnboardingOptIn)
     }
 
     private fun isFinalPage(position: Int) = position == pageCount() - 1
@@ -109,9 +103,7 @@ class OnboardingPageManagerWithTrackerBlocking(
     }
 
     private fun buildSummaryPage(blueprint: SummaryPageBlueprint): UnifiedSummaryPage {
-        val titleTextResourceId =
-            if (blueprint.isFreshAppInstall) R.string.unifiedOnboardingTitleFirstVisit else R.string.unifiedOnboardingTitleSubsequentVisits
-        return onboardingPageBuilder.buildSummaryPage(blueprint.continueButtonTextResourceId, titleTextResourceId)
+        return onboardingPageBuilder.buildSummaryPage(blueprint.continueButtonTextResourceId)
     }
 
     private fun buildDefaultBrowserPage(blueprint: DefaultBrowserBlueprint): DefaultBrowserPage {

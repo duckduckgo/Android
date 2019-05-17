@@ -254,12 +254,6 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-
-    <style name="OnboardingTextSubtitle.Subtitle2">
-        <item name="android:paddingTop">16dp</item>
-        <item name="android:lineSpacingExtra">6sp</item>
-    </style>
-
     <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="buttonBarNegativeButtonStyle">@style/AlertDialogButtonStyle</item>
         <item name="buttonBarPositiveButtonStyle">@style/AlertDialogButtonStyle</item>

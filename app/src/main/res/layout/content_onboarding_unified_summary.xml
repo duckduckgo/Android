@@ -46,25 +46,21 @@
                 android:id="@+id/title"
                 style="@style/OnboardingTextTitle"
                 android:layout_margin="10dp"
-                android:paddingStart="6dp"
-                android:paddingEnd="6dp"
+                android:text="@string/unifiedOnboardingTitleFirstVisit"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_max="350dp"
-                tools:text="@string/unifiedOnboardingTitleFirstVisit" />
+                app:layout_constraintWidth_max="280dp" />
 
             <TextView
                 android:id="@+id/subtitle"
                 style="@style/OnboardingTextSubtitle"
                 android:layout_margin="10dp"
-                android:paddingStart="6dp"
-                android:paddingEnd="6dp"
-                android:text="@string/unifiedOnboardingSubtitle"
+                android:text="@string/unifiedOnboardingSubtitleTrackerBlockingEnabled"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/title"
-                app:layout_constraintWidth_max="250dp" />
+                app:layout_constraintWidth_max="280dp" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/contentContainer"
@@ -137,16 +133,15 @@
 
     <Button
         android:id="@+id/continueButton"
+        style="@style/OnboardingButtonPrimaryCta"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/onboardingContinue"
-        style="@style/OnboardingButtonPrimaryCta"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_min="48dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/scrollView"
-        />
+        app:layout_constraintTop_toBottomOf="@id/scrollView" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -52,7 +52,7 @@ class LaunchActivity : DuckDuckGoActivity() {
     }
 
     private fun showOnboarding() {
-        startActivity(OnboardingActivity.intent(this, isFreshAppInstall = true))
+        startActivity(OnboardingActivity.intent(this))
         finish()
     }
 

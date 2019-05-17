@@ -25,7 +25,7 @@ import com.duckduckgo.app.onboarding.ui.page.UnifiedSummaryPage
 
 interface OnboardingPageBuilder {
     fun buildTrackerBlockingOptInPage(): TrackerBlockerOptInPage
-    fun buildSummaryPage(@StringRes continueButtonTextResourceId: Int?, @StringRes titleResourceId: Int): UnifiedSummaryPage
+    fun buildSummaryPage(@StringRes continueButtonTextResourceId: Int?): UnifiedSummaryPage
     fun buildDefaultBrowserPage(@StringRes continueButtonTextResourceId: Int?): DefaultBrowserPage
 
     sealed class OnboardingPageBlueprint(@StringRes open var continueButtonTextResourceId: Int) {
@@ -33,7 +33,7 @@ interface OnboardingPageBuilder {
         data class TrackerBlockingOptInBlueprint(override var continueButtonTextResourceId: Int = 0) :
             OnboardingPageBlueprint(continueButtonTextResourceId)
 
-        data class SummaryPageBlueprint(val isFreshAppInstall: Boolean, override var continueButtonTextResourceId: Int = 0) :
+        data class SummaryPageBlueprint(override var continueButtonTextResourceId: Int = 0) :
             OnboardingPageBlueprint(continueButtonTextResourceId)
 
         data class DefaultBrowserBlueprint(override var continueButtonTextResourceId: Int = 0) :
@@ -47,13 +47,12 @@ class OnboardingFragmentPageBuilder : OnboardingPageBuilder {
         return TrackerBlockerOptInPage()
     }
 
-    override fun buildSummaryPage(@StringRes continueButtonTextResourceId: Int?, @StringRes titleResourceId: Int): UnifiedSummaryPage {
+    override fun buildSummaryPage(@StringRes continueButtonTextResourceId: Int?): UnifiedSummaryPage {
         val bundle = Bundle()
 
         if (continueButtonTextResourceId != null) {
             bundle.putInt(OnboardingPageFragment.CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA, continueButtonTextResourceId)
         }
-        bundle.putInt(OnboardingPageFragment.TITLE_TEXT_RESOURCE_ID_EXTRA, titleResourceId)
 
         val fragment = UnifiedSummaryPage()
         fragment.arguments = bundle

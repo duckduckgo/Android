@@ -49,6 +49,5 @@ abstract class OnboardingPageFragment : Fragment() {
 
     companion object {
         const val CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA = "CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA"
-        const val TITLE_TEXT_RESOURCE_ID_EXTRA = "TITLE_TEXT_RESOURCE_ID_EXTRA"
     }
 }

@@ -46,7 +46,7 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
         configureDefaultBrowserPageConfig()
         configureTrackerBlockerOptInPageConfig()
 
-        testee.buildPageBlueprints(testCase.freshInstall)
+        testee.buildPageBlueprints()
         assertEquals(testCase.expectedPageCount, testee.pageCount())
     }
 
@@ -72,15 +72,10 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
         @Parameterized.Parameters(name = "Test case: {index} - {0}")
         fun testData(): Array<TestCase> {
             return arrayOf(
-                TestCase(false, false, false, 1),
-                TestCase(false, false, true, 1),
-                TestCase(false, true, false, 1),
-                TestCase(false, true, true, 1),
-
-                TestCase(true, false, false, 1),
-                TestCase(true, false, true, 2),
-                TestCase(true, true, false, 2),
-                TestCase(true, true, true, 3)
+                TestCase(false, false, 1),
+                TestCase(false, true, 2),
+                TestCase(true, false, 2),
+                TestCase(true, true, 3)
             )
         }
     }
@@ -102,5 +97,5 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
         whenever(variantManager.getVariant()).thenReturn(Variant("test", features = emptyList()))
     }
 
-    data class TestCase(val freshInstall: Boolean, val trackerBlockerOptInPage: Boolean, val defaultBrowserPage: Boolean, val expectedPageCount: Int)
+    data class TestCase(val trackerBlockerOptInPage: Boolean, val defaultBrowserPage: Boolean, val expectedPageCount: Int)
 }

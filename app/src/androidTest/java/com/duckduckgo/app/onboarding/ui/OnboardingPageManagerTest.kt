@@ -42,36 +42,18 @@ class OnboardingPageManagerTest {
     fun whenDefaultBrowserSupportedAndTrackerBlockingOptInSupportedThenFirstPageShowsContinueTextOnButton() {
         configureDeviceSupportsDefaultBrowser()
         configureShouldShowTrackerBlockerOptIn()
-        val isFreshInstall = true
-        testee.buildPageBlueprints(isFreshAppInstall = isFreshInstall)
-        val resourceId = testee.getContinueButtonTextResourceId(0, isFreshAppInstall = isFreshInstall)
+        testee.buildPageBlueprints()
+        val resourceId = testee.getContinueButtonTextResourceId(0)
         assertEquals(R.string.onboardingContinue, resourceId)
     }
 
     @Test
-    fun whenFreshInstallDefaultBrowserNotSupportedAndTrackerBlockingOptInNotSupportedThenFirstPageShowsFinalTextOnButton() {
+    fun whenDefaultBrowserNotSupportedAndTrackerBlockingOptInNotSupportedThenFirstPageShowsFinalTextOnButton() {
         configureDeviceDoesNotSupportDefaultBrowser()
         configureShouldNotShowTrackerBlockerOptIn()
-        val isFreshAppInstall = true
-        testee.buildPageBlueprints(isFreshAppInstall)
-        val resourceId = testee.getContinueButtonTextResourceId(0, isFreshAppInstall = isFreshAppInstall)
+        testee.buildPageBlueprints()
+        val resourceId = testee.getContinueButtonTextResourceId(0)
         assertEquals(R.string.onboardingContinueFinalPage, resourceId)
-    }
-
-    @Test
-    fun whenNotFreshInstallDefaultBrowserSupportedThenFirstPageShowsBackTextOnButton() {
-        configureDeviceSupportsDefaultBrowser()
-        val isFreshAppInstall = false
-        testee.buildPageBlueprints(isFreshAppInstall)
-        val resourceId = testee.getContinueButtonTextResourceId(0, isFreshAppInstall = false)
-        assertEquals(R.string.onboardingBackButton, resourceId)
-    }
-
-    @Test
-    fun whenNotFreshInstallDefaultBrowserNotSupportedThenFirstPageShowsBackTextOnButton() {
-        configureDeviceDoesNotSupportDefaultBrowser()
-        val resourceId = testee.getContinueButtonTextResourceId(0, isFreshAppInstall = false)
-        assertEquals(R.string.onboardingBackButton, resourceId)
     }
 
     private fun configureShouldNotShowTrackerBlockerOptIn() {

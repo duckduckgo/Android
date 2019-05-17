@@ -43,9 +43,6 @@ class UnifiedSummaryPage : OnboardingPageFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        val titleText = extractTitleText()
-        title.setText(titleText)
-
         extractContinueButtonTextResourceId()?.let { continueButton.setText(it) }
         continueButton.setOnClickListener { onContinuePressed() }
 
@@ -59,12 +56,6 @@ class UnifiedSummaryPage : OnboardingPageFragment() {
         }
     }
 
-    @StringRes
-    private fun extractTitleText(): Int {
-        return arguments?.getInt(TITLE_TEXT_RESOURCE_ID_EXTRA, R.string.unifiedOnboardingTitleFirstVisit)
-            ?: R.string.unifiedOnboardingTitleFirstVisit
-    }
-
     /**
      * Updates the UI elements to reflect whether tracker protection is currently on or off
      *
@@ -74,14 +65,35 @@ class UnifiedSummaryPage : OnboardingPageFragment() {
         if (view == null) return
 
         val resources = if (privacySettingsStore.privacyOn) {
-            TrackerBlockingUiResources(R.drawable.icon_tracker_blocking_enabled, R.string.unifiedOnboardingBrowsingProtectionEnabledSubtitle)
+            uiResourcesTrackerBlockingEnabled()
         } else {
-            TrackerBlockingUiResources(R.drawable.icon_tracker_blocking_disabled, R.string.unifiedOnboardingBrowsingProtectionDisabledSubtitle)
+            uiResourcesTrackerBlockingDisabled()
         }
 
-        browsingProtectionIcon.setImageResource(resources.icon)
+        browsingProtectionIcon.setImageResource(resources.browsingProtectionIcon)
         browserProtectionSubtitle.setText(resources.browserProtectionSubtitle)
+        subtitle.setText(resources.pageSubtitle)
     }
 
-    data class TrackerBlockingUiResources(@DrawableRes val icon: Int, @StringRes val browserProtectionSubtitle: Int)
+    private fun uiResourcesTrackerBlockingEnabled(): TrackerBlockingUiResources {
+        return TrackerBlockingUiResources(
+            browsingProtectionIcon = R.drawable.icon_tracker_blocking_enabled,
+            browserProtectionSubtitle = R.string.unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled,
+            pageSubtitle = R.string.unifiedOnboardingSubtitleTrackerBlockingEnabled
+        )
+    }
+
+    private fun uiResourcesTrackerBlockingDisabled(): TrackerBlockingUiResources {
+        return TrackerBlockingUiResources(
+            browsingProtectionIcon = R.drawable.icon_tracker_blocking_disabled,
+            browserProtectionSubtitle = R.string.unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingDisabled,
+            pageSubtitle = R.string.unifiedOnboardingSubtitleTrackerBlockingDisabled
+        )
+    }
+
+    data class TrackerBlockingUiResources(
+        @DrawableRes val browsingProtectionIcon: Int,
+        @StringRes val browserProtectionSubtitle: Int,
+        @StringRes val pageSubtitle: Int
+    )
 }
