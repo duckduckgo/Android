@@ -52,9 +52,7 @@ class OnboardingPageManagerWithTrackerBlocking(
             pages.add(TrackerBlockingOptInBlueprint())
         }
 
-        if (shouldShowSummaryPage()) {
-            pages.add(SummaryPageBlueprint())
-        }
+        pages.add(SummaryPageBlueprint())
 
         if (shouldShowDefaultBrowserPage()) {
             pages.add((DefaultBrowserBlueprint()))
@@ -81,11 +79,6 @@ class OnboardingPageManagerWithTrackerBlocking(
         } else {
             R.string.onboardingContinue
         }
-    }
-
-    private fun shouldShowSummaryPage(): Boolean {
-        // always show summary screen
-        return true
     }
 
     private fun shouldShowDefaultBrowserPage(): Boolean {
