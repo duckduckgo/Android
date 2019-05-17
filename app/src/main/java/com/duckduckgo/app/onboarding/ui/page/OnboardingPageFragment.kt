@@ -20,16 +20,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.ColorRes
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 
 abstract class OnboardingPageFragment : Fragment() {
-
-    @ColorRes
-    open fun backgroundColor(): Int = R.color.white
 
     @LayoutRes
     abstract fun layoutResource(): Int
