@@ -57,6 +57,9 @@ class TrackerBlockerOptInPage : OnboardingPageFragment(), TrackerBlockingOptOutC
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        if (savedInstanceState != null) {
+            optOutConfirmationDialog()?.listener = this
+        }
         acceptTrackerBlocking.setOnClickListener { onTrackerBlockingEnabledPress() }
         declineTrackerBlocking.setOnClickListener { onTrackerBlockingDisabledPress() }
     }
@@ -91,6 +94,9 @@ class TrackerBlockerOptInPage : OnboardingPageFragment(), TrackerBlockingOptOutC
             fragment.show(it, BLOCKING_DISABLED_CONFIRMATION_FRAGMENT_TAG)
         }
     }
+
+    private fun optOutConfirmationDialog() =
+        fragmentManager?.findFragmentByTag(BLOCKING_DISABLED_CONFIRMATION_FRAGMENT_TAG) as TrackerBlockingOptOutConfirmationDialog?
 
     private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProviders.of(this, viewModelFactory).get(V::class.java) }
 
