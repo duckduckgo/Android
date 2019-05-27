@@ -46,7 +46,6 @@ class OnboardingViewModel(
     fun onOnboardingDone() {
         onboardingStore.onboardingShown()
         fireTrackerBlockingFinalStatePixel()
-
     }
 
     private fun fireTrackerBlockingFinalStatePixel() {
