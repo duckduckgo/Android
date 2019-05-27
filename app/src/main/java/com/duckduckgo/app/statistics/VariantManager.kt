@@ -50,7 +50,11 @@ interface VariantManager {
             Variant(key = "me", weight = 0.0, features = listOf(NotificationPrivacyDay1, NotificationSuppressClearDataDay3)),
             Variant(key = "mi", weight = 0.0, features = listOf(NotificationClearDataDay1, NotificationSuppressClearDataDay3)),
             Variant(key = "mf", weight = 0.0, features = listOf(NotificationSuppressClearDataDay3)),
-            Variant(key = "mk", weight = 0.0, features = listOf(NotificationPrivacyDay1))
+            Variant(key = "mk", weight = 0.0, features = listOf(NotificationPrivacyDay1)),
+
+            // tracker blocker opt in variants
+            Variant(key = "mm", weight = 0.0, features = emptyList()),
+            Variant(key = "mn", weight = 0.0, features = listOf(TrackerBlockingOnboardingOptIn))
         )
     }
 
@@ -100,6 +104,7 @@ class ExperimentationVariantManager(
     private fun generateVariant(activeVariants: List<Variant>): Variant {
         val weightSum = activeVariants.sumByDouble { it.weight }
         if (weightSum == 0.0) {
+            Timber.v("No variants active; allocating default")
             return DEFAULT_VARIANT
         }
         val randomizedIndex = indexRandomizer.random(activeVariants)
