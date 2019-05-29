@@ -128,17 +128,25 @@ class WebViewLongPressHandlerTest {
     @Test
     fun whenUserSelectedDownloadImageOptionThenActionIsDownloadFileActionRequired() {
         whenever(mockMenuItem.itemId).thenReturn(WebViewLongPressHandler.CONTEXT_MENU_ID_DOWNLOAD_IMAGE)
-        val longPressTarget = LongPressTarget(url = "example.com", type = HitTestResult.SRC_ANCHOR_TYPE)
+        val longPressTarget = LongPressTarget(url = "example.com", imageUrl = "example.com/foo.jpg", type = HitTestResult.SRC_ANCHOR_TYPE)
         val action = testee.userSelectedMenuItem(longPressTarget, mockMenuItem)
         assertTrue(action is LongPressHandler.RequiredAction.DownloadFile)
     }
 
     @Test
+    fun whenUserSelectedDownloadImageOptionButNoImageUrlAvailableThenNoActionRequired() {
+        whenever(mockMenuItem.itemId).thenReturn(WebViewLongPressHandler.CONTEXT_MENU_ID_DOWNLOAD_IMAGE)
+        val longPressTarget = LongPressTarget(url = "example.com", imageUrl = null, type = HitTestResult.SRC_ANCHOR_TYPE)
+        val action = testee.userSelectedMenuItem(longPressTarget, mockMenuItem)
+        assertTrue(action is LongPressHandler.RequiredAction.None)
+    }
+
+    @Test
     fun whenUserSelectedDownloadImageOptionThenDownloadFileWithCorrectUrlReturned() {
         whenever(mockMenuItem.itemId).thenReturn(WebViewLongPressHandler.CONTEXT_MENU_ID_DOWNLOAD_IMAGE)
-        val longPressTarget = LongPressTarget(url = "example.com", type = HitTestResult.SRC_ANCHOR_TYPE)
+        val longPressTarget = LongPressTarget(url = "example.com", imageUrl = "example.com/foo.jpg", type = HitTestResult.SRC_ANCHOR_TYPE)
         val action = testee.userSelectedMenuItem(longPressTarget, mockMenuItem) as LongPressHandler.RequiredAction.DownloadFile
-        assertEquals("example.com", action.url)
+        assertEquals("example.com/foo.jpg", action.url)
     }
 
     @Test
