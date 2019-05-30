@@ -659,6 +659,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
             it.setFindListener(this)
         }
+
+        if (BuildConfig.DEBUG) {
+            WebView.setWebContentsDebuggingEnabled(true)
+        }
     }
 
     /**
