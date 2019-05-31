@@ -326,12 +326,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun showHome() {
+        showKeyboardImmediately()
         appBarLayout.setExpanded(true)
         logoHidingLayoutChangeListener.callToActionView = ctaContainer
+        logoHidingLayoutChangeListener.onReadyToShowLogo()
         webView?.onPause()
         webView?.hide()
         omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
-        showKeyboard()
     }
 
     private fun showBrowser() {
@@ -607,10 +608,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun configureKeyboardAwareLogoAnimation() {
-        // we want layout transitions for when the size changes; we don't want them when items disappear (can cause glitch on call to action button)
-        newTabLayout.layoutTransition?.enableTransitionType(CHANGING)
-        newTabLayout.layoutTransition?.disableTransitionType(DISAPPEARING)
-
+        newTabLayout.layoutTransition?.apply {
+            // we want layout transitions for when the size changes; we don't want them when items disappear (can cause glitch on call to action button)
+            enableTransitionType(CHANGING)
+            disableTransitionType(DISAPPEARING)
+            setDuration(200)
+        }
         rootView.addOnLayoutChangeListener(logoHidingLayoutChangeListener)
     }
 
@@ -765,6 +768,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
     }
 
+    private fun showKeyboardImmediately() {
+        if (!isHidden) {
+            Timber.v("Keyboard now showing")
+            omnibarTextInput?.showKeyboard()
+        }
+    }
+
     private fun showKeyboard() {
         if (!isHidden) {
             Timber.v("Keyboard now showing")
@@ -788,7 +798,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
-        super.onHiddenChanged(hidden)
         if (hidden) {
             viewModel.onViewHidden()
             webView?.onPause()
@@ -796,6 +805,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             webView?.onResume()
             viewModel.onViewVisible()
         }
+        super.onHiddenChanged(hidden)
     }
 
     /**

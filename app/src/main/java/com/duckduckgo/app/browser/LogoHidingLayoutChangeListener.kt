@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.graphics.Rect
 import android.view.View
+import android.view.animation.AccelerateInterpolator
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.duckduckgo.app.global.view.toDp
@@ -28,17 +29,32 @@ class LogoHidingLayoutChangeListener(private var ddgLogoView: View) : View.OnLay
 
     var callToActionView: View? = null
 
-    override fun onLayoutChange(view: View, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
-        update()
+    private var ready = false
+
+    fun onReadyToShowLogo() {
+        if (enoughRoomForLogo(getHeightDp())) {
+            ddgLogoView.animate().apply {
+                duration = 1000
+                interpolator = AccelerateInterpolator()
+                alpha(1f)
+                withEndAction { ready = true }
+            }
+        }
     }
 
-    fun update() {
+    override fun onLayoutChange(view: View, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
+        if (ready) {
+            update()
+        }
+    }
+
+    private fun update() {
         val heightDp = getHeightDp()
 
         Timber.v("App height now: $heightDp dp, call to action button showing: ${callToActionView?.isVisible}")
 
         if (enoughRoomForLogo(heightDp)) {
-            ddgLogoView.alpha = 1.0f
+            ddgLogoView.alpha = 1f
         } else {
             ddgLogoView.alpha = 0f
         }
