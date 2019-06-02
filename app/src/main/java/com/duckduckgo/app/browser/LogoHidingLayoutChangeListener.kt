@@ -33,12 +33,7 @@ class LogoHidingLayoutChangeListener(private var ddgLogoView: View) : View.OnLay
 
     fun onReadyToShowLogo() {
         if (enoughRoomForLogo(getHeightDp())) {
-            ddgLogoView.animate().apply {
-                duration = 1000
-                interpolator = AccelerateInterpolator()
-                alpha(1f)
-                withEndAction { ready = true }
-            }
+            fadeLogoIn { ready = true }
         }
     }
 
@@ -49,14 +44,31 @@ class LogoHidingLayoutChangeListener(private var ddgLogoView: View) : View.OnLay
     }
 
     private fun update() {
+
         val heightDp = getHeightDp()
-
         Timber.v("App height now: $heightDp dp, call to action button showing: ${callToActionView?.isVisible}")
-
         if (enoughRoomForLogo(heightDp)) {
-            ddgLogoView.alpha = 1f
+            fadeLogoIn {}
         } else {
-            ddgLogoView.alpha = 0f
+            fadeLogoOut {}
+        }
+    }
+
+    private fun fadeLogoIn(endAction: () -> Unit) {
+        ddgLogoView.animate().apply {
+            duration = FADE_IN_DURATION
+            interpolator = AccelerateInterpolator()
+            alpha(1f)
+            withEndAction { endAction }
+        }
+    }
+
+    private fun fadeLogoOut(endAction: () -> Unit) {
+        ddgLogoView.animate().apply {
+            duration = FADE_OUT_DURATION
+            interpolator = AccelerateInterpolator()
+            alpha(0f)
+            withEndAction { endAction }
         }
     }
 
@@ -84,6 +96,8 @@ class LogoHidingLayoutChangeListener(private var ddgLogoView: View) : View.OnLay
 
     companion object {
         private const val MINIMUM_AVAILABLE_HEIGHT_REQUIRED_TO_SHOW_LOGO = 220
+        private const val FADE_IN_DURATION = 1000L
+        private const val FADE_OUT_DURATION = 200L
     }
 
 }

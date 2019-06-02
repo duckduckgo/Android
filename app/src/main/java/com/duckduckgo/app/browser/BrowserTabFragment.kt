@@ -329,10 +329,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         showKeyboardImmediately()
         appBarLayout.setExpanded(true)
         logoHidingLayoutChangeListener.callToActionView = ctaContainer
-        logoHidingLayoutChangeListener.onReadyToShowLogo()
         webView?.onPause()
         webView?.hide()
         omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
+        logoHidingLayoutChangeListener.onReadyToShowLogo()
     }
 
     private fun showBrowser() {
