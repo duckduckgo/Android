@@ -198,7 +198,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
     }
 
-    private val logoHidingLayoutChangeListener by lazy { LogoHidingLayoutChangeListener(ddgLogo) }
+    private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -243,6 +243,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         addTextChangedListeners()
         appBarLayout.setExpanded(true)
         viewModel.onViewVisible()
+        logoHidingListener.onResume()
+    }
+
+    override fun onPause() {
+        logoHidingListener.onPause()
+        super.onPause()
     }
 
     private fun createPopupMenu() {
@@ -328,11 +334,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private fun showHome() {
         showKeyboardImmediately()
         appBarLayout.setExpanded(true)
-        logoHidingLayoutChangeListener.callToActionView = ctaContainer
         webView?.onPause()
         webView?.hide()
         omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
-        logoHidingLayoutChangeListener.onReadyToShowLogo()
+        logoHidingListener.onReadyToShowLogo()
     }
 
     private fun showBrowser() {
@@ -614,7 +619,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             disableTransitionType(DISAPPEARING)
             setDuration(200)
         }
-        rootView.addOnLayoutChangeListener(logoHidingLayoutChangeListener)
+        rootView.addOnLayoutChangeListener(logoHidingListener)
     }
 
     private fun userEnteredQuery(query: String) {
@@ -1142,7 +1147,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             ctaContainer.removeAllViews()
 
             inflate(context, R.layout.include_cta, ctaContainer)
-            logoHidingLayoutChangeListener.callToActionView = ctaContainer
+            logoHidingListener.callToActionView = ctaContainer
 
             configuration.apply(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {
