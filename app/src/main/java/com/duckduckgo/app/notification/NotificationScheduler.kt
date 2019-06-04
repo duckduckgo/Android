@@ -63,6 +63,10 @@ class NotificationScheduler @Inject constructor(
         WorkManager.getInstance().enqueue(request)
     }
 
+    // Legacy code. Unused class required for users who already have this notification scheduled from previous version. We will
+    // delete this as part of https://app.asana.com/0/414730916066338/1119619712088571
+    class ShowClearDataNotification(context: Context, params: WorkerParameters) : ClearDataNotificationWorker(context, params)
+
     open class ClearDataNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
     class PrivacyNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
 
