@@ -30,7 +30,6 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -48,7 +47,6 @@ class NotificationSchedulerTest {
     fun before() {
         whenever(variantManager.getVariant(any())).thenReturn(DEFAULT_VARIANT)
         testee = NotificationScheduler(
-            variantManager,
             clearNotification,
             privacyNotification
         )
@@ -59,7 +57,7 @@ class NotificationSchedulerTest {
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
-        assertTrue(notificationScheduled(PrivacyNotificationWorker::class.jvmName))
+        assertNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -67,7 +65,7 @@ class NotificationSchedulerTest {
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
-        assertTrue(notificationScheduled(PrivacyNotificationWorker::class.jvmName))
+        assertNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -75,7 +73,7 @@ class NotificationSchedulerTest {
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
-        assertTrue(notificationScheduled(ClearDataNotificationWorker::class.jvmName))
+        assertNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -83,19 +81,22 @@ class NotificationSchedulerTest {
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
-        assertFalse(notificationScheduled())
+        assertNoNotificationScheduled()
     }
 
-    private fun notificationScheduled(workerName: String? = null): Boolean {
-        val workers = WorkManager
+    private fun assertNotificationScheduled(workerName: String) {
+        assertTrue(getScheduledWorkers().any { it.tags.contains(workerName) })
+    }
+
+    private fun assertNoNotificationScheduled() {
+        assertTrue(getScheduledWorkers().isEmpty())
+    }
+
+    private fun getScheduledWorkers(): List<WorkInfo> {
+        return WorkManager
             .getInstance()
             .getWorkInfosByTag(NotificationScheduler.WORK_REQUEST_TAG)
             .get()
             .filter { it.state == WorkInfo.State.ENQUEUED }
-
-        if (workerName == null) {
-            return workers.isNotEmpty()
-        }
-        return workers.any { it.tags.contains(workerName) }
     }
 }

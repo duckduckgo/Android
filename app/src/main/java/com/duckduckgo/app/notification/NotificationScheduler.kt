@@ -28,7 +28,6 @@ import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotification
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_SHOWN
 import timber.log.Timber
@@ -36,14 +35,12 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class NotificationScheduler @Inject constructor(
-    private val variantManager: VariantManager,
     private val clearDataNotification: SchedulableNotification,
     private val privacyNotification: SchedulableNotification
 ) {
     suspend fun scheduleNextNotification() {
 
         WorkManager.getInstance().cancelAllWorkByTag(WORK_REQUEST_TAG)
-        val variant = variantManager.getVariant()
 
         when {
             privacyNotification.canShow() -> {
@@ -65,10 +62,6 @@ class NotificationScheduler @Inject constructor(
 
         WorkManager.getInstance().enqueue(request)
     }
-
-    // Legacy code. Unused class required for users who already have this notification scheduled from previous version. We can delete this in a
-    // couple of weeks once old notifications have cleared. We should also remove "open" access from ClearDataNotificationWorker.
-    class ShowClearDataNotification(context: Context, params: WorkerParameters) : ClearDataNotificationWorker(context, params)
 
     open class ClearDataNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
     class PrivacyNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)

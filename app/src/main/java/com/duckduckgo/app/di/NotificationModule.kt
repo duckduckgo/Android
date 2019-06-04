@@ -27,7 +27,6 @@ import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -74,12 +73,10 @@ class NotificationModule {
     @Provides
     @Singleton
     fun providesNotificationScheduler(
-        variantManager: VariantManager,
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification
     ): NotificationScheduler {
         return NotificationScheduler(
-            variantManager,
             clearDataNotification,
             privacyProtectionNotification
         )
