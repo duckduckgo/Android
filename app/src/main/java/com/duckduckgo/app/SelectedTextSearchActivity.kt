@@ -16,12 +16,14 @@
 
 package com.duckduckgo.app
 
+import android.app.SearchManager
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.app.browser.BrowserActivity
+import timber.log.Timber
 
 /**
  * Exists purely to pull out the intent extra and launch the query in a new tab.
@@ -33,9 +35,23 @@ class SelectedTextSearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val query = intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT)
+        val query = extractQuery(intent)
         startActivity(BrowserActivity.intent(this, queryExtra = query))
         finish()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun extractQuery(intent: Intent?): String? {
+        if (intent == null) return null
+
+        val textSelectionQuery = intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT)
+        if (textSelectionQuery != null) return textSelectionQuery
+
+        val webSearchQuery = intent.getStringExtra(SearchManager.QUERY)
+        if (webSearchQuery != null) return webSearchQuery
+
+        Timber.w("SelectedTextSearchActivity launched with unexpected intent format")
+        return null
     }
 
 }
