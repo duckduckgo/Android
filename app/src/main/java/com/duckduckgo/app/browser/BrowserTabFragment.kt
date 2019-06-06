@@ -617,7 +617,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             // we want layout transitions for when the size changes; we don't want them when items disappear (can cause glitch on call to action button)
             enableTransitionType(CHANGING)
             disableTransitionType(DISAPPEARING)
-            setDuration(200)
+            setDuration(LAYOUT_TRANSITION_MS)
         }
         rootView.addOnLayoutChangeListener(logoHidingListener)
     }
@@ -803,6 +803,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
         if (hidden) {
             viewModel.onViewHidden()
             webView?.onPause()
@@ -810,7 +811,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             webView?.onResume()
             viewModel.onViewVisible()
         }
-        super.onHiddenChanged(hidden)
     }
 
     /**
@@ -952,6 +952,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         private const val ADD_BOOKMARK_FRAGMENT_TAG = "ADD_BOOKMARK"
         private const val KEYBOARD_DELAY = 200L
+        private const val LAYOUT_TRANSITION_MS = 200L
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
