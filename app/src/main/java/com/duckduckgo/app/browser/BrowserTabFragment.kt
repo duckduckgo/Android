@@ -198,7 +198,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
     }
 
-    private val logoHidingLayoutChangeListener by lazy { LogoHidingLayoutChangeListener(ddgLogo) }
+    private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -243,6 +243,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         addTextChangedListeners()
         appBarLayout.setExpanded(true)
         viewModel.onViewVisible()
+        logoHidingListener.onResume()
+    }
+
+    override fun onPause() {
+        logoHidingListener.onPause()
+        super.onPause()
     }
 
     private fun createPopupMenu() {
@@ -326,12 +332,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun showHome() {
+        showKeyboardImmediately()
         appBarLayout.setExpanded(true)
-        logoHidingLayoutChangeListener.callToActionView = ctaContainer
         webView?.onPause()
         webView?.hide()
         omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
-        showKeyboard()
+        logoHidingListener.onReadyToShowLogo()
     }
 
     private fun showBrowser() {
@@ -607,11 +613,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun configureKeyboardAwareLogoAnimation() {
-        // we want layout transitions for when the size changes; we don't want them when items disappear (can cause glitch on call to action button)
-        newTabLayout.layoutTransition?.enableTransitionType(CHANGING)
-        newTabLayout.layoutTransition?.disableTransitionType(DISAPPEARING)
-
-        rootView.addOnLayoutChangeListener(logoHidingLayoutChangeListener)
+        newTabLayout.layoutTransition?.apply {
+            // we want layout transitions for when the size changes; we don't want them when items disappear (can cause glitch on call to action button)
+            enableTransitionType(CHANGING)
+            disableTransitionType(DISAPPEARING)
+            setDuration(LAYOUT_TRANSITION_MS)
+        }
+        rootView.addOnLayoutChangeListener(logoHidingListener)
     }
 
     private fun userEnteredQuery(query: String) {
@@ -658,6 +666,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             registerForContextMenu(it)
 
             it.setFindListener(this)
+        }
+
+        if (BuildConfig.DEBUG) {
+            WebView.setWebContentsDebuggingEnabled(true)
         }
     }
 
@@ -758,6 +770,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             Timber.v("Keyboard now hiding")
             omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibarTextInput?.hideKeyboard() }
             focusDummy.requestFocus()
+        }
+    }
+
+    private fun showKeyboardImmediately() {
+        if (!isHidden) {
+            Timber.v("Keyboard now showing")
+            omnibarTextInput?.showKeyboard()
         }
     }
 
@@ -933,6 +952,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         private const val ADD_BOOKMARK_FRAGMENT_TAG = "ADD_BOOKMARK"
         private const val KEYBOARD_DELAY = 200L
+        private const val LAYOUT_TRANSITION_MS = 200L
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
@@ -1128,7 +1148,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             ctaContainer.removeAllViews()
 
             inflate(context, R.layout.include_cta, ctaContainer)
-            logoHidingLayoutChangeListener.callToActionView = ctaContainer
+            logoHidingListener.callToActionView = ctaContainer
 
             configuration.apply(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {

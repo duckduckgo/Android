@@ -29,6 +29,7 @@
     <ImageView
         android:id="@+id/ddgLogo"
         android:layout_width="0dp"
+        android:alpha="0"
         android:layout_height="wrap_content"
         android:contentDescription="@string/duckDuckGoLogoDescription"
         android:src="@drawable/logo_full"
