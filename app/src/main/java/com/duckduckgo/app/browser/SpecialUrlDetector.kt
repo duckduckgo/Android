@@ -52,7 +52,7 @@ class SpecialUrlDetectorImpl : SpecialUrlDetector {
             SMSTO_SCHEME -> buildSmsTo(uriString)
             HTTP_SCHEME, HTTPS_SCHEME -> UrlType.Web(uriString)
             ABOUT_SCHEME -> UrlType.Unknown(uriString)
-            null -> UrlType.SearchQuery(uriString)
+            SITE_SCHEME, null -> UrlType.SearchQuery(uriString)
             else -> buildIntent(uriString)
         }
     }
@@ -93,6 +93,7 @@ class SpecialUrlDetectorImpl : SpecialUrlDetector {
         private const val HTTP_SCHEME = "http"
         private const val HTTPS_SCHEME = "https"
         private const val ABOUT_SCHEME = "about"
+        private const val SITE_SCHEME = "site"
 
         private const val EXTRA_FALLBACK_URL = "browser_fallback_url"
     }
