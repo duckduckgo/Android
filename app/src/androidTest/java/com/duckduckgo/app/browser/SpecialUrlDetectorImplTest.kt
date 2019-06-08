@@ -127,4 +127,18 @@ class SpecialUrlDetectorImplTest {
         val type = testee.determineType("smsto:123-555-12323") as Sms
         assertEquals("123-555-12323", type.telephoneNumber)
     }
+
+    @Test
+    fun whenUrlIsSiteSearchThenSearchTypeDetected() {
+        val expected = SearchQuery::class
+        val actual = testee.determineType("site:duckduckgo.com about")
+        assertEquals(expected, actual::class)
+    }
+
+    @Test
+    fun whenUrlIsNormalSearchThenSearchTypeDetected() {
+        val expected = SearchQuery::class
+        val actual = testee.determineType("no scheme search")
+        assertEquals(expected, actual::class)
+    }
 }
