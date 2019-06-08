@@ -42,7 +42,7 @@ class UriString {
             if (uri.scheme != UrlScheme.http && uri.scheme != UrlScheme.https) return false
             if (uri.userInfo != null) return false
             if (uri.host == null) return false
-            if (uri.path.contains(space)) return false
+            if (inputQuery.contains(space)) return false
             return isValidHost(uri.host)
         }
 
