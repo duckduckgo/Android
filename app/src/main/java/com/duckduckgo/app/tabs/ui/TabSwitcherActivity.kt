@@ -42,6 +42,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.longToast
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.max
 import kotlin.math.min
 
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitchedListener, CoroutineScope {
@@ -66,9 +67,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
 
     override fun onResume() {
         super.onResume()
-        tabsAdapter.selectedTab?.let { selectedTab ->
-            tabScrollView.post {
-                val currentItemY = tabsRecycler[min(selectedTab.position, tabsRecycler.childCount-1)].y.toInt()
+        tabScrollView.post {
+            if (tabsRecycler.childCount > 0) {
+                val currentItemY = tabsRecycler[min(
+                    tabsAdapter.selectedTabPosition,
+                    max(tabsRecycler.childCount - 1, 0)
+                )].y.toInt()
                 tabScrollView.smoothScrollTo(0, currentItemY)
             }
         }
