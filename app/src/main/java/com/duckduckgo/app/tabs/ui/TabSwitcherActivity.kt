@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.core.view.get
+import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.browser.R
@@ -67,12 +68,13 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
 
     override fun onResume() {
         super.onResume()
-        tabScrollView.post {
+        tabScrollView.smoothScrollTo(tabsAdapter.selectedTabPosition)
+    }
+
+    private fun NestedScrollView.smoothScrollTo(position: Int) {
+        post {
             if (tabsRecycler.childCount > 0) {
-                val currentItemY = tabsRecycler[min(
-                    tabsAdapter.selectedTabPosition,
-                    max(tabsRecycler.childCount - 1, 0)
-                )].y.toInt()
+                val currentItemY = tabsRecycler[min(position, max(tabsRecycler.childCount - 1, 0))].y.toInt()
                 tabScrollView.smoothScrollTo(0, currentItemY)
             }
         }
