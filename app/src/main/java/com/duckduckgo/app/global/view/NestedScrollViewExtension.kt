@@ -29,8 +29,8 @@ import kotlin.math.min
 fun NestedScrollView.smoothScrollTo(position: Int, recyclerView: RecyclerView) {
     post {
         if (recyclerView.childCount > 0 && position < recyclerView.childCount) {
-            val currentItemY = recyclerView[min(position, recyclerView.childCount - 1)].y.toInt()
-            smoothScrollTo(0, currentItemY)
+            val currentItem = recyclerView[min(position, recyclerView.childCount - 1)]
+            smoothScrollTo(0, currentItem.y.toInt() - currentItem.height * 4/3 )
         }
     }
 }
