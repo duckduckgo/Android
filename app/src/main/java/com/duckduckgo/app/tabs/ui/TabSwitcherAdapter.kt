@@ -34,7 +34,7 @@ import kotlinx.android.synthetic.main.item_tab.view.*
 class TabSwitcherAdapter(private val context: Context, private val itemClickListener: TabSwitchedListener) : Adapter<TabViewHolder>() {
 
     private var data: List<TabEntity> = ArrayList()
-    private var selectedTab: TabEntity? = null
+    var selectedTab: TabEntity? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TabViewHolder {
         val inflater = LayoutInflater.from(parent.context)

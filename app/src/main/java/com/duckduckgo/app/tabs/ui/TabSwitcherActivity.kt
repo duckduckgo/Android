@@ -21,6 +21,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.core.view.get
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.browser.R
@@ -41,6 +42,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.longToast
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.min
 
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitchedListener, CoroutineScope {
 
@@ -60,6 +62,16 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
         configureToolbar()
         configureRecycler()
         configureObservers()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        tabsAdapter.selectedTab?.let { selectedTab ->
+            tabScrollView.post {
+                val currentItemY = tabsRecycler[min(selectedTab.position, tabsRecycler.childCount-1)].y.toInt()
+                tabScrollView.smoothScrollTo(0, currentItemY)
+            }
+        }
     }
 
     private fun configureToolbar() {
