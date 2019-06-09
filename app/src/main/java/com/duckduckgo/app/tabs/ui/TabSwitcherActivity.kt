@@ -21,14 +21,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.core.view.get
-import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.global.view.FireDialog
+import com.duckduckgo.app.global.view.smoothScrollTo
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
@@ -43,8 +42,6 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.longToast
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
-import kotlin.math.max
-import kotlin.math.min
 
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitchedListener, CoroutineScope {
 
@@ -68,16 +65,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
 
     override fun onResume() {
         super.onResume()
-        tabScrollView.smoothScrollTo(tabsAdapter.selectedTabPosition)
-    }
-
-    private fun NestedScrollView.smoothScrollTo(position: Int) {
-        post {
-            if (tabsRecycler.childCount > 0) {
-                val currentItemY = tabsRecycler[min(position, max(tabsRecycler.childCount - 1, 0))].y.toInt()
-                tabScrollView.smoothScrollTo(0, currentItemY)
-            }
-        }
+        tabScrollView.smoothScrollTo(tabsAdapter.selectedTabPosition, tabsRecycler)
     }
 
     private fun configureToolbar() {
