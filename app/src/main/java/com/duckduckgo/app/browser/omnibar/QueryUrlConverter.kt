@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.omnibar
 
 import android.net.Uri
+import android.webkit.URLUtil
 import com.duckduckgo.app.browser.RequestRewriter
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.UriString
@@ -29,6 +30,10 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
     override fun convertQueryToUrl(searchQuery: String): String {
         if (UriString.isWebUrl(searchQuery)) {
             return convertUri(searchQuery)
+        }
+
+        if (URLUtil.isDataUrl(searchQuery)) {
+            return searchQuery
         }
 
         val uriBuilder = Uri.Builder()
