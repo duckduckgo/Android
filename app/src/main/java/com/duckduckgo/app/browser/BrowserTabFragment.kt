@@ -707,13 +707,20 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         return when {
             hitTestResult.extra == null -> null
             hitTestResult.type == UNKNOWN_TYPE -> null
-            hitTestResult.type == IMAGE_TYPE -> LongPressTarget(url = hitTestResult.extra, imageUrl = hitTestResult.extra, type = hitTestResult.type)
+            hitTestResult.type == IMAGE_TYPE -> LongPressTarget(
+                url = hitTestResult.extra,
+                imageUrl = hitTestResult.extra,
+                type = hitTestResult.type
+            )
             hitTestResult.type == SRC_IMAGE_ANCHOR_TYPE -> LongPressTarget(
                 url = getTargetUrlForImageSource(),
                 imageUrl = hitTestResult.extra,
                 type = hitTestResult.type
             )
-            else -> LongPressTarget(url = hitTestResult.extra, type = hitTestResult.type)
+            else -> LongPressTarget(
+                url = hitTestResult.extra,
+                type = hitTestResult.type
+            )
         }
     }
 
