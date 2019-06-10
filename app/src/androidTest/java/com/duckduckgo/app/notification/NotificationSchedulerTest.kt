@@ -21,6 +21,8 @@ package com.duckduckgo.app.notification
 
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
+import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
@@ -28,10 +30,10 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import kotlin.reflect.jvm.jvmName
 
 class NotificationSchedulerTest {
 
@@ -45,31 +47,56 @@ class NotificationSchedulerTest {
     fun before() {
         whenever(variantManager.getVariant(any())).thenReturn(DEFAULT_VARIANT)
         testee = NotificationScheduler(
-            variantManager,
             clearNotification,
             privacyNotification
         )
     }
 
     @Test
-    fun whenClearNotificationCanShowThenNotificationScheduled() = runBlocking<Unit> {
+    fun whenBothPrivacyNotificationAndCleatDataCanShowThenPrivacyNotificationScheduled() = runBlocking<Unit> {
+        whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
-        assertTrue(notificationScheduled())
+        assertNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
     }
 
     @Test
-    fun whenClearNotificationCannotShowThenNotificationNotScheduled() = runBlocking<Unit> {
+    fun whenPrivacyNotificationCanShowAndCleatDataCannotThenPrivacyNotificationScheduled() = runBlocking<Unit> {
+        whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
-        assertFalse(notificationScheduled())
+        assertNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
     }
 
-    private fun notificationScheduled(): Boolean {
+    @Test
+    fun whenPrivacyNotificationCannotShowAndClearNotificationCanShowThenNotificationScheduled() = runBlocking<Unit> {
+        whenever(privacyNotification.canShow()).thenReturn(false)
+        whenever(clearNotification.canShow()).thenReturn(true)
+        testee.scheduleNextNotification()
+        assertNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
+    }
+
+    @Test
+    fun whenNoNotificationCanShowThenNoNotificationScheduled() = runBlocking<Unit> {
+        whenever(privacyNotification.canShow()).thenReturn(false)
+        whenever(clearNotification.canShow()).thenReturn(false)
+        testee.scheduleNextNotification()
+        assertNoNotificationScheduled()
+    }
+
+    private fun assertNotificationScheduled(workerName: String) {
+        assertTrue(getScheduledWorkers().any { it.tags.contains(workerName) })
+    }
+
+    private fun assertNoNotificationScheduled() {
+        assertTrue(getScheduledWorkers().isEmpty())
+    }
+
+    private fun getScheduledWorkers(): List<WorkInfo> {
         return WorkManager
             .getInstance()
             .getWorkInfosByTag(NotificationScheduler.WORK_REQUEST_TAG)
             .get()
-            .any { it.state == WorkInfo.State.ENQUEUED }
+            .filter { it.state == WorkInfo.State.ENQUEUED }
     }
 }

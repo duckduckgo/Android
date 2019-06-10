@@ -92,7 +92,7 @@
                         android:selectAllOnFocus="true"
                         android:textColor="?attr/omnibarTextColor"
                         android:textColorHint="?attr/omnibarHintColor"
-                        android:textCursorDrawable="@null"
+                        android:textCursorDrawable="@drawable/text_cursor"
                         android:textSize="13sp"
                         android:textStyle="normal"
                         app:layout_constraintBottom_toBottomOf="parent"

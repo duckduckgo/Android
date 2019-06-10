@@ -18,7 +18,7 @@ package com.duckduckgo.app.statistics
 
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.*
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.TrackerBlockingOnboardingOptIn
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
 
@@ -26,10 +26,6 @@ import timber.log.Timber
 interface VariantManager {
 
     sealed class VariantFeature {
-        object NotificationPrivacyDay1 : VariantFeature()
-        object NotificationClearDataDay1 : VariantFeature()
-        object NotificationSuppressClearDataDay3 : VariantFeature()
-
         object TrackerBlockingOnboardingOptIn : VariantFeature()
     }
 
@@ -40,17 +36,10 @@ interface VariantManager {
 
         val ACTIVE_VARIANTS = listOf(
 
-            // SERP variants. "sc" may be used as a shared control in the future if we can filter by app version
-            // Currently set to 0.0 to free up allocations for new projects
-            Variant(key = "sc", weight = 0.0, features = emptyList()),
-            Variant(key = "se", weight = 0.0, features = emptyList()),
-
-            // Notification variants
-            // Currently set to 0.0 to free up allocations for new projects
-            Variant(key = "me", weight = 0.0, features = listOf(NotificationPrivacyDay1, NotificationSuppressClearDataDay3)),
-            Variant(key = "mi", weight = 0.0, features = listOf(NotificationClearDataDay1, NotificationSuppressClearDataDay3)),
-            Variant(key = "mf", weight = 0.0, features = listOf(NotificationSuppressClearDataDay3)),
-            Variant(key = "mk", weight = 0.0, features = listOf(NotificationPrivacyDay1)),
+            // SERP variants. "sc" may also be used as a shared control for mobile experiments in
+            // the future if we can filter by app version
+            Variant(key = "sc", weight = 1.0, features = emptyList()),
+            Variant(key = "se", weight = 1.0, features = emptyList()),
 
             // tracker blocker opt in variants
             Variant(key = "mm", weight = 0.0, features = emptyList()),
