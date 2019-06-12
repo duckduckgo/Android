@@ -42,8 +42,9 @@ class SpecialUrlDetectorImpl : SpecialUrlDetector {
 
     override fun determineType(uri: Uri): UrlType {
         val uriString = uri.toString()
+        val scheme = uri.scheme
 
-        return when (uri.scheme) {
+        return when (scheme) {
             TEL_SCHEME -> buildTelephone(uriString)
             TELPROMPT_SCHEME -> buildTelephonePrompt(uriString)
             MAILTO_SCHEME -> buildEmail(uriString)
