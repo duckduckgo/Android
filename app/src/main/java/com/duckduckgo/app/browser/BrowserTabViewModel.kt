@@ -596,13 +596,14 @@ class BrowserTabViewModel(
     }
 
     fun userLongPressedInWebView(target: LongPressTarget, menu: ContextMenu) {
-        Timber.i("Long pressed on ${target.type}, (url=${target.url})")
+        Timber.i("Long pressed on ${target.type}, (url=${target.url}), (image url = ${target.imageUrl})")
         longPressHandler.handleLongPress(target.type, target.url, menu)
     }
 
     fun userSelectedItemFromLongPressMenu(longPressTarget: LongPressTarget, item: MenuItem): Boolean {
 
         val requiredAction = longPressHandler.userSelectedMenuItem(longPressTarget, item)
+        Timber.d("Required action from long press is $requiredAction")
 
         return when (requiredAction) {
             is RequiredAction.OpenInNewTab -> {

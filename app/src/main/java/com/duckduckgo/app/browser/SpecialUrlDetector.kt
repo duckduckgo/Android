@@ -42,15 +42,14 @@ class SpecialUrlDetectorImpl : SpecialUrlDetector {
 
     override fun determineType(uri: Uri): UrlType {
         val uriString = uri.toString()
-        val scheme = uri.scheme
 
-        return when (scheme) {
+        return when (uri.scheme) {
             TEL_SCHEME -> buildTelephone(uriString)
             TELPROMPT_SCHEME -> buildTelephonePrompt(uriString)
             MAILTO_SCHEME -> buildEmail(uriString)
             SMS_SCHEME -> buildSms(uriString)
             SMSTO_SCHEME -> buildSmsTo(uriString)
-            HTTP_SCHEME, HTTPS_SCHEME -> UrlType.Web(uriString)
+            HTTP_SCHEME, HTTPS_SCHEME, DATA_SCHEME -> UrlType.Web(uriString)
             ABOUT_SCHEME -> UrlType.Unknown(uriString)
             null -> UrlType.SearchQuery(uriString)
             else -> buildIntent(uriString)
@@ -93,6 +92,7 @@ class SpecialUrlDetectorImpl : SpecialUrlDetector {
         private const val HTTP_SCHEME = "http"
         private const val HTTPS_SCHEME = "https"
         private const val ABOUT_SCHEME = "about"
+        private const val DATA_SCHEME = "data"
 
         private const val EXTRA_FALLBACK_URL = "browser_fallback_url"
     }
