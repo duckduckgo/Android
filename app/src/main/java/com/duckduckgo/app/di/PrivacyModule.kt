@@ -50,9 +50,10 @@ class PrivacyModule {
         clearingStore: UnsentForgetAllPixelStore,
         tabRepository: TabRepository,
         settingsDataStore: SettingsDataStore,
-        cookieManager: DuckDuckGoCookieManager
+        cookieManager: DuckDuckGoCookieManager,
+        appCacheClearer: AppCacheClearer
     ): ClearDataAction {
-        return ClearPersonalDataAction(context, dataManager, clearingStore, tabRepository, settingsDataStore, cookieManager)
+        return ClearPersonalDataAction(context, dataManager, clearingStore, tabRepository, settingsDataStore, cookieManager, appCacheClearer)
     }
 
     @Provides
@@ -78,4 +79,10 @@ class PrivacyModule {
         pixel: Pixel
     ): HistoricTrackerBlockingObserver =
         HistoricTrackerBlockingObserver(appInstallStore, privacySettingsStore, pixel)
+
+    @Provides
+    @Singleton
+    fun appCacheCleaner(context: Context): AppCacheClearer {
+        return AndroidAppCacheClearer(context)
+    }
 }
