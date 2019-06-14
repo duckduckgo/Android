@@ -88,6 +88,7 @@
     <string name="newTabMenuItem">New Tab</string>
     <string name="openInNewTab">Open in New Tab</string>
     <string name="openInNewBackgroundTab">Open In Background Tab</string>
+    <string name="openImageInNewTab">Open Image In Background Tab</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Close</string>
     <string name="tapFireDirective">Tap </string>
@@ -220,7 +221,7 @@
     <string name="edit">Edit</string>
 
     <!-- Widget -->
-    <string name="searchWidgetTextHint">Search Privately</string>
+    <string name="searchWidgetTextHint">Search DuckDuckGo</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Add to Home</string>

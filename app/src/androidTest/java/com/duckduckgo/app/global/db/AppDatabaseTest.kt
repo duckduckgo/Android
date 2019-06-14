@@ -52,7 +52,7 @@ class AppDatabaseTest {
         testHelper.createDatabase(TEST_DB_NAME, 2).use {
             it.execSQL("INSERT INTO `network_leaderboard` VALUES ('Network2', 'example.com')")
         }
-        assertTrue(database().networkLeaderboardDao().trackerNetworkTally().blockingObserve()!!.isEmpty())
+        assertTrue(database().networkLeaderboardDao().trackerNetworkLeaderboard().blockingObserve()!!.isEmpty())
     }
 
     @Test
@@ -118,6 +118,11 @@ class AppDatabaseTest {
     @Test
     fun whenMigratingFromVersion11To12ThenValidationSucceeds() {
         createDatabaseAndMigrate(11, 12, AppDatabase.MIGRATION_11_TO_12)
+    }
+
+    @Test
+    fun whenMigratingFromVersion12To13ThenValidationSucceeds() {
+        createDatabaseAndMigrate(12, 13, AppDatabase.MIGRATION_12_TO_13)
     }
 
     @Test

@@ -23,7 +23,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
-import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao.NetworkTally
+import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
@@ -48,18 +48,18 @@ class PrivacyDashboardViewModel(
         val practices: PrivacyPractices.Summary,
         val toggleEnabled: Boolean,
         val showTrackerNetworkLeaderboard: Boolean,
-        val domainsVisited: Int,
-        val trackerNetworkTally: List<NetworkTally>,
+        val sitesVisited: Int,
+        val trackerNetworkEntries: List<NetworkLeaderboardEntry>,
         val shouldReloadPage: Boolean
     )
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     private var site: Site? = null
 
-    private val domainsVisited: LiveData<Int> = networkLeaderboardDao.domainsVisitedCount()
-    private val domainsVisitedObserver = Observer<Int> { onDomainsVisitedChanged(it) }
-    private val trackerNetworkTally: LiveData<List<NetworkTally>> = networkLeaderboardDao.trackerNetworkTally()
-    private val trackerNetworkActivityObserver = Observer<List<NetworkTally>> { onTrackerNetworkTallyChanged(it) }
+    private val sitesVisited: LiveData<Int> = networkLeaderboardDao.sitesVisited()
+    private val sitesVisitedObserver = Observer<Int> { onSitesVisitedChanged(it) }
+    private val trackerNetworkLeaderboard: LiveData<List<NetworkLeaderboardEntry>> = networkLeaderboardDao.trackerNetworkLeaderboard()
+    private val trackerNetworkActivityObserver = Observer<List<NetworkLeaderboardEntry>> { onTrackerNetworkEntriesChanged(it) }
 
     private val privacyInitiallyOn = settingsStore.privacyOn
 
@@ -69,37 +69,37 @@ class PrivacyDashboardViewModel(
     init {
         pixel.fire(PRIVACY_DASHBOARD_OPENED)
         resetViewState()
-        domainsVisited.observeForever(domainsVisitedObserver)
-        trackerNetworkTally.observeForever(trackerNetworkActivityObserver)
+        sitesVisited.observeForever(sitesVisitedObserver)
+        trackerNetworkLeaderboard.observeForever(trackerNetworkActivityObserver)
     }
 
     @VisibleForTesting
     public override fun onCleared() {
         super.onCleared()
-        domainsVisited.removeObserver(domainsVisitedObserver)
-        trackerNetworkTally.removeObserver(trackerNetworkActivityObserver)
+        sitesVisited.removeObserver(sitesVisitedObserver)
+        trackerNetworkLeaderboard.removeObserver(trackerNetworkActivityObserver)
     }
 
-    fun onDomainsVisitedChanged(count: Int?) {
-        val domainCount = count ?: 0
-        val networkCount = viewState.value?.trackerNetworkTally?.count() ?: 0
+    fun onSitesVisitedChanged(count: Int?) {
+        val siteCount = count ?: 0
+        val networkCount = viewState.value?.trackerNetworkEntries?.count() ?: 0
         viewState.value = viewState.value?.copy(
-            showTrackerNetworkLeaderboard = showTrackerNetworkLeaderboard(domainCount, networkCount),
-            domainsVisited = domainCount
+            showTrackerNetworkLeaderboard = showTrackerNetworkLeaderboard(siteCount, networkCount),
+            sitesVisited = siteCount
         )
     }
 
-    fun onTrackerNetworkTallyChanged(tally: List<NetworkTally>?) {
-        val domainCount = viewState.value?.domainsVisited ?: 0
-        val networkTally = tally ?: emptyList()
+    fun onTrackerNetworkEntriesChanged(networkLeaderboardEntries: List<NetworkLeaderboardEntry>?) {
+        val domainCount = viewState.value?.sitesVisited ?: 0
+        val networkEntries = networkLeaderboardEntries ?: emptyList()
         viewState.value = viewState.value?.copy(
-            showTrackerNetworkLeaderboard = showTrackerNetworkLeaderboard(domainCount, networkTally.count()),
-            trackerNetworkTally = networkTally
+            showTrackerNetworkLeaderboard = showTrackerNetworkLeaderboard(domainCount, networkEntries.count()),
+            trackerNetworkEntries = networkEntries
         )
     }
 
-    private fun showTrackerNetworkLeaderboard(domainCount: Int, networkCount: Int): Boolean {
-        return domainCount > LEADERNOARD_MIN_DOMAINS_EXCLUSIVE && networkCount >= LEADERBOARD_MIN_NETWORKS
+    private fun showTrackerNetworkLeaderboard(siteVisitedCount: Int, networkCount: Int): Boolean {
+        return siteVisitedCount > LEADERBOARD_MIN_DOMAINS_EXCLUSIVE && networkCount >= LEADERBOARD_MIN_NETWORKS
     }
 
     fun onSiteChanged(site: Site?) {
@@ -122,8 +122,8 @@ class PrivacyDashboardViewModel(
             toggleEnabled = settingsStore.privacyOn,
             practices = UNKNOWN,
             showTrackerNetworkLeaderboard = false,
-            domainsVisited = 0,
-            trackerNetworkTally = emptyList(),
+            sitesVisited = 0,
+            trackerNetworkEntries = emptyList(),
             shouldReloadPage = shouldReloadPage
         )
     }
@@ -158,7 +158,7 @@ class PrivacyDashboardViewModel(
 
     private companion object {
         private const val LEADERBOARD_MIN_NETWORKS = 3
-        private const val LEADERNOARD_MIN_DOMAINS_EXCLUSIVE = 30
+        private const val LEADERBOARD_MIN_DOMAINS_EXCLUSIVE = 30
     }
 }
 

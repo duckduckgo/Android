@@ -127,4 +127,16 @@ class SpecialUrlDetectorImplTest {
         val type = testee.determineType("smsto:123-555-12323") as Sms
         assertEquals("123-555-12323", type.telephoneNumber)
     }
+
+    @Test
+    fun whenUrlIsCustomUriSchemeThenIntentTypeDetected() {
+        val type = testee.determineType("myapp:foo bar") as IntentType
+        assertEquals("myapp:foo bar", type.url)
+    }
+
+    @Test
+    fun whenUrlIsParametrizedQueryThenSearchQueryTypeDetected() {
+        val type = testee.determineType("foo site:duckduckgo.com") as SearchQuery
+        assertEquals("foo site:duckduckgo.com", type.query)
+    }
 }

@@ -39,8 +39,7 @@ import android.view.inputmethod.EditorInfo
 import android.webkit.*
 import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
-import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
-import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
+import android.webkit.WebView.HitTestResult.*
 import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.AnyThread
@@ -708,8 +707,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         return when {
             hitTestResult.extra == null -> null
             hitTestResult.type == UNKNOWN_TYPE -> null
+            hitTestResult.type == IMAGE_TYPE -> LongPressTarget(
+                url = hitTestResult.extra,
+                imageUrl = hitTestResult.extra,
+                type = hitTestResult.type
+            )
             hitTestResult.type == SRC_IMAGE_ANCHOR_TYPE -> LongPressTarget(
-                url = getTargetUrlForImageSource() ?: hitTestResult.extra,
+                url = getTargetUrlForImageSource(),
                 imageUrl = hitTestResult.extra,
                 type = hitTestResult.type
             )

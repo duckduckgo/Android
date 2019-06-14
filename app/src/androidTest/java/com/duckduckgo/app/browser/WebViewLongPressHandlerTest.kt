@@ -60,89 +60,97 @@ class WebViewLongPressHandlerTest {
     }
 
     @Test
-    fun whenLongPressedWithImageTypeThenPixelFired() {
+    fun whenUserLongPressesWithImageTypeThenPixelFired() {
         testee.handleLongPress(HitTestResult.IMAGE_TYPE, HTTPS_IMAGE_URL, mockMenu)
         verify(mockPixel).fire(Pixel.PixelName.LONG_PRESS)
     }
 
     @Test
-    fun whenLongPressedWithAnchorImageTypeThenPixelFired() {
+    fun whenUserLongPressesWithAnchorImageTypeThenPixelFired() {
         testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, HTTPS_IMAGE_URL, mockMenu)
         verify(mockPixel).fire(Pixel.PixelName.LONG_PRESS)
     }
 
     @Test
-    fun whenLongPressedWithUnknownTypeThenPixelNotFired() {
+    fun whenUserLongPressesWithUnknownTypeThenPixelNotFired() {
         testee.handleLongPress(HitTestResult.UNKNOWN_TYPE, HTTPS_IMAGE_URL, mockMenu)
         verify(mockPixel, never()).fire(Pixel.PixelName.LONG_PRESS)
     }
 
     @Test
-    fun whenLongPressedWithImageTypeThenUrlHeaderAddedToMenu() {
+    fun whenUserLongPressesWithImageTypeThenUrlHeaderAddedToMenu() {
         testee.handleLongPress(HitTestResult.IMAGE_TYPE, HTTPS_IMAGE_URL, mockMenu)
         verify(mockMenu).setHeaderTitle(HTTPS_IMAGE_URL)
     }
 
     @Test
-    fun whenLongPressedWithAnchorImageTypeThenUrlHeaderAddedToMenu() {
+    fun whenUserLongPressesWithAnchorImageTypeThenUrlHeaderAddedToMenu() {
         testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, HTTPS_IMAGE_URL, mockMenu)
         verify(mockMenu).setHeaderTitle(HTTPS_IMAGE_URL)
     }
 
     @Test
-    fun whenLongPressedWithAnchorImageTypeThenTabOptionsHeaderAddedToMenu() {
+    fun whenUserLongPressesWithAnchorImageTypeThenTabOptionsHeaderAddedToMenu() {
         testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, HTTPS_IMAGE_URL, mockMenu)
         verifyNewForegroundTabItemAdded()
     }
 
     @Test
-    fun whenLongPressedWithAnchorImageTypeThenBgTabOptionsHeaderAddedToMenu() {
+    fun whenUserLongPressesWithAnchorImageTypeThenBgTabOptionsHeaderAddedToMenu() {
         testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, HTTPS_IMAGE_URL, mockMenu)
         verifyNewBackgroundTabItemAdded()
     }
 
     @Test
-    fun whenLongPressedWithImageTypeThenDownloadImageMenuAdded() {
+    fun whenUserLongPressesWithImageTypeThenDownloadImageMenuAdded() {
         testee.handleLongPress(HitTestResult.IMAGE_TYPE, HTTPS_IMAGE_URL, mockMenu)
         verifyDownloadImageItemAdded()
     }
 
     @Test
-    fun whenLongPressedWithAnchorImageTypeThenDownloadImageMenuAdded() {
+    fun whenUserLongPressesWithAnchorImageTypeThenDownloadImageMenuAdded() {
         testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, HTTPS_IMAGE_URL, mockMenu)
         verifyDownloadImageItemAdded()
     }
 
     @Test
-    fun whenLongPressedWithOtherImageTypeThenMenuNotAltered() {
+    fun whenUserLongPressesWithOtherImageTypeThenMenuNotAltered() {
         testee.handleLongPress(HitTestResult.UNKNOWN_TYPE, HTTPS_IMAGE_URL, mockMenu)
         verifyMenuNotAltered()
     }
 
     @Test
-    fun whenLongPressedWithImageTypeWhichIsADataUriThenDownloadImageMenuAdded() {
+    fun whenUserLongPressesWithImageTypeWhichIsADataUriThenDownloadImageMenuAdded() {
         testee.handleLongPress(HitTestResult.IMAGE_TYPE, DATA_URI_IMAGE_URL, mockMenu)
         verifyDownloadImageItemAdded()
     }
 
     @Test
-    fun whenUserSelectedDownloadImageOptionThenActionIsDownloadFileActionRequired() {
+    fun whenUserSelectsDownloadImageOptionThenActionIsDownloadFileActionRequired() {
         whenever(mockMenuItem.itemId).thenReturn(WebViewLongPressHandler.CONTEXT_MENU_ID_DOWNLOAD_IMAGE)
-        val longPressTarget = LongPressTarget(url = "example.com", type = HitTestResult.SRC_ANCHOR_TYPE)
+        val longPressTarget = LongPressTarget(url = "example.com", imageUrl = "example.com/foo.jpg", type = HitTestResult.SRC_ANCHOR_TYPE)
         val action = testee.userSelectedMenuItem(longPressTarget, mockMenuItem)
         assertTrue(action is LongPressHandler.RequiredAction.DownloadFile)
     }
 
     @Test
-    fun whenUserSelectedDownloadImageOptionThenDownloadFileWithCorrectUrlReturned() {
+    fun whenUserSelectsDownloadImageOptionButNoImageUrlAvailableThenNoActionRequired() {
         whenever(mockMenuItem.itemId).thenReturn(WebViewLongPressHandler.CONTEXT_MENU_ID_DOWNLOAD_IMAGE)
-        val longPressTarget = LongPressTarget(url = "example.com", type = HitTestResult.SRC_ANCHOR_TYPE)
-        val action = testee.userSelectedMenuItem(longPressTarget, mockMenuItem) as LongPressHandler.RequiredAction.DownloadFile
-        assertEquals("example.com", action.url)
+        val longPressTarget = LongPressTarget(url = "example.com", imageUrl = null, type = HitTestResult.SRC_ANCHOR_TYPE)
+        val action = testee.userSelectedMenuItem(longPressTarget, mockMenuItem)
+        assertTrue(action is LongPressHandler.RequiredAction.None)
     }
 
     @Test
-    fun whenUserSelectedUnknownOptionThenNoActionRequiredReturned() {
+    fun whenUserSelectsDownloadImageOptionThenDownloadFileWithCorrectUrlReturned() {
+        whenever(mockMenuItem.itemId).thenReturn(WebViewLongPressHandler.CONTEXT_MENU_ID_DOWNLOAD_IMAGE)
+        val longPressTarget = LongPressTarget(url = "example.com", imageUrl = "example.com/foo.jpg", type = HitTestResult.SRC_ANCHOR_TYPE)
+        val action = testee.userSelectedMenuItem(longPressTarget, mockMenuItem) as LongPressHandler.RequiredAction.DownloadFile
+        assertEquals("example.com/foo.jpg", action.url)
+    }
+
+    @Test
+    fun whenUserSelectsUnknownOptionThenNoActionRequiredReturned() {
         val unknownMenuId = 123
         whenever(mockMenuItem.itemId).thenReturn(unknownMenuId)
         val longPressTarget = LongPressTarget(url = "example.com", type = HitTestResult.SRC_ANCHOR_TYPE)

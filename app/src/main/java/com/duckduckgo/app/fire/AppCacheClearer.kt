@@ -14,6 +14,25 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.model
+package com.duckduckgo.app.fire
 
-data class LongPressTarget(val url: String?, val type: Int, val imageUrl: String? = null)
+import android.content.Context
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+
+interface AppCacheClearer {
+
+    suspend fun clearCache()
+
+}
+
+class AndroidAppCacheClearer(private val context: Context) : AppCacheClearer {
+
+    override suspend fun clearCache() {
+        withContext(Dispatchers.IO) {
+            context.cacheDir.deleteRecursively()
+        }
+    }
+
+}
