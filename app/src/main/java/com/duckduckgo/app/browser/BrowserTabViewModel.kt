@@ -56,7 +56,6 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
-import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -431,9 +430,8 @@ class BrowserTabViewModel(
     }
 
     private fun registerSiteVisit() {
-        val domainVisited = url?.toUri()?.host ?: return
         Schedulers.io().scheduleDirect {
-            networkLeaderboardDao.insert(SiteVisitedEntity(domainVisited))
+            networkLeaderboardDao.incrementSitesVisited()
         }
     }
 
@@ -517,7 +515,7 @@ class BrowserTabViewModel(
         val networkName = event.trackerNetwork?.name ?: return
         val domainVisited = Uri.parse(event.documentUrl).host ?: return
         networkLeaderboardDao.insert(NetworkLeaderboardEntry(networkName, domainVisited))
-        networkLeaderboardDao.insert(SiteVisitedEntity(domainVisited))
+        networkLeaderboardDao.incrementSitesVisited()
     }
 
     override fun pageHasHttpResources(page: String?) {

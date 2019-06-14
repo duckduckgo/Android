@@ -40,7 +40,7 @@ import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
-import com.duckduckgo.app.privacy.db.SiteVisitedEntity
+import com.duckduckgo.app.privacy.db.SitesVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyProtectionCountsEntity
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -55,12 +55,12 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 12, entities = [
+    exportSchema = true, version = 13, entities = [
         DisconnectTracker::class,
         HttpsBloomFilterSpec::class,
         HttpsWhitelistedDomain::class,
         NetworkLeaderboardEntry::class,
-        SiteVisitedEntity::class,
+        SitesVisitedEntity::class,
         AppConfigurationEntity::class,
         TabEntity::class,
         TabSelectionEntity::class,
@@ -188,6 +188,13 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_12_TO_13: Migration = object : Migration(12, 13) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DROP TABLE `site_visited`")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `sites_visited` (`key` TEXT NOT NULL, `count` INTEGER NOT NULL, PRIMARY KEY(`key`))")
+            }
+        }
+
         val ALL_MIGRATIONS: List<Migration>
             get() = listOf(
                 MIGRATION_1_TO_2,
@@ -200,7 +207,8 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_8_TO_9,
                 MIGRATION_9_TO_10,
                 MIGRATION_10_TO_11,
-                MIGRATION_11_TO_12
+                MIGRATION_11_TO_12,
+                MIGRATION_12_TO_13
             )
     }
 }

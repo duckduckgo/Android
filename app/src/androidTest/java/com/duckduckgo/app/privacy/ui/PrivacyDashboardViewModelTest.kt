@@ -49,7 +49,7 @@ class PrivacyDashboardViewModelTest {
     private var settingStore: PrivacySettingsStore = mock()
     private var networkLeaderboard: NetworkLeaderboardDao = mock()
     private var networkTallyLiveData: LiveData<List<NetworkTally>> = mock()
-    private var domainsVisitedLiveData: LiveData<Int> = mock()
+    private var sitesVisitedLiveData: LiveData<Int> = mock()
     private var mockPixel: Pixel = mock()
 
     private val testee: PrivacyDashboardViewModel by lazy {
@@ -60,9 +60,9 @@ class PrivacyDashboardViewModelTest {
 
     @Before
     fun before() {
-        whenever(domainsVisitedLiveData.value).thenReturn(0)
+        whenever(sitesVisitedLiveData.value).thenReturn(0)
         whenever(networkTallyLiveData.value).thenReturn(emptyList())
-        whenever(networkLeaderboard.domainsVisitedCount()).thenReturn(domainsVisitedLiveData)
+        whenever(networkLeaderboard.sitesVisited()).thenReturn(sitesVisitedLiveData)
         whenever(networkLeaderboard.trackerNetworkTally()).thenReturn(networkTallyLiveData)
     }
 
@@ -151,12 +151,12 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenNetworkCountIsAtLeastThreeAndTotalDomainsIsOverThirtyThenShowSummaryIsTrue() {
+    fun whenNetworkCountIsAtLeastThreeAndTotalSitesIsOverThirtyThenShowSummaryIsTrue() {
         val first = NetworkTally("Network1", 5)
         val second = NetworkTally("Network2", 3)
         val third = NetworkTally("Network3", 3)
         testee.onTrackerNetworkTallyChanged(listOf(first, second, third))
-        testee.onDomainsVisitedChanged(31)
+        testee.onSitesVisitedChanged(31)
         assertTrue(testee.viewState.value!!.showTrackerNetworkLeaderboard)
     }
 
@@ -165,17 +165,17 @@ class PrivacyDashboardViewModelTest {
         val first = NetworkTally("Network1", 5)
         val second = NetworkTally("Network2", 3)
         testee.onTrackerNetworkTallyChanged(listOf(first, second))
-        testee.onDomainsVisitedChanged(31)
+        testee.onSitesVisitedChanged(31)
         assertFalse(testee.viewState.value!!.showTrackerNetworkLeaderboard)
     }
 
     @Test
-    fun whenDomainsIsNotOverThirtyThenShowSummaryIsFalse() {
+    fun whenSitesIsNotOverThirtyThenShowSummaryIsFalse() {
         val first = NetworkTally("Network1", 5)
         val second = NetworkTally("Network2", 3)
         val third = NetworkTally("Network3", 3)
         testee.onTrackerNetworkTallyChanged(listOf(first, second, third))
-        testee.onDomainsVisitedChanged(30)
+        testee.onSitesVisitedChanged(30)
         assertFalse(testee.viewState.value!!.showTrackerNetworkLeaderboard)
     }
 

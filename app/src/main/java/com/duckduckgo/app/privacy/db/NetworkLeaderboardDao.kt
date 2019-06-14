@@ -17,22 +17,30 @@
 package com.duckduckgo.app.privacy.db
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 
 @Dao
-interface NetworkLeaderboardDao {
+abstract class NetworkLeaderboardDao {
+
+    @Query("select count from sites_visited")
+    abstract fun sitesVisited(): LiveData<Int>
+
+    @Transaction
+    open fun incrementSitesVisited() {
+        val changedRows = incrementSitesVisitedIfExists()
+        if (changedRows == 0) {
+            initializeSitesVisited(SitesVisitedEntity(count = 1))
+        }
+    }
+
+    @Insert
+    protected abstract fun initializeSitesVisited(entity: SitesVisitedEntity)
+
+    @Query("UPDATE sites_visited SET count = count + 1")
+    protected abstract fun incrementSitesVisitedIfExists(): Int
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(siteVisited: SiteVisitedEntity)
-
-    @Query("select count(distinct domain) from site_visited")
-    fun domainsVisitedCount(): LiveData<Int>
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(leaderboardEntry: NetworkLeaderboardEntry)
+    abstract fun insert(leaderboardEntry: NetworkLeaderboardEntry)
 
     @Query(
         "select networkName, count(domainVisited) as domainCount " +
@@ -40,7 +48,7 @@ interface NetworkLeaderboardDao {
                 "group by networkName " +
                 "order by domainCount desc"
     )
-    fun trackerNetworkTally(): LiveData<List<NetworkTally>>
+    abstract fun trackerNetworkTally(): LiveData<List<NetworkTally>>
 
     data class NetworkTally(val networkName: String, val domainCount: Int)
 }

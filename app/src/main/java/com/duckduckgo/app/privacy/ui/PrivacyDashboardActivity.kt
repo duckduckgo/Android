@@ -104,9 +104,9 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
             return
         }
 
-        trackerNetworkPill1.render(viewState.trackerNetworkTally.elementAtOrNull(0), viewState.domainsVisited)
-        trackerNetworkPill2.render(viewState.trackerNetworkTally.elementAtOrNull(1), viewState.domainsVisited)
-        trackerNetworkPill3.render(viewState.trackerNetworkTally.elementAtOrNull(2), viewState.domainsVisited)
+        trackerNetworkPill1.render(viewState.trackerNetworkTally.elementAtOrNull(0), viewState.sitesVisited)
+        trackerNetworkPill2.render(viewState.trackerNetworkTally.elementAtOrNull(1), viewState.sitesVisited)
+        trackerNetworkPill3.render(viewState.trackerNetworkTally.elementAtOrNull(2), viewState.sitesVisited)
         showTrackerNetworkLeaderboard()
     }
 
