@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 13,
-    "identityHash": "a768ea03dc6e432d5f63d9e441cba3db",
+    "identityHash": "04130d73cf4edde498a7b6833f40049d",
     "entities": [
       {
         "tableName": "disconnect_tracker",
@@ -102,7 +102,7 @@
       },
       {
         "tableName": "network_leaderboard",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`networkName` TEXT NOT NULL, `domainVisited` TEXT NOT NULL, PRIMARY KEY(`networkName`, `domainVisited`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`networkName` TEXT NOT NULL, `count` INTEGER NOT NULL, PRIMARY KEY(`networkName`))",
         "fields": [
           {
             "fieldPath": "networkName",
@@ -111,16 +111,15 @@
             "notNull": true
           },
           {
-            "fieldPath": "domainVisited",
-            "columnName": "domainVisited",
-            "affinity": "TEXT",
+            "fieldPath": "count",
+            "columnName": "count",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "networkName",
-            "domainVisited"
+            "networkName"
           ],
           "autoGenerate": false
         },
@@ -541,7 +540,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"a768ea03dc6e432d5f63d9e441cba3db\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"04130d73cf4edde498a7b6833f40049d\")"
     ]
   }
 }

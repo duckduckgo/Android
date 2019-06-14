@@ -55,7 +55,6 @@ import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
-import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -513,8 +512,7 @@ class BrowserTabViewModel(
 
     private fun updateNetworkLeaderboard(event: TrackingEvent) {
         val networkName = event.trackerNetwork?.name ?: return
-        val domainVisited = Uri.parse(event.documentUrl).host ?: return
-        networkLeaderboardDao.insert(NetworkLeaderboardEntry(networkName, domainVisited))
+        networkLeaderboardDao.incrementNetworkCount(networkName)
         networkLeaderboardDao.incrementSitesVisited()
     }
 

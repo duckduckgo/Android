@@ -297,7 +297,7 @@ class BrowserTabViewModelTest {
     fun whenTrackerDetectedThenNetworkLeaderboardUpdated() {
         val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", TrackerNetwork("Network1", "www.tracker.com"), false)
         testee.trackerDetected(event)
-        verify(mockNetworkLeaderboardDao).insert(NetworkLeaderboardEntry("Network1", "www.example.com"))
+        verify(mockNetworkLeaderboardDao).incrementNetworkCount("Network1")
     }
 
     @Test

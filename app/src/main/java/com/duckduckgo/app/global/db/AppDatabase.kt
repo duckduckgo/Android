@@ -191,7 +191,9 @@ abstract class AppDatabase : RoomDatabase() {
         val MIGRATION_12_TO_13: Migration = object : Migration(12, 13) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("DROP TABLE `site_visited`")
+                database.execSQL("DROP TABLE `network_leaderboard`")
                 database.execSQL("CREATE TABLE IF NOT EXISTS `sites_visited` (`key` TEXT NOT NULL, `count` INTEGER NOT NULL, PRIMARY KEY(`key`))")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `network_leaderboard` (`networkName` TEXT NOT NULL, `count` INTEGER NOT NULL, PRIMARY KEY(`networkName`))")
             }
         }
 

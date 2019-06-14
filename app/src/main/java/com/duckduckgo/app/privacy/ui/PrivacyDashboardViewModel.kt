@@ -23,7 +23,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
-import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao.NetworkTally
+import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
@@ -49,7 +49,7 @@ class PrivacyDashboardViewModel(
         val toggleEnabled: Boolean,
         val showTrackerNetworkLeaderboard: Boolean,
         val sitesVisited: Int,
-        val trackerNetworkTally: List<NetworkTally>,
+        val trackerNetworkEntries: List<NetworkLeaderboardEntry>,
         val shouldReloadPage: Boolean
     )
 
@@ -58,8 +58,8 @@ class PrivacyDashboardViewModel(
 
     private val sitesVisited: LiveData<Int> = networkLeaderboardDao.sitesVisited()
     private val sitesVisitedObserver = Observer<Int> { onSitesVisitedChanged(it) }
-    private val trackerNetworkTally: LiveData<List<NetworkTally>> = networkLeaderboardDao.trackerNetworkTally()
-    private val trackerNetworkActivityObserver = Observer<List<NetworkTally>> { onTrackerNetworkTallyChanged(it) }
+    private val trackerNetworkLeaderboard: LiveData<List<NetworkLeaderboardEntry>> = networkLeaderboardDao.trackerNetworkLeaderboard()
+    private val trackerNetworkActivityObserver = Observer<List<NetworkLeaderboardEntry>> { onTrackerNetworkEntriesChanged(it) }
 
     private val privacyInitiallyOn = settingsStore.privacyOn
 
@@ -70,36 +70,36 @@ class PrivacyDashboardViewModel(
         pixel.fire(PRIVACY_DASHBOARD_OPENED)
         resetViewState()
         sitesVisited.observeForever(sitesVisitedObserver)
-        trackerNetworkTally.observeForever(trackerNetworkActivityObserver)
+        trackerNetworkLeaderboard.observeForever(trackerNetworkActivityObserver)
     }
 
     @VisibleForTesting
     public override fun onCleared() {
         super.onCleared()
         sitesVisited.removeObserver(sitesVisitedObserver)
-        trackerNetworkTally.removeObserver(trackerNetworkActivityObserver)
+        trackerNetworkLeaderboard.removeObserver(trackerNetworkActivityObserver)
     }
 
     fun onSitesVisitedChanged(count: Int?) {
         val siteCount = count ?: 0
-        val networkCount = viewState.value?.trackerNetworkTally?.count() ?: 0
+        val networkCount = viewState.value?.trackerNetworkEntries?.count() ?: 0
         viewState.value = viewState.value?.copy(
             showTrackerNetworkLeaderboard = showTrackerNetworkLeaderboard(siteCount, networkCount),
             sitesVisited = siteCount
         )
     }
 
-    fun onTrackerNetworkTallyChanged(tally: List<NetworkTally>?) {
+    fun onTrackerNetworkEntriesChanged(networkLeaderboardEntries: List<NetworkLeaderboardEntry>?) {
         val domainCount = viewState.value?.sitesVisited ?: 0
-        val networkTally = tally ?: emptyList()
+        val networkEntries = networkLeaderboardEntries ?: emptyList()
         viewState.value = viewState.value?.copy(
-            showTrackerNetworkLeaderboard = showTrackerNetworkLeaderboard(domainCount, networkTally.count()),
-            trackerNetworkTally = networkTally
+            showTrackerNetworkLeaderboard = showTrackerNetworkLeaderboard(domainCount, networkEntries.count()),
+            trackerNetworkEntries = networkEntries
         )
     }
 
-    private fun showTrackerNetworkLeaderboard(domainCount: Int, networkCount: Int): Boolean {
-        return domainCount > LEADERBOARD_MIN_DOMAINS_EXCLUSIVE && networkCount >= LEADERBOARD_MIN_NETWORKS
+    private fun showTrackerNetworkLeaderboard(siteVisitedCount: Int, networkCount: Int): Boolean {
+        return siteVisitedCount > LEADERBOARD_MIN_DOMAINS_EXCLUSIVE && networkCount >= LEADERBOARD_MIN_NETWORKS
     }
 
     fun onSiteChanged(site: Site?) {
@@ -123,7 +123,7 @@ class PrivacyDashboardViewModel(
             practices = UNKNOWN,
             showTrackerNetworkLeaderboard = false,
             sitesVisited = 0,
-            trackerNetworkTally = emptyList(),
+            trackerNetworkEntries = emptyList(),
             shouldReloadPage = shouldReloadPage
         )
     }

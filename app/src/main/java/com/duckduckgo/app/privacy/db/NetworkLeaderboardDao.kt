@@ -39,16 +39,21 @@ abstract class NetworkLeaderboardDao {
     @Query("UPDATE sites_visited SET count = count + 1")
     protected abstract fun incrementSitesVisitedIfExists(): Int
 
+    @Transaction
+    open fun incrementNetworkCount(network: String) {
+        val changedRows = incrementNetworkCountIfExists(network)
+        if (changedRows == 0) {
+            initializeNetwork(NetworkLeaderboardEntry(network, 1))
+        }
+    }
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    abstract fun insert(leaderboardEntry: NetworkLeaderboardEntry)
+    protected abstract fun initializeNetwork(leaderboardEntry: NetworkLeaderboardEntry)
 
-    @Query(
-        "select networkName, count(domainVisited) as domainCount " +
-                "from network_leaderboard " +
-                "group by networkName " +
-                "order by domainCount desc"
-    )
-    abstract fun trackerNetworkTally(): LiveData<List<NetworkTally>>
+    @Query("UPDATE network_leaderboard SET count = count + 1 WHERE networkName = :networkName")
+    protected abstract fun incrementNetworkCountIfExists(networkName: String): Int
 
-    data class NetworkTally(val networkName: String, val domainCount: Int)
+
+    @Query("select * from network_leaderboard order by count desc")
+    abstract fun trackerNetworkLeaderboard(): LiveData<List<NetworkLeaderboardEntry>>
 }

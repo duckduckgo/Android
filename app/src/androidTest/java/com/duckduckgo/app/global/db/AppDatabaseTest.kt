@@ -52,7 +52,7 @@ class AppDatabaseTest {
         testHelper.createDatabase(TEST_DB_NAME, 2).use {
             it.execSQL("INSERT INTO `network_leaderboard` VALUES ('Network2', 'example.com')")
         }
-        assertTrue(database().networkLeaderboardDao().trackerNetworkTally().blockingObserve()!!.isEmpty())
+        assertTrue(database().networkLeaderboardDao().trackerNetworkLeaderboard().blockingObserve()!!.isEmpty())
     }
 
     @Test
