@@ -61,9 +61,10 @@ class WebViewRequestInterceptor(
     override suspend fun shouldIntercept(
         request: WebResourceRequest,
         webView: WebView,
-        currentUrl: String?,
+        documentUrl: String?,
         webViewClientListener: WebViewClientListener?
     ): WebResourceResponse? {
+
         val url = request.url
 
         if (shouldUpgrade(request)) {
@@ -73,7 +74,7 @@ class WebViewRequestInterceptor(
             return WebResourceResponse(null, null, null)
         }
 
-        val documentUrl = currentUrl ?: return null
+        if (documentUrl == null) return null
 
         if (TrustedSites.isTrusted(documentUrl)) {
             return null

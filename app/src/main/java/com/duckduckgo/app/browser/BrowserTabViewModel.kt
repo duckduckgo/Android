@@ -36,7 +36,6 @@ import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment.SaveBookmarkListener
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
-import com.duckduckgo.app.browser.BrowserWebViewClient.BrowserNavigationOptions
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
@@ -192,10 +191,8 @@ class BrowserTabViewModel(
         }
     }
 
-    override val url: String?
+    val url: String?
         get() = site?.url
-
-    private var pendingUrl: String? = null
 
     private var appConfigurationDownloaded = false
     private val appConfigurationObservable = appConfigurationDao.appConfigurationStatus()
@@ -203,7 +200,7 @@ class BrowserTabViewModel(
     private var siteLiveData = MutableLiveData<Site>()
     private var site: Site? = null
     private lateinit var tabId: String
-    private var navigationOptions: BrowserNavigationOptions? = null
+    private var webNavigationState: WebNavigationState? = null
 
     init {
         initializeViewStates()
@@ -311,7 +308,7 @@ class BrowserTabViewModel(
     }
 
     private fun shouldClearHistoryOnNewQuery(): Boolean {
-        val navigation = navigationOptions ?: return false
+        val navigation = webNavigationState ?: return false
         return !currentBrowserViewState().browserShowing && navigation.hasNavigationHistory
     }
 
@@ -331,7 +328,7 @@ class BrowserTabViewModel(
      * @return true if navigation handled, otherwise false
      */
     fun onUserPressedBack(): Boolean {
-        val navigation = navigationOptions ?: return false
+        val navigation = webNavigationState ?: return false
 
         if (!currentBrowserViewState().browserShowing) {
             return false
@@ -349,7 +346,6 @@ class BrowserTabViewModel(
     }
 
     private fun navigateHome() {
-        pendingUrl = null
         site = null
         onSiteChanged()
 
@@ -360,19 +356,6 @@ class BrowserTabViewModel(
         )
         omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = "")
         loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
-    }
-
-    override fun progressChanged(progressedUrl: String?, newProgress: Int) {
-        Timber.v("Loading in progress $newProgress")
-        if (!currentBrowserViewState().browserShowing) return
-        val progress = currentLoadingViewState()
-        loadingViewState.value = progress.copy(progress = newProgress)
-
-        if (progressedUrl == pendingUrl) {
-            // We change the url here rather than loadingStarted to protect against phishing
-            // See https://github.com/duckduckgo/Android/pull/390
-            urlChanged(pendingUrl)
-        }
     }
 
     override fun goFullScreen(view: View) {
@@ -387,45 +370,37 @@ class BrowserTabViewModel(
         browserViewState.value = currentState.copy(isFullScreen = false)
     }
 
-    override fun loadingStarted(url: String?) {
-        Timber.v("Loading started")
+    override fun progressChanged(progressedUrl: String?, newProgress: Int) {
+        Timber.v("Loading in progress $newProgress")
         if (!currentBrowserViewState().browserShowing) return
+        val isLoading = newProgress < 100
         val progress = currentLoadingViewState()
-        loadingViewState.value = progress.copy(isLoading = true)
-        pendingUrl = url
-        site = null
-        onSiteChanged()
+        loadingViewState.value = progress.copy(isLoading = isLoading, progress = newProgress)
     }
 
-    override fun navigationOptionsChanged(navigation: BrowserNavigationOptions) {
-        navigationOptions = navigation
+    override fun webNavigationStateChanged(newWebNavigationState: WebNavigationState) {
+
+        val stateChange = WebNavigationStateChange(webNavigationState, newWebNavigationState)
+        webNavigationState = newWebNavigationState
 
         if (!currentBrowserViewState().browserShowing) return
 
         browserViewState.value = currentBrowserViewState().copy(
-            canGoBack = navigation.canGoBack || !skipHome,
-            canGoForward = navigation.canGoForward
+            canGoBack = newWebNavigationState.canGoBack || !skipHome,
+            canGoForward = newWebNavigationState.canGoForward
         )
-    }
 
-    override fun loadingFinished(url: String?) {
-        Timber.v("Loading finished")
-
-        if (!currentBrowserViewState().browserShowing) return
-
-        if (pendingUrl != null) {
-            urlChanged(url)
+        stateChange.newPage()?.let {
+            onPageChanged(it)
         }
 
-        val currentOmnibarViewState = currentOmnibarViewState()
-        val currentLoadingViewState = currentLoadingViewState()
+        stateChange.updatedPage()?.let {
+            onUrlUpdated(it)
+        }
 
-        val omnibarText = if (url != null) omnibarTextForUrl(url) else currentOmnibarViewState.omnibarText
-
-        loadingViewState.value = currentLoadingViewState.copy(isLoading = false)
-        omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarText)
-
-        registerSiteVisit()
+        if (stateChange.isClear()) {
+            onPageCleared()
+        }
     }
 
     private fun registerSiteVisit() {
@@ -454,26 +429,15 @@ class BrowserTabViewModel(
         command.postValue(SendSms(telephoneNumber))
     }
 
-    private fun urlChanged(url: String?) {
-        Timber.v("Url changed: $url")
+    private fun onPageChanged(url: String) {
 
-        if (url == null) {
-            findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = false)
+        Timber.v("Page changed: $url")
+        buildSiteFactory(url)
 
-            val currentBrowserViewState = currentBrowserViewState()
-            browserViewState.value = currentBrowserViewState.copy(
-                canAddBookmarks = false,
-                addToHomeEnabled = false,
-                addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported()
-            )
-
-            return
-        }
+        val currentOmnibarViewState = currentOmnibarViewState()
+        omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url)))
 
         val currentBrowserViewState = currentBrowserViewState()
-        val currentOmnibarViewState = currentOmnibarViewState()
-
-        omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url)))
         findInPageViewState.postValue(FindInPageViewState(visible = false, canFindInPage = true))
         browserViewState.postValue(
             currentBrowserViewState.copy(
@@ -489,13 +453,31 @@ class BrowserTabViewModel(
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             statisticsUpdater.refreshSearchRetentionAtb()
         }
-        pendingUrl = null
 
-        buildSiteFactory(url)
-        onSiteChanged()
+        registerSiteVisit()
     }
 
-    private fun omnibarTextForUrl(url: String): String {
+    private fun onPageCleared() {
+        site = null
+        onSiteChanged()
+
+        val currentBrowserViewState = currentBrowserViewState()
+        browserViewState.value = currentBrowserViewState.copy(
+            canAddBookmarks = false,
+            addToHomeEnabled = false,
+            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported()
+        )
+    }
+
+
+    private fun onUrlUpdated(url: String) {
+        Timber.v("Page url updated: $url")
+        val currentOmnibarViewState = currentOmnibarViewState()
+        omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url)))
+    }
+
+    private fun omnibarTextForUrl(url: String?): String {
+        if (url == null) return ""
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             return duckDuckGoUrlDetector.extractQuery(url) ?: ""
         }
@@ -503,6 +485,7 @@ class BrowserTabViewModel(
     }
 
     override fun trackerDetected(event: TrackingEvent) {
+        Timber.d("Tracker detected while on ${url} and the document was ${event.documentUrl}")
         if (event.documentUrl == url) {
             site?.trackerDetected(event)
             onSiteChanged()
@@ -513,7 +496,6 @@ class BrowserTabViewModel(
     private fun updateNetworkLeaderboard(event: TrackingEvent) {
         val networkName = event.trackerNetwork?.name ?: return
         networkLeaderboardDao.incrementNetworkCount(networkName)
-        networkLeaderboardDao.incrementSitesVisited()
     }
 
     override fun pageHasHttpResources(page: String?) {
@@ -788,4 +770,3 @@ class BrowserTabViewModel(
         request.handler.cancel()
     }
 }
-

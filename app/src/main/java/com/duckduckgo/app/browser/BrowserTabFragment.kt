@@ -1213,6 +1213,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         private fun shouldUpdateOmnibarTextInput(viewState: OmnibarViewState, omnibarInput: String?) =
-            !viewState.isEditing && omnibarTextInput.isDifferent(omnibarInput)
+            (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibarTextInput.isDifferent(omnibarInput)
     }
 }

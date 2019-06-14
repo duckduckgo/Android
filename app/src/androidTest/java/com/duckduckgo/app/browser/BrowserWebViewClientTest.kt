@@ -25,7 +25,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
-import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 
@@ -53,23 +52,16 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledThenListenerNotified() {
+    fun whenOnPageStartedCalledThenListenerInstructedToUpdateNavigationOptions() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(listener).loadingStarted(EXAMPLE_URL)
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnPageFinishedCalledThenListenerNotified() = runBlocking {
-        testee.onPageFinished(webView, EXAMPLE_URL)
-        verify(listener).loadingFinished(EXAMPLE_URL)
+        verify(listener).webNavigationStateChanged(any())
     }
 
     @UiThreadTest
     @Test
     fun whenOnPageFinishedCalledThenListenerInstructedToUpdateNavigationOptions() {
         testee.onPageFinished(webView, EXAMPLE_URL)
-        verify(listener).navigationOptionsChanged(any())
+        verify(listener).webNavigationStateChanged(any())
     }
 
     @UiThreadTest

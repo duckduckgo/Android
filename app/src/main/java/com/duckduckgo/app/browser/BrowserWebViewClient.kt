@@ -22,10 +22,8 @@ import android.os.Build
 import android.webkit.*
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
-import androidx.core.net.toUri
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
-import com.duckduckgo.app.global.isHttpsVersionOfUri
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.URI
 
@@ -38,7 +36,6 @@ class BrowserWebViewClient(
 
     var webViewClientListener: WebViewClientListener? = null
 
-    private var currentUrl: String? = null
     private var tempTimer = 0L
 
     /**
@@ -97,36 +94,27 @@ class BrowserWebViewClient(
 
     @UiThread
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
+        Timber.d("\nonPageStarted $url")
         tempTimer = System.currentTimeMillis()
-        Timber.d("\nonPageStarted {\nurl: $url\nwebView.url: ${webView.url}\n}\n")
-        currentUrl = url
-
-        webViewClientListener?.let {
-            it.loadingStarted(url)
-            it.navigationOptionsChanged(WebViewNavigationOptions(webView.copyBackForwardList()))
-        }
+        webViewClientListener?.webNavigationStateChanged(WebViewNavigationState(webView.copyBackForwardList()))
     }
 
     @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
-        currentUrl = url
-        webViewClientListener?.let {
-            it.loadingFinished(url)
-            it.navigationOptionsChanged(WebViewNavigationOptions(webView.copyBackForwardList()))
-        }
-
-        Timber.i("Page Load Time: ${System.currentTimeMillis() - tempTimer}ms for $url")
+        Timber.i("onPageFinished $url, load time: ${System.currentTimeMillis() - tempTimer}ms")
+        webViewClientListener?.webNavigationStateChanged(WebViewNavigationState(webView.copyBackForwardList()))
     }
 
     @WorkerThread
     override fun shouldInterceptRequest(webView: WebView, request: WebResourceRequest): WebResourceResponse? {
-        Timber.v("Intercepting resource ${request.url} on page $currentUrl")
-        return runBlocking { requestInterceptor.shouldIntercept(request, webView, currentUrl, webViewClientListener) }
+        val documentUrl = runBlocking { async(Dispatchers.Main) { webView.originalUrl }.await() }
+        Timber.v("Intercepting resource ${request.url} on page $documentUrl")
+        return runBlocking { requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener) }
     }
 
     @UiThread
     override fun onReceivedHttpAuthRequest(view: WebView?, handler: HttpAuthHandler?, host: String?, realm: String?) {
-        Timber.v("onReceivedHttpAuthRequest ${view?.url} $realm, $host,  $currentUrl")
+        Timber.v("onReceivedHttpAuthRequest ${view?.url} $realm, $host")
 
         if (handler != null) {
             Timber.v("onReceivedHttpAuthRequest - useHttpAuthUsernamePassword [${handler.useHttpAuthUsernamePassword()}]")
@@ -191,28 +179,5 @@ class BrowserWebViewClient(
     private inline fun consume(function: () -> Unit): Boolean {
         function()
         return true
-    }
-
-    interface BrowserNavigationOptions {
-        val stepsToPreviousPage: Int
-        val canGoBack: Boolean
-        val canGoForward: Boolean
-        val hasNavigationHistory: Boolean
-    }
-
-    data class WebViewNavigationOptions(val stack: WebBackForwardList) : BrowserNavigationOptions {
-
-        override val stepsToPreviousPage: Int = if (stack.isHttpsUpgrade) 2 else 1
-        override val canGoBack: Boolean = stack.currentIndex >= stepsToPreviousPage
-        override val canGoForward: Boolean = stack.currentIndex + 1 < stack.size
-        override val hasNavigationHistory = stack.size != 0
-
-        private val WebBackForwardList.isHttpsUpgrade: Boolean
-            get() {
-                if (currentIndex < 1) return false
-                val current = currentItem?.originalUrl?.toUri() ?: return false
-                val previous = getItemAtIndex(currentIndex - 1).originalUrl?.toUri() ?: return false
-                return current.isHttpsVersionOfUri(previous)
-            }
     }
 }
