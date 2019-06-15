@@ -24,10 +24,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.*
 import org.junit.Before
 import org.junit.Test
 
@@ -111,6 +108,16 @@ class BrowserChromeClientTest {
         webView.stubUrl = url
         testee.onProgressChanged(webView, 10)
         verify(mockWebViewClientListener).progressChanged(url, 10)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnCreateWindowThenOpenUrlInNewTab() {
+        val url = "https://example.com"
+        webView.stubUrl = url
+        testee.onCreateWindow(webView, false, false,  null)
+        verify(mockWebViewClientListener).openInNewTab(webView.stubUrl)
+        verifyNoMoreInteractions(mockWebViewClientListener)
     }
 
     private class TestWebView(context: Context) : WebView(context) {
