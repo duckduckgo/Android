@@ -17,11 +17,12 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
+import android.os.Message
 import android.view.View
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
-import com.duckduckgo.app.browser.BrowserWebViewClient.*
+import com.duckduckgo.app.browser.BrowserWebViewClient.WebViewNavigationOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -72,5 +73,10 @@ class BrowserChromeClient @Inject constructor() : WebChromeClient(), CoroutineSc
     override fun onShowFileChooser(webView: WebView, filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: FileChooserParams): Boolean {
         webViewClientListener?.showFileChooser(filePathCallback, fileChooserParams)
         return true
+    }
+
+    override fun onCreateWindow(view: WebView?, isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message?): Boolean {
+        webViewClientListener?.openInNewTab(view?.url)
+        return super.onCreateWindow(view, isDialog, isUserGesture, resultMsg)
     }
 }

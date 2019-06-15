@@ -91,7 +91,6 @@ class BrowserTabViewModel(
     private val searchCountDao: SearchCountDao,
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, HttpAuthenticationListener, ViewModel() {
-
     private var buildingSiteFactoryJob: Job? = null
 
     data class GlobalLayoutViewState(
@@ -773,6 +772,10 @@ class BrowserTabViewModel(
 
     override fun externalAppLinkClicked(appLink: IntentType) {
         command.value = HandleExternalAppLink(appLink)
+    }
+
+    override fun openInNewTab(url: String?) {
+        command.value = OpenInNewTab(url ?: "")
     }
 
     override fun requiresAuthentication(request: BasicAuthenticationRequest) {
