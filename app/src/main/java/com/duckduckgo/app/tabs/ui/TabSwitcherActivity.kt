@@ -29,6 +29,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.global.view.FireDialog
+import com.duckduckgo.app.global.view.attachItemTouchHelper
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
@@ -72,9 +73,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     private fun configureRecycler() {
         tabsRecycler.layoutManager = LinearLayoutManager(this)
         tabsRecycler.adapter = tabsAdapter
+        tabsRecycler.attachItemTouchHelper(
+            object :
+                ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
 
-        ItemTouchHelper(
-            object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
                 override fun onMove(
                     recyclerView: RecyclerView,
                     viewHolder: RecyclerView.ViewHolder,
@@ -88,9 +90,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
                         onTabDeleted(swipedTab)
                     }
                 }
-
             }
-        ).attachToRecyclerView(tabsRecycler)
+        )
     }
 
     private fun configureObservers() {
