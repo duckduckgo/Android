@@ -22,7 +22,9 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
@@ -70,6 +72,25 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     private fun configureRecycler() {
         tabsRecycler.layoutManager = LinearLayoutManager(this)
         tabsRecycler.adapter = tabsAdapter
+
+        ItemTouchHelper(
+            object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+                ): Boolean = false
+
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    val position = viewHolder.adapterPosition
+                    viewModel.tabs.value?.takeIf { it.count() > position }?.let { tabList ->
+                        val swipedTab = tabList[position]
+                        onTabDeleted(swipedTab)
+                    }
+                }
+
+            }
+        ).attachToRecyclerView(tabsRecycler)
     }
 
     private fun configureObservers() {
@@ -155,3 +176,4 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
         }
     }
 }
+
