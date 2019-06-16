@@ -33,6 +33,7 @@ class TabSwitcherViewModel(private val tabRepository: TabRepository, private val
 
     sealed class Command {
         data class DisplayMessage(@StringRes val messageId: Int) : Command()
+        data class DeleteTab(val tab: TabEntity) : Command()
         object Close : Command()
     }
 
@@ -49,6 +50,12 @@ class TabSwitcherViewModel(private val tabRepository: TabRepository, private val
     suspend fun onTabDeleted(tab: TabEntity) {
         tabRepository.delete(tab)
         webViewSessionStorage.deleteSession(tab.tabId)
+    }
+
+    fun deleteTab(position: Int) {
+        tabs.value?.takeIf { it.count() > position }?.let { tabList ->
+            command.value = Command.DeleteTab(tabList[position])
+        }
     }
 
     fun onClearComplete() {

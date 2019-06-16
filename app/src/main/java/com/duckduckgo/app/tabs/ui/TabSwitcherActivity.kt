@@ -84,11 +84,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
                 ): Boolean = false
 
                 override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                    val position = viewHolder.adapterPosition
-                    viewModel.tabs.value?.takeIf { it.count() > position }?.let { tabList ->
-                        val swipedTab = tabList[position]
-                        onTabDeleted(swipedTab)
-                    }
+                    viewModel.deleteTab(viewHolder.adapterPosition)
                 }
             }
         )
@@ -113,6 +109,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     private fun processCommand(command: Command?) {
         when (command) {
             is DisplayMessage -> applicationContext?.longToast(command.messageId)
+            is Command.DeleteTab -> onTabDeleted(command.tab)
             is Close -> finish()
         }
     }
