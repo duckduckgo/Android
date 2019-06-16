@@ -51,7 +51,6 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
-import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -1044,6 +1043,18 @@ class BrowserTabViewModelTest {
         whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(true)
         testee.restoreWebViewState(null, "")
         assertFalse(globalLayoutViewState().isNewTabState)
+    }
+
+    @Test
+    fun whenOpenInNewTabThenOpenInNewTabCommandWithCorrectUrlSent() {
+        val url = "https://example.com"
+        testee.openInNewTab(url)
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue
+        assertTrue(command is Command.OpenInNewTab)
+        command as Command.OpenInNewTab
+        assertEquals(url, command.query)
     }
 
     @Test
