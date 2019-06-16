@@ -18,6 +18,7 @@ package com.duckduckgo.app.global.view
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.WebDataManager
+import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -40,6 +41,7 @@ class ClearPersonalDataActionTest {
     private val mockTabRepository: TabRepository = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockCookieManager: DuckDuckGoCookieManager = mock()
+    private val mockAppCacheClearer: AppCacheClearer = mock()
 
     @Before
     fun setup() {
@@ -49,7 +51,8 @@ class ClearPersonalDataActionTest {
             mockClearingUnsentForgetAllPixelStore,
             mockTabRepository,
             mockSettingsDataStore,
-            mockCookieManager
+            mockCookieManager,
+            mockAppCacheClearer
         )
     }
 
@@ -81,6 +84,12 @@ class ClearPersonalDataActionTest {
     fun whenClearCalledThenDataManagerClearsCookies() = runBlocking<Unit> {
         testee.clearTabsAndAllDataAsync(false, false)
         verify(mockDataManager).clearExternalCookies()
+    }
+
+    @Test
+    fun whenClearCalledThenAppCacheClearerClearsCache() = runBlocking<Unit> {
+        testee.clearTabsAndAllDataAsync(false, false)
+        verify(mockAppCacheClearer).clearCache()
     }
 
     @Test

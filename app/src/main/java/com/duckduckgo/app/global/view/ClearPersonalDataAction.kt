@@ -23,6 +23,7 @@ import android.webkit.WebViewDatabase
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.WebDataManager
+import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
@@ -53,7 +54,8 @@ class ClearPersonalDataAction @Inject constructor(
     private val clearingStore: UnsentForgetAllPixelStore,
     private val tabRepository: TabRepository,
     private val settingsDataStore: SettingsDataStore,
-    private val cookieManager: DuckDuckGoCookieManager
+    private val cookieManager: DuckDuckGoCookieManager,
+    private val appCacheClearer: AppCacheClearer
 ) : ClearDataAction, CoroutineScope {
 
     private val clearJob: Job = Job()
@@ -104,6 +106,8 @@ class ClearPersonalDataAction @Inject constructor(
 
         dataManager.clearData(createWebView(), createWebStorage(), WebViewDatabase.getInstance(context))
         dataManager.clearExternalCookies()
+
+        appCacheClearer.clearCache()
 
         Timber.i("Finished clearing data")
     }

@@ -50,10 +50,10 @@ class SpecialUrlDetectorImpl : SpecialUrlDetector {
             MAILTO_SCHEME -> buildEmail(uriString)
             SMS_SCHEME -> buildSms(uriString)
             SMSTO_SCHEME -> buildSmsTo(uriString)
-            HTTP_SCHEME, HTTPS_SCHEME -> UrlType.Web(uriString)
+            HTTP_SCHEME, HTTPS_SCHEME, DATA_SCHEME -> UrlType.Web(uriString)
             ABOUT_SCHEME -> UrlType.Unknown(uriString)
             null -> UrlType.SearchQuery(uriString)
-            else -> buildIntent(uriString)
+            else -> checkForIntent(scheme, uriString)
         }
     }
 
@@ -66,6 +66,15 @@ class SpecialUrlDetectorImpl : SpecialUrlDetector {
     private fun buildSms(uriString: String) = UrlType.Sms(uriString.removePrefix("$SMS_SCHEME:"))
 
     private fun buildSmsTo(uriString: String) = UrlType.Sms(uriString.removePrefix("$SMSTO_SCHEME:"))
+
+    private fun checkForIntent(scheme: String, uriString: String): UrlType {
+        val validUriSchemeRegex = Regex("[a-z][a-zA-Z\\d+.-]+")
+        if (scheme.matches(validUriSchemeRegex)){
+            return buildIntent(uriString)
+        }
+
+        return UrlType.SearchQuery(uriString)
+    }
 
     private fun buildIntent(uriString: String): UrlType {
         return try {
@@ -93,6 +102,7 @@ class SpecialUrlDetectorImpl : SpecialUrlDetector {
         private const val HTTP_SCHEME = "http"
         private const val HTTPS_SCHEME = "https"
         private const val ABOUT_SCHEME = "about"
+        private const val DATA_SCHEME = "data"
 
         private const val EXTRA_FALLBACK_URL = "browser_fallback_url"
     }

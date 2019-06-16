@@ -52,7 +52,6 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
-import com.duckduckgo.app.privacy.db.SiteVisitedEntity
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -298,7 +297,7 @@ class BrowserTabViewModelTest {
     fun whenTrackerDetectedThenNetworkLeaderboardUpdated() {
         val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", TrackerNetwork("Network1", "www.tracker.com"), false)
         testee.trackerDetected(event)
-        verify(mockNetworkLeaderboardDao).insert(NetworkLeaderboardEntry("Network1", "www.example.com"))
+        verify(mockNetworkLeaderboardDao).incrementNetworkCount("Network1")
     }
 
     @Test
@@ -389,7 +388,7 @@ class BrowserTabViewModelTest {
         isBrowsing(true)
         testee.loadingStarted("http://example.com/abc")
         testee.loadingFinished("http://example.com/abc")
-        verify(mockNetworkLeaderboardDao).insert(SiteVisitedEntity("example.com"))
+        verify(mockNetworkLeaderboardDao).incrementSitesVisited()
     }
 
     @Test
@@ -397,7 +396,7 @@ class BrowserTabViewModelTest {
         isBrowsing(false)
         testee.loadingStarted("http://example.com/abc")
         testee.loadingFinished("http://example.com/abc")
-        verify(mockNetworkLeaderboardDao, never()).insert(SiteVisitedEntity("example.com"))
+        verify(mockNetworkLeaderboardDao, never()).incrementSitesVisited()
     }
 
     @Test
@@ -443,13 +442,13 @@ class BrowserTabViewModelTest {
     @Test
     fun whenLoadingFinishedWithNoUrlThenSiteVisitedEntryNotAddedToLeaderboardDao() {
         testee.loadingFinished(null)
-        verify(mockNetworkLeaderboardDao, never()).insert(SiteVisitedEntity("example.com"))
+        verify(mockNetworkLeaderboardDao, never()).incrementSitesVisited()
     }
 
     @Test
     fun whenTrackerDetectedThenSiteVisitedEntryAddedToLeaderboardDao() {
         testee.trackerDetected(TrackingEvent("http://example.com/abc", "http://tracker.com", TrackerNetwork("Network", "http:// netwotk.com"), true))
-        verify(mockNetworkLeaderboardDao).insert(SiteVisitedEntity("example.com"))
+        verify(mockNetworkLeaderboardDao).incrementSitesVisited()
     }
 
     @Test

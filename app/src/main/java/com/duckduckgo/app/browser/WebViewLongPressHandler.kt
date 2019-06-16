@@ -80,14 +80,15 @@ class WebViewLongPressHandler @Inject constructor(private val context: Context, 
     }
 
     private fun addImageMenuOptions(menu: ContextMenu) {
-        menu.add(0, CONTEXT_MENU_ID_DOWNLOAD_IMAGE, 0, R.string.downloadImage)
+        menu.add(0, CONTEXT_MENU_ID_DOWNLOAD_IMAGE, CONTEXT_MENU_ID_DOWNLOAD_IMAGE, R.string.downloadImage)
+        menu.add(0, CONTEXT_MENU_ID_OPEN_IMAGE_IN_NEW_BACKGROUND_TAB, CONTEXT_MENU_ID_OPEN_IMAGE_IN_NEW_BACKGROUND_TAB, R.string.openImageInNewTab)
     }
 
     private fun addLinkMenuOptions(menu: ContextMenu) {
-        menu.add(0, CONTEXT_MENU_ID_OPEN_IN_NEW_TAB, 1, R.string.openInNewTab)
-        menu.add(0, CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB, 2, R.string.openInNewBackgroundTab)
-        menu.add(0, CONTEXT_MENU_ID_COPY, 3, R.string.copyUrl)
-        menu.add(0, CONTEXT_MENU_ID_SHARE_LINK, 4, R.string.shareLink)
+        menu.add(0, CONTEXT_MENU_ID_OPEN_IN_NEW_TAB, CONTEXT_MENU_ID_OPEN_IN_NEW_TAB, R.string.openInNewTab)
+        menu.add(0, CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB, CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB, R.string.openInNewBackgroundTab)
+        menu.add(0, CONTEXT_MENU_ID_COPY, CONTEXT_MENU_ID_COPY, R.string.copyUrl)
+        menu.add(0, CONTEXT_MENU_ID_SHARE_LINK, CONTEXT_MENU_ID_SHARE_LINK, R.string.shareLink)
     }
 
     private fun isLinkSupported(longPressTargetUrl: String?) = URLUtil.isNetworkUrl(longPressTargetUrl) || URLUtil.isDataUrl(longPressTargetUrl)
@@ -96,23 +97,33 @@ class WebViewLongPressHandler @Inject constructor(private val context: Context, 
         return when (item.itemId) {
             CONTEXT_MENU_ID_OPEN_IN_NEW_TAB -> {
                 pixel.fire(LONG_PRESS_NEW_TAB)
-                return OpenInNewTab(longPressTarget.url)
+                val url = longPressTarget.url ?: return None
+                return OpenInNewTab(url)
             }
             CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB -> {
                 pixel.fire(LONG_PRESS_NEW_BACKGROUND_TAB)
-                return OpenInNewBackgroundTab(longPressTarget.url)
+                val url = longPressTarget.url ?: return None
+                return OpenInNewBackgroundTab(url)
             }
             CONTEXT_MENU_ID_DOWNLOAD_IMAGE -> {
                 pixel.fire(LONG_PRESS_DOWNLOAD_IMAGE)
-                return DownloadFile(longPressTarget.imageUrl ?: longPressTarget.url)
+                val url = longPressTarget.imageUrl ?: return None
+                return DownloadFile(url)
+            }
+            CONTEXT_MENU_ID_OPEN_IMAGE_IN_NEW_BACKGROUND_TAB -> {
+                pixel.fire(LONG_PRESS_OPEN_IMAGE_IN_BACKGROUND_TAB)
+                val url = longPressTarget.imageUrl ?: return None
+                return OpenInNewBackgroundTab(url)
             }
             CONTEXT_MENU_ID_SHARE_LINK -> {
                 pixel.fire(LONG_PRESS_SHARE)
-                return ShareLink(longPressTarget.url)
+                val url = longPressTarget.url ?: return None
+                return ShareLink(url)
             }
             CONTEXT_MENU_ID_COPY -> {
                 pixel.fire(LONG_PRESS_COPY_URL)
-                return CopyLink(longPressTarget.url)
+                val url = longPressTarget.url ?: return None
+                return CopyLink(url)
             }
             else -> None
         }
@@ -121,9 +132,10 @@ class WebViewLongPressHandler @Inject constructor(private val context: Context, 
 
     companion object {
         const val CONTEXT_MENU_ID_OPEN_IN_NEW_TAB = 1
-        const val CONTEXT_MENU_ID_DOWNLOAD_IMAGE = 2
-        const val CONTEXT_MENU_ID_SHARE_LINK = 3
-        const val CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB = 4
-        const val CONTEXT_MENU_ID_COPY = 5
+        const val CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB = 2
+        const val CONTEXT_MENU_ID_COPY = 3
+        const val CONTEXT_MENU_ID_SHARE_LINK = 4
+        const val CONTEXT_MENU_ID_DOWNLOAD_IMAGE = 5
+        const val CONTEXT_MENU_ID_OPEN_IMAGE_IN_NEW_BACKGROUND_TAB = 6
     }
 }
