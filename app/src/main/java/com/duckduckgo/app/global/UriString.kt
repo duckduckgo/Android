@@ -38,11 +38,11 @@ class UriString {
         }
 
         fun isWebUrl(inputQuery: String): Boolean {
+            if (inputQuery.contains(space)) return false
             val uri = Uri.parse(inputQuery).withScheme()
             if (uri.scheme != UrlScheme.http && uri.scheme != UrlScheme.https) return false
             if (uri.userInfo != null) return false
             if (uri.host == null) return false
-            if (uri.path.contains(space)) return false
             return isValidHost(uri.host)
         }
 
