@@ -24,6 +24,7 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
+import com.duckduckgo.app.global.file.FileDeleter
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import kotlinx.coroutines.runBlocking
@@ -35,7 +36,9 @@ class WebViewDataManagerTest {
 
     private val mockCookieManager: DuckDuckGoCookieManager = mock()
     private val mockStorage: WebStorage = mock()
-    private val testee = WebViewDataManager(WebViewSessionInMemoryStorage(), mockCookieManager)
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val mockFileDeleter: FileDeleter = mock()
+    private val testee = WebViewDataManager(context, WebViewSessionInMemoryStorage(), mockCookieManager, mockFileDeleter)
 
     @UiThreadTest
     @Test
