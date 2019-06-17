@@ -48,7 +48,7 @@ class PrivacyDashboardViewModelTest {
     private var viewStateObserver: Observer<PrivacyDashboardViewModel.ViewState> = mock()
     private var settingStore: PrivacySettingsStore = mock()
     private var networkLeaderboardDao: NetworkLeaderboardDao = mock()
-    private var networkLeaserboardLiveData: LiveData<List<NetworkLeaderboardEntry>> = mock()
+    private var networkLeaderboardLiveData: LiveData<List<NetworkLeaderboardEntry>> = mock()
     private var sitesVisitedLiveData: LiveData<Int> = mock()
     private var mockPixel: Pixel = mock()
 
@@ -61,9 +61,9 @@ class PrivacyDashboardViewModelTest {
     @Before
     fun before() {
         whenever(sitesVisitedLiveData.value).thenReturn(0)
-        whenever(networkLeaserboardLiveData.value).thenReturn(emptyList())
+        whenever(networkLeaderboardLiveData.value).thenReturn(emptyList())
         whenever(networkLeaderboardDao.sitesVisited()).thenReturn(sitesVisitedLiveData)
-        whenever(networkLeaderboardDao.trackerNetworkLeaderboard()).thenReturn(networkLeaserboardLiveData)
+        whenever(networkLeaderboardDao.trackerNetworkLeaderboard()).thenReturn(networkLeaderboardLiveData)
     }
 
     @After
