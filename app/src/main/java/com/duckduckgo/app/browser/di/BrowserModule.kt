@@ -91,8 +91,8 @@ class BrowserModule {
 
     @Singleton
     @Provides
-    fun webDataManager(webViewSessionStorage: WebViewSessionStorage, cookieManager: DuckDuckGoCookieManager): WebDataManager =
-        WebViewDataManager(webViewSessionStorage, cookieManager)
+    fun webDataManager(context: Context, webViewSessionStorage: WebViewSessionStorage, cookieManager: DuckDuckGoCookieManager): WebDataManager =
+        WebViewDataManager(context, webViewSessionStorage, cookieManager)
 
     @Provides
     fun clipboardManager(context: Context): ClipboardManager {

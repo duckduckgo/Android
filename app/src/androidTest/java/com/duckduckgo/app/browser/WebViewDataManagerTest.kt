@@ -35,7 +35,8 @@ class WebViewDataManagerTest {
 
     private val mockCookieManager: DuckDuckGoCookieManager = mock()
     private val mockStorage: WebStorage = mock()
-    private val testee = WebViewDataManager(WebViewSessionInMemoryStorage(), mockCookieManager)
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val testee = WebViewDataManager(context, WebViewSessionInMemoryStorage(), mockCookieManager)
 
     @UiThreadTest
     @Test

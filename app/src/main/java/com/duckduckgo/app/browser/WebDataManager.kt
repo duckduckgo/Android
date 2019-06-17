@@ -16,21 +16,25 @@
 
 package com.duckduckgo.app.browser
 
+import android.content.Context
 import android.os.Build
 import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewDatabase
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
+import java.io.File
 import javax.inject.Inject
 
 interface WebDataManager {
     suspend fun clearExternalCookies()
     fun clearData(webView: WebView, webStorage: WebStorage, webViewDatabase: WebViewDatabase)
     fun clearWebViewSessions()
+    suspend fun deleteWebViewDirectory()
 }
 
 class WebViewDataManager @Inject constructor(
+    private val context: Context,
     private val webViewSessionStorage: WebViewSessionStorage,
     private val cookieManager: DuckDuckGoCookieManager
 ) : WebDataManager {
@@ -64,6 +68,13 @@ class WebViewDataManager @Inject constructor(
         webView.clearFormData()
     }
 
+    override suspend fun deleteWebViewDirectory() {
+        val webViewDataDirectory = File(context.applicationInfo.dataDir, WEBVIEW_DATA_DIRECTORY_NAME)
+        val files = webViewDataDirectory.listFiles() ?: return
+        val filesToDelete = files.filterNot { FILENAMES_EXCLUDED_FROM_DELETION.contains(it.name) }
+        filesToDelete.forEach { it.deleteRecursively() }
+    }
+
     /**
      * Deprecated and not needed on Oreo or later
      */
@@ -82,5 +93,14 @@ class WebViewDataManager @Inject constructor(
 
     override fun clearWebViewSessions() {
         webViewSessionStorage.deleteAllSessions()
+    }
+
+    companion object {
+        private const val WEBVIEW_DATA_DIRECTORY_NAME = "app_webview"
+
+        private val FILENAMES_EXCLUDED_FROM_DELETION = listOf(
+            "Cookies",
+            "Local Storage"
+        )
     }
 }
