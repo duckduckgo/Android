@@ -17,8 +17,7 @@
 package com.duckduckgo.app.fire
 
 import android.content.Context
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.duckduckgo.app.global.file.FileDeleter
 
 
 interface AppCacheClearer {
@@ -27,12 +26,22 @@ interface AppCacheClearer {
 
 }
 
-class AndroidAppCacheClearer(private val context: Context) : AppCacheClearer {
+class AndroidAppCacheClearer(private val context: Context, private val fileDeleter: FileDeleter) : AppCacheClearer {
 
     override suspend fun clearCache() {
-        withContext(Dispatchers.IO) {
-            context.cacheDir.deleteRecursively()
-        }
+        fileDeleter.deleteContents(context.cacheDir, FILENAMES_EXCLUDED_FROM_DELETION)
+    }
+
+    companion object {
+
+        /* Exclude this WebView cache directory, based on warning from Firefox Focus:
+         *   "If the folder or its contents are deleted, WebView will stop using the disk cache entirely."
+         */
+        private const val WEBVIEW_CACHE_DIR = "org.chromium.android_webview"
+
+        private val FILENAMES_EXCLUDED_FROM_DELETION = listOf(
+            WEBVIEW_CACHE_DIR
+        )
     }
 
 }

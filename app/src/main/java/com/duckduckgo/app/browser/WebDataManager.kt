@@ -23,6 +23,7 @@ import android.webkit.WebView
 import android.webkit.WebViewDatabase
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
+import com.duckduckgo.app.global.file.FileDeleter
 import java.io.File
 import javax.inject.Inject
 
@@ -36,7 +37,8 @@ interface WebDataManager {
 class WebViewDataManager @Inject constructor(
     private val context: Context,
     private val webViewSessionStorage: WebViewSessionStorage,
-    private val cookieManager: DuckDuckGoCookieManager
+    private val cookieManager: DuckDuckGoCookieManager,
+    private val fileDeleter: FileDeleter
 ) : WebDataManager {
 
     override fun clearData(webView: WebView, webStorage: WebStorage, webViewDatabase: WebViewDatabase) {
@@ -70,9 +72,7 @@ class WebViewDataManager @Inject constructor(
 
     override suspend fun deleteWebViewDirectory() {
         val webViewDataDirectory = File(context.applicationInfo.dataDir, WEBVIEW_DATA_DIRECTORY_NAME)
-        val files = webViewDataDirectory.listFiles() ?: return
-        val filesToDelete = files.filterNot { FILENAMES_EXCLUDED_FROM_DELETION.contains(it.name) }
-        filesToDelete.forEach { it.deleteRecursively() }
+        fileDeleter.deleteContents(webViewDataDirectory, FILENAMES_EXCLUDED_FROM_DELETION)
     }
 
     /**
