@@ -17,21 +17,23 @@
 package com.duckduckgo.app.tabs.ui
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
+import androidx.core.content.ContextCompat
+import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.tabs.model.TabEntity
-import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
 import kotlinx.android.synthetic.main.item_tab.view.*
 
-class TabSwitcherAdapter(private val context: Context, private val itemClickListener: TabSwitchedListener) : Adapter<TabViewHolder>() {
+class TabSwitcherAdapter(private val context: Context, private val itemClickListener: TabSwitchedListener) : Adapter<TabSwitcherAdapter.TabViewHolder>() {
 
     private var data: List<TabEntity> = ArrayList()
     private var selectedTab: TabEntity? = null
@@ -39,7 +41,9 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TabViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val root = inflater.inflate(R.layout.item_tab, parent, false)
-        return TabViewHolder(root, root.favicon, root.title, root.url, root.close, root.tabUnread)
+        //return TabViewHolder(root, root.favicon, root.tabPreview, root.title, root.close, root.tabUnread)
+        return TabViewHolder(root, root.favicon, root.tabPreview, root.title, root.close)
+        //return TabViewHolder(root)
     }
 
     override fun getItemCount(): Int {
@@ -50,9 +54,8 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
 
         val tab = data[position]
         holder.title.text = tab.displayTitle(context)
-        holder.url.text = tab.displayUrl()
-        holder.tabUnread.visibility = if (tab.viewed) View.INVISIBLE else View.VISIBLE
-        holder.root.setBackgroundResource(if (tab.tabId == selectedTab?.tabId) SELECTED_BACKGROUND else DEFAULT_BACKGROUND)
+        //holder.tabUnread.visibility = if (tab.viewed) View.INVISIBLE else View.VISIBLE
+        //holder.root.setBackgroundResource(if (tab.tabId == selectedTab?.tabId) SELECTED_BACKGROUND else DEFAULT_BACKGROUND)
 
         GlideApp.with(holder.root)
             .load(tab.favicon())
@@ -60,7 +63,24 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
             .error(R.drawable.ic_globe_gray_16dp)
             .into(holder.favicon)
 
+        holder.tabPreview.setImageResource(R.drawable.ic_globe_gray_16dp)
+
+//        GlideApp.with(holder.root)
+//            .load(R.drawable.ic_globe_gray_16dp)
+//            .into(holder.tabPreview)
+
         attachClickListeners(holder, tab)
+
+        val randomColorList = listOf(
+            R.color.cornflowerBlue,
+            R.color.brickOrange,
+            R.color.midGreen,
+            R.color.coolGray
+        )
+
+        val color = position % randomColorList.size
+        val tint = ContextCompat.getColor(context, randomColorList[color])
+        ImageViewCompat.setImageTintList(holder.tabPreview, ColorStateList.valueOf(tint))
     }
 
     private fun attachClickListeners(holder: TabViewHolder, tab: TabEntity) {
@@ -81,6 +101,8 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
         notifyDataSetChanged()
     }
 
+    fun getTab(position: Int): TabEntity = data[position]
+
     interface TabSwitchedListener {
         fun onNewTabRequested()
         fun onTabSelected(tab: TabEntity)
@@ -90,10 +112,10 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
     data class TabViewHolder(
         val root: View,
         val favicon: ImageView,
+        val tabPreview: ImageView,
         val title: TextView,
-        val url: TextView,
-        val close: ImageView,
-        val tabUnread: View
+        val close: ImageView/*,
+        val tabUnread: View*/
     ) : ViewHolder(root)
 
     companion object {
@@ -103,5 +125,6 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
         @DrawableRes
         private const val DEFAULT_BACKGROUND = R.drawable.tab_background
     }
+
 
 }

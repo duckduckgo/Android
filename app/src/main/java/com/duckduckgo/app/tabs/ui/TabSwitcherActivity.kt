@@ -22,7 +22,11 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.ItemTouchHelper.LEFT
+import androidx.recyclerview.widget.ItemTouchHelper.RIGHT
+import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
@@ -39,6 +43,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.longToast
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -68,8 +73,27 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     }
 
     private fun configureRecycler() {
-        tabsRecycler.layoutManager = LinearLayoutManager(this)
+        val numberColumns = calculateNumberOfColumns(180)
+        tabsRecycler.layoutManager = GridLayoutManager(this, numberColumns)
         tabsRecycler.adapter = tabsAdapter
+
+        val swipeListener = ItemTouchHelper(object : SwipeToDeleteCallback() {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val adapterPosition = viewHolder.adapterPosition
+                Timber.i("onSwiped $adapterPosition")
+                val tab = tabsAdapter.getTab(viewHolder.adapterPosition)
+                tabsAdapter.notifyItemRemoved(adapterPosition)
+                onTabDeleted(tab)
+            }
+        })
+        swipeListener.attachToRecyclerView(tabsRecycler)
+    }
+
+    private fun calculateNumberOfColumns(columnWidthDp: Int): Int {
+        val displayMetrics = resources.displayMetrics;
+        val screenWidthDp = displayMetrics.widthPixels / displayMetrics.density;
+        val numberOfColumns = (screenWidthDp / columnWidthDp + 0.5).toInt()
+        return Math.min(MAX_COLUMNS, numberOfColumns)
     }
 
     private fun configureObservers() {
@@ -150,8 +174,16 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     }
 
     companion object {
+        private const val MAX_COLUMNS = 4
+
         fun intent(context: Context): Intent {
             return Intent(context, TabSwitcherActivity::class.java)
+        }
+    }
+
+    abstract class SwipeToDeleteCallback : ItemTouchHelper.SimpleCallback(0, LEFT or RIGHT) {
+        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+            return false
         }
     }
 }
