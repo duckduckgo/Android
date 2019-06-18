@@ -151,7 +151,7 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenNetworkCountIsAtLeastThreeAndTotalSitesIsOverThirtyThenShowSummaryIsTrue() {
+    fun whenNetworkCountIsThreeAndTotalSitesIsThirtyOneThenShowSummaryIsTrue() {
         val first = NetworkLeaderboardEntry("Network1", 5)
         val second = NetworkLeaderboardEntry("Network2", 3)
         val third = NetworkLeaderboardEntry("Network3", 3)
@@ -161,7 +161,7 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenNetworkCountIsLessThanThreeThenShowSummaryIsFalse() {
+    fun whenNetworkCountIsTwoAndTotalSitesIsThirtyOneThenShowSummaryIsFalse() {
         val first = NetworkLeaderboardEntry("Network1", 5)
         val second = NetworkLeaderboardEntry("Network2", 3)
         testee.onTrackerNetworkEntriesChanged(listOf(first, second))
@@ -170,7 +170,16 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenSitesIsNotOverThirtyThenShowSummaryIsFalse() {
+    fun whenNetworkCountIsTwoAndTotalSitesIsThirtyThenShowSummaryIsFalse() {
+        val first = NetworkLeaderboardEntry("Network1", 5)
+        val second = NetworkLeaderboardEntry("Network2", 3)
+        testee.onTrackerNetworkEntriesChanged(listOf(first, second))
+        testee.onSitesVisitedChanged(30)
+        assertFalse(testee.viewState.value!!.shouldShowTrackerNetworkLeaderboard)
+    }
+
+    @Test
+    fun whenNetworkCountIsThreeAndTotalSitesIsThirtyThenShowSummaryIsFalse() {
         val first = NetworkLeaderboardEntry("Network1", 5)
         val second = NetworkLeaderboardEntry("Network2", 3)
         val third = NetworkLeaderboardEntry("Network3", 3)
