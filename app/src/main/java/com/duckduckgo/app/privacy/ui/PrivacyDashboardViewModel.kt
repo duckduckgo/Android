@@ -47,7 +47,7 @@ class PrivacyDashboardViewModel(
         val allTrackersBlocked: Boolean,
         val practices: PrivacyPractices.Summary,
         val toggleEnabled: Boolean,
-        val showTrackerNetworkLeaderboard: Boolean,
+        val shouldShowTrackerNetworkLeaderboard: Boolean,
         val sitesVisited: Int,
         val trackerNetworkEntries: List<NetworkLeaderboardEntry>,
         val shouldReloadPage: Boolean
@@ -84,7 +84,7 @@ class PrivacyDashboardViewModel(
         val siteCount = count ?: 0
         val networkCount = viewState.value?.trackerNetworkEntries?.count() ?: 0
         viewState.value = viewState.value?.copy(
-            showTrackerNetworkLeaderboard = showTrackerNetworkLeaderboard(siteCount, networkCount),
+            shouldShowTrackerNetworkLeaderboard = showTrackerNetworkLeaderboard(siteCount, networkCount),
             sitesVisited = siteCount
         )
     }
@@ -93,7 +93,7 @@ class PrivacyDashboardViewModel(
         val domainCount = viewState.value?.sitesVisited ?: 0
         val networkEntries = networkLeaderboardEntries ?: emptyList()
         viewState.value = viewState.value?.copy(
-            showTrackerNetworkLeaderboard = showTrackerNetworkLeaderboard(domainCount, networkEntries.count()),
+            shouldShowTrackerNetworkLeaderboard = showTrackerNetworkLeaderboard(domainCount, networkEntries.count()),
             trackerNetworkEntries = networkEntries
         )
     }
@@ -121,7 +121,7 @@ class PrivacyDashboardViewModel(
             allTrackersBlocked = true,
             toggleEnabled = settingsStore.privacyOn,
             practices = UNKNOWN,
-            showTrackerNetworkLeaderboard = false,
+            shouldShowTrackerNetworkLeaderboard = false,
             sitesVisited = 0,
             trackerNetworkEntries = emptyList(),
             shouldReloadPage = shouldReloadPage

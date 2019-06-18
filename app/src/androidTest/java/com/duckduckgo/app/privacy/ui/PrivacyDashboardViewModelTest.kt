@@ -157,7 +157,7 @@ class PrivacyDashboardViewModelTest {
         val third = NetworkLeaderboardEntry("Network3", 3)
         testee.onTrackerNetworkEntriesChanged(listOf(first, second, third))
         testee.onSitesVisitedChanged(31)
-        assertTrue(testee.viewState.value!!.showTrackerNetworkLeaderboard)
+        assertTrue(testee.viewState.value!!.shouldShowTrackerNetworkLeaderboard)
     }
 
     @Test
@@ -166,7 +166,7 @@ class PrivacyDashboardViewModelTest {
         val second = NetworkLeaderboardEntry("Network2", 3)
         testee.onTrackerNetworkEntriesChanged(listOf(first, second))
         testee.onSitesVisitedChanged(31)
-        assertFalse(testee.viewState.value!!.showTrackerNetworkLeaderboard)
+        assertFalse(testee.viewState.value!!.shouldShowTrackerNetworkLeaderboard)
     }
 
     @Test
@@ -176,7 +176,7 @@ class PrivacyDashboardViewModelTest {
         val third = NetworkLeaderboardEntry("Network3", 3)
         testee.onTrackerNetworkEntriesChanged(listOf(first, second, third))
         testee.onSitesVisitedChanged(30)
-        assertFalse(testee.viewState.value!!.showTrackerNetworkLeaderboard)
+        assertFalse(testee.viewState.value!!.shouldShowTrackerNetworkLeaderboard)
     }
 
     @Test
@@ -195,7 +195,7 @@ class PrivacyDashboardViewModelTest {
         testee.onTrackerNetworkEntriesChanged(emptyList())
         val viewState = testee.viewState.value!!
         assertEquals(emptyList<NetworkLeaderboardEntry>(), viewState.trackerNetworkEntries)
-        assertFalse(viewState.showTrackerNetworkLeaderboard)
+        assertFalse(viewState.shouldShowTrackerNetworkLeaderboard)
     }
 
     private fun site(
