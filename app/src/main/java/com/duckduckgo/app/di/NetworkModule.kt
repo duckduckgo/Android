@@ -70,7 +70,7 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    @Named("pixel")
+    @Named("nonCaching")
     fun pixelOkHttpClient(apiRequestInterceptor: ApiRequestInterceptor): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(apiRequestInterceptor)
@@ -92,12 +92,13 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    @Named("pixel")
-    fun pixelRetrofit(@Named("pixel") okHttpClient: OkHttpClient): Retrofit {
+    @Named("nonCaching")
+    fun nonCachingRetrofit(@Named("nonCaching") okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(Url.PIXEL)
+            .baseUrl(Url.API)
             .client(okHttpClient)
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
     }
 
@@ -115,7 +116,7 @@ class NetworkModule {
             retrofit.create(HttpsUpgradeService::class.java)
 
     @Provides
-    fun autoCompleteService(@Named("api") retrofit: Retrofit): AutoCompleteService =
+    fun autoCompleteService(@Named("nonCaching") retrofit: Retrofit): AutoCompleteService =
             retrofit.create(AutoCompleteService::class.java)
 
     @Provides

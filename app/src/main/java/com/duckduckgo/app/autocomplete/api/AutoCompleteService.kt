@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.autocomplete.api
 
+import com.duckduckgo.app.global.AppUrl
 import io.reactivex.Observable
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -23,7 +24,7 @@ import retrofit2.http.Query
 
 interface AutoCompleteService {
 
-    @GET("/ac/")
+    @GET("${AppUrl.Url.API}/ac/")
     fun autoComplete(@Query("q") query: String): Observable<List<AutoCompleteServiceRawResult>>
 }
 
