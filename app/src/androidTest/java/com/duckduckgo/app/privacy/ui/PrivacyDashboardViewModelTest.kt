@@ -48,7 +48,7 @@ class PrivacyDashboardViewModelTest {
     private var viewStateObserver: Observer<PrivacyDashboardViewModel.ViewState> = mock()
     private var settingStore: PrivacySettingsStore = mock()
     private var networkLeaderboardDao: NetworkLeaderboardDao = mock()
-    private var networkLeaserboardLiveData: LiveData<List<NetworkLeaderboardEntry>> = mock()
+    private var networkLeaderboardLiveData: LiveData<List<NetworkLeaderboardEntry>> = mock()
     private var sitesVisitedLiveData: LiveData<Int> = mock()
     private var mockPixel: Pixel = mock()
 
@@ -61,9 +61,9 @@ class PrivacyDashboardViewModelTest {
     @Before
     fun before() {
         whenever(sitesVisitedLiveData.value).thenReturn(0)
-        whenever(networkLeaserboardLiveData.value).thenReturn(emptyList())
+        whenever(networkLeaderboardLiveData.value).thenReturn(emptyList())
         whenever(networkLeaderboardDao.sitesVisited()).thenReturn(sitesVisitedLiveData)
-        whenever(networkLeaderboardDao.trackerNetworkLeaderboard()).thenReturn(networkLeaserboardLiveData)
+        whenever(networkLeaderboardDao.trackerNetworkLeaderboard()).thenReturn(networkLeaderboardLiveData)
     }
 
     @After
@@ -151,32 +151,41 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenNetworkCountIsAtLeastThreeAndTotalSitesIsOverThirtyThenShowSummaryIsTrue() {
+    fun whenNetworkCountIsThreeAndTotalSitesIsThirtyOneThenShowSummaryIsTrue() {
         val first = NetworkLeaderboardEntry("Network1", 5)
         val second = NetworkLeaderboardEntry("Network2", 3)
         val third = NetworkLeaderboardEntry("Network3", 3)
         testee.onTrackerNetworkEntriesChanged(listOf(first, second, third))
         testee.onSitesVisitedChanged(31)
-        assertTrue(testee.viewState.value!!.showTrackerNetworkLeaderboard)
+        assertTrue(testee.viewState.value!!.shouldShowTrackerNetworkLeaderboard)
     }
 
     @Test
-    fun whenNetworkCountIsLessThanThreeThenShowSummaryIsFalse() {
+    fun whenNetworkCountIsTwoAndTotalSitesIsThirtyOneThenShowSummaryIsFalse() {
         val first = NetworkLeaderboardEntry("Network1", 5)
         val second = NetworkLeaderboardEntry("Network2", 3)
         testee.onTrackerNetworkEntriesChanged(listOf(first, second))
         testee.onSitesVisitedChanged(31)
-        assertFalse(testee.viewState.value!!.showTrackerNetworkLeaderboard)
+        assertFalse(testee.viewState.value!!.shouldShowTrackerNetworkLeaderboard)
     }
 
     @Test
-    fun whenSitesIsNotOverThirtyThenShowSummaryIsFalse() {
+    fun whenNetworkCountIsTwoAndTotalSitesIsThirtyThenShowSummaryIsFalse() {
+        val first = NetworkLeaderboardEntry("Network1", 5)
+        val second = NetworkLeaderboardEntry("Network2", 3)
+        testee.onTrackerNetworkEntriesChanged(listOf(first, second))
+        testee.onSitesVisitedChanged(30)
+        assertFalse(testee.viewState.value!!.shouldShowTrackerNetworkLeaderboard)
+    }
+
+    @Test
+    fun whenNetworkCountIsThreeAndTotalSitesIsThirtyThenShowSummaryIsFalse() {
         val first = NetworkLeaderboardEntry("Network1", 5)
         val second = NetworkLeaderboardEntry("Network2", 3)
         val third = NetworkLeaderboardEntry("Network3", 3)
         testee.onTrackerNetworkEntriesChanged(listOf(first, second, third))
         testee.onSitesVisitedChanged(30)
-        assertFalse(testee.viewState.value!!.showTrackerNetworkLeaderboard)
+        assertFalse(testee.viewState.value!!.shouldShowTrackerNetworkLeaderboard)
     }
 
     @Test
@@ -195,7 +204,7 @@ class PrivacyDashboardViewModelTest {
         testee.onTrackerNetworkEntriesChanged(emptyList())
         val viewState = testee.viewState.value!!
         assertEquals(emptyList<NetworkLeaderboardEntry>(), viewState.trackerNetworkEntries)
-        assertFalse(viewState.showTrackerNetworkLeaderboard)
+        assertFalse(viewState.shouldShowTrackerNetworkLeaderboard)
     }
 
     private fun site(

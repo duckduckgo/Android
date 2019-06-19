@@ -29,7 +29,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import dagger.Module
 import dagger.Provides
-import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import javax.inject.Named
 
@@ -49,7 +48,7 @@ class StatisticsModule {
         StatisticsRequester(statisticsDataStore, statisticsService, variantManager)
 
     @Provides
-    fun pixelService(@Named("pixel") okHttpClient: OkHttpClient, @Named("pixel") retrofit: Retrofit): PixelService {
+    fun pixelService(@Named("nonCaching") retrofit: Retrofit): PixelService {
         return retrofit.create(PixelService::class.java)
     }
 
