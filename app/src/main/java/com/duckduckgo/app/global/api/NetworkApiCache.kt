@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.autocomplete.api
-
-import com.duckduckgo.app.global.AppUrl
-import io.reactivex.Observable
-import retrofit2.http.GET
-import retrofit2.http.Query
+package com.duckduckgo.app.global.api
 
 
-interface AutoCompleteService {
+class NetworkApiCache {
 
-    @GET("${AppUrl.Url.API}/ac/")
-    fun autoComplete(@Query("q") query: String): Observable<List<AutoCompleteServiceRawResult>>
+    companion object {
+        const val FILE_NAME = "okHttpCache"
+    }
 }
-
-data class AutoCompleteServiceRawResult(val phrase: String)
