@@ -28,6 +28,7 @@ import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
 import com.duckduckgo.app.feedback.api.SubReasonApiMapper
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.api.ApiRequestInterceptor
+import com.duckduckgo.app.global.api.NetworkApiCache
 import com.duckduckgo.app.global.job.JobBuilder
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeService
 import com.duckduckgo.app.job.AppConfigurationSyncer
@@ -47,6 +48,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
+import java.io.File
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -58,7 +60,8 @@ class NetworkModule {
     @Singleton
     @Named("api")
     fun apiOkHttpClient(context: Context, apiRequestInterceptor: ApiRequestInterceptor): OkHttpClient {
-        val cache = Cache(context.cacheDir, CACHE_SIZE)
+        val cacheLocation = File(context.cacheDir, NetworkApiCache.FILE_NAME)
+        val cache = Cache(cacheLocation, CACHE_SIZE)
         return OkHttpClient.Builder()
             .addInterceptor(apiRequestInterceptor)
             .cache(cache)
