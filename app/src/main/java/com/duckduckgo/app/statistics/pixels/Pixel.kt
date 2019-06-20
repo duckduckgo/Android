@@ -73,9 +73,6 @@ interface Pixel {
         SETTINGS_THEME_TOGGLED_LIGHT("ms_tl"),
         SETTINGS_THEME_TOGGLED_DARK("ms_td"),
 
-        HTTPS_UPGRADE_SITE_ERROR("ehd"),
-        HTTPS_UPGRADE_SITE_SUMMARY("ehs"),
-
         SURVEY_CTA_SHOWN(pixelName = "mus_cs"),
         SURVEY_CTA_DISMISSED(pixelName = "mus_cd"),
         SURVEY_CTA_LAUNCHED(pixelName = "mus_cl"),
@@ -121,9 +118,6 @@ interface Pixel {
 
     object PixelParameter {
         const val URL = "url"
-        const val ERROR_CODE = "error_code"
-        const val TOTAL_COUNT = "total"
-        const val FAILURE_COUNT = "failures"
         const val APP_VERSION = "app_version"
     }
 

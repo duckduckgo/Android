@@ -16,39 +16,24 @@
 
 package com.duckduckgo.app.browser
 
-import android.annotation.TargetApi
 import android.graphics.Bitmap
 import android.net.Uri
-import android.net.http.SslError
 import android.os.Build
 import android.webkit.*
-import androidx.annotation.AnyThread
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
-import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.global.isHttpsVersionOfUri
-import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.HTTPS_UPGRADE_SITE_ERROR
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.APP_VERSION
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.ERROR_CODE
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.URL
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.net.URI
-import kotlin.concurrent.thread
 
 
 class BrowserWebViewClient(
     private val requestRewriter: RequestRewriter,
     private val specialUrlDetector: SpecialUrlDetector,
-    private val requestInterceptor: RequestInterceptor,
-    private val httpsUpgrader: HttpsUpgrader,
-    private val statisticsDataStore: StatisticsDataStore,
-    private val pixel: Pixel
+    private val requestInterceptor: RequestInterceptor
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -120,11 +105,6 @@ class BrowserWebViewClient(
             it.loadingStarted(url)
             it.navigationOptionsChanged(WebViewNavigationOptions(webView.copyBackForwardList()))
         }
-
-        val uri = if (currentUrl != null) Uri.parse(currentUrl) else null
-        if (uri != null) {
-            reportHttpsIfInUpgradeList(uri)
-        }
     }
 
     @UiThread
@@ -142,35 +122,6 @@ class BrowserWebViewClient(
     override fun shouldInterceptRequest(webView: WebView, request: WebResourceRequest): WebResourceResponse? {
         Timber.v("Intercepting resource ${request.url} on page $currentUrl")
         return runBlocking { requestInterceptor.shouldIntercept(request, webView, currentUrl, webViewClientListener) }
-    }
-
-    @UiThread
-    @Suppress("OverridingDeprecatedMember", "DEPRECATION")
-    override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            val url = failingUrl.toUri()
-            reportHttpsErrorIfInUpgradeList(url, error = "WEB_RESOURCE_ERROR_$errorCode")
-        }
-        super.onReceivedError(view, errorCode, description, failingUrl)
-    }
-
-    @UiThread
-    @TargetApi(Build.VERSION_CODES.M)
-    override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
-        if (request.isForMainFrame) {
-            reportHttpsErrorIfInUpgradeList(request.url, error = "WEB_RESOURCE_ERROR_${error.errorCode}")
-        }
-        super.onReceivedError(view, request, error)
-    }
-
-    @UiThread
-    override fun onReceivedSslError(view: WebView, handler: SslErrorHandler, error: SslError) {
-        val uri = error.url.toUri()
-        val isMainFrameRequest = currentUrl == uri.toString()
-        if (isMainFrameRequest) {
-            reportHttpsErrorIfInUpgradeList(uri, "SSL_ERROR_${error.primaryError}")
-        }
-        super.onReceivedSslError(view, handler, error)
     }
 
     @UiThread
@@ -230,37 +181,6 @@ class BrowserWebViewClient(
 
             it.requiresAuthentication(request)
         }
-    }
-
-    @AnyThread
-    private fun reportHttpsErrorIfInUpgradeList(url: Uri, error: String?) {
-        if (!url.isHttps) return
-        thread {
-            if (httpsUpgrader.isInUpgradeList(url)) {
-                reportHttpsUpgradeSiteError(url, error)
-                statisticsDataStore.httpsUpgradesFailures += 1
-            }
-        }
-    }
-
-    @AnyThread
-    private fun reportHttpsIfInUpgradeList(url: Uri) {
-        if (!url.isHttps) return
-        thread {
-            if (httpsUpgrader.isInUpgradeList(url)) {
-                statisticsDataStore.httpsUpgradesTotal += 1
-            }
-        }
-    }
-
-    private fun reportHttpsUpgradeSiteError(url: Uri, error: String?) {
-        val host = url.host ?: return
-        val params = mapOf(
-            APP_VERSION to BuildConfig.VERSION_NAME,
-            URL to "https://$host",
-            ERROR_CODE to error
-        )
-        pixel.fire(HTTPS_UPGRADE_SITE_ERROR, params)
     }
 
     /**
