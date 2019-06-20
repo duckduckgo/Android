@@ -40,7 +40,7 @@ class WebViewDataManager @Inject constructor(
 ) : WebDataManager {
 
     override suspend fun clearData(webView: WebView, webStorage: WebStorage, webViewDatabase: WebViewDatabase) {
-        clearWebViewCacheCache(webView)
+        clearWebViewCache(webView)
         clearHistory(webView)
         clearWebStorage(webStorage)
         clearFormData(webView, webViewDatabase)
@@ -49,7 +49,7 @@ class WebViewDataManager @Inject constructor(
         clearWebViewDirectory(exclusions = WEBVIEW_FILES_EXCLUDED_FROM_DELETION)
     }
 
-    private fun clearWebViewCacheCache(webView: WebView) {
+    private fun clearWebViewCache(webView: WebView) {
         webView.clearCache(true)
     }
 
