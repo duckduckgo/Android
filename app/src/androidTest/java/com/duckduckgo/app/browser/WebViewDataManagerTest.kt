@@ -47,7 +47,6 @@ class WebViewDataManagerTest {
         withContext(Dispatchers.Main) {
             val webView = TestWebView(context)
             testee.clearData(webView, mockStorage, mockWebViewDatabase)
-
             assertTrue(webView.historyCleared)
         }
     }
@@ -57,7 +56,6 @@ class WebViewDataManagerTest {
         withContext(Dispatchers.Main) {
             val webView = TestWebView(context)
             testee.clearData(webView, mockStorage, mockWebViewDatabase)
-
             assertTrue(webView.cacheCleared)
         }
     }
@@ -67,7 +65,6 @@ class WebViewDataManagerTest {
         withContext(Dispatchers.Main) {
             val webView = TestWebView(context)
             testee.clearData(webView, mockStorage, mockWebViewDatabase)
-
             assertTrue(webView.clearedFormData)
         }
     }
@@ -77,7 +74,6 @@ class WebViewDataManagerTest {
         withContext(Dispatchers.Main) {
             val webView = TestWebView(context)
             testee.clearData(webView, mockStorage, mockWebViewDatabase)
-
             verify(mockStorage).deleteAllData()
         }
     }
@@ -87,7 +83,6 @@ class WebViewDataManagerTest {
         withContext(Dispatchers.Main) {
             val webView = TestWebView(context)
             testee.clearData(webView, mockStorage, mockWebViewDatabase)
-
             verify(mockWebViewDatabase).clearHttpAuthUsernamePassword()
         }
     }
@@ -97,7 +92,6 @@ class WebViewDataManagerTest {
         withContext(Dispatchers.Main) {
             val webView = TestWebView(context)
             testee.clearData(webView, mockStorage, mockWebViewDatabase)
-
             verify(mockCookieManager).removeExternalCookies()
         }
     }
