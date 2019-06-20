@@ -65,7 +65,7 @@ class TrackersRendererTest {
     }
 
     @Test
-    fun whenSitestVisitedIsZeroThenPercentageIsBlank() {
+    fun whenSitesVisitedIsZeroThenPercentageIsBlank() {
         val text = testee.networkPercentage(NetworkLeaderboardEntry("", 10), 0)
         assertEquals("", text)
     }

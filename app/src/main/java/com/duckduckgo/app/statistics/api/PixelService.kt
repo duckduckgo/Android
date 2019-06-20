@@ -25,7 +25,7 @@ import retrofit2.http.QueryMap
 
 interface PixelService {
 
-    @GET("/t/{pixelName}_android_{formFactor}")
+    @GET("${AppUrl.Url.PIXEL}/t/{pixelName}_android_{formFactor}")
     fun fire(
         @Path("pixelName") pixelName: String,
         @Path("formFactor") formFactor: String,

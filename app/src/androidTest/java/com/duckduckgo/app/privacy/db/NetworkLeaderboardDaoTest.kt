@@ -77,7 +77,7 @@ class NetworkLeaderboardDaoTest {
     }
 
     @Test
-    fun whenSiteVisitedIncremenetedThenSiteVisitedCountIncreaesByOne() {
+    fun whenSitesVisitedIncrementedThenSiteVisitedCountIncreasesByOne() {
         dao.incrementSitesVisited()
         assertEquals(1, dao.sitesVisited().blockingObserve())
         dao.incrementSitesVisited()

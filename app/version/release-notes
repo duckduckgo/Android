@@ -1,5 +1,5 @@
 ## What's new in this release?
-In this release, we improved our handling for URLs with spaces and improved the way we clear app data.
+In this release, we improved our network caching to reduce data usage.
 
 ## Have feedback?
 You can always reach us at https://duckduckgo.com/feedback.
