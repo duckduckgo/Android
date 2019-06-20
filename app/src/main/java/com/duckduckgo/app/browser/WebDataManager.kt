@@ -99,8 +99,7 @@ class WebViewDataManager @Inject constructor(
         private const val WEBVIEW_DATA_DIRECTORY_NAME = "app_webview"
 
         private val FILENAMES_EXCLUDED_FROM_DELETION = listOf(
-            "Cookies",
-            "Local Storage"
+            "Cookies"
         )
     }
 }
