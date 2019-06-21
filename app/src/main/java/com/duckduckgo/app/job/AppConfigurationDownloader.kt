@@ -48,7 +48,6 @@ class AppConfigurationDownloader(
         val entityListDownload = entityListDownloader.download()
         val surrogatesDownload = resourceSurrogateDownloader.downloadList()
         val httpsUpgradeDownload = httpsUpgradeDataDownloader.download()
-        val httpStatisticsReport = httpsUpgradeDataDownloader.reportUpgradeStatistics()
         val surveyDownload = surveyDownloader.download()
 
         return Completable.mergeDelayError(
@@ -60,7 +59,6 @@ class AppConfigurationDownloader(
                 entityListDownload,
                 surrogatesDownload,
                 httpsUpgradeDownload,
-                httpStatisticsReport,
                 surveyDownload
             )
         ).doOnComplete {
