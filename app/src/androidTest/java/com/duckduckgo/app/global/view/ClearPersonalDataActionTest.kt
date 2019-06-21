@@ -81,12 +81,6 @@ class ClearPersonalDataActionTest {
     }
 
     @Test
-    fun whenClearCalledThenDataManagerClearsCookies() = runBlocking<Unit> {
-        testee.clearTabsAndAllDataAsync(false, false)
-        verify(mockDataManager).clearExternalCookies()
-    }
-
-    @Test
     fun whenClearCalledThenAppCacheClearerClearsCache() = runBlocking<Unit> {
         testee.clearTabsAndAllDataAsync(false, false)
         verify(mockAppCacheClearer).clearCache()
