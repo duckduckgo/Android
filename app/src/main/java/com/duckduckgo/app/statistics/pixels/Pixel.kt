@@ -116,11 +116,6 @@ interface Pixel {
         FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s")
     }
 
-    object PixelParameter {
-        const val URL = "url"
-        const val APP_VERSION = "app_version"
-    }
-
     fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap(), includeLocale: Boolean = false)
     fun fire(pixelName: String, parameters: Map<String, String?> = emptyMap(), includeLocale: Boolean = false)
     fun fireCompletable(pixelName: String, parameters: Map<String, String?>): Completable
