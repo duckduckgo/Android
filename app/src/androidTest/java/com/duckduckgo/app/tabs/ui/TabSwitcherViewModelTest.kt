@@ -19,6 +19,7 @@
 package com.duckduckgo.app.tabs.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
@@ -58,6 +59,8 @@ class TabSwitcherViewModelTest {
         MockitoAnnotations.initMocks(this)
         runBlocking {
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
+            whenever(mockTabRepository.liveTabs).thenReturn(
+                MutableLiveData<List<TabEntity>>(listOf(TabEntity("id", position = 0))))
             testee = TabSwitcherViewModel(mockTabRepository, WebViewSessionInMemoryStorage())
             testee.command.observeForever(mockCommandObserver)
         }
@@ -92,6 +95,13 @@ class TabSwitcherViewModelTest {
         verify(mockCommandObserver, times(2)).onChanged(commandCaptor.capture())
         assertEquals(Command.DisplayMessage(R.string.fireDataCleared), commandCaptor.allValues[0])
         assertEquals(Command.Close, commandCaptor.allValues[1])
+    }
+
+    @Test
+    fun whenDeleteTabThenThenVerifyDeleteTabCommandWithCorrectTab() {
+        testee.deleteTab(0)
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.DeleteTab(testee.tabs.value!![0]), commandCaptor.value)
     }
 
 }
