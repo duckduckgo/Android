@@ -29,6 +29,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.global.view.FireDialog
+import com.duckduckgo.app.global.view.JustSwipeCallback
 import com.duckduckgo.app.global.view.attachItemTouchHelper
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -74,15 +75,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
         tabsRecycler.layoutManager = LinearLayoutManager(this)
         tabsRecycler.adapter = tabsAdapter
         tabsRecycler.attachItemTouchHelper(
-            object :
-                ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
-
-                override fun onMove(
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                    target: RecyclerView.ViewHolder
-                ): Boolean = false
-
+            object : JustSwipeCallback(swipeDirs = ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
                 override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                     viewModel.deleteTab(viewHolder.adapterPosition)
                 }
