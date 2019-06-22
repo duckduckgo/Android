@@ -30,6 +30,7 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.fire.WebViewCookieManager
 import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
@@ -58,12 +59,9 @@ class BrowserModule {
     fun browserWebViewClient(
         requestRewriter: RequestRewriter,
         specialUrlDetector: SpecialUrlDetector,
-        requestInterceptor: RequestInterceptor,
-        httpsUpgrader: HttpsUpgrader,
-        statisticsDataStore: StatisticsDataStore,
-        pixel: Pixel
+        requestInterceptor: RequestInterceptor
     ): BrowserWebViewClient {
-        return BrowserWebViewClient(requestRewriter, specialUrlDetector, requestInterceptor, httpsUpgrader, statisticsDataStore, pixel)
+        return BrowserWebViewClient(requestRewriter, specialUrlDetector, requestInterceptor)
     }
 
     @Provides
@@ -91,8 +89,13 @@ class BrowserModule {
 
     @Singleton
     @Provides
-    fun webDataManager(webViewSessionStorage: WebViewSessionStorage, cookieManager: DuckDuckGoCookieManager): WebDataManager =
-        WebViewDataManager(webViewSessionStorage, cookieManager)
+    fun webDataManager(
+        context: Context,
+        webViewSessionStorage: WebViewSessionStorage,
+        cookieManager: DuckDuckGoCookieManager,
+        fileDeleter: FileDeleter
+    ): WebDataManager =
+        WebViewDataManager(context, webViewSessionStorage, cookieManager, fileDeleter)
 
     @Provides
     fun clipboardManager(context: Context): ClipboardManager {

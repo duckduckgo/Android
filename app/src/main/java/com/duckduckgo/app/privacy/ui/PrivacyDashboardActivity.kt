@@ -99,7 +99,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
     private fun renderTrackerNetworkLeaderboard(viewState: ViewState) {
 
-        if (!viewState.showTrackerNetworkLeaderboard) {
+        if (!viewState.shouldShowTrackerNetworkLeaderboard) {
             hideTrackerNetworkLeaderboard()
             return
         }

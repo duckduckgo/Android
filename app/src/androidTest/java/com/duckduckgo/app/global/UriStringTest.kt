@@ -217,6 +217,11 @@ class UriStringTest {
     }
 
     @Test
+    fun whenPathIsValidContainsEncodedSpaceNormalUrlThenIsWebUrlIsTrue() {
+        assertTrue(isWebUrl("http://www.example.com/pa%20th"))
+    }
+
+    @Test
     fun whenParamsAreValidNormalUrlThenIsWebUrlIsTrue() {
         assertTrue(isWebUrl("http://test.com?s=dafas&d=342"))
     }

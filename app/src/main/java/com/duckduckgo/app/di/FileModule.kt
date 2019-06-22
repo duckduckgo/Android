@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics.store
+package com.duckduckgo.app.di
 
-import com.duckduckgo.app.statistics.model.Atb
+import com.duckduckgo.app.global.file.AndroidFileDeleter
+import com.duckduckgo.app.global.file.FileDeleter
+import dagger.Module
+import dagger.Provides
 
-interface StatisticsDataStore {
 
-    val hasInstallationStatistics: Boolean
+@Module
+class FileModule {
 
-    var atb: Atb?
-    var appRetentionAtb: String?
-    var searchRetentionAtb: String?
-    var variant: String?
+    @Provides
+    fun providesFileDeleter(): FileDeleter {
+        return AndroidFileDeleter()
+    }
 
-    fun saveAtb(atb: Atb)
-    fun clearAtb()
 }

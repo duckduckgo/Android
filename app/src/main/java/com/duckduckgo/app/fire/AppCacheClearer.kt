@@ -17,8 +17,8 @@
 package com.duckduckgo.app.fire
 
 import android.content.Context
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.duckduckgo.app.global.api.NetworkApiCache
+import com.duckduckgo.app.global.file.FileDeleter
 
 
 interface AppCacheClearer {
@@ -27,12 +27,30 @@ interface AppCacheClearer {
 
 }
 
-class AndroidAppCacheClearer(private val context: Context) : AppCacheClearer {
+class AndroidAppCacheClearer(private val context: Context, private val fileDeleter: FileDeleter) : AppCacheClearer {
 
     override suspend fun clearCache() {
-        withContext(Dispatchers.IO) {
-            context.cacheDir.deleteRecursively()
-        }
+        fileDeleter.deleteContents(context.cacheDir, FILENAMES_EXCLUDED_FROM_DELETION)
+    }
+
+    companion object {
+
+        /*
+         * Exclude this WebView cache directory, based on warning from Firefox Focus:
+         *   "If the folder or its contents are deleted, WebView will stop using the disk cache entirely."
+         */
+        private const val WEBVIEW_CACHE_DIR = "org.chromium.android_webview"
+
+        /*
+         * Exclude the OkHttp networking cache from being deleted. This doesn't contain any sensitive information.
+         * Deleting this would just cause large amounts of non-sensitive data to have be downloaded again when app next launches.
+         */
+        private const val NETWORK_CACHE_DIR = NetworkApiCache.FILE_NAME
+
+        private val FILENAMES_EXCLUDED_FROM_DELETION = listOf(
+            WEBVIEW_CACHE_DIR,
+            NETWORK_CACHE_DIR
+        )
     }
 
 }
