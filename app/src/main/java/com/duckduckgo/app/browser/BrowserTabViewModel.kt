@@ -692,6 +692,10 @@ class BrowserTabViewModel(
         findInPageViewState.value = FindInPageViewState()
     }
 
+    fun determineShowBrowser() {
+        browserViewState.value = currentBrowserViewState().copy(browserShowing = !url.isNullOrBlank())
+    }
+
     fun userSharingLink(url: String?) {
         if (url != null) {
             command.value = ShareLink(removeAtbAndSourceParamsFromSearch(url))
