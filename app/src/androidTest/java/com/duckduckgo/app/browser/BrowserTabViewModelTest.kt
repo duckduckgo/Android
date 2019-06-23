@@ -51,7 +51,6 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
-import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -1044,6 +1043,20 @@ class BrowserTabViewModelTest {
         whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(true)
         testee.restoreWebViewState(null, "")
         assertFalse(globalLayoutViewState().isNewTabState)
+    }
+
+    @Test
+    fun whenUrlNotPresentThenSetBrowserNotShowing() {
+        testee.loadData("id", null, false)
+        testee.determineShowBrowser()
+        assertEquals(false, testee.browserViewState.value?.browserShowing)
+    }
+
+    @Test
+    fun whenUrlPresentThenSetBrowserShowing() {
+        testee.loadData("id", "https://example.com", false)
+        testee.determineShowBrowser()
+        assertEquals(true, testee.browserViewState.value?.browserShowing)
     }
 
     @Test
