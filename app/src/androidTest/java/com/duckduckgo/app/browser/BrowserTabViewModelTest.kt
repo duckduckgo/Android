@@ -1046,8 +1046,15 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlNotPresentThenSetBrowserNotShowing() {
+    fun whenUrlNullThenSetBrowserNotShowing() {
         testee.loadData("id", null, false)
+        testee.determineShowBrowser()
+        assertEquals(false, testee.browserViewState.value?.browserShowing)
+    }
+
+    @Test
+    fun whenUrlBlankThenSetBrowserNotShowing() {
+        testee.loadData("id", "  ", false)
         testee.determineShowBrowser()
         assertEquals(false, testee.browserViewState.value?.browserShowing)
     }
