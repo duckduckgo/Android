@@ -297,6 +297,6 @@
     <string name="authenticationDialogPasswordHint">Password</string>
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
-    <string name="systemTextSearchMessage">Duck it! (Private search)</string>
+    <string name="systemTextSearchMessage">Search DuckDuckGo</string>
 
 </resources>
