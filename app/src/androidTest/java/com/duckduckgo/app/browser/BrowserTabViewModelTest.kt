@@ -346,7 +346,7 @@ class BrowserTabViewModelTest {
     fun whenBrowsingAndUrlLoadedThenUrlUpdated() {
         val url = "foo.com"
         loadUrl(url, isBrowserShowing = true)
-        testee.webNavigationStateChanged(buildWebNavigation(originalUrl = url))
+        testee.navigationStateChanged(buildWebNavigation(originalUrl = url))
         assertEquals(url, testee.url)
     }
 
@@ -445,15 +445,15 @@ class BrowserTabViewModelTest {
     fun whenBrowsingAndViewModelGetsProgressUpdateThenViewStateIsUpdated() {
         setBrowserShowing(true)
 
-        testee.progressChanged("", 0)
+        testee.progressChanged(0)
         assertEquals(0, loadingViewState().progress)
         assertEquals(true, loadingViewState().isLoading)
 
-        testee.progressChanged("", 50)
+        testee.progressChanged(50)
         assertEquals(50, loadingViewState().progress)
         assertEquals(true, loadingViewState().isLoading)
 
-        testee.progressChanged("", 100)
+        testee.progressChanged(100)
         assertEquals(100, loadingViewState().progress)
         assertEquals(false, loadingViewState().isLoading)
     }
@@ -461,7 +461,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenNotBrowserAndViewModelGetsProgressUpdateThenViewStateIsNotUpdated() {
         setBrowserShowing(false)
-        testee.progressChanged("", 10)
+        testee.progressChanged(10)
         assertEquals(0, loadingViewState().progress)
         assertEquals(false, loadingViewState().isLoading)
     }
@@ -753,13 +753,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenHomeShowingAndNeverBrowsedThenForwardButtonInactive() {
-        navigate(isBrowsing = false)
+        setupNavigation(isBrowsing = false)
         assertFalse(browserViewState().canGoForward)
     }
 
     @Test
     fun whenHomeShowingByPressingBackOnBrowserThenForwardButtonActive() {
-        navigate(isBrowsing = true)
+        setupNavigation(isBrowsing = true)
         testee.onUserPressedBack()
         assertFalse(browserViewState().browserShowing)
         assertTrue(browserViewState().canGoForward)
@@ -767,40 +767,40 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBrowserShowingAndCanGoForwardThenForwardButtonActive() {
-        navigate(isBrowsing = true, canGoForward = true)
+        setupNavigation(isBrowsing = true, canGoForward = true)
         assertTrue(browserViewState().canGoForward)
     }
 
     @Test
     fun whenBrowserShowingAndCannotGoForwardThenForwardButtonInactive() {
-        navigate(isBrowsing = true, canGoForward = false)
+        setupNavigation(isBrowsing = true, canGoForward = false)
         assertFalse(browserViewState().canGoForward)
     }
 
     @Test
     fun whenHomeShowingThenBackButtonInactiveEvenIfBrowserCanGoBack() {
-        navigate(isBrowsing = false, canGoBack = false)
+        setupNavigation(isBrowsing = false, canGoBack = false)
         assertFalse(browserViewState().canGoBack)
 
-        navigate(isBrowsing = false, canGoBack = true)
+        setupNavigation(isBrowsing = false, canGoBack = true)
         assertFalse(browserViewState().canGoBack)
     }
 
     @Test
     fun whenBrowserShowingAndCanGoBackThenBackButtonActive() {
-        navigate(isBrowsing = true, canGoBack = true)
+        setupNavigation(isBrowsing = true, canGoBack = true)
         assertTrue(browserViewState().canGoBack)
     }
 
     @Test
     fun whenBrowserShowingAndCannotGoBackAndSkipHomeThenBackButtonInactive() {
-        navigate(skipHome = true, isBrowsing = true, canGoBack = false)
+        setupNavigation(skipHome = true, isBrowsing = true, canGoBack = false)
         assertFalse(browserViewState().canGoBack)
     }
 
     @Test
     fun whenBrowserShowingAndCannotGoBackAndNotSkipHomeThenBackButtonActive() {
-        navigate(skipHome = false, isBrowsing = true, canGoBack = false)
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         assertTrue(browserViewState().canGoBack)
     }
 
@@ -821,7 +821,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserBrowsingPressesBackAndBrowserCanGoBackThenNavigatesToPreviousPageAndHandledTrue() {
-        navigate(isBrowsing = true, canGoBack = true, stepsToPreviousPage = 2)
+        setupNavigation(isBrowsing = true, canGoBack = true, stepsToPreviousPage = 2)
         assertTrue(testee.onUserPressedBack())
 
         val backCommand = captureCommands().lastValue as Command.NavigateBack
@@ -831,7 +831,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserBrowsingPressesBackAndBrowserCannotGoBackAndHomeNotSkippedThenHomeShownAndHandledTrue() {
-        navigate(skipHome = false, isBrowsing = true, canGoBack = false)
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         assertTrue(testee.onUserPressedBack())
         assertFalse(browserViewState().browserShowing)
         assertEquals("", omnibarViewState().omnibarText)
@@ -839,7 +839,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserBrowsingPressesBackAndBrowserCannotGoBackAndHomeIsSkippedThenHandledFalse() {
-        navigate(skipHome = true, isBrowsing = false, canGoBack = false)
+        setupNavigation(skipHome = true, isBrowsing = false, canGoBack = false)
         assertFalse(testee.onUserPressedBack())
     }
 
@@ -983,7 +983,21 @@ class BrowserTabViewModelTest {
         verify(mockHandler, atLeastOnce()).proceed(username, password)
     }
 
-    private fun navigate(
+    private fun setBrowserShowing(isBrowsing: Boolean) {
+        testee.browserViewState.value = browserViewState().copy(browserShowing = isBrowsing)
+    }
+
+    private fun loadUrl(url: String?, isBrowserShowing: Boolean = true) {
+        setBrowserShowing(isBrowserShowing)
+        testee.navigationStateChanged(buildWebNavigation(originalUrl = url, currentUrl = url))
+    }
+
+    private fun updateUrl(originalUrl: String?, currentUrl: String?, isBrowserShowing: Boolean) {
+        setBrowserShowing(isBrowserShowing)
+        testee.navigationStateChanged(buildWebNavigation(originalUrl = originalUrl, currentUrl = currentUrl))
+    }
+
+    private fun setupNavigation(
         skipHome: Boolean = false,
         isBrowsing: Boolean,
         canGoForward: Boolean = false,
@@ -993,21 +1007,7 @@ class BrowserTabViewModelTest {
         testee.skipHome = skipHome
         setBrowserShowing(isBrowsing)
         val nav = buildWebNavigation(canGoForward = canGoForward, canGoBack = canGoBack, stepsToPreviousPage = stepsToPreviousPage)
-        testee.webNavigationStateChanged(nav)
-    }
-
-    private fun setBrowserShowing(isBrowsing: Boolean) {
-        testee.browserViewState.value = browserViewState().copy(browserShowing = isBrowsing)
-    }
-
-    private fun loadUrl(url: String?, isBrowserShowing: Boolean = true) {
-        setBrowserShowing(isBrowserShowing)
-        testee.webNavigationStateChanged(buildWebNavigation(originalUrl = url, currentUrl = url))
-    }
-
-    private fun updateUrl(originalUrl: String?, currentUrl: String?, isBrowserShowing: Boolean) {
-        setBrowserShowing(isBrowserShowing)
-        testee.webNavigationStateChanged(buildWebNavigation(originalUrl = originalUrl, currentUrl = currentUrl))
+        testee.navigationStateChanged(nav)
     }
 
     private fun captureCommands(): ArgumentCaptor<Command> {

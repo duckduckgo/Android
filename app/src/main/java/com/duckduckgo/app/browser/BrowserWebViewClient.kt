@@ -96,13 +96,13 @@ class BrowserWebViewClient(
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
         Timber.d("\nonPageStarted $url")
         tempTimer = System.currentTimeMillis()
-        webViewClientListener?.webNavigationStateChanged(WebViewNavigationState(webView.copyBackForwardList()))
+        webViewClientListener?.navigationStateChanged(WebViewNavigationState(webView.copyBackForwardList()))
     }
 
     @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
         Timber.i("onPageFinished $url, load time: ${System.currentTimeMillis() - tempTimer}ms")
-        webViewClientListener?.webNavigationStateChanged(WebViewNavigationState(webView.copyBackForwardList()))
+        webViewClientListener?.navigationStateChanged(WebViewNavigationState(webView.copyBackForwardList()))
     }
 
     @WorkerThread

@@ -54,14 +54,14 @@ class BrowserWebViewClientTest {
     @Test
     fun whenOnPageStartedCalledThenListenerInstructedToUpdateNavigationOptions() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(listener).webNavigationStateChanged(any())
+        verify(listener).navigationStateChanged(any())
     }
 
     @UiThreadTest
     @Test
     fun whenOnPageFinishedCalledThenListenerInstructedToUpdateNavigationOptions() {
         testee.onPageFinished(webView, EXAMPLE_URL)
-        verify(listener).webNavigationStateChanged(any())
+        verify(listener).navigationStateChanged(any())
     }
 
     @UiThreadTest

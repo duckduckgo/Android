@@ -61,8 +61,8 @@ class BrowserChromeClient @Inject constructor() : WebChromeClient(), CoroutineSc
     override fun onProgressChanged(webView: WebView, newProgress: Int) {
         Timber.d("onProgressChanged ${webView.url}, $newProgress")
         val navigationList = webView.copyBackForwardList()
-        webViewClientListener?.webNavigationStateChanged(WebViewNavigationState(navigationList))
-        webViewClientListener?.progressChanged(webView.url, newProgress)
+        webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
+        webViewClientListener?.progressChanged(newProgress)
     }
 
     override fun onReceivedTitle(view: WebView, title: String) {

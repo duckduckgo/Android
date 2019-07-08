@@ -370,15 +370,7 @@ class BrowserTabViewModel(
         browserViewState.value = currentState.copy(isFullScreen = false)
     }
 
-    override fun progressChanged(progressedUrl: String?, newProgress: Int) {
-        Timber.v("Loading in progress $newProgress")
-        if (!currentBrowserViewState().browserShowing) return
-        val isLoading = newProgress < 100
-        val progress = currentLoadingViewState()
-        loadingViewState.value = progress.copy(isLoading = isLoading, progress = newProgress)
-    }
-
-    override fun webNavigationStateChanged(newWebNavigationState: WebNavigationState) {
+    override fun navigationStateChanged(newWebNavigationState: WebNavigationState) {
 
         val stateChange = WebNavigationStateChange(webNavigationState, newWebNavigationState)
         webNavigationState = newWebNavigationState
@@ -401,6 +393,14 @@ class BrowserTabViewModel(
         if (stateChange.isClear()) {
             onPageCleared()
         }
+    }
+
+    override fun progressChanged(newProgress: Int) {
+        Timber.v("Loading in progress $newProgress")
+        if (!currentBrowserViewState().browserShowing) return
+        val isLoading = newProgress < 100
+        val progress = currentLoadingViewState()
+        loadingViewState.value = progress.copy(isLoading = isLoading, progress = newProgress)
     }
 
     private fun registerSiteVisit() {
