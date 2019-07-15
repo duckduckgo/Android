@@ -107,7 +107,7 @@ class BrowserWebViewClient(
 
     @WorkerThread
     override fun shouldInterceptRequest(webView: WebView, request: WebResourceRequest): WebResourceResponse? {
-        val documentUrl = runBlocking { async(Dispatchers.Main) { webView.originalUrl }.await() }
+        val documentUrl = runBlocking { async(Dispatchers.Main) { webView.url }.await() }
         Timber.v("Intercepting resource ${request.url} on page $documentUrl")
         return runBlocking { requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener) }
     }

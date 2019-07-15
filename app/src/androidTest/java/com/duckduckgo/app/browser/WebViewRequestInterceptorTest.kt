@@ -135,7 +135,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whendocumentUrlIsNullThenShouldContinueToLoad() = runBlocking<Unit> {
+    fun whenDocumentUrlIsNullThenShouldContinueToLoad() = runBlocking<Unit> {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,

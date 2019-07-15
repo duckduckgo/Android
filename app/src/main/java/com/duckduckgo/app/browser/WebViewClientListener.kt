@@ -30,7 +30,7 @@ interface WebViewClientListener {
 
     fun titleReceived(title: String)
     fun trackerDetected(event: TrackingEvent)
-    fun pageHasHttpResources(page: String?)
+    fun pageHasHttpResources(url: String)
 
     fun sendEmailRequested(emailAddress: String)
     fun sendSmsRequested(telephoneNumber: String)

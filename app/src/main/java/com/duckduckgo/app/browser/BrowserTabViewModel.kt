@@ -53,6 +53,7 @@ import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -270,7 +271,7 @@ class BrowserTabViewModel(
     }
 
     fun onViewVisible() {
-        command.value = if (url == null) ShowKeyboard else HideKeyboard
+        command.value = if (!currentBrowserViewState().browserShowing) ShowKeyboard else HideKeyboard
         ctaViewModel.refreshCta()
     }
 
@@ -469,9 +470,10 @@ class BrowserTabViewModel(
         )
     }
 
-
     private fun onUrlUpdated(url: String) {
         Timber.v("Page url updated: $url")
+        site?.url = url
+        onSiteChanged()
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url)))
     }
@@ -486,7 +488,7 @@ class BrowserTabViewModel(
 
     override fun trackerDetected(event: TrackingEvent) {
         Timber.d("Tracker detected while on ${url} and the document was ${event.documentUrl}")
-        if (event.documentUrl == url) {
+        if (site?.domainMatchesUrl(event.documentUrl) == true) {
             site?.trackerDetected(event)
             onSiteChanged()
         }
@@ -498,8 +500,8 @@ class BrowserTabViewModel(
         networkLeaderboardDao.incrementNetworkCount(networkName)
     }
 
-    override fun pageHasHttpResources(page: String?) {
-        if (page == url) {
+    override fun pageHasHttpResources(url: String) {
+        if (site?.domainMatchesUrl(url) == true) {
             site?.hasHttpResources = true
             onSiteChanged()
         }

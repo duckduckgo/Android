@@ -251,16 +251,16 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenViewBecomesVisibleWithActiveSiteThenKeyboardHidden() {
-        loadUrl("http://exmaple.com")
+    fun whenViewBecomesVisibleAndBrowserShowingThenKeyboardHidden() {
+        setBrowserShowing(true)
         testee.onViewVisible()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.contains(Command.HideKeyboard))
     }
 
     @Test
-    fun whenViewBecomesVisibleWithoutActiveSiteThenKeyboardShown() {
-        loadUrl(null)
+    fun whenViewBecomesVisibleAndHomeShowingThenKeyboardShown() {
+        setBrowserShowing(false)
         testee.onViewVisible()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
@@ -343,47 +343,37 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowsingAndUrlLoadedThenUrlUpdated() {
-        val url = "foo.com"
-        loadUrl(url, isBrowserShowing = true)
-        testee.navigationStateChanged(buildWebNavigation(originalUrl = url))
-        assertEquals(url, testee.url)
-    }
-
-    @Test
-    fun whenNotBrowsingAndUrlLoadedThenUrlNotUpdated() {
-        loadUrl("foo.com", isBrowserShowing = false)
-        assertNull(testee.url)
-    }
-
-    @Test
-    fun whenBrowsingAndUrlLoadedThenOmnibarTextUpdatedToMatch() {
+    fun whenBrowsingAndUrlLoadedThenUrlAndOmnibarTextUpdatedToMatch() {
         val exampleUrl = "http://example.com/abc"
         loadUrl(exampleUrl, true)
+        assertEquals(exampleUrl, testee.url)
         assertEquals(exampleUrl, omnibarViewState().omnibarText)
     }
 
     @Test
-    fun whenNotBrowsingAndUrlLoadedThenOmnibarTextRemainsBlank() {
+    fun whenNotBrowsingAndUrlLoadedThenUrlNullAndOmnibarTextRemainsBlank() {
         loadUrl("http://example.com/abc", false)
+        assertEquals(null, testee.url)
         assertEquals("", omnibarViewState().omnibarText)
     }
 
     @Test
-    fun whenBrowsingAndPageUrlIsUpdatedThenOmnibarTextIsUpdated() {
+    fun whenBrowsingAndUrlIsUpdatedThenUrlAndOmnibarTextUpdatedToMatch() {
         val originalUrl = "http://example.com/"
         val currentUrl = "http://example.com/current"
         loadUrl(originalUrl, true)
         updateUrl(originalUrl, currentUrl, true)
+        assertEquals(currentUrl, testee.url)
         assertEquals(currentUrl, omnibarViewState().omnibarText)
     }
 
     @Test
-    fun whenNotBrowsingAndPageUrlIsUpdatedThenOmnibarTextRemainsUnchanged() {
+    fun whenNotBrowsingAndUrlIsUpdatedThenUrlAndOmnibarTextRemainUnchanged() {
         val originalUrl = "http://example.com/"
         val currentUrl = "http://example.com/current"
         loadUrl(originalUrl, true)
         updateUrl(originalUrl, currentUrl, false)
+        assertEquals(originalUrl, testee.url)
         assertEquals(originalUrl, omnibarViewState().omnibarText)
     }
 

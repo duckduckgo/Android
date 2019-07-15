@@ -30,31 +30,8 @@ interface WebNavigationState {
     val hasNavigationHistory: Boolean
 }
 
-class WebNavigationStateChange(val previous: WebNavigationState?, val new: WebNavigationState) {
 
-    fun newPage(): String? {
-        if (previous?.originalUrl != new.originalUrl) {
-            return new.originalUrl
-        }
-        return null
-    }
-
-    fun updatedPage(): String? {
-        if (newPage() == null && previous?.currentUrl != new.currentUrl) {
-            return new.currentUrl
-        }
-        return null
-    }
-
-    fun isClear(): Boolean {
-        return previous?.originalUrl != null && new.originalUrl == null
-    }
-}
-
-data class WebViewNavigationState(
-    private val stack: WebBackForwardList
-) :
-    WebNavigationState {
+data class WebViewNavigationState(private val stack: WebBackForwardList) : WebNavigationState {
 
     override val originalUrl: String? = stack.originalUrl
 
@@ -67,6 +44,30 @@ data class WebViewNavigationState(
     override val canGoForward: Boolean = stack.currentIndex + 1 < stack.size
 
     override val hasNavigationHistory = stack.size != 0
+}
+
+class WebNavigationStateChange(val previous: WebNavigationState?, val new: WebNavigationState) {
+
+    fun newPage(): String? {
+        // A new page load is identified by the original url changing
+        // The most up-to-date record of the url is the current one as a url may change during loading
+        if (previous?.originalUrl != new.originalUrl) {
+            return new.currentUrl
+        }
+        return null
+    }
+
+    fun updatedPage(): String? {
+        // If this is not a new page AND the currentUrl is different then the url has just been updated
+        if (newPage() == null && previous?.currentUrl != new.currentUrl) {
+            return new.currentUrl
+        }
+        return null
+    }
+
+    fun isClear(): Boolean {
+        return previous?.originalUrl != null && new.originalUrl == null
+    }
 }
 
 private val WebBackForwardList.originalUrl: String?

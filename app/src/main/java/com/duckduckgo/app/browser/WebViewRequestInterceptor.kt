@@ -35,7 +35,7 @@ interface RequestInterceptor {
     suspend fun shouldIntercept(
         request: WebResourceRequest,
         webView: WebView,
-        currentUrl: String?,
+        documentUrl: String?,
         webViewClientListener: WebViewClientListener?
     ): WebResourceResponse?
 }

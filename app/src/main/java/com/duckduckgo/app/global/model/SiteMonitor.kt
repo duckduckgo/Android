@@ -18,6 +18,7 @@
 package com.duckduckgo.app.global.model
 
 import android.net.Uri
+import androidx.core.net.toUri
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.global.model.Site.SiteGrades
@@ -32,30 +33,28 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import java.util.concurrent.CopyOnWriteArrayList
 
 class SiteMonitor(
-    override val url: String,
+    url: String,
     override var title: String?,
     val prevalenceStore: PrevalenceStore
 
 ) : Site {
 
-    override var privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN
-    override var memberNetwork: TrackerNetwork? = null
-    private val gradeCalculator: Grade
+    override var url: String = url
+        set(value) {
+            field = value
+            uri = field.toUri()
+        }
 
-    init {
-        val isHttps = https != HttpsStatus.NONE
-
-        // httpsAutoUpgrade is not supported yet; for now, keep it equal to isHttps and don't penalise sites
-        gradeCalculator = Grade(https = isHttps, httpsAutoUpgrade = isHttps, prevalenceStore = prevalenceStore)
-    }
-
-    override val uri: Uri?
-        get() = Uri.parse(url)
+    override var uri: Uri? = url.toUri()
 
     override val https: HttpsStatus
         get() = httpsStatus()
 
     override var hasHttpResources = false
+
+    override var privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN
+
+    override var memberNetwork: TrackerNetwork? = null
 
     override val trackingEvents = CopyOnWriteArrayList<TrackingEvent>()
 
@@ -79,6 +78,15 @@ class SiteMonitor(
 
     override val allTrackersBlocked: Boolean
         get() = trackingEvents.none { !it.blocked }
+
+    private val gradeCalculator: Grade
+
+    init {
+        val isHttps = https != HttpsStatus.NONE
+
+        // httpsAutoUpgrade is not supported yet; for now, keep it equal to isHttps and don't penalise sites
+        gradeCalculator = Grade(https = isHttps, httpsAutoUpgrade = isHttps, prevalenceStore = prevalenceStore)
+    }
 
     override fun updatePrivacyData(sitePrivacyData: SitePrivacyData) {
         this.privacyPractices = sitePrivacyData.practices
