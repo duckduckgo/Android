@@ -220,7 +220,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSearchUrlSharedThenAtbAndSourceParametersAreRemoved() {
-        testee.userSharingLink("https://duckduckgo.com/?q=test&atb=v117-1&t=ddg_test")
+        loadUrl("https://duckduckgo.com/?q=test&atb=v117-1&t=ddg_test")
+        testee.onShareSelected()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShareLink)
 
@@ -231,7 +232,8 @@ class BrowserTabViewModelTest {
     @Test
     fun whenNonSearchUrlSharedThenUrlIsUnchanged() {
         val url = "https://duckduckgo.com/about?atb=v117-1&t=ddg_test"
-        testee.userSharingLink(url)
+        loadUrl(url)
+        testee.onShareSelected()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShareLink)
 
@@ -730,14 +732,16 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSelectsDesktopSiteThenDesktopModeStateUpdated() {
-        testee.desktopSiteModeToggled("http://example.com", desktopSiteRequested = true)
+        loadUrl("http://example.com")
+        testee.onDesktopSiteModeToggled(true)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(browserViewState().isDesktopBrowsingMode)
     }
 
     @Test
     fun whenUserSelectsMobileSiteThenMobileModeStateUpdated() {
-        testee.desktopSiteModeToggled("http://example.com", desktopSiteRequested = false)
+        loadUrl("http://example.com")
+        testee.onDesktopSiteModeToggled(false)
         assertFalse(browserViewState().isDesktopBrowsingMode)
     }
 
@@ -841,7 +845,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSelectsDesktopSiteWhenOnMobileSpecificSiteThenUrlModified() {
-        testee.desktopSiteModeToggled("http://m.example.com", desktopSiteRequested = true)
+        loadUrl("http://m.example.com")
+        testee.onDesktopSiteModeToggled(true)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue as Navigate
         assertEquals("http://example.com", ultimateCommand.url)
@@ -849,7 +854,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSelectsDesktopSiteWhenNotOnMobileSpecificSiteThenUrlNotModified() {
-        testee.desktopSiteModeToggled("http://example.com", desktopSiteRequested = true)
+        loadUrl("http://example.com")
+        testee.onDesktopSiteModeToggled(true)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
         assertTrue(ultimateCommand == Command.Refresh)
@@ -857,7 +863,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSelectsMobileSiteWhenOnMobileSpecificSiteThenUrlNotModified() {
-        testee.desktopSiteModeToggled("http://m.example.com", desktopSiteRequested = false)
+        loadUrl("http://m.example.com")
+        testee.onDesktopSiteModeToggled(false)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
         assertTrue(ultimateCommand == Command.Refresh)
@@ -865,7 +872,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSelectsMobileSiteWhenNotOnMobileSpecificSiteThenUrlNotModified() {
-        testee.desktopSiteModeToggled("http://example.com", desktopSiteRequested = false)
+        loadUrl("http://example.com")
+        testee.onDesktopSiteModeToggled(false)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
         assertTrue(ultimateCommand == Command.Refresh)
@@ -882,10 +890,30 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenSiteLoadedAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithUrlAndTitle() {
+        loadUrl("foo.com")
+        testee.titleReceived("Foo Title")
+        testee.onAddBookmarkSelected()
+        val command = captureCommands().value as Command.AddBookmark
+        assertEquals("foo.com", command.url)
+        assertEquals("Foo Title", command.title)
+    }
+
+    @Test
+    fun whenNoSiteAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithBlankTitleAndUrl() {
+        testee.onAddBookmarkSelected()
+        val command = captureCommands().value as Command.AddBookmark
+        assertNotNull(command)
+        assertNull(command.url)
+        assertNull(command.title)
+    }
+
+    @Test
     fun whenUserSelectsToShareLinkThenShareLinkCommandSent() {
-        testee.userSharingLink("foo")
+        loadUrl("foo.com")
+        testee.onShareSelected()
         val command = captureCommands().value as Command.ShareLink
-        assertEquals("foo", command.url)
+        assertEquals("foo.com", command.url)
     }
 
     @Test
@@ -905,7 +933,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSelectsToShareLinkWithNullUrlThenShareLinkCommandNotSent() {
-        testee.userSharingLink(null)
+        loadUrl(null)
+        testee.onShareSelected()
         verify(mockCommandObserver, never()).onChanged(any())
     }
 

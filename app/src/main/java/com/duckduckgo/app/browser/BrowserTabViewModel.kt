@@ -154,6 +154,7 @@ class BrowserTabViewModel(
         object HideKeyboard : Command()
         class ShowFullScreen(val view: View) : Command()
         class DownloadImage(val url: String) : Command()
+        class AddBookmark(val title: String?, val url: String?) : Command()
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
@@ -617,7 +618,7 @@ class BrowserTabViewModel(
         command.value = OpenInNewBackgroundTab(url)
     }
 
-    fun userRequestingToFindInPage() {
+    fun onFindInPageSelected() {
         findInPageViewState.value = FindInPageViewState(visible = true, canFindInPage = true)
     }
 
@@ -650,18 +651,16 @@ class BrowserTabViewModel(
         globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
     }
 
-    fun desktopSiteModeToggled(urlString: String?, desktopSiteRequested: Boolean) {
+    fun onDesktopSiteModeToggled(desktopSiteRequested: Boolean) {
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(isDesktopBrowsingMode = desktopSiteRequested)
 
-        if (urlString == null) {
-            return
-        }
-        val url = Uri.parse(urlString)
-        if (desktopSiteRequested && url.isMobileSite) {
-            val desktopUrl = url.toDesktopUri()
-            Timber.i("Original URL $urlString - attempting $desktopUrl with desktop site UA string")
-            command.value = Navigate(desktopUrl.toString())
+        val uri = site?.uri ?: return
+
+        if (desktopSiteRequested && uri.isMobileSite) {
+            val desktopUrl = uri.toDesktopUri().toString()
+            Timber.i("Original URL $url - attempting $desktopUrl with desktop site UA string")
+            command.value = Navigate(desktopUrl)
         } else {
             command.value = Refresh
         }
@@ -676,9 +675,13 @@ class BrowserTabViewModel(
         findInPageViewState.value = FindInPageViewState()
     }
 
-    fun userSharingLink(url: String?) {
-        if (url != null) {
-            command.value = ShareLink(removeAtbAndSourceParamsFromSearch(url))
+    fun onAddBookmarkSelected() {
+        command.value = AddBookmark(site?.title, site?.url)
+    }
+
+    fun onShareSelected() {
+        site?.url?.let {
+            command.value = ShareLink(removeAtbAndSourceParamsFromSearch(it))
         }
     }
 
@@ -718,7 +721,8 @@ class BrowserTabViewModel(
     }
 
     @SuppressLint("CheckResult")
-    fun userRequestedToPinPageToHome(currentPage: String) {
+    fun onPinPageToHomeSelected() {
+        val currentPage = url ?: return
         val title = if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentPage)) {
             duckDuckGoUrlDetector.extractQuery(currentPage) ?: currentPage
         } else {

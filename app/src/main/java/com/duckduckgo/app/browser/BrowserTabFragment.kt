@@ -259,23 +259,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             onMenuItemClicked(view.refreshPopupMenuItem) { refresh() }
             onMenuItemClicked(view.newTabPopupMenuItem) { browserActivity?.launchNewTab() }
             onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
-            onMenuItemClicked(view.addBookmarksPopupMenuItem) { addBookmark() }
-            onMenuItemClicked(view.findInPageMenuItem) { viewModel.userRequestingToFindInPage() }
+            onMenuItemClicked(view.addBookmarksPopupMenuItem) { viewModel.onAddBookmarkSelected() }
+            onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
             onMenuItemClicked(view.brokenSitePopupMenuItem) { viewModel.onBrokenSiteSelected() }
             onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
-            onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) {
-                viewModel.desktopSiteModeToggled(
-                    urlString = webView?.url,
-                    desktopSiteRequested = view.requestDesktopSiteCheckMenuItem.isChecked
-                )
-            }
-            onMenuItemClicked(view.sharePageMenuItem) { viewModel.userSharingLink(webView?.url) }
-            onMenuItemClicked(view.addToHome) {
-                context?.let {
-                    val url = webView?.url ?: return@let
-                    viewModel.userRequestedToPinPageToHome(url)
-                }
-            }
+            onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) { viewModel.onDesktopSiteModeToggled(view.requestDesktopSiteCheckMenuItem.isChecked) }
+            onMenuItemClicked(view.sharePageMenuItem) { viewModel.onShareSelected() }
+            onMenuItemClicked(view.addToHome) { viewModel.onPinPageToHomeSelected() }
         }
     }
 
@@ -367,6 +357,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
             is Command.OpenInNewBackgroundTab -> {
                 openInNewBackgroundTab()
+            }
+            is Command.AddBookmark -> {
+                addBookmark(it.title, it.url)
             }
             is Command.Navigate -> {
                 navigate(it.url)
@@ -739,17 +732,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         popupMenu.show(rootView, toolbar)
     }
 
-    private fun launchSharePageChooser(url: String) {
-        activity?.share(url, "")
-    }
-
-    private fun addBookmark() {
-        val addBookmarkDialog = SaveBookmarkDialogFragment.createDialogCreationMode(
-            existingTitle = webView?.title,
-            existingUrl = webView?.url
-        )
+    private fun addBookmark(title: String?, url: String?) {
+        val addBookmarkDialog = SaveBookmarkDialogFragment.createDialogCreationMode(title, url)
         addBookmarkDialog.show(childFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
         addBookmarkDialog.listener = viewModel
+    }
+
+    private fun launchSharePageChooser(url: String) {
+        activity?.share(url, "")
     }
 
     override fun onFindResultReceived(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Boolean) {
