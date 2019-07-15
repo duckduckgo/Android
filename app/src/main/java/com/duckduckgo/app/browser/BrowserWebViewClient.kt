@@ -23,7 +23,9 @@ import android.webkit.*
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.net.URI
 
@@ -36,7 +38,6 @@ class BrowserWebViewClient(
 
     var webViewClientListener: WebViewClientListener? = null
 
-    private var tempTimer = 0L
 
     /**
      * This is the new method of url overriding available from API 24 onwards
@@ -94,14 +95,11 @@ class BrowserWebViewClient(
 
     @UiThread
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
-        Timber.d("\nonPageStarted $url")
-        tempTimer = System.currentTimeMillis()
         webViewClientListener?.navigationStateChanged(WebViewNavigationState(webView.copyBackForwardList()))
     }
 
     @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
-        Timber.i("onPageFinished $url, load time: ${System.currentTimeMillis() - tempTimer}ms")
         webViewClientListener?.navigationStateChanged(WebViewNavigationState(webView.copyBackForwardList()))
     }
 
