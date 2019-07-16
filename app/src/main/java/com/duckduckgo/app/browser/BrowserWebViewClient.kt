@@ -37,6 +37,7 @@ class BrowserWebViewClient(
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
+    private var lastPageStarted: String? = null
 
 
     /**
@@ -95,6 +96,10 @@ class BrowserWebViewClient(
 
     @UiThread
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
+        if (url != null && url == lastPageStarted) {
+            webViewClientListener?.pageRefreshed(url)
+        }
+        lastPageStarted = url
         webViewClientListener?.navigationStateChanged(WebViewNavigationState(webView.copyBackForwardList()))
     }
 

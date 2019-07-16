@@ -385,16 +385,81 @@ class BrowserTabViewModel(
         )
 
         stateChange.newPage()?.let {
-            onPageChanged(it)
+            pageChanged(it)
         }
 
         stateChange.updatedPage()?.let {
-            onUrlUpdated(it)
+            urlUpdated(it)
         }
 
         if (stateChange.isClear()) {
-            onPageCleared()
+            pageCleared()
         }
+    }
+
+    private fun pageChanged(url: String) {
+
+        Timber.v("Page changed: $url")
+        buildSiteFactory(url)
+
+        val currentOmnibarViewState = currentOmnibarViewState()
+        omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url)))
+
+        val currentBrowserViewState = currentBrowserViewState()
+        findInPageViewState.postValue(FindInPageViewState(visible = false, canFindInPage = true))
+        browserViewState.postValue(
+            currentBrowserViewState.copy(
+                browserShowing = true,
+                canAddBookmarks = true,
+                addToHomeEnabled = true,
+                addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
+                canSharePage = true,
+                showPrivacyGrade = appConfigurationDownloaded
+            )
+        )
+
+        if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
+            statisticsUpdater.refreshSearchRetentionAtb()
+        }
+
+        registerSiteVisit()
+    }
+
+    private fun urlUpdated(url: String) {
+        Timber.v("Page url updated: $url")
+        site?.url = url
+        onSiteChanged()
+        val currentOmnibarViewState = currentOmnibarViewState()
+        omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url)))
+    }
+
+    private fun omnibarTextForUrl(url: String?): String {
+        if (url == null) return ""
+        if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
+            return duckDuckGoUrlDetector.extractQuery(url) ?: ""
+        }
+        return url
+    }
+
+    private fun pageCleared() {
+
+        Timber.v("Page cleared: $url")
+        site = null
+        onSiteChanged()
+
+        val currentBrowserViewState = currentBrowserViewState()
+        browserViewState.value = currentBrowserViewState.copy(
+            canAddBookmarks = false,
+            addToHomeEnabled = false,
+            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
+            canSharePage = false,
+            showPrivacyGrade = false
+        )
+    }
+
+    override fun pageRefreshed(refreshedUrl: String) {
+        Timber.v("Page refreshed: $refreshedUrl")
+        pageChanged(refreshedUrl)
     }
 
     override fun progressChanged(newProgress: Int) {
@@ -429,62 +494,6 @@ class BrowserTabViewModel(
     @AnyThread
     override fun sendSmsRequested(telephoneNumber: String) {
         command.postValue(SendSms(telephoneNumber))
-    }
-
-    private fun onPageChanged(url: String) {
-
-        Timber.v("Page changed: $url")
-        buildSiteFactory(url)
-
-        val currentOmnibarViewState = currentOmnibarViewState()
-        omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url)))
-
-        val currentBrowserViewState = currentBrowserViewState()
-        findInPageViewState.postValue(FindInPageViewState(visible = false, canFindInPage = true))
-        browserViewState.postValue(
-            currentBrowserViewState.copy(
-                browserShowing = true,
-                canAddBookmarks = true,
-                addToHomeEnabled = true,
-                addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
-                canSharePage = true,
-                showPrivacyGrade = appConfigurationDownloaded
-            )
-        )
-
-        if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            statisticsUpdater.refreshSearchRetentionAtb()
-        }
-
-        registerSiteVisit()
-    }
-
-    private fun onPageCleared() {
-        site = null
-        onSiteChanged()
-
-        val currentBrowserViewState = currentBrowserViewState()
-        browserViewState.value = currentBrowserViewState.copy(
-            canAddBookmarks = false,
-            addToHomeEnabled = false,
-            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported()
-        )
-    }
-
-    private fun onUrlUpdated(url: String) {
-        Timber.v("Page url updated: $url")
-        site?.url = url
-        onSiteChanged()
-        val currentOmnibarViewState = currentOmnibarViewState()
-        omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url)))
-    }
-
-    private fun omnibarTextForUrl(url: String?): String {
-        if (url == null) return ""
-        if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            return duckDuckGoUrlDetector.extractQuery(url) ?: ""
-        }
-        return url
     }
 
     override fun trackerDetected(event: TrackingEvent) {
@@ -680,7 +689,7 @@ class BrowserTabViewModel(
     }
 
     fun onShareSelected() {
-        site?.url?.let {
+        url?.let {
             command.value = ShareLink(removeAtbAndSourceParamsFromSearch(it))
         }
     }

@@ -24,6 +24,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.Before
 import org.junit.Test
@@ -55,6 +56,22 @@ class BrowserWebViewClientTest {
     fun whenOnPageStartedCalledThenListenerInstructedToUpdateNavigationOptions() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         verify(listener).navigationStateChanged(any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledWithSameUrlAsPreviousThenListenerNotifiedOfRefresh() {
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        verify(listener).pageRefreshed(EXAMPLE_URL)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledWithDifferentUrlToPreviousThenListenerNotNotifiedOfRefresh() {
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        testee.onPageStarted(webView, "foo.com", null)
+        verify(listener, never()).pageRefreshed(any())
     }
 
     @UiThreadTest
