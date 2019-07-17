@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2018 DuckDuckGo
+  ~ Copyright (c) 2019 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -16,35 +16,30 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/settingsSectionGeneral"
+    android:id="@+id/settingsSectionAutocomplete"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/settingsGeneralTitle"
+        android:id="@+id/settingsAutocompleteTitle"
         style="@style/SettingsSectionTitle"
-        android:text="@string/settingsHeadingGeneral"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:text="@string/settingsHeadingAutocomplete" />
 
     <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/lightThemeToggle"
+        android:id="@+id/autocompleteToggle"
         style="@style/SettingsSwitch"
-        android:text="@string/settingsLightTheme"
+        android:text="@string/settingsAutocompleteEnabled"
         android:theme="@style/SettingsSwitchTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/settingsGeneralTitle" />
+        app:layout_constraintTop_toBottomOf="@id/settingsAutocompleteTitle" />
 
     <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/setAsDefaultBrowserSetting"
+        android:id="@+id/bookmarksAutocompleteToggle"
         style="@style/SettingsSwitch"
-        android:text="@string/settingsDefaultBrowserEnabled"
+        android:text="@string/settingsAutocompleteBookmarksEnabled"
         android:theme="@style/SettingsSwitchTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/lightThemeToggle" />
-
-
+        app:layout_constraintTop_toBottomOf="@id/autocompleteToggle" />
 </androidx.constraintlayout.widget.ConstraintLayout>

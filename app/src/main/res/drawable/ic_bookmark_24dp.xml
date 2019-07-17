@@ -15,14 +15,11 @@
   -->
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:width="24dp"
-    android:height="24dp"
     android:viewportWidth="24"
-    android:viewportHeight="24">
+    android:viewportHeight="24"
+    android:width="24dp"
+    android:height="24dp">
     <path
-        android:pathData="M14.774,16.051a6.702,6.702 0,0 1,-8.716 -10.13,6.7 6.7,0 0,1 10.13,8.716l3.446,3.447a1,1 0,0 1,-1.414 1.414l-3.446,-3.447zM7.33,14.124a4.9,4.9 0,1 0,6.93 -6.93,4.9 4.9,0 0,0 -6.93,6.93z"
-        android:fillColor="?attr/toolbarIconColor"
-        android:fillType="nonZero"
-        tools:ignore="VectorRaster" />
+        android:pathData="M16.286 4H7.714A1.72 1.72 0 0 0 6 5.714V18.67a0.5 0.5 0 0 0 0.697 0.46L12 16.857l5.303 2.273a0.5 0.5 0 0 0 0.697 -0.46V5.714A1.72 1.72 0 0 0 16.286 4z"
+        android:fillColor="?attr/toolbarIconColor" />
 </vector>

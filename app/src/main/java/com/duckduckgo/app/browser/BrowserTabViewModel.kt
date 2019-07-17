@@ -58,6 +58,7 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -89,6 +90,7 @@ class BrowserTabViewModel(
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
+    private val pixel: Pixel,
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, HttpAuthenticationListener, ViewModel() {
 
@@ -117,7 +119,8 @@ class BrowserTabViewModel(
 
     data class OmnibarViewState(
         val omnibarText: String = "",
-        val isEditing: Boolean = false
+        val isEditing: Boolean = false,
+        val shouldMoveCaretToEnd: Boolean = false
     )
 
     data class LoadingViewState(
@@ -136,7 +139,7 @@ class BrowserTabViewModel(
 
     data class AutoCompleteViewState(
         val showSuggestions: Boolean = false,
-        val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
+        val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList(), false)
     )
 
     sealed class Command {
@@ -258,7 +261,7 @@ class BrowserTabViewModel(
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
         val results = result.suggestions.take(6)
         val currentViewState = currentAutoCompleteViewState()
-        autoCompleteViewState.value = currentViewState.copy(searchResults = AutoCompleteResult(result.query, results))
+        autoCompleteViewState.value = currentViewState.copy(searchResults = AutoCompleteResult(result.query, results, result.hasBookmarks))
     }
 
     @VisibleForTesting
@@ -279,6 +282,35 @@ class BrowserTabViewModel(
 
     fun onViewHidden() {
         skipHome = false
+    }
+
+    @SuppressLint("CheckResult")
+    fun onUserSubmittedAutocomplete(suggestion: AutoCompleteApi.AutoCompleteSuggestion) {
+        onUserSubmittedQuery(suggestion.phrase)
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val result= bookmarksDao.hasBookmarks()
+            Timber.d("Bookmarks result $result")
+            fireAutocompletePixel(suggestion, result)
+        }
+    }
+
+    private fun fireAutocompletePixel(suggestion: AutoCompleteApi.AutoCompleteSuggestion, hasBookmarks: Boolean) {
+        val currentViewState = currentAutoCompleteViewState()
+        val params = mapOf(
+            Pixel.PixelParameter.SHOWED_BOOKMARKS to currentViewState.searchResults.hasBookmarks.toString(),
+            Pixel.PixelParameter.BOOKMARK_CAPABLE to hasBookmarks.toString()
+        )
+        val pixelName = when(suggestion) {
+            is AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion -> {
+                Pixel.PixelName.AUTOCOMPLETE_BOOKMARK_SELECTION
+            }
+            else -> {
+                Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION
+            }
+        }
+
+        pixel.fire(pixelName, params)
     }
 
     fun onUserSubmittedQuery(input: String) {
@@ -305,7 +337,7 @@ class BrowserTabViewModel(
 
         globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
         findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
-        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = trimmedInput)
+        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = trimmedInput, shouldMoveCaretToEnd = false)
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
         autoCompleteViewState.value = AutoCompleteViewState(false)
     }
@@ -358,7 +390,7 @@ class BrowserTabViewModel(
             canGoBack = false,
             canGoForward = true
         )
-        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = "")
+        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = "", shouldMoveCaretToEnd = false)
         loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
     }
 
@@ -423,7 +455,7 @@ class BrowserTabViewModel(
         val omnibarText = if (url != null) omnibarTextForUrl(url) else currentOmnibarViewState.omnibarText
 
         loadingViewState.value = currentLoadingViewState.copy(isLoading = false)
-        omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarText)
+        omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarText, shouldMoveCaretToEnd = false)
 
         registerSiteVisit()
     }
@@ -546,7 +578,7 @@ class BrowserTabViewModel(
 
         // determine if empty list to be shown, or existing search results
         val autoCompleteSearchResults = if (query.isBlank()) {
-            AutoCompleteResult(query, emptyList())
+            AutoCompleteResult(query, emptyList(), false)
         } else {
             currentAutoCompleteViewState().searchResults
         }
@@ -587,7 +619,7 @@ class BrowserTabViewModel(
     }
 
     fun onUserSelectedToEditQuery(query: String) {
-        omnibarViewState.value = currentOmnibarViewState().copy(isEditing = false, omnibarText = query)
+        omnibarViewState.value = currentOmnibarViewState().copy(isEditing = false, omnibarText = query, shouldMoveCaretToEnd = true)
         autoCompleteViewState.value = AutoCompleteViewState(showSuggestions = false)
     }
 

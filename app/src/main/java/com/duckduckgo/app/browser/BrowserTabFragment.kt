@@ -56,6 +56,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
@@ -531,7 +532,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         autoCompleteSuggestionsList.layoutManager = LinearLayoutManager(context)
         autoCompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
             immediateSearchClickListener = {
-                userEnteredQuery(it.phrase)
+                userSelectedAutocomplete(it)
             },
             editableSearchClickListener = {
                 viewModel.onUserSelectedToEditQuery(it.phrase)
@@ -619,6 +620,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             setDuration(LAYOUT_TRANSITION_MS)
         }
         rootView.addOnLayoutChangeListener(logoHidingListener)
+    }
+
+    private fun userSelectedAutocomplete(suggestion: AutoCompleteApi.AutoCompleteSuggestion) {
+        viewModel.onUserSubmittedAutocomplete(suggestion)
     }
 
     private fun userEnteredQuery(query: String) {
@@ -1015,6 +1020,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
                     omnibarTextInput.setText(viewState.omnibarText)
                     appBarLayout.setExpanded(true, true)
+                    if (viewState.shouldMoveCaretToEnd) {
+                        omnibarTextInput.setSelection(viewState.omnibarText.length)
+                    }
                 }
             }
         }
