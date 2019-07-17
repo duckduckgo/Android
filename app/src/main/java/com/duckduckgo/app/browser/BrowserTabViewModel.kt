@@ -374,26 +374,22 @@ class BrowserTabViewModel(
 
     override fun navigationStateChanged(newWebNavigationState: WebNavigationState) {
 
-        val stateChange = WebNavigationStateChange(webNavigationState, newWebNavigationState)
+        val stateChange = newWebNavigationState.compare(webNavigationState)
         webNavigationState = newWebNavigationState
 
         if (!currentBrowserViewState().browserShowing) return
 
-        browserViewState.value = currentBrowserViewState().copy(
-            canGoBack = newWebNavigationState.canGoBack || !skipHome,
-            canGoForward = newWebNavigationState.canGoForward
-        )
-
-        stateChange.newPage()?.let {
-            pageChanged(it)
+        when {
+            stateChange is NewPage -> pageChanged(stateChange.url)
+            stateChange is PageCleared -> pageCleared()
+            stateChange is UrlUpdate -> urlUpdated(stateChange.url)
         }
 
-        stateChange.updatedPage()?.let {
-            urlUpdated(it)
-        }
-
-        if (stateChange.isClear()) {
-            pageCleared()
+        if (stateChange !is Unchanged) {
+            browserViewState.value = currentBrowserViewState().copy(
+                canGoBack = newWebNavigationState.canGoBack || !skipHome,
+                canGoForward = newWebNavigationState.canGoForward
+            )
         }
     }
 
@@ -442,7 +438,6 @@ class BrowserTabViewModel(
     }
 
     private fun pageCleared() {
-
         Timber.v("Page cleared: $url")
         site = null
         onSiteChanged()

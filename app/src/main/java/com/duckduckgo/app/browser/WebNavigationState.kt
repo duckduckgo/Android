@@ -30,6 +30,37 @@ interface WebNavigationState {
     val hasNavigationHistory: Boolean
 }
 
+sealed class WebNavigationStateChange
+data class NewPage(val url: String) : WebNavigationStateChange()
+data class UrlUpdate(val url: String) : WebNavigationStateChange()
+object PageCleared : WebNavigationStateChange()
+object Unchanged : WebNavigationStateChange()
+object Other : WebNavigationStateChange()
+
+fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStateChange {
+
+    if (this == previous) {
+        return Unchanged
+    }
+
+    if (originalUrl == null && previous?.originalUrl != null) {
+        return PageCleared
+    }
+
+    val latestUrl = currentUrl ?: return Other
+
+    // A new page load is identified by the original url changing
+    if (originalUrl != previous?.originalUrl) {
+        return NewPage(latestUrl)
+    }
+
+    // The most up-to-date record of the url is the current one, this may change during a page load
+    if (currentUrl != previous?.currentUrl) {
+        return UrlUpdate(latestUrl)
+    }
+
+    return Other
+}
 
 data class WebViewNavigationState(private val stack: WebBackForwardList) : WebNavigationState {
 
@@ -44,29 +75,20 @@ data class WebViewNavigationState(private val stack: WebBackForwardList) : WebNa
     override val canGoForward: Boolean = stack.currentIndex + 1 < stack.size
 
     override val hasNavigationHistory = stack.size != 0
-}
 
-class WebNavigationStateChange(val previous: WebNavigationState?, val new: WebNavigationState) {
+    override fun equals(other: Any?): Boolean {
 
-    fun newPage(): String? {
-        // A new page load is identified by the original url changing
-        // The most up-to-date record of the url is the current one as a url may change during loading
-        if (previous?.originalUrl != new.originalUrl) {
-            return new.currentUrl
-        }
-        return null
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as WebViewNavigationState
+        if (stack != other.stack) return false
+
+        return true
     }
 
-    fun updatedPage(): String? {
-        // If this is not a new page AND the currentUrl is different then the url has just been updated
-        if (newPage() == null && previous?.currentUrl != new.currentUrl) {
-            return new.currentUrl
-        }
-        return null
-    }
-
-    fun isClear(): Boolean {
-        return previous?.originalUrl != null && new.originalUrl == null
+    override fun hashCode(): Int {
+        return stack.hashCode()
     }
 }
 
