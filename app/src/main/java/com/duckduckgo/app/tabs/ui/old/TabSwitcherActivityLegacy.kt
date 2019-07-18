@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs.ui
+package com.duckduckgo.app.tabs.ui.old
 
 import android.content.Context
 import android.content.Intent
@@ -22,7 +22,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
@@ -30,6 +30,8 @@ import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.ui.TabSwitcherListener
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DisplayMessage
@@ -43,7 +45,7 @@ import org.jetbrains.anko.longToast
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
+class TabSwitcherActivityLegacy : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = SupervisorJob() + Dispatchers.Main
@@ -54,12 +56,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     @Inject
     lateinit var variantManager: VariantManager
 
-    @Inject
-    lateinit var gridViewColumnCalculator: GridViewColumnCalculator
-
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
-    private val tabsAdapter = TabSwitcherAdapter(this, this)
+    private val tabsAdapter = TabSwitcherAdapterLegacy(this, this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,8 +74,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun configureRecycler() {
-        val columnCount = gridViewColumnCalculator.calculateNumberOfColumns(TAB_GRID_COLUMN_WIDTH_DP, TAB_GRID_MAX_COLUMN_COUNT)
-        tabsRecycler.layoutManager = GridLayoutManager(this, columnCount)
+        tabsRecycler.layoutManager = LinearLayoutManager(this)
         tabsRecycler.adapter = tabsAdapter
     }
 
@@ -159,10 +157,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     companion object {
         fun intent(context: Context): Intent {
-            return Intent(context, TabSwitcherActivity::class.java)
+            return Intent(context, TabSwitcherActivityLegacy::class.java)
         }
-
-        private const val TAB_GRID_COLUMN_WIDTH_DP = 180
-        private const val TAB_GRID_MAX_COLUMN_COUNT = 4
     }
 }

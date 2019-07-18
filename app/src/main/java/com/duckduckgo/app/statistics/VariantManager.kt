@@ -27,6 +27,8 @@ interface VariantManager {
 
     sealed class VariantFeature {
         object TrackerBlockingOnboardingOptIn : VariantFeature()
+
+        object TabSwitcherGrid : VariantFeature()
     }
 
     companion object {
@@ -43,7 +45,10 @@ interface VariantManager {
 
             // tracker blocker opt in variants
             Variant(key = "mm", weight = 0.0, features = emptyList()),
-            Variant(key = "mn", weight = 0.0, features = listOf(TrackerBlockingOnboardingOptIn))
+            Variant(key = "mn", weight = 0.0, features = listOf(TrackerBlockingOnboardingOptIn)),
+
+            Variant(key = "?1", weight = 1000.0, features = emptyList()),
+            Variant(key = "?2", weight = 1000.0, features = listOf(VariantFeature.TabSwitcherGrid))
         )
     }
 

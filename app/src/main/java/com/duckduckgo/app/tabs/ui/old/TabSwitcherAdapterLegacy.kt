@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs.ui
+package com.duckduckgo.app.tabs.ui.old
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -23,30 +23,34 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.tabs.model.TabEntity
-import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
+import com.duckduckgo.app.tabs.ui.TabSwitcherListener
+import com.duckduckgo.app.tabs.ui.displayTitle
+import com.duckduckgo.app.tabs.ui.displayUrl
+import com.duckduckgo.app.tabs.ui.favicon
 import kotlinx.android.synthetic.main.item_tab.view.*
 
-class TabSwitcherAdapter(private val context: Context, private val itemClickListener: TabSwitcherListener) : Adapter<TabViewHolder>() {
+class TabSwitcherAdapterLegacy(private val context: Context, private val itemClickListener: TabSwitcherListener) :
+    Adapter<TabSwitcherAdapterLegacy.TabViewHolderLegacy>() {
 
     private var data: List<TabEntity> = ArrayList()
     private var selectedTab: TabEntity? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TabViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TabViewHolderLegacy {
         val inflater = LayoutInflater.from(parent.context)
-        val root = inflater.inflate(R.layout.item_tab, parent, false)
-        return TabViewHolder(root, root.favicon, root.title, root.url, root.close, root.tabUnread)
+        val root = inflater.inflate(R.layout.item_tab_legacy, parent, false)
+        return TabViewHolderLegacy(root, root.favicon, root.title, root.url, root.close, root.tabUnread)
     }
 
     override fun getItemCount(): Int {
         return data.size
     }
 
-    override fun onBindViewHolder(holder: TabViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: TabViewHolderLegacy, position: Int) {
 
         val tab = data[position]
         holder.title.text = tab.displayTitle(context)
@@ -63,7 +67,7 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
         attachClickListeners(holder, tab)
     }
 
-    private fun attachClickListeners(holder: TabViewHolder, tab: TabEntity) {
+    private fun attachClickListeners(holder: TabViewHolderLegacy, tab: TabEntity) {
         holder.root.setOnClickListener {
             itemClickListener.onTabSelected(tab)
         }
@@ -81,14 +85,14 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
         notifyDataSetChanged()
     }
 
-    data class TabViewHolder(
+    data class TabViewHolderLegacy(
         val root: View,
         val favicon: ImageView,
         val title: TextView,
         val url: TextView,
         val close: ImageView,
         val tabUnread: View
-    ) : ViewHolder(root)
+    ) : RecyclerView.ViewHolder(root)
 
     companion object {
 

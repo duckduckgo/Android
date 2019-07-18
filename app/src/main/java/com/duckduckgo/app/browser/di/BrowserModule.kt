@@ -38,6 +38,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogates
+import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import dagger.Module
 import dagger.Provides
@@ -127,5 +128,11 @@ class BrowserModule {
     @Provides
     fun webViewCookieManager(): CookieManager {
         return CookieManager.getInstance()
+    }
+
+    @Singleton
+    @Provides
+    fun fridViewColumnCalculator(context: Context): GridViewColumnCalculator {
+        return GridViewColumnCalculator(context)
     }
 }
