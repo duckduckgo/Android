@@ -453,8 +453,10 @@ class BrowserTabViewModel(
     }
 
     override fun pageRefreshed(refreshedUrl: String) {
-        Timber.v("Page refreshed: $refreshedUrl")
-        pageChanged(refreshedUrl)
+        if (refreshedUrl == url) {
+            Timber.v("Page refreshed: $refreshedUrl")
+            pageChanged(refreshedUrl)
+        }
     }
 
     override fun progressChanged(newProgress: Int) {
