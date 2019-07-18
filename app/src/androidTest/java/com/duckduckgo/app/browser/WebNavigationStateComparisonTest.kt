@@ -104,7 +104,7 @@ class WebNavigationStateComparisonTest {
         assertEquals(Other, latestState.compare(previousState))
     }
 
-    fun buildState(originalUrl: String?, currentUrl: String?): WebNavigationState {
+    private fun buildState(originalUrl: String?, currentUrl: String?): WebNavigationState {
         return TestNavigationState(
             originalUrl = originalUrl,
             currentUrl = currentUrl,

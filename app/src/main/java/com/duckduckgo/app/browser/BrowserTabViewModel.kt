@@ -492,7 +492,7 @@ class BrowserTabViewModel(
     }
 
     override fun trackerDetected(event: TrackingEvent) {
-        Timber.d("Tracker detected while on ${url} and the document was ${event.documentUrl}")
+        Timber.d("Tracker detected while on $url and the document was ${event.documentUrl}")
         if (site?.domainMatchesUrl(event.documentUrl) == true) {
             site?.trackerDetected(event)
             onSiteChanged()

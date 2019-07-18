@@ -24,8 +24,8 @@ import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.net.URI
 
@@ -96,11 +96,11 @@ class BrowserWebViewClient(
 
     @UiThread
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
+        webViewClientListener?.navigationStateChanged(WebViewNavigationState(webView.copyBackForwardList()))
         if (url != null && url == lastPageStarted) {
             webViewClientListener?.pageRefreshed(url)
         }
         lastPageStarted = url
-        webViewClientListener?.navigationStateChanged(WebViewNavigationState(webView.copyBackForwardList()))
     }
 
     @UiThread
@@ -110,7 +110,7 @@ class BrowserWebViewClient(
 
     @WorkerThread
     override fun shouldInterceptRequest(webView: WebView, request: WebResourceRequest): WebResourceResponse? {
-        val documentUrl = runBlocking { async(Dispatchers.Main) { webView.url }.await() }
+        val documentUrl = runBlocking { withContext(Dispatchers.Main) { webView.url } }
         Timber.v("Intercepting resource ${request.url} on page $documentUrl")
         return runBlocking { requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener) }
     }
