@@ -77,18 +77,28 @@ data class WebViewNavigationState(private val stack: WebBackForwardList) : WebNa
     override val hasNavigationHistory = stack.size != 0
 
     override fun equals(other: Any?): Boolean {
-
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
         other as WebViewNavigationState
-        if (stack != other.stack) return false
+        if (originalUrl != other.originalUrl) return false
+        if (currentUrl != other.currentUrl) return false
+        if (stepsToPreviousPage != other.stepsToPreviousPage) return false
+        if (canGoBack != other.canGoBack) return false
+        if (canGoForward != other.canGoForward) return false
+        if (hasNavigationHistory != other.hasNavigationHistory) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return stack.hashCode()
+        var result = originalUrl?.hashCode() ?: 0
+        result = 31 * result + (currentUrl?.hashCode() ?: 0)
+        result = 31 * result + stepsToPreviousPage
+        result = 31 * result + canGoBack.hashCode()
+        result = 31 * result + canGoForward.hashCode()
+        result = 31 * result + hasNavigationHistory.hashCode()
+        return result
     }
 }
 
