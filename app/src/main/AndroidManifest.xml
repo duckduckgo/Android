@@ -84,6 +84,23 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <activity android:name="com.duckduckgo.app.SelectedTextSearchActivity"
+            android:label="@string/systemTextSearchMessage"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.PROCESS_TEXT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+
+            <!-- Allow app to respond to "web search" requests from system -->
+            <intent-filter>
+                <action android:name="android.intent.action.WEB_SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name="com.duckduckgo.app.tabs.ui.TabSwitcherActivity"
             android:label="@string/tabActivityTitle" />
