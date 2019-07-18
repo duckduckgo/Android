@@ -234,6 +234,7 @@ class BrowserTabViewModel(
         }
 
         site = siteFactory.buildSite(url)
+        onSiteChanged()
         buildingSiteFactoryJob = viewModelScope.launch(Dispatchers.IO) {
             site?.let {
                 siteFactory.loadFullSiteDetails(it)
