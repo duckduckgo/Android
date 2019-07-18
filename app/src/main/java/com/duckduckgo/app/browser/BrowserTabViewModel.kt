@@ -454,7 +454,7 @@ class BrowserTabViewModel(
     }
 
     override fun pageRefreshed(refreshedUrl: String) {
-        if (refreshedUrl == url) {
+        if (url == null || refreshedUrl == url) {
             Timber.v("Page refreshed: $refreshedUrl")
             pageChanged(refreshedUrl)
         }
