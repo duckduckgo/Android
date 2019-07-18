@@ -85,7 +85,7 @@ class BrowserChromeClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnProgressChangedCalledThenListenerInstructedToUpdateNavigationOptions() {
+    fun whenOnProgressChangedCalledThenListenerInstructedToUpdateNavigationState() {
         testee.onProgressChanged(webView, 10)
         verify(mockWebViewClientListener).navigationStateChanged(any())
     }

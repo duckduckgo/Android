@@ -382,7 +382,7 @@ class BrowserTabViewModel(
         when {
             stateChange is NewPage -> pageChanged(stateChange.url)
             stateChange is PageCleared -> pageCleared()
-            stateChange is UrlUpdate -> urlUpdated(stateChange.url)
+            stateChange is UrlUpdated -> urlUpdated(stateChange.url)
         }
 
         if (stateChange !is Unchanged) {
@@ -507,8 +507,8 @@ class BrowserTabViewModel(
         networkLeaderboardDao.incrementNetworkCount(networkName)
     }
 
-    override fun pageHasHttpResources(url: String) {
-        if (site?.domainMatchesUrl(url) == true) {
+    override fun pageHasHttpResources(page: String) {
+        if (site?.domainMatchesUrl(page) == true) {
             site?.hasHttpResources = true
             onSiteChanged()
         }

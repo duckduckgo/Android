@@ -32,7 +32,7 @@ interface WebNavigationState {
 
 sealed class WebNavigationStateChange
 data class NewPage(val url: String) : WebNavigationStateChange()
-data class UrlUpdate(val url: String) : WebNavigationStateChange()
+data class UrlUpdated(val url: String) : WebNavigationStateChange()
 object PageCleared : WebNavigationStateChange()
 object Unchanged : WebNavigationStateChange()
 object Other : WebNavigationStateChange()
@@ -56,7 +56,7 @@ fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStat
 
     // The most up-to-date record of the url is the current one, this may change during a page load
     if (currentUrl != previous?.currentUrl) {
-        return UrlUpdate(latestUrl)
+        return UrlUpdated(latestUrl)
     }
 
     return Other
