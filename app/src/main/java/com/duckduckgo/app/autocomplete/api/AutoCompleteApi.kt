@@ -17,6 +17,8 @@
 package com.duckduckgo.app.autocomplete.api
 
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Companion.BOOKMARK_TYPE
+import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Companion.SUGGESTION_TYPE
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import io.reactivex.Observable
@@ -86,11 +88,11 @@ open class AutoCompleteApi @Inject constructor(
         val hasBookmarks: Boolean
     )
 
-    sealed class AutoCompleteSuggestion(val phrase: String) {
+    sealed class AutoCompleteSuggestion(val phrase: String, val suggestionType: Int) {
         class AutoCompleteSearchSuggestion(phrase: String, val isUrl: Boolean) :
-            AutoCompleteSuggestion(phrase)
+            AutoCompleteSuggestion(phrase, SUGGESTION_TYPE)
 
         class AutoCompleteBookmarkSuggestion(phrase: String, val title: String, val url: String) :
-            AutoCompleteSuggestion(phrase)
+            AutoCompleteSuggestion(phrase, BOOKMARK_TYPE)
     }
 }

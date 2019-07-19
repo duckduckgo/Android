@@ -17,9 +17,6 @@
 package com.duckduckgo.app.browser.autocomplete
 
 import android.content.Context
-import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Companion.BOOKMARK_TYPE
-import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Companion.EMPTY_TYPE
-import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Companion.SUGGESTION_TYPE
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences
 import dagger.Module
@@ -31,12 +28,4 @@ class BrowserAutoCompleteModule {
 
     @Provides
     fun settingsDataStore(context: Context): SettingsDataStore = SettingsSharedPreferences(context)
-
-    @Provides
-    fun suggestionViewHolderFactoryMap(): Map<Int, SuggestionViewHolderFactory> =
-        mapOf(
-            EMPTY_TYPE to EmptySuggestionViewHolderFactory(),
-            SUGGESTION_TYPE to SearchSuggestionViewHolderFactory(),
-            BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory()
-        )
 }

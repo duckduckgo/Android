@@ -60,7 +60,6 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
-import com.duckduckgo.app.browser.autocomplete.SuggestionViewHolderFactory
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
@@ -147,9 +146,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     @Inject
     lateinit var omnibarScrolling: OmnibarScrolling
-
-    @Inject
-    lateinit var viewHolderFactoryMap: Map<Int, @JvmSuppressWildcards SuggestionViewHolderFactory>
 
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
@@ -540,8 +536,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             },
             editableSearchClickListener = {
                 viewModel.onUserSelectedToEditQuery(it.phrase)
-            },
-            viewHolderFactoryMap = viewHolderFactoryMap
+            }
         )
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }

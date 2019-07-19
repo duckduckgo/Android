@@ -20,30 +20,32 @@ import android.view.ViewGroup
 import androidx.annotation.UiThread
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.browser.autocomplete.AutoCompleteViewHolder.EmptySuggestionViewHolder
-import javax.inject.Inject
 
-class BrowserAutoCompleteSuggestionsAdapter @Inject constructor(
+class BrowserAutoCompleteSuggestionsAdapter (
     private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-    private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-    private val viewHolderFactoryMap: Map<Int, @JvmSuppressWildcards SuggestionViewHolderFactory>
+    private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
 ) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
 
+    private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> = mutableMapOf()
     private val suggestions: MutableList<AutoCompleteSuggestion> = ArrayList()
 
+    init {
+        viewHolderFactoryMap.apply {
+            EMPTY_TYPE to EmptySuggestionViewHolderFactory()
+            SUGGESTION_TYPE to SearchSuggestionViewHolderFactory()
+            BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory()
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AutoCompleteViewHolder =
-        (viewHolderFactoryMap[viewType])!!.onCreateViewHolder(parent)
+        viewHolderFactoryMap.getValue(viewType).onCreateViewHolder(parent)
 
     override fun getItemViewType(position: Int): Int {
-        if (suggestions.isEmpty()) {
-            return EMPTY_TYPE
-        }
-        return when(suggestions[position]) {
-            is AutoCompleteBookmarkSuggestion -> BOOKMARK_TYPE
-            is AutoCompleteSearchSuggestion -> SUGGESTION_TYPE
+        return if (suggestions.isEmpty()) {
+            EMPTY_TYPE
+        } else {
+            suggestions[position].suggestionType
         }
     }
 
@@ -51,7 +53,7 @@ class BrowserAutoCompleteSuggestionsAdapter @Inject constructor(
         if (holder is EmptySuggestionViewHolder) {
             // nothing required
         } else {
-            (viewHolderFactoryMap[getItemViewType(position)])?.onBindViewHolder(
+            viewHolderFactoryMap.getValue(getItemViewType(position)).onBindViewHolder(
                 holder,
                 suggestions[position],
                 immediateSearchClickListener,
@@ -82,4 +84,3 @@ class BrowserAutoCompleteSuggestionsAdapter @Inject constructor(
         const val BOOKMARK_TYPE = 3
     }
 }
-
