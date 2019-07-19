@@ -203,7 +203,8 @@ class BrowserTabViewModelTest {
             faviconDownloader = mockFaviconDownloader,
             addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector,
             ctaViewModel = ctaViewModel,
-            searchCountDao = mockSearchCountDao
+            searchCountDao = mockSearchCountDao,
+            pixel = mockPixel
         )
 
         testee.loadData("abc", null, false)

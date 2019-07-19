@@ -27,14 +27,14 @@ class BrowserAutoCompleteSuggestionsAdapter (
     private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
 ) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
 
-    private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> = mutableMapOf()
+    private val viewHolderFactoryMap: MutableMap<Int, SuggestionViewHolderFactory> = mutableMapOf()
     private val suggestions: MutableList<AutoCompleteSuggestion> = ArrayList()
 
     init {
         viewHolderFactoryMap.apply {
-            EMPTY_TYPE to EmptySuggestionViewHolderFactory()
-            SUGGESTION_TYPE to SearchSuggestionViewHolderFactory()
-            BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory()
+            put(EMPTY_TYPE, EmptySuggestionViewHolderFactory())
+            put(SUGGESTION_TYPE, SearchSuggestionViewHolderFactory())
+            put(BOOKMARK_TYPE, BookmarkSuggestionViewHolderFactory())
         }
     }
 
