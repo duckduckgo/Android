@@ -70,6 +70,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -289,7 +290,7 @@ class BrowserTabViewModel(
         onUserSubmittedQuery(suggestion.phrase)
 
         viewModelScope.launch(Dispatchers.IO) {
-            val result= bookmarksDao.hasBookmarks()
+            val result = withContext(Dispatchers.IO) { bookmarksDao.hasBookmarks() }
             Timber.d("Bookmarks result $result")
             fireAutocompletePixel(suggestion, result)
         }
