@@ -587,10 +587,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         toolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.fire -> {
-                    //browserActivity?.launchFire()
-                    launch{
-                        for(i in 1..100)
-                            viewModel.openInNewBackgroundTab("https://edition.cnn.com")}
+                    browserActivity?.launchFire()
                     return@setOnMenuItemClickListener true
                 }
                 else -> return@setOnMenuItemClickListener false

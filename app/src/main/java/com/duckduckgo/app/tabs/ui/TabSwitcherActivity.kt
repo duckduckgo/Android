@@ -135,21 +135,21 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun configureObservers() {
         viewModel.tabs.observe(this, Observer<List<TabEntity>> {
-            render(true)
+            render()
         })
         viewModel.selectedTab.observe(this, Observer<TabEntity> {
-            render(false)
+            render()
         })
         viewModel.command.observe(this, Observer {
             processCommand(it)
         })
     }
 
-    private fun render(autoScrollToCurrentTab: Boolean) {
+    private fun render() {
         tabsAdapter.updateData(viewModel.tabs.value, viewModel.selectedTab.value)
 
-        Timber.i("Rendering tab list. should autoscroll to current tab? $autoScrollToCurrentTab")
-        if (autoScrollToCurrentTab) {
+        if (loadingTabs) {
+            loadingTabs = false
 
             // ensure we show the currently selected tab on screen
             scrollToShowCurrentTab()
@@ -159,7 +159,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun scrollToShowCurrentTab() {
         val index = tabsAdapter.adapterPositionForTab(intent.getStringExtra(EXTRA_KEY_SELECTED_TAB))
         Timber.i("selected tab is index $index in grid")
-        //tabsRecycler.layoutManager?.scrollToPosition(index)
         tabsRecycler.scrollToPosition(index)
     }
 
@@ -192,10 +191,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun onNewTabRequested() {
-        //launch { viewModel.onNewTabRequested() }
-        Timber.i("trying to show current tab")
-        scrollToShowCurrentTab()
-
+        launch { viewModel.onNewTabRequested() }
     }
 
     override fun onTabSelected(tab: TabEntity) {

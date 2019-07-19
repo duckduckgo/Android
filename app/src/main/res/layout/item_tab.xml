@@ -47,13 +47,13 @@
 
         <ImageView
             android:id="@+id/close"
-            android:layout_width="24dp"
-            android:layout_height="0dp"
-            android:layout_marginEnd="6dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="2dp"
             android:background="?selectableItemBackground"
             android:contentDescription="@string/closeContentDescription"
             android:scaleType="center"
-            android:src="@drawable/ic_close_24dp"
+            android:src="@drawable/ic_close_tab"
             android:tint="@color/grayish"
             app:layout_constraintBottom_toBottomOf="@id/favicon"
             app:layout_constraintEnd_toEndOf="parent"
