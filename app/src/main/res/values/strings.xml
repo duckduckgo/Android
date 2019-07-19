@@ -73,8 +73,8 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Edit query before searching</string>
-    <string name="settingsAutocompleteEnabled">Autocomplete Suggestions</string>
-    <string name="settingsAutocompleteBookmarksEnabled">Suggest Bookmarks</string>
+    <string name="settingsAutocompleteEnabled">Show Autocomplete Suggestions</string>
+    <string name="settingsAutocompleteBookmarksEnabled">Include Bookmarked Sites</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Open External App</string>
