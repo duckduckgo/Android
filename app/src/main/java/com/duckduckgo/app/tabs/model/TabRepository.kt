@@ -47,4 +47,6 @@ interface TabRepository {
     fun deleteAll()
 
     suspend fun select(tabId: String)
+
+    fun updateTabPreviewImage(tabId: String, fileName: String)
 }

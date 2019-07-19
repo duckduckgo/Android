@@ -168,6 +168,7 @@ class BrowserTabViewModel(
         object LaunchLegacyAddWidget : Command()
         class RequiresAuthentication(val request: BasicAuthenticationRequest) : Command()
         class SaveCredentials(val request: BasicAuthenticationRequest, val credentials: BasicAuthenticationCredentials) : Command()
+        object GenerateWebViewPreviewImage : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -426,6 +427,14 @@ class BrowserTabViewModel(
         omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarText)
 
         registerSiteVisit()
+
+        generateWebViewPreviewImage()
+    }
+
+
+    private fun generateWebViewPreviewImage() {
+        Timber.i("Generating WebView preview image")
+        command.value = GenerateWebViewPreviewImage
     }
 
     private fun registerSiteVisit() {
@@ -769,6 +778,10 @@ class BrowserTabViewModel(
 
     fun onUserDismissedCta() {
         ctaViewModel.onCtaDismissed()
+    }
+
+    fun updateTabPreview(tabId: String, fileName: String) {
+        tabRepository.updateTabPreviewImage(tabId, fileName)
     }
 
     override fun externalAppLinkClicked(appLink: IntentType) {

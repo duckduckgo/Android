@@ -27,6 +27,10 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
+import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
+import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
+import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.fire.WebViewCookieManager
 import com.duckduckgo.app.global.AppUrl
@@ -132,7 +136,19 @@ class BrowserModule {
 
     @Singleton
     @Provides
-    fun fridViewColumnCalculator(context: Context): GridViewColumnCalculator {
+    fun gridViewColumnCalculator(context: Context): GridViewColumnCalculator {
         return GridViewColumnCalculator(context)
     }
+
+    @Singleton
+    @Provides
+    fun webViewPreviewPersister(context: Context): WebViewPreviewPersister {
+        return FileBasedWebViewPreviewPersister(context)
+    }
+
+    @Provides
+    fun webViewPreviewGenerator() : WebViewPreviewGenerator {
+        return FileBasedWebViewPreviewGenerator()
+    }
+
 }

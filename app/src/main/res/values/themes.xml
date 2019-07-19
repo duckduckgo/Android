@@ -41,7 +41,7 @@
         <item name="omnibarTextColor">@color/white</item>
         <item name="omnibarHintColor">@color/grayishTwo</item>
         <item name="autoCompleteTextColor">@color/white</item>
-        <item name="tabTitleTextColor">@color/midnight</item>
+        <item name="tabTitleTextColor">@color/white</item>
         <item name="tabSubtitleTextColor">@color/coolGray</item>
         <item name="tabSelectedBorderColor">@color/skyBlue</item>
         <item name="tabsFireTextColor">@color/white</item>
@@ -63,6 +63,9 @@
         <item name="feedbackListItemSeparatorColor">@color/charcoalGrey</item>
         <item name="feedbackEditTextBackgroundColor">@color/almostBlack</item>
         <item name="feedbackEditTextHintColor">@color/grayish</item>
+
+        <item name="tabPlaceholderTintColor">@color/brownishGrayTwo</item>
+        <item name="tabCardBackgroundColor">@color/almostBlack</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -116,6 +119,9 @@
         <item name="feedbackListItemSeparatorColor">@color/whiteSix</item>
         <item name="feedbackEditTextBackgroundColor">@color/whiteFive</item>
         <item name="feedbackEditTextHintColor">@color/warmerGray</item>
+
+        <item name="tabPlaceholderTintColor">@color/grayishThree</item>
+        <item name="tabCardBackgroundColor">@color/white</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">

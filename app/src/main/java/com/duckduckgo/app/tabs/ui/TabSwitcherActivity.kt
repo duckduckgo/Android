@@ -18,12 +18,18 @@ package com.duckduckgo.app.tabs.ui
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Canvas
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.widget.Toolbar
+import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.global.view.FireDialog
@@ -33,15 +39,15 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DisplayMessage
-import kotlinx.android.synthetic.main.content_tab_switcher.*
-import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.longToast
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.abs
 
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
 
@@ -57,16 +63,31 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     @Inject
     lateinit var gridViewColumnCalculator: GridViewColumnCalculator
 
+    @Inject
+    lateinit var webViewPreviewPersister: WebViewPreviewPersister
+
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
-    private val tabsAdapter = TabSwitcherAdapter(this, this)
+    private val tabsAdapter: TabSwitcherAdapter by lazy { TabSwitcherAdapter(this, webViewPreviewPersister) }
+
+    private var loadingTabs = true
+
+    private lateinit var tabsRecycler: RecyclerView
+    private lateinit var toolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        postponeEnterTransition()
         setContentView(R.layout.activity_tab_switcher)
+        configureViewReferences()
         configureToolbar()
         configureRecycler()
         configureObservers()
+    }
+
+    private fun configureViewReferences() {
+        tabsRecycler = findViewById(R.id.tabsRecycler)
+        toolbar = findViewById(R.id.toolbar)
     }
 
     private fun configureToolbar() {
@@ -75,25 +96,71 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun configureRecycler() {
-        val columnCount = gridViewColumnCalculator.calculateNumberOfColumns(TAB_GRID_COLUMN_WIDTH_DP, TAB_GRID_MAX_COLUMN_COUNT)
-        tabsRecycler.layoutManager = GridLayoutManager(this, columnCount)
+        val numberColumns = gridViewColumnCalculator.calculateNumberOfColumns(TAB_GRID_COLUMN_WIDTH_DP, TAB_GRID_MAX_COLUMN_COUNT)
+        val layoutManager = GridLayoutManager(this, numberColumns)
+        tabsRecycler.layoutManager = layoutManager
         tabsRecycler.adapter = tabsAdapter
+
+        // wait until recycler view is ready before allow Activity transition animation to run
+        tabsRecycler.doOnPreDraw {
+            Timber.i("onPreDraw")
+            startPostponedEnterTransition()
+        }
+
+        val swipeListener = ItemTouchHelper(object : SwipeToDeleteCallback() {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val tab = tabsAdapter.getTab(viewHolder.adapterPosition)
+                onTabDeleted(tab)
+            }
+
+            override fun onChildDraw(
+                c: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    val alpha = 1 - (abs(dX) / (recyclerView.width / numberColumns))
+                    viewHolder.itemView.alpha = alpha
+                }
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+            }
+        })
+        swipeListener.attachToRecyclerView(tabsRecycler)
     }
+
 
     private fun configureObservers() {
         viewModel.tabs.observe(this, Observer<List<TabEntity>> {
-            render()
+            render(true)
         })
         viewModel.selectedTab.observe(this, Observer<TabEntity> {
-            render()
+            render(false)
         })
         viewModel.command.observe(this, Observer {
             processCommand(it)
         })
     }
 
-    private fun render() {
+    private fun render(autoScrollToCurrentTab: Boolean) {
         tabsAdapter.updateData(viewModel.tabs.value, viewModel.selectedTab.value)
+
+        Timber.i("Rendering tab list. should autoscroll to current tab? $autoScrollToCurrentTab")
+        if (autoScrollToCurrentTab) {
+
+            // ensure we show the currently selected tab on screen
+            scrollToShowCurrentTab()
+        }
+    }
+
+    private fun scrollToShowCurrentTab() {
+        val index = tabsAdapter.adapterPositionForTab(intent.getStringExtra(EXTRA_KEY_SELECTED_TAB))
+        Timber.i("selected tab is index $index in grid")
+        //tabsRecycler.layoutManager?.scrollToPosition(index)
+        tabsRecycler.scrollToPosition(index)
     }
 
     private fun processCommand(command: Command?) {
@@ -125,7 +192,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun onNewTabRequested() {
-        launch { viewModel.onNewTabRequested() }
+        //launch { viewModel.onNewTabRequested() }
+        Timber.i("trying to show current tab")
+        scrollToShowCurrentTab()
+
     }
 
     override fun onTabSelected(tab: TabEntity) {
@@ -158,11 +228,22 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, TabSwitcherActivity::class.java)
+        fun intent(context: Context, selectedTabId: String? = null): Intent {
+            val intent = Intent(context, TabSwitcherActivity::class.java)
+            intent.putExtra(EXTRA_KEY_SELECTED_TAB, selectedTabId)
+            return intent
         }
+
+        const val EXTRA_KEY_SELECTED_TAB = "selected"
 
         private const val TAB_GRID_COLUMN_WIDTH_DP = 180
         private const val TAB_GRID_MAX_COLUMN_COUNT = 4
+
+    }
+
+    abstract class SwipeToDeleteCallback : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+            return false
+        }
     }
 }

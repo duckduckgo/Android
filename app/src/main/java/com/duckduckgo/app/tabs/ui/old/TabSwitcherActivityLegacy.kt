@@ -62,7 +62,7 @@ class TabSwitcherActivityLegacy : DuckDuckGoActivity(), TabSwitcherListener, Cor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_tab_switcher)
+        setContentView(R.layout.activity_tab_switcher_legacy)
         configureToolbar()
         configureRecycler()
         configureObservers()

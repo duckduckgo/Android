@@ -20,6 +20,7 @@ package com.duckduckgo.app.tabs.model
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.db.TabsDao
@@ -31,7 +32,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, private val siteFactory: SiteFactory) : TabRepository {
+class TabDataRepository @Inject constructor(
+    private val tabsDao: TabsDao,
+    private val siteFactory: SiteFactory,
+    private val webViewPreviewPersister: WebViewPreviewPersister
+) : TabRepository {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs()
 
@@ -120,6 +125,20 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
         databaseExecutor().scheduleDirect {
             val selection = TabSelectionEntity(tabId = tabId)
             tabsDao.insertTabSelection(selection)
+        }
+    }
+
+    override fun updateTabPreviewImage(tabId: String, fileName: String) {
+        databaseExecutor().scheduleDirect {
+            val tab = tabsDao.tab(tabId) ?: return@scheduleDirect
+
+            val oldPreviewFileName = tab.tabPreviewFile
+            tab.tabPreviewFile = fileName
+            tabsDao.updateTab(tab)
+
+            oldPreviewFileName?.let {
+                webViewPreviewPersister.delete(oldPreviewFileName)
+            }
         }
     }
 

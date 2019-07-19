@@ -32,7 +32,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherListener
 import com.duckduckgo.app.tabs.ui.displayTitle
 import com.duckduckgo.app.tabs.ui.displayUrl
 import com.duckduckgo.app.tabs.ui.favicon
-import kotlinx.android.synthetic.main.item_tab.view.*
 
 class TabSwitcherAdapterLegacy(private val context: Context, private val itemClickListener: TabSwitcherListener) :
     Adapter<TabSwitcherAdapterLegacy.TabViewHolderLegacy>() {
@@ -43,7 +42,14 @@ class TabSwitcherAdapterLegacy(private val context: Context, private val itemCli
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TabViewHolderLegacy {
         val inflater = LayoutInflater.from(parent.context)
         val root = inflater.inflate(R.layout.item_tab_legacy, parent, false)
-        return TabViewHolderLegacy(root, root.favicon, root.title, root.url, root.close, root.tabUnread)
+
+        val favicon = root.findViewById<ImageView>(R.id.favicon)
+        val title = root.findViewById<TextView>(R.id.title)
+        val url = root.findViewById<TextView>(R.id.url)
+        val closeButton = root.findViewById<ImageView>(R.id.close)
+        val tabUnread = root.findViewById<ImageView>(R.id.tabUnread)
+
+        return TabViewHolderLegacy(root, favicon, title, url, closeButton, tabUnread)
     }
 
     override fun getItemCount(): Int {

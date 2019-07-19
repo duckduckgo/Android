@@ -42,12 +42,8 @@ import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.TabSwitcherGrid
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
-import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
-import com.duckduckgo.app.tabs.ui.old.TabSwitcherActivityLegacy
 import kotlinx.android.synthetic.main.activity_browser.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.longToast
@@ -68,9 +64,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
 
     @Inject
     lateinit var pixel: Pixel
-
-    @Inject
-    lateinit var variantManager: VariantManager
 
     @Inject
     lateinit var playStoreUtils: PlayStoreUtils
@@ -275,14 +268,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
         }
         dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.show()
-    }
-
-    fun launchTabSwitcher() {
-        if (variantManager.getVariant().hasFeature(TabSwitcherGrid)) {
-            startActivity(TabSwitcherActivity.intent(this))
-        } else {
-            startActivity(TabSwitcherActivityLegacy.intent(this))
-        }
     }
 
     fun launchNewTab() {
