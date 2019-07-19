@@ -103,12 +103,17 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
                 bookmarksAutocompleteToggle.quietlySetIsChecked(it.bookmarksAutoCompleteSuggestionsEnabled, bookmarksAutocompleteToggleListener)
                 updateDefaultBrowserViewVisibility(it)
                 updateAutomaticClearDataOptions(it.automaticallyClearData)
+                updateBookmarksAutoCompleteToggle(it.autoCompleteSuggestionsEnabled)
             }
         })
 
         viewModel.command.observe(this, Observer {
             processCommand(it)
         })
+    }
+
+    private fun updateBookmarksAutoCompleteToggle(enabled: Boolean) {
+        bookmarksAutocompleteToggle.isEnabled = enabled
     }
 
     private fun updateAutomaticClearDataOptions(automaticallyClearData: AutomaticallyClearData) {
