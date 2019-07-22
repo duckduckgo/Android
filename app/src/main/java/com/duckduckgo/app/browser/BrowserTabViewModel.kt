@@ -386,12 +386,11 @@ class BrowserTabViewModel(
             stateChange is UrlUpdated -> urlUpdated(stateChange.url)
         }
 
-        if (stateChange !is Unchanged) {
-            browserViewState.value = currentBrowserViewState().copy(
-                canGoBack = newWebNavigationState.canGoBack || !skipHome,
-                canGoForward = newWebNavigationState.canGoForward
-            )
-        }
+        browserViewState.value = currentBrowserViewState().copy(
+            canGoBack = newWebNavigationState.canGoBack || !skipHome,
+            canGoForward = newWebNavigationState.canGoForward
+        )
+
     }
 
     private fun pageChanged(url: String) {
