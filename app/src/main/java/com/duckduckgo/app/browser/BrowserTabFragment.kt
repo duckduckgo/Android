@@ -793,6 +793,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     override fun onViewStateRestored(bundle: Bundle?) {
         viewModel.restoreWebViewState(webView, omnibarTextInput.text.toString())
+        viewModel.determineShowBrowser()
         super.onViewStateRestored(bundle)
     }
 

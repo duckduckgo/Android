@@ -692,6 +692,10 @@ class BrowserTabViewModel(
         }
     }
 
+    fun determineShowBrowser() {
+        browserViewState.value = currentBrowserViewState().copy(browserShowing = !url.isNullOrBlank())
+    }
+
     private fun removeAtbAndSourceParamsFromSearch(url: String): String {
         if (!duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             return url
