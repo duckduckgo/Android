@@ -29,6 +29,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.*
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
@@ -51,8 +52,8 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
-import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.model.PrivacyPractices
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.*
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -65,6 +66,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
+import io.reactivex.Single
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.*
@@ -1072,6 +1074,60 @@ class BrowserTabViewModelTest {
         testee.handleAuthentication(request = authenticationRequest, credentials = credentials)
 
         verify(mockHandler, atLeastOnce()).proceed(username, password)
+    }
+
+    @Test
+    fun whenAutoCompleteSuggestionSubmittedThenSubmitSuggestionPhraseAsQuery() {
+        whenever(bookmarksDao.hasBookmarks()).thenReturn(Single.just(true))
+
+        testee.onUserSubmittedAutocomplete(AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com"))
+        assertSame("example", omnibarViewState().omnibarText)
+    }
+
+    @Test
+    fun whenBookmarkSuggestionSubmittedWithNoBookmarksThenAutoCompleteBookmarkSelectionPixelSent() {
+        whenever(bookmarksDao.hasBookmarks()).thenReturn(Single.just(true))
+
+        testee.autoCompleteViewState.value = autoCompleteViewState().copy(
+            searchResults = AutoCompleteResult(
+                "",
+                emptyList(),
+                true
+            )
+        )
+
+        testee.onUserSubmittedAutocomplete(AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com"))
+
+        val params = mapOf(
+            Pixel.PixelParameter.SHOWED_BOOKMARKS to "false",
+            Pixel.PixelParameter.BOOKMARK_CAPABLE to "true"
+        )
+
+
+        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_BOOKMARK_SELECTION, params)
+    }
+
+    @Test
+    fun whenSearchSuggestionSubmittedWithNoBookmarksThenAutoCompleteSearchSelectionPixelSent() {
+        whenever(bookmarksDao.hasBookmarks()).thenReturn(Single.just(true))
+
+        testee.autoCompleteViewState.value = autoCompleteViewState().copy(
+            searchResults = AutoCompleteResult(
+                "",
+                emptyList(),
+                true
+            )
+        )
+
+        testee.onUserSubmittedAutocomplete(AutoCompleteSearchSuggestion("example", false))
+
+        val params = mapOf(
+            Pixel.PixelParameter.SHOWED_BOOKMARKS to "false",
+            Pixel.PixelParameter.BOOKMARK_CAPABLE to "true"
+        )
+
+
+        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION, params)
     }
 
     private fun isBrowsing(isBrowsing: Boolean) {
