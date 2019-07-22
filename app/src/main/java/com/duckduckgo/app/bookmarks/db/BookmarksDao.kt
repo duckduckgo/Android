@@ -39,5 +39,5 @@ interface BookmarksDao {
     fun bookmarksByQuery(query: String): Single<List<BookmarkEntity>>
 
     @Query("select CAST(COUNT(*) AS BIT) from bookmarks")
-    fun hasBookmarks(): Single<Boolean>
+    suspend fun hasBookmarks(): Boolean
 }

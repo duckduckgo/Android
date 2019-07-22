@@ -29,7 +29,6 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.*
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
@@ -1077,58 +1076,61 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenAutoCompleteSuggestionSubmittedThenSubmitSuggestionPhraseAsQuery() {
-        whenever(bookmarksDao.hasBookmarks()).thenReturn(Single.just(true))
-
+    fun whenAutoCompleteSuggestionSubmittedThenSubmitSuggestionPhraseAsQuery() = runBlocking {
+        whenever(bookmarksDao.hasBookmarks()).thenReturn(true)
         testee.onUserSubmittedAutocomplete(AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com"))
+
         assertSame("example", omnibarViewState().omnibarText)
     }
 
     @Test
-    fun whenBookmarkSuggestionSubmittedWithNoBookmarksThenAutoCompleteBookmarkSelectionPixelSent() {
-        whenever(bookmarksDao.hasBookmarks()).thenReturn(Single.just(true))
-
-        testee.autoCompleteViewState.value = autoCompleteViewState().copy(
-            searchResults = AutoCompleteResult(
-                "",
-                emptyList(),
-                true
-            )
-        )
-
+    fun whenBookmarkSuggestionWithBookmarksSubmittedWithNoBookmarksThenAutoCompleteBookmarkSelectionPixelSent() = runBlocking {
+        whenever(bookmarksDao.hasBookmarks()).thenReturn(true)
         testee.onUserSubmittedAutocomplete(AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com"))
 
-        val params = mapOf(
-            Pixel.PixelParameter.SHOWED_BOOKMARKS to "false",
-            Pixel.PixelParameter.BOOKMARK_CAPABLE to "true"
-        )
-
-
-        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_BOOKMARK_SELECTION, params)
+        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_BOOKMARK_SELECTION, pixelParams(true))
     }
 
     @Test
-    fun whenSearchSuggestionSubmittedWithNoBookmarksThenAutoCompleteSearchSelectionPixelSent() {
-        whenever(bookmarksDao.hasBookmarks()).thenReturn(Single.just(true))
-
-        testee.autoCompleteViewState.value = autoCompleteViewState().copy(
-            searchResults = AutoCompleteResult(
-                "",
-                emptyList(),
-                true
-            )
-        )
-
+    fun whenSearchSuggestionWithBookmarksSubmittedWithNoBookmarksThenAutoCompleteSearchSelectionPixelSent() = runBlocking {
+        whenever(bookmarksDao.hasBookmarks()).thenReturn(true)
         testee.onUserSubmittedAutocomplete(AutoCompleteSearchSuggestion("example", false))
 
-        val params = mapOf(
-            Pixel.PixelParameter.SHOWED_BOOKMARKS to "false",
-            Pixel.PixelParameter.BOOKMARK_CAPABLE to "true"
-        )
-
-
-        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION, params)
+        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(true))
     }
+
+    @Test
+    fun whenBookmarkSuggestionWithoutBookmarksSubmittedWithNoBookmarksThenAutoCompleteBookmarkSelectionPixelSent() = runBlocking {
+        whenever(bookmarksDao.hasBookmarks()).thenReturn(false)
+        testee.onUserSubmittedAutocomplete(AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com"))
+
+        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_BOOKMARK_SELECTION, pixelParams(false))
+    }
+
+    @Test
+    fun whenSearchSuggestionWithoutBookmarksSubmittedWithNoBookmarksThenAutoCompleteSearchSelectionPixelSent() = runBlocking {
+        whenever(bookmarksDao.hasBookmarks()).thenReturn(false)
+        testee.onUserSubmittedAutocomplete(AutoCompleteSearchSuggestion("example", false))
+
+        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(false))
+    }
+
+    @Test
+    fun whenUserSelectToEditQueryThenMoveCaretToTheEnd() {
+        testee.onUserSelectedToEditQuery("foo")
+        assertTrue(omnibarViewState().shouldMoveCaretToEnd)
+    }
+
+    @Test
+    fun whenUserSubmitsQueryThenCaretDoesNotMoveToTheEnd() {
+        testee.onUserSubmittedQuery("foo")
+        assertFalse(omnibarViewState().shouldMoveCaretToEnd)
+    }
+
+    private fun pixelParams(bookmarkCapable: Boolean) = mapOf(
+        Pixel.PixelParameter.SHOWED_BOOKMARKS to "false",
+        Pixel.PixelParameter.BOOKMARK_CAPABLE to bookmarkCapable.toString()
+    )
 
     private fun isBrowsing(isBrowsing: Boolean) {
         testee.browserViewState.value = browserViewState().copy(browserShowing = isBrowsing)

@@ -70,6 +70,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -284,17 +285,11 @@ class BrowserTabViewModel(
         skipHome = false
     }
 
-    @SuppressLint("CheckResult")
-    fun onUserSubmittedAutocomplete(suggestion: AutoCompleteApi.AutoCompleteSuggestion) {
+    suspend fun onUserSubmittedAutocomplete(suggestion: AutoCompleteApi.AutoCompleteSuggestion) {
         onUserSubmittedQuery(suggestion.phrase)
 
-        bookmarksDao.hasBookmarks()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                fireAutocompletePixel(suggestion, it)
-            }, { throwable ->
-                Timber.w(throwable, "Failed when retrieving bookmarks")
-            })
+        val hasBookmarks = withContext(Dispatchers.IO) { bookmarksDao.hasBookmarks() }
+        fireAutocompletePixel(suggestion, hasBookmarks)
     }
 
     private fun fireAutocompletePixel(suggestion: AutoCompleteApi.AutoCompleteSuggestion, hasBookmarks: Boolean) {

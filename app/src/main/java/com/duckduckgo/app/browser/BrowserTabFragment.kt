@@ -96,7 +96,9 @@ import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
@@ -623,7 +625,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun userSelectedAutocomplete(suggestion: AutoCompleteApi.AutoCompleteSuggestion) {
-        viewModel.onUserSubmittedAutocomplete(suggestion)
+        GlobalScope.launch {
+            viewModel.onUserSubmittedAutocomplete(suggestion)
+        }
     }
 
     private fun userEnteredQuery(query: String) {
