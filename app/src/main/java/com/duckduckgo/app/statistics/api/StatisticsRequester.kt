@@ -87,6 +87,7 @@ class StatisticsRequester(
             .subscribe({
                 Timber.v("Search atb refresh succeeded, latest atb is ${it.version}")
                 store.searchRetentionAtb = it.version
+                storeUpdateVersionIfPresent(it)
             }, {
                 Timber.v("Search atb refresh failed with error ${it.localizedMessage}")
             })
@@ -94,7 +95,6 @@ class StatisticsRequester(
 
     @SuppressLint("CheckResult")
     override fun refreshAppRetentionAtb() {
-
         val atb = store.atb
 
         if (atb == null) {
@@ -110,9 +110,17 @@ class StatisticsRequester(
             .subscribe({
                 Timber.v("App atb refresh succeeded, latest atb is ${it.version}")
                 store.appRetentionAtb = it.version
+                storeUpdateVersionIfPresent(it)
             }, {
                 Timber.v("App atb refresh failed with error ${it.localizedMessage}")
             })
+
+    }
+
+    private fun storeUpdateVersionIfPresent(retrievedAtb: Atb) {
+        if (retrievedAtb.updateVersion != null) {
+            store.atb = Atb(retrievedAtb.updateVersion!!)
+        }
     }
 
     companion object {
