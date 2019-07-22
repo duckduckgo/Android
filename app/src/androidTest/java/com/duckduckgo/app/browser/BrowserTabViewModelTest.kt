@@ -328,7 +328,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBrowsingAndUrlLoadedThenSiteVisitedEntryAddedToLeaderboardDao() {
-        loadUrl("http://example.com/abc", true)
+        loadUrl("http://example.com/abc", isBrowserShowing = true)
         verify(mockNetworkLeaderboardDao).incrementSitesVisited()
     }
 
@@ -340,30 +340,33 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNotBrowsingAndUrlLoadedThenSiteVisitedEntryNotAddedToLeaderboardDao() {
-        loadUrl("http://example.com/abc", false)
+        loadUrl("http://example.com/abc", isBrowserShowing = false)
         verify(mockNetworkLeaderboardDao, never()).incrementSitesVisited()
     }
 
     @Test
-    fun whenBrowsingAndUrlLoadedThenUrlAndOmnibarTextUpdatedToMatch() {
+    fun whenBrowsingAndUrlLoadedThenUrlTitleAndOmnibarTextUpdatedToMatch() {
         val exampleUrl = "http://example.com/abc"
-        loadUrl(exampleUrl, true)
+        val exampleTitle = "Title"
+        loadUrl(exampleUrl, title = exampleTitle, isBrowserShowing = true)
         assertEquals(exampleUrl, testee.url)
         assertEquals(exampleUrl, omnibarViewState().omnibarText)
+        assertEquals(exampleTitle, testee.title)
     }
 
     @Test
-    fun whenNotBrowsingAndUrlLoadedThenUrlNullAndOmnibarTextRemainsBlank() {
-        loadUrl("http://example.com/abc", false)
+    fun whenNotBrowsingAndUrlLoadedThenUrlAndTitleNullAndOmnibarTextRemainsBlank() {
+        loadUrl("http://example.com/abc", "Title", isBrowserShowing = false)
         assertEquals(null, testee.url)
         assertEquals("", omnibarViewState().omnibarText)
+        assertEquals(null, testee.title)
     }
 
     @Test
     fun whenBrowsingAndUrlIsUpdatedThenUrlAndOmnibarTextUpdatedToMatch() {
         val originalUrl = "http://example.com/"
         val currentUrl = "http://example.com/current"
-        loadUrl(originalUrl, true)
+        loadUrl(originalUrl, isBrowserShowing = true)
         updateUrl(originalUrl, currentUrl, true)
         assertEquals(currentUrl, testee.url)
         assertEquals(currentUrl, omnibarViewState().omnibarText)
@@ -373,7 +376,7 @@ class BrowserTabViewModelTest {
     fun whenNotBrowsingAndUrlIsUpdatedThenUrlAndOmnibarTextRemainUnchanged() {
         val originalUrl = "http://example.com/"
         val currentUrl = "http://example.com/current"
-        loadUrl(originalUrl, true)
+        loadUrl(originalUrl, isBrowserShowing = true)
         updateUrl(originalUrl, currentUrl, false)
         assertEquals(originalUrl, testee.url)
         assertEquals(originalUrl, omnibarViewState().omnibarText)
@@ -382,13 +385,13 @@ class BrowserTabViewModelTest {
     @Test
     fun whenBrowsingAndUrlLoadedWithQueryUrlThenOmnibarTextUpdatedToShowQuery() {
         val queryUrl = "http://duckduckgo.com?q=test"
-        loadUrl(queryUrl, true)
+        loadUrl(queryUrl, isBrowserShowing = true)
         assertEquals("test", omnibarViewState().omnibarText)
     }
 
     @Test
     fun whenNotBrowsingAndUrlLoadedWithQueryUrlThenOmnibarTextextRemainsBlank() {
-        loadUrl("http://duckduckgo.com?q=test", false)
+        loadUrl("http://duckduckgo.com?q=test", isBrowserShowing = false)
         assertEquals("", omnibarViewState().omnibarText)
     }
 
@@ -918,7 +921,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOnSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithUrl() = runBlocking<Unit> {
-        loadUrl("foo.com", true)
+        loadUrl("foo.com", isBrowserShowing = true)
         testee.onBrokenSiteSelected()
         val command = captureCommands().value as Command.BrokenSiteFeedback
         assertEquals("foo.com", command.url)
@@ -1027,9 +1030,9 @@ class BrowserTabViewModelTest {
         testee.browserViewState.value = browserViewState().copy(browserShowing = isBrowsing)
     }
 
-    private fun loadUrl(url: String?, isBrowserShowing: Boolean = true) {
+    private fun loadUrl(url: String?, title: String? = null, isBrowserShowing: Boolean = true) {
         setBrowserShowing(isBrowserShowing)
-        testee.navigationStateChanged(buildWebNavigation(originalUrl = url, currentUrl = url))
+        testee.navigationStateChanged(buildWebNavigation(originalUrl = url, currentUrl = url, title = title))
     }
 
     private fun updateUrl(originalUrl: String?, currentUrl: String?, isBrowserShowing: Boolean) {
@@ -1058,6 +1061,7 @@ class BrowserTabViewModelTest {
     private fun buildWebNavigation(
         currentUrl: String? = null,
         originalUrl: String? = null,
+        title: String? = null,
         canGoForward: Boolean = false,
         canGoBack: Boolean = false,
         stepsToPreviousPage: Int = 0
@@ -1065,6 +1069,7 @@ class BrowserTabViewModelTest {
         val nav: WebNavigationState = mock()
         whenever(nav.originalUrl).thenReturn(originalUrl)
         whenever(nav.currentUrl).thenReturn(currentUrl)
+        whenever(nav.title).thenReturn(title)
         whenever(nav.canGoForward).thenReturn(canGoForward)
         whenever(nav.canGoBack).thenReturn(canGoBack)
         whenever(nav.stepsToPreviousPage).thenReturn(stepsToPreviousPage)

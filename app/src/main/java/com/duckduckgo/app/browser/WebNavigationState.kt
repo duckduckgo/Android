@@ -24,6 +24,7 @@ import com.duckduckgo.app.global.isHttpsVersionOfUri
 interface WebNavigationState {
     val originalUrl: String?
     val currentUrl: String?
+    val title: String?
     val stepsToPreviousPage: Int
     val canGoBack: Boolean
     val canGoForward: Boolean
@@ -31,7 +32,7 @@ interface WebNavigationState {
 }
 
 sealed class WebNavigationStateChange
-data class NewPage(val url: String) : WebNavigationStateChange()
+data class NewPage(val url: String, val title: String?) : WebNavigationStateChange()
 data class UrlUpdated(val url: String) : WebNavigationStateChange()
 object PageCleared : WebNavigationStateChange()
 object Unchanged : WebNavigationStateChange()
@@ -51,7 +52,7 @@ fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStat
 
     // A new page load is identified by the original url changing
     if (originalUrl != previous?.originalUrl) {
-        return NewPage(latestUrl)
+        return NewPage(latestUrl, title)
     }
 
     // The most up-to-date record of the url is the current one, this may change during a page load
@@ -68,6 +69,8 @@ data class WebViewNavigationState(private val stack: WebBackForwardList) : WebNa
 
     override val currentUrl: String? = stack.currentUrl
 
+    override val title: String? = stack.currentItem?.title
+
     override val stepsToPreviousPage: Int = if (stack.isHttpsUpgrade) 2 else 1
 
     override val canGoBack: Boolean = stack.currentIndex >= stepsToPreviousPage
@@ -83,6 +86,7 @@ data class WebViewNavigationState(private val stack: WebBackForwardList) : WebNa
         other as WebViewNavigationState
         if (originalUrl != other.originalUrl) return false
         if (currentUrl != other.currentUrl) return false
+        if (title != other.title) return false
         if (stepsToPreviousPage != other.stepsToPreviousPage) return false
         if (canGoBack != other.canGoBack) return false
         if (canGoForward != other.canGoForward) return false
@@ -94,6 +98,7 @@ data class WebViewNavigationState(private val stack: WebBackForwardList) : WebNa
     override fun hashCode(): Int {
         var result = originalUrl?.hashCode() ?: 0
         result = 31 * result + (currentUrl?.hashCode() ?: 0)
+        result = 31 * result + (title?.hashCode() ?: 0)
         result = 31 * result + stepsToPreviousPage
         result = 31 * result + canGoBack.hashCode()
         result = 31 * result + canGoForward.hashCode()

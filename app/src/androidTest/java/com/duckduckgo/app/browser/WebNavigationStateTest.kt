@@ -35,38 +35,45 @@ class WebNavigationStateComparisonTest {
     }
 
     @Test
-    fun whenPreviousStateIsNullAndLatestContainsAnOriginalUrlAndACurrentUrlThenCompareReturnsNewPage() {
+    fun whenPreviousStateIsNullAndLatestContainsAnOriginalUrlACurrentUrlAndTitleThenCompareReturnsNewPageWithTitle() {
+        val previousState = null
+        val latestState = buildState("latest.com", "subdomain.latest.com", "Title")
+        assertEquals(NewPage("subdomain.latest.com", "Title"), latestState.compare(previousState))
+    }
+
+    @Test
+    fun whenPreviousStateIsNullAndLatestContainsAnOriginalUrlACurrentUrlAndNoTitleThenCompareReturnsNewPageWithoutTitle() {
         val previousState = null
         val latestState = buildState("latest.com", "subdomain.latest.com")
-        assertEquals(NewPage("subdomain.latest.com"), latestState.compare(previousState))
+        assertEquals(NewPage("subdomain.latest.com", null), latestState.compare(previousState))
     }
 
     @Test
     fun whenPreviousContainsNoOriginalOrCurrentUrlAndLatestContainsAnOriginalAndCurrentUrlThenCompareReturnsNewPage() {
         val previousState = buildState(null, null)
         val latestState = buildState("latest.com", "subdomain.latest.com")
-        assertEquals(NewPage("subdomain.latest.com"), latestState.compare(previousState))
+        assertEquals(NewPage("subdomain.latest.com", null), latestState.compare(previousState))
     }
 
     @Test
-    fun whenPreviousContainsNoOriginalUrlAndContainsACurrentUrlAndLatestContainsAnOriginalAndCurrentUrlThenCompareReturnsNewPage() {
+    fun whenPreviousContainsNoOriginalUrlAndACurrentUrlAndLatestContainsAnOriginalAndCurrentUrlThenCompareReturnsNewPage() {
         val previousState = buildState(null, "subdomain.previous.com")
         val latestState = buildState("latest.com", "subdomain.latest.com")
-        assertEquals(NewPage("subdomain.latest.com"), latestState.compare(previousState))
+        assertEquals(NewPage("subdomain.latest.com", null), latestState.compare(previousState))
     }
 
     @Test
     fun whenPreviousContainsAnOriginalUrlAndNoCurrentUrlAndLatestContainsAnOriginalAndCurrentUrlThenCompareReturnsNewPage() {
         val previousState = buildState("previous.com", null)
         val latestState = buildState("latest.com", "subdomain.latest.com")
-        assertEquals(NewPage("subdomain.latest.com"), latestState.compare(previousState))
+        assertEquals(NewPage("subdomain.latest.com", null), latestState.compare(previousState))
     }
 
     @Test
     fun whenPreviousContainsAnOriginalUrlAndCurrentUrlAndLatestContainsADifferentOriginalUrlThenCompareReturnsNewPage() {
         val previousState = buildState("previous.com", "subdomain.previous.com")
         val latestState = buildState("latest.com", "subdomain.latest.com")
-        assertEquals(NewPage("subdomain.latest.com"), latestState.compare(previousState))
+        assertEquals(NewPage("subdomain.latest.com", null), latestState.compare(previousState))
     }
 
     @Test
@@ -104,10 +111,11 @@ class WebNavigationStateComparisonTest {
         assertEquals(Other, latestState.compare(previousState))
     }
 
-    private fun buildState(originalUrl: String?, currentUrl: String?): WebNavigationState {
+    private fun buildState(originalUrl: String?, currentUrl: String?, title: String? = null): WebNavigationState {
         return TestNavigationState(
             originalUrl = originalUrl,
             currentUrl = currentUrl,
+            title = title,
             stepsToPreviousPage = 1,
             canGoBack = true,
             canGoForward = true,
@@ -119,6 +127,7 @@ class WebNavigationStateComparisonTest {
 data class TestNavigationState(
     override val originalUrl: String?,
     override val currentUrl: String?,
+    override val title: String?,
     override val stepsToPreviousPage: Int,
     override val canGoBack: Boolean,
     override val canGoForward: Boolean,

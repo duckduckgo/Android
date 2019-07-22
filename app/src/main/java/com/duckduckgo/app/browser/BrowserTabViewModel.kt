@@ -196,6 +196,9 @@ class BrowserTabViewModel(
     val url: String?
         get() = site?.url
 
+   val title: String?
+        get() = site?.title
+
     private var appConfigurationDownloaded = false
     private val appConfigurationObservable = appConfigurationDao.appConfigurationStatus()
     private val autoCompletePublishSubject = PublishRelay.create<String>()
@@ -226,14 +229,14 @@ class BrowserTabViewModel(
         }
     }
 
-    private fun buildSiteFactory(url: String) {
+    private fun buildSiteFactory(url: String, title: String? = null) {
 
         if (buildingSiteFactoryJob?.isCompleted == false) {
             Timber.i("Cancelling existing work to build SiteMonitor for $url")
             buildingSiteFactoryJob?.cancel()
         }
 
-        site = siteFactory.buildSite(url)
+        site = siteFactory.buildSite(url, title)
         onSiteChanged()
         buildingSiteFactoryJob = viewModelScope.launch(Dispatchers.IO) {
             site?.let {
@@ -386,16 +389,16 @@ class BrowserTabViewModel(
         )
 
         when {
-            stateChange is NewPage -> pageChanged(stateChange.url)
+            stateChange is NewPage -> pageChanged(stateChange.url, stateChange.title)
             stateChange is PageCleared -> pageCleared()
             stateChange is UrlUpdated -> urlUpdated(stateChange.url)
         }
     }
 
-    private fun pageChanged(url: String) {
+    private fun pageChanged(url: String, title: String?) {
 
         Timber.v("Page changed: $url")
-        buildSiteFactory(url)
+        buildSiteFactory(url, title)
 
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url)))
@@ -454,7 +457,7 @@ class BrowserTabViewModel(
     override fun pageRefreshed(refreshedUrl: String) {
         if (url == null || refreshedUrl == url) {
             Timber.v("Page refreshed: $refreshedUrl")
-            pageChanged(refreshedUrl)
+            pageChanged(refreshedUrl, title)
         }
     }
 
@@ -472,8 +475,8 @@ class BrowserTabViewModel(
         }
     }
 
-    override fun titleReceived(title: String) {
-        site?.title = (title)
+    override fun titleReceived(newTitle: String) {
+        site?.title = newTitle
         onSiteChanged()
     }
 
@@ -681,7 +684,7 @@ class BrowserTabViewModel(
     }
 
     fun onAddBookmarkSelected() {
-        command.value = AddBookmark(site?.title, site?.url)
+        command.value = AddBookmark(title, url)
     }
 
     fun onShareSelected() {
