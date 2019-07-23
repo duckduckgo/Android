@@ -73,6 +73,22 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
+    fun whenAlreadyInitializedRefreshSearchRetentionCallWithUpdateVersionResponseUpdatesAtb() {
+        statisticsStore.saveAtb(Atb("100-1"))
+        queueResponseFromFile(VALID_UPDATE_RESPONSE_JSON)
+        testee.refreshSearchRetentionAtb()
+        assertEquals("v99-1", statisticsStore.atb?.version)
+    }
+
+    @Test
+    fun whenAlreadyInitializedRefreshAppRetentionCallWithUpdateVersionResponseUpdatesAtb() {
+        statisticsStore.saveAtb(Atb("100-1"))
+        queueResponseFromFile(VALID_UPDATE_RESPONSE_JSON)
+        testee.refreshAppRetentionAtb()
+        assertEquals("v99-1", statisticsStore.atb?.version)
+    }
+
+    @Test
     fun whenNotYetInitializedAtbInitializationStoresAtbResponse() {
         queueResponseFromFile(VALID_JSON)
         queueResponseFromString(responseBody = "", responseCode = 200)
@@ -332,6 +348,7 @@ class StatisticsRequesterJsonTest {
     companion object {
         private const val VALID_JSON = "atb_response_valid.json"
         private const val VALID_REFRESH_RESPONSE_JSON = "atb_refresh_response_valid.json"
+        private const val VALID_UPDATE_RESPONSE_JSON = "atb_update_response_valid.json"
         private const val INVALID_JSON_MISSING_VERSION = "atb_response_invalid_missing_version.json"
         private const val INVALID_JSON_CORRUPT_JSON = "atb_response_invalid_malformed_json.json"
 
