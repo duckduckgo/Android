@@ -253,7 +253,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             val activity = activity ?: return@setOnClickListener
 
             if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.TabSwitcherGrid)) {
-                startActivityForResult(TabSwitcherActivity.intent(activity, tabId), 1234)
+                startActivity(TabSwitcherActivity.intent(activity, tabId))
+                activity.overridePendingTransition(0, R.anim.slide_to_bottom)
             } else {
                 startActivity(TabSwitcherActivityLegacy.intent(activity))
             }

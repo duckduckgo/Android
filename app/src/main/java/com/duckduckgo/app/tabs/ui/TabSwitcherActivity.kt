@@ -217,6 +217,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     override fun finish() {
         clearObserversEarlyToStopViewUpdates()
         super.finish()
+        overridePendingTransition(R.anim.slide_from_bottom, android.R.anim.fade_out)
     }
 
     private fun clearObserversEarlyToStopViewUpdates() {
