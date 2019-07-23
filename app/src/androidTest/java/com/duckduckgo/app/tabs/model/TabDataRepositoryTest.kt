@@ -22,6 +22,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.model.PrivacyPractices
@@ -59,6 +60,9 @@ class TabDataRepositoryTest {
     @Mock
     private lateinit var mockTrackerNetworks: TrackerNetworks
 
+    @Mock
+    private lateinit var mockWebViewPreviewPersister: WebViewPreviewPersister
+
     private lateinit var testee: TabDataRepository
 
     @UiThreadTest
@@ -67,7 +71,11 @@ class TabDataRepositoryTest {
         MockitoAnnotations.initMocks(this)
         runBlocking {
             whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
-            testee = TabDataRepository(mockDao, SiteFactory(mockPrivacyPractices, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore))
+            testee = TabDataRepository(
+                mockDao,
+                SiteFactory(mockPrivacyPractices, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore),
+                mockWebViewPreviewPersister
+            )
         }
     }
 
