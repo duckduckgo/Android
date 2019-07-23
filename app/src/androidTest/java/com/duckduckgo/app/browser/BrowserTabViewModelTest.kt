@@ -51,7 +51,6 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
-import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -221,7 +220,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSearchUrlSharedThenAtbAndSourceParametersAreRemoved() {
-        testee.userSharingLink("https://duckduckgo.com/?q=test&atb=v117-1&t=ddg_test")
+        loadUrl("https://duckduckgo.com/?q=test&atb=v117-1&t=ddg_test")
+        testee.onShareSelected()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShareLink)
 
@@ -232,7 +232,8 @@ class BrowserTabViewModelTest {
     @Test
     fun whenNonSearchUrlSharedThenUrlIsUnchanged() {
         val url = "https://duckduckgo.com/about?atb=v117-1&t=ddg_test"
-        testee.userSharingLink(url)
+        loadUrl(url)
+        testee.onShareSelected()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShareLink)
 
@@ -252,16 +253,16 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenViewBecomesVisibleWithActiveSiteThenKeyboardHidden() {
-        changeUrl("http://exmaple.com")
+    fun whenViewBecomesVisibleAndBrowserShowingThenKeyboardHidden() {
+        setBrowserShowing(true)
         testee.onViewVisible()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.contains(Command.HideKeyboard))
     }
 
     @Test
-    fun whenViewBecomesVisibleWithoutActiveSiteThenKeyboardShown() {
-        changeUrl(null)
+    fun whenViewBecomesVisibleAndHomeShowingThenKeyboardShown() {
+        setBrowserShowing(false)
         testee.onViewVisible()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
@@ -274,14 +275,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlPresentThenAddBookmarkButtonEnabled() {
-        changeUrl("www.example.com")
+    fun whenBrowsingAndUrlPresentThenAddBookmarkButtonEnabled() {
+        loadUrl("www.example.com", isBrowserShowing = true)
         assertTrue(browserViewState().canAddBookmarks)
     }
 
     @Test
-    fun whenNoUrlThenAddBookmarkButtonDisabled() {
-        changeUrl(null)
+    fun whenBrowsingAndNoUrlThenAddBookmarkButtonDisabled() {
+        loadUrl(null, isBrowserShowing = true)
+        assertFalse(browserViewState().canAddBookmarks)
+    }
+
+    @Test
+    fun whenNotBrowsingAndUrlPresentThenAddBookmarkButtonDisabled() {
+        loadUrl("www.example.com", isBrowserShowing = false)
         assertFalse(browserViewState().canAddBookmarks)
     }
 
@@ -320,135 +327,72 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowsingAndViewModelNotifiedThatWebViewIsLoadingThenViewStateIsUpdated() {
-        isBrowsing(true)
-        testee.loadingStarted("http://example.com")
-        assertTrue(loadingViewState().isLoading)
-    }
-
-    @Test
-    fun whenNotBrowsingAndViewModelNotifiedThatWebViewIsLoadingThenViewStateIsNotUpdated() {
-        isBrowsing(false)
-        testee.loadingStarted("http://example.com")
-        assertFalse(loadingViewState().isLoading)
-    }
-
-    @Test
-    fun whenBrowsingAndViewModelNotifiedThatWebViewHasFinishedLoadingThenViewStateIsUpdated() {
-        isBrowsing(true)
-        testee.loadingStarted("http://example.com")
-        testee.loadingFinished(null)
-        assertFalse(loadingViewState().isLoading)
-    }
-
-    @Test
-    fun whenBrowsingAndLoadingFinishedAndInitialUrlNeverProgressedThenUrlUpdated() {
-        val initialUrl = "http://foo.com/abc"
-        val finalUrl = "http://bar.com/abc"
-        isBrowsing(true)
-        testee.loadingStarted(initialUrl)
-        testee.loadingFinished(finalUrl)
-        assertEquals(finalUrl, testee.url)
-    }
-
-    @Test
-    fun whenNotBrowsingAndLoadingFinishedAndInitialUrlNeverProgressedThenUrlNotUpdated() {
-        val initialUrl = "http://foo.com/abc"
-        val finalUrl = "http://bar.com/abc"
-        isBrowsing(false)
-        testee.loadingStarted(initialUrl)
-        testee.loadingFinished(finalUrl)
-        assertNull(testee.url)
-    }
-
-    @Test
-    fun whenBrowsingAndLoadingFinishedAndInitialUrlProgressedThenUrlNotUpdated() {
-        val initialUrl = "http://foo.com/abc"
-        val finalUrl = "http://foo.com/xyz"
-        isBrowsing(true)
-        testee.loadingStarted(initialUrl)
-        testee.progressChanged(initialUrl, 10)
-        testee.loadingFinished(finalUrl)
-        assertEquals(initialUrl, testee.url)
-    }
-
-    @Test
-    fun whenNotBrowsingAndLoadingFinishedAndInitialUrlProgressedThenUrlNotUpdated() {
-        val initialUrl = "http://foo.com/abc"
-        val finalUrl = "http://foo.com/xyz"
-        isBrowsing(false)
-        testee.loadingStarted(initialUrl)
-        testee.progressChanged(initialUrl, 10)
-        testee.loadingFinished(finalUrl)
-        assertNull(testee.url)
-    }
-
-    @Test
-    fun whenBrowsingAndLoadingFinishedWithUrlThenSiteVisitedEntryAddedToLeaderboardDao() {
-        isBrowsing(true)
-        testee.loadingStarted("http://example.com/abc")
-        testee.loadingFinished("http://example.com/abc")
+    fun whenBrowsingAndUrlLoadedThenSiteVisitedEntryAddedToLeaderboardDao() {
+        loadUrl("http://example.com/abc", isBrowserShowing = true)
         verify(mockNetworkLeaderboardDao).incrementSitesVisited()
     }
 
     @Test
-    fun whenNotBrowsingAndLoadingFinishedWithUrlThenSiteVisitedEntryNotAddedToLeaderboardDao() {
-        isBrowsing(false)
-        testee.loadingStarted("http://example.com/abc")
-        testee.loadingFinished("http://example.com/abc")
+    fun whenBrowsingAndUrlClearedThenSiteVisitedEntryNotAddedToLeaderboardDao() {
+        loadUrl(null, isBrowserShowing = true)
         verify(mockNetworkLeaderboardDao, never()).incrementSitesVisited()
     }
 
     @Test
-    fun whenBrowsingAndLoadingFinishedWithUrlThenOmnibarTextUpdatedToMatch() {
-        isBrowsing(true)
+    fun whenNotBrowsingAndUrlLoadedThenSiteVisitedEntryNotAddedToLeaderboardDao() {
+        loadUrl("http://example.com/abc", isBrowserShowing = false)
+        verify(mockNetworkLeaderboardDao, never()).incrementSitesVisited()
+    }
+
+    @Test
+    fun whenBrowsingAndUrlLoadedThenUrlTitleAndOmnibarTextUpdatedToMatch() {
         val exampleUrl = "http://example.com/abc"
-        testee.loadingFinished(exampleUrl)
+        val exampleTitle = "Title"
+        loadUrl(exampleUrl, title = exampleTitle, isBrowserShowing = true)
+        assertEquals(exampleUrl, testee.url)
         assertEquals(exampleUrl, omnibarViewState().omnibarText)
+        assertEquals(exampleTitle, testee.title)
     }
 
     @Test
-    fun whenNotBrowsingAndLoadingFinishedWithUrlThenOmnibarTextRemainsBlank() {
-        isBrowsing(false)
-        val exampleUrl = "http://example.com/abc"
-        testee.loadingFinished(exampleUrl)
+    fun whenNotBrowsingAndUrlLoadedThenUrlAndTitleNullAndOmnibarTextRemainsBlank() {
+        loadUrl("http://example.com/abc", "Title", isBrowserShowing = false)
+        assertEquals(null, testee.url)
         assertEquals("", omnibarViewState().omnibarText)
+        assertEquals(null, testee.title)
     }
 
     @Test
-    fun whenBrowsingAndLoadingFinishedWithQueryUrlThenOmnibarTextUpdatedToShowQuery() {
-        isBrowsing(true)
+    fun whenBrowsingAndUrlIsUpdatedThenUrlAndOmnibarTextUpdatedToMatch() {
+        val originalUrl = "http://example.com/"
+        val currentUrl = "http://example.com/current"
+        loadUrl(originalUrl, isBrowserShowing = true)
+        updateUrl(originalUrl, currentUrl, true)
+        assertEquals(currentUrl, testee.url)
+        assertEquals(currentUrl, omnibarViewState().omnibarText)
+    }
+
+    @Test
+    fun whenNotBrowsingAndUrlIsUpdatedThenUrlAndOmnibarTextRemainUnchanged() {
+        val originalUrl = "http://example.com/"
+        val currentUrl = "http://example.com/current"
+        loadUrl(originalUrl, isBrowserShowing = true)
+        updateUrl(originalUrl, currentUrl, false)
+        assertEquals(originalUrl, testee.url)
+        assertEquals(originalUrl, omnibarViewState().omnibarText)
+    }
+
+    @Test
+    fun whenBrowsingAndUrlLoadedWithQueryUrlThenOmnibarTextUpdatedToShowQuery() {
         val queryUrl = "http://duckduckgo.com?q=test"
-        testee.loadingFinished(queryUrl)
+        loadUrl(queryUrl, isBrowserShowing = true)
         assertEquals("test", omnibarViewState().omnibarText)
     }
 
     @Test
-    fun whenNotBrowsingAndLoadingFinishedWithQueryUrlThenOmnibarTextextRemainsBlank() {
-        isBrowsing(false)
-        val queryUrl = "http://duckduckgo.com?q=test"
-        testee.loadingFinished(queryUrl)
+    fun whenNotBrowsingAndUrlLoadedWithQueryUrlThenOmnibarTextextRemainsBlank() {
+        loadUrl("http://duckduckgo.com?q=test", isBrowserShowing = false)
         assertEquals("", omnibarViewState().omnibarText)
-    }
-
-    @Test
-    fun whenLoadingFinishedWithNoUrlThenOmnibarTextUpdatedToMatch() {
-        val exampleUrl = "http://example.com/abc"
-        changeUrl(exampleUrl)
-        testee.loadingFinished(null)
-        assertEquals(exampleUrl, omnibarViewState().omnibarText)
-    }
-
-    @Test
-    fun whenLoadingFinishedWithNoUrlThenSiteVisitedEntryNotAddedToLeaderboardDao() {
-        testee.loadingFinished(null)
-        verify(mockNetworkLeaderboardDao, never()).incrementSitesVisited()
-    }
-
-    @Test
-    fun whenTrackerDetectedThenSiteVisitedEntryAddedToLeaderboardDao() {
-        testee.trackerDetected(TrackingEvent("http://example.com/abc", "http://tracker.com", TrackerNetwork("Network", "http:// netwotk.com"), true))
-        verify(mockNetworkLeaderboardDao).incrementSitesVisited()
     }
 
     @Test
@@ -469,110 +413,72 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowsingAndUrlStartsLoadingWithProgressChangeThenUrlUpdated() {
-        val url = "foo.com"
-        isBrowsing(true)
-        testee.loadingStarted(url)
-        testee.progressChanged(url, 10)
-        assertEquals(url, testee.url)
-    }
-
-    @Test
-    fun whenNotBrowsingAndUrlStartsLoadingWithProgressChangeThenUrlNotUpdated() {
-        val url = "foo.com"
-        isBrowsing(false)
-        testee.loadingStarted(url)
-        testee.progressChanged(url, 10)
-        assertNull(testee.url)
-    }
-
-    @Test
-    fun whenUrlStartsLoadingButProgressHasNotChangedThenUrlNotUpdated() {
-        testee.loadingStarted("foo.com")
-        assertNull(testee.url)
-    }
-
-    @Test
-    fun whenUrlHasNotStartedLoadingAndProgressChangeThenUrlNotUpdated() {
-        testee.progressChanged("foo.com", 10)
-        assertNull(testee.url)
-    }
-
-    @Test
-    fun whenBrowsingAndUrlChangedThenViewStateIsUpdated() {
-        changeUrl("duckduckgo.com", true)
-        assertEquals("duckduckgo.com", omnibarViewState().omnibarText)
-    }
-
-    @Test
-    fun whenNotBrowsingAndUrlChangedThenUrlIsNotUpdated() {
-        changeUrl("duckduckgo.com", false)
-        assertEquals("", omnibarViewState().omnibarText)
-    }
-
-    @Test
-    fun whenUrlChangedWithDuckDuckGoUrlContainingQueryThenUrlRewrittenToContainQuery() {
-        changeUrl("http://duckduckgo.com?q=test")
+    fun whenDuckDuckGoUrlContainingQueryLoadedThenUrlRewrittenToContainQuery() {
+        loadUrl("http://duckduckgo.com?q=test")
         assertEquals("test", omnibarViewState().omnibarText)
     }
 
     @Test
-    fun whenUrlChangedWithDuckDuckGoUrlContainingQueryThenAtbRefreshed() {
-        changeUrl("http://duckduckgo.com?q=test")
+    fun whenDuckDuckGoUrlContainingQueryLoadedThenAtbRefreshed() {
+        loadUrl("http://duckduckgo.com?q=test")
         verify(mockStatisticsUpdater).refreshSearchRetentionAtb()
     }
 
     @Test
-    fun whenUrlChangedWithDuckDuckGoUrlNotContainingQueryThenFullUrlShown() {
-        changeUrl("http://duckduckgo.com")
+    fun whenDuckDuckGoUrlNotContainingQueryLoadedThenFullUrlShown() {
+        loadUrl("http://duckduckgo.com")
         assertEquals("http://duckduckgo.com", omnibarViewState().omnibarText)
     }
 
     @Test
-    fun whenUrlChangedWithNonDuckDuckGoUrlThenFullUrlShown() {
-        changeUrl("http://example.com")
+    fun whenNonDuckDuckGoUrlLoadedThenFullUrlShown() {
+        loadUrl("http://example.com")
         assertEquals("http://example.com", omnibarViewState().omnibarText)
     }
 
     @Test
     fun whenBrowsingAndViewModelGetsProgressUpdateThenViewStateIsUpdated() {
-        isBrowsing(true)
+        setBrowserShowing(true)
 
-        testee.progressChanged("", 0)
+        testee.progressChanged(0)
         assertEquals(0, loadingViewState().progress)
+        assertEquals(true, loadingViewState().isLoading)
 
-        testee.progressChanged("", 50)
+        testee.progressChanged(50)
         assertEquals(50, loadingViewState().progress)
+        assertEquals(true, loadingViewState().isLoading)
 
-        testee.progressChanged("", 100)
+        testee.progressChanged(100)
         assertEquals(100, loadingViewState().progress)
+        assertEquals(false, loadingViewState().isLoading)
     }
-
 
     @Test
     fun whenNotBrowserAndViewModelGetsProgressUpdateThenViewStateIsNotUpdated() {
-        isBrowsing(false)
-        testee.progressChanged("", 10)
+        setBrowserShowing(false)
+        testee.progressChanged(10)
         assertEquals(0, loadingViewState().progress)
+        assertEquals(false, loadingViewState().isLoading)
     }
 
     @Test
-    fun whenLoadingStartedThenPrivacyGradeIsCleared() = runBlocking<Unit> {
-        testee.loadingStarted("http://example.com")
+    fun whenUrlClearedThenPrivacyGradeIsCleared() = runBlocking<Unit> {
+        loadUrl("https://duckduckgo.com")
+        assertNotNull(testee.privacyGrade.value)
+        loadUrl(null)
         assertNull(testee.privacyGrade.value)
     }
 
     @Test
-    fun whenUrlChangedThenPrivacyGradeIsReset() = runBlocking<Unit> {
-        val grade = testee.privacyGrade.value
-        changeUrl("https://example.com")
-        assertNotEquals(grade, testee.privacyGrade.value)
+    fun whenUrlLoadedThenPrivacyGradeIsReset() = runBlocking<Unit> {
+        loadUrl("https://duckduckgo.com")
+        assertNotNull(testee.privacyGrade.value)
     }
 
     @Test
     fun whenEnoughTrackersDetectedThenPrivacyGradeIsUpdated() {
         val grade = testee.privacyGrade.value
-        changeUrl("https://example.com")
+        loadUrl("https://example.com")
         for (i in 1..10) {
             testee.trackerDetected(TrackingEvent("https://example.com", "", null, false))
         }
@@ -587,14 +493,14 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUrlUpdatedAfterConfigDownloadThenPrivacyGradeIsShown() {
         testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
-        changeUrl("")
+        loadUrl("")
         assertTrue(browserViewState().showPrivacyGrade)
     }
 
     @Test
     fun whenUrlUpdatedBeforeConfigDownloadThenPrivacyGradeIsShown() {
         testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = false))
-        changeUrl("")
+        loadUrl("")
         assertFalse(browserViewState().showPrivacyGrade)
     }
 
@@ -829,14 +735,16 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSelectsDesktopSiteThenDesktopModeStateUpdated() {
-        testee.desktopSiteModeToggled("http://example.com", desktopSiteRequested = true)
+        loadUrl("http://example.com")
+        testee.onDesktopSiteModeToggled(true)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(browserViewState().isDesktopBrowsingMode)
     }
 
     @Test
     fun whenUserSelectsMobileSiteThenMobileModeStateUpdated() {
-        testee.desktopSiteModeToggled("http://example.com", desktopSiteRequested = false)
+        loadUrl("http://example.com")
+        testee.onDesktopSiteModeToggled(false)
         assertFalse(browserViewState().isDesktopBrowsingMode)
     }
 
@@ -895,14 +803,14 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserBrowsingPressesForwardThenNavigatesForward() {
-        isBrowsing(true)
+        setBrowserShowing(true)
         testee.onUserPressedForward()
         assertTrue(captureCommands().lastValue == Command.NavigateForward)
     }
 
     @Test
     fun whenUserOnHomePressesForwardThenBrowserShownAndPageRefreshed() {
-        isBrowsing(false)
+        setBrowserShowing(false)
         testee.onUserPressedForward()
         assertTrue(browserViewState().browserShowing)
         assertTrue(captureCommands().lastValue == Command.Refresh)
@@ -934,13 +842,14 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserOnHomePressesBackThenReturnsHandledFalse() {
-        isBrowsing(false)
+        setBrowserShowing(false)
         assertFalse(testee.onUserPressedBack())
     }
 
     @Test
     fun whenUserSelectsDesktopSiteWhenOnMobileSpecificSiteThenUrlModified() {
-        testee.desktopSiteModeToggled("http://m.example.com", desktopSiteRequested = true)
+        loadUrl("http://m.example.com")
+        testee.onDesktopSiteModeToggled(true)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue as Navigate
         assertEquals("http://example.com", ultimateCommand.url)
@@ -948,7 +857,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSelectsDesktopSiteWhenNotOnMobileSpecificSiteThenUrlNotModified() {
-        testee.desktopSiteModeToggled("http://example.com", desktopSiteRequested = true)
+        loadUrl("http://example.com")
+        testee.onDesktopSiteModeToggled(true)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
         assertTrue(ultimateCommand == Command.Refresh)
@@ -956,7 +866,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSelectsMobileSiteWhenOnMobileSpecificSiteThenUrlNotModified() {
-        testee.desktopSiteModeToggled("http://m.example.com", desktopSiteRequested = false)
+        loadUrl("http://m.example.com")
+        testee.onDesktopSiteModeToggled(false)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
         assertTrue(ultimateCommand == Command.Refresh)
@@ -964,7 +875,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSelectsMobileSiteWhenNotOnMobileSpecificSiteThenUrlNotModified() {
-        testee.desktopSiteModeToggled("http://example.com", desktopSiteRequested = false)
+        loadUrl("http://example.com")
+        testee.onDesktopSiteModeToggled(false)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
         assertTrue(ultimateCommand == Command.Refresh)
@@ -981,16 +893,35 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenSiteLoadedAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithUrlAndTitle() {
+        loadUrl("foo.com")
+        testee.titleReceived("Foo Title")
+        testee.onAddBookmarkSelected()
+        val command = captureCommands().value as Command.AddBookmark
+        assertEquals("foo.com", command.url)
+        assertEquals("Foo Title", command.title)
+    }
+
+    @Test
+    fun whenNoSiteAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithBlankTitleAndUrl() {
+        testee.onAddBookmarkSelected()
+        val command = captureCommands().value as Command.AddBookmark
+        assertNotNull(command)
+        assertNull(command.url)
+        assertNull(command.title)
+    }
+
+    @Test
     fun whenUserSelectsToShareLinkThenShareLinkCommandSent() {
-        testee.userSharingLink("foo")
+        loadUrl("foo.com")
+        testee.onShareSelected()
         val command = captureCommands().value as Command.ShareLink
-        assertEquals("foo", command.url)
+        assertEquals("foo.com", command.url)
     }
 
     @Test
     fun whenOnSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithUrl() = runBlocking<Unit> {
-        isBrowsing(true)
-        changeUrl("foo.com")
+        loadUrl("foo.com", isBrowserShowing = true)
         testee.onBrokenSiteSelected()
         val command = captureCommands().value as Command.BrokenSiteFeedback
         assertEquals("foo.com", command.url)
@@ -1005,7 +936,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSelectsToShareLinkWithNullUrlThenShareLinkCommandNotSent() {
-        testee.userSharingLink(null)
+        loadUrl(null)
+        testee.onShareSelected()
         verify(mockCommandObserver, never()).onChanged(any())
     }
 
@@ -1047,6 +979,27 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUrlNullThenSetBrowserNotShowing() {
+        testee.loadData("id", null, false)
+        testee.determineShowBrowser()
+        assertEquals(false, testee.browserViewState.value?.browserShowing)
+    }
+
+    @Test
+    fun whenUrlBlankThenSetBrowserNotShowing() {
+        testee.loadData("id", "  ", false)
+        testee.determineShowBrowser()
+        assertEquals(false, testee.browserViewState.value?.browserShowing)
+    }
+
+    @Test
+    fun whenUrlPresentThenSetBrowserShowing() {
+        testee.loadData("id", "https://example.com", false)
+        testee.determineShowBrowser()
+        assertEquals(true, testee.browserViewState.value?.browserShowing)
+    }
+
+    @Test
     fun whenAuthenticationIsRequiredThenRequiresAuthenticationCommandSent() {
         val mockHandler = mock<HttpAuthHandler>()
         val siteURL = "http://example.com/requires-auth"
@@ -1073,29 +1026,54 @@ class BrowserTabViewModelTest {
         verify(mockHandler, atLeastOnce()).proceed(username, password)
     }
 
-    private fun isBrowsing(isBrowsing: Boolean) {
+    private fun setBrowserShowing(isBrowsing: Boolean) {
         testee.browserViewState.value = browserViewState().copy(browserShowing = isBrowsing)
     }
 
-    private fun setupNavigation(skipHome: Boolean = false, isBrowsing: Boolean, canGoForward: Boolean = false, canGoBack: Boolean = false, stepsToPreviousPage:Int = 0) {
-        testee.skipHome = skipHome
-        isBrowsing(isBrowsing)
-        val nav: BrowserWebViewClient.BrowserNavigationOptions = mock()
-        whenever(nav.canGoForward).thenReturn(canGoForward)
-        whenever(nav.canGoBack).thenReturn(canGoBack)
-        whenever(nav.stepsToPreviousPage).thenReturn(stepsToPreviousPage)
-        testee.navigationOptionsChanged(nav)
+    private fun loadUrl(url: String?, title: String? = null, isBrowserShowing: Boolean = true) {
+        setBrowserShowing(isBrowserShowing)
+        testee.navigationStateChanged(buildWebNavigation(originalUrl = url, currentUrl = url, title = title))
     }
 
-    private fun changeUrl(url: String?, isBrowsing: Boolean = true) {
-        isBrowsing(isBrowsing)
-        testee.loadingStarted(url)
-        testee.progressChanged(url, 100)
+    private fun updateUrl(originalUrl: String?, currentUrl: String?, isBrowserShowing: Boolean) {
+        setBrowserShowing(isBrowserShowing)
+        testee.navigationStateChanged(buildWebNavigation(originalUrl = originalUrl, currentUrl = currentUrl))
+    }
+
+    private fun setupNavigation(
+        skipHome: Boolean = false,
+        isBrowsing: Boolean,
+        canGoForward: Boolean = false,
+        canGoBack: Boolean = false,
+        stepsToPreviousPage: Int = 0
+    ) {
+        testee.skipHome = skipHome
+        setBrowserShowing(isBrowsing)
+        val nav = buildWebNavigation(canGoForward = canGoForward, canGoBack = canGoBack, stepsToPreviousPage = stepsToPreviousPage)
+        testee.navigationStateChanged(nav)
     }
 
     private fun captureCommands(): ArgumentCaptor<Command> {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         return commandCaptor
+    }
+
+    private fun buildWebNavigation(
+        currentUrl: String? = null,
+        originalUrl: String? = null,
+        title: String? = null,
+        canGoForward: Boolean = false,
+        canGoBack: Boolean = false,
+        stepsToPreviousPage: Int = 0
+    ): WebNavigationState {
+        val nav: WebNavigationState = mock()
+        whenever(nav.originalUrl).thenReturn(originalUrl)
+        whenever(nav.currentUrl).thenReturn(currentUrl)
+        whenever(nav.title).thenReturn(title)
+        whenever(nav.canGoForward).thenReturn(canGoForward)
+        whenever(nav.canGoBack).thenReturn(canGoBack)
+        whenever(nav.stepsToPreviousPage).thenReturn(stepsToPreviousPage)
+        return nav
     }
 
     private fun browserViewState() = testee.browserViewState.value!!

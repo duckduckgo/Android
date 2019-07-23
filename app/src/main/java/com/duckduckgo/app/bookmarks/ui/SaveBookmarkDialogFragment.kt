@@ -88,8 +88,8 @@ class SaveBookmarkDialogFragment : DialogFragment() {
     }
 
     private fun getExistingId(): Int? = arguments!!.getInt(KEY_BOOKMARK_ID)
-    private fun getExistingTitle(): String = arguments!!.getString(KEY_PREEXISTING_TITLE)
-    private fun getExistingUrl(): String = arguments!!.getString(KEY_PREEXISTING_URL)
+    private fun getExistingTitle(): String? = arguments!!.getString(KEY_PREEXISTING_TITLE)
+    private fun getExistingUrl(): String? = arguments!!.getString(KEY_PREEXISTING_URL)
 
     private fun validateBundleArguments() {
         if (arguments == null) throw IllegalArgumentException("Missing arguments bundle")

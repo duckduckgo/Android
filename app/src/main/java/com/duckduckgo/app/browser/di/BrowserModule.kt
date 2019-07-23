@@ -59,12 +59,9 @@ class BrowserModule {
     fun browserWebViewClient(
         requestRewriter: RequestRewriter,
         specialUrlDetector: SpecialUrlDetector,
-        requestInterceptor: RequestInterceptor,
-        httpsUpgrader: HttpsUpgrader,
-        statisticsDataStore: StatisticsDataStore,
-        pixel: Pixel
+        requestInterceptor: RequestInterceptor
     ): BrowserWebViewClient {
-        return BrowserWebViewClient(requestRewriter, specialUrlDetector, requestInterceptor, httpsUpgrader, statisticsDataStore, pixel)
+        return BrowserWebViewClient(requestRewriter, specialUrlDetector, requestInterceptor)
     }
 
     @Provides

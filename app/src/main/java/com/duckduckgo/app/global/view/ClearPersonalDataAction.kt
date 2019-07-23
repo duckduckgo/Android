@@ -105,9 +105,6 @@ class ClearPersonalDataAction @Inject constructor(
         }
 
         dataManager.clearData(createWebView(), createWebStorage(), WebViewDatabase.getInstance(context))
-        dataManager.clearExternalCookies()
-        dataManager.deleteWebViewDirectory()
-
         appCacheClearer.clearCache()
 
         Timber.i("Finished clearing data")
