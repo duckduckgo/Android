@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.webkit.WebBackForwardList
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import com.duckduckgo.app.global.isHttpsVersionOfUri
 
 
@@ -31,12 +32,13 @@ interface WebNavigationState {
     val hasNavigationHistory: Boolean
 }
 
-sealed class WebNavigationStateChange
-data class NewPage(val url: String, val title: String?) : WebNavigationStateChange()
-data class UrlUpdated(val url: String) : WebNavigationStateChange()
-object PageCleared : WebNavigationStateChange()
-object Unchanged : WebNavigationStateChange()
-object Other : WebNavigationStateChange()
+sealed class WebNavigationStateChange {
+    data class NewPage(val url: String, val title: String?) : WebNavigationStateChange()
+    data class UrlUpdated(val url: String) : WebNavigationStateChange()
+    object PageCleared : WebNavigationStateChange()
+    object Unchanged : WebNavigationStateChange()
+    object Other : WebNavigationStateChange()
+}
 
 fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStateChange {
 

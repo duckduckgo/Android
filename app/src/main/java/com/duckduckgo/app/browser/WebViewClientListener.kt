@@ -25,11 +25,11 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 
 interface WebViewClientListener {
 
-    fun navigationStateChanged(navigationState: WebNavigationState)
+    fun navigationStateChanged(newWebNavigationState: WebNavigationState)
     fun pageRefreshed(refreshedUrl: String)
     fun progressChanged(newProgress: Int)
 
-    fun titleReceived(title: String)
+    fun titleReceived(newTitle: String)
     fun trackerDetected(event: TrackingEvent)
     fun pageHasHttpResources(page: String)
 

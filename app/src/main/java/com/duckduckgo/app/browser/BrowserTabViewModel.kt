@@ -38,6 +38,7 @@ import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment.SaveBookmarkLi
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
+import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
@@ -196,7 +197,7 @@ class BrowserTabViewModel(
     val url: String?
         get() = site?.url
 
-   val title: String?
+    val title: String?
         get() = site?.title
 
     private var appConfigurationDownloaded = false
@@ -388,10 +389,10 @@ class BrowserTabViewModel(
             canGoForward = newWebNavigationState.canGoForward
         )
 
-        when {
-            stateChange is NewPage -> pageChanged(stateChange.url, stateChange.title)
-            stateChange is PageCleared -> pageCleared()
-            stateChange is UrlUpdated -> urlUpdated(stateChange.url)
+        when (stateChange) {
+            is NewPage -> pageChanged(stateChange.url, stateChange.title)
+            is PageCleared -> pageCleared()
+            is UrlUpdated -> urlUpdated(stateChange.url)
         }
     }
 
