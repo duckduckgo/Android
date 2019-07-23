@@ -42,10 +42,18 @@ class SiteMonitor(
     override var url: String = url
         set(value) {
             field = value
-            uri = field.toUri()
+            _uri = field.toUri()
         }
 
-    override var uri: Uri? = url.toUri()
+    /**
+     * A read-only uri version of the url. To update, update the url
+     */
+    override val uri: Uri? get() = _uri
+
+    /**
+     * Backing field to ensure uri cannot be publicly written
+     */
+    private var _uri: Uri? = url.toUri()
 
     override val https: HttpsStatus
         get() = httpsStatus()
