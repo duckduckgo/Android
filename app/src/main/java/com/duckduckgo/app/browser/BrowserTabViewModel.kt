@@ -36,6 +36,7 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment.SaveBookmarkListener
@@ -289,20 +290,16 @@ class BrowserTabViewModel(
         skipHome = false
     }
 
-    suspend fun onUserSubmittedAutocomplete(suggestion: AutoCompleteApi.AutoCompleteSuggestion) {
-        onUserSubmittedQuery(suggestion.phrase)
-
-        val hasBookmarks = withContext(Dispatchers.IO) { bookmarksDao.hasBookmarks() }
-        fireAutocompletePixel(suggestion, hasBookmarks)
-    }
-
-    private fun fireAutocompletePixel(suggestion: AutoCompleteApi.AutoCompleteSuggestion, hasBookmarks: Boolean) {
+    suspend fun fireAutocompletePixel(suggestion: AutoCompleteSuggestion) {
         val currentViewState = currentAutoCompleteViewState()
+        val hasBookmarks = withContext(Dispatchers.IO) {
+            bookmarksDao.hasBookmarks()
+        }
         val params = mapOf(
             PixelParameter.SHOWED_BOOKMARKS to currentViewState.searchResults.hasBookmarks.toString(),
             PixelParameter.BOOKMARK_CAPABLE to hasBookmarks.toString()
         )
-        val pixelName = when(suggestion) {
+        val pixelName = when (suggestion) {
             is AutoCompleteBookmarkSuggestion -> PixelName.AUTOCOMPLETE_BOOKMARK_SELECTION
             is AutoCompleteSearchSuggestion -> PixelName.AUTOCOMPLETE_SEARCH_SELECTION
         }

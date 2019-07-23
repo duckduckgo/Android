@@ -65,7 +65,6 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
-import io.reactivex.Single
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.*
@@ -1076,43 +1075,30 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenAutoCompleteSuggestionSubmittedThenSubmitSuggestionPhraseAsQuery() = runBlocking {
+    fun whenBookmarkSuggestionSubmittedThenAutoCompleteBookmarkSelectionPixelSent() = runBlocking {
         whenever(bookmarksDao.hasBookmarks()).thenReturn(true)
-        testee.onUserSubmittedAutocomplete(AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com"))
+        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteApi.AutoCompleteResult("", emptyList(), true))
+        testee.fireAutocompletePixel(AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com"))
 
-        assertSame("example", omnibarViewState().omnibarText)
+        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_BOOKMARK_SELECTION, pixelParams(showedBookmarks = true, bookmarkCapable = true))
     }
 
     @Test
-    fun whenBookmarkSuggestionWithBookmarksSubmittedWithNoBookmarksThenAutoCompleteBookmarkSelectionPixelSent() = runBlocking {
+    fun whenSearchSuggestionSubmittedWithBookmarksThenAutoCompleteSearchSelectionPixelSent() = runBlocking {
         whenever(bookmarksDao.hasBookmarks()).thenReturn(true)
-        testee.onUserSubmittedAutocomplete(AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com"))
+        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteApi.AutoCompleteResult("", emptyList(), true))
+        testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
 
-        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_BOOKMARK_SELECTION, pixelParams(true))
+        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(showedBookmarks = true, bookmarkCapable = true))
     }
 
     @Test
-    fun whenSearchSuggestionWithBookmarksSubmittedWithNoBookmarksThenAutoCompleteSearchSelectionPixelSent() = runBlocking {
-        whenever(bookmarksDao.hasBookmarks()).thenReturn(true)
-        testee.onUserSubmittedAutocomplete(AutoCompleteSearchSuggestion("example", false))
-
-        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(true))
-    }
-
-    @Test
-    fun whenBookmarkSuggestionWithoutBookmarksSubmittedWithNoBookmarksThenAutoCompleteBookmarkSelectionPixelSent() = runBlocking {
+    fun whenSearchSuggestionSubmittedWithoutBookmarksThenAutoCompleteSearchSelectionPixelSent() = runBlocking {
         whenever(bookmarksDao.hasBookmarks()).thenReturn(false)
-        testee.onUserSubmittedAutocomplete(AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com"))
+        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteApi.AutoCompleteResult("", emptyList(), false))
+        testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
 
-        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_BOOKMARK_SELECTION, pixelParams(false))
-    }
-
-    @Test
-    fun whenSearchSuggestionWithoutBookmarksSubmittedWithNoBookmarksThenAutoCompleteSearchSelectionPixelSent() = runBlocking {
-        whenever(bookmarksDao.hasBookmarks()).thenReturn(false)
-        testee.onUserSubmittedAutocomplete(AutoCompleteSearchSuggestion("example", false))
-
-        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(false))
+        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(showedBookmarks = false, bookmarkCapable = false))
     }
 
     @Test
@@ -1127,8 +1113,8 @@ class BrowserTabViewModelTest {
         assertFalse(omnibarViewState().shouldMoveCaretToEnd)
     }
 
-    private fun pixelParams(bookmarkCapable: Boolean) = mapOf(
-        Pixel.PixelParameter.SHOWED_BOOKMARKS to "false",
+    private fun pixelParams(showedBookmarks: Boolean, bookmarkCapable: Boolean) = mapOf(
+        Pixel.PixelParameter.SHOWED_BOOKMARKS to showedBookmarks.toString(),
         Pixel.PixelParameter.BOOKMARK_CAPABLE to bookmarkCapable.toString()
     )
 
@@ -1136,7 +1122,13 @@ class BrowserTabViewModelTest {
         testee.browserViewState.value = browserViewState().copy(browserShowing = isBrowsing)
     }
 
-    private fun setupNavigation(skipHome: Boolean = false, isBrowsing: Boolean, canGoForward: Boolean = false, canGoBack: Boolean = false, stepsToPreviousPage:Int = 0) {
+    private fun setupNavigation(
+        skipHome: Boolean = false,
+        isBrowsing: Boolean,
+        canGoForward: Boolean = false,
+        canGoBack: Boolean = false,
+        stepsToPreviousPage: Int = 0
+    ) {
         testee.skipHome = skipHome
         isBrowsing(isBrowsing)
         val nav: BrowserWebViewClient.BrowserNavigationOptions = mock()

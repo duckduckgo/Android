@@ -36,16 +36,10 @@ open class AutoCompleteApi @Inject constructor(
     fun autoComplete(query: String): Observable<AutoCompleteResult> {
 
         if (query.isBlank()) {
-            return Observable.just(AutoCompleteResult(query, emptyList(), false))
+            return Observable.just(AutoCompleteResult(query = query, suggestions = emptyList(), hasBookmarks = false))
         }
 
-        var bookmarks = Observable.just(emptyList<AutoCompleteBookmarkSuggestion>())
-
-        if (settingsDataStore.bookmarksAutoCompleteSuggestionsEnabled) {
-            bookmarks = getAutoCompleteBookmarkResults(query)
-        }
-
-        return bookmarks.zipWith(
+        return bookmarksObservable(query).zipWith(
             getAutoCompleteSearchResults(query),
             BiFunction { bookmarksResults, searchResults ->
                 AutoCompleteResult(
@@ -55,6 +49,14 @@ open class AutoCompleteApi @Inject constructor(
                 )
             }
         )
+    }
+
+    private fun bookmarksObservable(query: String): Observable<List<AutoCompleteBookmarkSuggestion>> {
+        return if (settingsDataStore.bookmarksAutoCompleteSuggestionsEnabled) {
+            getAutoCompleteBookmarkResults(query)
+        } else {
+            Observable.just(emptyList())
+        }
     }
 
     private fun getAutoCompleteSearchResults(query: String) =

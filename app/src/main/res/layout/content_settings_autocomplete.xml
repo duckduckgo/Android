@@ -23,6 +23,9 @@
     <TextView
         android:id="@+id/settingsAutocompleteTitle"
         style="@style/SettingsSectionTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:text="@string/settingsHeadingAutocomplete" />
 
     <androidx.appcompat.widget.SwitchCompat

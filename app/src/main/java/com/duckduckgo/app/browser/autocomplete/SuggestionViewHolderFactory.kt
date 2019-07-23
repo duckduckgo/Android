@@ -34,13 +34,15 @@ interface SuggestionViewHolderFactory {
 
     fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder
 
-    fun onBindViewHolder(holder: AutoCompleteViewHolder,
-                         suggestion: AutoCompleteSuggestion,
-                         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-                         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit)
+    fun onBindViewHolder(
+        holder: AutoCompleteViewHolder,
+        suggestion: AutoCompleteSuggestion,
+        immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
+    )
 }
 
-class SearchSuggestionViewHolderFactory: SuggestionViewHolderFactory {
+class SearchSuggestionViewHolderFactory : SuggestionViewHolderFactory {
 
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -49,10 +51,11 @@ class SearchSuggestionViewHolderFactory: SuggestionViewHolderFactory {
         )
     }
 
-    override fun onBindViewHolder(holder: AutoCompleteViewHolder,
-                                  suggestion: AutoCompleteSuggestion,
-                                  immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-                                  editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
+    override fun onBindViewHolder(
+        holder: AutoCompleteViewHolder,
+        suggestion: AutoCompleteSuggestion,
+        immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
     ) {
         val searchSuggestionViewHolder = holder as SearchSuggestionViewHolder
         searchSuggestionViewHolder.bind(suggestion as AutoCompleteSearchSuggestion, immediateSearchClickListener, editableSearchClickListener)
@@ -66,16 +69,16 @@ class BookmarkSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         return BookmarkSuggestionViewHolder(inflater.inflate(R.layout.item_autocomplete_bookmark_suggestion, parent, false))
     }
 
-    override fun onBindViewHolder(holder: AutoCompleteViewHolder,
-                                  suggestion: AutoCompleteSuggestion,
-                                  immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-                                  editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
+    override fun onBindViewHolder(
+        holder: AutoCompleteViewHolder,
+        suggestion: AutoCompleteSuggestion,
+        immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
     ) {
         val bookmarkSuggestionViewHolder = holder as BookmarkSuggestionViewHolder
         bookmarkSuggestionViewHolder.bind(suggestion as AutoCompleteBookmarkSuggestion, immediateSearchClickListener, editableSearchClickListener)
     }
 }
-
 
 class EmptySuggestionViewHolderFactory : SuggestionViewHolderFactory {
 
@@ -84,10 +87,11 @@ class EmptySuggestionViewHolderFactory : SuggestionViewHolderFactory {
         return EmptySuggestionViewHolder(inflater.inflate(R.layout.item_autocomplete_no_suggestions, parent, false))
     }
 
-    override fun onBindViewHolder(holder: AutoCompleteViewHolder,
-                                  suggestion: AutoCompleteSuggestion,
-                                  immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-                                  editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
+    override fun onBindViewHolder(
+        holder: AutoCompleteViewHolder,
+        suggestion: AutoCompleteSuggestion,
+        immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
     ) {
         // do nothing
     }

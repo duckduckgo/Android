@@ -56,7 +56,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
@@ -624,10 +624,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         rootView.addOnLayoutChangeListener(logoHidingListener)
     }
 
-    private fun userSelectedAutocomplete(suggestion: AutoCompleteApi.AutoCompleteSuggestion) {
+    private fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
+        // send pixel before submitting the query and changing the autocomplete state to empty; otherwise will send the wrong params
         GlobalScope.launch {
-            viewModel.onUserSubmittedAutocomplete(suggestion)
+            viewModel.fireAutocompletePixel(suggestion)
         }
+        viewModel.onUserSubmittedQuery(suggestion.phrase)
     }
 
     private fun userEnteredQuery(query: String) {

@@ -22,21 +22,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion
 import com.duckduckgo.app.browser.autocomplete.AutoCompleteViewHolder.EmptySuggestionViewHolder
 
-class BrowserAutoCompleteSuggestionsAdapter (
+class BrowserAutoCompleteSuggestionsAdapter(
     private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
     private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
 ) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
 
-    private val viewHolderFactoryMap: MutableMap<Int, SuggestionViewHolderFactory> = mutableMapOf()
+    private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> = mapOf(
+        EMPTY_TYPE to EmptySuggestionViewHolderFactory(),
+        SUGGESTION_TYPE to SearchSuggestionViewHolderFactory(),
+        BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory()
+    )
     private val suggestions: MutableList<AutoCompleteSuggestion> = ArrayList()
-
-    init {
-        viewHolderFactoryMap.apply {
-            put(EMPTY_TYPE, EmptySuggestionViewHolderFactory())
-            put(SUGGESTION_TYPE, SearchSuggestionViewHolderFactory())
-            put(BOOKMARK_TYPE, BookmarkSuggestionViewHolderFactory())
-        }
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AutoCompleteViewHolder =
         viewHolderFactoryMap.getValue(viewType).onCreateViewHolder(parent)

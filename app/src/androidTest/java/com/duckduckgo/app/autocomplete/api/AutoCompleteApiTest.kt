@@ -84,9 +84,13 @@ class AutoCompleteApiTest {
     fun whenReturnBookmarkSuggestionsThenPhraseIsSameAsURL() {
         whenever(mockSettingsDataStore.bookmarksAutoCompleteSuggestionsEnabled).thenReturn(true)
         whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(Observable.just(emptyList()))
-        whenever(mockBookmarksDao.bookmarksByQuery(anyString())).thenReturn(Single.just(listOf(
-            BookmarkEntity(0, "title", "https://example.com")
-        )))
+        whenever(mockBookmarksDao.bookmarksByQuery(anyString())).thenReturn(
+            Single.just(
+                listOf(
+                    BookmarkEntity(0, "title", "https://example.com")
+                )
+            )
+        )
 
         val result = testee.autoComplete("foo").test()
         val value = result.values()[0] as AutoCompleteApi.AutoCompleteResult
