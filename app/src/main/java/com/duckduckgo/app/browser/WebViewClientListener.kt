@@ -20,20 +20,18 @@ import android.net.Uri
 import android.view.View
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
-import com.duckduckgo.app.browser.BrowserWebViewClient.BrowserNavigationOptions
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 
 interface WebViewClientListener {
 
-    val url: String?
-    fun loadingStarted(url: String?)
-    fun progressChanged(progressedUrl: String?, newProgress: Int)
-    fun loadingFinished(url: String? = null)
-    fun titleReceived(title: String)
-    fun navigationOptionsChanged(navigation: BrowserNavigationOptions)
+    fun navigationStateChanged(newWebNavigationState: WebNavigationState)
+    fun pageRefreshed(refreshedUrl: String)
+    fun progressChanged(newProgress: Int)
+
+    fun titleReceived(newTitle: String)
     fun trackerDetected(event: TrackingEvent)
-    fun pageHasHttpResources(page: String?)
+    fun pageHasHttpResources(page: String)
 
     fun sendEmailRequested(emailAddress: String)
     fun sendSmsRequested(telephoneNumber: String)
