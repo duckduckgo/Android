@@ -113,7 +113,7 @@ class BrowserWebViewClient(
         return runBlocking {
             val documentUrl = withContext(Dispatchers.Main) { webView.url }
             Timber.v("Intercepting resource ${request.url} on page $documentUrl")
-            runBlocking { requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener) }
+            requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
         }
     }
 
