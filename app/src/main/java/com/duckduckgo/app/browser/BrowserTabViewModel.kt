@@ -30,8 +30,12 @@ import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import androidx.lifecycle.*
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment.SaveBookmarkListener
@@ -295,16 +299,12 @@ class BrowserTabViewModel(
     private fun fireAutocompletePixel(suggestion: AutoCompleteApi.AutoCompleteSuggestion, hasBookmarks: Boolean) {
         val currentViewState = currentAutoCompleteViewState()
         val params = mapOf(
-            Pixel.PixelParameter.SHOWED_BOOKMARKS to currentViewState.searchResults.hasBookmarks.toString(),
-            Pixel.PixelParameter.BOOKMARK_CAPABLE to hasBookmarks.toString()
+            PixelParameter.SHOWED_BOOKMARKS to currentViewState.searchResults.hasBookmarks.toString(),
+            PixelParameter.BOOKMARK_CAPABLE to hasBookmarks.toString()
         )
         val pixelName = when(suggestion) {
-            is AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion -> {
-                Pixel.PixelName.AUTOCOMPLETE_BOOKMARK_SELECTION
-            }
-            else -> {
-                Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION
-            }
+            is AutoCompleteBookmarkSuggestion -> PixelName.AUTOCOMPLETE_BOOKMARK_SELECTION
+            is AutoCompleteSearchSuggestion -> PixelName.AUTOCOMPLETE_SEARCH_SELECTION
         }
 
         pixel.fire(pixelName, params)

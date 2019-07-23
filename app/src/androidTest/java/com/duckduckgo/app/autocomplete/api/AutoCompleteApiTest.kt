@@ -48,7 +48,6 @@ class AutoCompleteApiTest {
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-
         testee = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao, mockSettingsDataStore)
     }
 

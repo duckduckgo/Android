@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.autocomplete.api
 
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Companion.BOOKMARK_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Companion.SUGGESTION_TYPE
@@ -37,7 +39,7 @@ open class AutoCompleteApi @Inject constructor(
             return Observable.just(AutoCompleteResult(query, emptyList(), false))
         }
 
-        var bookmarks = Observable.just(emptyList<AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion>())
+        var bookmarks = Observable.just(emptyList<AutoCompleteBookmarkSuggestion>())
 
         if (settingsDataStore.bookmarksAutoCompleteSuggestionsEnabled) {
             bookmarks = getAutoCompleteBookmarkResults(query)
@@ -59,10 +61,7 @@ open class AutoCompleteApi @Inject constructor(
         autoCompleteService.autoComplete(query)
             .flatMapIterable { it }
             .map {
-                AutoCompleteSuggestion.AutoCompleteSearchSuggestion(
-                    phrase = it.phrase,
-                    isUrl = UriString.isWebUrl(it.phrase)
-                )
+                AutoCompleteSearchSuggestion(phrase = it.phrase, isUrl = UriString.isWebUrl(it.phrase))
             }
             .toList()
             .onErrorReturn { emptyList() }
@@ -72,11 +71,7 @@ open class AutoCompleteApi @Inject constructor(
         bookmarksDao.bookmarksByQuery("%$query%")
             .flattenAsObservable { it }
             .map {
-                AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
-                    phrase = it.url,
-                    title = it.title ?: "",
-                    url = it.url
-                )
+                AutoCompleteBookmarkSuggestion(phrase = it.url, title = it.title ?: "", url = it.url)
             }
             .toList()
             .onErrorReturn { emptyList() }

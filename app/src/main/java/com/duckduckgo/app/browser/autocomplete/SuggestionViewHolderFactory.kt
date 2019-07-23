@@ -40,17 +40,12 @@ interface SuggestionViewHolderFactory {
                          editableSearchClickListener: (AutoCompleteSuggestion) -> Unit)
 }
 
-
 class SearchSuggestionViewHolderFactory: SuggestionViewHolderFactory {
 
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return SearchSuggestionViewHolder(
-            inflater.inflate(
-                R.layout.item_autocomplete_search_suggestion,
-                parent,
-                false
-            )
+            inflater.inflate(R.layout.item_autocomplete_search_suggestion, parent, false)
         )
     }
 
@@ -97,7 +92,6 @@ class EmptySuggestionViewHolderFactory : SuggestionViewHolderFactory {
         // do nothing
     }
 }
-
 
 sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
