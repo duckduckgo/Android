@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
