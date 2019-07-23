@@ -119,7 +119,7 @@ class StatisticsRequester(
 
     private fun storeUpdateVersionIfPresent(retrievedAtb: Atb) {
         if (retrievedAtb.updateVersion != null) {
-            store.atb = Atb(retrievedAtb.updateVersion!!)
+            store.atb = Atb(retrievedAtb.updateVersion)
         }
     }
 
