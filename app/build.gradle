@@ -19,6 +19,7 @@ android {
         versionName buildVersionName()
         testInstrumentationRunner "com.duckduckgo.app.TestRunner"
         archivesBaseName = "duckduckgo-$versionName"
+        vectorDrawables.useSupportLibrary = true
 
         javaCompileOptions {
             annotationProcessorOptions {
