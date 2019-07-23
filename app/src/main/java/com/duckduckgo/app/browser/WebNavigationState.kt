@@ -81,6 +81,10 @@ data class WebViewNavigationState(private val stack: WebBackForwardList) : WebNa
 
     override val hasNavigationHistory = stack.size != 0
 
+    /**
+     * Auto generated equality method. We create this manually to omit the privately stored system stack property as
+     * we are only interested in our properties and the stacks are never equal unless the same instances are compared.
+     */
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -97,6 +101,9 @@ data class WebViewNavigationState(private val stack: WebBackForwardList) : WebNa
         return true
     }
 
+    /**
+     * Auto generated hash method to support equality method
+     */
     override fun hashCode(): Int {
         var result = originalUrl?.hashCode() ?: 0
         result = 31 * result + (currentUrl?.hashCode() ?: 0)
