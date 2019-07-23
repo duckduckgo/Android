@@ -51,6 +51,22 @@ class StatisticsRequesterTest {
     }
 
     @Test
+    fun whenUpdateVersionPresentDuringRefreshSearchRetentionThenPreviousAtbIsReplacedWithUpdateVersion() {
+        configureStoredStatistics()
+        whenever(mockService.updateSearchAtb(any(), any(), any())).thenReturn(Observable.just(UPDATE_ATB))
+        testee.refreshSearchRetentionAtb()
+        verify(mockStatisticsStore).atb = Atb(UPDATE_ATB.updateVersion!!)
+    }
+
+    @Test
+    fun whenUpdateVersionPresentDuringRefreshAppRetentionThenPreviousAtbIsReplacedWithUpdateVersion() {
+        configureStoredStatistics()
+        whenever(mockService.updateAppAtb(any(), any(), any())).thenReturn(Observable.just(UPDATE_ATB))
+        testee.refreshAppRetentionAtb()
+        verify(mockStatisticsStore).atb = Atb(UPDATE_ATB.updateVersion!!)
+    }
+
+    @Test
     fun whenNoStatisticsStoredThenInitializeAtbInvokesExti() {
         configureNoStoredStatistics()
         testee.initializeAtb()
@@ -68,9 +84,18 @@ class StatisticsRequesterTest {
     }
 
     @Test
-    fun whenNoStatisticsStoredThenRefreshRetrievesAtbAndInvokesExti() {
+    fun whenNoStatisticsStoredThenRefreshSearchRetentionRetrievesAtbAndInvokesExti() {
         configureNoStoredStatistics()
         testee.refreshSearchRetentionAtb()
+        verify(mockService).atb(any())
+        verify(mockService).exti(eq(ATB_WITH_VARIANT), any())
+        verify(mockStatisticsStore).saveAtb(ATB)
+    }
+
+    @Test
+    fun whenNoStatisticsStoredThenRefreshAppRetentionRetrievesAtbAndInvokesExti() {
+        configureNoStoredStatistics()
+        testee.refreshAppRetentionAtb()
         verify(mockService).atb(any())
         verify(mockService).exti(eq(ATB_WITH_VARIANT), any())
         verify(mockStatisticsStore).saveAtb(ATB)
@@ -125,6 +150,7 @@ class StatisticsRequesterTest {
 
     companion object {
         private val ATB = Atb("v105-2")
+        private val UPDATE_ATB = Atb("v105-2", updateVersion = "v99-1")
         private const val ATB_WITH_VARIANT = "v105-2ma"
         private const val NEW_ATB = "v105-4"
     }

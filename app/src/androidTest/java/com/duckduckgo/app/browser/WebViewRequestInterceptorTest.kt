@@ -72,7 +72,7 @@ class WebViewRequestInterceptorTest {
         configureShouldUpgrade()
         testee.shouldIntercept(
             request = mockRequest,
-            currentUrl = null,
+            documentUrl = null,
             webView = webView,
             webViewClientListener = null
         )
@@ -85,7 +85,7 @@ class WebViewRequestInterceptorTest {
         configureShouldUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
-            currentUrl = null,
+            documentUrl = null,
             webView = webView,
             webViewClientListener = null
         )
@@ -99,7 +99,7 @@ class WebViewRequestInterceptorTest {
         whenever(mockRequest.isForMainFrame).thenReturn(false)
         testee.shouldIntercept(
             request = mockRequest,
-            currentUrl = null,
+            documentUrl = null,
             webView = webView,
             webViewClientListener = null
         )
@@ -113,7 +113,7 @@ class WebViewRequestInterceptorTest {
         whenever(mockRequest.url).thenReturn(null)
         testee.shouldIntercept(
             request = mockRequest,
-            currentUrl = null,
+            documentUrl = null,
             webView = webView,
             webViewClientListener = null
         )
@@ -126,7 +126,7 @@ class WebViewRequestInterceptorTest {
         whenever(mockHttpsUpgrader.shouldUpgrade(any())).thenReturn(false)
         testee.shouldIntercept(
             request = mockRequest,
-            currentUrl = null,
+            documentUrl = null,
             webView = webView,
             webViewClientListener = null
         )
@@ -135,11 +135,11 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenCurrentUrlIsNullThenShouldContinueToLoad() = runBlocking<Unit> {
+    fun whenDocumentUrlIsNullThenShouldContinueToLoad() = runBlocking<Unit> {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
-            currentUrl = null,
+            documentUrl = null,
             webView = webView,
             webViewClientListener = null
         )
@@ -151,7 +151,7 @@ class WebViewRequestInterceptorTest {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
-            currentUrl = "duckduckgo.com/a/b/c?q=123",
+            documentUrl = "duckduckgo.com/a/b/c?q=123",
             webView = webView,
             webViewClientListener = null
         )
@@ -164,7 +164,7 @@ class WebViewRequestInterceptorTest {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
-            currentUrl = "donttrack.us/a/b/c?q=123",
+            documentUrl = "donttrack.us/a/b/c?q=123",
             webView = webView,
             webViewClientListener = null
         )
@@ -177,7 +177,7 @@ class WebViewRequestInterceptorTest {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
-            currentUrl = "spreadprivacy.com/a/b/c?q=123",
+            documentUrl = "spreadprivacy.com/a/b/c?q=123",
             webView = webView,
             webViewClientListener = null
         )
@@ -190,7 +190,7 @@ class WebViewRequestInterceptorTest {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
-            currentUrl = "duckduckhack.com/a/b/c?q=123",
+            documentUrl = "duckduckhack.com/a/b/c?q=123",
             webView = webView,
             webViewClientListener = null
         )
@@ -203,7 +203,7 @@ class WebViewRequestInterceptorTest {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
-            currentUrl = "privatebrowsingmyths.com/a/b/c?q=123",
+            documentUrl = "privatebrowsingmyths.com/a/b/c?q=123",
             webView = webView,
             webViewClientListener = null
         )
@@ -216,7 +216,7 @@ class WebViewRequestInterceptorTest {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
-            currentUrl = "duck.co/a/b/c?q=123",
+            documentUrl = "duck.co/a/b/c?q=123",
             webView = webView,
             webViewClientListener = null
         )
@@ -232,7 +232,7 @@ class WebViewRequestInterceptorTest {
 
         val response = testee.shouldIntercept(
             request = mockRequest,
-            currentUrl = "foo.com",
+            documentUrl = "foo.com",
             webView = webView,
             webViewClientListener = mockListener
         )
@@ -249,7 +249,7 @@ class WebViewRequestInterceptorTest {
 
         val response = testee.shouldIntercept(
             request = mockRequest,
-            currentUrl = "foo.com",
+            documentUrl = "foo.com",
             webView = webView,
             webViewClientListener = mockListener
         )
@@ -267,7 +267,7 @@ class WebViewRequestInterceptorTest {
         configureShouldBlock()
         val response = testee.shouldIntercept(
             request = mockRequest,
-            currentUrl = "foo.com",
+            documentUrl = "foo.com",
             webView = webView,
             webViewClientListener = null
         )
@@ -288,7 +288,7 @@ class WebViewRequestInterceptorTest {
         configureShouldBlock()
         val response = testee.shouldIntercept(
             request = mockRequest,
-            currentUrl = "foo.com",
+            documentUrl = "foo.com",
             webView = webView,
             webViewClientListener = null
         )
