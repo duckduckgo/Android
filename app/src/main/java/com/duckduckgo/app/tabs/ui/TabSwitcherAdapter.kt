@@ -36,7 +36,6 @@ import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.image.GlideRequests
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.show
-import com.duckduckgo.app.global.view.toPx
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
 import com.google.android.material.card.MaterialCardView
@@ -71,14 +70,14 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
         holder.title.text = tab.displayTitle(context)
         //holder.tabUnread.visibility = if (tab.viewed) View.INVISIBLE else View.VISIBLE
 
-        if (tab.tabId == selectedTab?.tabId) {
-            holder.root.strokeWidth = 2.toPx()
-            val marginSize = holder.root.strokeWidth + 2.toPx()
-            updateMargin(holder, marginSize)
-        } else {
-            holder.root.strokeWidth = 0
-            updateMargin(holder, 0)
-        }
+//        if (tab.tabId == selectedTab?.tabId) {
+//            holder.root.strokeWidth = 2.toPx()
+//            val marginSize = holder.root.strokeWidth + 2.toPx()
+//            updateMargin(holder, marginSize)
+//        } else {
+//            holder.root.strokeWidth = 0
+//            updateMargin(holder, 0)
+//        }
 
         val glide = GlideApp.with(holder.root)
 

@@ -19,9 +19,13 @@ package com.duckduckgo.app.tabs.ui
 import android.content.Context
 import android.content.Intent
 import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.RectF
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.Observer
@@ -33,6 +37,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.global.view.FireDialog
+import com.duckduckgo.app.global.view.toPx
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -48,6 +53,7 @@ import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
+
 
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
 
@@ -130,6 +136,43 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             }
         })
         swipeListener.attachToRecyclerView(tabsRecycler)
+
+        tabsRecycler.addItemDecoration(object: RecyclerView.ItemDecoration(){
+
+            val paintStroke: Paint = Paint().apply {
+                style = Paint.Style.STROKE
+                strokeWidth = 4.toPx().toFloat()
+                color = Color.GREEN
+            }
+
+            override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
+                val childCount = parent.childCount
+
+                // For each child view we would need to calculate the
+                // bounds and fill it by drawing a rectangle
+                for (i in 0 until childCount) {
+                    val child = parent.getChildAt(i)
+
+                    // Get the bounds
+                    val rect = getBounds(child)
+
+                    // Fill the view by drawing a rectangle with rounded corner
+                    c.drawRoundRect(rect, 10f, 10f, paintStroke)
+                }
+            }
+
+            private fun getBounds(child: View): RectF {
+                val params = child.layoutParams as RecyclerView.LayoutParams
+
+                val left = child.paddingLeft
+                val right = left + child.right + child.paddingRight
+
+                val top = child.top - params.topMargin
+                val bottom = child.bottom + params.bottomMargin
+
+                return RectF(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat())
+            }
+        })
     }
 
 

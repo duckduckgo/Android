@@ -24,9 +24,7 @@
     android:layout_marginBottom="10dp"
     android:elevation="2dp"
     app:cardBackgroundColor="?attr/colorPrimary"
-    app:cardCornerRadius="6dp"
-    app:strokeColor="?attr/normalTextColor"
-    tools:strokeWidth="3dp">
+    app:cardCornerRadius="6dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cardContentsContainer"
