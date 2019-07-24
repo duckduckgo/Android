@@ -99,6 +99,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
@@ -621,8 +622,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         // send pixel before submitting the query and changing the autocomplete state to empty; otherwise will send the wrong params
         GlobalScope.launch {
             viewModel.fireAutocompletePixel(suggestion)
+            withContext(Dispatchers.Main) {
+                viewModel.onUserSubmittedQuery(suggestion.phrase)
+            }
         }
-        viewModel.onUserSubmittedQuery(suggestion.phrase)
     }
 
     private fun userEnteredQuery(query: String) {
