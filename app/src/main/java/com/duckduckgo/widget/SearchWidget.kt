@@ -59,7 +59,7 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
     override fun onEnabled(context: Context) {
         if (!appInstallStore.widgetInstalled) {
             appInstallStore.widgetInstalled = true
-            pixel.fire(WIDGETS_ADDED, includeLocale = true)
+            pixel.fire(WIDGETS_ADDED)
         }
     }
 
@@ -84,7 +84,7 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
     override fun onDeleted(context: Context, appWidgetIds: IntArray?) {
         if (appInstallStore.widgetInstalled && !widgetCapabilities.hasInstalledWidgets) {
             appInstallStore.widgetInstalled = false
-            pixel.fire(WIDGETS_DELETED, includeLocale = true)
+            pixel.fire(WIDGETS_DELETED)
         }
     }
 }
