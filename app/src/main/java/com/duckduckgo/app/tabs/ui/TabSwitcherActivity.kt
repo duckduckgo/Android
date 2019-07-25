@@ -19,14 +19,15 @@ package com.duckduckgo.app.tabs.ui
 import android.content.Context
 import android.content.Intent
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
@@ -137,12 +138,21 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         })
         swipeListener.attachToRecyclerView(tabsRecycler)
 
-        tabsRecycler.addItemDecoration(object: RecyclerView.ItemDecoration(){
 
-            val paintStroke: Paint = Paint().apply {
+        val borderDecorator = object : RecyclerView.ItemDecoration() {
+
+            private val radius = 8.toPx().toFloat()
+            private val borderWidth = 2.toPx().toFloat()
+            private val borderGap = 4.toPx().toFloat()
+
+            val borderStroke: Paint = Paint().apply {
+                isAntiAlias = true
                 style = Paint.Style.STROKE
-                strokeWidth = 4.toPx().toFloat()
-                color = Color.GREEN
+                strokeWidth = borderWidth
+
+                val typedValue = TypedValue()
+                themedContext.theme.resolveAttribute(R.attr.normalTextColor, typedValue, true)
+                color = ContextCompat.getColor(applicationContext, typedValue.resourceId)
             }
 
             override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
@@ -152,27 +162,32 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 // bounds and fill it by drawing a rectangle
                 for (i in 0 until childCount) {
                     val child = parent.getChildAt(i)
+                    val tab = (parent.adapter as TabSwitcherAdapter).getTab(i)
 
-                    // Get the bounds
-                    val rect = getBounds(child)
+                    if (tab.tabId == intent.getStringExtra(EXTRA_KEY_SELECTED_TAB)) {
 
-                    // Fill the view by drawing a rectangle with rounded corner
-                    c.drawRoundRect(rect, 10f, 10f, paintStroke)
+                        // Get the bounds
+                        val rect = getBounds(child)
+
+                        // Fill the view by drawing a rectangle with rounded corner
+                        c.drawRoundRect(rect, radius, radius, borderStroke)
+                    }
                 }
+
+                super.onDrawOver(c, parent, state)
             }
 
             private fun getBounds(child: View): RectF {
-                val params = child.layoutParams as RecyclerView.LayoutParams
+                val left = child.left + child.translationX - child.paddingLeft - borderGap
+                val right = child.right + child.translationX + child.paddingRight + borderGap
 
-                val left = child.paddingLeft
-                val right = left + child.right + child.paddingRight
+                val top = child.top - child.paddingTop - borderGap
+                val bottom = child.bottom + child.paddingBottom + borderGap
 
-                val top = child.top - params.topMargin
-                val bottom = child.bottom + params.bottomMargin
-
-                return RectF(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat())
+                return RectF(left, top, right, bottom)
             }
-        })
+        }
+        tabsRecycler.addItemDecoration(borderDecorator)
     }
 
 
