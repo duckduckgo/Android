@@ -159,11 +159,21 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             override fun onDrawOver(c: Canvas, recyclerView: RecyclerView, state: RecyclerView.State) {
                 val adapter = recyclerView.adapter as TabSwitcherAdapter? ?: return
 
-                for (i in 0 until adapter.itemCount) {
-                    val tab = adapter.getTab(i)
+                Timber.i("child count: ${recyclerView.childCount}")
+
+                for (i in 0 until recyclerView.childCount) {
+                    val child = recyclerView.getChildAt(i)
+
+                    val positionInAdapter = recyclerView.getChildAdapterPosition(child)
+                    if (positionInAdapter < 0) {
+                        Timber.i("Invalid position")
+                        continue
+                    }
+
+                    Timber.i("child count: $i, adapter position:$positionInAdapter")
+                    val tab = adapter.getTab(positionInAdapter)
 
                     if (tab.tabId == intent.getStringExtra(EXTRA_KEY_SELECTED_TAB)) {
-                        val child = recyclerView.getChildAt(i)
                         val rect = child.getBounds()
 
                         borderStroke.alpha = (child.alpha * 255).toInt()
