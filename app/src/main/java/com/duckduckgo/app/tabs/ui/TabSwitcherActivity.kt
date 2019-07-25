@@ -170,7 +170,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                         continue
                     }
 
-                    Timber.i("child count: $i, adapter position:$positionInAdapter")
                     val tab = adapter.getTab(positionInAdapter)
 
                     if (tab.tabId == intent.getStringExtra(EXTRA_KEY_SELECTED_TAB)) {
@@ -188,8 +187,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 val leftPosition = left + translationX - paddingLeft - borderGap
                 val rightPosition = right + translationX + paddingRight + borderGap
 
-                val topPosition = top - paddingTop - borderGap
-                val bottomPosition = bottom + paddingBottom + borderGap
+                val topPosition = top + translationY - paddingTop - borderGap
+                val bottomPosition = bottom + translationY + paddingBottom + borderGap
 
                 return RectF(leftPosition, topPosition, rightPosition, bottomPosition)
             }
