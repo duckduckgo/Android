@@ -19,7 +19,7 @@ package com.duckduckgo.app.global
 import org.junit.Assert.*
 import org.junit.Test
 
-class ChecksumTest {
+class HashUtilitiesTest {
 
     @Test
     fun whenSha256ChecksumCalledThenChecksumIsCorrect() {
@@ -28,12 +28,12 @@ class ChecksumTest {
     }
 
     @Test
-    fun whenSha256CheckumCorrectThenVerifyIsTrue() {
+    fun whenSha256HashCorrectThenVerifyIsTrue() {
         assertTrue(helloWorldText.toByteArray().verifySha256(helloWorldSha256))
     }
 
     @Test
-    fun whenSha256CheckumIncorrectThenVerifyIsFalse() {
+    fun whenSha256HashIncorrectThenVerifyIsFalse() {
         assertFalse(helloWorldText.toByteArray().verifySha256(otherSha256))
     }
 

@@ -19,8 +19,10 @@ package com.duckduckgo.app.httpsupgrade
 import android.net.Uri
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.isHttps
+import com.duckduckgo.app.global.sha1
 import com.duckduckgo.app.global.toHttps
 import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
+import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeService
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import timber.log.Timber
 import java.util.concurrent.locks.ReentrantLock
@@ -29,9 +31,6 @@ interface HttpsUpgrader {
 
     @WorkerThread
     fun shouldUpgrade(uri: Uri): Boolean
-
-    @WorkerThread
-    fun isInUpgradeList(uri: Uri): Boolean
 
     fun upgrade(uri: Uri): Uri {
         return uri.toHttps
@@ -43,11 +42,13 @@ interface HttpsUpgrader {
 
 class HttpsUpgraderImpl(
     private val whitelistedDao: HttpsWhitelistDao,
-    private val bloomFactory: HttpsBloomFilterFactory
+    private val bloomFactory: HttpsBloomFilterFactory,
+    private val httpsUpgradeService: HttpsUpgradeService
 ) : HttpsUpgrader {
 
-    private var httpsBloomFilter: BloomFilter? = null
-    private val dataReloadLock = ReentrantLock()
+    private var localBloomFilter: BloomFilter? = null
+    private val localDataReloadLock = ReentrantLock()
+    private val isLocalListReloading get() = localDataReloadLock.isLocked
 
     @WorkerThread
     override fun shouldUpgrade(uri: Uri): Boolean {
@@ -56,27 +57,28 @@ class HttpsUpgraderImpl(
             return false
         }
 
-        return isInUpgradeList(uri)
+        val host = uri.host ?: return false
+        if (!isLocalListReloading && isInLocalUpgradeList(host)) {
+            return true
+        }
+
+        return isInGlobalUpgradeList(host)
     }
 
     @WorkerThread
-    override fun isInUpgradeList(uri: Uri): Boolean {
-
-        val host = uri.host ?: return false
-
-        waitForAnyReloadsToComplete()
+    private fun isInLocalUpgradeList(host: String): Boolean {
 
         if (whitelistedDao.contains(host)) {
             Timber.d("$host is in whitelist and so not upgradable")
             return false
         }
 
-        httpsBloomFilter?.let {
+        localBloomFilter?.let {
 
             val initialTime = System.nanoTime()
             val shouldUpgrade = it.contains(host)
             val totalTime = System.nanoTime() - initialTime
-            Timber.d("$host ${if (shouldUpgrade) "is" else "is not"} upgradable, lookup in ${totalTime / NANO_TO_MILLIS_DIVISOR}ms")
+            Timber.d("$host ${if (shouldUpgrade) "is" else "is not"} locally upgradable, lookup in ${totalTime / NANO_TO_MILLIS_DIVISOR}ms")
 
             return shouldUpgrade
         }
@@ -84,21 +86,33 @@ class HttpsUpgraderImpl(
         return false
     }
 
-    private fun waitForAnyReloadsToComplete() {
-        // wait for lock (by locking and unlocking) before continuing
-        if (dataReloadLock.isLocked) {
-            dataReloadLock.lock()
-            dataReloadLock.unlock()
+    @WorkerThread
+    private fun isInGlobalUpgradeList(host: String): Boolean {
+
+        val initialTime = System.nanoTime()
+        var shouldUpgrade = false
+
+        val sha1Host = host.sha1
+        val partialSha1Host = sha1Host.substring(0, 4)
+        try {
+            val response = httpsUpgradeService.upgradeListForPartialHost(partialSha1Host).execute()
+            shouldUpgrade = response.body()?.contains(sha1Host) == true
+        } catch (error: Exception) {
+            Timber.w("Global https lookup failed with $error")
         }
+
+        val totalTime = System.nanoTime() - initialTime
+        Timber.d("$host ${if (shouldUpgrade) "is" else "is not"} globally upgradable, lookup in ${totalTime / NANO_TO_MILLIS_DIVISOR}ms")
+        return shouldUpgrade
     }
 
     @WorkerThread
     override fun reloadData() {
-        dataReloadLock.lock()
+        localDataReloadLock.lock()
         try {
-            httpsBloomFilter = bloomFactory.create()
+            localBloomFilter = bloomFactory.create()
         } finally {
-            dataReloadLock.unlock()
+            localDataReloadLock.unlock()
         }
     }
 

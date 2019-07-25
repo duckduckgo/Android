@@ -16,18 +16,19 @@
 
 package com.duckduckgo.app.global
 
-import java.math.BigInteger
-import java.security.MessageDigest
-
+import org.apache.commons.codec.binary.Hex
+import org.apache.commons.codec.digest.DigestUtils
 
 val ByteArray.sha256: String
-    get() {
-        val md = MessageDigest.getInstance("SHA-256")
-        md.reset()
-        val digest = md.digest(this)
-        return String.format("%0" + digest.size * 2 + "x", BigInteger(1, digest))
-    }
+    get() = String(Hex.encodeHex(DigestUtils.sha256(this)))
 
 fun ByteArray.verifySha256(sha256: String): Boolean {
     return this.sha256 == sha256
+}
+
+val String.sha1: String
+    get() = String(Hex.encodeHex(DigestUtils.sha1(this)))
+
+fun String.verifySha1(sha1: String): Boolean {
+    return this.sha1 == sha1
 }

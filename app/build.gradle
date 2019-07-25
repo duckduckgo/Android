@@ -108,6 +108,7 @@ ext {
     mockito = "2.18.3"
     mockitoKotlin = "2.0.0"
     commonsMath = "3.6.1"
+    commonsCodec = "1.13"
 }
 
 
@@ -175,6 +176,7 @@ dependencies {
 
     // Apache commons
     implementation "org.apache.commons:commons-math3:$commonsMath"
+    implementation "commons-codec:commons-codec:$commonsCodec"
 
     testImplementation "org.mockito:mockito-core:$mockito"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
