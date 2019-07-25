@@ -19,6 +19,7 @@ package com.duckduckgo.app.httpsupgrade
 import android.net.Uri
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.isHttps
+import com.duckduckgo.app.global.performance.measureExecution
 import com.duckduckgo.app.global.sha1
 import com.duckduckgo.app.global.toHttps
 import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
@@ -73,36 +74,35 @@ class HttpsUpgraderImpl(
             return false
         }
 
+        var shouldUpgrade = false
+
         localBloomFilter?.let {
-
-            val initialTime = System.nanoTime()
-            val shouldUpgrade = it.contains(host)
-            val totalTime = System.nanoTime() - initialTime
-            Timber.d("$host ${if (shouldUpgrade) "is" else "is not"} locally upgradable, lookup in ${totalTime / NANO_TO_MILLIS_DIVISOR}ms")
-
-            return shouldUpgrade
+            measureExecution("Local Https lookup took") {
+                shouldUpgrade = it.contains(host)
+            }
         }
 
-        return false
+        Timber.d("$host ${if (shouldUpgrade) "is" else "is not"} locally upgradable")
+        return shouldUpgrade
     }
 
     @WorkerThread
     private fun isInGlobalUpgradeList(host: String): Boolean {
 
-        val initialTime = System.nanoTime()
         var shouldUpgrade = false
 
-        val sha1Host = host.sha1
-        val partialSha1Host = sha1Host.substring(0, 4)
-        try {
-            val response = httpsUpgradeService.upgradeListForPartialHost(partialSha1Host).execute()
-            shouldUpgrade = response.body()?.contains(sha1Host) == true
-        } catch (error: Exception) {
-            Timber.w("Global https lookup failed with $error")
+        measureExecution("Global Https lookup took") {
+            val sha1Host = host.sha1
+            val partialSha1Host = sha1Host.substring(0, 4)
+            try {
+                val response = httpsUpgradeService.upgradeListForPartialHost(partialSha1Host).execute()
+                shouldUpgrade = response.body()?.contains(sha1Host) == true
+            } catch (error: Exception) {
+                Timber.w("Global https lookup failed with $error")
+            }
         }
 
-        val totalTime = System.nanoTime() - initialTime
-        Timber.d("$host ${if (shouldUpgrade) "is" else "is not"} globally upgradable, lookup in ${totalTime / NANO_TO_MILLIS_DIVISOR}ms")
+        Timber.d("$host ${if (shouldUpgrade) "is" else "is not"} globally upgradable")
         return shouldUpgrade
     }
 
@@ -115,9 +115,4 @@ class HttpsUpgraderImpl(
             localDataReloadLock.unlock()
         }
     }
-
-    companion object {
-        const val NANO_TO_MILLIS_DIVISOR = 1_000_000.0
-    }
-
 }
