@@ -18,6 +18,7 @@ package com.duckduckgo.app.httpsupgrade
 
 import android.net.Uri
 import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
+import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeService
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -32,12 +33,13 @@ class HttpsUpgraderTest {
 
     private var mockHttpsBloomFilterFactory: HttpsBloomFilterFactory = mock()
     private var mockWhitelistDao: HttpsWhitelistDao = mock()
+    private var mockHttpsUpgradeService: HttpsUpgradeService = mock()
     private var bloomFilter = BloomFilter(100, 0.01)
 
     @Before
     fun before() {
         whenever(mockHttpsBloomFilterFactory.create()).thenReturn(bloomFilter)
-        testee = HttpsUpgraderImpl(mockWhitelistDao, mockHttpsBloomFilterFactory)
+        testee = HttpsUpgraderImpl(mockWhitelistDao, mockHttpsBloomFilterFactory, mockHttpsUpgradeService)
         testee.reloadData()
     }
 
