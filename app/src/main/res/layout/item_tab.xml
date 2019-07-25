@@ -47,7 +47,6 @@
             android:id="@+id/close"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:layout_marginEnd="2dp"
             android:background="?selectableItemBackground"
             android:contentDescription="@string/closeContentDescription"
             android:scaleType="center"
