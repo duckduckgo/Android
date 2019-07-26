@@ -179,6 +179,7 @@ class ViewModelFactory @Inject constructor(
         faviconDownloader = faviconDownloader,
         addToHomeCapabilityDetector = addToHomeCapabilityDetector,
         ctaViewModel = ctaViewModel,
-        searchCountDao = searchCountDao
+        searchCountDao = searchCountDao,
+        pixel = pixel
     )
 }
