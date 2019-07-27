@@ -18,6 +18,7 @@ package com.duckduckgo.app.httpsupgrade
 
 import android.net.Uri
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.global.api.isCached
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.global.performance.measureExecution
 import com.duckduckgo.app.global.sha1
@@ -25,7 +26,10 @@ import com.duckduckgo.app.global.toHttps
 import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeService
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import timber.log.Timber
+import java.lang.Error
 import java.util.concurrent.locks.ReentrantLock
 
 interface HttpsUpgrader {
@@ -44,7 +48,8 @@ interface HttpsUpgrader {
 class HttpsUpgraderImpl(
     private val whitelistedDao: HttpsWhitelistDao,
     private val bloomFactory: HttpsBloomFilterFactory,
-    private val httpsUpgradeService: HttpsUpgradeService
+    private val httpsUpgradeService: HttpsUpgradeService,
+    private val pixel: Pixel
 ) : HttpsUpgrader {
 
     private var localBloomFilter: BloomFilter? = null
@@ -55,15 +60,22 @@ class HttpsUpgraderImpl(
     override fun shouldUpgrade(uri: Uri): Boolean {
 
         if (uri.isHttps) {
+            pixel.fire(HTTPS_NO_LOOKUP)
             return false
         }
 
-        val host = uri.host ?: return false
+        val host = uri.host
+        if (host == null) {
+            pixel.fire(HTTPS_NO_LOOKUP)
+            return false
+        }
+
         if (!isLocalListReloading && isInLocalUpgradeList(host)) {
+            pixel.fire(HTTPS_LOCAL_LOOKUP)
             return true
         }
 
-        return isInGlobalUpgradeList(host)
+        return isInServiceUpgradeList(host)
     }
 
     @WorkerThread
@@ -82,28 +94,35 @@ class HttpsUpgraderImpl(
             }
         }
 
-        Timber.d("$host ${if (shouldUpgrade) "is" else "is not"} locally upgradable")
+        Timber.d("$host ${if (shouldUpgrade) "is" else "is not"} locally upgradable according to local filter")
         return shouldUpgrade
     }
 
     @WorkerThread
-    private fun isInGlobalUpgradeList(host: String): Boolean {
+    private fun isInServiceUpgradeList(host: String): Boolean {
 
         var shouldUpgrade = false
 
-        measureExecution("Global Https lookup took") {
+        measureExecution("Service Https lookup took") {
             val sha1Host = host.sha1
             val partialSha1Host = sha1Host.substring(0, 4)
+
             try {
                 val response = httpsUpgradeService.upgradeListForPartialHost(partialSha1Host).execute()
-                shouldUpgrade = response.body()?.contains(sha1Host) == true
+                if (response.isSuccessful) {
+                    shouldUpgrade = response.body()?.contains(sha1Host) == true
+                    pixel.fire(if (response.isCached) HTTPS_SERVICE_CACHE_LOOKUP else HTTPS_SERVICE_REQUEST_LOOKUP)
+                } else {
+                    Timber.w("Service https lookup failed with ${response.code()}")
+                }
+
             } catch (error: Exception) {
-                Timber.w("Global https lookup failed with $error")
+                Timber.w("Service https lookup failed with $error")
             }
         }
 
-        Timber.d("$host ${if (shouldUpgrade) "is" else "is not"} globally upgradable")
-        return shouldUpgrade
+        Timber.d("$host ${if (shouldUpgrade) "is" else "is not"} upgradable according to service")
+        return false
     }
 
     @WorkerThread
