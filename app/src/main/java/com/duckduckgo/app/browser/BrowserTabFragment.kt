@@ -248,11 +248,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private fun configureShowTabSwitcherListener() {
         tabsButton?.actionView?.setOnClickListener {
-            generateWebViewPreviewImage()
-
             val activity = activity ?: return@setOnClickListener
 
             if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.TabSwitcherGrid)) {
+                generateWebViewPreviewImage()
                 startActivity(TabSwitcherActivity.intent(activity, tabId))
                 activity.overridePendingTransition(0, R.anim.slide_to_bottom)
             } else {
