@@ -34,7 +34,6 @@ import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIF
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.image.GlideRequests
-import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
@@ -69,9 +68,10 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
 
         val tab = getItem(position)
         holder.title.text = tab.displayTitle(context)
+
         updateUnreadIndicator(holder, tab)
 
-        val glide = GlideApp.with(holder.root)
+        val glide = GlideApp.with(holder.root.context)
 
         glide.load(tab.favicon())
             .placeholder(R.drawable.ic_globe_gray_16dp)
@@ -79,13 +79,10 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
             .into(holder.favicon)
 
 
-        loadTabPreviewImage(tab, glide, holder, initialisePreviews = true)
+        loadTabPreviewImage(tab, glide, holder)
 
         //ViewCompat.setTransitionName(holder.root, tab.tabId)
         attachClickListeners(holder, tab)
-
-        holder.root
-
     }
 
     private fun updateUnreadIndicator(holder: TabViewHolder, tab: TabEntity) {
@@ -98,19 +95,17 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
             return
         }
 
-        Timber.i("Found ${payloads.size} payloads")
-
         val tab = getItem(position)
 
         for (payload in payloads) {
             val bundle = payload as Bundle
 
             for (key: String in bundle.keySet()) {
-                Timber.v("Need an update, as $key changed")
+                Timber.v("$key changed - Need an update for $tab")
             }
 
             bundle[DIFF_KEY_PREVIEW]?.let {
-                loadTabPreviewImage(tab, GlideApp.with(holder.root), holder, initialisePreviews = false)
+                loadTabPreviewImage(tab, GlideApp.with(holder.root), holder)
             }
 
             bundle[DIFF_KEY_TITLE]?.let {
@@ -123,12 +118,9 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
         }
     }
 
-    private fun loadTabPreviewImage(tab: TabEntity, glide: GlideRequests, holder: TabViewHolder, initialisePreviews: Boolean) {
-        if (initialisePreviews) {
-            initialiseWebViewPreviewImages(holder)
-        }
-
+    private fun loadTabPreviewImage(tab: TabEntity, glide: GlideRequests, holder: TabViewHolder) {
         val previewFile = tab.tabPreviewFile ?: return
+
         val cachedWebViewPreview = File(webViewPreviewPersister.fullPathForFile(previewFile))
         if (!cachedWebViewPreview.exists()) {
             return
@@ -141,11 +133,6 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
             .listener(WebViewPreviewGlideListener(holder))
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(holder.tabPreview)
-    }
-
-    private fun initialiseWebViewPreviewImages(holder: TabViewHolder) {
-        holder.tabPreviewPlaceholder.show()
-        holder.tabPreview.gone()
     }
 
     private fun attachClickListeners(holder: TabViewHolder, tab: TabEntity) {

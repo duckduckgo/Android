@@ -106,6 +106,7 @@
             android:id="@+id/tabPreviewPlaceholder"
             android:layout_width="0dp"
             android:layout_height="170dp"
+            android:visibility="gone"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_tab_placeholder"
             android:tint="?attr/tabPlaceholderTintColor"

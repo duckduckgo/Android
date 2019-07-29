@@ -92,7 +92,15 @@ class TabDataRepository @Inject constructor(
         databaseExecutor().scheduleDirect {
             val current = tabsDao.tab(tabId)
             val position = current?.position ?: 0
-            val tab = TabEntity(tabId, site?.url, site?.title, false, true, position = position)
+            val tab = TabEntity(
+                tabId,
+                site?.url,
+                site?.title,
+                skipHome = false,
+                viewed = true,
+                position = position,
+                tabPreviewFile = current?.tabPreviewFile
+            )
             tabsDao.updateTab(tab)
         }
     }
