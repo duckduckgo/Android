@@ -136,7 +136,7 @@ class TabDataRepository @Inject constructor(
         }
     }
 
-    override fun updateTabPreviewImage(tabId: String, fileName: String) {
+    override fun updateTabPreviewImage(tabId: String, fileName: String?) {
         databaseExecutor().scheduleDirect {
             val tab = tabsDao.tab(tabId) ?: return@scheduleDirect
 
