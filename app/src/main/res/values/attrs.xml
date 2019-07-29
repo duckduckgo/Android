@@ -24,6 +24,7 @@
     <attr name="omnibarTextColor" format="color" />
     <attr name="omnibarHintColor" format="color" />
     <attr name="autoCompleteTextColor" format="color" />
+    <attr name="autoCompleteSubtitleTextColor" format="color" />
     <attr name="tabTitleTextColor" format="color" />
     <attr name="tabSubtitleTextColor" format="color" />
     <attr name="tabSelectedBorderColor" format="color" />

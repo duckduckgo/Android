@@ -21,6 +21,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.global.db.AppDatabase
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -71,6 +72,18 @@ class BookmarksDaoTest {
         val list = dao.bookmarks().blockingObserve()
         assertNotNull(list)
         assertTrue(list!!.isEmpty())
+    }
+
+    @Test
+    fun whenBookmarksExistThenReturnTrue() = runBlocking {
+        val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com")
+        dao.insert(bookmark)
+        assertTrue(dao.hasBookmarks())
+    }
+
+    @Test
+    fun whenBookmarkAreEmptyThenReturnFalse() = runBlocking {
+        assertFalse(dao.hasBookmarks())
     }
 
 }

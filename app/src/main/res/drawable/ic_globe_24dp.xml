@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2018 DuckDuckGo
+  ~ Copyright (c) 2019 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -20,16 +20,7 @@
     android:viewportWidth="24"
     android:viewportHeight="24">
     <path
-        android:fillColor="#00000000"
-        android:pathData="M12,12m-6.25,0a6.25,6.25 0,1 1,12.5 0a6.25,6.25 0,1 1,-12.5 0"
-        android:strokeWidth="1.5"
-        android:strokeColor="?attr/toolbarIconColor" />
-    <path
-        android:fillColor="#00000000"
-        android:pathData="M9.75,12a2.25,6.25 0,1 0,4.5 0a2.25,6.25 0,1 0,-4.5 0z"
-        android:strokeWidth="1.5"
-        android:strokeColor="?attr/toolbarIconColor" />
-    <path
         android:fillColor="?attr/toolbarIconColor"
-        android:pathData="M6,11h12v2H6z" />
+        android:fillType="nonZero"
+        android:pathData="M5.576,13a6.509,6.509 0,0 0,4.156 5.093c-0.65,-1.263 -1.094,-3.06 -1.205,-5.093h-2.95zM5.576,11h2.951c0.111,-2.033 0.556,-3.83 1.205,-5.093A6.509,6.509 0,0 0,5.576 11zM18.424,11a6.509,6.509 0,0 0,-4.156 -5.093c0.65,1.263 1.094,3.06 1.205,5.093h2.95zM18.424,13h-2.951c-0.111,2.033 -0.556,3.83 -1.205,5.093A6.509,6.509 0,0 0,18.424 13zM10.031,13c0.194,3.178 1.274,5.5 1.969,5.5 0.695,0 1.775,-2.322 1.97,-5.5h-3.94zM10.031,11h3.938C13.775,7.822 12.695,5.5 12,5.5c-0.695,0 -1.775,2.322 -1.97,5.5zM12,20a8,8 0,1 1,0 -16,8 8,0 0,1 0,16z" />
 </vector>
