@@ -428,12 +428,6 @@ class BrowserTabViewModel(
 
         registerSiteVisit()
 
-        generateWebViewPreviewImage()
-    }
-
-
-    private fun generateWebViewPreviewImage() {
-        Timber.i("Generating WebView preview image")
         command.value = GenerateWebViewPreviewImage
     }
 
