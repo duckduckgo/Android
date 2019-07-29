@@ -18,10 +18,10 @@ package com.duckduckgo.app.tabs.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.view.updateMargins
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -59,7 +59,8 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
             tabPreviewPlaceholder = root.tabPreviewPlaceholder,
             title = root.title,
             close = root.close,
-            cardContentsContainer = root.cardContentsContainer
+            cardContentsContainer = root.cardContentsContainer,
+            tabUnread = root.tabUnread
         )
     }
 
@@ -68,16 +69,7 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
 
         val tab = getItem(position)
         holder.title.text = tab.displayTitle(context)
-        //holder.tabUnread.visibility = if (tab.viewed) View.INVISIBLE else View.VISIBLE
-
-//        if (tab.tabId == selectedTab?.tabId) {
-//            holder.root.strokeWidth = 2.toPx()
-//            val marginSize = holder.root.strokeWidth + 2.toPx()
-//            updateMargin(holder, marginSize)
-//        } else {
-//            holder.root.strokeWidth = 0
-//            updateMargin(holder, 0)
-//        }
+        updateUnreadIndicator(holder, tab)
 
         val glide = GlideApp.with(holder.root)
 
@@ -96,10 +88,8 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
 
     }
 
-    private fun updateMargin(holder: TabViewHolder, marginSize: Int) {
-        val params = holder.cardContentsContainer.layoutParams as ViewGroup.MarginLayoutParams
-        params.updateMargins(left = marginSize, top = marginSize, right = marginSize, bottom = marginSize)
-        holder.cardContentsContainer.layoutParams = params
+    private fun updateUnreadIndicator(holder: TabViewHolder, tab: TabEntity) {
+        holder.tabUnread.visibility = if (tab.viewed) View.INVISIBLE else View.VISIBLE
     }
 
     override fun onBindViewHolder(holder: TabViewHolder, position: Int, payloads: MutableList<Any>) {
@@ -110,15 +100,17 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
 
         Timber.i("Found ${payloads.size} payloads")
 
+        val tab = getItem(position)
+
         for (payload in payloads) {
             val bundle = payload as Bundle
 
             for (key: String in bundle.keySet()) {
-                Timber.i("Need an update, as $key changed")
+                Timber.v("Need an update, as $key changed")
             }
 
             bundle[DIFF_KEY_PREVIEW]?.let {
-                loadTabPreviewImage(getItem(position), GlideApp.with(holder.root), holder, initialisePreviews = false)
+                loadTabPreviewImage(tab, GlideApp.with(holder.root), holder, initialisePreviews = false)
             }
 
             bundle[DIFF_KEY_TITLE]?.let {
@@ -126,7 +118,7 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
             }
 
             bundle[DIFF_KEY_VIEWED]?.let {
-                Timber.w("TODO: viewed status changed")
+                updateUnreadIndicator(holder, tab)
             }
         }
     }
@@ -176,7 +168,6 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
 
     fun adapterPositionForTab(tabId: String?): Int {
         if (tabId == null) return -1
-        Timber.i("Finding adapter position for $tabId from a list of ${currentList.size} tabs")
         return currentList.indexOfFirst { it.tabId == tabId }
     }
 
@@ -186,8 +177,8 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
         val tabPreview: ImageView,
         val tabPreviewPlaceholder: ImageView,
         val title: TextView,
-        val close: ImageView/*,
-        val tabUnread: View*/,
+        val close: ImageView,
+        val tabUnread: ImageView,
         val cardContentsContainer: ViewGroup
     ) : ViewHolder(root)
 
