@@ -85,10 +85,7 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
 
     private fun extractTabTitle(tab: TabEntity, context: Context): String {
         var title = tab.displayTitle(context)
-
-//        // strip off the "at DuckDuckGo" suffix from the title if it exists
-//        title = title.removeSuffix(DUCKDUCKGO_TITLE_SUFFIX)
-//
+        title = title.removeSuffix(DUCKDUCKGO_TITLE_SUFFIX)
         return title
     }
 
@@ -135,8 +132,6 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
 
         holder.tabPreview.show()
         glide.load(cachedWebViewPreview)
-            //.diskCacheStrategy(DiskCacheStrategy.NONE)
-            //.skipMemoryCache(true)
             .listener(WebViewPreviewGlideListener(holder))
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(holder.tabPreview)
