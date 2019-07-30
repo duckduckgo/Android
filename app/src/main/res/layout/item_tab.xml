@@ -79,6 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:fontFamily="sans-serif-medium"
+            android:ellipsize="end"
             android:lines="1"
             android:textColor="?attr/tabTitleTextColor"
             android:textIsSelectable="false"
