@@ -128,8 +128,8 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
 
         holder.tabPreview.show()
         glide.load(cachedWebViewPreview)
-            .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .skipMemoryCache(true)
+            //.diskCacheStrategy(DiskCacheStrategy.NONE)
+            //.skipMemoryCache(true)
             .listener(WebViewPreviewGlideListener(holder))
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(holder.tabPreview)
