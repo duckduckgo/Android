@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.tabs.ui
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,7 +25,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback
@@ -65,13 +65,11 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
 
     override fun onBindViewHolder(holder: TabViewHolder, position: Int) {
         val context = holder.root.context
-
         val tab = getItem(position)
-        holder.title.text = tab.displayTitle(context)
+        val glide = GlideApp.with(context)
 
+        holder.title.text = extractTabTitle(tab, context)
         updateUnreadIndicator(holder, tab)
-
-        val glide = GlideApp.with(holder.root.context)
 
         glide.load(tab.favicon())
             .placeholder(R.drawable.ic_globe_gray_16dp)
@@ -83,6 +81,15 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
 
         //ViewCompat.setTransitionName(holder.root, tab.tabId)
         attachClickListeners(holder, tab)
+    }
+
+    private fun extractTabTitle(tab: TabEntity, context: Context): String {
+        var title = tab.displayTitle(context)
+
+//        // strip off the "at DuckDuckGo" suffix from the title if it exists
+//        title = title.removeSuffix(DUCKDUCKGO_TITLE_SUFFIX)
+//
+        return title
     }
 
     private fun updateUnreadIndicator(holder: TabViewHolder, tab: TabEntity) {
@@ -156,6 +163,10 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
     fun adapterPositionForTab(tabId: String?): Int {
         if (tabId == null) return -1
         return currentList.indexOfFirst { it.tabId == tabId }
+    }
+
+    companion object {
+        private const val DUCKDUCKGO_TITLE_SUFFIX = "at DuckDuckGo"
     }
 
     data class TabViewHolder(
