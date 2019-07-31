@@ -142,9 +142,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         val borderDecorator = object : RecyclerView.ItemDecoration() {
 
-            private val radius = 8.toPx().toFloat()
+            private val borderRadius = 9.toPx().toFloat()
             private val borderWidth = 2.toPx().toFloat()
-            private val borderGap = 2.toPx().toFloat()
+            private val borderPadding = 3.toPx().toFloat()
 
             val borderStroke: Paint = Paint().apply {
                 isAntiAlias = true
@@ -173,7 +173,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                         val rect = child.getBounds()
 
                         borderStroke.alpha = (child.alpha * 255).toInt()
-                        c.drawRoundRect(rect, radius, radius, borderStroke)
+                        c.drawRoundRect(rect, borderRadius, borderRadius, borderStroke)
                     }
                 }
 
@@ -181,11 +181,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             }
 
             private fun View.getBounds(): RectF {
-                val leftPosition = left + translationX - paddingLeft - borderGap
-                val rightPosition = right + translationX + paddingRight + borderGap
+                val leftPosition = left + translationX - paddingLeft - borderPadding
+                val rightPosition = right + translationX + paddingRight + borderPadding
 
-                val topPosition = top + translationY - paddingTop - borderGap
-                val bottomPosition = bottom + translationY + paddingBottom + borderGap
+                val topPosition = top + translationY - paddingTop - borderPadding
+                val bottomPosition = bottom + translationY + paddingBottom + borderPadding
 
                 return RectF(leftPosition, topPosition, rightPosition, bottomPosition)
             }
