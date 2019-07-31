@@ -425,11 +425,6 @@ class BrowserTabViewModel(
             is PageCleared -> pageCleared()
             is UrlUpdated -> urlUpdated(stateChange.url)
         }
-
-        if (stateChange != Unchanged) {
-            Timber.i("State change is now $stateChange")
-            command.value = GenerateWebViewPreviewImage
-        }
     }
 
     private fun pageChanged(url: String, title: String?) {
