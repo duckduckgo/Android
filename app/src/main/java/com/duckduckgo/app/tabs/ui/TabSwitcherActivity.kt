@@ -80,6 +80,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private var loadingTabs = true
 
+    private var selectedTabId: String? = null
+
     private lateinit var tabsRecycler: RecyclerView
     private lateinit var toolbar: Toolbar
 
@@ -87,10 +89,15 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         super.onCreate(savedInstanceState)
         postponeEnterTransition()
         setContentView(R.layout.activity_tab_switcher)
+        extractIntentExtras()
         configureViewReferences()
         configureToolbar()
         configureRecycler()
         configureObservers()
+    }
+
+    private fun extractIntentExtras() {
+        selectedTabId = intent.getStringExtra(EXTRA_KEY_SELECTED_TAB)
     }
 
     private fun configureViewReferences() {
@@ -169,9 +176,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
                     val tab = adapter.getTab(positionInAdapter)
 
-                    if (tab.tabId == intent.getStringExtra(EXTRA_KEY_SELECTED_TAB)) {
+                    if (tab.tabId == selectedTabId) {
                         val rect = child.getBounds()
-
                         borderStroke.alpha = (child.alpha * 255).toInt()
                         c.drawRoundRect(rect, borderRadius, borderRadius, borderStroke)
                     }
@@ -196,18 +202,15 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun configureObservers() {
         viewModel.tabs.observe(this, Observer<List<TabEntity>> {
-            render()
-        })
-        viewModel.selectedTab.observe(this, Observer<TabEntity> {
-            render()
+            render(it)
         })
         viewModel.command.observe(this, Observer {
             processCommand(it)
         })
     }
 
-    private fun render() {
-        tabsAdapter.updateData(viewModel.tabs.value, viewModel.selectedTab.value)
+    private fun render(tabs: List<TabEntity>) {
+        tabsAdapter.updateData(tabs)
 
         if (loadingTabs) {
             loadingTabs = false
@@ -218,7 +221,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun scrollToShowCurrentTab() {
-        val index = tabsAdapter.adapterPositionForTab(intent.getStringExtra(EXTRA_KEY_SELECTED_TAB))
+        val index = tabsAdapter.adapterPositionForTab(selectedTabId)
         tabsRecycler.scrollToPosition(index)
     }
 
@@ -255,6 +258,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun onTabSelected(tab: TabEntity) {
+        selectedTabId = tab.tabId
+        tabsRecycler.invalidateItemDecorations()
         launch { viewModel.onTabSelected(tab) }
     }
 

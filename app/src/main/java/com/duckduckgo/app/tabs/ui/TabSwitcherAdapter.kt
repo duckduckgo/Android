@@ -45,8 +45,6 @@ import java.io.File
 class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, private val webViewPreviewPersister: WebViewPreviewPersister) :
     ListAdapter<TabEntity, TabViewHolder>(TabEntityDiffCallback()) {
 
-    private var selectedTab: TabEntity? = null
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TabViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val root = inflater.inflate(R.layout.item_tab, parent, false) as MaterialCardView
@@ -146,11 +144,9 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
         }
     }
 
-    fun updateData(data: List<TabEntity>?, selectedTab: TabEntity?) {
+    fun updateData(data: List<TabEntity>?) {
         if (data == null) return
-
         submitList(data)
-        this.selectedTab = selectedTab
     }
 
     fun getTab(position: Int): TabEntity = getItem(position)
