@@ -144,7 +144,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
             private val radius = 8.toPx().toFloat()
             private val borderWidth = 2.toPx().toFloat()
-            private val borderGap = 4.toPx().toFloat()
+            private val borderGap = 2.toPx().toFloat()
 
             val borderStroke: Paint = Paint().apply {
                 isAntiAlias = true

@@ -251,7 +251,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.TabSwitcherGrid)) {
                 viewModel.userLaunchingTabSwitcher()
                 startActivity(TabSwitcherActivity.intent(activity, tabId))
-                activity.overridePendingTransition(0, R.anim.slide_to_bottom)
+                activity.overridePendingTransition(android.R.anim.fade_in, R.anim.slide_to_bottom)
             } else {
                 startActivity(TabSwitcherActivityLegacy.intent(activity))
             }
