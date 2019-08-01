@@ -50,7 +50,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:itemCount="3"
-        tools:listitem="@layout/item_autocomplete_suggestion"
+        tools:listitem="@layout/item_autocomplete_search_suggestion"
         tools:visibility="visible" />
 
     <include layout="@layout/include_new_browser_tab" />
