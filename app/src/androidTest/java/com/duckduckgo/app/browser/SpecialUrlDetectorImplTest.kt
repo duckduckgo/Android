@@ -139,4 +139,17 @@ class SpecialUrlDetectorImplTest {
         val type = testee.determineType("foo site:duckduckgo.com") as SearchQuery
         assertEquals("foo site:duckduckgo.com", type.query)
     }
+
+    @Test
+    fun whenUrlIsJavascriptSchemeThenWebSearchTypeDetected() {
+        val expected = SearchQuery::class
+        val actual = testee.determineType("javascript:alert(0)")
+        assertEquals(expected, actual::class)
+    }
+
+    @Test
+    fun whenUrlIsJavascriptSchemeThenFullQueryRetained() {
+        val type = testee.determineType("javascript:alert(0)") as SearchQuery
+        assertEquals("javascript:alert(0)", type.query)
+    }
 }
