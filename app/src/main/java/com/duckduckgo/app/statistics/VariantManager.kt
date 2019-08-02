@@ -25,7 +25,8 @@ import timber.log.Timber
 interface VariantManager {
 
     sealed class VariantFeature {
-        object TabSwitcherGrid : VariantFeature()
+        // variant-dependant features listed here
+
     }
 
     companion object {
@@ -38,10 +39,7 @@ interface VariantManager {
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
             Variant(key = "sc", weight = 1.0, features = emptyList()),
-            Variant(key = "se", weight = 1.0, features = emptyList()),
-
-            Variant(key = "mo", weight = 1.0, features = emptyList()),
-            Variant(key = "mp", weight = 1.0, features = listOf(VariantFeature.TabSwitcherGrid))
+            Variant(key = "se", weight = 1.0, features = emptyList())
         )
     }
 
