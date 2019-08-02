@@ -307,7 +307,13 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
 
     companion object {
 
-        fun intent(context: Context, queryExtra: String? = null, newSearch: Boolean = false, widgetSearch: Boolean = false, launchedFromFireAction: Boolean = false): Intent {
+        fun intent(
+            context: Context,
+            queryExtra: String? = null,
+            newSearch: Boolean = false,
+            widgetSearch: Boolean = false,
+            launchedFromFireAction: Boolean = false
+        ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
             intent.putExtra(NEW_SEARCH_EXTRA, newSearch)

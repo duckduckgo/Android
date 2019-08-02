@@ -151,7 +151,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     lateinit var omnibarScrolling: OmnibarScrolling
 
     @Inject
-    lateinit var previewGenerator : WebViewPreviewGenerator
+    lateinit var previewGenerator: WebViewPreviewGenerator
 
     @Inject
     lateinit var previewPersister: WebViewPreviewPersister
@@ -251,7 +251,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.TabSwitcherGrid)) {
                 viewModel.userLaunchingTabSwitcher()
                 startActivity(TabSwitcherActivity.intent(activity, tabId))
-                activity.overridePendingTransition(android.R.anim.fade_in, R.anim.slide_to_bottom)
+                activity.overridePendingTransition(R.anim.tab_anim_fade_in, R.anim.slide_to_bottom)
             } else {
                 startActivity(TabSwitcherActivityLegacy.intent(activity))
             }

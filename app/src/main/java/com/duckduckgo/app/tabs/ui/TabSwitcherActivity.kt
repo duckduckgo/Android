@@ -78,7 +78,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private val tabsAdapter: TabSwitcherAdapter by lazy { TabSwitcherAdapter(this, webViewPreviewPersister) }
 
-    private var loadingTabs = true
+    // we need to scroll to show selected tab, but only if it is the first time loading the tabs.
+    private var firstTimeLoadingTabsList = true
 
     private var selectedTabId: String? = null
 
@@ -87,7 +88,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        postponeEnterTransition()
         setContentView(R.layout.activity_tab_switcher)
         extractIntentExtras()
         configureViewReferences()
@@ -199,7 +199,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabsRecycler.addItemDecoration(borderDecorator)
     }
 
-
     private fun configureObservers() {
         viewModel.tabs.observe(this, Observer<List<TabEntity>> {
             render(it)
@@ -212,10 +211,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun render(tabs: List<TabEntity>) {
         tabsAdapter.updateData(tabs)
 
-        if (loadingTabs) {
-            loadingTabs = false
+        if (firstTimeLoadingTabsList) {
+            firstTimeLoadingTabsList = false
 
-            // ensure we show the currently selected tab on screen
             scrollToShowCurrentTab()
         }
     }
@@ -228,7 +226,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun processCommand(command: Command?) {
         when (command) {
             is DisplayMessage -> applicationContext?.longToast(command.messageId)
-            is Close -> finish()
+            is Close -> finishAfterTransition()
         }
     }
 
@@ -282,7 +280,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     override fun finish() {
         clearObserversEarlyToStopViewUpdates()
         super.finish()
-        overridePendingTransition(R.anim.slide_from_bottom, android.R.anim.fade_out)
+        overridePendingTransition(R.anim.slide_from_bottom, R.anim.tab_anim_fade_out)
     }
 
     private fun clearObserversEarlyToStopViewUpdates() {

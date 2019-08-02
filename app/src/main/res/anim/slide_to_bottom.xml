@@ -15,6 +15,6 @@
   -->
 
 <translate xmlns:android="http://schemas.android.com/apk/res/android"
-    android:duration="300"
+    android:duration="@integer/tab_switcher_animation_duration_ms"
     android:fromYDelta="0%"
     android:toYDelta="30%" />
