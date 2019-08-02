@@ -61,7 +61,16 @@ class FileBasedWebViewPreviewGenerator : WebViewPreviewGenerator {
 
     private suspend fun scaleBitmap(fullSize: Bitmap, webView: WebView): Bitmap {
         return withContext(Dispatchers.IO) {
-            return@withContext Bitmap.createScaledBitmap(fullSize, webView.width, webView.height, false)
+            return@withContext Bitmap.createScaledBitmap(
+                fullSize,
+                (webView.width * COMPRESSION_PERCENTAGE / 100),
+                (webView.height * COMPRESSION_PERCENTAGE / 100),
+                false
+            )
         }
+    }
+
+    companion object {
+        private const val COMPRESSION_PERCENTAGE = 50
     }
 }
