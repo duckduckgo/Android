@@ -455,16 +455,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun generateWebViewPreviewImage() {
-        launch {
-
-            webView?.let {
+        webView?.let {
+            launch {
                 try {
-
                     val bitmap = previewGenerator.generatePreview(it)
                     val fileName = previewPersister.save(bitmap, tabId)
                     viewModel.updateTabPreview(tabId, fileName)
-
-                } catch (e: IllegalStateException) {
+                } catch (e: Throwable) {
                     Timber.w(e, "Failed to extract bitmap from WebView")
                 }
             }
