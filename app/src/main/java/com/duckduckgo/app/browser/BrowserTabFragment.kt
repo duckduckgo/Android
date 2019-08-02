@@ -81,7 +81,6 @@ import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyActivity
@@ -155,9 +154,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     @Inject
     lateinit var previewPersister: WebViewPreviewPersister
-
-    @Inject
-    lateinit var variantManager: VariantManager
 
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
@@ -246,16 +242,19 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private fun configureShowTabSwitcherListener() {
         tabsButton?.actionView?.setOnClickListener {
-            val activity = activity ?: return@setOnClickListener
-
-            if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.TabSwitcherGrid)) {
-                viewModel.userLaunchingTabSwitcher()
-                startActivity(TabSwitcherActivity.intent(activity, tabId))
-                activity.overridePendingTransition(R.anim.tab_anim_fade_in, R.anim.slide_to_bottom)
-            } else {
-                startActivity(TabSwitcherActivityLegacy.intent(activity))
-            }
+            viewModel.userLaunchingTabSwitcher()
         }
+    }
+
+    private fun launchTabSwitcherLegacy() {
+        val activity = activity ?: return
+        startActivity(TabSwitcherActivityLegacy.intent(activity))
+    }
+
+    private fun launchTabSwitcher() {
+        val activity = activity ?: return
+        startActivity(TabSwitcherActivity.intent(activity, tabId))
+        activity.overridePendingTransition(R.anim.tab_anim_fade_in, R.anim.slide_to_bottom)
     }
 
     override fun onResume() {
@@ -450,6 +449,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.RequiresAuthentication -> showAuthenticationDialog(it.request)
             is Command.SaveCredentials -> saveBasicAuthCredentials(it.request, it.credentials)
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
+            is Command.LaunchTabSwitcher -> launchTabSwitcher()
+            is Command.LaunchTabSwitcherLegacy -> launchTabSwitcherLegacy()
         }
     }
 

@@ -47,8 +47,8 @@ interface VariantManager {
             Variant(key = "mm", weight = 0.0, features = emptyList()),
             Variant(key = "mn", weight = 0.0, features = listOf(TrackerBlockingOnboardingOptIn)),
 
-            Variant(key = "?1", weight = 0000.0, features = emptyList()),
-            Variant(key = "?2", weight = 1000.0, features = listOf(VariantFeature.TabSwitcherGrid))
+            Variant(key = "mw", weight = 1.0, features = emptyList()),
+            Variant(key = "mx", weight = 1.0, features = listOf(VariantFeature.TabSwitcherGrid))
         )
     }
 

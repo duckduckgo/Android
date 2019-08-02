@@ -61,6 +61,8 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.TabSwitcherGrid
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
@@ -98,6 +100,7 @@ class BrowserTabViewModel(
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
+    private val variantManager: VariantManager,
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, HttpAuthenticationListener, ViewModel() {
 
@@ -180,6 +183,8 @@ class BrowserTabViewModel(
         class RequiresAuthentication(val request: BasicAuthenticationRequest) : Command()
         class SaveCredentials(val request: BasicAuthenticationRequest, val credentials: BasicAuthenticationCredentials) : Command()
         object GenerateWebViewPreviewImage : Command()
+        object LaunchTabSwitcher : Command()
+        object LaunchTabSwitcherLegacy : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -857,10 +862,16 @@ class BrowserTabViewModel(
     }
 
     fun userLaunchingTabSwitcher() {
-        if (shouldDeleteTabPreview(site?.url)) {
-            deleteTabPreview(tabId)
-        } else if (shouldUpdateTabPreview(site?.url)) {
-            command.value = GenerateWebViewPreviewImage
+        if (variantManager.getVariant().hasFeature(TabSwitcherGrid)) {
+            if (shouldDeleteTabPreview(site?.url)) {
+                deleteTabPreview(tabId)
+            } else if (shouldUpdateTabPreview(site?.url)) {
+                command.value = GenerateWebViewPreviewImage
+            }
+
+            command.value = LaunchTabSwitcher
+        } else {
+            command.value = LaunchTabSwitcherLegacy
         }
     }
 }
