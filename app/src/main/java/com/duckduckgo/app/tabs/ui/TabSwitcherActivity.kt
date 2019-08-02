@@ -244,6 +244,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun onNewTabRequested() {
+        clearObserversEarlyToStopViewUpdates()
         launch { viewModel.onNewTabRequested() }
     }
 

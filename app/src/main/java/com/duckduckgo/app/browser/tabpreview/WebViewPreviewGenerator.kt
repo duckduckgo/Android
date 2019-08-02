@@ -37,7 +37,6 @@ class FileBasedWebViewPreviewGenerator : WebViewPreviewGenerator {
         val scaledBitmap = scaleBitmap(fullSizeBitmap, webView)
         Timber.d("Full size bitmap: ${fullSizeBitmap.byteCount}, reduced size: ${scaledBitmap.byteCount}")
         return scaledBitmap
-
     }
 
     private suspend fun convertWebViewToBitmap(webView: WebView): Bitmap {

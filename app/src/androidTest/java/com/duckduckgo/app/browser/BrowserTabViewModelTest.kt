@@ -29,6 +29,8 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
@@ -52,9 +54,9 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.*
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
@@ -145,6 +147,9 @@ class BrowserTabViewModelTest {
     private lateinit var mockAppInstallStore: AppInstallStore
 
     @Mock
+    private lateinit var mockVariantManager: VariantManager
+
+    @Mock
     private lateinit var mockPixel: Pixel
 
     @Mock
@@ -204,7 +209,8 @@ class BrowserTabViewModelTest {
             addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector,
             ctaViewModel = ctaViewModel,
             searchCountDao = mockSearchCountDao,
-            pixel = mockPixel
+            pixel = mockPixel,
+            variantManager = mockVariantManager
         )
 
         testee.loadData("abc", null, false)

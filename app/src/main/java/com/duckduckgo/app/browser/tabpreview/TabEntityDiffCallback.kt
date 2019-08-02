@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser.tabpreview
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
 import com.duckduckgo.app.tabs.model.TabEntity
-import timber.log.Timber
 
 
 class TabEntityDiffCallback : DiffUtil.ItemCallback<TabEntity>() {
@@ -45,7 +44,6 @@ class TabEntityDiffCallback : DiffUtil.ItemCallback<TabEntity>() {
     }
 
     override fun getChangePayload(oldItem: TabEntity, newItem: TabEntity): Bundle {
-        Timber.i("Detected a difference in $oldItem and $newItem")
 
         val diffBundle = Bundle()
 
