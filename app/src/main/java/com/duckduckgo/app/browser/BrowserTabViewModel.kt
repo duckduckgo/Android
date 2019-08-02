@@ -521,16 +521,17 @@ class BrowserTabViewModel(
         return siteUrl != null && canGenerateWebViewPreview()
     }
 
+    /**
+     * This is a performance optimisation to guard against generating bitmaps too frequently, as can happen as this is invoked from onProgressChanged
+     */
     private fun canGenerateWebViewPreview(): Boolean {
         val difference = System.currentTimeMillis() - lastWebViewPreviewTimestamp
-        Timber.i("It's been ${difference}ms since last timestamp was generated")
 
         if (difference >= TimeUnit.SECONDS.toMillis(2)) {
-            Timber.i("Able to generate webview preview")
             return true
         }
 
-        Timber.i("Not allowed to generate a webview preview; too soon since the last one ($difference ms ago)")
+        Timber.v("Not allowed to generate a WebView preview; too soon since the last one (${difference}ms ago)")
         return false
     }
 
