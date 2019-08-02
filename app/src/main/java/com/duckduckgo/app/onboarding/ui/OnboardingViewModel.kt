@@ -19,16 +19,10 @@ package com.duckduckgo.app.onboarding.ui
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
-import com.duckduckgo.app.privacy.store.PrivacySettingsStore
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.pixels.Pixel
 
 class OnboardingViewModel(
     private val onboardingStore: OnboardingStore,
-    private val privacySettingsStore: PrivacySettingsStore,
-    private val pageLayoutManager: OnboardingPageManager,
-    private val variantManager: VariantManager,
-    private val pixel: Pixel
+    private val pageLayoutManager: OnboardingPageManager
 ) : ViewModel() {
 
     fun initializePages() {
@@ -45,17 +39,5 @@ class OnboardingViewModel(
 
     fun onOnboardingDone() {
         onboardingStore.onboardingShown()
-        fireTrackerBlockingFinalStatePixel()
-    }
-
-    private fun fireTrackerBlockingFinalStatePixel() {
-        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.TrackerBlockingOnboardingOptIn)) {
-            val pixelName = if (privacySettingsStore.privacyOn) {
-                Pixel.PixelName.ONBOARDING_TRACKER_BLOCKING_FINAL_ONBOARDING_STATE_ENABLED
-            } else {
-                Pixel.PixelName.ONBOARDING_TRACKER_BLOCKING_FINAL_ONBOARDING_STATE_DISABLED
-            }
-            pixel.fire(pixelName)
-        }
     }
 }
