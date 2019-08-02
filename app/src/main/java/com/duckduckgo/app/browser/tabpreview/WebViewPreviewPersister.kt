@@ -30,6 +30,7 @@ interface WebViewPreviewPersister {
 
     suspend fun save(bitmap: Bitmap, tabId: String): String
     fun delete(filename: String)
+    fun deleteAll()
     fun fullPathForFile(previewName: String): String
 }
 
@@ -49,6 +50,10 @@ class FileBasedWebViewPreviewPersister(val context: Context) : WebViewPreviewPer
     override fun delete(filename: String) {
         val fileToDelete = File(previewDestinationDirectory(), filename)
         fileToDelete.delete()
+    }
+
+    override fun deleteAll() {
+        previewDestinationDirectory().deleteRecursively()
     }
 
     override fun fullPathForFile(previewName: String): String {

@@ -83,7 +83,14 @@ class TabDataRepository @Inject constructor(
             val position = tabsDao.tab(tabId)?.position ?: -1
             val uri = Uri.parse(url)
             val title = uri.host?.removePrefix("www.") ?: url
-            val tab = TabEntity(generateTabId(), url, title, false, false, position + 1)
+            val tab = TabEntity(
+                tabId = generateTabId(),
+                url = url,
+                title = title,
+                skipHome = false,
+                viewed = false,
+                position = position + 1
+            )
             tabsDao.insertTabAtPosition(tab)
         }
     }
@@ -93,9 +100,9 @@ class TabDataRepository @Inject constructor(
             val current = tabsDao.tab(tabId)
             val position = current?.position ?: 0
             val tab = TabEntity(
-                tabId,
-                site?.url,
-                site?.title,
+                tabId = tabId,
+                url = site?.url,
+                title = site?.title,
                 skipHome = false,
                 viewed = true,
                 position = position,
@@ -118,6 +125,10 @@ class TabDataRepository @Inject constructor(
 
     override suspend fun delete(tab: TabEntity) {
         databaseExecutor().scheduleDirect {
+            tab.tabPreviewFile?.let {
+                deletePreviewImage(it)
+            }
+
             tabsDao.deleteTabAndUpdateSelection(tab)
         }
         siteData.remove(tab.tabId)
@@ -126,6 +137,7 @@ class TabDataRepository @Inject constructor(
     override fun deleteAll() {
         Timber.i("Deleting tabs right now")
         tabsDao.deleteAllTabs()
+        webViewPreviewPersister.deleteAll()
         siteData.clear()
     }
 
@@ -144,9 +156,13 @@ class TabDataRepository @Inject constructor(
             tab.tabPreviewFile = fileName
             tabsDao.updateTab(tab)
 
-            oldPreviewFileName?.let {
-                webViewPreviewPersister.delete(oldPreviewFileName)
-            }
+            deletePreviewImage(oldPreviewFileName)
+        }
+    }
+
+    private fun deletePreviewImage(previewFileName: String?) {
+        previewFileName?.let {
+            webViewPreviewPersister.delete(previewFileName)
         }
     }
 
