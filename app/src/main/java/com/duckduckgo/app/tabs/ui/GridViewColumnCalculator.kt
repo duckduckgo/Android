@@ -24,9 +24,13 @@ class GridViewColumnCalculator(val context: Context) {
 
     fun calculateNumberOfColumns(columnWidthDp: Int, maxColumns: Int): Int {
         val displayMetrics = context.resources.displayMetrics
-        val screenWidthDp = displayMetrics.widthPixels / displayMetrics.density;
-        val numberOfColumns = (screenWidthDp / columnWidthDp + 0.5).toInt()
+        val screenWidthDp = displayMetrics.widthPixels / displayMetrics.density
+        val numberOfColumns = (screenWidthDp / columnWidthDp + PADDING).toInt()
         return min(maxColumns, numberOfColumns)
+    }
+
+    companion object {
+        private const val PADDING = 0.5
     }
 
 }

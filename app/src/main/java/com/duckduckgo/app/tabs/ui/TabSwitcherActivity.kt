@@ -29,7 +29,6 @@ import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.math.MathUtils.clamp
-import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -51,7 +50,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.longToast
-import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
@@ -115,12 +113,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         val layoutManager = GridLayoutManager(this, numberColumns)
         tabsRecycler.layoutManager = layoutManager
         tabsRecycler.adapter = tabsAdapter
-
-        // wait until recycler view is ready before allow Activity transition animation to run
-        tabsRecycler.doOnPreDraw {
-            Timber.i("onPreDraw")
-            startPostponedEnterTransition()
-        }
 
         val swipeListener = ItemTouchHelper(object : SwipeToDeleteCallback() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {

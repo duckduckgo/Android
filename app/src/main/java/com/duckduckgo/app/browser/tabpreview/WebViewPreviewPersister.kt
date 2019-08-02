@@ -41,7 +41,7 @@ class FileBasedWebViewPreviewPersister(val context: Context) : WebViewPreviewPer
             val previewFile = prepareDestinationFile(tabId)
             writeBytesToFile(previewFile, bitmap)
 
-            Timber.i("Wrote bitmap preview to ${previewFile.absolutePath}")
+            Timber.d("Wrote bitmap preview to ${previewFile.absolutePath}")
             return@withContext previewFile.name
         }
     }
