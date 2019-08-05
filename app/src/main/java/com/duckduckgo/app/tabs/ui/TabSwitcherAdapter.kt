@@ -53,7 +53,6 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
             root = root,
             favicon = root.favicon,
             tabPreview = root.tabPreview,
-            tabPreviewPlaceholder = root.tabPreviewPlaceholder,
             title = root.title,
             close = root.close,
             cardContentsContainer = root.cardContentsContainer,
@@ -130,7 +129,6 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
 
         holder.tabPreview.show()
         glide.load(cachedWebViewPreview)
-            .listener(WebViewPreviewGlideListener(holder))
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(holder.tabPreview)
     }
@@ -164,7 +162,6 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
         val root: MaterialCardView,
         val favicon: ImageView,
         val tabPreview: ImageView,
-        val tabPreviewPlaceholder: ImageView,
         val title: TextView,
         val close: ImageView,
         val tabUnread: ImageView,

@@ -103,20 +103,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/title" />
 
-        <ImageView
-            android:id="@+id/tabPreviewPlaceholder"
-            android:layout_width="0dp"
-            android:layout_height="170dp"
-            android:visibility="gone"
-            android:importantForAccessibility="no"
-            android:src="@drawable/ic_tab_placeholder"
-            android:tint="?attr/tabPlaceholderTintColor"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/title" />
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

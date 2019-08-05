@@ -65,7 +65,6 @@
         <item name="feedbackEditTextBackgroundColor">@color/almostBlack</item>
         <item name="feedbackEditTextHintColor">@color/grayish</item>
 
-        <item name="tabPlaceholderTintColor">@color/brownishGrayTwo</item>
         <item name="tabCardBackgroundColor">@color/almostBlack</item>
     </style>
 
@@ -122,7 +121,6 @@
         <item name="feedbackEditTextBackgroundColor">@color/whiteFive</item>
         <item name="feedbackEditTextHintColor">@color/warmerGray</item>
 
-        <item name="tabPlaceholderTintColor">@color/grayishThree</item>
         <item name="tabCardBackgroundColor">@color/white</item>
     </style>
 
