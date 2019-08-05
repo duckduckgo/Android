@@ -76,7 +76,6 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
 
         loadTabPreviewImage(tab, glide, holder)
 
-        //ViewCompat.setTransitionName(holder.root, tab.tabId)
         attachClickListeners(holder, tab)
     }
 

@@ -43,6 +43,7 @@
         <item name="autoCompleteTextColor">@color/white</item>
         <item name="autoCompleteSubtitleTextColor">@color/grayish</item>
         <item name="tabTitleTextColor">@color/white</item>
+        <item name="tabTitleTextColorLegacy">@color/midnight</item>
         <item name="tabSubtitleTextColor">@color/coolGray</item>
         <item name="tabSelectedBorderColor">@color/skyBlue</item>
         <item name="tabsFireTextColor">@color/white</item>
@@ -99,6 +100,7 @@
         <item name="autoCompleteTextColor">@color/grayishBrown</item>
         <item name="autoCompleteSubtitleTextColor">@color/warmerGray</item>
         <item name="tabTitleTextColor">@color/almostBlack</item>
+        <item name="tabTitleTextColorLegacy">@color/almostBlack</item>
         <item name="tabSubtitleTextColor">@color/warmerGray</item>
         <item name="tabSelectedBorderColor">@color/cornflowerBlue</item>
         <item name="tabsFireTextColor">@color/warmerGray</item>
