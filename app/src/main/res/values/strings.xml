@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="appName">DuckDuckGo</string>
+    <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
 
     <!-- Onboarding Activity -->
@@ -8,31 +8,19 @@
     <string name="onboardingDefaultBrowserDescription">Visit Settings to search and browse with DuckDuckGo every time.</string>
     <string name="onboardingDefaultBrowserGoToSettingsAction">Go to Settings</string>
     <string name="onboardingContinue">Continue</string>
-    <string name="onboardingGoBack">Go back</string>
     <string name="onboardingContinueFinalPage">Start Browsing</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Welcome to\nDuckDuckGo!</string>
     <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Stay private as you search and browse the web.</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingDisabled">For full browsing protection, go back to activate tracker blocking.</string>
     <string name="unifiedOnboardingPrivateSearchTitle">Private Search</string>
     <string name="unifiedOnboardingPrivateSearchSubtitle">With DuckDuckGo, your searches are always private.</string>
     <string name="unifiedOnboardingBrowsingProtectionTitle">Browsing Protection</string>
     <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Block trackers and browse securely by default.</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingDisabled">Without tracker blocking you don\'t have full browsing protection.</string>
     <string name="unifiedOnboardingDataClearingTitle">Data Clearing</string>
     <string name="unifiedOnboardingDataClearingSubtitle">Erase your browsing data with the tap of a button.</string>
     <string name="unifiedOnboardingCustomizationTitle">Customization</string>
     <string name="unifiedOnboardingCustomizationSubtitle">Pick a theme and customize privacy features.</string>
-
-    <!-- Tracker Block Opt-in -->
-    <string name="trackerBlockingOptInSubtitle">First, let\'s talk about trackers</string>
-    <string name="onboardingTrackerOptInItemTitle">Activate tracker blocking to get started.</string>
-    <string name="onboardingTrackerOptInItemSubtitle">Activate tracker blocking now and DuckDuckGo Privacy Browser will stop advertisers from tracking you while you browse.</string>
-    <string name="onboardingAcceptTrackerBlockingActivation">Activate tracker blocking</string>
-    <string name="onboardingDeclineTrackerBlockingActivation">Nah, let them track me</string>
-    <string name="onboardingOptedOutConfirmationTitle">Continue without tracker blocking?</string>
-    <string name="onboardingOptedOutConfirmationSubtitle">Without tracker blocking activated, you won\'t be protected from third-party trackers while you browse.\n\nAre you sure you want to continue?</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Can\'t launch default app settings screen</string>
@@ -83,7 +71,7 @@
     <string name="unableToOpenLink">Unable to open this type of link</string>
 
     <!-- Tabs -->
-    <string name="homeTab">DuckDuckGo</string>
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Tabs</string>
     <string name="tabsMenuItem">Tabs</string>
     <string name="newTabMenuItem">New Tab</string>
