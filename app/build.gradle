@@ -36,7 +36,7 @@ android {
     }
     buildTypes {
         debug {
-            pseudoLocalesEnabled true
+            pseudoLocalesEnabled false
         }
         release {
             minifyEnabled false
