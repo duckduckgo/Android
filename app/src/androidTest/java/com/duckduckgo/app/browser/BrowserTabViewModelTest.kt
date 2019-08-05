@@ -52,6 +52,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.*
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -202,7 +203,8 @@ class BrowserTabViewModelTest {
             faviconDownloader = mockFaviconDownloader,
             addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector,
             ctaViewModel = ctaViewModel,
-            searchCountDao = mockSearchCountDao
+            searchCountDao = mockSearchCountDao,
+            pixel = mockPixel
         )
 
         testee.loadData("abc", null, false)
@@ -1025,6 +1027,50 @@ class BrowserTabViewModelTest {
 
         verify(mockHandler, atLeastOnce()).proceed(username, password)
     }
+
+    @Test
+    fun whenBookmarkSuggestionSubmittedThenAutoCompleteBookmarkSelectionPixelSent() = runBlocking {
+        whenever(bookmarksDao.hasBookmarks()).thenReturn(true)
+        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteApi.AutoCompleteResult("", emptyList(), true))
+        testee.fireAutocompletePixel(AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com"))
+
+        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_BOOKMARK_SELECTION, pixelParams(showedBookmarks = true, bookmarkCapable = true))
+    }
+
+    @Test
+    fun whenSearchSuggestionSubmittedWithBookmarksThenAutoCompleteSearchSelectionPixelSent() = runBlocking {
+        whenever(bookmarksDao.hasBookmarks()).thenReturn(true)
+        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteApi.AutoCompleteResult("", emptyList(), true))
+        testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
+
+        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(showedBookmarks = true, bookmarkCapable = true))
+    }
+
+    @Test
+    fun whenSearchSuggestionSubmittedWithoutBookmarksThenAutoCompleteSearchSelectionPixelSent() = runBlocking {
+        whenever(bookmarksDao.hasBookmarks()).thenReturn(false)
+        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteApi.AutoCompleteResult("", emptyList(), false))
+        testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
+
+        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(showedBookmarks = false, bookmarkCapable = false))
+    }
+
+    @Test
+    fun whenUserSelectToEditQueryThenMoveCaretToTheEnd() {
+        testee.onUserSelectedToEditQuery("foo")
+        assertTrue(omnibarViewState().shouldMoveCaretToEnd)
+    }
+
+    @Test
+    fun whenUserSubmitsQueryThenCaretDoesNotMoveToTheEnd() {
+        testee.onUserSubmittedQuery("foo")
+        assertFalse(omnibarViewState().shouldMoveCaretToEnd)
+    }
+
+    private fun pixelParams(showedBookmarks: Boolean, bookmarkCapable: Boolean) = mapOf(
+        Pixel.PixelParameter.SHOWED_BOOKMARKS to showedBookmarks.toString(),
+        Pixel.PixelParameter.BOOKMARK_CAPABLE to bookmarkCapable.toString()
+    )
 
     private fun setBrowserShowing(isBrowsing: Boolean) {
         testee.browserViewState.value = browserViewState().copy(browserShowing = isBrowsing)

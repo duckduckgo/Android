@@ -19,6 +19,7 @@ android {
         versionName buildVersionName()
         testInstrumentationRunner "com.duckduckgo.app.TestRunner"
         archivesBaseName = "duckduckgo-$versionName"
+        vectorDrawables.useSupportLibrary = true
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -85,7 +86,7 @@ ext {
     fragmentKtx = "1.0.0"
     constraintLayout = "2.0.0-beta1"
     lifecycle = "2.1.0-alpha04"
-    room = "2.1.0-alpha05"
+    room = "2.1.0"
     workManager = "2.0.0"
     legacySupport = "1.0.0"
     espressoCore = "3.1.1"
@@ -154,6 +155,8 @@ dependencies {
 
     // Room
     implementation "androidx.room:room-runtime:$room"
+    implementation "androidx.room:room-rxjava2:$room"
+    implementation "androidx.room:room-ktx:$room"
     kapt "androidx.room:room-compiler:$room"
     testImplementation "androidx.room:room-testing:$room"
     androidTestImplementation "androidx.room:room-testing:$room"

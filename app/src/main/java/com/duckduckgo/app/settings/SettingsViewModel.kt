@@ -46,7 +46,8 @@ class SettingsViewModel @Inject constructor(
         val autoCompleteSuggestionsEnabled: Boolean = true,
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false,
-        val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY)
+        val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
+        val bookmarksAutoCompleteSuggestionsEnabled: Boolean = true
     )
 
     data class AutomaticallyClearData(
@@ -87,7 +88,8 @@ class SettingsViewModel @Inject constructor(
             isAppDefaultBrowser = defaultBrowserAlready,
             showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
             version = obtainVersion(variant.key),
-            automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled)
+            automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled),
+            bookmarksAutoCompleteSuggestionsEnabled = settingsDataStore.bookmarksAutoCompleteSuggestionsEnabled
         )
     }
 
@@ -110,6 +112,16 @@ class SettingsViewModel @Inject constructor(
         settingsDataStore.autoCompleteSuggestionsEnabled = enabled
 
         viewState.value = currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)
+    }
+
+    fun onBookmarksAutocompleteSettingChanged(enabled: Boolean) {
+        Timber.i("User changed bookmarks autocomplete setting, is now enabled: $enabled")
+        settingsDataStore.bookmarksAutoCompleteSuggestionsEnabled = enabled
+
+        viewState.value = currentViewState().copy(bookmarksAutoCompleteSuggestionsEnabled = enabled)
+
+        val pixelName = if (enabled) BOOKMARKS_IN_AUTOCOMPLETE_ENABLED else BOOKMARKS_IN_AUTOCOMPLETE_DISABLED
+        pixel.fire(pixelName)
     }
 
     private fun obtainVersion(variantKey: String): String {

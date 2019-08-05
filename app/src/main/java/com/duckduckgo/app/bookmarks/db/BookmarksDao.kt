@@ -18,6 +18,7 @@ package com.duckduckgo.app.bookmarks.db
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import io.reactivex.Single
 
 @Dao
 interface BookmarksDao {
@@ -34,4 +35,9 @@ interface BookmarksDao {
     @Update
     fun update(bookmarkEntity: BookmarkEntity)
 
+    @Query("select * from bookmarks WHERE title LIKE :query OR url LIKE :query ")
+    fun bookmarksByQuery(query: String): Single<List<BookmarkEntity>>
+
+    @Query("select CAST(COUNT(*) AS BIT) from bookmarks")
+    suspend fun hasBookmarks(): Boolean
 }
