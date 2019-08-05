@@ -25,9 +25,7 @@ import timber.log.Timber
 
 
 interface WebViewPreviewGenerator {
-
     suspend fun generatePreview(webView: WebView): Bitmap
-
 }
 
 class FileBasedWebViewPreviewGenerator : WebViewPreviewGenerator {

@@ -18,17 +18,10 @@ package com.duckduckgo.app.tabs.ui
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.RectF
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
-import androidx.core.math.MathUtils.clamp
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -38,7 +31,6 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.global.view.FireDialog
-import com.duckduckgo.app.global.view.toPx
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -52,7 +44,6 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.longToast
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
-import kotlin.math.abs
 
 
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
@@ -82,6 +73,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private var selectedTabId: String? = null
 
     private lateinit var tabsRecycler: RecyclerView
+    private lateinit var tabGridItemDecorator: TabGridItemDecorator
     private lateinit var toolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -114,81 +106,16 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabsRecycler.layoutManager = layoutManager
         tabsRecycler.adapter = tabsAdapter
 
-        val swipeListener = ItemTouchHelper(object : SwipeToDeleteCallback() {
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val tab = tabsAdapter.getTab(viewHolder.adapterPosition)
+        val swipeListener = ItemTouchHelper(SwipeToCloseTabListener(tabsAdapter, numberColumns, object : SwipeToCloseTabListener.OnTabSwipedListener {
+            override fun onSwiped(tab: TabEntity) {
                 onTabDeleted(tab)
             }
-
-            override fun onChildDraw(
-                c: Canvas,
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                dX: Float,
-                dY: Float,
-                actionState: Int,
-                isCurrentlyActive: Boolean
-            ) {
-                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-                    val alpha = 1 - (abs(dX) / (recyclerView.width / numberColumns))
-                    viewHolder.itemView.alpha = clamp(alpha, 0f, 1f)
-                }
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-            }
-        })
+        }))
         swipeListener.attachToRecyclerView(tabsRecycler)
 
 
-        val borderDecorator = object : RecyclerView.ItemDecoration() {
-
-            private val borderRadius = 9.toPx().toFloat()
-            private val borderWidth = 2.toPx().toFloat()
-            private val borderPadding = 3.toPx().toFloat()
-
-            val borderStroke: Paint = Paint().apply {
-                isAntiAlias = true
-                style = Paint.Style.STROKE
-                strokeWidth = borderWidth
-
-                val typedValue = TypedValue()
-                themedContext.theme.resolveAttribute(R.attr.normalTextColor, typedValue, true)
-                color = ContextCompat.getColor(applicationContext, typedValue.resourceId)
-            }
-
-            override fun onDrawOver(c: Canvas, recyclerView: RecyclerView, state: RecyclerView.State) {
-                val adapter = recyclerView.adapter as TabSwitcherAdapter? ?: return
-
-                for (i in 0 until recyclerView.childCount) {
-                    val child = recyclerView.getChildAt(i)
-
-                    val positionInAdapter = recyclerView.getChildAdapterPosition(child)
-                    if (positionInAdapter < 0) {
-                        continue
-                    }
-
-                    val tab = adapter.getTab(positionInAdapter)
-
-                    if (tab.tabId == selectedTabId) {
-                        val rect = child.getBounds()
-                        borderStroke.alpha = (child.alpha * 255).toInt()
-                        c.drawRoundRect(rect, borderRadius, borderRadius, borderStroke)
-                    }
-                }
-
-                super.onDrawOver(c, recyclerView, state)
-            }
-
-            private fun View.getBounds(): RectF {
-                val leftPosition = left + translationX - paddingLeft - borderPadding
-                val rightPosition = right + translationX + paddingRight + borderPadding
-
-                val topPosition = top + translationY - paddingTop - borderPadding
-                val bottomPosition = bottom + translationY + paddingBottom + borderPadding
-
-                return RectF(leftPosition, topPosition, rightPosition, bottomPosition)
-            }
-        }
-        tabsRecycler.addItemDecoration(borderDecorator)
+        tabGridItemDecorator = TabGridItemDecorator(themedContext, selectedTabId)
+        tabsRecycler.addItemDecoration(tabGridItemDecorator)
     }
 
     private fun configureObservers() {
@@ -250,8 +177,13 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onTabSelected(tab: TabEntity) {
         selectedTabId = tab.tabId
-        tabsRecycler.invalidateItemDecorations()
+        updateTabGridItemDecorator(tab)
         launch { viewModel.onTabSelected(tab) }
+    }
+
+    private fun updateTabGridItemDecorator(tab: TabEntity) {
+        tabGridItemDecorator.selectedTabId = tab.tabId
+        tabsRecycler.invalidateItemDecorations()
     }
 
     override fun onTabDeleted(tab: TabEntity) {
@@ -291,7 +223,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         private const val TAB_GRID_COLUMN_WIDTH_DP = 180
         private const val TAB_GRID_MAX_COLUMN_COUNT = 4
-
     }
 
     abstract class SwipeToDeleteCallback : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
