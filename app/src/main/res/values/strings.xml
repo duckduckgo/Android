@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="appName">DuckDuckGo</string>
+    <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
 
     <!-- Onboarding Activity -->
@@ -83,7 +83,7 @@
     <string name="unableToOpenLink">Unable to open this type of link</string>
 
     <!-- Tabs -->
-    <string name="homeTab">DuckDuckGo</string>
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Tabs</string>
     <string name="tabsMenuItem">Tabs</string>
     <string name="newTabMenuItem">New Tab</string>
