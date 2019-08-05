@@ -22,11 +22,10 @@ import android.os.Bundle
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.onboarding.ui.page.TrackerBlockerOptInPage
 import kotlinx.android.synthetic.main.activity_onboarding.*
 
 
-class OnboardingActivity : DuckDuckGoActivity(), TrackerBlockerOptInPage.TrackerBlockingDecisionListener {
+class OnboardingActivity : DuckDuckGoActivity() {
 
     private lateinit var viewPageAdapter: PagerAdapter
 
@@ -56,16 +55,6 @@ class OnboardingActivity : DuckDuckGoActivity(), TrackerBlockerOptInPage.Tracker
         viewPager.offscreenPageLimit = 1
         viewPager.adapter = viewPageAdapter
         viewPager.setSwipingEnabled(false)
-    }
-
-    override fun onUserEnabledTrackerBlocking() {
-        viewPageAdapter.notifyDataSetChanged()
-        onContinueClicked()
-    }
-
-    override fun onUserDisabledTrackerBlocking() {
-        viewPageAdapter.notifyDataSetChanged()
-        onContinueClicked()
     }
 
     override fun onBackPressed() {

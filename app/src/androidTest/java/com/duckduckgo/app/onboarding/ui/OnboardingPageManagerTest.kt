@@ -18,7 +18,6 @@ package com.duckduckgo.app.onboarding.ui
 
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -35,38 +34,23 @@ class OnboardingPageManagerTest {
 
     @Before
     fun setup() {
-        testee = OnboardingPageManagerWithTrackerBlocking(variantManager, onboardingPageBuilder, mockDefaultBrowserDetector)
+        testee = OnboardingPageManagerWithTrackerBlocking(onboardingPageBuilder, mockDefaultBrowserDetector)
     }
 
     @Test
-    fun whenDefaultBrowserSupportedAndTrackerBlockingOptInSupportedThenFirstPageShowsContinueTextOnButton() {
+    fun whenDefaultBrowserSupportedThenFirstPageShowsContinueTextOnButton() {
         configureDeviceSupportsDefaultBrowser()
-        configureShouldShowTrackerBlockerOptIn()
         testee.buildPageBlueprints()
         val resourceId = testee.getContinueButtonTextResourceId(0)
         assertEquals(R.string.onboardingContinue, resourceId)
     }
 
     @Test
-    fun whenDefaultBrowserNotSupportedAndTrackerBlockingOptInNotSupportedThenFirstPageShowsFinalTextOnButton() {
+    fun whenDefaultBrowserNotSupportedThenFirstPageShowsFinalTextOnButton() {
         configureDeviceDoesNotSupportDefaultBrowser()
-        configureShouldNotShowTrackerBlockerOptIn()
         testee.buildPageBlueprints()
         val resourceId = testee.getContinueButtonTextResourceId(0)
         assertEquals(R.string.onboardingContinueFinalPage, resourceId)
-    }
-
-    private fun configureShouldNotShowTrackerBlockerOptIn() {
-        whenever(variantManager.getVariant()).thenReturn(Variant("test", features = emptyList()))
-    }
-
-    private fun configureShouldShowTrackerBlockerOptIn() {
-        whenever(variantManager.getVariant()).thenReturn(
-            Variant(
-                "test",
-                features = listOf(VariantManager.VariantFeature.TrackerBlockingOnboardingOptIn)
-            )
-        )
     }
 
     private fun configureDeviceSupportsDefaultBrowser() {
