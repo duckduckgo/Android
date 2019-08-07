@@ -70,6 +70,12 @@ class HttpsUpgraderImpl(
             return false
         }
 
+        if (whitelistedDao.contains(host)) {
+            pixel.fire(HTTPS_NO_LOOKUP)
+            Timber.d("$host is in whitelist and so not upgradable")
+            return false
+        }
+
         if (!isLocalListReloading && isInLocalUpgradeList(host)) {
             pixel.fire(HTTPS_LOCAL_LOOKUP)
             return true
@@ -81,13 +87,7 @@ class HttpsUpgraderImpl(
     @WorkerThread
     private fun isInLocalUpgradeList(host: String): Boolean {
 
-        if (whitelistedDao.contains(host)) {
-            Timber.d("$host is in whitelist and so not upgradable")
-            return false
-        }
-
         var shouldUpgrade = false
-
         localBloomFilter?.let {
             measureExecution("Local Https lookup took") {
                 shouldUpgrade = it.contains(host)
