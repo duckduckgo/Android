@@ -16,10 +16,12 @@
 
 package com.duckduckgo.app.browser
 
+import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.browser.WebViewRequestInterceptor.InterceptAction
 import com.duckduckgo.app.global.isHttp
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
@@ -37,7 +39,7 @@ interface RequestInterceptor {
         webView: WebView,
         documentUrl: String?,
         webViewClientListener: WebViewClientListener?
-    ): WebResourceResponse?
+    ): InterceptAction
 }
 
 class WebViewRequestInterceptor(
@@ -51,9 +53,6 @@ class WebViewRequestInterceptor(
     /**
      * Notify the application of a resource request and allow the application to return the data.
      *
-     * If the return value is null, the WebView will continue to load the resource as usual.
-     * Otherwise, the return response and data will be used.
-     *
      * NOTE: This method is called on a thread other than the UI thread so clients should exercise
      * caution when accessing private data or the view system.
      */
@@ -63,21 +62,19 @@ class WebViewRequestInterceptor(
         webView: WebView,
         documentUrl: String?,
         webViewClientListener: WebViewClientListener?
-    ): WebResourceResponse? {
+    ): InterceptAction {
 
         val url = request.url
 
         if (shouldUpgrade(request)) {
-            val newUri = httpsUpgrader.upgrade(url)
-            webView.post { webView.loadUrl(newUri.toString()) }
             privacyProtectionCountDao.incrementUpgradeCount()
-            return WebResourceResponse(null, null, null)
+            return InterceptAction.BlockAndLoadAlternativeUrl(httpsUpgrader.upgrade(url))
         }
 
-        if (documentUrl == null) return null
+        if (documentUrl == null) return InterceptAction.Allow
 
         if (TrustedSites.isTrusted(documentUrl)) {
-            return null
+            return InterceptAction.Allow
         }
 
         if (url != null && url.isHttp) {
@@ -88,15 +85,16 @@ class WebViewRequestInterceptor(
             val surrogate = resourceSurrogates.get(url)
             if (surrogate.responseAvailable) {
                 Timber.d("Surrogate found for $url")
-                return WebResourceResponse(surrogate.mimeType, "UTF-8", surrogate.jsFunction.byteInputStream())
+                val surrgoateResponse = WebResourceResponse(surrogate.mimeType, "UTF-8", surrogate.jsFunction.byteInputStream())
+                return InterceptAction.BlockAndSubstituteSurrogate(surrgoateResponse)
             }
 
             Timber.d("Blocking request $url")
             privacyProtectionCountDao.incrementBlockedTrackerCount()
-            return WebResourceResponse(null, null, null)
+            return InterceptAction.Block
         }
 
-        return null
+        return InterceptAction.Allow
     }
 
     private fun shouldUpgrade(request: WebResourceRequest) =
@@ -114,4 +112,10 @@ class WebViewRequestInterceptor(
         return trackingEvent.blocked
     }
 
+    sealed class InterceptAction {
+        object Allow : InterceptAction()
+        object Block : InterceptAction()
+        data class BlockAndLoadAlternativeUrl(val url: Uri) : InterceptAction()
+        data class BlockAndSubstituteSurrogate(val webResourceResponse: WebResourceResponse) : InterceptAction()
+    }
 }

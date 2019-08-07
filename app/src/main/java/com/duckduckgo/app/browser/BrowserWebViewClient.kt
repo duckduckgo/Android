@@ -22,6 +22,7 @@ import android.os.Build
 import android.webkit.*
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.browser.WebViewRequestInterceptor.InterceptAction
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -111,9 +112,27 @@ class BrowserWebViewClient(
     @WorkerThread
     override fun shouldInterceptRequest(webView: WebView, request: WebResourceRequest): WebResourceResponse? {
         return runBlocking {
+
             val documentUrl = withContext(Dispatchers.Main) { webView.url }
             Timber.v("Intercepting resource ${request.url} on page $documentUrl")
-            requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
+            val interceptionAction = requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
+
+            if (interceptionAction is InterceptAction.BlockAndLoadAlternativeUrl) {
+                withContext(Dispatchers.Main) {
+                    webView.loadUrl(interceptionAction.url.toString())
+                }
+            }
+
+            return@runBlocking convertActionToWebResourceResponse(interceptionAction)
+        }
+    }
+
+    private fun convertActionToWebResourceResponse(action: InterceptAction): WebResourceResponse? {
+        return when (action) {
+            InterceptAction.Allow -> null
+            InterceptAction.Block -> blockingResponse()
+            is InterceptAction.BlockAndSubstituteSurrogate -> action.webResourceResponse
+            is InterceptAction.BlockAndLoadAlternativeUrl -> blockingResponse()
         }
     }
 
@@ -184,5 +203,9 @@ class BrowserWebViewClient(
     private inline fun consume(function: () -> Unit): Boolean {
         function()
         return true
+    }
+
+    private fun blockingResponse(): WebResourceResponse {
+        return WebResourceResponse(null, null, null)
     }
 }

@@ -20,10 +20,11 @@ package com.duckduckgo.app.browser
 
 import android.net.Uri
 import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.browser.WebViewRequestInterceptor.InterceptAction
+import com.duckduckgo.app.browser.WebViewRequestInterceptor.InterceptAction.*
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.surrogates.ResourceSurrogates
@@ -32,7 +33,8 @@ import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
@@ -90,7 +92,8 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = null
         )
 
-        assertCancelledResponse(response)
+        assertTrue(response is BlockAndLoadAlternativeUrl)
+        assertEquals(validHttpsUri(), (response as BlockAndLoadAlternativeUrl).url)
     }
 
     @Test
@@ -258,7 +261,6 @@ class WebViewRequestInterceptorTest {
         assertRequestCanContinueToLoad(response)
     }
 
-
     @Test
     fun whenRequestShouldBlockAndNoSurrogateThenCancellingResponseReturned() = runBlocking<Unit> {
         whenever(mockResourceSurrogates.get(any())).thenReturn(SurrogateResponse(responseAvailable = false))
@@ -272,7 +274,7 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = null
         )
 
-        assertCancelledResponse(response)
+        assertRequestIsBlocked(response)
     }
 
     @Test
@@ -293,12 +295,11 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = null
         )
 
-        assertEquals(availableSurrogate.jsFunction.byteInputStream().read(), response!!.data.read())
+        assertTrue(response is BlockAndSubstituteSurrogate)
+        val surrogate = response as BlockAndSubstituteSurrogate
+        assertEquals(availableSurrogate.jsFunction.byteInputStream().read(), surrogate.webResourceResponse.data.read())
     }
 
-    private fun assertRequestCanContinueToLoad(response: WebResourceResponse?) {
-        assertNull(response)
-    }
 
     private fun configureShouldBlock() {
         val blockTrackingEvent = TrackingEvent(
@@ -313,9 +314,11 @@ class WebViewRequestInterceptorTest {
 
     private fun configureShouldUpgrade() = runBlocking<Unit> {
         whenever(mockHttpsUpgrader.shouldUpgrade(any())).thenReturn(true)
+        whenever(mockHttpsUpgrader.upgrade(any())).thenReturn(validHttpsUri())
         whenever(mockRequest.url).thenReturn(validUri())
         whenever(mockRequest.isForMainFrame).thenReturn(true)
     }
+
 
     private fun configureShouldNotUpgrade() = runBlocking<Unit> {
         whenever(mockHttpsUpgrader.shouldUpgrade(any())).thenReturn(false)
@@ -325,12 +328,14 @@ class WebViewRequestInterceptorTest {
     }
 
     private fun validUri() = Uri.parse("example.com")
+    private fun validHttpsUri() = Uri.parse("https://example.com")
 
-    private fun assertCancelledResponse(response: WebResourceResponse?) {
-        assertNotNull(response)
-        assertNull(response!!.data)
-        assertNull(response.mimeType)
-        assertNull(response.encoding)
+    private fun assertRequestCanContinueToLoad(response: InterceptAction) {
+        assertTrue(response is Allow)
+    }
+
+    private fun assertRequestIsBlocked(response: InterceptAction) {
+        assertTrue(response is Block)
     }
 
 }
