@@ -20,7 +20,6 @@ import android.net.Uri
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.api.isCached
 import com.duckduckgo.app.global.isHttps
-import com.duckduckgo.app.global.performance.measureExecution
 import com.duckduckgo.app.global.sha1
 import com.duckduckgo.app.global.toHttps
 import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
@@ -29,7 +28,6 @@ import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import timber.log.Timber
-import java.lang.Error
 import java.util.concurrent.locks.ReentrantLock
 
 interface HttpsUpgrader {
@@ -76,53 +74,43 @@ class HttpsUpgraderImpl(
             return false
         }
 
-        if (!isLocalListReloading && isInLocalUpgradeList(host)) {
+        val isLocallyUpgradable = !isLocalListReloading && isInLocalUpgradeList(host)
+        Timber.d("$host ${if (isLocallyUpgradable) "is" else "is not"} locally upgradable")
+        if (isLocallyUpgradable) {
             pixel.fire(HTTPS_LOCAL_LOOKUP)
             return true
         }
 
-        return isInServiceUpgradeList(host)
+        val serviceUpgradeResult = isInServiceUpgradeList(host)
+        pixel.fire(if (serviceUpgradeResult.isCached) HTTPS_SERVICE_CACHE_LOOKUP else HTTPS_SERVICE_REQUEST_LOOKUP)
+        Timber.d("$host ${if (serviceUpgradeResult.isUpgradable) "is" else "is not"} service upgradable")
+        return serviceUpgradeResult.isUpgradable
     }
 
     @WorkerThread
     private fun isInLocalUpgradeList(host: String): Boolean {
-
-        var shouldUpgrade = false
-        localBloomFilter?.let {
-            measureExecution("Local Https lookup took") {
-                shouldUpgrade = it.contains(host)
-            }
-        }
-
-        Timber.d("$host ${if (shouldUpgrade) "is" else "is not"} locally upgradable according to local filter")
-        return shouldUpgrade
+        return localBloomFilter?.contains(host) == true
     }
 
     @WorkerThread
-    private fun isInServiceUpgradeList(host: String): Boolean {
+    private fun isInServiceUpgradeList(host: String): HttpsServiceResult {
 
-        var shouldUpgrade = false
+        val sha1Host = host.sha1
+        val partialSha1Host = sha1Host.substring(0, 4)
 
-        measureExecution("Service Https lookup took") {
-            val sha1Host = host.sha1
-            val partialSha1Host = sha1Host.substring(0, 4)
-
-            try {
-                val response = httpsUpgradeService.upgradeListForPartialHost(partialSha1Host).execute()
-                if (response.isSuccessful) {
-                    shouldUpgrade = response.body()?.contains(sha1Host) == true
-                    pixel.fire(if (response.isCached) HTTPS_SERVICE_CACHE_LOOKUP else HTTPS_SERVICE_REQUEST_LOOKUP)
-                } else {
-                    Timber.w("Service https lookup failed with ${response.code()}")
-                }
-
-            } catch (error: Exception) {
-                Timber.w("Service https lookup failed with $error")
+        try {
+            val response = httpsUpgradeService.upgradeListForPartialHost(partialSha1Host).execute()
+            if (response.isSuccessful) {
+                val shouldUpgrade = response.body()?.contains(sha1Host) == true
+                return HttpsServiceResult(shouldUpgrade, response.isCached)
+            } else {
+                Timber.w("Service https lookup failed with ${response.code()}")
             }
+        } catch (error: Exception) {
+            Timber.w("Service https lookup failed with $error")
         }
 
-        Timber.d("$host ${if (shouldUpgrade) "is" else "is not"} upgradable according to service")
-        return false
+        return HttpsServiceResult(false, false)
     }
 
     @WorkerThread
@@ -134,4 +122,9 @@ class HttpsUpgraderImpl(
             localDataReloadLock.unlock()
         }
     }
+
+    data class HttpsServiceResult(
+        val isUpgradable: Boolean,
+        val isCached: Boolean
+    )
 }

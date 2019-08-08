@@ -35,6 +35,6 @@ interface HttpsUpgradeService {
     @GET("https://staticcdn.duckduckgo.com/https/https-mobile-bloom.bin?cache_version=1")
     fun httpsBloomFilter(): Call<ResponseBody>
 
-    @GET("https://ddh1.duckduckgo.com/collect.js")
-    fun upgradeListForPartialHost(@Query("partial") partialMd5: String): Call<List<String>>
+    @GET("https://duckduckgo.com/smarter_encryption.js")
+    fun upgradeListForPartialHost(@Query("pv1") partialMd5: String): Call<List<String>>
 }
