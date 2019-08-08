@@ -32,11 +32,11 @@ Rather than C style strings
 Mixing the two styles within a single statement can lead to crashes so we have standardized on the more readable Kotlin style. This is slightly less efficient - should efficiency become an issue we can use proguard to optimize away log statements for releases.
 
 ## Package Names
-Package names are lowercase thus:
+Case in package names is problematic as some file system and tools do not handle case sensitive file changes well. For this reason, we opt for lowercase packages in our project. Thus we have:
 
 ```package com.duckduckgo.app.trackerdetection```
 
-not
+rather than:
 
 ```package com.duckduckgo.app.trackerDetection```
 
