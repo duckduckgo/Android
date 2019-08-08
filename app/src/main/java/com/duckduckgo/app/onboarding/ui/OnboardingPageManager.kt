@@ -20,13 +20,11 @@ import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint
-import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.*
+import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.DefaultBrowserBlueprint
+import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.SummaryPageBlueprint
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
-import com.duckduckgo.app.onboarding.ui.page.TrackerBlockerOptInPage
 import com.duckduckgo.app.onboarding.ui.page.UnifiedSummaryPage
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.TrackerBlockingOnboardingOptIn
 
 interface OnboardingPageManager {
     fun pageCount(): Int
@@ -36,7 +34,6 @@ interface OnboardingPageManager {
 }
 
 class OnboardingPageManagerWithTrackerBlocking(
-    private val variantManager: VariantManager,
     private val onboardingPageBuilder: OnboardingPageBuilder,
     private val defaultWebBrowserCapability: DefaultBrowserDetector
 ) : OnboardingPageManager {
@@ -47,10 +44,6 @@ class OnboardingPageManagerWithTrackerBlocking(
 
     override fun buildPageBlueprints() {
         pages.clear()
-
-        if (shouldShowTrackerBlockingOptIn()) {
-            pages.add(TrackerBlockingOptInBlueprint())
-        }
 
         pages.add(SummaryPageBlueprint())
 
@@ -65,7 +58,6 @@ class OnboardingPageManagerWithTrackerBlocking(
 
     override fun buildPage(position: Int): OnboardingPageFragment? {
         return when (val blueprint = pages.getOrNull(position)) {
-            is TrackerBlockingOptInBlueprint -> buildBlockingOptInPage()
             is SummaryPageBlueprint -> buildSummaryPage(blueprint)
             is DefaultBrowserBlueprint -> buildDefaultBrowserPage(blueprint)
             else -> null
@@ -85,15 +77,8 @@ class OnboardingPageManagerWithTrackerBlocking(
         return defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration()
     }
 
-    private fun shouldShowTrackerBlockingOptIn(): Boolean {
-        return variantManager.getVariant().hasFeature(TrackerBlockingOnboardingOptIn)
-    }
-
     private fun isFinalPage(position: Int) = position == pageCount() - 1
 
-    private fun buildBlockingOptInPage(): TrackerBlockerOptInPage {
-        return onboardingPageBuilder.buildTrackerBlockingOptInPage()
-    }
 
     private fun buildSummaryPage(blueprint: SummaryPageBlueprint): UnifiedSummaryPage {
         return onboardingPageBuilder.buildSummaryPage(blueprint.continueButtonTextResourceId)

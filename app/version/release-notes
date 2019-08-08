@@ -1,5 +1,5 @@
 ## What's new in this release?
-In this release, we squashed a number of bugs and improved our url handling.
+In this release, we fixed a bug which could cause problems when loading certain webpages.
 
 ## Have feedback?
 You can always reach us at https://duckduckgo.com/feedback

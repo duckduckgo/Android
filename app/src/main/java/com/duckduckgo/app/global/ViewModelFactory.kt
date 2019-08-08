@@ -133,7 +133,7 @@ class ViewModelFactory @Inject constructor(
             }
         } as T
 
-    private fun onboardingViewModel() = OnboardingViewModel(onboardingStore, privacySettingsStore, onboardingPageManager, variantManager, pixel)
+    private fun onboardingViewModel() = OnboardingViewModel(onboardingStore, onboardingPageManager)
 
     private fun settingsViewModel(): SettingsViewModel {
         return SettingsViewModel(
@@ -179,6 +179,7 @@ class ViewModelFactory @Inject constructor(
         faviconDownloader = faviconDownloader,
         addToHomeCapabilityDetector = addToHomeCapabilityDetector,
         ctaViewModel = ctaViewModel,
-        searchCountDao = searchCountDao
+        searchCountDao = searchCountDao,
+        pixel = pixel
     )
 }

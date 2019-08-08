@@ -16,55 +16,45 @@
 
 package com.duckduckgo.app.browser.autocomplete
 
-import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.UiThread
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.AutoCompleteViewHolder
-import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.AutoCompleteViewHolder.EmptySuggestionViewHolder
-import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.AutoCompleteViewHolder.SuggestionViewHolder
-import kotlinx.android.synthetic.main.item_autocomplete_suggestion.view.*
-import javax.inject.Inject
+import com.duckduckgo.app.browser.autocomplete.AutoCompleteViewHolder.EmptySuggestionViewHolder
 
-class BrowserAutoCompleteSuggestionsAdapter @Inject constructor(
+class BrowserAutoCompleteSuggestionsAdapter(
     private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
     private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
 ) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
 
+    private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> = mapOf(
+        EMPTY_TYPE to EmptySuggestionViewHolderFactory(),
+        SUGGESTION_TYPE to SearchSuggestionViewHolderFactory(),
+        BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory()
+    )
     private val suggestions: MutableList<AutoCompleteSuggestion> = ArrayList()
 
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AutoCompleteViewHolder {
-
-        val inflater = LayoutInflater.from(parent.context)
-
-        return if (suggestions.isEmpty()) {
-            EmptySuggestionViewHolder(inflater.inflate(R.layout.item_autocomplete_no_suggestions, parent, false))
-        } else {
-            SuggestionViewHolder(inflater.inflate(R.layout.item_autocomplete_suggestion, parent, false))
-        }
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AutoCompleteViewHolder =
+        viewHolderFactoryMap.getValue(viewType).onCreateViewHolder(parent)
 
     override fun getItemViewType(position: Int): Int {
-        if (suggestions.isEmpty()) {
-            return EMPTY_TYPE
+        return if (suggestions.isEmpty()) {
+            EMPTY_TYPE
+        } else {
+            suggestions[position].suggestionType
         }
-
-        return SUGGESTION_TYPE
     }
 
     override fun onBindViewHolder(holder: AutoCompleteViewHolder, position: Int) {
-        when (holder) {
-            is EmptySuggestionViewHolder -> {
-                // nothing required
-            }
-            is SuggestionViewHolder -> {
-                val suggestion = suggestions[position]
-                holder.bind(suggestion, immediateSearchClickListener, editableSearchClickListener)
-            }
+        if (holder is EmptySuggestionViewHolder) {
+            // nothing required
+        } else {
+            viewHolderFactoryMap.getValue(getItemViewType(position)).onBindViewHolder(
+                holder,
+                suggestions[position],
+                immediateSearchClickListener,
+                editableSearchClickListener
+            )
         }
     }
 
@@ -84,31 +74,9 @@ class BrowserAutoCompleteSuggestionsAdapter @Inject constructor(
         notifyDataSetChanged()
     }
 
-    sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-        class SuggestionViewHolder(itemView: View) : AutoCompleteViewHolder(itemView) {
-            fun bind(
-                item: AutoCompleteSuggestion,
-                immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
-                editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
-            ) = with(itemView) {
-
-                phrase.text = item.phrase
-
-                val phraseOrUrlImage = if (item.isUrl) R.drawable.ic_globe_24dp else R.drawable.ic_loupe_24dp
-                phraseOrUrlIndicator.setImageResource(phraseOrUrlImage)
-
-                editQueryImage.setOnClickListener { editableSearchClickListener(item) }
-                setOnClickListener { immediateSearchListener(item) }
-            }
-        }
-
-        class EmptySuggestionViewHolder(itemView: View) : AutoCompleteViewHolder(itemView)
-    }
-
     companion object {
-        private const val EMPTY_TYPE = 1
-        private const val SUGGESTION_TYPE = 2
+        const val EMPTY_TYPE = 1
+        const val SUGGESTION_TYPE = 2
+        const val BOOKMARK_TYPE = 3
     }
 }
-

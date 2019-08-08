@@ -36,13 +36,6 @@ interface Pixel {
         ONBOARDING_DEFAULT_BROWSER_SETTINGS_LAUNCHED("m_odb_l"),
         ONBOARDING_DEFAULT_BROWSER_SKIPPED("m_odb_s"),
 
-        ONBOARDING_TRACKER_BLOCKING_USER_OPTED_IN("m_otbi_y"),
-        ONBOARDING_TRACKER_BLOCKING_USER_DECLINED("m_otbi_n"),
-        ONBOARDING_TRACKER_BLOCKING_OPT_OUT_DIALOG_CONTINUE_ANYWAY("m_otbd_c"),
-        ONBOARDING_TRACKER_BLOCKING_OPT_OUT_DIALOG_CANCELLED("m_otbd_x"),
-        ONBOARDING_TRACKER_BLOCKING_FINAL_ONBOARDING_STATE_ENABLED("m_otbf_y"),
-        ONBOARDING_TRACKER_BLOCKING_FINAL_ONBOARDING_STATE_DISABLED("m_otbf_n"),
-
         PRIVACY_DASHBOARD_OPENED("mp"),
         PRIVACY_DASHBOARD_SCORECARD("mp_c"),
         PRIVACY_DASHBOARD_ENCRYPTION("mp_e"),
@@ -113,7 +106,18 @@ interface Pixel {
         APP_FEEDBACK_DIALOG_USER_CANCELLED("mrp_f_d%d_c"),
 
         FEEDBACK_POSITIVE_SUBMISSION("mfbs_%s_submit"),
-        FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s")
+        FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s"),
+
+        AUTOCOMPLETE_BOOKMARK_SELECTION("m_aut_s_b"),
+        AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s"),
+
+        BOOKMARKS_IN_AUTOCOMPLETE_ENABLED("m_biaut_e"),
+        BOOKMARKS_IN_AUTOCOMPLETE_DISABLED("m_biaut_d")
+    }
+
+    object PixelParameter {
+        const val BOOKMARK_CAPABLE = "bc"
+        const val SHOWED_BOOKMARKS = "sb"
     }
 
     fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap(), includeLocale: Boolean = false)

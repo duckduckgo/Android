@@ -253,7 +253,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
     }
 
     private fun launchNewSearch(intent: Intent): Boolean {
-        return intent.getBooleanExtra(NEW_SEARCH_EXTRA, false) || intent.action == Intent.ACTION_ASSIST
+        return intent.getBooleanExtra(NEW_SEARCH_EXTRA, false) || intent.action == Intent.ACTION_ASSIST || intent.action == NEW_SEARCH_ACTION
     }
 
     fun launchPrivacyDashboard() {
@@ -321,6 +321,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
             return intent
         }
 
+        const val NEW_SEARCH_ACTION = "com.duckduckgo.mobile.android.NEW_SEARCH"
         const val NEW_SEARCH_EXTRA = "NEW_SEARCH_EXTRA"
         const val WIDGET_SEARCH_EXTRA = "WIDGET_SEARCH_EXTRA"
         const val PERFORM_FIRE_ON_ENTRY_EXTRA = "PERFORM_FIRE_ON_ENTRY_EXTRA"

@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="appName">DuckDuckGo</string>
+    <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
 
     <!-- Onboarding Activity -->
@@ -8,31 +8,19 @@
     <string name="onboardingDefaultBrowserDescription">Visit Settings to search and browse with DuckDuckGo every time.</string>
     <string name="onboardingDefaultBrowserGoToSettingsAction">Go to Settings</string>
     <string name="onboardingContinue">Continue</string>
-    <string name="onboardingGoBack">Go back</string>
     <string name="onboardingContinueFinalPage">Start Browsing</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Welcome to\nDuckDuckGo!</string>
     <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Stay private as you search and browse the web.</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingDisabled">For full browsing protection, go back to activate tracker blocking.</string>
     <string name="unifiedOnboardingPrivateSearchTitle">Private Search</string>
     <string name="unifiedOnboardingPrivateSearchSubtitle">With DuckDuckGo, your searches are always private.</string>
     <string name="unifiedOnboardingBrowsingProtectionTitle">Browsing Protection</string>
     <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Block trackers and browse securely by default.</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingDisabled">Without tracker blocking you don\'t have full browsing protection.</string>
     <string name="unifiedOnboardingDataClearingTitle">Data Clearing</string>
     <string name="unifiedOnboardingDataClearingSubtitle">Erase your browsing data with the tap of a button.</string>
     <string name="unifiedOnboardingCustomizationTitle">Customization</string>
     <string name="unifiedOnboardingCustomizationSubtitle">Pick a theme and customize privacy features.</string>
-
-    <!-- Tracker Block Opt-in -->
-    <string name="trackerBlockingOptInSubtitle">First, let\'s talk about trackers</string>
-    <string name="onboardingTrackerOptInItemTitle">Activate tracker blocking to get started.</string>
-    <string name="onboardingTrackerOptInItemSubtitle">Activate tracker blocking now and DuckDuckGo Privacy Browser will stop advertisers from tracking you while you browse.</string>
-    <string name="onboardingAcceptTrackerBlockingActivation">Activate tracker blocking</string>
-    <string name="onboardingDeclineTrackerBlockingActivation">Nah, let them track me</string>
-    <string name="onboardingOptedOutConfirmationTitle">Continue without tracker blocking?</string>
-    <string name="onboardingOptedOutConfirmationSubtitle">Without tracker blocking activated, you won\'t be protected from third-party trackers while you browse.\n\nAre you sure you want to continue?</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Can\'t launch default app settings screen</string>
@@ -73,7 +61,8 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Edit query before searching</string>
-    <string name="settingsAutocompleteEnabled">Autocomplete Suggestions</string>
+    <string name="settingsAutocompleteEnabled">Show Autocomplete Suggestions</string>
+    <string name="settingsAutocompleteBookmarksEnabled">Include Bookmarked Sites</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Open External App</string>
@@ -82,7 +71,7 @@
     <string name="unableToOpenLink">Unable to open this type of link</string>
 
     <!-- Tabs -->
-    <string name="homeTab">DuckDuckGo</string>
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Tabs</string>
     <string name="tabsMenuItem">Tabs</string>
     <string name="newTabMenuItem">New Tab</string>
@@ -163,6 +152,7 @@
     <string name="settingsHeadingGeneral">General</string>
     <string name="settingsHeadingOther">Other</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
+    <string name="settingsHeadingAutocomplete">Autocomplete</string>
     <string name="settingsLightTheme">Light Theme</string>
     <string name="settingsAboutDuckduckgo">About DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
@@ -299,5 +289,79 @@
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
     <string name="systemTextSearchMessage">Search DuckDuckGo</string>
+
+    <!-- App feedback disambiguation -->
+    <string name="feedbackActivityTitle">Share Your Feedback</string>
+    <string name="missingBrowserFeaturesTitleLong">Browser features are missing or frustrating</string>
+    <string name="missingBrowserFeaturesTitleShort">Browser Feature Issues</string>
+    <string name="missingBrowserFeaturesSubtitle">Which browsing feature can we add or improve?</string>
+    <string name="missingBrowserFeatureSubReasonNavigation">Navigating forward, backward, refreshing</string>
+    <string name="missingBrowserFeatureSubReasonTabManagement">Creating and managing tabs</string>
+    <string name="missingBrowserFeatureSubReasonAdPopups">Ad and pop-up blocking</string>
+    <string name="missingBrowserFeatureSubReasonVideos">Watching videos</string>
+    <string name="missingBrowserFeatureSubReasonImages">Interacting with images</string>
+    <string name="missingBrowserFeatureSubReasonBookmarks">Creating and managing bookmarks</string>
+    <string name="missingBrowserFeatureSubReasonOther">None of these</string>
+
+    <string name="websiteNotLoadingTitleLong">Certainly websites don\'t load correctly</string>
+    <string name="websiteNotLoadingTitleShort">Website loading Issues</string>
+    <string name="websiteNotLoadingSubtitle">Which website is broken?"</string>
+
+    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo search isn\'t good enough</string>
+    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo Search Issues</string>
+    <string name="searchNotGoodEnoughSubtitle">Which search feature can we add or improve?</string>
+    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programming/technical search</string>
+    <string name="searchNotGoodEnoughSubReasonGoogleLayout">The layout should be more like Google</string>
+    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Faster load time</string>
+    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Searching in a specific language or region</string>
+    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Better autocomplete</string>
+    <string name="searchNotGoodEnoughSubReasonOther">None of these</string>
+
+    <string name="needMoreCustomizationTitleLong">There aren\'t enough ways to customize the app</string>
+    <string name="needMoreCustomizationTitleShort">Customization Issues</string>
+    <string name="needMoreCustomizationSubtitle">Which customization option can we add or improve?</string>
+    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">The home screen configuration</string>
+    <string name="needMoreCustomizationSubReasonTabDisplay">How tabs are displayed</string>
+    <string name="needMoreCustomizationSubReasonAppLooks">How the app looks</string>
+    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Which data is cleared</string>
+    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">When data is cleared</string>
+    <string name="needMoreCustomizationSubReasonBookmarksDisplay">How bookmarks are displayed</string>
+    <string name="needMoreCustomizationSubReasonOther">None of these</string>
+
+    <string name="appIsSlowOrBuggyTitleLong">The app is slow, buggy, or crashes</string>
+    <string name="appIsSlowOrBuggyTitleShort">Performance Issues</string>
+    <string name="appIsSlowOrBuggySubtitle">Which issue are you experiencing?</string>
+    <string name="appIsSlowOrBuggySubReasonSlowResults">Web pages or search results load slowly</string>
+    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">The app crashes or freezes</string>
+    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Video or media playback bugs</string>
+    <string name="appIsSlowOrBuggySubReasonOther">None of these</string>
+
+    <string name="otherMainReasonTitleLong">None of these</string>
+    <string name="otherMainReasonTitleShort">Other Issues</string>
+    <string name="otherMainReasonSubtitle">@string/tellUsHowToImprove</string>
+
+    <string name="openEndedInputHint">How can we improve? (Optional)</string>
+    <string name="submitFeedback">SUBMIT FEEDBACK</string>
+
+    <string name="tellUsHowToImprove">Please tell us what we can improve.</string>
+    <string name="thanksForTheFeedback">Thanks for the feedback!</string>
+    <string name="feedbackNegativeMainReasonPageSubtitle">What is your frustration most related to?</string>
+    <string name="feedbackNegativeMainReasonPageTitle">We\'re sorry to hear that.</string>
+    <string name="feedbackShareDetails">Share details</string>
+    <string name="sharePositiveFeedbackWithTheTeam">Are there any details you\'d like to share with the team?</string>
+    <string name="whatHaveYouBeenEnjoying">What have you been enjoying?</string>
+    <string name="awesomeToHear">Awesome to hear!</string>
+    <string name="shareTheLoveWithARating">Please share the love by rating on the Play Store.</string>
+    <string name="rateTheApp">RATE THE APP</string>
+    <string name="declineFurtherFeedback">NO THANKS, I\'M DONE</string>
+    <string name="whichBrokenSites">Where are you seeing these issues?</string>
+    <string name="whichBrokenSitesHint">Which website has issues?</string>
+    <string name="feedbackSpecificAsPossible">Please be as specific as possible</string>
+    <string name="feedbackInitialDisambiguationTitle">Let\'s get started!</string>
+    <string name="feedbackInitialDisambiguationSubtitle">How would you categorize your feedback?</string>
+    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Positive feedback button</string>
+    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Negative feedback button</string>
+    <string name="feedbackIsImportantToUs">Your anonymous feedback is important to us.</string>
+
 
 </resources>
