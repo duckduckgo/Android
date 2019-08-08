@@ -133,7 +133,7 @@ class ViewModelFactory @Inject constructor(
             }
         } as T
 
-    private fun onboardingViewModel() = OnboardingViewModel(onboardingStore, privacySettingsStore, onboardingPageManager, variantManager, pixel)
+    private fun onboardingViewModel() = OnboardingViewModel(onboardingStore, onboardingPageManager)
 
     private fun settingsViewModel(): SettingsViewModel {
         return SettingsViewModel(
