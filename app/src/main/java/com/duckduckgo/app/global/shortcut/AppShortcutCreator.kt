@@ -77,7 +77,7 @@ class AppShortcutCreator @Inject constructor() {
 
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_SHOW_BOOKMARKS)
             .setShortLabel(context.getString(R.string.bookmarksActivityTitle))
-            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_overflow_bookmarks_24dp))
+            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_bookmarks))
             .setIntents(stackBuilder.intents)
             .build().toShortcutInfo()
     }
