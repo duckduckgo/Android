@@ -144,7 +144,7 @@
     <string name="fireClearAll">Clear All Tabs and Data</string>
     <string name="fireCancel">Cancel</string>
     <string name="fireDataCleared">Data cleared</string>
-    <string name="fireProcessName">:fire</string>
+    <string name="fireProcessName" translatable="false">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Settings</string>
@@ -252,12 +252,12 @@
     <string name="rateAppDialogTitle">Rate the app</string>
     <string name="rateAppDialogMessage">Your feedback matters. Please share the love with a review.</string>
     <string name="rateAppDialogPositiveButton">Rate App</string>
-    <string name="rateAppDialogNegativeButton">@string/noThanks</string>
+    <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">We\'re sorry to hear that</string>
     <string name="giveFeedbackDialogMessage">Let us know how we can improve the app for you</string>
     <string name="giveFeedbackDialogPositiveButton">Give Feedback</string>
-    <string name="giveFeedbackDialogNegativeButton">@string/noThanks</string>
+    <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="noThanks">No Thanks</string>
 
@@ -338,7 +338,7 @@
 
     <string name="otherMainReasonTitleLong">None of these</string>
     <string name="otherMainReasonTitleShort">Other Issues</string>
-    <string name="otherMainReasonSubtitle">@string/tellUsHowToImprove</string>
+    <string name="otherMainReasonSubtitle" translatable="false">@string/tellUsHowToImprove</string>
 
     <string name="openEndedInputHint">How can we improve? (Optional)</string>
     <string name="submitFeedback">SUBMIT FEEDBACK</string>
