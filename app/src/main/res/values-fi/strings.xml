@@ -1,19 +1,364 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (c) 2019 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-<resources>
+    <string name="appName" translatable="false">DuckDuckGo</string>
+    <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
+
+    <!-- Onboarding Activity -->
+    <string name="onboardingDefaultBrowserTitle">Tee yksityisyydestä oletusarvosi</string>
+    <string name="onboardingDefaultBrowserDescription">Siirry asetuksiin hakeaksesi ja selaillaksesi aina DuckDuckGolla.</string>
+    <string name="onboardingDefaultBrowserGoToSettingsAction">Siirry asetuksiin</string>
+    <string name="onboardingContinue">Jatka</string>
+    <string name="onboardingContinueFinalPage">Aloita selaaminen</string>
+
+    <!-- Unified Welcome Page -->
+    <string name="unifiedOnboardingTitleFirstVisit">\nDuckDuckGo toivottaa sinut tervetulleeksi!</string>
+    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Varmista yksityisyytesi verkkohakujen ja -selailun yhteydessä.</string>
+    <string name="unifiedOnboardingPrivateSearchTitle">Yksityinen haku</string>
+    <string name="unifiedOnboardingPrivateSearchSubtitle">DuckDuckGo-hakusi ovat aina yksityisiä.</string>
+    <string name="unifiedOnboardingBrowsingProtectionTitle">Selaussuoja</string>
+    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Estä seuranta ja selaa turvallisesti oletusarvoisesti.</string>
+    <string name="unifiedOnboardingDataClearingTitle">Tietojen poisto</string>
+    <string name="unifiedOnboardingDataClearingSubtitle">Poista selaustietosi napinpainalluksella.</string>
+    <string name="unifiedOnboardingCustomizationTitle">Yksilöinti</string>
+    <string name="unifiedOnboardingCustomizationSubtitle">Valitse teema ja muokkaa tietosuojaominaisuuksia.</string>
+
+    <!-- Default Browser -->
+    <string name="cannotLaunchDefaultAppSettings">Sovelluksen oletusasetusnäyttöä ei voida käynnistää</string>
+    <string name="settingsDefaultBrowserEnabled">Aseta oletusselaimeksi</string>
+
+    <!-- Browser Activity -->
+    <string name="browserPopupMenu">Selainvalikko</string>
+    <string name="refresh">Päivitä</string>
+    <string name="back">Takaisin</string>
+    <string name="forward">Eteenpäin</string>
+
+    <string name="omnibarInputHint">Hae tai kirjoita URL</string>
+    <string name="clearButtonContentDescription">Tyhjennä hakusyöte</string>
+    <string name="no_compatible_third_party_app_installed">Yhteensopivaa sovellusta ei ole asennettu</string>
+    <string name="addBookmarkMenuTitle">Lisää kirjanmerkki</string>
+    <string name="requestDesktopSiteMenuTitle">Pöytäkonesivusto</string>
+
+    <!-- Downloading files -->
+    <string name="downloadImage">Lataa kuva</string>
+    <string name="permissionRequiredToDownload">Lataaminen edellyttää tallennuslupaa</string>
+    <string name="downloadComplete">Lataus valmis.</string>
+    <string name="downloadFailed">Lataaminen ei onnistunut</string>
+    <string name="downloadInProgress">Ladataan</string>
+
+    <!-- Sharing options -->
+    <string name="options">Valinnat</string>
+    <string name="shareLink">Jaa linkki</string>
+    <string name="shareMenuTitle">Jaa…</string>
+    <string name="copyUrl">Kopioi linkin osoite</string>
+
+    <!-- Find in page -->
+    <string name="findInPageMenuTitle">Etsi sivulta</string>
+    <string name="nextSearchTermDescription">Etsi seuraava</string>
+    <string name="previousSearchTermDescription">Etsi edellinen</string>
+    <string name="closeFindInPageButtonDescription">Sulje etsi sivulta -näkymä</string>
+    <string name="findInPageHint">Etsi sivulta</string>
+    <string name="findInPageMatches">%d/%d</string>
+
+    <!-- AutoComplete Suggestions -->
+    <string name="editQueryBeforeSubmitting">Muokkaa kyselyä ennen hakua</string>
+    <string name="settingsAutocompleteEnabled">Näytä automaattisen täydennyksen ehdotukset</string>
+    <string name="settingsAutocompleteBookmarksEnabled">Sisällytä mukaan kirjanmerkeissä olevat sivustot</string>
+
+    <!-- Opening external apps -->
+    <string name="openExternalApp">Avaa ulkoinen sovellus</string>
+    <string name="launchingExternalApp">Avaa toisessa sovelluksessa</string>
+    <string name="confirmOpenExternalApp">Haluatko poistua DuckDuckGosta nähdäksesi tämän sisällön?</string>
+    <string name="unableToOpenLink">Tämäntyyppisen linkin avaaminen ei onnistu</string>
+
+    <!-- Tabs -->
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="tabActivityTitle">Välilehdet</string>
+    <string name="tabsMenuItem">Välilehdet</string>
+    <string name="newTabMenuItem">Uusi välilehti</string>
+    <string name="openInNewTab">Avaa uudella välilehdellä</string>
+    <string name="openInNewBackgroundTab">Avaa taustavälilehdellä</string>
+    <string name="openImageInNewTab">Avaa kuva taustavälilehdellä</string>
+    <string name="faviconContentDescription">Suosikkikuvake</string>
+    <string name="closeContentDescription">Sulje</string>
+    <string name="tapFireDirective">Napauta </string>
+    <string name="tapFireIconDescription">"fire"</string>
+    <string name="tapFireExplanation"> unohtaaksesi kaiken</string>
+    <string name="closeAllTabsMenuItem">Sulje kaikki välilehdet</string>
+
+    <!-- Privacy Dashboard Activities -->
+    <string name="privacyDashboardActivityTitle">Tietosuojan ohjauspaneeli</string>
+    <string name="privacyProtectionEnabled">TIETOSUOJA KÄYTÖSSÄ</string>
+    <string name="privacyProtectionDisabled">TIETOSUOJA ON POISTETTU KÄYTÖSTÄ</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">PARANNETTU &lt;img src="%d" /&gt;–&lt;img src="%d" /&gt;</string>
+    <string name="privacyGradeContentDescription">Tietosuoja-arvosana</string>
+
+    <string name="httpsGood">Salattu yhteys</string>
+    <string name="httpsMixed">Salaukseltaan vaihteleva yhteys</string>
+    <string name="httpsBad">Salaamaton yhteys</string>
+
+    <string name="networksActivityTitle">Seurantaverkostot</string>
+    <string name="networksContentDescription">Seurantaverkostot</string>
+    <string name="networksOverview">Seurantaverkostot kokoavat verkkohistoriasi sinua koskevaksi tietoprofiiliksi. Merkittävät seurantaverkostot ovat haitallisempia, koska ne voivat seurata toimiasi ja harjoittaa kohdennusta useammassa osassa verkkoa.</string>
+
+    <plurals name="trackersFound">
+        <item quantity="one">%s seurantapalvelin löytynyt</item>
+        <item quantity="other">%s seurantapalvelinta löytynyt</item>
+    </plurals>
+
+    <plurals name="trackerBlocked">
+        <item quantity="one">%s seurantapalvelin estetty</item>
+        <item quantity="other">%s seurantapalvelinta estetty</item>
+    </plurals>
+
+    <plurals name="majorNetworksFound">
+        <item quantity="one">%s merkittävä seurantaverkosto löytynyt</item>
+        <item quantity="other">%s merkittävää seurantaverkostoa löytynyt</item>
+    </plurals>
+
+    <plurals name="majorNetworksBlocked">
+        <item quantity="one">%s merkittävä seurantaverkosto estetty</item>
+        <item quantity="other">%s merkittävää seurantaverkostoa estetty</item>
+    </plurals>
+
+    <string name="scorecardActivityTitle">Tietosuoja-arvosana</string>
+    <string name="scorecardSiteIsMemberOfMajorNetwork">Sivusto on merkittävä seurantaverkosto</string>
+    <string name="scorecardPrivacyGrade">Tietosuoja-arvosana</string>
+    <string name="scorecardEnhancedGrade">Parannettu arvosana</string>
+
+    <string name="privacyTermsActivityTitle">Tietosuojakäytännöt</string>
+    <string name="practicesGood">Hyvät tietosuojakäytännöt</string>
+    <string name="practicesMixed">Vaihtelevat tietosuojakäytännöt"</string>
+    <string name="practicesBad">"Huonot tietosuojakäytännöt"</string>
+    <string name="practicesUnknown">Tuntemattomat tietosuojakäytännöt</string>
+    <string name="practicesOverview">Tietosuojakäytännöt kertovat, missä määrin verkkosivuston kanssa jakamiasi henkilötietoja suojataan.</string>
+    <string name="practicesTosdrLink">Tietosuojakäytäntöjen tulokset kohteesta <b><u>ToS;DR</u></b></string>
+    <string name="practicesIconContentGood">Hyvä käytäntö -kuvake</string>
+    <string name="practicesIconContentBad">Huono käytäntö -kuvake</string>
+    <string name="privacyProtectionToggle">Tietosuoja</string>
+
+    <string name="networkTrackerSummaryHeader">PAHIMMAT SEURANTAVERKOSTOT</string>
+    <string name="networkTrackerSummaryNotReady">Keräämme edelleen tietoja näyttääksemme, kuinka monta seurantapalvelinta olemme estäneet.</string>
+
+    <!-- Fire -->
+    <string name="fireMenu">Poista tiedot</string>
+    <string name="fireClearAll">Poista kaikki välilehdet ja tiedot</string>
+    <string name="fireCancel">Peruuta</string>
+    <string name="fireDataCleared">Tiedot poistettu</string>
+    <string name="fireProcessName">:fire</string>
+
+    <!-- Settings Activity -->
+    <string name="settingsActivityTitle">Asetukset</string>
+    <string name="settingsMenuItemTitle">Asetukset</string>
+    <string name="settingsHeadingGeneral">Yleistä</string>
+    <string name="settingsHeadingOther">Muu</string>
+    <string name="settingsHeadingPrivacy">Tietosuoja</string>
+    <string name="settingsHeadingAutocomplete">Automaattinen täydennys</string>
+    <string name="settingsLightTheme">Valoisa teema</string>
+    <string name="settingsAboutDuckduckgo">Tietoa DuckDuckGosta</string>
+    <string name="settingsVersion">Versio</string>
+    <string name="leaveFeedback">Jätä palautetta</string>
+
+    <!-- Settings - Automatically clearing data -->
+    <string name="settingsAutomaticallyClearingDialogSave">Tallenna</string>
+
+    <string name="settingsAutomaticallyClearWhat">Tyhjennä automaattisesti…</string>
+    <string name="settingsAutomaticallyClearWhatOptionNone">Ei mitään</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabs">Välilehdet</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Välilehdet ja tiedot</string>
+
+    <string name="settingsAutomaticallyClearWhen">Tyhjennä…</string>
+    <string name="settingsAutomaticallyClearWhenAppExitOnly">Vain sovelluksesta poistuttaessa</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Sovelluksesta poistuttaessa, 5 sekunnin toimettomuuden jälkeen</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Sovelluksesta poistuttaessa, 5 minuutin toimettomuuden jälkeen</string>
+    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Sovelluksesta poistuttaessa, 15 minuutin toimettomuuden jälkeen</string>
+    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Sovelluksesta poistuttaessa, 30 minuutin toimettomuuden jälkeen</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Sovelluksesta poistuttaessa, 60 minuutin toimettomuuden jälkeen</string>
+
+    <!-- About Activity -->
+    <string name="aboutActivityTitle">Tietoa meistä</string>
+    <string name="aboutHeading">Tietosuojaa, yksinkertaisesti.</string>
+    <string name="aboutDescription">
+        DuckDuckGo asettaa uudet standardit luottamukselle verkossa.\n\ DuckDuckGo-tietosuojaselain tarjoaa kaikki keskeiset tietosuojaominaisuudet nettihakujesi ja -selailusi turvaksi, kuten seurantapalvelinten eston, älykkäämmän salauksen ja yksityisen DuckDuckGo-haun.\n\ Internetin ei pitäisi tuntua karmivalta paikalta ja haluamasi nettiyksityisyyden pitäisi järjestyä sulkemalla verhot.</string>
+    <string name="aboutMoreLink">Lisätietoa: duckduckgo.com/about</string>
+    <string name="no_suggestions">Ei ehdotuksia</string>
+
+    <!-- Broken Site Activity -->
+    <string name="brokenSiteReportBrokenSiteMenuItem">Ilmoita viallisesta sivustosta</string>
+    <string name="brokenSiteHeading">Ilmoita viallisesta sivustosta</string>
+    <string name="brokenSiteModalDescription">Viallisesta sivustosta ilmoittaminen tapahtuu täysin anonyymisti ja auttaa meitä kehittämään sovellusta!</string>
+    <string name="brokenSiteUrlHint">Anna URL-osoite</string>
+    <string name="brokenSiteDomainLabel">Viallisen sivuston verkkotunnus:</string>
+    <string name="brokenSiteMessageHint">Missä sisällössä tai toiminnallisuudessa on vikaa?</string>
+    <string name="brokenSiteSubmitButton">Lähetä palaute</string>
+    <string name="brokenSiteSubmitted">Kiitos! Palaute lähetetty</string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">Kirjanmerkit</string>
+    <string name="bookmarksActivityTitle">Kirjanmerkit</string>
+    <string name="bookmarkDeleteConfirmMessage">Haluatko varmasti poistaa kirjanmerkin &lt;b&gt;%s&lt;/b&gt;?</string>
+    <string name="bookmarkDeleteConfirmTitle">Vahvista</string>
+    <string name="bookmarkAddedFeedback">Kirjanmerkki lisätty</string>
+    <string name="bookmarkTitleHint">Kirjanmerkin otsikko</string>
+    <string name="bookmarkUrlHint">Kirjanmerkin URL-osoite</string>
+    <string name="bookmarkSave">Tallenna</string>
+    <string name="bookmarkTitleEdit">Muokkaa kirjanmerkkiä</string>
+    <string name="bookmarkTitleSave">Tallenna kirjanmerkki</string>
+    <string name="noBookmarks">Kirjanmerkkejä ei ole vielä lisätty</string>
+    <string name="bookmarkOverflowContentDescription">Lisää vaihtoehtoja kirjanmerkille %s</string>
+    <string name="delete">Poista</string>
+    <string name="edit">Muokkaa</string>
+
+    <!-- Widget -->
+    <string name="searchWidgetTextHint">Hae DuckDuckGosta</string>
+
+    <!-- Home Screen Shortcuts -->
+    <string name="addToHome">Lisää etusivulle</string>
+
+    <!-- User Survey -->
+    <string name="surveyCtaTitle">Auta meitä kehittämään sovellusta!</string>
+    <string name="surveyCtaDescription">Vastaa lyhyeen anonyymiin kyselyymme ja kerro palautteesi.</string>
+    <string name="surveyCtaLaunchButton">Vastaa kyselyyn</string>
+    <string name="surveyCtaDismissButton">Ei kiitos</string>
+    <string name="surveyActivityTitle">Käyttäjäkysely</string>
+    <string name="surveyTitle">DUCKDUCKGO-KYSELY</string>
+    <string name="surveyDismissContentDescription">Hylkää kysely</string>
+    <string name="surveyLoadingErrorTitle">Voi ei!</string>
+    <string name="surveyLoadingErrorText">Kyselyä ei voida ladata tällä hetkellä.\nYritä myöhemmin uudelleen.</string>
+
+    <!-- Add widget -->
+    <string name="addWidgetCtaTitle">Kokeile haku-widgetiämme!</string>
+    <string name="addWidgetCtaDescription">Lisää haku-widgetimme aloitusnäytöllesi, josta löydät sen nopeasti ja helposti.</string>
+    <string name="addWidgetCtaAutoLaunchButton">Lisää widget</string>
+    <string name="addWidgetCtaInstructionsLaunchButton">Näytä minulle</string>
+    <string name="addWidgetCtaDismissButton">Hylkää</string>
+    <string name="addWidgetInstructionsActivityTitle">Lisää widget</string>
+    <string name="addWidgetInstruction1Label">1</string>
+    <string name="addWidgetInstruction1">Paina aloitusnäyttöä pitkään ja avaa sitten widget-valikko</string>
+    <string name="addWidgetInstruction2Label">2</string>
+    <string name="addWidgetInstruction2">Etsi DuckDuckGo-widget</string>
+    <string name="addWidgetInstruction3Label">3</string>
+    <string name="addWidgetInstruction3">Vedä widget aloitusnäytöllesi</string>
+    <string name="addWidgetInstructionsButtonGoHome">Siirry aloitusnäyttöön</string>
+    <string name="addWidgetInstructionsButtonClose">Sulje</string>
+
+    <!-- App Enjoyment / Rating / Feedback -->
+    <string name="appEnjoymentDialogTitle">Pidätkö DuckDuckGosta?</string>
+    <string name="appEnjoymentDialogMessage">Olisi hienoa tietää, mitä mieltä olet</string>
+    <string name="appEnjoymentDialogPositiveButton">Olen tyytyväinen</string>
+    <string name="appEnjoymentDialogNegativeButton">Vielä on kehitettävää</string>
+
+    <string name="rateAppDialogTitle">Arvioi sovellus</string>
+    <string name="rateAppDialogMessage">Palautteellasi on väliä. Kerro kehusi arvostelun muodossa.</string>
+    <string name="rateAppDialogPositiveButton">Arvioi sovellus</string>
+    <string name="rateAppDialogNegativeButton">@string/noThanks</string>
+
+    <string name="giveFeedbackDialogTitle">Ikävä kuulla</string>
+    <string name="giveFeedbackDialogMessage">Kerro, miten voisimme mielestäsi parantaa sovellusta</string>
+    <string name="giveFeedbackDialogPositiveButton">Anna palautetta</string>
+    <string name="giveFeedbackDialogNegativeButton">@string/noThanks</string>
+
+    <string name="noThanks">Ei kiitos</string>
+
+    <!-- Notification Channel Names -->
+    <string name="notificationChannelFileDownloading">Tiedosto latautuu</string>
+    <string name="notificationChannelFileDownloaded">Tiedosto ladattu</string>
+    <string name="notificationChannelTutorials">Opetusmateriaalit</string>
+
+    <!-- Clear Notification -->
+    <string name="clearNotificationTitle">Tietojen tyhjennys asetettu manuaaliseksi</string>
+    <string name="clearNotificationDescription">Mukauta DuckDuckGo poistamaan selaustiedot automaattisesti jokaisen istunnon jälkeen.</string>
+
+    <!-- Privacy Protection Notification -->
+    <string name="privacyProtectionNotificationDefaultTitle">Suojelemme yksityisyyttäsi</string>
+    <string name="privacyProtectionNotificationReportTitle">Tietosuojaraporttisi</string>
+    <string name="privacyProtectionNotificationDefaultDescription">DuckDuckGo-sovelluksen käyttö suojaa tietojasi estämällä seurantapalvelimet ja salaamalla yhteydet.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">Suojelit tietojasi turvaamalla %d salaamatonta yhteyttä DuckDuckGota käyttäessäsi.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">Suojelit tietojasi estämällä %d seurantapalvelinta DuckDuckGota käyttäessäsi.</string>
+    <string name="privacyProtectionNotificationBothDescription">Suojelit tietojasi estämällä %d seurantapalvelinta ja turvaamalla %d salaamatonta yhteyttä DuckDuckGota käyttäessäsi.</string>
+    <string name="privacyProtectionNotificationLaunchButton">Jatka selailua</string>
+
+    <!-- Authentication -->
+    <string name="authenticationDialogTitle">Kirjaudu sisään</string>
+    <string name="authenticationDialogMessage">%s vaatii käyttäjätunnuksen ja salasanan.</string>
+    <string name="authenticationDialogPositiveButton">Kirjaudu sisään</string>
+    <string name="authenticationDialogNegativeButton">Peruuta</string>
+    <string name="authenticationDialogUsernameHint">Käyttäjätunnus</string>
+    <string name="authenticationDialogPasswordHint">Salasana</string>
+
+    <!-- User-facing label for when a user selects text and might want to search for that text -->
+    <string name="systemTextSearchMessage">Hae DuckDuckGosta</string>
+
+    <!-- App feedback disambiguation -->
+    <string name="feedbackActivityTitle">Jaa palautteesi</string>
+    <string name="missingBrowserFeaturesTitleLong">Selaimen ominaisuudet ovat puutteellisia tai turhauttavia</string>
+    <string name="missingBrowserFeaturesTitleShort">Selainominaisuuksiin liittyvät ongelmat</string>
+    <string name="missingBrowserFeaturesSubtitle">Mitä selaustoimintoja voimme lisätä tai parantaa?</string>
+    <string name="missingBrowserFeatureSubReasonNavigation">Navigointi eteen-/taaksepäin, päivittäminen</string>
+    <string name="missingBrowserFeatureSubReasonTabManagement">Välilehtien luominen ja hallinnointi</string>
+    <string name="missingBrowserFeatureSubReasonAdPopups">Mainosten ja ponnahdusikkunoiden esto</string>
+    <string name="missingBrowserFeatureSubReasonVideos">Videoiden katselu</string>
+    <string name="missingBrowserFeatureSubReasonImages">Vuorovaikutus kuvien kanssa</string>
+    <string name="missingBrowserFeatureSubReasonBookmarks">Kirjanmerkkien luominen ja hallinta</string>
+    <string name="missingBrowserFeatureSubReasonOther">Ei mikään näistä</string>
+
+    <string name="websiteNotLoadingTitleLong">Osa verkkosivustoista ei lataudu oikein</string>
+    <string name="websiteNotLoadingTitleShort">Verkkosivustojen latausongelmat</string>
+    <string name="websiteNotLoadingSubtitle">Mikä verkkosivusto on viallinen?"</string>
+
+    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo-haku ei ole riittävän hyvä</string>
+    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo-hakuongelmat</string>
+    <string name="searchNotGoodEnoughSubtitle">Mitä hakuominaisuuksia voimme lisätä tai parantaa?</string>
+    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Ohjelmointi-/tekninen haku</string>
+    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Ulkoasun pitäisi muistuttaa enemmän Googlea</string>
+    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Nopeampi latausaika</string>
+    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Haku tietyllä kielellä tai tietyllä alueella</string>
+    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Parempi automaattinen täydennys</string>
+    <string name="searchNotGoodEnoughSubReasonOther">Ei mikään näistä</string>
+
+    <string name="needMoreCustomizationTitleLong">Sovelluksen yksilöintimahdollisuuksia ei ole tarpeeksi</string>
+    <string name="needMoreCustomizationTitleShort">Yksilöintiongelmat</string>
+    <string name="needMoreCustomizationSubtitle">Mitä yksilöintivaihtoehtoja voimme lisätä tai parantaa?</string>
+    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Aloitusnäytön järjestys</string>
+    <string name="needMoreCustomizationSubReasonTabDisplay">Välilehtien näyttäminen</string>
+    <string name="needMoreCustomizationSubReasonAppLooks">Sovelluksen ulkonäkö</string>
+    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Tyhjennettävät tiedot</string>
+    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Tietojen tyhjennyksen ajankohta</string>
+    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Kirjanmerkkien näyttäminen</string>
+    <string name="needMoreCustomizationSubReasonOther">Ei mikään näistä</string>
+
+    <string name="appIsSlowOrBuggyTitleLong">Sovellus on hidas, virheellinen tai kaatuu</string>
+    <string name="appIsSlowOrBuggyTitleShort">Suorituskykyyn liittyvät ongelmat</string>
+    <string name="appIsSlowOrBuggySubtitle">Mitä ongelmia sinulla on esiintynyt?</string>
+    <string name="appIsSlowOrBuggySubReasonSlowResults">Verkkosivut tai hakutulokset latautuvat hitaasti</string>
+    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Sovellus kaatuu tai jähmettyy</string>
+    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Videon tai median toistovirheet</string>
+    <string name="appIsSlowOrBuggySubReasonOther">Ei mikään näistä</string>
+
+    <string name="otherMainReasonTitleLong">Ei mikään näistä</string>
+    <string name="otherMainReasonTitleShort">Muut ongelmat</string>
+
+    <string name="openEndedInputHint">Miten voimme parantaa toimintaamme? (Valinnainen)</string>
+    <string name="submitFeedback">LÄHETÄ PALAUTE</string>
+
+    <string name="tellUsHowToImprove">Kerro meille, mitä voimme parantaa.</string>
+    <string name="thanksForTheFeedback">Kiitos palautteesta!</string>
+    <string name="feedbackNegativeMainReasonPageSubtitle">Mikä turhauttaa sinua eniten?</string>
+    <string name="feedbackNegativeMainReasonPageTitle">Ikävä kuulla.</string>
+    <string name="feedbackShareDetails">Kerro tarkempia tietoja</string>
+    <string name="sharePositiveFeedbackWithTheTeam">Haluaisitko kertoa tiimille tarkempia tietoja?</string>
+    <string name="whatHaveYouBeenEnjoying">Mistä olet nauttinut?</string>
+    <string name="awesomeToHear">Mahtava kuulla!</string>
+    <string name="shareTheLoveWithARating">Jaathan kehusi Play Store -arviolla.</string>
+    <string name="rateTheApp">ARVIOI SOVELLUS</string>
+    <string name="declineFurtherFeedback">EI KIITOS, TÄMÄ RIITTI</string>
+    <string name="whichBrokenSites">Missä näitä ongelmia esiintyy?</string>
+    <string name="whichBrokenSitesHint">Millä verkkosivustolla on ongelmia?</string>
+    <string name="feedbackSpecificAsPossible">Kerro mahdollisimman tarkasti</string>
+    <string name="feedbackInitialDisambiguationTitle">Aloitetaan!</string>
+    <string name="feedbackInitialDisambiguationSubtitle">Miten luokittelisit palautteesi?</string>
+    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Positiivinen palaute -painike</string>
+    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Negatiivinen palaute -painike</string>
+    <string name="feedbackIsImportantToUs">Anonyymi palautteesi on meille tärkeää.</string>
+
+
 </resources>
