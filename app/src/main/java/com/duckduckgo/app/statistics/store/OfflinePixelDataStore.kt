@@ -37,7 +37,6 @@ class OfflinePixelSharedPreferences @Inject constructor(private val context: Con
         get() = preferences.getInt(KEY_WEB_RENDERER_GONE_OTHER_COUNT, 0)
         set(value) = preferences.edit(true) { putInt(KEY_WEB_RENDERER_GONE_OTHER_COUNT, value) }
 
-
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
