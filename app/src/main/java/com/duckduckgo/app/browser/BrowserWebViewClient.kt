@@ -20,9 +20,11 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.webkit.*
+import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
+import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -33,7 +35,8 @@ import java.net.URI
 class BrowserWebViewClient(
     private val requestRewriter: RequestRewriter,
     private val specialUrlDetector: SpecialUrlDetector,
-    private val requestInterceptor: RequestInterceptor
+    private val requestInterceptor: RequestInterceptor,
+    private val offlinePixelDataStore: OfflinePixelDataStore
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -115,6 +118,16 @@ class BrowserWebViewClient(
             Timber.v("Intercepting resource ${request.url} on page $documentUrl")
             requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onRenderProcessGone(view: WebView?, detail: RenderProcessGoneDetail?): Boolean {
+        if (detail?.didCrash() == true) {
+            offlinePixelDataStore.webRendererGoneCrashCount += 1
+        } else {
+            offlinePixelDataStore.webRendererGoneOtherCount += 1
+        }
+        return super.onRenderProcessGone(view, detail)
     }
 
     @UiThread

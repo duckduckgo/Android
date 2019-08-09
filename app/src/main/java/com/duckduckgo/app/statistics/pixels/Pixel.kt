@@ -32,6 +32,7 @@ interface Pixel {
 
         APP_LAUNCH("ml"),
         FORGET_ALL_EXECUTED("mf"),
+        WEB_RENDERER_GONE("m_d_wrg"),
 
         ONBOARDING_DEFAULT_BROWSER_SETTINGS_LAUNCHED("m_odb_l"),
         ONBOARDING_DEFAULT_BROWSER_SKIPPED("m_odb_s"),
@@ -118,6 +119,8 @@ interface Pixel {
     object PixelParameter {
         const val BOOKMARK_CAPABLE = "bc"
         const val SHOWED_BOOKMARKS = "sb"
+        const val WEB_RENDERER_GONE_CRASH = "wrc"
+        const val WEB_RENDERER_GONE_OTHER = "wro"
     }
 
     fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap(), includeLocale: Boolean = false)

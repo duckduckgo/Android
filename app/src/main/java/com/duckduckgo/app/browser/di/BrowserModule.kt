@@ -36,6 +36,7 @@ import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.trackerdetection.TrackerDetector
@@ -59,9 +60,10 @@ class BrowserModule {
     fun browserWebViewClient(
         requestRewriter: RequestRewriter,
         specialUrlDetector: SpecialUrlDetector,
-        requestInterceptor: RequestInterceptor
+        requestInterceptor: RequestInterceptor,
+        offlinePixelDataStore: OfflinePixelDataStore
     ): BrowserWebViewClient {
-        return BrowserWebViewClient(requestRewriter, specialUrlDetector, requestInterceptor)
+        return BrowserWebViewClient(requestRewriter, specialUrlDetector, requestInterceptor, offlinePixelDataStore)
     }
 
     @Provides

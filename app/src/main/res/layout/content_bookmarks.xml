@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -41,4 +41,4 @@
         android:textColor="?attr/bookmarkTitleTextColor"
         android:textSize="16sp" />
 
-</FrameLayout>
+</merge>
