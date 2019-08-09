@@ -19,7 +19,7 @@
         android:gravity="center"
         android:left="3.5dp"
         android:right="3.5dp">
-        <bitmap xmlns:android="http://schemas.android.com/apk/res/android"
+        <bitmap
             android:scaleType="fitXY"
             android:src="@drawable/icon_fire_glyph" />
     </item>

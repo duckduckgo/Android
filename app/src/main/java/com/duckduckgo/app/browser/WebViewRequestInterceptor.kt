@@ -27,6 +27,8 @@ import com.duckduckgo.app.privacy.model.TrustedSites
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.ResourceType
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface RequestInterceptor {
@@ -69,7 +71,11 @@ class WebViewRequestInterceptor(
 
         if (shouldUpgrade(request)) {
             val newUri = httpsUpgrader.upgrade(url)
-            webView.post { webView.loadUrl(newUri.toString()) }
+
+            withContext(Dispatchers.Main) {
+                webView.loadUrl(newUri.toString())
+            }
+
             privacyProtectionCountDao.incrementUpgradeCount()
             return WebResourceResponse(null, null, null)
         }
