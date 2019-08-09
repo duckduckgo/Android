@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.content.Context
+import android.os.Build
 import android.webkit.HttpAuthHandler
 import android.webkit.RenderProcessGoneDetail
 import android.webkit.WebView
@@ -93,18 +94,22 @@ class BrowserWebViewClientTest {
 
     @Test
     fun whenRenderProcessGoneDueToCrashThenCrashDataStoreEntryIsIncremented() {
-        val detail: RenderProcessGoneDetail = mock()
-        whenever(detail.didCrash()).thenReturn(true)
-        testee.onRenderProcessGone(webView, detail)
-        verify(offlinePixelDataStore, times(1)).webRendererGoneCrashCount = 1
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val detail: RenderProcessGoneDetail = mock()
+            whenever(detail.didCrash()).thenReturn(true)
+            testee.onRenderProcessGone(webView, detail)
+            verify(offlinePixelDataStore, times(1)).webRendererGoneCrashCount = 1
+        }
     }
 
     @Test
     fun whenRenderProcessGoneDueToNonCrashThenOtherDataStoreEntryIsIncremented() {
-        val detail: RenderProcessGoneDetail = mock()
-        whenever(detail.didCrash()).thenReturn(false)
-        testee.onRenderProcessGone(webView, detail)
-        verify(offlinePixelDataStore, times(1)).webRendererGoneOtherCount = 1
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val detail: RenderProcessGoneDetail = mock()
+            whenever(detail.didCrash()).thenReturn(false)
+            testee.onRenderProcessGone(webView, detail)
+            verify(offlinePixelDataStore, times(1)).webRendererGoneOtherCount = 1
+        }
     }
 
     private class TestWebView(context: Context) : WebView(context)
