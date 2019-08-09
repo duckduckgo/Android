@@ -20,12 +20,10 @@ import android.content.Context
 import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.api.PixelService
-import com.duckduckgo.app.statistics.api.StatisticsRequester
-import com.duckduckgo.app.statistics.api.StatisticsService
-import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.api.*
 import com.duckduckgo.app.statistics.pixels.ApiBasedPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import dagger.Module
 import dagger.Provides
@@ -53,10 +51,13 @@ class StatisticsModule {
     }
 
     @Provides
-    fun deviceInfo(context: Context): DeviceInfo = ContextDeviceInfo(context)
-
-    @Provides
     fun pixel(pixelService: PixelService, statisticsDataStore: StatisticsDataStore, variantManager: VariantManager, deviceInfo: DeviceInfo): Pixel =
         ApiBasedPixel(pixelService, statisticsDataStore, variantManager, deviceInfo)
+
+    @Provides
+    fun offlinePixelSender(offlinePixelDataStore: OfflinePixelDataStore, pixel: Pixel): OfflinePixelSender = OfflinePixelSender(offlinePixelDataStore, pixel )
+
+    @Provides
+    fun deviceInfo(context: Context): DeviceInfo = ContextDeviceInfo(context)
 
 }
