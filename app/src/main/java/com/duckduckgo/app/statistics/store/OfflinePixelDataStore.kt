@@ -42,7 +42,7 @@ class OfflinePixelSharedPreferences @Inject constructor(private val context: Con
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
     companion object {
-        private const val FILENAME = "com.duckduckgo.app.statistics.offline.pixels"
+        const val FILENAME = "com.duckduckgo.app.statistics.offline.pixels"
         private const val KEY_WEB_RENDERER_GONE_CRASH_COUNT = "WEB_RENDERER_GONE_CRASH_COUNT"
         private const val KEY_WEB_RENDERER_GONE_OTHER_COUNT = "WEB_RENDERER_GONE_OTHER_COUNT"
     }
