@@ -138,7 +138,6 @@
     </plurals>
 
     <plurals name="majorNetworksBlocked">
-        <item quantity="one">Заблокирована %s крупная трекерная сеть</item>
         <item quantity="one">Заблокирована %s крупная сеть отслеживания</item>
         <item quantity="few">Заблокировано %s крупные сети отслеживания</item>
         <item quantity="many">Заблокирована %s крупных сетей отслеживания</item>
