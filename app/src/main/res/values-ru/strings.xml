@@ -118,22 +118,31 @@
 
     <plurals name="trackersFound">
         <item quantity="one">Найден %s трекер</item>
-        <item quantity="other">Найдено %s трекера(-ов)</item>
+        <item quantity="few">Найдено %s трекера</item>
+        <item quantity="many">Найдено %s трекеров</item>
+        <item quantity="other">Найдены %s трекеры</item>
     </plurals>
 
     <plurals name="trackerBlocked">
         <item quantity="one">Заблокирован %s трекер</item>
-        <item quantity="other">Заблокировано %s трекера(-ов)</item>
+        <item quantity="few">Заблокировано %s трекера</item>
+        <item quantity="many">Заблокировано %s трекеров</item>
+        <item quantity="other">Заблокированы %s трекеры</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
-        <item quantity="one">Найдена %s крупная трекерная сеть</item>
-        <item quantity="other">Найдено %s крупных трекерных сети(-ей)</item>
+        <item quantity="one">Обнаружена %s крупная сеть отслеживания</item>
+        <item quantity="few">Обнаружено %s крупные сети отслеживания</item>
+        <item quantity="many">Обнаружено %s крупных сетей отслеживания</item>
+        <item quantity="other">Обнаружено %s крупные сети отслеживания</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
         <item quantity="one">Заблокирована %s крупная трекерная сеть</item>
-        <item quantity="other">Заблокировано %s крупных трекерных сети(-ей)</item>
+        <item quantity="one">Заблокирована %s крупная сеть отслеживания</item>
+        <item quantity="few">Заблокировано %s крупные сети отслеживания</item>
+        <item quantity="many">Заблокирована %s крупных сетей отслеживания</item>
+        <item quantity="other">Заблокированы %s крупные сети отслеживания</item>
     </plurals>
 
     <string name="scorecardActivityTitle">Рейтинг конфиденциальности</string>
