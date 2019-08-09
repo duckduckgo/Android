@@ -123,9 +123,9 @@ class BrowserWebViewClient(
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onRenderProcessGone(view: WebView?, detail: RenderProcessGoneDetail?): Boolean {
         if (detail?.didCrash() == true) {
-            offlinePixelDataStore.webRendererGoneCrashCount  += 1
+            offlinePixelDataStore.webRendererGoneCrashCount += 1
         } else {
-            offlinePixelDataStore.webRendererGoneOtherCount  += 1
+            offlinePixelDataStore.webRendererGoneOtherCount += 1
         }
         return super.onRenderProcessGone(view, detail)
     }
