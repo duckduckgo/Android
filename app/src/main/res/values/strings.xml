@@ -338,7 +338,6 @@
 
     <string name="otherMainReasonTitleLong">None of these</string>
     <string name="otherMainReasonTitleShort">Other Issues</string>
-    <string name="otherMainReasonSubtitle" translatable="false">@string/tellUsHowToImprove</string>
 
     <string name="openEndedInputHint">How can we improve? (Optional)</string>
     <string name="submitFeedback">SUBMIT FEEDBACK</string>
