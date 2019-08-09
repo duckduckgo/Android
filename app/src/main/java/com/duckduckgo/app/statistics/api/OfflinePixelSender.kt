@@ -40,16 +40,18 @@ class OfflinePixelSender @Inject constructor(
     fun sendWebRendererGonePixel(): Completable {
         return defer {
 
-            if (dataStore.webRendererGoneCrashCount == 0 && dataStore.webRendererGoneOtherCount == 0) {
+            val goneCrashCount = dataStore.webRendererGoneCrashCount
+            val goneOtherCount = dataStore.webRendererGoneOtherCount
+            if (goneCrashCount == 0 && goneOtherCount == 0) {
                 return@defer complete()
             }
             val params = mapOf(
-                WEB_RENDERER_GONE_CRASH to dataStore.webRendererGoneCrashCount.toString(),
-                WEB_RENDERER_GONE_OTHER to dataStore.webRendererGoneOtherCount.toString()
+                WEB_RENDERER_GONE_CRASH to goneCrashCount.toString(),
+                WEB_RENDERER_GONE_OTHER to goneOtherCount.toString()
             )
 
             pixel.fireCompletable(WEB_RENDERER_GONE.pixelName, params).andThen {
-                Timber.v("Offline pixel sent ${WEB_RENDERER_GONE.pixelName} crashes: ${dataStore.webRendererGoneCrashCount} other: ${dataStore.webRendererGoneOtherCount} ")
+                Timber.v("Offline pixel sent ${WEB_RENDERER_GONE.pixelName} crashes: ${goneCrashCount} other: ${goneOtherCount} ")
                 dataStore.webRendererGoneCrashCount = 0
                 dataStore.webRendererGoneOtherCount = 0
             }
