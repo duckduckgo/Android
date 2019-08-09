@@ -144,7 +144,6 @@
     <string name="fireClearAll">Vymazat všechny karty a data</string>
     <string name="fireCancel">Zrušit</string>
     <string name="fireDataCleared">Data vymazána</string>
-    <string name="fireProcessName">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Nastavení</string>

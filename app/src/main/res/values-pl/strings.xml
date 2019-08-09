@@ -144,7 +144,6 @@
     <string name="fireClearAll">Wyczyść wszystkie karty i dane</string>
     <string name="fireCancel">Anuluj</string>
     <string name="fireDataCleared">Dane zostały usunięte</string>
-    <string name="fireProcessName">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Ustawienia</string>

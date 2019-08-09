@@ -144,7 +144,6 @@
     <string name="fireClearAll">Borrar todos los datos y pestañas</string>
     <string name="fireCancel">Cancelar</string>
     <string name="fireDataCleared">Datos eliminados</string>
-    <string name="fireProcessName">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Ajustes</string>

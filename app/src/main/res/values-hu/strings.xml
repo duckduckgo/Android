@@ -144,7 +144,6 @@
     <string name="fireClearAll">Összes lap és adat törlése</string>
     <string name="fireCancel">Mégse</string>
     <string name="fireDataCleared">Adatok törölve</string>
-    <string name="fireProcessName">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Beállítások</string>

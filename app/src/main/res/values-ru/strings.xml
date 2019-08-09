@@ -169,7 +169,6 @@
     <string name="fireClearAll">Сбросить все вкладки и данные</string>
     <string name="fireCancel">Отменить</string>
     <string name="fireDataCleared">Данные сброшены</string>
-    <string name="fireProcessName">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Настройки</string>

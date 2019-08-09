@@ -160,7 +160,6 @@
     <string name="fireClearAll">Elimina tutte le schede e i dati</string>
     <string name="fireCancel">Annulla</string>
     <string name="fireDataCleared">I dati sono stati eliminati</string>
-    <string name="fireProcessName">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Impostazioni</string>

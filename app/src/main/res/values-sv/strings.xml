@@ -160,7 +160,6 @@
     <string name="fireClearAll">Rensa alla flikar och data</string>
     <string name="fireCancel">Avbryt</string>
     <string name="fireDataCleared">Data rensad</string>
-    <string name="fireProcessName">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Inställningar</string>

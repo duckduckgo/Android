@@ -144,7 +144,6 @@
     <string name="fireClearAll">Poista kaikki välilehdet ja tiedot</string>
     <string name="fireCancel">Peruuta</string>
     <string name="fireDataCleared">Tiedot poistettu</string>
-    <string name="fireProcessName">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Asetukset</string>

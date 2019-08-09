@@ -144,7 +144,6 @@
     <string name="fireClearAll">Effacer tous les onglets et données</string>
     <string name="fireCancel">Annuler</string>
     <string name="fireDataCleared">Données effacées</string>
-    <string name="fireProcessName">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Paramètres</string>

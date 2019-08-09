@@ -144,7 +144,6 @@
     <string name="fireClearAll">Εκκαθάριση όλων των καρτελών και δεδομένων</string>
     <string name="fireCancel">Ακύρωση</string>
     <string name="fireDataCleared">Εκκαθάριση δεδομένων</string>
-    <string name="fireProcessName">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Ρυθμίσεις</string>

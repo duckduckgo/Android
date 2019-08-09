@@ -144,7 +144,6 @@
     <string name="fireClearAll">Изчистване на всички подпрозорци и данни</string>
     <string name="fireCancel">Отмяна</string>
     <string name="fireDataCleared">Данните са изчистени</string>
-    <string name="fireProcessName">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Настройки</string>

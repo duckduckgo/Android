@@ -144,7 +144,6 @@
     <string name="fireClearAll">Tøm alle faner og data</string>
     <string name="fireCancel">Avbryt</string>
     <string name="fireDataCleared">Data tømt</string>
-    <string name="fireProcessName">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Innstillinger</string>

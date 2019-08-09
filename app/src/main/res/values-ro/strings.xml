@@ -144,7 +144,6 @@
     <string name="fireClearAll">Șterge toate filele și datele</string>
     <string name="fireCancel">Anulare</string>
     <string name="fireDataCleared">Date șterse</string>
-    <string name="fireProcessName">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Setări</string>

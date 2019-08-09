@@ -144,7 +144,6 @@
     <string name="fireClearAll">Počisti vse zavihke in podatke</string>
     <string name="fireCancel">Preklic</string>
     <string name="fireDataCleared">Podatki izbrisani</string>
-    <string name="fireProcessName">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Nastavitve</string>

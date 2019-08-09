@@ -144,7 +144,6 @@
     <string name="fireClearAll">Ryd alle faner og data</string>
     <string name="fireCancel">Annuller</string>
     <string name="fireDataCleared">Data ryddet</string>
-    <string name="fireProcessName">:brand</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Indstillinger</string>

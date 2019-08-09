@@ -144,7 +144,6 @@
     <string name="fireClearAll">Valyti visas korteles ir duomenis</string>
     <string name="fireCancel">Atšaukti</string>
     <string name="fireDataCleared">Duomenys išvalyti</string>
-    <string name="fireProcessName">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Nustatymai</string>

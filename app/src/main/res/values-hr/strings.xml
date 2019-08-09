@@ -144,7 +144,6 @@
     <string name="fireClearAll">Obriši sve kartice i podatke</string>
     <string name="fireCancel">Odustani</string>
     <string name="fireDataCleared">Podaci su obrisani</string>
-    <string name="fireProcessName">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Postavke</string>
