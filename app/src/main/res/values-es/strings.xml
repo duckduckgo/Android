@@ -165,13 +165,13 @@
     <string name="settingsAutomaticallyClearWhatOptionTabs">Pestañas</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Pestañas y datos</string>
 
-    <string name="settingsAutomaticallyClearWhen">Borrar el…</string>
-    <string name="settingsAutomaticallyClearWhenAppExitOnly">Solo salida de la aplicación</string>
-    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Salida de la aplicación (5 segundos de inactividad)</string>
-    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Salida de la aplicación (5 minutos de inactividad)</string>
-    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Salida de la aplicación (15 minutos de inactividad)</string>
-    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Salida de la aplicación (30 minutos de inactividad)</string>
-    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Salida de la aplicación (60 minutos de inactividad)</string>
+    <string name="settingsAutomaticallyClearWhen">Borrar al…</string>
+    <string name="settingsAutomaticallyClearWhenAppExitOnly">Salir de la aplicación</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Salir de la aplicación (5 segundos de inactividad)</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Salir de la aplicación (5 minutos de inactividad)</string>
+    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Salir de la aplicación (15 minutos de inactividad)</string>
+    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Salir de la aplicación (30 minutos de inactividad)</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Salir de la aplicación (60 minutos de inactividad)</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Acerca de nosotros</string>
@@ -222,7 +222,7 @@
     <string name="surveyTitle">ENCUESTA DUCKDUCKGO</string>
     <string name="surveyDismissContentDescription">Omitir encuesta</string>
     <string name="surveyLoadingErrorTitle">¡Vaya!</string>
-    <string name="surveyLoadingErrorText">Nuestra encuesta no se está cargando en estos momentos.\nVuelve a intentarlo más tarde.</string>
+    <string name="surveyLoadingErrorText">Nuestra encuesta no se pudo cargar en este momento.\nVuelve a intentarlo más tarde.</string>
 
     <!-- Add widget -->
     <string name="addWidgetCtaTitle">Prueba nuestro widget de búsqueda</string>
