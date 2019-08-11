@@ -19,6 +19,7 @@
 package com.duckduckgo.app.browser
 
 import android.content.Context
+import android.os.Message
 import android.view.View
 import android.webkit.WebChromeClient
 import android.webkit.WebView
@@ -90,25 +91,22 @@ class BrowserChromeClientTest {
     @UiThreadTest
     @Test
     fun whenOnCreateWindowWithUserGestureThenOpenUrlInNewTab() {
-        webView.stubUrl = "https://example.com"
-        testee.onCreateWindow(webView, isDialog = false, isUserGesture = true,  resultMsg = null)
-        verify(mockWebViewClientListener).openInNewTab(webView.stubUrl)
+        testee.onCreateWindow(webView, isDialog = false, isUserGesture = true, resultMsg = mockMsg)
+        verify(mockWebViewClientListener).openInNewTab(anyOrNull())
         verifyNoMoreInteractions(mockWebViewClientListener)
     }
 
     @UiThreadTest
     @Test
     fun whenOnCreateWindowNoUserGestureThenOpenUrlInNewTab() {
-        webView.stubUrl = "https://example.com"
-        testee.onCreateWindow(webView, isDialog = false, isUserGesture = false, resultMsg = null)
+        testee.onCreateWindow(webView, isDialog = false, isUserGesture = false, resultMsg = mockMsg)
         verifyZeroInteractions(mockWebViewClientListener)
     }
 
-    private class TestWebView(context: Context) : WebView(context) {
-        var stubUrl: String = ""
-
-        override fun getUrl(): String {
-            return stubUrl
-        }
+    private val mockMsg = Message().apply {
+        target = mock()
+        obj = mock<WebView.WebViewTransport>()
     }
+
+    private class TestWebView(context: Context) : WebView(context)
 }
