@@ -76,8 +76,12 @@ class BrowserChromeClient @Inject constructor() : WebChromeClient(), CoroutineSc
     }
 
     override fun onCreateWindow(view: WebView?, isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message?): Boolean =
-        if (isUserGesture) {
-            webViewClientListener?.openInNewTab(view?.url)
+        if (isUserGesture && resultMsg?.obj is WebView.WebViewTransport) {
+            val transport = resultMsg.obj as WebView.WebViewTransport
+            val newWebView = WebView(view?.context)
+            transport.webView = newWebView
+            resultMsg.sendToTarget()
+            webViewClientListener?.openInNewTab(newWebView.url)
             true
         } else {
             false
