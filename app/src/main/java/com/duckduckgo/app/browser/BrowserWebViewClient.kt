@@ -16,45 +16,32 @@
 
 package com.duckduckgo.app.browser
 
-import android.annotation.TargetApi
 import android.graphics.Bitmap
 import android.net.Uri
-import android.net.http.SslError
 import android.os.Build
 import android.webkit.*
-import androidx.annotation.AnyThread
+import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
-import androidx.core.net.toUri
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
-import com.duckduckgo.app.global.isHttps
-import com.duckduckgo.app.global.isHttpsVersionOfUri
-import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.HTTPS_UPGRADE_SITE_ERROR
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.APP_VERSION
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.ERROR_CODE
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.URL
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.net.URI
-import kotlin.concurrent.thread
 
 
 class BrowserWebViewClient(
     private val requestRewriter: RequestRewriter,
     private val specialUrlDetector: SpecialUrlDetector,
     private val requestInterceptor: RequestInterceptor,
-    private val httpsUpgrader: HttpsUpgrader,
-    private val statisticsDataStore: StatisticsDataStore,
-    private val pixel: Pixel
+    private val offlinePixelDataStore: OfflinePixelDataStore
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
+    private var lastPageStarted: String? = null
 
-    private var currentUrl: String? = null
-    private var tempTimer = 0L
 
     /**
      * This is the new method of url overriding available from API 24 onwards
@@ -112,70 +99,40 @@ class BrowserWebViewClient(
 
     @UiThread
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
-        tempTimer = System.currentTimeMillis()
-        Timber.d("\nonPageStarted {\nurl: $url\nwebView.url: ${webView.url}\n}\n")
-        currentUrl = url
-
-        webViewClientListener?.let {
-            it.loadingStarted(url)
-            it.navigationOptionsChanged(WebViewNavigationOptions(webView.copyBackForwardList()))
+        webViewClientListener?.navigationStateChanged(WebViewNavigationState(webView.copyBackForwardList()))
+        if (url != null && url == lastPageStarted) {
+            webViewClientListener?.pageRefreshed(url)
         }
-
-        val uri = if (currentUrl != null) Uri.parse(currentUrl) else null
-        if (uri != null) {
-            reportHttpsIfInUpgradeList(uri)
-        }
+        lastPageStarted = url
     }
 
     @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
-        currentUrl = url
-        webViewClientListener?.let {
-            it.loadingFinished(url)
-            it.navigationOptionsChanged(WebViewNavigationOptions(webView.copyBackForwardList()))
-        }
-
-        Timber.i("Page Load Time: ${System.currentTimeMillis() - tempTimer}ms for $url")
+        webViewClientListener?.navigationStateChanged(WebViewNavigationState(webView.copyBackForwardList()))
     }
 
     @WorkerThread
     override fun shouldInterceptRequest(webView: WebView, request: WebResourceRequest): WebResourceResponse? {
-        Timber.v("Intercepting resource ${request.url} on page $currentUrl")
-        return runBlocking { requestInterceptor.shouldIntercept(request, webView, currentUrl, webViewClientListener) }
+        return runBlocking {
+            val documentUrl = withContext(Dispatchers.Main) { webView.url }
+            Timber.v("Intercepting resource ${request.url} on page $documentUrl")
+            requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
+        }
     }
 
-    @UiThread
-    @Suppress("OverridingDeprecatedMember", "DEPRECATION")
-    override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            val url = failingUrl.toUri()
-            reportHttpsErrorIfInUpgradeList(url, error = "WEB_RESOURCE_ERROR_$errorCode")
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onRenderProcessGone(view: WebView?, detail: RenderProcessGoneDetail?): Boolean {
+        if (detail?.didCrash() == true) {
+            offlinePixelDataStore.webRendererGoneCrashCount += 1
+        } else {
+            offlinePixelDataStore.webRendererGoneOtherCount += 1
         }
-        super.onReceivedError(view, errorCode, description, failingUrl)
-    }
-
-    @UiThread
-    @TargetApi(Build.VERSION_CODES.M)
-    override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
-        if (request.isForMainFrame) {
-            reportHttpsErrorIfInUpgradeList(request.url, error = "WEB_RESOURCE_ERROR_${error.errorCode}")
-        }
-        super.onReceivedError(view, request, error)
-    }
-
-    @UiThread
-    override fun onReceivedSslError(view: WebView, handler: SslErrorHandler, error: SslError) {
-        val uri = error.url.toUri()
-        val isMainFrameRequest = currentUrl == uri.toString()
-        if (isMainFrameRequest) {
-            reportHttpsErrorIfInUpgradeList(uri, "SSL_ERROR_${error.primaryError}")
-        }
-        super.onReceivedSslError(view, handler, error)
+        return super.onRenderProcessGone(view, detail)
     }
 
     @UiThread
     override fun onReceivedHttpAuthRequest(view: WebView?, handler: HttpAuthHandler?, host: String?, realm: String?) {
-        Timber.v("onReceivedHttpAuthRequest ${view?.url} $realm, $host,  $currentUrl")
+        Timber.v("onReceivedHttpAuthRequest ${view?.url} $realm, $host")
 
         if (handler != null) {
             Timber.v("onReceivedHttpAuthRequest - useHttpAuthUsernamePassword [${handler.useHttpAuthUsernamePassword()}]")
@@ -232,37 +189,6 @@ class BrowserWebViewClient(
         }
     }
 
-    @AnyThread
-    private fun reportHttpsErrorIfInUpgradeList(url: Uri, error: String?) {
-        if (!url.isHttps) return
-        thread {
-            if (httpsUpgrader.isInUpgradeList(url)) {
-                reportHttpsUpgradeSiteError(url, error)
-                statisticsDataStore.httpsUpgradesFailures += 1
-            }
-        }
-    }
-
-    @AnyThread
-    private fun reportHttpsIfInUpgradeList(url: Uri) {
-        if (!url.isHttps) return
-        thread {
-            if (httpsUpgrader.isInUpgradeList(url)) {
-                statisticsDataStore.httpsUpgradesTotal += 1
-            }
-        }
-    }
-
-    private fun reportHttpsUpgradeSiteError(url: Uri, error: String?) {
-        val host = url.host ?: return
-        val params = mapOf(
-            APP_VERSION to BuildConfig.VERSION_NAME,
-            URL to "https://$host",
-            ERROR_CODE to error
-        )
-        pixel.fire(HTTPS_UPGRADE_SITE_ERROR, params)
-    }
-
     /**
      * Utility to function to execute a function, and then return true
      *
@@ -271,28 +197,5 @@ class BrowserWebViewClient(
     private inline fun consume(function: () -> Unit): Boolean {
         function()
         return true
-    }
-
-    interface BrowserNavigationOptions {
-        val stepsToPreviousPage: Int
-        val canGoBack: Boolean
-        val canGoForward: Boolean
-        val hasNavigationHistory: Boolean
-    }
-
-    data class WebViewNavigationOptions(val stack: WebBackForwardList) : BrowserNavigationOptions {
-
-        override val stepsToPreviousPage: Int = if (stack.isHttpsUpgrade) 2 else 1
-        override val canGoBack: Boolean = stack.currentIndex >= stepsToPreviousPage
-        override val canGoForward: Boolean = stack.currentIndex + 1 < stack.size
-        override val hasNavigationHistory = stack.size != 0
-
-        private val WebBackForwardList.isHttpsUpgrade: Boolean
-            get() {
-                if (currentIndex < 1) return false
-                val current = currentItem?.originalUrl?.toUri() ?: return false
-                val previous = getItemAtIndex(currentIndex - 1).originalUrl?.toUri() ?: return false
-                return current.isHttpsVersionOfUri(previous)
-            }
     }
 }

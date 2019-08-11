@@ -24,6 +24,5 @@ enum class PrivacyGrade {
     C_PLUS,
     C,
     D,
-    UNKNOWN;
-
+    UNKNOWN
 }

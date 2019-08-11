@@ -30,15 +30,20 @@ import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import androidx.lifecycle.*
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment.SaveBookmarkListener
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
-import com.duckduckgo.app.browser.BrowserWebViewClient.BrowserNavigationOptions
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
+import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
@@ -54,10 +59,12 @@ import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -69,6 +76,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -89,6 +97,7 @@ class BrowserTabViewModel(
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
+    private val pixel: Pixel,
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, SaveBookmarkListener, HttpAuthenticationListener, ViewModel() {
     private var buildingSiteFactoryJob: Job? = null
@@ -116,7 +125,8 @@ class BrowserTabViewModel(
 
     data class OmnibarViewState(
         val omnibarText: String = "",
-        val isEditing: Boolean = false
+        val isEditing: Boolean = false,
+        val shouldMoveCaretToEnd: Boolean = false
     )
 
     data class LoadingViewState(
@@ -135,7 +145,7 @@ class BrowserTabViewModel(
 
     data class AutoCompleteViewState(
         val showSuggestions: Boolean = false,
-        val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
+        val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList(), false)
     )
 
     sealed class Command {
@@ -153,6 +163,7 @@ class BrowserTabViewModel(
         object HideKeyboard : Command()
         class ShowFullScreen(val view: View) : Command()
         class DownloadImage(val url: String) : Command()
+        class AddBookmark(val title: String?, val url: String?) : Command()
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
@@ -191,10 +202,11 @@ class BrowserTabViewModel(
         }
     }
 
-    override val url: String?
+    val url: String?
         get() = site?.url
 
-    private var pendingUrl: String? = null
+    val title: String?
+        get() = site?.title
 
     private var appConfigurationDownloaded = false
     private val appConfigurationObservable = appConfigurationDao.appConfigurationStatus()
@@ -202,7 +214,7 @@ class BrowserTabViewModel(
     private var siteLiveData = MutableLiveData<Site>()
     private var site: Site? = null
     private lateinit var tabId: String
-    private var navigationOptions: BrowserNavigationOptions? = null
+    private var webNavigationState: WebNavigationState? = null
 
     init {
         initializeViewStates()
@@ -226,14 +238,15 @@ class BrowserTabViewModel(
         }
     }
 
-    private fun buildSiteFactory(url: String) {
+    private fun buildSiteFactory(url: String, title: String? = null) {
 
         if (buildingSiteFactoryJob?.isCompleted == false) {
             Timber.i("Cancelling existing work to build SiteMonitor for $url")
             buildingSiteFactoryJob?.cancel()
         }
 
-        site = siteFactory.buildSite(url)
+        site = siteFactory.buildSite(url, title)
+        onSiteChanged()
         buildingSiteFactoryJob = viewModelScope.launch(Dispatchers.IO) {
             site?.let {
                 siteFactory.loadFullSiteDetails(it)
@@ -257,7 +270,7 @@ class BrowserTabViewModel(
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
         val results = result.suggestions.take(6)
         val currentViewState = currentAutoCompleteViewState()
-        autoCompleteViewState.value = currentViewState.copy(searchResults = AutoCompleteResult(result.query, results))
+        autoCompleteViewState.value = currentViewState.copy(searchResults = AutoCompleteResult(result.query, results, result.hasBookmarks))
     }
 
     @VisibleForTesting
@@ -272,12 +285,29 @@ class BrowserTabViewModel(
     }
 
     fun onViewVisible() {
-        command.value = if (url == null) ShowKeyboard else HideKeyboard
+        command.value = if (!currentBrowserViewState().browserShowing) ShowKeyboard else HideKeyboard
         ctaViewModel.refreshCta()
     }
 
     fun onViewHidden() {
         skipHome = false
+    }
+
+    suspend fun fireAutocompletePixel(suggestion: AutoCompleteSuggestion) {
+        val currentViewState = currentAutoCompleteViewState()
+        val hasBookmarks = withContext(Dispatchers.IO) {
+            bookmarksDao.hasBookmarks()
+        }
+        val params = mapOf(
+            PixelParameter.SHOWED_BOOKMARKS to currentViewState.searchResults.hasBookmarks.toString(),
+            PixelParameter.BOOKMARK_CAPABLE to hasBookmarks.toString()
+        )
+        val pixelName = when (suggestion) {
+            is AutoCompleteBookmarkSuggestion -> PixelName.AUTOCOMPLETE_BOOKMARK_SELECTION
+            is AutoCompleteSearchSuggestion -> PixelName.AUTOCOMPLETE_SEARCH_SELECTION
+        }
+
+        pixel.fire(pixelName, params)
     }
 
     fun onUserSubmittedQuery(input: String) {
@@ -304,13 +334,13 @@ class BrowserTabViewModel(
 
         globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
         findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
-        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = trimmedInput)
+        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = trimmedInput, shouldMoveCaretToEnd = false)
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
         autoCompleteViewState.value = AutoCompleteViewState(false)
     }
 
     private fun shouldClearHistoryOnNewQuery(): Boolean {
-        val navigation = navigationOptions ?: return false
+        val navigation = webNavigationState ?: return false
         return !currentBrowserViewState().browserShowing && navigation.hasNavigationHistory
     }
 
@@ -330,7 +360,7 @@ class BrowserTabViewModel(
      * @return true if navigation handled, otherwise false
      */
     fun onUserPressedBack(): Boolean {
-        val navigation = navigationOptions ?: return false
+        val navigation = webNavigationState ?: return false
 
         if (!currentBrowserViewState().browserShowing) {
             return false
@@ -348,7 +378,6 @@ class BrowserTabViewModel(
     }
 
     private fun navigateHome() {
-        pendingUrl = null
         site = null
         onSiteChanged()
 
@@ -357,21 +386,8 @@ class BrowserTabViewModel(
             canGoBack = false,
             canGoForward = true
         )
-        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = "")
+        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = "", shouldMoveCaretToEnd = false)
         loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
-    }
-
-    override fun progressChanged(progressedUrl: String?, newProgress: Int) {
-        Timber.v("Loading in progress $newProgress")
-        if (!currentBrowserViewState().browserShowing) return
-        val progress = currentLoadingViewState()
-        loadingViewState.value = progress.copy(progress = newProgress)
-
-        if (progressedUrl == pendingUrl) {
-            // We change the url here rather than loadingStarted to protect against phishing
-            // See https://github.com/duckduckgo/Android/pull/390
-            urlChanged(pendingUrl)
-        }
     }
 
     override fun goFullScreen(view: View) {
@@ -386,45 +402,97 @@ class BrowserTabViewModel(
         browserViewState.value = currentState.copy(isFullScreen = false)
     }
 
-    override fun loadingStarted(url: String?) {
-        Timber.v("Loading started")
-        if (!currentBrowserViewState().browserShowing) return
-        val progress = currentLoadingViewState()
-        loadingViewState.value = progress.copy(isLoading = true)
-        pendingUrl = url
-        site = null
-        onSiteChanged()
-    }
+    override fun navigationStateChanged(newWebNavigationState: WebNavigationState) {
 
-    override fun navigationOptionsChanged(navigation: BrowserNavigationOptions) {
-        navigationOptions = navigation
+        val stateChange = newWebNavigationState.compare(webNavigationState)
+        webNavigationState = newWebNavigationState
 
         if (!currentBrowserViewState().browserShowing) return
 
         browserViewState.value = currentBrowserViewState().copy(
-            canGoBack = navigation.canGoBack || !skipHome,
-            canGoForward = navigation.canGoForward
+            canGoBack = newWebNavigationState.canGoBack || !skipHome,
+            canGoForward = newWebNavigationState.canGoForward
+        )
+
+        when (stateChange) {
+            is NewPage -> pageChanged(stateChange.url, stateChange.title)
+            is PageCleared -> pageCleared()
+            is UrlUpdated -> urlUpdated(stateChange.url)
+        }
+    }
+
+    private fun pageChanged(url: String, title: String?) {
+
+        Timber.v("Page changed: $url")
+        buildSiteFactory(url, title)
+
+        val currentOmnibarViewState = currentOmnibarViewState()
+        omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false))
+
+        val currentBrowserViewState = currentBrowserViewState()
+        findInPageViewState.postValue(FindInPageViewState(visible = false, canFindInPage = true))
+        browserViewState.postValue(
+            currentBrowserViewState.copy(
+                browserShowing = true,
+                canAddBookmarks = true,
+                addToHomeEnabled = true,
+                addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
+                canSharePage = true,
+                showPrivacyGrade = appConfigurationDownloaded
+            )
+        )
+
+        if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
+            statisticsUpdater.refreshSearchRetentionAtb()
+        }
+
+        registerSiteVisit()
+    }
+
+    private fun urlUpdated(url: String) {
+        Timber.v("Page url updated: $url")
+        site?.url = url
+        onSiteChanged()
+        val currentOmnibarViewState = currentOmnibarViewState()
+        omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false))
+    }
+
+    private fun omnibarTextForUrl(url: String?): String {
+        if (url == null) return ""
+        if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
+            return duckDuckGoUrlDetector.extractQuery(url) ?: ""
+        }
+        return url
+    }
+
+    private fun pageCleared() {
+        Timber.v("Page cleared: $url")
+        site = null
+        onSiteChanged()
+
+        val currentBrowserViewState = currentBrowserViewState()
+        browserViewState.value = currentBrowserViewState.copy(
+            canAddBookmarks = false,
+            addToHomeEnabled = false,
+            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
+            canSharePage = false,
+            showPrivacyGrade = false
         )
     }
 
-    override fun loadingFinished(url: String?) {
-        Timber.v("Loading finished")
-
-        if (!currentBrowserViewState().browserShowing) return
-
-        if (pendingUrl != null) {
-            urlChanged(url)
+    override fun pageRefreshed(refreshedUrl: String) {
+        if (url == null || refreshedUrl == url) {
+            Timber.v("Page refreshed: $refreshedUrl")
+            pageChanged(refreshedUrl, title)
         }
+    }
 
-        val currentOmnibarViewState = currentOmnibarViewState()
-        val currentLoadingViewState = currentLoadingViewState()
-
-        val omnibarText = if (url != null) omnibarTextForUrl(url) else currentOmnibarViewState.omnibarText
-
-        loadingViewState.value = currentLoadingViewState.copy(isLoading = false)
-        omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarText)
-
-        registerSiteVisit()
+    override fun progressChanged(newProgress: Int) {
+        Timber.v("Loading in progress $newProgress")
+        if (!currentBrowserViewState().browserShowing) return
+        val isLoading = newProgress < 100
+        val progress = currentLoadingViewState()
+        loadingViewState.value = progress.copy(isLoading = isLoading, progress = newProgress)
     }
 
     private fun registerSiteVisit() {
@@ -433,8 +501,8 @@ class BrowserTabViewModel(
         }
     }
 
-    override fun titleReceived(title: String) {
-        site?.title = (title)
+    override fun titleReceived(newTitle: String) {
+        site?.title = newTitle
         onSiteChanged()
     }
 
@@ -453,56 +521,9 @@ class BrowserTabViewModel(
         command.postValue(SendSms(telephoneNumber))
     }
 
-    private fun urlChanged(url: String?) {
-        Timber.v("Url changed: $url")
-
-        if (url == null) {
-            findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = false)
-
-            val currentBrowserViewState = currentBrowserViewState()
-            browserViewState.value = currentBrowserViewState.copy(
-                canAddBookmarks = false,
-                addToHomeEnabled = false,
-                addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported()
-            )
-
-            return
-        }
-
-        val currentBrowserViewState = currentBrowserViewState()
-        val currentOmnibarViewState = currentOmnibarViewState()
-
-        omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url)))
-        findInPageViewState.postValue(FindInPageViewState(visible = false, canFindInPage = true))
-        browserViewState.postValue(
-            currentBrowserViewState.copy(
-                browserShowing = true,
-                canAddBookmarks = true,
-                addToHomeEnabled = true,
-                addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
-                canSharePage = true,
-                showPrivacyGrade = appConfigurationDownloaded
-            )
-        )
-
-        if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            statisticsUpdater.refreshSearchRetentionAtb()
-        }
-        pendingUrl = null
-
-        buildSiteFactory(url)
-        onSiteChanged()
-    }
-
-    private fun omnibarTextForUrl(url: String): String {
-        if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            return duckDuckGoUrlDetector.extractQuery(url) ?: ""
-        }
-        return url
-    }
-
     override fun trackerDetected(event: TrackingEvent) {
-        if (event.documentUrl == url) {
+        Timber.d("Tracker detected while on $url and the document was ${event.documentUrl}")
+        if (site?.domainMatchesUrl(event.documentUrl) == true) {
             site?.trackerDetected(event)
             onSiteChanged()
         }
@@ -512,11 +533,10 @@ class BrowserTabViewModel(
     private fun updateNetworkLeaderboard(event: TrackingEvent) {
         val networkName = event.trackerNetwork?.name ?: return
         networkLeaderboardDao.incrementNetworkCount(networkName)
-        networkLeaderboardDao.incrementSitesVisited()
     }
 
-    override fun pageHasHttpResources(page: String?) {
-        if (page == url) {
+    override fun pageHasHttpResources(page: String) {
+        if (site?.domainMatchesUrl(page) == true) {
             site?.hasHttpResources = true
             onSiteChanged()
         }
@@ -545,7 +565,7 @@ class BrowserTabViewModel(
 
         // determine if empty list to be shown, or existing search results
         val autoCompleteSearchResults = if (query.isBlank()) {
-            AutoCompleteResult(query, emptyList())
+            AutoCompleteResult(query, emptyList(), false)
         } else {
             currentAutoCompleteViewState().searchResults
         }
@@ -586,7 +606,7 @@ class BrowserTabViewModel(
     }
 
     fun onUserSelectedToEditQuery(query: String) {
-        omnibarViewState.value = currentOmnibarViewState().copy(isEditing = false, omnibarText = query)
+        omnibarViewState.value = currentOmnibarViewState().copy(isEditing = false, omnibarText = query, shouldMoveCaretToEnd = true)
         autoCompleteViewState.value = AutoCompleteViewState(showSuggestions = false)
     }
 
@@ -632,7 +652,7 @@ class BrowserTabViewModel(
         command.value = OpenInNewBackgroundTab(url)
     }
 
-    fun userRequestingToFindInPage() {
+    fun onFindInPageSelected() {
         findInPageViewState.value = FindInPageViewState(visible = true, canFindInPage = true)
     }
 
@@ -665,18 +685,16 @@ class BrowserTabViewModel(
         globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
     }
 
-    fun desktopSiteModeToggled(urlString: String?, desktopSiteRequested: Boolean) {
+    fun onDesktopSiteModeToggled(desktopSiteRequested: Boolean) {
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(isDesktopBrowsingMode = desktopSiteRequested)
 
-        if (urlString == null) {
-            return
-        }
-        val url = Uri.parse(urlString)
-        if (desktopSiteRequested && url.isMobileSite) {
-            val desktopUrl = url.toDesktopUri()
-            Timber.i("Original URL $urlString - attempting $desktopUrl with desktop site UA string")
-            command.value = Navigate(desktopUrl.toString())
+        val uri = site?.uri ?: return
+
+        if (desktopSiteRequested && uri.isMobileSite) {
+            val desktopUrl = uri.toDesktopUri().toString()
+            Timber.i("Original URL $url - attempting $desktopUrl with desktop site UA string")
+            command.value = Navigate(desktopUrl)
         } else {
             command.value = Refresh
         }
@@ -691,10 +709,18 @@ class BrowserTabViewModel(
         findInPageViewState.value = FindInPageViewState()
     }
 
-    fun userSharingLink(url: String?) {
-        if (url != null) {
-            command.value = ShareLink(removeAtbAndSourceParamsFromSearch(url))
+    fun onAddBookmarkSelected() {
+        command.value = AddBookmark(title, url)
+    }
+
+    fun onShareSelected() {
+        url?.let {
+            command.value = ShareLink(removeAtbAndSourceParamsFromSearch(it))
         }
+    }
+
+    fun determineShowBrowser() {
+        browserViewState.value = currentBrowserViewState().copy(browserShowing = !url.isNullOrBlank())
     }
 
     private fun removeAtbAndSourceParamsFromSearch(url: String): String {
@@ -733,7 +759,8 @@ class BrowserTabViewModel(
     }
 
     @SuppressLint("CheckResult")
-    fun userRequestedToPinPageToHome(currentPage: String) {
+    fun onPinPageToHomeSelected() {
+        val currentPage = url ?: return
         val title = if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentPage)) {
             duckDuckGoUrlDetector.extractQuery(currentPage) ?: currentPage
         } else {
@@ -791,4 +818,3 @@ class BrowserTabViewModel(
         request.handler.cancel()
     }
 }
-

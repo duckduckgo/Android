@@ -75,39 +75,16 @@ class BrowserChromeClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnProgressChangedCalledThenListenerInstructedToUpdateProgressAndNavigationOptions() {
+    fun whenOnProgressChangedCalledThenListenerInstructedToUpdateProgress() {
         testee.onProgressChanged(webView, 10)
-        verify(mockWebViewClientListener).progressChanged(webView.stubUrl, 10)
-        verify(mockWebViewClientListener).navigationOptionsChanged(any())
+        verify(mockWebViewClientListener).progressChanged(10)
     }
 
     @UiThreadTest
     @Test
-    fun whenOnProgressChangedCalledButNoUrlChangeThenListenerInstructedToUpdateProgressASecondTime() {
-        webView.stubUrl = "foo.com"
+    fun whenOnProgressChangedCalledThenListenerInstructedToUpdateNavigationState() {
         testee.onProgressChanged(webView, 10)
-        testee.onProgressChanged(webView, 20)
-        verify(mockWebViewClientListener, times(2)).progressChanged(any(), any())
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnProgressChangedCalledAfterUrlChangeThenListenerInstructedToUpdateProgressAgain() {
-        webView.stubUrl = "foo.com"
-        testee.onProgressChanged(webView, 10)
-        testee.onProgressChanged(webView, 20)
-        webView.stubUrl = "bar.com"
-        testee.onProgressChanged(webView, 30)
-        verify(mockWebViewClientListener, times(3)).progressChanged(any(), any())
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnProgressChangedCalledThenPassedOnToWebClient() {
-        val url = "https://example.com"
-        webView.stubUrl = url
-        testee.onProgressChanged(webView, 10)
-        verify(mockWebViewClientListener).progressChanged(url, 10)
+        verify(mockWebViewClientListener).navigationStateChanged(any())
     }
 
     @UiThreadTest

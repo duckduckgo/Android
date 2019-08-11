@@ -17,9 +17,6 @@
 package com.duckduckgo.app.onboarding.ui
 
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.statistics.Variant
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertEquals
@@ -32,30 +29,20 @@ import org.junit.runners.Parameterized
 class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
 
     private lateinit var testee: OnboardingPageManager
-    private val variantManager: VariantManager = mock()
     private val onboardingPageBuilder: OnboardingPageBuilder = mock()
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
 
     @Before
     fun setup() {
-        testee = OnboardingPageManagerWithTrackerBlocking(variantManager, onboardingPageBuilder, mockDefaultBrowserDetector)
+        testee = OnboardingPageManagerWithTrackerBlocking(onboardingPageBuilder, mockDefaultBrowserDetector)
     }
 
     @Test
     fun ensurePageCountAsExpected() {
         configureDefaultBrowserPageConfig()
-        configureTrackerBlockerOptInPageConfig()
 
         testee.buildPageBlueprints()
         assertEquals(testCase.expectedPageCount, testee.pageCount())
-    }
-
-    private fun configureTrackerBlockerOptInPageConfig() {
-        if (testCase.trackerBlockerOptInPage) {
-            configureShowTrackerBlockerOptInPage()
-        } else {
-            configureHideTrackerBlockerOptInPage()
-        }
     }
 
     private fun configureDefaultBrowserPageConfig() {
@@ -72,10 +59,8 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
         @Parameterized.Parameters(name = "Test case: {index} - {0}")
         fun testData(): Array<TestCase> {
             return arrayOf(
-                TestCase(false, false, 1),
-                TestCase(false, true, 2),
-                TestCase(true, false, 2),
-                TestCase(true, true, 3)
+                TestCase(false, 1),
+                TestCase(true, 2)
             )
         }
     }
@@ -88,13 +73,5 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
         whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(false)
     }
 
-    private fun configureShowTrackerBlockerOptInPage() {
-        whenever(variantManager.getVariant()).thenReturn(Variant("test", features = listOf(VariantFeature.TrackerBlockingOnboardingOptIn)))
-    }
-
-    private fun configureHideTrackerBlockerOptInPage() {
-        whenever(variantManager.getVariant()).thenReturn(Variant("test", features = emptyList()))
-    }
-
-    data class TestCase(val trackerBlockerOptInPage: Boolean, val defaultBrowserPage: Boolean, val expectedPageCount: Int)
+    data class TestCase(val defaultBrowserPage: Boolean, val expectedPageCount: Int)
 }

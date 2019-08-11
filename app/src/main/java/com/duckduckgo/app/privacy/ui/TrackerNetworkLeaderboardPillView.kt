@@ -45,11 +45,11 @@ class TrackerNetworkLeaderboardPillView : FrameLayout {
         View.inflate(context, R.layout.view_network_tracker_pill, this)
     }
 
-    fun render(netowrkEntity: NetworkLeaderboardEntry?, totalSitesVisited: Int) {
-        netowrkEntity ?: return
-        icon.setImageResource(renderer.networkPillIcon(context, netowrkEntity.networkName) ?: R.drawable.network_pill_generic)
-        val percentText = renderer.networkPercentage(netowrkEntity, totalSitesVisited)
-        icon.contentDescription = "${netowrkEntity.networkName} $percentText"
+    fun render(networkEntity: NetworkLeaderboardEntry?, totalSitesVisited: Int) {
+        networkEntity ?: return
+        icon.setImageResource(renderer.networkPillIcon(context, networkEntity.networkName) ?: R.drawable.network_pill_generic)
+        val percentText = renderer.networkPercentage(networkEntity, totalSitesVisited)
+        icon.contentDescription = "${networkEntity.networkName} $percentText"
         percentage.text = percentText
     }
 

@@ -20,18 +20,13 @@ import android.os.Bundle
 import androidx.annotation.StringRes
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
-import com.duckduckgo.app.onboarding.ui.page.TrackerBlockerOptInPage
 import com.duckduckgo.app.onboarding.ui.page.UnifiedSummaryPage
 
 interface OnboardingPageBuilder {
-    fun buildTrackerBlockingOptInPage(): TrackerBlockerOptInPage
     fun buildSummaryPage(@StringRes continueButtonTextResourceId: Int?): UnifiedSummaryPage
     fun buildDefaultBrowserPage(@StringRes continueButtonTextResourceId: Int?): DefaultBrowserPage
 
     sealed class OnboardingPageBlueprint(@StringRes open var continueButtonTextResourceId: Int) {
-
-        data class TrackerBlockingOptInBlueprint(override var continueButtonTextResourceId: Int = 0) :
-            OnboardingPageBlueprint(continueButtonTextResourceId)
 
         data class SummaryPageBlueprint(override var continueButtonTextResourceId: Int = 0) :
             OnboardingPageBlueprint(continueButtonTextResourceId)
@@ -42,10 +37,6 @@ interface OnboardingPageBuilder {
 }
 
 class OnboardingFragmentPageBuilder : OnboardingPageBuilder {
-
-    override fun buildTrackerBlockingOptInPage(): TrackerBlockerOptInPage {
-        return TrackerBlockerOptInPage()
-    }
 
     override fun buildSummaryPage(@StringRes continueButtonTextResourceId: Int?): UnifiedSummaryPage {
         val bundle = Bundle()

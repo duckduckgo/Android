@@ -22,7 +22,6 @@ import android.view.View
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
-import com.duckduckgo.app.browser.BrowserWebViewClient.WebViewNavigationOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -61,9 +60,10 @@ class BrowserChromeClient @Inject constructor() : WebChromeClient(), CoroutineSc
     }
 
     override fun onProgressChanged(webView: WebView, newProgress: Int) {
-        Timber.d("onProgressChanged - $newProgress - ${webView.url}")
-        webViewClientListener?.progressChanged(webView.url, newProgress)
-        webViewClientListener?.navigationOptionsChanged(WebViewNavigationOptions(webView.copyBackForwardList()))
+        Timber.d("onProgressChanged ${webView.url}, $newProgress")
+        val navigationList = webView.copyBackForwardList()
+        webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
+        webViewClientListener?.progressChanged(newProgress)
     }
 
     override fun onReceivedTitle(view: WebView, title: String) {

@@ -24,6 +24,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @Suppress("RemoveExplicitTypeArguments")
 class WebViewCookieManagerTest {
@@ -33,8 +35,17 @@ class WebViewCookieManagerTest {
     private val cookieManager: CookieManager = CookieManager.getInstance()
 
     @Before
-    fun setup() {
+    fun setup() = runBlocking {
+        removeExistingCookies()
         testee = WebViewCookieManager(cookieManager, host)
+    }
+
+    private suspend fun removeExistingCookies() {
+        withContext(Dispatchers.Main) {
+            suspendCoroutine<Unit> { continuation ->
+                cookieManager.removeAllCookies { continuation.resume(Unit) }
+            }
+        }
     }
 
     @Test

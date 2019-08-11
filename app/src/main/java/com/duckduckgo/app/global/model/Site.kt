@@ -17,6 +17,8 @@
 package com.duckduckgo.app.global.model
 
 import android.net.Uri
+import androidx.core.net.toUri
+import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.model.SiteFactory.SitePrivacyData
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -26,19 +28,29 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 
 interface Site {
 
-    val url: String
-    val privacyPractices: PrivacyPractices.Practices
-    val memberNetwork: TrackerNetwork?
+    /*
+     * The current url for this site. This is sometimes different to the url originally
+     * loaded as the url may change while loading a site
+     */
+    var url: String
 
+    /*
+     * The current uri for this site. This is sometimes different to the url originally
+     * loaded as the url may change while loading a site
+     */
     val uri: Uri?
+
     var title: String?
     val https: HttpsStatus
+    var hasHttpResources: Boolean
+
+    val privacyPractices: PrivacyPractices.Practices
+    val memberNetwork: TrackerNetwork?
     val trackingEvents: List<TrackingEvent>
     val trackerCount: Int
     val distinctTrackersByNetwork: Map<String, List<TrackingEvent>>
     val majorNetworkCount: Int
     val allTrackersBlocked: Boolean
-    var hasHttpResources: Boolean
     fun trackerDetected(event: TrackingEvent)
     fun updatePrivacyData(sitePrivacyData: SitePrivacyData)
 
@@ -46,4 +58,8 @@ interface Site {
 
     data class SiteGrades(val grade: PrivacyGrade, val improvedGrade: PrivacyGrade)
 
+}
+
+fun Site.domainMatchesUrl(matchingUrl: String): Boolean {
+    return uri?.baseHost == matchingUrl.toUri().baseHost
 }

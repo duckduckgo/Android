@@ -27,6 +27,8 @@ import com.duckduckgo.app.privacy.model.TrustedSites
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.ResourceType
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface RequestInterceptor {
@@ -35,7 +37,7 @@ interface RequestInterceptor {
     suspend fun shouldIntercept(
         request: WebResourceRequest,
         webView: WebView,
-        currentUrl: String?,
+        documentUrl: String?,
         webViewClientListener: WebViewClientListener?
     ): WebResourceResponse?
 }
@@ -61,19 +63,24 @@ class WebViewRequestInterceptor(
     override suspend fun shouldIntercept(
         request: WebResourceRequest,
         webView: WebView,
-        currentUrl: String?,
+        documentUrl: String?,
         webViewClientListener: WebViewClientListener?
     ): WebResourceResponse? {
+
         val url = request.url
 
         if (shouldUpgrade(request)) {
             val newUri = httpsUpgrader.upgrade(url)
-            webView.post { webView.loadUrl(newUri.toString()) }
+
+            withContext(Dispatchers.Main) {
+                webView.loadUrl(newUri.toString())
+            }
+
             privacyProtectionCountDao.incrementUpgradeCount()
             return WebResourceResponse(null, null, null)
         }
 
-        val documentUrl = currentUrl ?: return null
+        if (documentUrl == null) return null
 
         if (TrustedSites.isTrusted(documentUrl)) {
             return null

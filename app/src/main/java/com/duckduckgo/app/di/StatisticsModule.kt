@@ -20,16 +20,13 @@ import android.content.Context
 import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.api.PixelService
-import com.duckduckgo.app.statistics.api.StatisticsRequester
-import com.duckduckgo.app.statistics.api.StatisticsService
-import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.api.*
 import com.duckduckgo.app.statistics.pixels.ApiBasedPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import dagger.Module
 import dagger.Provides
-import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import javax.inject.Named
 
@@ -49,15 +46,18 @@ class StatisticsModule {
         StatisticsRequester(statisticsDataStore, statisticsService, variantManager)
 
     @Provides
-    fun pixelService(@Named("pixel") okHttpClient: OkHttpClient, @Named("pixel") retrofit: Retrofit): PixelService {
+    fun pixelService(@Named("nonCaching") retrofit: Retrofit): PixelService {
         return retrofit.create(PixelService::class.java)
     }
 
     @Provides
-    fun deviceInfo(context: Context): DeviceInfo = ContextDeviceInfo(context)
-
-    @Provides
     fun pixel(pixelService: PixelService, statisticsDataStore: StatisticsDataStore, variantManager: VariantManager, deviceInfo: DeviceInfo): Pixel =
         ApiBasedPixel(pixelService, statisticsDataStore, variantManager, deviceInfo)
+
+    @Provides
+    fun offlinePixelSender(offlinePixelDataStore: OfflinePixelDataStore, pixel: Pixel): OfflinePixelSender = OfflinePixelSender(offlinePixelDataStore, pixel )
+
+    @Provides
+    fun deviceInfo(context: Context): DeviceInfo = ContextDeviceInfo(context)
 
 }

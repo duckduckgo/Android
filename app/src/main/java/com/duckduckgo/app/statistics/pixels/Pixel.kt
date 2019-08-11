@@ -32,16 +32,10 @@ interface Pixel {
 
         APP_LAUNCH("ml"),
         FORGET_ALL_EXECUTED("mf"),
+        WEB_RENDERER_GONE("m_d_wrg"),
 
         ONBOARDING_DEFAULT_BROWSER_SETTINGS_LAUNCHED("m_odb_l"),
         ONBOARDING_DEFAULT_BROWSER_SKIPPED("m_odb_s"),
-
-        ONBOARDING_TRACKER_BLOCKING_USER_OPTED_IN("m_otbi_y"),
-        ONBOARDING_TRACKER_BLOCKING_USER_DECLINED("m_otbi_n"),
-        ONBOARDING_TRACKER_BLOCKING_OPT_OUT_DIALOG_CONTINUE_ANYWAY("m_otbd_c"),
-        ONBOARDING_TRACKER_BLOCKING_OPT_OUT_DIALOG_CANCELLED("m_otbd_x"),
-        ONBOARDING_TRACKER_BLOCKING_FINAL_ONBOARDING_STATE_ENABLED("m_otbf_y"),
-        ONBOARDING_TRACKER_BLOCKING_FINAL_ONBOARDING_STATE_DISABLED("m_otbf_n"),
 
         PRIVACY_DASHBOARD_OPENED("mp"),
         PRIVACY_DASHBOARD_SCORECARD("mp_c"),
@@ -72,9 +66,6 @@ interface Pixel {
         SETTINGS_OPENED("ms"),
         SETTINGS_THEME_TOGGLED_LIGHT("ms_tl"),
         SETTINGS_THEME_TOGGLED_DARK("ms_td"),
-
-        HTTPS_UPGRADE_SITE_ERROR("ehd"),
-        HTTPS_UPGRADE_SITE_SUMMARY("ehs"),
 
         SURVEY_CTA_SHOWN(pixelName = "mus_cs"),
         SURVEY_CTA_DISMISSED(pixelName = "mus_cd"),
@@ -116,15 +107,20 @@ interface Pixel {
         APP_FEEDBACK_DIALOG_USER_CANCELLED("mrp_f_d%d_c"),
 
         FEEDBACK_POSITIVE_SUBMISSION("mfbs_%s_submit"),
-        FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s")
+        FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s"),
+
+        AUTOCOMPLETE_BOOKMARK_SELECTION("m_aut_s_b"),
+        AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s"),
+
+        BOOKMARKS_IN_AUTOCOMPLETE_ENABLED("m_biaut_e"),
+        BOOKMARKS_IN_AUTOCOMPLETE_DISABLED("m_biaut_d")
     }
 
     object PixelParameter {
-        const val URL = "url"
-        const val ERROR_CODE = "error_code"
-        const val TOTAL_COUNT = "total"
-        const val FAILURE_COUNT = "failures"
-        const val APP_VERSION = "app_version"
+        const val BOOKMARK_CAPABLE = "bc"
+        const val SHOWED_BOOKMARKS = "sb"
+        const val WEB_RENDERER_GONE_CRASH = "wrc"
+        const val WEB_RENDERER_GONE_OTHER = "wro"
     }
 
     fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap(), includeLocale: Boolean = false)
