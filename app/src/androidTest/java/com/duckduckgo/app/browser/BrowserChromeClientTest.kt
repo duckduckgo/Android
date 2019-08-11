@@ -89,12 +89,19 @@ class BrowserChromeClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnCreateWindowThenOpenUrlInNewTab() {
-        val url = "https://example.com"
-        webView.stubUrl = url
-        testee.onCreateWindow(webView, false, true,  null)
+    fun whenOnCreateWindowWithUserGestureThenOpenUrlInNewTab() {
+        webView.stubUrl = "https://example.com"
+        testee.onCreateWindow(webView, isDialog = false, isUserGesture = true,  resultMsg = null)
         verify(mockWebViewClientListener).openInNewTab(webView.stubUrl)
         verifyNoMoreInteractions(mockWebViewClientListener)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnCreateWindowNoUserGestureThenOpenUrlInNewTab() {
+        webView.stubUrl = "https://example.com"
+        testee.onCreateWindow(webView, isDialog = false, isUserGesture = false, resultMsg = null)
+        verifyZeroInteractions(mockWebViewClientListener)
     }
 
     private class TestWebView(context: Context) : WebView(context) {
