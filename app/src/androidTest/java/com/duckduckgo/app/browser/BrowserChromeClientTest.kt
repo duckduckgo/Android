@@ -92,7 +92,7 @@ class BrowserChromeClientTest {
     fun whenOnCreateWindowThenOpenUrlInNewTab() {
         val url = "https://example.com"
         webView.stubUrl = url
-        testee.onCreateWindow(webView, false, false,  null)
+        testee.onCreateWindow(webView, false, true,  null)
         verify(mockWebViewClientListener).openInNewTab(webView.stubUrl)
         verifyNoMoreInteractions(mockWebViewClientListener)
     }

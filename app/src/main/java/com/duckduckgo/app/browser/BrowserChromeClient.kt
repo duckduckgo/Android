@@ -75,8 +75,11 @@ class BrowserChromeClient @Inject constructor() : WebChromeClient(), CoroutineSc
         return true
     }
 
-    override fun onCreateWindow(view: WebView?, isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message?): Boolean {
-        webViewClientListener?.openInNewTab(view?.url)
-        return super.onCreateWindow(view, isDialog, isUserGesture, resultMsg)
-    }
+    override fun onCreateWindow(view: WebView?, isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message?): Boolean =
+        if (isUserGesture) {
+            webViewClientListener?.openInNewTab(view?.url)
+            true
+        } else {
+            false
+        }
 }
