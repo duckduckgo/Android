@@ -802,7 +802,7 @@ class BrowserTabViewModel(
     }
 
     override fun openInNewTab(url: String?) {
-        command.value = OpenInNewTab(url ?: "")
+        command.value = OpenInNewTab(url.orEmpty())
     }
 
     override fun requiresAuthentication(request: BasicAuthenticationRequest) {
