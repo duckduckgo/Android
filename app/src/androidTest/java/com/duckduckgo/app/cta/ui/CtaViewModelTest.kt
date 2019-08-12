@@ -174,21 +174,21 @@ class CtaViewModelTest {
     fun whenCtaShownPixelIsFired() {
         testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
         testee.onCtaShown()
-        verify(mockPixel).fire(eq(SURVEY_CTA_SHOWN), any(), eq(false))
+        verify(mockPixel).fire(eq(SURVEY_CTA_SHOWN), any())
     }
 
     @Test
     fun whenCtaLaunchedPixelIsFired() {
         testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
         testee.onCtaLaunched()
-        verify(mockPixel).fire(eq(SURVEY_CTA_LAUNCHED), any(), eq(false))
+        verify(mockPixel).fire(eq(SURVEY_CTA_LAUNCHED), any())
     }
 
     @Test
     fun whenCtaDismissedPixelIsFired() {
         testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
         testee.onCtaDismissed()
-        verify(mockPixel).fire(eq(SURVEY_CTA_DISMISSED), any(), eq(false))
+        verify(mockPixel).fire(eq(SURVEY_CTA_DISMISSED), any())
     }
 
     @Test

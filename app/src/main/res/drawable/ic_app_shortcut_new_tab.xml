@@ -1,34 +1,14 @@
-<!--
-  ~ Copyright (c) 2018 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
-    android:viewportWidth="48"
-    android:viewportHeight="48">
+    android:viewportWidth="24"
+    android:viewportHeight="24">
     <path
         android:fillColor="#F5F5F5"
         android:fillType="evenOdd"
-        android:pathData="M24,24m-22,0a22,22 0,1 1,44 0a22,22 0,1 1,-44 0" />
+        android:pathData="M12,12m-12,0a12,12 0,1 1,24 0a12,12 0,1 1,-24 0" />
     <path
         android:fillColor="#DE5833"
         android:fillType="nonZero"
-        android:pathData="M18,14v16h16L34,14L18,14zM20.25,12h13.5A2.25,2.25 0,0 1,36 14.25v13.5A2.25,2.25 0,0 1,33.75 30h-13.5A2.25,2.25 0,0 1,18 27.75v-13.5A2.25,2.25 0,0 1,20.25 12z" />
-    <path
-        android:fillColor="#DE5833"
-        android:fillType="nonZero"
-        android:pathData="M24,24v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM16,16h14a2,2 0,0 1,2 2v14a2,2 0,0 1,-2 2L16,34a2,2 0,0 1,-2 -2L14,18a2,2 0,0 1,2 -2z" />
+        android:pathData="M5.7,7.8c-0.385,0 -0.7,0.315 -0.7,0.7v9.1c0,0.77 0.63,1.4 1.4,1.4h9.1c0.385,0 0.7,-0.315 0.7,-0.7 0,-0.385 -0.315,-0.7 -0.7,-0.7L7.1,17.6a0.702,0.702 0,0 1,-0.7 -0.7L6.4,8.5c0,-0.385 -0.315,-0.7 -0.7,-0.7zM17.6,5L9.2,5c-0.77,0 -1.4,0.63 -1.4,1.4v8.4c0,0.77 0.63,1.4 1.4,1.4h8.4c0.77,0 1.4,-0.63 1.4,-1.4L19,6.4c0,-0.77 -0.63,-1.4 -1.4,-1.4zM16.2,11.3h-2.1v2.1c0,0.385 -0.315,0.7 -0.7,0.7a0.702,0.702 0,0 1,-0.7 -0.7v-2.1h-2.1a0.702,0.702 0,0 1,-0.7 -0.7c0,-0.385 0.315,-0.7 0.7,-0.7h2.1L12.7,7.8c0,-0.385 0.315,-0.7 0.7,-0.7 0.385,0 0.7,0.315 0.7,0.7v2.1h2.1c0.385,0 0.7,0.315 0.7,0.7 0,0.385 -0.315,0.7 -0.7,0.7z" />
 </vector>
