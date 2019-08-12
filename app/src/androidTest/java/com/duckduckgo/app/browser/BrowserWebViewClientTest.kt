@@ -17,15 +17,16 @@
 package com.duckduckgo.app.browser
 
 import android.content.Context
+import android.os.Build
 import android.webkit.HttpAuthHandler
+import android.webkit.RenderProcessGoneDetail
 import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.verify
+import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
+import com.nhaarman.mockitokotlin2.*
 import org.junit.Before
 import org.junit.Test
 
@@ -38,6 +39,7 @@ class BrowserWebViewClientTest {
     private val specialUrlDetector: SpecialUrlDetector = mock()
     private val requestInterceptor: RequestInterceptor = mock()
     private val listener: WebViewClientListener = mock()
+    private val offlinePixelDataStore: OfflinePixelDataStore = mock()
 
     @UiThreadTest
     @Before
@@ -46,7 +48,8 @@ class BrowserWebViewClientTest {
         testee = BrowserWebViewClient(
             requestRewriter,
             specialUrlDetector,
-            requestInterceptor
+            requestInterceptor,
+            offlinePixelDataStore
         )
         testee.webViewClientListener = listener
     }
@@ -88,6 +91,24 @@ class BrowserWebViewClientTest {
         val authenticationRequest = BasicAuthenticationRequest(mockHandler, EXAMPLE_URL, EXAMPLE_URL, EXAMPLE_URL)
         testee.onReceivedHttpAuthRequest(webView, mockHandler, EXAMPLE_URL, EXAMPLE_URL)
         verify(listener).requiresAuthentication(authenticationRequest)
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun whenRenderProcessGoneDueToCrashThenCrashDataStoreEntryIsIncremented() {
+        val detail: RenderProcessGoneDetail = mock()
+        whenever(detail.didCrash()).thenReturn(true)
+        testee.onRenderProcessGone(webView, detail)
+        verify(offlinePixelDataStore, times(1)).webRendererGoneCrashCount = 1
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun whenRenderProcessGoneDueToNonCrashThenOtherDataStoreEntryIsIncremented() {
+        val detail: RenderProcessGoneDetail = mock()
+        whenever(detail.didCrash()).thenReturn(false)
+        testee.onRenderProcessGone(webView, detail)
+        verify(offlinePixelDataStore, times(1)).webRendererGoneOtherCount = 1
     }
 
     private class TestWebView(context: Context) : WebView(context)
