@@ -18,7 +18,6 @@ package com.duckduckgo.app.statistics
 
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.TrackerBlockingOnboardingOptIn
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
 
@@ -26,8 +25,7 @@ import timber.log.Timber
 interface VariantManager {
 
     sealed class VariantFeature {
-        object TrackerBlockingOnboardingOptIn : VariantFeature()
-
+        // variant-dependant features listed here
         object TabSwitcherGrid : VariantFeature()
     }
 
@@ -42,10 +40,6 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList()),
             Variant(key = "se", weight = 0.0, features = emptyList()),
-
-            // tracker blocker opt in variants
-            Variant(key = "mm", weight = 0.0, features = emptyList()),
-            Variant(key = "mn", weight = 0.0, features = listOf(TrackerBlockingOnboardingOptIn)),
 
             Variant(key = "mw", weight = 1.0, features = emptyList()),
             Variant(key = "mx", weight = 1.0, features = listOf(VariantFeature.TabSwitcherGrid))

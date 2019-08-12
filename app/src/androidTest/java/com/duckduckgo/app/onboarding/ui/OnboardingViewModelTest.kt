@@ -43,10 +43,10 @@ class OnboardingViewModelTest {
     private val mockDefaultBrowserCapabilityDetector: DefaultBrowserDetector = mock()
     private val pixelSender: Pixel = mock()
     private val mockPageLayout: OnboardingPageManager =
-        OnboardingPageManagerWithTrackerBlocking(variantManager, OnboardingFragmentPageBuilder(), mockDefaultBrowserCapabilityDetector)
+        OnboardingPageManagerWithTrackerBlocking(OnboardingFragmentPageBuilder(), mockDefaultBrowserCapabilityDetector)
 
     private val testee: OnboardingViewModel by lazy {
-        OnboardingViewModel(onboardingStore, privacySettingsStore, mockPageLayout, variantManager, pixelSender)
+        OnboardingViewModel(onboardingStore, mockPageLayout)
     }
 
     @Test

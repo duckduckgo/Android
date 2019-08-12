@@ -32,16 +32,10 @@ interface Pixel {
 
         APP_LAUNCH("ml"),
         FORGET_ALL_EXECUTED("mf"),
+        WEB_RENDERER_GONE("m_d_wrg"),
 
         ONBOARDING_DEFAULT_BROWSER_SETTINGS_LAUNCHED("m_odb_l"),
         ONBOARDING_DEFAULT_BROWSER_SKIPPED("m_odb_s"),
-
-        ONBOARDING_TRACKER_BLOCKING_USER_OPTED_IN("m_otbi_y"),
-        ONBOARDING_TRACKER_BLOCKING_USER_DECLINED("m_otbi_n"),
-        ONBOARDING_TRACKER_BLOCKING_OPT_OUT_DIALOG_CONTINUE_ANYWAY("m_otbd_c"),
-        ONBOARDING_TRACKER_BLOCKING_OPT_OUT_DIALOG_CANCELLED("m_otbd_x"),
-        ONBOARDING_TRACKER_BLOCKING_FINAL_ONBOARDING_STATE_ENABLED("m_otbf_y"),
-        ONBOARDING_TRACKER_BLOCKING_FINAL_ONBOARDING_STATE_DISABLED("m_otbf_n"),
 
         PRIVACY_DASHBOARD_OPENED("mp"),
         PRIVACY_DASHBOARD_SCORECARD("mp_c"),
@@ -125,6 +119,8 @@ interface Pixel {
     object PixelParameter {
         const val BOOKMARK_CAPABLE = "bc"
         const val SHOWED_BOOKMARKS = "sb"
+        const val WEB_RENDERER_GONE_CRASH = "wrc"
+        const val WEB_RENDERER_GONE_OTHER = "wro"
     }
 
     fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap(), includeLocale: Boolean = false)

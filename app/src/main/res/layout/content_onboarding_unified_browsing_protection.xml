@@ -39,7 +39,7 @@
 
         <TextView
             android:id="@+id/browserProtectionSubtitle"
-            android:text="@string/unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingDisabled"
+            android:text="@string/unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled"
             style="@style/OnboardingListItemSubtitle"
             app:layout_constraintStart_toStartOf="@id/browserProtectionTitle"
             app:layout_constraintTop_toBottomOf="@id/browserProtectionTitle" />
