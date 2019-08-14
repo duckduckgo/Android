@@ -24,6 +24,7 @@ import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.api.OfflinePixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.Module
 import dagger.Provides
@@ -35,6 +36,7 @@ class WorkerModule {
     @Provides
     @Singleton
     fun workerFactory(
+        offlinePixelSender: OfflinePixelSender,
         settingsDataStore: SettingsDataStore,
         clearDataAction: ClearDataAction,
         notficationManager: NotificationManagerCompat,
@@ -45,6 +47,7 @@ class WorkerModule {
         pixel: Pixel
     ): WorkerFactory {
         return DaggerWorkerFactory(
+            offlinePixelSender,
             settingsDataStore,
             clearDataAction,
             notficationManager,

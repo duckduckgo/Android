@@ -16,9 +16,12 @@
 
 package com.duckduckgo.app.statistics.pixels
 
+import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.PixelService
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
@@ -31,7 +34,10 @@ interface Pixel {
 
         APP_LAUNCH("ml"),
         FORGET_ALL_EXECUTED("mf"),
-        WEB_RENDERER_GONE("m_d_wrg"),
+
+        APPLICATION_CRASH("m_d_ac"),
+        WEB_RENDERER_GONE_CRASH("m_d_wrg_c"),
+        WEB_RENDERER_GONE_KILLED("m_d_wrg_k"),
 
         ONBOARDING_DEFAULT_BROWSER_SETTINGS_LAUNCHED("m_odb_l"),
         ONBOARDING_DEFAULT_BROWSER_SKIPPED("m_odb_s"),
@@ -116,16 +122,15 @@ interface Pixel {
     }
 
     object PixelParameter {
+        const val APP_VERSION = "version"
+        const val COUNT = "count"
         const val BOOKMARK_CAPABLE = "bc"
         const val SHOWED_BOOKMARKS = "sb"
-        const val WEB_RENDERER_GONE_CRASH = "wrc"
-        const val WEB_RENDERER_GONE_OTHER = "wro"
     }
 
     fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap())
     fun fire(pixelName: String, parameters: Map<String, String?> = emptyMap())
     fun fireCompletable(pixelName: String, parameters: Map<String, String?>): Completable
-
 }
 
 class ApiBasedPixel @Inject constructor(
@@ -135,12 +140,11 @@ class ApiBasedPixel @Inject constructor(
     private val deviceInfo: DeviceInfo
 ) : Pixel {
 
-    override fun fire(pixel: Pixel.PixelName, parameters: Map<String, String?>) {
+    override fun fire(pixel: PixelName, parameters: Map<String, String?>) {
         fire(pixel.pixelName, parameters)
     }
 
     override fun fire(pixelName: String, parameters: Map<String, String?>) {
-
         fireCompletable(pixelName, parameters)
             .subscribeOn(Schedulers.io())
             .subscribe({
@@ -151,7 +155,9 @@ class ApiBasedPixel @Inject constructor(
     }
 
     override fun fireCompletable(pixelName: String, parameters: Map<String, String?>): Completable {
+        val defaultParameters = mapOf(PixelParameter.APP_VERSION to deviceInfo.appVersion)
+        val fullParameters = defaultParameters.plus(parameters)
         val atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
-        return api.fire(pixelName, deviceInfo.formFactor().description, atb, parameters)
+        return api.fire(pixelName, deviceInfo.formFactor().description, atb, fullParameters)
     }
 }

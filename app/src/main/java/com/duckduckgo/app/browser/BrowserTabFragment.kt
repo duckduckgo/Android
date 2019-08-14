@@ -658,7 +658,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 setSupportZoom(true)
             }
 
-            it.setDownloadListener { url, userAgent, contentDisposition, mimeType, contentLength ->
+            it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
                 requestFileDownload(url, contentDisposition, mimeType)
             }
 

@@ -108,7 +108,7 @@ class BrowserWebViewClientTest {
         val detail: RenderProcessGoneDetail = mock()
         whenever(detail.didCrash()).thenReturn(false)
         testee.onRenderProcessGone(webView, detail)
-        verify(offlinePixelDataStore, times(1)).webRendererGoneOtherCount = 1
+        verify(offlinePixelDataStore, times(1)).webRendererGoneKilledCount = 1
     }
 
     private class TestWebView(context: Context) : WebView(context)

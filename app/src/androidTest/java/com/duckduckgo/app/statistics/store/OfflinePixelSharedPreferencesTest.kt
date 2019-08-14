@@ -36,6 +36,17 @@ class OfflinePixelSharedPreferencesTest {
     }
 
     @Test
+    fun whenInitializedThenApplicartionCountIsZero() {
+        assertEquals(0, testee.applicationCrashCount)
+    }
+
+    @Test
+    fun whenApplicationCrashCountIsSetThenUpdated() {
+        testee.applicationCrashCount = 2
+        assertEquals(2, testee.applicationCrashCount)
+    }
+
+    @Test
     fun whenInitializedThenWebRendererGoneCrashCountIsZero() {
         assertEquals(0, testee.webRendererGoneCrashCount)
     }
@@ -47,13 +58,13 @@ class OfflinePixelSharedPreferencesTest {
     }
 
     @Test
-    fun whenInitializedThenWebRendererGoneOtherCountIsZero() {
-        assertEquals(0, testee.webRendererGoneOtherCount)
+    fun whenInitializedThenWebRendererGoneKilledCountIsZero() {
+        assertEquals(0, testee.webRendererGoneKilledCount)
     }
 
     @Test
-    fun whenWebRendererOtherCrashCountIsSetThenUpdated() {
-        testee.webRendererGoneOtherCount = 2
-        assertEquals(2, testee.webRendererGoneOtherCount)
+    fun whenWebRendererKilledCrashCountIsSetThenUpdated() {
+        testee.webRendererGoneKilledCount = 2
+        assertEquals(2, testee.webRendererGoneKilledCount)
     }
 }

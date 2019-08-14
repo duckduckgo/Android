@@ -125,7 +125,7 @@ class BrowserWebViewClient(
         if (detail?.didCrash() == true) {
             offlinePixelDataStore.webRendererGoneCrashCount += 1
         } else {
-            offlinePixelDataStore.webRendererGoneOtherCount += 1
+            offlinePixelDataStore.webRendererGoneKilledCount += 1
         }
         return super.onRenderProcessGone(view, detail)
     }
