@@ -32,7 +32,7 @@ There is a branch containing the current translations, called [`feature/app_tran
 1. Each language has a `values` directory containing the language code, and the `strings.xml` file contains the translations. Examples:
     - Italian translation files are located within `values-it/strings.xml`  
     - Spanish translation files are located within `values-es/strings.xml`
-1. If you notice anything which could be improved, you will create a PR containing the improved language suggestions and those changes will be merged into that branch if accepted.
+1. If you notice anything which could be improved, you should create a PR containing the improved language suggestions and those changes will be merged into that branch if accepted.
     1. Fork the project, and clone your new fork
     1. Checkout the `feature/app_translation` branch
     1. Make the changes to the relevant `strings.xml` file.
