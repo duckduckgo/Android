@@ -33,12 +33,13 @@ There is a branch containing the current translations, called [`feature/app_tran
     - Italian translation files are located within `values-it/strings.xml`  
     - Spanish translation files are located within `values-es/strings.xml`
 1. If you notice anything which could be improved, you should create a PR containing the improved language suggestions and those changes will be merged into that branch if accepted.
-    1. Fork the project, and clone your new fork
-    1. Checkout the `feature/app_translation` branch
-    1. Make the changes to the relevant `strings.xml` file.
-    1. Commit and push the changes to your fork
-    1. Create a Pull Request for your changes.
-    1. Ensure your target branch in your PR is to merge into `feature/app_translations`
+    1. Fork the project, and clone your forked project to your machine. [https://help.github.com/en/articles/fork-a-repo]
+    1. Checkout the translations branch `git checkout --track origin/feature/app_translations`
+    1. Make the changes to the relevant `strings.xml` file, and commit
+    1. Test the app in the language you've improved, and ensure the changed strings look good
+    1. Push the changes to your fork `git push origin`
+    1. Create a Pull Request for your changes. [https://help.github.com/en/articles/creating-a-pull-request-from-a-fork]
+        - Ensure the base branch in your PR is `feature/app_translations`
       
 
 ℹ️ Please note we are not looking for help with other languages at this time; only the languages listed above. e may open up requests in future for additional languages. 
