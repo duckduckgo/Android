@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+﻿<!--
   ~ Copyright (c) 2019 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,5 +14,374 @@
   ~ limitations under the License.
   -->
 
-<resources>
-</resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="appName" translatable="false">DuckDuckGo</string>
+    <string name="duckDuckGoLogoDescription">Логотип DuckDuckGo</string>
+
+    <!-- Onboarding Activity -->
+    <string name="onboardingDefaultBrowserTitle">Обеспечение конфиденциальности по умолчанию</string>
+    <string name="onboardingDefaultBrowserDescription">Чтобы сделать DuckDuckGo поисковой системой по умолчанию, перейдите в «Настройки».</string>
+    <string name="onboardingDefaultBrowserGoToSettingsAction">Перейти в раздел «Настройки»</string>
+    <string name="onboardingContinue">Продолжить</string>
+    <string name="onboardingContinueFinalPage">Запустить браузер</string>
+
+    <!-- Unified Welcome Page -->
+    <string name="unifiedOnboardingTitleFirstVisit">Добро пожаловать в\nDuckDuckGo!</string>
+    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Сохраняйте анонимность во время поиска и навигации в Интернете.</string>
+    <string name="unifiedOnboardingPrivateSearchTitle">Конфиденциальный поиск</string>
+    <string name="unifiedOnboardingPrivateSearchSubtitle">С DuckDuckGo ваш поиск всегда будет конфиденциальным.</string>
+    <string name="unifiedOnboardingBrowsingProtectionTitle">Защита во время навигации в Интернете</string>
+    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Блокуйте трекеры и просматривайте информацию в Интернете в безопасном режиме по умолчанию.</string>
+    <string name="unifiedOnboardingDataClearingTitle">Сброс данных</string>
+    <string name="unifiedOnboardingDataClearingSubtitle">Удаляйте историю просмотров одним нажатием кнопки.</string>
+    <string name="unifiedOnboardingCustomizationTitle">Пользовательская настройка</string>
+    <string name="unifiedOnboardingCustomizationSubtitle">Выберите тему и настройте режим конфиденциальности в соответствии со своими предпочтениями.</string>
+
+    <!-- Default Browser -->
+    <string name="cannotLaunchDefaultAppSettings">Не удается открыть экран настроек приложения по умолчанию</string>
+    <string name="settingsDefaultBrowserEnabled">Сделать браузером по умолчанию</string>
+
+    <!-- Browser Activity -->
+    <string name="browserPopupMenu">Меню браузера</string>
+    <string name="refresh">Обновить</string>
+    <string name="back">Назад</string>
+    <string name="forward">Вперед</string>
+
+    <string name="omnibarInputHint">Выполнить поиск или ввести URL-адрес</string>
+    <string name="clearButtonContentDescription">Сбросить поисковый запрос</string>
+    <string name="no_compatible_third_party_app_installed">Совместимое приложение не установлено</string>
+    <string name="addBookmarkMenuTitle">Добавить закладку</string>
+    <string name="requestDesktopSiteMenuTitle">Версия сайта для компьютера</string>
+
+    <!-- Downloading files -->
+    <string name="downloadImage">Загрузить изображение</string>
+    <string name="permissionRequiredToDownload">Для загрузки требуется разрешение на сохранение</string>
+    <string name="downloadComplete">Загрузка завершена.</string>
+    <string name="downloadFailed">Не удалось выполнить загрузку</string>
+    <string name="downloadInProgress">Загрузка</string>
+
+    <!-- Sharing options -->
+    <string name="options">Параметры</string>
+    <string name="shareLink">Поделиться ссылкой</string>
+    <string name="shareMenuTitle">Поделиться…</string>
+    <string name="copyUrl">Скопировать ссылку</string>
+
+    <!-- Find in page -->
+    <string name="findInPageMenuTitle">Найти на странице</string>
+    <string name="nextSearchTermDescription">Найти следующий</string>
+    <string name="previousSearchTermDescription">Найти предыдущий</string>
+    <string name="closeFindInPageButtonDescription">Закрыть окно поиска на странице</string>
+    <string name="findInPageHint">Найти на странице</string>
+    <string name="findInPageMatches">%d/%d</string>
+
+    <!-- AutoComplete Suggestions -->
+    <string name="editQueryBeforeSubmitting">Редактировать запрос перед выполнением поиска</string>
+    <string name="settingsAutocompleteEnabled">Показать предложения автозаполнения</string>
+    <string name="settingsAutocompleteBookmarksEnabled">Включить сайты, добавленные в закладки</string>
+
+    <!-- Opening external apps -->
+    <string name="openExternalApp">Открыть внешнее приложение</string>
+    <string name="launchingExternalApp">Открыть в другом приложении</string>
+    <string name="confirmOpenExternalApp">Выйти из DuckDuckGo для просмотра этого контента?</string>
+    <string name="unableToOpenLink">Невозможно открыть ссылку этого типа</string>
+
+    <!-- Tabs -->
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="tabActivityTitle">Вкладки</string>
+    <string name="tabsMenuItem">Вкладки</string>
+    <string name="newTabMenuItem">Новая вкладка</string>
+    <string name="openInNewTab">Открыть в новой вкладке</string>
+    <string name="openInNewBackgroundTab">Открыть в фоновой вкладке</string>
+    <string name="openImageInNewTab">Открыть изображение в фоновой вкладке</string>
+    <string name="faviconContentDescription">Значок сайта</string>
+    <string name="closeContentDescription">Закрыть</string>
+    <string name="tapFireDirective">Нажмите на значок </string>
+    <string name="tapFireIconDescription">огня,</string>
+    <string name="tapFireExplanation"> чтобы очистить всю историю</string>
+    <string name="closeAllTabsMenuItem">Закрыть все вкладки</string>
+
+    <!-- Privacy Dashboard Activities -->
+    <string name="privacyDashboardActivityTitle">Панель конфиденциальности</string>
+    <string name="privacyProtectionEnabled">РЕЖИМ КОНФИДЕНЦИАЛЬНОСТИ ВКЛЮЧЕН</string>
+    <string name="privacyProtectionDisabled">РЕЖИМ КОНФИДЕНЦИАЛЬНОСТИ ВЫКЛЮЧЕН</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">УРОВЕНЬ КОНФИДЕНЦИАЛЬНОСТИ ПОВЫШЕН С &lt;img src="%d" /&gt; ДО &lt;img src="%d" /&gt;</string>
+    <string name="privacyGradeContentDescription">Рейтинг конфиденциальности</string>
+
+    <string name="httpsGood">Зашифрованное соединение</string>
+    <string name="httpsMixed">Соединение со смешанным шифрованием</string>
+    <string name="httpsBad">Незашифрованное соединение</string>
+
+    <string name="networksActivityTitle">Трекерные сети</string>
+    <string name="networksContentDescription">Трекерные сети</string>
+    <string name="networksOverview">Трекерные сети собирают историю вашей активности в Интернете и формируют ваш информационный профиль. Крупные трекерные сети более опасны, так как могут отслеживать вас и показывать адресную рекламу на большем количестве сайтов.</string>
+
+    <plurals name="trackersFound">
+        <item quantity="one">Найден %s трекер</item>
+        <item quantity="few">Найдено %s трекера</item>
+        <item quantity="many">Найдено %s трекеров</item>
+        <item quantity="other">Найдены %s трекеры</item>
+    </plurals>
+
+    <plurals name="trackerBlocked">
+        <item quantity="one">Заблокирован %s трекер</item>
+        <item quantity="few">Заблокировано %s трекера</item>
+        <item quantity="many">Заблокировано %s трекеров</item>
+        <item quantity="other">Заблокированы %s трекеры</item>
+    </plurals>
+
+    <plurals name="majorNetworksFound">
+        <item quantity="one">Обнаружена %s крупная сеть отслеживания</item>
+        <item quantity="few">Обнаружено %s крупные сети отслеживания</item>
+        <item quantity="many">Обнаружено %s крупных сетей отслеживания</item>
+        <item quantity="other">Обнаружено %s крупные сети отслеживания</item>
+    </plurals>
+
+    <plurals name="majorNetworksBlocked">
+        <item quantity="one">Заблокирована %s крупная сеть отслеживания</item>
+        <item quantity="few">Заблокировано %s крупные сети отслеживания</item>
+        <item quantity="many">Заблокирована %s крупных сетей отслеживания</item>
+        <item quantity="other">Заблокированы %s крупные сети отслеживания</item>
+    </plurals>
+
+    <string name="scorecardActivityTitle">Рейтинг конфиденциальности</string>
+    <string name="scorecardSiteIsMemberOfMajorNetwork">Этот сайт является крупной трекерной сетью</string>
+    <string name="scorecardPrivacyGrade">Рейтинг конфиденциальности</string>
+    <string name="scorecardEnhancedGrade">Повышенный рейтинг конфиденциальности</string>
+
+    <string name="privacyTermsActivityTitle">Уровень защиты конфиденциальности</string>
+    <string name="practicesGood">Высокий уровень защиты конфиденциальности</string>
+    <string name="practicesMixed">Средний уровень защиты конфиденциальности</string>
+    <string name="practicesBad">Низкий уровень защиты конфиденциальности</string>
+    <string name="practicesUnknown">Уровень защиты конфиденциальности неизвестен</string>
+    <string name="practicesOverview">Уровень защиты конфиденциальности показывает, насколько защищены персональные данные, которые вы передаете на сайт.</string>
+    <string name="practicesTosdrLink">Данные об уровне защиты конфиденциальности предоставлены <b><u>ToS;DR</u></b></string>
+    <string name="practicesIconContentGood">Значок высокого уровня защиты конфиденциальности</string>
+    <string name="practicesIconContentBad">Значок низкого уровня защиты конфиденциальности</string>
+    <string name="privacyProtectionToggle">Защита конфиденциальности</string>
+
+    <string name="networkTrackerSummaryHeader">ОСНОВНЫЕ ТРЕКЕРНЫЕ СЕТИ, ПРЕДСТАВЛЯЮЩИЕ УГРОЗУ КОНФИДЕНЦИАЛЬНОСТИ</string>
+    <string name="networkTrackerSummaryNotReady">Мы продолжаем собирать данные, чтобы показать, сколько трекеров мы заблокировали.</string>
+
+    <!-- Fire -->
+    <string name="fireMenu">Сбросить данные</string>
+    <string name="fireClearAll">Сбросить все вкладки и данные</string>
+    <string name="fireCancel">Отменить</string>
+    <string name="fireDataCleared">Данные сброшены</string>
+
+    <!-- Settings Activity -->
+    <string name="settingsActivityTitle">Настройки</string>
+    <string name="settingsMenuItemTitle">Настройки</string>
+    <string name="settingsHeadingGeneral">Общие настройки</string>
+    <string name="settingsHeadingOther">Дополнительные настройки</string>
+    <string name="settingsHeadingPrivacy">Конфиденциальность</string>
+    <string name="settingsHeadingAutocomplete">Автозаполнение</string>
+    <string name="settingsLightTheme">Светлая тема</string>
+    <string name="settingsAboutDuckduckgo">Сведения о DuckDuckGo</string>
+    <string name="settingsVersion">Версия</string>
+    <string name="leaveFeedback">Оставить отзыв</string>
+
+    <!-- Settings - Automatically clearing data -->
+    <string name="settingsAutomaticallyClearingDialogSave">Сохранить</string>
+
+    <string name="settingsAutomaticallyClearWhat">Автоматически сбрасывать…</string>
+    <string name="settingsAutomaticallyClearWhatOptionNone">Ничего</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabs">Вкладки</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Вкладки и данные</string>
+
+    <string name="settingsAutomaticallyClearWhen">Выполнять сброс…</string>
+    <string name="settingsAutomaticallyClearWhenAppExitOnly">Только после выхода из приложения</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">После выхода из приложения, через 5 секунд бездействия</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">После выхода из приложения, через 5 минут бездействия</string>
+    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">После выхода из приложения, через 15 минут бездействия</string>
+    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">После выхода из приложения, через 30 минут бездействия</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">После выхода из приложения, через 60 минут бездействия</string>
+
+    <!-- About Activity -->
+    <string name="aboutActivityTitle">Информация о нас</string>
+    <string name="aboutHeading">Максимум конфиденциальности, минимум усилий.</string>
+    <string name="aboutDescription">
+        DuckDuckGo устанавливает новый стандарт доверия в сети Интернет.\n\ Веб-браузер DuckDuckGo предоставляет все функции обеспечения конфиденциальности, необходимые для защиты ваших данных во время поиска и навигации в Интернете, в том числе функцию блокировки отслеживающих программ (трекеров), более сложное шифрование и конфиденциальный поиск DuckDuckGo.\n\ В конце концов, Интернет не должен пугать и вызывать негативные эмоции, а обеспечить конфиденциальность в Интернете, которую вы заслуживаете, должно быть так же просто, как закрыть шторы.</string>
+    <string name="aboutMoreLink">Больше информации см. по адресу https://duckduckgo.com/about</string>
+    <string name="no_suggestions">Нет предложений</string>
+
+    <!-- Broken Site Activity -->
+    <string name="brokenSiteReportBrokenSiteMenuItem">Сообщить о нерабочем сайте</string>
+    <string name="brokenSiteHeading">Сообщить о нерабочем сайте</string>
+    <string name="brokenSiteModalDescription">Сообщение о нерабочих сайтах полностью анонимно и помогает нам улучшить приложение!</string>
+    <string name="brokenSiteUrlHint">Введите URL</string>
+    <string name="brokenSiteDomainLabel">Домен нерабочего сайта:</string>
+    <string name="brokenSiteMessageHint">Какой контент или функциональные возможности не доступны?</string>
+    <string name="brokenSiteSubmitButton">Отправить отзыв</string>
+    <string name="brokenSiteSubmitted">Спасибо! Отзыв отправлен</string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">Закладки</string>
+    <string name="bookmarksActivityTitle">Закладки</string>
+    <string name="bookmarkDeleteConfirmMessage">Вы действительно хотите удалить закладку &lt;b&gt;%s&lt;/b&gt;?</string>
+    <string name="bookmarkDeleteConfirmTitle">Подтвердить</string>
+    <string name="bookmarkAddedFeedback">Закладка добавлена</string>
+    <string name="bookmarkTitleHint">Название закладки</string>
+    <string name="bookmarkUrlHint">URL закладки</string>
+    <string name="bookmarkSave">Сохранить</string>
+    <string name="bookmarkTitleEdit">Редактировать закладку</string>
+    <string name="bookmarkTitleSave">Сохранить закладку</string>
+    <string name="noBookmarks">Закладок пока нет</string>
+    <string name="bookmarkOverflowContentDescription">Другие параметры управления закладкой %s</string>
+    <string name="delete">Удалить</string>
+    <string name="edit">Редактировать</string>
+
+    <!-- Widget -->
+    <string name="searchWidgetTextHint">Найти через DuckDuckGo</string>
+
+    <!-- Home Screen Shortcuts -->
+    <string name="addToHome">Добавить на главный экран</string>
+
+    <!-- User Survey -->
+    <string name="surveyCtaTitle">Помогите нам улучшить приложение!</string>
+    <string name="surveyCtaDescription">Примите участие в нашем коротком анонимном опросе и поделитесь своим мнением.</string>
+    <string name="surveyCtaLaunchButton">Принять участие в опросе</string>
+    <string name="surveyCtaDismissButton">Нет, спасибо</string>
+    <string name="surveyActivityTitle">Опрос пользователя</string>
+    <string name="surveyTitle">ОПРОС DUCKDUCKGO</string>
+    <string name="surveyDismissContentDescription">Закрыть опрос</string>
+    <string name="surveyLoadingErrorTitle">О нет!</string>
+    <string name="surveyLoadingErrorText">В настоящее время невозможно загрузить наш опрос.\nПовторите попытку позже.</string>
+
+    <!-- Add widget -->
+    <string name="addWidgetCtaTitle">Попробуйте наш поисковый виджет!</string>
+    <string name="addWidgetCtaDescription">Добавьте наш поисковый виджет на главный экран, чтобы он всегда был под рукой.</string>
+    <string name="addWidgetCtaAutoLaunchButton">Добавить виджет</string>
+    <string name="addWidgetCtaInstructionsLaunchButton">Показать</string>
+    <string name="addWidgetCtaDismissButton">Игнорировать</string>
+    <string name="addWidgetInstructionsActivityTitle">Добавить виджет</string>
+    <string name="addWidgetInstruction1Label">1</string>
+    <string name="addWidgetInstruction1">Нажмите на главный экран и удерживайте несколько секунд, затем откройте меню виджетов.</string>
+    <string name="addWidgetInstruction2Label">2</string>
+    <string name="addWidgetInstruction2">Найдите виджет DuckDuckGo.</string>
+    <string name="addWidgetInstruction3Label">3</string>
+    <string name="addWidgetInstruction3">Перетащите виджет на главный экран.</string>
+    <string name="addWidgetInstructionsButtonGoHome">Перейти на главный экран</string>
+    <string name="addWidgetInstructionsButtonClose">Закрыть</string>
+
+    <!-- App Enjoyment / Rating / Feedback -->
+    <string name="appEnjoymentDialogTitle">Нравится DuckDuckGo?</string>
+    <string name="appEnjoymentDialogMessage">Нам бы хотелось узнать, что вы думаете о DuckDuckGo</string>
+    <string name="appEnjoymentDialogPositiveButton">Мне нравится это приложение</string>
+    <string name="appEnjoymentDialogNegativeButton">Приложение нужно доработать</string>
+
+    <string name="rateAppDialogTitle">Оцените приложение</string>
+    <string name="rateAppDialogMessage">Ваше мнение важно для нас. Пожалуйста, оставьте свой отзыв.</string>
+    <string name="rateAppDialogPositiveButton">Оценить приложение</string>
+    <string name="rateAppDialogNegativeButton">@string/noThanks</string>
+
+    <string name="giveFeedbackDialogTitle">Очень жаль.</string>
+    <string name="giveFeedbackDialogMessage">Есть идеи по улучшению приложения? Дайте нам знать</string>
+    <string name="giveFeedbackDialogPositiveButton">Оставить отзыв</string>
+    <string name="giveFeedbackDialogNegativeButton">@string/noThanks</string>
+
+    <string name="noThanks">Нет, спасибо</string>
+
+    <!-- Notification Channel Names -->
+    <string name="notificationChannelFileDownloading">Загрузка файла</string>
+    <string name="notificationChannelFileDownloaded">Файл загружен</string>
+    <string name="notificationChannelTutorials">Руководства</string>
+
+    <!-- Clear Notification -->
+    <string name="clearNotificationTitle">Сброс данных вручную</string>
+    <string name="clearNotificationDescription">Настройте DuckDuckGo на автоматический сброс данных браузера после каждого сеанса.</string>
+
+    <!-- Privacy Protection Notification -->
+    <string name="privacyProtectionNotificationDefaultTitle">Мы защищаем вашу конфиденциальность</string>
+    <string name="privacyProtectionNotificationReportTitle">Ваш отчет о конфиденциальности</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Приложение DuckDuckGo защищает ваши данные, блокируя трекеры и шифруя соединения.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">Вы защитили свои данные, защитив %d незашифрованных соединений во время использования DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">Вы защитили свои данные, заблокировав %d трекеров во время использования DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationBothDescription">Вы защитили свои данные, заблокировав %d трекеров и защитив %d незашифрованных соединений во время использования DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationLaunchButton">Продолжить навигацию</string>
+    
+    <!-- Authentication -->
+    <string name="authenticationDialogTitle">Вход</string>
+    <string name="authenticationDialogMessage">Для входа на %s требуются имя пользователя и пароль.</string>
+    <string name="authenticationDialogPositiveButton">Вход</string>
+    <string name="authenticationDialogNegativeButton">Отменить</string>
+    <string name="authenticationDialogUsernameHint">Имя пользователя</string>
+    <string name="authenticationDialogPasswordHint">Пароль</string>
+
+    <!-- User-facing label for when a user selects text and might want to search for that text -->
+    <string name="systemTextSearchMessage">Найти через DuckDuckGo</string>
+
+    <!-- App feedback disambiguation -->
+    <string name="feedbackActivityTitle">Поделитесь своим отзывом</string>
+    <string name="missingBrowserFeaturesTitleLong">Функции браузера отсутствуют или плохо работают</string>
+    <string name="missingBrowserFeaturesTitleShort">Проблемы с функциями браузера</string>
+    <string name="missingBrowserFeaturesSubtitle">Какую функцию навигации в Интернете мы могли бы добавить или улучшить?</string>
+    <string name="missingBrowserFeatureSubReasonNavigation">Перемещение вперед, назад, обновление страницы</string>
+    <string name="missingBrowserFeatureSubReasonTabManagement">Создание вкладок/управление вкладками</string>
+    <string name="missingBrowserFeatureSubReasonAdPopups">Блокирование рекламы и всплывающих окон</string>
+    <string name="missingBrowserFeatureSubReasonVideos">Просмотр видео</string>
+    <string name="missingBrowserFeatureSubReasonImages">Работа с изображениями</string>
+    <string name="missingBrowserFeatureSubReasonBookmarks">Создание закладок/управление закладками</string>
+    <string name="missingBrowserFeatureSubReasonOther">Ничего из перечисленного</string>
+
+    <string name="websiteNotLoadingTitleLong">Определенные сайты загружаются с ошибками</string>
+    <string name="websiteNotLoadingTitleShort">Проблемы с загрузкой сайтов</string>
+    <string name="websiteNotLoadingSubtitle">На каком сайте возникает проблема?</string>
+
+    <string name="searchNotGoodEnoughTitleLong">Поиск DuckDuckGo недостаточно хорош</string>
+    <string name="searchNotGoodEnoughTitleShort">Проблемы с поиском DuckDuckGo</string>
+    <string name="searchNotGoodEnoughSubtitle">Какую функцию поиска мы могли бы добавить или улучшить?</string>
+    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Программирование/технический поиск</string>
+    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Оформление должно быть больше похоже на поиск Google</string>
+    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Ускорение загрузки</string>
+    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Поиск по определенному языку или региону</string>
+    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Улучшение автозаполнения</string>
+    <string name="searchNotGoodEnoughSubReasonOther">Ничего из перечисленного</string>
+
+    <string name="needMoreCustomizationTitleLong">Слишком мало вариантов пользовательской настройки приложения</string>
+    <string name="needMoreCustomizationTitleShort">Проблемы с пользовательской настройкой</string>
+    <string name="needMoreCustomizationSubtitle">Какие элементы настройки мы могли бы добавить или улучшить?</string>
+    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Конфигурация главного экрана</string>
+    <string name="needMoreCustomizationSubReasonTabDisplay">Формат отображения вкладок</string>
+    <string name="needMoreCustomizationSubReasonAppLooks">Интерфейс приложения</string>
+    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Тип данных, подлежащих сбросу</string>
+    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Время сброса данных</string>
+    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Формат отображения закладок</string>
+    <string name="needMoreCustomizationSubReasonOther">Ничего из перечисленного</string>
+
+    <string name="appIsSlowOrBuggyTitleLong">Приложение работает слишком медленно, часто возникают ошибки или сбои</string>
+    <string name="appIsSlowOrBuggyTitleShort">Проблемы с производительностью</string>
+    <string name="appIsSlowOrBuggySubtitle">Какие проблемы у вас возникают?</string>
+    <string name="appIsSlowOrBuggySubReasonSlowResults">Медленно загружаются веб-страницы или результаты поиска</string>
+    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Приложение дает сбой или зависает</string>
+    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Видео или медиа воспроизводится с ошибками</string>
+    <string name="appIsSlowOrBuggySubReasonOther">Ничего из перечисленного</string>
+
+    <string name="otherMainReasonTitleLong">Ничего из перечисленного</string>
+    <string name="otherMainReasonTitleShort">Другие проблемы</string>
+
+    <string name="openEndedInputHint">Как мы можем улучшить наше приложение? (необязательно)</string>
+    <string name="submitFeedback">ОТПРАВИТЬ ОТЗЫВ</string>
+
+    <string name="tellUsHowToImprove">Что нам следует улучшить?</string>
+    <string name="thanksForTheFeedback">Спасибо за отзыв!</string>
+    <string name="feedbackNegativeMainReasonPageSubtitle">Что вам больше всего не понравилось?</string>
+    <string name="feedbackNegativeMainReasonPageTitle">Нам очень жаль.</string>
+    <string name="feedbackShareDetails">Добавить комментарий</string>
+    <string name="sharePositiveFeedbackWithTheTeam">Хотите добавить комментарий для нашей команды разработчиков?</string>
+    <string name="whatHaveYouBeenEnjoying">Что вам больше всего понравилось?</string>
+    <string name="awesomeToHear">Приятно слышать!</string>
+    <string name="shareTheLoveWithARating">Пожалуйста, оцените наше приложение в Play Store.</string>
+    <string name="rateTheApp">ОЦЕНИТЬ ПРИЛОЖЕНИЕ</string>
+    <string name="declineFurtherFeedback">НЕТ, СПАСИБО.</string>
+    <string name="whichBrokenSites">Где возникают эти проблемы?</string>
+    <string name="whichBrokenSitesHint">На каком сайте возникли проблемы?</string>
+    <string name="feedbackSpecificAsPossible">Отвечайте как можно конкретнее.</string>
+    <string name="feedbackInitialDisambiguationTitle">Итак, начнем!</string>
+    <string name="feedbackInitialDisambiguationSubtitle">К какой категории вы бы отнесли свой отзыв?</string>
+    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Кнопка отправки положительного отзыва</string>
+    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Кнопка отправки негативного отзыва</string>
+    <string name="feedbackIsImportantToUs">Ваш анонимный отзыв важен для нас.</string>
+
+
+</resources> 

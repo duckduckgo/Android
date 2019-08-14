@@ -1,19 +1,363 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (c) 2019 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-<resources>
-</resources>
+    <string name="appName" translatable="false">DuckDuckGo</string>
+    <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
+
+    <!-- Onboarding Activity -->
+    <string name="onboardingDefaultBrowserTitle">Gør privatliv standarden for dig</string>
+    <string name="onboardingDefaultBrowserDescription">Besøg Indstillinger for at søge og surfe med DuckDuckGo hver gang.</string>
+    <string name="onboardingDefaultBrowserGoToSettingsAction">Gå til Indstillinger</string>
+    <string name="onboardingContinue">Fortsæt</string>
+    <string name="onboardingContinueFinalPage">Gå i gang med at surfe</string>
+
+    <!-- Unified Welcome Page -->
+    <string name="unifiedOnboardingTitleFirstVisit">Velkommen til\nDuckDuckGo!</string>
+    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Forbliv privat, mens du søger og surfer på nettet.</string>
+    <string name="unifiedOnboardingPrivateSearchTitle">Privat søgning</string>
+    <string name="unifiedOnboardingPrivateSearchSubtitle">Med DuckDuckGo er dine søgninger altid private.</string>
+    <string name="unifiedOnboardingBrowsingProtectionTitle">Browsingbeskyttelse</string>
+    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Bloker automatisk trackere og surf sikkert</string>
+    <string name="unifiedOnboardingDataClearingTitle">Datarydning</string>
+    <string name="unifiedOnboardingDataClearingSubtitle">Slet dine browserdata med et tryk på en knap.</string>
+    <string name="unifiedOnboardingCustomizationTitle">Tilpasning</string>
+    <string name="unifiedOnboardingCustomizationSubtitle">Vælg et tema, og tilpas funktioner til beskyttelse af privatlivets fred.</string>
+
+    <!-- Default Browser -->
+    <string name="cannotLaunchDefaultAppSettings">Det var ikke muligt at starte standard app-indstillingsskærmen</string>
+    <string name="settingsDefaultBrowserEnabled">Angiv som standardbrowser</string>
+
+    <!-- Browser Activity -->
+    <string name="browserPopupMenu">Browsermenu</string>
+    <string name="refresh">Opdater</string>
+    <string name="back">Tilbage</string>
+    <string name="forward">Frem</string>
+
+    <string name="omnibarInputHint">Søg eller indtast URL</string>
+    <string name="clearButtonContentDescription">Ryd søgeinput</string>
+    <string name="no_compatible_third_party_app_installed">Ingen kompatibel app installeret</string>
+    <string name="addBookmarkMenuTitle">Tilføj bogmærke</string>
+    <string name="requestDesktopSiteMenuTitle">Stationær computer</string>
+
+    <!-- Downloading files -->
+    <string name="downloadImage">Download billede</string>
+    <string name="permissionRequiredToDownload">Download kræver lagringstilladelse</string>
+    <string name="downloadComplete">Download fuldført.</string>
+    <string name="downloadFailed">Det var ikke muligt at downloade</string>
+    <string name="downloadInProgress">Downloader</string>
+
+    <!-- Sharing options -->
+    <string name="options">Valgmuligheder</string>
+    <string name="shareLink">Del link</string>
+    <string name="shareMenuTitle">Del …</string>
+    <string name="copyUrl">Kopiér linkadresse</string>
+
+    <!-- Find in page -->
+    <string name="findInPageMenuTitle">Find på side</string>
+    <string name="nextSearchTermDescription">Find næste</string>
+    <string name="previousSearchTermDescription">Find tidligere</string>
+    <string name="closeFindInPageButtonDescription">Luk visningen find på side</string>
+    <string name="findInPageHint">Find på side</string>
+    <string name="findInPageMatches">%d/%d</string>
+
+    <!-- AutoComplete Suggestions -->
+    <string name="editQueryBeforeSubmitting">Redigér forespørgsel før søgning</string>
+    <string name="settingsAutocompleteEnabled">Vis forslag til Autoudfyld</string>
+    <string name="settingsAutocompleteBookmarksEnabled">Inkludér bogmærkede sider</string>
+
+    <!-- Opening external apps -->
+    <string name="openExternalApp">Åbn ekstern app</string>
+    <string name="launchingExternalApp">Åbn i en anden app</string>
+    <string name="confirmOpenExternalApp">Ønsker du at forlade DuckDuckGo for at se dette indhold?</string>
+    <string name="unableToOpenLink">Det er ikke muligt at åbne denne type link</string>
+
+    <!-- Tabs -->
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="tabActivityTitle">Faner</string>
+    <string name="tabsMenuItem">Faner</string>
+    <string name="newTabMenuItem">Ny fane</string>
+    <string name="openInNewTab">Åbn i ny fane</string>
+    <string name="openInNewBackgroundTab">Åbn i baggrundsfanen</string>
+    <string name="openImageInNewTab">Åbn billede i baggrundsfanen</string>
+    <string name="faviconContentDescription">Favicon</string>
+    <string name="closeContentDescription">Luk</string>
+    <string name="tapFireDirective">Fane </string>
+    <string name="tapFireIconDescription">brænd</string>
+    <string name="tapFireExplanation"> for at glemme alt</string>
+    <string name="closeAllTabsMenuItem">Luk alle faner</string>
+
+    <!-- Privacy Dashboard Activities -->
+    <string name="privacyDashboardActivityTitle">Privatlivspanel</string>
+    <string name="privacyProtectionEnabled">BESKYTTELSE AF PRIVATLIVETS FRED AKTIVERET</string>
+    <string name="privacyProtectionDisabled">BESKYTTELSE AF PRIVATLIVETS FRED DEAKTIVERET</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">FORSTÆRKET FRA &lt;img src="%d" /&gt; TIL &lt;img src="%d" /&gt;</string>
+    <string name="privacyGradeContentDescription">Grad af privatliv</string>
+
+    <string name="httpsGood">Krypteret forbindelse</string>
+    <string name="httpsMixed">Blandet krypteringsforbindelse</string>
+    <string name="httpsBad">Ukrypteret forbindelse</string>
+
+    <string name="networksActivityTitle">Tracker-netværk</string>
+    <string name="networksContentDescription">Tracker-netværk</string>
+    <string name="networksOverview">Tracker-netværk samler din webhistorik i en dataprofil om dig. Større tracker-netværk er mere skadelige, fordi de kan spore og målrette sig dig over en større del af internettet.</string>
+
+    <plurals name="trackersFound">
+        <item quantity="one">%s tracker fundet</item>
+        <item quantity="other">%s trackere fundet</item>
+    </plurals>
+
+    <plurals name="trackerBlocked">
+        <item quantity="one">%s tracker blokeret</item>
+        <item quantity="other">%s trackere blokeret</item>
+    </plurals>
+
+    <plurals name="majorNetworksFound">
+        <item quantity="one">%s større tracker-netværk fundet</item>
+        <item quantity="other">%s større tracker-netværk fundet</item>
+    </plurals>
+
+    <plurals name="majorNetworksBlocked">
+        <item quantity="one">%s større tracker-netværk blokeret</item>
+        <item quantity="other">%s større tracker-netværk blokeret</item>
+    </plurals>
+
+    <string name="scorecardActivityTitle">Grad af privatliv</string>
+    <string name="scorecardSiteIsMemberOfMajorNetwork">Webstedet er et stort tracker-netværk</string>
+    <string name="scorecardPrivacyGrade">Grad af privatliv</string>
+    <string name="scorecardEnhancedGrade">Forstærket grad</string>
+
+    <string name="privacyTermsActivityTitle">Praksis for beskyttelse af privatlivets fred</string>
+    <string name="practicesGood">God praksis for beskyttelse af privatlivets fred</string>
+    <string name="practicesMixed">Blandet praksis for beskyttelse af privatlivets fred"</string>
+    <string name="practicesBad">Dårlig praksis for beskyttelse af privatlivets fred"</string>
+    <string name="practicesUnknown">Ukendt praksis for beskyttelse af privatlivets fred</string>
+    <string name="practicesOverview">Praksis for beskyttelse af privatlivets fred angiver, i hvor høj grad de personoplysninger, som du deler med et websted, er beskyttet.</string>
+    <string name="practicesTosdrLink">Praksis for beskyttelse af privatlivets fred fra <b><u>ToS;DR</u></b></string>
+    <string name="practicesIconContentGood">Ikon for god praksis</string>
+    <string name="practicesIconContentBad">Ikon for dårlig praksis</string>
+    <string name="privacyProtectionToggle">Beskyttelse af privatlivets fred</string>
+
+    <string name="networkTrackerSummaryHeader">DE STØRSTE LOVOVERTRÆDERE FRA TRACKER-NETVÆRK</string>
+    <string name="networkTrackerSummaryNotReady">Vi indsamler stadig data for at vise, hvor mange trackere vi har blokeret.</string>
+
+    <!-- Fire -->
+    <string name="fireMenu">Ryd data</string>
+    <string name="fireClearAll">Ryd alle faner og data</string>
+    <string name="fireCancel">Annuller</string>
+    <string name="fireDataCleared">Data ryddet</string>
+
+    <!-- Settings Activity -->
+    <string name="settingsActivityTitle">Indstillinger</string>
+    <string name="settingsMenuItemTitle">Indstillinger</string>
+    <string name="settingsHeadingGeneral">Generelt</string>
+    <string name="settingsHeadingOther">Andet</string>
+    <string name="settingsHeadingPrivacy">Privatliv</string>
+    <string name="settingsHeadingAutocomplete">Autoudfyld</string>
+    <string name="settingsLightTheme">Lystema</string>
+    <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
+    <string name="settingsVersion">Version</string>
+    <string name="leaveFeedback">Giv feedback</string>
+
+    <!-- Settings - Automatically clearing data -->
+    <string name="settingsAutomaticallyClearingDialogSave">Gem</string>
+
+    <string name="settingsAutomaticallyClearWhat">Ryd automatisk …</string>
+    <string name="settingsAutomaticallyClearWhatOptionNone">Ingen</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabs">Faner</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Faner og data</string>
+
+    <string name="settingsAutomaticallyClearWhen">Ryd den …</string>
+    <string name="settingsAutomaticallyClearWhenAppExitOnly">Kun ved app-afslutning</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">App-afslutning, inaktiv i 5 sekunder</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">App-afslutning, inaktiv i 5 minutter</string>
+    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">App-afslutning, inaktiv i 15 minutter</string>
+    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">App-afslutning, inaktiv i 30 minutter</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App-afslutning, inaktiv i 60 minutter</string>
+
+    <!-- About Activity -->
+    <string name="aboutActivityTitle">Om os</string>
+    <string name="aboutHeading">Privatlivets fred, forenklet.</string>
+    <string name="aboutDescription">
+        Hos DuckDuckGo sætter vi den nye standard for tiltro online .\n\ DuckDuckGo Privacy Browser giver dig alle de nødvendige værktøjer til at værne over privatlivets fred, så du kan beskytte dig selv, når du søger og surfer på nettet, herunder tracker-blokering, smartere kryptering og DuckDuckGo-privat søgning.\n\ Internettet bør trods alt ikke føles så skummelt, og det bør være lige så enkelt at få det privatliv, du fortjener online, som at lukke dine persienner ned.</string>
+    <string name="aboutMoreLink">Mere på duckduckgo.com/about</string>
+    <string name="no_suggestions">Ingen forslag</string>
+
+    <!-- Broken Site Activity -->
+    <string name="brokenSiteReportBrokenSiteMenuItem">Rapporter ødelagt websted</string>
+    <string name="brokenSiteHeading">Rapporter et ødelagt websted</string>
+    <string name="brokenSiteModalDescription">Rapportering af ødelagte websteder er helt anonymt og hjælper os med at forbedre appen!</string>
+    <string name="brokenSiteUrlHint">Indtast URL</string>
+    <string name="brokenSiteDomainLabel">Det ødelagte websteds domæne:</string>
+    <string name="brokenSiteMessageHint">Hvilket indhold eller hvilken funktion bryder ned?</string>
+    <string name="brokenSiteSubmitButton">Send feedback</string>
+    <string name="brokenSiteSubmitted">Mange tak! Feedback sendt</string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">Bogmærker</string>
+    <string name="bookmarksActivityTitle">Bogmærker</string>
+    <string name="bookmarkDeleteConfirmMessage">Er du sikker på, at du vil slette bogmærket &lt;b&gt;%s&lt;/b&gt;?</string>
+    <string name="bookmarkDeleteConfirmTitle">Bekræft</string>
+    <string name="bookmarkAddedFeedback">Bogmærke tilføjet</string>
+    <string name="bookmarkTitleHint">Titel på bogmærke</string>
+    <string name="bookmarkUrlHint">Bogmærkets URL</string>
+    <string name="bookmarkSave">Gem</string>
+    <string name="bookmarkTitleEdit">Rediger bogmærke</string>
+    <string name="bookmarkTitleSave">Gem bogmærke</string>
+    <string name="noBookmarks">Ingen bogmærker tilføjet endnu</string>
+    <string name="bookmarkOverflowContentDescription">Flere muligheder for bogmærke %s</string>
+    <string name="delete">Slet</string>
+    <string name="edit">Rediger</string>
+
+    <!-- Widget -->
+    <string name="searchWidgetTextHint">Søg på DuckDuckGo</string>
+
+    <!-- Home Screen Shortcuts -->
+    <string name="addToHome">Føj til startsiden</string>
+
+    <!-- User Survey -->
+    <string name="surveyCtaTitle">Hjælp os med at forbedre appen!</string>
+    <string name="surveyCtaDescription">Deltag i vores korte, anonyme undersøgelse, og del din feedback.</string>
+    <string name="surveyCtaLaunchButton">Deltag i undersøgelsen</string>
+    <string name="surveyCtaDismissButton">Nej tak.</string>
+    <string name="surveyActivityTitle">Brugerundersøgelse</string>
+    <string name="surveyTitle">DUCKDUCKGO-UNDERSØGELSE</string>
+    <string name="surveyDismissContentDescription">Afvis undersøgelse</string>
+    <string name="surveyLoadingErrorTitle">Åh, nej!</string>
+    <string name="surveyLoadingErrorText">Vores undersøgelse kan ikke indlæses i øjeblikket.\nForsøg igen senere.</string>
+
+    <!-- Add widget -->
+    <string name="addWidgetCtaTitle">Prøv vores søgewidget!</string>
+    <string name="addWidgetCtaDescription">Tilføj vores søgewidget på startskærmbilledet for hurtig og nem adgang.</string>
+    <string name="addWidgetCtaAutoLaunchButton">Tilføj widget</string>
+    <string name="addWidgetCtaInstructionsLaunchButton">Vis mig</string>
+    <string name="addWidgetCtaDismissButton">Afvis</string>
+    <string name="addWidgetInstructionsActivityTitle">Tilføj widget</string>
+    <string name="addWidgetInstruction1Label">1</string>
+    <string name="addWidgetInstruction1">Tryk længe på startskærmen, og åbn derefter menuen widgets</string>
+    <string name="addWidgetInstruction2Label">2</string>
+    <string name="addWidgetInstruction2">Find widget\'en DuckDuckGo</string>
+    <string name="addWidgetInstruction3Label">3</string>
+    <string name="addWidgetInstruction3">Træk widget\'en til startskærmbilledet</string>
+    <string name="addWidgetInstructionsButtonGoHome">Gå til startskærmen</string>
+    <string name="addWidgetInstructionsButtonClose">Luk</string>
+
+    <!-- App Enjoyment / Rating / Feedback -->
+    <string name="appEnjoymentDialogTitle">Nyder du DuckDuckGo?</string>
+    <string name="appEnjoymentDialogMessage">Vi vil rigtig gerne vide, hvad du synes</string>
+    <string name="appEnjoymentDialogPositiveButton">Jeg kan godt lide den.</string>
+    <string name="appEnjoymentDialogNegativeButton">Den skal forbedres</string>
+
+    <string name="rateAppDialogTitle">Bedøm appen</string>
+    <string name="rateAppDialogMessage">Din feedback betyder noget. Del din kærlighed med en bedømmelse.</string>
+    <string name="rateAppDialogPositiveButton">Bedøm appen</string>
+    <string name="rateAppDialogNegativeButton">@string/noThanks</string>
+
+    <string name="giveFeedbackDialogTitle">Det er vi kede af at høre</string>
+    <string name="giveFeedbackDialogMessage">Fortæl os, hvordan vi kan forbedre appen for dig</string>
+    <string name="giveFeedbackDialogPositiveButton">Giv feedback</string>
+    <string name="giveFeedbackDialogNegativeButton">@string/noThanks</string>
+
+    <string name="noThanks">Nej tak.</string>
+
+    <!-- Notification Channel Names -->
+    <string name="notificationChannelFileDownloading">Fil downloader</string>
+    <string name="notificationChannelFileDownloaded">Fil downloadet</string>
+    <string name="notificationChannelTutorials">Vejledninger</string>
+
+    <!-- Clear Notification -->
+    <string name="clearNotificationTitle">Datarydning indstillet til manuel</string>
+    <string name="clearNotificationDescription">Tilpas DuckDuckGo til automatisk at rydde browserdata efter hver session.</string>
+
+    <!-- Privacy Protection Notification -->
+    <string name="privacyProtectionNotificationDefaultTitle">Vi beskytter dit privatliv</string>
+    <string name="privacyProtectionNotificationReportTitle">Din privatlivsrapport</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Brug af DuckDuckGo-appen beskytter dine data ved at blokere trackere og kryptere forbindelser.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">Du beskyttede dine data ved at sikre %d ukrypterede forbindelser, mens du bruger DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">Du beskyttede dine data ved at blokere %d trackere, mens du bruger DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationBothDescription">Du beskyttede dine data ved at blokere %d trackere og sikre %d ukrypterede forbindelser, mens du bruger DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationLaunchButton">Genoptag surfing</string>
+
+    <!-- Authentication -->
+    <string name="authenticationDialogTitle">Log ind</string>
+    <string name="authenticationDialogMessage">%s kræver et brugernavn og adgangskode.</string>
+    <string name="authenticationDialogPositiveButton">Log ind</string>
+    <string name="authenticationDialogNegativeButton">Annuller</string>
+    <string name="authenticationDialogUsernameHint">Brugernavn</string>
+    <string name="authenticationDialogPasswordHint">Adgangskode</string>
+
+    <!-- User-facing label for when a user selects text and might want to search for that text -->
+    <string name="systemTextSearchMessage">Søg på DuckDuckGo</string>
+
+    <!-- App feedback disambiguation -->
+    <string name="feedbackActivityTitle">Del din feedback</string>
+    <string name="missingBrowserFeaturesTitleLong">Browserfunktioner mangler eller gør mig frustreret</string>
+    <string name="missingBrowserFeaturesTitleShort">Problemer med browserfunktioner</string>
+    <string name="missingBrowserFeaturesSubtitle">Hvilken browserfunktion kan vi tilføje eller forbedre?</string>
+    <string name="missingBrowserFeatureSubReasonNavigation">Navigation fremad, tilbage, opdatere</string>
+    <string name="missingBrowserFeatureSubReasonTabManagement">Oprettelse og håndtering af faner</string>
+    <string name="missingBrowserFeatureSubReasonAdPopups">Blokering af annoncer og pop op-vinduer</string>
+    <string name="missingBrowserFeatureSubReasonVideos">Visning af videoer</string>
+    <string name="missingBrowserFeatureSubReasonImages">Interaktion med billeder</string>
+    <string name="missingBrowserFeatureSubReasonBookmarks">Oprettelse og håndtering af bogmærker</string>
+    <string name="missingBrowserFeatureSubReasonOther">Ingen af disse</string>
+
+    <string name="websiteNotLoadingTitleLong">Visse websteder indlæses ikke korrekt</string>
+    <string name="websiteNotLoadingTitleShort">Problemer med indlæsning af websted</string>
+    <string name="websiteNotLoadingSubtitle">Hvilket websted er ødelagt?"</string>
+
+    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo-søgningen er ikke god nok</string>
+    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo-søgeproblemer</string>
+    <string name="searchNotGoodEnoughSubtitle">Hvilken søgefunktion kan vi tilføje eller forbedre?</string>
+    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programmering/teknisk søgning</string>
+    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Layoutet bør være mere som Google</string>
+    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Hurtigere indlæsningstid</string>
+    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Søgning på et bestemt sprog eller en bestemt region</string>
+    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Bedre autoudfyld</string>
+    <string name="searchNotGoodEnoughSubReasonOther">Ingen af disse</string>
+
+    <string name="needMoreCustomizationTitleLong">Der er ikke nok måder at tilpasse appen på</string>
+    <string name="needMoreCustomizationTitleShort">Problemer med tilpasning</string>
+    <string name="needMoreCustomizationSubtitle">Hvilken tilpasningsmulighed kan vi tilføje eller forbedre?</string>
+    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Startskærmens konfiguration</string>
+    <string name="needMoreCustomizationSubReasonTabDisplay">Hvordan faner vises</string>
+    <string name="needMoreCustomizationSubReasonAppLooks">Hvordan appen ser ud</string>
+    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Hvilke data der bliver ryddet</string>
+    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Hvornår data bliver ryddet</string>
+    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Hvordan bogmærker vises</string>
+    <string name="needMoreCustomizationSubReasonOther">Ingen af disse</string>
+
+    <string name="appIsSlowOrBuggyTitleLong">Appen er langsom, fejlfyldt eller bryder sammen</string>
+    <string name="appIsSlowOrBuggyTitleShort">Problemer med ydeevnen</string>
+    <string name="appIsSlowOrBuggySubtitle">Hvilket problem oplever du?</string>
+    <string name="appIsSlowOrBuggySubReasonSlowResults">Websider eller søgeresultater indlæses langsomt</string>
+    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Appen går ned eller fryser</string>
+    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Fejl ved video- eller medieafspilning</string>
+    <string name="appIsSlowOrBuggySubReasonOther">Ingen af disse</string>
+
+    <string name="otherMainReasonTitleLong">Ingen af disse</string>
+    <string name="otherMainReasonTitleShort">Andre problemer</string>
+
+    <string name="openEndedInputHint">Hvordan kan vi forbedre os? (Valgfrit)</string>
+    <string name="submitFeedback">SEND FEEDBACK</string>
+
+    <string name="tellUsHowToImprove">Fortæl os, hvad vi kan forbedre.</string>
+    <string name="thanksForTheFeedback">Tak for din feedback!</string>
+    <string name="feedbackNegativeMainReasonPageSubtitle">Hvad handler din frustration mest om?</string>
+    <string name="feedbackNegativeMainReasonPageTitle">Det er vi kede af at høre.</string>
+    <string name="feedbackShareDetails">Del oplysninger</string>
+    <string name="sharePositiveFeedbackWithTheTeam">Er der nogen detaljer, du gerne vil dele med teamet?</string>
+    <string name="whatHaveYouBeenEnjoying">Hvad har du haft glæde af?</string>
+    <string name="awesomeToHear">Fantastisk at høre!</string>
+    <string name="shareTheLoveWithARating">Del kærligheden ved at bedømme os i Play Store.</string>
+    <string name="rateTheApp">BEDØM APPEN</string>
+    <string name="declineFurtherFeedback">NEJ TAK, JEG ER FÆRDIG.</string>
+    <string name="whichBrokenSites">Hvor oplever du disse problemer?</string>
+    <string name="whichBrokenSitesHint">Hvilket websted har problemer?</string>
+    <string name="feedbackSpecificAsPossible">Vær så specifik som muligt</string>
+    <string name="feedbackInitialDisambiguationTitle">Lad os komme i gang!</string>
+    <string name="feedbackInitialDisambiguationSubtitle">Hvordan vil du kategorisere din feedback?</string>
+    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Knap til positiv feedback</string>
+    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Knap til negativ feedback</string>
+    <string name="feedbackIsImportantToUs">Din anonyme feedback er vigtig for os.</string>
+
+
+</resources> 
