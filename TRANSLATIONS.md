@@ -42,4 +42,4 @@ There is a branch containing the current translations, called [`feature/app_tran
         - Ensure the base branch in your PR is `feature/app_translations`
       
 
-ℹ️ Please note we are not looking for help with other languages at this time; only the languages listed above. e may open up requests in future for additional languages. 
+ℹ️ Please note we are not looking for help with other languages at this time; only the languages listed above. We may open up requests in future for additional languages.
