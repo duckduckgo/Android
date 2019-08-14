@@ -4,7 +4,7 @@
     <string name="duckDuckGoLogoDescription">Logotipo de DuckDuckGo</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Haz de la privacidad tu valor por defecto</string>
+    <string name="onboardingDefaultBrowserTitle">aHaz de la privacidad tu valor por defecto</string>
     <string name="onboardingDefaultBrowserDescription">Accede a «Ajustes» para realizar búsquedas y navegar con DuckDuckGo en cualquier momento.</string>
     <string name="onboardingDefaultBrowserGoToSettingsAction">Acceder a «Ajustes»</string>
     <string name="onboardingContinue">Continuar</string>
