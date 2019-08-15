@@ -122,7 +122,7 @@ interface Pixel {
     }
 
     object PixelParameter {
-        const val APP_VERSION = "version"
+        const val APP_VERSION = "appVersion"
         const val COUNT = "count"
         const val BOOKMARK_CAPABLE = "bc"
         const val SHOWED_BOOKMARKS = "sb"

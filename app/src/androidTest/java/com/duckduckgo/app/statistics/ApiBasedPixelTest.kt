@@ -104,9 +104,11 @@ class ApiBasedPixelTest {
         whenever(mockDeviceInfo.appVersion).thenReturn("1.0.0")
 
         val pixel = ApiBasedPixel(mockPixelService, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo)
-        val params = mapOf("param1" to "value1", "param2" to "value2", "version" to "1.0.0")
+        val params = mapOf("param1" to "value1", "param2" to "value2")
+        val expectedParams = mapOf("param1" to "value1", "param2" to "value2", "appVersion" to "1.0.0")
+
         pixel.fire(PRIVACY_DASHBOARD_OPENED, params)
-        verify(mockPixelService).fire("mp", "phone", "atbvariant", params)
+        verify(mockPixelService).fire("mp", "phone", "atbvariant", expectedParams)
     }
 
     @Test
@@ -119,8 +121,8 @@ class ApiBasedPixelTest {
 
 
         val pixel = ApiBasedPixel(mockPixelService, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo)
-        val params = mapOf("version" to "1.0.0")
         pixel.fire(PRIVACY_DASHBOARD_OPENED)
-        verify(mockPixelService).fire("mp", "phone", "atbvariant", params)
+        val expectedParams = mapOf("appVersion" to "1.0.0")
+        verify(mockPixelService).fire("mp", "phone", "atbvariant", expectedParams)
     }
 }

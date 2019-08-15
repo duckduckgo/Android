@@ -40,7 +40,7 @@ class OfflinePixelSender @Inject constructor(
         return Completable.mergeDelayError(
             listOf(
                 sendApplicationKilledPixel(),
-                sendWebRendererCrashPixel(),
+                sendWebRendererCrashedPixel(),
                 sendWebRendererKilledPixel()
             )
         )
@@ -60,7 +60,7 @@ class OfflinePixelSender @Inject constructor(
         }
     }
 
-    private fun sendWebRendererCrashPixel(): Completable {
+    private fun sendWebRendererCrashedPixel(): Completable {
         return defer {
             val count = dataStore.webRendererGoneCrashCount
             if (count == 0) {
