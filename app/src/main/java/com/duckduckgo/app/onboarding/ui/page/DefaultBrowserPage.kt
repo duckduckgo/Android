@@ -109,7 +109,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
 
         if (isDefault) {
             installStore.defaultBrowser = true
-            pixel.fire(Pixel.PixelName.DEFAULT_BROWSER_SET, includeLocale = true)
+            pixel.fire(Pixel.PixelName.DEFAULT_BROWSER_SET)
         }
     }
 

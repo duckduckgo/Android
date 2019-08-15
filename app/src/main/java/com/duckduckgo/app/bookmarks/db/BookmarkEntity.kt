@@ -21,7 +21,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "bookmarks")
 data class BookmarkEntity(
-    @PrimaryKey(autoGenerate = true) var id: Int = 0,
+    @PrimaryKey(autoGenerate = true) var id: Long = 0,
     var title: String?,
     var url: String
 )

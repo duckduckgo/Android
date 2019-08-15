@@ -120,35 +120,4 @@ class ApiBasedPixelTest {
         pixel.fire(PRIVACY_DASHBOARD_OPENED)
         verify(mockPixelService).fire("mp", "phone", "atbvariant", params)
     }
-
-    @Test
-    fun whenPixelFiredWithAdditionalParametersAndLocaleThenPixelServiceCalledWithBothSetsOfParameters() {
-        whenever(mockPixelService.fire(any(), any(), any(), any())).thenReturn(Completable.complete())
-        whenever(mockStatisticsDataStore.atb).thenReturn(Atb("atb"))
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("variant"))
-        whenever(mockDeviceInfo.formFactor()).thenReturn(DeviceInfo.FormFactor.PHONE)
-        whenever(mockDeviceInfo.country).thenReturn("us")
-        whenever(mockDeviceInfo.language).thenReturn("es")
-
-        val pixel = ApiBasedPixel(mockPixelService, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo)
-        val params = mapOf("param1" to "value1")
-        val localeParams = mapOf("lg" to "es", "co" to "us")
-        pixel.fire(PRIVACY_DASHBOARD_OPENED, params, includeLocale = true)
-        verify(mockPixelService).fire("mp", "phone", "atbvariant", params.plus(localeParams))
-    }
-
-    @Test
-    fun whenPixelFiredWithLocaleAndNoAdditionalParametersThenPixelServiceCalledWithLocaleParameters() {
-        whenever(mockPixelService.fire(any(), any(), any(), any())).thenReturn(Completable.complete())
-        whenever(mockStatisticsDataStore.atb).thenReturn(Atb("atb"))
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("variant"))
-        whenever(mockDeviceInfo.formFactor()).thenReturn(DeviceInfo.FormFactor.PHONE)
-        whenever(mockDeviceInfo.country).thenReturn("us")
-        whenever(mockDeviceInfo.language).thenReturn("es")
-
-        val pixel = ApiBasedPixel(mockPixelService, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo)
-        val localeParams = mapOf("lg" to "es", "co" to "us")
-        pixel.fire(PRIVACY_DASHBOARD_OPENED, includeLocale = true)
-        verify(mockPixelService).fire("mp", "phone", "atbvariant", localeParams)
-    }
 }

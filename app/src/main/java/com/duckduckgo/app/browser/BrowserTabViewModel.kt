@@ -30,16 +30,14 @@ import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import androidx.lifecycle.*
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment.SaveBookmarkListener
+import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment.EditBookmarkListener
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
@@ -65,6 +63,8 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -99,7 +99,8 @@ class BrowserTabViewModel(
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
     appConfigurationDao: AppConfigurationDao
-) : WebViewClientListener, SaveBookmarkListener, HttpAuthenticationListener, ViewModel() {
+) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
+
     private var buildingSiteFactoryJob: Job? = null
 
     data class GlobalLayoutViewState(
@@ -163,12 +164,11 @@ class BrowserTabViewModel(
         object HideKeyboard : Command()
         class ShowFullScreen(val view: View) : Command()
         class DownloadImage(val url: String) : Command()
-        class AddBookmark(val title: String?, val url: String?) : Command()
+        class ShowBookmarkAddedConfirmation(val bookmarkId: Long, val title: String?, val url: String?) : Command()
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
         class BrokenSiteFeedback(val url: String?) : Command()
-        class DisplayMessage(@StringRes val messageId: Int) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         class HandleExternalAppLink(val appLink: IntentType) : Command()
@@ -594,11 +594,27 @@ class BrowserTabViewModel(
         }
     }
 
-    override fun onBookmarkSaved(id: Int?, title: String, url: String) {
-        Schedulers.io().scheduleDirect {
+    suspend fun onBookmarkAddRequested() {
+        val url = url ?: ""
+        val title = title ?: ""
+        val id = withContext(Dispatchers.IO) {
             bookmarksDao.insert(BookmarkEntity(title = title, url = url))
         }
-        command.value = DisplayMessage(R.string.bookmarkAddedFeedback)
+        withContext(Dispatchers.Main) {
+            command.value = ShowBookmarkAddedConfirmation(id, title, url)
+        }
+    }
+
+    override fun onBookmarkEdited(id: Long, title: String, url: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            editBookmark(id, title, url)
+        }
+    }
+
+    suspend fun editBookmark(id: Long, title: String, url: String) {
+        withContext(Dispatchers.IO) {
+            bookmarksDao.update(BookmarkEntity(id, title, url))
+        }
     }
 
     fun onBrokenSiteSelected() {
@@ -707,10 +723,6 @@ class BrowserTabViewModel(
         autoCompleteViewState.value = AutoCompleteViewState()
         omnibarViewState.value = OmnibarViewState()
         findInPageViewState.value = FindInPageViewState()
-    }
-
-    fun onAddBookmarkSelected() {
-        command.value = AddBookmark(title, url)
     }
 
     fun onShareSelected() {
