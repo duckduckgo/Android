@@ -17,10 +17,7 @@
 package com.duckduckgo.app.statistics.api
 
 import android.content.Context
-import androidx.work.CoroutineWorker
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.WorkerParameters
+import androidx.work.*
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -33,8 +30,9 @@ class OfflinePixelScheduler @Inject constructor() {
         val workManager = WorkManager.getInstance()
         workManager.cancelAllWorkByTag(WORK_REQUEST_TAG)
 
-        val request = PeriodicWorkRequestBuilder<OfflinePixelWorker>(HOURLY_INTERVAL, TimeUnit.HOURS)
+        val request = PeriodicWorkRequestBuilder<OfflinePixelWorker>(SERVICE_INTERVAL, SERVICE_TIME_UNIT)
             .addTag(WORK_REQUEST_TAG)
+            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, BACKOFF_INTERVAL, BACKOFF_TIME_UNIT)
             .build()
 
         workManager.enqueue(request)
@@ -45,19 +43,22 @@ class OfflinePixelScheduler @Inject constructor() {
         lateinit var offlinePixelSender: OfflinePixelSender
 
         override suspend fun doWork(): Result {
-            try {
+            return try {
                 offlinePixelSender
                     .sendOfflinePixels()
                     .blockingAwait()
-                return Result.success()
+                Result.success()
             } catch (e: Exception) {
-                return Result.failure()
+                Result.failure()
             }
         }
     }
 
     companion object {
         private const val WORK_REQUEST_TAG = "com.duckduckgo.statistics.offlinepixels.schedule"
-        private const val HOURLY_INTERVAL = 3L
+        private const val SERVICE_INTERVAL = 3L
+        private val SERVICE_TIME_UNIT = TimeUnit.HOURS
+        private const val BACKOFF_INTERVAL = 10L
+        private val BACKOFF_TIME_UNIT = TimeUnit.MINUTES
     }
 }

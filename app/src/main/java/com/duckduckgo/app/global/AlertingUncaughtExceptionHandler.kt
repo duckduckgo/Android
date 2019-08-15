@@ -25,6 +25,6 @@ class AlertingUncaughtExceptionHandler(
 
     override fun uncaughtException(t: Thread?, e: Throwable?) {
         offlinePixelDataStore.applicationCrashCount += 1
-        originalHandler.uncaughtException(t, e);
+        originalHandler.uncaughtException(t, e)
     }
 }

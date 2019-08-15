@@ -54,7 +54,7 @@ class OfflinePixelSender @Inject constructor(
             }
             val params = mapOf(COUNT to count.toString())
             pixel.fireCompletable(APPLICATION_CRASH.pixelName, params).andThen {
-                Timber.v("Offline pixel sent ${APPLICATION_CRASH.pixelName} count: ${count}")
+                Timber.v("Offline pixel sent ${APPLICATION_CRASH.pixelName} count: $count")
                 dataStore.applicationCrashCount = 0
             }
         }
@@ -68,7 +68,7 @@ class OfflinePixelSender @Inject constructor(
             }
             val params = mapOf(COUNT to count.toString())
             pixel.fireCompletable(WEB_RENDERER_GONE_CRASH.pixelName, params).andThen {
-                Timber.v("Offline pixel sent ${WEB_RENDERER_GONE_CRASH.pixelName} count: ${count}")
+                Timber.v("Offline pixel sent ${WEB_RENDERER_GONE_CRASH.pixelName} count: $count")
                 dataStore.webRendererGoneCrashCount = 0
             }
         }
@@ -82,7 +82,7 @@ class OfflinePixelSender @Inject constructor(
             }
             val params = mapOf(COUNT to count.toString())
             pixel.fireCompletable(WEB_RENDERER_GONE_KILLED.pixelName, params).andThen {
-                Timber.v("Offline pixel sent ${WEB_RENDERER_GONE_KILLED.pixelName} count: ${count}")
+                Timber.v("Offline pixel sent ${WEB_RENDERER_GONE_KILLED.pixelName} count: $count")
                 dataStore.webRendererGoneKilledCount = 0
             }
         }

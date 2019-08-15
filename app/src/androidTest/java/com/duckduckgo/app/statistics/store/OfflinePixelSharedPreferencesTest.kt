@@ -36,7 +36,7 @@ class OfflinePixelSharedPreferencesTest {
     }
 
     @Test
-    fun whenInitializedThenApplicartionCountIsZero() {
+    fun whenInitializedThenApplicationCountIsZero() {
         assertEquals(0, testee.applicationCrashCount)
     }
 
