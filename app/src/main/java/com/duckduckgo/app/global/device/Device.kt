@@ -19,6 +19,7 @@ package com.duckduckgo.app.global.device
 import android.content.Context
 import android.telephony.TelephonyManager
 import android.util.TypedValue
+import com.duckduckgo.app.browser.BuildConfig
 import java.util.*
 import javax.inject.Inject
 
@@ -29,6 +30,8 @@ interface DeviceInfo {
         TABLET("tablet")
     }
 
+    val appVersion: String
+
     val language: String
 
     val country: String
@@ -38,9 +41,7 @@ interface DeviceInfo {
 
 class ContextDeviceInfo @Inject constructor(private val context: Context) : DeviceInfo {
 
-    private val telephonyManager by lazy {
-        context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-    }
+    override val appVersion = "${BuildConfig.VERSION_NAME}"
 
     override val language: String by lazy {
         Locale.getDefault().language
@@ -50,6 +51,10 @@ class ContextDeviceInfo @Inject constructor(private val context: Context) : Devi
         val telephonyCountry = telephonyManager.networkCountryIso
         val deviceCountry = if (telephonyCountry.isNotBlank()) telephonyCountry else Locale.getDefault().country
         deviceCountry.toLowerCase()
+    }
+
+    private val telephonyManager by lazy {
+        context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
     }
 
     override fun formFactor(): DeviceInfo.FormFactor {
