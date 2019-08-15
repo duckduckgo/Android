@@ -265,6 +265,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
     fun launchFire() {
         val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction)
         dialog.clearStarted = {
+            removeObservers()
             clearingInProgressView.show()
         }
         dialog.clearComplete = { viewModel.onClearComplete() }
