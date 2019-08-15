@@ -48,7 +48,7 @@ class OfflinePixelScheduler @Inject constructor() {
             try {
                 offlinePixelSender
                     .sendOfflinePixels()
-                    .blockingGet()
+                    .blockingAwait()
                 return Result.success()
             } catch (e: Exception) {
                 return Result.failure()

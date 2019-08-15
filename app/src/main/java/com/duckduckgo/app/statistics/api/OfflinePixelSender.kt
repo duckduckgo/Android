@@ -37,9 +37,13 @@ class OfflinePixelSender @Inject constructor(
 ) {
 
     fun sendOfflinePixels(): Completable {
-        return sendApplicationKilledPixel()
-            .andThen(sendWebRendererCrashPixel())
-            .andThen(sendWebRendererKilledPixel())
+        return Completable.mergeDelayError(
+            listOf(
+                sendApplicationKilledPixel(),
+                sendWebRendererCrashPixel(),
+                sendWebRendererKilledPixel()
+            )
+        )
     }
 
     private fun sendApplicationKilledPixel(): Completable {
