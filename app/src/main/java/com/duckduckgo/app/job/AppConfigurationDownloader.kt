@@ -17,12 +17,11 @@
 package com.duckduckgo.app.job
 
 import com.duckduckgo.app.entities.api.EntityListDownloader
-import com.duckduckgo.app.survey.api.SurveyDownloader
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeDataDownloader
-import com.duckduckgo.app.statistics.api.OfflinePixelSender
 import com.duckduckgo.app.surrogates.api.ResourceSurrogateListDownloader
+import com.duckduckgo.app.survey.api.SurveyDownloader
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import io.reactivex.Completable
@@ -33,7 +32,6 @@ interface ConfigurationDownloader {
 }
 
 class AppConfigurationDownloader(
-    private val offlinePixelSender: OfflinePixelSender,
     private val trackerDataDownloader: TrackerDataDownloader,
     private val httpsUpgradeDataDownloader: HttpsUpgradeDataDownloader,
     private val resourceSurrogateDownloader: ResourceSurrogateListDownloader,
@@ -43,7 +41,6 @@ class AppConfigurationDownloader(
 ) : ConfigurationDownloader {
 
     override fun downloadTask(): Completable {
-        val sendWebPixel = offlinePixelSender.sendWebRendererGonePixel()
         val easyListDownload = trackerDataDownloader.downloadList(EASYLIST)
         val easyPrivacyDownload = trackerDataDownloader.downloadList(EASYPRIVACY)
         val trackersWhitelist = trackerDataDownloader.downloadList(TRACKERSWHITELIST)
@@ -55,7 +52,6 @@ class AppConfigurationDownloader(
 
         return Completable.mergeDelayError(
             listOf(
-                sendWebPixel,
                 easyListDownload,
                 easyPrivacyDownload,
                 trackersWhitelist,

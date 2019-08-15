@@ -57,7 +57,7 @@ class ApiBasedPixelTest {
         val pixel = ApiBasedPixel(mockPixelService, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo)
         pixel.fire(PRIVACY_DASHBOARD_OPENED)
 
-        verify(mockPixelService).fire("mp", "phone", "atbvariant", emptyMap())
+        verify(mockPixelService).fire(eq("mp"), eq("phone"), eq("atbvariant"), any())
     }
 
     @Test
@@ -70,7 +70,7 @@ class ApiBasedPixelTest {
         val pixel = ApiBasedPixel(mockPixelService, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo)
         pixel.fire(FORGET_ALL_EXECUTED)
 
-        verify(mockPixelService).fire("mf", "phone", "atb", emptyMap())
+        verify(mockPixelService).fire(eq("mf"), eq("phone"), eq("atb"), any())
     }
 
     @Test
@@ -81,7 +81,7 @@ class ApiBasedPixelTest {
         val pixel = ApiBasedPixel(mockPixelService, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo)
         pixel.fire(APP_LAUNCH)
 
-        verify(mockPixelService).fire("ml", "tablet", "", emptyMap())
+        verify(mockPixelService).fire(eq("ml"), eq("tablet"), eq(""), any())
     }
 
     @Test
@@ -92,32 +92,37 @@ class ApiBasedPixelTest {
         val pixel = ApiBasedPixel(mockPixelService, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo)
         pixel.fire(APP_LAUNCH)
 
-        verify(mockPixelService).fire("ml", "phone", "", emptyMap())
+        verify(mockPixelService).fire(eq("ml"), eq("phone"), eq(""), any())
     }
 
     @Test
-    fun whenPixelFiredWithAdditionalParametersThenPixelServiceCalledWithAdditionalParameters() {
+    fun whenPixelFiredWithAdditionalParametersThenPixelServiceCalledWithDefaultAndAdditionalParameters() {
         whenever(mockPixelService.fire(any(), any(), any(), any())).thenReturn(Completable.complete())
         whenever(mockStatisticsDataStore.atb).thenReturn(Atb("atb"))
         whenever(mockVariantManager.getVariant()).thenReturn(Variant("variant"))
         whenever(mockDeviceInfo.formFactor()).thenReturn(DeviceInfo.FormFactor.PHONE)
+        whenever(mockDeviceInfo.appVersion).thenReturn("1.0.0")
 
         val pixel = ApiBasedPixel(mockPixelService, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo)
         val params = mapOf("param1" to "value1", "param2" to "value2")
+        val expectedParams = mapOf("param1" to "value1", "param2" to "value2", "appVersion" to "1.0.0")
+
         pixel.fire(PRIVACY_DASHBOARD_OPENED, params)
-        verify(mockPixelService).fire("mp", "phone", "atbvariant", params)
+        verify(mockPixelService).fire("mp", "phone", "atbvariant", expectedParams)
     }
 
     @Test
-    fun whenPixelFiredWithoutAdditionalParametersThenPixelServiceCalledWithNoParameters() {
+    fun whenPixelFiredWithoutAdditionalParametersThenPixelServiceCalledWithOnlyDefaultParameters() {
         whenever(mockPixelService.fire(any(), any(), any(), any())).thenReturn(Completable.complete())
         whenever(mockStatisticsDataStore.atb).thenReturn(Atb("atb"))
         whenever(mockVariantManager.getVariant()).thenReturn(Variant("variant"))
         whenever(mockDeviceInfo.formFactor()).thenReturn(DeviceInfo.FormFactor.PHONE)
+        whenever(mockDeviceInfo.appVersion).thenReturn("1.0.0")
+
 
         val pixel = ApiBasedPixel(mockPixelService, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo)
-        val params = emptyMap<String, String>()
         pixel.fire(PRIVACY_DASHBOARD_OPENED)
-        verify(mockPixelService).fire("mp", "phone", "atbvariant", params)
+        val expectedParams = mapOf("appVersion" to "1.0.0")
+        verify(mockPixelService).fire("mp", "phone", "atbvariant", expectedParams)
     }
 }
