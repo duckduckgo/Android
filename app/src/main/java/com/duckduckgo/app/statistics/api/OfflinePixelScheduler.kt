@@ -30,8 +30,13 @@ class OfflinePixelScheduler @Inject constructor() {
         val workManager = WorkManager.getInstance()
         workManager.cancelAllWorkByTag(WORK_REQUEST_TAG)
 
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
         val request = PeriodicWorkRequestBuilder<OfflinePixelWorker>(SERVICE_INTERVAL, SERVICE_TIME_UNIT)
             .addTag(WORK_REQUEST_TAG)
+            .setConstraints(constraints)
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, BACKOFF_INTERVAL, BACKOFF_TIME_UNIT)
             .build()
 
