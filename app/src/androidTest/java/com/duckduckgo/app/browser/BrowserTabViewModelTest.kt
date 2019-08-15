@@ -29,10 +29,11 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
@@ -52,7 +53,6 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.*
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -295,11 +295,19 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBookmarkAddedThenDaoIsUpdatedAndUserNotified() {
-        testee.onBookmarkSaved(null, "A title", "www.example.com")
+    fun whenBookmarkEditedThenDaoIsUpdated() = runBlocking<Unit> {
+        testee.editBookmark(0, "A title", "www.example.com")
+        verify(bookmarksDao).update(BookmarkEntity(title = "A title", url = "www.example.com"))
+    }
+
+    @Test
+    fun whenBookmarkAddedThenDaoIsUpdatedAndUserNotified() = runBlocking<Unit> {
+        loadUrl("www.example.com", "A title")
+
+        testee.onBookmarkAddRequested()
         verify(bookmarksDao).insert(BookmarkEntity(title = "A title", url = "www.example.com"))
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.lastValue is DisplayMessage)
+        assertTrue(commandCaptor.lastValue is Command.ShowBookmarkAddedConfirmation)
     }
 
     @Test
@@ -895,22 +903,24 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSiteLoadedAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithUrlAndTitle() {
+    fun whenSiteLoadedAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithUrlAndTitle() = runBlocking<Unit> {
         loadUrl("foo.com")
         testee.titleReceived("Foo Title")
-        testee.onAddBookmarkSelected()
-        val command = captureCommands().value as Command.AddBookmark
+        testee.onBookmarkAddRequested()
+        val command = captureCommands().value as Command.ShowBookmarkAddedConfirmation
         assertEquals("foo.com", command.url)
         assertEquals("Foo Title", command.title)
     }
 
     @Test
-    fun whenNoSiteAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithBlankTitleAndUrl() {
-        testee.onAddBookmarkSelected()
-        val command = captureCommands().value as Command.AddBookmark
-        assertNotNull(command)
-        assertNull(command.url)
-        assertNull(command.title)
+    fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkAddedWithBlankTitleAndUrl() = runBlocking<Unit> {
+        whenever(bookmarksDao.insert(any())).thenReturn(1)
+        testee.onBookmarkAddRequested()
+        verify(bookmarksDao).insert(BookmarkEntity(title = "", url = ""))
+        val command = captureCommands().value as Command.ShowBookmarkAddedConfirmation
+        assertEquals(1, command.bookmarkId)
+        assertEquals("", command.title)
+        assertEquals("", command.url)
     }
 
     @Test

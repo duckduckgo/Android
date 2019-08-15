@@ -204,7 +204,6 @@
     <string name="bookmarkUrlHint">Bookmark URL</string>
     <string name="bookmarkSave">Save</string>
     <string name="bookmarkTitleEdit">Edit Bookmark</string>
-    <string name="bookmarkTitleSave">Save Bookmark</string>
     <string name="noBookmarks">No bookmarks added yet</string>
     <string name="bookmarkOverflowContentDescription">More options for bookmark %s</string>
     <string name="delete">Delete</string>
@@ -363,5 +362,6 @@
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Negative feedback button</string>
     <string name="feedbackIsImportantToUs">Your anonymous feedback is important to us.</string>
 
+    <string name="bookmarkEdited">Bookmark added</string>
 
 </resources>

@@ -24,7 +24,7 @@ import io.reactivex.Single
 interface BookmarksDao {
 
     @Insert
-    fun insert(bookmark: BookmarkEntity)
+    fun insert(bookmark: BookmarkEntity): Long
 
     @Query("select * from bookmarks")
     fun bookmarks(): LiveData<List<BookmarkEntity>>
@@ -32,7 +32,7 @@ interface BookmarksDao {
     @Delete
     fun delete(bookmark: BookmarkEntity)
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(bookmarkEntity: BookmarkEntity)
 
     @Query("select * from bookmarks WHERE title LIKE :query OR url LIKE :query ")
