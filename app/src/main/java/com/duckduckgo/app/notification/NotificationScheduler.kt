@@ -35,12 +35,14 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class NotificationScheduler @Inject constructor(
+    private val workManager: WorkManager,
     private val clearDataNotification: SchedulableNotification,
     private val privacyNotification: SchedulableNotification
 ) {
+
     suspend fun scheduleNextNotification() {
 
-        WorkManager.getInstance().cancelAllWorkByTag(WORK_REQUEST_TAG)
+        workManager.cancelAllWorkByTag(WORK_REQUEST_TAG)
 
         when {
             privacyNotification.canShow() -> {
@@ -60,7 +62,7 @@ class NotificationScheduler @Inject constructor(
             .setInitialDelay(duration, unit)
             .build()
 
-        WorkManager.getInstance().enqueue(request)
+        workManager.enqueue(request)
     }
 
     // Legacy code. Unused class required for users who already have this notification scheduled from previous version. We will
