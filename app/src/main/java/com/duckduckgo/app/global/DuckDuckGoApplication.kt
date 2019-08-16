@@ -25,8 +25,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.work.Configuration
-import androidx.work.WorkManager
 import androidx.work.WorkerFactory
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
@@ -47,7 +45,6 @@ import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.privacy.HistoricTrackerBlockingObserver
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
-import com.duckduckgo.app.statistics.api.OfflinePixelSender
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_LAUNCH
@@ -164,8 +161,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
         if (appIsRestarting()) return
 
-        configureWorkManager()
-
         ProcessLifecycleOwner.get().lifecycle.also {
             it.addObserver(this)
             it.addObserver(dataClearer)
@@ -196,14 +191,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     private fun configureUncaughtExceptionHandler() {
         val originalHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler(AlertingUncaughtExceptionHandler(originalHandler, offlinePixelDataStore))
-    }
-
-    private fun configureWorkManager() {
-        val config = Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
-
-        WorkManager.initialize(this, config)
     }
 
     private fun recordInstallationTimestamp() {
