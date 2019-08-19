@@ -58,7 +58,6 @@
         <item name="buttonOutlinedBorderColor">@color/brownishGrayTwo</item>
         <item name="callToActionTitleColor">@color/white</item>
         <item name="callToActionSubtitleColor">@color/grayishThree</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
 
         <item name="feedbackAnonymousFeedbackLabelColor">@color/grayish</item>
         <item name="feedbackListItemBackgroundColor">@color/almostBlack</item>
@@ -76,6 +75,7 @@
     <style name="AppTheme.Dark.Transparent">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
     <!-- To create a new color theme, copy this light one and update the suffix as appropriate.
