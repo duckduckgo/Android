@@ -313,6 +313,7 @@ class WebViewRequestInterceptorTest {
 
     private fun configureShouldUpgrade() = runBlocking<Unit> {
         whenever(mockHttpsUpgrader.shouldUpgrade(any())).thenReturn(true)
+        whenever(mockHttpsUpgrader.upgrade(any())).thenReturn(validHttpsUri())
         whenever(mockRequest.url).thenReturn(validUri())
         whenever(mockRequest.isForMainFrame).thenReturn(true)
     }
@@ -325,6 +326,7 @@ class WebViewRequestInterceptorTest {
     }
 
     private fun validUri() = Uri.parse("example.com")
+    private fun validHttpsUri() = Uri.parse("https://example.com")
 
     private fun assertCancelledResponse(response: WebResourceResponse?) {
         assertNotNull(response)

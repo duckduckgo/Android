@@ -30,10 +30,13 @@ import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
+import com.duckduckgo.app.statistics.api.OfflinePixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel
 import timber.log.Timber
 
 class DaggerWorkerFactory(
+    private val offlinePixelSender: OfflinePixelSender,
     private val settingsDataStore: SettingsDataStore,
     private val clearDataAction: ClearDataAction,
     private val notificationManager: NotificationManagerCompat,
@@ -51,6 +54,7 @@ class DaggerWorkerFactory(
         val instance = constructor.newInstance(appContext, workerParameters)
 
         when (instance) {
+            is OfflinePixelScheduler.OfflinePixelWorker -> injectOfflinePixelWorker(instance)
             is DataClearingWorker -> injectDataClearWorker(instance)
             is ClearDataNotificationWorker -> injectClearDataNotificationWorker(instance)
             is PrivacyNotificationWorker -> injectPrivacyNotificationWorker(instance)
@@ -58,6 +62,10 @@ class DaggerWorkerFactory(
         }
 
         return instance
+    }
+
+    private fun injectOfflinePixelWorker(worker: OfflinePixelScheduler.OfflinePixelWorker) {
+        worker.offlinePixelSender = offlinePixelSender
     }
 
     private fun injectDataClearWorker(worker: DataClearingWorker) {

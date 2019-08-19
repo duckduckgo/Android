@@ -91,7 +91,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun showEditBookmarkDialog(bookmark: BookmarkEntity) {
-        val dialog = SaveBookmarkDialogFragment.createDialogEditingMode(bookmark)
+        val dialog = EditBookmarkDialogFragment.instance(bookmark.id.toLong(), bookmark.title, bookmark.url)
         dialog.show(supportFragmentManager, EDIT_BOOKMARK_FRAGMENT_TAG)
         dialog.listener = viewModel
     }
