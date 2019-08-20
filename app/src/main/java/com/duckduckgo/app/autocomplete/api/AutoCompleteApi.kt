@@ -22,15 +22,13 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Companion.BOOKMARK_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Companion.SUGGESTION_TYPE
 import com.duckduckgo.app.global.UriString
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import javax.inject.Inject
 
 open class AutoCompleteApi @Inject constructor(
     private val autoCompleteService: AutoCompleteService,
-    private val bookmarksDao: BookmarksDao,
-    private val settingsDataStore: SettingsDataStore
+    private val bookmarksDao: BookmarksDao
 ) {
 
     fun autoComplete(query: String): Observable<AutoCompleteResult> {
@@ -39,7 +37,7 @@ open class AutoCompleteApi @Inject constructor(
             return Observable.just(AutoCompleteResult(query = query, suggestions = emptyList(), hasBookmarks = false))
         }
 
-        return bookmarksObservable(query).zipWith(
+        return getAutoCompleteBookmarkResults(query).zipWith(
             getAutoCompleteSearchResults(query),
             BiFunction { bookmarksResults, searchResults ->
                 AutoCompleteResult(
@@ -49,14 +47,6 @@ open class AutoCompleteApi @Inject constructor(
                 )
             }
         )
-    }
-
-    private fun bookmarksObservable(query: String): Observable<List<AutoCompleteBookmarkSuggestion>> {
-        return if (settingsDataStore.bookmarksAutoCompleteSuggestionsEnabled) {
-            getAutoCompleteBookmarkResults(query)
-        } else {
-            Observable.just(emptyList())
-        }
     }
 
     private fun getAutoCompleteSearchResults(query: String) =

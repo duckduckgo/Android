@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.statistics.pixels
 
-import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.PixelService
@@ -115,10 +114,7 @@ interface Pixel {
         FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s"),
 
         AUTOCOMPLETE_BOOKMARK_SELECTION("m_aut_s_b"),
-        AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s"),
-
-        BOOKMARKS_IN_AUTOCOMPLETE_ENABLED("m_biaut_e"),
-        BOOKMARKS_IN_AUTOCOMPLETE_DISABLED("m_biaut_d")
+        AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s")
     }
 
     object PixelParameter {
