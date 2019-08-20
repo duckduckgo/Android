@@ -29,7 +29,6 @@ interface SettingsDataStore {
     var lastExecutedJobId: String?
     var theme: DuckDuckGoTheme?
     var autoCompleteSuggestionsEnabled: Boolean
-    var bookmarksAutoCompleteSuggestionsEnabled: Boolean
 
     /**
      * This will be checked upon app startup and used to decide whether it should perform a clear or not.
@@ -70,10 +69,6 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
     override var autoCompleteSuggestionsEnabled: Boolean
         get() = preferences.getBoolean(KEY_AUTOCOMPLETE_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled) }
-
-    override var bookmarksAutoCompleteSuggestionsEnabled: Boolean
-        get() = preferences.getBoolean(KEY_BOOKMARKS_AUTOCOMPLETE_ENABLED, true)
-        set(enabled) = preferences.edit { putBoolean(KEY_BOOKMARKS_AUTOCOMPLETE_ENABLED, enabled) }
 
     override var appUsedSinceLastClear: Boolean
         get() = preferences.getBoolean(KEY_APP_USED_SINCE_LAST_CLEAR, true)
@@ -126,7 +121,6 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         const val KEY_BACKGROUND_JOB_ID = "BACKGROUND_JOB_ID"
         const val KEY_THEME = "THEME"
         const val KEY_AUTOCOMPLETE_ENABLED = "AUTOCOMPLETE_ENABLED"
-        const val KEY_BOOKMARKS_AUTOCOMPLETE_ENABLED = "BOOKMARKS_AUTOCOMPLETE_ENABLED"
         const val KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION = "AUTOMATICALLY_CLEAR_WHAT_OPTION"
         const val KEY_AUTOMATICALLY_CLEAR_WHEN_OPTION = "AUTOMATICALLY_CLEAR_WHEN_OPTION"
         const val KEY_APP_BACKGROUNDED_TIMESTAMP = "APP_BACKGROUNDED_TIMESTAMP"

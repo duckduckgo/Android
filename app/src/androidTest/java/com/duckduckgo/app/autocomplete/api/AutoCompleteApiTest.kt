@@ -18,8 +18,6 @@ package com.duckduckgo.app.autocomplete.api
 
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import io.reactivex.Observable
@@ -40,30 +38,16 @@ class AutoCompleteApiTest {
     @Mock
     private lateinit var mockBookmarksDao: BookmarksDao
 
-    @Mock
-    private lateinit var mockSettingsDataStore: SettingsDataStore
-
     private lateinit var testee: AutoCompleteApi
 
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        testee = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao, mockSettingsDataStore)
+        testee = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao)
     }
 
     @Test
-    fun whenBookmarkSuggestionsAreDisabledThenDoNotGetBookmarksFromDAO() {
-        whenever(mockSettingsDataStore.bookmarksAutoCompleteSuggestionsEnabled).thenReturn(false)
-        whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(Observable.just(emptyList()))
-
-        testee.autoComplete("foo")
-
-        verify(mockBookmarksDao, never()).bookmarksByQuery(anyString())
-    }
-
-    @Test
-    fun whenBookmarkSuggestionsAreEnabledThenGetBookmarksFromDAO() {
-        whenever(mockSettingsDataStore.bookmarksAutoCompleteSuggestionsEnabled).thenReturn(true)
+    fun whenQueryIsNotBlankThenTryToGetBookmarksFromDAO() {
         whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(Observable.just(emptyList()))
         whenever(mockBookmarksDao.bookmarksByQuery(anyString())).thenReturn(Single.just(emptyList()))
 
@@ -82,7 +66,6 @@ class AutoCompleteApiTest {
 
     @Test
     fun whenReturnBookmarkSuggestionsThenPhraseIsSameAsURL() {
-        whenever(mockSettingsDataStore.bookmarksAutoCompleteSuggestionsEnabled).thenReturn(true)
         whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(Observable.just(emptyList()))
         whenever(mockBookmarksDao.bookmarksByQuery(anyString())).thenReturn(Single.just(listOf(BookmarkEntity(0, "title", "https://example.com"))))
 
