@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.statistics.api
 
+import android.net.Uri
+import androidx.core.net.toUri
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.FileUtilities.loadText
 import com.duckduckgo.app.InstantSchedulersRule
@@ -31,6 +33,7 @@ import com.squareup.moshi.Moshi
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.RecordedRequest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -39,6 +42,9 @@ import org.junit.Test
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
+import java.net.InetAddress
+import java.net.InetSocketAddress
+import java.net.Proxy
 import java.util.concurrent.TimeUnit
 
 
@@ -145,7 +151,7 @@ class StatisticsRequesterJsonTest {
         queueResponseFromString("", 200)
         testee.initializeAtb()
         val request = takeRequestImmediately()
-        assertEquals("/atb.js", request.requestUrl.encodedPath())
+        assertEquals("/atb.js", request.encodedPath())
     }
 
     @Test
@@ -154,7 +160,7 @@ class StatisticsRequesterJsonTest {
         queueResponseFromString("", 200)
         testee.initializeAtb()
         val atbRequest = takeRequestImmediately()
-        val testParam = atbRequest.requestUrl.queryParameter(ParamKey.DEV_MODE)
+        val testParam = atbRequest.extractQueryParam(ParamKey.DEV_MODE)
         assertTestParameterSent(testParam)
     }
 
@@ -165,7 +171,7 @@ class StatisticsRequesterJsonTest {
         testee.initializeAtb()
         takeRequestImmediately()
         val extiRequest = takeRequestImmediately()
-        assertEquals("/exti/", extiRequest.requestUrl.encodedPath())
+        assertEquals("/exti/", extiRequest.encodedPath())
     }
 
     @Test
@@ -175,7 +181,7 @@ class StatisticsRequesterJsonTest {
         testee.initializeAtb()
         takeRequestImmediately()
         val extiRequest = takeRequestImmediately()
-        val testParam = extiRequest.requestUrl.queryParameter(ParamKey.DEV_MODE)
+        val testParam = extiRequest.extractQueryParam(ParamKey.DEV_MODE)
         assertTestParameterSent(testParam)
     }
 
@@ -186,7 +192,7 @@ class StatisticsRequesterJsonTest {
         testee.initializeAtb()
         takeRequestImmediately()
         val extiRequest = takeRequestImmediately()
-        val atbQueryParam = extiRequest.requestUrl.queryParameter("atb")
+        val atbQueryParam = extiRequest.extractQueryParam("atb")
         assertNotNull(atbQueryParam)
         assertEquals("v105-3ma", atbQueryParam)
     }
@@ -197,8 +203,8 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshSearchRetentionAtb()
         val refreshRequest = takeRequestImmediately()
-        assertEquals("/atb.js", refreshRequest.requestUrl.encodedPath())
-        assertNull(refreshRequest.requestUrl.queryParameter("at"))
+        assertEquals("/atb.js", refreshRequest.encodedPath())
+        assertNull(refreshRequest.extractQueryParam("at"))
     }
 
     @Test
@@ -207,8 +213,8 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
         val refreshRequest = takeRequestImmediately()
-        assertEquals("/atb.js", refreshRequest.requestUrl.encodedPath())
-        assertEquals("app_use", refreshRequest.requestUrl.queryParameter("at"))
+        assertEquals("/atb.js", refreshRequest.encodedPath())
+        assertEquals("app_use", refreshRequest.extractQueryParam("at"))
     }
 
     @Test
@@ -233,7 +239,7 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshSearchRetentionAtb()
         val refreshRequest = takeRequestImmediately()
-        val testParam = refreshRequest.requestUrl.queryParameter(ParamKey.DEV_MODE)
+        val testParam = refreshRequest.extractQueryParam(ParamKey.DEV_MODE)
         assertTestParameterSent(testParam)
     }
 
@@ -243,7 +249,7 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
         val refreshRequest = takeRequestImmediately()
-        val testParam = refreshRequest.requestUrl.queryParameter(ParamKey.DEV_MODE)
+        val testParam = refreshRequest.extractQueryParam(ParamKey.DEV_MODE)
         assertTestParameterSent(testParam)
     }
 
@@ -253,7 +259,7 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshSearchRetentionAtb()
         val refreshRequest = takeRequestImmediately()
-        val atbParam = refreshRequest.requestUrl.queryParameter(ParamKey.ATB)
+        val atbParam = refreshRequest.extractQueryParam(ParamKey.ATB)
         assertEquals("100-1ma", atbParam)
     }
 
@@ -263,7 +269,7 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
         val refreshRequest = takeRequestImmediately()
-        val atbParam = refreshRequest.requestUrl.queryParameter(ParamKey.ATB)
+        val atbParam = refreshRequest.extractQueryParam(ParamKey.ATB)
         assertEquals("100-1ma", atbParam)
     }
 
@@ -274,7 +280,7 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshSearchRetentionAtb()
         val refreshRequest = takeRequestImmediately()
-        val atbParam = refreshRequest.requestUrl.queryParameter(ParamKey.RETENTION_ATB)
+        val atbParam = refreshRequest.extractQueryParam(ParamKey.RETENTION_ATB)
         assertEquals("101-3", atbParam)
     }
 
@@ -285,7 +291,7 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
         val refreshRequest = takeRequestImmediately()
-        val atbParam = refreshRequest.requestUrl.queryParameter(ParamKey.RETENTION_ATB)
+        val atbParam = refreshRequest.extractQueryParam(ParamKey.RETENTION_ATB)
         assertEquals("101-3", atbParam)
     }
 
@@ -311,6 +317,7 @@ class StatisticsRequesterJsonTest {
         queueResponse(response)
     }
 
+    @Suppress("SameParameterValue")
     private fun queueResponseFromString(responseBody: String, responseCode: Int = 200) {
         val response = MockResponse()
             .setBody(responseBody)
@@ -329,10 +336,11 @@ class StatisticsRequesterJsonTest {
         server.start()
 
         val okHttpClient = OkHttpClient.Builder()
+            .proxy(Proxy(Proxy.Type.HTTP, InetSocketAddress(InetAddress.getLocalHost(), server.port)))
             .build()
 
         val retrofit = Retrofit.Builder()
-            .baseUrl(server.url("/").toString())
+            .baseUrl(server.url("localhost/").toString())
             .client(okHttpClient)
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(MoshiConverterFactory.create(Moshi.Builder().build()))
@@ -343,6 +351,18 @@ class StatisticsRequesterJsonTest {
 
     private fun assertNumberRequestsMade(expectedRequests: Int) {
         assertEquals(expectedRequests, server.requestCount)
+    }
+
+    private fun RecordedRequest.requestUri(): Uri {
+        return path.toUri()
+    }
+
+    private fun RecordedRequest.extractQueryParam(keyName: String): String? {
+        return requestUri().getQueryParameter(keyName)
+    }
+
+    private fun RecordedRequest.encodedPath(): String? {
+        return requestUri().encodedPath
     }
 
     companion object {

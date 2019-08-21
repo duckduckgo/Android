@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.db
+package com.duckduckgo.app.global
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
 
-@Entity(tableName = "bookmarks")
-data class BookmarkEntity(
-    @PrimaryKey(autoGenerate = true) var id: Long = 0,
-    var title: String?,
-    var url: String
-)
+class AlertingUncaughtExceptionHandler(
+    private val originalHandler: Thread.UncaughtExceptionHandler,
+    private val offlinePixelDataStore: OfflinePixelDataStore
+) : Thread.UncaughtExceptionHandler {
+
+    override fun uncaughtException(t: Thread?, e: Throwable?) {
+        offlinePixelDataStore.applicationCrashCount += 1
+        originalHandler.uncaughtException(t, e)
+    }
+}

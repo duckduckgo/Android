@@ -33,7 +33,6 @@ open class AppConfigurationDownloaderModule {
 
     @Provides
     open fun appConfigurationDownloader(
-        offlinePixelSender: OfflinePixelSender,
         trackerDataDownloader: TrackerDataDownloader,
         httpsUpgradeDataDownloader: HttpsUpgradeDataDownloader,
         resourceSurrogateDownloader: ResourceSurrogateListDownloader,
@@ -43,7 +42,6 @@ open class AppConfigurationDownloaderModule {
     ): ConfigurationDownloader {
 
         return AppConfigurationDownloader(
-            offlinePixelSender,
             trackerDataDownloader,
             httpsUpgradeDataDownloader,
             resourceSurrogateDownloader,

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.global.shortcut
 
+import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ShortcutInfo
@@ -24,6 +25,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.graphics.drawable.IconCompat
+import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import javax.inject.Inject
@@ -37,6 +39,7 @@ class AppShortcutCreator @Inject constructor() {
 
         shortcutList.add(buildNewTabShortcut(context))
         shortcutList.add(buildClearDataShortcut(context))
+        shortcutList.add(buildBookmarksShortcut(context))
 
         val shortcutManager = context.getSystemService(ShortcutManager::class.java)
         shortcutManager.dynamicShortcuts = shortcutList
@@ -66,9 +69,23 @@ class AppShortcutCreator @Inject constructor() {
             .build().toShortcutInfo()
     }
 
+    @RequiresApi(Build.VERSION_CODES.N_MR1)
+    private fun buildBookmarksShortcut(context: Context): ShortcutInfo {
+        val bookmarksActivity = BookmarksActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
+
+        val stackBuilder = TaskStackBuilder.create(context).addNextIntentWithParentStack(bookmarksActivity)
+
+        return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_SHOW_BOOKMARKS)
+            .setShortLabel(context.getString(R.string.bookmarksActivityTitle))
+            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_bookmarks))
+            .setIntents(stackBuilder.intents)
+            .build().toShortcutInfo()
+    }
+
     companion object {
         private const val SHORTCUT_ID_CLEAR_DATA = "clearData"
         private const val SHORTCUT_ID_NEW_TAB = "newTab"
+        private const val SHORTCUT_ID_SHOW_BOOKMARKS = "showBookmarks"
     }
 
 }

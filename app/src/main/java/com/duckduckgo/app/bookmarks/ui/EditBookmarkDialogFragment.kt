@@ -23,35 +23,35 @@ import android.view.WindowManager
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
-import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.view.hideKeyboard
 import com.duckduckgo.app.global.view.showKeyboard
 import org.jetbrains.anko.find
 
 
-class SaveBookmarkDialogFragment : DialogFragment() {
+class EditBookmarkDialogFragment : DialogFragment() {
 
-    interface SaveBookmarkListener {
-        fun onBookmarkSaved(id: Int?, title: String, url: String)
+    interface EditBookmarkListener {
+        fun onBookmarkEdited(id: Long, title: String, url: String)
     }
 
-    var listener: SaveBookmarkListener? = null
+    var listener: EditBookmarkListener? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val rootView = View.inflate(activity, R.layout.add_or_edit_bookmark, null)
+        val rootView = View.inflate(activity, R.layout.edit_bookmark, null)
         val titleInput = rootView.find<EditText>(R.id.titleInput)
         val urlInput = rootView.find<EditText>(R.id.urlInput)
 
         val alertBuilder = AlertDialog.Builder(activity!!)
             .setView(rootView)
+            .setTitle(R.string.bookmarkTitleEdit)
             .setPositiveButton(R.string.bookmarkSave) { _, _ ->
                 userAcceptedDialog(titleInput, urlInput)
             }
 
         validateBundleArguments()
 
-        setAlertTitle(alertBuilder)
         populateFields(titleInput, urlInput)
 
         val alert = alertBuilder.create()
@@ -60,17 +60,19 @@ class SaveBookmarkDialogFragment : DialogFragment() {
     }
 
     private fun userAcceptedDialog(titleInput: EditText, urlInput: EditText) {
-        listener?.onBookmarkSaved(
+        listener?.onBookmarkEdited(
             getExistingId(),
             titleInput.text.toString(),
             urlInput.text.toString()
         )
+
+        titleInput.hideKeyboard()
     }
 
     private fun showKeyboard(titleInput: EditText, alert: AlertDialog) {
         titleInput.setSelection(titleInput.text.length)
         titleInput.showKeyboard()
-        alert.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+        alert.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
     }
 
     private fun populateFields(titleInput: EditText, urlInput: EditText) {
@@ -78,60 +80,33 @@ class SaveBookmarkDialogFragment : DialogFragment() {
         urlInput.setText(getExistingUrl())
     }
 
-    private fun setAlertTitle(alertBuilder: AlertDialog.Builder) {
-        val titleStringRes = if (isInEditMode()) {
-            R.string.bookmarkTitleEdit
-        } else {
-            R.string.bookmarkTitleSave
-        }
-        alertBuilder.setTitle(titleStringRes)
-    }
-
-    private fun getExistingId(): Int? = arguments!!.getInt(KEY_BOOKMARK_ID)
+    private fun getExistingId(): Long = arguments!!.getLong(KEY_BOOKMARK_ID)
     private fun getExistingTitle(): String? = arguments!!.getString(KEY_PREEXISTING_TITLE)
     private fun getExistingUrl(): String? = arguments!!.getString(KEY_PREEXISTING_URL)
 
     private fun validateBundleArguments() {
         if (arguments == null) throw IllegalArgumentException("Missing arguments bundle")
         val args = arguments!!
-        if (!args.containsKey(KEY_IS_EDIT_MODE) ||
-            !args.containsKey(KEY_PREEXISTING_TITLE) ||
+        if (!args.containsKey(KEY_PREEXISTING_TITLE) ||
             !args.containsKey(KEY_PREEXISTING_URL)
         ) {
-            throw IllegalArgumentException("Bundle arguments required [KEY_IS_EDIT_MODE, KEY_PREEXISTING_TITLE, KEY_PREEXISTING_URL]")
+            throw IllegalArgumentException("Bundle arguments required [KEY_PREEXISTING_TITLE, KEY_PREEXISTING_URL]")
         }
     }
 
-    private fun isInEditMode(): Boolean = arguments!!.getBoolean(KEY_IS_EDIT_MODE)
-
     companion object {
-        private const val KEY_IS_EDIT_MODE = "KEY_IS_EDIT_MODE"
         private const val KEY_BOOKMARK_ID = "KEY_BOOKMARK_ID"
         private const val KEY_PREEXISTING_TITLE = "KEY_PREEXISTING_TITLE"
         private const val KEY_PREEXISTING_URL = "KEY_PREEXISTING_URL"
 
-        fun createDialogEditingMode(bookmark: BookmarkEntity): SaveBookmarkDialogFragment {
+        fun instance(bookmarkId: Long, title: String?, url: String?): EditBookmarkDialogFragment {
 
-            val dialog = SaveBookmarkDialogFragment()
+            val dialog = EditBookmarkDialogFragment()
             val bundle = Bundle()
 
-            bundle.putBoolean(KEY_IS_EDIT_MODE, true)
-            bundle.putInt(KEY_BOOKMARK_ID, bookmark.id)
-            bundle.putString(KEY_PREEXISTING_TITLE, bookmark.title)
-            bundle.putString(KEY_PREEXISTING_URL, bookmark.url)
-
-            dialog.arguments = bundle
-            return dialog
-        }
-
-        fun createDialogCreationMode(existingTitle: String?, existingUrl: String?): SaveBookmarkDialogFragment {
-
-            val dialog = SaveBookmarkDialogFragment()
-            val bundle = Bundle()
-
-            bundle.putBoolean(KEY_IS_EDIT_MODE, false)
-            bundle.putString(KEY_PREEXISTING_TITLE, existingTitle)
-            bundle.putString(KEY_PREEXISTING_URL, existingUrl)
+            bundle.putLong(KEY_BOOKMARK_ID, bookmarkId)
+            bundle.putString(KEY_PREEXISTING_TITLE, title)
+            bundle.putString(KEY_PREEXISTING_URL, url)
 
             dialog.arguments = bundle
             return dialog

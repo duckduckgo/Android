@@ -19,6 +19,8 @@
 
 package com.duckduckgo.app.notification
 
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.work.Configuration
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
@@ -41,12 +43,15 @@ class NotificationSchedulerTest {
     private val clearNotification: SchedulableNotification = mock()
     private val privacyNotification: SchedulableNotification = mock()
 
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private var workManager = WorkManager.getInstance(context)
     private lateinit var testee: NotificationScheduler
 
     @Before
     fun before() {
         whenever(variantManager.getVariant(any())).thenReturn(DEFAULT_VARIANT)
         testee = NotificationScheduler(
+            workManager,
             clearNotification,
             privacyNotification
         )
@@ -93,8 +98,7 @@ class NotificationSchedulerTest {
     }
 
     private fun getScheduledWorkers(): List<WorkInfo> {
-        return WorkManager
-            .getInstance()
+        return workManager
             .getWorkInfosByTag(NotificationScheduler.WORK_REQUEST_TAG)
             .get()
             .filter { it.state == WorkInfo.State.ENQUEUED }

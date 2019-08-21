@@ -57,7 +57,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion
-import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
+import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
@@ -279,7 +279,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             onMenuItemClicked(view.refreshPopupMenuItem) { refresh() }
             onMenuItemClicked(view.newTabPopupMenuItem) { browserActivity?.launchNewTab() }
             onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
-            onMenuItemClicked(view.addBookmarksPopupMenuItem) { viewModel.onAddBookmarkSelected() }
+            onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() }}
             onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
             onMenuItemClicked(view.brokenSitePopupMenuItem) { viewModel.onBrokenSiteSelected() }
             onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
@@ -378,9 +378,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.OpenInNewBackgroundTab -> {
                 openInNewBackgroundTab()
             }
-            is Command.AddBookmark -> {
-                addBookmark(it.title, it.url)
-            }
+            is Command.ShowBookmarkAddedConfirmation -> bookmarkAdded(it.bookmarkId, it.title, it.url)
             is Command.Navigate -> {
                 navigate(it.url)
             }
@@ -431,7 +429,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.CopyLink -> {
                 clipboardManager.primaryClip = ClipData.newPlainText(null, it.url)
             }
-            is Command.DisplayMessage -> showToast(it.messageId)
             is Command.ShowFileChooser -> {
                 launchFilePicker(it)
             }
@@ -691,7 +688,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 setSupportZoom(true)
             }
 
-            it.setDownloadListener { url, userAgent, contentDisposition, mimeType, contentLength ->
+            it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
                 requestFileDownload(url, contentDisposition, mimeType)
             }
 
@@ -779,10 +776,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         popupMenu.show(rootView, toolbar)
     }
 
-    private fun addBookmark(title: String?, url: String?) {
-        val addBookmarkDialog = SaveBookmarkDialogFragment.createDialogCreationMode(title, url)
-        addBookmarkDialog.show(childFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
-        addBookmarkDialog.listener = viewModel
+    private fun bookmarkAdded(bookmarkId: Long, title: String?, url: String?) {
+
+        Snackbar.make(rootView, R.string.bookmarkEdited, Snackbar.LENGTH_LONG)
+            .setAction(R.string.edit) {
+                val addBookmarkDialog = EditBookmarkDialogFragment.instance(bookmarkId, title, url)
+                addBookmarkDialog.show(childFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
+                addBookmarkDialog.listener = viewModel
+            }
+            .show()
     }
 
     private fun launchSharePageChooser(url: String) {
