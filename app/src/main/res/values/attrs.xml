@@ -30,6 +30,7 @@
     <attr name="tabSubtitleTextColor" format="color" />
     <attr name="tabSelectedBorderColor" format="color" />
     <attr name="tabsFireTextColor" format="color" />
+    <attr name="tabCardBackgroundColor" format="color" />
     <attr name="bookmarkIconColor" format="color" />
     <attr name="bookmarkTitleTextColor" format="color" />
     <attr name="bookmarkSubtitleTextColor" format="color" />
@@ -47,6 +48,5 @@
     <attr name="feedbackListItemSeparatorColor" format="color" />
     <attr name="feedbackEditTextBackgroundColor" format="color" />
     <attr name="feedbackEditTextHintColor" format="color" />
-    <attr name="tabCardBackgroundColor" format="color" />
 
 </resources>

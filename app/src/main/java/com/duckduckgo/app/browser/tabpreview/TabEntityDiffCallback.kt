@@ -28,34 +28,25 @@ class TabEntityDiffCallback : DiffUtil.ItemCallback<TabEntity>() {
     }
 
     override fun areContentsTheSame(oldItem: TabEntity, newItem: TabEntity): Boolean {
-        return !previewImageChanged(oldItem, newItem) &&
-                !viewStatusChanged(oldItem, newItem) &&
-                !titleChanged(oldItem, newItem)
+        return oldItem.tabPreviewFile == newItem.tabPreviewFile
+                && oldItem.viewed == newItem.viewed
+                && oldItem.title == newItem.title
     }
 
-    private fun titleChanged(oldItem: TabEntity, newItem: TabEntity) =
-        oldItem.title != newItem.title
-
-    private fun viewStatusChanged(oldItem: TabEntity, newItem: TabEntity) =
-        oldItem.viewed != newItem.viewed
-
-    private fun previewImageChanged(oldItem: TabEntity, newItem: TabEntity): Boolean {
-        return oldItem.tabPreviewFile != newItem.tabPreviewFile
-    }
 
     override fun getChangePayload(oldItem: TabEntity, newItem: TabEntity): Bundle {
 
         val diffBundle = Bundle()
 
-        if (titleChanged(oldItem, newItem)) {
+        if (oldItem.title != newItem.title) {
             diffBundle.putString(DIFF_KEY_TITLE, newItem.title)
         }
 
-        if (viewStatusChanged(oldItem, newItem)) {
+        if (oldItem.viewed != newItem.viewed) {
             diffBundle.putBoolean(DIFF_KEY_VIEWED, newItem.viewed)
         }
 
-        if (previewImageChanged(oldItem, newItem)) {
+        if (oldItem.tabPreviewFile != newItem.tabPreviewFile) {
             diffBundle.putString(DIFF_KEY_PREVIEW, newItem.tabPreviewFile)
         }
 

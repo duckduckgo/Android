@@ -32,7 +32,7 @@ class FileBasedWebViewPreviewGenerator : WebViewPreviewGenerator {
 
     override suspend fun generatePreview(webView: WebView): Bitmap {
         val fullSizeBitmap = convertWebViewToBitmap(webView)
-        val scaledBitmap = scaleBitmap(fullSizeBitmap, webView)
+        val scaledBitmap = scaleBitmap(fullSizeBitmap)
         Timber.d("Full size bitmap: ${fullSizeBitmap.byteCount}, reduced size: ${scaledBitmap.byteCount}")
         return scaledBitmap
     }
@@ -56,18 +56,18 @@ class FileBasedWebViewPreviewGenerator : WebViewPreviewGenerator {
         webView.isHorizontalScrollBarEnabled = false
     }
 
-    private suspend fun scaleBitmap(fullSize: Bitmap, webView: WebView): Bitmap {
+    private suspend fun scaleBitmap(bitmap: Bitmap): Bitmap {
         return withContext(Dispatchers.IO) {
             return@withContext Bitmap.createScaledBitmap(
-                fullSize,
-                (webView.width * COMPRESSION_PERCENTAGE / 100),
-                (webView.height * COMPRESSION_PERCENTAGE / 100),
+                bitmap,
+                (bitmap.width * COMPRESSION_RATIO).toInt(),
+                (bitmap.height * COMPRESSION_RATIO).toInt(),
                 false
             )
         }
     }
 
     companion object {
-        private const val COMPRESSION_PERCENTAGE = 50
+        private const val COMPRESSION_RATIO = 0.5
     }
 }

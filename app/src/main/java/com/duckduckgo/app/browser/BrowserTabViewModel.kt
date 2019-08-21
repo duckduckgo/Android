@@ -26,7 +26,6 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.annotation.AnyThread
-import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import androidx.lifecycle.*
@@ -221,7 +220,6 @@ class BrowserTabViewModel(
     private var site: Site? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
-    private var lastWebViewPreviewTimestamp = 0L
 
     init {
         initializeViewStates()
@@ -505,33 +503,8 @@ class BrowserTabViewModel(
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = newProgress)
 
         if (!isLoading) {
-            if (shouldDeleteTabPreview(site?.url)) {
-                deleteTabPreview(tabId)
-                lastWebViewPreviewTimestamp = 0
-            } else if (shouldUpdateTabPreview(site?.url)) {
-                lastWebViewPreviewTimestamp = System.currentTimeMillis()
-                command.value = GenerateWebViewPreviewImage
-            }
+            updateOrDeleteWebViewPreview()
         }
-    }
-
-    private fun shouldDeleteTabPreview(siteUrl: String?) = siteUrl == null
-    private fun shouldUpdateTabPreview(siteUrl: String?): Boolean {
-        return siteUrl != null && canGenerateWebViewPreview()
-    }
-
-    /**
-     * This is a performance optimisation to guard against generating bitmaps too frequently, as can happen as this is invoked from onProgressChanged
-     */
-    private fun canGenerateWebViewPreview(): Boolean {
-        val difference = System.currentTimeMillis() - lastWebViewPreviewTimestamp
-
-        if (difference >= TimeUnit.SECONDS.toMillis(2)) {
-            return true
-        }
-
-        Timber.v("Not allowed to generate a WebView preview; too soon since the last one (${difference}ms ago)")
-        return false
     }
 
     private fun registerSiteVisit() {
@@ -875,15 +848,21 @@ class BrowserTabViewModel(
 
     fun userLaunchingTabSwitcher() {
         if (variantManager.getVariant().hasFeature(TabSwitcherGrid)) {
-            if (shouldDeleteTabPreview(site?.url)) {
-                deleteTabPreview(tabId)
-            } else if (shouldUpdateTabPreview(site?.url)) {
-                command.value = GenerateWebViewPreviewImage
-            }
+            updateOrDeleteWebViewPreview()
 
             command.value = LaunchTabSwitcher
         } else {
             command.value = LaunchTabSwitcherLegacy
+        }
+    }
+
+    private fun updateOrDeleteWebViewPreview() {
+        val url = site?.url
+        Timber.d("Updating or deleting WebView preview for $url")
+        if (url == null) {
+            deleteTabPreview(tabId)
+        } else {
+            command.value = GenerateWebViewPreviewImage
         }
     }
 }

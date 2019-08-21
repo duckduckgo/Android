@@ -180,6 +180,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         viewModel
     }
 
+    // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
+    private var bitmapGeneratorJob: Job? = null
+
     private val browserActivity
         get() = activity as? BrowserActivity
 
@@ -279,7 +282,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             onMenuItemClicked(view.refreshPopupMenuItem) { refresh() }
             onMenuItemClicked(view.newTabPopupMenuItem) { browserActivity?.launchNewTab() }
             onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
-            onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() }}
+            onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
             onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
             onMenuItemClicked(view.brokenSitePopupMenuItem) { viewModel.onBrokenSiteSelected() }
             onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
@@ -452,14 +455,22 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun generateWebViewPreviewImage() {
-        webView?.let {
-            launch {
+        webView?.let { webView ->
+
+            // if there's an existing job for generating a preview, cancel that in favor of the new request
+            bitmapGeneratorJob?.cancel()
+
+            bitmapGeneratorJob = launch {
+                delay(WEBVIEW_PREVIEW_GENERATOR_DEBOUNCE_TIME_MS)
+
+                Timber.i("Generating webview preview")
                 try {
-                    val bitmap = previewGenerator.generatePreview(it)
-                    val fileName = previewPersister.save(bitmap, tabId)
+                    val preview = previewGenerator.generatePreview(webView)
+                    val fileName = previewPersister.save(preview, tabId)
                     viewModel.updateTabPreview(tabId, fileName)
-                } catch (e: Throwable) {
-                    Timber.w(e, "Failed to extract bitmap from WebView")
+                    Timber.i("Saved and updated tab preview")
+                } catch (e: RuntimeException) {
+                    Timber.w(e, "Failed to generate WebView preview")
                 }
             }
         }
@@ -1004,6 +1015,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private const val URL_BUNDLE_KEY = "url"
 
         private const val AUTHENTICATION_DIALOG_TAG = "AUTH_DIALOG_TAG"
+
+        private const val WEBVIEW_PREVIEW_GENERATOR_DEBOUNCE_TIME_MS = 1_000L
 
         fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
             val fragment = BrowserTabFragment()

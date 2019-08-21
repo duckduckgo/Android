@@ -47,6 +47,7 @@
         <item name="tabSubtitleTextColor">@color/coolGray</item>
         <item name="tabSelectedBorderColor">@color/skyBlue</item>
         <item name="tabsFireTextColor">@color/white</item>
+        <item name="tabCardBackgroundColor">@color/almostBlack</item>
         <item name="bookmarkIconColor">@color/white</item>
         <item name="bookmarkTitleTextColor">@color/white</item>
         <item name="bookmarkSubtitleTextColor">@color/grayishTwo</item>
@@ -66,7 +67,6 @@
         <item name="feedbackEditTextBackgroundColor">@color/almostBlack</item>
         <item name="feedbackEditTextHintColor">@color/grayish</item>
 
-        <item name="tabCardBackgroundColor">@color/almostBlack</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -104,6 +104,7 @@
         <item name="tabSubtitleTextColor">@color/warmerGray</item>
         <item name="tabSelectedBorderColor">@color/cornflowerBlue</item>
         <item name="tabsFireTextColor">@color/warmerGray</item>
+        <item name="tabCardBackgroundColor">@color/white</item>
         <item name="bookmarkIconColor">@color/grayishBrown</item>
         <item name="bookmarkTitleTextColor">@color/almostBlack</item>
         <item name="bookmarkSubtitleTextColor">@color/warmerGray</item>
@@ -123,7 +124,6 @@
         <item name="feedbackEditTextBackgroundColor">@color/whiteFive</item>
         <item name="feedbackEditTextHintColor">@color/warmerGray</item>
 
-        <item name="tabCardBackgroundColor">@color/white</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
