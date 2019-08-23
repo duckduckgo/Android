@@ -101,23 +101,27 @@
     <string name="networksOverview">Sledovací sítě agregují vaši webovou historii do datového profilu o vás. Hlavní sledovací sítě jsou nebezpečnější, protože vás mohou sledovat a zaměřit přes více internetových stránek.</string>
 
     <plurals name="trackersFound">
-        <item quantity="one">Nalezeno %s sledovací zařízení</item>
-        <item quantity="other">Nalezena sledovací zařízení (%s)</item>
+        <item quantity="one">Nalezen %s tracker</item>
+        <item quantity="few">Nalezeny %s trackery</item>
+        <item quantity="other">Nalezeno %s trackerů</item>
     </plurals>
 
     <plurals name="trackerBlocked">
-        <item quantity="one">Zablokováno %s sledovací zařízení</item>
-        <item quantity="other">Zablokována sledovací zařízení (%s)</item>
+        <item quantity="one">Zablokován %s tracker</item>
+        <item quantity="few">Zablokovány %s trackery</item>
+        <item quantity="other">Zablokováno %s trackerů</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
-        <item quantity="one">Nalezena %s hlavní sledovací síť</item>
-        <item quantity="other">Nalezeny hlavní sledovací sítě (%s)</item>
+        <item quantity="one">Nalezena %s síť</item>
+        <item quantity="few">Nalezeny %s hlavní sítě</item>
+        <item quantity="other">Nalezeno %s hlavních sítí</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
-        <item quantity="one">Zablokována %s hlavní sledovací síť</item>
-        <item quantity="other">Zablokovány hlavní sledovací sítě (%s)</item>
+        <item quantity="one">Zablokována %s hlavní síť</item>
+        <item quantity="few">Zablokovány %s hlavní sítě</item>
+        <item quantity="other">Zablokováno %s hlavních sítí</item>
     </plurals>
 
     <string name="scorecardActivityTitle">Hodnocení ochrany soukromí</string>
