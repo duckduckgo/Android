@@ -102,21 +102,29 @@
 
     <plurals name="trackersFound">
         <item quantity="one">Najden %s sledilnik</item>
+        <item quantity="two">Najdena %s sledilnika</item>
+        <item quantity="few">Najdeni %s sledilniki</item>
         <item quantity="other">Najdenih %s sledilnikov</item>
     </plurals>
 
     <plurals name="trackerBlocked">
         <item quantity="one">Blokiran %s sledilnik</item>
+        <item quantity="two">Blokirana %s sledilnika</item>
+        <item quantity="few">Blokiranih %s sledilnikov</item>
         <item quantity="other">Blokiranih %s sledilnikov</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
         <item quantity="one">Najdeno %s glavno sledilno omrežje</item>
+        <item quantity="two">Najdeni %s glavni omrežji</item>
+        <item quantity="few">Najdenih %s glavnih omrežij</item>
         <item quantity="other">Najdenih %s glavnih sledilnih omrežij</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
         <item quantity="one">Blokirano %s glavno sledilno omrežje</item>
+        <item quantity="two"> Blokirani %s glavni omrežji</item>
+        <item quantity="few">Blokiranih %s glavnih omrežij</item>
         <item quantity="other">Blokiranih %s glavnih sledilnih omrežij</item>
     </plurals>
 

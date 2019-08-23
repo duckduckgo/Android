@@ -101,23 +101,27 @@
     <string name="networksOverview">Sekiklių tinklai stebi jūsų naršymo tinkle istoriją ir iš jos sudaro jūsų duomenų profilį. Daugelis sekiklių tinklų yra pavojingesni, nes jie gali sekti ir rasti jus didesnėje interneto erdvėje.</string>
 
     <plurals name="trackersFound">
-        <item quantity="one">Rastas %s sekiklis</item>
+        <item quantity="one">Aptiktas %s sekiklis</item>
+        <item quantity="few">Aptikta %s sekiklių</item>
         <item quantity="other">Rasta %s sekiklių (-iai)</item>
     </plurals>
 
     <plurals name="trackerBlocked">
-        <item quantity="one">%s sekiklis blokuotas</item>
-        <item quantity="other">%s sekiklių (-ių) užblokuoti</item>
+        <item quantity="one">Užblokuotas %s sekiklis</item>
+        <item quantity="few">Užblokuota %s sekiklių</item>
+        <item quantity="other">Užblokuota %s sekiklių</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
-        <item quantity="one">Rastas %s didelis sekiklių tinklas</item>
-        <item quantity="other">Rasta %s didelių sekiklių tinklų (-ai)</item>
+        <item quantity="one">Aptiktas %s didelis sekimo tinklas</item>
+        <item quantity="few">Aptikta %s didelių sekimo tinklų</item>
+        <item quantity="other">Aptikta %s didelių sekimo tinklų</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
-        <item quantity="one">Užblokuotas %s didelis sekiklių tinklas</item>
-        <item quantity="other">Užblokuota %s didelių sekiklių tinklų (-ai)</item>
+        <item quantity="one">Užblokuotas %s didelis sekimo tinklas</item>
+        <item quantity="few">Užblokuota %s didelių sekimo tinklų</item>
+        <item quantity="other">Užblokuota %s didelių sekimo tinklų</item>
     </plurals>
 
     <string name="scorecardActivityTitle">Privatumo laipsnis</string>

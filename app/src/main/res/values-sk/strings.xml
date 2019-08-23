@@ -101,8 +101,9 @@
     <string name="networksOverview">Siete sledovacích zariadení zhrnú vašu webovú históriu do vášho dátového profilu. Veľké siete sledovacích zariadení sú nebezpečnejšie, pretože sa na vás môžu zamerať a sledovať vás na viacerých internetových stránkach.</string>
 
     <plurals name="trackersFound">
-        <item quantity="one">%s nájdené sledovacie zariadenie</item>
-        <item quantity="other">%s nájdených sledovacích zariadení</item>
+        <item quantity="one">Nájdené %s sledovacie zariadenie</item>
+        <item quantity="few">Nájdených %s sledovacích zariadení</item>
+        <item quantity="other">Nájdených %s sledovacích zariadení</item>
     </plurals>
 
     <plurals name="trackerBlocked">

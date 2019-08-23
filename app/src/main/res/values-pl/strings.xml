@@ -101,23 +101,31 @@
     <string name="networksOverview">Sieci skryptów śledzących tworzą historię wyszukiwania w formie profilu informacyjnego na Twój temat. Największe sieci skryptów śledzących są bardziej szkodliwe, ponieważ mogą śledzić i namierzać Cię na większym obszarze Internetu.</string>
 
     <plurals name="trackersFound">
-        <item quantity="one">Znaleziono skrypt śledzący %s</item>
-        <item quantity="other">Znaleziono skrypty śledzące %s</item>
+        <item quantity="one">%s Znaleziono tracker</item>
+        <item quantity="few">%s Znaleziono trackery</item>
+        <item quantity="many">%s Znaleziono trackerów</item>
+        <item quantity="other">%s Znaleziono trackery</item>
     </plurals>
 
     <plurals name="trackerBlocked">
-        <item quantity="one">Skrypt śledzący %s został zablokowany</item>
-        <item quantity="other">Skrypty śledzące %s zostały zablokowane</item>
+        <item quantity="one">%s Zablokowany tracker</item>
+        <item quantity="few">%s Zablokowane trackery</item>
+        <item quantity="many">%s Zablokowanych trackerów</item>
+        <item quantity="other">%s Zablokowane trackery</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
-        <item quantity="one">Wykryto %s główną sieć skryptów śledzących</item>
-        <item quantity="other">Wykryto %s głównych sieci skryptów śledzących</item>
+        <item quantity="one">%s Znaleziono główną sieć śledzenia</item>
+        <item quantity="few">%s Znaleziono główne sieci śledzenia</item>
+        <item quantity="many">%s Znaleziono główne sieci śledzenia</item>
+        <item quantity="other">%s Znaleziono główne sieci śledzenia</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
-        <item quantity="one">Zablokowano %s główną sieć skryptów śledzących</item>
-        <item quantity="other">Zablokowano %s głównych sieci skryptów śledzących</item>
+        <item quantity="one">%s Zablokowana główna sieć śledząca</item>
+        <item quantity="few">%s Zablokowano główne sieci śledzenia</item>
+        <item quantity="many">%s Zablokowano główne sieci śledzenia</item>
+        <item quantity="other">%s Zablokowano główne sieci śledzenia</item>
     </plurals>
 
     <string name="scorecardActivityTitle">Poziom prywatności</string>
