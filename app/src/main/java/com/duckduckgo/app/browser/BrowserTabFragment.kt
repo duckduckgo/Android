@@ -76,6 +76,7 @@ import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.CtaConfiguration
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
@@ -117,6 +118,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
+
+    @Inject
+    lateinit var deviceInfo: DeviceInfo
 
     @Inject
     lateinit var fileChooserIntentBuilder: FileChooserIntentBuilder
@@ -632,7 +636,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             true
         ).findViewById(R.id.browserWebView) as WebView
         webView?.let {
-            userAgentProvider = UserAgentProvider(it.settings.userAgentString)
+            userAgentProvider = UserAgentProvider(it.settings.userAgentString, deviceInfo)
 
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
