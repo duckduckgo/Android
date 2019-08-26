@@ -77,12 +77,16 @@ class HttpsUpgraderImpl(
         val isLocallyUpgradable = !isLocalListReloading && isInLocalUpgradeList(host)
         Timber.d("$host ${if (isLocallyUpgradable) "is" else "is not"} locally upgradable")
         if (isLocallyUpgradable) {
-            pixel.fire(HTTPS_LOCAL_LOOKUP)
+            pixel.fire(HTTPS_LOCAL_UPGRADE)
             return true
         }
 
         val serviceUpgradeResult = isInServiceUpgradeList(host)
-        pixel.fire(if (serviceUpgradeResult.isCached) HTTPS_SERVICE_CACHE_LOOKUP else HTTPS_SERVICE_REQUEST_LOOKUP)
+        if(serviceUpgradeResult.isUpgradable) {
+            pixel.fire(if (serviceUpgradeResult.isCached) HTTPS_SERVICE_CACHE_UPGRADE else HTTPS_SERVICE_REQUEST_UPGRADE)
+        } else {
+            pixel.fire(if (serviceUpgradeResult.isCached) HTTPS_SERVICE_CACHE_NO_UPGRADE else HTTPS_SERVICE_REQUEST_NO_UPGRADE)
+        }
         Timber.d("$host ${if (serviceUpgradeResult.isUpgradable) "is" else "is not"} service upgradable")
         return serviceUpgradeResult.isUpgradable
     }
@@ -110,7 +114,7 @@ class HttpsUpgraderImpl(
             Timber.w("Service https lookup failed with $error")
         }
 
-        return HttpsServiceResult(false, false)
+        return HttpsServiceResult(isUpgradable = false, isCached = false)
     }
 
     @WorkerThread
