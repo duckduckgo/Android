@@ -1,6 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Λογότυπο DuckDuckGo</string>
 
     <!-- Onboarding Activity -->
@@ -71,7 +70,6 @@
     <string name="unableToOpenLink">Αδυναμία ανοίγματος αυτού του τύπου συνδέσμου</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Καρτέλες</string>
     <string name="tabsMenuItem">Καρτέλες</string>
     <string name="newTabMenuItem">Νέα καρτέλα</string>
@@ -249,12 +247,10 @@
     <string name="rateAppDialogTitle">Αξιολογήστε την εφαρμογή</string>
     <string name="rateAppDialogMessage">Τα σχόλιά σας είναι σημαντικά. Δείξτε την αγάπη σας με μια κριτική.</string>
     <string name="rateAppDialogPositiveButton">Αξιολόγηση εφαρμογής</string>
-    <string name="rateAppDialogNegativeButton">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Λυπούμαστε πολύ για αυτό</string>
     <string name="giveFeedbackDialogMessage">Πείτε μας πώς μπορούμε να βελτιώσουμε την εφαρμογή για εσάς</string>
     <string name="giveFeedbackDialogPositiveButton">Υποβολή σχολίων</string>
-    <string name="giveFeedbackDialogNegativeButton">@string/noThanks</string>
 
     <string name="noThanks">Όχι, ευχαριστώ</string>
 
@@ -347,7 +343,7 @@
     <string name="sharePositiveFeedbackWithTheTeam">Υπάρχουν λεπτομέρειες που θα θέλατε να μοιραστείτε με την ομάδα;</string>
     <string name="whatHaveYouBeenEnjoying">Ποια στοιχεία απολαμβάνετε;</string>
     <string name="awesomeToHear">Αυτό μας κάνει πολύ χαρούμενους!</string>
-    <string name="shareTheLoveWithARating">Δείξτε την αγάπη σας αξιολογώντας μας στο Play Store.</string>
+    <string name="shareTheLoveWithARating">Δείξτε την αγάπη σας αξιολογώντας μας στο Google Play.</string>
     <string name="rateTheApp">ΑΞΙΟΛΟΓΗΣΤΕ ΤΗΝ ΕΦΑΡΜΟΓΗ</string>
     <string name="declineFurtherFeedback">ΟΧΙ ΕΥΧΑΡΙΣΤΩ, ΤΕΛΕΙΩΣΑ</string>
     <string name="whichBrokenSites">Πού βλέπετε τα προβλήματα αυτά;</string>
@@ -358,6 +354,5 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Κουμπί θετικών σχολίων</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Κουμπί αρνητικών σχολίων</string>
     <string name="feedbackIsImportantToUs">Τα ανώνυμα σχόλιά σας είναι σημαντικά για εμάς.</string>
-
 
 </resources>

@@ -16,7 +16,6 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGos logotyp</string>
 
     <!-- Onboarding Activity -->
@@ -87,7 +86,6 @@
     <string name="unableToOpenLink">Kunde inte öppna den här länktypen</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Flikar</string>
     <string name="tabsMenuItem">Flikar</string>
     <string name="newTabMenuItem">Ny flik</string>
@@ -265,12 +263,10 @@
     <string name="rateAppDialogTitle">Betygsätt appen</string>
     <string name="rateAppDialogMessage">Dina åsikter är viktiga. Dela med dig av det du gillar, skriv en recension!</string>
     <string name="rateAppDialogPositiveButton">Betygsätt appen</string>
-    <string name="rateAppDialogNegativeButton">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Det var tråkigt att höra</string>
     <string name="giveFeedbackDialogMessage">Berätta hur vi kan förbättra appen för dig</string>
     <string name="giveFeedbackDialogPositiveButton">Berätta vad du tycker</string>
-    <string name="giveFeedbackDialogNegativeButton">@string/noThanks</string>
 
     <string name="noThanks">Nej tack</string>
 
@@ -363,7 +359,7 @@
     <string name="sharePositiveFeedbackWithTheTeam">Finns det några detaljer du vill dela med teamet?</string>
     <string name="whatHaveYouBeenEnjoying">Vad har du uppskattat med appen?</string>
     <string name="awesomeToHear">Kul att höra!</string>
-    <string name="shareTheLoveWithARating">Dela din uppskattning, betygsätt appen på Play Store!</string>
+    <string name="shareTheLoveWithARating">Dela din uppskattning, betygsätt appen på Google Play!</string>
     <string name="rateTheApp">BETYGSÄTT APPEN</string>
     <string name="declineFurtherFeedback">NEJ TACK, JAG ÄR KLAR</string>
     <string name="whichBrokenSites">Var ser du dessa problem?</string>
@@ -375,5 +371,4 @@
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Knappen för negativ återkoppling</string>
     <string name="feedbackIsImportantToUs">Din anonyma återkoppling är viktig för oss.</string>
 
-
-</resources> 
+</resources>

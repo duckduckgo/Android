@@ -350,7 +350,7 @@
     <string name="sharePositiveFeedbackWithTheTeam">Are there any details you\'d like to share with the team?</string>
     <string name="whatHaveYouBeenEnjoying">What have you been enjoying?</string>
     <string name="awesomeToHear">Awesome to hear!</string>
-    <string name="shareTheLoveWithARating">Please share the love by rating on the Play Store.</string>
+    <string name="shareTheLoveWithARating">Please share the love by rating on the Google Play.</string>
     <string name="rateTheApp">RATE THE APP</string>
     <string name="declineFurtherFeedback">NO THANKS, I\'M DONE</string>
     <string name="whichBrokenSites">Where are you seeing these issues?</string>
@@ -361,6 +361,5 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Positive feedback button</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Negative feedback button</string>
     <string name="feedbackIsImportantToUs">Your anonymous feedback is important to us.</string>
-
 
 </resources>

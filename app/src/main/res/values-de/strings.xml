@@ -1,6 +1,5 @@
 ﻿<resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo-Logo</string>
 
     <!-- Onboarding Activity -->
@@ -71,7 +70,6 @@
     <string name="unableToOpenLink">Diese Art von Link kann nicht geöffnet werden</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Tabs</string>
     <string name="tabsMenuItem">Tabs</string>
     <string name="newTabMenuItem">Neuer Tab</string>
@@ -249,12 +247,10 @@
     <string name="rateAppDialogTitle">Die App bewerten</string>
     <string name="rateAppDialogMessage">Dein Feedback ist uns wichtig. Bitte teile deine Begeisterung mit einer Bewertung.</string>
     <string name="rateAppDialogPositiveButton">App bewerten</string>
-    <string name="rateAppDialogNegativeButton">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Es tut uns leid, das zu hören</string>
     <string name="giveFeedbackDialogMessage">Wie können wir die App für dich verbessern?</string>
     <string name="giveFeedbackDialogPositiveButton">Feedback abgeben</string>
-    <string name="giveFeedbackDialogNegativeButton">@string/noThanks</string>
 
     <string name="noThanks">Nein, danke</string>
 
@@ -347,7 +343,7 @@
     <string name="sharePositiveFeedbackWithTheTeam">Gibt es weitere Informationen, die du dem Team mitteilen möchten?</string>
     <string name="whatHaveYouBeenEnjoying">Was hat dir gefallen?</string>
     <string name="awesomeToHear">Das freut uns!</string>
-    <string name="shareTheLoveWithARating">Bitte teile deine Begeisterung mit einer Bewertung im Play Store.</string>
+    <string name="shareTheLoveWithARating">Bitte teile deine Begeisterung mit einer Bewertung im Google Play.</string>
     <string name="rateTheApp">DIE APP BEWERTEN</string>
     <string name="declineFurtherFeedback">NEIN DANKE, ICH BIN FERTIG</string>
     <string name="whichBrokenSites">Wo treten diese Probleme auf?</string>
@@ -359,5 +355,4 @@
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Schaltfläche für negatives Feedback</string>
     <string name="feedbackIsImportantToUs">Dein anonymes Feedback ist uns wichtig.</string>
 
-
-</resources> 
+</resources>

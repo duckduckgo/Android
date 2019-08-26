@@ -1,6 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
 
     <!-- Onboarding Activity -->
@@ -71,7 +70,6 @@
     <string name="unableToOpenLink">Det er ikke muligt at åbne denne type link</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Faner</string>
     <string name="tabsMenuItem">Faner</string>
     <string name="newTabMenuItem">Ny fane</string>
@@ -249,12 +247,10 @@
     <string name="rateAppDialogTitle">Bedøm appen</string>
     <string name="rateAppDialogMessage">Din feedback betyder noget. Del din kærlighed med en bedømmelse.</string>
     <string name="rateAppDialogPositiveButton">Bedøm appen</string>
-    <string name="rateAppDialogNegativeButton">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Det er vi kede af at høre</string>
     <string name="giveFeedbackDialogMessage">Fortæl os, hvordan vi kan forbedre appen for dig</string>
     <string name="giveFeedbackDialogPositiveButton">Giv feedback</string>
-    <string name="giveFeedbackDialogNegativeButton">@string/noThanks</string>
 
     <string name="noThanks">Nej tak.</string>
 
@@ -347,7 +343,7 @@
     <string name="sharePositiveFeedbackWithTheTeam">Er der nogen detaljer, du gerne vil dele med teamet?</string>
     <string name="whatHaveYouBeenEnjoying">Hvad har du haft glæde af?</string>
     <string name="awesomeToHear">Fantastisk at høre!</string>
-    <string name="shareTheLoveWithARating">Del kærligheden ved at bedømme os i Play Store.</string>
+    <string name="shareTheLoveWithARating">Del kærligheden ved at bedømme os i Google Play.</string>
     <string name="rateTheApp">BEDØM APPEN</string>
     <string name="declineFurtherFeedback">NEJ TAK, JEG ER FÆRDIG.</string>
     <string name="whichBrokenSites">Hvor oplever du disse problemer?</string>
@@ -359,5 +355,4 @@
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Knap til negativ feedback</string>
     <string name="feedbackIsImportantToUs">Din anonyme feedback er vigtig for os.</string>
 
-
-</resources> 
+</resources>

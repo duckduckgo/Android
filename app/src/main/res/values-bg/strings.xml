@@ -1,6 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Лого на DuckDuckGo</string>
 
     <!-- Onboarding Activity -->
@@ -71,7 +70,6 @@
     <string name="unableToOpenLink">Не може да се отвори този тип връзка</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Подпрозорци</string>
     <string name="tabsMenuItem">Подпрозорци</string>
     <string name="newTabMenuItem">Нов подпрозорец</string>
@@ -249,12 +247,10 @@
     <string name="rateAppDialogTitle">Оценете приложението</string>
     <string name="rateAppDialogMessage">Вашите отзиви са ценни. Моля, споделете дали го харесвате с отзив.</string>
     <string name="rateAppDialogPositiveButton">Оценка на приложението</string>
-    <string name="rateAppDialogNegativeButton">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Съжаляваме да чуем това</string>
     <string name="giveFeedbackDialogMessage">Кажете ни как можем да подобрим приложението за Вас</string>
     <string name="giveFeedbackDialogPositiveButton">Оставете отзиви</string>
-    <string name="giveFeedbackDialogNegativeButton">@string/noThanks</string>
 
     <string name="noThanks">Не, благодаря</string>
 
@@ -347,7 +343,7 @@
     <string name="sharePositiveFeedbackWithTheTeam">Има ли някакви подробности, които искате да споделите с екипа?</string>
     <string name="whatHaveYouBeenEnjoying">Кое Ви беше най-приятно?</string>
     <string name="awesomeToHear">Страхотно е да чуем това!</string>
-    <string name="shareTheLoveWithARating">Моля, споделете вашето харесване каот оцените в Play Store.</string>
+    <string name="shareTheLoveWithARating">Моля, споделете вашето харесване каот оцените в Google Play.</string>
     <string name="rateTheApp">ОЦЕНЕТЕ ПРИЛОЖЕНИЕТО</string>
     <string name="declineFurtherFeedback">НЕ БЛАГОДАРЯ, ПРИКЛЮЧИХ</string>
     <string name="whichBrokenSites">Къде виждате тези проблеми?</string>
@@ -358,6 +354,5 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Бутон за положителни отзиви</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Бутон за отрицателни отзиви</string>
     <string name="feedbackIsImportantToUs">Вашите анонимни отзиви са важни за нас.</string>
-
 
 </resources>

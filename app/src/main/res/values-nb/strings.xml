@@ -1,6 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
 
     <!-- Onboarding Activity -->
@@ -71,7 +70,6 @@
     <string name="unableToOpenLink">Kan ikke åpne denne typen lenke</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Faner</string>
     <string name="tabsMenuItem">Faner</string>
     <string name="newTabMenuItem">Ny fane</string>
@@ -249,12 +247,10 @@
     <string name="rateAppDialogTitle">Vurder appen</string>
     <string name="rateAppDialogMessage">Tilbakemeldingen din er viktig. Del kjærligheten med en anmeldelse.</string>
     <string name="rateAppDialogPositiveButton">Vurder app</string>
-    <string name="rateAppDialogNegativeButton">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Det var leit å høre</string>
     <string name="giveFeedbackDialogMessage">Fortell oss hvordan vi kan forbedre appen for deg</string>
     <string name="giveFeedbackDialogPositiveButton">Gi tilbakemelding</string>
-    <string name="giveFeedbackDialogNegativeButton">@string/noThanks</string>
 
     <string name="noThanks">Nei takk</string>
 
@@ -347,7 +343,7 @@
     <string name="sharePositiveFeedbackWithTheTeam">Har du noen detaljer du ønsker å dele med teamet?</string>
     <string name="whatHaveYouBeenEnjoying">Hva liker du?</string>
     <string name="awesomeToHear">Flott å høre!</string>
-    <string name="shareTheLoveWithARating">Vennligst del kjærligheten gjennom å vurdere oss i Play-butikken.</string>
+    <string name="shareTheLoveWithARating">Vennligst del kjærligheten gjennom å vurdere oss i Google Play-butikken.</string>
     <string name="rateTheApp">VURDER APPEN</string>
     <string name="declineFurtherFeedback">NEI TAKK, JEG ER FERDIG</string>
     <string name="whichBrokenSites">Når opplever du disse problemene?</string>
@@ -358,6 +354,5 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Knapp for positiv tilbakemelding</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Knapp for negativ tilbakemelding</string>
     <string name="feedbackIsImportantToUs">Den anonyme tilbakemeldingen din er viktig for oss.</string>
-
 
 </resources>

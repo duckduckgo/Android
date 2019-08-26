@@ -1,6 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
 
     <!-- Onboarding Activity -->
@@ -71,7 +70,6 @@
     <string name="unableToOpenLink">Nepodarilo sa otvoriť tento typ odkazu</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Karty</string>
     <string name="tabsMenuItem">Karty</string>
     <string name="newTabMenuItem">Nová karta</string>
@@ -249,12 +247,10 @@
     <string name="rateAppDialogTitle">Ohodnotiť aplikáciu</string>
     <string name="rateAppDialogMessage">Vaša spätná väzba je dôležitá. Podeľte sa o svoju spokojnosť v recenzii.</string>
     <string name="rateAppDialogPositiveButton">Hodnotiť aplikáciu</string>
-    <string name="rateAppDialogNegativeButton">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Mrzí nás to</string>
     <string name="giveFeedbackDialogMessage">Dajte nám vedieť, ako by sme mohli aplikáciu zdokonaliť</string>
     <string name="giveFeedbackDialogPositiveButton">Odoslať spätnú väzbu</string>
-    <string name="giveFeedbackDialogNegativeButton">@string/noThanks</string>
 
     <string name="noThanks">Nie, ďakujem</string>
 
@@ -347,7 +343,7 @@
     <string name="sharePositiveFeedbackWithTheTeam">Chceli by ste tímu povedať podrobnosti?</string>
     <string name="whatHaveYouBeenEnjoying">Čo sa vám páčilo?</string>
     <string name="awesomeToHear">Tešíme sa z toho!</string>
-    <string name="shareTheLoveWithARating">Podeľte sa o svoju spokojnosť hodnotením v Obchode Play.</string>
+    <string name="shareTheLoveWithARating">Podeľte sa o svoju spokojnosť hodnotením v Google Play.</string>
     <string name="rateTheApp">OHODNOTIŤ APLIKÁCIU</string>
     <string name="declineFurtherFeedback">NIE, ĎAKUJEM, SKONČIL SOM.</string>
     <string name="whichBrokenSites">Kde ste si všimli tieto problémy?</string>
@@ -358,6 +354,5 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Tlačidlo pozitívnej spätnej väzby</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Tlačidlo negatívnej spätnej väzby</string>
     <string name="feedbackIsImportantToUs">Anonymná spätná väzba je pre nás dôležitá.</string>
-
 
 </resources>
