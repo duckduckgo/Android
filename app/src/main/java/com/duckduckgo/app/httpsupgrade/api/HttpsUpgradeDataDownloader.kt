@@ -25,7 +25,7 @@ import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec.Companion.HTTPS_BINARY_FILE
 import io.reactivex.Completable
-import io.reactivex.Completable.*
+import io.reactivex.Completable.fromAction
 import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject

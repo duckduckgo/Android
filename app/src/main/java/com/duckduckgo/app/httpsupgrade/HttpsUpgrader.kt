@@ -82,7 +82,7 @@ class HttpsUpgraderImpl(
         }
 
         val serviceUpgradeResult = isInServiceUpgradeList(host)
-        if(serviceUpgradeResult.isUpgradable) {
+        if (serviceUpgradeResult.isUpgradable) {
             pixel.fire(if (serviceUpgradeResult.isCached) HTTPS_SERVICE_CACHE_UPGRADE else HTTPS_SERVICE_REQUEST_UPGRADE)
         } else {
             pixel.fire(if (serviceUpgradeResult.isCached) HTTPS_SERVICE_CACHE_NO_UPGRADE else HTTPS_SERVICE_REQUEST_NO_UPGRADE)
