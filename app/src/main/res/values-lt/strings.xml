@@ -1,6 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="appName" translatable="false">„DUCKDUCKGO“</string>
     <string name="duckDuckGoLogoDescription">„DuckDuckGo“ logotipas</string>
 
     <!-- Onboarding Activity -->
@@ -71,7 +70,6 @@
     <string name="unableToOpenLink">Nepavyko atverti šio tipo nuorodos</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">„DUCKDUCKGO“</string>
     <string name="tabActivityTitle">Kortelės</string>
     <string name="tabsMenuItem">Kortelės</string>
     <string name="newTabMenuItem">Nauja kortelė</string>
@@ -253,12 +251,10 @@
     <string name="rateAppDialogTitle">Įvertinkite programą</string>
     <string name="rateAppDialogMessage">Jūsų atsiliepimai mums labai svarbūs. Palikite mums atsiliepimą.</string>
     <string name="rateAppDialogPositiveButton">Įvertinkite programą</string>
-    <string name="rateAppDialogNegativeButton">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Apgailestaujame</string>
     <string name="giveFeedbackDialogMessage">Pasakykite savo nuomonę, kaip galėtumėme patobulinti programą</string>
     <string name="giveFeedbackDialogPositiveButton">Pateikite atsiliepimą</string>
-    <string name="giveFeedbackDialogNegativeButton">@string/noThanks</string>
 
     <string name="noThanks">Ne, dėkoju</string>
 
@@ -362,6 +358,5 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Teigiamų atsiliepimų mygtukas</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Neigiamų atsiliepimų mygtukas</string>
     <string name="feedbackIsImportantToUs">Jūsų anoniminiai atsiliepimai mums labai svarbūs.</string>
-
 
 </resources>

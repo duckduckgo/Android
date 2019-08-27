@@ -1,6 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
 
     <!-- Onboarding Activity -->
@@ -71,7 +70,6 @@
     <string name="unableToOpenLink">Tento typ odkazu nelze otevřít.</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Karty</string>
     <string name="tabsMenuItem">Karty</string>
     <string name="newTabMenuItem">Nová karta</string>
@@ -253,12 +251,10 @@
     <string name="rateAppDialogTitle">Ohodnoťte aplikaci</string>
     <string name="rateAppDialogMessage">Na vaší zpětné vazbě záleží. Podělte se o pozitiva v hodnocení.</string>
     <string name="rateAppDialogPositiveButton">Ohodnoťte aplikaci</string>
-    <string name="rateAppDialogNegativeButton">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Je nám líto, že nejste spokojení.</string>
     <string name="giveFeedbackDialogMessage">Dejte nám vědět, jak pro vás můžeme aplikaci vylepšit.</string>
     <string name="giveFeedbackDialogPositiveButton">Poskytněte zpětnou vazbu.</string>
-    <string name="giveFeedbackDialogNegativeButton">@string/noThanks</string>
 
     <string name="noThanks">Ne, děkuji</string>
 
@@ -362,6 +358,5 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Tlačítko pozitivní zpětné vazby</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Tlačítko negativní zpětné vazby</string>
     <string name="feedbackIsImportantToUs">Vaše anonymní zpětná vazba je pro nás důležitá.</string>
-
 
 </resources>

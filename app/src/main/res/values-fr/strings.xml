@@ -1,6 +1,5 @@
 ﻿<resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
 
     <!-- Onboarding Activity -->
@@ -71,7 +70,6 @@
     <string name="unableToOpenLink">Impossible d\'ouvrir ce type de lien</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Onglets</string>
     <string name="tabsMenuItem">Onglets</string>
     <string name="newTabMenuItem">Nouvel onglet</string>
@@ -249,12 +247,10 @@
     <string name="rateAppDialogTitle">Notez l\'application</string>
     <string name="rateAppDialogMessage">Vos commentaires nous intéressent. Veuillez partager votre appréciation en donnant votre avis.</string>
     <string name="rateAppDialogPositiveButton">Notez l\'application</string>
-    <string name="rateAppDialogNegativeButton">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Nous regrettons de l\'apprendre</string>
     <string name="giveFeedbackDialogMessage">Dites-nous comment nous pouvons améliorer l\'application pour vous</string>
     <string name="giveFeedbackDialogPositiveButton">Donnez votre avis</string>
-    <string name="giveFeedbackDialogNegativeButton">@string/noThanks</string>
 
     <string name="noThanks">Non merci</string>
 
@@ -359,5 +355,4 @@
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Bouton de commentaires négatifs</string>
     <string name="feedbackIsImportantToUs">Vos commentaires anonymes sont importants pour nous.</string>
 
-
-</resources> 
+</resources>

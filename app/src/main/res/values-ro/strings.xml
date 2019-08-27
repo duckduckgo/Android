@@ -1,6 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logoul DuckDuckGo</string>
 
     <!-- Onboarding Activity -->
@@ -71,7 +70,6 @@
     <string name="unableToOpenLink">Imposibil de deschis acest tip de link</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">File</string>
     <string name="tabsMenuItem">File</string>
     <string name="newTabMenuItem">Filă nouă</string>
@@ -253,12 +251,10 @@
     <string name="rateAppDialogTitle">Evaluați aplicația</string>
     <string name="rateAppDialogMessage">Feedback-ul dvs. contează. Vă rugăm să vă partajați preferința printr-o recenzie.</string>
     <string name="rateAppDialogPositiveButton">Evaluați aplicația</string>
-    <string name="rateAppDialogNegativeButton">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Ne pare rău să auzim aceasta</string>
     <string name="giveFeedbackDialogMessage">Spuneți-ne cum putem îmbunătăți aplicația pentru dvs.</string>
     <string name="giveFeedbackDialogPositiveButton">Trimiteți feedback</string>
-    <string name="giveFeedbackDialogNegativeButton">@string/noThanks</string>
 
     <string name="noThanks">Nu, mulțumesc</string>
 
@@ -362,6 +358,5 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Buton feedback pozitiv</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Buton feedback negativ</string>
     <string name="feedbackIsImportantToUs">Feedbackul dvs. anonim este important pentru noi.</string>
-
 
 </resources>

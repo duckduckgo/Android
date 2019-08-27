@@ -1,6 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logotip DuckDuckGo</string>
 
     <!-- Onboarding Activity -->
@@ -71,7 +70,6 @@
     <string name="unableToOpenLink">Nije moguće otvoriti ovu vrstu poveznice</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Kartice</string>
     <string name="tabsMenuItem">Kartice</string>
     <string name="newTabMenuItem">Nova kartica</string>
@@ -249,12 +247,10 @@
     <string name="rateAppDialogTitle">Ocijenite aplikaciju</string>
     <string name="rateAppDialogMessage">Važne povratne informacije su važne. Podijelite ljubav recenzijom.</string>
     <string name="rateAppDialogPositiveButton">Ocijenite aplikaciju</string>
-    <string name="rateAppDialogNegativeButton">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Žao nam je što to čujemo</string>
     <string name="giveFeedbackDialogMessage">Javite nam kako možemo poboljšati aplikaciju za vas</string>
     <string name="giveFeedbackDialogPositiveButton">Dajte povratne informacije</string>
-    <string name="giveFeedbackDialogNegativeButton">@string/noThanks</string>
 
     <string name="noThanks">Ne, hvala</string>
 
@@ -358,6 +354,5 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Gumb za pozitivne povratne informacije</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Gumb za negativne povratne informacije</string>
     <string name="feedbackIsImportantToUs">Vaše anonimne povratne informacije su važne za nas.</string>
-
 
 </resources>

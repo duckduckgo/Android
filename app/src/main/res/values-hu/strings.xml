@@ -1,6 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logó</string>
 
     <!-- Onboarding Activity -->
@@ -71,7 +70,6 @@
     <string name="unableToOpenLink">Az ilyen típusú hivatkozás megnyitása nem sikerült</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Lapok</string>
     <string name="tabsMenuItem">Lapok</string>
     <string name="newTabMenuItem">Új lap</string>
@@ -249,12 +247,10 @@
     <string name="rateAppDialogTitle">Alkalmazás értékelése</string>
     <string name="rateAppDialogMessage">Számunkra fontos a visszajelzésed. Ha tetszik az alkalmazás, kérjük, ossz meg róla egy pozitív véleményt.</string>
     <string name="rateAppDialogPositiveButton">Alkalmazás értékelése</string>
-    <string name="rateAppDialogNegativeButton">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Sajnálattal halljuk</string>
     <string name="giveFeedbackDialogMessage">Mondd el, hogyan javíthatunk számodra az alkalmazáson</string>
     <string name="giveFeedbackDialogPositiveButton">Visszajelzés küldése</string>
-    <string name="giveFeedbackDialogNegativeButton">@string/noThanks</string>
 
     <string name="noThanks">Nem, köszönöm</string>
 
@@ -358,6 +354,5 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Pozitív visszajelzés gomb</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Negatív visszajelzés gomb</string>
     <string name="feedbackIsImportantToUs">Anonim visszajelzésed fontos számunkra.</string>
-
 
 </resources>
