@@ -144,8 +144,8 @@ class BrowserModule {
 
     @Singleton
     @Provides
-    fun webViewPreviewPersister(context: Context): WebViewPreviewPersister {
-        return FileBasedWebViewPreviewPersister(context)
+    fun webViewPreviewPersister(context: Context, fileDeleter: FileDeleter): WebViewPreviewPersister {
+        return FileBasedWebViewPreviewPersister(context, fileDeleter)
     }
 
     @Provides

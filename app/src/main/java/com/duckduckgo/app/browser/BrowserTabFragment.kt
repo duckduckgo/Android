@@ -245,7 +245,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private fun configureShowTabSwitcherListener() {
         tabsButton?.actionView?.setOnClickListener {
-            viewModel.userLaunchingTabSwitcher()
+            launch { viewModel.userLaunchingTabSwitcher() }
         }
     }
 
@@ -448,22 +448,24 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.LaunchLegacyAddWidget -> launchLegacyAddWidget()
             is Command.RequiresAuthentication -> showAuthenticationDialog(it.request)
             is Command.SaveCredentials -> saveBasicAuthCredentials(it.request, it.credentials)
-            is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
+            is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage(it.forceImmediate)
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
             is Command.LaunchTabSwitcherLegacy -> launchTabSwitcherLegacy()
         }
     }
 
-    private fun generateWebViewPreviewImage() {
+    private fun generateWebViewPreviewImage(forceImmediate: Boolean) {
         webView?.let { webView ->
 
             // if there's an existing job for generating a preview, cancel that in favor of the new request
             bitmapGeneratorJob?.cancel()
 
             bitmapGeneratorJob = launch {
-                delay(WEBVIEW_PREVIEW_GENERATOR_DEBOUNCE_TIME_MS)
+                if (!forceImmediate) {
+                    delay(WEBVIEW_PREVIEW_GENERATOR_DEBOUNCE_TIME_MS)
+                }
 
-                Timber.i("Generating webview preview")
+                Timber.i("Generating WebView preview")
                 try {
                     val preview = previewGenerator.generatePreview(webView)
                     val fileName = previewPersister.save(preview, tabId)

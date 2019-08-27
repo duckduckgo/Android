@@ -26,6 +26,8 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.db.TabsDao
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -97,18 +99,7 @@ class TabDataRepository @Inject constructor(
 
     override suspend fun update(tabId: String, site: Site?) {
         databaseExecutor().scheduleDirect {
-            val current = tabsDao.tab(tabId)
-            val position = current?.position ?: 0
-            val tab = TabEntity(
-                tabId = tabId,
-                url = site?.url,
-                title = site?.title,
-                skipHome = false,
-                viewed = true,
-                position = position,
-                tabPreviewFile = current?.tabPreviewFile
-            )
-            tabsDao.updateTab(tab)
+            tabsDao.updateUrlAndTitle(tabId, site?.url, site?.title, viewed = true)
         }
     }
 
@@ -125,9 +116,7 @@ class TabDataRepository @Inject constructor(
 
     override suspend fun delete(tab: TabEntity) {
         databaseExecutor().scheduleDirect {
-            tab.tabPreviewFile?.let {
-                deletePreviewImage(it)
-            }
+            deleteOldPreviewImages(tab.tabId)
 
             tabsDao.deleteTabAndUpdateSelection(tab)
         }
@@ -150,20 +139,22 @@ class TabDataRepository @Inject constructor(
 
     override fun updateTabPreviewImage(tabId: String, fileName: String?) {
         databaseExecutor().scheduleDirect {
-            val tab = tabsDao.tab(tabId) ?: return@scheduleDirect
-
-            val oldPreviewFileName = tab.tabPreviewFile
+            val tab = tabsDao.tab(tabId)
+            if (tab == null) {
+                Timber.w("Cannot find tab for tab ID")
+                return@scheduleDirect
+            }
             tab.tabPreviewFile = fileName
             tabsDao.updateTab(tab)
 
-            deletePreviewImage(oldPreviewFileName)
+            Timber.i("Updated tab preview image. $tabId now uses $fileName")
+            deleteOldPreviewImages(tabId, fileName)
         }
     }
 
-    private fun deletePreviewImage(previewFileName: String?) {
-        previewFileName?.let {
-            webViewPreviewPersister.delete(previewFileName)
-        }
+    private fun deleteOldPreviewImages(tabId: String, currentPreviewImage: String? = null) {
+        Timber.i("Deleting old preview image for $tabId. Current image is $currentPreviewImage")
+        GlobalScope.launch { webViewPreviewPersister.deletePreviewsForTab(tabId, currentPreviewImage) }
     }
 
     /**

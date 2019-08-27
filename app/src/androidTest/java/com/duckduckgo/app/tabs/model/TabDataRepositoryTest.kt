@@ -103,9 +103,9 @@ class TabDataRepositoryTest {
         testee.addNewTabAfterExistingTab("http://www.example.com", "tabid")
         testee.update("tabid", null)
 
-        val captor = argumentCaptor<TabEntity>()
-        verify(mockDao).updateTab(captor.capture())
-        assertTrue(captor.firstValue.viewed)
+        val captor = argumentCaptor<Boolean>()
+        verify(mockDao).updateUrlAndTitle(any(), anyOrNull(), anyOrNull(), captor.capture())
+        assertTrue(captor.firstValue)
     }
 
     @Test
