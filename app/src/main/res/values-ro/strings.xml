@@ -99,23 +99,27 @@
     <string name="networksOverview">Rețelele de cookie-uri de urmărire vă adună istoricul web într-un profil de date despre dvs. Rețelele mari de cookie-uri de urmărire sunt mai dăunătoare, deoarece vă pot urmări și vă pot viza pe mai multe site-uri de pe internet.</string>
 
     <plurals name="trackersFound">
-        <item quantity="one">%s cookie de urmărire găsit</item>
-        <item quantity="other">%s cookie-uri de urmărire găsite</item>
+        <item quantity="one">%s Urmăritor Găsit</item>
+        <item quantity="few">%s Urmăritori Găsiți</item>
+        <item quantity="other">%s Urmăritori Găsiți</item>
     </plurals>
 
     <plurals name="trackerBlocked">
-        <item quantity="one">%s cookie de urmărire blocat</item>
-        <item quantity="other">%s cookie-uri de urmărire blocate</item>
+        <item quantity="one">%s Urmăritor Blocat</item>
+        <item quantity="few">%s Urmăritori Blocați</item>
+        <item quantity="other">%s Urmăritori Blocați</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
-        <item quantity="one">%s rețea mare de cookie-uri de urmărire găsită</item>
-        <item quantity="other">%s rețele mari de cookie-uri de urmărire găsite</item>
+        <item quantity="one">%s Rețea Principală Urmăritoare Găsită</item>
+        <item quantity="few">%s Rețele Principale Urmăritoare Găsite</item>
+        <item quantity="other">%s Rețele Principale Urmăritoare Găsite</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
-        <item quantity="one">%s rețea mare de cookie-uri de urmărire blocată</item>
-        <item quantity="other">%s rețele mari de cookie-uri de urmărire blocate</item>
+        <item quantity="one">%s Rețea Principală Urmăritoare Blocată</item>
+        <item quantity="few">%s Rețele Principale Urmpritoare Blocate</item>
+        <item quantity="other">%s Rețele Principale Urmpritoare Blocate</item>
     </plurals>
 
     <string name="scorecardActivityTitle">Grad de confidențialitate</string>
