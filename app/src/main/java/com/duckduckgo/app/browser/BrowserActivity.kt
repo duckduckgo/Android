@@ -39,6 +39,8 @@ import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.view.*
+import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageExperiment
+import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageExperiment.Companion.HANDLED_IN_APP
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
@@ -160,6 +162,19 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
         Timber.i("launchNewSearchOrQuery: $intent")
 
         if (intent == null) {
+            return
+        }
+
+        var handledInApp = intent.getIntExtra(HANDLED_IN_APP, -1)
+        if (handledInApp > 1.unaryMinus()) {
+            handledInApp++
+            Timber.i("MARCOS: value is $handledInApp")
+            Timber.i("Setting DDG as default browser")
+            val defaultIntent = Intent().apply {
+                putExtra(HANDLED_IN_APP, handledInApp)
+            }
+            setResult(DefaultBrowserPageExperiment.DEFAULT_BROWSER_REQUEST_CODE_DIALOG, defaultIntent)
+            finish()
             return
         }
 

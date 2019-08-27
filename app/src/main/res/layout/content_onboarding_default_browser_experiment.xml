@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2019 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/longDescriptionContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:tag="onboardingDefaultBrowser"
+    tools:background="@color/white"
+    tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/welcomeLayout"
+        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+    <TextView
+        android:id="@+id/welcomeToDuckDuckGoTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:fontFamily="sans-serif-black"
+        android:lineSpacingExtra="2sp"
+        android:text="@string/defaultBrowserWelcome"
+        android:textAlignment="center"
+        android:textColor="@color/brownishGrayTwo"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/defaultBrowserImage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="40dp"
+        android:layout_marginTop="42dp"
+        android:layout_marginBottom="26dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/set_as_default_browser_illustration_experiment"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/welcomeToDuckDuckGoTitle"
+        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintWidth_max="300dp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/browserProtectionTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:fontFamily="sans-serif"
+        android:lineSpacingExtra="3sp"
+        android:text="@string/onboardingDefaultBrowserTitle"
+        android:textAlignment="center"
+        android:textColor="@color/almostBlack"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/welcomeLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/browserProtectionSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:fontFamily="sans-serif"
+        android:text="@string/defaultBrowserDescriptionNoDefault"
+        android:textAlignment="center"
+        android:textColor="@color/brownishGrayTwo"
+        android:textSize="18sp"
+        android:textStyle="normal"
+        app:layout_constraintTop_toBottomOf="@id/browserProtectionTitle"
+        app:layout_constraintEnd_toEndOf="@id/browserProtectionTitle"
+        app:layout_constraintStart_toStartOf="@id/browserProtectionTitle"
+        app:layout_constraintWidth_max="500dp"
+        app:layout_constraintWidth_percent="0.8" />
+
+    <Button
+        android:id="@+id/continueButton"
+        style="@style/OnboardingButtonPrimaryCta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/defaultBrowserMaybeLater"
+        app:layout_constraintBottom_toTopOf="@+id/launchSettingsButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/launchSettingsButton"
+        style="@style/OnboardingButtonSecondaryCta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/defaultBrowserLetsDoIt"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <include
+        layout="@layout/content_onboarding_default_browser_card"
+        android:id="@+id/defaultCard"
+        android:visibility="invisible"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -25,6 +25,10 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Can\'t launch default app settings screen</string>
     <string name="settingsDefaultBrowserEnabled">Set as Default Browser</string>
+    <string name="defaultBrowserWelcome">WELCOME TO DUCKDUCKGO</string>
+    <string name="defaultBrowserMaybeLater">Maybe later</string>
+    <string name="defaultBrowserLetsDoIt">Let\'s do it!</string>
+    <string name="defaultBrowserDescriptionNoDefault">Experience peace of mind when\nopening links on your phone</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Browser menu</string>

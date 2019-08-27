@@ -1,0 +1,94 @@
+/*
+ * Copyright (c) 2019 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.app.onboarding.ui.page
+
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.statistics.pixels.Pixel
+import timber.log.Timber
+
+class DefaultBrowserPageExperimentViewModel(val defaultBrowserDetector: DefaultBrowserDetector, val pixel: Pixel, val installStore: AppInstallStore) : ViewModel() {
+
+    data class ViewState(
+        val showSettingsUI: Boolean = false,
+        val showInstructionsCard: Boolean = false,
+        val showOnlyContinue: Boolean = false,
+        val isLastAttempt: Boolean = false
+    )
+
+    sealed class Command {
+        class OpenDialog(val value: Int = 0) : Command()
+        object OpenSettings : Command()
+        object ContinueToBrowser : Command()
+    }
+
+    val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    val command: SingleLiveEvent<Command> = SingleLiveEvent()
+
+    init {
+        viewState.value = ViewState(
+            showSettingsUI = defaultBrowserDetector.hasDefaultBrowser()
+        )
+    }
+
+    fun onDefaultBrowserClicked() {
+        if (defaultBrowserDetector.hasDefaultBrowser()) {
+            pixel.fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SETTINGS_LAUNCHED)
+            command.value = Command.OpenSettings
+        } else {
+            command.value = Command.OpenDialog()
+            viewState.value = viewState.value?.copy(showInstructionsCard = true)
+        }
+    }
+
+    fun handleResult(fromBrowser: Int) {
+        Timber.i("MARCOS: From browser value is @$fromBrowser")
+        viewState.value = viewState.value?.copy(showInstructionsCard = false)
+        val isDefault = defaultBrowserDetector.isDefaultBrowser()
+        val hasDefault = defaultBrowserDetector.hasDefaultBrowser()
+        if (isDefault) {
+            viewState.value = viewState.value?.copy(showOnlyContinue = true, showInstructionsCard = false)
+        } else {
+            if (hasDefault) {
+                viewState.value = viewState.value?.copy(showOnlyContinue = false, showInstructionsCard = false)
+                return
+            }
+            if (fromBrowser > 1) {
+                command.value = Command.ContinueToBrowser
+            } else if (fromBrowser == 1) {
+                command.value = Command.OpenDialog(fromBrowser)
+            }
+            else {
+                //command.value = Command.OpenDialog(fromBrowser)
+            }
+        }
+    }
+
+    fun handleDefaultBrowserResult() {
+        val isDefault = defaultBrowserDetector.isDefaultBrowser()
+        val setText = if (isDefault) "was" else "was not"
+        Timber.i("User returned from default settings; DDG $setText set as default")
+
+        if (isDefault) {
+            installStore.defaultBrowser = true
+            pixel.fire(Pixel.PixelName.DEFAULT_BROWSER_SET)
+        }
+    }
+}
