@@ -32,11 +32,14 @@
             layout="@layout/content_settings_general"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
         <View
             android:id="@+id/settingsSectionGeneralBottomDivider"
             style="@style/SettingsGroupDivider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/settingsSectionGeneral" />
 
         <include
@@ -48,24 +51,15 @@
         <View
             android:id="@+id/settingsSectionPrivacyBottomDivider"
             style="@style/SettingsGroupDivider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/settingsSectionPrivacy" />
-
-        <include
-            layout="@layout/content_settings_autocomplete"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/settingsSectionPrivacyBottomDivider" />
-
-        <View
-            android:id="@+id/settingsSectionAutocompleteBottomDivider"
-            style="@style/SettingsGroupDivider"
-            app:layout_constraintTop_toBottomOf="@id/settingsSectionAutocomplete" />
 
         <include
             layout="@layout/content_settings_other"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/settingsSectionAutocompleteBottomDivider" />
+            app:layout_constraintTop_toBottomOf="@id/settingsSectionPrivacyBottomDivider" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
