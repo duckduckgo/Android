@@ -88,7 +88,7 @@ class WebNavigationStateComparisonTest {
     fun whenPreviousContainsAnOriginalUrlAndCurrentUrlAndLatestContainsSameOriginalUrlAndDifferentCurrentUrlWithSameHostThenCompareReturnsUrlUpdated() {
         val previousState = buildState("http://same.com", "http://same.com/previous")
         val latestState = buildState("http://same.com", "http://same.com/latest")
-        assertEquals(UrlUpdated("http://subdomain.latest.com"), latestState.compare(previousState))
+        assertEquals(UrlUpdated("http://same.com/latest"), latestState.compare(previousState))
     }
 
     @Test
