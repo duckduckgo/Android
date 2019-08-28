@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
+@file:Suppress("RemoveExplicitTypeArguments", "SameParameterValue")
+
 package com.duckduckgo.app.browser.tabpreview
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.file.FileDeleter
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
+import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -60,6 +67,36 @@ class FileBasedWebViewPreviewPersisterTest {
         verifyTabIdUsedAsDirectory(tabId, path)
     }
 
+    @Test
+    fun whenDeleteAllCalledThenEntireTabPreviewDirectoryDeleted() = runBlocking<Unit> {
+        testee.deleteAll()
+        val captor = argumentCaptor<File>()
+        verify(mockFileDeleter).deleteDirectory(captor.capture())
+        verifyTabPreviewDirectoryUse(captor.firstValue.absolutePath)
+    }
+
+    @Test
+    fun whenDeletingOnlyPreviewForATabThenTabDirectoryRemoved() = runBlocking<Unit> {
+        val tabId = "ABC-123"
+        testee.deletePreviewsForTab(tabId, currentPreviewImage = null)
+        verify(mockFileDeleter).deleteDirectory(any())
+    }
+
+    @Test
+    fun whenDeletingOldPreviewForATabButANewOneExistsThenOnlySinglePreviewImageDeleted() = runBlocking<Unit> {
+        val tabId = "ABC-123"
+        val newTabPreviewFilename = "new.jpg"
+        val captor = argumentCaptor<List<String>>()
+        testee.deletePreviewsForTab(tabId, newTabPreviewFilename)
+        verify(mockFileDeleter).deleteContents(any(), captor.capture())
+        verifyExistingPreviewExcludedFromDeletion(captor.firstValue, newTabPreviewFilename)
+    }
+
+    private fun verifyExistingPreviewExcludedFromDeletion(exclusionList: List<String>, newTabPreviewFilename: String) {
+        assertEquals(1, exclusionList.size)
+        assertTrue(exclusionList.contains(newTabPreviewFilename))
+    }
+
     private fun verifyTabIdUsedAsDirectory(tabId: String, path: File) {
         assertTrue(path.parent.endsWith(tabId))
     }
@@ -69,6 +106,6 @@ class FileBasedWebViewPreviewPersisterTest {
     }
 
     private fun verifyTabPreviewDirectoryUse(path: String) {
-        assertTrue(path.contains("/${FileBasedWebViewPreviewPersister.TAB_PREVIEW_DIRECTORY}/"))
+        assertTrue(path.contains("/${FileBasedWebViewPreviewPersister.TAB_PREVIEW_DIRECTORY}"))
     }
 }

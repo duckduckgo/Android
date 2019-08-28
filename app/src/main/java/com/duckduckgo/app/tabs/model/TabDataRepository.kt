@@ -126,7 +126,7 @@ class TabDataRepository @Inject constructor(
     override fun deleteAll() {
         Timber.i("Deleting tabs right now")
         tabsDao.deleteAllTabs()
-        webViewPreviewPersister.deleteAll()
+        GlobalScope.launch { webViewPreviewPersister.deleteAll() }
         siteData.clear()
     }
 

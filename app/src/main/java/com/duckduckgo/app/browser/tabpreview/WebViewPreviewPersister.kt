@@ -29,14 +29,17 @@ import java.io.FileOutputStream
 
 interface WebViewPreviewPersister {
 
-    suspend fun save(bitmap: Bitmap, tabId: String): String
-    fun delete(tabId: String, filename: String)
-    fun deleteAll()
     fun fullPathForFile(tabId: String, previewName: String): String
+    suspend fun save(bitmap: Bitmap, tabId: String): String
+    suspend fun deleteAll()
     suspend fun deletePreviewsForTab(tabId: String, currentPreviewImage: String?)
 }
 
 class FileBasedWebViewPreviewPersister(val context: Context, private val fileDeleter: FileDeleter) : WebViewPreviewPersister {
+
+    override suspend fun deleteAll() {
+        fileDeleter.deleteDirectory(previewDestinationDirectory())
+    }
 
     override suspend fun save(bitmap: Bitmap, tabId: String): String {
         return withContext(Dispatchers.IO) {
@@ -49,18 +52,12 @@ class FileBasedWebViewPreviewPersister(val context: Context, private val fileDel
         }
     }
 
-    override fun delete(tabId: String, filename: String) {
-        val fileToDelete = fileForPreview(tabId, filename)
-        Timber.i("Deleting file ${fileToDelete.absolutePath}")
-        fileToDelete.delete()
-    }
-
     override suspend fun deletePreviewsForTab(tabId: String, currentPreviewImage: String?) {
         val directoryToDelete = directoryForTabPreviews(tabId)
 
         if (currentPreviewImage == null) {
             Timber.i("Deleting all tab previews for $tabId")
-            directoryToDelete.deleteRecursively()
+            fileDeleter.deleteDirectory(directoryToDelete)
         } else {
 
             Timber.i("Keeping tab preview $currentPreviewImage but deleting the rest for $tabId")
@@ -69,10 +66,6 @@ class FileBasedWebViewPreviewPersister(val context: Context, private val fileDel
         }
 
         Timber.i("Does tab preview directory still exist? ${directoryToDelete.exists()}")
-    }
-
-    override fun deleteAll() {
-        previewDestinationDirectory().deleteRecursively()
     }
 
     override fun fullPathForFile(tabId: String, previewName: String): String {
