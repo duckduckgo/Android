@@ -57,8 +57,14 @@ fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStat
         return NewPage(latestUrl, title)
     }
 
-    // The most up-to-date record of the url is the current one, this may change during a page load
+    // The most up-to-date record of the url is the current one, this may change many times during a page load
+    // If the host changes too, we class it as a new page load
     if (currentUrl != previous?.currentUrl) {
+
+        if (currentUrl?.toUri()?.host != previous?.currentUrl?.toUri()?.host) {
+            return NewPage(latestUrl, title)
+        }
+
         return UrlUpdated(latestUrl)
     }
 
