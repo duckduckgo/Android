@@ -34,7 +34,7 @@ class HashUtilitiesTest {
     }
 
     @Test
-    fun whenCorretSha256HashUsedThenVerifyIsTrue() {
+    fun whenCorrectSha256HashUsedThenVerifyIsTrue() {
         assertTrue(helloWorldText.toByteArray().verifySha256(helloWorldSha256))
     }
 

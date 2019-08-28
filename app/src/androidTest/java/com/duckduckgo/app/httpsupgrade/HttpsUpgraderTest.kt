@@ -39,7 +39,7 @@ class HttpsUpgraderTest {
     private var mockHttpsBloomFilterFactory: HttpsBloomFilterFactory = mock()
     private var mockWhitelistDao: HttpsWhitelistDao = mock()
     private var mockUpgradeService: HttpsUpgradeService = mock()
-    private var mockSerivceCall: Call<List<String>> = mock()
+    private var mockServiceCall: Call<List<String>> = mock()
 
     private var mockPixel: Pixel = mock()
     private var bloomFilter = BloomFilter(100, 0.01)
@@ -77,38 +77,38 @@ class HttpsUpgraderTest {
 
     @Test
     fun whenHttpUriIsNotInLocalListButCanBeUpgradedByServiceThenShouldUpgrade() {
-        whenever(mockSerivceCall.execute()).thenReturn(Response.success(serviceResponse()))
-        whenever(mockUpgradeService.upgradeListForPartialHost(any())).thenReturn(mockSerivceCall)
+        whenever(mockServiceCall.execute()).thenReturn(Response.success(serviceResponse()))
+        whenever(mockUpgradeService.upgradeListForPartialHost(any())).thenReturn(mockServiceCall)
         assertTrue(testee.shouldUpgrade(Uri.parse("http://service.url")))
     }
 
     @Test
     fun whenHttpUriIsNotInLocalListAndCannotBeUpgradedByServiceThenShouldNotUpgrade() {
-        whenever(mockSerivceCall.execute()).thenReturn(Response.success(serviceResponse()))
-        whenever(mockUpgradeService.upgradeListForPartialHost(any())).thenReturn(mockSerivceCall)
+        whenever(mockServiceCall.execute()).thenReturn(Response.success(serviceResponse()))
+        whenever(mockUpgradeService.upgradeListForPartialHost(any())).thenReturn(mockServiceCall)
         assertFalse(testee.shouldUpgrade(Uri.parse("http://unknown.com")))
     }
 
     @Test
     fun whenHttpUriIsNotInLocalListAndServiceRequestFailsThenShouldNotUpgrade() {
-        whenever(mockSerivceCall.execute()).thenReturn(Response.error(500, ResponseBody.create(null, "")))
-        whenever(mockUpgradeService.upgradeListForPartialHost(any())).thenReturn(mockSerivceCall)
+        whenever(mockServiceCall.execute()).thenReturn(Response.error(500, ResponseBody.create(null, "")))
+        whenever(mockUpgradeService.upgradeListForPartialHost(any())).thenReturn(mockServiceCall)
         assertFalse(testee.shouldUpgrade(Uri.parse("http://service.url")))
     }
 
     @Test
     fun whenBloomFilterIsNotLoadedAndUrlIsInServiceListThenShouldUpgrade() {
         whenever(mockHttpsBloomFilterFactory.create()).thenReturn(null)
-        whenever(mockSerivceCall.execute()).thenReturn(Response.success(serviceResponse()))
-        whenever(mockUpgradeService.upgradeListForPartialHost(any())).thenReturn(mockSerivceCall)
+        whenever(mockServiceCall.execute()).thenReturn(Response.success(serviceResponse()))
+        whenever(mockUpgradeService.upgradeListForPartialHost(any())).thenReturn(mockServiceCall)
         assertTrue(testee.shouldUpgrade(Uri.parse("http://service.url")))
     }
 
     @Test
     fun testWhenBloomFilterIsNotLoadedAndUrlNotInServiceListThenShouldNotUpgrade() {
         whenever(mockHttpsBloomFilterFactory.create()).thenReturn(null)
-        whenever(mockSerivceCall.execute()).thenReturn(Response.success(serviceResponse()))
-        whenever(mockUpgradeService.upgradeListForPartialHost(any())).thenReturn(mockSerivceCall)
+        whenever(mockServiceCall.execute()).thenReturn(Response.success(serviceResponse()))
+        whenever(mockUpgradeService.upgradeListForPartialHost(any())).thenReturn(mockServiceCall)
         assertFalse(testee.shouldUpgrade(Uri.parse("http://unknown.com")))
     }
 

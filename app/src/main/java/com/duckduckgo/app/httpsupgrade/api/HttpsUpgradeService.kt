@@ -36,5 +36,5 @@ interface HttpsUpgradeService {
     fun httpsBloomFilter(): Call<ResponseBody>
 
     @GET("https://duckduckgo.com/smarter_encryption.js")
-    fun upgradeListForPartialHost(@Query("pv1") partialMd5: String): Call<List<String>>
+    fun upgradeListForPartialHost(@Query("pv1") partialSha1: String): Call<List<String>>
 }
