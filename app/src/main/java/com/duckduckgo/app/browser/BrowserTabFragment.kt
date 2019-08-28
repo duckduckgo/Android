@@ -465,12 +465,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     delay(WEBVIEW_PREVIEW_GENERATOR_DEBOUNCE_TIME_MS)
                 }
 
-                Timber.i("Generating WebView preview")
+                Timber.d("Generating WebView preview")
                 try {
                     val preview = previewGenerator.generatePreview(webView)
                     val fileName = previewPersister.save(preview, tabId)
                     viewModel.updateTabPreview(tabId, fileName)
-                    Timber.i("Saved and updated tab preview")
+                    Timber.d("Saved and updated tab preview")
                 } catch (e: RuntimeException) {
                     Timber.w(e, "Failed to generate WebView preview")
                 }

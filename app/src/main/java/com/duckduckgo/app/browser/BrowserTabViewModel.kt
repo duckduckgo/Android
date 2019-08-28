@@ -421,7 +421,7 @@ class BrowserTabViewModel(
             canGoForward = newWebNavigationState.canGoForward
         )
 
-        Timber.i("navigationStateChanged: $stateChange")
+        Timber.v("navigationStateChanged: $stateChange")
         when (stateChange) {
             is NewPage -> pageChanged(stateChange.url, stateChange.title)
             is PageCleared -> pageCleared()
@@ -559,7 +559,6 @@ class BrowserTabViewModel(
         privacyGrade.postValue(site?.calculateGrades()?.improvedGrade)
 
         viewModelScope.launch(Dispatchers.IO) {
-            Timber.i("onSiteChanged, updating tab $tabId")
             tabRepository.update(tabId, site)
         }
     }

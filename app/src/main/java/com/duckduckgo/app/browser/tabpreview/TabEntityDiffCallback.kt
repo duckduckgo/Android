@@ -33,7 +33,6 @@ class TabEntityDiffCallback : DiffUtil.ItemCallback<TabEntity>() {
                 && oldItem.title == newItem.title
     }
 
-
     override fun getChangePayload(oldItem: TabEntity, newItem: TabEntity): Bundle {
 
         val diffBundle = Bundle()
