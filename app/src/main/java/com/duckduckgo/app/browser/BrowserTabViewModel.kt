@@ -26,7 +26,6 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.annotation.AnyThread
-import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import androidx.lifecycle.*
