@@ -24,7 +24,11 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import timber.log.Timber
 
-class DefaultBrowserPageExperimentViewModel(val defaultBrowserDetector: DefaultBrowserDetector, val pixel: Pixel, val installStore: AppInstallStore) : ViewModel() {
+class DefaultBrowserPageExperimentViewModel(
+    private val defaultBrowserDetector: DefaultBrowserDetector,
+    private val pixel: Pixel,
+    private val installStore: AppInstallStore
+) : ViewModel() {
 
     data class ViewState(
         val showSettingsUI: Boolean = false,
@@ -34,18 +38,26 @@ class DefaultBrowserPageExperimentViewModel(val defaultBrowserDetector: DefaultB
     )
 
     sealed class Command {
-        class OpenDialog(val value: Int = 0) : Command()
+        class OpenDialog(val timesOpened: Int = 0) : Command()
         object OpenSettings : Command()
         object ContinueToBrowser : Command()
+    }
+
+    sealed class Origin {
+        class InternalBrowser(val timesOpened: Int = 0) : Origin()
+        object ExternalBrowser : Origin()
+        object Settings : Origin()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     init {
-        viewState.value = ViewState(
-            showSettingsUI = defaultBrowserDetector.hasDefaultBrowser()
-        )
+        viewState.value = ViewState(showSettingsUI = defaultBrowserDetector.hasDefaultBrowser())
+    }
+
+    fun reloadInstructions() {
+        viewState.value = viewState.value?.copy(showSettingsUI = defaultBrowserDetector.hasDefaultBrowser())
     }
 
     fun onDefaultBrowserClicked() {
@@ -58,37 +70,49 @@ class DefaultBrowserPageExperimentViewModel(val defaultBrowserDetector: DefaultB
         }
     }
 
-    fun handleResult(fromBrowser: Int) {
-        Timber.i("MARCOS: From browser value is @$fromBrowser")
-        viewState.value = viewState.value?.copy(showInstructionsCard = false)
+    fun handleResult(origin: Origin) {
         val isDefault = defaultBrowserDetector.isDefaultBrowser()
-        val hasDefault = defaultBrowserDetector.hasDefaultBrowser()
-        if (isDefault) {
-            viewState.value = viewState.value?.copy(showOnlyContinue = true, showInstructionsCard = false)
-        } else {
-            if (hasDefault) {
-                viewState.value = viewState.value?.copy(showOnlyContinue = false, showInstructionsCard = false)
-                return
+        when (origin) {
+            is Origin.InternalBrowser -> {
+                if (isDefault) {
+                    viewState.value = viewState.value?.copy(showOnlyContinue = true, showInstructionsCard = false)
+                } else {
+                    when {
+                        origin.timesOpened < MAX_DIALOG_ATTEMPTS -> {
+                            viewState.value = viewState.value?.copy(showOnlyContinue = false, showInstructionsCard = true)
+                            command.value = Command.OpenDialog(origin.timesOpened)
+                        }
+                        origin.timesOpened >= MAX_DIALOG_ATTEMPTS -> {
+                            viewState.value = viewState.value?.copy(showInstructionsCard = false)
+                            command.value = Command.ContinueToBrowser
+                        }
+                        else -> {
+                            viewState.value = viewState.value?.copy(
+                                showSettingsUI = defaultBrowserDetector.hasDefaultBrowser(),
+                                showOnlyContinue = false,
+                                showInstructionsCard = false
+                            )
+                        }
+                    }
+                }
             }
-            if (fromBrowser > 1) {
-                command.value = Command.ContinueToBrowser
-            } else if (fromBrowser == 1) {
-                command.value = Command.OpenDialog(fromBrowser)
+            is Origin.ExternalBrowser -> {
+                viewState.value = viewState.value?.copy(showSettingsUI = defaultBrowserDetector.hasDefaultBrowser(), showInstructionsCard = false)
             }
-            else {
-                //command.value = Command.OpenDialog(fromBrowser)
+            is Origin.Settings -> {
+                viewState.value = viewState.value?.copy(showSettingsUI = true, showInstructionsCard = false)
+                val setText = if (isDefault) "was" else "was not"
+                Timber.i("User returned from default settings; DDG $setText set as default")
+
+                if (isDefault) {
+                    installStore.defaultBrowser = true
+                    pixel.fire(Pixel.PixelName.DEFAULT_BROWSER_SET)
+                }
             }
         }
     }
 
-    fun handleDefaultBrowserResult() {
-        val isDefault = defaultBrowserDetector.isDefaultBrowser()
-        val setText = if (isDefault) "was" else "was not"
-        Timber.i("User returned from default settings; DDG $setText set as default")
-
-        if (isDefault) {
-            installStore.defaultBrowser = true
-            pixel.fire(Pixel.PixelName.DEFAULT_BROWSER_SET)
-        }
+    companion object {
+        const val MAX_DIALOG_ATTEMPTS = 2
     }
 }

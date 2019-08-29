@@ -28,7 +28,7 @@
     <string name="defaultBrowserWelcome">WELCOME TO DUCKDUCKGO</string>
     <string name="defaultBrowserMaybeLater">Maybe later</string>
     <string name="defaultBrowserLetsDoIt">Let\'s do it!</string>
-    <string name="defaultBrowserDescriptionNoDefault">Experience peace of mind when\nopening links on your phone</string>
+    <string name="defaultBrowserDescriptionNoDefault">Experience peace of mind when opening links on your phone</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Browser menu</string>

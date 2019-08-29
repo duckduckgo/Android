@@ -40,7 +40,7 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageExperiment
-import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageExperiment.Companion.HANDLED_IN_APP
+import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageExperiment.Companion.TIMES_OPENED
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
@@ -165,13 +165,12 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
             return
         }
 
-        var handledInApp = intent.getIntExtra(HANDLED_IN_APP, -1)
-        if (handledInApp > 1.unaryMinus()) {
-            handledInApp++
-            Timber.i("MARCOS: value is $handledInApp")
+        var timesDefaultBrowserDialogOpened = intent.getIntExtra(TIMES_OPENED, -1)
+        if (timesDefaultBrowserDialogOpened > 1.unaryMinus()) {
+            timesDefaultBrowserDialogOpened++
             Timber.i("Setting DDG as default browser")
             val defaultIntent = Intent().apply {
-                putExtra(HANDLED_IN_APP, handledInApp)
+                putExtra(TIMES_OPENED, timesDefaultBrowserDialogOpened)
             }
             setResult(DefaultBrowserPageExperiment.DEFAULT_BROWSER_REQUEST_CODE_DIALOG, defaultIntent)
             finish()

@@ -58,7 +58,7 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
     @Inject
     lateinit var defaultBrowserDetector: DefaultBrowserDetector
 
-    private var userLaunchedDefaultBrowserSettings = false
+    private var userTriedToSetDDGAsDefault = false
     private var toast: Toast? = null
 
     private val viewModel: DefaultBrowserPageExperimentViewModel by lazy {
@@ -75,7 +75,7 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
         super.onActivityCreated(savedInstanceState)
 
         if (savedInstanceState != null) {
-            userLaunchedDefaultBrowserSettings = savedInstanceState.getBoolean(SAVED_STATE_LAUNCHED_SETTINGS)
+            userTriedToSetDDGAsDefault = savedInstanceState.getBoolean(SAVED_STATE_LAUNCHED_DEFAULT)
         }
 
         observeViewModel()
@@ -86,11 +86,16 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
             viewModel.onDefaultBrowserClicked()
         }
         continueButton.setOnClickListener {
-            if (!userLaunchedDefaultBrowserSettings) {
+            if (!userTriedToSetDDGAsDefault) {
                 pixel.fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
             }
             onContinuePressed()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.reloadInstructions()
     }
 
     private fun observeViewModel() {
@@ -104,7 +109,7 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
 
         viewModel.command.observe(this, Observer {
             when (it) {
-                is DefaultBrowserPageExperimentViewModel.Command.OpenDialog -> onLaunchDefaultBrowserWithDialogClicked(it.value)
+                is DefaultBrowserPageExperimentViewModel.Command.OpenDialog -> onLaunchDefaultBrowserWithDialogClicked(it.timesOpened)
                 is DefaultBrowserPageExperimentViewModel.Command.OpenSettings -> onLaunchDefaultBrowserSettingsClicked()
                 is DefaultBrowserPageExperimentViewModel.Command.ContinueToBrowser -> onContinuePressed()
             }
@@ -113,7 +118,9 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
 
     private fun setOnlyContinue(visible: Boolean) {
         if (visible) {
+            defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_experiment)
             launchSettingsButton.visibility = View.GONE
+            browserProtectionSubtitle.text = "You are now using DuckDuckGo as your default browser"
         } else {
             launchSettingsButton.visibility = View.VISIBLE
         }
@@ -132,7 +139,7 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
-        outState.putBoolean(SAVED_STATE_LAUNCHED_SETTINGS, userLaunchedDefaultBrowserSettings)
+        outState.putBoolean(SAVED_STATE_LAUNCHED_DEFAULT, userTriedToSetDDGAsDefault)
     }
 
     @SuppressLint("InflateParams")
@@ -147,15 +154,10 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
             setGravity(Gravity.TOP or Gravity.FILL_HORIZONTAL, 0, 0)
             duration = Toast.LENGTH_LONG
         }
-        Timber.i("MARCOS: Toast shown")
         toast?.show()
     }
 
     private fun hideCard() {
-        Timber.i("MARCOS: Hiding card")
-        if (toast == null) {
-            Timber.i("MARCOS: Toast null")
-        }
         toast?.cancel()
         defaultCard.animate()
             .alpha(0f)
@@ -165,12 +167,12 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
 
     private fun onLaunchDefaultBrowserWithDialogClicked(value: Int) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(DEFAULT_URL))
-        intent.putExtra(HANDLED_IN_APP, value)
+        intent.putExtra(TIMES_OPENED, value)
         startActivityForResult(intent, DEFAULT_BROWSER_REQUEST_CODE_DIALOG)
     }
 
     private fun onLaunchDefaultBrowserSettingsClicked() {
-        userLaunchedDefaultBrowserSettings = true
+        userTriedToSetDDGAsDefault = true
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val intent = DefaultBrowserSystemSettings.intent()
             try {
@@ -184,11 +186,16 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             DEFAULT_BROWSER_REQUEST_CODE_SETTINGS -> {
-                viewModel.handleDefaultBrowserResult()
+                viewModel.handleResult(DefaultBrowserPageExperimentViewModel.Origin.Settings)
             }
             DEFAULT_BROWSER_REQUEST_CODE_DIALOG -> {
-                val test = data?.getIntExtra(HANDLED_IN_APP, -1) ?: -1
-                viewModel.handleResult(test)
+                val timesOpened = data?.getIntExtra(TIMES_OPENED, -1)
+                val origin = if (timesOpened != null && timesOpened != -1) {
+                    DefaultBrowserPageExperimentViewModel.Origin.InternalBrowser(timesOpened)
+                } else {
+                    DefaultBrowserPageExperimentViewModel.Origin.ExternalBrowser
+                }
+                viewModel.handleResult(origin)
             }
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
@@ -198,7 +205,7 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
         const val DEFAULT_BROWSER_REQUEST_CODE_DIALOG = 101
         private const val DEFAULT_URL = "https://donttrack.us"
         private const val DEFAULT_BROWSER_REQUEST_CODE_SETTINGS = 100
-        private const val SAVED_STATE_LAUNCHED_SETTINGS = "SAVED_STATE_LAUNCHED_SETTINGS"
-        const val HANDLED_IN_APP = "handledInApp"
+        private const val SAVED_STATE_LAUNCHED_DEFAULT = "SAVED_STATE_LAUNCHED_DEFAULT"
+        const val TIMES_OPENED = "timesOpened"
     }
 }
