@@ -37,6 +37,7 @@ interface Pixel {
         APPLICATION_CRASH("m_d_ac"),
         WEB_RENDERER_GONE_CRASH("m_d_wrg_c"),
         WEB_RENDERER_GONE_KILLED("m_d_wrg_k"),
+        BROKEN_SITE_REPORTED("m_bsr"),
 
         ONBOARDING_DEFAULT_BROWSER_SETTINGS_LAUNCHED("m_odb_l"),
         ONBOARDING_DEFAULT_BROWSER_SKIPPED("m_odb_s"),
@@ -119,6 +120,7 @@ interface Pixel {
 
     object PixelParameter {
         const val APP_VERSION = "appVersion"
+        const val URL = "url"
         const val COUNT = "count"
         const val BOOKMARK_CAPABLE = "bc"
         const val SHOWED_BOOKMARKS = "sb"
