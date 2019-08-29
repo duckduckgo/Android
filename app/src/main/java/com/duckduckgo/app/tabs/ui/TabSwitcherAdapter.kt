@@ -17,50 +17,119 @@
 package com.duckduckgo.app.tabs.ui
 
 import android.content.Context
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.annotation.DrawableRes
-import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback
+import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_PREVIEW
+import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_TITLE
+import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_VIEWED
+import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.image.GlideApp
+import com.duckduckgo.app.global.image.GlideRequests
+import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
+import com.google.android.material.card.MaterialCardView
 import kotlinx.android.synthetic.main.item_tab.view.*
+import timber.log.Timber
+import java.io.File
 
-class TabSwitcherAdapter(private val context: Context, private val itemClickListener: TabSwitchedListener) : Adapter<TabViewHolder>() {
-
-    private var data: List<TabEntity> = ArrayList()
-    private var selectedTab: TabEntity? = null
+class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, private val webViewPreviewPersister: WebViewPreviewPersister) :
+    ListAdapter<TabEntity, TabViewHolder>(TabEntityDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TabViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val root = inflater.inflate(R.layout.item_tab, parent, false)
-        return TabViewHolder(root, root.favicon, root.title, root.url, root.close, root.tabUnread)
-    }
+        val root = inflater.inflate(R.layout.item_tab, parent, false) as MaterialCardView
 
-    override fun getItemCount(): Int {
-        return data.size
+        return TabViewHolder(
+            root = root,
+            favicon = root.favicon,
+            tabPreview = root.tabPreview,
+            title = root.title,
+            close = root.close,
+            cardContentsContainer = root.cardContentsContainer,
+            tabUnread = root.tabUnread
+        )
     }
 
     override fun onBindViewHolder(holder: TabViewHolder, position: Int) {
+        val context = holder.root.context
+        val tab = getItem(position)
+        val glide = GlideApp.with(context)
 
-        val tab = data[position]
-        holder.title.text = tab.displayTitle(context)
-        holder.url.text = tab.displayUrl()
-        holder.tabUnread.visibility = if (tab.viewed) View.INVISIBLE else View.VISIBLE
-        holder.root.setBackgroundResource(if (tab.tabId == selectedTab?.tabId) SELECTED_BACKGROUND else DEFAULT_BACKGROUND)
+        holder.title.text = extractTabTitle(tab, context)
+        updateUnreadIndicator(holder, tab)
 
-        GlideApp.with(holder.root)
-            .load(tab.favicon())
+        glide.load(tab.favicon())
             .placeholder(R.drawable.ic_globe_gray_16dp)
             .error(R.drawable.ic_globe_gray_16dp)
             .into(holder.favicon)
 
+
+        loadTabPreviewImage(tab, glide, holder)
+
         attachClickListeners(holder, tab)
+    }
+
+    private fun extractTabTitle(tab: TabEntity, context: Context): String {
+        var title = tab.displayTitle(context)
+        title = title.removeSuffix(DUCKDUCKGO_TITLE_SUFFIX)
+        return title
+    }
+
+    private fun updateUnreadIndicator(holder: TabViewHolder, tab: TabEntity) {
+        holder.tabUnread.visibility = if (tab.viewed) View.INVISIBLE else View.VISIBLE
+    }
+
+    override fun onBindViewHolder(holder: TabViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.isEmpty()) {
+            onBindViewHolder(holder, position)
+            return
+        }
+
+        val tab = getItem(position)
+
+        for (payload in payloads) {
+            val bundle = payload as Bundle
+
+            for (key: String in bundle.keySet()) {
+                Timber.v("$key changed - Need an update for $tab")
+            }
+
+            bundle[DIFF_KEY_PREVIEW]?.let {
+                loadTabPreviewImage(tab, GlideApp.with(holder.root), holder)
+            }
+
+            bundle[DIFF_KEY_TITLE]?.let {
+                holder.title.text = it as String
+            }
+
+            bundle[DIFF_KEY_VIEWED]?.let {
+                updateUnreadIndicator(holder, tab)
+            }
+        }
+    }
+
+    private fun loadTabPreviewImage(tab: TabEntity, glide: GlideRequests, holder: TabViewHolder) {
+        val previewFile = tab.tabPreviewFile ?: return
+
+        val cachedWebViewPreview = File(webViewPreviewPersister.fullPathForFile(tab.tabId, previewFile))
+        if (!cachedWebViewPreview.exists()) {
+            return
+        }
+
+        holder.tabPreview.show()
+        glide.load(cachedWebViewPreview)
+            .transition(DrawableTransitionOptions.withCrossFade())
+            .into(holder.tabPreview)
     }
 
     private fun attachClickListeners(holder: TabViewHolder, tab: TabEntity) {
@@ -72,36 +141,30 @@ class TabSwitcherAdapter(private val context: Context, private val itemClickList
         }
     }
 
-    fun updateData(data: List<TabEntity>?, selectedTab: TabEntity?) {
-
-        data ?: return
-
-        this.data = data
-        this.selectedTab = selectedTab
-        notifyDataSetChanged()
+    fun updateData(data: List<TabEntity>?) {
+        if (data == null) return
+        submitList(data)
     }
 
-    interface TabSwitchedListener {
-        fun onNewTabRequested()
-        fun onTabSelected(tab: TabEntity)
-        fun onTabDeleted(tab: TabEntity)
+    fun getTab(position: Int): TabEntity = getItem(position)
+
+    fun adapterPositionForTab(tabId: String?): Int {
+        if (tabId == null) return -1
+        return currentList.indexOfFirst { it.tabId == tabId }
+    }
+
+    companion object {
+        private const val DUCKDUCKGO_TITLE_SUFFIX = "at DuckDuckGo"
     }
 
     data class TabViewHolder(
-        val root: View,
+        val root: MaterialCardView,
         val favicon: ImageView,
+        val tabPreview: ImageView,
         val title: TextView,
-        val url: TextView,
         val close: ImageView,
-        val tabUnread: View
+        val tabUnread: ImageView,
+        val cardContentsContainer: ViewGroup
     ) : ViewHolder(root)
-
-    companion object {
-
-        @DrawableRes
-        private const val SELECTED_BACKGROUND = R.drawable.tab_background_selected
-        @DrawableRes
-        private const val DEFAULT_BACKGROUND = R.drawable.tab_background
-    }
 
 }

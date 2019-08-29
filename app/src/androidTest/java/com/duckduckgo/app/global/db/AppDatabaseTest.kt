@@ -121,17 +121,23 @@ class AppDatabaseTest {
     }
 
     @Test
-    fun whenMigratingFromVersion12To13ThenValidationSucceeds() {
-        createDatabaseAndMigrate(12, 13, AppDatabase.MIGRATION_12_TO_13)
-    }
-
-    @Test
     fun whenMigratingFromVersion11To12ThenTabsDoNotSkipHome() {
         testHelper.createDatabase(TEST_DB_NAME, 11).use {
             it.execSQL("INSERT INTO `tabs` values ('tabid1', 'url', 'title', 1, 0) ")
         }
         assertFalse(database().tabsDao().tabs()[0].skipHome)
     }
+
+    @Test
+    fun whenMigratingFromVersion12To13ThenValidationSucceeds() {
+        createDatabaseAndMigrate(12, 13, AppDatabase.MIGRATION_12_TO_13)
+    }
+
+    @Test
+    fun whenMigratingFromVersion13To14ThenValidationSucceeds() {
+        createDatabaseAndMigrate(13, 14, AppDatabase.MIGRATION_13_TO_14)
+    }
+
 
     private fun createDatabase(version: Int) {
         testHelper.createDatabase(TEST_DB_NAME, version).close()

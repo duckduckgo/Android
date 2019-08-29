@@ -71,6 +71,8 @@ import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
+import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
+import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.CtaConfiguration
@@ -84,6 +86,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
+import com.duckduckgo.app.tabs.ui.old.TabSwitcherActivityLegacy
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
@@ -149,6 +153,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     @Inject
     lateinit var omnibarScrolling: OmnibarScrolling
 
+    @Inject
+    lateinit var previewGenerator: WebViewPreviewGenerator
+
+    @Inject
+    lateinit var previewPersister: WebViewPreviewPersister
+
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
     lateinit var userAgentProvider: UserAgentProvider
@@ -173,6 +183,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         viewModel.loadData(tabId, initialUrl, skipHome)
         viewModel
     }
+
+    // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
+    private var bitmapGeneratorJob: Job? = null
 
     private val browserActivity
         get() = activity as? BrowserActivity
@@ -236,8 +249,19 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private fun configureShowTabSwitcherListener() {
         tabsButton?.actionView?.setOnClickListener {
-            browserActivity?.launchTabSwitcher()
+            launch { viewModel.userLaunchingTabSwitcher() }
         }
+    }
+
+    private fun launchTabSwitcherLegacy() {
+        val activity = activity ?: return
+        startActivity(TabSwitcherActivityLegacy.intent(activity))
+    }
+
+    private fun launchTabSwitcher() {
+        val activity = activity ?: return
+        startActivity(TabSwitcherActivity.intent(activity, tabId))
+        activity.overridePendingTransition(R.anim.tab_anim_fade_in, R.anim.slide_to_bottom)
     }
 
     override fun onResume() {
@@ -262,7 +286,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             onMenuItemClicked(view.refreshPopupMenuItem) { refresh() }
             onMenuItemClicked(view.newTabPopupMenuItem) { browserActivity?.launchNewTab() }
             onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
-            onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() }}
+            onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
             onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
             onMenuItemClicked(view.brokenSitePopupMenuItem) { viewModel.onBrokenSiteSelected() }
             onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
@@ -428,6 +452,33 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.LaunchLegacyAddWidget -> launchLegacyAddWidget()
             is Command.RequiresAuthentication -> showAuthenticationDialog(it.request)
             is Command.SaveCredentials -> saveBasicAuthCredentials(it.request, it.credentials)
+            is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage(it.forceImmediate)
+            is Command.LaunchTabSwitcher -> launchTabSwitcher()
+            is Command.LaunchTabSwitcherLegacy -> launchTabSwitcherLegacy()
+        }
+    }
+
+    private fun generateWebViewPreviewImage(forceImmediate: Boolean) {
+        webView?.let { webView ->
+
+            // if there's an existing job for generating a preview, cancel that in favor of the new request
+            bitmapGeneratorJob?.cancel()
+
+            bitmapGeneratorJob = launch {
+                if (!forceImmediate) {
+                    delay(WEBVIEW_PREVIEW_GENERATOR_DEBOUNCE_TIME_MS)
+                }
+
+                Timber.d("Generating WebView preview")
+                try {
+                    val preview = previewGenerator.generatePreview(webView)
+                    val fileName = previewPersister.save(preview, tabId)
+                    viewModel.updateTabPreview(tabId, fileName)
+                    Timber.d("Saved and updated tab preview")
+                } catch (e: RuntimeException) {
+                    Timber.w(e, "Failed to generate WebView preview")
+                }
+            }
         }
     }
 
@@ -970,6 +1021,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private const val URL_BUNDLE_KEY = "url"
 
         private const val AUTHENTICATION_DIALOG_TAG = "AUTH_DIALOG_TAG"
+
+        private const val WEBVIEW_PREVIEW_GENERATOR_DEBOUNCE_TIME_MS = 1_000L
 
         fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
             val fragment = BrowserTabFragment()
