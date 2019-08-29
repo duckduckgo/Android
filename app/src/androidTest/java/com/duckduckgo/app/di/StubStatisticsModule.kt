@@ -16,6 +16,9 @@
 
 package com.duckduckgo.app.di
 
+import android.content.Context
+import com.duckduckgo.app.global.device.ContextDeviceInfo
+import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.api.StatisticsService
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -63,4 +66,7 @@ class StubStatisticsModule {
             }
         }
     }
+
+    @Provides
+    fun deviceInfo(context: Context): DeviceInfo = ContextDeviceInfo(context)
 }
