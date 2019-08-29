@@ -28,9 +28,9 @@ class TabEntityDiffCallback : DiffUtil.ItemCallback<TabEntity>() {
     }
 
     override fun areContentsTheSame(oldItem: TabEntity, newItem: TabEntity): Boolean {
-        return oldItem.tabPreviewFile == newItem.tabPreviewFile
-                && oldItem.viewed == newItem.viewed
-                && oldItem.title == newItem.title
+        return oldItem.tabPreviewFile == newItem.tabPreviewFile &&
+                oldItem.viewed == newItem.viewed &&
+                oldItem.title == newItem.title
     }
 
     override fun getChangePayload(oldItem: TabEntity, newItem: TabEntity): Bundle {
