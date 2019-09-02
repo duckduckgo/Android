@@ -61,7 +61,6 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Muokkaa kyselyä ennen hakua</string>
     <string name="settingsAutocompleteEnabled">Näytä automaattisen täydennyksen ehdotukset</string>
-    <string name="settingsAutocompleteBookmarksEnabled">Sisällytä mukaan kirjanmerkeissä olevat sivustot</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Avaa ulkoinen sovellus</string>
@@ -149,7 +148,6 @@
     <string name="settingsHeadingGeneral">Yleistä</string>
     <string name="settingsHeadingOther">Muu</string>
     <string name="settingsHeadingPrivacy">Tietosuoja</string>
-    <string name="settingsHeadingAutocomplete">Automaattinen täydennys</string>
     <string name="settingsLightTheme">Valoisa teema</string>
     <string name="settingsAboutDuckduckgo">Tietoa DuckDuckGosta</string>
     <string name="settingsVersion">Versio</string>
@@ -199,7 +197,6 @@
     <string name="bookmarkUrlHint">Kirjanmerkin URL-osoite</string>
     <string name="bookmarkSave">Tallenna</string>
     <string name="bookmarkTitleEdit">Muokkaa kirjanmerkkiä</string>
-    <string name="bookmarkTitleSave">Tallenna kirjanmerkki</string>
     <string name="noBookmarks">Kirjanmerkkejä ei ole vielä lisätty</string>
     <string name="bookmarkOverflowContentDescription">Lisää vaihtoehtoja kirjanmerkille %s</string>
     <string name="delete">Poista</string>

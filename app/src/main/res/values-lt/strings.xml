@@ -61,7 +61,6 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Redaguoti užklausą prieš ieškant</string>
     <string name="settingsAutocompleteEnabled">Rodyti automatinio užbaigimo pasiūlymus</string>
-    <string name="settingsAutocompleteBookmarksEnabled">Įtraukti svetaines su žymelėmis</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Atidaryti išorinę programą</string>
@@ -153,7 +152,6 @@
     <string name="settingsHeadingGeneral">Bendrieji</string>
     <string name="settingsHeadingOther">Kiti</string>
     <string name="settingsHeadingPrivacy">Privatumas</string>
-    <string name="settingsHeadingAutocomplete">Automatinis užbaigimas</string>
     <string name="settingsLightTheme">Šviesus apipavidalinimas</string>
     <string name="settingsAboutDuckduckgo">Apie „DuckDuckGo“</string>
     <string name="settingsVersion">Versija</string>
@@ -203,7 +201,6 @@
     <string name="bookmarkUrlHint">Žymelės URL</string>
     <string name="bookmarkSave">Išsaugoti</string>
     <string name="bookmarkTitleEdit">Redaguoti žymelę</string>
-    <string name="bookmarkTitleSave">Išsaugoti žymelę</string>
     <string name="noBookmarks">Žymelių dar nepridėta</string>
     <string name="bookmarkOverflowContentDescription">Daugiau parinkčių žymelei %s</string>
     <string name="delete">Trinti</string>

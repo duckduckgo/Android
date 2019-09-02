@@ -61,7 +61,6 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Modifier la requête avant la recherche</string>
     <string name="settingsAutocompleteEnabled">Afficher les suggestions de saisie semi-automatique</string>
-    <string name="settingsAutocompleteBookmarksEnabled">Inclure les sites référencés</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Ouvrir une application externe</string>
@@ -149,7 +148,6 @@
     <string name="settingsHeadingGeneral">Général</string>
     <string name="settingsHeadingOther">Autre</string>
     <string name="settingsHeadingPrivacy">Confidentialité</string>
-    <string name="settingsHeadingAutocomplete">Saisie semi-automatique</string>
     <string name="settingsLightTheme">Thème clair</string>
     <string name="settingsAboutDuckduckgo">À propos de DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
@@ -199,7 +197,6 @@
     <string name="bookmarkUrlHint">URL du signet</string>
     <string name="bookmarkSave">Enregistrer</string>
     <string name="bookmarkTitleEdit">Modifier le signet</string>
-    <string name="bookmarkTitleSave">Enregistrer le signet</string>
     <string name="noBookmarks">Aucun signet ajouté pour le moment</string>
     <string name="bookmarkOverflowContentDescription">Plus d\'options pour le signet %s</string>
     <string name="delete">Supprimer</string>

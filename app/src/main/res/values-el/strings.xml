@@ -61,7 +61,6 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Επεξεργασία ερωτήματος πριν την αναζήτηση</string>
     <string name="settingsAutocompleteEnabled">Εμφάνιση προτάσεων αυτόματης συμπλήρωσης</string>
-    <string name="settingsAutocompleteBookmarksEnabled">Να συμπεριληφθούν ιστότοποι με σελιδοδείκτη</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Άνοιγμα εξωτερικής εφαρμογής</string>
@@ -149,7 +148,6 @@
     <string name="settingsHeadingGeneral">Γενικά</string>
     <string name="settingsHeadingOther">Άλλα</string>
     <string name="settingsHeadingPrivacy">Ιδιωτικότητα</string>
-    <string name="settingsHeadingAutocomplete">Αυτόματη συμπλήρωση</string>
     <string name="settingsLightTheme">Ανοιχτόχρωμο θέμα</string>
     <string name="settingsAboutDuckduckgo">Πληροφορίες για το DuckDuckGo</string>
     <string name="settingsVersion">Έκδοση</string>
@@ -199,7 +197,6 @@
     <string name="bookmarkUrlHint">Διεύθυνση URL σελιδοδείκτη</string>
     <string name="bookmarkSave">Αποθήκευση</string>
     <string name="bookmarkTitleEdit">Επεξεργασία σελιδοδείκτη</string>
-    <string name="bookmarkTitleSave">Αποθήκευση σελιδοδείκτη</string>
     <string name="noBookmarks">Δεν προστέθηκαν σελιδοδείκτες ακόμα</string>
     <string name="bookmarkOverflowContentDescription">Περισσότερες επιλογές για σελιδοδείκτη %s</string>
     <string name="delete">Διαγραφή</string>

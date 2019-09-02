@@ -61,7 +61,6 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Uredi upit prije pretraživanja</string>
     <string name="settingsAutocompleteEnabled">Prikaži prijedloge za automatsko ispunjavanje</string>
-    <string name="settingsAutocompleteBookmarksEnabled">Uključi označena web-mjesta</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Otvori vanjsku aplikaciju</string>
@@ -149,7 +148,6 @@
     <string name="settingsHeadingGeneral">Općenito</string>
     <string name="settingsHeadingOther">Ostalo</string>
     <string name="settingsHeadingPrivacy">Zaštita privatnosti</string>
-    <string name="settingsHeadingAutocomplete">Automatsko ispunjavanje</string>
     <string name="settingsLightTheme">Svijetla tema</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Inačica</string>
@@ -199,7 +197,6 @@
     <string name="bookmarkUrlHint">URL knjižne oznake</string>
     <string name="bookmarkSave">Spremi</string>
     <string name="bookmarkTitleEdit">Uredi knjižnu oznaku</string>
-    <string name="bookmarkTitleSave">Spremi knjižnu oznaku</string>
     <string name="noBookmarks">Još nema dodanih knjižnih oznaka</string>
     <string name="bookmarkOverflowContentDescription">Više opcija za knjižnu oznaku %s</string>
     <string name="delete">Izbriši</string>

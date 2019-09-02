@@ -77,7 +77,6 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Modifica query prima di iniziare la ricerca</string>
     <string name="settingsAutocompleteEnabled">Mostra suggerimenti di completamento automatico</string>
-    <string name="settingsAutocompleteBookmarksEnabled">Includi i siti dei segnalibri</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Apri l\'app esterna</string>
@@ -165,7 +164,6 @@
     <string name="settingsHeadingGeneral">Generale</string>
     <string name="settingsHeadingOther">Altro</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
-    <string name="settingsHeadingAutocomplete">Completa automaticamente</string>
     <string name="settingsLightTheme">Tema chiaro</string>
     <string name="settingsAboutDuckduckgo">Informazioni su DuckDuckGo</string>
     <string name="settingsVersion">Versione</string>
@@ -215,7 +213,6 @@
     <string name="bookmarkUrlHint">URL del segnalibro</string>
     <string name="bookmarkSave">Salva</string>
     <string name="bookmarkTitleEdit">Modifica segnalibro</string>
-    <string name="bookmarkTitleSave">Salva segnalibro</string>
     <string name="noBookmarks">Non è ancora stato aggiunto nessun segnalibro</string>
     <string name="bookmarkOverflowContentDescription">Ulteriori opzioni per il segnalibro %s</string>
     <string name="delete">Cancella</string>

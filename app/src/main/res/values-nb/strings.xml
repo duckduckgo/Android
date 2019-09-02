@@ -61,7 +61,6 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Rediger spørringen før du søker</string>
     <string name="settingsAutocompleteEnabled">Vis forslag fra autofullføring</string>
-    <string name="settingsAutocompleteBookmarksEnabled">Inkluder bokmerkede nettsteder</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Åpne ekstern app</string>
@@ -149,7 +148,6 @@
     <string name="settingsHeadingGeneral">Generelt</string>
     <string name="settingsHeadingOther">Annet</string>
     <string name="settingsHeadingPrivacy">Personvern</string>
-    <string name="settingsHeadingAutocomplete">Autofullføring</string>
     <string name="settingsLightTheme">Lyst tema</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Versjon</string>
@@ -199,7 +197,6 @@
     <string name="bookmarkUrlHint">Bokmerke-URL</string>
     <string name="bookmarkSave">Lagre</string>
     <string name="bookmarkTitleEdit">Rediger bokmerke</string>
-    <string name="bookmarkTitleSave">Lagre bokmerke</string>
     <string name="noBookmarks">Det har ennå ikke blitt lagt til et bokmerke</string>
     <string name="bookmarkOverflowContentDescription">Flere alternativer for bokmerket %s</string>
     <string name="delete">Slett</string>

@@ -61,7 +61,6 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Редактиране на заявка преди търсене</string>
     <string name="settingsAutocompleteEnabled">Показване на предложенията за автоматично довършване</string>
-    <string name="settingsAutocompleteBookmarksEnabled">Включване на сайтове с отметки</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Отваряне на външно приложение</string>
@@ -149,7 +148,6 @@
     <string name="settingsHeadingGeneral">Обща информация</string>
     <string name="settingsHeadingOther">Други</string>
     <string name="settingsHeadingPrivacy">Поверителност</string>
-    <string name="settingsHeadingAutocomplete">Автодовършване</string>
     <string name="settingsLightTheme">Светла тема</string>
     <string name="settingsAboutDuckduckgo">За DuckDuckGo</string>
     <string name="settingsVersion">Версия</string>
@@ -199,7 +197,6 @@
     <string name="bookmarkUrlHint">URL адрес на отметката</string>
     <string name="bookmarkSave">Запазване</string>
     <string name="bookmarkTitleEdit">Редактиране на отметка</string>
-    <string name="bookmarkTitleSave">Запазване на отметката</string>
     <string name="noBookmarks">Все още няма добавени отметки</string>
     <string name="bookmarkOverflowContentDescription">Още опции за отметка %s</string>
     <string name="delete">Изтриване</string>

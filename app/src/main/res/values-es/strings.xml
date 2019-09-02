@@ -61,7 +61,6 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editar consulta antes de buscar</string>
     <string name="settingsAutocompleteEnabled">Mostrar sugerencias de autocompletado</string>
-    <string name="settingsAutocompleteBookmarksEnabled">Incluir sitios web añadidos a marcadores</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Abrir aplicación externa</string>
@@ -149,7 +148,6 @@
     <string name="settingsHeadingGeneral">General</string>
     <string name="settingsHeadingOther">Otros</string>
     <string name="settingsHeadingPrivacy">Privacidad</string>
-    <string name="settingsHeadingAutocomplete">Autocompletar</string>
     <string name="settingsLightTheme">Tema claro</string>
     <string name="settingsAboutDuckduckgo">Acerca de DuckDuckGo</string>
     <string name="settingsVersion">Versión</string>
@@ -199,7 +197,6 @@
     <string name="bookmarkUrlHint">URL del marcador</string>
     <string name="bookmarkSave">Guardar</string>
     <string name="bookmarkTitleEdit">Editar marcador</string>
-    <string name="bookmarkTitleSave">Guardar marcador</string>
     <string name="noBookmarks">No se han añadido marcadores todavía</string>
     <string name="bookmarkOverflowContentDescription">Más opciones para el marcador %s</string>
     <string name="delete">Eliminar</string>

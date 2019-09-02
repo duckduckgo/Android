@@ -61,7 +61,6 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Upraviť otázku pred vyhľadávaním</string>
     <string name="settingsAutocompleteEnabled">Zobraziť návrhy automatického dopĺňania</string>
-    <string name="settingsAutocompleteBookmarksEnabled">Zahrnúť stránky v záložkách</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Otvoriť externú aplikáciu</string>
@@ -150,7 +149,6 @@
     <string name="settingsHeadingGeneral">Všeobecné</string>
     <string name="settingsHeadingOther">Iné</string>
     <string name="settingsHeadingPrivacy">Súkromie</string>
-    <string name="settingsHeadingAutocomplete">Automatické dopĺňanie</string>
     <string name="settingsLightTheme">Svetlý motív</string>
     <string name="settingsAboutDuckduckgo">Informácie o DuckDuckGo</string>
     <string name="settingsVersion">Verzia</string>
@@ -200,7 +198,6 @@
     <string name="bookmarkUrlHint">Webová adresa záložky</string>
     <string name="bookmarkSave">Uložiť</string>
     <string name="bookmarkTitleEdit">Upraviť záložku</string>
-    <string name="bookmarkTitleSave">Uložiť záložku</string>
     <string name="noBookmarks">Zatiaľ neboli pridané žiadne záložky</string>
     <string name="bookmarkOverflowContentDescription">Viac možností pre záložku %s</string>
     <string name="delete">Vymazať</string>

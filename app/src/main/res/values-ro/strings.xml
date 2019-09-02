@@ -61,7 +61,6 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editare interogare înainte de căutare</string>
     <string name="settingsAutocompleteEnabled">Afișează sugestiile de completare automată</string>
-    <string name="settingsAutocompleteBookmarksEnabled">Include site-urile marcate cu semne de carte</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Deschide aplicația externă</string>
@@ -153,7 +152,6 @@
     <string name="settingsHeadingGeneral">Generalități</string>
     <string name="settingsHeadingOther">Altele</string>
     <string name="settingsHeadingPrivacy">Confidențialitate</string>
-    <string name="settingsHeadingAutocomplete">Completare automată</string>
     <string name="settingsLightTheme">Temă luminoasă</string>
     <string name="settingsAboutDuckduckgo">Despre DuckDuckGo</string>
     <string name="settingsVersion">Versiune</string>
@@ -203,7 +201,6 @@
     <string name="bookmarkUrlHint">Adresă URL semn de carte</string>
     <string name="bookmarkSave">Salvare</string>
     <string name="bookmarkTitleEdit">Editare semn de carte</string>
-    <string name="bookmarkTitleSave">Salvare semn de carte</string>
     <string name="noBookmarks">Nu s-a adăugat niciun semn de carte</string>
     <string name="bookmarkOverflowContentDescription">Mai multe opțiuni pentru semnul de carte %s</string>
     <string name="delete">Ștergere</string>

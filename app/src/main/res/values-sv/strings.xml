@@ -77,7 +77,6 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Redigera förfrågan innan sökning</string>
     <string name="settingsAutocompleteEnabled">Visa "Autoslutför förslag"</string>
-    <string name="settingsAutocompleteBookmarksEnabled">Inkludera bokmärkta platser</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Öppna extern app</string>
@@ -165,7 +164,6 @@
     <string name="settingsHeadingGeneral">Allmänt</string>
     <string name="settingsHeadingOther">Annat</string>
     <string name="settingsHeadingPrivacy">Sekretess</string>
-    <string name="settingsHeadingAutocomplete">Autoslutför</string>
     <string name="settingsLightTheme">Ljust</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
@@ -215,7 +213,6 @@
     <string name="bookmarkUrlHint">Bokmärkets URL</string>
     <string name="bookmarkSave">Spara</string>
     <string name="bookmarkTitleEdit">Redigera bokmärke</string>
-    <string name="bookmarkTitleSave">Spara bokmärke</string>
     <string name="noBookmarks">Inga bokmärken har lagts till ännu</string>
     <string name="bookmarkOverflowContentDescription">Fler alternativ för bokmärke %s</string>
     <string name="delete">Ta bort</string>

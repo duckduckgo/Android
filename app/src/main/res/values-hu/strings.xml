@@ -61,7 +61,6 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Lekérdezés szerkesztése keresés előtt</string>
     <string name="settingsAutocompleteEnabled">Automatikus kiegészítési javaslatok megjelenítése</string>
-    <string name="settingsAutocompleteBookmarksEnabled">Könyvjelzővel ellátott weboldalak megjelenítése</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Külső alkalmazás megnyitása</string>
@@ -149,7 +148,6 @@
     <string name="settingsHeadingGeneral">Általános</string>
     <string name="settingsHeadingOther">Egyéb</string>
     <string name="settingsHeadingPrivacy">Adatvédelem</string>
-    <string name="settingsHeadingAutocomplete">Automatikus kiegészítés</string>
     <string name="settingsLightTheme">Világos felület</string>
     <string name="settingsAboutDuckduckgo">A DuckDuckGo névjegye</string>
     <string name="settingsVersion">Változat</string>
@@ -199,7 +197,6 @@
     <string name="bookmarkUrlHint">Könyvjelző URL</string>
     <string name="bookmarkSave">Mentés</string>
     <string name="bookmarkTitleEdit">Könyvjelző szerkesztése</string>
-    <string name="bookmarkTitleSave">Könyvjelző mentése</string>
     <string name="noBookmarks">Még nincsenek könyvjelzők hozzáadva</string>
     <string name="bookmarkOverflowContentDescription">%s könyvjelző további lehetőségei</string>
     <string name="delete">Törlés</string>

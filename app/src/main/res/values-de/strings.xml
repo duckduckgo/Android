@@ -61,7 +61,6 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Anfrage vor der Suche bearbeiten</string>
     <string name="settingsAutocompleteEnabled">Vorschläge für die Autovervollständigung anzeigen</string>
-    <string name="settingsAutocompleteBookmarksEnabled">Mit Lesezeichen gespeicherte Seiten einschließen</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Externe App öffnen</string>
@@ -149,7 +148,6 @@
     <string name="settingsHeadingGeneral">Allgemeines</string>
     <string name="settingsHeadingOther">Sonstiges</string>
     <string name="settingsHeadingPrivacy">Privatsphäre</string>
-    <string name="settingsHeadingAutocomplete">Autovervollständigung</string>
     <string name="settingsLightTheme">Light Theme</string>
     <string name="settingsAboutDuckduckgo">Über DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
@@ -199,7 +197,6 @@
     <string name="bookmarkUrlHint">Lesezeichen-URL</string>
     <string name="bookmarkSave">Speichern</string>
     <string name="bookmarkTitleEdit">Lesezeichen bearbeiten</string>
-    <string name="bookmarkTitleSave">Lesezeichen speichern</string>
     <string name="noBookmarks">Noch keine Lesezeichen hinzugefügt</string>
     <string name="bookmarkOverflowContentDescription">Mehr Optionen für Lesezeichen %s</string>
     <string name="delete">Löschen</string>

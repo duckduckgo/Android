@@ -61,7 +61,6 @@
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Bewerk query alvorens te zoeken</string>
     <string name="settingsAutocompleteEnabled">Suggesties voor automatisch aanvullen weergeven</string>
-    <string name="settingsAutocompleteBookmarksEnabled">Voeg bladwijzersites toe</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Externe app openen</string>
@@ -149,7 +148,6 @@
     <string name="settingsHeadingGeneral">Algemeen</string>
     <string name="settingsHeadingOther">Overige</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
-    <string name="settingsHeadingAutocomplete">Automatisch aanvullen</string>
     <string name="settingsLightTheme">Lichtthema</string>
     <string name="settingsAboutDuckduckgo">Over DuckDuckGo</string>
     <string name="settingsVersion">Versie</string>
@@ -199,7 +197,6 @@
     <string name="bookmarkUrlHint">URL bladwijzer</string>
     <string name="bookmarkSave">Opslaan</string>
     <string name="bookmarkTitleEdit">Bladwijzer bewerken</string>
-    <string name="bookmarkTitleSave">Bladwijzer opslaan</string>
     <string name="noBookmarks">Nog geen bladwijzers toegevoegd</string>
     <string name="bookmarkOverflowContentDescription">Meer opties voor bladwijzer %s</string>
     <string name="delete">Verwijderen</string>
