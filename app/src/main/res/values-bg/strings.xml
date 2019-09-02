@@ -263,14 +263,14 @@
     <string name="privacyProtectionNotificationDefaultTitle">Ние защитаваме Вашата поверителност</string>
     <string name="privacyProtectionNotificationReportTitle">Доклад за Вашата поверителност</string>
     <string name="privacyProtectionNotificationDefaultDescription">Използването на приложението DuckDuckGo защитава Вашите данни, като блокира проследяващите елементи и шифрова връзките.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">Вие защитихте своите данни, като осигурихте % нешифровани връзки, докато използвахте DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">Вие защитихте своите данни, като блокирахте % проследяващи елемента, докато използвахте DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">Вие защитихте своите данни, като осигурихте %s нешифровани връзки, докато използвахте DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">Вие защитихте своите данни, като блокирахте %s проследяващи елемента, докато използвахте DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">Вие защитихте своите данни, като блокирахте % проследяващи елемента и осигурихте % нешифровани връзки, докато използвахте DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Подновете сърфирането</string>
 
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Влизане</string>
-    <string name="authenticationDialogMessage">% изисква потребителско име и парола.</string>
+    <string name="authenticationDialogMessage">%s изисква потребителско име и парола.</string>
     <string name="authenticationDialogPositiveButton">Влизане</string>
     <string name="authenticationDialogNegativeButton">Отмяна</string>
     <string name="authenticationDialogUsernameHint">Потребителско име</string>
