@@ -56,7 +56,6 @@
     <string name="previousSearchTermDescription">Намери предишен</string>
     <string name="closeFindInPageButtonDescription">Затваряне на изгледа за тръсене в страницата</string>
     <string name="findInPageHint">Намери в страницата</string>
-    <string name="findInPageMatches">%d/%d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Редактиране на заявка преди търсене</string>

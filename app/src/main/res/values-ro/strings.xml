@@ -56,7 +56,6 @@
     <string name="previousSearchTermDescription">Găsirea rezultatului anterior</string>
     <string name="closeFindInPageButtonDescription">Închideți vizualizarea „găsire în pagină”</string>
     <string name="findInPageHint">Găsire în pagină</string>
-    <string name="findInPageMatches">%d/%d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editare interogare înainte de căutare</string>

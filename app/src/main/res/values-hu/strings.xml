@@ -56,7 +56,6 @@
     <string name="previousSearchTermDescription">Előző keresése</string>
     <string name="closeFindInPageButtonDescription">Keresés az oldalon nézet bezárása</string>
     <string name="findInPageHint">Keresés az oldalon</string>
-    <string name="findInPageMatches">%d/%d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Lekérdezés szerkesztése keresés előtt</string>
