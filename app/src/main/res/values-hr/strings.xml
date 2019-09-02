@@ -1,19 +1,358 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (c) 2019 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-<resources>
+    <string name="duckDuckGoLogoDescription">Logotip DuckDuckGo</string>
+
+    <!-- Onboarding Activity -->
+    <string name="onboardingDefaultBrowserTitle">Učinite zaštitu privatnosti zadanom.</string>
+    <string name="onboardingDefaultBrowserDescription">Posjetite Postavke kako biste svaki put pretraživali i pregledavali uz DuckDuckGo.</string>
+    <string name="onboardingDefaultBrowserGoToSettingsAction">Idite na Postavke</string>
+    <string name="onboardingContinue">Nastavi</string>
+    <string name="onboardingContinueFinalPage">Započni pregledavanje</string>
+
+    <!-- Unified Welcome Page -->
+    <string name="unifiedOnboardingTitleFirstVisit">Dobrodošli u\naDuckDuckGo!</string>
+    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Ostanite anonimni dok pretražujete i pregledavate internet.</string>
+    <string name="unifiedOnboardingPrivateSearchTitle">Privatno pretraživanje</string>
+    <string name="unifiedOnboardingPrivateSearchSubtitle">Uz DuckDuckGo, vaša pretraživanja su uvijek privatna.</string>
+    <string name="unifiedOnboardingBrowsingProtectionTitle">Zaštita kod pregledavanja</string>
+    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Blokirajte alate za praćenje i pregledavajte sigurno kao zadani način.</string>
+    <string name="unifiedOnboardingDataClearingTitle">Brisanje podataka</string>
+    <string name="unifiedOnboardingDataClearingSubtitle">Izbrišite podatke o pregledavanju dodirom gumba.</string>
+    <string name="unifiedOnboardingCustomizationTitle">Prilagodba</string>
+    <string name="unifiedOnboardingCustomizationSubtitle">Izaberite temu i prilagodite značajke zaštite privatnosti.</string>
+
+    <!-- Default Browser -->
+    <string name="cannotLaunchDefaultAppSettings">Ne mogu pokrenuti zaslon zadanih postavki u aplikaciji</string>
+    <string name="settingsDefaultBrowserEnabled">Postavi kao zadani preglednik</string>
+
+    <!-- Browser Activity -->
+    <string name="browserPopupMenu">Izbornik preglednika</string>
+    <string name="refresh">Osvježi</string>
+    <string name="back">Natrag</string>
+    <string name="forward">Naprijed</string>
+
+    <string name="omnibarInputHint">Traži ili upiši URL adresu</string>
+    <string name="clearButtonContentDescription">Obriši unos pretraživanja</string>
+    <string name="no_compatible_third_party_app_installed">Nije instalirana kompatibilna aplikacija</string>
+    <string name="addBookmarkMenuTitle">Dodaj knjižnu oznaku</string>
+    <string name="requestDesktopSiteMenuTitle">Mjesto radne površine</string>
+
+    <!-- Downloading files -->
+    <string name="downloadImage">Preuzmi sliku</string>
+    <string name="permissionRequiredToDownload">Preuzimanje zahtijeva dozvolu za pohranu</string>
+    <string name="downloadComplete">Preuzimanje dovršeno.</string>
+    <string name="downloadFailed">Preuzimanje nije uspjelo</string>
+    <string name="downloadInProgress">Preuzimanje</string>
+
+    <!-- Sharing options -->
+    <string name="options">Opcije</string>
+    <string name="shareLink">Podijeli poveznicu</string>
+    <string name="shareMenuTitle">Podijeli…</string>
+    <string name="copyUrl">Kopiraj adresu poveznice</string>
+
+    <!-- Find in page -->
+    <string name="findInPageMenuTitle">Pronađi na stranici</string>
+    <string name="nextSearchTermDescription">Pronađi sljedeće</string>
+    <string name="previousSearchTermDescription">Pronađi prethodno</string>
+    <string name="closeFindInPageButtonDescription">Zatvori prikaz pronađi na stranici</string>
+    <string name="findInPageHint">Pronađi na stranici</string>
+    <string name="findInPageMatches">%d/%d</string>
+
+    <!-- AutoComplete Suggestions -->
+    <string name="editQueryBeforeSubmitting">Uredi upit prije pretraživanja</string>
+    <string name="settingsAutocompleteEnabled">Prikaži prijedloge za automatsko ispunjavanje</string>
+    <string name="settingsAutocompleteBookmarksEnabled">Uključi označena web-mjesta</string>
+
+    <!-- Opening external apps -->
+    <string name="openExternalApp">Otvori vanjsku aplikaciju</string>
+    <string name="launchingExternalApp">Otvori u drugoj aplikaciji</string>
+    <string name="confirmOpenExternalApp">Želite li napustiti DuckDuckGo da biste vidjeli ovaj sadržaj?</string>
+    <string name="unableToOpenLink">Nije moguće otvoriti ovu vrstu poveznice</string>
+
+    <!-- Tabs -->
+    <string name="tabActivityTitle">Kartice</string>
+    <string name="tabsMenuItem">Kartice</string>
+    <string name="newTabMenuItem">Nova kartica</string>
+    <string name="openInNewTab">Otvori u novoj kartici</string>
+    <string name="openInNewBackgroundTab">Otvori karticu u pozadini</string>
+    <string name="openImageInNewTab">Otvori sliku u kartici u pozadini</string>
+    <string name="faviconContentDescription">Pohranjena ikona</string>
+    <string name="closeContentDescription">Zatvori</string>
+    <string name="tapFireDirective">Dodirni </string>
+    <string name="tapFireIconDescription">brisanje</string>
+    <string name="tapFireExplanation"> za potpuno uklanjanje</string>
+    <string name="closeAllTabsMenuItem">Zatvori sve kartice</string>
+
+    <!-- Privacy Dashboard Activities -->
+    <string name="privacyDashboardActivityTitle">Nadzorna ploča zaštite privatnosti</string>
+    <string name="privacyProtectionEnabled">ZAŠTITA PRIVATNOSTI OMOGUĆENA</string>
+    <string name="privacyProtectionDisabled">ZAŠTITA PRIVATNOSTI ONEMOGUĆENA</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">POBOLJŠANO OD &lt;img src="%d" /&gt; DO &lt;img src="%d" /&gt;</string>
+    <string name="privacyGradeContentDescription">Ocjena zaštite privatnosti</string>
+
+    <string name="httpsGood">Šifrirana veza</string>
+    <string name="httpsMixed">Miješana šifrirana veza</string>
+    <string name="httpsBad">Nešifrirana veza</string>
+
+    <string name="networksActivityTitle">Mreže za praćenje</string>
+    <string name="networksContentDescription">Mreže za praćenje</string>
+    <string name="networksOverview">Mreže za praćenje objedinjuju vašu povijest web pregledavanja u podatkovni profil o vama. Glavne mreže za praćenje su štetnije jer vas mogu pratiti i ciljati na većem dijelu interneta.</string>
+
+    <plurals name="trackersFound">
+        <item quantity="one">% pronađen alat za praćenje</item>
+        <item quantity="other">% pronađenih alata za praćenje</item>
+    </plurals>
+
+    <plurals name="trackerBlocked">
+        <item quantity="one">% blokiranih alata za praćenje</item>
+        <item quantity="other">% blokiranih alata za praćenje</item>
+    </plurals>
+
+    <plurals name="majorNetworksFound">
+        <item quantity="one">%s pronađenih glavnih mreža za praćenje</item>
+        <item quantity="other">%s pronađenih glavnih mreža za praćenje</item>
+    </plurals>
+
+    <plurals name="majorNetworksBlocked">
+        <item quantity="one">%s blokiranih glavnih mreža za praćenje</item>
+        <item quantity="other">%s blokiranih glavnih mreža za praćenje</item>
+    </plurals>
+
+    <string name="scorecardActivityTitle">Ocjena zaštite privatnosti</string>
+    <string name="scorecardSiteIsMemberOfMajorNetwork">Web-mjesto je glavna mreža za praćenje</string>
+    <string name="scorecardPrivacyGrade">Ocjena zaštite privatnosti</string>
+    <string name="scorecardEnhancedGrade">Poboljšana ocjena</string>
+
+    <string name="privacyTermsActivityTitle">Prakse zaštite privatnosti</string>
+    <string name="practicesGood">Dobre prakse zaštite privatnosti</string>
+    <string name="practicesMixed">Miješane prakse zaštite privatnosti</string>
+    <string name="practicesBad">"Loše prakse zaštite privatnosti"</string>
+    <string name="practicesUnknown">Nepoznata praksa zaštite privatnosti</string>
+    <string name="practicesOverview">Prakse zaštite privatnosti pokazuju koliko su zaštićeni osobni podaci koje dijelite s web-mjestom.</string>
+    <string name="practicesTosdrLink">Prakse zaštite privatnosti rezultat su <b><u>ToS;DR</u></b></string>
+    <string name="practicesIconContentGood">Ikona za dobru praksu</string>
+    <string name="practicesIconContentBad">Ikona za lošu praksu</string>
+    <string name="privacyProtectionToggle">Zaštita privatnosti</string>
+
+    <string name="networkTrackerSummaryHeader">NAJVEĆI PREKRŠITELJI OD MREŽA ZA PRAĆENJE</string>
+    <string name="networkTrackerSummaryNotReady">Još uvijek prikupljamo podatke kako bismo pokazali koliko smo alata za praćenje blokirali.</string>
+
+    <!-- Fire -->
+    <string name="fireMenu">Obriši podatke</string>
+    <string name="fireClearAll">Obriši sve kartice i podatke</string>
+    <string name="fireCancel">Odustani</string>
+    <string name="fireDataCleared">Podaci su obrisani</string>
+
+    <!-- Settings Activity -->
+    <string name="settingsActivityTitle">Postavke</string>
+    <string name="settingsMenuItemTitle">Postavke</string>
+    <string name="settingsHeadingGeneral">Općenito</string>
+    <string name="settingsHeadingOther">Ostalo</string>
+    <string name="settingsHeadingPrivacy">Zaštita privatnosti</string>
+    <string name="settingsHeadingAutocomplete">Automatsko ispunjavanje</string>
+    <string name="settingsLightTheme">Svijetla tema</string>
+    <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
+    <string name="settingsVersion">Inačica</string>
+    <string name="leaveFeedback">Ostavi povratne informacije</string>
+
+    <!-- Settings - Automatically clearing data -->
+    <string name="settingsAutomaticallyClearingDialogSave">Spremi</string>
+
+    <string name="settingsAutomaticallyClearWhat">Automatski obriši…</string>
+    <string name="settingsAutomaticallyClearWhatOptionNone">Nijedno</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabs">Kartice</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Kartice i podaci</string>
+
+    <string name="settingsAutomaticallyClearWhen">Očisti na…</string>
+    <string name="settingsAutomaticallyClearWhenAppExitOnly">Samo izlaz iz aplikacije</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Izlaz iz aplikacije, neaktivan 5 sekundi</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Izlaz iz aplikacije, neaktivan 5 minuta</string>
+    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Izlaz iz aplikacije, neaktivan 15 minuta</string>
+    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Izlaz iz aplikacije, neaktivan 30 minuta</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Izlaz iz aplikacije, neaktivan 60 minuta</string>
+
+    <!-- About Activity -->
+    <string name="aboutActivityTitle">O nama</string>
+    <string name="aboutHeading">Zaštita privatnosti, pojednostavljeno.</string>
+    <string name="aboutDescription">
+        U DuckDuckGo postavljamo novi standard povjerenja na mreži.\n\ DuckDuckGo anonimni preglednik pruža sve što vam je potrebno da se zaštitite dok pretražujete i pregledavate internet, uključujući blokiranje alata za praćenje, pametnije šifriranje i privatno pretraživanje DuckDuckGo.\n\ Uostalom, internet ne bi trebao biti jezivo mjesto, a dobivanje privatnosti koju zaslužujete na internetu trebalo bi biti jednostavno poput spuštanja roleta.</string>
+    <string name="aboutMoreLink">Više na duckduckgo.com/about</string>
+    <string name="no_suggestions">Nema prijedloga</string>
+
+    <!-- Broken Site Activity -->
+    <string name="brokenSiteReportBrokenSiteMenuItem">Prijavi neispravno web-mjesto</string>
+    <string name="brokenSiteHeading">Prijavi neispravno web-mjesto</string>
+    <string name="brokenSiteModalDescription">Izvješćivanje o neispravnom web-mjestu potpuno je anonimno i pomaže nam poboljšati aplikaciju!</string>
+    <string name="brokenSiteUrlHint">Unesi URL</string>
+    <string name="brokenSiteDomainLabel">Domena neispravnog web-mjesta:</string>
+    <string name="brokenSiteMessageHint">Koji sadržaj ili funkcionalnost je neispravan?</string>
+    <string name="brokenSiteSubmitButton">Pošalji povratne informacije</string>
+    <string name="brokenSiteSubmitted">Hvala! Povratne informacije su poslane</string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">Knjižne oznake</string>
+    <string name="bookmarksActivityTitle">Knjižne oznake</string>
+    <string name="bookmarkDeleteConfirmMessage">Sigurno želite izbrisati knjižnu oznaku &lt;b&gt;%s&lt;/b&gt;?</string>
+    <string name="bookmarkDeleteConfirmTitle">Potvrdi</string>
+    <string name="bookmarkAddedFeedback">Knjižna oznaka je dodana</string>
+    <string name="bookmarkTitleHint">Naslov knjižne oznake</string>
+    <string name="bookmarkUrlHint">URL knjižne oznake</string>
+    <string name="bookmarkSave">Spremi</string>
+    <string name="bookmarkTitleEdit">Uredi knjižnu oznaku</string>
+    <string name="bookmarkTitleSave">Spremi knjižnu oznaku</string>
+    <string name="noBookmarks">Još nema dodanih knjižnih oznaka</string>
+    <string name="bookmarkOverflowContentDescription">Više opcija za knjižnu oznaku %s</string>
+    <string name="delete">Izbriši</string>
+    <string name="edit">Uredi</string>
+
+    <!-- Widget -->
+    <string name="searchWidgetTextHint">Pretraži DuckDuckGo</string>
+
+    <!-- Home Screen Shortcuts -->
+    <string name="addToHome">Dodaj na početnu stranicu</string>
+
+    <!-- User Survey -->
+    <string name="surveyCtaTitle">Pomozite nam da poboljšamo aplikaciju!</string>
+    <string name="surveyCtaDescription">Ispunite našu kratku, anonimnu anketu i podijelite svoje povratne informacije.</string>
+    <string name="surveyCtaLaunchButton">Ispunite anketu</string>
+    <string name="surveyCtaDismissButton">Ne, hvala</string>
+    <string name="surveyActivityTitle">Anketa o korisniku</string>
+    <string name="surveyTitle">ANKETA DUCKDUCKGO</string>
+    <string name="surveyDismissContentDescription">Odbaci anketu</string>
+    <string name="surveyLoadingErrorTitle">O, ne!</string>
+    <string name="surveyLoadingErrorText">Anketa se trenutačno ne učitava.\ nPokušajte ponovno kasnije.</string>
+
+    <!-- Add widget -->
+    <string name="addWidgetCtaTitle">Isprobajte naš widget za pretraživanje!</string>
+    <string name="addWidgetCtaDescription">Dodajte naš widget za pretraživanje na početni zaslon za brz i jednostavan pristup.</string>
+    <string name="addWidgetCtaAutoLaunchButton">Dodaj widget</string>
+    <string name="addWidgetCtaInstructionsLaunchButton">Pokaži mi</string>
+    <string name="addWidgetCtaDismissButton">Odbaci</string>
+    <string name="addWidgetInstructionsActivityTitle">Dodaj widget</string>
+    <string name="addWidgetInstruction1Label">1</string>
+    <string name="addWidgetInstruction1">Dugim pritiskom pritisnite početni zaslon, a zatim otvorite izbornik widgeta</string>
+    <string name="addWidgetInstruction2Label">2</string>
+    <string name="addWidgetInstruction2">Pronađite widget DuckDuckGo</string>
+    <string name="addWidgetInstruction3Label">3</string>
+    <string name="addWidgetInstruction3">Dovucite widget na početni zaslon</string>
+    <string name="addWidgetInstructionsButtonGoHome">Idite na početni zaslon</string>
+    <string name="addWidgetInstructionsButtonClose">Zatvori</string>
+
+    <!-- App Enjoyment / Rating / Feedback -->
+    <string name="appEnjoymentDialogTitle">Uživate u DuckDuckGo?</string>
+    <string name="appEnjoymentDialogMessage">Voljeli bismo znati što mislite</string>
+    <string name="appEnjoymentDialogPositiveButton">Sviđa mi se</string>
+    <string name="appEnjoymentDialogNegativeButton">Treba ga doraditi.</string>
+
+    <string name="rateAppDialogTitle">Ocijenite aplikaciju</string>
+    <string name="rateAppDialogMessage">Važne povratne informacije su važne. Podijelite ljubav recenzijom.</string>
+    <string name="rateAppDialogPositiveButton">Ocijenite aplikaciju</string>
+
+    <string name="giveFeedbackDialogTitle">Žao nam je što to čujemo</string>
+    <string name="giveFeedbackDialogMessage">Javite nam kako možemo poboljšati aplikaciju za vas</string>
+    <string name="giveFeedbackDialogPositiveButton">Dajte povratne informacije</string>
+
+    <string name="noThanks">Ne, hvala</string>
+
+    <!-- Notification Channel Names -->
+    <string name="notificationChannelFileDownloading">Preuzimanje datoteke</string>
+    <string name="notificationChannelFileDownloaded">Datoteka preuzeta</string>
+    <string name="notificationChannelTutorials">Vodiči</string>
+
+    <!-- Clear Notification -->
+    <string name="clearNotificationTitle">Brisanje podataka postavljeno na ručno</string>
+    <string name="clearNotificationDescription">Prilagodite DuckDuckGo za automatsko brisanje podataka pregledavanja nakon svake sesije.</string>
+
+    <!-- Privacy Protection Notification -->
+    <string name="privacyProtectionNotificationDefaultTitle">Štitimo vašu privatnost</string>
+    <string name="privacyProtectionNotificationReportTitle">Vaše Izvješće o zaštiti privatnosti</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Korištenje aplikacije DuckDuckGo štiti vaše podatke blokiranjem alata za praćenje i šifriranjem veza.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">Zaštitili ste svoje podatke osiguravanjem %d nešifriranih veza dok ste koristili DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">Zaštitili ste svoje podatke blokiranjem %d alata za praćenje dok ste koristili DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationBothDescription">Zaštitili ste svoje podatke blokiranjem %d alata za praćenje i osiguravanjem %d nešifriranih veza dok ste koristili DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationLaunchButton">Nastavi pregledavanje</string>
+
+    <!-- Authentication -->
+    <string name="authenticationDialogTitle">Prijava</string>
+    <string name="authenticationDialogMessage">%s zahtijeva korisničko ime i lozinku.</string>
+    <string name="authenticationDialogPositiveButton">Prijava</string>
+    <string name="authenticationDialogNegativeButton">Odustani</string>
+    <string name="authenticationDialogUsernameHint">Korisničko ime</string>
+    <string name="authenticationDialogPasswordHint">Lozinka</string>
+
+    <!-- User-facing label for when a user selects text and might want to search for that text -->
+    <string name="systemTextSearchMessage">Pretraži DuckDuckGo</string>
+
+    <!-- App feedback disambiguation -->
+    <string name="feedbackActivityTitle">Podijelite svoje povratne informacije</string>
+    <string name="missingBrowserFeaturesTitleLong">Značajke preglednika nedostaju ili su frustrirajuće</string>
+    <string name="missingBrowserFeaturesTitleShort">Problemi sa značajkama preglednika</string>
+    <string name="missingBrowserFeaturesSubtitle">Koju značajku pregledavanja možemo dodati ili poboljšati?</string>
+    <string name="missingBrowserFeatureSubReasonNavigation">Kretanje naprijed, natrag, osvježavanje</string>
+    <string name="missingBrowserFeatureSubReasonTabManagement">Stvaranje kartica i upravljanje karticama</string>
+    <string name="missingBrowserFeatureSubReasonAdPopups">Blokiranje oglasa i skočnih prozora</string>
+    <string name="missingBrowserFeatureSubReasonVideos">Gledanje videozapisa</string>
+    <string name="missingBrowserFeatureSubReasonImages">Interakcija sa slikama</string>
+    <string name="missingBrowserFeatureSubReasonBookmarks">Stvaranje knjiških oznaka i upravljanje oznakama</string>
+    <string name="missingBrowserFeatureSubReasonOther">Ništa od navedenog</string>
+
+    <string name="websiteNotLoadingTitleLong">Sigurno se web-mjesta ne učitavaju ispravno</string>
+    <string name="websiteNotLoadingTitleShort">Problemi s učitavanjem web-mjesta</string>
+    <string name="websiteNotLoadingSubtitle">Koje je web-mjesto neispravno?"</string>
+
+    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo pretraživanje nije dovoljno dobro</string>
+    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo problemi s pretraživanjem</string>
+    <string name="searchNotGoodEnoughSubtitle">Koju značajku pretraživanja možemo dodati ili poboljšati?</string>
+    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programiranje/tehničko pretraživanje</string>
+    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Izgled bi trebao biti više nalik Googleu</string>
+    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Brže vrijeme učitavanja</string>
+    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Pretraživanje na određenom jeziku ili području</string>
+    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Bolje automatsko ispunjavanje</string>
+    <string name="searchNotGoodEnoughSubReasonOther">Ništa od navedenog</string>
+
+    <string name="needMoreCustomizationTitleLong">Nema dovoljno načina za prilagodbu aplikacije</string>
+    <string name="needMoreCustomizationTitleShort">Problemi s prilagođavanjem</string>
+    <string name="needMoreCustomizationSubtitle">Koju opciju prilagodbe možemo dodati ili poboljšati?</string>
+    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Konfiguracija početnog zaslona</string>
+    <string name="needMoreCustomizationSubReasonTabDisplay">Kako se prikazuju kartice</string>
+    <string name="needMoreCustomizationSubReasonAppLooks">Kako aplikacija izgleda</string>
+    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Koji su podaci obrisani</string>
+    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Kada se obrišu podaci</string>
+    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Kako se prikazuju knjižne oznake</string>
+    <string name="needMoreCustomizationSubReasonOther">Ništa od navedenog</string>
+
+    <string name="appIsSlowOrBuggyTitleLong">Aplikacija je spora, neispravna, ili se ruši</string>
+    <string name="appIsSlowOrBuggyTitleShort">Problemi s izvedbom</string>
+    <string name="appIsSlowOrBuggySubtitle">Koji problem imate?</string>
+    <string name="appIsSlowOrBuggySubReasonSlowResults">Web-stranice ili rezultati pretraživanja učitavaju se sporo</string>
+    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Aplikacija se ruši ili zamrzava</string>
+    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Pogreške u reprodukciji videozapisa ili medija</string>
+    <string name="appIsSlowOrBuggySubReasonOther">Ništa od navedenog</string>
+
+    <string name="otherMainReasonTitleLong">Ništa od navedenog</string>
+    <string name="otherMainReasonTitleShort">Ostali problemi</string>
+
+    <string name="openEndedInputHint">Kako se možemo poboljšati? (Neobavezno)</string>
+    <string name="submitFeedback">POŠALJI POVRATNE INFORMACIJE</string>
+
+    <string name="tellUsHowToImprove">Recite nam što možemo poboljšati.</string>
+    <string name="thanksForTheFeedback">Hvala na povratnim informacijama!</string>
+    <string name="feedbackNegativeMainReasonPageSubtitle">Zbog čega ste ponajviše frustrirani?</string>
+    <string name="feedbackNegativeMainReasonPageTitle">Žao nam je što to čujemo.</string>
+    <string name="feedbackShareDetails">Podijelite pojedinosti</string>
+    <string name="sharePositiveFeedbackWithTheTeam">Želite li s timom podijeliti neke pojedinosti?</string>
+    <string name="whatHaveYouBeenEnjoying">U čemu ste uživali?</string>
+    <string name="awesomeToHear">Divno je to čuti!</string>
+    <string name="shareTheLoveWithARating">Podijelite ljubav ocjenom na Play trgovini.</string>
+    <string name="rateTheApp">OCIJENITE APLIKACIJU</string>
+    <string name="declineFurtherFeedback">NE HVALA, ZAVRŠIO/LA SAM.</string>
+    <string name="whichBrokenSites">Gdje vidite te probleme?</string>
+    <string name="whichBrokenSitesHint">Koje web-mjesto ima problema?</string>
+    <string name="feedbackSpecificAsPossible">Budite što precizniji.</string>
+    <string name="feedbackInitialDisambiguationTitle">Započnimo!</string>
+    <string name="feedbackInitialDisambiguationSubtitle">Kamo biste svrstali svoje povratne informacije?</string>
+    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Gumb za pozitivne povratne informacije</string>
+    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Gumb za negativne povratne informacije</string>
+    <string name="feedbackIsImportantToUs">Vaše anonimne povratne informacije su važne za nas.</string>
+
 </resources>

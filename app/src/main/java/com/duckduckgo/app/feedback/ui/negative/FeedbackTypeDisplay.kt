@@ -106,7 +106,7 @@ class FeedbackTypeDisplay {
                     type,
                     R.string.otherMainReasonTitleLong,
                     R.string.otherMainReasonTitleShort,
-                    R.string.otherMainReasonSubtitle
+                    R.string.tellUsHowToImprove
                 )
             }
         }
