@@ -98,13 +98,13 @@
     <string name="networksOverview">Mreže za praćenje objedinjuju vašu povijest web pregledavanja u podatkovni profil o vama. Glavne mreže za praćenje su štetnije jer vas mogu pratiti i ciljati na većem dijelu interneta.</string>
 
     <plurals name="trackersFound">
-        <item quantity="one">% pronađen alat za praćenje</item>
-        <item quantity="other">% pronađenih alata za praćenje</item>
+        <item quantity="one">%s pronađen alat za praćenje</item>
+        <item quantity="other">%s pronađenih alata za praćenje</item>
     </plurals>
 
     <plurals name="trackerBlocked">
-        <item quantity="one">% blokiranih alata za praćenje</item>
-        <item quantity="other">% blokiranih alata za praćenje</item>
+        <item quantity="one">%s blokiranih alata za praćenje</item>
+        <item quantity="other">%s blokiranih alata za praćenje</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
