@@ -502,7 +502,7 @@ class BrowserTabViewModel(
         val progress = currentLoadingViewState()
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = newProgress)
 
-        if (variantManager.getVariant().hasFeature(TabSwitcherGrid) && !isLoading) {
+        if (!isLoading && variantManager.getVariant().hasFeature(TabSwitcherGrid)) {
             updateOrDeleteWebViewPreview(forceImmediate = false)
         }
     }
