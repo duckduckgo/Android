@@ -95,4 +95,7 @@ abstract class TabsDao {
         return tabs().lastOrNull()
     }
 
+    @Query("update tabs set url=:url, title=:title, viewed=:viewed where tabId=:tabId")
+    abstract fun updateUrlAndTitle(tabId: String, url: String?, title: String?, viewed: Boolean)
+
 }

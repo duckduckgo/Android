@@ -46,8 +46,7 @@ class SettingsViewModel @Inject constructor(
         val autoCompleteSuggestionsEnabled: Boolean = true,
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false,
-        val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
-        val bookmarksAutoCompleteSuggestionsEnabled: Boolean = true
+        val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY)
     )
 
     data class AutomaticallyClearData(
@@ -88,8 +87,7 @@ class SettingsViewModel @Inject constructor(
             isAppDefaultBrowser = defaultBrowserAlready,
             showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
             version = obtainVersion(variant.key),
-            automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled),
-            bookmarksAutoCompleteSuggestionsEnabled = settingsDataStore.bookmarksAutoCompleteSuggestionsEnabled
+            automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled)
         )
     }
 
@@ -112,16 +110,6 @@ class SettingsViewModel @Inject constructor(
         settingsDataStore.autoCompleteSuggestionsEnabled = enabled
 
         viewState.value = currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)
-    }
-
-    fun onBookmarksAutocompleteSettingChanged(enabled: Boolean) {
-        Timber.i("User changed bookmarks autocomplete setting, is now enabled: $enabled")
-        settingsDataStore.bookmarksAutoCompleteSuggestionsEnabled = enabled
-
-        viewState.value = currentViewState().copy(bookmarksAutoCompleteSuggestionsEnabled = enabled)
-
-        val pixelName = if (enabled) BOOKMARKS_IN_AUTOCOMPLETE_ENABLED else BOOKMARKS_IN_AUTOCOMPLETE_DISABLED
-        pixel.fire(pixelName)
     }
 
     private fun obtainVersion(variantKey: String): String {
@@ -175,21 +163,21 @@ class SettingsViewModel @Inject constructor(
         return viewState.value!!
     }
 
-    private fun ClearWhatOption.pixelEvent(): Pixel.PixelName {
+    private fun ClearWhatOption.pixelEvent(): PixelName {
         return when (this) {
-            ClearWhatOption.CLEAR_NONE -> PixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_NONE
-            ClearWhatOption.CLEAR_TABS_ONLY -> PixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_TABS
-            ClearWhatOption.CLEAR_TABS_AND_DATA -> PixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_TABS_AND_DATA
+            ClearWhatOption.CLEAR_NONE -> AUTOMATIC_CLEAR_DATA_WHAT_OPTION_NONE
+            ClearWhatOption.CLEAR_TABS_ONLY -> AUTOMATIC_CLEAR_DATA_WHAT_OPTION_TABS
+            ClearWhatOption.CLEAR_TABS_AND_DATA -> AUTOMATIC_CLEAR_DATA_WHAT_OPTION_TABS_AND_DATA
         }
     }
 
-    private fun ClearWhenOption.pixelEvent(): Pixel.PixelName? {
+    private fun ClearWhenOption.pixelEvent(): PixelName? {
         return when (this) {
-            ClearWhenOption.APP_EXIT_ONLY -> PixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_ONLY
-            ClearWhenOption.APP_EXIT_OR_5_MINS -> PixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_5_MINS
-            ClearWhenOption.APP_EXIT_OR_15_MINS -> PixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_15_MINS
-            ClearWhenOption.APP_EXIT_OR_30_MINS -> PixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_30_MINS
-            ClearWhenOption.APP_EXIT_OR_60_MINS -> PixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_60_MINS
+            ClearWhenOption.APP_EXIT_ONLY -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_ONLY
+            ClearWhenOption.APP_EXIT_OR_5_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_5_MINS
+            ClearWhenOption.APP_EXIT_OR_15_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_15_MINS
+            ClearWhenOption.APP_EXIT_OR_30_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_30_MINS
+            ClearWhenOption.APP_EXIT_OR_60_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_60_MINS
             else -> null
         }
     }

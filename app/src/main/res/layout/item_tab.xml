@@ -13,100 +13,97 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="10dp"
-    android:layout_marginTop="5dp"
-    android:layout_marginEnd="10dp"
-    android:layout_marginBottom="5dp"
-    android:background="@drawable/tab_background"
-    android:elevation="2dp">
+    android:layout_marginStart="7dp"
+    android:layout_marginTop="6dp"
+    android:layout_marginEnd="7dp"
+    android:layout_marginBottom="10dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="?attr/colorPrimary"
+    app:cardCornerRadius="6dp">
 
-    <ImageView
-        android:id="@+id/tabUnread"
-        android:layout_width="12dp"
-        android:layout_height="12dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:importantForAccessibility="no"
-        android:src="@drawable/tab_unread"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cardContentsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideTop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_begin="16dp" />
+        <ImageView
+            android:id="@+id/favicon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:contentDescription="@string/faviconContentDescription"
+            android:src="@drawable/ic_globe_gray_16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideBottom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_end="16dp" />
+        <ImageView
+            android:importantForAccessibility="no"
+            android:id="@+id/tabUnread"
+            android:layout_width="9dp"
+            android:layout_height="9dp"
+            android:src="@drawable/tab_unread_indicator"
+            android:elevation="30dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginBottom="2dp"
+            app:layout_constraintCircle="@id/favicon"
+            app:layout_constraintCircleRadius="8dp"
+            app:layout_constraintCircleAngle="135"
+            app:layout_constraintStart_toEndOf="@id/favicon"
+            app:layout_constraintTop_toBottomOf="@id/favicon"
+            app:layout_constraintBottom_toBottomOf="@id/favicon"
+            app:layout_constraintEnd_toEndOf="@id/favicon" />
 
-    <ImageView
-        android:id="@+id/favicon"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
-        android:layout_marginStart="20dp"
-        android:contentDescription="@string/faviconContentDescription"
-        android:src="@drawable/ic_globe_gray_16dp"
-        app:layout_constraintBottom_toBottomOf="@id/guideBottom"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/guideTop" />
+        <ImageView
+            android:id="@+id/close"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?selectableItemBackground"
+            android:contentDescription="@string/closeContentDescription"
+            android:scaleType="center"
+            android:src="@drawable/ic_close_tab"
+            android:tint="@color/grayish"
+            app:layout_constraintBottom_toBottomOf="@id/favicon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/favicon" />
 
-    <ImageView
-        android:id="@+id/close"
-        android:layout_width="62dp"
-        android:layout_height="0dp"
-        android:background="?selectableItemBackground"
-        android:contentDescription="@string/closeContentDescription"
-        android:scaleType="center"
-        android:src="@drawable/ic_close_24dp"
-        android:tint="@color/grayish"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:ellipsize="end"
+            android:lines="1"
+            android:textColor="?attr/tabTitleTextColor"
+            android:textIsSelectable="false"
+            android:textSize="13sp"
+            android:textStyle="normal"
+            app:layout_constraintBottom_toBottomOf="@id/favicon"
+            app:layout_constraintEnd_toStartOf="@id/close"
+            app:layout_constraintStart_toEndOf="@id/favicon"
+            app:layout_constraintTop_toTopOf="@id/favicon"
+            tools:text="Slashdot" />
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:fontFamily="sans-serif-medium"
-        android:lines="1"
-        android:textColor="?attr/tabTitleTextColor"
-        android:textIsSelectable="false"
-        android:textSize="16sp"
-        android:textStyle="normal"
-        app:layout_constraintEnd_toStartOf="@id/close"
-        app:layout_constraintStart_toEndOf="@id/favicon"
-        app:layout_constraintTop_toTopOf="@id/guideTop"
-        tools:text="Slashdot" />
+        <ImageView
+            android:id="@+id/tabPreview"
+            android:layout_width="0dp"
+            android:layout_height="170dp"
+            android:layout_marginTop="11dp"
+            android:importantForAccessibility="no"
+            android:scaleType="matrix"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title" />
 
-    <TextView
-        android:id="@+id/url"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="4dp"
-        android:fontFamily="sans-serif"
-        android:lines="1"
-        android:textColor="?attr/tabSubtitleTextColor"
-        android:textIsSelectable="false"
-        android:textSize="12sp"
-        android:textStyle="normal"
-        app:layout_constraintBottom_toBottomOf="@id/guideBottom"
-        app:layout_constraintEnd_toStartOf="@id/close"
-        app:layout_constraintStart_toEndOf="@id/favicon"
-        app:layout_constraintTop_toBottomOf="@id/title"
-        tools:text="https://m.slashdot.org" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

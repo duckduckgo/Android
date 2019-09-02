@@ -26,6 +26,7 @@ interface VariantManager {
 
     sealed class VariantFeature {
         // variant-dependant features listed here
+        object TabSwitcherGrid : VariantFeature()
         object OnboardingExperiment : VariantFeature()
     }
 
@@ -40,6 +41,10 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList()),
             Variant(key = "se", weight = 0.0, features = emptyList()),
+
+            Variant(key = "mw", weight = 1.0, features = emptyList()),
+            Variant(key = "mx", weight = 1.0, features = listOf(VariantFeature.TabSwitcherGrid)),
+
             Variant(key = "mp", weight = 1.0, features = emptyList()),
             Variant(key = "mo", weight = 1.0, features = listOf(VariantFeature.OnboardingExperiment))
         )

@@ -20,9 +20,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.statistics.pixels.Pixel
 
 
-class BrokenSiteViewModel(private val brokenSiteSender: BrokenSiteSender) : ViewModel() {
+class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender: BrokenSiteSender) : ViewModel() {
 
     data class ViewState(
         val url: String? = null,
@@ -87,6 +88,7 @@ class BrokenSiteViewModel(private val brokenSiteSender: BrokenSiteSender) : View
         val url = viewValue.url ?: return
 
         brokenSiteSender.submitBrokenSiteFeedback(message, url)
+        pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf(Pixel.PixelParameter.URL to url))
         command.value = Command.ConfirmAndFinish
     }
 }

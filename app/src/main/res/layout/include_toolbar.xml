@@ -22,6 +22,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:id="@+id/appBarLayout"
     android:theme="@style/AppTheme.Dark.AppBarOverlay"
     tools:showIn="@layout/activity_tracker_networks">
 

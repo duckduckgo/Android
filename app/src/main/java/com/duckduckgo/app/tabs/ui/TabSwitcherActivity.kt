@@ -21,19 +21,22 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.settings.SettingsActivity
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DisplayMessage
-import kotlinx.android.synthetic.main.content_tab_switcher.*
-import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -42,7 +45,8 @@ import org.jetbrains.anko.longToast
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitchedListener, CoroutineScope {
+
+class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = SupervisorJob() + Dispatchers.Main
@@ -50,16 +54,45 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
 
+    @Inject
+    lateinit var variantManager: VariantManager
+
+    @Inject
+    lateinit var gridViewColumnCalculator: GridViewColumnCalculator
+
+    @Inject
+    lateinit var webViewPreviewPersister: WebViewPreviewPersister
+
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
-    private val tabsAdapter = TabSwitcherAdapter(this, this)
+    private val tabsAdapter: TabSwitcherAdapter by lazy { TabSwitcherAdapter(this, webViewPreviewPersister) }
+
+    // we need to scroll to show selected tab, but only if it is the first time loading the tabs.
+    private var firstTimeLoadingTabsList = true
+
+    private var selectedTabId: String? = null
+
+    private lateinit var tabsRecycler: RecyclerView
+    private lateinit var tabGridItemDecorator: TabGridItemDecorator
+    private lateinit var toolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tab_switcher)
+        extractIntentExtras()
+        configureViewReferences()
         configureToolbar()
         configureRecycler()
         configureObservers()
+    }
+
+    private fun extractIntentExtras() {
+        selectedTabId = intent.getStringExtra(EXTRA_KEY_SELECTED_TAB)
+    }
+
+    private fun configureViewReferences() {
+        tabsRecycler = findViewById(R.id.tabsRecycler)
+        toolbar = findViewById(R.id.toolbar)
     }
 
     private fun configureToolbar() {
@@ -68,30 +101,51 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     }
 
     private fun configureRecycler() {
-        tabsRecycler.layoutManager = LinearLayoutManager(this)
+        val numberColumns = gridViewColumnCalculator.calculateNumberOfColumns(TAB_GRID_COLUMN_WIDTH_DP, TAB_GRID_MAX_COLUMN_COUNT)
+        val layoutManager = GridLayoutManager(this, numberColumns)
+        tabsRecycler.layoutManager = layoutManager
         tabsRecycler.adapter = tabsAdapter
+
+        val swipeListener = ItemTouchHelper(SwipeToCloseTabListener(tabsAdapter, numberColumns, object : SwipeToCloseTabListener.OnTabSwipedListener {
+            override fun onSwiped(tab: TabEntity) {
+                onTabDeleted(tab)
+            }
+        }))
+        swipeListener.attachToRecyclerView(tabsRecycler)
+
+
+        tabGridItemDecorator = TabGridItemDecorator(themedContext, selectedTabId)
+        tabsRecycler.addItemDecoration(tabGridItemDecorator)
     }
 
     private fun configureObservers() {
         viewModel.tabs.observe(this, Observer<List<TabEntity>> {
-            render()
-        })
-        viewModel.selectedTab.observe(this, Observer<TabEntity> {
-            render()
+            render(it)
         })
         viewModel.command.observe(this, Observer {
             processCommand(it)
         })
     }
 
-    private fun render() {
-        tabsAdapter.updateData(viewModel.tabs.value, viewModel.selectedTab.value)
+    private fun render(tabs: List<TabEntity>) {
+        tabsAdapter.updateData(tabs)
+
+        if (firstTimeLoadingTabsList) {
+            firstTimeLoadingTabsList = false
+
+            scrollToShowCurrentTab()
+        }
+    }
+
+    private fun scrollToShowCurrentTab() {
+        val index = tabsAdapter.adapterPositionForTab(selectedTabId)
+        tabsRecycler.scrollToPosition(index)
     }
 
     private fun processCommand(command: Command?) {
         when (command) {
             is DisplayMessage -> applicationContext?.longToast(command.messageId)
-            is Close -> finish()
+            is Close -> finishAfterTransition()
         }
     }
 
@@ -117,11 +171,19 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     }
 
     override fun onNewTabRequested() {
+        clearObserversEarlyToStopViewUpdates()
         launch { viewModel.onNewTabRequested() }
     }
 
     override fun onTabSelected(tab: TabEntity) {
+        selectedTabId = tab.tabId
+        updateTabGridItemDecorator(tab)
         launch { viewModel.onTabSelected(tab) }
+    }
+
+    private fun updateTabGridItemDecorator(tab: TabEntity) {
+        tabGridItemDecorator.selectedTabId = tab.tabId
+        tabsRecycler.invalidateItemDecorations()
     }
 
     override fun onTabDeleted(tab: TabEntity) {
@@ -143,6 +205,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     override fun finish() {
         clearObserversEarlyToStopViewUpdates()
         super.finish()
+        overridePendingTransition(R.anim.slide_from_bottom, R.anim.tab_anim_fade_out)
     }
 
     private fun clearObserversEarlyToStopViewUpdates() {
@@ -150,8 +213,15 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherAdapter.TabSwitched
     }
 
     companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, TabSwitcherActivity::class.java)
+        fun intent(context: Context, selectedTabId: String? = null): Intent {
+            val intent = Intent(context, TabSwitcherActivity::class.java)
+            intent.putExtra(EXTRA_KEY_SELECTED_TAB, selectedTabId)
+            return intent
         }
+
+        const val EXTRA_KEY_SELECTED_TAB = "selected"
+
+        private const val TAB_GRID_COLUMN_WIDTH_DP = 180
+        private const val TAB_GRID_MAX_COLUMN_COUNT = 4
     }
 }

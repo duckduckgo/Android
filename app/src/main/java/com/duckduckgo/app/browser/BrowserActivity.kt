@@ -46,7 +46,6 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
-import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import kotlinx.android.synthetic.main.activity_browser.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.longToast
@@ -286,10 +285,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
         dialog.show()
     }
 
-    fun launchTabSwitcher() {
-        startActivity(TabSwitcherActivity.intent(this))
-    }
-
     fun launchNewTab() {
         launch { viewModel.onNewTabRequested() }
     }
@@ -327,7 +322,13 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
 
     companion object {
 
-        fun intent(context: Context, queryExtra: String? = null, newSearch: Boolean = false, widgetSearch: Boolean = false, launchedFromFireAction: Boolean = false): Intent {
+        fun intent(
+            context: Context,
+            queryExtra: String? = null,
+            newSearch: Boolean = false,
+            widgetSearch: Boolean = false,
+            launchedFromFireAction: Boolean = false
+        ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
             intent.putExtra(NEW_SEARCH_EXTRA, newSearch)

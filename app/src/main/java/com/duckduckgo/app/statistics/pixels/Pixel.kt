@@ -37,6 +37,7 @@ interface Pixel {
         APPLICATION_CRASH("m_d_ac"),
         WEB_RENDERER_GONE_CRASH("m_d_wrg_c"),
         WEB_RENDERER_GONE_KILLED("m_d_wrg_k"),
+        BROKEN_SITE_REPORTED("m_bsr"),
 
         ONBOARDING_DEFAULT_BROWSER_LAUNCHED("m_odb_l"),
         ONBOARDING_DEFAULT_BROWSER_SKIPPED("m_odb_s"),
@@ -114,14 +115,12 @@ interface Pixel {
         FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s"),
 
         AUTOCOMPLETE_BOOKMARK_SELECTION("m_aut_s_b"),
-        AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s"),
-
-        BOOKMARKS_IN_AUTOCOMPLETE_ENABLED("m_biaut_e"),
-        BOOKMARKS_IN_AUTOCOMPLETE_DISABLED("m_biaut_d")
+        AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s")
     }
 
     object PixelParameter {
         const val APP_VERSION = "appVersion"
+        const val URL = "url"
         const val COUNT = "count"
         const val BOOKMARK_CAPABLE = "bc"
         const val SHOWED_BOOKMARKS = "sb"
