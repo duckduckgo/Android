@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs.model
+package com.duckduckgo.app.tabs.ui
 
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import com.duckduckgo.app.tabs.model.TabEntity
 
 
-@Entity(
-    tableName = "tabs",
-    indices = [
-        Index("tabId")
-    ]
-)
-data class TabEntity(
-    @PrimaryKey var tabId: String,
-    var url: String? = null,
-    var title: String? = null,
-    var skipHome: Boolean = false,
-    var viewed: Boolean = true,
-    var position: Int,
-    var tabPreviewFile: String? = null
-)
-
-val TabEntity.isBlank: Boolean
-    get() = title == null && url == null
+interface TabSwitcherListener {
+    fun onNewTabRequested()
+    fun onTabSelected(tab: TabEntity)
+    fun onTabDeleted(tab: TabEntity)
+}

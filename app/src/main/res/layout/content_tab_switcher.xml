@@ -13,66 +13,22 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginBottom="10dp"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:ignore="Overdraw"
-    tools:showIn="@layout/activity_tab_switcher">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/tabsRecycler"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            tools:itemCount="3"
-            tools:listitem="@layout/item_tab" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_margin="16dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:text="@string/tapFireDirective"
-                android:textColor="?attr/tabsFireTextColor"
-                android:textSize="14sp"
-                android:textStyle="normal" />
-
-            <ImageView
-                android:layout_width="13dp"
-                android:layout_height="17dp"
-                android:layout_marginStart="6dp"
-                android:layout_marginEnd="6dp"
-                android:contentDescription="@string/tapFireIconDescription"
-                android:src="@drawable/ic_fire_no_padding"
-                android:tint="?attr/tabsFireTextColor" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:text="@string/tapFireExplanation"
-                android:textColor="?attr/tabsFireTextColor"
-                android:textSize="14sp"
-                android:textStyle="normal" />
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-</androidx.core.widget.NestedScrollView>
+    android:id="@+id/tabsRecycler"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:layout_marginStart="7dp"
+    android:layout_marginEnd="7dp"
+    android:clipToPadding="false"
+    android:paddingTop="10dp"
+    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/appBarLayout"
+    tools:itemCount="3"
+    tools:listitem="@layout/item_tab"
+    tools:showIn="@layout/activity_tab_switcher"
+    tools:spanCount="2" />

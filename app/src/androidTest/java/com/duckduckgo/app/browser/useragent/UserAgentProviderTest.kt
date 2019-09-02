@@ -16,47 +16,58 @@
 
 package com.duckduckgo.app.browser.useragent
 
+import com.duckduckgo.app.global.device.DeviceInfo
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 
-private const val CHROME_UA_MOBILE =
+private const val CHROME_MOBILE_UA =
     "Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P Build/OPM3.171019.014) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Mobile Safari/537.36"
 
 // Some values will be dynamic based on OS/Architecture/Software versions, so use Regex to match around dynamic values
-private val CHROME_UA_DESKTOP_REGEX = Regex(
-    "Mozilla/5.0 \\(X11; Linux .*?\\) AppleWebKit/[.0-9]+ \\(KHTML, like Gecko\\) Chrome/[.0-9]+ Safari/[.0-9]+"
+private val DESKTOP_UA_REGEX = Regex(
+    "Mozilla/5.0 \\(X11; Linux .*?\\) AppleWebKit/[.0-9]+ \\(KHTML, like Gecko\\) Chrome/[.0-9]+ Safari/[.0-9]+ DuckDuckGo/5"
 )
-private val CHROME_UA_MOBILE_REGEX = Regex(
-    "Mozilla/5.0 \\(Linux; Android .*?\\) AppleWebKit/[.0-9]+ \\(KHTML, like Gecko\\) Chrome/[.0-9]+ Mobile Safari/[.0-9]+"
+private val MOBILE_UA_REGEX = Regex(
+    "Mozilla/5.0 \\(Linux; Android .*?\\) AppleWebKit/[.0-9]+ \\(KHTML, like Gecko\\) Chrome/[.0-9]+ Mobile Safari/[.0-9]+ DuckDuckGo/5"
 )
 
-private val CHROME_UA_MOBILE_REGEX_MISSING_APPLE_WEBKIT_DETAILS = Regex(
-    "Mozilla/5.0 \\(Linux; Android .*?\\)"
+private val MOBILE_UA_REGEX_MISSING_APPLE_WEBKIT_DETAILS = Regex(
+    "Mozilla/5.0 \\(Linux; Android .*?\\) DuckDuckGo/5"
 )
 
 class UserAgentProviderTest {
 
     private lateinit var testee: UserAgentProvider
 
-    @Test
-    fun whenMobileUaRetrievedThenDeviceStrippedFromReturnedUa() {
-        testee = UserAgentProvider(CHROME_UA_MOBILE)
-        val actual = testee.getUserAgent(desktopSiteRequested = false)
-        assertTrue(CHROME_UA_MOBILE_REGEX.matches(actual))
+    private var deviceInfo: DeviceInfo = mock()
+
+    @Before
+    fun before() {
+        whenever (deviceInfo.majorAppVersion).thenReturn("5")
     }
 
     @Test
-    fun whenDesktopUaRetrievedThenDeviceStrippedFromReturnedUa() {
-        testee = UserAgentProvider(CHROME_UA_MOBILE)
+    fun whenMobileUaRetrievedThenDeviceStrippedAndDuckDuckGoSuffixAddedToUA() {
+        testee = UserAgentProvider(CHROME_MOBILE_UA, deviceInfo)
+        val actual = testee.getUserAgent(desktopSiteRequested = false)
+        assertTrue(MOBILE_UA_REGEX.matches(actual))
+    }
+
+    @Test
+    fun whenDesktopUaRetrievedThenDeviceStrippedAndDuckDuckGoSuffixAddedToUA() {
+        testee = UserAgentProvider(CHROME_MOBILE_UA, deviceInfo)
         val actual = testee.getUserAgent(desktopSiteRequested = true)
-        assertTrue(CHROME_UA_DESKTOP_REGEX.matches(actual))
+        assertTrue(DESKTOP_UA_REGEX.matches(actual))
     }
 
     @Test
-    fun whenMissingAppleWebKitStringThenSimplyReturnsNothing() {
+    fun whenMissingAppleWebKitStringThenUAContainsOnlyMozillaAndDuckDuckGoProducts() {
         val missingAppleWebKitPart = "Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P Build/OPM3.171019.014) Chrome/64.0.3282.137 Mobile Safari/537.36"
-        testee = UserAgentProvider(missingAppleWebKitPart)
+        testee = UserAgentProvider(missingAppleWebKitPart, deviceInfo)
         val actual = testee.getUserAgent(desktopSiteRequested = false)
-        assertTrue(CHROME_UA_MOBILE_REGEX_MISSING_APPLE_WEBKIT_DETAILS.matches(actual))
+        assertTrue(MOBILE_UA_REGEX_MISSING_APPLE_WEBKIT_DETAILS.matches(actual))
     }
 }

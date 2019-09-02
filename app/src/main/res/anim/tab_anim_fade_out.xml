@@ -14,10 +14,9 @@
   ~ limitations under the License.
   -->
 
-<set xmlns:android="http://schemas.android.com/apk/res/android">
-    <translate
-        android:duration="@integer/slide_animation_duration_ms"
-        android:fromXDelta="0"
-        android:interpolator="@android:anim/accelerate_decelerate_interpolator"
-        android:toXDelta="100%p" />
-</set>
+
+<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="@integer/tab_switcher_animation_duration_ms"
+    android:fromAlpha="1.0"
+    android:interpolator="@android:interpolator/decelerate_quad"
+    android:toAlpha="0.0" />

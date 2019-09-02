@@ -14,10 +14,14 @@
   ~ limitations under the License.
   -->
 
-<set xmlns:android="http://schemas.android.com/apk/res/android">
-    <translate
-        android:duration="@integer/slide_animation_duration_ms"
-        android:fromXDelta="0"
-        android:interpolator="@android:anim/accelerate_decelerate_interpolator"
-        android:toXDelta="100%p" />
-</set>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.duckduckgo.app.tabs.ui.old.TabSwitcherActivityLegacy">
+
+    <include layout="@layout/include_toolbar" />
+
+    <include layout="@layout/content_tab_switcher_legacy" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -55,6 +55,7 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
@@ -145,6 +146,9 @@ class BrowserTabViewModelTest {
     private lateinit var mockAppInstallStore: AppInstallStore
 
     @Mock
+    private lateinit var mockVariantManager: VariantManager
+
+    @Mock
     private lateinit var mockPixel: Pixel
 
     @Mock
@@ -204,7 +208,8 @@ class BrowserTabViewModelTest {
             addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector,
             ctaViewModel = ctaViewModel,
             searchCountDao = mockSearchCountDao,
-            pixel = mockPixel
+            pixel = mockPixel,
+            variantManager = mockVariantManager
         )
 
         testee.loadData("abc", null, false)
