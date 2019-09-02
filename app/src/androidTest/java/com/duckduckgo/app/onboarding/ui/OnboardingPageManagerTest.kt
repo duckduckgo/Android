@@ -34,7 +34,7 @@ class OnboardingPageManagerTest {
 
     @Before
     fun setup() {
-        testee = OnboardingPageManagerWithTrackerBlocking(onboardingPageBuilder, mockDefaultBrowserDetector)
+        testee = OnboardingPageManagerWithTrackerBlocking(onboardingPageBuilder, mockDefaultBrowserDetector, variantManager)
     }
 
     @Test

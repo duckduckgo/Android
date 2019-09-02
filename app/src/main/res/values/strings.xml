@@ -29,6 +29,7 @@
     <string name="defaultBrowserMaybeLater">Maybe later</string>
     <string name="defaultBrowserLetsDoIt">Let\'s do it!</string>
     <string name="defaultBrowserDescriptionNoDefault">Experience peace of mind when opening links on your phone</string>
+    <string name="defaultBrowserDescriptionDefaultSet">You are now using DuckDuckGo as your default browser</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Browser menu</string>

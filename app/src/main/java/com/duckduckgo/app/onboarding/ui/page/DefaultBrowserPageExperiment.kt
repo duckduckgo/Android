@@ -30,11 +30,8 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.global.ViewModelFactory
-import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.continueButton
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.launchSettingsButton
@@ -47,16 +44,7 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
     override fun layoutResource(): Int = R.layout.content_onboarding_default_browser_experiment
 
     @Inject
-    lateinit var pixel: Pixel
-
-    @Inject
-    lateinit var installStore: AppInstallStore
-
-    @Inject
     lateinit var viewModelFactory: ViewModelFactory
-
-    @Inject
-    lateinit var defaultBrowserDetector: DefaultBrowserDetector
 
     private var userTriedToSetDDGAsDefault = false
     private var toast: Toast? = null
@@ -86,16 +74,18 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
             viewModel.onDefaultBrowserClicked()
         }
         continueButton.setOnClickListener {
-            if (!userTriedToSetDDGAsDefault) {
-                pixel.fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
-            }
-            onContinuePressed()
+            viewModel.onContinueToBrowser(userTriedToSetDDGAsDefault)
         }
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.reloadInstructions()
+        viewModel.reloadUI()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(SAVED_STATE_LAUNCHED_DEFAULT, userTriedToSetDDGAsDefault)
     }
 
     private fun observeViewModel() {
@@ -109,7 +99,7 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
 
         viewModel.command.observe(this, Observer {
             when (it) {
-                is DefaultBrowserPageExperimentViewModel.Command.OpenDialog -> onLaunchDefaultBrowserWithDialogClicked(it.timesOpened)
+                is DefaultBrowserPageExperimentViewModel.Command.OpenDialog -> onLaunchDefaultBrowserWithDialogClicked(it.timesOpened, it.url)
                 is DefaultBrowserPageExperimentViewModel.Command.OpenSettings -> onLaunchDefaultBrowserSettingsClicked()
                 is DefaultBrowserPageExperimentViewModel.Command.ContinueToBrowser -> onContinuePressed()
             }
@@ -120,7 +110,7 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
         if (visible) {
             defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_experiment)
             launchSettingsButton.visibility = View.GONE
-            browserProtectionSubtitle.text = "You are now using DuckDuckGo as your default browser"
+            browserProtectionSubtitle.text = getString(R.string.defaultBrowserDescriptionDefaultSet)
         } else {
             launchSettingsButton.visibility = View.VISIBLE
         }
@@ -134,12 +124,6 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
     private fun setUIForSettings() {
         defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration)
         browserProtectionSubtitle.text = getString(R.string.onboardingDefaultBrowserDescription)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        outState.putBoolean(SAVED_STATE_LAUNCHED_DEFAULT, userTriedToSetDDGAsDefault)
     }
 
     @SuppressLint("InflateParams")
@@ -165,9 +149,10 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
             .start()
     }
 
-    private fun onLaunchDefaultBrowserWithDialogClicked(value: Int) {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(DEFAULT_URL))
-        intent.putExtra(TIMES_OPENED, value)
+    private fun onLaunchDefaultBrowserWithDialogClicked(timesOpened: Int, url: String) {
+        userTriedToSetDDGAsDefault = true
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        intent.putExtra(TIMES_OPENED, timesOpened)
         startActivityForResult(intent, DEFAULT_BROWSER_REQUEST_CODE_DIALOG)
     }
 
@@ -202,10 +187,9 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
     }
 
     companion object {
-        const val DEFAULT_BROWSER_REQUEST_CODE_DIALOG = 101
-        private const val DEFAULT_URL = "https://donttrack.us"
         private const val DEFAULT_BROWSER_REQUEST_CODE_SETTINGS = 100
         private const val SAVED_STATE_LAUNCHED_DEFAULT = "SAVED_STATE_LAUNCHED_DEFAULT"
+        const val DEFAULT_BROWSER_REQUEST_CODE_DIALOG = 101
         const val TIMES_OPENED = "timesOpened"
     }
 }

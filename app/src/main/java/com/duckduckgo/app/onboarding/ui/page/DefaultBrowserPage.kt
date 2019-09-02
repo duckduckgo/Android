@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.*
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
 import timber.log.Timber
@@ -65,7 +66,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
         }
         continueButton.setOnClickListener {
             if (!userLaunchedDefaultBrowserSettings) {
-                pixel.fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
+                pixel.fire(PixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
             }
             onContinuePressed()
         }
@@ -79,7 +80,10 @@ class DefaultBrowserPage : OnboardingPageFragment() {
 
     private fun onLaunchDefaultBrowserSettingsClicked() {
         userLaunchedDefaultBrowserSettings = true
-        pixel.fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SETTINGS_LAUNCHED)
+        val params = mapOf(
+            PixelParameter.DEFAULT_BROWSER_BEHAVIOUR_TRIGGERED to PixelValues.DEFAULT_BROWSER_SETTINGS
+        )
+        pixel.fire(PixelName.ONBOARDING_DEFAULT_BROWSER_LAUNCHED, params)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val intent = DefaultBrowserSystemSettings.intent()
             try {
@@ -109,13 +113,16 @@ class DefaultBrowserPage : OnboardingPageFragment() {
 
         if (isDefault) {
             installStore.defaultBrowser = true
-            pixel.fire(Pixel.PixelName.DEFAULT_BROWSER_SET)
+            installStore.defaultBrowser = true
+            val params = mapOf(
+                PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()
+            )
+            pixel.fire(PixelName.DEFAULT_BROWSER_SET, params)
         }
     }
 
     companion object {
         private const val DEFAULT_BROWSER_REQUEST_CODE = 100
         private const val SAVED_STATE_LAUNCHED_SETTINGS = "SAVED_STATE_LAUNCHED_SETTINGS"
-
     }
 }

@@ -22,7 +22,6 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import timber.log.Timber
 
 class DefaultBrowserPageExperimentViewModel(
     private val defaultBrowserDetector: DefaultBrowserDetector,
@@ -33,12 +32,11 @@ class DefaultBrowserPageExperimentViewModel(
     data class ViewState(
         val showSettingsUI: Boolean = false,
         val showInstructionsCard: Boolean = false,
-        val showOnlyContinue: Boolean = false,
-        val isLastAttempt: Boolean = false
+        val showOnlyContinue: Boolean = false
     )
 
     sealed class Command {
-        class OpenDialog(val timesOpened: Int = 0) : Command()
+        class OpenDialog(val timesOpened: Int = 0, val url: String = DEFAULT_URL) : Command()
         object OpenSettings : Command()
         object ContinueToBrowser : Command()
     }
@@ -56,18 +54,30 @@ class DefaultBrowserPageExperimentViewModel(
         viewState.value = ViewState(showSettingsUI = defaultBrowserDetector.hasDefaultBrowser())
     }
 
-    fun reloadInstructions() {
+    fun reloadUI() {
         viewState.value = viewState.value?.copy(showSettingsUI = defaultBrowserDetector.hasDefaultBrowser())
     }
 
+    fun onContinueToBrowser(userTriedToSetDDGAsDefault: Boolean) {
+        if (!userTriedToSetDDGAsDefault) {
+            pixel.fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
+        }
+        command.value = Command.ContinueToBrowser
+    }
+
     fun onDefaultBrowserClicked() {
+        var behaviourTriggered = Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS
         if (defaultBrowserDetector.hasDefaultBrowser()) {
-            pixel.fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SETTINGS_LAUNCHED)
             command.value = Command.OpenSettings
         } else {
+            behaviourTriggered = Pixel.PixelValues.DEFAULT_BROWSER_DIALOG
             command.value = Command.OpenDialog()
             viewState.value = viewState.value?.copy(showInstructionsCard = true)
         }
+        val params = mapOf(
+            Pixel.PixelParameter.DEFAULT_BROWSER_BEHAVIOUR_TRIGGERED to behaviourTriggered
+        )
+        pixel.fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_LAUNCHED, params)
     }
 
     fun handleResult(origin: Origin) {
@@ -86,13 +96,14 @@ class DefaultBrowserPageExperimentViewModel(
                             viewState.value = viewState.value?.copy(showInstructionsCard = false)
                             command.value = Command.ContinueToBrowser
                         }
-                        else -> {
-                            viewState.value = viewState.value?.copy(
-                                showSettingsUI = defaultBrowserDetector.hasDefaultBrowser(),
-                                showOnlyContinue = false,
-                                showInstructionsCard = false
-                            )
-                        }
+//                        else -> {
+//                            // This may not be needed, above cases should cover all scenarios
+//                            viewState.value = viewState.value?.copy(
+//                                showSettingsUI = defaultBrowserDetector.hasDefaultBrowser(),
+//                                showOnlyContinue = false,
+//                                showInstructionsCard = false
+//                            )
+//                        }
                     }
                 }
             }
@@ -101,18 +112,23 @@ class DefaultBrowserPageExperimentViewModel(
             }
             is Origin.Settings -> {
                 viewState.value = viewState.value?.copy(showSettingsUI = true, showInstructionsCard = false)
-                val setText = if (isDefault) "was" else "was not"
-                Timber.i("User returned from default settings; DDG $setText set as default")
-
-                if (isDefault) {
-                    installStore.defaultBrowser = true
-                    pixel.fire(Pixel.PixelName.DEFAULT_BROWSER_SET)
-                }
             }
+        }
+        firePixel()
+    }
+
+    private fun firePixel() {
+        if (defaultBrowserDetector.isDefaultBrowser()) {
+            installStore.defaultBrowser = true
+            val params = mapOf(
+                Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()
+            )
+            pixel.fire(Pixel.PixelName.DEFAULT_BROWSER_SET, params)
         }
     }
 
     companion object {
         const val MAX_DIALOG_ATTEMPTS = 2
+        const val DEFAULT_URL = "https://donttrack.us"
     }
 }
