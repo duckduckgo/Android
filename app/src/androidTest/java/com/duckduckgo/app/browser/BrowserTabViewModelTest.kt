@@ -480,7 +480,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenProgressChangesToFinishedAndImprovedTabUxVariantActiveThenUpdateWebViewPreview() {
+    fun whenProgressChangesToFinishedAndImprovedTabUxVariantActiveThenWebViewPreviewGenerated() {
         whenever(mockVariantManager.getVariant()).thenReturn(Variant("mx", 1.0, listOf(VariantManager.VariantFeature.TabSwitcherGrid)))
         updateUrl("https://example.com", "https://example.com", true)
         testee.progressChanged(100)
@@ -489,7 +489,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenProgressChangesToFinishedAndImprovedTabUxVariantNotActiveThenDoNotUpdateWebViewPreview() {
+    fun whenProgressChangesToFinishedAndImprovedTabUxVariantNotActiveThenWebViewPreviewNotGenerated() {
         whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
         updateUrl("https://example.com", "https://example.com", true)
         testee.progressChanged(100)
