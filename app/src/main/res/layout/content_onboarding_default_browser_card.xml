@@ -17,14 +17,12 @@
   -->
 
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:layout_gravity="top|center"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_gravity="top|center"
     android:background="@color/white"
-    card_view:cardElevation="4dp"
-    tools:context="com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity">
+    card_view:cardElevation="4dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -32,31 +30,32 @@
 
         <ImageView
             android:id="@+id/logo"
-            card_view:layout_constraintTop_toTopOf="parent"
-            card_view:layout_constraintStart_toStartOf="parent"
-            card_view:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginStart="30dp"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:contentDescription="@string/duckDuckGoLogoDescription"
             android:src="@drawable/logo_medium"
-            />
+            card_view:layout_constraintBottom_toBottomOf="parent"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/instructions"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_marginStart="18dp"
-            android:gravity="center"
-            android:textAlignment="center"
             android:fontFamily="sans-serif-medium"
-            android:textSize="15sp"
+            android:gravity="center"
+            android:text="@string/defaultBrowserInstructions"
+            android:textAlignment="center"
             android:textColor="@color/almostBlack"
-            card_view:layout_constraintTop_toTopOf="@id/logo"
+            android:textSize="15sp"
             card_view:layout_constraintBottom_toBottomOf="@id/logo"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintStart_toEndOf="@id/logo"
-            android:text="Select DuckDuckGo and tap Always"
-            android:layout_width="match_parent"
-            android:layout_height="0dp" />
+            card_view:layout_constraintTop_toTopOf="@id/logo" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -39,6 +39,12 @@ import kotlinx.android.synthetic.main.content_onboarding_default_browser_experim
 import kotlinx.android.synthetic.main.content_onboarding_default_browser_experiment.defaultBrowserImage
 import timber.log.Timber
 import javax.inject.Inject
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
+import android.text.SpannableString
+import android.widget.TextView
+import androidx.core.content.ContextCompat
+import kotlinx.android.synthetic.main.content_onboarding_default_browser_card.*
 
 class DefaultBrowserPageExperiment : OnboardingPageFragment() {
     override fun layoutResource(): Int = R.layout.content_onboarding_default_browser_experiment
@@ -129,14 +135,35 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
         toast?.cancel()
         defaultCard.visibility = View.VISIBLE
         defaultCard.alpha = 1f
+
         val inflater = LayoutInflater.from(requireContext())
         val inflatedView = inflater.inflate(R.layout.content_onboarding_default_browser_card, null)
+        val instructionsTextToast = inflatedView.findViewById<TextView>(R.id.instructions)
+        val spannableString = getInstructionsCardSpannableString()
+
+        instructionsTextToast.text = spannableString
+        instructions.text = spannableString
+
         toast = Toast(requireContext()).apply {
             view = inflatedView
             setGravity(Gravity.TOP or Gravity.FILL_HORIZONTAL, 0, 0)
             duration = Toast.LENGTH_LONG
         }
         toast?.show()
+    }
+
+    private fun getInstructionsCardSpannableString(): SpannableString {
+        val instructionsString = getString(R.string.defaultBrowserInstructions)
+        val spannableString = SpannableString(instructionsString)
+        val instructionsArray = instructionsString.split(ALWAYS.toRegex())
+
+        spannableString.setSpan(
+            ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.cornflowerBlue)),
+            instructionsArray[0].length,
+            instructionsString.indexOf(instructionsArray[1]),
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        return spannableString
     }
 
     private fun hideCard() {
@@ -185,6 +212,7 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
     }
 
     companion object {
+        private const val ALWAYS = "Always"
         private const val DEFAULT_BROWSER_REQUEST_CODE_SETTINGS = 100
         private const val SAVED_STATE_LAUNCHED_DEFAULT = "SAVED_STATE_LAUNCHED_DEFAULT"
         const val DEFAULT_BROWSER_REQUEST_CODE_DIALOG = 101
