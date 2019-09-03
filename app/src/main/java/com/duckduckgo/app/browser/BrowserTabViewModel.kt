@@ -26,7 +26,6 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.annotation.AnyThread
-import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import androidx.lifecycle.*
@@ -61,6 +60,8 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.TabSwitcherGrid
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
@@ -98,6 +99,7 @@ class BrowserTabViewModel(
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
+    private val variantManager: VariantManager,
     appConfigurationDao: AppConfigurationDao
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
 
@@ -178,6 +180,9 @@ class BrowserTabViewModel(
         object LaunchLegacyAddWidget : Command()
         class RequiresAuthentication(val request: BasicAuthenticationRequest) : Command()
         class SaveCredentials(val request: BasicAuthenticationRequest, val credentials: BasicAuthenticationCredentials) : Command()
+        class GenerateWebViewPreviewImage(val forceImmediate: Boolean) : Command()
+        object LaunchTabSwitcher : Command()
+        object LaunchTabSwitcherLegacy : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -388,6 +393,8 @@ class BrowserTabViewModel(
         )
         omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = "", shouldMoveCaretToEnd = false)
         loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
+
+        deleteTabPreview(tabId)
     }
 
     override fun goFullScreen(view: View) {
@@ -414,6 +421,7 @@ class BrowserTabViewModel(
             canGoForward = newWebNavigationState.canGoForward
         )
 
+        Timber.v("navigationStateChanged: $stateChange")
         when (stateChange) {
             is NewPage -> pageChanged(stateChange.url, stateChange.title)
             is PageCleared -> pageCleared()
@@ -493,6 +501,10 @@ class BrowserTabViewModel(
         val isLoading = newProgress < 100
         val progress = currentLoadingViewState()
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = newProgress)
+
+        if (!isLoading && variantManager.getVariant().hasFeature(TabSwitcherGrid)) {
+            updateOrDeleteWebViewPreview(forceImmediate = false)
+        }
     }
 
     private fun registerSiteVisit() {
@@ -809,6 +821,14 @@ class BrowserTabViewModel(
         ctaViewModel.onCtaDismissed()
     }
 
+    fun updateTabPreview(tabId: String, fileName: String) {
+        tabRepository.updateTabPreviewImage(tabId, fileName)
+    }
+
+    private fun deleteTabPreview(tabId: String) {
+        tabRepository.updateTabPreviewImage(tabId, null)
+    }
+
     override fun externalAppLinkClicked(appLink: IntentType) {
         command.value = HandleExternalAppLink(appLink)
     }
@@ -824,5 +844,25 @@ class BrowserTabViewModel(
 
     override fun cancelAuthentication(request: BasicAuthenticationRequest) {
         request.handler.cancel()
+    }
+
+    fun userLaunchingTabSwitcher() {
+        if (variantManager.getVariant().hasFeature(TabSwitcherGrid)) {
+            updateOrDeleteWebViewPreview(forceImmediate = true)
+
+            command.value = LaunchTabSwitcher
+        } else {
+            command.value = LaunchTabSwitcherLegacy
+        }
+    }
+
+    private fun updateOrDeleteWebViewPreview(forceImmediate: Boolean) {
+        val url = site?.url
+        Timber.d("Updating or deleting WebView preview for $url")
+        if (url == null) {
+            deleteTabPreview(tabId)
+        } else {
+            command.value = GenerateWebViewPreviewImage(forceImmediate)
+        }
     }
 }

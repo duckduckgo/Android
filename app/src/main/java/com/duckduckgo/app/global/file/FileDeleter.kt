@@ -30,15 +30,25 @@ interface FileDeleter {
      * Note, the exclusion list only applies to the top-level directory. All files in subdirectories will be deleted, regardless of exclusion list.
      */
     suspend fun deleteContents(parentDirectory: File, excludedFiles: List<String> = emptyList())
+
+    /**
+     * Delete the contents of the given directory, and deletes the directory itself.
+     */
+    suspend fun deleteDirectory(directoryToDelete: File)
 }
 
 class AndroidFileDeleter : FileDeleter {
-
     override suspend fun deleteContents(parentDirectory: File, excludedFiles: List<String>) {
         withContext(Dispatchers.IO) {
             val files = parentDirectory.listFiles() ?: return@withContext
             val filesToDelete = files.filterNot { excludedFiles.contains(it.name) }
             filesToDelete.forEach { it.deleteRecursively() }
+        }
+    }
+
+    override suspend fun deleteDirectory(directoryToDelete: File) {
+        withContext(Dispatchers.IO) {
+            directoryToDelete.deleteRecursively()
         }
     }
 }

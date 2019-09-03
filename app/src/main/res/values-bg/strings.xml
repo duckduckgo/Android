@@ -1,19 +1,354 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (c) 2019 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-<resources>
+    <string name="duckDuckGoLogoDescription">Лого на DuckDuckGo</string>
+
+    <!-- Onboarding Activity -->
+    <string name="onboardingDefaultBrowserTitle">Поверителността да стане Ваша настройка по подразбиране</string>
+    <string name="onboardingDefaultBrowserDescription">Посетете Настройки, за да търсите и сърфирате с DuckDuckGo всеки път.</string>
+    <string name="onboardingDefaultBrowserGoToSettingsAction">Към настройките</string>
+    <string name="onboardingContinue">Напред</string>
+    <string name="onboardingContinueFinalPage">Начало на сърфирането</string>
+
+    <!-- Unified Welcome Page -->
+    <string name="unifiedOnboardingTitleFirstVisit">Добре дошли в\nDuckDuckGo!</string>
+    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Запазете поверителността си, докато търсите и сърфирате в мрежата.</string>
+    <string name="unifiedOnboardingPrivateSearchTitle">Частно търсене</string>
+    <string name="unifiedOnboardingPrivateSearchSubtitle">С DuckDuckGo търсенията Ви винаги са лични.</string>
+    <string name="unifiedOnboardingBrowsingProtectionTitle">Защита при сърфиране</string>
+    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Блокирайте проследяващите устройства и сърфирайте сигурно по подразбиране.</string>
+    <string name="unifiedOnboardingDataClearingTitle">Изчистване на данни</string>
+    <string name="unifiedOnboardingDataClearingSubtitle">Изтрийте данните за сърфирането си с едно натискане на бутон.</string>
+    <string name="unifiedOnboardingCustomizationTitle">Персонализиране</string>
+    <string name="unifiedOnboardingCustomizationSubtitle">Изберете тема и персонализирайте функциите за поверителност.</string>
+
+    <!-- Default Browser -->
+    <string name="cannotLaunchDefaultAppSettings">Екранът за настройки на приложения по подразбиране не може да бъде стартиран</string>
+    <string name="settingsDefaultBrowserEnabled">Задаване като браузър по подразбиране</string>
+
+    <!-- Browser Activity -->
+    <string name="browserPopupMenu">Меню на браузъра</string>
+    <string name="refresh">Опресняване</string>
+    <string name="back">Обратно</string>
+    <string name="forward">Напред</string>
+
+    <string name="omnibarInputHint">Търсене или въвеждане на URL адрес</string>
+    <string name="clearButtonContentDescription">Изчистване на въведеното търсене</string>
+    <string name="no_compatible_third_party_app_installed">Няма инсталирано съвместимо приложение</string>
+    <string name="addBookmarkMenuTitle">Добави отметка</string>
+    <string name="requestDesktopSiteMenuTitle">Сайт на работния плот</string>
+
+    <!-- Downloading files -->
+    <string name="downloadImage">Изтегляне на изображение</string>
+    <string name="permissionRequiredToDownload">Изтеглянето изисква разрешение за съхранение</string>
+    <string name="downloadComplete">Изтеглянето е завършено.</string>
+    <string name="downloadFailed">Неуспешно изтегляне</string>
+    <string name="downloadInProgress">Изтегля се</string>
+
+    <!-- Sharing options -->
+    <string name="options">Опции</string>
+    <string name="shareLink">Споделяне на връзка</string>
+    <string name="shareMenuTitle">Споделяне…</string>
+    <string name="copyUrl">Копиране на адреса на връзката</string>
+
+    <!-- Find in page -->
+    <string name="findInPageMenuTitle">Намери в страницата</string>
+    <string name="nextSearchTermDescription">Намери следващ</string>
+    <string name="previousSearchTermDescription">Намери предишен</string>
+    <string name="closeFindInPageButtonDescription">Затваряне на изгледа за тръсене в страницата</string>
+    <string name="findInPageHint">Намери в страницата</string>
+
+    <!-- AutoComplete Suggestions -->
+    <string name="editQueryBeforeSubmitting">Редактиране на заявка преди търсене</string>
+    <string name="settingsAutocompleteEnabled">Показване на предложенията за автоматично довършване</string>
+
+    <!-- Opening external apps -->
+    <string name="openExternalApp">Отваряне на външно приложение</string>
+    <string name="launchingExternalApp">Отваряне в друго приложение</string>
+    <string name="confirmOpenExternalApp">Искате ли да напуснете DuckDuckGo, за да видите това съдържание?</string>
+    <string name="unableToOpenLink">Не може да се отвори този тип връзка</string>
+
+    <!-- Tabs -->
+    <string name="tabActivityTitle">Подпрозорци</string>
+    <string name="tabsMenuItem">Подпрозорци</string>
+    <string name="newTabMenuItem">Нов подпрозорец</string>
+    <string name="openInNewTab">Отваряне в нов подпрозорец</string>
+    <string name="openInNewBackgroundTab">Отваряне във фонов подпрозорец</string>
+    <string name="openImageInNewTab">Отваряне на изображението във фоновия подпрозорец</string>
+    <string name="faviconContentDescription">Favicon</string>
+    <string name="closeContentDescription">Затваряне</string>
+    <string name="tapFireDirective">Докоснете </string>
+    <string name="tapFireIconDescription">бутона Fire</string>
+    <string name="tapFireExplanation"> за изтриване на цялата информация</string>
+    <string name="closeAllTabsMenuItem">Затваряне на всички подпрозорци</string>
+
+    <!-- Privacy Dashboard Activities -->
+    <string name="privacyDashboardActivityTitle">Табло за управление на поверителността</string>
+    <string name="privacyProtectionEnabled">ЗАЩИТАТА НА ПОВЕРИТЕЛНОСТТА Е АКТИВИРАНА</string>
+    <string name="privacyProtectionDisabled">ЗАЩИТАТА НА ПОВЕРИТЕЛНОСТТА Е ДЕАКТИВИРАНА</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ПОДОБРЕН ОТ &lt;img src="%d" /&gt; ДО &lt;img src="%d" /&gt;</string>
+    <string name="privacyGradeContentDescription">Клас на поверителност</string>
+
+    <string name="httpsGood">Шифрована връзка</string>
+    <string name="httpsMixed">Смесена връзка за шифроване</string>
+    <string name="httpsBad">Нешифрована връзка</string>
+
+    <string name="networksActivityTitle">Проследяващи мрежи</string>
+    <string name="networksContentDescription">Проследяващи мрежи</string>
+    <string name="networksOverview">Проследяващите мрежи обединяват историята на мрежата ви в профил с данни за вас. Основните проследяващи мрежи са по-вредни, защото могат да ви проследяват и насочват през по-голяма част от интернет.</string>
+
+    <plurals name="trackersFound">
+        <item quantity="one">%s открито проследяващо устройство</item>
+        <item quantity="other">%s открити проследяващи устройства</item>
+    </plurals>
+
+    <plurals name="trackerBlocked">
+        <item quantity="one">%s блокирано проследяващо устройство</item>
+        <item quantity="other">%s блокирани проследяващи устройства</item>
+    </plurals>
+
+    <plurals name="majorNetworksFound">
+        <item quantity="one">%s открита основна мрежа за проследяване</item>
+        <item quantity="other">%s открити основни проследяващи мрежи</item>
+    </plurals>
+
+    <plurals name="majorNetworksBlocked">
+        <item quantity="one">%s блокирана основна проследяваща мрежа</item>
+        <item quantity="other">%s блокирани основни проследяващи мрежи</item>
+    </plurals>
+
+    <string name="scorecardActivityTitle">Клас на поверителност</string>
+    <string name="scorecardSiteIsMemberOfMajorNetwork">Сайтът е основна проследяваща мрежа</string>
+    <string name="scorecardPrivacyGrade">Клас на поверителност</string>
+    <string name="scorecardEnhancedGrade">Засилена степен</string>
+
+    <string name="privacyTermsActivityTitle">Практики за защита на поверителността</string>
+    <string name="practicesGood">Добри практики за защита на поверителността</string>
+    <string name="practicesMixed">Смесени практики за защита на поверителността"</string>
+    <string name="practicesBad">"Лоши практики за защита на поверителността"</string>
+    <string name="practicesUnknown">Неизвестни практики за защита на поверителността</string>
+    <string name="practicesOverview">Практиките за защита на поверителността показват каква част от личната информация, която споделяте с уебсайт, е защитена.</string>
+    <string name="practicesTosdrLink">Практиките за защита на поверителността са резултат от <b><u>ToS;DR</u></b></string>
+    <string name="practicesIconContentGood">Иконка за добра практика</string>
+    <string name="practicesIconContentBad">Иконка за лоша практика</string>
+    <string name="privacyProtectionToggle">Защита на поверителността</string>
+
+    <string name="networkTrackerSummaryHeader">ОСНОВНИ НАРУШИТЕЛИ НА МРЕЖАТА ЗА ПРОСЛЕДЯВАНЕ</string>
+    <string name="networkTrackerSummaryNotReady">Все още събираме данни, за да покажем колко проследяващи елемента сме блокирали.</string>
+
+    <!-- Fire -->
+    <string name="fireMenu">Изчистване на данни</string>
+    <string name="fireClearAll">Изчистване на всички подпрозорци и данни</string>
+    <string name="fireCancel">Отмяна</string>
+    <string name="fireDataCleared">Данните са изчистени</string>
+
+    <!-- Settings Activity -->
+    <string name="settingsActivityTitle">Настройки</string>
+    <string name="settingsMenuItemTitle">Настройки</string>
+    <string name="settingsHeadingGeneral">Обща информация</string>
+    <string name="settingsHeadingOther">Други</string>
+    <string name="settingsHeadingPrivacy">Поверителност</string>
+    <string name="settingsLightTheme">Светла тема</string>
+    <string name="settingsAboutDuckduckgo">За DuckDuckGo</string>
+    <string name="settingsVersion">Версия</string>
+    <string name="leaveFeedback">Оставете отзиви</string>
+
+    <!-- Settings - Automatically clearing data -->
+    <string name="settingsAutomaticallyClearingDialogSave">Запази</string>
+
+    <string name="settingsAutomaticallyClearWhat">Автоматично изчистване…</string>
+    <string name="settingsAutomaticallyClearWhatOptionNone">Няма</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabs">Подпрозорци</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Подпрозорци и данни</string>
+
+    <string name="settingsAutomaticallyClearWhen">Изчистване на…</string>
+    <string name="settingsAutomaticallyClearWhenAppExitOnly">Само при изход от приложението</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Изход от приложението, неактивен за 5 секунди</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Изход от приложението, неактивен за 5 минути</string>
+    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Изход от приложението, неактивен за 15 минути</string>
+    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Изход от приложението, неактивен за 30 минути</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Изход от приложението, неактивен за 60 минути</string>
+
+    <!-- About Activity -->
+    <string name="aboutActivityTitle">За нас</string>
+    <string name="aboutHeading">Поверителност, опростена.</string>
+    <string name="aboutDescription">
+        В DuckDuckGo задаваме новия стандарт на доверие онлайн.\n\ Браузърът за поверителност DuckDuckGo осигурява всички необходими елементи за защита на поверителността, докато търсите и сърфирате в мрежата, включително блокиране на проследяващи елементи, по-интелигентно криптиране и частно търсене с DuckDuckGo.\ n\ В крайна сметка интернет не трябва да създава чувство на страх, а получаването на поверителността, която заслужавате онлайн, трябва да е толкова просто, колкото пускането на щорите.</string>
+    <string name="aboutMoreLink">Още на duckduckgo.com/about</string>
+    <string name="no_suggestions">Няма предложения</string>
+
+    <!-- Broken Site Activity -->
+    <string name="brokenSiteReportBrokenSiteMenuItem">Подаване на сигнал за повреден сайт</string>
+    <string name="brokenSiteHeading">Подаване на сигнал за повреден сайт</string>
+    <string name="brokenSiteModalDescription">Подаването на сигнали за повредени сайтове е напълно анонимно и ни помага да подобрим приложението!</string>
+    <string name="brokenSiteUrlHint">Въведете URL адрес</string>
+    <string name="brokenSiteDomainLabel">Домейн на повредения сайт:</string>
+    <string name="brokenSiteMessageHint">Кое съдържание или функционалност се нарушава?</string>
+    <string name="brokenSiteSubmitButton">Изпращане на отзиви</string>
+    <string name="brokenSiteSubmitted">Благодарим Ви! Изпратена обратна връзка</string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">Отметки</string>
+    <string name="bookmarksActivityTitle">Отметки</string>
+    <string name="bookmarkDeleteConfirmMessage">Наистина ли искате да изтриете отметка &lt;b&gt;%s&lt;/b&gt;?</string>
+    <string name="bookmarkDeleteConfirmTitle">Потвърдете</string>
+    <string name="bookmarkAddedFeedback">Добавена е отметка</string>
+    <string name="bookmarkTitleHint">Заглавие на отметката</string>
+    <string name="bookmarkUrlHint">URL адрес на отметката</string>
+    <string name="bookmarkSave">Запазване</string>
+    <string name="bookmarkTitleEdit">Редактиране на отметка</string>
+    <string name="noBookmarks">Все още няма добавени отметки</string>
+    <string name="bookmarkOverflowContentDescription">Още опции за отметка %s</string>
+    <string name="delete">Изтриване</string>
+    <string name="edit">Редактиране</string>
+
+    <!-- Widget -->
+    <string name="searchWidgetTextHint">Търсене с DuckDuckGo</string>
+
+    <!-- Home Screen Shortcuts -->
+    <string name="addToHome">Добави към Начало</string>
+
+    <!-- User Survey -->
+    <string name="surveyCtaTitle">Помогнете ни да подобрим приложението!</string>
+    <string name="surveyCtaDescription">Попълнете нашата кратка, анонимна анкета и споделете отзивите си.</string>
+    <string name="surveyCtaLaunchButton">Попълнете анкетата</string>
+    <string name="surveyCtaDismissButton">Не, благодаря</string>
+    <string name="surveyActivityTitle">Потребителска анкета</string>
+    <string name="surveyTitle">АНКЕТА НА DUCKDUCKGO</string>
+    <string name="surveyDismissContentDescription">Отхвърляне на анкетата</string>
+    <string name="surveyLoadingErrorTitle">О, не!</string>
+    <string name="surveyLoadingErrorText">В момента анкетата ни не се зарежда.\ nМоля, опитайте отново по-късно.</string>
+
+    <!-- Add widget -->
+    <string name="addWidgetCtaTitle">Изпробвайте нашeто приспособление за търсене!</string>
+    <string name="addWidgetCtaDescription">Добавете нашето приспособление за търсене към началния си екран за бърз и лесен достъп.</string>
+    <string name="addWidgetCtaAutoLaunchButton">Добави Приспособлението</string>
+    <string name="addWidgetCtaInstructionsLaunchButton">Показване</string>
+    <string name="addWidgetCtaDismissButton">Отказване</string>
+    <string name="addWidgetInstructionsActivityTitle">Добави приспособлението</string>
+    <string name="addWidgetInstruction1Label">1</string>
+    <string name="addWidgetInstruction1">Натиснете продължително началния екран, след което отворете менюто с приспособленията</string>
+    <string name="addWidgetInstruction2Label">2</string>
+    <string name="addWidgetInstruction2">Намери DuckDuckGo приспособлението</string>
+    <string name="addWidgetInstruction3Label">3</string>
+    <string name="addWidgetInstruction3">Плъзнете приспособлението до началния екран</string>
+    <string name="addWidgetInstructionsButtonGoHome">Към началния екран</string>
+    <string name="addWidgetInstructionsButtonClose">Затваряне</string>
+
+    <!-- App Enjoyment / Rating / Feedback -->
+    <string name="appEnjoymentDialogTitle">Наслаждавате ли се на DuckDuckGo?</string>
+    <string name="appEnjoymentDialogMessage">Бихме искали да знаем какво мислите.</string>
+    <string name="appEnjoymentDialogPositiveButton">Харесва ми.</string>
+    <string name="appEnjoymentDialogNegativeButton">Необходимо е да се поработи върху него</string>
+
+    <string name="rateAppDialogTitle">Оценете приложението</string>
+    <string name="rateAppDialogMessage">Вашите отзиви са ценни. Моля, споделете дали го харесвате с отзив.</string>
+    <string name="rateAppDialogPositiveButton">Оценка на приложението</string>
+
+    <string name="giveFeedbackDialogTitle">Съжаляваме да чуем това</string>
+    <string name="giveFeedbackDialogMessage">Кажете ни как можем да подобрим приложението за Вас</string>
+    <string name="giveFeedbackDialogPositiveButton">Оставете отзиви</string>
+
+    <string name="noThanks">Не, благодаря</string>
+
+    <!-- Notification Channel Names -->
+    <string name="notificationChannelFileDownloading">Файлът се изтегля</string>
+    <string name="notificationChannelFileDownloaded">Файлът е изтеглен</string>
+    <string name="notificationChannelTutorials">Указания</string>
+
+    <!-- Clear Notification -->
+    <string name="clearNotificationTitle">Ръчно изчистване на данните</string>
+    <string name="clearNotificationDescription">Персонализирайте  DuckDuckGo да изчиства автоматично данните от сърфирането след всяка сесия.</string>
+
+    <!-- Privacy Protection Notification -->
+    <string name="privacyProtectionNotificationDefaultTitle">Ние защитаваме Вашата поверителност</string>
+    <string name="privacyProtectionNotificationReportTitle">Доклад за Вашата поверителност</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Използването на приложението DuckDuckGo защитава Вашите данни, като блокира проследяващите елементи и шифрова връзките.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">Вие защитихте своите данни, като осигурихте %d нешифровани връзки, докато използвахте DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">Вие защитихте своите данни, като блокирахте %d проследяващи елемента, докато използвахте DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationBothDescription">Вие защитихте своите данни, като блокирахте %d проследяващи елемента и осигурихте %d нешифровани връзки, докато използвахте DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationLaunchButton">Подновете сърфирането</string>
+
+    <!-- Authentication -->
+    <string name="authenticationDialogTitle">Влизане</string>
+    <string name="authenticationDialogMessage">%s изисква потребителско име и парола.</string>
+    <string name="authenticationDialogPositiveButton">Влизане</string>
+    <string name="authenticationDialogNegativeButton">Отмяна</string>
+    <string name="authenticationDialogUsernameHint">Потребителско име</string>
+    <string name="authenticationDialogPasswordHint">Парола</string>
+
+    <!-- User-facing label for when a user selects text and might want to search for that text -->
+    <string name="systemTextSearchMessage">Търсене с DuckDuckGo</string>
+
+    <!-- App feedback disambiguation -->
+    <string name="feedbackActivityTitle">Споделете своите отзиви</string>
+    <string name="missingBrowserFeaturesTitleLong">Липсват някои характеристики на браузъра или са объркващи</string>
+    <string name="missingBrowserFeaturesTitleShort">Проблеми с характеристика на браузъра</string>
+    <string name="missingBrowserFeaturesSubtitle">Коя характеристика за сърфиране можем да добавим или да подобрим?</string>
+    <string name="missingBrowserFeatureSubReasonNavigation">Навигация напред, назад, опресняване</string>
+    <string name="missingBrowserFeatureSubReasonTabManagement">Създаване и управление на подпрозорци</string>
+    <string name="missingBrowserFeatureSubReasonAdPopups">Блокиране на реклами и изскачащи прозорци</string>
+    <string name="missingBrowserFeatureSubReasonVideos">Гледане на видео</string>
+    <string name="missingBrowserFeatureSubReasonImages">Интерактивно гледане на изображения</string>
+    <string name="missingBrowserFeatureSubReasonBookmarks">Създаване и управление на отметки</string>
+    <string name="missingBrowserFeatureSubReasonOther">Никое от тези</string>
+
+    <string name="websiteNotLoadingTitleLong">Определени уебсайтове не се зареждат правилно</string>
+    <string name="websiteNotLoadingTitleShort">Проблеми със зареждането на уебсайтове</string>
+    <string name="websiteNotLoadingSubtitle">Кой уебсайт е повреден?"</string>
+
+    <string name="searchNotGoodEnoughTitleLong">Търсенето с DuckDuckGo не е достатъчно добро</string>
+    <string name="searchNotGoodEnoughTitleShort">Проблеми при търсенето с DuckDuckGo</string>
+    <string name="searchNotGoodEnoughSubtitle">Коя характеристика за търсене можем да добавим или да подобрим?</string>
+    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Програмиращо/техническо търсене</string>
+    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Оформлението трябва да бъде повече като Google</string>
+    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">По-бързо зареждане</string>
+    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Търсене на специфичен език или в специфичен район</string>
+    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">По-добро автозавършване</string>
+    <string name="searchNotGoodEnoughSubReasonOther">Никое от тези</string>
+
+    <string name="needMoreCustomizationTitleLong">Няма достатъчно начини за персонализиране на приложението</string>
+    <string name="needMoreCustomizationTitleShort">Проблеми с персонализирането</string>
+    <string name="needMoreCustomizationSubtitle">Коя опция за персонализиране можем да добавим или да подобрим?</string>
+    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Конфигурацията на началния екран</string>
+    <string name="needMoreCustomizationSubReasonTabDisplay">Как са изобразени подпрозорците</string>
+    <string name="needMoreCustomizationSubReasonAppLooks">Как изглежда приложението</string>
+    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Кои данни са изчистени</string>
+    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Кога са изчистени данните</string>
+    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Как са изобразени отметките</string>
+    <string name="needMoreCustomizationSubReasonOther">Никое от тези</string>
+
+    <string name="appIsSlowOrBuggyTitleLong">Приложението е бавно, има бъгове или се срива</string>
+    <string name="appIsSlowOrBuggyTitleShort">Проблеми с работата</string>
+    <string name="appIsSlowOrBuggySubtitle">Кой проблем имате?</string>
+    <string name="appIsSlowOrBuggySubReasonSlowResults">Уеб страниците или резултатите от търсене се зареждат бавно</string>
+    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Срив или замръзване на приложението</string>
+    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Бъгове при възпроизвеждане на видео или мултимедийни файлове</string>
+    <string name="appIsSlowOrBuggySubReasonOther">Никое от тези</string>
+
+    <string name="otherMainReasonTitleLong">Никое от тези</string>
+    <string name="otherMainReasonTitleShort">Други проблеми</string>
+
+    <string name="openEndedInputHint">Как можем да се подобрим? (По желание)</string>
+    <string name="submitFeedback">ИЗПРАЩАНЕ НА ОТЗИВИ</string>
+
+    <string name="tellUsHowToImprove">Моля, кажете ни какво можем да подобрим.</string>
+    <string name="thanksForTheFeedback">Благодарим за отзивите!</string>
+    <string name="feedbackNegativeMainReasonPageSubtitle">С какво най-вече са свързани отрицателните Ви впечатления?</string>
+    <string name="feedbackNegativeMainReasonPageTitle">Съжаляваме да чуем това.</string>
+    <string name="feedbackShareDetails">Споделете подробности</string>
+    <string name="sharePositiveFeedbackWithTheTeam">Има ли някакви подробности, които искате да споделите с екипа?</string>
+    <string name="whatHaveYouBeenEnjoying">Кое Ви беше най-приятно?</string>
+    <string name="awesomeToHear">Страхотно е да чуем това!</string>
+    <string name="shareTheLoveWithARating">Моля, споделете вашето харесване каот оцените в Play Store.</string>
+    <string name="rateTheApp">ОЦЕНЕТЕ ПРИЛОЖЕНИЕТО</string>
+    <string name="declineFurtherFeedback">НЕ БЛАГОДАРЯ, ПРИКЛЮЧИХ</string>
+    <string name="whichBrokenSites">Къде виждате тези проблеми?</string>
+    <string name="whichBrokenSitesHint">В кой уебсайт има проблеми?</string>
+    <string name="feedbackSpecificAsPossible">Моля, бъдете колкото може по-конкретни</string>
+    <string name="feedbackInitialDisambiguationTitle">Да започваме!</string>
+    <string name="feedbackInitialDisambiguationSubtitle">Как бихте категоризирали отзивите си?</string>
+    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Бутон за положителни отзиви</string>
+    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Бутон за отрицателни отзиви</string>
+    <string name="feedbackIsImportantToUs">Вашите анонимни отзиви са важни за нас.</string>
+
 </resources>

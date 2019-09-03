@@ -6,7 +6,9 @@ import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.After
@@ -15,7 +17,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
 class BrokenSiteViewModelTest {
@@ -28,11 +29,11 @@ class BrokenSiteViewModelTest {
     @Suppress("unused")
     val schedulers = InstantSchedulersRule()
 
-    @Mock
-    private lateinit var mockBrokenSiteSender: BrokenSiteSender
+    private val mockPixel: Pixel = mock()
 
-    @Mock
-    private lateinit var mockCommandObserver: Observer<BrokenSiteViewModel.Command>
+    private val mockBrokenSiteSender: BrokenSiteSender = mock()
+
+    private val mockCommandObserver: Observer<BrokenSiteViewModel.Command> = mock()
 
     private lateinit var testee: BrokenSiteViewModel
 
@@ -42,7 +43,7 @@ class BrokenSiteViewModelTest {
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        testee = BrokenSiteViewModel(mockBrokenSiteSender)
+        testee = BrokenSiteViewModel(mockPixel, mockBrokenSiteSender)
         testee.command.observeForever(mockCommandObserver)
     }
 
@@ -104,11 +105,12 @@ class BrokenSiteViewModelTest {
     }
 
     @Test
-    fun whenCanSubmitBrokenSiteAndSubmitPressedThenFeedbackSubmitted() {
+    fun whenCanSubmitBrokenSiteAndSubmitPressedThenFeedbackAndPixelSubmitted() {
         testee.onBrokenSiteUrlChanged(url)
         testee.onFeedbackMessageChanged(message)
         testee.onSubmitPressed()
 
+        verify(mockPixel).fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
         verify(mockBrokenSiteSender).submitBrokenSiteFeedback(message, url)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }

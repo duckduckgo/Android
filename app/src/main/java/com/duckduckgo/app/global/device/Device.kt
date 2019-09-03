@@ -32,6 +32,8 @@ interface DeviceInfo {
 
     val appVersion: String
 
+    val majorAppVersion: String
+
     val language: String
 
     val country: String
@@ -42,6 +44,8 @@ interface DeviceInfo {
 class ContextDeviceInfo @Inject constructor(private val context: Context) : DeviceInfo {
 
     override val appVersion = "${BuildConfig.VERSION_NAME}"
+
+    override val majorAppVersion = appVersion.split(".").first()
 
     override val language: String by lazy {
         Locale.getDefault().language
