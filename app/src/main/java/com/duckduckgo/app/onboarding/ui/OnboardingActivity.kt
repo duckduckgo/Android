@@ -42,7 +42,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
         if (next < viewPager.adapter!!.count) {
             viewPager.setCurrentItem(next, true)
         } else {
-            //viewModel.onOnboardingDone()
+            viewModel.onOnboardingDone()
             startActivity(BrowserActivity.intent(this))
             finish()
         }

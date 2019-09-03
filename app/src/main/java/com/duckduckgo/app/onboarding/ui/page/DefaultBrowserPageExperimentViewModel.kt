@@ -87,23 +87,12 @@ class DefaultBrowserPageExperimentViewModel(
                 if (isDefault) {
                     viewState.value = viewState.value?.copy(showOnlyContinue = true, showInstructionsCard = false)
                 } else {
-                    when {
-                        origin.timesOpened < MAX_DIALOG_ATTEMPTS -> {
-                            viewState.value = viewState.value?.copy(showOnlyContinue = false, showInstructionsCard = true)
-                            command.value = Command.OpenDialog(origin.timesOpened)
-                        }
-                        origin.timesOpened >= MAX_DIALOG_ATTEMPTS -> {
-                            viewState.value = viewState.value?.copy(showInstructionsCard = false)
-                            command.value = Command.ContinueToBrowser
-                        }
-//                        else -> {
-//                            // This may not be needed, above cases should cover all scenarios
-//                            viewState.value = viewState.value?.copy(
-//                                showSettingsUI = defaultBrowserDetector.hasDefaultBrowser(),
-//                                showOnlyContinue = false,
-//                                showInstructionsCard = false
-//                            )
-//                        }
+                    if (origin.timesOpened < MAX_DIALOG_ATTEMPTS) {
+                        viewState.value = viewState.value?.copy(showOnlyContinue = false, showInstructionsCard = true)
+                        command.value = Command.OpenDialog(origin.timesOpened)
+                    } else {
+                        viewState.value = viewState.value?.copy(showInstructionsCard = false)
+                        command.value = Command.ContinueToBrowser
                     }
                 }
             }
@@ -111,7 +100,11 @@ class DefaultBrowserPageExperimentViewModel(
                 viewState.value = viewState.value?.copy(showSettingsUI = defaultBrowserDetector.hasDefaultBrowser(), showInstructionsCard = false)
             }
             is Origin.Settings -> {
-                viewState.value = viewState.value?.copy(showSettingsUI = true, showInstructionsCard = false)
+                if (isDefault) {
+                    viewState.value = viewState.value?.copy(showOnlyContinue = true, showInstructionsCard = false)
+                } else {
+                    viewState.value = viewState.value?.copy(showSettingsUI = true, showInstructionsCard = false)
+                }
             }
         }
         firePixel()

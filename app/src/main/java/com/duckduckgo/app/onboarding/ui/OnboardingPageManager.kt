@@ -64,8 +64,7 @@ class OnboardingPageManagerWithTrackerBlocking(
         return when (val blueprint = pages.getOrNull(position)) {
             is SummaryPageBlueprint -> buildSummaryPage(blueprint)
             is DefaultBrowserBlueprint -> {
-                //if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.OnboardingExperiment)) {
-                if (true) {
+                if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.OnboardingExperiment)) {
                     buildDefaultBrowserPageExperiment(blueprint)
                 } else {
                     buildDefaultBrowserPage(blueprint)

@@ -27,6 +27,7 @@ interface VariantManager {
     sealed class VariantFeature {
         // variant-dependant features listed here
         object TabSwitcherGrid : VariantFeature()
+
         object OnboardingExperiment : VariantFeature()
     }
 

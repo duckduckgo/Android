@@ -53,7 +53,6 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
         ViewModelProviders.of(this, viewModelFactory).get(DefaultBrowserPageExperimentViewModel::class.java)
     }
 
-
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
@@ -67,8 +66,6 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
         }
 
         observeViewModel()
-
-        extractContinueButtonTextResourceId()?.let { continueButton.setText(it) }
 
         launchSettingsButton.setOnClickListener {
             viewModel.onDefaultBrowserClicked()
@@ -108,10 +105,11 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
 
     private fun setOnlyContinue(visible: Boolean) {
         if (visible) {
-            defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_experiment)
+            extractContinueButtonTextResourceId()?.let { continueButton.setText(it) }
             launchSettingsButton.visibility = View.GONE
             browserProtectionSubtitle.text = getString(R.string.defaultBrowserDescriptionDefaultSet)
         } else {
+            continueButton.setText(R.string.defaultBrowserMaybeLater)
             launchSettingsButton.visibility = View.VISIBLE
         }
     }

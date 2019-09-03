@@ -195,7 +195,19 @@ class DefaultBrowserPageExperimentViewModelTest {
     }
 
     @Test
-    fun whenUserWasTakenToSettingsAndSelectedDDGAsDefaultThenShowSettingsUI() {
+    fun whenUserWasTakenToSettingsAndSelectedDDGAsDefaultThenShowContinueToBrowserUI() {
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(false)
+
+        testee.handleResult(Origin.Settings)
+
+        assertTrue(viewState().showOnlyContinue)
+        assertFalse(viewState().showInstructionsCard)
+    }
+
+    @Test
+    fun whenUserWasTakenToSettingsAndDidNotSelectDDGAsDefaultThenShowSettingsUI() {
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(false)
 
         testee.handleResult(Origin.Settings)
