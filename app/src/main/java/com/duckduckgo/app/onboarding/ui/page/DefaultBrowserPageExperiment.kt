@@ -113,7 +113,7 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
         if (visible) {
             extractContinueButtonTextResourceId()?.let { continueButton.setText(it) }
             launchSettingsButton.visibility = View.GONE
-            browserProtectionSubtitle.text = getString(R.string.defaultBrowserDescriptionDefaultSet)
+            browserProtectionSubtitle.setText(R.string.defaultBrowserDescriptionDefaultSet)
         } else {
             continueButton.setText(R.string.defaultBrowserMaybeLater)
             launchSettingsButton.visibility = View.VISIBLE
@@ -122,12 +122,12 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
 
     private fun setUIForDialog() {
         defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_experiment)
-        browserProtectionSubtitle.text = getString(R.string.defaultBrowserDescriptionNoDefault)
+        browserProtectionSubtitle.setText(R.string.defaultBrowserDescriptionNoDefault)
     }
 
     private fun setUIForSettings() {
         defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration)
-        browserProtectionSubtitle.text = getString(R.string.onboardingDefaultBrowserDescription)
+        browserProtectionSubtitle.setText(R.string.onboardingDefaultBrowserDescription)
     }
 
     @SuppressLint("InflateParams")
