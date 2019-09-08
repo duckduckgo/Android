@@ -165,7 +165,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
         }
 
         var timesDefaultBrowserDialogOpened = intent.getIntExtra(TIMES_OPENED, -1)
-        if (timesDefaultBrowserDialogOpened > 1.unaryMinus()) {
+        if (timesDefaultBrowserDialogOpened >= 0) {
             timesDefaultBrowserDialogOpened++
             Timber.i("Setting DDG as default browser")
             val defaultIntent = Intent().apply {

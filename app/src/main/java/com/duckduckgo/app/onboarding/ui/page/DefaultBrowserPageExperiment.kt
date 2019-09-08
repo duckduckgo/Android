@@ -114,6 +114,7 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
             extractContinueButtonTextResourceId()?.let { continueButton.setText(it) }
             launchSettingsButton.visibility = View.GONE
             browserProtectionSubtitle.setText(R.string.defaultBrowserDescriptionDefaultSet)
+            browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitleDefaultSet)
         } else {
             continueButton.setText(R.string.defaultBrowserMaybeLater)
             launchSettingsButton.visibility = View.VISIBLE

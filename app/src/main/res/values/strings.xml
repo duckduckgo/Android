@@ -4,7 +4,8 @@
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Make Privacy Your Default</string>
+    <string name="onboardingDefaultBrowserTitle">Make DuckDuckGo Your Default</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Say Hello to Peace of Mind</string>
     <string name="onboardingDefaultBrowserDescription">Visit Settings to search and browse with DuckDuckGo every time.</string>
     <string name="onboardingDefaultBrowserGoToSettingsAction">Go to Settings</string>
     <string name="onboardingContinue">Continue</string>
@@ -26,10 +27,10 @@
     <string name="cannotLaunchDefaultAppSettings">Can\'t launch default app settings screen</string>
     <string name="settingsDefaultBrowserEnabled">Set as Default Browser</string>
     <string name="defaultBrowserWelcome">WELCOME TO DUCKDUCKGO</string>
-    <string name="defaultBrowserMaybeLater">Maybe later</string>
+    <string name="defaultBrowserMaybeLater">Maybe Later</string>
     <string name="defaultBrowserLetsDoIt">Let\'s do it!</string>
-    <string name="defaultBrowserDescriptionNoDefault">Experience peace of mind when opening links on your phone.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">You set DuckDuckGo as your default browser.</string>
+    <string name="defaultBrowserDescriptionNoDefault">Open links with peace of mind, every time.</string>
+    <string name="defaultBrowserDescriptionDefaultSet">With DuckDuckGo, your online data is more private by default, wherever the internet takes you.</string>
     <string name="defaultBrowserInstructions">Select DuckDuckGo and tap Always.</string>
 
     <!-- Browser Activity -->
