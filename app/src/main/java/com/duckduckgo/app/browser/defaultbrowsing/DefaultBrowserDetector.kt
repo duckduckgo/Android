@@ -50,9 +50,8 @@ class AndroidDefaultBrowserDetector @Inject constructor(private val context: Con
 
     private fun defaultBrowserPackage(): String {
         val intent = Intent(ACTION_VIEW, Uri.parse("https://"))
-        val resolutionInfo: ResolveInfo = context.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
-        Timber.i("MARCOS: Default browser os ${resolutionInfo.activityInfo.packageName}")
-        return resolutionInfo.activityInfo.packageName
+        val resolutionInfo: ResolveInfo? = context.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
+        return resolutionInfo?.activityInfo?.packageName ?: "android"
     }
 
 }
