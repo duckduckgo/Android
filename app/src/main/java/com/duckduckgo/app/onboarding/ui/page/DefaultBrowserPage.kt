@@ -113,7 +113,6 @@ class DefaultBrowserPage : OnboardingPageFragment() {
 
         if (isDefault) {
             installStore.defaultBrowser = true
-            installStore.defaultBrowser = true
             val params = mapOf(
                 PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()
             )
