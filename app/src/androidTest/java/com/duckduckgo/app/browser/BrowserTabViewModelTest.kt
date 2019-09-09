@@ -502,20 +502,20 @@ class BrowserTabViewModelTest {
         testee.progressChanged(100)
         verify(mockCommandObserver, never()).onChanged(any<Command.GenerateWebViewPreviewImage>())
     }
-//
-//    @Test
-//    fun whenUrlClearedThenPrivacyGradeIsCleared() = runBlocking<Unit> {
-//        loadUrl("https://duckduckgo.com")
-//        assertNotNull(testee.privacyGrade.value)
-//        loadUrl(null)
-//        assertNull(testee.privacyGrade.value)
-//    }
-//
-//    @Test
-//    fun whenUrlLoadedThenPrivacyGradeIsReset() = runBlocking<Unit> {
-//        loadUrl("https://duckduckgo.com")
-//        assertNotNull(testee.privacyGrade.value)
-//    }
+
+    @Test
+    fun whenUrlClearedThenPrivacyGradeIsCleared() = runBlocking<Unit> {
+        loadUrl("https://duckduckgo.com")
+        assertNotNull(testee.privacyGrade.value)
+        loadUrl(null)
+        assertNull(testee.privacyGrade.value)
+    }
+
+    @Test
+    fun whenUrlLoadedThenPrivacyGradeIsReset() = runBlocking<Unit> {
+        loadUrl("https://duckduckgo.com")
+        assertNotNull(testee.privacyGrade.value)
+    }
 
     @Test
     fun whenEnoughTrackersDetectedThenPrivacyGradeIsUpdated() {
@@ -663,8 +663,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEnteringQueryWithAutoCompleteEnabledThenAutoCompleteSuggestionsShown() {
-        whenever(mockBookmarksDao.bookmarksByQuery("%foo%")).thenReturn(Single.just(emptyList()))
-        whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(Observable.just(emptyList()))
+//        whenever(mockBookmarksDao.bookmarksByQuery("%foo%")).thenReturn(Single.just(emptyList()))
+//        whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(Observable.just(emptyList()))
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.onOmnibarInputStateChanged("foo", true, hasQueryChanged = true)
         assertTrue(autoCompleteViewState().showSuggestions)
