@@ -258,16 +258,16 @@ class BrowserTabViewModelTest {
         assertEquals(url, shareLink.url)
     }
 
-//    @Test
-//    fun whenOpenInNewBackgroundRequestedThenTabRepositoryUpdatedAndCommandIssued() = runBlocking<Unit> {
-//        val url = "http://www.example.com"
-//        testee.openInNewBackgroundTab(url)
-//
-//        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-//        assertTrue(commandCaptor.lastValue is Command.OpenInNewBackgroundTab)
-//
-//        verify(mockTabsRepository).addNewTabAfterExistingTab(url, "abc")
-//    }
+    @Test
+    fun whenOpenInNewBackgroundRequestedThenTabRepositoryUpdatedAndCommandIssued() = runBlocking<Unit> {
+        val url = "http://www.example.com"
+        testee.openInNewBackgroundTab(url)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.OpenInNewBackgroundTab)
+
+        verify(mockTabsRepository).addNewTabAfterExistingTab(url, "abc")
+    }
 
     @Test
     fun whenViewBecomesVisibleAndBrowserShowingThenKeyboardHidden() {
@@ -309,21 +309,21 @@ class BrowserTabViewModelTest {
         assertFalse(browserViewState().canAddBookmarks)
     }
 
-//    @Test
-//    fun whenBookmarkEditedThenDaoIsUpdated() = runBlocking<Unit> {
-//        testee.editBookmark(0, "A title", "www.example.com")
-//        verify(mockBookmarksDao).update(BookmarkEntity(title = "A title", url = "www.example.com"))
-//    }
-//
-//    @Test
-//    fun whenBookmarkAddedThenDaoIsUpdatedAndUserNotified() = runBlocking<Unit> {
-//        loadUrl("www.example.com", "A title")
-//
-//        testee.onBookmarkAddRequested()
-//        verify(mockBookmarksDao).insert(BookmarkEntity(title = "A title", url = "www.example.com"))
-//        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-//        assertTrue(commandCaptor.lastValue is Command.ShowBookmarkAddedConfirmation)
-//    }
+    @Test
+    fun whenBookmarkEditedThenDaoIsUpdated() = runBlocking<Unit> {
+        testee.editBookmark(0, "A title", "www.example.com")
+        verify(mockBookmarksDao).update(BookmarkEntity(title = "A title", url = "www.example.com"))
+    }
+
+    @Test
+    fun whenBookmarkAddedThenDaoIsUpdatedAndUserNotified() = runBlocking<Unit> {
+        loadUrl("www.example.com", "A title")
+
+        testee.onBookmarkAddRequested()
+        verify(mockBookmarksDao).insert(BookmarkEntity(title = "A title", url = "www.example.com"))
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.ShowBookmarkAddedConfirmation)
+    }
 
     @Test
     fun whenTrackerDetectedThenNetworkLeaderboardUpdated() {
@@ -936,26 +936,26 @@ class BrowserTabViewModelTest {
         assertEquals("http://example.com", command.query)
     }
 
-//    @Test
-//    fun whenSiteLoadedAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithUrlAndTitle() = runBlocking<Unit> {
-//        loadUrl("foo.com")
-//        testee.titleReceived("Foo Title")
-//        testee.onBookmarkAddRequested()
-//        val command = captureCommands().value as Command.ShowBookmarkAddedConfirmation
-//        assertEquals("foo.com", command.url)
-//        assertEquals("Foo Title", command.title)
-//    }
-//
-//    @Test
-//    fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkAddedWithBlankTitleAndUrl() = runBlocking<Unit> {
-//        whenever(mockBookmarksDao.insert(any())).thenReturn(1)
-//        testee.onBookmarkAddRequested()
-//        verify(mockBookmarksDao).insert(BookmarkEntity(title = "", url = ""))
-//        val command = captureCommands().value as Command.ShowBookmarkAddedConfirmation
-//        assertEquals(1, command.bookmarkId)
-//        assertEquals("", command.title)
-//        assertEquals("", command.url)
-//    }
+    @Test
+    fun whenSiteLoadedAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithUrlAndTitle() = runBlocking<Unit> {
+        loadUrl("foo.com")
+        testee.titleReceived("Foo Title")
+        testee.onBookmarkAddRequested()
+        val command = captureCommands().value as Command.ShowBookmarkAddedConfirmation
+        assertEquals("foo.com", command.url)
+        assertEquals("Foo Title", command.title)
+    }
+
+    @Test
+    fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkAddedWithBlankTitleAndUrl() = runBlocking<Unit> {
+        whenever(mockBookmarksDao.insert(any())).thenReturn(1)
+        testee.onBookmarkAddRequested()
+        verify(mockBookmarksDao).insert(BookmarkEntity(title = "", url = ""))
+        val command = captureCommands().value as Command.ShowBookmarkAddedConfirmation
+        assertEquals(1, command.bookmarkId)
+        assertEquals("", command.title)
+        assertEquals("", command.url)
+    }
 
     @Test
     fun whenUserSelectsToShareLinkThenShareLinkCommandSent() {
@@ -965,13 +965,13 @@ class BrowserTabViewModelTest {
         assertEquals("foo.com", command.url)
     }
 
-//    @Test
-//    fun whenOnSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithUrl() = runBlocking<Unit> {
-//        loadUrl("foo.com", isBrowserShowing = true)
-//        testee.onBrokenSiteSelected()
-//        val command = captureCommands().value as Command.BrokenSiteFeedback
-//        assertEquals("foo.com", command.url)
-//    }
+    @Test
+    fun whenOnSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithUrl() = runBlocking<Unit> {
+        loadUrl("foo.com", isBrowserShowing = true)
+        testee.onBrokenSiteSelected()
+        val command = captureCommands().value as Command.BrokenSiteFeedback
+        assertEquals("foo.com", command.url)
+    }
 
     @Test
     fun whenNoSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithoutUrl() {
@@ -1072,32 +1072,32 @@ class BrowserTabViewModelTest {
         verify(mockHandler, atLeastOnce()).proceed(username, password)
     }
 
-//    @Test
-//    fun whenBookmarkSuggestionSubmittedThenAutoCompleteBookmarkSelectionPixelSent() = runBlocking {
-//        whenever(mockBookmarksDao.hasBookmarks()).thenReturn(true)
-//        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteApi.AutoCompleteResult("", emptyList(), true))
-//        testee.fireAutocompletePixel(AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com"))
-//
-//        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_BOOKMARK_SELECTION, pixelParams(showedBookmarks = true, bookmarkCapable = true))
-//    }
-//
-//    @Test
-//    fun whenSearchSuggestionSubmittedWithBookmarksThenAutoCompleteSearchSelectionPixelSent() = runBlocking {
-//        whenever(mockBookmarksDao.hasBookmarks()).thenReturn(true)
-//        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteApi.AutoCompleteResult("", emptyList(), true))
-//        testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
-//
-//        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(showedBookmarks = true, bookmarkCapable = true))
-//    }
-//
-//    @Test
-//    fun whenSearchSuggestionSubmittedWithoutBookmarksThenAutoCompleteSearchSelectionPixelSent() = runBlocking {
-//        whenever(mockBookmarksDao.hasBookmarks()).thenReturn(false)
-//        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteApi.AutoCompleteResult("", emptyList(), false))
-//        testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
-//
-//        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(showedBookmarks = false, bookmarkCapable = false))
-//    }
+    @Test
+    fun whenBookmarkSuggestionSubmittedThenAutoCompleteBookmarkSelectionPixelSent() = runBlocking {
+        whenever(mockBookmarksDao.hasBookmarks()).thenReturn(true)
+        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteApi.AutoCompleteResult("", emptyList(), true))
+        testee.fireAutocompletePixel(AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com"))
+
+        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_BOOKMARK_SELECTION, pixelParams(showedBookmarks = true, bookmarkCapable = true))
+    }
+
+    @Test
+    fun whenSearchSuggestionSubmittedWithBookmarksThenAutoCompleteSearchSelectionPixelSent() = runBlocking {
+        whenever(mockBookmarksDao.hasBookmarks()).thenReturn(true)
+        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteApi.AutoCompleteResult("", emptyList(), true))
+        testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
+
+        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(showedBookmarks = true, bookmarkCapable = true))
+    }
+
+    @Test
+    fun whenSearchSuggestionSubmittedWithoutBookmarksThenAutoCompleteSearchSelectionPixelSent() = runBlocking {
+        whenever(mockBookmarksDao.hasBookmarks()).thenReturn(false)
+        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteApi.AutoCompleteResult("", emptyList(), false))
+        testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
+
+        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(showedBookmarks = false, bookmarkCapable = false))
+    }
 
     @Test
     fun whenUserSelectToEditQueryThenMoveCaretToTheEnd() {
