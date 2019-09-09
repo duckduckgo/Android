@@ -25,7 +25,6 @@ import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageExperimentViewMod
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DEFAULT_BROWSER_DIALOG
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS
-import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.lastValue
 import com.nhaarman.mockitokotlin2.never
@@ -168,7 +167,7 @@ class DefaultBrowserPageExperimentViewModelTest {
         assertTrue(viewState().showInstructionsCard)
         assertTrue(captureCommands().lastValue is Command.OpenDialog)
         assertEquals(1, (captureCommands().lastValue as Command.OpenDialog).timesOpened)
-        verify(mockPixel, never()).fire(any<Pixel.PixelName>(), any())
+        verify(mockPixel).fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_RESULT_JUST_ONCE)
     }
 
     @Test
@@ -179,7 +178,7 @@ class DefaultBrowserPageExperimentViewModelTest {
 
         assertFalse(viewState().showInstructionsCard)
         assertTrue(captureCommands().lastValue is Command.ContinueToBrowser)
-        verify(mockPixel, never()).fire(any<Pixel.PixelName>(), any())
+        verify(mockPixel).fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_RESULT_MAX_JUST_ONCE)
     }
 
     @Test
@@ -191,7 +190,7 @@ class DefaultBrowserPageExperimentViewModelTest {
 
         assertTrue(viewState().showSettingsUI)
         assertFalse(viewState().showInstructionsCard)
-        verify(mockPixel, never()).fire(any<Pixel.PixelName>(), any())
+        verify(mockPixel).fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_RESULT_EXTERNAL)
     }
 
     @Test
@@ -226,6 +225,15 @@ class DefaultBrowserPageExperimentViewModelTest {
         testee.handleResult(Origin.Settings)
 
         verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_SET, params)
+    }
+
+    @Test
+    fun whenUserDoesNotSelectedDDGAsDefaultThenFirePixel() {
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+
+        testee.handleResult(Origin.Settings)
+
+        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_NOT_SET)
     }
 
     private fun captureCommands(): ArgumentCaptor<Command> {

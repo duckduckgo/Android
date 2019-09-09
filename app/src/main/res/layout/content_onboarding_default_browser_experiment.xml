@@ -24,36 +24,17 @@
     tools:background="@color/white"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
-
-    <TextView
-        android:id="@+id/welcomeToDuckDuckGoTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:fontFamily="sans-serif-black"
-        android:lineSpacingExtra="2sp"
-        android:text="@string/defaultBrowserWelcome"
-        android:textAlignment="center"
-        android:textColor="@color/brownishGrayTwo"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <ImageView
         android:id="@+id/defaultBrowserImage"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="40dp"
-        android:layout_marginTop="42dp"
-        android:layout_marginBottom="26dp"
+        android:layout_margin="30dp"
         android:importantForAccessibility="no"
         android:src="@drawable/set_as_default_browser_illustration_experiment"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/welcomeToDuckDuckGoTitle"
+        app:layout_constraintTop_toBottomOf="@id/defaultCard"
         app:layout_constraintVertical_bias="0.5"
         app:layout_constraintWidth_max="300dp" />
 

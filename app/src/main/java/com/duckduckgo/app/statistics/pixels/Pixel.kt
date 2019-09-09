@@ -41,6 +41,9 @@ interface Pixel {
 
         ONBOARDING_DEFAULT_BROWSER_LAUNCHED("m_odb_l"),
         ONBOARDING_DEFAULT_BROWSER_SKIPPED("m_odb_s"),
+        ONBOARDING_DEFAULT_BROWSER_RESULT_EXTERNAL("m_odb_e"),
+        ONBOARDING_DEFAULT_BROWSER_RESULT_JUST_ONCE("m_odb_jo"),
+        ONBOARDING_DEFAULT_BROWSER_RESULT_MAX_JUST_ONCE("m_odb_s_jo"),
 
         PRIVACY_DASHBOARD_OPENED("mp"),
         PRIVACY_DASHBOARD_SCORECARD("mp_c"),
@@ -55,6 +58,7 @@ interface Pixel {
         TRACKER_BLOCKER_DASHBOARD_TURNED_OFF(pixelName = "m_tb_off_pd"),
 
         DEFAULT_BROWSER_SET("m_db_s"),
+        DEFAULT_BROWSER_NOT_SET("m_db_ns"),
         DEFAULT_BROWSER_UNSET("m_db_u"),
         WIDGETS_ADDED(pixelName = "m_w_a"),
         WIDGETS_DELETED(pixelName = "m_w_d"),

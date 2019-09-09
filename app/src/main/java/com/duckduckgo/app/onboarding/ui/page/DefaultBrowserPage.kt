@@ -117,6 +117,8 @@ class DefaultBrowserPage : OnboardingPageFragment() {
                 PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()
             )
             pixel.fire(PixelName.DEFAULT_BROWSER_SET, params)
+        } else {
+            pixel.fire(PixelName.DEFAULT_BROWSER_NOT_SET)
         }
     }
 
