@@ -71,7 +71,10 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Observable
 import io.reactivex.Single
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.resetMain
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -228,11 +231,13 @@ class BrowserTabViewModelTest {
         whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
     }
 
+    @ExperimentalCoroutinesApi
     @After
     fun after() {
         testee.onCleared()
         db.close()
         testee.command.removeObserver(mockCommandObserver)
+        Dispatchers.resetMain()
     }
 
     @Test
@@ -661,6 +666,7 @@ class BrowserTabViewModelTest {
         assertFalse(browserViewState().showMenuButton)
     }
 
+    // Test failed here
     @Test
     fun whenEnteringQueryWithAutoCompleteEnabledThenAutoCompleteSuggestionsShown() {
         whenever(mockBookmarksDao.bookmarksByQuery("%foo%")).thenReturn(Single.just(emptyList()))
@@ -798,6 +804,8 @@ class BrowserTabViewModelTest {
         assertFalse(browserViewState().canGoForward)
     }
 
+
+    // failed test
     @Test
     fun whenHomeShowingByPressingBackOnBrowserThenForwardButtonActive() {
         setupNavigation(isBrowsing = true)
@@ -1010,6 +1018,8 @@ class BrowserTabViewModelTest {
         assertEquals("foo.com", command.url)
     }
 
+
+    // Failed test here
     @Test
     fun whenRestoringWebViewSessionNotRestorableAndNoPreviousUrlThenNoUrlLoaded() {
         whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(false)

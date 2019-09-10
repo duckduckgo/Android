@@ -31,7 +31,11 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.resetMain
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -66,6 +70,13 @@ class WebViewRequestInterceptorTest {
 
         webView = WebView(context)
     }
+
+    @ExperimentalCoroutinesApi
+    @After
+    fun after() {
+        Dispatchers.resetMain()
+    }
+
 
     @Test
     fun whenUrlShouldBeUpgradedThenUpgraderInvoked() = runBlocking<Unit> {
