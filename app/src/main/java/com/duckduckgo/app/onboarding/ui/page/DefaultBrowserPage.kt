@@ -70,6 +70,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
             }
             onContinuePressed()
         }
+        pixel.fire(PixelName.ONBOARDING_DEFAULT_BROWSER_VISUALIZED)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -114,11 +115,15 @@ class DefaultBrowserPage : OnboardingPageFragment() {
         if (isDefault) {
             installStore.defaultBrowser = true
             val params = mapOf(
-                PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()
+                PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
+                PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to PixelValues.DEFAULT_BROWSER_SETTINGS
             )
             pixel.fire(PixelName.DEFAULT_BROWSER_SET, params)
         } else {
-            pixel.fire(PixelName.DEFAULT_BROWSER_NOT_SET)
+            val params = mapOf(
+                PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to PixelValues.DEFAULT_BROWSER_SETTINGS
+            )
+            pixel.fire(PixelName.DEFAULT_BROWSER_NOT_SET, params)
         }
     }
 

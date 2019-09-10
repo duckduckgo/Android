@@ -28,7 +28,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.global.ViewModelFactory
@@ -44,6 +43,7 @@ import android.text.style.ForegroundColorSpan
 import android.text.SpannableString
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.content_onboarding_default_browser_card.*
 
 class DefaultBrowserPageExperiment : OnboardingPageFragment() {
@@ -53,10 +53,11 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
     lateinit var viewModelFactory: ViewModelFactory
 
     private var userTriedToSetDDGAsDefault = false
+    private var userSelectedExternalBrowser = false
     private var toast: Toast? = null
 
     private val viewModel: DefaultBrowserPageExperimentViewModel by lazy {
-        ViewModelProviders.of(this, viewModelFactory).get(DefaultBrowserPageExperimentViewModel::class.java)
+        ViewModelProvider(this, viewModelFactory).get(DefaultBrowserPageExperimentViewModel::class.java)
     }
 
     override fun onAttach(context: Context) {
@@ -73,17 +74,17 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
 
         observeViewModel()
 
-        launchSettingsButton.setOnClickListener {
-            viewModel.onDefaultBrowserClicked()
-        }
-        continueButton.setOnClickListener {
-            viewModel.onContinueToBrowser(userTriedToSetDDGAsDefault)
-        }
+        setButtonsBehaviour()
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.reloadUI()
+        viewModel.loadUI()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        userSelectedExternalBrowser = true
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -109,15 +110,31 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
         })
     }
 
+    private fun setButtonsBehaviour() {
+        launchSettingsButton.setOnClickListener {
+            viewModel.onDefaultBrowserClicked()
+        }
+        continueButton.setOnClickListener {
+            viewModel.onContinueToBrowser(userTriedToSetDDGAsDefault)
+        }
+    }
+
     private fun setOnlyContinue(visible: Boolean) {
         if (visible) {
-            extractContinueButtonTextResourceId()?.let { continueButton.setText(it) }
-            launchSettingsButton.visibility = View.GONE
+            continueButton.visibility = View.INVISIBLE
             browserProtectionSubtitle.setText(R.string.defaultBrowserDescriptionDefaultSet)
             browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitleDefaultSet)
+
+            defaultBrowserImage.setImageResource(R.drawable.hiker)
+
+            extractContinueButtonTextResourceId()?.let { launchSettingsButton.setText(it) }
+            launchSettingsButton.setOnClickListener {
+                viewModel.onContinueToBrowser(userTriedToSetDDGAsDefault)
+            }
         } else {
-            continueButton.setText(R.string.defaultBrowserMaybeLater)
-            launchSettingsButton.visibility = View.VISIBLE
+            launchSettingsButton.setText(R.string.defaultBrowserLetsDoIt)
+            continueButton.visibility = View.VISIBLE
+            setButtonsBehaviour()
         }
     }
 
@@ -201,11 +218,17 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
             }
             DEFAULT_BROWSER_REQUEST_CODE_DIALOG -> {
                 val timesOpened = data?.getIntExtra(TIMES_OPENED, -1)
-                val origin = if (timesOpened != null && timesOpened != -1) {
-                    DefaultBrowserPageExperimentViewModel.Origin.InternalBrowser(timesOpened)
-                } else {
-                    DefaultBrowserPageExperimentViewModel.Origin.ExternalBrowser
-                }
+                val origin =
+                    if (timesOpened != null && timesOpened != -1) {
+                        DefaultBrowserPageExperimentViewModel.Origin.InternalBrowser(timesOpened)
+                    } else {
+                        if (userSelectedExternalBrowser) {
+                            DefaultBrowserPageExperimentViewModel.Origin.ExternalBrowser
+                        } else {
+                            DefaultBrowserPageExperimentViewModel.Origin.DialogDismissed
+                        }
+                    }
+                userSelectedExternalBrowser = false
                 viewModel.handleResult(origin)
             }
             else -> super.onActivityResult(requestCode, resultCode, data)

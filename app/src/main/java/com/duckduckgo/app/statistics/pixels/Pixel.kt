@@ -39,11 +39,10 @@ interface Pixel {
         WEB_RENDERER_GONE_KILLED("m_d_wrg_k"),
         BROKEN_SITE_REPORTED("m_bsr"),
 
+        ONBOARDING_DEFAULT_BROWSER_VISUALIZED("m_odb_v"),
         ONBOARDING_DEFAULT_BROWSER_LAUNCHED("m_odb_l"),
         ONBOARDING_DEFAULT_BROWSER_SKIPPED("m_odb_s"),
-        ONBOARDING_DEFAULT_BROWSER_RESULT_EXTERNAL("m_odb_e"),
-        ONBOARDING_DEFAULT_BROWSER_RESULT_JUST_ONCE("m_odb_jo"),
-        ONBOARDING_DEFAULT_BROWSER_RESULT_MAX_JUST_ONCE("m_odb_s_jo"),
+        ONBOARDING_DEFAULT_BROWSER_SELECTED_JUST_ONCE("m_odb_jo"),
 
         PRIVACY_DASHBOARD_OPENED("mp"),
         PRIVACY_DASHBOARD_SCORECARD("mp_c"),
@@ -130,11 +129,15 @@ interface Pixel {
         const val SHOWED_BOOKMARKS = "sb"
         const val DEFAULT_BROWSER_BEHAVIOUR_TRIGGERED = "bt"
         const val DEFAULT_BROWSER_SET_FROM_ONBOARDING = "fo"
+        const val DEFAULT_BROWSER_SET_ORIGIN = "dbo"
     }
 
     object PixelValues {
         const val DEFAULT_BROWSER_SETTINGS = "s"
         const val DEFAULT_BROWSER_DIALOG = "d"
+        const val DEFAULT_BROWSER_DIALOG_DISMISSED = "dd"
+        const val DEFAULT_BROWSER_JUST_ONCE_MAX = "jom"
+        const val DEFAULT_BROWSER_EXTERNAL = "e"
     }
 
     fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap())

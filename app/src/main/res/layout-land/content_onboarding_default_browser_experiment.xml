@@ -24,6 +24,26 @@
     tools:background="@color/white"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
+    <Button
+        android:id="@+id/continueButton"
+        style="@style/OnboardingButtonSecondaryCta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/defaultBrowserMaybeLater"
+        app:layout_constraintBottom_toTopOf="@+id/launchSettingsButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/launchSettingsButton"
+        style="@style/OnboardingButtonPrimaryCta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/defaultBrowserLetsDoIt"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <ImageView
         android:id="@+id/defaultBrowserImage"
         android:layout_width="0dp"
@@ -64,6 +84,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:fontFamily="sans-serif"
+        android:lineSpacingExtra="7sp"
         android:text="@string/defaultBrowserDescriptionNoDefault"
         android:textAlignment="center"
         android:textColor="@color/brownishGrayTwo"
@@ -75,36 +96,14 @@
         app:layout_constraintTop_toBottomOf="@id/browserProtectionTitle"
         app:layout_constraintWidth_max="500dp" />
 
-    <Button
-        android:id="@+id/continueButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/defaultBrowserMaybeLater"
-        style="@style/OnboardingButtonSecondaryCta"
-        app:layout_constraintBottom_toTopOf="@+id/launchSettingsButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-
-    <Button
-        android:id="@+id/launchSettingsButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/defaultBrowserLetsDoIt"
-        style="@style/OnboardingButtonPrimaryCta"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <include
-        layout="@layout/content_onboarding_default_browser_card"
         android:id="@+id/defaultCard"
-        android:visibility="invisible"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        layout="@layout/content_onboarding_default_browser_card"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        />
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

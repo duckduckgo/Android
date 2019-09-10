@@ -45,21 +45,29 @@ class DefaultBrowserPageExperimentViewModel(
         class InternalBrowser(val timesOpened: Int = 0) : Origin()
         object ExternalBrowser : Origin()
         object Settings : Origin()
+        object DialogDismissed : Origin()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     init {
-        viewState.value = ViewState(showSettingsUI = defaultBrowserDetector.hasDefaultBrowser())
+        viewState.value = ViewState(
+            showOnlyContinue = defaultBrowserDetector.isDefaultBrowser(),
+            showSettingsUI = defaultBrowserDetector.hasDefaultBrowser()
+        )
+        pixel.fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_VISUALIZED)
     }
 
-    fun reloadUI() {
-        viewState.value = viewState.value?.copy(showSettingsUI = defaultBrowserDetector.hasDefaultBrowser())
+    fun loadUI() {
+        viewState.value = viewState.value?.copy(
+            showOnlyContinue = defaultBrowserDetector.isDefaultBrowser(),
+            showSettingsUI = defaultBrowserDetector.hasDefaultBrowser()
+        )
     }
 
     fun onContinueToBrowser(userTriedToSetDDGAsDefault: Boolean) {
-        if (!userTriedToSetDDGAsDefault) {
+        if (!userTriedToSetDDGAsDefault && !defaultBrowserDetector.isDefaultBrowser()) {
             pixel.fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
         }
         command.value = Command.ContinueToBrowser
@@ -82,46 +90,54 @@ class DefaultBrowserPageExperimentViewModel(
 
     fun handleResult(origin: Origin) {
         val isDefault = defaultBrowserDetector.isDefaultBrowser()
+        val showSettingsUI = defaultBrowserDetector.hasDefaultBrowser()
+        var showInstructionsCard = false
         when (origin) {
             is Origin.InternalBrowser -> {
                 if (isDefault) {
-                    viewState.value = viewState.value?.copy(showOnlyContinue = true, showInstructionsCard = false)
+                    fireDefaultBrowserPixel(originValue = Pixel.PixelValues.DEFAULT_BROWSER_DIALOG)
                 } else {
                     if (origin.timesOpened < MAX_DIALOG_ATTEMPTS) {
-                        viewState.value = viewState.value?.copy(showOnlyContinue = false, showInstructionsCard = true)
+                        showInstructionsCard = true
                         command.value = Command.OpenDialog(origin.timesOpened)
-                        pixel.fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_RESULT_JUST_ONCE)
+                        pixel.fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SELECTED_JUST_ONCE)
                     } else {
-                        viewState.value = viewState.value?.copy(showInstructionsCard = false)
                         command.value = Command.ContinueToBrowser
-                        pixel.fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_RESULT_MAX_JUST_ONCE)
+                        fireDefaultBrowserPixel(originValue = Pixel.PixelValues.DEFAULT_BROWSER_JUST_ONCE_MAX)
                     }
                 }
             }
+            is Origin.DialogDismissed -> {
+                fireDefaultBrowserPixel(originValue = Pixel.PixelValues.DEFAULT_BROWSER_DIALOG_DISMISSED)
+            }
             is Origin.ExternalBrowser -> {
-                viewState.value = viewState.value?.copy(showSettingsUI = defaultBrowserDetector.hasDefaultBrowser(), showInstructionsCard = false)
-                pixel.fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_RESULT_EXTERNAL)
+                fireDefaultBrowserPixel(originValue = Pixel.PixelValues.DEFAULT_BROWSER_EXTERNAL)
             }
             is Origin.Settings -> {
-                if (isDefault) {
-                    viewState.value = viewState.value?.copy(showOnlyContinue = true, showInstructionsCard = false)
-                } else {
-                    viewState.value = viewState.value?.copy(showSettingsUI = true, showInstructionsCard = false)
-                }
+                fireDefaultBrowserPixel(originValue = Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS)
             }
         }
-        fireDefaultBrowserPixel()
+        viewState.value = viewState.value?.copy(
+            showOnlyContinue = isDefault,
+            showSettingsUI = showSettingsUI,
+            showInstructionsCard = showInstructionsCard
+        )
     }
 
-    private fun fireDefaultBrowserPixel() {
+    private fun fireDefaultBrowserPixel(originValue: String) {
         if (defaultBrowserDetector.isDefaultBrowser()) {
             installStore.defaultBrowser = true
             val params = mapOf(
-                Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()
+                Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
+                Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to originValue
             )
             pixel.fire(Pixel.PixelName.DEFAULT_BROWSER_SET, params)
         } else {
-            pixel.fire(Pixel.PixelName.DEFAULT_BROWSER_NOT_SET)
+            installStore.defaultBrowser = false
+            val params = mapOf(
+                Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to originValue
+            )
+            pixel.fire(Pixel.PixelName.DEFAULT_BROWSER_NOT_SET, params)
         }
     }
 
