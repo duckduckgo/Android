@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.brokensite
 
+import android.webkit.URLUtil
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
@@ -77,6 +78,10 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
         }
 
         if (url.isNullOrBlank()) {
+            return false
+        }
+
+        if (!URLUtil.isValidUrl(url)) {
             return false
         }
 
