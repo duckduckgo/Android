@@ -84,8 +84,7 @@ class FeedbackActivity : DuckDuckGoActivity(),
     private fun render(viewState: UpdateViewCommand) {
         Timber.v("ViewState is: $viewState")
 
-        val state = viewState.fragmentViewState
-        when (state) {
+        when (val state = viewState.fragmentViewState) {
             is FragmentState.InitialAppEnjoymentClarifier -> showInitialFeedbackView(state.forwardDirection)
             is FragmentState.PositiveFeedbackFirstStep -> showPositiveFeedbackView(state.forwardDirection)
             is FragmentState.PositiveShareFeedback -> showSharePositiveFeedbackView(state.forwardDirection)
