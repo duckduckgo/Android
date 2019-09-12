@@ -53,10 +53,6 @@ class WebViewRequestInterceptorTest {
 
     private lateinit var webView: WebView
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutinesTestRule = CoroutinesTestRule()
-
     @UiThreadTest
     @Before
     fun setup() {

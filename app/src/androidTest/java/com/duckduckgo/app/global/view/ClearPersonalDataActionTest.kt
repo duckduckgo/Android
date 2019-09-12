@@ -37,10 +37,6 @@ import org.junit.Test
 @Suppress("RemoveExplicitTypeArguments")
 class ClearPersonalDataActionTest {
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutinesTestRule = CoroutinesTestRule()
-
     private lateinit var testee: ClearPersonalDataAction
 
     private val mockDataManager: WebDataManager = mock()

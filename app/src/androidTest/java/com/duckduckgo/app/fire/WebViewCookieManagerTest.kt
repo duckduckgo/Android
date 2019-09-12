@@ -33,10 +33,6 @@ import kotlin.coroutines.suspendCoroutine
 @Suppress("RemoveExplicitTypeArguments")
 class WebViewCookieManagerTest {
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutinesTestRule = CoroutinesTestRule()
-
     private lateinit var testee: WebViewCookieManager
 
     private val cookieManager: CookieManager = CookieManager.getInstance()
