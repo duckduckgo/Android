@@ -38,13 +38,8 @@ import kotlinx.android.synthetic.main.content_onboarding_default_browser_experim
 import kotlinx.android.synthetic.main.content_onboarding_default_browser_experiment.defaultBrowserImage
 import timber.log.Timber
 import javax.inject.Inject
-import android.text.Spanned
-import android.text.style.ForegroundColorSpan
-import android.text.SpannableString
-import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
-import kotlinx.android.synthetic.main.content_onboarding_default_browser_card.*
+import com.duckduckgo.app.browser.BrowserActivity
 
 class DefaultBrowserPageExperiment : OnboardingPageFragment() {
     override fun layoutResource(): Int = R.layout.content_onboarding_default_browser_experiment
@@ -103,7 +98,7 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
 
         viewModel.command.observe(this, Observer {
             when (it) {
-                is DefaultBrowserPageExperimentViewModel.Command.OpenDialog -> onLaunchDefaultBrowserWithDialogClicked(it.timesOpened, it.url)
+                is DefaultBrowserPageExperimentViewModel.Command.OpenDialog -> onLaunchDefaultBrowserWithDialogClicked(it.url)
                 is DefaultBrowserPageExperimentViewModel.Command.OpenSettings -> onLaunchDefaultBrowserSettingsClicked()
                 is DefaultBrowserPageExperimentViewModel.Command.ContinueToBrowser -> onContinuePressed()
             }
@@ -158,11 +153,6 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
 
         val inflater = LayoutInflater.from(requireContext())
         val inflatedView = inflater.inflate(R.layout.content_onboarding_default_browser_card, null)
-        val instructionsTextToast = inflatedView.findViewById<TextView>(R.id.instructions)
-        val spannableString = getInstructionsCardSpannableString()
-
-        instructionsTextToast.text = spannableString
-        instructions.text = spannableString
 
         toast = Toast(requireContext()).apply {
             view = inflatedView
@@ -170,20 +160,6 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
             duration = Toast.LENGTH_LONG
         }
         toast?.show()
-    }
-
-    private fun getInstructionsCardSpannableString(): SpannableString {
-        val instructionsString = getString(R.string.defaultBrowserInstructions)
-        val spannableString = SpannableString(instructionsString)
-        val instructionsArray = instructionsString.split(ALWAYS.toRegex())
-
-        spannableString.setSpan(
-            ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.cornflowerBlue)),
-            instructionsArray[0].length,
-            instructionsString.indexOf(instructionsArray[1]),
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        return spannableString
     }
 
     private fun hideCard() {
@@ -194,10 +170,10 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
             .start()
     }
 
-    private fun onLaunchDefaultBrowserWithDialogClicked(timesOpened: Int, url: String) {
+    private fun onLaunchDefaultBrowserWithDialogClicked(url: String) {
         userTriedToSetDDGAsDefault = true
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        intent.putExtra(TIMES_OPENED, timesOpened)
+        intent.putExtra(BrowserActivity.LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, true)
         startActivityForResult(intent, DEFAULT_BROWSER_REQUEST_CODE_DIALOG)
     }
 
@@ -219,10 +195,9 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
                 viewModel.handleResult(DefaultBrowserPageExperimentViewModel.Origin.Settings)
             }
             DEFAULT_BROWSER_REQUEST_CODE_DIALOG -> {
-                val timesOpened = data?.getIntExtra(TIMES_OPENED, -1)
                 val origin =
-                    if (timesOpened != null && timesOpened != -1) {
-                        DefaultBrowserPageExperimentViewModel.Origin.InternalBrowser(timesOpened)
+                    if (resultCode == DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL) {
+                        DefaultBrowserPageExperimentViewModel.Origin.InternalBrowser
                     } else {
                         if (userSelectedExternalBrowser) {
                             DefaultBrowserPageExperimentViewModel.Origin.ExternalBrowser
@@ -238,10 +213,9 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
     }
 
     companion object {
-        private const val ALWAYS = "Always"
         private const val DEFAULT_BROWSER_REQUEST_CODE_SETTINGS = 100
         private const val SAVED_STATE_LAUNCHED_DEFAULT = "SAVED_STATE_LAUNCHED_DEFAULT"
         const val DEFAULT_BROWSER_REQUEST_CODE_DIALOG = 101
-        const val TIMES_OPENED = "timesOpened"
+        const val DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL = 102
     }
 }

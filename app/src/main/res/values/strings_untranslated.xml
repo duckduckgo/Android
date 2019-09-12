@@ -15,7 +15,7 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserTitleExperiment">Make DuckDuckGo Your Default</string>
@@ -27,7 +27,7 @@
     <string name="defaultBrowserLetsDoIt">Let\'s do it!</string>
     <string name="defaultBrowserDescriptionNoDefault">Open links with peace of mind, every time.</string>
     <string name="defaultBrowserDescriptionDefaultSet">With DuckDuckGo, your online data is more private by default, wherever the internet takes you.</string>
-    <string name="defaultBrowserInstructions">Select DuckDuckGo and tap Always.</string>
+    <string name="defaultBrowserInstructions">Select DuckDuckGo and tap <font color='#678fff'>Always</font>.</string>
 
     <string name="bookmarkEdited">Bookmark added</string>
 </resources>

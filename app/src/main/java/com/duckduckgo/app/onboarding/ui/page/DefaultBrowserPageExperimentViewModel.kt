@@ -36,13 +36,13 @@ class DefaultBrowserPageExperimentViewModel(
     )
 
     sealed class Command {
-        class OpenDialog(val timesOpened: Int = 0, val url: String = DEFAULT_URL) : Command()
+        class OpenDialog(val url: String = DEFAULT_URL) : Command()
         object OpenSettings : Command()
         object ContinueToBrowser : Command()
     }
 
     sealed class Origin {
-        class InternalBrowser(val timesOpened: Int = 0) : Origin()
+        object InternalBrowser : Origin()
         object ExternalBrowser : Origin()
         object Settings : Origin()
         object DialogDismissed : Origin()
@@ -50,6 +50,7 @@ class DefaultBrowserPageExperimentViewModel(
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
+    var timesPressedJustOnce: Int = 0
 
     init {
         viewState.value = ViewState(
@@ -78,6 +79,7 @@ class DefaultBrowserPageExperimentViewModel(
         if (defaultBrowserDetector.hasDefaultBrowser()) {
             command.value = Command.OpenSettings
         } else {
+            timesPressedJustOnce++
             behaviourTriggered = Pixel.PixelValues.DEFAULT_BROWSER_DIALOG
             command.value = Command.OpenDialog()
             viewState.value = viewState.value?.copy(showInstructionsCard = true)
@@ -97,9 +99,10 @@ class DefaultBrowserPageExperimentViewModel(
                 if (isDefault) {
                     fireDefaultBrowserPixel(originValue = Pixel.PixelValues.DEFAULT_BROWSER_DIALOG)
                 } else {
-                    if (origin.timesOpened < MAX_DIALOG_ATTEMPTS) {
+                    if (timesPressedJustOnce < MAX_DIALOG_ATTEMPTS) {
+                        timesPressedJustOnce++
                         showInstructionsCard = true
-                        command.value = Command.OpenDialog(origin.timesOpened)
+                        command.value = Command.OpenDialog()
                         pixel.fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SELECTED_JUST_ONCE)
                     } else {
                         command.value = Command.ContinueToBrowser
@@ -108,12 +111,15 @@ class DefaultBrowserPageExperimentViewModel(
                 }
             }
             is Origin.DialogDismissed -> {
+                timesPressedJustOnce = 0
                 fireDefaultBrowserPixel(originValue = Pixel.PixelValues.DEFAULT_BROWSER_DIALOG_DISMISSED)
             }
             is Origin.ExternalBrowser -> {
+                timesPressedJustOnce = 0
                 fireDefaultBrowserPixel(originValue = Pixel.PixelValues.DEFAULT_BROWSER_EXTERNAL)
             }
             is Origin.Settings -> {
+                timesPressedJustOnce = 0
                 fireDefaultBrowserPixel(originValue = Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS)
             }
         }
