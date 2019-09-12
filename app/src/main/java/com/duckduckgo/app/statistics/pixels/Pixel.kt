@@ -49,6 +49,13 @@ interface Pixel {
         PRIVACY_DASHBOARD_PRIVACY_PRACTICES("mp_p"),
         PRIVACY_DASHBOARD_NETWORKS("mp_n"),
 
+        HTTPS_NO_LOOKUP("m_https_nl"),
+        HTTPS_LOCAL_UPGRADE("m_https_lu"),
+        HTTPS_SERVICE_REQUEST_UPGRADE("m_https_sru"),
+        HTTPS_SERVICE_CACHE_UPGRADE("m_https_scu"),
+        HTTPS_SERVICE_REQUEST_NO_UPGRADE("m_https_srn"),
+        HTTPS_SERVICE_CACHE_NO_UPGRADE("m_https_scn"),
+
         TRACKER_BLOCKER_HISTORICAL_ON(pixelName = "m_tb_on_h"),
         TRACKER_BLOCKER_HISTORICAL_OFF(pixelName = "m_tb_off_h"),
         TRACKER_BLOCKER_DASHBOARD_TURNED_ON(pixelName = "m_tb_on_pd"),

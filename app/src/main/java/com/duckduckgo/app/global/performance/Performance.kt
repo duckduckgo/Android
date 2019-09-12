@@ -20,13 +20,15 @@ package com.duckduckgo.app.global.performance
 
 import android.util.Log
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
+object PerformanceConstants {
+    const val NANO_TO_MILLIS_DIVISOR = 1_000_000.0
+}
 
 inline fun <T> measureExecution(logMessage: String, logLevel: Int = Log.DEBUG, function: () -> T): T {
     val startTime = System.nanoTime()
     return function.invoke().also {
-        val difference = System.nanoTime() - startTime
-        Timber.log(logLevel, "$logMessage; took ${TimeUnit.NANOSECONDS.toMillis(difference)}ms")
+        val difference = (System.nanoTime() - startTime) / PerformanceConstants.NANO_TO_MILLIS_DIVISOR
+        Timber.log(logLevel, "$logMessage; took ${difference}ms")
     }
 }
