@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.view
 
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.CoroutinesTestRule
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
@@ -27,12 +28,18 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 @Suppress("RemoveExplicitTypeArguments")
 class ClearPersonalDataActionTest {
+
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    var coroutinesTestRule = CoroutinesTestRule()
 
     private lateinit var testee: ClearPersonalDataAction
 

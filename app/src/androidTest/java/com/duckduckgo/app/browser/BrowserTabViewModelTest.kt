@@ -27,6 +27,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import com.duckduckgo.app.CoroutinesTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
@@ -95,6 +96,10 @@ class BrowserTabViewModelTest {
     @get:Rule
     @Suppress("unused")
     val schedulers = InstantSchedulersRule()
+
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    var coroutinesTestRule = CoroutinesTestRule()
 
     @Mock
     private lateinit var mockPrevalenceStore: PrevalenceStore
@@ -237,7 +242,6 @@ class BrowserTabViewModelTest {
         testee.onCleared()
         db.close()
         testee.command.removeObserver(mockCommandObserver)
-        Dispatchers.resetMain()
     }
 
     @Test
