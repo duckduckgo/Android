@@ -65,7 +65,7 @@
         android:layout_marginTop="26dp"
         android:fontFamily="sans-serif"
         android:lineSpacingExtra="3sp"
-        android:text="@string/onboardingDefaultBrowserTitle"
+        android:text="@string/onboardingDefaultBrowserTitleExperiment"
         android:textAlignment="center"
         android:textColor="@color/almostBlack"
         android:textSize="22sp"

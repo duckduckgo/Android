@@ -141,11 +141,13 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
     private fun setUIForDialog() {
         defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_experiment)
         browserProtectionSubtitle.setText(R.string.defaultBrowserDescriptionNoDefault)
+        browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitleExperiment)
     }
 
     private fun setUIForSettings() {
         defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration)
         browserProtectionSubtitle.setText(R.string.onboardingDefaultBrowserDescription)
+        browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitleExperiment)
     }
 
     @SuppressLint("InflateParams")
