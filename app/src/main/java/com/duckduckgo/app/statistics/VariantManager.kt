@@ -16,10 +16,12 @@
 
 package com.duckduckgo.app.statistics
 
+import android.os.Build
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
+import java.util.Locale
 
 @WorkerThread
 interface VariantManager {
@@ -34,20 +36,26 @@ interface VariantManager {
     companion object {
 
         // this will be returned when there are no other active experiments
-        val DEFAULT_VARIANT = Variant(key = "", features = emptyList())
+        val DEFAULT_VARIANT = Variant(key = "", features = emptyList(), restrictToEnglish = false)
 
         val ACTIVE_VARIANTS = listOf(
 
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
-            Variant(key = "sc", weight = 0.0, features = emptyList()),
-            Variant(key = "se", weight = 0.0, features = emptyList()),
+            Variant(key = "sc", weight = 0.0, features = emptyList(), restrictToEnglish = false),
+            Variant(key = "se", weight = 0.0, features = emptyList(), restrictToEnglish = false),
 
-            Variant(key = "mw", weight = 1.0, features = emptyList()),
-            Variant(key = "mx", weight = 1.0, features = listOf(VariantFeature.TabSwitcherGrid)),
+            Variant(key = "mw", weight = 1.0, features = emptyList(), restrictToEnglish = false),
+            Variant(key = "mx", weight = 1.0, features = listOf(VariantFeature.TabSwitcherGrid), restrictToEnglish = false),
 
-            Variant(key = "mp", weight = 1.0, features = emptyList()),
-            Variant(key = "mo", weight = 1.0, features = listOf(VariantFeature.OnboardingExperiment))
+            Variant(key = "mp", weight = 1.0, features = emptyList(), restrictToEnglish = true, minApi = Build.VERSION_CODES.N),
+            Variant(
+                key = "mo",
+                weight = 1.0,
+                features = listOf(VariantFeature.OnboardingExperiment),
+                restrictToEnglish = true,
+                minApi = Build.VERSION_CODES.N
+            )
         )
     }
 
@@ -95,13 +103,23 @@ class ExperimentationVariantManager(
     }
 
     private fun generateVariant(activeVariants: List<Variant>): Variant {
-        val weightSum = activeVariants.sumByDouble { it.weight }
+        val weightSum = filterByEnglishLocale(filterByApi(activeVariants)).sumByDouble { it.weight }
         if (weightSum == 0.0) {
             Timber.v("No variants active; allocating default")
             return DEFAULT_VARIANT
         }
         val randomizedIndex = indexRandomizer.random(activeVariants)
         return activeVariants[randomizedIndex]
+    }
+
+    private fun filterByApi(activeVariants: List<Variant>) = activeVariants.filter { it.minApi == null || it.minApi <= Build.VERSION.SDK_INT }
+
+    private fun filterByEnglishLocale(activeVariants: List<Variant>): List<Variant> =
+        activeVariants.filter { (it.restrictToEnglish && isEnglishLocale() || !it.restrictToEnglish) }
+
+    private fun isEnglishLocale(): Boolean {
+        val locale = Locale.getDefault()
+        return locale != null && locale.language == "en"
     }
 }
 
@@ -113,7 +131,9 @@ class ExperimentationVariantManager(
 data class Variant(
     val key: String,
     override val weight: Double = 0.0,
-    val features: List<VariantManager.VariantFeature> = emptyList()
+    val features: List<VariantManager.VariantFeature> = emptyList(),
+    val restrictToEnglish: Boolean,
+    val minApi: Int? = null
 ) : Probabilistic {
 
     fun hasFeature(feature: VariantManager.VariantFeature) = features.contains(feature)
