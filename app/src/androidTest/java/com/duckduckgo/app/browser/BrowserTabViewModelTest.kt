@@ -218,7 +218,7 @@ class BrowserTabViewModelTest {
         testee.command.observeForever(mockCommandObserver)
 
         whenever(mockOmnibarConverter.convertQueryToUrl(any())).thenReturn("duckduckgo.com")
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
+        whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
     }
 
     @After
@@ -481,7 +481,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenProgressChangesToFinishedAndImprovedTabUxVariantActiveThenWebViewPreviewGenerated() {
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("mx", 1.0, listOf(VariantManager.VariantFeature.TabSwitcherGrid)))
+        whenever(mockVariantManager.getVariant()).thenReturn(Variant("mx", 1.0, listOf(VariantManager.VariantFeature.TabSwitcherGrid), restrictToEnglish = false))
         updateUrl("https://example.com", "https://example.com", true)
         testee.progressChanged(100)
         val command = captureCommands().lastValue as Command.GenerateWebViewPreviewImage
