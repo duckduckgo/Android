@@ -25,7 +25,6 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
@@ -40,6 +39,8 @@ import timber.log.Timber
 import javax.inject.Inject
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.global.view.hide
+import com.duckduckgo.app.global.view.show
 
 class DefaultBrowserPageExperiment : OnboardingPageFragment() {
     override fun layoutResource(): Int = R.layout.content_onboarding_default_browser_experiment
@@ -90,7 +91,7 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
     private fun observeViewModel() {
         viewModel.viewState.observe(this, Observer<DefaultBrowserPageExperimentViewModel.ViewState> { viewState ->
             viewState?.let {
-                if (it.showSettingsUI) setUIForSettings() else setUIForDialog()
+                if (it.showSettingsUi) setUiForSettings() else setUiForDialog()
                 if (it.showInstructionsCard) showCard() else hideCard()
                 setOnlyContinue(it.showOnlyContinue)
             }
@@ -116,7 +117,7 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
 
     private fun setOnlyContinue(visible: Boolean) {
         if (visible) {
-            continueButton.visibility = View.INVISIBLE
+            continueButton.hide()
             browserProtectionSubtitle.setText(R.string.defaultBrowserDescriptionDefaultSet)
             browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitleDefaultSet)
 
@@ -128,18 +129,18 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
             }
         } else {
             launchSettingsButton.setText(R.string.defaultBrowserLetsDoIt)
-            continueButton.visibility = View.VISIBLE
+            continueButton.show()
             setButtonsBehaviour()
         }
     }
 
-    private fun setUIForDialog() {
+    private fun setUiForDialog() {
         defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_experiment)
         browserProtectionSubtitle.setText(R.string.defaultBrowserDescriptionNoDefault)
         browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitleExperiment)
     }
 
-    private fun setUIForSettings() {
+    private fun setUiForSettings() {
         defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration)
         browserProtectionSubtitle.setText(R.string.onboardingDefaultBrowserDescription)
         browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitleExperiment)
@@ -148,7 +149,7 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
     @SuppressLint("InflateParams")
     private fun showCard() {
         toast?.cancel()
-        defaultCard.visibility = View.VISIBLE
+        defaultCard.show()
         defaultCard.alpha = 1f
 
         val inflater = LayoutInflater.from(requireContext())

@@ -70,7 +70,7 @@ class StatisticsRequesterJsonTest {
         statisticsStore.clearAtb()
 
         testee = StatisticsRequester(statisticsStore, statisticsService, mockVariantManager)
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("ma", 100.0))
+        whenever(mockVariantManager.getVariant()).thenReturn(Variant("ma", 100.0, restrictToEnglish = false))
     }
 
     @After

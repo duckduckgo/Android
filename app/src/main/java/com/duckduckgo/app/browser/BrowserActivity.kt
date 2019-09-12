@@ -164,7 +164,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
         }
 
         if (intent.getBooleanExtra(LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, false)) {
-            Timber.i("Setting DDG as default browser")
             setResult(DefaultBrowserPageExperiment.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL)
             finish()
             return

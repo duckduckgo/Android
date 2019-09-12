@@ -43,7 +43,7 @@ class ExperimentationVariantManagerTest {
 
     @Test
     fun whenVariantAlreadyPersistedThenVariantReturned() {
-        activeVariants.add(Variant("foo", 100.0))
+        activeVariants.add(Variant("foo", 100.0, restrictToEnglish = false))
         whenever(mockStore.variant).thenReturn("foo")
 
         assertEquals("foo", testee.getVariant(activeVariants).key)
@@ -51,7 +51,7 @@ class ExperimentationVariantManagerTest {
 
     @Test
     fun whenVariantAlreadyPersistedThenVariantAllocatorNeverInvoked() {
-        activeVariants.add(Variant("foo", 100.0))
+        activeVariants.add(Variant("foo", 100.0, restrictToEnglish = false))
         whenever(mockStore.variant).thenReturn("foo")
 
         testee.getVariant(activeVariants)
@@ -77,7 +77,7 @@ class ExperimentationVariantManagerTest {
 
     @Test
     fun whenVariantPersistedIsNotFoundInActiveVariantListThenRestoredToDefaultVariant() {
-        activeVariants.add(Variant("foo", 100.0))
+        activeVariants.add(Variant("foo", 100.0, restrictToEnglish = false))
         whenever(mockStore.variant).thenReturn("bar")
 
         assertEquals(VariantManager.DEFAULT_VARIANT, testee.getVariant(activeVariants))
@@ -85,7 +85,7 @@ class ExperimentationVariantManagerTest {
 
     @Test
     fun whenVariantPersistedIsNotFoundInActiveVariantListThenNewVariantIsPersisted() {
-        activeVariants.add(Variant("foo", 100.0))
+        activeVariants.add(Variant("foo", 100.0, restrictToEnglish = false))
 
         whenever(mockStore.variant).thenReturn("bar")
         testee.getVariant(activeVariants)
@@ -96,7 +96,7 @@ class ExperimentationVariantManagerTest {
 
     @Test
     fun whenNoVariantPersistedThenNewVariantAllocated() {
-        activeVariants.add(Variant("foo", 100.0))
+        activeVariants.add(Variant("foo", 100.0, restrictToEnglish = false))
 
         testee.getVariant(activeVariants)
 
@@ -105,7 +105,7 @@ class ExperimentationVariantManagerTest {
 
     @Test
     fun whenNoVariantPersistedThenNewVariantKeyIsAllocatedAndPersisted() {
-        activeVariants.add(Variant("foo", 100.0))
+        activeVariants.add(Variant("foo", 100.0, restrictToEnglish = false))
 
         testee.getVariant(activeVariants)
 

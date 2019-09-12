@@ -46,12 +46,15 @@ class AndroidDefaultBrowserDetector @Inject constructor(private val context: Con
         return defaultAlready
     }
 
-    override fun hasDefaultBrowser(): Boolean = defaultBrowserPackage() != "android"
+    override fun hasDefaultBrowser(): Boolean = defaultBrowserPackage() != ANDROID_PACKAGE
 
     private fun defaultBrowserPackage(): String {
         val intent = Intent(ACTION_VIEW, Uri.parse("https://"))
         val resolutionInfo: ResolveInfo? = context.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
-        return resolutionInfo?.activityInfo?.packageName ?: "android"
+        return resolutionInfo?.activityInfo?.packageName ?: ANDROID_PACKAGE
     }
 
+    companion object {
+        const val ANDROID_PACKAGE = "android"
+    }
 }

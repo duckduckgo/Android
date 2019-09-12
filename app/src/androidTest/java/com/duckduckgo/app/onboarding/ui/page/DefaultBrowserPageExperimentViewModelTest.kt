@@ -85,24 +85,34 @@ class DefaultBrowserPageExperimentViewModelTest {
 
         testee = DefaultBrowserPageExperimentViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore)
 
-        assertTrue(viewState().showSettingsUI)
+        assertTrue(viewState().showSettingsUi)
     }
 
     @Test
     fun whenInitializingIfThereIsNotADefaultBrowserThenShowDialogUI() {
-        assertFalse(viewState().showSettingsUI)
+        whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(false)
+
+        assertFalse(viewState().showSettingsUi)
     }
 
     @Test
-    fun whenLoadUiThenShowSettingsDependingOnDefaultBrowserValue() {
-        whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(true).thenReturn(false)
+    fun whenLoadUiThenShowSettingsUiIfDefaultBrowserIsTrue() {
+        whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(true)
 
         testee.loadUI()
-        assertTrue(viewState().showSettingsUI)
 
-        testee.loadUI()
-        assertFalse(viewState().showSettingsUI)
+        assertTrue(viewState().showSettingsUi)
     }
+
+    @Test
+    fun whenLoadUiThenShowDialogUiIfDefaultBrowserIsFalse() {
+        whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(false)
+
+        testee.loadUI()
+
+        assertFalse(viewState().showSettingsUi)
+    }
+
 
     @Test
     fun whenContinueButtonClickedWithoutTryingToSetDDGAsDefaultThenSendPixelAndExecuteContinueToBrowserCommand() {
@@ -168,7 +178,7 @@ class DefaultBrowserPageExperimentViewModelTest {
             Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to DEFAULT_BROWSER_DIALOG
         )
 
-        testee.handleResult(Origin.InternalBrowser())
+        testee.handleResult(Origin.InternalBrowser)
 
         assertTrue(viewState().showOnlyContinue)
         assertFalse(viewState().showInstructionsCard)
@@ -179,12 +189,12 @@ class DefaultBrowserPageExperimentViewModelTest {
     fun whenUserSetDDGAsJustOnceForFirstTimeThenShowInstructionsAgainOpenDialogAndFirePixel() {
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
 
-        testee.handleResult(Origin.InternalBrowser(1))
+        testee.handleResult(Origin.InternalBrowser)
 
         assertFalse(viewState().showOnlyContinue)
         assertTrue(viewState().showInstructionsCard)
         assertTrue(captureCommands().lastValue is Command.OpenDialog)
-        assertEquals(1, (captureCommands().lastValue as Command.OpenDialog).timesOpened)
+        assertEquals(1, testee.timesPressedJustOnce)
         verify(mockPixel).fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SELECTED_JUST_ONCE)
     }
 
@@ -195,7 +205,8 @@ class DefaultBrowserPageExperimentViewModelTest {
             Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to Pixel.PixelValues.DEFAULT_BROWSER_JUST_ONCE_MAX
         )
 
-        testee.handleResult(Origin.InternalBrowser(MAX_DIALOG_ATTEMPTS))
+        testee.timesPressedJustOnce = MAX_DIALOG_ATTEMPTS
+        testee.handleResult(Origin.InternalBrowser)
 
         assertFalse(viewState().showInstructionsCard)
         assertTrue(captureCommands().lastValue is Command.ContinueToBrowser)
@@ -212,7 +223,7 @@ class DefaultBrowserPageExperimentViewModelTest {
 
         testee.handleResult(Origin.DialogDismissed)
 
-        assertFalse(viewState().showSettingsUI)
+        assertFalse(viewState().showSettingsUi)
         assertFalse(viewState().showInstructionsCard)
         verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_NOT_SET, params)
     }
@@ -227,7 +238,7 @@ class DefaultBrowserPageExperimentViewModelTest {
 
         testee.handleResult(Origin.ExternalBrowser)
 
-        assertTrue(viewState().showSettingsUI)
+        assertTrue(viewState().showSettingsUi)
         assertFalse(viewState().showInstructionsCard)
         verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_NOT_SET, params)
     }
@@ -250,7 +261,7 @@ class DefaultBrowserPageExperimentViewModelTest {
 
         testee.handleResult(Origin.Settings)
 
-        assertTrue(viewState().showSettingsUI)
+        assertTrue(viewState().showSettingsUi)
         assertFalse(viewState().showInstructionsCard)
     }
 
@@ -277,6 +288,63 @@ class DefaultBrowserPageExperimentViewModelTest {
         testee.handleResult(Origin.Settings)
 
         verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_NOT_SET, params)
+    }
+
+    @Test
+    fun whenOriginReceivedIsSettingsThenResetTimesPressedJustOnce() {
+        testee.timesPressedJustOnce = 1
+
+        testee.handleResult(Origin.Settings)
+
+        assertEquals(0, testee.timesPressedJustOnce)
+    }
+
+    @Test
+    fun whenOriginReceivedIsDialogDismissedThenResetTimesPressedJustOnce() {
+        testee.timesPressedJustOnce = 1
+
+        testee.handleResult(Origin.DialogDismissed)
+
+        assertEquals(0, testee.timesPressedJustOnce)
+    }
+
+    @Test
+    fun whenOriginReceivedIsExternalBrowserThenResetTimesPressedJustOnce() {
+        testee.timesPressedJustOnce = 1
+
+        testee.handleResult(Origin.ExternalBrowser)
+
+        assertEquals(0, testee.timesPressedJustOnce)
+    }
+
+    @Test
+    fun whenOriginReceivedIsInternalBrowserAndDDGIsTheDefaultBrowserThenResetTimesPressedJustOnce() {
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        testee.timesPressedJustOnce = 1
+
+        testee.handleResult(Origin.InternalBrowser)
+
+        assertEquals(0, testee.timesPressedJustOnce)
+    }
+
+    @Test
+    fun whenOriginReceivedIsInternalBrowserAndDDGIsNotTheDefaultBrowserThenIncreaseTimesPressedJustOnceIfIsLessThanTheMaxNumberOfAttempts() {
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        testee.timesPressedJustOnce = 1
+
+        testee.handleResult(Origin.InternalBrowser)
+
+        assertEquals(2, testee.timesPressedJustOnce)
+    }
+
+    @Test
+    fun whenOriginReceivedIsInternalBrowserAndDDGIsNotTheDefaultBrowserThenResetTimesPressedJustOnceIfIsGreaterOrEqualThanTheMaxNumberOfAttempts() {
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        testee.timesPressedJustOnce = MAX_DIALOG_ATTEMPTS
+
+        testee.handleResult(Origin.InternalBrowser)
+
+        assertEquals(0, testee.timesPressedJustOnce)
     }
 
     private fun captureCommands(): ArgumentCaptor<Command> {
