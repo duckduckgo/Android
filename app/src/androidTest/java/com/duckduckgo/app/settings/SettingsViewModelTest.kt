@@ -206,7 +206,7 @@ class SettingsViewModelTest {
 
     @Test
     fun whenVariantIsSetThenVariantKeyIncludedInSettings() {
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("ab"))
+        whenever(mockVariantManager.getVariant()).thenReturn(Variant("ab", filterBy = { true }))
         testee.start()
         val expectedStartString = "${BuildConfig.VERSION_NAME} ab (${BuildConfig.VERSION_CODE})"
         assertEquals(expectedStartString, latestViewState().version)
