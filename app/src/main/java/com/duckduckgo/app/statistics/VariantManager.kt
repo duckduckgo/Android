@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.statistics
 
-import android.os.Build
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -34,18 +33,23 @@ interface VariantManager {
     companion object {
 
         // this will be returned when there are no other active experiments
-        val DEFAULT_VARIANT = Variant(key = "", features = emptyList(), restrictToEnglish = false)
+        val DEFAULT_VARIANT = Variant(key = "", features = emptyList())
 
         val ACTIVE_VARIANTS = listOf(
 
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
-            Variant(key = "sc", weight = 0.0, features = emptyList(), restrictToEnglish = false),
-            Variant(key = "se", weight = 0.0, features = emptyList(), restrictToEnglish = false),
+            Variant(key = "sc", weight = 0.0, features = emptyList()),
+            Variant(key = "se", weight = 0.0, features = emptyList()),
 
-            Variant(key = "mw", weight = 1.0, features = emptyList(), restrictToEnglish = false),
-            Variant(key = "mx", weight = 1.0, features = listOf(VariantFeature.TabSwitcherGrid), restrictToEnglish = false)
+            Variant(key = "mw", weight = 1.0, features = emptyList()),
+            Variant(key = "mx", weight = 1.0, features = listOf(VariantFeature.TabSwitcherGrid))
         )
+
+        private fun isEnglishLocale(): Boolean {
+            val locale = Locale.getDefault()
+            return locale != null && locale.language == "en"
+        }
     }
 
     fun getVariant(activeVariants: List<Variant> = ACTIVE_VARIANTS): Variant
@@ -68,7 +72,7 @@ class ExperimentationVariantManager(
 
         if (currentVariantKey == null) {
             var newVariant = generateVariant(activeVariants)
-            val compliesWithFilters = filterByApi(newVariant) && filterByEnglishLocale(newVariant)
+            val compliesWithFilters = newVariant.filterBy()
 
             if (!compliesWithFilters) {
                 newVariant = DEFAULT_VARIANT
@@ -105,15 +109,6 @@ class ExperimentationVariantManager(
         val randomizedIndex = indexRandomizer.random(activeVariants)
         return activeVariants[randomizedIndex]
     }
-
-    private fun filterByApi(variant: Variant) = variant.minApi == null || variant.minApi <= Build.VERSION.SDK_INT
-
-    private fun filterByEnglishLocale(variant: Variant) = (variant.restrictToEnglish && isEnglishLocale() || !variant.restrictToEnglish)
-
-    private fun isEnglishLocale(): Boolean {
-        val locale = Locale.getDefault()
-        return locale != null && locale.language == "en"
-    }
 }
 
 /**
@@ -125,8 +120,7 @@ data class Variant(
     val key: String,
     override val weight: Double = 0.0,
     val features: List<VariantManager.VariantFeature> = emptyList(),
-    val restrictToEnglish: Boolean,
-    val minApi: Int? = null
+    val filterBy: () -> Boolean = { true }
 ) : Probabilistic {
 
     fun hasFeature(feature: VariantManager.VariantFeature) = features.contains(feature)
