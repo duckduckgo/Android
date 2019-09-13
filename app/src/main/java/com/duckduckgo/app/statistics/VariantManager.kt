@@ -33,19 +33,21 @@ interface VariantManager {
     companion object {
 
         // this will be returned when there are no other active experiments
-        val DEFAULT_VARIANT = Variant(key = "", features = emptyList(), filterBy = { true })
+        val DEFAULT_VARIANT = Variant(key = "", features = emptyList(), filterBy = { noFilter() })
 
         val ACTIVE_VARIANTS = listOf(
 
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
-            Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { true }),
-            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { true }),
+            Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
 
             // All groups in an experiment (control and variants) MUST use the same filters
-            Variant(key = "mw", weight = 1.0, features = emptyList(), filterBy = { true }),
-            Variant(key = "mx", weight = 1.0, features = listOf(VariantFeature.TabSwitcherGrid), filterBy = { true })
+            Variant(key = "mw", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "mx", weight = 1.0, features = listOf(VariantFeature.TabSwitcherGrid), filterBy = { noFilter() })
         )
+
+        private fun noFilter(): Boolean = true
 
         private fun isEnglishLocale(): Boolean {
             val locale = Locale.getDefault()
