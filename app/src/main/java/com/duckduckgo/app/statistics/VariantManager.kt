@@ -42,6 +42,7 @@ interface VariantManager {
             Variant(key = "sc", weight = 0.0, features = emptyList()),
             Variant(key = "se", weight = 0.0, features = emptyList()),
 
+            // All groups in an experiment (control and variants) MUST use the same filters
             Variant(key = "mw", weight = 1.0, features = emptyList()),
             Variant(key = "mx", weight = 1.0, features = listOf(VariantFeature.TabSwitcherGrid))
         )
