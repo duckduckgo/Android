@@ -67,7 +67,12 @@ class ExperimentationVariantManager(
         }
 
         if (currentVariantKey == null) {
-            val newVariant = generateVariant(activeVariants)
+            var newVariant = generateVariant(activeVariants)
+            val compliesWithFilters = filterByApi(newVariant) && filterByEnglishLocale(newVariant)
+
+            if (!compliesWithFilters) {
+                newVariant = DEFAULT_VARIANT
+            }
             Timber.i("Current variant is null; allocating new one $newVariant")
             persistVariant(newVariant)
             return newVariant
@@ -92,7 +97,7 @@ class ExperimentationVariantManager(
     }
 
     private fun generateVariant(activeVariants: List<Variant>): Variant {
-        val weightSum = filterByEnglishLocale(filterByApi(activeVariants)).sumByDouble { it.weight }
+        val weightSum = activeVariants.sumByDouble { it.weight }
         if (weightSum == 0.0) {
             Timber.v("No variants active; allocating default")
             return DEFAULT_VARIANT
@@ -101,10 +106,9 @@ class ExperimentationVariantManager(
         return activeVariants[randomizedIndex]
     }
 
-    private fun filterByApi(activeVariants: List<Variant>) = activeVariants.filter { it.minApi == null || it.minApi <= Build.VERSION.SDK_INT }
+    private fun filterByApi(variant: Variant) = variant.minApi == null || variant.minApi <= Build.VERSION.SDK_INT
 
-    private fun filterByEnglishLocale(activeVariants: List<Variant>): List<Variant> =
-        activeVariants.filter { (it.restrictToEnglish && isEnglishLocale() || !it.restrictToEnglish) }
+    private fun filterByEnglishLocale(variant: Variant) = (variant.restrictToEnglish && isEnglishLocale() || !variant.restrictToEnglish)
 
     private fun isEnglishLocale(): Boolean {
         val locale = Locale.getDefault()
