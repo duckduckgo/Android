@@ -57,7 +57,7 @@ class AtbIntegrationTest {
         statisticsStore = StatisticsSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
         statisticsStore.clearAtb()
 
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("ma", 100.0))
+        whenever(mockVariantManager.getVariant()).thenReturn(Variant("ma", 100.0, filterBy = { true }))
         service = getDaggerComponent().retrofit().create(StatisticsService::class.java)
         testee = StatisticsRequester(statisticsStore, service, mockVariantManager)
     }
