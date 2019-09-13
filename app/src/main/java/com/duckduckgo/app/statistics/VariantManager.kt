@@ -49,13 +49,15 @@ interface VariantManager {
             Variant(key = "mw", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "mx", weight = 1.0, features = listOf(VariantFeature.TabSwitcherGrid), filterBy = { noFilter() }),
 
-            Variant(key = "mp", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() && apiIsNougatOrAbove() }),
+            Variant(key = "mp", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() && apiIsNougatOrAbove() && isNotHuawei() }),
             Variant(
                 key = "mo",
                 weight = 1.0,
                 features = listOf(VariantFeature.OnboardingExperiment),
-                filterBy = { isEnglishLocale() && apiIsNougatOrAbove() })
+                filterBy = { isEnglishLocale() && apiIsNougatOrAbove() && isNotHuawei() })
         )
+
+        private fun isNotHuawei() = Build.MANUFACTURER != "HUAWEI"
 
         private fun apiIsNougatOrAbove(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
 
