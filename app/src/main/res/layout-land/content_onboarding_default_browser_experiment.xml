@@ -96,14 +96,4 @@
         app:layout_constraintTop_toBottomOf="@id/browserProtectionTitle"
         app:layout_constraintWidth_max="500dp" />
 
-    <include
-        android:id="@+id/defaultCard"
-        layout="@layout/content_onboarding_default_browser_card"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

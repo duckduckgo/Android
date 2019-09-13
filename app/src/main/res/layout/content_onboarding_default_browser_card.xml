@@ -32,7 +32,7 @@
             android:id="@+id/logo"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:layout_marginStart="30dp"
+            android:layout_marginStart="20dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:contentDescription="@string/duckDuckGoLogoDescription"
@@ -43,9 +43,9 @@
 
         <TextView
             android:id="@+id/instructions"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="18dp"
+            android:layout_marginEnd="20dp"
             android:fontFamily="sans-serif-medium"
             android:gravity="center"
             android:text="@string/defaultBrowserInstructions"

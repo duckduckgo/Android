@@ -48,13 +48,13 @@
         android:id="@+id/defaultBrowserImage"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="30dp"
+        android:layout_marginTop="60dp"
         android:importantForAccessibility="no"
         android:src="@drawable/set_as_default_browser_illustration_experiment"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/defaultCard"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5"
         app:layout_constraintWidth_max="300dp" />
 
@@ -77,7 +77,7 @@
     <TextView
         android:id="@+id/browserProtectionSubtitle"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginTop="10dp"
         android:fontFamily="sans-serif"
         android:lineSpacingExtra="7sp"
@@ -89,17 +89,8 @@
         app:layout_constraintEnd_toEndOf="@id/browserProtectionTitle"
         app:layout_constraintStart_toStartOf="@id/browserProtectionTitle"
         app:layout_constraintTop_toBottomOf="@id/browserProtectionTitle"
+        app:layout_constraintBottom_toTopOf="@id/continueButton"
         app:layout_constraintWidth_max="300dp"
         app:layout_constraintWidth_percent="0.8" />
-
-    <include
-        android:id="@+id/defaultCard"
-        layout="@layout/content_onboarding_default_browser_card"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

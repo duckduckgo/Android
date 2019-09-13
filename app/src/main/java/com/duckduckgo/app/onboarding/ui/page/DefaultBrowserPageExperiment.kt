@@ -25,6 +25,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
@@ -51,6 +52,7 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
     private var userTriedToSetDDGAsDefault = false
     private var userSelectedExternalBrowser = false
     private var toast: Toast? = null
+    private var defaultCard: View? = null
 
     private val viewModel: DefaultBrowserPageExperimentViewModel by lazy {
         ViewModelProvider(this, viewModelFactory).get(DefaultBrowserPageExperimentViewModel::class.java)
@@ -63,6 +65,7 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        defaultCard = activity?.findViewById(R.id.defaultCard)
 
         if (savedInstanceState != null) {
             userTriedToSetDDGAsDefault = savedInstanceState.getBoolean(SAVED_STATE_LAUNCHED_DEFAULT)
@@ -149,8 +152,8 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
     @SuppressLint("InflateParams")
     private fun showCard() {
         toast?.cancel()
-        defaultCard.show()
-        defaultCard.alpha = 1f
+        defaultCard?.show()
+        defaultCard?.alpha = 1f
 
         val inflater = LayoutInflater.from(requireContext())
         val inflatedView = inflater.inflate(R.layout.content_onboarding_default_browser_card, null)
@@ -165,10 +168,7 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
 
     private fun hideCard() {
         toast?.cancel()
-        defaultCard.animate()
-            .alpha(0f)
-            .setDuration(100)
-            .start()
+        defaultCard?.animate()?.alpha(0f)?.setDuration(100)?.start()
     }
 
     private fun onLaunchDefaultBrowserWithDialogClicked(url: String) {
