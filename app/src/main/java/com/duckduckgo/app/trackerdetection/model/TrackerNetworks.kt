@@ -19,13 +19,13 @@ package com.duckduckgo.app.trackerdetection.model
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.entities.EntityMapping
+import com.duckduckgo.app.global.uri.extractAllSubdomainHostCombinations
 import com.duckduckgo.app.global.uri.removeSubdomain
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
 
 interface TrackerNetworks {
     fun network(url: String): TrackerNetwork?
-
 }
 
 class TrackerNetworksLookup(
@@ -36,9 +36,8 @@ class TrackerNetworksLookup(
 
     @WorkerThread
     override fun network(url: String): TrackerNetwork? {
-
         val entity = entityMapping.entityForUrl(url) ?: return null
-        val tracker = recursivelyFindMatchingTracker(url)
+        val tracker = findMatchingTracker(url)
         val prevalence = prevalenceStore.findPrevalenceOf(entity.entityName)
 
         return TrackerNetwork(
@@ -48,30 +47,22 @@ class TrackerNetworksLookup(
         )
     }
 
-    private fun recursivelyFindMatchingTracker(url: String): DisconnectTracker? {
+    private fun findMatchingTracker(url: String): DisconnectTracker? {
         val uri = url.toUri()
         val host = uri.host ?: return null
+        val parentDomain = uri.removeSubdomain()
 
-        // try searching for exact domain
-        val direct = lookUpTrackerInDatabase(host)
-        if (direct != null) {
-            return direct
+        return if (parentDomain != null) {
+            val hosts = uri.extractAllSubdomainHostCombinations(host)
+            trackerDataDao.get(hosts)
+        } else {
+            trackerDataDao.get(host)
         }
-
-        // remove the first subdomain, and try again
-        val parentDomain = uri.removeSubdomain() ?: return null
-        return recursivelyFindMatchingTracker(parentDomain)
-    }
-
-    @WorkerThread
-    private fun lookUpTrackerInDatabase(url: String): DisconnectTracker? {
-        return trackerDataDao.get(url)
     }
 
     companion object {
 
         const val MAJOR_NETWORK_PREVALENCE = 7.0
-
     }
 }
 

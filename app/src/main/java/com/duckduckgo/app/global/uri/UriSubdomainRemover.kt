@@ -17,7 +17,21 @@
 package com.duckduckgo.app.global.uri
 
 import android.net.Uri
+import androidx.core.net.toUri
 
+fun Uri?.extractAllSubdomainHostCombinations(parentHost: String): List<String> {
+    var nextUri = this
+    var nextHost = parentHost
+    val hosts = mutableListOf<String>()
+    while (nextHost.isNotEmpty()) {
+        hosts.add(nextHost)
+        val nextDomain = nextUri?.removeSubdomain()
+        nextUri = nextDomain?.toUri()
+        nextHost = nextUri?.host ?: ""
+    }
+
+    return hosts
+}
 
 fun Uri.removeSubdomain(): String? {
     val host = host ?: return null
