@@ -18,10 +18,7 @@ package com.duckduckgo.app.entities
 
 import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.entities.db.EntityListEntity
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
@@ -65,48 +62,19 @@ class EntityMappingTest {
     @Test
     fun whenUrlContainsOneUnmatchedSubDomainAndOneMatchingDomainThenValueIsReturned() {
         val url = "a.b.com"
-        whenever(mockDao.get(url)).thenReturn(anEntity())
+        val domains = listOf("a.b.com", "b.com")
+        whenever(mockDao.get(domains)).doReturn(anEntity())
         val entity = testee.entityForUrl("https://$url")
         assertNotNull(entity)
-        verify(mockDao).get("a.b.com")
+        verify(mockDao).get(domains)
     }
 
     @Test
     fun whenUrlContainsOneMultipartTldThenTldIsSearchedForInDb() {
         val url = "a.co.uk"
+        val domains = listOf("a.co.uk", "co.uk")
         testee.entityForUrl("https://$url")
-        verify(mockDao).get("a.co.uk")
-        verify(mockDao).get("co.uk")
-    }
-
-    @Test
-    fun whenUrlContainsManyUnmatchedSubdomainsThenAllIntermediateValuesAreSearchedFor() {
-        val url = "a.b.c.com"
-        whenever(mockDao.get("a.b.c.com")).thenReturn(null)
-        whenever(mockDao.get("b.c.com")).thenReturn(null)
-        whenever(mockDao.get("c.com")).thenReturn(null)
-
-        val entity = testee.entityForUrl("https://$url")
-        assertNull(entity)
-        verify(mockDao).get("a.b.c.com")
-        verify(mockDao).get("b.c.com")
-        verify(mockDao).get("b.c.com")
-        verify(mockDao).get("c.com")
-    }
-
-    @Test
-    fun whenUrlContainsManyMatchingSubdomainsThenSearchingStopsWhenValueFound() {
-        val url = "a.b.c.com"
-        whenever(mockDao.get("a.b.c.com")).thenReturn(null)
-        whenever(mockDao.get("b.c.com")).thenReturn(anEntity())
-        whenever(mockDao.get("c.com")).thenReturn(null)
-
-        val entity = testee.entityForUrl("https://$url")
-        assertNotNull(entity)
-
-        verify(mockDao).get("a.b.c.com")
-        verify(mockDao).get("b.c.com")
-        verify(mockDao, never()).get("c.com")
+        verify(mockDao).get(domains)
     }
 
     private fun anEntity() = EntityListEntity("", "")
