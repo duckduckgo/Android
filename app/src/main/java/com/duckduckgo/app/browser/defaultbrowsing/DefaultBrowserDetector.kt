@@ -30,6 +30,7 @@ import javax.inject.Inject
 interface DefaultBrowserDetector {
     fun deviceSupportsDefaultBrowserConfiguration(): Boolean
     fun isDefaultBrowser(): Boolean
+    fun hasDefaultBrowser(): Boolean
 }
 
 class AndroidDefaultBrowserDetector @Inject constructor(private val context: Context) : DefaultBrowserDetector {
@@ -39,11 +40,21 @@ class AndroidDefaultBrowserDetector @Inject constructor(private val context: Con
     }
 
     override fun isDefaultBrowser(): Boolean {
+        val defaultBrowserPackage = defaultBrowserPackage()
+        val defaultAlready = defaultBrowserPackage == BuildConfig.APPLICATION_ID
+        Timber.i("Default browser identified as $defaultBrowserPackage")
+        return defaultAlready
+    }
+
+    override fun hasDefaultBrowser(): Boolean = defaultBrowserPackage() != ANDROID_PACKAGE
+
+    private fun defaultBrowserPackage(): String {
         val intent = Intent(ACTION_VIEW, Uri.parse("https://"))
         val resolutionInfo: ResolveInfo? = context.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
-        val defaultAlready = resolutionInfo?.activityInfo?.packageName == BuildConfig.APPLICATION_ID
+        return resolutionInfo?.activityInfo?.packageName ?: ANDROID_PACKAGE
+    }
 
-        Timber.i("Default browser identified as ${resolutionInfo?.activityInfo?.packageName}")
-        return defaultAlready
+    companion object {
+        const val ANDROID_PACKAGE = "android"
     }
 }

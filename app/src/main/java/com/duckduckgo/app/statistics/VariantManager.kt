@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.statistics
 
+import android.os.Build
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -28,6 +29,8 @@ interface VariantManager {
     sealed class VariantFeature {
         // variant-dependant features listed here
         object TabSwitcherGrid : VariantFeature()
+
+        object OnboardingExperiment : VariantFeature()
     }
 
     companion object {
@@ -44,8 +47,19 @@ interface VariantManager {
 
             // All groups in an experiment (control and variants) MUST use the same filters
             Variant(key = "mw", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "mx", weight = 1.0, features = listOf(VariantFeature.TabSwitcherGrid), filterBy = { noFilter() })
+            Variant(key = "mx", weight = 1.0, features = listOf(VariantFeature.TabSwitcherGrid), filterBy = { noFilter() }),
+
+            Variant(key = "mp", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() && apiIsNougatOrAbove() && isNotHuawei() }),
+            Variant(
+                key = "mo",
+                weight = 1.0,
+                features = listOf(VariantFeature.OnboardingExperiment),
+                filterBy = { isEnglishLocale() && apiIsNougatOrAbove() && isNotHuawei() })
         )
+
+        private fun isNotHuawei() = Build.MANUFACTURER != "HUAWEI"
+
+        private fun apiIsNougatOrAbove(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
 
         private fun noFilter(): Boolean = true
 
