@@ -497,7 +497,9 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenProgressChangesToFinishedAndImprovedTabUxVariantActiveThenWebViewPreviewGenerated() {
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("mx", 1.0, listOf(VariantManager.VariantFeature.TabSwitcherGrid)))
+        whenever(mockVariantManager.getVariant()).thenReturn(
+            Variant("mx", 1.0, listOf(VariantManager.VariantFeature.TabSwitcherGrid), filterBy = { true })
+        )
         updateUrl("https://example.com", "https://example.com", true)
         testee.progressChanged(100)
         val command = captureCommands().lastValue as Command.GenerateWebViewPreviewImage

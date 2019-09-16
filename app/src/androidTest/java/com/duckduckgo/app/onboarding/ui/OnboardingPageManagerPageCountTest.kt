@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding.ui
 
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.statistics.VariantManager
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertEquals
@@ -31,10 +32,11 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
     private lateinit var testee: OnboardingPageManager
     private val onboardingPageBuilder: OnboardingPageBuilder = mock()
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
+    private val mockVariantManager: VariantManager = mock()
 
     @Before
     fun setup() {
-        testee = OnboardingPageManagerWithTrackerBlocking(onboardingPageBuilder, mockDefaultBrowserDetector)
+        testee = OnboardingPageManagerWithTrackerBlocking(onboardingPageBuilder, mockDefaultBrowserDetector, mockVariantManager)
     }
 
     @Test

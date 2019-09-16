@@ -37,6 +37,7 @@ import com.duckduckgo.app.launch.LaunchActivity
 import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
+import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageExperiment
 import com.duckduckgo.app.onboarding.ui.page.UnifiedSummaryPage
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.privacy.ui.PrivacyPracticesActivity
@@ -131,6 +132,9 @@ abstract class AndroidBindingModule {
 
     @ContributesAndroidInjector
     abstract fun onboardingDefaultBrowserFragment(): DefaultBrowserPage
+
+    @ContributesAndroidInjector
+    abstract fun onboardingDefaultBrowserFragmentExperiment(): DefaultBrowserPageExperiment
 
     @ContributesAndroidInjector
     abstract fun appEnjoymentDialogFragment(): AppEnjoymentDialogFragment

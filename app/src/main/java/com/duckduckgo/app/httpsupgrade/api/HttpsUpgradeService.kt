@@ -22,6 +22,7 @@ import io.reactivex.Observable
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 interface HttpsUpgradeService {
 
@@ -33,4 +34,7 @@ interface HttpsUpgradeService {
 
     @GET("https://staticcdn.duckduckgo.com/https/https-mobile-bloom.bin?cache_version=1")
     fun httpsBloomFilter(): Call<ResponseBody>
+
+    @GET("https://duckduckgo.com/smarter_encryption.js")
+    fun upgradeListForPartialHost(@Query("pv1") partialSha1: String): Call<List<String>>
 }
