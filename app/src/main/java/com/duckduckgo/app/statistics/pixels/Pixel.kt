@@ -39,8 +39,10 @@ interface Pixel {
         WEB_RENDERER_GONE_KILLED("m_d_wrg_k"),
         BROKEN_SITE_REPORTED("m_bsr"),
 
-        ONBOARDING_DEFAULT_BROWSER_SETTINGS_LAUNCHED("m_odb_l"),
+        ONBOARDING_DEFAULT_BROWSER_VISUALIZED("m_odb_v"),
+        ONBOARDING_DEFAULT_BROWSER_LAUNCHED("m_odb_l"),
         ONBOARDING_DEFAULT_BROWSER_SKIPPED("m_odb_s"),
+        ONBOARDING_DEFAULT_BROWSER_SELECTED_JUST_ONCE("m_odb_jo"),
 
         PRIVACY_DASHBOARD_OPENED("mp"),
         PRIVACY_DASHBOARD_SCORECARD("mp_c"),
@@ -49,12 +51,20 @@ interface Pixel {
         PRIVACY_DASHBOARD_PRIVACY_PRACTICES("mp_p"),
         PRIVACY_DASHBOARD_NETWORKS("mp_n"),
 
+        HTTPS_NO_LOOKUP("m_https_nl"),
+        HTTPS_LOCAL_UPGRADE("m_https_lu"),
+        HTTPS_SERVICE_REQUEST_UPGRADE("m_https_sru"),
+        HTTPS_SERVICE_CACHE_UPGRADE("m_https_scu"),
+        HTTPS_SERVICE_REQUEST_NO_UPGRADE("m_https_srn"),
+        HTTPS_SERVICE_CACHE_NO_UPGRADE("m_https_scn"),
+
         TRACKER_BLOCKER_HISTORICAL_ON(pixelName = "m_tb_on_h"),
         TRACKER_BLOCKER_HISTORICAL_OFF(pixelName = "m_tb_off_h"),
         TRACKER_BLOCKER_DASHBOARD_TURNED_ON(pixelName = "m_tb_on_pd"),
         TRACKER_BLOCKER_DASHBOARD_TURNED_OFF(pixelName = "m_tb_off_pd"),
 
         DEFAULT_BROWSER_SET("m_db_s"),
+        DEFAULT_BROWSER_NOT_SET("m_db_ns"),
         DEFAULT_BROWSER_UNSET("m_db_u"),
         WIDGETS_ADDED(pixelName = "m_w_a"),
         WIDGETS_DELETED(pixelName = "m_w_d"),
@@ -124,6 +134,17 @@ interface Pixel {
         const val COUNT = "count"
         const val BOOKMARK_CAPABLE = "bc"
         const val SHOWED_BOOKMARKS = "sb"
+        const val DEFAULT_BROWSER_BEHAVIOUR_TRIGGERED = "bt"
+        const val DEFAULT_BROWSER_SET_FROM_ONBOARDING = "fo"
+        const val DEFAULT_BROWSER_SET_ORIGIN = "dbo"
+    }
+
+    object PixelValues {
+        const val DEFAULT_BROWSER_SETTINGS = "s"
+        const val DEFAULT_BROWSER_DIALOG = "d"
+        const val DEFAULT_BROWSER_DIALOG_DISMISSED = "dd"
+        const val DEFAULT_BROWSER_JUST_ONCE_MAX = "jom"
+        const val DEFAULT_BROWSER_EXTERNAL = "e"
     }
 
     fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap())

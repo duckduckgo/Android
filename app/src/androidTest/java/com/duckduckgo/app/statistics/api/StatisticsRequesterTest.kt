@@ -44,7 +44,7 @@ class StatisticsRequesterTest {
 
     @Before
     fun before() {
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("ma", 100.0))
+        whenever(mockVariantManager.getVariant()).thenReturn(Variant("ma", 100.0, filterBy = { true }))
         whenever(mockService.atb(any())).thenReturn(Observable.just(ATB))
         whenever(mockService.updateSearchAtb(any(), any(), any())).thenReturn(Observable.just(Atb(NEW_ATB)))
         whenever(mockService.exti(any(), any())).thenReturn(Observable.just(mockResponseBody))

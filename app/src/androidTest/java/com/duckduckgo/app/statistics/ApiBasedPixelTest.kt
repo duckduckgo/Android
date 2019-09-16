@@ -51,7 +51,7 @@ class ApiBasedPixelTest {
     fun whenPixelFiredThenPixelServiceCalledWithCorrectAtbAndVariant() {
         whenever(mockPixelService.fire(any(), any(), any(), anyOrNull())).thenReturn(Completable.complete())
         whenever(mockStatisticsDataStore.atb).thenReturn(Atb("atb"))
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("variant"))
+        whenever(mockVariantManager.getVariant()).thenReturn(Variant("variant", filterBy = { true }))
         whenever(mockDeviceInfo.formFactor()).thenReturn(DeviceInfo.FormFactor.PHONE)
 
         val pixel = ApiBasedPixel(mockPixelService, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo)
@@ -99,7 +99,7 @@ class ApiBasedPixelTest {
     fun whenPixelFiredWithAdditionalParametersThenPixelServiceCalledWithDefaultAndAdditionalParameters() {
         whenever(mockPixelService.fire(any(), any(), any(), any())).thenReturn(Completable.complete())
         whenever(mockStatisticsDataStore.atb).thenReturn(Atb("atb"))
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("variant"))
+        whenever(mockVariantManager.getVariant()).thenReturn(Variant("variant", filterBy = { true }))
         whenever(mockDeviceInfo.formFactor()).thenReturn(DeviceInfo.FormFactor.PHONE)
         whenever(mockDeviceInfo.appVersion).thenReturn("1.0.0")
 
@@ -115,7 +115,7 @@ class ApiBasedPixelTest {
     fun whenPixelFiredWithoutAdditionalParametersThenPixelServiceCalledWithOnlyDefaultParameters() {
         whenever(mockPixelService.fire(any(), any(), any(), any())).thenReturn(Completable.complete())
         whenever(mockStatisticsDataStore.atb).thenReturn(Atb("atb"))
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("variant"))
+        whenever(mockVariantManager.getVariant()).thenReturn(Variant("variant", filterBy = { true }))
         whenever(mockDeviceInfo.formFactor()).thenReturn(DeviceInfo.FormFactor.PHONE)
         whenever(mockDeviceInfo.appVersion).thenReturn("1.0.0")
 

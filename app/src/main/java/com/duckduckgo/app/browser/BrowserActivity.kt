@@ -39,6 +39,7 @@ import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.view.*
+import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageExperiment
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
@@ -159,6 +160,12 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
         Timber.i("launchNewSearchOrQuery: $intent")
 
         if (intent == null) {
+            return
+        }
+
+        if (intent.getBooleanExtra(LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, false)) {
+            setResult(DefaultBrowserPageExperiment.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL)
+            finish()
             return
         }
 
@@ -328,6 +335,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
         const val WIDGET_SEARCH_EXTRA = "WIDGET_SEARCH_EXTRA"
         const val PERFORM_FIRE_ON_ENTRY_EXTRA = "PERFORM_FIRE_ON_ENTRY_EXTRA"
         const val LAUNCHED_FROM_FIRE_EXTRA = "LAUNCHED_FROM_FIRE_EXTRA"
+        const val LAUNCH_FROM_DEFAULT_BROWSER_DIALOG = "LAUNCH_FROM_DEFAULT_BROWSER_DIALOG"
 
         private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"
 
