@@ -97,9 +97,9 @@ class BrowserTabViewModelTest {
     @Suppress("unused")
     val schedulers = InstantSchedulersRule()
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutinesTestRule = CoroutinesTestRule()
+//    @ExperimentalCoroutinesApi
+//    @get:Rule
+//    var coroutinesTestRule = CoroutinesTestRule()
 
     @Mock
     private lateinit var mockPrevalenceStore: PrevalenceStore
@@ -670,7 +670,6 @@ class BrowserTabViewModelTest {
         assertFalse(browserViewState().showMenuButton)
     }
 
-    // Test failed here
     @Test
     fun whenEnteringQueryWithAutoCompleteEnabledThenAutoCompleteSuggestionsShown() {
         whenever(mockBookmarksDao.bookmarksByQuery("%foo%")).thenReturn(Single.just(emptyList()))
@@ -808,8 +807,6 @@ class BrowserTabViewModelTest {
         assertFalse(browserViewState().canGoForward)
     }
 
-
-    // failed test
     @Test
     fun whenHomeShowingByPressingBackOnBrowserThenForwardButtonActive() {
         setupNavigation(isBrowsing = true)
@@ -1022,8 +1019,6 @@ class BrowserTabViewModelTest {
         assertEquals("foo.com", command.url)
     }
 
-
-    // Failed test here
     @Test
     fun whenRestoringWebViewSessionNotRestorableAndNoPreviousUrlThenNoUrlLoaded() {
         whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(false)
