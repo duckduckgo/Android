@@ -180,7 +180,7 @@ class BrowserTabViewModel(
         object LaunchLegacyAddWidget : Command()
         class RequiresAuthentication(val request: BasicAuthenticationRequest) : Command()
         class SaveCredentials(val request: BasicAuthenticationRequest, val credentials: BasicAuthenticationCredentials) : Command()
-        class GenerateWebViewPreviewImage(val forceImmediate: Boolean) : Command()
+        class GenerateWebViewPreviewImage() : Command()
         object LaunchTabSwitcher : Command()
         object LaunchTabSwitcherLegacy : Command()
     }
@@ -501,10 +501,6 @@ class BrowserTabViewModel(
         val isLoading = newProgress < 100
         val progress = currentLoadingViewState()
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = newProgress)
-
-        if (!isLoading && variantManager.getVariant().hasFeature(TabSwitcherGrid)) {
-            updateOrDeleteWebViewPreview(forceImmediate = false)
-        }
     }
 
     private fun registerSiteVisit() {
@@ -825,7 +821,7 @@ class BrowserTabViewModel(
         tabRepository.updateTabPreviewImage(tabId, fileName)
     }
 
-    private fun deleteTabPreview(tabId: String) {
+    fun deleteTabPreview(tabId: String) {
         tabRepository.updateTabPreviewImage(tabId, null)
     }
 
@@ -848,21 +844,9 @@ class BrowserTabViewModel(
 
     fun userLaunchingTabSwitcher() {
         if (variantManager.getVariant().hasFeature(TabSwitcherGrid)) {
-            updateOrDeleteWebViewPreview(forceImmediate = true)
-
             command.value = LaunchTabSwitcher
         } else {
             command.value = LaunchTabSwitcherLegacy
-        }
-    }
-
-    private fun updateOrDeleteWebViewPreview(forceImmediate: Boolean) {
-        val url = site?.url
-        Timber.d("Updating or deleting WebView preview for $url")
-        if (url == null) {
-            deleteTabPreview(tabId)
-        } else {
-            command.value = GenerateWebViewPreviewImage(forceImmediate)
         }
     }
 }

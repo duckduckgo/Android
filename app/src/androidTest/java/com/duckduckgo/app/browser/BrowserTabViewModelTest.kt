@@ -55,7 +55,6 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -477,25 +476,6 @@ class BrowserTabViewModelTest {
         testee.progressChanged(10)
         assertEquals(0, loadingViewState().progress)
         assertEquals(false, loadingViewState().isLoading)
-    }
-
-    @Test
-    fun whenProgressChangesToFinishedAndImprovedTabUxVariantActiveThenWebViewPreviewGenerated() {
-        whenever(mockVariantManager.getVariant()).thenReturn(
-            Variant("mx", 1.0, listOf(VariantManager.VariantFeature.TabSwitcherGrid), filterBy = { true })
-        )
-        updateUrl("https://example.com", "https://example.com", true)
-        testee.progressChanged(100)
-        val command = captureCommands().lastValue as Command.GenerateWebViewPreviewImage
-        assertFalse(command.forceImmediate)
-    }
-
-    @Test
-    fun whenProgressChangesToFinishedAndImprovedTabUxVariantNotActiveThenWebViewPreviewNotGenerated() {
-        whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
-        updateUrl("https://example.com", "https://example.com", true)
-        testee.progressChanged(100)
-        verify(mockCommandObserver, never()).onChanged(any<Command.GenerateWebViewPreviewImage>())
     }
 
     @Test
