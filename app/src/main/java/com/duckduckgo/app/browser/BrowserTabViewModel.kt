@@ -555,11 +555,15 @@ class BrowserTabViewModel(
     }
 
     private fun onSiteChanged() {
-        siteLiveData.postValue(site)
-        privacyGrade.postValue(site?.calculateGrades()?.improvedGrade)
-
-        viewModelScope.launch(Dispatchers.IO) {
-            tabRepository.update(tabId, site)
+        val test = site?.calculateGrades()?.improvedGrade
+        viewModelScope.launch {
+            withContext(Dispatchers.Main) {
+                siteLiveData.value = site
+                privacyGrade.value = test
+            }
+            withContext(Dispatchers.IO) {
+                tabRepository.update(tabId, site)
+            }
         }
     }
 
