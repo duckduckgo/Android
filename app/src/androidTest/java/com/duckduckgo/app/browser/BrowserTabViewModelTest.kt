@@ -72,10 +72,8 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Observable
 import io.reactivex.Single
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.resetMain
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -97,9 +95,9 @@ class BrowserTabViewModelTest {
     @Suppress("unused")
     val schedulers = InstantSchedulersRule()
 
-//    @ExperimentalCoroutinesApi
-//    @get:Rule
-//    var coroutinesTestRule = CoroutinesTestRule()
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    var coroutinesTestRule = CoroutinesTestRule()
 
     @Mock
     private lateinit var mockPrevalenceStore: PrevalenceStore
