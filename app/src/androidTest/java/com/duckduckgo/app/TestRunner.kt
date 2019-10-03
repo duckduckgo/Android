@@ -19,11 +19,17 @@ package com.duckduckgo.app
 import android.app.Application
 import android.content.Context
 import androidx.test.runner.AndroidJUnitRunner
+import timber.log.Timber
 
 
 @Suppress("unused")
 class TestRunner : AndroidJUnitRunner() {
     override fun newApplication(cl: ClassLoader, className: String, context: Context): Application {
         return super.newApplication(cl, TestApplication::class.java.name, context)
+    }
+
+    override fun onException(obj: Any?, e: Throwable?): Boolean {
+        Timber.d("MyMException: ${e?.localizedMessage} -> ${e?.printStackTrace()} ")
+        return super.onException(obj, e)
     }
 }
