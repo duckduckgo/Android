@@ -41,7 +41,7 @@ class InstantSchedulersRule : TestRule {
                 RxJavaPlugins.setComputationSchedulerHandler { Schedulers.trampoline() }
                 RxJavaPlugins.setNewThreadSchedulerHandler { Schedulers.trampoline() }
                 RxJavaPlugins.setSingleSchedulerHandler { Schedulers.trampoline() }
-                RxAndroidPlugins.setMainThreadSchedulerHandler { Schedulers.trampoline() }
+                //RxAndroidPlugins.setMainThreadSchedulerHandler { Schedulers.trampoline() }
 
                 base.evaluate()
 

@@ -88,11 +88,9 @@ import java.util.concurrent.TimeUnit
 class BrowserTabViewModelTest {
 
     @get:Rule
-    @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
-    @Suppress("unused")
     val schedulers = InstantSchedulersRule()
 
     @ExperimentalCoroutinesApi
