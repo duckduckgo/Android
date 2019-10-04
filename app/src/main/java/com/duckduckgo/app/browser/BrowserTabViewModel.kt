@@ -180,7 +180,7 @@ class BrowserTabViewModel(
         object LaunchLegacyAddWidget : Command()
         class RequiresAuthentication(val request: BasicAuthenticationRequest) : Command()
         class SaveCredentials(val request: BasicAuthenticationRequest, val credentials: BasicAuthenticationCredentials) : Command()
-        class GenerateWebViewPreviewImage() : Command()
+        object GenerateWebViewPreviewImage : Command()
         object LaunchTabSwitcher : Command()
         object LaunchTabSwitcherLegacy : Command()
     }
