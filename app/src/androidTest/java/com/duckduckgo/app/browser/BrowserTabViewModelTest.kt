@@ -27,7 +27,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import com.duckduckgo.app.CoroutinesTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
@@ -72,7 +71,6 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Observable
 import io.reactivex.Single
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.*
@@ -92,10 +90,6 @@ class BrowserTabViewModelTest {
 
     @get:Rule
     val schedulers = InstantSchedulersRule()
-
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutinesTestRule = CoroutinesTestRule()
 
     @Mock
     private lateinit var mockPrevalenceStore: PrevalenceStore
@@ -232,7 +226,6 @@ class BrowserTabViewModelTest {
         whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
     }
 
-    @ExperimentalCoroutinesApi
     @After
     fun after() {
         testee.onCleared()
