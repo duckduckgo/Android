@@ -72,7 +72,7 @@ class ClearPersonalDataAction @Inject constructor(
 
     override fun killProcess() {
         Timber.i("Killing process")
-        System.exit(0)
+        //System.exit(0)
     }
 
     override suspend fun clearTabsAndAllDataAsync(appInForeground: Boolean, shouldFireDataClearPixel: Boolean) {
