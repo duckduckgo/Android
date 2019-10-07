@@ -17,15 +17,12 @@
 package com.duckduckgo.app.fire
 
 import android.webkit.CookieManager
-import com.duckduckgo.app.CoroutinesTestRule
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
