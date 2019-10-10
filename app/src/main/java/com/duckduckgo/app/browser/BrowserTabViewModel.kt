@@ -255,8 +255,10 @@ class BrowserTabViewModel(
         buildingSiteFactoryJob = viewModelScope.launch(Dispatchers.IO) {
             site?.let {
                 siteFactory.loadFullSiteDetails(it)
-                onSiteChanged()
             }
+        }
+        site?.let {
+            onSiteChanged()
         }
     }
 
@@ -281,6 +283,7 @@ class BrowserTabViewModel(
     @VisibleForTesting
     public override fun onCleared() {
         super.onCleared()
+        buildingSiteFactoryJob?.cancel()
         appConfigurationObservable.removeObserver(appConfigurationObserver)
     }
 
@@ -557,7 +560,6 @@ class BrowserTabViewModel(
     private fun onSiteChanged() {
         siteLiveData.postValue(site)
         privacyGrade.postValue(site?.calculateGrades()?.improvedGrade)
-
         viewModelScope.launch(Dispatchers.IO) {
             tabRepository.update(tabId, site)
         }

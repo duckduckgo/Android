@@ -70,19 +70,19 @@ class ClearPersonalDataActionTest {
 
     @Test
     fun whenClearCalledThenDataManagerClearsSessions() = runBlocking<Unit> {
-        testee.clearTabsAndAllDataAsync(false, false)
+        testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
         verify(mockDataManager).clearWebViewSessions()
     }
 
     @Test
     fun whenClearCalledThenDataManagerClearsData() = runBlocking<Unit> {
-        testee.clearTabsAndAllDataAsync(false, false)
+        testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
         verify(mockDataManager).clearData(any(), any(), any())
     }
 
     @Test
     fun whenClearCalledThenAppCacheClearerClearsCache() = runBlocking<Unit> {
-        testee.clearTabsAndAllDataAsync(false, false)
+        testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
         verify(mockAppCacheClearer).clearCache()
     }
 
