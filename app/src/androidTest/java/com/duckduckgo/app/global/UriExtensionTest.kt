@@ -126,6 +126,22 @@ class UriExtensionTest {
     }
 
     @Test
+    fun whenIpWithPortUriThenHasIpHostIsTrue() {
+        assertTrue(Uri.parse("https://54.229.105.203:999/something").hasIpHost)
+        assertTrue(Uri.parse("54.229.105.203:999/something").hasIpHost)
+    }
+
+    @Test
+    fun whenIpWithPortUriThenPortNumberParsedSuccessfully() {
+        assertEquals(999, Uri.parse("https://54.229.105.203:999/something").port)
+    }
+
+    @Test
+    fun whenValidIpAddressWithPortParsedWithSchemeThenPortNumberParsedSuccessfully(){
+        assertEquals(999, Uri.parse("121.33.2.11:999").withScheme().port)
+    }
+
+    @Test
     fun whenStandardUriThenHasIpHostIsFalse() {
         assertFalse(Uri.parse("http://example.com").hasIpHost)
     }
