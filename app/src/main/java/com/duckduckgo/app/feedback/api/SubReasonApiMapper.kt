@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.feedback.api
 
-import com.duckduckgo.app.feedback.ui.negative.FeedbackType
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.CustomizationSubReasons.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MissingBrowserFeaturesSubReasons.*
@@ -27,17 +26,17 @@ import javax.inject.Inject
 
 class SubReasonApiMapper @Inject constructor() {
 
-    fun apiKeyFromSubReason(subReason: FeedbackType.SubReason?): String {
+    fun apiKeyFromSubReason(subReason: SubReason?): String {
         return when (subReason) {
-            is FeedbackType.MissingBrowserFeaturesSubReasons -> browserFeaturesSubReason(subReason)
-            is FeedbackType.SearchNotGoodEnoughSubReasons -> searchNotGoodEnoughSubReason(subReason)
-            is FeedbackType.CustomizationSubReasons -> customizationSubReason(subReason)
-            is FeedbackType.PerformanceSubReasons -> performanceSubReasons(subReason)
+            is MissingBrowserFeaturesSubReasons -> browserFeaturesSubReason(subReason)
+            is SearchNotGoodEnoughSubReasons -> searchNotGoodEnoughSubReason(subReason)
+            is CustomizationSubReasons -> customizationSubReason(subReason)
+            is PerformanceSubReasons -> performanceSubReasons(subReason)
             else -> GENERIC
         }
     }
 
-    private fun browserFeaturesSubReason(subReason: FeedbackType.MissingBrowserFeaturesSubReasons): String {
+    private fun browserFeaturesSubReason(subReason: MissingBrowserFeaturesSubReasons): String {
         return when (subReason) {
             NAVIGATION_ISSUES -> "navigation"
             TAB_MANAGEMENT -> "tabs"
@@ -49,7 +48,7 @@ class SubReasonApiMapper @Inject constructor() {
         }
     }
 
-    private fun searchNotGoodEnoughSubReason(subReason: FeedbackType.SearchNotGoodEnoughSubReasons): String {
+    private fun searchNotGoodEnoughSubReason(subReason: SearchNotGoodEnoughSubReasons): String {
         return when (subReason) {
             PROGRAMMING_TECHNICAL_SEARCHES -> "technical"
             LAYOUT_MORE_LIKE_GOOGLE -> "layout"
@@ -60,7 +59,7 @@ class SubReasonApiMapper @Inject constructor() {
         }
     }
 
-    private fun customizationSubReason(subReason: FeedbackType.CustomizationSubReasons): String {
+    private fun customizationSubReason(subReason: CustomizationSubReasons): String {
         return when (subReason) {
             HOME_SCREEN_CONFIGURATION -> "home"
             TAB_DISPLAY -> "tabs"
@@ -72,7 +71,7 @@ class SubReasonApiMapper @Inject constructor() {
         }
     }
 
-    private fun performanceSubReasons(subReason: FeedbackType.PerformanceSubReasons): String {
+    private fun performanceSubReasons(subReason: PerformanceSubReasons): String {
         return when (subReason) {
             SLOW_WEB_PAGE_LOADS -> "slow"
             APP_CRASHES_OR_FREEZES -> "crash"
@@ -85,6 +84,5 @@ class SubReasonApiMapper @Inject constructor() {
         private const val OTHER = "other"
         private const val GENERIC = "submit"
     }
-
 
 }
