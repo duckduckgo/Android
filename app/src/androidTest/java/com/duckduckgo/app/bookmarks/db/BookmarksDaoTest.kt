@@ -19,7 +19,7 @@ package com.duckduckgo.app.bookmarks.db
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutinesTestRule
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.global.db.AppDatabase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -38,7 +38,7 @@ class BookmarksDaoTest {
 
     @ExperimentalCoroutinesApi
     @get:Rule
-    var coroutinesTestRule = CoroutinesTestRule()
+    var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var db: AppDatabase
     private lateinit var dao: BookmarksDao

@@ -21,7 +21,7 @@ package com.duckduckgo.app.tabs.model
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.test.annotation.UiThreadTest
-import com.duckduckgo.app.CoroutinesTestRule
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.model.Site
@@ -52,7 +52,7 @@ class TabDataRepositoryTest {
 
     @ExperimentalCoroutinesApi
     @get:Rule
-    var coroutinesTestRule = CoroutinesTestRule()
+    var coroutinesTestRule = CoroutineTestRule()
 
     @Mock
     private lateinit var mockDao: TabsDao

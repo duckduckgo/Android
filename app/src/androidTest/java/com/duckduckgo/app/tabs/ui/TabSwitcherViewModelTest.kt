@@ -20,7 +20,7 @@ package com.duckduckgo.app.tabs.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import com.duckduckgo.app.CoroutinesTestRule
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -46,7 +46,7 @@ class TabSwitcherViewModelTest {
 
     @ExperimentalCoroutinesApi
     @get:Rule
-    var coroutinesTestRule = CoroutinesTestRule()
+    var coroutinesTestRule = CoroutineTestRule()
 
     @Mock
     private lateinit var mockCommandObserver: Observer<Command>

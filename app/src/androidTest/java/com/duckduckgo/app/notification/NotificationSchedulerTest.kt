@@ -22,7 +22,7 @@ package com.duckduckgo.app.notification
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.duckduckgo.app.CoroutinesTestRule
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
 import com.duckduckgo.app.notification.model.SchedulableNotification
@@ -43,7 +43,7 @@ class NotificationSchedulerTest {
 
     @ExperimentalCoroutinesApi
     @get:Rule
-    var coroutinesTestRule = CoroutinesTestRule()
+    var coroutinesTestRule = CoroutineTestRule()
 
     private val variantManager: VariantManager = mock()
     private val clearNotification: SchedulableNotification = mock()

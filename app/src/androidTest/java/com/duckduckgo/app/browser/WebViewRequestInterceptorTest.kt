@@ -23,7 +23,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
-import com.duckduckgo.app.CoroutinesTestRule
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.surrogates.ResourceSurrogates
@@ -44,7 +44,7 @@ class WebViewRequestInterceptorTest {
 
     @ExperimentalCoroutinesApi
     @get:Rule
-    var coroutinesTestRule = CoroutinesTestRule()
+    var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var testee: WebViewRequestInterceptor
 
