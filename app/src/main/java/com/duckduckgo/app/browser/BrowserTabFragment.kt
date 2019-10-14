@@ -312,7 +312,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
             onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
             onMenuItemClicked(view.refreshPopupMenuItem) { refresh() }
-            onMenuItemClicked(view.newTabPopupMenuItem) { browserActivity?.launchNewTab() }
+            onMenuItemClicked(view.newTabPopupMenuItem) { viewModel.userRequestedOpeningNewTab() }
             onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
             onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
             onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
@@ -413,6 +413,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.OpenInNewBackgroundTab -> {
                 openInNewBackgroundTab()
             }
+            is Command.LaunchNewTab -> browserActivity?.launchNewTab()
             is Command.ShowBookmarkAddedConfirmation -> bookmarkAdded(it.bookmarkId, it.title, it.url)
             is Command.Navigate -> {
                 navigate(it.url)

@@ -158,6 +158,7 @@ class BrowserTabViewModel(
         object NavigateForward : Command()
         class OpenInNewTab(val query: String) : Command()
         class OpenInNewBackgroundTab(val query: String) : Command()
+        object LaunchNewTab : Command()
         object ResetHistory : Command()
         class DialNumber(val telephoneNumber: String) : Command()
         class SendSms(val telephoneNumber: String) : Command()
@@ -803,6 +804,11 @@ class BrowserTabViewModel(
                 Timber.w(throwable, "Failed to obtain favicon")
                 command.value = AddHomeShortcut(title, currentPage)
             })
+    }
+
+    fun userRequestedOpeningNewTab() {
+        command.value = GenerateWebViewPreviewImage
+        command.value = LaunchNewTab
     }
 
     fun onSurveyChanged(survey: Survey?) {
