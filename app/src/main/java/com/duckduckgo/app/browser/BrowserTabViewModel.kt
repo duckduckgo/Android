@@ -379,6 +379,8 @@ class BrowserTabViewModel(
             return true
         }
 
+        Timber.d("User pressed back and tab is set to skip home; need to generate WebView preview now")
+        command.value = GenerateWebViewPreviewImage
         return false
     }
 
@@ -646,10 +648,12 @@ class BrowserTabViewModel(
 
         return when (requiredAction) {
             is RequiredAction.OpenInNewTab -> {
+                command.value = GenerateWebViewPreviewImage
                 command.value = OpenInNewTab(requiredAction.url)
                 true
             }
             is RequiredAction.OpenInNewBackgroundTab -> {
+                command.value = GenerateWebViewPreviewImage
                 viewModelScope.launch { openInNewBackgroundTab(requiredAction.url) }
                 true
             }

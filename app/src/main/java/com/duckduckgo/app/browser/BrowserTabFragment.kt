@@ -890,7 +890,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
         if (hidden) {
-            generateWebViewPreviewImage()
             viewModel.onViewHidden()
             webView?.onPause()
         } else {
