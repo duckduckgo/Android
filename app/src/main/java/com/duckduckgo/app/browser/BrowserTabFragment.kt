@@ -701,6 +701,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 builtInZoomControls = true
                 displayZoomControls = false
                 mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+                setSupportMultipleWindows(true)
                 disableWebSql(this)
                 setSupportZoom(true)
             }

@@ -1053,6 +1053,18 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOpenInNewTabThenOpenInNewTabCommandWithCorrectUrlSent() {
+        val url = "https://example.com"
+        testee.openInNewTab(url)
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue
+        assertTrue(command is Command.OpenInNewTab)
+        command as Command.OpenInNewTab
+        assertEquals(url, command.query)
+    }
+
+    @Test
     fun whenAuthenticationIsRequiredThenRequiresAuthenticationCommandSent() {
         val mockHandler = mock<HttpAuthHandler>()
         val siteURL = "http://example.com/requires-auth"

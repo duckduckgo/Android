@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
+import android.os.Message
 import android.view.View
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
@@ -73,4 +74,16 @@ class BrowserChromeClient @Inject constructor() : WebChromeClient(), CoroutineSc
         webViewClientListener?.showFileChooser(filePathCallback, fileChooserParams)
         return true
     }
+
+    override fun onCreateWindow(view: WebView?, isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message?): Boolean =
+        if (isUserGesture && resultMsg?.obj is WebView.WebViewTransport) {
+            val transport = resultMsg.obj as WebView.WebViewTransport
+            val newWebView = WebView(view?.context)
+            transport.webView = newWebView
+            resultMsg.sendToTarget()
+            webViewClientListener?.openInNewTab(newWebView.url)
+            true
+        } else {
+            false
+        }
 }

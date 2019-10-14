@@ -835,6 +835,10 @@ class BrowserTabViewModel(
         command.value = HandleExternalAppLink(appLink)
     }
 
+    override fun openInNewTab(url: String?) {
+        command.value = OpenInNewTab(url.orEmpty())
+    }
+
     override fun requiresAuthentication(request: BasicAuthenticationRequest) {
         command.value = RequiresAuthentication(request)
     }
