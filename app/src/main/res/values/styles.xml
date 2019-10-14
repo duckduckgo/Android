@@ -259,13 +259,9 @@
         <item name="android:layout_height">match_parent</item>
     </style>
 
-    <style name="FeedbackInputHintStyle" parent="@android:style/TextAppearance">
-        <item name="android:textColorHint">@color/cornflowerBlue</item>
-        <item name="android:textColor">@color/cornflowerBlue</item>
-    </style>
-
     <style name="FeedbackInputBoxStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxStrokeColor">@color/cornflowerBlue</item>
+        <item name="hintTextColor">@color/cornflowerBlue</item>
         <item name="android:textColorHint">?attr/feedbackEditTextHintColor</item>
         <item name="boxBackgroundColor">?attr/feedbackEditTextBackgroundColor</item>
     </style>

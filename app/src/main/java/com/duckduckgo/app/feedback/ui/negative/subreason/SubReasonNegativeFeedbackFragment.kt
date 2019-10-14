@@ -25,7 +25,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
 import com.duckduckgo.app.feedback.ui.common.FeedbackItemDecoration
-import com.duckduckgo.app.feedback.ui.negative.FeedbackType
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay
@@ -40,10 +39,10 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
     private lateinit var recyclerAdapter: SubReasonAdapter
 
     interface DisambiguationNegativeFeedbackListener {
-        fun userSelectedSubReasonMissingBrowserFeatures(mainReason: MainReason, subReason: FeedbackType.MissingBrowserFeaturesSubReasons)
-        fun userSelectedSubReasonSearchNotGoodEnough(mainReason: MainReason, subReason: FeedbackType.SearchNotGoodEnoughSubReasons)
-        fun userSelectedSubReasonNeedMoreCustomization(mainReason: MainReason, subReason: FeedbackType.CustomizationSubReasons)
-        fun userSelectedSubReasonAppIsSlowOrBuggy(mainReason: MainReason, subReason: FeedbackType.PerformanceSubReasons)
+        fun userSelectedSubReasonMissingBrowserFeatures(mainReason: MainReason, subReason: MissingBrowserFeaturesSubReasons)
+        fun userSelectedSubReasonSearchNotGoodEnough(mainReason: MainReason, subReason: SearchNotGoodEnoughSubReasons)
+        fun userSelectedSubReasonNeedMoreCustomization(mainReason: MainReason, subReason: CustomizationSubReasons)
+        fun userSelectedSubReasonAppIsSlowOrBuggy(mainReason: MainReason, subReason: PerformanceSubReasons)
     }
 
     private val listener: DisambiguationNegativeFeedbackListener?
@@ -123,13 +122,13 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
     }
 
     private fun moreCustomizationsSubReasons(): List<FeedbackTypeSubReasonDisplay> {
-        return FeedbackType.CustomizationSubReasons.values().mapNotNull {
+        return CustomizationSubReasons.values().mapNotNull {
             FeedbackTypeDisplay.subReasons[it]
         }
     }
 
     private fun appSlowOrBuggySubReasons(): List<FeedbackTypeSubReasonDisplay> {
-        return FeedbackType.PerformanceSubReasons.values().mapNotNull {
+        return PerformanceSubReasons.values().mapNotNull {
             FeedbackTypeDisplay.subReasons[it]
         }
     }

@@ -16,18 +16,25 @@
 
 package com.duckduckgo.app.global.rating
 
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentRepository
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 @Suppress("RemoveExplicitTypeArguments", "PrivatePropertyName")
 class InitialPromptDeciderTest {
+
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var testee: InitialPromptDecider
 
