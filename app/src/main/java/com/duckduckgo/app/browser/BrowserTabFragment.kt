@@ -500,7 +500,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     viewModel.updateTabPreview(tabId, fileName)
                     Timber.d("Saved and updated tab preview")
                 } catch (e: RuntimeException) {
-                    Timber.w(e, "Failed to generate WebView preview")
+                    Timber.d(e, "Failed to generate WebView preview")
                 }
             }
         }
