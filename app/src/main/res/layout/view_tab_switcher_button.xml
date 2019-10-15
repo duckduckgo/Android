@@ -48,6 +48,7 @@
         android:layout_centerInParent="true"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:clickable="true"
+        android:longClickable="true"
         android:focusable="true" />
 
 </RelativeLayout>
