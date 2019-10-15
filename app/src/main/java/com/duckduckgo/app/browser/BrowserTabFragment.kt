@@ -245,10 +245,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             viewModel.onViewReady()
 
             messageFromPreviousTab?.let {
+                viewModel.showBrowser()
                 val transport = it.obj as WebView.WebViewTransport
                 transport.webView = webView
                 it.sendToTarget()
-                viewModel.determineShowBrowser()
             }
         }
     }
@@ -695,6 +695,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             webViewContainer,
             true
         ).findViewById(R.id.browserWebView) as WebView
+
         webView?.let {
             userAgentProvider = UserAgentProvider(it.settings.userAgentString, deviceInfo)
 

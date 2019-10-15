@@ -751,7 +751,13 @@ class BrowserTabViewModel(
         browserViewState.value = currentBrowserViewState().copy(browserShowing = !url.isNullOrBlank())
     }
 
+    fun showBrowser() {
+        globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
+        browserViewState.value = currentBrowserViewState().copy(browserShowing = true)
+    }
+
     private fun removeAtbAndSourceParamsFromSearch(url: String): String {
+
         if (!duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             return url
         }

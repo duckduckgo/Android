@@ -291,20 +291,21 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
     }
 
     fun openMessageInNewTab(message: Message) {
-        Timber.i("Opening new TARGET BLANK TAB")
-        val tabId = "abcd" //TODO
-        val fragment = BrowserTabFragment.newInstance(tabId, null, true)
-        val transaction = supportFragmentManager.beginTransaction()
-        val tab = currentTab
-        if (tab == null) {
-            transaction.replace(R.id.fragmentContainer, fragment, tabId)
-        } else {
-            transaction.hide(tab)
-            transaction.add(R.id.fragmentContainer, fragment, tabId)
+        launch {
+            val tabId= viewModel.onNewTabRequested()
+            val fragment = BrowserTabFragment.newInstance(tabId, null, false)
+            val transaction = supportFragmentManager.beginTransaction()
+            val tab = currentTab
+            if (tab == null) {
+                transaction.replace(R.id.fragmentContainer, fragment, tabId)
+            } else {
+                transaction.hide(tab)
+                transaction.add(R.id.fragmentContainer, fragment, tabId)
+            }
+            transaction.commit()
+            fragment.messageFromPreviousTab = message
+            currentTab = fragment
         }
-        transaction.commit()
-        fragment.messageFromPreviousTab = message
-        currentTab = fragment
     }
 
     fun launchBrokenSiteFeedback(url: String?) {
