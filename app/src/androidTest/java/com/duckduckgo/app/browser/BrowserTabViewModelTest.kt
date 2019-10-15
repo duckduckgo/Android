@@ -1098,6 +1098,48 @@ class BrowserTabViewModelTest {
         assertFalse(omnibarViewState().shouldMoveCaretToEnd)
     }
 
+    @Test
+    fun whenUserRequestedToOpenNewTabThenGenerateWebViewPreviewImage() {
+        testee.userRequestedOpeningNewTab()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.firstValue
+        assertTrue(command is Command.GenerateWebViewPreviewImage)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabThenNewTabCommandIssued() {
+        testee.userRequestedOpeningNewTab()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.lastValue
+        assertTrue(command is Command.LaunchNewTab)
+    }
+
+    @Test
+    fun whenUserPressesBackAndSkippingHomeThenWebViewPreviewGenerated() {
+        setupNavigation(isBrowsing = true, canGoBack = false, skipHome = true)
+        testee.onUserPressedBack()
+        verifyGenerateWebViewPreviewCommandIssued()
+    }
+
+    @Test
+    fun whenUserPressesBackAndNotSkippingHomeThenWebViewPreviewNotGenerated() {
+        setupNavigation(isBrowsing = true, canGoBack = false, skipHome = false)
+        testee.onUserPressedBack()
+        verifyGenerateWebViewPreviewCommandNotIssued()
+    }
+
+    private fun verifyGenerateWebViewPreviewCommandIssued() {
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val generatedPreviewCommand = commandCaptor.allValues.find { it is Command.GenerateWebViewPreviewImage }
+        assertNotNull(generatedPreviewCommand)
+    }
+
+    private fun verifyGenerateWebViewPreviewCommandNotIssued() {
+        verify(mockCommandObserver, atLeast(0)).onChanged(commandCaptor.capture())
+        val generatedPreviewCommand = commandCaptor.allValues.find { it is Command.GenerateWebViewPreviewImage }
+        assertNull(generatedPreviewCommand)
+    }
+
     private fun pixelParams(showedBookmarks: Boolean, bookmarkCapable: Boolean) = mapOf(
         Pixel.PixelParameter.SHOWED_BOOKMARKS to showedBookmarks.toString(),
         Pixel.PixelParameter.BOOKMARK_CAPABLE to bookmarkCapable.toString()
