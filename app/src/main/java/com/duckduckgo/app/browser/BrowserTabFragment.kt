@@ -28,10 +28,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
+import android.os.*
 import android.text.Editable
 import android.view.*
 import android.view.View.*
@@ -163,6 +160,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     lateinit var userAgentProvider: UserAgentProvider
 
+    var messageFromPreviousTab: Message? = null
+
     private val initialUrl get() = arguments!!.getString(URL_EXTRA_ARG)
 
     private val skipHome get() = arguments!!.getBoolean(SKIP_HOME_ARG)
@@ -244,6 +243,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
+
+            messageFromPreviousTab?.let {
+                val transport = it.obj as WebView.WebViewTransport
+                transport.webView = webView
+                it.sendToTarget()
+                viewModel.determineShowBrowser()
+            }
         }
     }
 
@@ -381,6 +387,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             Command.Refresh -> refresh()
             is Command.OpenInNewTab -> {
                 browserActivity?.openInNewTab(it.query)
+            }
+            is Command.OpenMessageInNewTab -> {
+                browserActivity?.openMessageInNewTab(it.message)
             }
             is Command.OpenInNewBackgroundTab -> {
                 openInNewBackgroundTab()

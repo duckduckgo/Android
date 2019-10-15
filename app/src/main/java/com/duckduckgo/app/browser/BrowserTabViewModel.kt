@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Message
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
@@ -157,6 +158,7 @@ class BrowserTabViewModel(
         class NavigateBack(val steps: Int) : Command()
         object NavigateForward : Command()
         class OpenInNewTab(val query: String) : Command()
+        class OpenMessageInNewTab(val message: Message, val transport: WebView.WebViewTransport) : Command()
         class OpenInNewBackgroundTab(val query: String) : Command()
         object ResetHistory : Command()
         class DialNumber(val telephoneNumber: String) : Command()
@@ -837,6 +839,10 @@ class BrowserTabViewModel(
 
     override fun openInNewTab(url: String?) {
         command.value = OpenInNewTab(url.orEmpty())
+    }
+
+    override fun openMessageInNewTab(message: Message, transport: WebView.WebViewTransport) {
+        command.value = OpenMessageInNewTab(message, transport)
     }
 
     override fun requiresAuthentication(request: BasicAuthenticationRequest) {

@@ -22,6 +22,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
 import android.os.Bundle
+import android.os.Message
+import android.webkit.WebView
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
@@ -46,6 +48,7 @@ import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import kotlinx.android.synthetic.main.activity_browser.*
+import kotlinx.android.synthetic.main.activity_user_survey.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.longToast
 import timber.log.Timber
@@ -113,7 +116,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
         }
     }
 
-    private fun openNewTab(tabId: String, url: String? = null, skipHome: Boolean) {
+    private fun openNewTab(tabId: String, url: String? = null, skipHome: Boolean): BrowserTabFragment {
         Timber.i("Opening new tab, url: $url, tabId: $tabId")
         val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome)
         val transaction = supportFragmentManager.beginTransaction()
@@ -126,6 +129,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
         }
         transaction.commit()
         currentTab = fragment
+        return fragment
     }
 
     private fun selectTab(tab: TabEntity?) {
@@ -284,6 +288,23 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
 
     fun openInNewTab(query: String) {
         launch { viewModel.onOpenInNewTabRequested(query) }
+    }
+
+    fun openMessageInNewTab(message: Message) {
+        Timber.i("Opening new TARGET BLANK TAB")
+        val tabId = "abcd" //TODO
+        val fragment = BrowserTabFragment.newInstance(tabId, null, true)
+        val transaction = supportFragmentManager.beginTransaction()
+        val tab = currentTab
+        if (tab == null) {
+            transaction.replace(R.id.fragmentContainer, fragment, tabId)
+        } else {
+            transaction.hide(tab)
+            transaction.add(R.id.fragmentContainer, fragment, tabId)
+        }
+        transaction.commit()
+        fragment.messageFromPreviousTab = message
+        currentTab = fragment
     }
 
     fun launchBrokenSiteFeedback(url: String?) {
