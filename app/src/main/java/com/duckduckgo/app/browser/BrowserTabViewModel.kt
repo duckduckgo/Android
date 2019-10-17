@@ -61,7 +61,6 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.TabSwitcherGrid
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
@@ -183,7 +182,6 @@ class BrowserTabViewModel(
         class SaveCredentials(val request: BasicAuthenticationRequest, val credentials: BasicAuthenticationCredentials) : Command()
         object GenerateWebViewPreviewImage : Command()
         object LaunchTabSwitcher : Command()
-        object LaunchTabSwitcherLegacy : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -855,10 +853,6 @@ class BrowserTabViewModel(
     }
 
     fun userLaunchingTabSwitcher() {
-        if (variantManager.getVariant().hasFeature(TabSwitcherGrid)) {
-            command.value = LaunchTabSwitcher
-        } else {
-            command.value = LaunchTabSwitcherLegacy
-        }
+        command.value = LaunchTabSwitcher
     }
 }

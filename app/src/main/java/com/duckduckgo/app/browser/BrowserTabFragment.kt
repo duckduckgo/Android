@@ -87,7 +87,6 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
-import com.duckduckgo.app.tabs.ui.old.TabSwitcherActivityLegacy
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
@@ -253,16 +252,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
             fun onStop() {
                 if (isVisible) {
-                    userLeavingBrowserScreen()
+                    updateOrDeleteWebViewPreview()
                 }
             }
         })
-    }
-
-    fun userLeavingBrowserScreen() {
-        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.TabSwitcherGrid)) {
-            updateOrDeleteWebViewPreview()
-        }
     }
 
     private fun updateOrDeleteWebViewPreview() {
@@ -279,11 +272,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         tabsButton?.actionView?.setOnClickListener {
             launch { viewModel.userLaunchingTabSwitcher() }
         }
-    }
-
-    private fun launchTabSwitcherLegacy() {
-        val activity = activity ?: return
-        startActivity(TabSwitcherActivityLegacy.intent(activity))
     }
 
     private fun launchTabSwitcher() {
@@ -483,7 +471,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.SaveCredentials -> saveBasicAuthCredentials(it.request, it.credentials)
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
-            is Command.LaunchTabSwitcherLegacy -> launchTabSwitcherLegacy()
         }
     }
 
