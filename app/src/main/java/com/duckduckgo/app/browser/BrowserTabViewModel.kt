@@ -253,13 +253,13 @@ class BrowserTabViewModel(
 
         site = siteFactory.buildSite(url, title)
         onSiteChanged()
-        buildingSiteFactoryJob = viewModelScope.launch(Dispatchers.IO) {
+        buildingSiteFactoryJob = viewModelScope.launch {
             site?.let {
-                siteFactory.loadFullSiteDetails(it)
+                withContext(Dispatchers.IO) {
+                    siteFactory.loadFullSiteDetails(it)
+                }
+                onSiteChanged()
             }
-        }
-        site?.let {
-            onSiteChanged()
         }
     }
 
