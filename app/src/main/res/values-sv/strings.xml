@@ -92,9 +92,6 @@
     <string name="openImageInNewTab">Öppna bild i bakgrundsflik</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Stäng</string>
-    <string name="tapFireDirective">Tryck på </string>
-    <string name="tapFireIconDescription">fire</string>
-    <string name="tapFireExplanation"> för att glömma allt</string>
     <string name="closeAllTabsMenuItem">Stäng alla flikar</string>
 
     <!-- Privacy Dashboard Activities -->

@@ -76,9 +76,6 @@
     <string name="openImageInNewTab">Otvori sliku u kartici u pozadini</string>
     <string name="faviconContentDescription">Pohranjena ikona</string>
     <string name="closeContentDescription">Zatvori</string>
-    <string name="tapFireDirective">Dodirni </string>
-    <string name="tapFireIconDescription">brisanje</string>
-    <string name="tapFireExplanation"> za potpuno uklanjanje</string>
     <string name="closeAllTabsMenuItem">Zatvori sve kartice</string>
 
     <!-- Privacy Dashboard Activities -->

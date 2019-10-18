@@ -76,9 +76,6 @@
     <string name="openImageInNewTab">Otvoriť obrázok v karte na pozadí</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Zatvoriť</string>
-    <string name="tapFireDirective">Klepnúť </string>
-    <string name="tapFireIconDescription">vypáliť</string>
-    <string name="tapFireExplanation"> a všetko zabudnúť</string>
     <string name="closeAllTabsMenuItem">Zatvoriť všetky karty</string>
 
     <!-- Privacy Dashboard Activities -->

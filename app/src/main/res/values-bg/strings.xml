@@ -76,9 +76,6 @@
     <string name="openImageInNewTab">Отваряне на изображението във фоновия подпрозорец</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Затваряне</string>
-    <string name="tapFireDirective">Докоснете </string>
-    <string name="tapFireIconDescription">бутона Fire</string>
-    <string name="tapFireExplanation"> за изтриване на цялата информация</string>
     <string name="closeAllTabsMenuItem">Затваряне на всички подпрозорци</string>
 
     <!-- Privacy Dashboard Activities -->

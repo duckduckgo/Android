@@ -76,9 +76,6 @@
     <string name="openImageInNewTab">Otevřít obrázek na pozadí</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Zavřít</string>
-    <string name="tapFireDirective">Klepněte </string>
-    <string name="tapFireIconDescription">na ikonku ohně</string>
-    <string name="tapFireExplanation"> a zapomeňte na všechno.</string>
     <string name="closeAllTabsMenuItem">Zavřít všechny karty</string>
 
     <!-- Privacy Dashboard Activities -->

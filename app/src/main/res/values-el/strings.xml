@@ -76,9 +76,6 @@
     <string name="openImageInNewTab">Άνοιγμα εικόνας στην καρτέλα παρασκηνίου</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Κλείσιμο</string>
-    <string name="tapFireDirective">Πατήστε </string>
-    <string name="tapFireIconDescription">πυροδότηση</string>
-    <string name="tapFireExplanation"> για να τα ξεχάσετε όλα</string>
     <string name="closeAllTabsMenuItem">Κλείσιμο όλων των καρτελών</string>
 
     <!-- Privacy Dashboard Activities -->

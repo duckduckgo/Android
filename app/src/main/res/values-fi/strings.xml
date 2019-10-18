@@ -76,9 +76,6 @@
     <string name="openImageInNewTab">Avaa kuva taustavälilehdellä</string>
     <string name="faviconContentDescription">Suosikkikuvake</string>
     <string name="closeContentDescription">Sulje</string>
-    <string name="tapFireDirective">Napauta </string>
-    <string name="tapFireIconDescription">"fire"</string>
-    <string name="tapFireExplanation"> unohtaaksesi kaiken</string>
     <string name="closeAllTabsMenuItem">Sulje kaikki välilehdet</string>
 
     <!-- Privacy Dashboard Activities -->

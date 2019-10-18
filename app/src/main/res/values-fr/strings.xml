@@ -76,9 +76,6 @@
     <string name="openImageInNewTab">Ouvrir l\'image en arrière-plan</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Fermer</string>
-    <string name="tapFireDirective">Appuyer </string>
-    <string name="tapFireIconDescription">feu</string>
-    <string name="tapFireExplanation"> tout oublier</string>
     <string name="closeAllTabsMenuItem">Fermer tous les onglets</string>
 
     <!-- Privacy Dashboard Activities -->

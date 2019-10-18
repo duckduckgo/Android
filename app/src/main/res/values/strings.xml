@@ -79,9 +79,6 @@
     <string name="openImageInNewTab">Open Image In Background Tab</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Close</string>
-    <string name="tapFireDirective">Tap </string>
-    <string name="tapFireIconDescription">fire</string>
-    <string name="tapFireExplanation"> to forget everything</string>
     <string name="closeAllTabsMenuItem">Close All Tabs</string>
 
     <!-- Privacy Dashboard Activities -->
