@@ -243,6 +243,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         configureAutoComplete()
         configureKeyboardAwareLogoAnimation()
         configureShowTabSwitcherListener()
+        configureLongClickOpensNewTabListener()
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
@@ -271,6 +272,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private fun configureShowTabSwitcherListener() {
         tabsButton?.actionView?.setOnClickListener {
             launch { viewModel.userLaunchingTabSwitcher() }
+        }
+    }
+
+    private fun configureLongClickOpensNewTabListener() {
+        tabsButton?.actionView?.setOnLongClickListener {
+            launch { viewModel.userRequestedOpeningNewTab() }
+            return@setOnLongClickListener true
         }
     }
 
