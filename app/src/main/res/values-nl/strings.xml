@@ -76,9 +76,6 @@
     <string name="openImageInNewTab">Afbeelding openen in tabblad op achtergrond</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Sluiten</string>
-    <string name="tapFireDirective">Tik </string>
-    <string name="tapFireIconDescription">vuur</string>
-    <string name="tapFireExplanation"> om alles te vergeten</string>
     <string name="closeAllTabsMenuItem">Alle tabbladen sluiten</string>
 
     <!-- Privacy Dashboard Activities -->

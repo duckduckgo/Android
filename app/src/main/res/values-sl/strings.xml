@@ -76,9 +76,6 @@
     <string name="openImageInNewTab">Odpri sliko na zavihku v ozadju</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Zapri</string>
-    <string name="tapFireDirective">Tapnite </string>
-    <string name="tapFireIconDescription">sprožilni gumb,</string>
-    <string name="tapFireExplanation"> da se vse pozabi</string>
     <string name="closeAllTabsMenuItem">Zapri vse zavihke</string>
 
     <!-- Privacy Dashboard Activities -->

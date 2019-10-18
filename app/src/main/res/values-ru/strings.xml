@@ -92,9 +92,6 @@
     <string name="openImageInNewTab">Открыть изображение в фоновой вкладке</string>
     <string name="faviconContentDescription">Значок сайта</string>
     <string name="closeContentDescription">Закрыть</string>
-    <string name="tapFireDirective">Нажмите на значок </string>
-    <string name="tapFireIconDescription">огня,</string>
-    <string name="tapFireExplanation"> чтобы очистить всю историю</string>
     <string name="closeAllTabsMenuItem">Закрыть все вкладки</string>
 
     <!-- Privacy Dashboard Activities -->

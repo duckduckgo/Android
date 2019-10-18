@@ -76,9 +76,6 @@
     <string name="openImageInNewTab">Otwórz obraz w karcie w tle</string>
     <string name="faviconContentDescription">Ikona skrótu</string>
     <string name="closeContentDescription">Zamknij</string>
-    <string name="tapFireDirective">Naciśnij </string>
-    <string name="tapFireIconDescription">„Fire”</string>
-    <string name="tapFireExplanation"> aby usunąć całą pamięć</string>
     <string name="closeAllTabsMenuItem">Zamknij wszystkie karty</string>
 
     <!-- Privacy Dashboard Activities -->
