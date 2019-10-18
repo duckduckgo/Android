@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.global
 
-import android.net.Uri
 import com.duckduckgo.app.global.UriString.Companion.isWebUrl
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class UriStringTest {
