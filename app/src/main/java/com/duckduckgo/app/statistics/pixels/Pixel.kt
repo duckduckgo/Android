@@ -58,8 +58,6 @@ interface Pixel {
         HTTPS_SERVICE_REQUEST_NO_UPGRADE("m_https_srn"),
         HTTPS_SERVICE_CACHE_NO_UPGRADE("m_https_scn"),
 
-        TRACKER_BLOCKER_HISTORICAL_ON(pixelName = "m_tb_on_h"),
-        TRACKER_BLOCKER_HISTORICAL_OFF(pixelName = "m_tb_off_h"),
         TRACKER_BLOCKER_DASHBOARD_TURNED_ON(pixelName = "m_tb_on_pd"),
         TRACKER_BLOCKER_DASHBOARD_TURNED_OFF(pixelName = "m_tb_off_pd"),
 
@@ -90,7 +88,6 @@ interface Pixel {
         NOTIFICATION_SHOWN("mnot_s"),
         NOTIFICATION_LAUNCHED("mnot_l"),
         NOTIFICATION_CANCELLED("mnot_c"),
-
         NOTIFICATIONS_ENABLED("mnot_e"),
         NOTIFICATIONS_DISABLED("mnot_d"),
 
