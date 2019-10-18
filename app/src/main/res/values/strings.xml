@@ -57,12 +57,11 @@
     <string name="previousSearchTermDescription">Find previous</string>
     <string name="closeFindInPageButtonDescription">Close find in page view</string>
     <string name="findInPageHint">Find in page</string>
-    <string name="findInPageMatches">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%d/%d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Edit query before searching</string>
-    <string name="settingsAutocompleteEnabled">Show Autocomplete Suggestions</string>
-    <string name="settingsAutocompleteBookmarksEnabled">Include Bookmarked Sites</string>
+    <string name="settingsAutocompleteEnabled">Autocomplete Suggestions</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Open External App</string>
@@ -144,7 +143,7 @@
     <string name="fireClearAll">Clear All Tabs and Data</string>
     <string name="fireCancel">Cancel</string>
     <string name="fireDataCleared">Data cleared</string>
-    <string name="fireProcessName">:fire</string>
+    <string name="fireProcessName" translatable="false">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Settings</string>
@@ -152,7 +151,6 @@
     <string name="settingsHeadingGeneral">General</string>
     <string name="settingsHeadingOther">Other</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
-    <string name="settingsHeadingAutocomplete">Autocomplete</string>
     <string name="settingsLightTheme">Light Theme</string>
     <string name="settingsAboutDuckduckgo">About DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
@@ -204,7 +202,6 @@
     <string name="bookmarkUrlHint">Bookmark URL</string>
     <string name="bookmarkSave">Save</string>
     <string name="bookmarkTitleEdit">Edit Bookmark</string>
-    <string name="bookmarkTitleSave">Save Bookmark</string>
     <string name="noBookmarks">No bookmarks added yet</string>
     <string name="bookmarkOverflowContentDescription">More options for bookmark %s</string>
     <string name="delete">Delete</string>
@@ -252,12 +249,12 @@
     <string name="rateAppDialogTitle">Rate the app</string>
     <string name="rateAppDialogMessage">Your feedback matters. Please share the love with a review.</string>
     <string name="rateAppDialogPositiveButton">Rate App</string>
-    <string name="rateAppDialogNegativeButton">@string/noThanks</string>
+    <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">We\'re sorry to hear that</string>
     <string name="giveFeedbackDialogMessage">Let us know how we can improve the app for you</string>
     <string name="giveFeedbackDialogPositiveButton">Give Feedback</string>
-    <string name="giveFeedbackDialogNegativeButton">@string/noThanks</string>
+    <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="noThanks">No Thanks</string>
 
@@ -338,7 +335,6 @@
 
     <string name="otherMainReasonTitleLong">None of these</string>
     <string name="otherMainReasonTitleShort">Other Issues</string>
-    <string name="otherMainReasonSubtitle">@string/tellUsHowToImprove</string>
 
     <string name="openEndedInputHint">How can we improve? (Optional)</string>
     <string name="submitFeedback">SUBMIT FEEDBACK</string>
@@ -362,6 +358,5 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Positive feedback button</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Negative feedback button</string>
     <string name="feedbackIsImportantToUs">Your anonymous feedback is important to us.</string>
-
 
 </resources>

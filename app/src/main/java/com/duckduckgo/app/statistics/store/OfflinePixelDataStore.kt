@@ -23,26 +23,32 @@ import javax.inject.Inject
 
 
 interface OfflinePixelDataStore {
+    var applicationCrashCount: Int
     var webRendererGoneCrashCount: Int
-    var webRendererGoneOtherCount: Int
+    var webRendererGoneKilledCount: Int
 }
 
 class OfflinePixelSharedPreferences @Inject constructor(private val context: Context) : OfflinePixelDataStore {
+
+    override var applicationCrashCount: Int
+        get() = preferences.getInt(KEY_APPLICATION_CRASH_COUNT, 0)
+        set(value) = preferences.edit(true) { putInt(KEY_APPLICATION_CRASH_COUNT, value) }
 
     override var webRendererGoneCrashCount: Int
         get() = preferences.getInt(KEY_WEB_RENDERER_GONE_CRASH_COUNT, 0)
         set(value) = preferences.edit(true) { putInt(KEY_WEB_RENDERER_GONE_CRASH_COUNT, value) }
 
-    override var webRendererGoneOtherCount: Int
-        get() = preferences.getInt(KEY_WEB_RENDERER_GONE_OTHER_COUNT, 0)
-        set(value) = preferences.edit(true) { putInt(KEY_WEB_RENDERER_GONE_OTHER_COUNT, value) }
+    override var webRendererGoneKilledCount: Int
+        get() = preferences.getInt(KEY_WEB_RENDERER_GONE_KILLED_COUNT, 0)
+        set(value) = preferences.edit(true) { putInt(KEY_WEB_RENDERER_GONE_KILLED_COUNT, value) }
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.statistics.offline.pixels"
+        private const val KEY_APPLICATION_CRASH_COUNT = "APPLICATION_CRASH_COUNT"
         private const val KEY_WEB_RENDERER_GONE_CRASH_COUNT = "WEB_RENDERER_GONE_CRASH_COUNT"
-        private const val KEY_WEB_RENDERER_GONE_OTHER_COUNT = "WEB_RENDERER_GONE_OTHER_COUNT"
+        private const val KEY_WEB_RENDERER_GONE_KILLED_COUNT = "WEB_RENDERER_GONE_KILLED_COUNT"
     }
 }

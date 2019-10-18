@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global
+package com.duckduckgo.app.tabs.ui
 
-import java.math.BigInteger
-import java.security.MessageDigest
+import com.duckduckgo.app.tabs.model.TabEntity
 
 
-val ByteArray.sha256: String
-    get() {
-        val md = MessageDigest.getInstance("SHA-256")
-        md.reset()
-        val digest = md.digest(this)
-        return String.format("%0" + digest.size * 2 + "x", BigInteger(1, digest))
-    }
-
-fun ByteArray.verifySha256(sha256: String): Boolean {
-    return this.sha256 == sha256
+interface TabSwitcherListener {
+    fun onNewTabRequested()
+    fun onTabSelected(tab: TabEntity)
+    fun onTabDeleted(tab: TabEntity)
 }

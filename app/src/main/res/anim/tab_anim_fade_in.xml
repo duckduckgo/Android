@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2019 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +14,9 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <integer name="slide_animation_duration">300</integer>
-</resources>
+
+<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="@integer/tab_switcher_animation_duration_ms"
+    android:fromAlpha="0.0"
+    android:interpolator="@android:interpolator/decelerate_quad"
+    android:toAlpha="1.0" />

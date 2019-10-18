@@ -53,11 +53,10 @@ import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion
-import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment
+import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
@@ -71,18 +70,24 @@ import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
+import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
+import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.CtaConfiguration
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
+import com.duckduckgo.app.tabs.ui.old.TabSwitcherActivityLegacy
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
@@ -94,12 +99,7 @@ import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
@@ -122,6 +122,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
+
+    @Inject
+    lateinit var deviceInfo: DeviceInfo
 
     @Inject
     lateinit var fileChooserIntentBuilder: FileChooserIntentBuilder
@@ -150,6 +153,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     @Inject
     lateinit var omnibarScrolling: OmnibarScrolling
 
+    @Inject
+    lateinit var previewGenerator: WebViewPreviewGenerator
+
+    @Inject
+    lateinit var previewPersister: WebViewPreviewPersister
+
+    @Inject
+    lateinit var variantManager: VariantManager
+
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
     lateinit var userAgentProvider: UserAgentProvider
@@ -174,6 +186,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         viewModel.loadData(tabId, initialUrl, skipHome)
         viewModel
     }
+
+    // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
+    private var bitmapGeneratorJob: Job? = null
 
     private val browserActivity
         get() = activity as? BrowserActivity
@@ -229,16 +244,60 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         configureAutoComplete()
         configureKeyboardAwareLogoAnimation()
         configureShowTabSwitcherListener()
+        configureLongClickOpensNewTabListener()
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
+        }
+
+        lifecycle.addObserver(object : LifecycleObserver {
+            @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+            fun onStop() {
+                if (isVisible) {
+                    userLeavingBrowserScreen()
+                }
+            }
+        })
+    }
+
+    fun userLeavingBrowserScreen() {
+        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.TabSwitcherGrid)) {
+            updateOrDeleteWebViewPreview()
+        }
+    }
+
+    private fun updateOrDeleteWebViewPreview() {
+        val url = viewModel.url
+        Timber.d("Updating or deleting WebView preview for $url")
+        if (url == null) {
+            viewModel.deleteTabPreview(tabId)
+        } else {
+            generateWebViewPreviewImage()
         }
     }
 
     private fun configureShowTabSwitcherListener() {
         tabsButton?.actionView?.setOnClickListener {
-            browserActivity?.launchTabSwitcher()
+            launch { viewModel.userLaunchingTabSwitcher() }
         }
+    }
+
+    private fun configureLongClickOpensNewTabListener() {
+        tabsButton?.actionView?.setOnLongClickListener {
+            launch { viewModel.userRequestedOpeningNewTab() }
+            return@setOnLongClickListener true
+        }
+    }
+
+    private fun launchTabSwitcherLegacy() {
+        val activity = activity ?: return
+        startActivity(TabSwitcherActivityLegacy.intent(activity))
+    }
+
+    private fun launchTabSwitcher() {
+        val activity = activity ?: return
+        startActivity(TabSwitcherActivity.intent(activity, tabId))
+        activity.overridePendingTransition(R.anim.tab_anim_fade_in, R.anim.slide_to_bottom)
     }
 
     override fun onResume() {
@@ -261,9 +320,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
             onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
             onMenuItemClicked(view.refreshPopupMenuItem) { refresh() }
-            onMenuItemClicked(view.newTabPopupMenuItem) { browserActivity?.launchNewTab() }
+            onMenuItemClicked(view.newTabPopupMenuItem) { viewModel.userRequestedOpeningNewTab() }
             onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
-            onMenuItemClicked(view.addBookmarksPopupMenuItem) { viewModel.onAddBookmarkSelected() }
+            onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
             onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
             onMenuItemClicked(view.brokenSitePopupMenuItem) { viewModel.onBrokenSiteSelected() }
             onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
@@ -362,9 +421,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.OpenInNewBackgroundTab -> {
                 openInNewBackgroundTab()
             }
-            is Command.AddBookmark -> {
-                addBookmark(it.title, it.url)
-            }
+            is Command.LaunchNewTab -> browserActivity?.launchNewTab()
+            is Command.ShowBookmarkAddedConfirmation -> bookmarkAdded(it.bookmarkId, it.title, it.url)
             is Command.Navigate -> {
                 navigate(it.url)
             }
@@ -415,7 +473,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.CopyLink -> {
                 clipboardManager.primaryClip = ClipData.newPlainText(null, it.url)
             }
-            is Command.DisplayMessage -> showToast(it.messageId)
             is Command.ShowFileChooser -> {
                 launchFilePicker(it)
             }
@@ -432,6 +489,29 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.LaunchLegacyAddWidget -> launchLegacyAddWidget()
             is Command.RequiresAuthentication -> showAuthenticationDialog(it.request)
             is Command.SaveCredentials -> saveBasicAuthCredentials(it.request, it.credentials)
+            is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
+            is Command.LaunchTabSwitcher -> launchTabSwitcher()
+            is Command.LaunchTabSwitcherLegacy -> launchTabSwitcherLegacy()
+        }
+    }
+
+    private fun generateWebViewPreviewImage() {
+        webView?.let { webView ->
+
+            // if there's an existing job for generating a preview, cancel that in favor of the new request
+            bitmapGeneratorJob?.cancel()
+
+            bitmapGeneratorJob = launch {
+                Timber.d("Generating WebView preview")
+                try {
+                    val preview = previewGenerator.generatePreview(webView)
+                    val fileName = previewPersister.save(preview, tabId)
+                    viewModel.updateTabPreview(tabId, fileName)
+                    Timber.d("Saved and updated tab preview")
+                } catch (e: RuntimeException) {
+                    Timber.d(e, "Failed to generate WebView preview")
+                }
+            }
         }
     }
 
@@ -640,7 +720,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             true
         ).findViewById(R.id.browserWebView) as WebView
         webView?.let {
-            userAgentProvider = UserAgentProvider(it.settings.userAgentString)
+            userAgentProvider = UserAgentProvider(it.settings.userAgentString, deviceInfo)
 
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
@@ -658,7 +738,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 setSupportZoom(true)
             }
 
-            it.setDownloadListener { url, userAgent, contentDisposition, mimeType, contentLength ->
+            it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
                 requestFileDownload(url, contentDisposition, mimeType)
             }
 
@@ -746,10 +826,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         popupMenu.show(rootView, toolbar)
     }
 
-    private fun addBookmark(title: String?, url: String?) {
-        val addBookmarkDialog = SaveBookmarkDialogFragment.createDialogCreationMode(title, url)
-        addBookmarkDialog.show(childFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
-        addBookmarkDialog.listener = viewModel
+    private fun bookmarkAdded(bookmarkId: Long, title: String?, url: String?) {
+
+        Snackbar.make(rootView, R.string.bookmarkEdited, Snackbar.LENGTH_LONG)
+            .setAction(R.string.edit) {
+                val addBookmarkDialog = EditBookmarkDialogFragment.instance(bookmarkId, title, url)
+                addBookmarkDialog.show(childFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
+                addBookmarkDialog.listener = viewModel
+            }
+            .show()
     }
 
     private fun launchSharePageChooser(url: String) {

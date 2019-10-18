@@ -26,20 +26,17 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.annotation.AnyThread
-import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import androidx.lifecycle.*
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.ui.SaveBookmarkDialogFragment.SaveBookmarkListener
+import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment.EditBookmarkListener
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
@@ -63,8 +60,12 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.TabSwitcherGrid
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -98,8 +99,9 @@ class BrowserTabViewModel(
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
+    private val variantManager: VariantManager,
     appConfigurationDao: AppConfigurationDao
-) : WebViewClientListener, SaveBookmarkListener, HttpAuthenticationListener, ViewModel() {
+) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
 
     private var buildingSiteFactoryJob: Job? = null
 
@@ -156,6 +158,7 @@ class BrowserTabViewModel(
         object NavigateForward : Command()
         class OpenInNewTab(val query: String) : Command()
         class OpenInNewBackgroundTab(val query: String) : Command()
+        object LaunchNewTab : Command()
         object ResetHistory : Command()
         class DialNumber(val telephoneNumber: String) : Command()
         class SendSms(val telephoneNumber: String) : Command()
@@ -164,12 +167,11 @@ class BrowserTabViewModel(
         object HideKeyboard : Command()
         class ShowFullScreen(val view: View) : Command()
         class DownloadImage(val url: String) : Command()
-        class AddBookmark(val title: String?, val url: String?) : Command()
+        class ShowBookmarkAddedConfirmation(val bookmarkId: Long, val title: String?, val url: String?) : Command()
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
         class BrokenSiteFeedback(val url: String?) : Command()
-        class DisplayMessage(@StringRes val messageId: Int) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         class HandleExternalAppLink(val appLink: IntentType) : Command()
@@ -179,6 +181,9 @@ class BrowserTabViewModel(
         object LaunchLegacyAddWidget : Command()
         class RequiresAuthentication(val request: BasicAuthenticationRequest) : Command()
         class SaveCredentials(val request: BasicAuthenticationRequest, val credentials: BasicAuthenticationCredentials) : Command()
+        object GenerateWebViewPreviewImage : Command()
+        object LaunchTabSwitcher : Command()
+        object LaunchTabSwitcherLegacy : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -248,9 +253,11 @@ class BrowserTabViewModel(
 
         site = siteFactory.buildSite(url, title)
         onSiteChanged()
-        buildingSiteFactoryJob = viewModelScope.launch(Dispatchers.IO) {
+        buildingSiteFactoryJob = viewModelScope.launch {
             site?.let {
-                siteFactory.loadFullSiteDetails(it)
+                withContext(Dispatchers.IO) {
+                    siteFactory.loadFullSiteDetails(it)
+                }
                 onSiteChanged()
             }
         }
@@ -277,6 +284,7 @@ class BrowserTabViewModel(
     @VisibleForTesting
     public override fun onCleared() {
         super.onCleared()
+        buildingSiteFactoryJob?.cancel()
         appConfigurationObservable.removeObserver(appConfigurationObserver)
     }
 
@@ -375,6 +383,8 @@ class BrowserTabViewModel(
             return true
         }
 
+        Timber.d("User pressed back and tab is set to skip home; need to generate WebView preview now")
+        command.value = GenerateWebViewPreviewImage
         return false
     }
 
@@ -389,6 +399,8 @@ class BrowserTabViewModel(
         )
         omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = "", shouldMoveCaretToEnd = false)
         loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
+
+        deleteTabPreview(tabId)
     }
 
     override fun goFullScreen(view: View) {
@@ -415,6 +427,7 @@ class BrowserTabViewModel(
             canGoForward = newWebNavigationState.canGoForward
         )
 
+        Timber.v("navigationStateChanged: $stateChange")
         when (stateChange) {
             is NewPage -> pageChanged(stateChange.url, stateChange.title)
             is PageCleared -> pageCleared()
@@ -546,7 +559,6 @@ class BrowserTabViewModel(
     private fun onSiteChanged() {
         siteLiveData.postValue(site)
         privacyGrade.postValue(site?.calculateGrades()?.improvedGrade)
-
         viewModelScope.launch(Dispatchers.IO) {
             tabRepository.update(tabId, site)
         }
@@ -595,11 +607,27 @@ class BrowserTabViewModel(
         }
     }
 
-    override fun onBookmarkSaved(id: Int?, title: String, url: String) {
-        Schedulers.io().scheduleDirect {
+    suspend fun onBookmarkAddRequested() {
+        val url = url ?: ""
+        val title = title ?: ""
+        val id = withContext(Dispatchers.IO) {
             bookmarksDao.insert(BookmarkEntity(title = title, url = url))
         }
-        command.value = DisplayMessage(R.string.bookmarkAddedFeedback)
+        withContext(Dispatchers.Main) {
+            command.value = ShowBookmarkAddedConfirmation(id, title, url)
+        }
+    }
+
+    override fun onBookmarkEdited(id: Long, title: String, url: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            editBookmark(id, title, url)
+        }
+    }
+
+    suspend fun editBookmark(id: Long, title: String, url: String) {
+        withContext(Dispatchers.IO) {
+            bookmarksDao.update(BookmarkEntity(id, title, url))
+        }
     }
 
     fun onBrokenSiteSelected() {
@@ -623,10 +651,12 @@ class BrowserTabViewModel(
 
         return when (requiredAction) {
             is RequiredAction.OpenInNewTab -> {
+                command.value = GenerateWebViewPreviewImage
                 command.value = OpenInNewTab(requiredAction.url)
                 true
             }
             is RequiredAction.OpenInNewBackgroundTab -> {
+                command.value = GenerateWebViewPreviewImage
                 viewModelScope.launch { openInNewBackgroundTab(requiredAction.url) }
                 true
             }
@@ -710,10 +740,6 @@ class BrowserTabViewModel(
         findInPageViewState.value = FindInPageViewState()
     }
 
-    fun onAddBookmarkSelected() {
-        command.value = AddBookmark(title, url)
-    }
-
     fun onShareSelected() {
         url?.let {
             command.value = ShareLink(removeAtbAndSourceParamsFromSearch(it))
@@ -780,6 +806,11 @@ class BrowserTabViewModel(
             })
     }
 
+    fun userRequestedOpeningNewTab() {
+        command.value = GenerateWebViewPreviewImage
+        command.value = LaunchNewTab
+    }
+
     fun onSurveyChanged(survey: Survey?) {
         ctaViewModel.onSurveyChanged(survey)
     }
@@ -798,6 +829,14 @@ class BrowserTabViewModel(
         ctaViewModel.onCtaDismissed()
     }
 
+    fun updateTabPreview(tabId: String, fileName: String) {
+        tabRepository.updateTabPreviewImage(tabId, fileName)
+    }
+
+    fun deleteTabPreview(tabId: String) {
+        tabRepository.updateTabPreviewImage(tabId, null)
+    }
+
     override fun externalAppLinkClicked(appLink: IntentType) {
         command.value = HandleExternalAppLink(appLink)
     }
@@ -813,5 +852,13 @@ class BrowserTabViewModel(
 
     override fun cancelAuthentication(request: BasicAuthenticationRequest) {
         request.handler.cancel()
+    }
+
+    fun userLaunchingTabSwitcher() {
+        if (variantManager.getVariant().hasFeature(TabSwitcherGrid)) {
+            command.value = LaunchTabSwitcher
+        } else {
+            command.value = LaunchTabSwitcherLegacy
+        }
     }
 }

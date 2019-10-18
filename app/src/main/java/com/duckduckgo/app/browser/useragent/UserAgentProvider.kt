@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.useragent
 
 import android.os.Build
+import com.duckduckgo.app.global.device.DeviceInfo
 
 
 /**
@@ -26,7 +27,7 @@ import android.os.Build
  * Example Default Desktop User Agent (From Chrome):
  * Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Safari/537.36
  */
-class UserAgentProvider constructor(private val defaultUserAgent: String) {
+class UserAgentProvider constructor(private val defaultUserAgent: String, private val device: DeviceInfo) {
 
     /**
      * Returns a modified UA string which omits the user's device make and model
@@ -38,7 +39,7 @@ class UserAgentProvider constructor(private val defaultUserAgent: String) {
     fun getUserAgent(desktopSiteRequested: Boolean = false): String {
 
         val platform = if (desktopSiteRequested) desktopUaPrefix() else mobileUaPrefix()
-        val userAgentStringSuffix = getWebKitVersionOnwards(desktopSiteRequested)
+        val userAgentStringSuffix = "${getWebKitVersionOnwards(desktopSiteRequested)} ${getApplicationSuffix()}"
 
         return "$MOZILLA_PREFIX ($platform)$userAgentStringSuffix"
     }
@@ -54,6 +55,10 @@ class UserAgentProvider constructor(private val defaultUserAgent: String) {
             result = result.replace(" Mobile ", " ")
         }
         return " $result"
+    }
+
+    private fun getApplicationSuffix(): String {
+        return "DuckDuckGo/${device.majorAppVersion}"
     }
 
     companion object {

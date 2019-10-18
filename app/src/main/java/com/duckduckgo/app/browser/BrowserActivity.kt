@@ -39,12 +39,12 @@ import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.view.*
+import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageExperiment
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
-import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import kotlinx.android.synthetic.main.activity_browser.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.longToast
@@ -163,6 +163,12 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
             return
         }
 
+        if (intent.getBooleanExtra(LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, false)) {
+            setResult(DefaultBrowserPageExperiment.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL)
+            finish()
+            return
+        }
+
         if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
 
             Timber.i("Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set")
@@ -265,14 +271,11 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
     fun launchFire() {
         val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction)
         dialog.clearStarted = {
+            removeObservers()
             clearingInProgressView.show()
         }
         dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.show()
-    }
-
-    fun launchTabSwitcher() {
-        startActivity(TabSwitcherActivity.intent(this))
     }
 
     fun launchNewTab() {
@@ -312,7 +315,13 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
 
     companion object {
 
-        fun intent(context: Context, queryExtra: String? = null, newSearch: Boolean = false, widgetSearch: Boolean = false, launchedFromFireAction: Boolean = false): Intent {
+        fun intent(
+            context: Context,
+            queryExtra: String? = null,
+            newSearch: Boolean = false,
+            widgetSearch: Boolean = false,
+            launchedFromFireAction: Boolean = false
+        ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
             intent.putExtra(NEW_SEARCH_EXTRA, newSearch)
@@ -326,6 +335,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
         const val WIDGET_SEARCH_EXTRA = "WIDGET_SEARCH_EXTRA"
         const val PERFORM_FIRE_ON_ENTRY_EXTRA = "PERFORM_FIRE_ON_ENTRY_EXTRA"
         const val LAUNCHED_FROM_FIRE_EXTRA = "LAUNCHED_FROM_FIRE_EXTRA"
+        const val LAUNCH_FROM_DEFAULT_BROWSER_DIALOG = "LAUNCH_FROM_DEFAULT_BROWSER_DIALOG"
 
         private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"
 

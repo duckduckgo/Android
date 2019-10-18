@@ -25,8 +25,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.work.Configuration
-import androidx.work.WorkManager
 import androidx.work.WorkerFactory
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
@@ -46,9 +44,11 @@ import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.privacy.HistoricTrackerBlockingObserver
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_LAUNCH
+import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
@@ -121,6 +121,12 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     lateinit var unsentForgetAllPixelStore: UnsentForgetAllPixelStore
 
     @Inject
+    lateinit var offlinePixelScheduler: OfflinePixelScheduler
+
+    @Inject
+    lateinit var offlinePixelDataStore: OfflinePixelDataStore
+
+    @Inject
     lateinit var dataClearer: DataClearer
 
     @Inject
@@ -149,12 +155,11 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
         configureLogging()
         configureDependencyInjection()
+        configureUncaughtExceptionHandler()
 
         Timber.i("Creating DuckDuckGoApplication")
 
         if (appIsRestarting()) return
-
-        configureWorkManager()
 
         ProcessLifecycleOwner.get().lifecycle.also {
             it.addObserver(this)
@@ -173,6 +178,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         initializeTheme(settingsDataStore)
         loadTrackerData()
         configureDataDownloader()
+        scheduleOfflinePixels()
 
         notificationRegistrar.registerApp()
 
@@ -182,12 +188,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         GlobalScope.launch { appDataLoader.loadData() }
     }
 
-    private fun configureWorkManager() {
-        val config = Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
-
-        WorkManager.initialize(this, config)
+    private fun configureUncaughtExceptionHandler() {
+        val originalHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler(AlertingUncaughtExceptionHandler(originalHandler, offlinePixelDataStore))
     }
 
     private fun recordInstallationTimestamp() {
@@ -263,6 +266,10 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
                 appConfigurationSyncer.scheduleRegularSync(this)
             }
             .subscribe({}, { Timber.w("Failed to download initial app configuration ${it.localizedMessage}") })
+    }
+
+    private fun scheduleOfflinePixels() {
+        offlinePixelScheduler.scheduleOfflinePixels()
     }
 
     override fun activityInjector(): AndroidInjector<Activity> = activityInjector

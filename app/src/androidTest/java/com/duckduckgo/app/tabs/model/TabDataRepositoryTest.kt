@@ -21,7 +21,9 @@ package com.duckduckgo.app.tabs.model
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.test.annotation.UiThreadTest
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.model.PrivacyPractices
@@ -29,6 +31,7 @@ import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Before
@@ -47,6 +50,10 @@ class TabDataRepositoryTest {
     @Suppress("unused")
     val schedulers = InstantSchedulersRule()
 
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
+
     @Mock
     private lateinit var mockDao: TabsDao
 
@@ -59,6 +66,9 @@ class TabDataRepositoryTest {
     @Mock
     private lateinit var mockTrackerNetworks: TrackerNetworks
 
+    @Mock
+    private lateinit var mockWebViewPreviewPersister: WebViewPreviewPersister
+
     private lateinit var testee: TabDataRepository
 
     @UiThreadTest
@@ -67,7 +77,11 @@ class TabDataRepositoryTest {
         MockitoAnnotations.initMocks(this)
         runBlocking {
             whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
-            testee = TabDataRepository(mockDao, SiteFactory(mockPrivacyPractices, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore))
+            testee = TabDataRepository(
+                mockDao,
+                SiteFactory(mockPrivacyPractices, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore),
+                mockWebViewPreviewPersister
+            )
         }
     }
 
@@ -95,9 +109,9 @@ class TabDataRepositoryTest {
         testee.addNewTabAfterExistingTab("http://www.example.com", "tabid")
         testee.update("tabid", null)
 
-        val captor = argumentCaptor<TabEntity>()
-        verify(mockDao).updateTab(captor.capture())
-        assertTrue(captor.firstValue.viewed)
+        val captor = argumentCaptor<Boolean>()
+        verify(mockDao).updateUrlAndTitle(any(), anyOrNull(), anyOrNull(), captor.capture())
+        assertTrue(captor.firstValue)
     }
 
     @Test

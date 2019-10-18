@@ -23,7 +23,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
-import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.surrogates.ResourceSurrogates
@@ -31,14 +31,20 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.MockitoAnnotations
 
 class WebViewRequestInterceptorTest {
+
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var testee: WebViewRequestInterceptor
 
@@ -48,7 +54,7 @@ class WebViewRequestInterceptorTest {
     private var mockRequest: WebResourceRequest = mock()
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
 
-    private lateinit var webView: WebView
+    private var webView: WebView = mock()
 
     @UiThreadTest
     @Before
@@ -61,10 +67,6 @@ class WebViewRequestInterceptorTest {
             resourceSurrogates = mockResourceSurrogates,
             privacyProtectionCountDao = mockPrivacyProtectionCountDao
         )
-
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-
-        webView = WebView(context)
     }
 
     @Test

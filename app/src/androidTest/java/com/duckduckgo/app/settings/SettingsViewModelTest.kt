@@ -206,34 +206,10 @@ class SettingsViewModelTest {
 
     @Test
     fun whenVariantIsSetThenVariantKeyIncludedInSettings() {
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("ab"))
+        whenever(mockVariantManager.getVariant()).thenReturn(Variant("ab", filterBy = { true }))
         testee.start()
         val expectedStartString = "${BuildConfig.VERSION_NAME} ab (${BuildConfig.VERSION_CODE})"
         assertEquals(expectedStartString, latestViewState().version)
-    }
-
-    @Test
-    fun whenBookmarksSuggestionsSwitchedOnThenDataStoreIsUpdated() {
-        testee.onBookmarksAutocompleteSettingChanged(true)
-        verify(mockAppSettingsDataStore).bookmarksAutoCompleteSuggestionsEnabled = true
-    }
-
-    @Test
-    fun whenBookmarksSuggestionsSwitchedOffThenDataStoreIsUpdated() {
-        testee.onBookmarksAutocompleteSettingChanged(false)
-        verify(mockAppSettingsDataStore).bookmarksAutoCompleteSuggestionsEnabled = false
-    }
-
-    @Test
-    fun whenBookmarksSuggestionsToggledOffThenBookmarksDisabledPixelIsSent() {
-        testee.onBookmarksAutocompleteSettingChanged(false)
-        verify(mockPixel).fire(Pixel.PixelName.BOOKMARKS_IN_AUTOCOMPLETE_DISABLED)
-    }
-
-    @Test
-    fun whenBookmarksSuggestionsToggledOnThenBookmarksEnabledPixelIsSent() {
-        testee.onBookmarksAutocompleteSettingChanged(true)
-        verify(mockPixel).fire(Pixel.PixelName.BOOKMARKS_IN_AUTOCOMPLETE_ENABLED)
     }
 
     private fun latestViewState() = testee.viewState.value!!

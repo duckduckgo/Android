@@ -19,8 +19,10 @@
 
 package com.duckduckgo.app.notification
 
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
 import com.duckduckgo.app.notification.model.SchedulableNotification
@@ -29,24 +31,33 @@ import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import kotlin.reflect.jvm.jvmName
 
 class NotificationSchedulerTest {
 
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
+
     private val variantManager: VariantManager = mock()
     private val clearNotification: SchedulableNotification = mock()
     private val privacyNotification: SchedulableNotification = mock()
 
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private var workManager = WorkManager.getInstance(context)
     private lateinit var testee: NotificationScheduler
 
     @Before
     fun before() {
         whenever(variantManager.getVariant(any())).thenReturn(DEFAULT_VARIANT)
         testee = NotificationScheduler(
+            workManager,
             clearNotification,
             privacyNotification
         )
@@ -93,8 +104,7 @@ class NotificationSchedulerTest {
     }
 
     private fun getScheduledWorkers(): List<WorkInfo> {
-        return WorkManager
-            .getInstance()
+        return workManager
             .getWorkInfosByTag(NotificationScheduler.WORK_REQUEST_TAG)
             .get()
             .filter { it.state == WorkInfo.State.ENQUEUED }

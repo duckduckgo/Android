@@ -19,6 +19,8 @@ package com.duckduckgo.app.statistics.pixels
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.PixelService
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
@@ -31,10 +33,16 @@ interface Pixel {
 
         APP_LAUNCH("ml"),
         FORGET_ALL_EXECUTED("mf"),
-        WEB_RENDERER_GONE("m_d_wrg"),
 
-        ONBOARDING_DEFAULT_BROWSER_SETTINGS_LAUNCHED("m_odb_l"),
+        APPLICATION_CRASH("m_d_ac"),
+        WEB_RENDERER_GONE_CRASH("m_d_wrg_c"),
+        WEB_RENDERER_GONE_KILLED("m_d_wrg_k"),
+        BROKEN_SITE_REPORTED("m_bsr"),
+
+        ONBOARDING_DEFAULT_BROWSER_VISUALIZED("m_odb_v"),
+        ONBOARDING_DEFAULT_BROWSER_LAUNCHED("m_odb_l"),
         ONBOARDING_DEFAULT_BROWSER_SKIPPED("m_odb_s"),
+        ONBOARDING_DEFAULT_BROWSER_SELECTED_JUST_ONCE("m_odb_jo"),
 
         PRIVACY_DASHBOARD_OPENED("mp"),
         PRIVACY_DASHBOARD_SCORECARD("mp_c"),
@@ -43,12 +51,20 @@ interface Pixel {
         PRIVACY_DASHBOARD_PRIVACY_PRACTICES("mp_p"),
         PRIVACY_DASHBOARD_NETWORKS("mp_n"),
 
+        HTTPS_NO_LOOKUP("m_https_nl"),
+        HTTPS_LOCAL_UPGRADE("m_https_lu"),
+        HTTPS_SERVICE_REQUEST_UPGRADE("m_https_sru"),
+        HTTPS_SERVICE_CACHE_UPGRADE("m_https_scu"),
+        HTTPS_SERVICE_REQUEST_NO_UPGRADE("m_https_srn"),
+        HTTPS_SERVICE_CACHE_NO_UPGRADE("m_https_scn"),
+
         TRACKER_BLOCKER_HISTORICAL_ON(pixelName = "m_tb_on_h"),
         TRACKER_BLOCKER_HISTORICAL_OFF(pixelName = "m_tb_off_h"),
         TRACKER_BLOCKER_DASHBOARD_TURNED_ON(pixelName = "m_tb_on_pd"),
         TRACKER_BLOCKER_DASHBOARD_TURNED_OFF(pixelName = "m_tb_off_pd"),
 
         DEFAULT_BROWSER_SET("m_db_s"),
+        DEFAULT_BROWSER_NOT_SET("m_db_ns"),
         DEFAULT_BROWSER_UNSET("m_db_u"),
         WIDGETS_ADDED(pixelName = "m_w_a"),
         WIDGETS_DELETED(pixelName = "m_w_d"),
@@ -109,23 +125,31 @@ interface Pixel {
         FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s"),
 
         AUTOCOMPLETE_BOOKMARK_SELECTION("m_aut_s_b"),
-        AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s"),
-
-        BOOKMARKS_IN_AUTOCOMPLETE_ENABLED("m_biaut_e"),
-        BOOKMARKS_IN_AUTOCOMPLETE_DISABLED("m_biaut_d")
+        AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s")
     }
 
     object PixelParameter {
+        const val APP_VERSION = "appVersion"
+        const val URL = "url"
+        const val COUNT = "count"
         const val BOOKMARK_CAPABLE = "bc"
         const val SHOWED_BOOKMARKS = "sb"
-        const val WEB_RENDERER_GONE_CRASH = "wrc"
-        const val WEB_RENDERER_GONE_OTHER = "wro"
+        const val DEFAULT_BROWSER_BEHAVIOUR_TRIGGERED = "bt"
+        const val DEFAULT_BROWSER_SET_FROM_ONBOARDING = "fo"
+        const val DEFAULT_BROWSER_SET_ORIGIN = "dbo"
+    }
+
+    object PixelValues {
+        const val DEFAULT_BROWSER_SETTINGS = "s"
+        const val DEFAULT_BROWSER_DIALOG = "d"
+        const val DEFAULT_BROWSER_DIALOG_DISMISSED = "dd"
+        const val DEFAULT_BROWSER_JUST_ONCE_MAX = "jom"
+        const val DEFAULT_BROWSER_EXTERNAL = "e"
     }
 
     fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap())
     fun fire(pixelName: String, parameters: Map<String, String?> = emptyMap())
     fun fireCompletable(pixelName: String, parameters: Map<String, String?>): Completable
-
 }
 
 class ApiBasedPixel @Inject constructor(
@@ -135,12 +159,11 @@ class ApiBasedPixel @Inject constructor(
     private val deviceInfo: DeviceInfo
 ) : Pixel {
 
-    override fun fire(pixel: Pixel.PixelName, parameters: Map<String, String?>) {
+    override fun fire(pixel: PixelName, parameters: Map<String, String?>) {
         fire(pixel.pixelName, parameters)
     }
 
     override fun fire(pixelName: String, parameters: Map<String, String?>) {
-
         fireCompletable(pixelName, parameters)
             .subscribeOn(Schedulers.io())
             .subscribe({
@@ -151,7 +174,9 @@ class ApiBasedPixel @Inject constructor(
     }
 
     override fun fireCompletable(pixelName: String, parameters: Map<String, String?>): Completable {
+        val defaultParameters = mapOf(PixelParameter.APP_VERSION to deviceInfo.appVersion)
+        val fullParameters = defaultParameters.plus(parameters)
         val atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
-        return api.fire(pixelName, deviceInfo.formFactor().description, atb, parameters)
+        return api.fire(pixelName, deviceInfo.formFactor().description, atb, fullParameters)
     }
 }

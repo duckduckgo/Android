@@ -22,6 +22,16 @@
     android:background="@color/white"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
+    <include
+        android:id="@+id/defaultCard"
+        layout="@layout/content_onboarding_default_browser_card"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <com.duckduckgo.app.onboarding.ui.page.viewpager.SwipeRestrictingViewPager
         android:id="@+id/viewPager"
         android:layout_width="0dp"

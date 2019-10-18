@@ -46,6 +46,7 @@ import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
+import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageExperimentViewModel
 import com.duckduckgo.app.onboarding.ui.page.TrackerBlockingSelectionViewModel
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
@@ -118,7 +119,7 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                 isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
                 isAssignableFrom(FeedbackViewModel::class.java) -> FeedbackViewModel(playStoreUtils, feedbackSubmitter)
-                isAssignableFrom(BrokenSiteViewModel::class.java) -> BrokenSiteViewModel(brokenSiteSender)
+                isAssignableFrom(BrokenSiteViewModel::class.java) -> BrokenSiteViewModel(pixel, brokenSiteSender)
                 isAssignableFrom(SurveyViewModel::class.java) -> SurveyViewModel(surveyDao, statisticsStore, appInstallStore)
                 isAssignableFrom(AddWidgetInstructionsViewModel::class.java) -> AddWidgetInstructionsViewModel()
                 isAssignableFrom(SettingsViewModel::class.java) -> settingsViewModel()
@@ -128,10 +129,13 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(ShareOpenEndedNegativeFeedbackViewModel::class.java) -> ShareOpenEndedNegativeFeedbackViewModel()
                 isAssignableFrom(BrokenSiteNegativeFeedbackViewModel::class.java) -> BrokenSiteNegativeFeedbackViewModel()
                 isAssignableFrom(TrackerBlockingSelectionViewModel::class.java) -> TrackerBlockingSelectionViewModel(privacySettingsStore)
+                isAssignableFrom(DefaultBrowserPageExperimentViewModel::class.java) -> defaultBrowserPageExperiment()
 
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
         } as T
+
+    private fun defaultBrowserPageExperiment() = DefaultBrowserPageExperimentViewModel(defaultBrowserDetector, pixel, appInstallStore)
 
     private fun onboardingViewModel() = OnboardingViewModel(onboardingStore, onboardingPageManager)
 
@@ -180,6 +184,7 @@ class ViewModelFactory @Inject constructor(
         addToHomeCapabilityDetector = addToHomeCapabilityDetector,
         ctaViewModel = ctaViewModel,
         searchCountDao = searchCountDao,
-        pixel = pixel
+        pixel = pixel,
+        variantManager = variantManager
     )
 }

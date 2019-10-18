@@ -20,18 +20,25 @@ package com.duckduckgo.app.tabs.model
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.db.TabsDao
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, private val siteFactory: SiteFactory) : TabRepository {
+class TabDataRepository @Inject constructor(
+    private val tabsDao: TabsDao,
+    private val siteFactory: SiteFactory,
+    private val webViewPreviewPersister: WebViewPreviewPersister
+) : TabRepository {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs()
 
@@ -78,17 +85,21 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
             val position = tabsDao.tab(tabId)?.position ?: -1
             val uri = Uri.parse(url)
             val title = uri.host?.removePrefix("www.") ?: url
-            val tab = TabEntity(generateTabId(), url, title, false, false, position + 1)
+            val tab = TabEntity(
+                tabId = generateTabId(),
+                url = url,
+                title = title,
+                skipHome = false,
+                viewed = false,
+                position = position + 1
+            )
             tabsDao.insertTabAtPosition(tab)
         }
     }
 
     override suspend fun update(tabId: String, site: Site?) {
         databaseExecutor().scheduleDirect {
-            val current = tabsDao.tab(tabId)
-            val position = current?.position ?: 0
-            val tab = TabEntity(tabId, site?.url, site?.title, false, true, position = position)
-            tabsDao.updateTab(tab)
+            tabsDao.updateUrlAndTitle(tabId, site?.url, site?.title, viewed = true)
         }
     }
 
@@ -105,6 +116,8 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
 
     override suspend fun delete(tab: TabEntity) {
         databaseExecutor().scheduleDirect {
+            deleteOldPreviewImages(tab.tabId)
+
             tabsDao.deleteTabAndUpdateSelection(tab)
         }
         siteData.remove(tab.tabId)
@@ -113,6 +126,7 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
     override fun deleteAll() {
         Timber.i("Deleting tabs right now")
         tabsDao.deleteAllTabs()
+        GlobalScope.launch { webViewPreviewPersister.deleteAll() }
         siteData.clear()
     }
 
@@ -121,6 +135,26 @@ class TabDataRepository @Inject constructor(private val tabsDao: TabsDao, privat
             val selection = TabSelectionEntity(tabId = tabId)
             tabsDao.insertTabSelection(selection)
         }
+    }
+
+    override fun updateTabPreviewImage(tabId: String, fileName: String?) {
+        databaseExecutor().scheduleDirect {
+            val tab = tabsDao.tab(tabId)
+            if (tab == null) {
+                Timber.w("Cannot find tab for tab ID")
+                return@scheduleDirect
+            }
+            tab.tabPreviewFile = fileName
+            tabsDao.updateTab(tab)
+
+            Timber.i("Updated tab preview image. $tabId now uses $fileName")
+            deleteOldPreviewImages(tabId, fileName)
+        }
+    }
+
+    private fun deleteOldPreviewImages(tabId: String, currentPreviewImage: String? = null) {
+        Timber.i("Deleting old preview image for $tabId. Current image is $currentPreviewImage")
+        GlobalScope.launch { webViewPreviewPersister.deletePreviewsForTab(tabId, currentPreviewImage) }
     }
 
     /**
