@@ -245,6 +245,10 @@ class BrowserTabViewModel(
         }
     }
 
+    fun onNewTarget() {
+        showBrowser()
+    }
+
     private fun buildSiteFactory(url: String, title: String? = null) {
 
         if (buildingSiteFactoryJob?.isCompleted == false) {
@@ -748,12 +752,16 @@ class BrowserTabViewModel(
     }
 
     fun determineShowBrowser() {
-        browserViewState.value = currentBrowserViewState().copy(browserShowing = !url.isNullOrBlank())
+        val showBrowser = currentBrowserViewState().browserShowing || !url.isNullOrBlank()
+        browserViewState.value = currentBrowserViewState().copy(browserShowing = showBrowser)
     }
 
     fun showBrowser() {
-        globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
+        Timber.d("MIA in showing browser, current state is ${currentBrowserViewState()}")
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true)
+        Timber.d("MIA in showing browser, current state is ${currentBrowserViewState()}")
+
+        globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
     }
 
     private fun removeAtbAndSourceParamsFromSearch(url: String): String {

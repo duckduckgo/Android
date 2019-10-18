@@ -243,12 +243,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
-
             messageFromPreviousTab?.let {
-                viewModel.showBrowser()
                 val transport = it.obj as WebView.WebViewTransport
                 transport.webView = webView
                 it.sendToTarget()
+                viewModel.onNewTarget()
             }
         }
     }
