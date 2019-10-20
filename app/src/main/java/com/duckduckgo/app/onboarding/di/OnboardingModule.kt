@@ -36,7 +36,7 @@ class OnboardingModule {
         onboardingPageBuilder: OnboardingPageBuilder,
         defaultBrowserDetector: DefaultBrowserDetector
     ): OnboardingPageManager {
-        return OnboardingPageManagerWithTrackerBlocking(onboardingPageBuilder, defaultBrowserDetector, variantManager)
+        return OnboardingPageManagerWithTrackerBlocking(onboardingPageBuilder, defaultBrowserDetector)
     }
 
     @Provides

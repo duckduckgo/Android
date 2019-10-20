@@ -46,7 +46,7 @@ import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
-import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageExperimentViewModel
+import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel
 import com.duckduckgo.app.onboarding.ui.page.TrackerBlockingSelectionViewModel
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
@@ -129,13 +129,13 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(ShareOpenEndedNegativeFeedbackViewModel::class.java) -> ShareOpenEndedNegativeFeedbackViewModel()
                 isAssignableFrom(BrokenSiteNegativeFeedbackViewModel::class.java) -> BrokenSiteNegativeFeedbackViewModel()
                 isAssignableFrom(TrackerBlockingSelectionViewModel::class.java) -> TrackerBlockingSelectionViewModel(privacySettingsStore)
-                isAssignableFrom(DefaultBrowserPageExperimentViewModel::class.java) -> defaultBrowserPageExperiment()
+                isAssignableFrom(DefaultBrowserPageViewModel::class.java) -> defaultBrowserPage()
 
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
         } as T
 
-    private fun defaultBrowserPageExperiment() = DefaultBrowserPageExperimentViewModel(defaultBrowserDetector, pixel, appInstallStore)
+    private fun defaultBrowserPage() = DefaultBrowserPageViewModel(defaultBrowserDetector, pixel, appInstallStore)
 
     private fun onboardingViewModel() = OnboardingViewModel(onboardingStore, onboardingPageManager)
 

@@ -34,8 +34,8 @@ import com.duckduckgo.app.global.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.continueButton
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.launchSettingsButton
-import kotlinx.android.synthetic.main.content_onboarding_default_browser_experiment.*
-import kotlinx.android.synthetic.main.content_onboarding_default_browser_experiment.defaultBrowserImage
+import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
+import kotlinx.android.synthetic.main.content_onboarding_default_browser.defaultBrowserImage
 import timber.log.Timber
 import javax.inject.Inject
 import androidx.lifecycle.ViewModelProvider
@@ -43,8 +43,8 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.global.view.hide
 import com.duckduckgo.app.global.view.show
 
-class DefaultBrowserPageExperiment : OnboardingPageFragment() {
-    override fun layoutResource(): Int = R.layout.content_onboarding_default_browser_experiment
+class DefaultBrowserPage : OnboardingPageFragment() {
+    override fun layoutResource(): Int = R.layout.content_onboarding_default_browser
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -54,8 +54,8 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
     private var toast: Toast? = null
     private var defaultCard: View? = null
 
-    private val viewModel: DefaultBrowserPageExperimentViewModel by lazy {
-        ViewModelProvider(this, viewModelFactory).get(DefaultBrowserPageExperimentViewModel::class.java)
+    private val viewModel: DefaultBrowserPageViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory).get(DefaultBrowserPageViewModel::class.java)
     }
 
     override fun onAttach(context: Context) {
@@ -92,7 +92,7 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(this, Observer<DefaultBrowserPageExperimentViewModel.ViewState> { viewState ->
+        viewModel.viewState.observe(this, Observer<DefaultBrowserPageViewModel.ViewState> { viewState ->
             viewState?.let {
                 if (it.showSettingsUi) setUiForSettings() else setUiForDialog()
                 if (it.showInstructionsCard) showCard() else hideCard()
@@ -102,9 +102,9 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
 
         viewModel.command.observe(this, Observer {
             when (it) {
-                is DefaultBrowserPageExperimentViewModel.Command.OpenDialog -> onLaunchDefaultBrowserWithDialogClicked(it.url)
-                is DefaultBrowserPageExperimentViewModel.Command.OpenSettings -> onLaunchDefaultBrowserSettingsClicked()
-                is DefaultBrowserPageExperimentViewModel.Command.ContinueToBrowser -> onContinuePressed()
+                is DefaultBrowserPageViewModel.Command.OpenDialog -> onLaunchDefaultBrowserWithDialogClicked(it.url)
+                is DefaultBrowserPageViewModel.Command.OpenSettings -> onLaunchDefaultBrowserSettingsClicked()
+                is DefaultBrowserPageViewModel.Command.ContinueToBrowser -> onContinuePressed()
             }
         })
     }
@@ -138,15 +138,15 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
     }
 
     private fun setUiForDialog() {
-        defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_experiment)
+        defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_dialog)
         browserProtectionSubtitle.setText(R.string.defaultBrowserDescriptionNoDefault)
-        browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitleExperiment)
+        browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitle)
     }
 
     private fun setUiForSettings() {
-        defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration)
+        defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_settings)
         browserProtectionSubtitle.setText(R.string.onboardingDefaultBrowserDescription)
-        browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitleExperiment)
+        browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitle)
     }
 
     @SuppressLint("InflateParams")
@@ -193,17 +193,17 @@ class DefaultBrowserPageExperiment : OnboardingPageFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             DEFAULT_BROWSER_REQUEST_CODE_SETTINGS -> {
-                viewModel.handleResult(DefaultBrowserPageExperimentViewModel.Origin.Settings)
+                viewModel.handleResult(DefaultBrowserPageViewModel.Origin.Settings)
             }
             DEFAULT_BROWSER_REQUEST_CODE_DIALOG -> {
                 val origin =
                     if (resultCode == DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL) {
-                        DefaultBrowserPageExperimentViewModel.Origin.InternalBrowser
+                        DefaultBrowserPageViewModel.Origin.InternalBrowser
                     } else {
                         if (userSelectedExternalBrowser) {
-                            DefaultBrowserPageExperimentViewModel.Origin.ExternalBrowser
+                            DefaultBrowserPageViewModel.Origin.ExternalBrowser
                         } else {
-                            DefaultBrowserPageExperimentViewModel.Origin.DialogDismissed
+                            DefaultBrowserPageViewModel.Origin.DialogDismissed
                         }
                     }
                 userSelectedExternalBrowser = false
