@@ -152,6 +152,6 @@ class DefaultBrowserPageViewModel(
 
     companion object {
         const val MAX_DIALOG_ATTEMPTS = 2
-        const val DEFAULT_URL = "https://donttrack.us"
+        const val DEFAULT_URL = "https://duckduckgo.com"
     }
 }
