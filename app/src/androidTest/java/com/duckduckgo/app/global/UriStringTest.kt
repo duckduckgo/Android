@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.global
 
+import android.net.Uri
 import com.duckduckgo.app.global.UriString.Companion.isWebUrl
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Test
 
 class UriStringTest {
@@ -72,6 +72,11 @@ class UriStringTest {
     }
 
     @Test
+    fun whenHostIsValidIpAddressWithPortThenIsWebUrlIsTrue() {
+        assertTrue(isWebUrl("121.33.2.11:999"))
+    }
+
+    @Test
     fun whenHostIsLocalhostThenIsWebUrlIsTrue() {
         assertTrue(isWebUrl("localhost"))
     }
@@ -104,6 +109,11 @@ class UriStringTest {
     @Test
     fun whenSchemeIsValidIpAddressThenIsWebUrlIsTrue() {
         assertTrue(isWebUrl("http://121.33.2.11"))
+    }
+
+    @Test
+    fun whenSchemeIsValidIpAddressWithPortThenIsWebUrlIsTrue() {
+        assertTrue(isWebUrl("http://121.33.2.11:999"))
     }
 
     @Test
@@ -164,6 +174,11 @@ class UriStringTest {
     @Test
     fun whenPathIsValidIpAddressThenIsWebUrlIsTrue() {
         assertTrue(isWebUrl("http://121.33.2.11/path"))
+    }
+
+    @Test
+    fun whenPathIsValidIpAddressWithPortThenIsWebUrlIsTrue() {
+        assertTrue(isWebUrl("http://121.33.2.11:999/path"))
     }
 
     @Test

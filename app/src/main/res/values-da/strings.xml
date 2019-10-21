@@ -76,9 +76,6 @@
     <string name="openImageInNewTab">Åbn billede i baggrundsfanen</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Luk</string>
-    <string name="tapFireDirective">Fane </string>
-    <string name="tapFireIconDescription">brænd</string>
-    <string name="tapFireExplanation"> for at glemme alt</string>
     <string name="closeAllTabsMenuItem">Luk alle faner</string>
 
     <!-- Privacy Dashboard Activities -->

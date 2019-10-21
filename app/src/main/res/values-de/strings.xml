@@ -76,9 +76,6 @@
     <string name="openImageInNewTab">Bild in Hintergrund-Tab öffnen</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Schließen</string>
-    <string name="tapFireDirective">Klicke auf das </string>
-    <string name="tapFireIconDescription">Feuer-Icon,</string>
-    <string name="tapFireExplanation"> um alles zu entfernen</string>
     <string name="closeAllTabsMenuItem">Alle Tabs schließen</string>
 
     <!-- Privacy Dashboard Activities -->

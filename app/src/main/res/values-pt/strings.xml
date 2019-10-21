@@ -76,9 +76,6 @@
     <string name="openImageInNewTab">Abrir imagem em separador em segundo plano</string>
     <string name="faviconContentDescription">Ícone de favorito</string>
     <string name="closeContentDescription">Fechar</string>
-    <string name="tapFireDirective">Tocar em </string>
-    <string name="tapFireIconDescription">fogo</string>
-    <string name="tapFireExplanation"> para esquecer tudo</string>
     <string name="closeAllTabsMenuItem">Fechar todos os separadores</string>
 
     <!-- Privacy Dashboard Activities -->

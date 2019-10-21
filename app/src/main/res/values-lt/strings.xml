@@ -76,9 +76,6 @@
     <string name="openImageInNewTab">Atverti paveikslėlį fono kortelėje</string>
     <string name="faviconContentDescription">Parankinio piktograma</string>
     <string name="closeContentDescription">Uždaryti</string>
-    <string name="tapFireDirective">Palieskite </string>
-    <string name="tapFireIconDescription">liepsną</string>
-    <string name="tapFireExplanation"> viską pamiršti</string>
     <string name="closeAllTabsMenuItem">Uždaryti visas korteles</string>
 
     <!-- Privacy Dashboard Activities -->

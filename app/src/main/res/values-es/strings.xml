@@ -76,9 +76,6 @@
     <string name="openImageInNewTab">Abrir imagen en una pestaña en segundo plano</string>
     <string name="faviconContentDescription">Favicono</string>
     <string name="closeContentDescription">Cerrar</string>
-    <string name="tapFireDirective">Tocar </string>
-    <string name="tapFireIconDescription">borrar</string>
-    <string name="tapFireExplanation"> olvidar todo</string>
     <string name="closeAllTabsMenuItem">Cerrar todas las pestañas</string>
 
     <!-- Privacy Dashboard Activities -->

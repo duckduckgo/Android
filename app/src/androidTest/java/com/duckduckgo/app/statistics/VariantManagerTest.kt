@@ -38,31 +38,6 @@ class VariantManagerTest {
     }
 
     @Test
-    fun tabUxExperimentVariantActive() {
-        val variant = variants.firstOrNull { it.key == "mx" }
-        assertEqualsDouble(1.0, variant!!.weight)
-    }
-
-    @Test
-    fun tabUxExperimentVariantHasExperimentalFeatureForGridTabSwitcher() {
-        val variant = variants.firstOrNull { it.key == "mx" }
-        assertEquals(1, variant!!.features.size)
-        assertTrue(variant.hasFeature(VariantManager.VariantFeature.TabSwitcherGrid))
-    }
-
-    @Test
-    fun tabUxControlGroupVariantActive() {
-        val variant = variants.firstOrNull { it.key == "mw" }
-        assertEqualsDouble(1.0, variant!!.weight)
-    }
-
-    @Test
-    fun tabUxControlGroupVariantHasNoExperimentFeatures() {
-        val variant = variants.firstOrNull { it.key == "mw" }
-        assertEquals(0, variant!!.features.size)
-    }
-
-    @Test
     fun defaultBrowserDialogExperimentVariantActive() {
         val variant = variants.firstOrNull { it.key == "mo" }
         assertEqualsDouble(1.0, variant!!.weight)

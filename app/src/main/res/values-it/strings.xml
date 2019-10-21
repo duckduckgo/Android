@@ -92,9 +92,6 @@
     <string name="openImageInNewTab">Apri l\'immagine in una scheda in secondo piano</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Chiudi</string>
-    <string name="tapFireDirective">Tocca </string>
-    <string name="tapFireIconDescription">l\'icona a forma di fiamma</string>
-    <string name="tapFireExplanation"> per eliminare tutto</string>
     <string name="closeAllTabsMenuItem">Chiudi tutte le schede</string>
 
     <!-- Privacy Dashboard Activities -->

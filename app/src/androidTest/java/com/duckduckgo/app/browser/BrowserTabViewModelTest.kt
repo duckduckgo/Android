@@ -27,10 +27,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
@@ -55,7 +57,6 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -68,6 +69,9 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
+import io.reactivex.Observable
+import io.reactivex.Single
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.*
@@ -83,12 +87,14 @@ import java.util.concurrent.TimeUnit
 class BrowserTabViewModelTest {
 
     @get:Rule
-    @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
-    @Suppress("unused")
     val schedulers = InstantSchedulersRule()
+
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
 
     @Mock
     private lateinit var mockPrevalenceStore: PrevalenceStore
@@ -112,10 +118,7 @@ class BrowserTabViewModelTest {
     private lateinit var mockSettingsStore: SettingsDataStore
 
     @Mock
-    private lateinit var mockAutoCompleteApi: AutoCompleteApi
-
-    @Mock
-    private lateinit var bookmarksDao: BookmarksDao
+    private lateinit var mockBookmarksDao: BookmarksDao
 
     @Mock
     private lateinit var mockLongPressHandler: LongPressHandler
@@ -154,7 +157,12 @@ class BrowserTabViewModelTest {
     private lateinit var mockPixel: Pixel
 
     @Mock
+    private lateinit var mockAutoCompleteService: AutoCompleteService
+
+    @Mock
     private lateinit var mockWidgetCapabilities: WidgetCapabilities
+
+    private lateinit var mockAutoCompleteApi: AutoCompleteApi
 
     private lateinit var ctaViewModel: CtaViewModel
 
@@ -176,6 +184,8 @@ class BrowserTabViewModelTest {
             .build()
 
         appConfigurationDao = db.appConfigurationDao()
+
+        mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao)
 
         ctaViewModel = CtaViewModel(
             mockAppInstallStore,
@@ -201,7 +211,7 @@ class BrowserTabViewModelTest {
             networkLeaderboardDao = mockNetworkLeaderboardDao,
             autoCompleteApi = mockAutoCompleteApi,
             appSettingsPreferencesStore = mockSettingsStore,
-            bookmarksDao = bookmarksDao,
+            bookmarksDao = mockBookmarksDao,
             longPressHandler = mockLongPressHandler,
             appConfigurationDao = appConfigurationDao,
             webViewSessionStorage = webViewSessionStorage,
@@ -221,6 +231,7 @@ class BrowserTabViewModelTest {
         whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
     }
 
+    @ExperimentalCoroutinesApi
     @After
     fun after() {
         testee.onCleared()
@@ -305,7 +316,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenBookmarkEditedThenDaoIsUpdated() = runBlocking<Unit> {
         testee.editBookmark(0, "A title", "www.example.com")
-        verify(bookmarksDao).update(BookmarkEntity(title = "A title", url = "www.example.com"))
+        verify(mockBookmarksDao).update(BookmarkEntity(title = "A title", url = "www.example.com"))
     }
 
     @Test
@@ -313,7 +324,7 @@ class BrowserTabViewModelTest {
         loadUrl("www.example.com", "A title")
 
         testee.onBookmarkAddRequested()
-        verify(bookmarksDao).insert(BookmarkEntity(title = "A title", url = "www.example.com"))
+        verify(mockBookmarksDao).insert(BookmarkEntity(title = "A title", url = "www.example.com"))
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShowBookmarkAddedConfirmation)
     }
@@ -480,25 +491,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenProgressChangesToFinishedAndImprovedTabUxVariantActiveThenWebViewPreviewGenerated() {
-        whenever(mockVariantManager.getVariant()).thenReturn(
-            Variant("mx", 1.0, listOf(VariantManager.VariantFeature.TabSwitcherGrid), filterBy = { true })
-        )
-        updateUrl("https://example.com", "https://example.com", true)
-        testee.progressChanged(100)
-        val command = captureCommands().lastValue as Command.GenerateWebViewPreviewImage
-        assertFalse(command.forceImmediate)
-    }
-
-    @Test
-    fun whenProgressChangesToFinishedAndImprovedTabUxVariantNotActiveThenWebViewPreviewNotGenerated() {
-        whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
-        updateUrl("https://example.com", "https://example.com", true)
-        testee.progressChanged(100)
-        verify(mockCommandObserver, never()).onChanged(any<Command.GenerateWebViewPreviewImage>())
-    }
-
-    @Test
     fun whenUrlClearedThenPrivacyGradeIsCleared() = runBlocking<Unit> {
         loadUrl("https://duckduckgo.com")
         assertNotNull(testee.privacyGrade.value)
@@ -658,6 +650,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEnteringQueryWithAutoCompleteEnabledThenAutoCompleteSuggestionsShown() {
+        whenever(mockBookmarksDao.bookmarksByQuery("%foo%")).thenReturn(Single.just(emptyList()))
+        whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(Observable.just(emptyList()))
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.onOmnibarInputStateChanged("foo", true, hasQueryChanged = true)
         assertTrue(autoCompleteViewState().showSuggestions)
@@ -941,9 +935,9 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkAddedWithBlankTitleAndUrl() = runBlocking<Unit> {
-        whenever(bookmarksDao.insert(any())).thenReturn(1)
+        whenever(mockBookmarksDao.insert(any())).thenReturn(1)
         testee.onBookmarkAddRequested()
-        verify(bookmarksDao).insert(BookmarkEntity(title = "", url = ""))
+        verify(mockBookmarksDao).insert(BookmarkEntity(title = "", url = ""))
         val command = captureCommands().value as Command.ShowBookmarkAddedConfirmation
         assertEquals(1, command.bookmarkId)
         assertEquals("", command.title)
@@ -1067,7 +1061,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBookmarkSuggestionSubmittedThenAutoCompleteBookmarkSelectionPixelSent() = runBlocking {
-        whenever(bookmarksDao.hasBookmarks()).thenReturn(true)
+        whenever(mockBookmarksDao.hasBookmarks()).thenReturn(true)
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteApi.AutoCompleteResult("", emptyList(), true))
         testee.fireAutocompletePixel(AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com"))
 
@@ -1076,7 +1070,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSearchSuggestionSubmittedWithBookmarksThenAutoCompleteSearchSelectionPixelSent() = runBlocking {
-        whenever(bookmarksDao.hasBookmarks()).thenReturn(true)
+        whenever(mockBookmarksDao.hasBookmarks()).thenReturn(true)
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteApi.AutoCompleteResult("", emptyList(), true))
         testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
 
@@ -1085,7 +1079,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSearchSuggestionSubmittedWithoutBookmarksThenAutoCompleteSearchSelectionPixelSent() = runBlocking {
-        whenever(bookmarksDao.hasBookmarks()).thenReturn(false)
+        whenever(mockBookmarksDao.hasBookmarks()).thenReturn(false)
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteApi.AutoCompleteResult("", emptyList(), false))
         testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
 
@@ -1102,6 +1096,48 @@ class BrowserTabViewModelTest {
     fun whenUserSubmitsQueryThenCaretDoesNotMoveToTheEnd() {
         testee.onUserSubmittedQuery("foo")
         assertFalse(omnibarViewState().shouldMoveCaretToEnd)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabThenGenerateWebViewPreviewImage() {
+        testee.userRequestedOpeningNewTab()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.firstValue
+        assertTrue(command is Command.GenerateWebViewPreviewImage)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabThenNewTabCommandIssued() {
+        testee.userRequestedOpeningNewTab()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.lastValue
+        assertTrue(command is Command.LaunchNewTab)
+    }
+
+    @Test
+    fun whenUserPressesBackAndSkippingHomeThenWebViewPreviewGenerated() {
+        setupNavigation(isBrowsing = true, canGoBack = false, skipHome = true)
+        testee.onUserPressedBack()
+        verifyGenerateWebViewPreviewCommandIssued()
+    }
+
+    @Test
+    fun whenUserPressesBackAndNotSkippingHomeThenWebViewPreviewNotGenerated() {
+        setupNavigation(isBrowsing = true, canGoBack = false, skipHome = false)
+        testee.onUserPressedBack()
+        verifyGenerateWebViewPreviewCommandNotIssued()
+    }
+
+    private fun verifyGenerateWebViewPreviewCommandIssued() {
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val generatedPreviewCommand = commandCaptor.allValues.find { it is Command.GenerateWebViewPreviewImage }
+        assertNotNull(generatedPreviewCommand)
+    }
+
+    private fun verifyGenerateWebViewPreviewCommandNotIssued() {
+        verify(mockCommandObserver, atLeast(0)).onChanged(commandCaptor.capture())
+        val generatedPreviewCommand = commandCaptor.allValues.find { it is Command.GenerateWebViewPreviewImage }
+        assertNull(generatedPreviewCommand)
     }
 
     private fun pixelParams(showedBookmarks: Boolean, bookmarkCapable: Boolean) = mapOf(

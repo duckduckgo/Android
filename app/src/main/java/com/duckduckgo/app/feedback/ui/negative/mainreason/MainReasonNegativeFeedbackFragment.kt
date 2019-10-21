@@ -25,7 +25,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
 import com.duckduckgo.app.feedback.ui.common.FeedbackItemDecoration
-import com.duckduckgo.app.feedback.ui.negative.FeedbackType
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.FeedbackTypeMainReasonDisplay
@@ -69,7 +68,7 @@ class MainReasonNegativeFeedbackFragment : FeedbackFragment() {
 
 
     private fun getMainReasonsDisplayText(): List<FeedbackTypeMainReasonDisplay> {
-        return FeedbackType.MainReason.values().mapNotNull {
+        return MainReason.values().mapNotNull {
             FeedbackTypeDisplay.mainReasons[it]
         }
     }

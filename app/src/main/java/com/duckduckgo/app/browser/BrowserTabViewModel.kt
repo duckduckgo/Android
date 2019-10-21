@@ -61,7 +61,6 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.TabSwitcherGrid
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
@@ -158,6 +157,7 @@ class BrowserTabViewModel(
         object NavigateForward : Command()
         class OpenInNewTab(val query: String) : Command()
         class OpenInNewBackgroundTab(val query: String) : Command()
+        object LaunchNewTab : Command()
         object ResetHistory : Command()
         class DialNumber(val telephoneNumber: String) : Command()
         class SendSms(val telephoneNumber: String) : Command()
@@ -180,9 +180,8 @@ class BrowserTabViewModel(
         object LaunchLegacyAddWidget : Command()
         class RequiresAuthentication(val request: BasicAuthenticationRequest) : Command()
         class SaveCredentials(val request: BasicAuthenticationRequest, val credentials: BasicAuthenticationCredentials) : Command()
-        class GenerateWebViewPreviewImage(val forceImmediate: Boolean) : Command()
+        object GenerateWebViewPreviewImage : Command()
         object LaunchTabSwitcher : Command()
-        object LaunchTabSwitcherLegacy : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -252,9 +251,11 @@ class BrowserTabViewModel(
 
         site = siteFactory.buildSite(url, title)
         onSiteChanged()
-        buildingSiteFactoryJob = viewModelScope.launch(Dispatchers.IO) {
+        buildingSiteFactoryJob = viewModelScope.launch {
             site?.let {
-                siteFactory.loadFullSiteDetails(it)
+                withContext(Dispatchers.IO) {
+                    siteFactory.loadFullSiteDetails(it)
+                }
                 onSiteChanged()
             }
         }
@@ -281,6 +282,7 @@ class BrowserTabViewModel(
     @VisibleForTesting
     public override fun onCleared() {
         super.onCleared()
+        buildingSiteFactoryJob?.cancel()
         appConfigurationObservable.removeObserver(appConfigurationObserver)
     }
 
@@ -379,6 +381,8 @@ class BrowserTabViewModel(
             return true
         }
 
+        Timber.d("User pressed back and tab is set to skip home; need to generate WebView preview now")
+        command.value = GenerateWebViewPreviewImage
         return false
     }
 
@@ -501,10 +505,6 @@ class BrowserTabViewModel(
         val isLoading = newProgress < 100
         val progress = currentLoadingViewState()
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = newProgress)
-
-        if (!isLoading && variantManager.getVariant().hasFeature(TabSwitcherGrid)) {
-            updateOrDeleteWebViewPreview(forceImmediate = false)
-        }
     }
 
     private fun registerSiteVisit() {
@@ -557,7 +557,6 @@ class BrowserTabViewModel(
     private fun onSiteChanged() {
         siteLiveData.postValue(site)
         privacyGrade.postValue(site?.calculateGrades()?.improvedGrade)
-
         viewModelScope.launch(Dispatchers.IO) {
             tabRepository.update(tabId, site)
         }
@@ -650,10 +649,12 @@ class BrowserTabViewModel(
 
         return when (requiredAction) {
             is RequiredAction.OpenInNewTab -> {
+                command.value = GenerateWebViewPreviewImage
                 command.value = OpenInNewTab(requiredAction.url)
                 true
             }
             is RequiredAction.OpenInNewBackgroundTab -> {
+                command.value = GenerateWebViewPreviewImage
                 viewModelScope.launch { openInNewBackgroundTab(requiredAction.url) }
                 true
             }
@@ -803,6 +804,11 @@ class BrowserTabViewModel(
             })
     }
 
+    fun userRequestedOpeningNewTab() {
+        command.value = GenerateWebViewPreviewImage
+        command.value = LaunchNewTab
+    }
+
     fun onSurveyChanged(survey: Survey?) {
         ctaViewModel.onSurveyChanged(survey)
     }
@@ -825,7 +831,7 @@ class BrowserTabViewModel(
         tabRepository.updateTabPreviewImage(tabId, fileName)
     }
 
-    private fun deleteTabPreview(tabId: String) {
+    fun deleteTabPreview(tabId: String) {
         tabRepository.updateTabPreviewImage(tabId, null)
     }
 
@@ -847,22 +853,6 @@ class BrowserTabViewModel(
     }
 
     fun userLaunchingTabSwitcher() {
-        if (variantManager.getVariant().hasFeature(TabSwitcherGrid)) {
-            updateOrDeleteWebViewPreview(forceImmediate = true)
-
-            command.value = LaunchTabSwitcher
-        } else {
-            command.value = LaunchTabSwitcherLegacy
-        }
-    }
-
-    private fun updateOrDeleteWebViewPreview(forceImmediate: Boolean) {
-        val url = site?.url
-        Timber.d("Updating or deleting WebView preview for $url")
-        if (url == null) {
-            deleteTabPreview(tabId)
-        } else {
-            command.value = GenerateWebViewPreviewImage(forceImmediate)
-        }
+        command.value = LaunchTabSwitcher
     }
 }

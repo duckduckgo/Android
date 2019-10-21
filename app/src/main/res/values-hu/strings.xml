@@ -76,9 +76,6 @@
     <string name="openImageInNewTab">Kép megnyitása háttérben lévő lapon</string>
     <string name="faviconContentDescription">Kedvenc ikon</string>
     <string name="closeContentDescription">Bezárás</string>
-    <string name="tapFireDirective">Koppints </string>
-    <string name="tapFireIconDescription">a tűz ikonra</string>
-    <string name="tapFireExplanation"> a beállítások törléséhez</string>
     <string name="closeAllTabsMenuItem">Összes lap bezárása</string>
 
     <!-- Privacy Dashboard Activities -->

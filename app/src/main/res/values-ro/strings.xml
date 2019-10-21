@@ -76,9 +76,6 @@
     <string name="openImageInNewTab">Deschide imaginea în fila de fundal</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Închidere</string>
-    <string name="tapFireDirective">Apăsați butonul </string>
-    <string name="tapFireIconDescription">„Fire”</string>
-    <string name="tapFireExplanation"> pentru a uita totul</string>
     <string name="closeAllTabsMenuItem">Închidere toate filele</string>
 
     <!-- Privacy Dashboard Activities -->

@@ -76,9 +76,6 @@
     <string name="openImageInNewTab">Åpne bilde i bakgrunnsfane</string>
     <string name="faviconContentDescription">Favorittikon</string>
     <string name="closeContentDescription">Lukk</string>
-    <string name="tapFireDirective">Klikk </string>
-    <string name="tapFireIconDescription">fyr av</string>
-    <string name="tapFireExplanation"> for å glemme alt</string>
     <string name="closeAllTabsMenuItem">Lukk alle faner</string>
 
     <!-- Privacy Dashboard Activities -->
