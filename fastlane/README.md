@@ -20,7 +20,12 @@ or alternatively using `brew cask install fastlane`
 ```
 fastlane android deploy_github
 ```
-Release
+Deploy APK to GitHub
+### android release
+```
+fastlane android release
+```
+Create new release
 
 ----
 
