@@ -3,11 +3,11 @@
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Faites de la confidentialité votre valeur par défaut</string>
     <string name="onboardingDefaultBrowserDescription">Accédez systématiquement aux paramètres pour faire des recherches et naviguer avec DuckDuckGo.</string>
-    <string name="onboardingDefaultBrowserGoToSettingsAction">Aller aux paramètres</string>
     <string name="onboardingContinue">Continuer</string>
     <string name="onboardingContinueFinalPage">Commencer la navigation</string>
+    <string name="onboardingDefaultBrowserTitle">Faites de DuckDuckGo votre appli par défaut</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Dites bonjour à la tranquillité d\'esprit</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Bienvenue sur\ nDuckDuckGo !</string>
@@ -24,6 +24,11 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Impossible de lancer l\'écran des paramètres par défaut de l\'application</string>
     <string name="settingsDefaultBrowserEnabled">Définir comme navigateur par défaut</string>
+    <string name="defaultBrowserMaybeLater">Peut-être plus tard</string>
+    <string name="defaultBrowserLetsDoIt">Allons-y !</string>
+    <string name="defaultBrowserDescriptionNoDefault">Des liens ouverts en toute tranquillité d\'esprit, à chaque fois.</string>
+    <string name="defaultBrowserDescriptionDefaultSet">Avec DuckDuckGo, vos données en ligne sont plus privées par défaut, peu importe où Internet vous mène.</string>
+    <string name="defaultBrowserInstructions">Sélectionnez DuckDuckGo et appuyez sur <font color="#678fff"> Toujours </font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Menu du navigateur</string>
@@ -197,6 +202,7 @@
     <string name="bookmarkOverflowContentDescription">Plus d\'options pour le signet %s</string>
     <string name="delete">Supprimer</string>
     <string name="edit">Modifier</string>
+    <string name="bookmarkEdited">Favori ajouté</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Recherche DuckDuckGo</string>

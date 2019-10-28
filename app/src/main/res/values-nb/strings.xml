@@ -3,11 +3,11 @@
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Sett personvern som standard</string>
     <string name="onboardingDefaultBrowserDescription">Åpne innstillinger for å søke og bruke nettleseren med DuckDuckGo hver gang.</string>
-    <string name="onboardingDefaultBrowserGoToSettingsAction">Gå til innstillinger</string>
     <string name="onboardingContinue">Fortsett</string>
     <string name="onboardingContinueFinalPage">Begynn å surfe</string>
+    <string name="onboardingDefaultBrowserTitle">Gjør DuckDuckGo til din standard</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Si hei til fred i sinnet</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Velkommen til\nDuckDuckGo!</string>
@@ -24,6 +24,11 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Kan ikke åpne skjermen for appens standardinnstillinger</string>
     <string name="settingsDefaultBrowserEnabled">Bruk nettleser som standard</string>
+    <string name="defaultBrowserMaybeLater">Kanskje senere</string>
+    <string name="defaultBrowserLetsDoIt">La oss gjøre det!</string>
+    <string name="defaultBrowserDescriptionNoDefault">Åpne lenker med ro i sinnet, hver gang.</string>
+    <string name="defaultBrowserDescriptionDefaultSet">Med DuckDuckGo blir dine nettdata som standard mer private, uansett hvor internett tar deg.</string>
+    <string name="defaultBrowserInstructions">Velg DuckDuckGo og trykk på <font color="#678fff"> Alltid </font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Nettlesermeny</string>
@@ -196,7 +201,8 @@
     <string name="noBookmarks">Det har ennå ikke blitt lagt til et bokmerke</string>
     <string name="bookmarkOverflowContentDescription">Flere alternativer for bokmerket %s</string>
     <string name="delete">Slett</string>
-    <string name="edit">Rediger</string>
+    <string name="edit">Rediger</string>4
+    <string name="bookmarkEdited">Bokmerke lagt til</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Søk på DuckDuckGo</string>
