@@ -3,11 +3,11 @@
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Nastavte si predvolenú ochranu osobných údajov</string>
     <string name="onboardingDefaultBrowserDescription">Na automatické vyhľadávanie a prehliadanie s DuckDuckGo navštívte Nastavenia.</string>
-    <string name="onboardingDefaultBrowserGoToSettingsAction">Prejsť na Nastavenia</string>
     <string name="onboardingContinue">Pokračovať</string>
     <string name="onboardingContinueFinalPage">Spustiť prehľadávanie</string>
+    <string name="onboardingDefaultBrowserTitle">Nastav DuckDuckGo ako svoju predvolenú aplikáciu</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Zoznám sa s pokojom mysle</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Vitajte na\nDuckDuckGo!</string>
@@ -24,6 +24,11 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nedá sa spustiť obrazovka predvolených nastavení aplikácie</string>
     <string name="settingsDefaultBrowserEnabled">Nastaviť ako predvolený prehliadač</string>
+    <string name="defaultBrowserMaybeLater">Možno neskôr</string>
+    <string name="defaultBrowserLetsDoIt">Poďme na to!</string>
+    <string name="defaultBrowserDescriptionNoDefault">Vždy otvor odkazy s pokojom mysle.</string>
+    <string name="defaultBrowserDescriptionDefaultSet">Pomocou DuckDuckGo sú tvoje online údaje v predvolenom nastavení viac chránené bez ohľadu na to, kam ťa internet zavedie.</string>
+    <string name="defaultBrowserInstructions">Zvoľ DuckDuckGo a ťukni <font color="#678fff">vždy</font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Ponuka prehliadača</string>
@@ -198,6 +203,7 @@
     <string name="bookmarkOverflowContentDescription">Viac možností pre záložku %s</string>
     <string name="delete">Vymazať</string>
     <string name="edit">Upraviť</string>
+    <string name="bookmarkEdited">Záložka pridaná</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Vyhľadať v DuckDuckGo</string>
