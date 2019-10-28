@@ -42,7 +42,6 @@ import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.NotificationScheduler
-import com.duckduckgo.app.privacy.HistoricTrackerBlockingObserver
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -89,9 +88,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     @Inject
     lateinit var defaultBrowserObserver: DefaultBrowserObserver
-
-    @Inject
-    lateinit var historicTrackerBlockingObserver: HistoricTrackerBlockingObserver
 
     @Inject
     lateinit var statisticsUpdater: StatisticsUpdater
@@ -166,7 +162,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
             it.addObserver(dataClearer)
             it.addObserver(appDaysUsedRecorder)
             it.addObserver(defaultBrowserObserver)
-            it.addObserver(historicTrackerBlockingObserver)
             it.addObserver(appEnjoymentLifecycleObserver)
         }
 
