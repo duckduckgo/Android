@@ -32,6 +32,8 @@ interface Pixel {
     enum class PixelName(val pixelName: String) {
 
         APP_LAUNCH("ml"),
+
+        FORGET_ALL_PRESSED("mf_p"),
         FORGET_ALL_EXECUTED("mf"),
 
         APPLICATION_CRASH("m_d_ac"),
