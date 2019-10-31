@@ -17,55 +17,33 @@
 package com.duckduckgo.app.trackerdetection.model
 
 import androidx.annotation.WorkerThread
-import androidx.core.net.toUri
 import com.duckduckgo.app.entities.EntityMapping
-import com.duckduckgo.app.global.uri.removeSubdomain
 import com.duckduckgo.app.privacy.store.PrevalenceStore
-import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
+import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
 
 interface TrackerNetworks {
     fun network(url: String): TrackerNetwork?
 
 }
 
+//TODO implement new version
 class TrackerNetworksLookup(
     private val prevalenceStore: PrevalenceStore,
     private val entityMapping: EntityMapping,
-    private val trackerDataDao: TrackerDataDao
+    private val tdsTrackerDao: TdsTrackerDao
 ) : TrackerNetworks {
 
     @WorkerThread
     override fun network(url: String): TrackerNetwork? {
 
         val entity = entityMapping.entityForUrl(url) ?: return null
-        val tracker = recursivelyFindMatchingTracker(url)
         val prevalence = prevalenceStore.findPrevalenceOf(entity.entityName)
 
         return TrackerNetwork(
             name = entity.entityName,
-            category = tracker?.category,
+            category = "",
             isMajor = (prevalence ?: 0.0) > MAJOR_NETWORK_PREVALENCE
         )
-    }
-
-    private fun recursivelyFindMatchingTracker(url: String): DisconnectTracker? {
-        val uri = url.toUri()
-        val host = uri.host ?: return null
-
-        // try searching for exact domain
-        val direct = lookUpTrackerInDatabase(host)
-        if (direct != null) {
-            return direct
-        }
-
-        // remove the first subdomain, and try again
-        val parentDomain = uri.removeSubdomain() ?: return null
-        return recursivelyFindMatchingTracker(parentDomain)
-    }
-
-    @WorkerThread
-    private fun lookUpTrackerInDatabase(url: String): DisconnectTracker? {
-        return trackerDataDao.get(url)
     }
 
     companion object {

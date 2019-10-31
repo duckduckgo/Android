@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,23 @@
 
 package com.duckduckgo.app.trackerdetection
 
-import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
-import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
+import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.trackerdetection.model.ResourceType
+import com.duckduckgo.app.trackerdetection.model.TdsTracker
+import com.duckduckgo.app.trackerdetection.model.TdsTracker.Action.BLOCK
 
-class DisconnectClient(override val name: Client.ClientName, private val trackers: List<DisconnectTracker>) : Client {
+class TdsClient(override val name: Client.ClientName, private val trackers: List<TdsTracker>) : Client {
 
     override fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean {
-        return trackers
-            .filter { bannedCategories.contains(it.category) }
-            .any { sameOrSubdomain(url, it.url) }
-    }
+        val domain = UriString.host(url) ?: return false
+        var tracker = trackers.firstOrNull { it.domain == domain } ?: return false
 
-    companion object {
-        private val bannedCategories = listOf("Analytics", "Advertising", "Social")
-    }
+        if (tracker.defaultAction == BLOCK) {
+            return true
+        }
 
+        //TODO rule checks
+        //TODO what about subdomains?
+        return false
+    }
 }

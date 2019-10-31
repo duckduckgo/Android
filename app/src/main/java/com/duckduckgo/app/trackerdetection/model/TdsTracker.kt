@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,35 @@ package com.duckduckgo.app.trackerdetection.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
 
-@Entity(tableName = "disconnect_tracker")
-data class DisconnectTracker(
-    @PrimaryKey val url: String,
-    val category: String,
-    val networkName: String,
-    val networkUrl: String
-)
+@Entity(tableName = "tds_tracker")
+data class TdsTracker(
+
+    @PrimaryKey val domain: String,
+
+    val defaultAction: Action,
+
+    val ownerName: String
+
+) {
+    enum class Action {
+        BLOCK,
+        WHITELIST
+    }
+
+    class ActionTypeConverter {
+
+        @TypeConverter
+        fun toAction(value: String): Action {
+            return Action.valueOf(value)
+        }
+
+        @TypeConverter
+        fun fromAction(value: Action): String {
+            return value.name
+        }
+    }
+
+}
+

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,9 @@
 
 package com.duckduckgo.app.trackerdetection.api
 
-import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
+import com.duckduckgo.app.trackerdetection.model.TdsTracker
 import com.squareup.moshi.Json
 
-class DisconnectListJson {
-
-    @Json(name = "categories")
-    lateinit var trackers: List<DisconnectTracker>
-
+class TdsJson {
+    lateinit var trackers: List<TdsTracker>
 }

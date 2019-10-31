@@ -30,7 +30,7 @@ class DaoModule {
     fun provideHttpsBloomFilterSpecDao(database: AppDatabase) = database.httpsBloomFilterSpecDao()
 
     @Provides
-    fun providesDisconnectTrackDao(database: AppDatabase) = database.trackerDataDao()
+    fun providesTdsTrackDao(database: AppDatabase) = database.tdsTrackerDao()
 
     @Provides
     fun providesNetworkLeaderboardDao(database: AppDatabase) = database.networkLeaderboardDao()

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,63 +16,62 @@
 
 package com.duckduckgo.app.trackerdetection
 
-import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
 import com.duckduckgo.app.trackerdetection.model.ResourceType
+import com.duckduckgo.app.trackerdetection.model.TdsTracker
+import com.duckduckgo.app.trackerdetection.model.TdsTracker.Action.BLOCK
+import com.duckduckgo.app.trackerdetection.model.TdsTracker.Action.WHITELIST
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 
-class DisconnectClientTest {
+class TdsClientTest {
 
     companion object {
-        private const val categoryBanned = "Social"
-        private const val categoryAllowed = "Content"
-        private const val network = "Network"
-        private const val networkUrl = "http://www.network.com/"
+        private const val owner = "A Network Owner"
         private const val documentUrl = "http://example.com/index.htm"
         private val resourceType = ResourceType.UNKNOWN
     }
 
     @Test
-    fun whenUrlIsATrackerInBlockedCategoryThenMatchesIsTrue() {
-        val data = listOf(DisconnectTracker("tracker.com", categoryBanned, network, networkUrl))
-        val testee = DisconnectClient(Client.ClientName.DISCONNECT, data)
+    fun whenUrlMatchesWithActionBlockThenMatchesIsTrue() {
+        val data = listOf(TdsTracker("tracker.com", BLOCK, owner))
+        val testee = TdsClient(Client.ClientName.TDS, data)
         assertTrue(testee.matches("http://tracker.com/script.js", documentUrl, resourceType))
     }
 
     @Test
-    fun whenUrlIsATrackerOutsideBlockedCategoryThenMatchesIsFalse() {
-        val data = listOf(DisconnectTracker("tracker.com", categoryAllowed, network, networkUrl))
-        val testee = DisconnectClient(Client.ClientName.DISCONNECT, data)
+    fun whenUrlMatchesWithActionWhitelistThenMatchesIsFalse() {
+        val data = listOf(TdsTracker("tracker.com", WHITELIST, owner))
+        val testee = TdsClient(Client.ClientName.TDS, data)
         assertFalse(testee.matches("http://tracker.com/script.js", documentUrl, resourceType))
     }
 
     @Test
     fun whenUrlIsNotATrackerThenMatchesIsFalse() {
-        val data = listOf(DisconnectTracker("tracker.com", categoryBanned, network, networkUrl))
-        val testee = DisconnectClient(Client.ClientName.DISCONNECT, data)
+        val data = listOf(TdsTracker("tracker.com", BLOCK, owner))
+        val testee = TdsClient(Client.ClientName.TDS, data)
         assertFalse(testee.matches("http://nontracker.com/script.js", documentUrl, resourceType))
     }
 
     @Test
     fun whenUrlIsASubdomainOfATrackerThenMatchesIsTrue() {
-        val data = listOf(DisconnectTracker("tracker.com", categoryBanned, network, networkUrl))
-        val testee = DisconnectClient(Client.ClientName.DISCONNECT, data)
+        val data = listOf(TdsTracker("tracker.com", BLOCK, owner))
+        val testee = TdsClient(Client.ClientName.TDS, data)
         assertTrue(testee.matches("http://subdomian.tracker.com/script.js", documentUrl, resourceType))
     }
 
     @Test
     fun whenUrlIsAParentDomainOfATrackerThenMatchesIsFalse() {
-        val data = listOf(DisconnectTracker("subdomain.tracker.com", categoryBanned, network, networkUrl))
-        val testee = DisconnectClient(Client.ClientName.DISCONNECT, data)
+        val data = listOf(TdsTracker("tracker.com", BLOCK, owner))
+        val testee = TdsClient(Client.ClientName.TDS, data)
         assertFalse(testee.matches("http://tracker.com/script.js", documentUrl, resourceType))
     }
 
     @Test
     fun whenUrlContaintsButIsNotSubdomainOfATrackerThenMatchesIsFalse() {
-        val data = listOf(DisconnectTracker("tracker.com", categoryBanned, network, networkUrl))
-        val testee = DisconnectClient(Client.ClientName.DISCONNECT, data)
+        val data = listOf(TdsTracker("tracker.com", BLOCK, owner))
+        val testee = TdsClient(Client.ClientName.TDS, data)
         assertFalse(testee.matches("http://notsubdomainoftracker.com", documentUrl, resourceType))
     }
 }

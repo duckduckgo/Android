@@ -23,7 +23,7 @@ import com.duckduckgo.app.trackerdetection.AdBlockClient
 import com.duckduckgo.app.trackerdetection.Client
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
-import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
+import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
 import io.reactivex.Completable
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -36,40 +36,40 @@ class TrackerDataDownloader @Inject constructor(
     private val trackerListService: TrackerListService,
     private val binaryDataStore: BinaryDataStore,
     private val trackerDataLoader: TrackerDataLoader,
-    private val trackerDataDao: TrackerDataDao,
+    private val tdsTrackerDao: TdsTrackerDao,
     private val appDatabase: AppDatabase
 ) {
 
     fun downloadList(clientName: Client.ClientName): Completable {
 
         return when (clientName) {
-            DISCONNECT -> downloadDisconnectList()
+            TDS -> downloadTdsList()
             TRACKERSWHITELIST -> downloadAdblockList(clientName) { trackerListService.trackersWhitelist() }
             EASYLIST, EASYPRIVACY -> removeLegacyList(clientName)
         }
     }
 
-    private fun downloadDisconnectList(): Completable {
+    private fun downloadTdsList(): Completable {
 
         return Completable.fromAction {
 
-            Timber.d("Downloading disconnect data")
+            Timber.d("Downloading tds.json")
 
-            val call = trackerListService.disconnect()
+            val call = trackerListService.tds()
             val response = call.execute()
 
-            if (response.isCached && trackerDataDao.count() != 0) {
-                Timber.d("Disconnect data already cached and stored")
+            if (response.isCached && tdsTrackerDao.count() != 0) {
+                Timber.d("Tds data already cached and stored")
                 return@fromAction
             }
 
             if (response.isSuccessful) {
-                Timber.d("Updating disconnect data from server")
+                Timber.d("Updating tds data from server")
                 val body = response.body()!!
 
                 appDatabase.runInTransaction {
-                    trackerDataDao.updateAll(body.trackers)
-                    trackerDataLoader.loadDisconnectData()
+                    tdsTrackerDao.updateAll(body.trackers)
+                    trackerDataLoader.loadTdsTrackerData()
                 }
 
             } else {

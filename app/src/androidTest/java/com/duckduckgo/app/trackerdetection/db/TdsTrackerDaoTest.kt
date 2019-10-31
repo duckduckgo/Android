@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,22 +19,22 @@ package com.duckduckgo.app.trackerdetection.db
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
+import com.duckduckgo.app.trackerdetection.model.TdsTracker
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-class TrackerDataDaoTest {
+class TdsTrackerDaoTest {
 
     private lateinit var db: AppDatabase
-    private lateinit var dao: TrackerDataDao
+    private lateinit var dao: TdsTrackerDao
 
     @Before
     fun before() {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java).build()
-        dao = db.trackerDataDao()
+        dao = db.tdsTrackerDao()
     }
 
     @After
@@ -49,35 +49,35 @@ class TrackerDataDaoTest {
 
     @Test
     fun whenTrackerInsertedThenCountIsOne() {
-        dao.insertAll(listOf(createTracker(trackerUrl)))
+        dao.insertAll(listOf(createTracker(trackerDomain)))
         assertEquals(1, dao.count())
     }
 
     @Test
     fun whenTrackerInsertedThenContainsTracker() {
-        val tracker = createTracker(trackerUrl)
+        val tracker = createTracker(trackerDomain)
         dao.insertAll(listOf(tracker))
         assertTrue(dao.getAll().contains(tracker))
     }
 
     @Test
     fun whenSecondUniqueTrackerInsertedThenCountIsTwo() {
-        dao.insertAll(listOf(createTracker(trackerUrl)))
-        dao.insertAll(listOf(createTracker(anotherTrackerUrl)))
+        dao.insertAll(listOf(createTracker(trackerDomain)))
+        dao.insertAll(listOf(createTracker(anotherTrackerDomain)))
         assertEquals(2, dao.count())
     }
 
     @Test
     fun whenSecondDuplicateTrackerInsertedThenCountIsOne() {
-        dao.insertAll(listOf(createTracker(trackerUrl)))
-        dao.insertAll(listOf(createTracker(trackerUrl)))
+        dao.insertAll(listOf(createTracker(trackerDomain)))
+        dao.insertAll(listOf(createTracker(trackerDomain)))
         assertEquals(1, dao.count())
     }
 
     @Test
     fun whenAllUpdatedThenPreviousValuesAreReplaced() {
-        val initialTracker = createTracker(trackerUrl)
-        val replacementTracker = createTracker(anotherTrackerUrl)
+        val initialTracker = createTracker(trackerDomain)
+        val replacementTracker = createTracker(anotherTrackerDomain)
 
         dao.insertAll(listOf(initialTracker))
         dao.updateAll(listOf(replacementTracker))
@@ -86,19 +86,19 @@ class TrackerDataDaoTest {
     }
 
     @Test
-    fun whenhAllDeletedThenCountIsZero() {
-        val tracker = createTracker(trackerUrl)
+    fun whenAllDeletedThenCountIsZero() {
+        val tracker = createTracker(trackerDomain)
         dao.insertAll(listOf(tracker))
         dao.deleteAll()
         assertEquals(0, dao.count())
     }
 
-    private fun createTracker(url: String): DisconnectTracker {
-        return DisconnectTracker(url, "", "", "")
+    private fun createTracker(domain: String): TdsTracker {
+        return TdsTracker(domain, TdsTracker.Action.BLOCK, "")
     }
 
     companion object {
-        var trackerUrl = "tracker.com"
-        var anotherTrackerUrl = "anotherTracker.com"
+        var trackerDomain = "tracker.com"
+        var anotherTrackerDomain = "anotherTracker.com"
     }
 }

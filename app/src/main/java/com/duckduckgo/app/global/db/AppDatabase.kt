@@ -47,16 +47,16 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
-import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
-import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
+import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
+import com.duckduckgo.app.trackerdetection.model.TdsTracker
 import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedEntity
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 14, entities = [
-        DisconnectTracker::class,
+    exportSchema = true, version = 15, entities = [
+        TdsTracker::class,
         HttpsBloomFilterSpec::class,
         HttpsWhitelistedDomain::class,
         NetworkLeaderboardEntry::class,
@@ -80,11 +80,12 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
     Survey.StatusTypeConverter::class,
     DismissedCta.IdTypeConverter::class,
     AppEnjoymentTypeConverter::class,
-    PromptCountConverter::class
+    PromptCountConverter::class,
+    TdsTracker.ActionTypeConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
 
-    abstract fun trackerDataDao(): TrackerDataDao
+    abstract fun tdsTrackerDao(): TdsTrackerDao
     abstract fun httpsWhitelistedDao(): HttpsWhitelistDao
     abstract fun httpsBloomFilterSpecDao(): HttpsBloomFilterSpecDao
     abstract fun networkLeaderboardDao(): NetworkLeaderboardDao
@@ -203,6 +204,13 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_14_TO_15: Migration = object : Migration(14, 15) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DROP TABLE `disconnect_tracker`")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `tds_tracker` (`domain` TEXT NOT NULL, `defaultAction` TEXT NOT NULL, `ownerName` TEXT NOT NULL, PRIMARY KEY(`domain`))")
+            }
+        }
+
         val ALL_MIGRATIONS: List<Migration>
             get() = listOf(
                 MIGRATION_1_TO_2,
@@ -217,7 +225,8 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_10_TO_11,
                 MIGRATION_11_TO_12,
                 MIGRATION_12_TO_13,
-                MIGRATION_13_TO_14
+                MIGRATION_13_TO_14,
+                MIGRATION_14_TO_15
             )
     }
 }

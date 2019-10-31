@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,31 +17,30 @@
 package com.duckduckgo.app.trackerdetection.db
 
 import androidx.room.*
-import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
-
+import com.duckduckgo.app.trackerdetection.model.TdsTracker
 
 @Dao
-abstract class TrackerDataDao {
+abstract class TdsTrackerDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertAll(trackers: List<DisconnectTracker>)
+    abstract fun insertAll(trackers: List<TdsTracker>)
 
     @Transaction
-    open fun updateAll(trackers: List<DisconnectTracker>) {
+    open fun updateAll(trackers: List<TdsTracker>) {
         deleteAll()
         insertAll(trackers)
     }
 
-    @Query("select * from disconnect_tracker")
-    abstract fun getAll(): List<DisconnectTracker>
+    @Query("select * from tds_tracker")
+    abstract fun getAll(): List<TdsTracker>
 
-    @Query("select * from disconnect_tracker where url = :url")
-    abstract fun get(url: String): DisconnectTracker?
+    @Query("select * from tds_tracker where domain = :domain")
+    abstract fun get(domain: String): TdsTracker?
 
 
-    @Query("select count(*) from disconnect_tracker")
+    @Query("select count(*) from tds_tracker")
     abstract fun count(): Int
 
-    @Query("delete from disconnect_tracker")
+    @Query("delete from tds_tracker")
     abstract fun deleteAll()
 }

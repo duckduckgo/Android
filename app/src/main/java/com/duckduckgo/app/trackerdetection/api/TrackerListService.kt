@@ -23,13 +23,13 @@ import retrofit2.http.Query
 
 interface TrackerListService {
 
+    @GET("https://staticcdn.duckduckgo.com/trackerblocking/tds.json")
+    fun tds(): Call<TdsJson>
+
     @GET("/contentblocking.js")
     fun list(@Query("l") list: String): Call<ResponseBody>
 
     @GET("/contentblocking/trackers-whitelist.txt")
     fun trackersWhitelist(): Call<ResponseBody>
-
-    @GET("/contentblocking.js?l=disconnect")
-    fun disconnect(): Call<DisconnectListJson>
 
 }
