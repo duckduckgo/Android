@@ -269,7 +269,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
     }
 
     fun launchFire() {
-        pixel.fire(Pixel.PixelName.FORGET_ALL_PRESSED)
+        pixel.fire(Pixel.PixelName.FORGET_ALL_PRESSED_BROWSING)
         val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction)
         dialog.clearStarted = {
             removeObservers()

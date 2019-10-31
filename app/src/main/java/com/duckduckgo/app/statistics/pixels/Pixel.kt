@@ -33,7 +33,8 @@ interface Pixel {
 
         APP_LAUNCH("ml"),
 
-        FORGET_ALL_PRESSED("mf_p"),
+        FORGET_ALL_PRESSED_BROWSING("mf_bp"),
+        FORGET_ALL_PRESSED_TABSWITCHING("mf_tp"),
         FORGET_ALL_EXECUTED("mf"),
 
         APPLICATION_CRASH("m_d_ac"),
