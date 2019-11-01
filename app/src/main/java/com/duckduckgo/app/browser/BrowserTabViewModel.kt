@@ -73,7 +73,6 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -99,7 +98,8 @@ class BrowserTabViewModel(
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
     private val variantManager: VariantManager,
-    appConfigurationDao: AppConfigurationDao
+    appConfigurationDao: AppConfigurationDao,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
 
     private var buildingSiteFactoryJob: Job? = null
@@ -253,10 +253,10 @@ class BrowserTabViewModel(
         onSiteChanged()
         buildingSiteFactoryJob = viewModelScope.launch {
             site?.let {
-                withContext(Dispatchers.IO) {
+                withContext(dispatchers.io()) {
                     siteFactory.loadFullSiteDetails(it)
+                    onSiteChanged()
                 }
-                onSiteChanged()
             }
         }
     }
@@ -302,7 +302,7 @@ class BrowserTabViewModel(
 
     suspend fun fireAutocompletePixel(suggestion: AutoCompleteSuggestion) {
         val currentViewState = currentAutoCompleteViewState()
-        val hasBookmarks = withContext(Dispatchers.IO) {
+        val hasBookmarks = withContext(dispatchers.io()) {
             bookmarksDao.hasBookmarks()
         }
         val params = mapOf(
@@ -325,7 +325,7 @@ class BrowserTabViewModel(
         command.value = HideKeyboard
         val trimmedInput = input.trim()
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatchers.io()) {
             searchCountDao.incrementSearchCount()
         }
 
@@ -555,10 +555,20 @@ class BrowserTabViewModel(
     }
 
     private fun onSiteChanged() {
-        siteLiveData.postValue(site)
-        privacyGrade.postValue(site?.calculateGrades()?.improvedGrade)
-        viewModelScope.launch(Dispatchers.IO) {
-            tabRepository.update(tabId, site)
+        viewModelScope.launch {
+
+            val improvedGrade = withContext(dispatchers.io()) {
+                site?.calculateGrades()?.improvedGrade
+            }
+
+            withContext(dispatchers.main()) {
+                siteLiveData.value = site
+                privacyGrade.value = improvedGrade
+            }
+
+            withContext(dispatchers.io()) {
+                tabRepository.update(tabId, site)
+            }
         }
     }
 
@@ -608,22 +618,22 @@ class BrowserTabViewModel(
     suspend fun onBookmarkAddRequested() {
         val url = url ?: ""
         val title = title ?: ""
-        val id = withContext(Dispatchers.IO) {
+        val id = withContext(dispatchers.io()) {
             bookmarksDao.insert(BookmarkEntity(title = title, url = url))
         }
-        withContext(Dispatchers.Main) {
+        withContext(dispatchers.main()) {
             command.value = ShowBookmarkAddedConfirmation(id, title, url)
         }
     }
 
     override fun onBookmarkEdited(id: Long, title: String, url: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatchers.io()) {
             editBookmark(id, title, url)
         }
     }
 
     suspend fun editBookmark(id: Long, title: String, url: String) {
-        withContext(Dispatchers.IO) {
+        withContext(dispatchers.io()) {
             bookmarksDao.update(BookmarkEntity(id, title, url))
         }
     }
