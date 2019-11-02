@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacy.store
+package com.duckduckgo.app.global
 
-interface PrivacySettingsStore {
-    var privacyOn: Boolean
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+
+
+interface DispatcherProvider {
+
+    fun main(): CoroutineDispatcher = Dispatchers.Main
+    fun default(): CoroutineDispatcher = Dispatchers.Default
+    fun io(): CoroutineDispatcher = Dispatchers.IO
+    fun unconfined(): CoroutineDispatcher = Dispatchers.Unconfined
+
 }
+
+class DefaultDispatcherProvider : DispatcherProvider

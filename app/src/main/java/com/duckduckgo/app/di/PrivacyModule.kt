@@ -22,16 +22,12 @@ import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.entities.EntityMapping
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.global.file.FileDeleter
-import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
-import com.duckduckgo.app.privacy.HistoricTrackerBlockingObserver
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPracticesImpl
-import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import dagger.Module
 import dagger.Provides
@@ -73,15 +69,6 @@ class PrivacyModule {
     ): DataClearer {
         return AutomaticDataClearer(workManager, settingsDataStore, clearDataAction, dataClearerTimeKeeper)
     }
-
-    @Provides
-    @Singleton
-    fun historicTrackerBlockingObserver(
-        appInstallStore: AppInstallStore,
-        privacySettingsStore: PrivacySettingsStore,
-        pixel: Pixel
-    ): HistoricTrackerBlockingObserver =
-        HistoricTrackerBlockingObserver(appInstallStore, privacySettingsStore, pixel)
 
     @Provides
     @Singleton

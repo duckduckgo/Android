@@ -36,7 +36,7 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
 
     @Before
     fun setup() {
-        testee = OnboardingPageManagerWithTrackerBlocking(onboardingPageBuilder, mockDefaultBrowserDetector, mockVariantManager)
+        testee = OnboardingPageManagerWithTrackerBlocking(onboardingPageBuilder, mockDefaultBrowserDetector)
     }
 
     @Test

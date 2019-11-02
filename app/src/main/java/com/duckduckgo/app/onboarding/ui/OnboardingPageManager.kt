@@ -23,11 +23,8 @@ import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlue
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.DefaultBrowserBlueprint
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.SummaryPageBlueprint
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
-import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageExperiment
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.app.onboarding.ui.page.UnifiedSummaryPage
-import com.duckduckgo.app.statistics.Variant
-import com.duckduckgo.app.statistics.VariantManager
 
 interface OnboardingPageManager {
     fun pageCount(): Int
@@ -38,8 +35,7 @@ interface OnboardingPageManager {
 
 class OnboardingPageManagerWithTrackerBlocking(
     private val onboardingPageBuilder: OnboardingPageBuilder,
-    private val defaultWebBrowserCapability: DefaultBrowserDetector,
-    private val variantManager: VariantManager
+    private val defaultWebBrowserCapability: DefaultBrowserDetector
 ) : OnboardingPageManager {
 
     private val pages = mutableListOf<OnboardingPageBlueprint>()
@@ -63,13 +59,7 @@ class OnboardingPageManagerWithTrackerBlocking(
     override fun buildPage(position: Int): OnboardingPageFragment? {
         return when (val blueprint = pages.getOrNull(position)) {
             is SummaryPageBlueprint -> buildSummaryPage(blueprint)
-            is DefaultBrowserBlueprint -> {
-                if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.OnboardingExperiment)) {
-                    buildDefaultBrowserPageExperiment(blueprint)
-                } else {
-                    buildDefaultBrowserPage(blueprint)
-                }
-            }
+            is DefaultBrowserBlueprint -> buildDefaultBrowserPage(blueprint)
             else -> null
         }
     }
@@ -96,9 +86,5 @@ class OnboardingPageManagerWithTrackerBlocking(
 
     private fun buildDefaultBrowserPage(blueprint: DefaultBrowserBlueprint): DefaultBrowserPage {
         return onboardingPageBuilder.buildDefaultBrowserPage(blueprint.continueButtonTextResourceId)
-    }
-
-    private fun buildDefaultBrowserPageExperiment(blueprint: DefaultBrowserBlueprint): DefaultBrowserPageExperiment {
-        return onboardingPageBuilder.buildDefaultBrowserPageExperiment(blueprint.continueButtonTextResourceId)
     }
 }

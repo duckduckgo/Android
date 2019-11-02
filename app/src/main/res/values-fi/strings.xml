@@ -3,11 +3,11 @@
     <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Tee yksityisyydestä oletusarvosi</string>
     <string name="onboardingDefaultBrowserDescription">Siirry asetuksiin hakeaksesi ja selaillaksesi aina DuckDuckGolla.</string>
-    <string name="onboardingDefaultBrowserGoToSettingsAction">Siirry asetuksiin</string>
     <string name="onboardingContinue">Jatka</string>
     <string name="onboardingContinueFinalPage">Aloita selaaminen</string>
+    <string name="onboardingDefaultBrowserTitle">Tee DuckDuckGo:sta oletusarvo</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Sano Hei Mielenrauhalle</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">\nDuckDuckGo toivottaa sinut tervetulleeksi!</string>
@@ -24,6 +24,11 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Sovelluksen oletusasetusnäyttöä ei voida käynnistää</string>
     <string name="settingsDefaultBrowserEnabled">Aseta oletusselaimeksi</string>
+    <string name="defaultBrowserMaybeLater">Ehkä myöhemmin</string>
+    <string name="defaultBrowserLetsDoIt">Aloitetaan!</string>
+    <string name="defaultBrowserDescriptionNoDefault">Avaa linkit ilman stressiä, joka kerta.</string>
+    <string name="defaultBrowserDescriptionDefaultSet">DuckDuckGon avulla online-tietosi ovat oletuksena yksityisempiä, missä tahansa surffailetkin.</string>
+    <string name="defaultBrowserInstructions">Valitse DuckDuckGo ja napauta <font color="#678fff"> Aina </font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Selainvalikko</string>
@@ -197,6 +202,7 @@
     <string name="bookmarkOverflowContentDescription">Lisää vaihtoehtoja kirjanmerkille %s</string>
     <string name="delete">Poista</string>
     <string name="edit">Muokkaa</string>
+    <string name="bookmarkEdited">Kirjanmerkki lisätty</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Hae DuckDuckGosta</string>

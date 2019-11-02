@@ -20,8 +20,8 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageExperimentViewModel.*
-import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageExperimentViewModel.Companion.MAX_DIALOG_ATTEMPTS
+import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel.*
+import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel.Companion.MAX_DIALOG_ATTEMPTS
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DEFAULT_BROWSER_DIALOG
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS
@@ -40,7 +40,7 @@ import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
-class DefaultBrowserPageExperimentViewModelTest {
+class DefaultBrowserPageViewModelTest {
 
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -54,7 +54,7 @@ class DefaultBrowserPageExperimentViewModelTest {
     @Mock
     private lateinit var mockInstallStore: AppInstallStore
 
-    private lateinit var testee: DefaultBrowserPageExperimentViewModel
+    private lateinit var testee: DefaultBrowserPageViewModel
 
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
@@ -65,7 +65,7 @@ class DefaultBrowserPageExperimentViewModelTest {
     @Before
     fun setup() {
         MockitoAnnotations.initMocks(this)
-        testee = DefaultBrowserPageExperimentViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore)
+        testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore)
         testee.command.observeForever(mockCommandObserver)
     }
 
@@ -83,7 +83,7 @@ class DefaultBrowserPageExperimentViewModelTest {
     fun whenInitializingIfThereIsADefaultBrowserThenShowSettingsUI() {
         whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(true)
 
-        testee = DefaultBrowserPageExperimentViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore)
+        testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore)
 
         assertTrue(viewState().showSettingsUi)
     }

@@ -3,11 +3,11 @@
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Nastavit soukromí jako výchozí</string>
     <string name="onboardingDefaultBrowserDescription">Přejděte do Nastavení a vždy vyhledávejte a prohlížejte s DuckDuckGo.</string>
-    <string name="onboardingDefaultBrowserGoToSettingsAction">Přejít do Nastavení</string>
     <string name="onboardingContinue">Pokračovat</string>
     <string name="onboardingContinueFinalPage">Začít prohlížet</string>
+    <string name="onboardingDefaultBrowserTitle">Nastavte si DuckDuckGo jako výchozí</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Uvítejte klid mysli</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Vítejte u\nDuckDuckGo!</string>
@@ -24,6 +24,11 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nelze spustit výchozí obrazovku nastavení aplikace.</string>
     <string name="settingsDefaultBrowserEnabled">Nastavit jako výchozí prohlížeč</string>
+    <string name="defaultBrowserMaybeLater">Možná později</string>
+    <string name="defaultBrowserLetsDoIt">Pojďme na to!</string>
+    <string name="defaultBrowserDescriptionNoDefault">Otevírejte odkazy s klidem mysli, pokaždé.</string>
+    <string name="defaultBrowserDescriptionDefaultSet">S DuckDuckGo jsou Vaše online data dle výchozího nastavení soukromější, ať už Vás internet zavede kamkoli.</string>
+    <string name="defaultBrowserInstructions">Vyberte DuckDuckGo a klepněte na <font color="#678fff">Vždy</font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Menu prohlížeče</string>
@@ -201,6 +206,7 @@
     <string name="bookmarkOverflowContentDescription">Další možnosti záložky %s</string>
     <string name="delete">Smazat</string>
     <string name="edit">Upravit</string>
+    <string name="bookmarkEdited">Záložka přidána</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Hledat DuckDuckGo</string>
