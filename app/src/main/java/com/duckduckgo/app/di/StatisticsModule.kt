@@ -19,6 +19,7 @@ package com.duckduckgo.app.di
 import android.content.Context
 import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.app.global.device.DeviceInfo
+import com.duckduckgo.app.global.exception.UncaughtWebViewExceptionRepository
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.*
 import com.duckduckgo.app.statistics.pixels.ApiBasedPixel
@@ -55,7 +56,11 @@ class StatisticsModule {
         ApiBasedPixel(pixelService, statisticsDataStore, variantManager, deviceInfo)
 
     @Provides
-    fun offlinePixelSender(offlinePixelDataStore: OfflinePixelDataStore, pixel: Pixel): OfflinePixelSender = OfflinePixelSender(offlinePixelDataStore, pixel )
+    fun offlinePixelSender(
+        offlinePixelDataStore: OfflinePixelDataStore,
+        uncaughtWebViewExceptionRepository: UncaughtWebViewExceptionRepository,
+        pixel: Pixel
+    ): OfflinePixelSender = OfflinePixelSender(offlinePixelDataStore, uncaughtWebViewExceptionRepository, pixel)
 
     @Provides
     fun deviceInfo(context: Context): DeviceInfo = ContextDeviceInfo(context)

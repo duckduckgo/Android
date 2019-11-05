@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global
+package com.duckduckgo.app.global.exception
 
-import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
-import timber.log.Timber
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-class AlertingUncaughtExceptionHandler(
-    private val originalHandler: Thread.UncaughtExceptionHandler,
-    private val offlinePixelDataStore: OfflinePixelDataStore
-) : Thread.UncaughtExceptionHandler {
-
-    override fun uncaughtException(t: Thread?, e: Throwable?) {
-        Timber.e(e, "Uncaught fatal exception")
-        offlinePixelDataStore.applicationCrashCount += 1
-        originalHandler.uncaughtException(t, e)
-    }
-}
+@Entity
+data class UncaughtWebViewExceptionEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val exceptionSource: UncaughtWebViewExceptionSource,
+    val message: String
+)

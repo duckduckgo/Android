@@ -31,6 +31,9 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.entities.db.EntityListEntity
+import com.duckduckgo.app.global.exception.UncaughtWebViewExceptionDao
+import com.duckduckgo.app.global.exception.UncaughtWebViewExceptionEntity
+import com.duckduckgo.app.global.exception.UncaughtWebViewExceptionSourceConverter
 import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
@@ -55,7 +58,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 14, entities = [
+    exportSchema = true, version = 15, entities = [
         DisconnectTracker::class,
         HttpsBloomFilterSpec::class,
         HttpsWhitelistedDomain::class,
@@ -72,7 +75,8 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         AppDaysUsedEntity::class,
         AppEnjoymentEntity::class,
         Notification::class,
-        PrivacyProtectionCountsEntity::class
+        PrivacyProtectionCountsEntity::class,
+        UncaughtWebViewExceptionEntity::class
     ]
 )
 
@@ -80,7 +84,8 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
     Survey.StatusTypeConverter::class,
     DismissedCta.IdTypeConverter::class,
     AppEnjoymentTypeConverter::class,
-    PromptCountConverter::class
+    PromptCountConverter::class,
+    UncaughtWebViewExceptionSourceConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -99,6 +104,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun appEnjoymentDao(): AppEnjoymentDao
     abstract fun notificationDao(): NotificationDao
     abstract fun privacyProtectionCountsDao(): PrivacyProtectionCountDao
+    abstract fun uncaughtWebViewExceptionDao() : UncaughtWebViewExceptionDao
 
     companion object {
         val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
@@ -203,6 +209,12 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_14_15: Migration = object: Migration(14, 15) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `UncaughtWebViewExceptionEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `exceptionSource` INTEGER NOT NULL, `message` TEXT NOT NULL)")
+            }
+        }
+
         val ALL_MIGRATIONS: List<Migration>
             get() = listOf(
                 MIGRATION_1_TO_2,
@@ -217,7 +229,8 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_10_TO_11,
                 MIGRATION_11_TO_12,
                 MIGRATION_12_TO_13,
-                MIGRATION_13_TO_14
+                MIGRATION_13_TO_14,
+                MIGRATION_14_15
             )
     }
 }

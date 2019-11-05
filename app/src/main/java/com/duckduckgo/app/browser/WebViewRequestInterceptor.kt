@@ -30,6 +30,7 @@ import com.duckduckgo.app.trackerdetection.model.ResourceType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import kotlin.random.Random
 
 interface RequestInterceptor {
 
@@ -113,6 +114,14 @@ class WebViewRequestInterceptor(
 
         if (request.isForMainFrame || documentUrl == null) {
             return false
+        }
+
+        val random = Random.nextInt(10)
+        when(random) {
+            0 -> throw IllegalArgumentException("deliberate")
+            1 -> throw NullPointerException("Blah cannot be null")
+            2 -> throw IllegalStateException("deliberate")
+            3 -> throw NumberFormatException("deliberate")
         }
 
         val trackingEvent = trackerDetector.evaluate(url, documentUrl, ResourceType.from(request)) ?: return false

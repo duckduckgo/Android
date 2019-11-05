@@ -24,6 +24,8 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
+import com.duckduckgo.app.global.exception.UncaughtWebViewExceptionRepository
+import com.duckduckgo.app.global.exception.UncaughtWebViewExceptionSource.SHOULD_INTERCEPT_REQUEST
 import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -36,7 +38,8 @@ class BrowserWebViewClient(
     private val requestRewriter: RequestRewriter,
     private val specialUrlDetector: SpecialUrlDetector,
     private val requestInterceptor: RequestInterceptor,
-    private val offlinePixelDataStore: OfflinePixelDataStore
+    private val offlinePixelDataStore: OfflinePixelDataStore,
+    private val uncaughtWebViewExceptionRepository: UncaughtWebViewExceptionRepository
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -114,14 +117,20 @@ class BrowserWebViewClient(
     @WorkerThread
     override fun shouldInterceptRequest(webView: WebView, request: WebResourceRequest): WebResourceResponse? {
         return runBlocking {
-            val documentUrl = withContext(Dispatchers.Main) { webView.url }
-            Timber.v("Intercepting resource ${request.url} on page $documentUrl")
-            requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
+            try {
+                val documentUrl = withContext(Dispatchers.Main) { webView.url }
+                Timber.v("Intercepting resource ${request.url} on page $documentUrl")
+                requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
+            } catch (e: Throwable) {
+                uncaughtWebViewExceptionRepository.uncaughtExceptionWhileInterceptingRequest(e, exceptionSource = SHOULD_INTERCEPT_REQUEST)
+                throw e
+            }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onRenderProcessGone(view: WebView?, detail: RenderProcessGoneDetail?): Boolean {
+        Timber.w("onRenderProcessGone ${detail?.didCrash()}")
         if (detail?.didCrash() == true) {
             offlinePixelDataStore.webRendererGoneCrashCount += 1
         } else {

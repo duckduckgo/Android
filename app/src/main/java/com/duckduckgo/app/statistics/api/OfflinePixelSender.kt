@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.statistics.api
 
+import com.duckduckgo.app.global.exception.UncaughtWebViewExceptionRepository
+import com.duckduckgo.app.global.exception.UncaughtWebViewExceptionSource
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.COUNT
@@ -33,6 +35,7 @@ import javax.inject.Inject
  */
 class OfflinePixelSender @Inject constructor(
     private val dataStore: OfflinePixelDataStore,
+    private val uncaughtWebViewExceptionRepository: UncaughtWebViewExceptionRepository,
     private val pixel: Pixel
 ) {
 
@@ -41,7 +44,8 @@ class OfflinePixelSender @Inject constructor(
             listOf(
                 sendApplicationKilledPixel(),
                 sendWebRendererCrashedPixel(),
-                sendWebRendererKilledPixel()
+                sendWebRendererKilledPixel(),
+                sendUncaughtWebViewExceptionsPixel()
             )
         )
     }
@@ -85,6 +89,39 @@ class OfflinePixelSender @Inject constructor(
                 Timber.v("Offline pixel sent ${WEB_RENDERER_GONE_KILLED.pixelName} count: $count")
                 dataStore.webRendererGoneKilledCount = 0
             }
+        }
+    }
+
+    private fun sendUncaughtWebViewExceptionsPixel(): Completable {
+        return defer {
+            val exceptions = uncaughtWebViewExceptionRepository.getExceptions()
+            Timber.i("About to send ${exceptions.size} uncaught exceptions as pixels")
+
+            val pixels = mutableListOf<Completable>()
+
+            exceptions.forEach { exception ->
+                Timber.i("Analysing exception $exception")
+                val pixelName = when (exception.exceptionSource) {
+                    UncaughtWebViewExceptionSource.SHOULD_INTERCEPT_REQUEST -> {
+                        ""
+                    }
+                    UncaughtWebViewExceptionSource.ON_PAGE_STARTED -> TODO()
+                }
+
+                TODO - MAP exception source to a map and pixel name.
+                add excecption.message to the map
+                ... win
+
+
+                val pixel = pixel.fireCompletable(pixelName, emptyMap())
+                    .andThen {
+                        Timber.i("And then... deleting the exception with ID ${exception.id}")
+                        uncaughtWebViewExceptionRepository.deleteException(exception.id)
+                    }
+                pixels.add(pixel)
+            }
+
+            Completable.mergeDelayError(pixels)
         }
     }
 }

@@ -63,6 +63,16 @@ class BrowserChromeClient @Inject constructor() : WebChromeClient(), CoroutineSc
         val navigationList = webView.copyBackForwardList()
         webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
         webViewClientListener?.progressChanged(newProgress)
+
+//        try {
+//            if (Random.nextInt(20) == 1) {
+//                Timber.i("Simulating crash")
+//                throw IllegalArgumentException("Deliberate 'random' crash")
+//            }
+//        } catch (e: Throwable) {
+//            Timber.w(e, "Caught exception")
+//        }
+
     }
 
     override fun onReceivedTitle(view: WebView, title: String) {

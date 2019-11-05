@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.di.BrowserModule
 import com.duckduckgo.app.browser.favicon.FaviconModule
 import com.duckduckgo.app.browser.rating.di.RatingModule
 import com.duckduckgo.app.global.DuckDuckGoApplication
+import com.duckduckgo.app.global.exception.UncaughtWebViewExceptionModule
 import com.duckduckgo.app.httpsupgrade.di.HttpsUpgraderModule
 import com.duckduckgo.app.onboarding.di.OnboardingModule
 import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
@@ -64,7 +65,8 @@ import javax.inject.Singleton
         WidgetModule::class,
         RatingModule::class,
         AppUsageModule::class,
-        FileModule::class
+        FileModule::class,
+        UncaughtWebViewExceptionModule::class
     ]
 )
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {

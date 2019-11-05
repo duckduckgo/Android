@@ -64,4 +64,7 @@ class DaoModule {
 
     @Provides
     fun privacyProtectionCounts(database: AppDatabase) = database.privacyProtectionCountsDao()
+
+    @Provides
+    fun uncaughtWebViewExceptionDao(database: AppDatabase) = database.uncaughtWebViewExceptionDao()
 }

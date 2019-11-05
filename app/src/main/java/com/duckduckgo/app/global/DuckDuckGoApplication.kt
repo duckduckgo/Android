@@ -44,6 +44,7 @@ import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
+import com.duckduckgo.app.statistics.api.OfflinePixelSender
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_LAUNCH
@@ -139,6 +140,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     @Inject
     lateinit var appDataLoader: AppDataLoader
+
+    @Inject
+    lateinit var offlinePixelSender: OfflinePixelSender
 
     private var launchedByFireAction: Boolean = false
 
@@ -264,7 +268,17 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     }
 
     private fun scheduleOfflinePixels() {
-        offlinePixelScheduler.scheduleOfflinePixels()
+        //offlinePixelScheduler.scheduleOfflinePixels()
+
+        // temp hack
+        offlinePixelSender.sendOfflinePixels()
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                Timber.i("Successfully sent exceptions as pixels")
+            }, { t: Throwable? ->
+                Timber.w(t, "Failed to send all exceptions as pixels")
+            })
+
     }
 
     override fun activityInjector(): AndroidInjector<Activity> = activityInjector
