@@ -16,29 +16,35 @@
 
 package com.duckduckgo.app.global.exception
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 
 class UncaughtWebViewExceptionRepository(private val uncaughtWebViewExceptionDao: UncaughtWebViewExceptionDao) {
 
-    fun uncaughtExceptionWhileInterceptingRequest(e: Throwable, exceptionSource: UncaughtWebViewExceptionSource) {
+    suspend fun uncaughtExceptionWhileInterceptingRequest(e: Throwable, exceptionSource: UncaughtWebViewExceptionSource) {
         Timber.e(e, "Uncaught exception while intercepting request")
-        val anonymisedExceptionCause = extractExceptionCause(e)
-        val exceptionEntity = UncaughtWebViewExceptionEntity(message = anonymisedExceptionCause, exceptionSource = exceptionSource)
-        uncaughtWebViewExceptionDao.add(exceptionEntity)
-
-        Timber.i("Added exception. There are now ${uncaughtWebViewExceptionDao.count()} exception in the Database")
+        withContext(Dispatchers.IO) {
+            val anonymisedExceptionCause = extractExceptionCause(e)
+            val exceptionEntity = UncaughtWebViewExceptionEntity(message = anonymisedExceptionCause, exceptionSource = exceptionSource)
+            uncaughtWebViewExceptionDao.add(exceptionEntity)
+        }
     }
 
-    fun getExceptions(): List<UncaughtWebViewExceptionEntity> {
-        return uncaughtWebViewExceptionDao.all()
+    suspend fun getExceptions(): List<UncaughtWebViewExceptionEntity> {
+        return withContext(Dispatchers.IO) {
+            uncaughtWebViewExceptionDao.all()
+        }
     }
 
     private fun extractExceptionCause(e: Throwable): String {
         return "${e.javaClass.name} - ${e.stackTrace?.first()}"
     }
 
-    fun deleteException(id: Long) {
-        uncaughtWebViewExceptionDao.delete(id)
+    suspend fun deleteException(id: Long) {
+        withContext(Dispatchers.IO) {
+            uncaughtWebViewExceptionDao.delete(id)
+        }
     }
 }

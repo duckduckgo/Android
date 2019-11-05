@@ -38,6 +38,7 @@ interface Pixel {
         FORGET_ALL_EXECUTED("mf"),
 
         APPLICATION_CRASH("m_d_ac"),
+        APPLICATION_CRASH_WEBVIEW_INTERCEPT("m_d_acw_i"),
         WEB_RENDERER_GONE_CRASH("m_d_wrg_c"),
         WEB_RENDERER_GONE_KILLED("m_d_wrg_k"),
         BROKEN_SITE_REPORTED("m_bsr"),
@@ -132,6 +133,7 @@ interface Pixel {
         const val APP_VERSION = "appVersion"
         const val URL = "url"
         const val COUNT = "count"
+        const val EXCEPTION_MESSAGE = "m"
         const val BOOKMARK_CAPABLE = "bc"
         const val SHOWED_BOOKMARKS = "sb"
         const val DEFAULT_BROWSER_BEHAVIOUR_TRIGGERED = "bt"

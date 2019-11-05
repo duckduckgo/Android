@@ -21,6 +21,7 @@ import com.duckduckgo.app.global.exception.UncaughtWebViewExceptionSource
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_MESSAGE
 import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
 import io.reactivex.Completable
 import io.reactivex.Completable.complete
@@ -103,17 +104,14 @@ class OfflinePixelSender @Inject constructor(
                 Timber.i("Analysing exception $exception")
                 val pixelName = when (exception.exceptionSource) {
                     UncaughtWebViewExceptionSource.SHOULD_INTERCEPT_REQUEST -> {
-                        ""
+                        APPLICATION_CRASH_WEBVIEW_INTERCEPT.pixelName
                     }
                     UncaughtWebViewExceptionSource.ON_PAGE_STARTED -> TODO()
                 }
 
-                TODO - MAP exception source to a map and pixel name.
-                add excecption.message to the map
-                ... win
+                val params = mapOf(EXCEPTION_MESSAGE to exception.message)
 
-
-                val pixel = pixel.fireCompletable(pixelName, emptyMap())
+                val pixel = pixel.fireCompletable(pixelName, params)
                     .andThen {
                         Timber.i("And then... deleting the exception with ID ${exception.id}")
                         uncaughtWebViewExceptionRepository.deleteException(exception.id)
