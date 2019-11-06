@@ -150,7 +150,7 @@ class BrowserWebViewClient(
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onRenderProcessGone(view: WebView?, detail: RenderProcessGoneDetail?): Boolean {
-        Timber.w("onRenderProcessGone ${detail?.didCrash()}")
+        Timber.w("onRenderProcessGone. Did it crash? ${detail?.didCrash()}")
         if (detail?.didCrash() == true) {
             offlinePixelDataStore.webRendererGoneCrashCount += 1
         } else {

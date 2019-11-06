@@ -20,8 +20,8 @@ package com.duckduckgo.app.global.exception
 class RootExceptionFinder {
 
     fun findRootException(throwable: Throwable?): Throwable? {
-        var count = 0
         var possibleRoot: Throwable? = throwable ?: return null
+        var count = 0
 
         while (count < NESTED_EXCEPTION_THRESHOLD && possibleRoot?.cause != null) {
             possibleRoot = possibleRoot.cause
@@ -32,6 +32,8 @@ class RootExceptionFinder {
     }
 
     companion object {
+
+        // arbitrary limit to protect against recursive nested Exceptions
         private const val NESTED_EXCEPTION_THRESHOLD = 20
     }
 }

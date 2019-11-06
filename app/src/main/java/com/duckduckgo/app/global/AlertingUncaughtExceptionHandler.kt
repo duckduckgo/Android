@@ -23,7 +23,6 @@ import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class AlertingUncaughtExceptionHandler(
     private val originalHandler: Thread.UncaughtExceptionHandler,
@@ -33,17 +32,16 @@ class AlertingUncaughtExceptionHandler(
 
     override fun uncaughtException(t: Thread?, originalException: Throwable?) {
         GlobalScope.launch(Dispatchers.IO) {
-
-            offlinePixelDataStore.applicationCrashCount += 1
-
-            val exceptionToThrow = if (originalException is RecordedThrowable) {
-                Timber.i("This exception was already recorded to the DB")
-                originalException.cause
+            val exceptionToThrow = if (exceptionAlreadyRecorded(originalException)) {
+                originalException?.cause
             } else {
                 uncaughtExceptionRepository.recordUncaughtException(originalException, UncaughtExceptionSource.GLOBAL)
             }
 
+            offlinePixelDataStore.applicationCrashCount += 1
             originalHandler.uncaughtException(t, exceptionToThrow)
         }
     }
+
+    private fun exceptionAlreadyRecorded(originalException: Throwable?) = originalException is RecordedThrowable
 }
