@@ -25,7 +25,8 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
-import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
+import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
+import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.nhaarman.mockitokotlin2.*
 import org.junit.Before
 import org.junit.Test
@@ -39,7 +40,8 @@ class BrowserWebViewClientTest {
     private val specialUrlDetector: SpecialUrlDetector = mock()
     private val requestInterceptor: RequestInterceptor = mock()
     private val listener: WebViewClientListener = mock()
-    private val offlinePixelDataStore: OfflinePixelDataStore = mock()
+    private val offlinePixelCountDataStore: OfflinePixelCountDataStore = mock()
+    private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
 
     @UiThreadTest
     @Before
@@ -49,7 +51,8 @@ class BrowserWebViewClientTest {
             requestRewriter,
             specialUrlDetector,
             requestInterceptor,
-            offlinePixelDataStore
+            offlinePixelCountDataStore,
+            uncaughtExceptionRepository
         )
         testee.webViewClientListener = listener
     }
@@ -99,7 +102,7 @@ class BrowserWebViewClientTest {
         val detail: RenderProcessGoneDetail = mock()
         whenever(detail.didCrash()).thenReturn(true)
         testee.onRenderProcessGone(webView, detail)
-        verify(offlinePixelDataStore, times(1)).webRendererGoneCrashCount = 1
+        verify(offlinePixelCountDataStore, times(1)).webRendererGoneCrashCount = 1
     }
 
     @Test
@@ -108,7 +111,7 @@ class BrowserWebViewClientTest {
         val detail: RenderProcessGoneDetail = mock()
         whenever(detail.didCrash()).thenReturn(false)
         testee.onRenderProcessGone(webView, detail)
-        verify(offlinePixelDataStore, times(1)).webRendererGoneKilledCount = 1
+        verify(offlinePixelCountDataStore, times(1)).webRendererGoneKilledCount = 1
     }
 
     private class TestWebView(context: Context) : WebView(context)

@@ -22,13 +22,13 @@ import androidx.core.content.edit
 import javax.inject.Inject
 
 
-interface OfflinePixelDataStore {
+interface OfflinePixelCountDataStore {
     var applicationCrashCount: Int
     var webRendererGoneCrashCount: Int
     var webRendererGoneKilledCount: Int
 }
 
-class OfflinePixelSharedPreferences @Inject constructor(private val context: Context) : OfflinePixelDataStore {
+class OfflinePixelCountSharedPreferences @Inject constructor(private val context: Context) : OfflinePixelCountDataStore {
 
     override var applicationCrashCount: Int
         get() = preferences.getInt(KEY_APPLICATION_CRASH_COUNT, 0)
