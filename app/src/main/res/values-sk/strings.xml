@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
+    <string name="appDescription">Súkromie jednoducho</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Na automatické vyhľadávanie a prehliadanie s DuckDuckGo navštívte Nastavenia.</string>
