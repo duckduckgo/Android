@@ -21,15 +21,16 @@ import android.view.View
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
+import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
+import kotlinx.coroutines.*
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
 
-class BrowserChromeClient @Inject constructor() : WebChromeClient(), CoroutineScope {
+class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepository: UncaughtExceptionRepository) : WebChromeClient(),
+    CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = SupervisorJob() + Dispatchers.Main
@@ -40,47 +41,77 @@ class BrowserChromeClient @Inject constructor() : WebChromeClient(), CoroutineSc
     private var customView: View? = null
 
     override fun onShowCustomView(view: View, callback: CustomViewCallback?) {
-        Timber.d("on show custom view")
+        try {
+            Timber.d("on show custom view")
+            if (customView != null) {
+                callback?.onCustomViewHidden()
+                return
+            }
 
-        if (customView != null) {
-            callback?.onCustomViewHidden()
-            return
+            customView = view
+            webViewClientListener?.goFullScreen(view)
+
+        } catch (e: Throwable) {
+            GlobalScope.launch {
+                val wrapped = uncaughtExceptionRepository.recordUncaughtException(e, SHOW_CUSTOM_VIEW)
+                throw wrapped
+            }
         }
-
-        customView = view
-        webViewClientListener?.goFullScreen(view)
     }
 
     override fun onHideCustomView() {
-        Timber.d("on hide custom view")
-
-        webViewClientListener?.exitFullScreen()
-        customView = null
+        try {
+            Timber.d("on hide custom view")
+            webViewClientListener?.exitFullScreen()
+            customView = null
+        } catch (e: Throwable) {
+            GlobalScope.launch {
+                val wrapped = uncaughtExceptionRepository.recordUncaughtException(e, HIDE_CUSTOM_VIEW)
+                throw wrapped
+            }
+        }
     }
 
     override fun onProgressChanged(webView: WebView, newProgress: Int) {
-        Timber.d("onProgressChanged ${webView.url}, $newProgress")
-        val navigationList = webView.copyBackForwardList()
-        webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
-        webViewClientListener?.progressChanged(newProgress)
+        try {
+            Timber.d("onProgressChanged ${webView.url}, $newProgress")
+            val navigationList = webView.copyBackForwardList()
+            webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
+            webViewClientListener?.progressChanged(newProgress)
 
-//        try {
-//            if (Random.nextInt(20) == 1) {
-//                Timber.i("Simulating crash")
-//                throw IllegalArgumentException("Deliberate 'random' crash")
-//            }
-//        } catch (e: Throwable) {
-//            Timber.w(e, "Caught exception")
-//        }
 
+        } catch (e: Throwable) {
+            GlobalScope.launch {
+                val wrapped = uncaughtExceptionRepository.recordUncaughtException(e, ON_PROGRESS_CHANGED)
+                throw wrapped
+            }
+        }
     }
 
     override fun onReceivedTitle(view: WebView, title: String) {
-        webViewClientListener?.titleReceived(title)
+        try {
+            webViewClientListener?.titleReceived(title)
+        } catch (e: Throwable) {
+            GlobalScope.launch {
+                val wrapped = uncaughtExceptionRepository.recordUncaughtException(e, RECEIVED_PAGE_TITLE)
+                throw wrapped
+            }
+        }
     }
 
     override fun onShowFileChooser(webView: WebView, filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: FileChooserParams): Boolean {
-        webViewClientListener?.showFileChooser(filePathCallback, fileChooserParams)
-        return true
+        return try {
+            webViewClientListener?.showFileChooser(filePathCallback, fileChooserParams)
+            true
+        } catch (e: Throwable) {
+            GlobalScope.launch {
+                val wrapped = uncaughtExceptionRepository.recordUncaughtException(e, SHOW_FILE_CHOOSER)
+                throw wrapped
+            }
+
+            // cancel the request using the documented way
+            filePathCallback.onReceiveValue(null)
+            true
+        }
     }
 }

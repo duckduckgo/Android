@@ -20,8 +20,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class UncaughtWebViewExceptionEntity(
+data class UncaughtExceptionEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val exceptionSource: UncaughtWebViewExceptionSource,
+    val exceptionSource: UncaughtExceptionSource,
     val message: String
 )

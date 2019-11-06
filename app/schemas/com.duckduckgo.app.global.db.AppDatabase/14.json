@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 14,
-    "identityHash": "5b4bf93e537bd4fb680b0932ed583932",
+    "identityHash": "9166b0d19e9da0abb06ecbad6ea3364a",
     "entities": [
       {
         "tableName": "disconnect_tracker",
@@ -541,44 +541,12 @@
         },
         "indices": [],
         "foreignKeys": []
-      },
-      {
-        "tableName": "UncaughtWebViewExceptionEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `exceptionSource` INTEGER NOT NULL, `message` TEXT NOT NULL)",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "exceptionSource",
-            "columnName": "exceptionSource",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "message",
-            "columnName": "message",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "id"
-          ],
-          "autoGenerate": true
-        },
-        "indices": [],
-        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5b4bf93e537bd4fb680b0932ed583932')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"9166b0d19e9da0abb06ecbad6ea3364a\")"
     ]
   }
 }

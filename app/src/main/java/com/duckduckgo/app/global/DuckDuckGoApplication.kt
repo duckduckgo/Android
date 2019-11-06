@@ -144,6 +144,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     @Inject
     lateinit var offlinePixelSender: OfflinePixelSender
 
+    @Inject
+    lateinit var alertingUncaughtExceptionHandler: AlertingUncaughtExceptionHandler
+
     private var launchedByFireAction: Boolean = false
 
     open lateinit var daggerAppComponent: AppComponent
@@ -188,8 +191,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     }
 
     private fun configureUncaughtExceptionHandler() {
-        val originalHandler = Thread.getDefaultUncaughtExceptionHandler()
-        Thread.setDefaultUncaughtExceptionHandler(AlertingUncaughtExceptionHandler(originalHandler, offlinePixelDataStore))
+        Thread.setDefaultUncaughtExceptionHandler(alertingUncaughtExceptionHandler)
     }
 
     private fun recordInstallationTimestamp() {
@@ -268,17 +270,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     }
 
     private fun scheduleOfflinePixels() {
-        //offlinePixelScheduler.scheduleOfflinePixels()
-
-        // temp hack
-        offlinePixelSender.sendOfflinePixels()
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                Timber.i("Successfully sent exceptions as pixels")
-            }, { t: Throwable? ->
-                Timber.w(t, "Failed to send all exceptions as pixels")
-            })
-
+        offlinePixelScheduler.scheduleOfflinePixels()
     }
 
     override fun activityInjector(): AndroidInjector<Activity> = activityInjector

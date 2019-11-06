@@ -34,7 +34,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.fire.WebViewCookieManager
 import com.duckduckgo.app.global.AppUrl
-import com.duckduckgo.app.global.exception.UncaughtWebViewExceptionRepository
+import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
@@ -68,14 +68,14 @@ class BrowserModule {
         specialUrlDetector: SpecialUrlDetector,
         requestInterceptor: RequestInterceptor,
         offlinePixelDataStore: OfflinePixelDataStore,
-        uncaughtWebViewExceptionRepository: UncaughtWebViewExceptionRepository
+        uncaughtExceptionRepository: UncaughtExceptionRepository
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             requestRewriter,
             specialUrlDetector,
             requestInterceptor,
             offlinePixelDataStore,
-            uncaughtWebViewExceptionRepository
+            uncaughtExceptionRepository
         )
     }
 

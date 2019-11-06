@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 15,
-    "identityHash": "5b4bf93e537bd4fb680b0932ed583932",
+    "identityHash": "91dfb18ac78a4e8db571479ee80bdf83",
     "entities": [
       {
         "tableName": "disconnect_tracker",
@@ -543,7 +543,7 @@
         "foreignKeys": []
       },
       {
-        "tableName": "UncaughtWebViewExceptionEntity",
+        "tableName": "UncaughtExceptionEntity",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `exceptionSource` INTEGER NOT NULL, `message` TEXT NOT NULL)",
         "fields": [
           {
@@ -578,7 +578,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5b4bf93e537bd4fb680b0932ed583932')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '91dfb18ac78a4e8db571479ee80bdf83')"
     ]
   }
 }

@@ -16,17 +16,22 @@
 
 package com.duckduckgo.app.global.exception
 
-import dagger.Module
-import dagger.Provides
-import javax.inject.Singleton
 
+class RootExceptionFinder {
 
-@Module
-class UncaughtWebViewExceptionModule {
+    fun findRootException(throwable: Throwable?): Throwable? {
+        var count = 0
+        var possibleRoot: Throwable? = throwable ?: return null
 
-    @Provides
-    @Singleton
-    fun uncaughtWebViewExceptionRepository(uncaughtWebViewExceptionDao: UncaughtWebViewExceptionDao): UncaughtWebViewExceptionRepository {
-        return UncaughtWebViewExceptionRepository(uncaughtWebViewExceptionDao)
+        while (count < NESTED_EXCEPTION_THRESHOLD && possibleRoot?.cause != null) {
+            possibleRoot = possibleRoot.cause
+            count++
+        }
+
+        return possibleRoot
+    }
+
+    companion object {
+        private const val NESTED_EXCEPTION_THRESHOLD = 20
     }
 }

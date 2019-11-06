@@ -31,9 +31,9 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.entities.db.EntityListDao
 import com.duckduckgo.app.entities.db.EntityListEntity
-import com.duckduckgo.app.global.exception.UncaughtWebViewExceptionDao
-import com.duckduckgo.app.global.exception.UncaughtWebViewExceptionEntity
-import com.duckduckgo.app.global.exception.UncaughtWebViewExceptionSourceConverter
+import com.duckduckgo.app.global.exception.UncaughtExceptionDao
+import com.duckduckgo.app.global.exception.UncaughtExceptionEntity
+import com.duckduckgo.app.global.exception.UncaughtExceptionSourceConverter
 import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
@@ -76,7 +76,7 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         AppEnjoymentEntity::class,
         Notification::class,
         PrivacyProtectionCountsEntity::class,
-        UncaughtWebViewExceptionEntity::class
+        UncaughtExceptionEntity::class
     ]
 )
 
@@ -85,7 +85,7 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
     DismissedCta.IdTypeConverter::class,
     AppEnjoymentTypeConverter::class,
     PromptCountConverter::class,
-    UncaughtWebViewExceptionSourceConverter::class
+    UncaughtExceptionSourceConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -104,7 +104,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun appEnjoymentDao(): AppEnjoymentDao
     abstract fun notificationDao(): NotificationDao
     abstract fun privacyProtectionCountsDao(): PrivacyProtectionCountDao
-    abstract fun uncaughtWebViewExceptionDao() : UncaughtWebViewExceptionDao
+    abstract fun uncaughtExceptionDao(): UncaughtExceptionDao
 
     companion object {
         val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
@@ -209,9 +209,9 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        val MIGRATION_14_15: Migration = object: Migration(14, 15) {
+        val MIGRATION_14_TO_15: Migration = object : Migration(14, 15) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("CREATE TABLE IF NOT EXISTS `UncaughtWebViewExceptionEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `exceptionSource` INTEGER NOT NULL, `message` TEXT NOT NULL)")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `UncaughtExceptionEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `exceptionSource` INTEGER NOT NULL, `message` TEXT NOT NULL)")
             }
         }
 
@@ -230,7 +230,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_11_TO_12,
                 MIGRATION_12_TO_13,
                 MIGRATION_13_TO_14,
-                MIGRATION_14_15
+                MIGRATION_14_TO_15
             )
     }
 }

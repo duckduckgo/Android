@@ -25,6 +25,7 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
+import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
 import com.nhaarman.mockitokotlin2.*
 import org.junit.Before
@@ -40,6 +41,7 @@ class BrowserWebViewClientTest {
     private val requestInterceptor: RequestInterceptor = mock()
     private val listener: WebViewClientListener = mock()
     private val offlinePixelDataStore: OfflinePixelDataStore = mock()
+    private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
 
     @UiThreadTest
     @Before
@@ -49,7 +51,8 @@ class BrowserWebViewClientTest {
             requestRewriter,
             specialUrlDetector,
             requestInterceptor,
-            offlinePixelDataStore
+            offlinePixelDataStore,
+            uncaughtExceptionRepository
         )
         testee.webViewClientListener = listener
     }

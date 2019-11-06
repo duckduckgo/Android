@@ -16,16 +16,17 @@
 
 package com.duckduckgo.app.statistics.api
 
-import com.duckduckgo.app.global.exception.UncaughtWebViewExceptionRepository
-import com.duckduckgo.app.global.exception.UncaughtWebViewExceptionSource
+import com.duckduckgo.app.global.exception.UncaughtExceptionEntity
+import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
+import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.COUNT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_MESSAGE
 import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
 import io.reactivex.Completable
-import io.reactivex.Completable.complete
-import io.reactivex.Completable.defer
+import io.reactivex.Completable.*
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -36,17 +37,17 @@ import javax.inject.Inject
  */
 class OfflinePixelSender @Inject constructor(
     private val dataStore: OfflinePixelDataStore,
-    private val uncaughtWebViewExceptionRepository: UncaughtWebViewExceptionRepository,
+    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
     private val pixel: Pixel
 ) {
 
     fun sendOfflinePixels(): Completable {
-        return Completable.mergeDelayError(
+        return mergeDelayError(
             listOf(
                 sendApplicationKilledPixel(),
                 sendWebRendererCrashedPixel(),
                 sendWebRendererKilledPixel(),
-                sendUncaughtWebViewExceptionsPixel()
+                sendUncaughtExceptionsPixel()
             )
         )
     }
@@ -93,33 +94,43 @@ class OfflinePixelSender @Inject constructor(
         }
     }
 
-    private fun sendUncaughtWebViewExceptionsPixel(): Completable {
+    private fun sendUncaughtExceptionsPixel(): Completable {
         return defer {
-            val exceptions = uncaughtWebViewExceptionRepository.getExceptions()
-            Timber.i("About to send ${exceptions.size} uncaught exceptions as pixels")
 
             val pixels = mutableListOf<Completable>()
+            val exceptions = runBlocking { uncaughtExceptionRepository.getExceptions() }
 
             exceptions.forEach { exception ->
-                Timber.i("Analysing exception $exception")
-                val pixelName = when (exception.exceptionSource) {
-                    UncaughtWebViewExceptionSource.SHOULD_INTERCEPT_REQUEST -> {
-                        APPLICATION_CRASH_WEBVIEW_INTERCEPT.pixelName
-                    }
-                    UncaughtWebViewExceptionSource.ON_PAGE_STARTED -> TODO()
-                }
-
+                Timber.d("Analysing exception $exception")
+                val pixelName = determinePixelName(exception)
                 val params = mapOf(EXCEPTION_MESSAGE to exception.message)
 
                 val pixel = pixel.fireCompletable(pixelName, params)
-                    .andThen {
-                        Timber.i("And then... deleting the exception with ID ${exception.id}")
-                        uncaughtWebViewExceptionRepository.deleteException(exception.id)
+                    .doOnComplete {
+                        Timber.d("Sent pixel containing exception; deleting exception with id=${exception.id}")
+                        runBlocking { uncaughtExceptionRepository.deleteException(exception.id) }
                     }
+
                 pixels.add(pixel)
             }
 
-            Completable.mergeDelayError(pixels)
+            return@defer mergeDelayError(pixels)
         }
+    }
+
+    private fun determinePixelName(exception: UncaughtExceptionEntity): String {
+        return when (exception.exceptionSource) {
+            GLOBAL -> APPLICATION_CRASH_GLOBAL
+            SHOULD_INTERCEPT_REQUEST -> APPLICATION_CRASH_WEBVIEW_SHOULD_INTERCEPT
+            ON_PAGE_STARTED -> APPLICATION_CRASH_WEBVIEW_PAGE_STARTED
+            ON_PAGE_FINISHED -> APPLICATION_CRASH_WEBVIEW_PAGE_FINISHED
+            SHOULD_OVERRIDE_REQUEST -> APPLICATION_CRASH_WEBVIEW_OVERRIDE_REQUEST
+            ON_HTTP_AUTH_REQUEST -> APPLICATION_CRASH_WEBVIEW_HTTP_AUTH_REQUEST
+            SHOW_CUSTOM_VIEW -> APPLICATION_CRASH_WEBVIEW_SHOW_CUSTOM_VIEW
+            HIDE_CUSTOM_VIEW -> APPLICATION_CRASH_WEBVIEW_HIDE_CUSTOM_VIEW
+            ON_PROGRESS_CHANGED -> APPLICATION_CRASH_WEBVIEW_ON_PROGRESS_CHANGED
+            RECEIVED_PAGE_TITLE -> APPLICATION_CRASH_WEBVIEW_RECEIVED_PAGE_TITLE
+            SHOW_FILE_CHOOSER -> APPLICATION_CRASH_WEBVIEW_SHOW_FILE_CHOOSER
+        }.pixelName
     }
 }
