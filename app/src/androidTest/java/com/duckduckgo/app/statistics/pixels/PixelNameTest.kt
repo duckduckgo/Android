@@ -23,12 +23,11 @@ class PixelNameTest {
 
     @Test
     fun verifyNoDuplicatePixelNames() {
-        val existingNames = mutableMapOf<String, Pixel.PixelName>()
+        val existingNames = mutableSetOf<String>()
         Pixel.PixelName.values().forEach {
-            if (existingNames.containsKey(it.pixelName)) {
+            if (!existingNames.add(it.pixelName)) {
                 fail("Duplicate pixel name found: ${it.pixelName}")
             }
-            existingNames[it.pixelName] = it
         }
     }
 
