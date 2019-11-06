@@ -21,6 +21,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -75,8 +76,33 @@ class UncaughtExceptionDaoTest {
     }
 
     @Test
+    fun whenSeveralExceptionExistAndOneDeletedThenCorrectEntryIsRemoved() {
+        val exception1 = UncaughtExceptionEntity(id = 1, exceptionSource = GLOBAL, message = "foo1")
+        val exception2 = UncaughtExceptionEntity(id = 2, exceptionSource = ON_PROGRESS_CHANGED, message = "foo2")
+        val exception3 = UncaughtExceptionEntity(id = 3, exceptionSource = ON_PAGE_STARTED, message = "foo3")
+        dao.add(exception1)
+        dao.add(exception2)
+        dao.add(exception3)
+
+        dao.delete(2)
+
+        val list = dao.all()
+        list.first().apply {
+            assertEquals(1, id)
+            assertEquals(exception1.exceptionSource, exceptionSource)
+            assertEquals(exception1.message, message)
+        }
+
+        list.last().apply {
+            assertEquals(3, id)
+            assertEquals(exception3.exceptionSource, exceptionSource)
+            assertEquals(exception3.message, message)
+        }
+    }
+
+    @Test
     fun whenExceptionRetrievedFromDatabaseThenAllDetailsRestored() {
-        val exception = UncaughtExceptionEntity(id = 1, exceptionSource = UncaughtExceptionSource.GLOBAL, message = "foo")
+        val exception = UncaughtExceptionEntity(id = 1, exceptionSource = GLOBAL, message = "foo")
         dao.add(exception)
         val list = dao.all()
         assertEquals(1, list.size)
@@ -88,5 +114,5 @@ class UncaughtExceptionDaoTest {
     }
 
     private fun anUncaughtExceptionEntity(id: Long? = null) =
-        UncaughtExceptionEntity(id = id ?: 0, exceptionSource = UncaughtExceptionSource.GLOBAL, message = "foo")
+        UncaughtExceptionEntity(id = id ?: 0, exceptionSource = GLOBAL, message = "foo")
 }
