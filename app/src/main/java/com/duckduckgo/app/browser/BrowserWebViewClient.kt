@@ -95,8 +95,8 @@ class BrowserWebViewClient(
             }
         } catch (e: Throwable) {
             GlobalScope.launch {
-                val wrapped = uncaughtExceptionRepository.recordUncaughtException(e, SHOULD_OVERRIDE_REQUEST)
-                throw wrapped
+                uncaughtExceptionRepository.recordUncaughtException(e, SHOULD_OVERRIDE_REQUEST)
+                throw e
             }
             return false
         }
@@ -116,8 +116,8 @@ class BrowserWebViewClient(
             lastPageStarted = url
         } catch (e: Throwable) {
             GlobalScope.launch {
-                val wrapped = uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)
-                throw wrapped
+                uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)
+                throw e
             }
         }
     }
@@ -128,8 +128,8 @@ class BrowserWebViewClient(
             webViewClientListener?.navigationStateChanged(WebViewNavigationState(webView.copyBackForwardList()))
         } catch (e: Throwable) {
             GlobalScope.launch {
-                val wrapped = uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_FINISHED)
-                throw wrapped
+                uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_FINISHED)
+                throw e
             }
         }
     }
@@ -142,8 +142,8 @@ class BrowserWebViewClient(
                 Timber.v("Intercepting resource ${request.url} on page $documentUrl")
                 requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
             } catch (e: Throwable) {
-                val wrapped = uncaughtExceptionRepository.recordUncaughtException(e, SHOULD_INTERCEPT_REQUEST)
-                throw wrapped
+                uncaughtExceptionRepository.recordUncaughtException(e, SHOULD_INTERCEPT_REQUEST)
+                throw e
             }
         }
     }
@@ -181,8 +181,8 @@ class BrowserWebViewClient(
             }
         } catch (e: Throwable) {
             GlobalScope.launch {
-                val wrapped = uncaughtExceptionRepository.recordUncaughtException(e, ON_HTTP_AUTH_REQUEST)
-                throw wrapped
+                uncaughtExceptionRepository.recordUncaughtException(e, ON_HTTP_AUTH_REQUEST)
+                throw e
             }
         }
     }

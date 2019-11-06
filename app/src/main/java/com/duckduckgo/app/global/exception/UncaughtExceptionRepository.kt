@@ -22,7 +22,7 @@ import timber.log.Timber
 
 
 interface UncaughtExceptionRepository {
-    suspend fun recordUncaughtException(e: Throwable?, exceptionSource: UncaughtExceptionSource): Throwable
+    suspend fun recordUncaughtException(e: Throwable?, exceptionSource: UncaughtExceptionSource)
     suspend fun getExceptions(): List<UncaughtExceptionEntity>
     suspend fun deleteException(id: Long)
 }
@@ -32,14 +32,21 @@ class UncaughtExceptionRepositoryDb(
     private val rootExceptionFinder: RootExceptionFinder
 ) : UncaughtExceptionRepository {
 
-    override suspend fun recordUncaughtException(e: Throwable?, exceptionSource: UncaughtExceptionSource): Throwable {
+    private var lastSeenException: Throwable? = null
+
+    override suspend fun recordUncaughtException(e: Throwable?, exceptionSource: UncaughtExceptionSource) {
         return withContext(Dispatchers.IO) {
+            if (e == lastSeenException) {
+                return@withContext
+            }
+
             Timber.e(e, "Uncaught exception - $exceptionSource")
 
             val rootCause = rootExceptionFinder.findRootException(e)
             val exceptionEntity = UncaughtExceptionEntity(message = extractExceptionCause(rootCause), exceptionSource = exceptionSource)
             uncaughtExceptionDao.add(exceptionEntity)
-            RecordedThrowable(e)
+
+            lastSeenException = e
         }
     }
 
@@ -63,9 +70,3 @@ class UncaughtExceptionRepositoryDb(
         }
     }
 }
-
-/**
- * Since we catch and re-throw Exceptions, the global exception handler will also receive this.
- * We need a way of allowing the global handler to know that the Exception has already been recorded, so that it isn't double counted.
- */
-class RecordedThrowable(rootCause: Throwable?) : Throwable(rootCause)

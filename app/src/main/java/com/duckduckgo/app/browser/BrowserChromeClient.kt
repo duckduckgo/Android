@@ -53,8 +53,8 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
 
         } catch (e: Throwable) {
             GlobalScope.launch {
-                val wrapped = uncaughtExceptionRepository.recordUncaughtException(e, SHOW_CUSTOM_VIEW)
-                throw wrapped
+                uncaughtExceptionRepository.recordUncaughtException(e, SHOW_CUSTOM_VIEW)
+                throw e
             }
         }
     }
@@ -66,8 +66,8 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
             customView = null
         } catch (e: Throwable) {
             GlobalScope.launch {
-                val wrapped = uncaughtExceptionRepository.recordUncaughtException(e, HIDE_CUSTOM_VIEW)
-                throw wrapped
+                uncaughtExceptionRepository.recordUncaughtException(e, HIDE_CUSTOM_VIEW)
+                throw e
             }
         }
     }
@@ -78,12 +78,10 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
             val navigationList = webView.copyBackForwardList()
             webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
             webViewClientListener?.progressChanged(newProgress)
-
-
         } catch (e: Throwable) {
             GlobalScope.launch {
-                val wrapped = uncaughtExceptionRepository.recordUncaughtException(e, ON_PROGRESS_CHANGED)
-                throw wrapped
+                uncaughtExceptionRepository.recordUncaughtException(e, ON_PROGRESS_CHANGED)
+                throw e
             }
         }
     }
@@ -93,8 +91,8 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
             webViewClientListener?.titleReceived(title)
         } catch (e: Throwable) {
             GlobalScope.launch {
-                val wrapped = uncaughtExceptionRepository.recordUncaughtException(e, RECEIVED_PAGE_TITLE)
-                throw wrapped
+                uncaughtExceptionRepository.recordUncaughtException(e, RECEIVED_PAGE_TITLE)
+                throw e
             }
         }
     }
@@ -105,8 +103,8 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
             true
         } catch (e: Throwable) {
             GlobalScope.launch {
-                val wrapped = uncaughtExceptionRepository.recordUncaughtException(e, SHOW_FILE_CHOOSER)
-                throw wrapped
+                uncaughtExceptionRepository.recordUncaughtException(e, SHOW_FILE_CHOOSER)
+                throw e
             }
 
             // cancel the request using the documented way

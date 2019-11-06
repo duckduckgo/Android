@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.global
 
-import com.duckduckgo.app.global.exception.RecordedThrowable
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
@@ -32,16 +31,10 @@ class AlertingUncaughtExceptionHandler(
 
     override fun uncaughtException(t: Thread?, originalException: Throwable?) {
         GlobalScope.launch(Dispatchers.IO) {
-            val exceptionToThrow = if (exceptionAlreadyRecorded(originalException)) {
-                originalException?.cause
-            } else {
-                uncaughtExceptionRepository.recordUncaughtException(originalException, UncaughtExceptionSource.GLOBAL)
-            }
+            uncaughtExceptionRepository.recordUncaughtException(originalException, UncaughtExceptionSource.GLOBAL)
 
             offlinePixelDataStore.applicationCrashCount += 1
-            originalHandler.uncaughtException(t, exceptionToThrow)
+            originalHandler.uncaughtException(t, originalException)
         }
     }
-
-    private fun exceptionAlreadyRecorded(originalException: Throwable?) = originalException is RecordedThrowable
 }
