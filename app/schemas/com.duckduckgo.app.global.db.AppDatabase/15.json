@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 15,
-    "identityHash": "91dfb18ac78a4e8db571479ee80bdf83",
+    "identityHash": "59c14d3de91b08c916a49d5bbdef6b93",
     "entities": [
       {
         "tableName": "disconnect_tracker",
@@ -544,7 +544,7 @@
       },
       {
         "tableName": "UncaughtExceptionEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `exceptionSource` INTEGER NOT NULL, `message` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `exceptionSource` TEXT NOT NULL, `message` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -555,7 +555,7 @@
           {
             "fieldPath": "exceptionSource",
             "columnName": "exceptionSource",
-            "affinity": "INTEGER",
+            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -578,7 +578,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '91dfb18ac78a4e8db571479ee80bdf83')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '59c14d3de91b08c916a49d5bbdef6b93')"
     ]
   }
 }

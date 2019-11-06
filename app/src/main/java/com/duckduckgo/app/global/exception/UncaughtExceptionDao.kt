@@ -21,19 +21,6 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.TypeConverter
 
-private const val GLOBAL_VALUE = 0
-private const val SHOULD_INTERCEPT_REQUEST_VALUE = 1
-private const val ON_PAGE_STARTED_VALUE = 2
-private const val ON_PAGE_FINISHED_VALUE = 3
-private const val SHOULD_OVERRIDE_REQUEST_VALUE = 4
-private const val ON_HTTP_AUTH_REQUEST_VALUE = 5
-private const val SHOW_CUSTOM_VIEW_VALUE = 6
-private const val HIDE_CUSTOM_VIEW_VALUE = 7
-private const val ON_PROGRESS_CHANGED_VALUE = 8
-private const val RECEIVED_PAGE_TITLE_VALUE = 9
-private const val SHOW_FILE_CHOOSER_VALUE = 10
-
-
 @Dao
 abstract class UncaughtExceptionDao {
 
@@ -51,33 +38,26 @@ abstract class UncaughtExceptionDao {
 
 }
 
-enum class UncaughtExceptionSource(val value: Int) {
-
-    GLOBAL(GLOBAL_VALUE),
-    SHOULD_INTERCEPT_REQUEST(SHOULD_INTERCEPT_REQUEST_VALUE),
-    ON_PAGE_STARTED(ON_PAGE_STARTED_VALUE),
-    ON_PAGE_FINISHED(ON_PAGE_FINISHED_VALUE),
-    ON_HTTP_AUTH_REQUEST(ON_HTTP_AUTH_REQUEST_VALUE),
-    SHOULD_OVERRIDE_REQUEST(SHOULD_OVERRIDE_REQUEST_VALUE),
-    SHOW_CUSTOM_VIEW(SHOW_CUSTOM_VIEW_VALUE),
-    HIDE_CUSTOM_VIEW(HIDE_CUSTOM_VIEW_VALUE),
-    ON_PROGRESS_CHANGED(ON_PROGRESS_CHANGED_VALUE),
-    RECEIVED_PAGE_TITLE(RECEIVED_PAGE_TITLE_VALUE),
-    SHOW_FILE_CHOOSER(SHOW_FILE_CHOOSER_VALUE);
-
-    companion object {
-        private val map = values().associateBy(UncaughtExceptionSource::value)
-        fun fromValue(value: Int) = map[value]
-    }
-
+enum class UncaughtExceptionSource {
+    GLOBAL,
+    SHOULD_INTERCEPT_REQUEST,
+    ON_PAGE_STARTED,
+    ON_PAGE_FINISHED,
+    SHOULD_OVERRIDE_REQUEST,
+    ON_HTTP_AUTH_REQUEST,
+    SHOW_CUSTOM_VIEW,
+    HIDE_CUSTOM_VIEW,
+    ON_PROGRESS_CHANGED,
+    RECEIVED_PAGE_TITLE,
+    SHOW_FILE_CHOOSER
 }
 
 class UncaughtExceptionSourceConverter {
 
     @TypeConverter
-    fun convertForDb(event: UncaughtExceptionSource): Int = event.value
+    fun convertForDb(event: UncaughtExceptionSource): String = event.name
 
     @TypeConverter
-    fun convertFromDb(value: Int): UncaughtExceptionSource? = UncaughtExceptionSource.fromValue(value)
+    fun convertFromDb(value: String): UncaughtExceptionSource? = UncaughtExceptionSource.valueOf(value)
 
 }

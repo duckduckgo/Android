@@ -211,7 +211,7 @@ abstract class AppDatabase : RoomDatabase() {
 
         val MIGRATION_14_TO_15: Migration = object : Migration(14, 15) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("CREATE TABLE IF NOT EXISTS `UncaughtExceptionEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `exceptionSource` INTEGER NOT NULL, `message` TEXT NOT NULL)")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `UncaughtExceptionEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `exceptionSource` TEXT NOT NULL, `message` TEXT NOT NULL)")
             }
         }
 
