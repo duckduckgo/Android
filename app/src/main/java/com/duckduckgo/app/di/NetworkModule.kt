@@ -143,7 +143,6 @@ class NetworkModule {
     fun feedbackService(@Named("api") retrofit: Retrofit): FeedbackService =
             retrofit.create(FeedbackService::class.java)
 
-
     @Provides
     @Singleton
     fun appConfigurationSyncer(
