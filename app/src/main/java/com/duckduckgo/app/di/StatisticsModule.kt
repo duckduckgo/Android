@@ -24,7 +24,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.*
 import com.duckduckgo.app.statistics.pixels.ApiBasedPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
+import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import dagger.Module
 import dagger.Provides
@@ -57,10 +57,10 @@ class StatisticsModule {
 
     @Provides
     fun offlinePixelSender(
-        offlinePixelDataStore: OfflinePixelDataStore,
+        offlinePixelCountDataStore: OfflinePixelCountDataStore,
         uncaughtExceptionRepository: UncaughtExceptionRepository,
         pixel: Pixel
-    ): OfflinePixelSender = OfflinePixelSender(offlinePixelDataStore, uncaughtExceptionRepository, pixel)
+    ): OfflinePixelSender = OfflinePixelSender(offlinePixelCountDataStore, uncaughtExceptionRepository, pixel)
 
     @Provides
     fun deviceInfo(context: Context): DeviceInfo = ContextDeviceInfo(context)

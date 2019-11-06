@@ -23,7 +23,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.COUNT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_MESSAGE
-import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
+import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import io.reactivex.Completable
 import io.reactivex.Completable.*
 import kotlinx.coroutines.runBlocking
@@ -36,7 +36,7 @@ import javax.inject.Inject
  * In those cases we schedule them to happen as part of our app data sync.
  */
 class OfflinePixelSender @Inject constructor(
-    private val dataStore: OfflinePixelDataStore,
+    private val offlineCountCountDataStore: OfflinePixelCountDataStore,
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,
     private val pixel: Pixel
 ) {
@@ -54,42 +54,42 @@ class OfflinePixelSender @Inject constructor(
 
     private fun sendApplicationKilledPixel(): Completable {
         return defer {
-            val count = dataStore.applicationCrashCount
+            val count = offlineCountCountDataStore.applicationCrashCount
             if (count == 0) {
                 return@defer complete()
             }
             val params = mapOf(COUNT to count.toString())
             pixel.fireCompletable(APPLICATION_CRASH.pixelName, params).andThen {
                 Timber.v("Offline pixel sent ${APPLICATION_CRASH.pixelName} count: $count")
-                dataStore.applicationCrashCount = 0
+                offlineCountCountDataStore.applicationCrashCount = 0
             }
         }
     }
 
     private fun sendWebRendererCrashedPixel(): Completable {
         return defer {
-            val count = dataStore.webRendererGoneCrashCount
+            val count = offlineCountCountDataStore.webRendererGoneCrashCount
             if (count == 0) {
                 return@defer complete()
             }
             val params = mapOf(COUNT to count.toString())
             pixel.fireCompletable(WEB_RENDERER_GONE_CRASH.pixelName, params).andThen {
                 Timber.v("Offline pixel sent ${WEB_RENDERER_GONE_CRASH.pixelName} count: $count")
-                dataStore.webRendererGoneCrashCount = 0
+                offlineCountCountDataStore.webRendererGoneCrashCount = 0
             }
         }
     }
 
     private fun sendWebRendererKilledPixel(): Completable {
         return defer {
-            val count = dataStore.webRendererGoneKilledCount
+            val count = offlineCountCountDataStore.webRendererGoneKilledCount
             if (count == 0) {
                 return@defer complete()
             }
             val params = mapOf(COUNT to count.toString())
             pixel.fireCompletable(WEB_RENDERER_GONE_KILLED.pixelName, params).andThen {
                 Timber.v("Offline pixel sent ${WEB_RENDERER_GONE_KILLED.pixelName} count: $count")
-                dataStore.webRendererGoneKilledCount = 0
+                offlineCountCountDataStore.webRendererGoneKilledCount = 0
             }
         }
     }

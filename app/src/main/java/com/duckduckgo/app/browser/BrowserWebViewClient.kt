@@ -26,7 +26,7 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
-import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
+import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.URI
@@ -36,7 +36,7 @@ class BrowserWebViewClient(
     private val requestRewriter: RequestRewriter,
     private val specialUrlDetector: SpecialUrlDetector,
     private val requestInterceptor: RequestInterceptor,
-    private val offlinePixelDataStore: OfflinePixelDataStore,
+    private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
     private val uncaughtExceptionRepository: UncaughtExceptionRepository
 ) : WebViewClient() {
 
@@ -152,9 +152,9 @@ class BrowserWebViewClient(
     override fun onRenderProcessGone(view: WebView?, detail: RenderProcessGoneDetail?): Boolean {
         Timber.w("onRenderProcessGone. Did it crash? ${detail?.didCrash()}")
         if (detail?.didCrash() == true) {
-            offlinePixelDataStore.webRendererGoneCrashCount += 1
+            offlinePixelCountDataStore.webRendererGoneCrashCount += 1
         } else {
-            offlinePixelDataStore.webRendererGoneKilledCount += 1
+            offlinePixelCountDataStore.webRendererGoneKilledCount += 1
         }
         return super.onRenderProcessGone(view, detail)
     }

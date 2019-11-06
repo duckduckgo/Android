@@ -48,7 +48,7 @@ import com.duckduckgo.app.statistics.api.OfflinePixelSender
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_LAUNCH
-import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
+import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
@@ -121,7 +121,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     lateinit var offlinePixelScheduler: OfflinePixelScheduler
 
     @Inject
-    lateinit var offlinePixelDataStore: OfflinePixelDataStore
+    lateinit var offlinePixelCountDataStore: OfflinePixelCountDataStore
 
     @Inject
     lateinit var dataClearer: DataClearer

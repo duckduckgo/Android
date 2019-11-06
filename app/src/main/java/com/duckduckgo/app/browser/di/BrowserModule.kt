@@ -41,7 +41,7 @@ import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
+import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
@@ -67,14 +67,14 @@ class BrowserModule {
         requestRewriter: RequestRewriter,
         specialUrlDetector: SpecialUrlDetector,
         requestInterceptor: RequestInterceptor,
-        offlinePixelDataStore: OfflinePixelDataStore,
+        offlinePixelCountDataStore: OfflinePixelCountDataStore,
         uncaughtExceptionRepository: UncaughtExceptionRepository
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             requestRewriter,
             specialUrlDetector,
             requestInterceptor,
-            offlinePixelDataStore,
+            offlinePixelCountDataStore,
             uncaughtExceptionRepository
         )
     }
