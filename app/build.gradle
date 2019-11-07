@@ -39,6 +39,7 @@ android {
     }
     buildTypes {
         debug {
+            applicationIdSuffix ".debug"
             pseudoLocalesEnabled false
         }
         release {
