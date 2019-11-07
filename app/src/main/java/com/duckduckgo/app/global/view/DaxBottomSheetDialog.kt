@@ -87,16 +87,18 @@ class DaxBottomSheetDialog(val clickOk: () -> Unit, val test: View, val other: V
         super.onStart()
         dialog?.window?.setLayout(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.WRAP_CONTENT)
         primaryCta.setOnClickListener {
-            test(test)
+            marcosTest?.cancel()
+            dismiss()
         }
         secondaryCta.setOnClickListener {
-            test(other)
+            marcosTest?.cancel()
+            dismiss()
         }
 
         val handler = Handler()
 
 
-        launch {
+        marcosTest = launch {
             dialogText.animate2("Every site has a privacy grade. Tap it to see how I protected your privacy.\n\nWant to get fancy? Try clearing your data by hitting the fire button.") {
                 handler.postDelayed(
                     {
@@ -107,6 +109,8 @@ class DaxBottomSheetDialog(val clickOk: () -> Unit, val test: View, val other: V
             }
         }
     }
+
+    var marcosTest : Job? = null
 
     fun test(targetView: View) {
         Timber.d("MARCOS executed yes! ")

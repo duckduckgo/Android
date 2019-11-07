@@ -260,23 +260,23 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 }
             }
         })
-
-        val fireButton = requireActivity().findViewById<View>(R.id.fire)
-        val gradeView = requireActivity().findViewById<View>(R.id.privacyGradeButton)
-
-        val dialog = DaxBottomSheetDialog({}, fireButton, gradeView)
-
-
-//        val outValue = TypedValue()
-//        requireContext().getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
-//        fireMenuButton!!.icon.setBackgroundResource(outValue.resourceId);
-
-        val handler = Handler()
-        handler.postDelayed(
-            {
-                dialog.show(requireFragmentManager(), "MARCOS")
-            }
-            , 1600)
+//
+//        val fireButton = requireActivity().findViewById<View>(R.id.fire)
+//        val gradeView = requireActivity().findViewById<View>(R.id.privacyGradeButton)
+//
+//        val dialog = DaxBottomSheetDialog({}, fireButton, gradeView)
+//
+//
+////        val outValue = TypedValue()
+////        requireContext().getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
+////        fireMenuButton!!.icon.setBackgroundResource(outValue.resourceId);
+//
+//      val handler = Handler()
+//        handler.postDelayed(
+//            {
+//                dialog.show(requireFragmentManager(), "MARCOS")
+//            }
+//            , 1600)
 
 
 //        val drawable = fireMenuButton?.icon
@@ -1132,6 +1132,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 pageLoadingIndicator.apply {
                     if (viewState.isLoading) show() else hide()
                     progress = viewState.progress
+                }
+
+                if (viewState.progress == 100 && (0..10).random() % 3 == 0) {
+                    val fireButton = requireActivity().findViewById<View>(R.id.fire)
+                    val gradeView = requireActivity().findViewById<View>(R.id.privacyGradeButton)
+
+                    val dialog = DaxBottomSheetDialog({}, fireButton, gradeView)
+
+                    dialog.show(requireFragmentManager(), "MARCOS")
                 }
             }
         }
