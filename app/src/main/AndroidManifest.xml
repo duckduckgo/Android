@@ -53,6 +53,7 @@
 
         <activity
             android:name=".BrowserActivity"
+            android:label="@string/appDescription"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize|stateHidden">

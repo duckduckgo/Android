@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
+    <string name="appDescription">Prywatność uproszczona</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Zmień ustawienia, aby zawsze wyszukiwać i przeglądać strony za pośrednictwem DuckDuckGo.</string>

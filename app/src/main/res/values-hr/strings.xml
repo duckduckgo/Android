@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logotip DuckDuckGo</string>
+    <string name="appDescription">Zaštita privatnosti, pojednostavljeno</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Posjetite Postavke kako biste svaki put pretraživali i pregledavali uz DuckDuckGo.</string>

@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
+    <string name="appDescription">Privatlivets fred, forenklet</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Besøg Indstillinger for at søge og surfe med DuckDuckGo hver gang.</string>
