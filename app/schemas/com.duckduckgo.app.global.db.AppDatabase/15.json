@@ -2,34 +2,40 @@
   "formatVersion": 1,
   "database": {
     "version": 15,
-    "identityHash": "811959b26804132e6a653926d3ebd54f",
+    "identityHash": "59c14d3de91b08c916a49d5bbdef6b93",
     "entities": [
       {
-        "tableName": "tds_tracker",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, `defaultAction` TEXT NOT NULL, `ownerName` TEXT NOT NULL, PRIMARY KEY(`domain`))",
+        "tableName": "disconnect_tracker",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`url` TEXT NOT NULL, `category` TEXT NOT NULL, `networkName` TEXT NOT NULL, `networkUrl` TEXT NOT NULL, PRIMARY KEY(`url`))",
         "fields": [
           {
-            "fieldPath": "domain",
-            "columnName": "domain",
+            "fieldPath": "url",
+            "columnName": "url",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "defaultAction",
-            "columnName": "defaultAction",
+            "fieldPath": "category",
+            "columnName": "category",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "ownerName",
-            "columnName": "ownerName",
+            "fieldPath": "networkName",
+            "columnName": "networkName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "networkUrl",
+            "columnName": "networkUrl",
             "affinity": "TEXT",
             "notNull": true
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "domain"
+            "url"
           ],
           "autoGenerate": false
         },
@@ -535,12 +541,44 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "UncaughtExceptionEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `exceptionSource` TEXT NOT NULL, `message` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exceptionSource",
+            "columnName": "exceptionSource",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "message",
+            "columnName": "message",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '811959b26804132e6a653926d3ebd54f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '59c14d3de91b08c916a49d5bbdef6b93')"
     ]
   }
 }
