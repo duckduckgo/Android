@@ -1,13 +1,14 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
+    <string name="appDescription">Privatlivets fred, forenklet</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Gør privatliv standarden for dig</string>
     <string name="onboardingDefaultBrowserDescription">Besøg Indstillinger for at søge og surfe med DuckDuckGo hver gang.</string>
-    <string name="onboardingDefaultBrowserGoToSettingsAction">Gå til Indstillinger</string>
     <string name="onboardingContinue">Fortsæt</string>
     <string name="onboardingContinueFinalPage">Gå i gang med at surfe</string>
+    <string name="onboardingDefaultBrowserTitle">Gør DuckDuckGo til din standard</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Sig hej til Fred i Sindet</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Velkommen til\nDuckDuckGo!</string>
@@ -24,6 +25,11 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Det var ikke muligt at starte standard app-indstillingsskærmen</string>
     <string name="settingsDefaultBrowserEnabled">Angiv som standardbrowser</string>
+    <string name="defaultBrowserMaybeLater">Måske senere</string>
+    <string name="defaultBrowserLetsDoIt">Lad os gøre det!</string>
+    <string name="defaultBrowserDescriptionNoDefault">Åbne link med ro i sindet, hver gang.</string>
+    <string name="defaultBrowserDescriptionDefaultSet">Med DuckDuckGo er dine online data mere private som standard, uanset hvor internettet fører dig hen.</string>
+    <string name="defaultBrowserInstructions">Vælg DuckDuckGo, og tryk på <font color="#678fff"> Altid </font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Browsermenu</string>
@@ -76,9 +82,6 @@
     <string name="openImageInNewTab">Åbn billede i baggrundsfanen</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Luk</string>
-    <string name="tapFireDirective">Fane </string>
-    <string name="tapFireIconDescription">brænd</string>
-    <string name="tapFireExplanation"> for at glemme alt</string>
     <string name="closeAllTabsMenuItem">Luk alle faner</string>
 
     <!-- Privacy Dashboard Activities -->
@@ -200,6 +203,7 @@
     <string name="bookmarkOverflowContentDescription">Flere muligheder for bogmærke %s</string>
     <string name="delete">Slet</string>
     <string name="edit">Rediger</string>
+    <string name="bookmarkEdited">Bogmærke tilføjet</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Søg på DuckDuckGo</string>

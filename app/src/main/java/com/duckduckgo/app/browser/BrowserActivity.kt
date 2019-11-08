@@ -41,7 +41,7 @@ import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.view.*
-import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageExperiment
+import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
@@ -168,7 +168,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
         }
 
         if (intent.getBooleanExtra(LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, false)) {
-            setResult(DefaultBrowserPageExperiment.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL)
+            setResult(DefaultBrowserPage.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL)
             finish()
             return
         }
@@ -273,6 +273,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
     }
 
     fun launchFire() {
+        pixel.fire(Pixel.PixelName.FORGET_ALL_PRESSED_BROWSING)
         val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction)
         dialog.clearStarted = {
             removeObservers()

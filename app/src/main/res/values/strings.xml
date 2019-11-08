@@ -2,13 +2,14 @@
 
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
+    <string name="appDescription">Privacy, simplified</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Make Privacy Your Default</string>
     <string name="onboardingDefaultBrowserDescription">Visit Settings to search and browse with DuckDuckGo every time.</string>
-    <string name="onboardingDefaultBrowserGoToSettingsAction">Go to Settings</string>
     <string name="onboardingContinue">Continue</string>
     <string name="onboardingContinueFinalPage">Start Browsing</string>
+    <string name="onboardingDefaultBrowserTitle">Make DuckDuckGo Your Default</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Say Hello to Peace of Mind</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Welcome to\nDuckDuckGo!</string>
@@ -25,6 +26,11 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Can\'t launch default app settings screen</string>
     <string name="settingsDefaultBrowserEnabled">Set as Default Browser</string>
+    <string name="defaultBrowserMaybeLater">Maybe Later</string>
+    <string name="defaultBrowserLetsDoIt">Let\'s do it!</string>
+    <string name="defaultBrowserDescriptionNoDefault">Open links with peace of mind, every time.</string>
+    <string name="defaultBrowserDescriptionDefaultSet">With DuckDuckGo, your online data is more private by default, wherever the internet takes you.</string>
+    <string name="defaultBrowserInstructions">Select DuckDuckGo and tap <font color='#678fff'>Always</font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Browser menu</string>
@@ -79,9 +85,6 @@
     <string name="openImageInNewTab">Open Image In Background Tab</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Close</string>
-    <string name="tapFireDirective">Tap </string>
-    <string name="tapFireIconDescription">fire</string>
-    <string name="tapFireExplanation"> to forget everything</string>
     <string name="closeAllTabsMenuItem">Close All Tabs</string>
 
     <!-- Privacy Dashboard Activities -->
@@ -206,6 +209,7 @@
     <string name="bookmarkOverflowContentDescription">More options for bookmark %s</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
+    <string name="bookmarkEdited">Bookmark added</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Search DuckDuckGo</string>

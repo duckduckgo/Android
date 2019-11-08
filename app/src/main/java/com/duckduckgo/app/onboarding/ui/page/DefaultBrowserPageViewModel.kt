@@ -23,7 +23,7 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 
-class DefaultBrowserPageExperimentViewModel(
+class DefaultBrowserPageViewModel(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val pixel: Pixel,
     private val installStore: AppInstallStore
@@ -152,6 +152,6 @@ class DefaultBrowserPageExperimentViewModel(
 
     companion object {
         const val MAX_DIALOG_ATTEMPTS = 2
-        const val DEFAULT_URL = "https://donttrack.us"
+        const val DEFAULT_URL = "https://duckduckgo.com"
     }
 }

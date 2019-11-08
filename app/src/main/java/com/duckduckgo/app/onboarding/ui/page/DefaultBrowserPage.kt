@@ -16,36 +16,47 @@
 
 package com.duckduckgo.app.onboarding.ui.page
 
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.Toast
+import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
-import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.*
+import com.duckduckgo.app.global.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.android.synthetic.main.content_onboarding_default_browser.continueButton
+import kotlinx.android.synthetic.main.content_onboarding_default_browser.launchSettingsButton
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
+import kotlinx.android.synthetic.main.content_onboarding_default_browser.defaultBrowserImage
 import timber.log.Timber
 import javax.inject.Inject
-
+import androidx.lifecycle.ViewModelProvider
+import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.global.view.hide
+import com.duckduckgo.app.global.view.show
 
 class DefaultBrowserPage : OnboardingPageFragment() {
     override fun layoutResource(): Int = R.layout.content_onboarding_default_browser
 
     @Inject
-    lateinit var pixel: Pixel
+    lateinit var viewModelFactory: ViewModelFactory
 
-    @Inject
-    lateinit var installStore: AppInstallStore
+    private var userTriedToSetDDGAsDefault = false
+    private var userSelectedExternalBrowser = false
+    private var toast: Toast? = null
+    private var defaultCard: View? = null
 
-    @Inject
-    lateinit var defaultBrowserDetector: DefaultBrowserDetector
-
-    private var userLaunchedDefaultBrowserSettings = false
+    private val viewModel: DefaultBrowserPageViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory).get(DefaultBrowserPageViewModel::class.java)
+    }
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -54,44 +65,125 @@ class DefaultBrowserPage : OnboardingPageFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        defaultCard = activity?.findViewById(R.id.defaultCard)
 
         if (savedInstanceState != null) {
-            userLaunchedDefaultBrowserSettings = savedInstanceState.getBoolean(SAVED_STATE_LAUNCHED_SETTINGS)
+            userTriedToSetDDGAsDefault = savedInstanceState.getBoolean(SAVED_STATE_LAUNCHED_DEFAULT)
         }
 
-        extractContinueButtonTextResourceId()?.let { continueButton.setText(it) }
+        observeViewModel()
 
-        launchSettingsButton.setOnClickListener {
-            onLaunchDefaultBrowserSettingsClicked()
-        }
-        continueButton.setOnClickListener {
-            if (!userLaunchedDefaultBrowserSettings) {
-                pixel.fire(PixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
-            }
-            onContinuePressed()
-        }
-        pixel.fire(PixelName.ONBOARDING_DEFAULT_BROWSER_VISUALIZED)
+        setButtonsBehaviour()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadUI()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        userSelectedExternalBrowser = true
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        outState.putBoolean(SAVED_STATE_LAUNCHED_DEFAULT, userTriedToSetDDGAsDefault)
+    }
 
-        outState.putBoolean(SAVED_STATE_LAUNCHED_SETTINGS, userLaunchedDefaultBrowserSettings)
+    private fun observeViewModel() {
+        viewModel.viewState.observe(this, Observer<DefaultBrowserPageViewModel.ViewState> { viewState ->
+            viewState?.let {
+                if (it.showSettingsUi) setUiForSettings() else setUiForDialog()
+                if (it.showInstructionsCard) showCard() else hideCard()
+                setOnlyContinue(it.showOnlyContinue)
+            }
+        })
+
+        viewModel.command.observe(this, Observer {
+            when (it) {
+                is DefaultBrowserPageViewModel.Command.OpenDialog -> onLaunchDefaultBrowserWithDialogClicked(it.url)
+                is DefaultBrowserPageViewModel.Command.OpenSettings -> onLaunchDefaultBrowserSettingsClicked()
+                is DefaultBrowserPageViewModel.Command.ContinueToBrowser -> onContinuePressed()
+            }
+        })
+    }
+
+    private fun setButtonsBehaviour() {
+        launchSettingsButton.setOnClickListener {
+            viewModel.onDefaultBrowserClicked()
+        }
+        continueButton.setOnClickListener {
+            viewModel.onContinueToBrowser(userTriedToSetDDGAsDefault)
+        }
+    }
+
+    private fun setOnlyContinue(visible: Boolean) {
+        if (visible) {
+            continueButton.hide()
+            browserProtectionSubtitle.setText(R.string.defaultBrowserDescriptionDefaultSet)
+            browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitleDefaultSet)
+
+            defaultBrowserImage.setImageResource(R.drawable.hiker)
+
+            extractContinueButtonTextResourceId()?.let { launchSettingsButton.setText(it) }
+            launchSettingsButton.setOnClickListener {
+                viewModel.onContinueToBrowser(userTriedToSetDDGAsDefault)
+            }
+        } else {
+            launchSettingsButton.setText(R.string.defaultBrowserLetsDoIt)
+            continueButton.show()
+            setButtonsBehaviour()
+        }
+    }
+
+    private fun setUiForDialog() {
+        defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_dialog)
+        browserProtectionSubtitle.setText(R.string.defaultBrowserDescriptionNoDefault)
+        browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitle)
+    }
+
+    private fun setUiForSettings() {
+        defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_settings)
+        browserProtectionSubtitle.setText(R.string.onboardingDefaultBrowserDescription)
+        browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitle)
+    }
+
+    @SuppressLint("InflateParams")
+    private fun showCard() {
+        toast?.cancel()
+        defaultCard?.show()
+        defaultCard?.alpha = 1f
+
+        val inflater = LayoutInflater.from(requireContext())
+        val inflatedView = inflater.inflate(R.layout.content_onboarding_default_browser_card, null)
+
+        toast = Toast(requireContext()).apply {
+            view = inflatedView
+            setGravity(Gravity.TOP or Gravity.FILL_HORIZONTAL, 0, 0)
+            duration = Toast.LENGTH_LONG
+        }
+        toast?.show()
+    }
+
+    private fun hideCard() {
+        toast?.cancel()
+        defaultCard?.animate()?.alpha(0f)?.setDuration(100)?.start()
+    }
+
+    private fun onLaunchDefaultBrowserWithDialogClicked(url: String) {
+        userTriedToSetDDGAsDefault = true
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        intent.putExtra(BrowserActivity.LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, true)
+        startActivityForResult(intent, DEFAULT_BROWSER_REQUEST_CODE_DIALOG)
     }
 
     private fun onLaunchDefaultBrowserSettingsClicked() {
-        userLaunchedDefaultBrowserSettings = true
-        val params = mapOf(
-            PixelParameter.DEFAULT_BROWSER_BEHAVIOUR_TRIGGERED to PixelValues.DEFAULT_BROWSER_SETTINGS
-        )
-        pixel.fire(PixelName.ONBOARDING_DEFAULT_BROWSER_LAUNCHED, params)
+        userTriedToSetDDGAsDefault = true
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val intent = DefaultBrowserSystemSettings.intent()
             try {
-                startActivityForResult(
-                    intent,
-                    DEFAULT_BROWSER_REQUEST_CODE
-                )
+                startActivityForResult(intent, DEFAULT_BROWSER_REQUEST_CODE_SETTINGS)
             } catch (e: ActivityNotFoundException) {
                 Timber.w(e, getString(R.string.cannotLaunchDefaultAppSettings))
             }
@@ -100,35 +192,31 @@ class DefaultBrowserPage : OnboardingPageFragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
-            DEFAULT_BROWSER_REQUEST_CODE -> {
-                handleDefaultBrowserResult()
+            DEFAULT_BROWSER_REQUEST_CODE_SETTINGS -> {
+                viewModel.handleResult(DefaultBrowserPageViewModel.Origin.Settings)
+            }
+            DEFAULT_BROWSER_REQUEST_CODE_DIALOG -> {
+                val origin =
+                    if (resultCode == DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL) {
+                        DefaultBrowserPageViewModel.Origin.InternalBrowser
+                    } else {
+                        if (userSelectedExternalBrowser) {
+                            DefaultBrowserPageViewModel.Origin.ExternalBrowser
+                        } else {
+                            DefaultBrowserPageViewModel.Origin.DialogDismissed
+                        }
+                    }
+                userSelectedExternalBrowser = false
+                viewModel.handleResult(origin)
             }
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
-    private fun handleDefaultBrowserResult() {
-        val isDefault = defaultBrowserDetector.isDefaultBrowser()
-        val setText = if (isDefault) "was" else "was not"
-        Timber.i("User returned from default settings; DDG $setText set as default")
-
-        if (isDefault) {
-            installStore.defaultBrowser = true
-            val params = mapOf(
-                PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
-                PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to PixelValues.DEFAULT_BROWSER_SETTINGS
-            )
-            pixel.fire(PixelName.DEFAULT_BROWSER_SET, params)
-        } else {
-            val params = mapOf(
-                PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to PixelValues.DEFAULT_BROWSER_SETTINGS
-            )
-            pixel.fire(PixelName.DEFAULT_BROWSER_NOT_SET, params)
-        }
-    }
-
     companion object {
-        private const val DEFAULT_BROWSER_REQUEST_CODE = 100
-        private const val SAVED_STATE_LAUNCHED_SETTINGS = "SAVED_STATE_LAUNCHED_SETTINGS"
+        private const val DEFAULT_BROWSER_REQUEST_CODE_SETTINGS = 100
+        private const val SAVED_STATE_LAUNCHED_DEFAULT = "SAVED_STATE_LAUNCHED_DEFAULT"
+        const val DEFAULT_BROWSER_REQUEST_CODE_DIALOG = 101
+        const val DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL = 102
     }
 }

@@ -1,13 +1,14 @@
 ﻿<resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">DuckDuckGo-Logo</string>
+    <string name="appDescription">Datenschutz – leicht gemacht</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Einstellungen zur Privatsphäre standardmäßig festlegen</string>
     <string name="onboardingDefaultBrowserDescription">Navigiere zu Einstellungen, damit du in Zukunft immer mit DuckDuckGo suchen und browsen kannst.</string>
-    <string name="onboardingDefaultBrowserGoToSettingsAction">Zu den Einstellungen</string>
     <string name="onboardingContinue">Weiter</string>
     <string name="onboardingContinueFinalPage">Mit dem Browsen beginnen</string>
+    <string name="onboardingDefaultBrowserTitle">DuckDuckGo als Standard-Browser einstellen</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Sag Hallo zum sichern Surfen</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Willkommen bei\nDuckDuckGo!</string>
@@ -24,6 +25,11 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Standardmäßiger App-Einstellungsbildschirm kann nicht gestartet werden</string>
     <string name="settingsDefaultBrowserEnabled">Als Standard-Browser festlegen</string>
+    <string name="defaultBrowserMaybeLater">Vielleicht später</string>
+    <string name="defaultBrowserLetsDoIt">Machen wir das!</string>
+    <string name="defaultBrowserDescriptionNoDefault">Öffnen Sie Links jederzeit sicher und ohne Sorge.</string>
+    <string name="defaultBrowserDescriptionDefaultSet">Mit DuckDuckGo sind Ihre Online-Daten standardmäßig vertraulich, egal wohin das Internet Sie führt.</string>
+    <string name="defaultBrowserInstructions">Wählen Sie DuckDuckGo aus und tippen Sie auf <font color="#678fff"> Immer </font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Browsermenü</string>
@@ -76,9 +82,6 @@
     <string name="openImageInNewTab">Bild in Hintergrund-Tab öffnen</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Schließen</string>
-    <string name="tapFireDirective">Klicke auf das </string>
-    <string name="tapFireIconDescription">Feuer-Icon,</string>
-    <string name="tapFireExplanation"> um alles zu entfernen</string>
     <string name="closeAllTabsMenuItem">Alle Tabs schließen</string>
 
     <!-- Privacy Dashboard Activities -->
@@ -200,6 +203,7 @@
     <string name="bookmarkOverflowContentDescription">Mehr Optionen für Lesezeichen %s</string>
     <string name="delete">Löschen</string>
     <string name="edit">Bearbeiten</string>
+    <string name="bookmarkEdited">Lesezeichen hinzugefügt</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Mit DuckDuckGo suchen</string>

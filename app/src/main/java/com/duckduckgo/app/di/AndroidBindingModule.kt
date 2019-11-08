@@ -37,7 +37,6 @@ import com.duckduckgo.app.launch.LaunchActivity
 import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
-import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageExperiment
 import com.duckduckgo.app.onboarding.ui.page.UnifiedSummaryPage
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.privacy.ui.PrivacyPracticesActivity
@@ -46,7 +45,6 @@ import com.duckduckgo.app.privacy.ui.TrackerNetworksActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
-import com.duckduckgo.app.tabs.ui.old.TabSwitcherActivityLegacy
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -72,10 +70,6 @@ abstract class AndroidBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector
     abstract fun tabsActivity(): TabSwitcherActivity
-
-    @ActivityScoped
-    @ContributesAndroidInjector
-    abstract fun tabsActivityLegacy(): TabSwitcherActivityLegacy
 
     @ActivityScoped
     @ContributesAndroidInjector
@@ -132,9 +126,6 @@ abstract class AndroidBindingModule {
 
     @ContributesAndroidInjector
     abstract fun onboardingDefaultBrowserFragment(): DefaultBrowserPage
-
-    @ContributesAndroidInjector
-    abstract fun onboardingDefaultBrowserFragmentExperiment(): DefaultBrowserPageExperiment
 
     @ContributesAndroidInjector
     abstract fun appEnjoymentDialogFragment(): AppEnjoymentDialogFragment

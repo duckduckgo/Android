@@ -57,7 +57,6 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -72,8 +71,11 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Observable
 import io.reactivex.Single
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.withContext
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -85,6 +87,7 @@ import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import java.util.concurrent.TimeUnit
 
+@ExperimentalCoroutinesApi
 class BrowserTabViewModelTest {
 
     @get:Rule
@@ -95,7 +98,7 @@ class BrowserTabViewModelTest {
 
     @ExperimentalCoroutinesApi
     @get:Rule
-    var coroutinesTestRule = CoroutineTestRule()
+    var coroutineRule = CoroutineTestRule()
 
     @Mock
     private lateinit var mockPrevalenceStore: PrevalenceStore
@@ -197,7 +200,7 @@ class BrowserTabViewModelTest {
         )
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore)
-        runBlocking<Unit> {
+        runBlockingTest {
             whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
             whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
             whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
@@ -222,7 +225,8 @@ class BrowserTabViewModelTest {
             ctaViewModel = ctaViewModel,
             searchCountDao = mockSearchCountDao,
             pixel = mockPixel,
-            variantManager = mockVariantManager
+            variantManager = mockVariantManager,
+            dispatchers = coroutineRule.testDispatcherProvider
         )
 
         testee.loadData("abc", null, false)
@@ -264,7 +268,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOpenInNewBackgroundRequestedThenTabRepositoryUpdatedAndCommandIssued() = runBlocking<Unit> {
+    fun whenOpenInNewBackgroundRequestedThenTabRepositoryUpdatedAndCommandIssued() = runBlockingTest {
         val url = "http://www.example.com"
         testee.openInNewBackgroundTab(url)
 
@@ -315,13 +319,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBookmarkEditedThenDaoIsUpdated() = runBlocking<Unit> {
+    fun whenBookmarkEditedThenDaoIsUpdated() = runBlockingTest {
         testee.editBookmark(0, "A title", "www.example.com")
         verify(mockBookmarksDao).update(BookmarkEntity(title = "A title", url = "www.example.com"))
     }
 
     @Test
-    fun whenBookmarkAddedThenDaoIsUpdatedAndUserNotified() = runBlocking<Unit> {
+    fun whenBookmarkAddedThenDaoIsUpdatedAndUserNotified() = runBlockingTest {
         loadUrl("www.example.com", "A title")
 
         testee.onBookmarkAddRequested()
@@ -357,7 +361,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowsingAndUrlLoadedThenSiteVisitedEntryAddedToLeaderboardDao() {
+    fun whenBrowsingAndUrlLoadedThenSiteVisitedEntryAddedToLeaderboardDao() = runBlockingTest {
         loadUrl("http://example.com/abc", isBrowserShowing = true)
         verify(mockNetworkLeaderboardDao).incrementSitesVisited()
     }
@@ -426,9 +430,11 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenViewModelNotifiedThatUrlGotFocusThenViewStateIsUpdated() {
-        testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-        assertTrue(omnibarViewState().isEditing)
+    fun whenViewModelNotifiedThatUrlGotFocusThenViewStateIsUpdated() = runBlockingTest {
+        withContext(Dispatchers.Main) {
+            testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
+            assertTrue(omnibarViewState().isEditing)
+        }
     }
 
     @Test
@@ -492,36 +498,21 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenProgressChangesToFinishedAndImprovedTabUxVariantActiveThenWebViewPreviewGenerated() {
-        whenever(mockVariantManager.getVariant()).thenReturn(
-            Variant("mx", 1.0, listOf(VariantManager.VariantFeature.TabSwitcherGrid), filterBy = { true })
-        )
-        updateUrl("https://example.com", "https://example.com", true)
-        testee.progressChanged(100)
-        val command = captureCommands().lastValue as Command.GenerateWebViewPreviewImage
-        assertFalse(command.forceImmediate)
+    fun whenUrlClearedThenPrivacyGradeIsCleared() = runBlockingTest {
+        withContext(Dispatchers.Main) {
+            loadUrl("https://duckduckgo.com")
+            assertNotNull(testee.privacyGrade.value)
+            loadUrl(null)
+            assertNull(testee.privacyGrade.value)
+        }
     }
 
     @Test
-    fun whenProgressChangesToFinishedAndImprovedTabUxVariantNotActiveThenWebViewPreviewNotGenerated() {
-        whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
-        updateUrl("https://example.com", "https://example.com", true)
-        testee.progressChanged(100)
-        verify(mockCommandObserver, never()).onChanged(any<Command.GenerateWebViewPreviewImage>())
-    }
-
-    @Test
-    fun whenUrlClearedThenPrivacyGradeIsCleared() = runBlocking<Unit> {
-        loadUrl("https://duckduckgo.com")
-        assertNotNull(testee.privacyGrade.value)
-        loadUrl(null)
-        assertNull(testee.privacyGrade.value)
-    }
-
-    @Test
-    fun whenUrlLoadedThenPrivacyGradeIsReset() = runBlocking<Unit> {
-        loadUrl("https://duckduckgo.com")
-        assertNotNull(testee.privacyGrade.value)
+    fun whenUrlLoadedThenPrivacyGradeIsReset() = runBlockingTest {
+        withContext(Dispatchers.Main) {
+            loadUrl("https://duckduckgo.com")
+            assertNotNull(testee.privacyGrade.value)
+        }
     }
 
     @Test
@@ -944,7 +935,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSiteLoadedAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithUrlAndTitle() = runBlocking<Unit> {
+    fun whenSiteLoadedAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithUrlAndTitle() = runBlockingTest {
         loadUrl("foo.com")
         testee.titleReceived("Foo Title")
         testee.onBookmarkAddRequested()
@@ -954,7 +945,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkAddedWithBlankTitleAndUrl() = runBlocking<Unit> {
+    fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkAddedWithBlankTitleAndUrl() = runBlockingTest {
         whenever(mockBookmarksDao.insert(any())).thenReturn(1)
         testee.onBookmarkAddRequested()
         verify(mockBookmarksDao).insert(BookmarkEntity(title = "", url = ""))
@@ -973,7 +964,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithUrl() = runBlocking<Unit> {
+    fun whenOnSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithUrl() = runBlockingTest {
         loadUrl("foo.com", isBrowserShowing = true)
         testee.onBrokenSiteSelected()
         val command = captureCommands().value as Command.BrokenSiteFeedback
@@ -1032,24 +1023,30 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlNullThenSetBrowserNotShowing() {
-        testee.loadData("id", null, false)
-        testee.determineShowBrowser()
-        assertEquals(false, testee.browserViewState.value?.browserShowing)
+    fun whenUrlNullThenSetBrowserNotShowing() = runBlockingTest {
+        withContext(Dispatchers.Main) {
+            testee.loadData("id", null, false)
+            testee.determineShowBrowser()
+            assertEquals(false, testee.browserViewState.value?.browserShowing)
+        }
     }
 
     @Test
-    fun whenUrlBlankThenSetBrowserNotShowing() {
-        testee.loadData("id", "  ", false)
-        testee.determineShowBrowser()
-        assertEquals(false, testee.browserViewState.value?.browserShowing)
+    fun whenUrlBlankThenSetBrowserNotShowing() = runBlockingTest {
+        withContext(Dispatchers.Main) {
+            testee.loadData("id", "  ", false)
+            testee.determineShowBrowser()
+            assertEquals(false, testee.browserViewState.value?.browserShowing)
+        }
     }
 
     @Test
-    fun whenUrlPresentThenSetBrowserShowing() {
-        testee.loadData("id", "https://example.com", false)
-        testee.determineShowBrowser()
-        assertEquals(true, testee.browserViewState.value?.browserShowing)
+    fun whenUrlPresentThenSetBrowserShowing() = runBlockingTest {
+        withContext(Dispatchers.Main) {
+            testee.loadData("id", "https://example.com", false)
+            testee.determineShowBrowser()
+            assertEquals(true, testee.browserViewState.value?.browserShowing)
+        }
     }
 
     @Test
@@ -1119,15 +1116,59 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSelectToEditQueryThenMoveCaretToTheEnd() {
-        testee.onUserSelectedToEditQuery("foo")
-        assertTrue(omnibarViewState().shouldMoveCaretToEnd)
+    fun whenUserSelectToEditQueryThenMoveCaretToTheEnd() = runBlockingTest {
+        withContext(Dispatchers.Main) {
+            testee.onUserSelectedToEditQuery("foo")
+            assertTrue(omnibarViewState().shouldMoveCaretToEnd)
+        }
     }
 
     @Test
     fun whenUserSubmitsQueryThenCaretDoesNotMoveToTheEnd() {
         testee.onUserSubmittedQuery("foo")
         assertFalse(omnibarViewState().shouldMoveCaretToEnd)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabThenGenerateWebViewPreviewImage() {
+        testee.userRequestedOpeningNewTab()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.firstValue
+        assertTrue(command is Command.GenerateWebViewPreviewImage)
+    }
+
+    @Test
+    fun whenUserRequestedToOpenNewTabThenNewTabCommandIssued() {
+        testee.userRequestedOpeningNewTab()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.lastValue
+        assertTrue(command is Command.LaunchNewTab)
+    }
+
+    @Test
+    fun whenUserPressesBackAndSkippingHomeThenWebViewPreviewGenerated() {
+        setupNavigation(isBrowsing = true, canGoBack = false, skipHome = true)
+        testee.onUserPressedBack()
+        verifyGenerateWebViewPreviewCommandIssued()
+    }
+
+    @Test
+    fun whenUserPressesBackAndNotSkippingHomeThenWebViewPreviewNotGenerated() {
+        setupNavigation(isBrowsing = true, canGoBack = false, skipHome = false)
+        testee.onUserPressedBack()
+        verifyGenerateWebViewPreviewCommandNotIssued()
+    }
+
+    private fun verifyGenerateWebViewPreviewCommandIssued() {
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val generatedPreviewCommand = commandCaptor.allValues.find { it is Command.GenerateWebViewPreviewImage }
+        assertNotNull(generatedPreviewCommand)
+    }
+
+    private fun verifyGenerateWebViewPreviewCommandNotIssued() {
+        verify(mockCommandObserver, atLeast(0)).onChanged(commandCaptor.capture())
+        val generatedPreviewCommand = commandCaptor.allValues.find { it is Command.GenerateWebViewPreviewImage }
+        assertNull(generatedPreviewCommand)
     }
 
     private fun pixelParams(showedBookmarks: Boolean, bookmarkCapable: Boolean) = mapOf(

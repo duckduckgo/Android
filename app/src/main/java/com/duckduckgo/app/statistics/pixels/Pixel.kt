@@ -32,9 +32,24 @@ interface Pixel {
     enum class PixelName(val pixelName: String) {
 
         APP_LAUNCH("ml"),
+
+        FORGET_ALL_PRESSED_BROWSING("mf_bp"),
+        FORGET_ALL_PRESSED_TABSWITCHING("mf_tp"),
         FORGET_ALL_EXECUTED("mf"),
 
         APPLICATION_CRASH("m_d_ac"),
+        APPLICATION_CRASH_GLOBAL("m_d_ac_g"),
+        APPLICATION_CRASH_WEBVIEW_SHOULD_INTERCEPT("m_d_ac_wi"),
+        APPLICATION_CRASH_WEBVIEW_PAGE_STARTED("m_d_ac_wps"),
+        APPLICATION_CRASH_WEBVIEW_PAGE_FINISHED("m_d_ac_wpf"),
+        APPLICATION_CRASH_WEBVIEW_OVERRIDE_REQUEST("m_d_ac_wo"),
+        APPLICATION_CRASH_WEBVIEW_HTTP_AUTH_REQUEST("m_d_ac_wh"),
+        APPLICATION_CRASH_WEBVIEW_SHOW_CUSTOM_VIEW("m_d_ac_wcs"),
+        APPLICATION_CRASH_WEBVIEW_HIDE_CUSTOM_VIEW("m_d_ac_wch"),
+        APPLICATION_CRASH_WEBVIEW_ON_PROGRESS_CHANGED("m_d_ac_wpc"),
+        APPLICATION_CRASH_WEBVIEW_RECEIVED_PAGE_TITLE("m_d_ac_wpt"),
+        APPLICATION_CRASH_WEBVIEW_SHOW_FILE_CHOOSER("m_d_ac_wfc"),
+
         WEB_RENDERER_GONE_CRASH("m_d_wrg_c"),
         WEB_RENDERER_GONE_KILLED("m_d_wrg_k"),
         BROKEN_SITE_REPORTED("m_bsr"),
@@ -58,8 +73,6 @@ interface Pixel {
         HTTPS_SERVICE_REQUEST_NO_UPGRADE("m_https_srn"),
         HTTPS_SERVICE_CACHE_NO_UPGRADE("m_https_scn"),
 
-        TRACKER_BLOCKER_HISTORICAL_ON(pixelName = "m_tb_on_h"),
-        TRACKER_BLOCKER_HISTORICAL_OFF(pixelName = "m_tb_off_h"),
         TRACKER_BLOCKER_DASHBOARD_TURNED_ON(pixelName = "m_tb_on_pd"),
         TRACKER_BLOCKER_DASHBOARD_TURNED_OFF(pixelName = "m_tb_off_pd"),
 
@@ -90,7 +103,6 @@ interface Pixel {
         NOTIFICATION_SHOWN("mnot_s"),
         NOTIFICATION_LAUNCHED("mnot_l"),
         NOTIFICATION_CANCELLED("mnot_c"),
-
         NOTIFICATIONS_ENABLED("mnot_e"),
         NOTIFICATIONS_DISABLED("mnot_d"),
 
@@ -132,6 +144,7 @@ interface Pixel {
         const val APP_VERSION = "appVersion"
         const val URL = "url"
         const val COUNT = "count"
+        const val EXCEPTION_MESSAGE = "m"
         const val BOOKMARK_CAPABLE = "bc"
         const val SHOWED_BOOKMARKS = "sb"
         const val DEFAULT_BROWSER_BEHAVIOUR_TRIGGERED = "bt"

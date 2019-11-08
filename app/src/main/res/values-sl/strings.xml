@@ -1,13 +1,14 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logotip DuckDuckGo</string>
+    <string name="appDescription">Poenostavljena zasebnost</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Naj bo zasebnost privzeta</string>
     <string name="onboardingDefaultBrowserDescription">Vsakič obiščite Nastavitve za iskanje in brskanje z DuckDuckGo.</string>
-    <string name="onboardingDefaultBrowserGoToSettingsAction">Pojdite na Nastavitve</string>
     <string name="onboardingContinue">Nadaljujte</string>
     <string name="onboardingContinueFinalPage">Začnite brskati</string>
+    <string name="onboardingDefaultBrowserTitle">Nastavi aplikacijo DuckDuckGo kot privzeto</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Najdite vaš notranji mir</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Dobrodošli v\nDuckDuckGo!</string>
@@ -24,6 +25,11 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Zaslona privzetih nastavitev aplikacije ni mogoče zagnati</string>
     <string name="settingsDefaultBrowserEnabled">Nastavite za privzeti brskalnik</string>
+    <string name="defaultBrowserMaybeLater">Mogoče kasneje</string>
+    <string name="defaultBrowserLetsDoIt">Zanima me!</string>
+    <string name="defaultBrowserDescriptionNoDefault">Bodite pomirjeni, ko odpirate povezave.</string>
+    <string name="defaultBrowserDescriptionDefaultSet">Z aplikacijo DuckDuckGo so vaši spletni podatki privzeto bolj zasebni, ne glede na to, kam vas vodi internet.</string>
+    <string name="defaultBrowserInstructions">Izberite aplikacijo DuckDuckGo in tapnite <font color="#678fff">Vedno</font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Meni brskalnika</string>
@@ -76,9 +82,6 @@
     <string name="openImageInNewTab">Odpri sliko na zavihku v ozadju</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Zapri</string>
-    <string name="tapFireDirective">Tapnite </string>
-    <string name="tapFireIconDescription">sprožilni gumb,</string>
-    <string name="tapFireExplanation"> da se vse pozabi</string>
     <string name="closeAllTabsMenuItem">Zapri vse zavihke</string>
 
     <!-- Privacy Dashboard Activities -->
@@ -208,6 +211,7 @@
     <string name="bookmarkOverflowContentDescription">Več možnosti za zaznamek %s</string>
     <string name="delete">Izbriši</string>
     <string name="edit">Uredi</string>
+    <string name="bookmarkEdited">Zaznamek je dodan</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Poišči DuckDuckGo</string>

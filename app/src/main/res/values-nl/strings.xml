@@ -1,13 +1,14 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
+    <string name="appDescription">Privacy, vereenvoudigd</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Zorg dat je standaard privacy hebt</string>
     <string name="onboardingDefaultBrowserDescription">Ga naar Instellingen om elke keer te zoeken en te browsen met DuckDuckGo.</string>
-    <string name="onboardingDefaultBrowserGoToSettingsAction">Ga naar Instellingen</string>
     <string name="onboardingContinue">Ga verder</string>
     <string name="onboardingContinueFinalPage">Start met browsen</string>
+    <string name="onboardingDefaultBrowserTitle">Stel DuckDuckGo in als uw standaardinstelling</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Zeg hallo tegen gemoedsrust.</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Welkom bij\nDuckDuckGo!</string>
@@ -24,6 +25,11 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Kan het scherm voor standaard app-instellingen niet openen</string>
     <string name="settingsDefaultBrowserEnabled">Instellen als standaard browser</string>
+    <string name="defaultBrowserMaybeLater">Later misschien</string>
+    <string name="defaultBrowserLetsDoIt">Laten we het doen!</string>
+    <string name="defaultBrowserDescriptionNoDefault">Elke keer links in een rustige toestand openen.</string>
+    <string name="defaultBrowserDescriptionDefaultSet">Dankzij DuckDuckGo zijn uw online gegevens standaard beter beschermt, waar het Internet u ook brengt.</string>
+    <string name="defaultBrowserInstructions">Selecteer DuckDuckGo en tik op <font color="#678fff"> Altijd </font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Browser menu</string>
@@ -76,9 +82,6 @@
     <string name="openImageInNewTab">Afbeelding openen in tabblad op achtergrond</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Sluiten</string>
-    <string name="tapFireDirective">Tik </string>
-    <string name="tapFireIconDescription">vuur</string>
-    <string name="tapFireExplanation"> om alles te vergeten</string>
     <string name="closeAllTabsMenuItem">Alle tabbladen sluiten</string>
 
     <!-- Privacy Dashboard Activities -->
@@ -200,6 +203,7 @@
     <string name="bookmarkOverflowContentDescription">Meer opties voor bladwijzer %s</string>
     <string name="delete">Verwijderen</string>
     <string name="edit">Bewerken</string>
+    <string name="bookmarkEdited">Bladwijzer toegevoegd</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">DuckDuckGo doorzoeken</string>

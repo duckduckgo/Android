@@ -37,56 +37,6 @@ class VariantManagerTest {
         assertEquals(0, variant.features.size)
     }
 
-    @Test
-    fun tabUxExperimentVariantActive() {
-        val variant = variants.firstOrNull { it.key == "mx" }
-        assertEqualsDouble(1.0, variant!!.weight)
-    }
-
-    @Test
-    fun tabUxExperimentVariantHasExperimentalFeatureForGridTabSwitcher() {
-        val variant = variants.firstOrNull { it.key == "mx" }
-        assertEquals(1, variant!!.features.size)
-        assertTrue(variant.hasFeature(VariantManager.VariantFeature.TabSwitcherGrid))
-    }
-
-    @Test
-    fun tabUxControlGroupVariantActive() {
-        val variant = variants.firstOrNull { it.key == "mw" }
-        assertEqualsDouble(1.0, variant!!.weight)
-    }
-
-    @Test
-    fun tabUxControlGroupVariantHasNoExperimentFeatures() {
-        val variant = variants.firstOrNull { it.key == "mw" }
-        assertEquals(0, variant!!.features.size)
-    }
-
-    @Test
-    fun defaultBrowserDialogExperimentVariantActive() {
-        val variant = variants.firstOrNull { it.key == "mo" }
-        assertEqualsDouble(1.0, variant!!.weight)
-    }
-
-    @Test
-    fun defaultBrowserDialogExperimentVariantHasExperimentalFeatureForOnboardingExperiment() {
-        val variant = variants.firstOrNull { it.key == "mo" }
-        assertEquals(1, variant!!.features.size)
-        assertTrue(variant.hasFeature(VariantManager.VariantFeature.OnboardingExperiment))
-    }
-
-    @Test
-    fun defaultBrowserDialogControlGroupVariantActive() {
-        val variant = variants.firstOrNull { it.key == "mp" }
-        assertEqualsDouble(1.0, variant!!.weight)
-    }
-
-    @Test
-    fun defaultBrowserDialogControlGroupVariantHasNoExperimentFeatures() {
-        val variant = variants.firstOrNull { it.key == "mp" }
-        assertEquals(0, variant!!.features.size)
-    }
-
     @Suppress("SameParameterValue")
     private fun assertEqualsDouble(expected: Double, actual: Double) {
         val comparison = expected.compareTo(actual)
