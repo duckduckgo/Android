@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection
 
-import com.duckduckgo.app.global.UriString
+import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.trackerdetection.model.ResourceType
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
 import com.duckduckgo.app.trackerdetection.model.TdsTracker.Action.BLOCK
@@ -24,15 +24,14 @@ import com.duckduckgo.app.trackerdetection.model.TdsTracker.Action.BLOCK
 class TdsClient(override val name: Client.ClientName, private val trackers: List<TdsTracker>) : Client {
 
     override fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean {
-        val domain = UriString.host(url) ?: return false
-        var tracker = trackers.firstOrNull { it.domain == domain } ?: return false
+        var tracker = trackers.firstOrNull { sameOrSubdomain(url, it.domain) }
 
-        if (tracker.defaultAction == BLOCK) {
+        if (tracker?.defaultAction == BLOCK) {
             return true
         }
 
         //TODO rule checks
-        //TODO what about subdomains?
+        //TODO check subdomain rules
         return false
     }
 }

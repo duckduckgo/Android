@@ -63,7 +63,7 @@ class TdsClientTest {
 
     @Test
     fun whenUrlIsAParentDomainOfATrackerThenMatchesIsFalse() {
-        val data = listOf(TdsTracker("tracker.com", BLOCK, owner))
+        val data = listOf(TdsTracker("subdomain.tracker.com", BLOCK, owner))
         val testee = TdsClient(Client.ClientName.TDS, data)
         assertFalse(testee.matches("http://tracker.com/script.js", documentUrl, resourceType))
     }
