@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Λογότυπο DuckDuckGo</string>
+    <string name="appDescription">Ιδιωτικότητα, απλοποιημένη</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Επισκεφθείτε τις Ρυθμίσεις για να εκτελείτε κάθε φορά αναζήτηση και περιήγηση με το DuckDuckGo.</string>

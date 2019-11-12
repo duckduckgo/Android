@@ -24,7 +24,7 @@
         <!-- Disable WorkManager's default initialization so we can use Dagger with it -->
         <provider
             android:name="androidx.work.impl.WorkManagerInitializer"
-            android:authorities="com.duckduckgo.app.browser.workmanager-init"
+            android:authorities="${applicationId}.workmanager-init"
             android:enabled="false"
             android:exported="false"
             tools:replace="android:authorities" />
@@ -53,6 +53,7 @@
 
         <activity
             android:name=".BrowserActivity"
+            android:label="@string/appDescription"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize|stateHidden">
