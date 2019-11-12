@@ -115,9 +115,8 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
     }
 
     override fun onCreateWindow(view: WebView?, isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message?): Boolean {
-        val resultObject = resultMsg?.obj
-        if (isUserGesture && resultObject is WebView.WebViewTransport) {
-            webViewClientListener?.openMessageInNewTab(resultMsg, resultObject)
+        if (isUserGesture && resultMsg?.obj is WebView.WebViewTransport) {
+            webViewClientListener?.openMessageInNewTab(resultMsg)
             return true
         }
         return false

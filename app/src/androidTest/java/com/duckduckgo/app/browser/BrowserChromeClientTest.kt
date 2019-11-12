@@ -95,7 +95,7 @@ class BrowserChromeClientTest {
     @Test
     fun whenOnCreateWindowWithUserGestureThenMessageOpenedInNewTab() {
         testee.onCreateWindow(webView, isDialog = false, isUserGesture = true, resultMsg = mockMsg)
-        verify(mockWebViewClientListener).openMessageInNewTab(eq(mockMsg), eq(mockMsg.obj as WebView.WebViewTransport))
+        verify(mockWebViewClientListener).openMessageInNewTab(eq(mockMsg))
         verifyNoMoreInteractions(mockWebViewClientListener)
     }
 

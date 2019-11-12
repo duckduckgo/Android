@@ -247,10 +247,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         if (savedInstanceState == null) {
             viewModel.onViewReady()
             messageFromPreviousTab?.let {
-                val transport = it.obj as WebView.WebViewTransport
-                transport.webView = webView
-                it.sendToTarget()
-                viewModel.onNewTarget()
+                processMessage(it)
             }
         }
 
@@ -262,6 +259,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 }
             }
         })
+    }
+
+    private fun processMessage(message: Message) {
+        val transport = message.obj as WebView.WebViewTransport
+        transport.webView = webView
+        message.sendToTarget()
+        val tabsButton = tabsButton?.actionView as TabSwitcherButton
+        tabsButton.animateCount()
+        viewModel.onMessageProcessed()
     }
 
     private fun updateOrDeleteWebViewPreview() {

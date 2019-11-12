@@ -43,7 +43,7 @@ interface WebViewClientListener {
     fun showFileChooser(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams)
     fun externalAppLinkClicked(appLink: SpecialUrlDetector.UrlType.IntentType)
     fun openInNewTab(url: String?)
-    fun openMessageInNewTab(message: Message, transport: WebView.WebViewTransport)
+    fun openMessageInNewTab(message: Message)
 
     fun requiresAuthentication(request: BasicAuthenticationRequest)
 }

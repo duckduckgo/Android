@@ -157,7 +157,7 @@ class BrowserTabViewModel(
         class NavigateBack(val steps: Int) : Command()
         object NavigateForward : Command()
         class OpenInNewTab(val query: String) : Command()
-        class OpenMessageInNewTab(val message: Message, val transport: WebView.WebViewTransport) : Command()
+        class OpenMessageInNewTab(val message: Message) : Command()
         class OpenInNewBackgroundTab(val query: String) : Command()
         object LaunchNewTab : Command()
         object ResetHistory : Command()
@@ -244,7 +244,7 @@ class BrowserTabViewModel(
         }
     }
 
-    fun onNewTarget() {
+    fun onMessageProcessed() {
         showBrowser()
     }
 
@@ -766,10 +766,7 @@ class BrowserTabViewModel(
     }
 
     fun showBrowser() {
-        Timber.d("MIA in showing browser, current state is ${currentBrowserViewState()}")
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true)
-        Timber.d("MIA in showing browser, current state is ${currentBrowserViewState()}")
-
         globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
     }
 
@@ -869,8 +866,8 @@ class BrowserTabViewModel(
         command.value = OpenInNewTab(url.orEmpty())
     }
 
-    override fun openMessageInNewTab(message: Message, transport: WebView.WebViewTransport) {
-        command.value = OpenMessageInNewTab(message, transport)
+    override fun openMessageInNewTab(message: Message) {
+        command.value = OpenMessageInNewTab(message)
     }
 
     override fun requiresAuthentication(request: BasicAuthenticationRequest) {

@@ -23,7 +23,6 @@ import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
 import android.os.Bundle
 import android.os.Message
-import android.webkit.WebView
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
@@ -48,7 +47,6 @@ import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import kotlinx.android.synthetic.main.activity_browser.*
-import kotlinx.android.synthetic.main.activity_user_survey.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.longToast
 import timber.log.Timber
