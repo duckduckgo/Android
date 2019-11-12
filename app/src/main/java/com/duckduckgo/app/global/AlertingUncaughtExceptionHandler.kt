@@ -20,8 +20,8 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 class AlertingUncaughtExceptionHandler(
     private val originalHandler: Thread.UncaughtExceptionHandler,
@@ -30,11 +30,12 @@ class AlertingUncaughtExceptionHandler(
 ) : Thread.UncaughtExceptionHandler {
 
     override fun uncaughtException(t: Thread?, originalException: Throwable?) {
-        GlobalScope.launch(Dispatchers.IO) {
-            uncaughtExceptionRepository.recordUncaughtException(originalException, UncaughtExceptionSource.GLOBAL)
-
-            offlinePixelCountDataStore.applicationCrashCount += 1
-            originalHandler.uncaughtException(t, originalException)
+        runBlocking {
+            withContext(Dispatchers.IO) {
+                uncaughtExceptionRepository.recordUncaughtException(originalException, UncaughtExceptionSource.GLOBAL)
+                offlinePixelCountDataStore.applicationCrashCount += 1
+                originalHandler.uncaughtException(t, originalException)
+            }
         }
     }
 }
