@@ -16,207 +16,159 @@
 
 package com.duckduckgo.app.global.view
 
-import android.animation.PropertyValuesHolder
-import android.animation.ValueAnimator
 import android.app.Dialog
-import android.content.Context
-import android.graphics.Canvas
+import android.content.DialogInterface
 import android.graphics.Color
-import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.os.Handler
-import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
-import android.view.WindowManager
 import android.view.Gravity
-import android.view.MenuInflater
-import android.view.MenuItem
 import androidx.constraintlayout.widget.ConstraintLayout
 import kotlinx.android.synthetic.main.sheet_dax_dialog.*
-import android.view.animation.AnimationSet
-import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
-import android.view.animation.LinearInterpolator
 import android.view.animation.OvershootInterpolator
 import android.view.animation.ScaleAnimation
-import android.view.animation.TranslateAnimation
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.RelativeLayout
-import android.widget.TextView
-import androidx.appcompat.widget.Toolbar
-import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.content.ContextCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 
+class DaxBottomSheetDialog(
+    private val daxText: String,
+    private val buttonText: String,
+    private val dismissible: Boolean = true,
+    private val typingDelayInMs: Long = 20
+) :
+    DialogFragment(), CoroutineScope {
 
-class DaxBottomSheetDialog(val clickOk: () -> Unit, val test: View, val other: View) : DialogFragment(),
-    CoroutineScope {
-
-    private val clearJob: Job = Job()
+    private val animationJob: Job = Job()
+    private var typingAnimationJob: Job? = null
+    private var afterAnimation: () -> Unit = {}
+    private var clickListener: () -> Unit = { dismiss() }
 
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + clearJob
+        get() = Dispatchers.Main + animationJob
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+        inflater.inflate(R.layout.sheet_dax_dialog, container, false)
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
         val window = dialog.window
-        val wlp = window?.attributes
-        wlp?.gravity = Gravity.BOTTOM
-        wlp?.width = WindowManager.LayoutParams.MATCH_PARENT
-        wlp?.verticalMargin = 20f
-        //wlp?.height= WindowManager.LayoutParams.MATCH_PARENT
+        val attributes = window?.attributes
+
+        attributes?.gravity = Gravity.BOTTOM
+        window?.attributes = attributes
         window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        window?.attributes = wlp
 
         return dialog
     }
 
+    override fun onCancel(dialog: DialogInterface) {
+        typingAnimationJob?.cancel()
+        super.onCancel(dialog)
+    }
+
     override fun onStart() {
         super.onStart()
-        dialog?.window?.setLayout(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.WRAP_CONTENT)
+        dialog?.window?.setLayout(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT)
+
+        primaryCta.text = buttonText
+
         primaryCta.setOnClickListener {
-            marcosTest?.cancel()
-            dismiss()
-        }
-        secondaryCta.setOnClickListener {
-            marcosTest?.cancel()
-            dismiss()
+            typingAnimationJob?.cancel()
+            clickListener()
         }
 
-        val handler = Handler()
+        hiddenText.text = daxText
 
+        typingAnimationJob = launch {
+            startTypingAnimation(daxText, afterAnimation)
+        }
 
-        marcosTest = launch {
-            dialogText.animate2("Every site has a privacy grade. Tap it to see how I protected your privacy.\n\nWant to get fancy? Try clearing your data by hitting the fire button.") {
-                handler.postDelayed(
-                    {
-                        test(other)
-                        test(test)
-                    }
-                    , 300)
+        if (dismissible) {
+            dialogContainer.setOnClickListener {
+                typingAnimationJob?.cancel()
+                dismiss()
+            }
+        }
+
+        dialogText.setOnClickListener {
+            if ((typingAnimationJob as Job).isActive) {
+                typingAnimationJob?.cancel()
+                dialogText.text = daxText
+                afterAnimation()
             }
         }
     }
 
-    var marcosTest : Job? = null
-
-    fun test(targetView: View) {
-        Timber.d("MARCOS executed yes! ")
-        // val myLayout: LinearLayout = requireActivity().findViewById(R.id.dialogContainer)
-
-        val myButton = ImageView(requireContext())
-        myButton.id = View.generateViewId()
-
-        myButton.setImageResource(R.drawable.ic_circle)
-        //myButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.midGreen))
-        //myButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.midGreen))
-
-//        myButton.layoutParams = params
-
-
-//        val constraints = ConstraintSet()
-//        constraints.clone(dialogContainer)
-//
-//        constraints.connect(myButton.id, ConstraintSet.START, ConstraintSet.START, test.itemId)
-//
-//        constraints.connect(myButton.id, ConstraintSet.END, ConstraintSet.END, test.itemId)
-//
-//        constraints.applyTo(dialogContainer)
-
-        // statusbar height
-
-        val rec = Rect()
-        val window = requireActivity().window
-
-        window.decorView.getWindowVisibleDisplayFrame(rec)
-        val statusheight = rec.top
-
-
-        // enf status bar height
-
-        val a: IntArray = intArrayOf(0, 0)
-        val r: Rect = Rect()
-        targetView.getLocationOnScreen(a)
-        val b = targetView.clipBounds
-        //  params.leftMargin = (a[0] + (a[0] + targetView.width)) / 2
-//        params.topMargin = ((a[1] - statusheight) + ((a[1] - statusheight) + targetView.height)) / 2
-
-        val width = (targetView.width)
-        val height = targetView.height // (a[1])// - statusheight) //+ targetView.height
-        val params = RelativeLayout.LayoutParams(
-            width + (width / 6),
-            height + (height / 6)
-        )
-//        targetView.x = a[0].toFloat()
-//        targetView.y = (a[1] - statusheight).toFloat()
-
-        params.leftMargin = a[0] - ((width / 6) / 2)
-        params.topMargin = (a[1] - statusheight) - ((width / 6) / 2)
-
-        Timber.d("MARCOS view: ${targetView.id}")
-        Timber.d("MARCOS height: ${height}")
-        Timber.d("MARCOS width: ${width}")
-        Timber.d("MARCOS left: ${params.leftMargin}")
-        Timber.d("MARCOS top: ${params.topMargin}")
-
-        dialogContainer.addView(myButton, params)
-
-
-        val fade_in: ScaleAnimation = ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
-        fade_in.setDuration(400)     // animation duration in milliseconds
-        fade_in.setFillAfter(true)    // If fillAfter is true, the transformation that this animation performed will persist when it is finished.
-        fade_in.interpolator = OvershootInterpolator(3f)
-        myButton.startAnimation(fade_in)
-
-        val righttopcorner = ImageView(requireContext())
-        righttopcorner.id = View.generateViewId()
-        righttopcorner.setImageResource(R.drawable.ic_circle)
-        righttopcorner.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.cornflowerBlue))
-        val params2 = RelativeLayout.LayoutParams(
-            20,
-            20
-        )
-        params2.leftMargin = a[0]
-        params2.topMargin = (a[1] - statusheight)
-
-        //    dialogContainer.addView(righttopcorner, params2)
-
-        val bottomrightcorner = ImageView(requireContext())
-        bottomrightcorner.id = View.generateViewId()
-        bottomrightcorner.setImageResource(R.drawable.ic_circle)
-        val params3 = RelativeLayout.LayoutParams(
-            20,
-            20
-        )
-        params3.leftMargin = a[0] + targetView.width
-        params3.topMargin = (a[1] - statusheight) + targetView.height
-
-//        dialogContainer.addView(bottomrightcorner, params3)
-
-
-//        val rect = test.icon.bounds
-//        val v = MarcosTest(requireContext())
-//        v.setView(rect)
-//
-//        test.actionView = v
-//
-//        v.startMyAnimation()
+    fun afterAnimationListener(afterAnimation: () -> Unit = {}) {
+        this.afterAnimation = afterAnimation
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.sheet_dax_dialog, container, false)
-        //return super.onCreateView(inflater, container, savedInstanceState)
+    fun setClickListener(clickListener: () -> Unit = { dismiss() }) {
+        this.clickListener = clickListener
+    }
+
+    fun startHighlightViewAnimation(targetView: View, duration: Long = 400, size: Float = 6f) {
+        val highlightImageView = ImageView(requireContext())
+
+        highlightImageView.id = View.generateViewId()
+        highlightImageView.setImageResource(R.drawable.ic_circle)
+
+
+        // calculate status bar height
+        val rec = Rect()
+        val window = requireActivity().window
+        window.decorView.getWindowVisibleDisplayFrame(rec)
+        val statusBarHeight = rec.top
+
+        // target view location and size
+        val width = targetView.width
+        val height = targetView.height
+        val a: IntArray = intArrayOf(0, 0)
+        targetView.getLocationOnScreen(a)
+
+        // set size of view using a multiplier to make it bigger
+        val params = RelativeLayout.LayoutParams(
+            width + (width / size).toInt(),
+            height + (height / size).toInt()
+        )
+
+        // set margins to position on top of target view
+        params.leftMargin = a[0] - ((width / size) / 2).toInt()
+        params.topMargin = (a[1] - statusBarHeight) - ((width / size) / 2).toInt()
+
+        // add view
+        dialogContainer.addView(highlightImageView, params)
+
+        // animate
+        val fadeInAnimation = ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
+        fadeInAnimation.duration = duration
+        fadeInAnimation.fillAfter = true
+        fadeInAnimation.interpolator = OvershootInterpolator(3f)
+        highlightImageView.startAnimation(fadeInAnimation)
+    }
+
+    private suspend fun startTypingAnimation(inputText: CharSequence, afterAnimation: () -> Unit = {}) {
+        withContext(Dispatchers.Main) {
+            launch {
+                inputText.mapIndexed { index, _ ->
+                    dialogText.text = inputText.subSequence(0, index)
+                    delay(typingDelayInMs)
+                }
+                afterAnimation()
+            }
+        }
     }
 }
