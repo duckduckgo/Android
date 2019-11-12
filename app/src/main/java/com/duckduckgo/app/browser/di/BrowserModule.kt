@@ -174,7 +174,7 @@ class BrowserModule {
     @Provides
     @Singleton
     @Named(SpecialUrlHandler.SUB_FRAME_HANDLER)
-    fun nonMainFrameUrlHandler(requestRewriter: RequestRewriter): SpecialUrlHandler {
+    fun nonMainFrameUrlHandler(): SpecialUrlHandler {
         return SubFrameUrlHandler()
     }
 }
