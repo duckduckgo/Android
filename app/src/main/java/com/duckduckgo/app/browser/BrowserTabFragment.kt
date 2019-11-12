@@ -26,7 +26,6 @@ import android.appwidget.AppWidgetManager
 import android.content.*
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.graphics.drawable.Animatable
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
@@ -34,7 +33,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.text.Editable
-import android.util.TypedValue
 import android.view.*
 import android.view.View.*
 import android.view.inputmethod.EditorInfo
@@ -105,7 +103,6 @@ import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
 import java.io.File
-import java.lang.Runnable
 import javax.inject.Inject
 import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
@@ -260,29 +257,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 }
             }
         })
-//
-//        val fireButton = requireActivity().findViewById<View>(R.id.fire)
-//        val gradeView = requireActivity().findViewById<View>(R.id.privacyGradeButton)
-//
-//        val dialog = DaxBottomSheetDialog({}, fireButton, gradeView)
-//
-//
-////        val outValue = TypedValue()
-////        requireContext().getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
-////        fireMenuButton!!.icon.setBackgroundResource(outValue.resourceId);
-//
-//      val handler = Handler()
-//        handler.postDelayed(
-//            {
-//                dialog.show(requireFragmentManager(), "MARCOS")
-//            }
-//            , 1600)
-
-
-//        val drawable = fireMenuButton?.icon
-//        if (drawable is Animatable) {
-//            drawable.start()
-//        }
     }
 
     private fun updateOrDeleteWebViewPreview() {
@@ -1132,15 +1106,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 pageLoadingIndicator.apply {
                     if (viewState.isLoading) show() else hide()
                     progress = viewState.progress
-                }
-
-                if (viewState.progress == 100 && (0..10).random() % 3 == 0) {
-                    val fireButton = requireActivity().findViewById<View>(R.id.fire)
-                    val gradeView = requireActivity().findViewById<View>(R.id.privacyGradeButton)
-
-                    val dialog = DaxBottomSheetDialog({}, fireButton, gradeView)
-
-                    dialog.show(requireFragmentManager(), "MARCOS")
                 }
             }
         }

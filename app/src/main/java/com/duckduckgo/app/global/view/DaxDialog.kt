@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 
-class DaxBottomSheetDialog(
+class DaxDialog(
     private val daxText: String,
     private val buttonText: String,
     private val dismissible: Boolean = true,
@@ -53,7 +53,7 @@ class DaxBottomSheetDialog(
 
     private val animationJob: Job = Job()
     private var typingAnimationJob: Job? = null
-    private var afterAnimation: () -> Unit = {}
+    private var onAnimationFinished: () -> Unit = {}
     private var clickListener: () -> Unit = { dismiss() }
 
     override val coroutineContext: CoroutineContext
@@ -81,19 +81,36 @@ class DaxBottomSheetDialog(
 
     override fun onStart() {
         super.onStart()
-        dialog?.window?.setLayout(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT)
+        setDialog()
+        setListeners()
 
-        primaryCta.text = buttonText
+        typingAnimationJob = launch {
+            startTypingAnimation(daxText, onAnimationFinished)
+        }
+    }
 
+    fun onAnimationFinishedListener(onAnimationFinished: () -> Unit = {}) {
+        this.onAnimationFinished = onAnimationFinished
+    }
+
+    fun setClickListener(clickListener: () -> Unit = { dismiss() }) {
+        this.clickListener = clickListener
+    }
+
+    fun startHighlightViewAnimation(targetView: View, duration: Long = 400, size: Float = 6f) {
+        val highlightImageView = addHighlightView(targetView, size)
+
+        val fadeInAnimation = ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
+        fadeInAnimation.duration = duration
+        fadeInAnimation.fillAfter = true
+        fadeInAnimation.interpolator = OvershootInterpolator(3f)
+        highlightImageView.startAnimation(fadeInAnimation)
+    }
+
+    private fun setListeners() {
         primaryCta.setOnClickListener {
             typingAnimationJob?.cancel()
             clickListener()
-        }
-
-        hiddenText.text = daxText
-
-        typingAnimationJob = launch {
-            startTypingAnimation(daxText, afterAnimation)
         }
 
         if (dismissible) {
@@ -107,57 +124,40 @@ class DaxBottomSheetDialog(
             if ((typingAnimationJob as Job).isActive) {
                 typingAnimationJob?.cancel()
                 dialogText.text = daxText
-                afterAnimation()
+                onAnimationFinished()
             }
         }
     }
 
-    fun afterAnimationListener(afterAnimation: () -> Unit = {}) {
-        this.afterAnimation = afterAnimation
+    private fun setDialog() {
+        dialog?.window?.setLayout(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT)
+        hiddenText.text = daxText
+        primaryCta.text = buttonText
     }
 
-    fun setClickListener(clickListener: () -> Unit = { dismiss() }) {
-        this.clickListener = clickListener
-    }
 
-    fun startHighlightViewAnimation(targetView: View, duration: Long = 400, size: Float = 6f) {
+    private fun addHighlightView(targetView: View, size: Float): View {
         val highlightImageView = ImageView(requireContext())
-
         highlightImageView.id = View.generateViewId()
         highlightImageView.setImageResource(R.drawable.ic_circle)
 
-
-        // calculate status bar height
         val rec = Rect()
         val window = requireActivity().window
         window.decorView.getWindowVisibleDisplayFrame(rec)
         val statusBarHeight = rec.top
 
-        // target view location and size
         val width = targetView.width
         val height = targetView.height
         val a: IntArray = intArrayOf(0, 0)
         targetView.getLocationOnScreen(a)
 
-        // set size of view using a multiplier to make it bigger
-        val params = RelativeLayout.LayoutParams(
-            width + (width / size).toInt(),
-            height + (height / size).toInt()
-        )
-
-        // set margins to position on top of target view
+        val params = RelativeLayout.LayoutParams(width + (width / size).toInt(), height + (height / size).toInt())
         params.leftMargin = a[0] - ((width / size) / 2).toInt()
         params.topMargin = (a[1] - statusBarHeight) - ((width / size) / 2).toInt()
 
-        // add view
         dialogContainer.addView(highlightImageView, params)
 
-        // animate
-        val fadeInAnimation = ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
-        fadeInAnimation.duration = duration
-        fadeInAnimation.fillAfter = true
-        fadeInAnimation.interpolator = OvershootInterpolator(3f)
-        highlightImageView.startAnimation(fadeInAnimation)
+        return highlightImageView
     }
 
     private suspend fun startTypingAnimation(inputText: CharSequence, afterAnimation: () -> Unit = {}) {
