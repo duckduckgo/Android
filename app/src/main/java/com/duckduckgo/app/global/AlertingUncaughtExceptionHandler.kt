@@ -30,12 +30,15 @@ class AlertingUncaughtExceptionHandler(
 ) : Thread.UncaughtExceptionHandler {
 
     override fun uncaughtException(t: Thread?, originalException: Throwable?) {
+
+        // block until the exception has been fully processed
         runBlocking {
             withContext(Dispatchers.IO) {
                 uncaughtExceptionRepository.recordUncaughtException(originalException, UncaughtExceptionSource.GLOBAL)
                 offlinePixelCountDataStore.applicationCrashCount += 1
-                originalHandler.uncaughtException(t, originalException)
             }
         }
+        originalHandler.uncaughtException(t, originalException)
     }
+
 }
