@@ -21,30 +21,26 @@ import android.webkit.WebBackForwardList
 import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
 
 class WebViewBackForwardListSafeExtractorTest {
 
-    @UiThreadTest
-    @Test(expected = NullPointerException::class)
-    fun whenCopyBackForwardListCalledTestWebViewThrowsException() {
-        val testWebView = TestWebViewThrowsNullPointerException(getInstrumentation().targetContext)
-        testWebView.copyBackForwardList()
-    }
+    private val context = getInstrumentation().targetContext
 
     @UiThreadTest
     @Test
     fun whenCopyBackForwardListCalledAndExceptionThrownThenNavigationListIsNull() {
-        val testWebView = TestWebViewThrowsNullPointerException(getInstrumentation().targetContext)
+        val testWebView = TestWebViewThrowsNullPointerException(context)
         assertNull(testWebView.safeCopyBackForwardList())
     }
 
     @UiThreadTest
     @Test
     fun whenCopyBackForwardListCalledAndNoExceptionThrownThenNavigationListIsNotNull() {
-        val testWebView = TestWebViewThrowsNullPointerException(getInstrumentation().targetContext)
-        assertNull(testWebView.safeCopyBackForwardList())
+        val testWebView = WebView(context)
+        assertNotNull(testWebView.safeCopyBackForwardList())
     }
 }
 
