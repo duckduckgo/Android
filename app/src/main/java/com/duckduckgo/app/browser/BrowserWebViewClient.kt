@@ -26,6 +26,7 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.BrowserWebViewClient.RequestOrigin.MainFrame
 import com.duckduckgo.app.browser.BrowserWebViewClient.RequestOrigin.SubFrame
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
+import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
@@ -88,7 +89,8 @@ class BrowserWebViewClient(
     @UiThread
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
         try {
-            webViewClientListener?.navigationStateChanged(WebViewNavigationState(webView.copyBackForwardList()))
+            val navigationList = webView.safeCopyBackForwardList() ?: return
+            webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
             if (url != null && url == lastPageStarted) {
                 webViewClientListener?.pageRefreshed(url)
             }
@@ -104,7 +106,8 @@ class BrowserWebViewClient(
     @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
         try {
-            webViewClientListener?.navigationStateChanged(WebViewNavigationState(webView.copyBackForwardList()))
+            val navigationList = webView.safeCopyBackForwardList() ?: return
+            webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
         } catch (e: Throwable) {
             GlobalScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_FINISHED)
