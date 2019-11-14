@@ -62,6 +62,7 @@ import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
+import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
@@ -1131,6 +1132,15 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val command = commandCaptor.lastValue
         assertTrue(command is Command.LaunchNewTab)
+    }
+
+    @Test
+    fun whenCloseCurrentTabThenDeleteTabFromRepository() = runBlocking {
+        val liveData = MutableLiveData<TabEntity>()
+        liveData.value = TabEntity("TAB_ID", "", "", false, true, 0)
+        whenever(mockTabsRepository.liveSelectedTab).thenReturn(liveData)
+        testee.closeCurrentTab()
+        verify(mockTabsRepository).delete(liveData.value!!)
     }
 
     @Test

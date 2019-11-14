@@ -40,6 +40,8 @@ import android.webkit.*
 import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
 import android.webkit.WebView.HitTestResult.*
+import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.AnyThread
@@ -216,6 +218,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
+
+    private var alertDialog: AlertDialog? = null
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -426,16 +430,16 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.DialNumber -> {
                 val intent = Intent(Intent.ACTION_DIAL)
                 intent.data = Uri.parse("tel:${it.telephoneNumber}")
-                activity?.launchExternalActivity(intent)
+                openExternalDialog(intent, requireContext())
             }
             is Command.SendEmail -> {
                 val intent = Intent(Intent.ACTION_SENDTO)
                 intent.data = Uri.parse(it.emailAddress)
-                activity?.launchExternalActivity(intent)
+                openExternalDialog(intent, requireContext())
             }
             is Command.SendSms -> {
                 val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${it.telephoneNumber}"))
-                startActivity(intent)
+                openExternalDialog(intent, requireContext())
             }
             Command.ShowKeyboard -> {
                 showKeyboard()
@@ -470,7 +474,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 }
             }
             is Command.HandleExternalAppLink -> {
-                externalAppLinkClicked(it)
+                openExternalDialog(it.appLink.intent, requireContext(), it.appLink.fallbackUrl, false)
             }
             is Command.LaunchSurvey -> launchSurvey(it.survey)
             is Command.LaunchAddWidget -> launchAddWidget()
@@ -511,40 +515,64 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
     }
 
-    private fun externalAppLinkClicked(appLinkCommand: Command.HandleExternalAppLink) {
-        context?.let {
+    private fun openExternalDialog(intent: Intent, context: Context, fallbackUrl: String? = null, showFirstOption: Boolean = true) {
+        context.let {
             val pm = it.packageManager
-            val intent = appLinkCommand.appLink.intent
             val activities = pm.queryIntentActivities(intent, 0)
-
-            Timber.i("Found ${activities.size} that could consume ${appLinkCommand.appLink.url}")
 
             when (activities.size) {
                 0 -> {
-                    if (appLinkCommand.appLink.fallbackUrl != null) {
-                        webView?.loadUrl(appLinkCommand.appLink.fallbackUrl)
+                    if (fallbackUrl != null) {
+                        webView?.loadUrl(fallbackUrl)
                     } else {
                         showToast(R.string.unableToOpenLink)
                     }
                     return
                 }
-                1 -> {
-                    val activity = activities.first()
-                    val appTitle = activity.loadLabel(pm)
-                    Timber.i("Exactly one app available for intent: $appTitle")
-
-                    AlertDialog.Builder(it)
-                        .setTitle(R.string.launchingExternalApp)
-                        .setMessage(getString(R.string.confirmOpenExternalApp))
-                        .setPositiveButton(R.string.openExternalApp) { _, _ -> it.startActivity(intent) }
-                        .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
-                        .show()
-                }
                 else -> {
-                    val title = getString(R.string.openExternalApp)
-                    val intentChooser = Intent.createChooser(intent, title)
-                    it.startActivity(intentChooser)
+                    if (activities.size == 1 || showFirstOption) {
+                        val activity = activities.first()
+                        val appTitle = activity.loadLabel(pm)
+                        Timber.i("Exactly one app available for intent: $appTitle")
+                        launchExternalAppDialog(it) { it.startActivity(intent) }
+                    } else {
+                        val title = getString(R.string.openExternalApp)
+                        val intentChooser = Intent.createChooser(intent, title)
+                        launchExternalAppDialog(it) { it.startActivity(intentChooser) }
+                    }
                 }
+            }
+        }
+    }
+
+    private fun launchExternalAppDialog(context: Context, onClick: () -> Unit) {
+        val isShowing = alertDialog?.isShowing
+
+        if (isShowing == null || !isShowing) {
+            val view = layoutInflater.inflate(R.layout.content_external_app_dialog, null)
+            val checkBox = view.findViewById<CheckBox>(R.id.checkboxDialog)
+
+            alertDialog = AlertDialog.Builder(context)
+                .setView(view)
+                .setTitle(R.string.launchingExternalApp)
+                .setMessage(getString(R.string.confirmOpenExternalApp))
+                .setPositiveButton(R.string.openExternalApp) { _, _ ->
+                    onClick()
+                }
+                .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                    dialog.dismiss()
+                    if (checkBox.isChecked) {
+                        launch {
+                            viewModel.closeCurrentTab()
+                            destroyWebView()
+                        }
+                    }
+                }
+                .show()
+
+            checkBox.setOnCheckedChangeListener { _, isChecked ->
+                val positiveButton: Button? = (alertDialog as AlertDialog).findViewById(android.R.id.button1)
+                positiveButton?.isEnabled = !isChecked
             }
 
         }
