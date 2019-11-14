@@ -2,6 +2,8 @@
 
     <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
     <string name="appDescription">Privatlivets fred, forenklet</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nej</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Besøg Indstillinger for at søge og surfe med DuckDuckGo hver gang.</string>

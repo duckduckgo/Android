@@ -2,6 +2,8 @@
 
     <string name="duckDuckGoLogoDescription">„DuckDuckGo“ logotipas</string>
     <string name="appDescription">Supaprastintas privatumas</string>
+    <string name="yes">Taip</string>
+    <string name="no">Ne</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Jei visada norite ieškoti ir naršyti naudojant „DuckDuckGo“, apsilankykite nustatymuose.</string>

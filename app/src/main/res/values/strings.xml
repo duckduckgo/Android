@@ -3,6 +3,8 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
     <string name="appDescription">Privacy, simplified</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Visit Settings to search and browse with DuckDuckGo every time.</string>

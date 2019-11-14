@@ -550,7 +550,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             alertDialog = AlertDialog.Builder(context)
                 .setTitle(R.string.launchingExternalApp)
                 .setMessage(getString(R.string.confirmOpenExternalApp))
-                .setPositiveButton(android.R.string.yes) { _, _ ->
+                .setPositiveButton(R.string.yes) { _, _ ->
                     onClick()
                 }
                 .setNeutralButton(R.string.closeTab) { dialog, _ ->
@@ -560,7 +560,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                         destroyWebView()
                     }
                 }
-                .setNegativeButton(android.R.string.no) { dialog, _ ->
+                .setNegativeButton(R.string.no) { dialog, _ ->
                     dialog.dismiss()
                 }
                 .show()

@@ -18,6 +18,8 @@
 
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
     <string name="appDescription">La privacy, semplificata</string>
+    <string name="yes">Sì</string>
+    <string name="no">No</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Visita la sezione Impostazioni per effettuare ricerche e navigare sempre con DuckDuckGo.</string>

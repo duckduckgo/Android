@@ -2,6 +2,8 @@
 
     <string name="duckDuckGoLogoDescription">Logótipo do DuckDuckGo</string>
     <string name="appDescription">Privacidade, simplificada</string>
+    <string name="yes">Sim</string>
+    <string name="no">Não</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Visite as Definições para pesquisar e navegar sempre com DuckDuckGo.</string>

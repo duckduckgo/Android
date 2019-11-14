@@ -2,6 +2,8 @@
 
     <string name="duckDuckGoLogoDescription">DuckDuckGo logó</string>
     <string name="appDescription">Adatvédelem, egyszerűsítve</string>
+    <string name="yes">Igen</string>
+    <string name="no">Nem</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">A Beállítások oldalon bármikor kereshetsz és böngészhetsz a DuckDuckGo segítségével.</string>

@@ -18,6 +18,8 @@
 
     <string name="duckDuckGoLogoDescription">DuckDuckGos logotyp</string>
     <string name="appDescription">Förenklad sekretessförklaring</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nej</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Gå till "Inställningar" för att söka och bläddra med DuckDuckGo varje gång.</string>

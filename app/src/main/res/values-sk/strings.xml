@@ -2,6 +2,8 @@
 
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
     <string name="appDescription">Súkromie jednoducho</string>
+    <string name="yes">Áno</string>
+    <string name="no">žiadny</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Na automatické vyhľadávanie a prehliadanie s DuckDuckGo navštívte Nastavenia.</string>

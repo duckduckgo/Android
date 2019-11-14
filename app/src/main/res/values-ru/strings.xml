@@ -18,6 +18,8 @@
 
     <string name="duckDuckGoLogoDescription">Логотип DuckDuckGo</string>
     <string name="appDescription">Максимум конфиденциальности, минимум усилий</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Чтобы сделать DuckDuckGo поисковой системой по умолчанию, перейдите в «Настройки».</string>

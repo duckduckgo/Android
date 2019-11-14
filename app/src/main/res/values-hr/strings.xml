@@ -2,6 +2,8 @@
 
     <string name="duckDuckGoLogoDescription">Logotip DuckDuckGo</string>
     <string name="appDescription">Zaštita privatnosti, pojednostavljeno</string>
+    <string name="yes">Da</string>
+    <string name="no">Ne</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Posjetite Postavke kako biste svaki put pretraživali i pregledavali uz DuckDuckGo.</string>

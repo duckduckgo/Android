@@ -2,6 +2,8 @@
 
     <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
     <string name="appDescription">Tietosuojaa, yksinkertaisesti</string>
+    <string name="yes">Joo</string>
+    <string name="no">Ei</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Siirry asetuksiin hakeaksesi ja selaillaksesi aina DuckDuckGolla.</string>

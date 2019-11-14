@@ -2,6 +2,8 @@
 
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
     <string name="appDescription">Privacy, vereenvoudigd</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nee</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Ga naar Instellingen om elke keer te zoeken en te browsen met DuckDuckGo.</string>

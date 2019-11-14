@@ -2,6 +2,8 @@
 
     <string name="duckDuckGoLogoDescription">Logoul DuckDuckGo</string>
     <string name="appDescription">Despre confidențialitate, pe scurt</string>
+    <string name="yes">Da</string>
+    <string name="no">Nu</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Accesați „Setări” pentru a căuta și naviga cu DuckDuckGo de fiecare dată.</string>
