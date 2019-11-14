@@ -23,8 +23,6 @@ import android.webkit.*
 import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.browser.BrowserWebViewClient.RequestOrigin.MainFrame
-import com.duckduckgo.app.browser.BrowserWebViewClient.RequestOrigin.SubFrame
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
@@ -35,12 +33,11 @@ import java.net.URI
 
 
 class BrowserWebViewClient(
+    private val requestRewriter: RequestRewriter,
     private val specialUrlDetector: SpecialUrlDetector,
     private val requestInterceptor: RequestInterceptor,
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
-    private val mainFrameUrlHandler: SpecialUrlHandler,
-    private val subFrameUrlHandler: SpecialUrlHandler
+    private val uncaughtExceptionRepository: UncaughtExceptionRepository
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -52,8 +49,7 @@ class BrowserWebViewClient(
      */
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         val url = request.url
-        val requestOrigin = if (request.isForMainFrame) MainFrame else SubFrame
-        return shouldOverride(view, url, requestOrigin)
+        return shouldOverride(view, url)
     }
 
     /**
@@ -62,27 +58,52 @@ class BrowserWebViewClient(
     @Suppress("OverridingDeprecatedMember")
     override fun shouldOverrideUrlLoading(view: WebView, urlString: String): Boolean {
         val url = Uri.parse(urlString)
-        return shouldOverride(view, url, RequestOrigin.Unknown)
+        return shouldOverride(view, url)
     }
 
     /**
      * API-agnostic implementation of deciding whether to override url or not
      */
-    private fun shouldOverride(webView: WebView, url: Uri, requestOrigin: RequestOrigin): Boolean {
-        return try {
-            Timber.d("Request origin: ${requestOrigin.javaClass.simpleName}, shouldOverride $url")
+    private fun shouldOverride(webView: WebView, url: Uri): Boolean {
+        try {
+            Timber.v("shouldOverride $url")
 
             val urlType = specialUrlDetector.determineType(url)
-            val urlHandler = getUrlHandler(requestOrigin)
-            urlHandler.handleUrl(webView, urlType, webViewClientListener)
 
+            return when (urlType) {
+                is SpecialUrlDetector.UrlType.Email -> consume { webViewClientListener?.sendEmailRequested(urlType.emailAddress) }
+                is SpecialUrlDetector.UrlType.Telephone -> consume { webViewClientListener?.dialTelephoneNumberRequested(urlType.telephoneNumber) }
+                is SpecialUrlDetector.UrlType.Sms -> consume { webViewClientListener?.sendSmsRequested(urlType.telephoneNumber) }
+                is SpecialUrlDetector.UrlType.IntentType -> consume {
+                    Timber.i("Found intent type link for $urlType.url")
+                    launchExternalApp(urlType)
+                }
+                is SpecialUrlDetector.UrlType.Unknown -> {
+                    Timber.w("Unable to process link type for ${urlType.url}")
+                    webView.loadUrl(webView.originalUrl)
+                    return false
+                }
+                is SpecialUrlDetector.UrlType.SearchQuery -> return false
+                is SpecialUrlDetector.UrlType.Web -> {
+                    if (requestRewriter.shouldRewriteRequest(url)) {
+                        val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(url)
+                        webView.loadUrl(newUri.toString())
+                        return true
+                    }
+                    return false
+                }
+            }
         } catch (e: Throwable) {
             GlobalScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, SHOULD_OVERRIDE_REQUEST)
                 throw e
             }
-            false
+            return false
         }
+    }
+
+    private fun launchExternalApp(urlType: SpecialUrlDetector.UrlType.IntentType) {
+        webViewClientListener?.externalAppLinkClicked(urlType)
     }
 
     @UiThread
@@ -203,19 +224,13 @@ class BrowserWebViewClient(
         }
     }
 
-    private fun getUrlHandler(requestOrigin: RequestOrigin): SpecialUrlHandler {
-        return when (requestOrigin) {
-            is MainFrame -> mainFrameUrlHandler
-            is SubFrame -> subFrameUrlHandler
-
-            // ideally we wouldn't have an unknown case, but for now, default to main frame handling for compatibility with existing behaviour
-            is RequestOrigin.Unknown -> mainFrameUrlHandler
-        }
-    }
-
-    sealed class RequestOrigin {
-        object MainFrame : RequestOrigin()
-        object SubFrame : RequestOrigin()
-        object Unknown : RequestOrigin()
+    /**
+     * Utility to function to execute a function, and then return true
+     *
+     * Useful to reduce clutter in repeatedly including `return true` after doing the real work.
+     */
+    private inline fun consume(function: () -> Unit): Boolean {
+        function()
+        return true
     }
 }

@@ -36,25 +36,23 @@ class BrowserWebViewClientTest {
     private lateinit var testee: BrowserWebViewClient
     private lateinit var webView: WebView
 
+    private val requestRewriter: RequestRewriter = mock()
     private val specialUrlDetector: SpecialUrlDetector = mock()
     private val requestInterceptor: RequestInterceptor = mock()
     private val listener: WebViewClientListener = mock()
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore = mock()
     private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
-    private val mainFrameUrlHandler: SpecialUrlHandler = mock()
-    private val subFrameUrlHandler: SpecialUrlHandler = mock()
 
     @UiThreadTest
     @Before
     fun setup() {
         webView = TestWebView(InstrumentationRegistry.getInstrumentation().targetContext)
         testee = BrowserWebViewClient(
+            requestRewriter,
             specialUrlDetector,
             requestInterceptor,
             offlinePixelCountDataStore,
-            uncaughtExceptionRepository,
-            mainFrameUrlHandler,
-            subFrameUrlHandler
+            uncaughtExceptionRepository
         )
         testee.webViewClientListener = listener
     }
