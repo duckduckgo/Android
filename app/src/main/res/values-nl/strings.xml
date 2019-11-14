@@ -83,6 +83,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Sluiten</string>
     <string name="closeAllTabsMenuItem">Alle tabbladen sluiten</string>
+    <string name="closeTab">Tabblad sluiten</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Privacydashboard</string>

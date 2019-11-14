@@ -83,6 +83,7 @@
     <string name="faviconContentDescription">Pohranjena ikona</string>
     <string name="closeContentDescription">Zatvori</string>
     <string name="closeAllTabsMenuItem">Zatvori sve kartice</string>
+    <string name="closeTab">Zatvori kartica</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Nadzorna ploča zaštite privatnosti</string>

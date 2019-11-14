@@ -99,6 +99,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Chiudi</string>
     <string name="closeAllTabsMenuItem">Chiudi tutte le schede</string>
+    <string name="closeTab">Chiudi scheda</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Dashboard sulla privacy</string>

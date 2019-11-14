@@ -83,6 +83,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Затваряне</string>
     <string name="closeAllTabsMenuItem">Затваряне на всички подпрозорци</string>
+    <string name="closeTab">Затваряне подпрозорец</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Табло за управление на поверителността</string>

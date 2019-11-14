@@ -83,6 +83,7 @@
     <string name="faviconContentDescription">Ícone de favorito</string>
     <string name="closeContentDescription">Fechar</string>
     <string name="closeAllTabsMenuItem">Fechar todos os separadores</string>
+    <string name="closeTab">Fechar separador</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Painel de privacidade</string>

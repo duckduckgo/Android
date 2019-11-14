@@ -40,8 +40,6 @@ import android.webkit.*
 import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
 import android.webkit.WebView.HitTestResult.*
-import android.widget.Button
-import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.AnyThread
@@ -430,7 +428,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.DialNumber -> {
                 val intent = Intent(Intent.ACTION_DIAL)
                 intent.data = Uri.parse("tel:${it.telephoneNumber}")
-                openExternalDialog(intent, requireContext())
+                openExternalDialog(intent, requireContext(), null, false)
             }
             is Command.SendEmail -> {
                 val intent = Intent(Intent.ACTION_SENDTO)
@@ -549,32 +547,23 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         val isShowing = alertDialog?.isShowing
 
         if (isShowing == null || !isShowing) {
-            val view = layoutInflater.inflate(R.layout.content_external_app_dialog, null)
-            val checkBox = view.findViewById<CheckBox>(R.id.checkboxDialog)
-
             alertDialog = AlertDialog.Builder(context)
-                .setView(view)
                 .setTitle(R.string.launchingExternalApp)
                 .setMessage(getString(R.string.confirmOpenExternalApp))
-                .setPositiveButton(R.string.openExternalApp) { _, _ ->
+                .setPositiveButton(android.R.string.yes) { _, _ ->
                     onClick()
                 }
-                .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                .setNeutralButton(R.string.closeTab) { dialog, _ ->
                     dialog.dismiss()
-                    if (checkBox.isChecked) {
-                        launch {
-                            viewModel.closeCurrentTab()
-                            destroyWebView()
-                        }
+                    launch {
+                        viewModel.closeCurrentTab()
+                        destroyWebView()
                     }
                 }
+                .setNegativeButton(android.R.string.no) { dialog, _ ->
+                    dialog.dismiss()
+                }
                 .show()
-
-            checkBox.setOnCheckedChangeListener { _, isChecked ->
-                val positiveButton: Button? = (alertDialog as AlertDialog).findViewById(android.R.id.button1)
-                positiveButton?.isEnabled = !isChecked
-            }
-
         }
     }
 

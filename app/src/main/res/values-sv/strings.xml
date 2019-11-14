@@ -99,6 +99,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Stäng</string>
     <string name="closeAllTabsMenuItem">Stäng alla flikar</string>
+    <string name="closeTab">Stäng flik</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Sekretesspanel</string>

@@ -83,6 +83,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Zatvoriť</string>
     <string name="closeAllTabsMenuItem">Zatvoriť všetky karty</string>
+    <string name="closeTab">Zatvoriť karta</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Ovládací panel ochrany súkromia</string>

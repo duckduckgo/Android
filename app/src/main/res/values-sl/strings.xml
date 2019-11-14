@@ -83,6 +83,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Zapri</string>
     <string name="closeAllTabsMenuItem">Zapri vse zavihke</string>
+    <string name="closeTab">Zapri zavihek</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Nadzorna plošča zasebnosti</string>

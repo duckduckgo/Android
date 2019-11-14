@@ -83,6 +83,7 @@
     <string name="faviconContentDescription">Suosikkikuvake</string>
     <string name="closeContentDescription">Sulje</string>
     <string name="closeAllTabsMenuItem">Sulje kaikki välilehdet</string>
+    <string name="closeTab">Sulje välilehti</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Tietosuojan ohjauspaneeli</string>

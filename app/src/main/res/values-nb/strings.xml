@@ -83,6 +83,7 @@
     <string name="faviconContentDescription">Favorittikon</string>
     <string name="closeContentDescription">Lukk</string>
     <string name="closeAllTabsMenuItem">Lukk alle faner</string>
+    <string name="closeTab">Lukk fane</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Dashbord for personvern</string>

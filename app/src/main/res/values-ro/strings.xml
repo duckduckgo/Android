@@ -83,6 +83,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Închidere</string>
     <string name="closeAllTabsMenuItem">Închidere toate filele</string>
+    <string name="closeTab">Închidere nouă</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Tabloul de bord privind confidențialitatea</string>

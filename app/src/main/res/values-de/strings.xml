@@ -83,6 +83,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Schließen</string>
     <string name="closeAllTabsMenuItem">Alle Tabs schließen</string>
+    <string name="closeTab">Alle tab</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>

@@ -83,6 +83,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Κλείσιμο</string>
     <string name="closeAllTabsMenuItem">Κλείσιμο όλων των καρτελών</string>
+    <string name="closeTab">Κλείσιμο καρτέλα</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Πίνακας εργαλείων ιδιωτικότητας</string>
