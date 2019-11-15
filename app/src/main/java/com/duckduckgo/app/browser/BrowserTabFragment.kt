@@ -1108,7 +1108,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     progress = viewState.progress
                 }
 
-                if (viewState.progress == 100) { // && (0..10).random() % 3 == 0) {
+                if (viewState.progress == 100 && (0..10).random() % 3 == 0) {
                     val fireButton = requireActivity().findViewById<View>(R.id.fire)
                     val gradeView = requireActivity().findViewById<View>(R.id.privacyGradeButton)
 
