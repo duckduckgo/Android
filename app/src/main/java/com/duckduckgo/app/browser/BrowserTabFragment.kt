@@ -428,16 +428,16 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.DialNumber -> {
                 val intent = Intent(Intent.ACTION_DIAL)
                 intent.data = Uri.parse("tel:${it.telephoneNumber}")
-                openExternalDialog(intent, requireContext(), null, false)
+                openExternalDialog(intent, null, false)
             }
             is Command.SendEmail -> {
                 val intent = Intent(Intent.ACTION_SENDTO)
                 intent.data = Uri.parse(it.emailAddress)
-                openExternalDialog(intent, requireContext())
+                openExternalDialog(intent)
             }
             is Command.SendSms -> {
                 val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${it.telephoneNumber}"))
-                openExternalDialog(intent, requireContext())
+                openExternalDialog(intent)
             }
             Command.ShowKeyboard -> {
                 showKeyboard()
@@ -472,7 +472,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 }
             }
             is Command.HandleExternalAppLink -> {
-                openExternalDialog(it.appLink.intent, requireContext(), it.appLink.fallbackUrl, false)
+                openExternalDialog(it.appLink.intent, it.appLink.fallbackUrl, false)
             }
             is Command.LaunchSurvey -> launchSurvey(it.survey)
             is Command.LaunchAddWidget -> launchAddWidget()
@@ -513,31 +513,28 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
     }
 
-    private fun openExternalDialog(intent: Intent, context: Context, fallbackUrl: String? = null, showFirstOption: Boolean = true) {
-        context.let {
+    private fun openExternalDialog(intent: Intent, fallbackUrl: String? = null, useFirstActivityFound: Boolean = true) {
+        context?.let {
             val pm = it.packageManager
             val activities = pm.queryIntentActivities(intent, 0)
 
-            when (activities.size) {
-                0 -> {
-                    if (fallbackUrl != null) {
-                        webView?.loadUrl(fallbackUrl)
-                    } else {
-                        showToast(R.string.unableToOpenLink)
-                    }
-                    return
+            if (activities.size == 0) {
+                if (fallbackUrl != null) {
+                    webView?.loadUrl(fallbackUrl)
+                } else {
+                    showToast(R.string.unableToOpenLink)
                 }
-                else -> {
-                    if (activities.size == 1 || showFirstOption) {
-                        val activity = activities.first()
-                        val appTitle = activity.loadLabel(pm)
-                        Timber.i("Exactly one app available for intent: $appTitle")
-                        launchExternalAppDialog(it) { it.startActivity(intent) }
-                    } else {
-                        val title = getString(R.string.openExternalApp)
-                        val intentChooser = Intent.createChooser(intent, title)
-                        launchExternalAppDialog(it) { it.startActivity(intentChooser) }
-                    }
+                return
+            } else {
+                if (activities.size == 1 || useFirstActivityFound) {
+                    val activity = activities.first()
+                    val appTitle = activity.loadLabel(pm)
+                    Timber.i("Exactly one app available for intent: $appTitle")
+                    launchExternalAppDialog(it) { it.startActivity(intent) }
+                } else {
+                    val title = getString(R.string.openExternalApp)
+                    val intentChooser = Intent.createChooser(intent, title)
+                    launchExternalAppDialog(it) { it.startActivity(intentChooser) }
                 }
             }
         }
@@ -546,7 +543,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private fun launchExternalAppDialog(context: Context, onClick: () -> Unit) {
         val isShowing = alertDialog?.isShowing
 
-        if (isShowing == null || !isShowing) {
+        if (isShowing != true) {
             alertDialog = AlertDialog.Builder(context)
                 .setTitle(R.string.launchingExternalApp)
                 .setMessage(getString(R.string.confirmOpenExternalApp))

@@ -1135,7 +1135,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenCloseCurrentTabThenDeleteTabFromRepository() = runBlocking {
+    fun whenCloseCurrentTabSelectedThenTabDeletedFromRepository() = runBlocking {
         val liveData = MutableLiveData<TabEntity>()
         liveData.value = TabEntity("TAB_ID", "", "", false, true, 0)
         whenever(mockTabsRepository.liveSelectedTab).thenReturn(liveData)

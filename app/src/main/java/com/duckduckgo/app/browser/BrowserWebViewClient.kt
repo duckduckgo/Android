@@ -68,29 +68,37 @@ class BrowserWebViewClient(
         try {
             Timber.v("shouldOverride $url")
 
-            val urlType = specialUrlDetector.determineType(url)
-
-            return when (urlType) {
-                is SpecialUrlDetector.UrlType.Email -> consume { webViewClientListener?.sendEmailRequested(urlType.emailAddress) }
-                is SpecialUrlDetector.UrlType.Telephone -> consume { webViewClientListener?.dialTelephoneNumberRequested(urlType.telephoneNumber) }
-                is SpecialUrlDetector.UrlType.Sms -> consume { webViewClientListener?.sendSmsRequested(urlType.telephoneNumber) }
-                is SpecialUrlDetector.UrlType.IntentType -> consume {
+            return when (val urlType = specialUrlDetector.determineType(url)) {
+                is SpecialUrlDetector.UrlType.Email -> {
+                    webViewClientListener?.sendEmailRequested(urlType.emailAddress)
+                    true
+                }
+                is SpecialUrlDetector.UrlType.Telephone -> {
+                    webViewClientListener?.dialTelephoneNumberRequested(urlType.telephoneNumber)
+                    true
+                }
+                is SpecialUrlDetector.UrlType.Sms -> {
+                    webViewClientListener?.sendSmsRequested(urlType.telephoneNumber)
+                    true
+                }
+                is SpecialUrlDetector.UrlType.IntentType -> {
                     Timber.i("Found intent type link for $urlType.url")
                     launchExternalApp(urlType)
+                    true
                 }
                 is SpecialUrlDetector.UrlType.Unknown -> {
                     Timber.w("Unable to process link type for ${urlType.url}")
                     webView.loadUrl(webView.originalUrl)
-                    return false
+                    false
                 }
-                is SpecialUrlDetector.UrlType.SearchQuery -> return false
+                is SpecialUrlDetector.UrlType.SearchQuery -> false
                 is SpecialUrlDetector.UrlType.Web -> {
                     if (requestRewriter.shouldRewriteRequest(url)) {
                         val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(url)
                         webView.loadUrl(newUri.toString())
                         return true
                     }
-                    return false
+                    false
                 }
             }
         } catch (e: Throwable) {
@@ -222,15 +230,5 @@ class BrowserWebViewClient(
 
             it.requiresAuthentication(request)
         }
-    }
-
-    /**
-     * Utility to function to execute a function, and then return true
-     *
-     * Useful to reduce clutter in repeatedly including `return true` after doing the real work.
-     */
-    private inline fun consume(function: () -> Unit): Boolean {
-        function()
-        return true
     }
 }
