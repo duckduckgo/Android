@@ -43,11 +43,13 @@ import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
+import com.duckduckgo.app.statistics.api.OfflinePixelSender
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_LAUNCH
-import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
+import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
@@ -120,7 +122,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     lateinit var offlinePixelScheduler: OfflinePixelScheduler
 
     @Inject
-    lateinit var offlinePixelDataStore: OfflinePixelDataStore
+    lateinit var offlinePixelCountDataStore: OfflinePixelCountDataStore
 
     @Inject
     lateinit var dataClearer: DataClearer
@@ -139,6 +141,15 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     @Inject
     lateinit var appDataLoader: AppDataLoader
+
+    @Inject
+    lateinit var offlinePixelSender: OfflinePixelSender
+
+    @Inject
+    lateinit var alertingUncaughtExceptionHandler: AlertingUncaughtExceptionHandler
+
+    @Inject
+    lateinit var variantManager: VariantManager
 
     private var launchedByFireAction: Boolean = false
 
@@ -170,7 +181,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         }
 
         recordInstallationTimestamp()
-        initializeTheme(settingsDataStore)
+        initializeTheme(settingsDataStore, variantManager)
         loadTrackerData()
         configureDataDownloader()
         scheduleOfflinePixels()
@@ -184,8 +195,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     }
 
     private fun configureUncaughtExceptionHandler() {
-        val originalHandler = Thread.getDefaultUncaughtExceptionHandler()
-        Thread.setDefaultUncaughtExceptionHandler(AlertingUncaughtExceptionHandler(originalHandler, offlinePixelDataStore))
+        Thread.setDefaultUncaughtExceptionHandler(alertingUncaughtExceptionHandler)
     }
 
     private fun recordInstallationTimestamp() {

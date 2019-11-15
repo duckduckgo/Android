@@ -34,19 +34,21 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.fire.WebViewCookieManager
 import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
+import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import dagger.Module
 import dagger.Provides
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -63,12 +65,21 @@ class BrowserModule {
 
     @Provides
     fun browserWebViewClient(
-        requestRewriter: RequestRewriter,
         specialUrlDetector: SpecialUrlDetector,
         requestInterceptor: RequestInterceptor,
-        offlinePixelDataStore: OfflinePixelDataStore
+        offlinePixelCountDataStore: OfflinePixelCountDataStore,
+        uncaughtExceptionRepository: UncaughtExceptionRepository,
+        @Named(SpecialUrlHandler.MAIN_FRAME_HANDLER) mainFrameUrlHandler: SpecialUrlHandler,
+        @Named(SpecialUrlHandler.SUB_FRAME_HANDLER) subFrameUrlHandler: SpecialUrlHandler
     ): BrowserWebViewClient {
-        return BrowserWebViewClient(requestRewriter, specialUrlDetector, requestInterceptor, offlinePixelDataStore)
+        return BrowserWebViewClient(
+            specialUrlDetector,
+            requestInterceptor,
+            offlinePixelCountDataStore,
+            uncaughtExceptionRepository,
+            mainFrameUrlHandler,
+            subFrameUrlHandler
+        )
     }
 
     @Provides
@@ -151,5 +162,19 @@ class BrowserModule {
     @Provides
     fun webViewPreviewGenerator(): WebViewPreviewGenerator {
         return FileBasedWebViewPreviewGenerator()
+    }
+
+    @Provides
+    @Singleton
+    @Named(SpecialUrlHandler.MAIN_FRAME_HANDLER)
+    fun mainFrameUrlHandler(requestRewriter: RequestRewriter): SpecialUrlHandler {
+        return MainFrameUrlHandler(requestRewriter)
+    }
+
+    @Provides
+    @Singleton
+    @Named(SpecialUrlHandler.SUB_FRAME_HANDLER)
+    fun nonMainFrameUrlHandler(): SpecialUrlHandler {
+        return SubFrameUrlHandler()
     }
 }

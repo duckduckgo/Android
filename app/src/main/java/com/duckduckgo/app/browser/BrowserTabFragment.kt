@@ -627,7 +627,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
-            Timber.i("Observed grade: $it")
+            Timber.d("Observed grade: $it")
             it?.let { privacyGrade ->
                 val drawable = context?.getDrawable(privacyGrade.icon()) ?: return@let
                 privacyGradeButton?.setImageDrawable(drawable)
