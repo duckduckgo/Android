@@ -74,19 +74,18 @@ class DaxDialog(
         return dialog
     }
 
-    override fun onCancel(dialog: DialogInterface) {
-        typingAnimationJob?.cancel()
-        super.onCancel(dialog)
-    }
-
     override fun onStart() {
         super.onStart()
         setDialog()
         setListeners()
-
         typingAnimationJob = launch {
             startTypingAnimation(daxText, onAnimationFinished)
         }
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        typingAnimationJob?.cancel()
+        super.onCancel(dialog)
     }
 
     fun onAnimationFinishedListener(onAnimationFinished: () -> Unit = {}) {
@@ -120,12 +119,14 @@ class DaxDialog(
             }
         }
 
-        dialogText.setOnClickListener {
-            if ((typingAnimationJob as Job).isActive) {
-                typingAnimationJob?.cancel()
-                dialogText.text = daxText
-                onAnimationFinished()
-            }
+        dialogText.setOnClickListener { textClickListener() }
+    }
+
+    private fun textClickListener() {
+        if ((typingAnimationJob as Job).isActive) {
+            typingAnimationJob?.cancel()
+            dialogText.text = daxText
+            onAnimationFinished()
         }
     }
 
@@ -167,6 +168,7 @@ class DaxDialog(
                     dialogText.text = inputText.subSequence(0, index)
                     delay(typingDelayInMs)
                 }
+                delay(300)
                 afterAnimation()
             }
         }
