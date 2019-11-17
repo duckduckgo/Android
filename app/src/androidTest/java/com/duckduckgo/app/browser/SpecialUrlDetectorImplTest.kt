@@ -152,4 +152,44 @@ class SpecialUrlDetectorImplTest {
         val type = testee.determineType("javascript:alert(0)") as SearchQuery
         assertEquals("javascript:alert(0)", type.query)
     }
+
+    @Test
+    fun whenSmsContentIsLongerThanMaxAllowedThenTruncateToMax() {
+        val longSms = randomString(1000)
+        val type = testee.determineType("sms:$longSms") as Sms
+        assertEquals(longSms.substring(0, 400), type.telephoneNumber)
+    }
+
+    @Test
+    fun whenSmsToContentIsLongerThanMaxAllowedThenTruncateToMax() {
+        val longSms = randomString(1000)
+        val type = testee.determineType("smsto:$longSms") as Sms
+        assertEquals(longSms.substring(0, 400), type.telephoneNumber)
+    }
+
+    @Test
+    fun whenEmailContentIsLongerThanMaxAllowedThenTruncateToMax() {
+        val longEmail = "mailto:${randomString(2000)}"
+        val type = testee.determineType(longEmail) as Email
+        assertEquals(longEmail.substring(0, 1000), type.emailAddress)
+    }
+
+    @Test
+    fun whenTelephoneContentIsLongerThanMaxAllowedThenTruncateToMax() {
+        val longTelephone = randomString(30)
+        val type = testee.determineType("tel:$longTelephone") as Telephone
+        assertEquals(longTelephone.substring(0, 20), type.telephoneNumber)
+    }
+
+    @Test
+    fun whenTelephonePromptContentIsLongerThanMaxAllowedThenTruncateToMax() {
+        val longTelephone = randomString(30)
+        val type = testee.determineType("telprompt:$longTelephone") as Telephone
+        assertEquals(longTelephone.substring(0, 20), type.telephoneNumber)
+    }
+
+    private fun randomString(length: Int): String {
+        val charList: List<Char> = ('a'..'z') + ('0'..'9')
+        return List(length) { charList.random() }.joinToString("")
+    }
 }

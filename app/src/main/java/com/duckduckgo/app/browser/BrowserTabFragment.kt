@@ -518,13 +518,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             val pm = it.packageManager
             val activities = pm.queryIntentActivities(intent, 0)
 
-            if (activities.size == 0) {
+            if (activities.isEmpty()) {
                 if (fallbackUrl != null) {
                     webView?.loadUrl(fallbackUrl)
                 } else {
                     showToast(R.string.unableToOpenLink)
                 }
-                return
             } else {
                 if (activities.size == 1 || useFirstActivityFound) {
                     val activity = activities.first()

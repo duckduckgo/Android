@@ -57,19 +57,20 @@ class SpecialUrlDetectorImpl : SpecialUrlDetector {
         }
     }
 
-    private fun buildTelephone(uriString: String) = UrlType.Telephone(uriString.removePrefix("$TEL_SCHEME:"))
+    private fun buildTelephone(uriString: String): UrlType = UrlType.Telephone(uriString.removePrefix("$TEL_SCHEME:").truncate(PHONE_MAX_LENGTH))
 
-    private fun buildTelephonePrompt(uriString: String): UrlType = UrlType.Telephone(uriString.removePrefix("$TELPROMPT_SCHEME:"))
+    private fun buildTelephonePrompt(uriString: String): UrlType =
+        UrlType.Telephone(uriString.removePrefix("$TELPROMPT_SCHEME:").truncate(PHONE_MAX_LENGTH))
 
-    private fun buildEmail(uriString: String): UrlType = UrlType.Email(uriString)
+    private fun buildEmail(uriString: String): UrlType = UrlType.Email(uriString.truncate(EMAIL_MAX_LENGTH))
 
-    private fun buildSms(uriString: String) = UrlType.Sms(uriString.removePrefix("$SMS_SCHEME:"))
+    private fun buildSms(uriString: String): UrlType = UrlType.Sms(uriString.removePrefix("$SMS_SCHEME:").truncate(SMS_MAX_LENGTH))
 
-    private fun buildSmsTo(uriString: String) = UrlType.Sms(uriString.removePrefix("$SMSTO_SCHEME:"))
+    private fun buildSmsTo(uriString: String): UrlType = UrlType.Sms(uriString.removePrefix("$SMSTO_SCHEME:").truncate(SMS_MAX_LENGTH))
 
     private fun checkForIntent(scheme: String, uriString: String): UrlType {
         val validUriSchemeRegex = Regex("[a-z][a-zA-Z\\d+.-]+")
-        if (scheme.matches(validUriSchemeRegex)){
+        if (scheme.matches(validUriSchemeRegex)) {
             return buildIntent(uriString)
         }
 
@@ -93,6 +94,8 @@ class SpecialUrlDetectorImpl : SpecialUrlDetector {
         return determineType(Uri.parse(uriString))
     }
 
+    private fun String.truncate(maxLength: Int): String = if (this.length > maxLength) this.substring(0, maxLength) else this
+
     companion object {
         private const val TEL_SCHEME = "tel"
         private const val TELPROMPT_SCHEME = "telprompt"
@@ -104,7 +107,9 @@ class SpecialUrlDetectorImpl : SpecialUrlDetector {
         private const val ABOUT_SCHEME = "about"
         private const val DATA_SCHEME = "data"
         private const val JAVASCRIPT_SCHEME = "javascript"
-
         private const val EXTRA_FALLBACK_URL = "browser_fallback_url"
+        private const val SMS_MAX_LENGTH = 400
+        private const val PHONE_MAX_LENGTH = 20
+        private const val EMAIL_MAX_LENGTH = 1000
     }
 }
