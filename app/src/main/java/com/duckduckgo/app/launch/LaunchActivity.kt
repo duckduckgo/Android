@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
+import com.duckduckgo.app.onboarding.ui.OnboardingActivityExperiment
 
 
 class LaunchActivity : DuckDuckGoActivity() {
@@ -52,7 +53,11 @@ class LaunchActivity : DuckDuckGoActivity() {
     }
 
     private fun showOnboarding() {
-        startActivity(OnboardingActivity.intent(this))
+        if (true) {
+            startActivity(OnboardingActivityExperiment.intent(this))
+        } else {
+            startActivity(OnboardingActivity.intent(this))
+        }
         finish()
     }
 

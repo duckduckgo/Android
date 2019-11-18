@@ -36,6 +36,7 @@ import com.duckduckgo.app.job.AppConfigurationJobService
 import com.duckduckgo.app.launch.LaunchActivity
 import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
+import com.duckduckgo.app.onboarding.ui.OnboardingActivityExperiment
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.UnifiedSummaryPage
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
@@ -62,6 +63,10 @@ abstract class AndroidBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector
     abstract fun onboardingActivity(): OnboardingActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun onboardingActivityExperiment(): OnboardingActivityExperiment
 
     @ActivityScoped
     @ContributesAndroidInjector

@@ -21,7 +21,7 @@ import androidx.fragment.app.FragmentPagerAdapter
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 
 class PagerAdapter(fragmentManager: FragmentManager, private val viewModel: OnboardingViewModel) :
-    FragmentPagerAdapter(fragmentManager) {
+    FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     override fun getCount(): Int {
         return viewModel.pageCount()
