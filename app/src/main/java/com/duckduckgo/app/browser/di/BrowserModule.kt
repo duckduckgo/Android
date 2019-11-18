@@ -48,7 +48,6 @@ import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import dagger.Module
 import dagger.Provides
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -65,21 +64,19 @@ class BrowserModule {
 
     @Provides
     fun browserWebViewClient(
+        requestRewriter: RequestRewriter,
         specialUrlDetector: SpecialUrlDetector,
         requestInterceptor: RequestInterceptor,
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
         uncaughtExceptionRepository: UncaughtExceptionRepository,
-        @Named(SpecialUrlHandler.MAIN_FRAME_HANDLER) mainFrameUrlHandler: SpecialUrlHandler,
-        @Named(SpecialUrlHandler.SUB_FRAME_HANDLER) subFrameUrlHandler: SpecialUrlHandler,
         cookieManager: CookieManager
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
+            requestRewriter,
             specialUrlDetector,
             requestInterceptor,
             offlinePixelCountDataStore,
             uncaughtExceptionRepository,
-            mainFrameUrlHandler,
-            subFrameUrlHandler,
             cookieManager
         )
     }
@@ -164,19 +161,5 @@ class BrowserModule {
     @Provides
     fun webViewPreviewGenerator(): WebViewPreviewGenerator {
         return FileBasedWebViewPreviewGenerator()
-    }
-
-    @Provides
-    @Singleton
-    @Named(SpecialUrlHandler.MAIN_FRAME_HANDLER)
-    fun mainFrameUrlHandler(requestRewriter: RequestRewriter): SpecialUrlHandler {
-        return MainFrameUrlHandler(requestRewriter)
-    }
-
-    @Provides
-    @Singleton
-    @Named(SpecialUrlHandler.SUB_FRAME_HANDLER)
-    fun nonMainFrameUrlHandler(): SpecialUrlHandler {
-        return SubFrameUrlHandler()
     }
 }

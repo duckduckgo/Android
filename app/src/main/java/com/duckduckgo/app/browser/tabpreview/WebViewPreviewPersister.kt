@@ -90,7 +90,7 @@ class FileBasedWebViewPreviewPersister(val context: Context, private val fileDel
     }
 
     private fun writeBytesToFile(previewFile: File, bitmap: Bitmap) {
-        val outputStream = FileOutputStream(previewFile).use { outputStream ->
+        FileOutputStream(previewFile).use { outputStream ->
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
             outputStream.flush()
         }
