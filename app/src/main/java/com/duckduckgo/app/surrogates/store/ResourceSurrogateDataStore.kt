@@ -27,7 +27,7 @@ class ResourceSurrogateDataStore @Inject constructor(private val context: Contex
         context.openFileInput(FILENAME).use { it.readBytes() }
 
     fun saveData(byteArray: ByteArray) {
-        context.openFileOutput(FILENAME, Context.MODE_PRIVATE).write(byteArray)
+        context.openFileOutput(FILENAME, Context.MODE_PRIVATE).use { it.write(byteArray) }
     }
 
     fun clearData() {
