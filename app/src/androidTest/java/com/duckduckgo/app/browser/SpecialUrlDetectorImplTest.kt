@@ -17,6 +17,9 @@
 package com.duckduckgo.app.browser
 
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.*
+import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.EMAIL_MAX_LENGTH
+import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LENGTH
+import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -155,37 +158,37 @@ class SpecialUrlDetectorImplTest {
 
     @Test
     fun whenSmsContentIsLongerThanMaxAllowedThenTruncateToMax() {
-        val longSms = randomString(1000)
+        val longSms = randomString(SMS_MAX_LENGTH + 1)
         val type = testee.determineType("sms:$longSms") as Sms
-        assertEquals(longSms.substring(0, 400), type.telephoneNumber)
+        assertEquals(longSms.substring(0, SMS_MAX_LENGTH), type.telephoneNumber)
     }
 
     @Test
     fun whenSmsToContentIsLongerThanMaxAllowedThenTruncateToMax() {
-        val longSms = randomString(1000)
+        val longSms = randomString(SMS_MAX_LENGTH + 1)
         val type = testee.determineType("smsto:$longSms") as Sms
-        assertEquals(longSms.substring(0, 400), type.telephoneNumber)
+        assertEquals(longSms.substring(0, SMS_MAX_LENGTH), type.telephoneNumber)
     }
 
     @Test
     fun whenEmailContentIsLongerThanMaxAllowedThenTruncateToMax() {
-        val longEmail = "mailto:${randomString(2000)}"
+        val longEmail = "mailto:${randomString(EMAIL_MAX_LENGTH + 1)}"
         val type = testee.determineType(longEmail) as Email
-        assertEquals(longEmail.substring(0, 1000), type.emailAddress)
+        assertEquals(longEmail.substring(0, EMAIL_MAX_LENGTH), type.emailAddress)
     }
 
     @Test
     fun whenTelephoneContentIsLongerThanMaxAllowedThenTruncateToMax() {
-        val longTelephone = randomString(30)
+        val longTelephone = randomString(PHONE_MAX_LENGTH + 1)
         val type = testee.determineType("tel:$longTelephone") as Telephone
-        assertEquals(longTelephone.substring(0, 20), type.telephoneNumber)
+        assertEquals(longTelephone.substring(0, PHONE_MAX_LENGTH), type.telephoneNumber)
     }
 
     @Test
     fun whenTelephonePromptContentIsLongerThanMaxAllowedThenTruncateToMax() {
-        val longTelephone = randomString(30)
+        val longTelephone = randomString(PHONE_MAX_LENGTH + 1)
         val type = testee.determineType("telprompt:$longTelephone") as Telephone
-        assertEquals(longTelephone.substring(0, 20), type.telephoneNumber)
+        assertEquals(longTelephone.substring(0, PHONE_MAX_LENGTH), type.telephoneNumber)
     }
 
     private fun randomString(length: Int): String {

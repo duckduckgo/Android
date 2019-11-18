@@ -108,8 +108,8 @@ class SpecialUrlDetectorImpl : SpecialUrlDetector {
         private const val DATA_SCHEME = "data"
         private const val JAVASCRIPT_SCHEME = "javascript"
         private const val EXTRA_FALLBACK_URL = "browser_fallback_url"
-        private const val SMS_MAX_LENGTH = 400
-        private const val PHONE_MAX_LENGTH = 20
-        private const val EMAIL_MAX_LENGTH = 1000
+        const val SMS_MAX_LENGTH = 400
+        const val PHONE_MAX_LENGTH = 20
+        const val EMAIL_MAX_LENGTH = 1000
     }
 }
