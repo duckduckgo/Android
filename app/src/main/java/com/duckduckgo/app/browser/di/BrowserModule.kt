@@ -70,7 +70,8 @@ class BrowserModule {
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
         uncaughtExceptionRepository: UncaughtExceptionRepository,
         @Named(SpecialUrlHandler.MAIN_FRAME_HANDLER) mainFrameUrlHandler: SpecialUrlHandler,
-        @Named(SpecialUrlHandler.SUB_FRAME_HANDLER) subFrameUrlHandler: SpecialUrlHandler
+        @Named(SpecialUrlHandler.SUB_FRAME_HANDLER) subFrameUrlHandler: SpecialUrlHandler,
+        cookieManager: CookieManager
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             specialUrlDetector,
@@ -78,7 +79,8 @@ class BrowserModule {
             offlinePixelCountDataStore,
             uncaughtExceptionRepository,
             mainFrameUrlHandler,
-            subFrameUrlHandler
+            subFrameUrlHandler,
+            cookieManager
         )
     }
 

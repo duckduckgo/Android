@@ -41,7 +41,8 @@ class BrowserWebViewClient(
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,
     private val mainFrameUrlHandler: SpecialUrlHandler,
-    private val subFrameUrlHandler: SpecialUrlHandler
+    private val subFrameUrlHandler: SpecialUrlHandler,
+    private val cookieManager: CookieManager
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -108,11 +109,18 @@ class BrowserWebViewClient(
         try {
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
+            flushCookies()
         } catch (e: Throwable) {
             GlobalScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_FINISHED)
                 throw e
             }
+        }
+    }
+
+    private fun flushCookies() {
+        GlobalScope.launch(Dispatchers.IO) {
+            cookieManager.flush()
         }
     }
 
