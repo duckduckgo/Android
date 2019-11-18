@@ -69,9 +69,17 @@ class WebViewDataManager @Inject constructor(
         }
     }
 
+    /**
+     * Deletes web view directory content. The Cookies file is kept as we clear cookies separately to avoid a crash and maintain ddg cookies.
+     * Cookies may appear in files:
+     *   app_webview/Cookies
+     *   app_webview/Default/Cookies
+     */
     private suspend fun clearWebViewDirectories(exclusions: List<String>) {
         val dataDir = context.applicationInfo.dataDir
         fileDeleter.deleteContents(File(dataDir, WEBVIEW_DATA_DIRECTORY_NAME), exclusions)
+
+        // We don't delete the Default dir as Cookies may be inside however we do clear any other content
         fileDeleter.deleteContents(File(dataDir, WEBVIEW_DEFAULT_DIRECTORY_NAME), exclusions)
     }
 
