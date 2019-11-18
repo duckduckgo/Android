@@ -21,6 +21,7 @@ import android.view.View
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
+import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import kotlinx.coroutines.*
@@ -75,7 +76,7 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
     override fun onProgressChanged(webView: WebView, newProgress: Int) {
         try {
             Timber.d("onProgressChanged ${webView.url}, $newProgress")
-            val navigationList = webView.copyBackForwardList()
+            val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
             webViewClientListener?.progressChanged(newProgress)
         } catch (e: Throwable) {

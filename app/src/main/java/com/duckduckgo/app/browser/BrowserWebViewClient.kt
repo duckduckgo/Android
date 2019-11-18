@@ -24,6 +24,7 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
+import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
@@ -37,7 +38,8 @@ class BrowserWebViewClient(
     private val specialUrlDetector: SpecialUrlDetector,
     private val requestInterceptor: RequestInterceptor,
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository
+    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
+    private val cookieManager: CookieManager
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -117,7 +119,8 @@ class BrowserWebViewClient(
     @UiThread
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
         try {
-            webViewClientListener?.navigationStateChanged(WebViewNavigationState(webView.copyBackForwardList()))
+            val navigationList = webView.safeCopyBackForwardList() ?: return
+            webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
             if (url != null && url == lastPageStarted) {
                 webViewClientListener?.pageRefreshed(url)
             }
@@ -133,12 +136,20 @@ class BrowserWebViewClient(
     @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
         try {
-            webViewClientListener?.navigationStateChanged(WebViewNavigationState(webView.copyBackForwardList()))
+            val navigationList = webView.safeCopyBackForwardList() ?: return
+            webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
+            flushCookies()
         } catch (e: Throwable) {
             GlobalScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_FINISHED)
                 throw e
             }
+        }
+    }
+
+    private fun flushCookies() {
+        GlobalScope.launch(Dispatchers.IO) {
+            cookieManager.flush()
         }
     }
 

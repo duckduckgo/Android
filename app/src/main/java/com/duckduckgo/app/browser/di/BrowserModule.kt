@@ -68,14 +68,16 @@ class BrowserModule {
         specialUrlDetector: SpecialUrlDetector,
         requestInterceptor: RequestInterceptor,
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
-        uncaughtExceptionRepository: UncaughtExceptionRepository
+        uncaughtExceptionRepository: UncaughtExceptionRepository,
+        cookieManager: CookieManager
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             requestRewriter,
             specialUrlDetector,
             requestInterceptor,
             offlinePixelCountDataStore,
-            uncaughtExceptionRepository
+            uncaughtExceptionRepository,
+            cookieManager
         )
     }
 
