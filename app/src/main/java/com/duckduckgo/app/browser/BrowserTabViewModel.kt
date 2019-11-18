@@ -351,6 +351,13 @@ class BrowserTabViewModel(
         return !currentBrowserViewState().browserShowing && navigation.hasNavigationHistory
     }
 
+    suspend fun closeCurrentTab() {
+        val currentTab = tabRepository.liveSelectedTab.value
+        currentTab?.let {
+            tabRepository.delete(currentTab)
+        }
+    }
+
     fun onUserPressedForward() {
         if (!currentBrowserViewState().browserShowing) {
             browserViewState.value = currentBrowserViewState().copy(browserShowing = true)

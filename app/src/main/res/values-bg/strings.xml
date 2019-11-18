@@ -2,6 +2,8 @@
 
     <string name="duckDuckGoLogoDescription">Лого на DuckDuckGo</string>
     <string name="appDescription">Поверителност, опростена</string>
+    <string name="yes">да</string>
+    <string name="no">Не</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Посетете Настройки, за да търсите и сърфирате с DuckDuckGo всеки път.</string>
@@ -83,6 +85,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Затваряне</string>
     <string name="closeAllTabsMenuItem">Затваряне на всички подпрозорци</string>
+    <string name="closeTab">Затваряне подпрозорец</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Табло за управление на поверителността</string>

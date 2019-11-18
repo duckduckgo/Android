@@ -2,6 +2,8 @@
 
     <string name="duckDuckGoLogoDescription">DuckDuckGo logó</string>
     <string name="appDescription">Adatvédelem, egyszerűsítve</string>
+    <string name="yes">Igen</string>
+    <string name="no">Nem</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">A Beállítások oldalon bármikor kereshetsz és böngészhetsz a DuckDuckGo segítségével.</string>
@@ -83,6 +85,7 @@
     <string name="faviconContentDescription">Kedvenc ikon</string>
     <string name="closeContentDescription">Bezárás</string>
     <string name="closeAllTabsMenuItem">Összes lap bezárása</string>
+    <string name="closeTab">Lap bezárása</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Adatvédelmi műszerfal</string>

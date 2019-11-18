@@ -18,6 +18,8 @@
 
     <string name="duckDuckGoLogoDescription">DuckDuckGos logotyp</string>
     <string name="appDescription">Förenklad sekretessförklaring</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nej</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Gå till "Inställningar" för att söka och bläddra med DuckDuckGo varje gång.</string>
@@ -99,6 +101,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Stäng</string>
     <string name="closeAllTabsMenuItem">Stäng alla flikar</string>
+    <string name="closeTab">Stäng flik</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Sekretesspanel</string>
