@@ -829,6 +829,7 @@ class BrowserTabViewModel(
             is CtaConfiguration.Survey -> LaunchSurvey(cta.survey)
             is CtaConfiguration.AddWidgetAuto -> LaunchAddWidget
             is CtaConfiguration.AddWidgetInstructions -> LaunchLegacyAddWidget
+            else -> return
         }
         ctaViewModel.onCtaLaunched()
     }

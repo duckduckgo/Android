@@ -80,6 +80,8 @@ class CtaViewModel @Inject constructor(
             if (canShowWidgetCta()) {
                 val ctaType = if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
                 ctaViewState.postValue(currentViewState.copy(cta = ctaType))
+            } else if (canShowDaxDialogCta()) {
+                ctaViewState.postValue(currentViewState.copy(cta = DaxDialog))
             } else {
                 ctaViewState.postValue(currentViewState.copy(cta = null))
             }
@@ -102,8 +104,12 @@ class CtaViewModel @Inject constructor(
     private fun canShowWidgetCta(): Boolean {
         return widgetCapabilities.supportsStandardWidgetAdd &&
                 !widgetCapabilities.hasInstalledWidgets &&
+                dismissedCtaDao.exists(CtaId.DAX_DIALOG) &&
                 !dismissedCtaDao.exists(CtaId.ADD_WIDGET)
     }
+
+    @WorkerThread
+    private fun canShowDaxDialogCta(): Boolean = !dismissedCtaDao.exists(CtaId.DAX_DIALOG)
 
     fun onCtaShown() {
         currentViewState.cta?.shownPixel?.let {
@@ -187,11 +193,25 @@ sealed class CtaConfiguration(
         null
     )
 
+    object DaxDialog : CtaConfiguration(
+        CtaId.DAX_DIALOG,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        null,
+        null,
+        null
+    )
+
     fun apply(view: View) {
-        view.ctaIcon.setImageResource(image)
-        view.ctaTitle.text = view.context.getString(title)
-        view.ctaSubtitle.text = view.context.getString(description)
-        view.ctaOkButton.text = view.context.getString(okButton)
-        view.ctaDismissButton.text = view.context.getString(dismissButton)
+        if (ctaId != CtaId.DAX_DIALOG) {
+            view.ctaIcon.setImageResource(image)
+            view.ctaTitle.text = view.context.getString(title)
+            view.ctaSubtitle.text = view.context.getString(description)
+            view.ctaOkButton.text = view.context.getString(okButton)
+            view.ctaDismissButton.text = view.context.getString(dismissButton)
+        }
     }
 }

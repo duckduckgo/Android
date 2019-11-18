@@ -74,6 +74,9 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.CtaConfiguration
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.global.ViewModelFactory
@@ -91,6 +94,7 @@ import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.android.synthetic.main.content_dax_dialog.*
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
@@ -121,6 +125,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
+
+    @Inject
+    lateinit var dismissedCtaDao: DismissedCtaDao
 
     @Inject
     lateinit var deviceInfo: DeviceInfo
@@ -215,7 +222,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
     }
 
-    private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
+    private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo, dismissedCtaDao) }
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -1233,7 +1240,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 renderCta()
             }
             configuration.apply(ctaContainer)
-            ctaContainer.show()
+            if (configuration.ctaId != CtaId.DAX_DIALOG) {
+                ctaContainer.show()
+            }
             ctaViewModel.onCtaShown()
         }
 
@@ -1245,24 +1254,49 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
             val context = context ?: return
             val configuration = lastSeenCtaViewState?.cta ?: return
-            ctaContainer.removeAllViews()
 
-            inflate(context, R.layout.include_cta, ctaContainer)
-            logoHidingListener.callToActionView = ctaContainer
+            if (configuration.ctaId == CtaId.DAX_DIALOG) {
+                daxDialog.alpha = 1f
+                val daxText = "Try visiting one of your favorite sites!\n\n" + "I’ll block trackers so they can’t spy on you. I’ll also upgrade the security of your connection if possible. \uD83D\uDD12"
+                hiddenText.text = daxText
+                primaryCta.hide()
+                launch {
+                    startTypingAnimation(daxText)
+                }
+            } else {
+                ctaContainer.removeAllViews()
 
-            configuration.apply(ctaContainer)
-            ctaContainer.ctaOkButton.setOnClickListener {
-                viewModel.onUserLaunchedCta()
+                inflate(context, R.layout.include_cta, ctaContainer)
+                logoHidingListener.callToActionView = ctaContainer
+
+                configuration.apply(ctaContainer)
+                ctaContainer.ctaOkButton.setOnClickListener {
+                    viewModel.onUserLaunchedCta()
+                }
+
+                ctaContainer.ctaDismissButton.setOnClickListener {
+                    viewModel.onUserDismissedCta()
+                }
+
+                ConstraintSet().also {
+                    it.clone(newTabLayout)
+                    it.connect(ddgLogo.id, ConstraintSet.BOTTOM, ctaContainer.id, ConstraintSet.TOP, 0)
+                    it.applyTo(newTabLayout)
+                }
             }
+        }
 
-            ctaContainer.ctaDismissButton.setOnClickListener {
-                viewModel.onUserDismissedCta()
-            }
-
-            ConstraintSet().also {
-                it.clone(newTabLayout)
-                it.connect(ddgLogo.id, ConstraintSet.BOTTOM, ctaContainer.id, ConstraintSet.TOP, 0)
-                it.applyTo(newTabLayout)
+        private suspend fun startTypingAnimation(inputText: CharSequence) {
+            withContext(Dispatchers.Main) {
+                launch {
+                    inputText.mapIndexed { index, _ ->
+                        dialogText.text = inputText.subSequence(0, index + 1)
+                        delay(20)
+                    }
+                    withContext(Dispatchers.IO) {
+                        dismissedCtaDao.insert(DismissedCta(CtaId.DAX_DIALOG))
+                    }
+                }
             }
         }
 

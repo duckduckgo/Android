@@ -23,7 +23,8 @@ import androidx.room.TypeConverter
 
 enum class CtaId {
     SURVEY,
-    ADD_WIDGET
+    ADD_WIDGET,
+    DAX_DIALOG
 }
 
 @Entity(

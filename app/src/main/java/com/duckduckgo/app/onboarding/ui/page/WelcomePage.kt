@@ -21,6 +21,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import com.duckduckgo.app.browser.R
 import kotlinx.android.synthetic.main.content_dax_dialog.*
@@ -52,6 +53,9 @@ class WelcomePage : OnboardingPageFragment(), CoroutineScope {
 
         val daxText = "The Internet can be kinda creepy.\n\nNot to worry! Searching and browsing privately is easier than you think."
         hiddenText.text = daxText
+        dialogText.setTextColor(ContextCompat.getColor(requireContext(), R.color.grayishBrown))
+        triangle.setImageResource(R.drawable.ic_triangle_bubble_white)
+        cardView.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.white)
 
         ViewCompat.animate(welcomeContent as View)
             .alpha(0f)
