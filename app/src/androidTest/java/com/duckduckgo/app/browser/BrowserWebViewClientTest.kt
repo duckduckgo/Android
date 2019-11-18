@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.content.Context
 import android.os.Build
+import android.webkit.CookieManager
 import android.webkit.HttpAuthHandler
 import android.webkit.RenderProcessGoneDetail
 import android.webkit.WebView
@@ -40,6 +41,7 @@ class BrowserWebViewClientTest {
     private val specialUrlDetector: SpecialUrlDetector = mock()
     private val requestInterceptor: RequestInterceptor = mock()
     private val listener: WebViewClientListener = mock()
+    private val cookieManager: CookieManager = mock()
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore = mock()
     private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
 
@@ -52,7 +54,8 @@ class BrowserWebViewClientTest {
             specialUrlDetector,
             requestInterceptor,
             offlinePixelCountDataStore,
-            uncaughtExceptionRepository
+            uncaughtExceptionRepository,
+            cookieManager
         )
         testee.webViewClientListener = listener
     }

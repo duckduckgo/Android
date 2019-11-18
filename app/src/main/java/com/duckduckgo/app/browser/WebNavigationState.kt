@@ -132,6 +132,6 @@ private val WebBackForwardList.isHttpsUpgrade: Boolean
     get() {
         if (currentIndex < 1) return false
         val current = originalUrl?.toUri() ?: return false
-        val previous = getItemAtIndex(currentIndex - 1).originalUrl?.toUri() ?: return false
+        val previous = getItemAtIndex(currentIndex - 1)?.originalUrl?.toUri() ?: return false
         return current.isHttpsVersionOfUri(previous)
     }

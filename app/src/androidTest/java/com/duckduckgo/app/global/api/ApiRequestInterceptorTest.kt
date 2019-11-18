@@ -53,7 +53,7 @@ class ApiRequestInterceptorTest {
         testee.intercept(mockChain)
         verify(mockChain).proceed(captor.capture())
 
-        val regex = "ddg_android/.*\\(com.duckduckgo.mobile.android.test; Android API .*\\)".toRegex()
+        val regex = "ddg_android/.*\\(com.duckduckgo.mobile.android.debug.test; Android API .*\\)".toRegex()
         val result = captor.value.header(Header.USER_AGENT)!!
         assertTrue(result.matches(regex))
     }

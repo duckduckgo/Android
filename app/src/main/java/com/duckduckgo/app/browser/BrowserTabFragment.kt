@@ -217,6 +217,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
 
+    private var alertDialog: AlertDialog? = null
+
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
@@ -426,16 +428,16 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.DialNumber -> {
                 val intent = Intent(Intent.ACTION_DIAL)
                 intent.data = Uri.parse("tel:${it.telephoneNumber}")
-                activity?.launchExternalActivity(intent)
+                openExternalDialog(intent, null, false)
             }
             is Command.SendEmail -> {
                 val intent = Intent(Intent.ACTION_SENDTO)
                 intent.data = Uri.parse(it.emailAddress)
-                activity?.launchExternalActivity(intent)
+                openExternalDialog(intent)
             }
             is Command.SendSms -> {
                 val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${it.telephoneNumber}"))
-                startActivity(intent)
+                openExternalDialog(intent)
             }
             Command.ShowKeyboard -> {
                 showKeyboard()
@@ -470,7 +472,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 }
             }
             is Command.HandleExternalAppLink -> {
-                externalAppLinkClicked(it)
+                openExternalDialog(it.appLink.intent, it.appLink.fallbackUrl, false)
             }
             is Command.LaunchSurvey -> launchSurvey(it.survey)
             is Command.LaunchAddWidget -> launchAddWidget()
@@ -511,42 +513,53 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
     }
 
-    private fun externalAppLinkClicked(appLinkCommand: Command.HandleExternalAppLink) {
+    private fun openExternalDialog(intent: Intent, fallbackUrl: String? = null, useFirstActivityFound: Boolean = true) {
         context?.let {
             val pm = it.packageManager
-            val intent = appLinkCommand.appLink.intent
             val activities = pm.queryIntentActivities(intent, 0)
 
-            Timber.i("Found ${activities.size} that could consume ${appLinkCommand.appLink.url}")
-
-            when (activities.size) {
-                0 -> {
-                    if (appLinkCommand.appLink.fallbackUrl != null) {
-                        webView?.loadUrl(appLinkCommand.appLink.fallbackUrl)
-                    } else {
-                        showToast(R.string.unableToOpenLink)
-                    }
-                    return
+            if (activities.isEmpty()) {
+                if (fallbackUrl != null) {
+                    webView?.loadUrl(fallbackUrl)
+                } else {
+                    showToast(R.string.unableToOpenLink)
                 }
-                1 -> {
+            } else {
+                if (activities.size == 1 || useFirstActivityFound) {
                     val activity = activities.first()
                     val appTitle = activity.loadLabel(pm)
                     Timber.i("Exactly one app available for intent: $appTitle")
-
-                    AlertDialog.Builder(it)
-                        .setTitle(R.string.launchingExternalApp)
-                        .setMessage(getString(R.string.confirmOpenExternalApp))
-                        .setPositiveButton(R.string.openExternalApp) { _, _ -> it.startActivity(intent) }
-                        .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
-                        .show()
-                }
-                else -> {
+                    launchExternalAppDialog(it) { it.startActivity(intent) }
+                } else {
                     val title = getString(R.string.openExternalApp)
                     val intentChooser = Intent.createChooser(intent, title)
-                    it.startActivity(intentChooser)
+                    launchExternalAppDialog(it) { it.startActivity(intentChooser) }
                 }
             }
+        }
+    }
 
+    private fun launchExternalAppDialog(context: Context, onClick: () -> Unit) {
+        val isShowing = alertDialog?.isShowing
+
+        if (isShowing != true) {
+            alertDialog = AlertDialog.Builder(context)
+                .setTitle(R.string.launchingExternalApp)
+                .setMessage(getString(R.string.confirmOpenExternalApp))
+                .setPositiveButton(R.string.yes) { _, _ ->
+                    onClick()
+                }
+                .setNeutralButton(R.string.closeTab) { dialog, _ ->
+                    dialog.dismiss()
+                    launch {
+                        viewModel.closeCurrentTab()
+                        destroyWebView()
+                    }
+                }
+                .setNegativeButton(R.string.no) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
         }
     }
 
@@ -627,7 +640,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
-            Timber.i("Observed grade: $it")
+            Timber.d("Observed grade: $it")
             it?.let { privacyGrade ->
                 val drawable = context?.getDrawable(privacyGrade.icon()) ?: return@let
                 privacyGradeButton?.setImageDrawable(drawable)
