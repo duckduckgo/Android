@@ -29,38 +29,25 @@ import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import android.view.Gravity
 import androidx.constraintlayout.widget.ConstraintLayout
-import kotlinx.android.synthetic.main.sheet_dax_dialog.*
+import kotlinx.android.synthetic.main.content_dax_dialog.*
 import android.view.animation.Animation
 import android.view.animation.OvershootInterpolator
 import android.view.animation.ScaleAnimation
 import android.widget.ImageView
 import android.widget.RelativeLayout
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlin.coroutines.CoroutineContext
 
 class DaxDialog(
     private val daxText: String,
     private val buttonText: String,
     private val dismissible: Boolean = true,
     private val typingDelayInMs: Long = 20
-) :
-    DialogFragment(), CoroutineScope {
+) : DialogFragment() {
 
-    private val animationJob: Job = Job()
-    private var typingAnimationJob: Job? = null
     private var onAnimationFinished: () -> Unit = {}
     private var clickListener: () -> Unit = { dismiss() }
 
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + animationJob
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-        inflater.inflate(R.layout.sheet_dax_dialog, container, false)
+        inflater.inflate(R.layout.content_dax_dialog, container, false)
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
@@ -78,13 +65,11 @@ class DaxDialog(
         super.onStart()
         setDialog()
         setListeners()
-        typingAnimationJob = launch {
-            startTypingAnimation(daxText, onAnimationFinished)
-        }
+        dialogText.startTypingAnimation(daxText, true, onAnimationFinished)
     }
 
     override fun onCancel(dialog: DialogInterface) {
-        typingAnimationJob?.cancel()
+        dialogText.cancelAnimation()
         super.onCancel(dialog)
     }
 
@@ -92,13 +77,12 @@ class DaxDialog(
         this.onAnimationFinished = onAnimationFinished
     }
 
-    fun setClickListener(clickListener: () -> Unit = { dismiss() }) {
+    fun setClickListener(clickListener: () -> Unit) {
         this.clickListener = clickListener
     }
 
     fun startHighlightViewAnimation(targetView: View, duration: Long = 400, size: Float = 6f) {
         val highlightImageView = addHighlightView(targetView, size)
-
         val fadeInAnimation = ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
         fadeInAnimation.duration = duration
         fadeInAnimation.fillAfter = true
@@ -108,25 +92,15 @@ class DaxDialog(
 
     private fun setListeners() {
         primaryCta.setOnClickListener {
-            typingAnimationJob?.cancel()
+            dialogText.cancelAnimation()
             clickListener()
         }
 
         if (dismissible) {
             dialogContainer.setOnClickListener {
-                typingAnimationJob?.cancel()
+                dialogText.cancelAnimation()
                 dismiss()
             }
-        }
-
-        dialogText.setOnClickListener { textClickListener() }
-    }
-
-    private fun textClickListener() {
-        if ((typingAnimationJob as Job).isActive) {
-            typingAnimationJob?.cancel()
-            dialogText.text = daxText
-            onAnimationFinished()
         }
     }
 
@@ -134,8 +108,8 @@ class DaxDialog(
         dialog?.window?.setLayout(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT)
         hiddenText.text = daxText
         primaryCta.text = buttonText
+        dialogText.typingDelayInMs = typingDelayInMs
     }
-
 
     private fun addHighlightView(targetView: View, size: Float): View {
         val highlightImageView = ImageView(requireContext())
@@ -159,18 +133,5 @@ class DaxDialog(
         dialogContainer.addView(highlightImageView, params)
 
         return highlightImageView
-    }
-
-    private suspend fun startTypingAnimation(inputText: CharSequence, afterAnimation: () -> Unit = {}) {
-        withContext(Dispatchers.Main) {
-            launch {
-                inputText.mapIndexed { index, _ ->
-                    dialogText.text = inputText.subSequence(0, index)
-                    delay(typingDelayInMs)
-                }
-                delay(300)
-                afterAnimation()
-            }
-        }
     }
 }
