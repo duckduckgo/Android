@@ -2,6 +2,8 @@
 
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
     <string name="appDescription">Le respect de votre vie privée, simplifié</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Accédez systématiquement aux paramètres pour faire des recherches et naviguer avec DuckDuckGo.</string>
@@ -83,6 +85,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Fermer</string>
     <string name="closeAllTabsMenuItem">Fermer tous les onglets</string>
+    <string name="closeTab">Fermer onglet</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Tableau de bord de confidentialité</string>

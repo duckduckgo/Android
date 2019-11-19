@@ -28,7 +28,7 @@ class BinaryDataStore @Inject constructor(private val context: Context) {
         context.openFileInput(name).use { it.readBytes() }
 
     fun saveData(name: String, byteArray: ByteArray) {
-        context.openFileOutput(name, Context.MODE_PRIVATE).write(byteArray)
+        context.openFileOutput(name, Context.MODE_PRIVATE).use { it.write(byteArray) }
     }
 
     fun clearData(name: String) {

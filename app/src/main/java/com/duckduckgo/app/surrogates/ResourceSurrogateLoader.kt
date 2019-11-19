@@ -46,13 +46,7 @@ class ResourceSurrogateLoader @Inject constructor(
 
     private fun parse(bytes: ByteArray): List<SurrogateResponse> {
         val surrogates = mutableListOf<SurrogateResponse>()
-
-        val reader = ByteArrayInputStream(bytes).bufferedReader()
-        val existingLines = reader.readLines().toMutableList()
-
-        if (existingLines.isNotEmpty() && existingLines.last().isNotBlank()) {
-            existingLines.add("")
-        }
+        val existingLines = readExistingLines(bytes)
 
         var nextLineIsNewRule = true
 
@@ -98,5 +92,16 @@ class ResourceSurrogateLoader @Inject constructor(
 
         Timber.d("Processed ${surrogates.size} surrogates")
         return surrogates
+    }
+
+    private fun readExistingLines(bytes: ByteArray): List<String> {
+        val existingLines = ByteArrayInputStream(bytes).bufferedReader().use { reader ->
+            reader.readLines().toMutableList()
+        }
+
+        if (existingLines.isNotEmpty() && existingLines.last().isNotBlank()) {
+            existingLines.add("")
+        }
+        return existingLines
     }
 }
