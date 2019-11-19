@@ -54,7 +54,6 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.usage.app.AppDaysUsedRecorder
-import com.squareup.leakcanary.LeakCanary
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
@@ -158,8 +157,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     override fun onCreate() {
         super.onCreate()
 
-        if (!installLeakCanary()) return
-
         configureLogging()
         configureDependencyInjection()
         configureUncaughtExceptionHandler()
@@ -202,14 +199,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         if (!appInstallStore.hasInstallTimestampRecorded()) {
             appInstallStore.installTimestamp = System.currentTimeMillis()
         }
-    }
-
-    protected open fun installLeakCanary(): Boolean {
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            return false
-        }
-        LeakCanary.install(this)
-        return true
     }
 
     private fun appIsRestarting(): Boolean {
