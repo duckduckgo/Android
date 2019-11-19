@@ -123,12 +123,12 @@ class DaxDialog(
 
         val width = targetView.width
         val height = targetView.height
-        val a: IntArray = intArrayOf(0, 0)
-        targetView.getLocationOnScreen(a)
+        val locationOnScreen: IntArray = intArrayOf(0, 0)
+        targetView.getLocationOnScreen(locationOnScreen)
 
         val params = RelativeLayout.LayoutParams(width + (width / size).toInt(), height + (height / size).toInt())
-        params.leftMargin = a[0] - ((width / size) / 2).toInt()
-        params.topMargin = (a[1] - statusBarHeight) - ((width / size) / 2).toInt()
+        params.leftMargin = locationOnScreen[0] - ((width / size) / 2).toInt()
+        params.topMargin = (locationOnScreen[1] - statusBarHeight) - ((width / size) / 2).toInt()
 
         dialogContainer.addView(highlightImageView, params)
 
