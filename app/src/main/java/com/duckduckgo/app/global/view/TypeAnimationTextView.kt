@@ -46,7 +46,7 @@ class TypeAnimationTextView @JvmOverloads constructor(
 
         if (isCancellable) {
             setOnClickListener {
-                if ((typingAnimationJob as Job).isActive) {
+                if (typingAnimationJob?.isActive == true) {
                     cancelAnimation()
                     text = inputText
                     afterAnimation()
