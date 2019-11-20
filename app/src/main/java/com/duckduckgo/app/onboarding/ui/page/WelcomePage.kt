@@ -24,7 +24,7 @@ import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import com.duckduckgo.app.browser.R
-import kotlinx.android.synthetic.main.content_dax_dialog.*
+import kotlinx.android.synthetic.main.include_dax_dialog.*
 import kotlinx.android.synthetic.main.content_onboarding_welcome.*
 import kotlinx.android.synthetic.main.content_onboarding_welcome.longDescriptionContainer
 import kotlinx.coroutines.CoroutineScope

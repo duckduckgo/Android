@@ -42,7 +42,7 @@
         app:layout_constraintWidth_max="180dp" />
 
     <include
-        layout="@layout/content_dax_dialog"
+        layout="@layout/include_dax_dialog"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="40dp"
