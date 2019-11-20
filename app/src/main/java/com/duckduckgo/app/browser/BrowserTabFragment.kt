@@ -1127,22 +1127,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     if (viewState.isLoading) show() else hide()
                     progress = viewState.progress
                 }
-
-                if (viewState.progress == 100 && (0..10).random() % 3 == 0) {
-                    val fireButton = requireActivity().findViewById<View>(R.id.fire)
-                    val gradeView = requireActivity().findViewById<View>(R.id.privacyGradeButton)
-
-                    val text =
-                        "Every site has a privacy grade. Tap it to see how I protected your privacy.\n\nWant to get fancy? Try clearing your data by hitting the fire button."
-                    val dialog = DaxDialog(text, "Got it")
-
-                    dialog.onAnimationFinishedListener {
-                        dialog.startHighlightViewAnimation(fireButton)
-                        dialog.startHighlightViewAnimation(targetView = gradeView, size = 1.5f)
-                    }
-
-                    dialog.show(requireFragmentManager(), "MARCOS")
-                }
             }
         }
 

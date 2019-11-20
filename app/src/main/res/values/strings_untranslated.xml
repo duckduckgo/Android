@@ -21,4 +21,6 @@
     <string name="onboardingWelcomeTitle">"Welcome to DuckDuckGo!"</string>
     <string name="onboardingLetsDoItButton">Let\'s Do It!</string>
 
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">HIDE</string>
 </resources>
