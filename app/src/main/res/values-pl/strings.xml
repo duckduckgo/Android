@@ -2,6 +2,8 @@
 
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
     <string name="appDescription">Prywatność uproszczona</string>
+    <string name="yes">Tak</string>
+    <string name="no">Nie</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Zmień ustawienia, aby zawsze wyszukiwać i przeglądać strony za pośrednictwem DuckDuckGo.</string>
@@ -83,6 +85,7 @@
     <string name="faviconContentDescription">Ikona skrótu</string>
     <string name="closeContentDescription">Zamknij</string>
     <string name="closeAllTabsMenuItem">Zamknij wszystkie karty</string>
+    <string name="closeTab">Zamknij karta</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Panel zarządzania prywatnością</string>

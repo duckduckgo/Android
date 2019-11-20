@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.content.Context
 import android.os.Build
+import android.webkit.CookieManager
 import android.webkit.HttpAuthHandler
 import android.webkit.RenderProcessGoneDetail
 import android.webkit.WebView
@@ -36,25 +37,25 @@ class BrowserWebViewClientTest {
     private lateinit var testee: BrowserWebViewClient
     private lateinit var webView: WebView
 
+    private val requestRewriter: RequestRewriter = mock()
     private val specialUrlDetector: SpecialUrlDetector = mock()
     private val requestInterceptor: RequestInterceptor = mock()
     private val listener: WebViewClientListener = mock()
+    private val cookieManager: CookieManager = mock()
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore = mock()
     private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
-    private val mainFrameUrlHandler: SpecialUrlHandler = mock()
-    private val subFrameUrlHandler: SpecialUrlHandler = mock()
 
     @UiThreadTest
     @Before
     fun setup() {
         webView = TestWebView(InstrumentationRegistry.getInstrumentation().targetContext)
         testee = BrowserWebViewClient(
+            requestRewriter,
             specialUrlDetector,
             requestInterceptor,
             offlinePixelCountDataStore,
             uncaughtExceptionRepository,
-            mainFrameUrlHandler,
-            subFrameUrlHandler
+            cookieManager
         )
         testee.webViewClientListener = listener
     }
