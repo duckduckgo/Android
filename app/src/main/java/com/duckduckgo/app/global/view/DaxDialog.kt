@@ -59,9 +59,8 @@ class DaxDialog(
         attributes?.gravity = Gravity.BOTTOM
         window?.attributes = attributes
         window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
-            setStyle(STYLE_NO_TITLE, android.R.style.Theme_DeviceDefault_Light_NoActionBar)
-        }
+        setStyle(STYLE_NO_TITLE, android.R.style.Theme_DeviceDefault_Light_NoActionBar)
+
         return dialog
     }
 
