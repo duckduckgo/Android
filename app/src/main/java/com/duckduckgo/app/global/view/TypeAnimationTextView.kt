@@ -26,22 +26,19 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
-
 class TypeAnimationTextView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : TextView(context, attrs, defStyleAttr), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + animationJob
+        get() = Dispatchers.Main + Job()
 
-    private val animationJob: Job = Job()
     private var typingAnimationJob: Job? = null
-
+    private var delayAfterAnimationInMs: Long = 300
+    private lateinit var inputText: String
     var typingDelayInMs: Long = 20
-    var delayAfterAnimationInMs: Long = 300
-    private lateinit var inputText: CharSequence
 
-    fun startTypingAnimation(inputText: CharSequence, isCancellable: Boolean = true, afterAnimation: () -> Unit = {}) {
+    fun startTypingAnimation(inputText: String, isCancellable: Boolean = true, afterAnimation: () -> Unit = {}) {
         this.inputText = inputText
 
         if (isCancellable) {
