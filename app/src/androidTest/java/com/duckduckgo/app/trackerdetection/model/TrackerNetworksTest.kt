@@ -26,7 +26,7 @@ import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
 import com.nhaarman.mockitokotlin2.mock
 import org.junit.Before
 
-//TODO implement new version
+//TODO update tests after implementation
 class TrackerNetworksTest {
 
     companion object {

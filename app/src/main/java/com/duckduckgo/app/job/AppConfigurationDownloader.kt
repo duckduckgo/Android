@@ -22,7 +22,6 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeDataDownloader
 import com.duckduckgo.app.surrogates.api.ResourceSurrogateListDownloader
 import com.duckduckgo.app.survey.api.SurveyDownloader
-import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import io.reactivex.Completable
 import timber.log.Timber
@@ -41,10 +40,9 @@ class AppConfigurationDownloader(
 ) : ConfigurationDownloader {
 
     override fun downloadTask(): Completable {
-        val tdsDownload = trackerDataDownloader.downloadList(TDS)
-        val easyListDownload = trackerDataDownloader.downloadList(EASYLIST)
-        val easyPrivacyDownload = trackerDataDownloader.downloadList(EASYPRIVACY)
-        val trackersWhitelist = trackerDataDownloader.downloadList(TRACKERSWHITELIST)
+        val tdsDownload = trackerDataDownloader.downloadTdsList()
+        val temporaryTrackingWhitelist = trackerDataDownloader.downloadTemporaryWhitelist()
+        val clearLegacyLists = trackerDataDownloader.clearLegacyLists()
         val entityListDownload = entityListDownloader.download()
         val surrogatesDownload = resourceSurrogateDownloader.downloadList()
         val httpsUpgradeDownload = httpsUpgradeDataDownloader.download()
@@ -53,9 +51,8 @@ class AppConfigurationDownloader(
         return Completable.mergeDelayError(
             listOf(
                 tdsDownload,
-                easyListDownload,
-                easyPrivacyDownload,
-                trackersWhitelist,
+                temporaryTrackingWhitelist,
+                clearLegacyLists,
                 entityListDownload,
                 surrogatesDownload,
                 httpsUpgradeDownload,

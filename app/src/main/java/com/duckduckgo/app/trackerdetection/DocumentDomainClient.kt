@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
- *  
+ * Copyright (c) 2019 DuckDuckGo
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,28 +16,17 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
+import com.duckduckgo.app.trackerdetection.model.DomainContainer
 import com.duckduckgo.app.trackerdetection.model.ResourceType
 
-interface Client {
+/**
+ * Performs matching of the top level document url to the domains. This is commonly used for whitelisting where
+ * the main site is whitelisted (not just individual trackers).
+ */
+class DocumentDomainClient(override val name: Client.ClientName, private val domains: List<DomainContainer>) : Client {
 
-    enum class ClientType {
-        BLOCKING,
-        WHITELIST
+    override fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean {
+        return domains.any { sameOrSubdomain(documentUrl, it.domain) }
     }
-
-    enum class ClientName(val type: ClientType) {
-        // current clients
-        TDS(ClientType.BLOCKING),
-        TEMPORARY_WHITELIST(ClientType.WHITELIST),
-
-        // legacy clients
-        EASYLIST(ClientType.BLOCKING),
-        EASYPRIVACY(ClientType.BLOCKING),
-        TRACKERSWHITELIST(ClientType.WHITELIST)
-    }
-
-    val name: ClientName
-
-    fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean
-
 }

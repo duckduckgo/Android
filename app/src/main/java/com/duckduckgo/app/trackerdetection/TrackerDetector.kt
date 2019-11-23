@@ -63,6 +63,7 @@ class TrackerDetectorImpl(
                 resourceType
             )
         }
+
         if (matches) {
             Timber.v("$documentUrl resource $url WAS identified as a tracker")
             return TrackingEvent(documentUrl, url, networkTrackers.network(url), settings.privacyOn)

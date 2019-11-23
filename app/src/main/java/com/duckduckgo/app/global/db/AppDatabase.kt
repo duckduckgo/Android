@@ -51,7 +51,9 @@ import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
+import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
+import com.duckduckgo.app.trackerdetection.model.TemporaryTrackingWhitelistedDomain
 import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedEntity
 import com.duckduckgo.app.usage.search.SearchCountDao
@@ -60,6 +62,7 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
 @Database(
     exportSchema = true, version = 16, entities = [
         TdsTracker::class,
+        TemporaryTrackingWhitelistedDomain::class,
         HttpsBloomFilterSpec::class,
         HttpsWhitelistedDomain::class,
         NetworkLeaderboardEntry::class,
@@ -91,6 +94,7 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun tdsTrackerDao(): TdsTrackerDao
+    abstract fun temporaryTrackingWhitelistDao(): TemporaryTrackingWhitelistDao
     abstract fun httpsWhitelistedDao(): HttpsWhitelistDao
     abstract fun httpsBloomFilterSpecDao(): HttpsBloomFilterSpecDao
     abstract fun networkLeaderboardDao(): NetworkLeaderboardDao
@@ -220,6 +224,7 @@ abstract class AppDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("DROP TABLE `disconnect_tracker`")
                 database.execSQL("CREATE TABLE IF NOT EXISTS `tds_tracker` (`domain` TEXT NOT NULL, `defaultAction` TEXT NOT NULL, `ownerName` TEXT NOT NULL, PRIMARY KEY(`domain`))")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `temporary_tracking_whitelist` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
             }
         }
 

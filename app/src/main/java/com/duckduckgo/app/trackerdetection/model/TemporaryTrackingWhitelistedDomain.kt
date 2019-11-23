@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.api
+package com.duckduckgo.app.trackerdetection.model
 
-import retrofit2.Call
-import retrofit2.http.GET
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-interface TrackerListService {
-
-    @GET("https://staticcdn.duckduckgo.com/trackerblocking/tds.json")
-    fun tds(): Call<TdsJson>
-
-    @GET("/contentblocking/trackers-whitelist-temporary.txt")
-    fun temporaryWhitelist(): Call<String>
-
-}
+@Entity(tableName = "temporary_tracking_whitelist")
+data class TemporaryTrackingWhitelistedDomain(
+    @PrimaryKey override val domain: String
+) : DomainContainer

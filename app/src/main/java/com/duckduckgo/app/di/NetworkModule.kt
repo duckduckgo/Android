@@ -48,6 +48,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.io.File
 import javax.inject.Named
 import javax.inject.Singleton
@@ -84,6 +85,7 @@ class NetworkModule {
         return Retrofit.Builder()
             .baseUrl(Url.API)
             .client(okHttpClient)
+            .addConverterFactory(ScalarsConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .addConverterFactory(MoshiConverterFactory.create(moshi))

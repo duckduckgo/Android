@@ -17,6 +17,7 @@
 package com.duckduckgo.app.trackerdetection
 
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import com.duckduckgo.app.trackerdetection.Client.ClientName
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYLIST
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYPRIVACY
 import com.duckduckgo.app.trackerdetection.model.ResourceType
@@ -29,16 +30,11 @@ import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 
-
 class TrackerDetectorTest {
 
     private val mockNetworkTrackers: TrackerNetworks = mock()
     private val settingStore: PrivacySettingsStore = mock()
     private val trackerDetector = TrackerDetectorImpl(mockNetworkTrackers, settingStore)
-
-    companion object {
-        private val resourceType = ResourceType.UNKNOWN
-    }
 
     @Test
     fun whenThereAreNoClientsThenClientCountIsZero() {
@@ -47,109 +43,117 @@ class TrackerDetectorTest {
 
     @Test
     fun whenClientAddedThenClientCountIsOne() {
-        trackerDetector.addClient(alwaysMatchingClient(EASYLIST))
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         assertEquals(1, trackerDetector.clientCount)
     }
 
     @Test
     fun whenTwoClientsWithDifferentNamesAddedThenCountIsTwo() {
-        trackerDetector.addClient(alwaysMatchingClient(EASYLIST))
-        trackerDetector.addClient(alwaysMatchingClient(EASYPRIVACY))
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
         assertEquals(2, trackerDetector.clientCount)
     }
 
     @Test
     fun whenTwoClientsWithSameNameAddedThenClientIsReplacedAndCountIsStillOne() {
-        trackerDetector.addClient(alwaysMatchingClient(EASYLIST))
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         assertEquals(1, trackerDetector.clientCount)
-        assertNotNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
+        assertNotNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", RESOURCE_TYPE))
 
-        trackerDetector.addClient(neverMatchingClient(EASYLIST))
+        trackerDetector.addClient(neverMatchingClient(CLIENT_A))
         assertEquals(1, trackerDetector.clientCount)
-        assertNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
+        assertNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", RESOURCE_TYPE))
     }
 
     @Test
     fun whenThereAreNoClientsThenEvaluateReturnsNull() {
-        assertNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
+        assertNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", RESOURCE_TYPE))
     }
 
     @Test
     fun whenAllClientsFailToMatchThenEvaluateReturnsNull() {
-        trackerDetector.addClient(neverMatchingClient(EASYLIST))
-        trackerDetector.addClient(neverMatchingClient(EASYPRIVACY))
-        assertNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType))
+        trackerDetector.addClient(neverMatchingClient(CLIENT_A))
+        trackerDetector.addClient(neverMatchingClient(CLIENT_B))
+        assertNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", RESOURCE_TYPE))
     }
 
     @Test
     fun whenPrivacyOnAndAllClientsMatchThenEvaluateReturnsBlockedTrackingEvent() {
         whenever(settingStore.privacyOn).thenReturn(true)
-        trackerDetector.addClient(alwaysMatchingClient(EASYLIST))
-        trackerDetector.addClient(alwaysMatchingClient(EASYPRIVACY))
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
         val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, true)
-        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType)
+        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", RESOURCE_TYPE)
         assertEquals(expected, actual)
     }
 
     @Test
     fun whenPrivacyOffAndAllClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() {
         whenever(settingStore.privacyOn).thenReturn(false)
-        trackerDetector.addClient(alwaysMatchingClient(EASYLIST))
-        trackerDetector.addClient(alwaysMatchingClient(EASYPRIVACY))
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
         val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, false)
-        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType)
+        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", RESOURCE_TYPE)
         assertEquals(expected, actual)
     }
 
     @Test
     fun whenPrivacyOnAndSomeClientsMatchThenEvaluateReturnsBlockedTrackingEvent() {
         whenever(settingStore.privacyOn).thenReturn(true)
-        trackerDetector.addClient(neverMatchingClient(EASYLIST))
-        trackerDetector.addClient(alwaysMatchingClient(EASYPRIVACY))
+        trackerDetector.addClient(neverMatchingClient(CLIENT_A))
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
         val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, true)
-        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType)
+        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", RESOURCE_TYPE)
         assertEquals(expected, actual)
     }
 
     @Test
     fun whenPrivacyOffAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() {
         whenever(settingStore.privacyOn).thenReturn(false)
-        trackerDetector.addClient(neverMatchingClient(EASYLIST))
-        trackerDetector.addClient(alwaysMatchingClient(EASYPRIVACY))
+        trackerDetector.addClient(neverMatchingClient(CLIENT_A))
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
         val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, false)
-        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", resourceType)
+        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com", RESOURCE_TYPE)
         assertEquals(expected, actual)
     }
 
     @Test
     fun whenUrlHasSameDomainAsDocumentThenEvaluateReturnsNull() {
-        trackerDetector.addClient(alwaysMatchingClient(EASYLIST))
-        assertNull(trackerDetector.evaluate("http://example.com/update.js", "http://example.com/index.com", resourceType))
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
+        assertNull(trackerDetector.evaluate("http://example.com/update.js", "http://example.com/index.com", RESOURCE_TYPE))
     }
 
     @Test
     fun whenUrlIsSubdomainOfDocumentThenEvaluateReturnsNull() {
-        trackerDetector.addClient(alwaysMatchingClient(EASYLIST))
-        assertNull(trackerDetector.evaluate("http://mobile.example.com/update.js", "http://example.com/index.com", resourceType))
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
+        assertNull(trackerDetector.evaluate("http://mobile.example.com/update.js", "http://example.com/index.com", RESOURCE_TYPE))
     }
 
     @Test
     fun whenUrlIsParentOfDocumentThenEvaluateReturnsNull() {
-        trackerDetector.addClient(alwaysMatchingClient(EASYLIST))
-        assertNull(trackerDetector.evaluate("http://example.com/update.js", "http://mobile.example.com/index.com", resourceType))
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
+        assertNull(trackerDetector.evaluate("http://example.com/update.js", "http://mobile.example.com/index.com", RESOURCE_TYPE))
     }
 
-    private fun alwaysMatchingClient(name: Client.ClientName): Client {
+    private fun alwaysMatchingClient(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
         whenever(client.matches(anyString(), anyString(), any())).thenReturn(true)
         return client
     }
 
-    private fun neverMatchingClient(name: Client.ClientName): Client {
+    private fun neverMatchingClient(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
         whenever(client.matches(anyString(), anyString(), any())).thenReturn(false)
         return client
+    }
+
+    companion object {
+        private val RESOURCE_TYPE = ResourceType.UNKNOWN
+
+        // It doesn't matter what the value of these is they just need to be different
+        private val CLIENT_A = EASYLIST
+        private val CLIENT_B = EASYPRIVACY
     }
 }

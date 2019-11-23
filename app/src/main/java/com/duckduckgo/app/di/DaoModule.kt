@@ -33,6 +33,9 @@ class DaoModule {
     fun providesTdsTrackDao(database: AppDatabase) = database.tdsTrackerDao()
 
     @Provides
+    fun providesTemporaryTrackingWhitelist(database: AppDatabase) = database.temporaryTrackingWhitelistDao()
+
+    @Provides
     fun providesNetworkLeaderboardDao(database: AppDatabase) = database.networkLeaderboardDao()
 
     @Provides

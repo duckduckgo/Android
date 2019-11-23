@@ -19,14 +19,13 @@ package com.duckduckgo.app.trackerdetection.api
 import com.duckduckgo.app.global.api.isCached
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.store.BinaryDataStore
-import com.duckduckgo.app.trackerdetection.AdBlockClient
 import com.duckduckgo.app.trackerdetection.Client
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
+import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
+import com.duckduckgo.app.trackerdetection.model.TemporaryTrackingWhitelistedDomain
 import io.reactivex.Completable
-import okhttp3.ResponseBody
-import retrofit2.Call
 import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
@@ -37,19 +36,11 @@ class TrackerDataDownloader @Inject constructor(
     private val binaryDataStore: BinaryDataStore,
     private val trackerDataLoader: TrackerDataLoader,
     private val tdsTrackerDao: TdsTrackerDao,
+    private val temporaryTrackingWhitelistDao: TemporaryTrackingWhitelistDao,
     private val appDatabase: AppDatabase
 ) {
 
-    fun downloadList(clientName: Client.ClientName): Completable {
-
-        return when (clientName) {
-            TDS -> downloadTdsList()
-            TRACKERSWHITELIST -> downloadAdblockList(clientName) { trackerListService.trackersWhitelist() }
-            EASYLIST, EASYPRIVACY -> removeLegacyList(clientName)
-        }
-    }
-
-    private fun downloadTdsList(): Completable {
+    fun downloadTdsList(): Completable {
 
         return Completable.fromAction {
 
@@ -78,42 +69,45 @@ class TrackerDataDownloader @Inject constructor(
         }
     }
 
-    private fun downloadAdblockList(clientName: Client.ClientName, callFactory: (clientName: Client.ClientName) -> Call<ResponseBody>): Completable {
+    fun downloadTemporaryWhitelist(): Completable {
+
         return Completable.fromAction {
 
-            Timber.d("Downloading ${clientName.name} data")
-            val call = callFactory(clientName)
+            Timber.d("Downloading temporary tracking whitelist")
+
+            val call = trackerListService.temporaryWhitelist()
             val response = call.execute()
 
-            if (response.isCached && binaryDataStore.hasData(clientName.name)) {
-                Timber.d("${clientName.name} data already cached and stored")
+            if (response.isCached && temporaryTrackingWhitelistDao.count() != 0) {
+                Timber.d("Temporary whitelist data already cached and stored")
                 return@fromAction
             }
 
             if (response.isSuccessful) {
-                val bodyBytes = response.body()!!.bytes()
-                Timber.d("Updating ${clientName.name} data store with new data")
-                persistTrackerData(clientName, bodyBytes)
-                trackerDataLoader.loadAdblockData(clientName)
+                Timber.d("Updating temporary tracking whitelist data from server")
+                val body = response.body()!!
+
+                appDatabase.runInTransaction {
+                    temporaryTrackingWhitelistDao.updateAll(body.lines().map { TemporaryTrackingWhitelistedDomain(it) })
+                    trackerDataLoader.loadTemporaryWhitelistData()
+                }
+
             } else {
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
         }
     }
 
-    private fun persistTrackerData(clientName: Client.ClientName, bodyBytes: ByteArray) {
-        val client = AdBlockClient(clientName)
-        client.loadBasicData(bodyBytes)
-        binaryDataStore.saveData(clientName.name, client.getProcessedData())
-    }
-
-    private fun removeLegacyList(clientName: Client.ClientName): Completable {
+    fun clearLegacyLists(): Completable {
         return Completable.fromAction {
-            if (binaryDataStore.hasData(clientName.name)) {
-                binaryDataStore.clearData(clientName.name)
+
+            listOf(EASYLIST, EASYPRIVACY, TRACKERSWHITELIST).forEach {
+                if (binaryDataStore.hasData(it.name)) {
+                    binaryDataStore.clearData(it.name)
+                }
             }
+
             return@fromAction
         }
     }
-
 }

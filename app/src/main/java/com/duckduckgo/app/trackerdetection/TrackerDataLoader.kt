@@ -17,40 +17,24 @@
 package com.duckduckgo.app.trackerdetection
 
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
+import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
 import timber.log.Timber
 import javax.inject.Inject
 
 @WorkerThread
 class TrackerDataLoader @Inject constructor(
     private val trackerDetector: TrackerDetector,
-    private val binaryDataStore: BinaryDataStore,
-    private val tdsTrackerDao: TdsTrackerDao
+    private val tdsTrackerDao: TdsTrackerDao,
+    private val tempWhitelistDao: TemporaryTrackingWhitelistDao
 ) {
 
     fun loadData() {
-
         Timber.d("Loading Tracker data")
-
-        // this is stored to disk, then fed to the C++ adblock module
-        loadAdblockData(Client.ClientName.TRACKERSWHITELIST)
 
         // stored in DB, then read into memory
         loadTdsTrackerData()
-    }
-
-    fun loadAdblockData(name: Client.ClientName) {
-        Timber.d("Looking for adblock tracker ${name.name} to load")
-
-        if (binaryDataStore.hasData(name.name)) {
-            Timber.d("Found adblock tracker ${name.name}")
-            val client = AdBlockClient(name)
-            client.loadProcessedData(binaryDataStore.loadData(name.name))
-            trackerDetector.addClient(client)
-        } else {
-            Timber.d("No adblock tracker ${name.name} found")
-        }
+        loadTemporaryWhitelistData()
     }
 
     fun loadTdsTrackerData() {
@@ -58,6 +42,14 @@ class TrackerDataLoader @Inject constructor(
         Timber.d("Loaded ${trackers.size} tds trackers from DB")
 
         val client = TdsClient(Client.ClientName.TDS, trackers)
+        trackerDetector.addClient(client)
+    }
+
+    fun loadTemporaryWhitelistData() {
+        val whitelist = tempWhitelistDao.getAll()
+        Timber.d("Loaded ${whitelist.size} temporarily whitelisted domains from DB")
+
+        val client = DocumentDomainClient(Client.ClientName.TEMPORARY_WHITELIST, whitelist)
         trackerDetector.addClient(client)
     }
 }

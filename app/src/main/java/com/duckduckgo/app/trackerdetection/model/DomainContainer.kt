@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
- *
+ * Copyright (c) 2019 DuckDuckGo
+ *  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,17 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.api
+package com.duckduckgo.app.trackerdetection.model
 
-import retrofit2.Call
-import retrofit2.http.GET
-
-interface TrackerListService {
-
-    @GET("https://staticcdn.duckduckgo.com/trackerblocking/tds.json")
-    fun tds(): Call<TdsJson>
-
-    @GET("/contentblocking/trackers-whitelist-temporary.txt")
-    fun temporaryWhitelist(): Call<String>
-
+interface DomainContainer {
+    val domain: String
 }
