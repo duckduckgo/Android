@@ -17,49 +17,50 @@
 package com.duckduckgo.app.trackerdetection.api
 
 import com.duckduckgo.app.FileUtilities.loadText
+import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
-import com.duckduckgo.app.trackerdetection.model.TdsTracker.Action
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assert.*
 import org.junit.Test
 
-class TdsTrackerJsonAdapterTest {
+class TdsTrackerJsonTest {
 
-    private val moshi = Moshi.Builder().add(TdsJsonAdapter()).build()
-    private val type = Types.newParameterizedType(List::class.java, TdsTracker::class.java)
-    private val jsonAdapter: JsonAdapter<List<TdsTracker>> = moshi.adapter(type)
+    private val actionConverter = ActionJsonAdapter()
+    private val moshi = Moshi.Builder().add(actionConverter).build()
+    private val type = Types.newParameterizedType(Map::class.java, String::class.java, TdsJsonTracker::class.java)
+    private val jsonAdapter: JsonAdapter<Map<String, TdsJsonTracker>> = moshi.adapter(type)
 
     @Test
     fun whenFormatIsValidThenTrackersAreCreated() {
         val json = loadText("json/tds.json")
-        val trackers = jsonAdapter.fromJson(json)
+        val trackers = jsonAdapter.fromJson(json)!!.toTdsTrackers()
         assertEquals(3, trackers.count())
     }
 
     @Test
     fun whenFormatIsValidThenBasicElementsAreConvertedCorrectly() {
         val json = loadText("json/tds.json")
-        val trackers = jsonAdapter.fromJson(json)
-        val tracker = trackers.find { it.domain == "1dmp.io" }
-        assertEquals(TdsTracker("1dmp.io", Action.BLOCK, "CleverDATA"), tracker)
+        val trackers = jsonAdapter.fromJson(json)!!.toTdsTrackers()
+        val tracker = trackers["1dmp.io"]
+        assertEquals(TdsTracker("1dmp.io", BLOCK, "CleverDATA LLC", arrayListOf()), tracker)
     }
 
     @Test
     fun whenTrackerHasInvalidDefaultActionThenTrackerNotCreated() {
         val json = loadText("json/tds_action_invalid.json")
-        val trackers = jsonAdapter.fromJson(json)
+        val jsonTrackers = jsonAdapter.fromJson(json)!!
+        val trackers = jsonTrackers.toTdsTrackers()
         assertEquals(2, trackers.count())
-        assertNull(trackers.find { it.domain == "1dmp.io" })
+        assertFalse(trackers.containsKey("1dmp.io"))
     }
 
     @Test
     fun whenTrackerIsMissingDefaultActionThenTrackerNotCreated() {
         val json = loadText("json/tds_action_missing.json")
-        val trackers = jsonAdapter.fromJson(json)
+        val trackers = jsonAdapter.fromJson(json)!!.toTdsTrackers()
         assertEquals(2, trackers.count())
-        assertNull(trackers.find { it.domain == "1dmp.io" })
+        assertFalse(trackers.containsKey("1dmp.io"))
     }
 }

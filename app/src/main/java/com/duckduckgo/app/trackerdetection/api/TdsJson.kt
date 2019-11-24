@@ -16,9 +16,50 @@
 
 package com.duckduckgo.app.trackerdetection.api
 
+import com.duckduckgo.app.trackerdetection.model.Action
+import com.duckduckgo.app.trackerdetection.model.Rule
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
-import com.squareup.moshi.Json
+import com.squareup.moshi.FromJson
+import com.squareup.moshi.ToJson
 
 class TdsJson {
-    lateinit var trackers: List<TdsTracker>
+    lateinit var trackers: Map<String, TdsJsonTracker>
+}
+
+fun Map<String, TdsJsonTracker>.toTdsTrackers(): Map<String, TdsTracker> {
+    return mapNotNull { (key, value) ->
+        value.toTdsTracker()?.let {
+            return@let key to it
+        }
+    }.toMap()
+}
+
+data class TdsJsonTracker(
+    val domain: String?,
+    val default: Action?,
+    val owner: TdsJsonOwner?,
+    val rules: List<Rule>?
+) {
+
+    fun toTdsTracker(): TdsTracker? {
+        if (domain == null || default == null || owner == null) return null
+        return TdsTracker(domain, default, owner.name, rules ?: emptyList())
+    }
+}
+
+data class TdsJsonOwner(
+    val name: String
+)
+
+class ActionJsonAdapter {
+
+    @ToJson
+    fun toJson(action: Action): String {
+        return action.name.toLowerCase()
+    }
+
+    @FromJson
+    fun fromJson(actionName: String): Action? {
+        return Action.values().firstOrNull { it.name == actionName.toUpperCase() }
+    }
 }

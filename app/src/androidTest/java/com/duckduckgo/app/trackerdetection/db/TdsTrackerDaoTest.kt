@@ -19,6 +19,7 @@ package com.duckduckgo.app.trackerdetection.db
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -94,7 +95,7 @@ class TdsTrackerDaoTest {
     }
 
     private fun createTracker(domain: String): TdsTracker {
-        return TdsTracker(domain, TdsTracker.Action.BLOCK, "")
+        return TdsTracker(domain, BLOCK, "", arrayListOf())
     }
 
     companion object {

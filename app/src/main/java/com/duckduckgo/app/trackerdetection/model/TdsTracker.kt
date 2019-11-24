@@ -19,34 +19,66 @@ package com.duckduckgo.app.trackerdetection.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
+import com.duckduckgo.app.di.JsonModule
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Types
 
 @Entity(tableName = "tds_tracker")
 data class TdsTracker(
-
-    @PrimaryKey val domain: String,
+    @PrimaryKey
+    val domain: String,
 
     val defaultAction: Action,
 
-    val ownerName: String
+    val ownerName: String,
 
-) {
-    enum class Action {
-        BLOCK,
-        WHITELIST
+    val rules: List<Rule>
+)
+
+enum class Action {
+    BLOCK,
+    IGNORE;
+}
+
+class Rule(
+    val rule: String,
+    val action: Action?,
+    val exceptions: RuleExceptions?
+)
+
+class RuleExceptions(
+    val domains: List<String>?,
+    val types: List<String>?
+)
+
+class ActionTypeConverter {
+
+    @TypeConverter
+    fun toAction(value: String): Action {
+        return Action.valueOf(value)
     }
 
-    class ActionTypeConverter {
+    @TypeConverter
+    fun fromAction(value: Action): String {
+        return value.name
+    }
+}
 
-        @TypeConverter
-        fun toAction(value: String): Action {
-            return Action.valueOf(value)
-        }
+class RuleTypeConverter() {
 
-        @TypeConverter
-        fun fromAction(value: Action): String {
-            return value.name
-        }
+    @TypeConverter
+    fun toRules(value: String): List<Rule> {
+        return jsonAdapter.fromJson(value)
     }
 
+    @TypeConverter
+    fun fromRules(value: List<Rule>): String {
+        return jsonAdapter.toJson(value)
+    }
+
+    companion object {
+        private val type = Types.newParameterizedType(List::class.java, Rule::class.java)
+        private val jsonAdapter: JsonAdapter<List<Rule>> = JsonModule().moshi().adapter(type)
+    }
 }
 

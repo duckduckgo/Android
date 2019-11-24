@@ -23,10 +23,10 @@ import com.duckduckgo.app.trackerdetection.model.TdsTracker
 abstract class TdsTrackerDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertAll(trackers: List<TdsTracker>)
+    abstract fun insertAll(trackers: Collection<TdsTracker>)
 
     @Transaction
-    open fun updateAll(trackers: List<TdsTracker>) {
+    open fun updateAll(trackers: Collection<TdsTracker>) {
         deleteAll()
         insertAll(trackers)
     }

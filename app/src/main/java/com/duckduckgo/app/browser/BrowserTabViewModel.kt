@@ -333,7 +333,7 @@ class BrowserTabViewModel(
         if (type is IntentType) {
             externalAppLinkClicked(type)
         } else {
-            if (shouldClearHistoryOnNewQuery()) {
+            if (    shouldClearHistoryOnNewQuery()) {
                 command.value = ResetHistory
             }
             command.value = Navigate(queryUrlConverter.convertQueryToUrl(trimmedInput))

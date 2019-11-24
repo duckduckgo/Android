@@ -17,21 +17,51 @@
 package com.duckduckgo.app.trackerdetection
 
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
+import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
+import com.duckduckgo.app.trackerdetection.model.Action.IGNORE
 import com.duckduckgo.app.trackerdetection.model.ResourceType
+import com.duckduckgo.app.trackerdetection.model.RuleExceptions
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
-import com.duckduckgo.app.trackerdetection.model.TdsTracker.Action.BLOCK
 
 class TdsClient(override val name: Client.ClientName, private val trackers: List<TdsTracker>) : Client {
 
     override fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean {
-        var tracker = trackers.firstOrNull { sameOrSubdomain(url, it.domain) }
 
-        if (tracker?.defaultAction == BLOCK) {
+        var tracker = trackers.firstOrNull { sameOrSubdomain(url, it.domain) } ?: return false
+
+        tracker.rules?.forEach { rule ->
+            if (url.matches(".*${rule.rule}.*".toRegex())) {
+                if (matchedException(rule.exceptions, documentUrl)) {
+                    return false
+                }
+                if (rule.action != null) {
+                    return rule.action != IGNORE
+                }
+            }
+        }
+
+        return tracker.defaultAction == BLOCK
+    }
+
+    private fun matchedException(exceptions: RuleExceptions?, documentUrl: String): Boolean {
+
+        if (exceptions == null) return false
+
+        val domains = exceptions.domains
+        val types = exceptions.types
+
+        // We don't support type filtering on android so if the types exist without a domain
+        // we allow the exception through
+        if (domains.isNullOrEmpty() && !types.isNullOrEmpty()) {
             return true
         }
 
-        //TODO rule checks
-        //TODO check subdomain rules
+        domains?.forEach {
+            if (sameOrSubdomain(documentUrl, it)) {
+                return true
+            }
+
+        }
         return false
     }
 }

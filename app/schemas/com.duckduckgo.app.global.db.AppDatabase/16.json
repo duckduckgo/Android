@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 16,
-    "identityHash": "21127353dbb699a6db92ee2853a2fd85",
+    "identityHash": "2a1c6e1ea3c97f95e1c8e349edba4a97",
     "entities": [
       {
         "tableName": "tds_tracker",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, `defaultAction` TEXT NOT NULL, `ownerName` TEXT NOT NULL, PRIMARY KEY(`domain`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, `defaultAction` TEXT NOT NULL, `ownerName` TEXT NOT NULL, `rules` TEXT NOT NULL, PRIMARY KEY(`domain`))",
         "fields": [
           {
             "fieldPath": "domain",
@@ -25,11 +25,49 @@
             "columnName": "ownerName",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "rules",
+            "columnName": "rules",
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
           "columnNames": [
             "domain"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "tds_entity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `displayName` TEXT NOT NULL, `prevalence` REAL NOT NULL, PRIMARY KEY(`name`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayName",
+            "columnName": "displayName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "prevalence",
+            "columnName": "prevalence",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "name"
           ],
           "autoGenerate": false
         },
@@ -592,7 +630,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '21127353dbb699a6db92ee2853a2fd85')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2a1c6e1ea3c97f95e1c8e349edba4a97')"
     ]
   }
 }

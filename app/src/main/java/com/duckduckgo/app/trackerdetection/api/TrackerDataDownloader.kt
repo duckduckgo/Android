@@ -19,7 +19,6 @@ package com.duckduckgo.app.trackerdetection.api
 import com.duckduckgo.app.global.api.isCached
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.store.BinaryDataStore
-import com.duckduckgo.app.trackerdetection.Client
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
@@ -59,7 +58,8 @@ class TrackerDataDownloader @Inject constructor(
                 val body = response.body()!!
 
                 appDatabase.runInTransaction {
-                    tdsTrackerDao.updateAll(body.trackers)
+                    val trackers = body.trackers.toTdsTrackers()
+                    tdsTrackerDao.updateAll(trackers.values)
                     trackerDataLoader.loadTdsTrackerData()
                 }
 
