@@ -21,7 +21,6 @@ import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -94,8 +93,8 @@ class DaxDialog(
         hideClickListener = clickListener
     }
 
-    fun startHighlightViewAnimation(targetView: View, duration: Long = 400, size: Float = 6f) {
-        val highlightImageView = addHighlightView(targetView, size)
+    fun startHighlightViewAnimation(targetView: View, duration: Long = 400, timesBigger: Float = 0f) {
+        val highlightImageView = addHighlightView(targetView, timesBigger)
         val scaleAnimation = buildScaleAnimation(duration)
         highlightImageView?.startAnimation(scaleAnimation)
     }
@@ -133,7 +132,7 @@ class DaxDialog(
         dialogText.typingDelayInMs = typingDelayInMs
     }
 
-    private fun addHighlightView(targetView: View, size: Float): View? {
+    private fun addHighlightView(targetView: View, timesBigger: Float): View? {
         return activity?.let {
             val highlightImageView = ImageView(context)
             highlightImageView.id = View.generateViewId()
@@ -149,10 +148,12 @@ class DaxDialog(
             val locationOnScreen: IntArray = intArrayOf(0, 0)
             targetView.getLocationOnScreen(locationOnScreen)
 
-            val params = RelativeLayout.LayoutParams(width + (width / size).toInt(), height + (height / size).toInt())
-            params.leftMargin = locationOnScreen[0] - ((width / size) / 2).toInt()
-            params.topMargin = (locationOnScreen[1] - statusBarHeight) - ((width / size) / 2).toInt()
+            val timesBiggerX: Float = width * timesBigger
+            val timesBiggerY: Float = height * timesBigger
 
+            val params = RelativeLayout.LayoutParams((width + timesBiggerX).toInt(), (height + timesBiggerY).toInt())
+            params.leftMargin = locationOnScreen[0] - (timesBiggerX / 2).toInt()
+            params.topMargin = (locationOnScreen[1] - statusBarHeight) - (timesBiggerY / 2).toInt()
             dialogContainer.addView(highlightImageView, params)
             highlightImageView
         }
