@@ -20,17 +20,17 @@
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Welcome to DuckDuckGo!"</string>
     <string name="onboardingLetsDoItButton">Let\'s Do It!</string>
-    <string name="daxIntroCtaText">Try visiting one of your favorite sites!\n\nI’ll block trackers so they can’t spy on you. I’ll also upgrade the security of your connection if possible. 🔒</string>
+    <string name="daxIntroCtaText"><![CDATA[Try visiting one of your favorite sites!<br/><br/>I\'ll block trackers so they can\'t spy on you. I\'ll also upgrade the security of your connection if possible. 🔒]]></string>
     <string name="daxSerpCtaText">Your DuckDuckGo searches are anonymous and I never store your search history. Ever. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="zero">&#160;tried to hide tracking code on this page! 👀\n\nNope. Not in my browser, blocked.\n\nIf you ever want to know more, just tap the privacy grade.</item>
+        <item quantity="zero"><![CDATA[&#160;tried to hide tracking code on this page! 👀<br/><br/>Nope. Not in my browser, blocked.<br/><br/>If you ever want to know more, just tap the privacy grade.]]></item>
         <item quantity="one"><![CDATA[&#160;and <b>%d other</b> tried to hide tracking code on this page! 👀<br/><br/>Nope. Not in my browser, blocked.<br/><br/>If you ever want to know more, just tap the privacy grade.]]></item>
         <item quantity="other"><![CDATA[&#160;and <b>%d others</b> tried to hide tracking code on this page! 👀<br/><br/>Nope. Not in my browser, blocked.<br/><br/> If you ever want to know more, just tap the privacy grade.]]></item>
     </plurals>
-    <string name="daxMainNetworkStep1CtaText">Heads up!\n\n This site is owned by %s.\n%s runs a major tracking network.</string>
+    <string name="daxMainNetworkStep1CtaText"><![CDATA[Heads up!<br/><br/> This site is owned by %s.\n%s runs a major tracking network]]>.</string>
     <string name="daxMainNetworkStep21CtaText"><![CDATA[In fact, %s trackers lurk on about %s of top sites. 😱<br/><br/>]]></string>
     <string name="daxMainNetworkStep2CtaText">%sI\'ll alert you to these practices with a low privacy grade. I\'ll also block %s trackers when you browse non-%s sites.</string>
-    <string name="daxNonSerpCtaText">Every site has a privacy grade. Tap it to see how I protected your privacy.\n\nWant to get fancy? Try clearing your data by hitting the fire button.</string>
+    <string name="daxNonSerpCtaText"><![CDATA[Every site has a privacy grade. Tap it to see how I protected your privacy.<br/><br/>Want to get fancy? Try clearing your data by hitting the fire button.]]></string>
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">HIDE</string>
     <string name="daxDialogPhew">Phew!</string>
