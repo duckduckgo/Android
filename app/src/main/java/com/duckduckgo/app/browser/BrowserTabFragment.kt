@@ -75,10 +75,11 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.db.DismissedCtaDao
-import com.duckduckgo.app.cta.model.CtaId
-import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.cta.ui.CtaConfiguration
+import com.duckduckgo.app.cta.ui.Cta
+import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.DaxBubbleCta
+import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.view.*
@@ -921,7 +922,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         super.onConfigurationChanged(newConfig)
         ddgLogo.setImageResource(R.drawable.logo_full)
         if (ctaContainer.isNotEmpty()) {
-            renderer.renderCta()
+            renderer.renderHomeCta()
         }
     }
 
@@ -1127,6 +1128,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     if (viewState.isLoading) show() else hide()
                     progress = viewState.progress
                 }
+
+                // TODO change
+                if (viewState.progress == 100) {
+                    ctaViewModel.refreshCta(viewModel.siteLiveData.value)
+                }
             }
         }
 
@@ -1227,73 +1233,72 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 if (viewState.cta != null) {
                     showCta(viewState.cta)
                 } else {
-                    hideCta()
+                    hideHomeCta()
+                    hideDaxCta()
                 }
             }
         }
 
-        private fun showCta(configuration: CtaConfiguration) {
-            if (ctaContainer.isEmpty()) {
-                renderCta()
-            }
-            configuration.apply(ctaContainer)
-            if (configuration.ctaId != CtaId.DAX_DIALOG) {
-                ctaContainer.show()
+        private fun showCta(configuration: Cta) {
+            when (configuration) {
+                is HomePanelCta -> showHomeCta(configuration)
+                is DaxBubbleCta -> showDaxCta(configuration)
+                is DaxDialogCta -> showDaxDialogCta(configuration)
             }
             ctaViewModel.onCtaShown()
         }
 
-        private fun hideCta() {
+        private fun showDaxDialogCta(configuration: DaxDialogCta) {
+            hideHomeCta()
+            hideDaxCta()
+            configuration.apply(null, activity)
+        }
+
+        private fun showDaxCta(configuration: DaxBubbleCta) {
+            hideHomeCta()
+            daxDialog.show()
+            configuration.apply(daxDialog, null)
+        }
+
+        private fun showHomeCta(configuration: HomePanelCta) {
+            hideDaxCta()
+            if (ctaContainer.isEmpty()) {
+                renderHomeCta()
+            }
+            configuration.apply(ctaContainer, null)
+            ctaContainer.show()
+        }
+
+        private fun hideDaxCta() {
+            daxDialog.gone()
+        }
+
+        private fun hideHomeCta() {
             ctaContainer.gone()
         }
 
-        fun renderCta() {
-
+        fun renderHomeCta() {
             val context = context ?: return
             val configuration = lastSeenCtaViewState?.cta ?: return
 
-            if (configuration.ctaId == CtaId.DAX_DIALOG) {
-                daxDialog.alpha = 1f
-                val daxText = "Try visiting one of your favorite sites!\n\n" + "I’ll block trackers so they can’t spy on you. I’ll also upgrade the security of your connection if possible. \uD83D\uDD12"
-                hiddenText.text = daxText
-                primaryCta.hide()
-                launch {
-                    startTypingAnimation(daxText)
-                }
-            } else {
-                ctaContainer.removeAllViews()
+            ctaContainer.removeAllViews()
 
-                inflate(context, R.layout.include_cta, ctaContainer)
-                logoHidingListener.callToActionView = ctaContainer
+            inflate(context, R.layout.include_cta, ctaContainer)
+            logoHidingListener.callToActionView = ctaContainer
 
-                configuration.apply(ctaContainer)
-                ctaContainer.ctaOkButton.setOnClickListener {
-                    viewModel.onUserLaunchedCta()
-                }
-
-                ctaContainer.ctaDismissButton.setOnClickListener {
-                    viewModel.onUserDismissedCta()
-                }
-
-                ConstraintSet().also {
-                    it.clone(newTabLayout)
-                    it.connect(ddgLogo.id, ConstraintSet.BOTTOM, ctaContainer.id, ConstraintSet.TOP, 0)
-                    it.applyTo(newTabLayout)
-                }
+            configuration.apply(ctaContainer, null)
+            ctaContainer.ctaOkButton.setOnClickListener {
+                viewModel.onUserLaunchedCta()
             }
-        }
 
-        private suspend fun startTypingAnimation(inputText: CharSequence) {
-            withContext(Dispatchers.Main) {
-                launch {
-                    inputText.mapIndexed { index, _ ->
-                        dialogText.text = inputText.subSequence(0, index + 1)
-                        delay(20)
-                    }
-                    withContext(Dispatchers.IO) {
-                        dismissedCtaDao.insert(DismissedCta(CtaId.DAX_DIALOG))
-                    }
-                }
+            ctaContainer.ctaDismissButton.setOnClickListener {
+                viewModel.onUserDismissedCta()
+            }
+
+            ConstraintSet().also {
+                it.clone(newTabLayout)
+                it.connect(ddgLogo.id, ConstraintSet.BOTTOM, ctaContainer.id, ConstraintSet.TOP, 0)
+                it.applyTo(newTabLayout)
             }
         }
 

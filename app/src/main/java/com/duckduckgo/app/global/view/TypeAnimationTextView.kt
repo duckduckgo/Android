@@ -39,11 +39,9 @@ class TypeAnimationTextView @JvmOverloads constructor(
 
     var typingDelayInMs: Long = 20
     var delayAfterAnimationInMs: Long = 300
-    private lateinit var inputText: CharSequence
 
-    fun startTypingAnimation(inputText: CharSequence, isCancellable: Boolean = true, afterAnimation: () -> Unit = {}) {
-        this.inputText = inputText
-
+    fun startTypingAnimation(textDialog: String, isCancellable: Boolean = true, afterAnimation: () -> Unit = {}) {
+        val inputText = textDialog.html(context)
         if (isCancellable) {
             setOnClickListener {
                 if (typingAnimationJob?.isActive == true) {
@@ -56,7 +54,7 @@ class TypeAnimationTextView @JvmOverloads constructor(
 
         typingAnimationJob = launch {
             inputText.mapIndexed { index, _ ->
-                text = inputText.subSequence(0, index)
+                text = inputText.subSequence(0, index + 1)
                 delay(typingDelayInMs)
             }
             delay(delayAfterAnimationInMs)

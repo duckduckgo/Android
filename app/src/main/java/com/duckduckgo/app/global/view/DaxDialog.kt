@@ -37,8 +37,8 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 
 class DaxDialog(
-    private val daxText: String,
-    private val buttonText: String,
+    var daxText: String,
+    var buttonText: String,
     private val dismissible: Boolean = true,
     private val typingDelayInMs: Long = 20
 ) : DialogFragment() {
@@ -116,9 +116,14 @@ class DaxDialog(
 
     private fun setDialog() {
         dialog?.window?.setLayout(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT)
-        hiddenText.text = daxText
-        primaryCta.text = buttonText
-        dialogText.typingDelayInMs = typingDelayInMs
+        context?.let {
+            hiddenText.text = daxText.html(it)
+            primaryCta.text = buttonText
+            dialogText.typingDelayInMs = typingDelayInMs
+        }
+        if (context == null) {
+            dismiss()
+        }
     }
 
     private fun addHighlightView(targetView: View, size: Float): View {

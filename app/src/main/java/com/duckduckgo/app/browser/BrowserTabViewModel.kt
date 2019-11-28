@@ -49,7 +49,7 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
-import com.duckduckgo.app.cta.ui.CtaConfiguration
+import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.db.AppConfigurationDao
@@ -215,7 +215,7 @@ class BrowserTabViewModel(
     private var appConfigurationDownloaded = false
     private val appConfigurationObservable = appConfigurationDao.appConfigurationStatus()
     private val autoCompletePublishSubject = PublishRelay.create<String>()
-    private var siteLiveData = MutableLiveData<Site>()
+    var siteLiveData = MutableLiveData<Site>()
     private var site: Site? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
@@ -833,9 +833,9 @@ class BrowserTabViewModel(
     fun onUserLaunchedCta() {
         val cta = ctaViewState.value?.cta ?: return
         command.value = when (cta) {
-            is CtaConfiguration.Survey -> LaunchSurvey(cta.survey)
-            is CtaConfiguration.AddWidgetAuto -> LaunchAddWidget
-            is CtaConfiguration.AddWidgetInstructions -> LaunchLegacyAddWidget
+            is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
+            is HomePanelCta.AddWidgetAuto -> LaunchAddWidget
+            is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
             else -> return
         }
         ctaViewModel.onCtaLaunched()

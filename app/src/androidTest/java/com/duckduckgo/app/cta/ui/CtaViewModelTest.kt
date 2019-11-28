@@ -101,19 +101,19 @@ class CtaViewModelTest {
     @Test
     fun whenScheduledSurveyChangesAndInstalledDaysMatchThenCtaIsSurvey() {
         testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
-        assertTrue(testee.ctaViewState.value!!.cta is CtaConfiguration.Survey)
+        assertTrue(testee.ctaViewState.value!!.cta is HomePanelCta.Survey)
     }
 
     @Test
     fun whenScheduledSurveyChangesAndInstalledDaysDontMatchThenCtaIsNotSurvey() {
         testee.onSurveyChanged(Survey("abc", "http://example.com", 2, SCHEDULED))
-        assertFalse(testee.ctaViewState.value!!.cta is CtaConfiguration.Survey)
+        assertFalse(testee.ctaViewState.value!!.cta is HomePanelCta.Survey)
     }
 
     @Test
     fun whenScheduledSurveyIsNullThenCtaIsNotSurvey() {
         testee.onSurveyChanged(null)
-        assertFalse(testee.ctaViewState.value!!.cta is CtaConfiguration.Survey)
+        assertFalse(testee.ctaViewState.value!!.cta is HomePanelCta.Survey)
     }
 
     @Test
@@ -122,7 +122,7 @@ class CtaViewModelTest {
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
         testee.refreshCta()
-        assertEquals(CtaConfiguration.AddWidgetAuto, testee.ctaViewState.value!!.cta)
+        assertEquals(HomePanelCta.AddWidgetAuto, testee.ctaViewState.value!!.cta)
     }
 
     @Test
@@ -140,7 +140,7 @@ class CtaViewModelTest {
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
         testee.refreshCta()
-        assertEquals(CtaConfiguration.AddWidgetInstructions, testee.ctaViewState.value!!.cta)
+        assertEquals(HomePanelCta.AddWidgetInstructions, testee.ctaViewState.value!!.cta)
     }
 
     @Test
@@ -206,20 +206,20 @@ class CtaViewModelTest {
 
         testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
         testee.onCtaDismissed()
-        assertEquals(CtaConfiguration.AddWidgetAuto, testee.ctaViewState.value!!.cta)
+        assertEquals(HomePanelCta.AddWidgetAuto, testee.ctaViewState.value!!.cta)
     }
 
     @Test
     fun whenSurveyCtaDismissedThenScheduledSurveysAreCancelled() {
         val survey = Survey("abc", "http://example.com", 1, SCHEDULED)
-        testee.ctaViewState.value = testee.ctaViewState.value!!.copy(cta = CtaConfiguration.Survey(survey))
+        testee.ctaViewState.value = testee.ctaViewState.value!!.copy(cta = HomePanelCta.Survey(survey))
         testee.onCtaDismissed()
         verify(mockSurveyDao).cancelScheduledSurveys()
     }
 
     @Test
     fun whenNonSurveyCtaDismissedCtaThenDatabaseNotified() {
-        testee.ctaViewState.value = testee.ctaViewState.value!!.copy(cta = CtaConfiguration.AddWidgetAuto)
+        testee.ctaViewState.value = testee.ctaViewState.value!!.copy(cta = HomePanelCta.AddWidgetAuto)
         testee.onCtaDismissed()
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.ADD_WIDGET))
     }

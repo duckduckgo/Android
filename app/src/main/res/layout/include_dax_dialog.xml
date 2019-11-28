@@ -67,7 +67,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" />
 
-            <TextView
+            <com.duckduckgo.app.global.view.TypeAnimationTextView
                 android:id="@+id/dialogText"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
