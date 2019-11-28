@@ -52,6 +52,9 @@ sealed class DaxDialogCta(
 
     open fun getDaxText(activity: FragmentActivity): String = activity.getString(description)
 
+    fun createDialog(activity: FragmentActivity): DaxDialog =
+        DaxDialog(getDaxText(activity), activity.resources.getString(DaxSerpCta.okButton))
+
     object DaxSerpCta : DaxDialogCta(
         CtaId.DAX_DIALOG,
         R.string.daxSerpCtaText,
@@ -62,9 +65,7 @@ sealed class DaxDialogCta(
     ) {
         override fun apply(view: View?, activity: FragmentActivity?) {
             activity?.let {
-                val daxText = getDaxText(activity)
-                val dialog = DaxDialog(daxText, activity.resources.getString(okButton))
-                dialog.show(it.supportFragmentManager, "test")
+                createDialog(activity).show(it.supportFragmentManager, TAG)
             }
         }
     }
@@ -78,10 +79,12 @@ sealed class DaxDialogCta(
         null
     ) {
         override fun getDaxText(activity: FragmentActivity): String {
-            val trackersFiltered =
-                trackers.asSequence().filter { MAIN_TRACKER_NETWORKS.contains(it.trackerNetwork?.name) }
-                    .map { MAIN_TRACKER_NETWORKS_NAMES[it.trackerNetwork?.name] }.take(2)
-                    .toList()
+            val trackersFiltered = trackers.asSequence()
+                .filter { MAIN_TRACKER_NETWORKS.contains(it.trackerNetwork?.name) }
+                .map { MAIN_TRACKER_NETWORKS_NAMES[it.trackerNetwork?.name] }
+                .take(MAX_TRACKERS_SHOWS)
+                .toList()
+
             val trackersText = trackersFiltered.joinToString(",")
             val size = trackers.size - trackersFiltered.size
             return "<b>$trackersText</b>" + activity.resources.getQuantityString(description, size, size)
@@ -89,9 +92,7 @@ sealed class DaxDialogCta(
 
         override fun apply(view: View?, activity: FragmentActivity?) {
             activity?.let {
-                val daxText = getDaxText(activity)
-                val dialog = DaxDialog(daxText, activity.resources.getString(okButton))
-                dialog.show(it.supportFragmentManager, "test")
+                createDialog(activity).show(it.supportFragmentManager, TAG)
             }
         }
     }
@@ -106,25 +107,27 @@ sealed class DaxDialogCta(
     ) {
         private fun getNetworkName(): String? = MAIN_TRACKER_NETWORKS_NAMES[network]
 
+        private fun firstParagraph(activity: FragmentActivity): String {
+            val percentage = NETWORK_PROPERTY_PERCENTAGES[network]
+            return if (percentage != null)
+                activity.resources.getString(R.string.daxMainNetworkStep21CtaText, getNetworkName(), percentage)
+            else ""
+        }
+
         override fun getDaxText(activity: FragmentActivity): String = activity.resources.getString(description, getNetworkName(), getNetworkName())
 
         override fun apply(view: View?, activity: FragmentActivity?) {
             activity?.let {
-                val daxText = getDaxText(activity)
-                val dialog = DaxDialog(daxText, activity.resources.getString(okButton))
-                dialog.setPrimaryCTAClickListener {
-                    val percentage = NETWORK_PROPERTY_PERCENTAGES[network]
-                    val firstParagraph =
-                        if (percentage != null)
-                            activity.resources.getString(R.string.daxMainNetworkStep21CtaText, getNetworkName(), percentage)
-                        else ""
-                    dialog.daxText =
-                        activity.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph, getNetworkName(), getNetworkName())
-                    dialog.buttonText = activity.resources.getString(R.string.daxDialogGotIt)
-                    dialog.setPrimaryCTAClickListener { dialog.dismiss() }
-                    dialog.onStart()
+                createDialog(activity).apply {
+                    setPrimaryCTAClickListener {
+                        val firstParagraph = firstParagraph(it)
+                        daxText = it.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph, getNetworkName(), getNetworkName())
+                        buttonText = it.resources.getString(R.string.daxDialogGotIt)
+                        setPrimaryCTAClickListener { dismiss() }
+                        onStart()
+                    }
+                    show(it.supportFragmentManager, TAG)
                 }
-                dialog.show(it.supportFragmentManager, "test")
             }
         }
     }
@@ -139,23 +142,25 @@ sealed class DaxDialogCta(
     ) {
         override fun apply(view: View?, activity: FragmentActivity?) {
             activity?.let {
-                val daxText = getDaxText(activity)
-                val dialog = DaxDialog(daxText, activity.resources.getString(okButton))
-                val fireButton = activity.findViewById<View>(R.id.fire)
-                dialog.onAnimationFinishedListener {
-                    dialog.startHighlightViewAnimation(fireButton)
+                createDialog(activity).apply {
+                    val fireButton = activity.findViewById<View>(R.id.fire)
+                    onAnimationFinishedListener {
+                        startHighlightViewAnimation(fireButton)
+                    }
+                    show(it.supportFragmentManager, TAG)
                 }
-                dialog.show(it.supportFragmentManager, "test")
             }
         }
     }
 
     companion object {
+        private const val TAG = "DaxDialog"
+        private const val MAX_TRACKERS_SHOWS = 2
+        const val SERP = "duckduckgo"
         val MAIN_TRACKER_NETWORKS = listOf("Facebook", "Amazon.com", "Twitter", "Google")
         val MAIN_TRACKER_NETWORKS_NAMES =
             mapOf(Pair("Facebook", "Facebook"), Pair("Amazon.com", "Amazon"), Pair("Twitter", "Twitter"), Pair("Google", "Google"))
         val NETWORK_PROPERTY_PERCENTAGES = mapOf(Pair("Google", "90%"), Pair("Facebook", "40%"))
-        val SERP = "duckduckgo"
     }
 }
 
