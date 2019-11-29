@@ -123,6 +123,9 @@ dependencies {
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanary"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'com.android.installreferrer:installreferrer:1.0'
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines"
     androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines"
