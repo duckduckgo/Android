@@ -39,7 +39,6 @@
 
         <activity
             android:name="com.duckduckgo.app.launch.LaunchActivity"
-            android:theme="@style/AppTheme.Splash"
             android:label="@string/appName">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
