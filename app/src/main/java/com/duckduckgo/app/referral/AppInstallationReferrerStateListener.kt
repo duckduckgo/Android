@@ -76,10 +76,10 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
         val suffix = loadFromDataStore()
         return if (suffix == null) {
             Timber.i("Already saw referrer data, but no campaign suffix saved")
-            ReferrerNotFound
+            ReferrerNotFound(fromCache = true)
         } else {
             Timber.i("Already have referrer data from previous run - $suffix")
-            ReferrerFound(suffix)
+            ReferrerFound(suffix, fromCache = true)
         }
     }
 

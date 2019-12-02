@@ -33,7 +33,7 @@ class QueryParamReferrerParser(private val pixel: Pixel) : AppInstallationReferr
 
     override fun parse(referrer: String): ParsedReferrerResult {
         val referrerParts = splitIntoConstituentParts(referrer)
-        if (referrerParts.isNullOrEmpty()) return ReferrerNotFound
+        if (referrerParts.isNullOrEmpty()) return ReferrerNotFound(fromCache = false)
 
         for (part in referrerParts) {
             Timber.d("Analysing query param part: $part")
@@ -52,7 +52,7 @@ class QueryParamReferrerParser(private val pixel: Pixel) : AppInstallationReferr
         }
 
         Timber.i("Referrer information does not contain inspected campaign names")
-        return ReferrerNotFound
+        return ReferrerNotFound(fromCache = false)
     }
 
     private fun sendPixelForResult(result: ParsedReferrerResult, pixelName: Pixel.PixelName) {
@@ -67,7 +67,7 @@ class QueryParamReferrerParser(private val pixel: Pixel) : AppInstallationReferr
 
         if (suffix.length < 2) {
             Timber.w("Unexpected suffix length for campaign")
-            return ReferrerNotFound
+            return ReferrerNotFound(fromCache = false)
         }
 
         val condensedSuffix = suffix.take(2)
@@ -89,9 +89,9 @@ class QueryParamReferrerParser(private val pixel: Pixel) : AppInstallationReferr
     }
 }
 
-sealed class ParsedReferrerResult {
-    data class ReferrerFound(val campaignSuffix: String) : ParsedReferrerResult()
-    object ReferrerNotFound : ParsedReferrerResult()
+sealed class ParsedReferrerResult(open val fromCache: Boolean = false) {
+    data class ReferrerFound(val campaignSuffix: String, override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
+    data class ReferrerNotFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
     data class ParseFailure(val reason: ParseFailureReason) : ParsedReferrerResult()
     object ReferrerInitialising : ParsedReferrerResult()
 }
