@@ -64,6 +64,22 @@
                     android:paddingStart="6dp"
                     android:paddingEnd="6dp">
 
+                    <TextView
+                        android:id="@+id/loadingText"
+                        android:alpha="0"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="?attr/omnibarTextColor"
+                        android:textSize="13sp"
+                        android:textStyle="normal"
+                        android:text="@string/trackersAnimationText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                    </TextView>
+
                     <ImageButton
                         android:id="@+id/privacyGradeButton"
                         android:layout_width="wrap_content"

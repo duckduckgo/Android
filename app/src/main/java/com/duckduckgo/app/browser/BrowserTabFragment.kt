@@ -17,8 +17,10 @@
 package com.duckduckgo.app.browser
 
 import android.Manifest
+import android.animation.AnimatorSet
 import android.animation.LayoutTransition.CHANGING
 import android.animation.LayoutTransition.DISAPPEARING
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
@@ -1120,6 +1122,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
         }
 
+        private var loadingAnimation: AnimatorSet = AnimatorSet()
+        private var finishAnimation: AnimatorSet = AnimatorSet()
+
         fun renderLoadingIndicator(viewState: LoadingViewState) {
             renderIfChanged(viewState, lastSeenLoadingViewState) {
                 lastSeenLoadingViewState = viewState
@@ -1129,10 +1134,63 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     progress = viewState.progress
                 }
 
+                if (viewState.progress <= 10) {
+                    val fadeClearTextButtonOut = animateFadeOut(clearTextButton)
+                    val fadeTextInputOut = animateFadeOut(omnibarTextInput)
+                    val fadeGradeOut = animateFadeOut(privacyGradeButton)
+
+                    val fadeLoadingIn = animateFadeIn(loadingText)
+                    val transition = AnimatorSet().apply {
+                        play(fadeClearTextButtonOut).with(fadeTextInputOut).with(fadeGradeOut).after(250)
+                    }
+
+                    if (!loadingAnimation.isRunning && !finishAnimation.isRunning) {
+                        loadingAnimation = AnimatorSet().apply {
+                            play(fadeLoadingIn).after(transition)
+                            start()
+                        }
+                    }
+
+                }
+
                 // TODO change
                 if (viewState.progress == 100) {
+                    if (loadingAnimation.isRunning) {
+                        loadingAnimation.cancel()
+                        loadingText.alpha = 1f
+                    }
+                    val fadeClearTextButtonIn = animateFadeIn(clearTextButton)
+                    val fadeTextInputIn = animateFadeIn(omnibarTextInput)
+                    val fadeGradeIn = animateFadeIn(privacyGradeButton)
+
+                    val fadeLoadingOut = animateFadeOut(loadingText)
+                    val transition = AnimatorSet().apply {
+                        play(fadeClearTextButtonIn).with(fadeTextInputIn).with(fadeGradeIn)
+                    }
+
+                    if (!finishAnimation.isRunning) {
+                        finishAnimation = AnimatorSet().apply {
+                            play(fadeLoadingOut).after(1350).before(transition)
+                            start()
+                        }
+                    }
+
                     ctaViewModel.refreshCta(viewModel.siteLiveData.value)
                 }
+            }
+        }
+
+        @SuppressLint("ObjectAnimatorBinding")
+        private fun animateFadeOut(view: Any): ObjectAnimator {
+            return ObjectAnimator.ofFloat(view, "alpha", 1f, 0f).apply {
+                duration = 250
+            }
+        }
+
+        @SuppressLint("ObjectAnimatorBinding")
+        private fun animateFadeIn(view: Any): ObjectAnimator {
+            return ObjectAnimator.ofFloat(view, "alpha", 0f, 1f).apply {
+                duration = 250
             }
         }
 
