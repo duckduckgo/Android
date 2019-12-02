@@ -70,7 +70,6 @@ class DaxDialog(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Timber.d("MARCOS on created")
         setDialog()
         setListeners()
         dialogText.startTypingAnimation(daxText, true, onAnimationFinished)

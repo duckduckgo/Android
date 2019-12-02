@@ -45,7 +45,6 @@ import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
 import com.duckduckgo.app.statistics.api.OfflinePixelSender
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -152,9 +151,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     lateinit var alertingUncaughtExceptionHandler: AlertingUncaughtExceptionHandler
 
     @Inject
-    lateinit var variantManager: VariantManager
-
-    @Inject
     lateinit var referralStateListener: AppInstallationReferrerStateListener
 
     private var launchedByFireAction: Boolean = false
@@ -185,7 +181,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         }
 
         recordInstallationTimestamp()
-        initializeTheme(settingsDataStore, variantManager)
+        initializeTheme(settingsDataStore)
         loadTrackerData()
         configureDataDownloader()
         scheduleOfflinePixels()
