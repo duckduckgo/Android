@@ -115,6 +115,7 @@ ext {
     mockito = "2.18.3"
     mockitoKotlin = "2.0.0"
     commonsMath = "3.6.1"
+    referrerLibrary = "1.0"
 }
 
 
@@ -124,7 +125,8 @@ dependencies {
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'com.android.installreferrer:installreferrer:1.0'
+    //noinspection GradleDependency - 1.1 has a bug which causes a crash
+    implementation "com.android.installreferrer:installreferrer:$referrerLibrary"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines"
