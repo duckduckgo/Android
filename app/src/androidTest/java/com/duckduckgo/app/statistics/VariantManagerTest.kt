@@ -37,31 +37,6 @@ class VariantManagerTest {
         assertEquals(0, variant.features.size)
     }
 
-    @Test
-    fun defaultLightThemeExperimentVariantActive() {
-        val variant = variants.firstOrNull { it.key == "mo" }
-        assertEqualsDouble(1.0, variant!!.weight)
-    }
-
-    @Test
-    fun defaultLightThemeExperimentVariantHasExperimentalFeatureForLightTheme() {
-        val variant = variants.firstOrNull { it.key == "mo" }
-        assertEquals(1, variant!!.features.size)
-        assertTrue(variant.hasFeature(VariantManager.VariantFeature.LightThemeExperiment))
-    }
-
-    @Test
-    fun defaultLightThemeControlGroupVariantActive() {
-        val variant = variants.firstOrNull { it.key == "mp" }
-        assertEqualsDouble(1.0, variant!!.weight)
-    }
-
-    @Test
-    fun defaultLightThemeControlGroupVariantHasNoExperimentFeatures() {
-        val variant = variants.firstOrNull { it.key == "mp" }
-        assertEquals(0, variant!!.features.size)
-    }
-
     @Suppress("SameParameterValue")
     private fun assertEqualsDouble(expected: Double, actual: Double) {
         val comparison = expected.compareTo(actual)
