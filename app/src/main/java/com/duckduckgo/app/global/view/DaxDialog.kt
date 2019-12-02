@@ -36,8 +36,8 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 
 class DaxDialog(
-    val daxText: String,
-    val buttonText: String,
+    var daxText: String,
+    var buttonText: String,
     private val dismissible: Boolean = true,
     private val typingDelayInMs: Long = 20
 ) : DialogFragment() {
