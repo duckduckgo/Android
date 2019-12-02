@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import kotlinx.android.synthetic.main.activity_onboarding.*
+import timber.log.Timber
 
 
 class OnboardingActivity : DuckDuckGoActivity() {
@@ -32,6 +33,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
     private val viewModel: OnboardingViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Timber.i("Creating OnboardingActivity")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_onboarding)
         configurePager()

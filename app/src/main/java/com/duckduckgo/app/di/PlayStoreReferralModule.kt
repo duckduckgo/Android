@@ -17,8 +17,9 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import com.duckduckgo.app.referral.AppInstallationReferrerParser
-import com.duckduckgo.app.referral.QueryParamReferrerParser
+import android.content.pm.PackageManager
+import com.duckduckgo.app.referral.*
+import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -31,7 +32,31 @@ class PlayStoreReferralModule {
     fun packageManager(context: Context) = context.packageManager
 
     @Provides
-    fun appInstallationReferrerParser(): AppInstallationReferrerParser {
-        return QueryParamReferrerParser()
+    fun appInstallationReferrerParser(pixel: Pixel): AppInstallationReferrerParser {
+        return QueryParamReferrerParser(pixel)
+    }
+
+    @Provides
+    @Singleton
+    fun appInstallationReferrerStateListener(
+        context: Context,
+        packageManager: PackageManager,
+        appInstallationReferrerParser: AppInstallationReferrerParser
+    ): AppInstallationReferrerStateListener {
+        return PlayStoreAppReferrerStateListener(context, packageManager, appInstallationReferrerParser)
+    }
+
+    @Provides
+    fun durationMeasuringReferrerRetriever(
+        referrerStateListener: AppInstallationReferrerStateListener,
+        durationBucketMapper: DurationBucketMapper,
+        pixel: Pixel
+    ): DurationMeasuringReferrerRetriever {
+        return DurationMeasuringReferrerRetriever(referrerStateListener, durationBucketMapper, pixel)
+    }
+
+    @Provides
+    fun durationBucketMapper(): DurationBucketMapper {
+        return DurationBucketMapper()
     }
 }

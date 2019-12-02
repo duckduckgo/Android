@@ -23,66 +23,62 @@ import org.junit.Test
 
 class QueryParamReferrerParserTest {
 
-    private lateinit var testee: QueryParamReferrerParser
+    private val testee: QueryParamReferrerParser = QueryParamReferrerParser()
 
     @Test
     fun whenReferrerDoesNotContainTargetThenNoReferrerFound() {
-        testee = QueryParamReferrerParser("target")
         verifyReferrerNotFound(testee.parse("ABC"))
     }
 
     @Test
     fun whenReferrerContainsTargetAndLongSuffixThenShortenedReferrerFound() {
-        testee = QueryParamReferrerParser("target")
-        val result = testee.parse("targetABC")
+        val result = testee.parse("DDGRAABC")
         verifyReferrerFound("AB", result)
     }
 
     @Test
     fun whenReferrerContainsTargetAndTwoCharSuffixThenReferrerFound() {
-        testee = QueryParamReferrerParser("target")
-        val result = testee.parse("targetXY")
+        val result = testee.parse("DDGRAXY")
         verifyReferrerFound("XY", result)
     }
 
     @Test
     fun whenReferrerContainsTargetAndOneCharSuffixThenNoReferrerFound() {
-        testee = QueryParamReferrerParser("target")
-        val result = testee.parse("targetX")
+        val result = testee.parse("DDGRAX")
         verifyReferrerNotFound(result)
     }
 
     @Test
     fun whenReferrerContainsTargetButNoSuffixThenNoReferrerFound() {
-        testee = QueryParamReferrerParser("target")
-        val result = testee.parse("targetX")
+        val result = testee.parse("DDGRAX")
         verifyReferrerNotFound(result)
     }
 
     @Test
     fun whenReferrerIsEmptyThenNoReferrerFound() {
-        testee = QueryParamReferrerParser("target")
         verifyReferrerNotFound(testee.parse(""))
     }
 
     @Test
     fun whenReferrerContainsTargetAsFirstParamThenReferrerFound() {
-        testee = QueryParamReferrerParser("target")
-        val result = testee.parse("key1=targetAB&key2=foo&key3=bar")
+        val result = testee.parse("key1=DDGRAAB&key2=foo&key3=bar")
         verifyReferrerFound("AB", result)
     }
 
     @Test
     fun whenReferrerContainsTargetAsLastParamThenReferrerFound() {
-        testee = QueryParamReferrerParser("target")
-        val result = testee.parse("key1=foo&key2=bar&key3=targetAB")
+        val result = testee.parse("key1=foo&key2=bar&key3=DDGRAAB")
         verifyReferrerFound("AB", result)
     }
 
     @Test
     fun whenReferrerContainsTargetWithDifferentCaseThenNoReferrerFound() {
-        testee = QueryParamReferrerParser("target")
-        verifyReferrerNotFound(testee.parse("TARGETAB"))
+        verifyReferrerNotFound(testee.parse("ddgraAB"))
+    }
+
+    @Test
+    fun whenTypeAReferrerNotFoundButTypeBFoundThenReferrerFound() {
+        verifyReferrerFound("AB", testee.parse("key1=foo&key2=bar&key3=DDGRBAB"))
     }
 
     private fun verifyReferrerFound(expectedReferrer: String, result: ParsedReferrerResult) {

@@ -18,6 +18,9 @@ package com.duckduckgo.app.referral
 
 import com.duckduckgo.app.referral.ParsedReferrerResult.ReferrerFound
 import com.duckduckgo.app.referral.ParsedReferrerResult.ReferrerNotFound
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_REFERRER_FOUND_TYPE_A
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_REFERRER_FOUND_TYPE_B
 import timber.log.Timber
 
 
@@ -26,7 +29,7 @@ interface AppInstallationReferrerParser {
     fun parse(referrer: String): ParsedReferrerResult
 }
 
-class QueryParamReferrerParser(private val campaignPrefix: String = CAMPAIGN_NAME_PREFIX) : AppInstallationReferrerParser {
+class QueryParamReferrerParser(private val pixel: Pixel) : AppInstallationReferrerParser {
 
     override fun parse(referrer: String): ParsedReferrerResult {
         val referrerParts = splitIntoConstituentParts(referrer)
@@ -34,25 +37,46 @@ class QueryParamReferrerParser(private val campaignPrefix: String = CAMPAIGN_NAM
 
         for (part in referrerParts) {
             Timber.d("Analysing query param part: $part")
-            if (part.contains(campaignPrefix)) {
-                Timber.i("Found target campaign name prefix $campaignPrefix in $part")
-                val suffix = stripCampaignName(part)
 
-                if (suffix.length < 2) {
-                    Timber.w("Unexpected suffix length for campaign")
-                    return ReferrerNotFound
-                }
+            if (part.contains(CAMPAIGN_NAME_PREFIX_TYPE_A)) {
+                val result = extractCampaignNameSuffix(part, CAMPAIGN_NAME_PREFIX_TYPE_A)
+                sendPixelForResult(result, APP_REFERRER_FOUND_TYPE_A)
+                return result
+            }
 
-                Timber.i("Would send $suffix (looking for ${campaignPrefix}, found in $part)")
-                return ReferrerFound(suffix.take(2))
+            if (part.contains(CAMPAIGN_NAME_PREFIX_TYPE_B)) {
+                val result = extractCampaignNameSuffix(part, CAMPAIGN_NAME_PREFIX_TYPE_B)
+                sendPixelForResult(result, APP_REFERRER_FOUND_TYPE_B)
+                return result
             }
         }
 
+        Timber.i("Referrer information does not contain inspected campaign names")
         return ReferrerNotFound
     }
 
-    private fun stripCampaignName(fullCampaignName: String): String {
-        return fullCampaignName.substringAfter(campaignPrefix, "")
+    private fun sendPixelForResult(result: ParsedReferrerResult, pixelName: Pixel.PixelName) {
+        if (result is ReferrerFound) {
+            pixel.fire(pixelName)
+        }
+    }
+
+    private fun extractCampaignNameSuffix(part: String, prefix: String): ParsedReferrerResult {
+        Timber.i("Found target campaign name prefix $prefix in $part")
+        val suffix = stripCampaignName(part, prefix)
+
+        if (suffix.length < 2) {
+            Timber.w("Unexpected suffix length for campaign")
+            return ReferrerNotFound
+        }
+
+        val condensedSuffix = suffix.take(2)
+        Timber.i("Found suffix $condensedSuffix (looking for ${prefix}, found in $part)")
+        return ReferrerFound(condensedSuffix)
+    }
+
+    private fun stripCampaignName(fullCampaignName: String, prefix: String): String {
+        return fullCampaignName.substringAfter(prefix, "")
     }
 
     private fun splitIntoConstituentParts(referrer: String?): List<String>? {
@@ -60,7 +84,8 @@ class QueryParamReferrerParser(private val campaignPrefix: String = CAMPAIGN_NAM
     }
 
     companion object {
-        private const val CAMPAIGN_NAME_PREFIX = "tCam"
+        private const val CAMPAIGN_NAME_PREFIX_TYPE_A = "DDGRA"
+        private const val CAMPAIGN_NAME_PREFIX_TYPE_B = "DDGRB"
     }
 }
 
@@ -68,6 +93,7 @@ sealed class ParsedReferrerResult {
     data class ReferrerFound(val campaignSuffix: String) : ParsedReferrerResult()
     object ReferrerNotFound : ParsedReferrerResult()
     data class ParseFailure(val reason: ParseFailureReason) : ParsedReferrerResult()
+    object ReferrerInitialising : ParsedReferrerResult()
 }
 
 sealed class ParseFailureReason {

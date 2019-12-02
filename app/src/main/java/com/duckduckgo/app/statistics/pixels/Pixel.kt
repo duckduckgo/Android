@@ -54,6 +54,12 @@ interface Pixel {
         WEB_RENDERER_GONE_KILLED("m_d_wrg_k"),
         BROKEN_SITE_REPORTED("m_bsr"),
 
+        APP_REFERRER_INFO_AVAILABLE("m_ria"),
+        APP_REFERRER_INFO_UNAVAILABLE("m_riu"),
+        APP_REFERRER_INFO_TIMEOUT("m_rit"),
+        APP_REFERRER_FOUND_TYPE_A("m_rfa"),
+        APP_REFERRER_FOUND_TYPE_B("m_rfb"),
+
         ONBOARDING_DEFAULT_BROWSER_VISUALIZED("m_odb_v"),
         ONBOARDING_DEFAULT_BROWSER_LAUNCHED("m_odb_l"),
         ONBOARDING_DEFAULT_BROWSER_SKIPPED("m_odb_s"),

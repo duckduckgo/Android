@@ -55,6 +55,7 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel
 import com.duckduckgo.app.privacy.ui.PrivacyPracticesViewModel
 import com.duckduckgo.app.privacy.ui.ScorecardViewModel
 import com.duckduckgo.app.privacy.ui.TrackerNetworksViewModel
+import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.settings.SettingsViewModel
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
@@ -103,13 +104,14 @@ class ViewModelFactory @Inject constructor(
     private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
     private val playStoreUtils: PlayStoreUtils,
     private val feedbackSubmitter: FeedbackSubmitter,
-    private val onboardingPageManager: OnboardingPageManager
+    private val onboardingPageManager: OnboardingPageManager,
+    private val appInstallationReferrerStateListener: AppInstallationReferrerStateListener
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
         with(modelClass) {
             when {
-                isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboardingStore)
+                isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboardingStore, appInstallationReferrerStateListener)
                 isAssignableFrom(OnboardingViewModel::class.java) -> onboardingViewModel()
                 isAssignableFrom(BrowserViewModel::class.java) -> browserViewModel()
                 isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()

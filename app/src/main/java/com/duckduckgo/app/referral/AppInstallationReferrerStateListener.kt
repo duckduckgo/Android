@@ -27,35 +27,86 @@ import com.duckduckgo.app.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_P
 import com.duckduckgo.app.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_REFERRAL_SERVICE
 import com.duckduckgo.app.referral.ParseFailureReason.*
 import com.duckduckgo.app.referral.ParsedReferrerResult.ParseFailure
-import kotlinx.coroutines.CancellableContinuation
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withTimeout
+import com.duckduckgo.app.referral.ParsedReferrerResult.ReferrerInitialising
+import kotlinx.coroutines.delay
 import timber.log.Timber
 import javax.inject.Inject
 
-class AppInstallationReferrerStateListener @Inject constructor(
-    context: Context,
+interface AppInstallationReferrerStateListener {
+
+    fun initialiseReferralRetrieval()
+    suspend fun retrieveReferralCode(): ParsedReferrerResult
+}
+
+class PlayStoreAppReferrerStateListener @Inject constructor(
+    val context: Context,
     private val packageManager: PackageManager,
     private val appInstallationReferrerParser: AppInstallationReferrerParser
-) : InstallReferrerStateListener {
+) : InstallReferrerStateListener, AppInstallationReferrerStateListener {
 
     private val referralClient = InstallReferrerClient.newBuilder(context).build()
+    private var initialisationStartTime: Long = 0
 
-    private var referralCodeContinuation: CancellableContinuation<ParsedReferrerResult>? = null
+    private var referralResult: ParsedReferrerResult = ReferrerInitialising
 
-    suspend fun retrieveReferralCode(timeoutMs: Long): ParsedReferrerResult {
-        Timber.i("Referrer: Retrieving referral code from Play Store referrer service")
-
-        return suspendCoroutineWithTimeout(timeoutMs) { continuation ->
-            referralCodeContinuation = continuation
-
+    /**
+     * Initialises the referrer service. This should only be called once.
+     */
+    override fun initialiseReferralRetrieval() {
+        try {
+            initialisationStartTime = System.currentTimeMillis()
             if (playStoreReferralServiceInstalled()) {
                 referralClient.startConnection(this)
             } else {
-                val wrappedError = ParseFailure(ReferralServiceUnavailable)
-                resumeContinuation(wrappedError)
+                referralResult = ParseFailure(ReferralServiceUnavailable)
             }
+        } catch (e: IllegalStateException) {
+            Timber.w(e, "Failed to obtain referrer information")
+            referralResult = ParseFailure(UnknownError)
         }
+    }
+
+    override fun onInstallReferrerSetupFinished(responseCode: Int) {
+        val referrerRetrievalDurationMs = System.currentTimeMillis() - initialisationStartTime
+        Timber.i("Took ${referrerRetrievalDurationMs}ms to get initial referral data callback")
+
+        when (responseCode) {
+            OK -> {
+                Timber.d("Successfully connected to Referrer service")
+                val response = referralClient.installReferrer
+                val referrer = response.installReferrer
+                val parsedResult = appInstallationReferrerParser.parse(referrer)
+                referralResultReceived(parsedResult)
+            }
+            FEATURE_NOT_SUPPORTED -> referralResultFailed(FeatureNotSupported)
+            SERVICE_UNAVAILABLE -> referralResultFailed(ServiceUnavailable)
+            DEVELOPER_ERROR -> referralResultFailed(DeveloperError)
+            SERVICE_DISCONNECTED -> referralResultFailed(ServiceDisconnected)
+            else -> referralResultFailed(UnknownError)
+        }
+        referralClient.endConnection()
+    }
+
+    /**
+     * Retrieves the app installation referral code.
+     * This might return a result immediately or might wait for a result to become available. There is no guarantee that a result will ever be returned.
+     *
+     * It is the caller's responsibility to guard against this function not returning a result in a timely manner, or not returning a result ever.
+     */
+    override suspend fun retrieveReferralCode(): ParsedReferrerResult {
+        if (referralResult != ReferrerInitialising) {
+            Timber.i("Referrer already determined; immediately answering")
+            return referralResult
+        }
+
+        Timber.i("Referrer: Retrieving referral code from Play Store referrer service")
+
+        while (referralResult == ReferrerInitialising) {
+            Timber.v("Still initialising - waiting")
+            delay(10)
+        }
+
+        return referralResult
     }
 
     private fun playStoreReferralServiceInstalled(): Boolean {
@@ -65,46 +116,15 @@ class AppInstallationReferrerStateListener @Inject constructor(
         return matchingServices.size > 0
     }
 
-    override fun onInstallReferrerSetupFinished(responseCode: Int) {
-        if (referralCodeContinuation?.isCancelled == true) {
-            Timber.d("Already canceled; doing nothing")
-            return
-        }
+    private fun referralResultReceived(result: ParsedReferrerResult) {
+        referralResult = result
+    }
 
-        when (responseCode) {
-            OK -> {
-                Timber.i("Successfully connected to Referrer service")
-
-                val response = referralClient.installReferrer
-                val referrer = response.installReferrer
-                val parsedResult = appInstallationReferrerParser.parse(referrer)
-                resumeContinuation(parsedResult)
-            }
-            FEATURE_NOT_SUPPORTED -> resumeContinuation(ParseFailure(FeatureNotSupported))
-            SERVICE_UNAVAILABLE -> resumeContinuation(ServiceUnavailable)
-            DEVELOPER_ERROR -> resumeContinuation(DeveloperError)
-            SERVICE_DISCONNECTED -> resumeContinuation(ServiceDisconnected)
-            else -> resumeContinuation(UnknownError)
-        }
-        referralClient.endConnection()
+    private fun referralResultFailed(reason: ParseFailureReason) {
+        referralResult = ParseFailure(reason)
     }
 
     override fun onInstallReferrerServiceDisconnected() {
         Timber.i("Referrer: ServiceDisconnected")
     }
-
-    private fun resumeContinuation(result: ParsedReferrerResult) {
-        referralCodeContinuation?.resumeWith(Result.success(result))
-    }
-
-    private fun resumeContinuation(errorReason: ParseFailureReason) {
-        referralCodeContinuation?.resumeWith(Result.success(ParseFailure(errorReason)))
-    }
-
-    private suspend inline fun <T> suspendCoroutineWithTimeout(timeoutMs: Long, crossinline block: (CancellableContinuation<T>) -> Unit): T {
-        return withTimeout(timeoutMs) {
-            suspendCancellableCoroutine(block = block)
-        }
-    }
-
 }

@@ -21,6 +21,7 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 
 
@@ -31,6 +32,7 @@ class LaunchActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
+        triggerAppInstallationReferrerRetrieval()
         configureObservers()
     }
 
@@ -49,6 +51,11 @@ class LaunchActivity : DuckDuckGoActivity() {
                 showHome()
             }
         }
+    }
+
+    private fun triggerAppInstallationReferrerRetrieval() {
+        val app = application as DuckDuckGoApplication
+        app.readAppInstallationReferrer()
     }
 
     private fun showOnboarding() {
