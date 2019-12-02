@@ -41,9 +41,10 @@ class PlayStoreReferralModule {
     fun appInstallationReferrerStateListener(
         context: Context,
         packageManager: PackageManager,
-        appInstallationReferrerParser: AppInstallationReferrerParser
+        appInstallationReferrerParser: AppInstallationReferrerParser,
+        appReferrerDataStore: AppReferrerDataStore
     ): AppInstallationReferrerStateListener {
-        return PlayStoreAppReferrerStateListener(context, packageManager, appInstallationReferrerParser)
+        return PlayStoreAppReferrerStateListener(context, packageManager, appInstallationReferrerParser, appReferrerDataStore)
     }
 
     @Provides
@@ -58,5 +59,11 @@ class PlayStoreReferralModule {
     @Provides
     fun durationBucketMapper(): DurationBucketMapper {
         return DurationBucketMapper()
+    }
+
+    @Provides
+    @Singleton
+    fun appReferrerDataStore(context: Context): AppReferrerDataStore {
+        return AppReferenceSharePreferences(context)
     }
 }
