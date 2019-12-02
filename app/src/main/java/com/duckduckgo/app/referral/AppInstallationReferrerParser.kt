@@ -57,7 +57,8 @@ class QueryParamReferrerParser(private val pixel: Pixel) : AppInstallationReferr
 
     private fun sendPixelForResult(result: ParsedReferrerResult, pixelName: Pixel.PixelName) {
         if (result is ReferrerFound) {
-            pixel.fire(pixelName)
+            val map = mapOf(PIXEL_KEY_CAMPAIGN_SUFFIX to result.campaignSuffix)
+            pixel.fire(pixelName, map)
         }
     }
 
@@ -86,6 +87,8 @@ class QueryParamReferrerParser(private val pixel: Pixel) : AppInstallationReferr
     companion object {
         private const val CAMPAIGN_NAME_PREFIX_TYPE_A = "DDGRA"
         private const val CAMPAIGN_NAME_PREFIX_TYPE_B = "DDGRB"
+
+        private const val PIXEL_KEY_CAMPAIGN_SUFFIX = "c"
     }
 }
 
