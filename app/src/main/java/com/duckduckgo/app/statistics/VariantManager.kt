@@ -27,8 +27,6 @@ interface VariantManager {
 
     sealed class VariantFeature {
         // variant-dependant features listed here
-
-        object OnboardingExperiment : VariantFeature()
     }
 
     companion object {
