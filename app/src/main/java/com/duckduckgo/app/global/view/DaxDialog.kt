@@ -79,6 +79,12 @@ class DaxDialog(
         super.onCancel(dialog)
     }
 
+    fun setDialogAndStartAnimation() {
+        setDialog()
+        setListeners()
+        dialogText.startTypingAnimation(daxText, true, onAnimationFinished)
+    }
+
     fun onAnimationFinishedListener(onAnimationFinished: () -> Unit) {
         this.onAnimationFinished = onAnimationFinished
     }

@@ -125,7 +125,7 @@ sealed class DaxDialogCta(
                         daxText = it.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph, getNetworkName(), getNetworkName())
                         buttonText = it.resources.getString(R.string.daxDialogGotIt)
                         setPrimaryCTAClickListener { dismiss() }
-                        onStart()
+                        setDialogAndStartAnimation()
                     }
                     show(it.supportFragmentManager, TAG)
                 }

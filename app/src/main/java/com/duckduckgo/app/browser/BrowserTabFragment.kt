@@ -28,6 +28,7 @@ import android.appwidget.AppWidgetManager
 import android.content.*
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.drawable.AnimatedVectorDrawable
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
@@ -43,6 +44,7 @@ import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
 import android.webkit.WebView.HitTestResult.*
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
@@ -110,6 +112,7 @@ import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
 import java.io.File
+import java.util.Locale
 import javax.inject.Inject
 import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
@@ -1134,7 +1137,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     progress = viewState.progress
                 }
 
-                if (viewState.progress <= 10) {
+                if (viewState.progress <= 10 && viewState.isLoading) {
                     val fadeClearTextButtonOut = animateFadeOut(clearTextButton)
                     val fadeTextInputOut = animateFadeOut(omnibarTextInput)
                     val fadeGradeOut = animateFadeOut(privacyGradeButton)
@@ -1155,29 +1158,120 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
                 // TODO change
                 if (viewState.progress == 100) {
-                    if (loadingAnimation.isRunning) {
-                        loadingAnimation.cancel()
-                        loadingText.alpha = 1f
-                    }
-                    val fadeClearTextButtonIn = animateFadeIn(clearTextButton)
-                    val fadeTextInputIn = animateFadeIn(omnibarTextInput)
-                    val fadeGradeIn = animateFadeIn(privacyGradeButton)
-
-                    val fadeLoadingOut = animateFadeOut(loadingText)
-                    val transition = AnimatorSet().apply {
-                        play(fadeClearTextButtonIn).with(fadeTextInputIn).with(fadeGradeIn)
-                    }
-
-                    if (!finishAnimation.isRunning) {
-                        finishAnimation = AnimatorSet().apply {
-                            play(fadeLoadingOut).after(1350).before(transition)
-                            start()
+                    withDelay(500) {
+                        if (loadingAnimation.isRunning) {
+                            loadingAnimation.end()
                         }
-                    }
+                        genericDelay = 3000L
+                        val animateOmnibarIn = animateOmnibarIn()
+                        val fadeLogosOut = animateFadeOut(networksContainer)
 
-                    ctaViewModel.refreshCta(viewModel.siteLiveData.value)
+                        if (!finishAnimation.isRunning) {
+                            finishAnimation = AnimatorSet().apply {
+                                play(runAnimations())
+                                play(fadeLogosOut).after(genericDelay).before(animateOmnibarIn)
+                                start()
+                            }
+                        }
+
+                        ctaViewModel.refreshCta(viewModel.siteLiveData.value)
+                    }
                 }
             }
+        }
+
+        private var genericDelay: Long = 3000L
+
+        private fun animateOmnibarIn(): AnimatorSet {
+            val fadeClearTextButtonIn = animateFadeIn(clearTextButton)
+            val fadeTextInputIn = animateFadeIn(omnibarTextInput)
+            val fadeGradeIn = animateFadeIn(privacyGradeButton)
+            return AnimatorSet().apply {
+                play(fadeClearTextButtonIn).with(fadeTextInputIn).with(fadeGradeIn)
+            }
+        }
+
+        private fun runAnimations(): AnimatorSet {
+            val site = viewModel.siteLiveData.value
+            val events = site?.trackingEvents
+
+            networksContainer.removeAllViews()
+            networksContainer.alpha = 0f
+
+            val logos = events?.asSequence()?.filter {
+                it.trackerNetwork != null
+            }?.map {
+                val logoName = "network_logo_${it.trackerNetwork!!.name.toLowerCase(Locale.getDefault()).replace(".", "")}"
+                resources.getIdentifier(logoName, "drawable", requireActivity().packageName)
+            }?.toList()?.filter { it != 0 }?.distinct()?.take(4)?.toList()
+
+            val views: MutableList<View> = logos?.map {
+                val imageView = ImageView(requireContext())
+                imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+                imageView.setImageResource(R.drawable.network_cross_anim)
+                imageView.setBackgroundResource(it)
+                imageView.id = generateViewId()
+                networksContainer.addView(imageView)
+                return@map imageView
+            }.orEmpty().toMutableList()
+
+            val constraints = ConstraintSet()
+            constraints.clone(networksContainer)
+
+            var previousItem: View? = null
+            var i = 1
+            views.map {
+                val isLastItem = views.indexOf(it) == views.size - 1
+                constraints.connect(it.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
+                constraints.connect(it.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
+                if (previousItem == null) {
+                    constraints.connect(it.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
+                } else {
+                    constraints.connect(it.id, ConstraintSet.START, (previousItem as View).id, ConstraintSet.END, 10)
+                }
+                if (isLastItem) {
+                    constraints.connect(it.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
+                }
+                previousItem = it
+                i++
+            }
+
+            val viewIds = views.map { it.id }.toIntArray()
+
+            if (viewIds.size > 1) {
+                constraints.createHorizontalChain(
+                    ConstraintSet.PARENT_ID,
+                    ConstraintSet.LEFT,
+                    ConstraintSet.PARENT_ID,
+                    ConstraintSet.RIGHT,
+                    viewIds,
+                    null,
+                    ConstraintSet.CHAIN_SPREAD
+                )
+            }
+
+            if (viewIds.isEmpty()) {
+                genericDelay = 0L
+            }
+            constraints.applyTo(networksContainer)
+
+            val fadeLoadingOut = animateFadeOut(loadingText)
+            val fadeLogosIn = animateFadeIn(networksContainer)
+
+            views.map {
+                if (it is ImageView) {
+                    val frameAnimation = it.drawable as AnimatedVectorDrawable
+                    frameAnimation.start()
+                }
+            }
+
+            return AnimatorSet().apply {
+                play(fadeLogosIn).after(fadeLoadingOut)
+            }
+        }
+
+        fun withDelay(delay : Long, block : () -> Unit) {
+            Handler().postDelayed(Runnable(block), delay)
         }
 
         @SuppressLint("ObjectAnimatorBinding")

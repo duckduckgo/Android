@@ -80,6 +80,13 @@
                         android:layout_height="wrap_content">
                     </TextView>
 
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/networksContainer"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent" />
+
                     <ImageButton
                         android:id="@+id/privacyGradeButton"
                         android:layout_width="wrap_content"
