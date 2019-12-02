@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginBottom="16dp"
-            android:src="@drawable/ic_dax_icon"
+            app:srcCompat="@drawable/ic_dax_icon"
             app:layout_constraintBottom_toTopOf="@id/cardView"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -52,7 +52,7 @@
             android:id="@+id/triangle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_triangle_bubble"
+            app:srcCompat="@drawable/ic_triangle_bubble"
             app:layout_constraintBottom_toTopOf="@+id/cardView"
             app:layout_constraintEnd_toEndOf="@id/logo"
             app:layout_constraintStart_toStartOf="@id/logo" />

@@ -28,7 +28,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import android.view.Gravity
-import androidx.constraintlayout.widget.ConstraintLayout
 import kotlinx.android.synthetic.main.content_dax_dialog.*
 import android.view.animation.Animation
 import android.view.animation.OvershootInterpolator
@@ -37,14 +36,14 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 
 class DaxDialog(
-    var daxText: String,
-    var buttonText: String,
+    val daxText: String,
+    val buttonText: String,
     private val dismissible: Boolean = true,
     private val typingDelayInMs: Long = 20
 ) : DialogFragment() {
 
     private var onAnimationFinished: () -> Unit = {}
-    private var primaryCTAClickListener: () -> Unit = { dismiss() }
+    private var primaryCtaClickListener: () -> Unit = { dismiss() }
     private var hideClickListener: () -> Unit = { dismiss() }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
@@ -58,12 +57,18 @@ class DaxDialog(
         attributes?.gravity = Gravity.BOTTOM
         window?.attributes = attributes
         window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        setStyle(STYLE_NO_TITLE, android.R.style.Theme_DeviceDefault_Light_NoActionBar)
 
         return dialog
     }
 
     override fun onStart() {
         super.onStart()
+        dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         setDialog()
         setListeners()
         dialogText.startTypingAnimation(daxText, true, onAnimationFinished)
@@ -79,20 +84,25 @@ class DaxDialog(
     }
 
     fun setPrimaryCTAClickListener(clickListener: () -> Unit) {
-        primaryCTAClickListener = clickListener
+        primaryCtaClickListener = clickListener
     }
 
     fun setHideClickListener(clickListener: () -> Unit) {
         hideClickListener = clickListener
     }
 
-    fun startHighlightViewAnimation(targetView: View, duration: Long = 400, size: Float = 6f) {
-        val highlightImageView = addHighlightView(targetView, size)
-        val fadeInAnimation = ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
-        fadeInAnimation.duration = duration
-        fadeInAnimation.fillAfter = true
-        fadeInAnimation.interpolator = OvershootInterpolator(3f)
-        highlightImageView.startAnimation(fadeInAnimation)
+    fun startHighlightViewAnimation(targetView: View, duration: Long = 400, timesBigger: Float = 0f) {
+        val highlightImageView = addHighlightView(targetView, timesBigger)
+        val scaleAnimation = buildScaleAnimation(duration)
+        highlightImageView?.startAnimation(scaleAnimation)
+    }
+
+    private fun buildScaleAnimation(duration: Long = 400): Animation {
+        val scaleAnimation = ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
+        scaleAnimation.duration = duration
+        scaleAnimation.fillAfter = true
+        scaleAnimation.interpolator = OvershootInterpolator(OVERSHOOT_TENSION)
+        return scaleAnimation
     }
 
     private fun setListeners() {
@@ -103,7 +113,7 @@ class DaxDialog(
 
         primaryCta.setOnClickListener {
             dialogText.cancelAnimation()
-            primaryCTAClickListener()
+            primaryCtaClickListener()
         }
 
         if (dismissible) {
@@ -115,7 +125,6 @@ class DaxDialog(
     }
 
     private fun setDialog() {
-        dialog?.window?.setLayout(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT)
         context?.let {
             hiddenText.text = daxText.html(it)
             primaryCta.text = buttonText
@@ -126,27 +135,34 @@ class DaxDialog(
         }
     }
 
-    private fun addHighlightView(targetView: View, size: Float): View {
-        val highlightImageView = ImageView(requireContext())
-        highlightImageView.id = View.generateViewId()
-        highlightImageView.setImageResource(R.drawable.ic_circle)
+    private fun addHighlightView(targetView: View, timesBigger: Float): View? {
+        return activity?.let {
+            val highlightImageView = ImageView(context)
+            highlightImageView.id = View.generateViewId()
+            highlightImageView.setImageResource(R.drawable.ic_circle)
 
-        val rec = Rect()
-        val window = requireActivity().window
-        window.decorView.getWindowVisibleDisplayFrame(rec)
-        val statusBarHeight = rec.top
+            val rec = Rect()
+            val window = it.window
+            window.decorView.getWindowVisibleDisplayFrame(rec)
 
-        val width = targetView.width
-        val height = targetView.height
-        val locationOnScreen: IntArray = intArrayOf(0, 0)
-        targetView.getLocationOnScreen(locationOnScreen)
+            val statusBarHeight = rec.top
+            val width = targetView.width
+            val height = targetView.height
+            val locationOnScreen: IntArray = intArrayOf(0, 0)
+            targetView.getLocationOnScreen(locationOnScreen)
 
-        val params = RelativeLayout.LayoutParams(width + (width / size).toInt(), height + (height / size).toInt())
-        params.leftMargin = locationOnScreen[0] - ((width / size) / 2).toInt()
-        params.topMargin = (locationOnScreen[1] - statusBarHeight) - ((width / size) / 2).toInt()
+            val timesBiggerX: Float = width * timesBigger
+            val timesBiggerY: Float = height * timesBigger
 
-        dialogContainer.addView(highlightImageView, params)
+            val params = RelativeLayout.LayoutParams((width + timesBiggerX).toInt(), (height + timesBiggerY).toInt())
+            params.leftMargin = locationOnScreen[0] - (timesBiggerX / 2).toInt()
+            params.topMargin = (locationOnScreen[1] - statusBarHeight) - (timesBiggerY / 2).toInt()
+            dialogContainer.addView(highlightImageView, params)
+            highlightImageView
+        }
+    }
 
-        return highlightImageView
+    companion object {
+        const val OVERSHOOT_TENSION = 3f
     }
 }

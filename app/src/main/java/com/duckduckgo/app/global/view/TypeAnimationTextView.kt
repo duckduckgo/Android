@@ -32,13 +32,11 @@ class TypeAnimationTextView @JvmOverloads constructor(
 ) : TextView(context, attrs, defStyleAttr), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + animationJob
+        get() = Dispatchers.Main + Job()
 
-    private val animationJob: Job = Job()
     private var typingAnimationJob: Job? = null
-
+    private var delayAfterAnimationInMs: Long = 300
     var typingDelayInMs: Long = 20
-    var delayAfterAnimationInMs: Long = 300
 
     fun startTypingAnimation(textDialog: String, isCancellable: Boolean = true, afterAnimation: () -> Unit = {}) {
         val inputText = textDialog.html(context)
