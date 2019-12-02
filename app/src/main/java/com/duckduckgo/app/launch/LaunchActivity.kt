@@ -32,7 +32,10 @@ class LaunchActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
+
+        // this is a good time to 'start the clock' and measure how much of a delay waiting for referral might impose
         triggerAppInstallationReferrerRetrieval()
+        
         configureObservers()
     }
 
@@ -55,7 +58,7 @@ class LaunchActivity : DuckDuckGoActivity() {
 
     private fun triggerAppInstallationReferrerRetrieval() {
         val app = application as DuckDuckGoApplication
-        app.readAppInstallationReferrer()
+        app.measureAppInstallationReferrer()
     }
 
     private fun showOnboarding() {
