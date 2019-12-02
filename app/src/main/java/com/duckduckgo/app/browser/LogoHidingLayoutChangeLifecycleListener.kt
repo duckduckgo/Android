@@ -22,13 +22,11 @@ import android.view.animation.AccelerateInterpolator
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.duckduckgo.app.cta.db.DismissedCtaDao
-import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.view.toDp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
@@ -64,10 +62,7 @@ class LogoHidingLayoutChangeLifecycleListener(private var ddgLogoView: View, pri
         val heightDp = getHeightDp()
         Timber.v("App height now: $heightDp dp, call to action button showing: ${callToActionView?.isVisible}")
         launch {
-            val test = withContext(Dispatchers.IO) {
-                return@withContext dismissedCtaDao.exists(CtaId.DAX_DIALOG)
-            }
-            if (readyToShowLogo && test && enoughRoomForLogo(heightDp)) {
+            if (readyToShowLogo && enoughRoomForLogo(heightDp)) {
                 fadeLogoIn()
             } else {
                 fadeLogoOut()

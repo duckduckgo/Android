@@ -1229,6 +1229,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         fun renderCtaViewState(viewState: CtaViewModel.CtaViewState) {
             renderIfChanged(viewState, lastSeenCtaViewState) {
+                ddgLogo.show()
                 lastSeenCtaViewState = viewState
                 if (viewState.cta != null) {
                     showCta(viewState.cta)
@@ -1252,11 +1253,16 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             hideHomeCta()
             hideDaxCta()
             configuration.apply(null, activity)
+            ctaViewModel.onCtaDismissed()
         }
 
         private fun showDaxCta(configuration: DaxBubbleCta) {
+            ddgLogo.hide()
             hideHomeCta()
             daxDialog.show()
+            configuration.afterAnimation = {
+                ctaViewModel.onCtaDismissed()
+            }
             configuration.apply(daxDialog, null)
         }
 
@@ -1270,6 +1276,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         private fun hideDaxCta() {
+            dialogText.cancelAnimation()
             daxDialog.gone()
         }
 

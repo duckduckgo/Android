@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.view.DaxDialog
 import com.duckduckgo.app.global.view.hide
+import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
@@ -53,10 +54,10 @@ sealed class DaxDialogCta(
     open fun getDaxText(activity: FragmentActivity): String = activity.getString(description)
 
     fun createDialog(activity: FragmentActivity): DaxDialog =
-        DaxDialog(getDaxText(activity), activity.resources.getString(DaxSerpCta.okButton))
+        DaxDialog(getDaxText(activity), activity.resources.getString(okButton))
 
     object DaxSerpCta : DaxDialogCta(
-        CtaId.DAX_DIALOG,
+        CtaId.DAX_DIALOG_SERP,
         R.string.daxSerpCtaText,
         R.string.daxDialogPhew,
         null,
@@ -71,7 +72,7 @@ sealed class DaxDialogCta(
     }
 
     class DaxTrackersBlockedCta(val trackers: List<TrackingEvent>) : DaxDialogCta(
-        CtaId.DAX_DIALOG,
+        CtaId.DAX_DIALOG_TRACKERS_FOUND,
         R.plurals.daxTrackersBlockedCtaText,
         R.string.daxDialogHighFive,
         null,
@@ -98,7 +99,7 @@ sealed class DaxDialogCta(
     }
 
     class DaxMainNetworkCta(val network: String) : DaxDialogCta(
-        CtaId.DAX_DIALOG,
+        CtaId.DAX_DIALOG_NETWORK,
         R.string.daxMainNetworkStep1CtaText,
         R.string.daxDialogNext,
         null,
@@ -133,7 +134,7 @@ sealed class DaxDialogCta(
     }
 
     object DaxNoSerpCta : DaxDialogCta(
-        CtaId.DAX_DIALOG,
+        CtaId.DAX_DIALOG_OTHER,
         R.string.daxNonSerpCtaText,
         R.string.daxDialogGotIt,
         null,
@@ -172,9 +173,19 @@ sealed class DaxBubbleCta(
     override val cancelPixel: Pixel.PixelName?
 ) : Cta {
 
+    var afterAnimation: () -> Unit = {}
+
     object DaxIntroCta : DaxBubbleCta(
-        CtaId.DAX_DIALOG,
+        CtaId.DAX_INTRO,
         R.string.daxIntroCtaText,
+        null,
+        null,
+        null
+    )
+
+    object DaxEndCta : DaxBubbleCta(
+        CtaId.DAX_END,
+        R.string.daxEndCtaText,
         null,
         null,
         null
@@ -184,9 +195,9 @@ sealed class DaxBubbleCta(
         view?.let {
             val daxText = view.context.getString(description)
             view.alpha = 1f
-            view.hiddenText.text = daxText
+            view.hiddenText.text = daxText.html(view.context)
             view.primaryCta.hide()
-            view.dialogText.startTypingAnimation(daxText, true)
+            view.dialogText.startTypingAnimation(daxText, true, afterAnimation = afterAnimation)
         }
     }
 }

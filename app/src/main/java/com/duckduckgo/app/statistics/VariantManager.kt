@@ -29,6 +29,8 @@ interface VariantManager {
         // variant-dependant features listed here
 
         object LightThemeExperiment : VariantFeature()
+        object ConceptTest : VariantFeature()
+        object ExistingNoCTA : VariantFeature()
     }
 
     companion object {
@@ -43,7 +45,10 @@ interface VariantManager {
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "mp", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "mo", weight = 1.0, features = listOf(VariantFeature.LightThemeExperiment), filterBy = { noFilter() })
+            Variant(key = "mo", weight = 1.0, features = listOf(VariantFeature.LightThemeExperiment), filterBy = { noFilter() }),
+            Variant(key = "mc", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "me", weight = 1.0, features = listOf(VariantFeature.ConceptTest), filterBy = { isEnglishLocale() }),
+            Variant(key = "md", weight = 1.0, features = listOf(VariantFeature.ExistingNoCTA), filterBy = { isEnglishLocale() })
 
             // All groups in an experiment (control and variants) MUST use the same filters
         )
@@ -105,6 +110,8 @@ class ExperimentationVariantManager(
     }
 
     private fun generateVariant(activeVariants: List<Variant>): Variant {
+        // TODO remove return after testing
+        return Variant(key = "me", weight = 1.0, features = listOf(VariantManager.VariantFeature.ConceptTest), filterBy = { true })
         val weightSum = activeVariants.sumByDouble { it.weight }
         if (weightSum == 0.0) {
             Timber.v("No variants active; allocating default")

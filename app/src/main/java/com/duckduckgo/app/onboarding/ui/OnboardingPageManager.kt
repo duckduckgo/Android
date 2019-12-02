@@ -27,6 +27,7 @@ import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.app.onboarding.ui.page.UnifiedSummaryPage
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage
+import com.duckduckgo.app.statistics.VariantManager
 
 interface OnboardingPageManager {
     fun pageCount(): Int
@@ -37,7 +38,8 @@ interface OnboardingPageManager {
 
 class OnboardingPageManagerWithTrackerBlocking(
     private val onboardingPageBuilder: OnboardingPageBuilder,
-    private val defaultWebBrowserCapability: DefaultBrowserDetector
+    private val defaultWebBrowserCapability: DefaultBrowserDetector,
+    private val variantManager: VariantManager
 ) : OnboardingPageManager {
 
     private val pages = mutableListOf<OnboardingPageBlueprint>()
@@ -47,7 +49,7 @@ class OnboardingPageManagerWithTrackerBlocking(
     override fun buildPageBlueprints() {
         pages.clear()
 
-        if (true) {
+        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)) {
             pages.add(WelcomeBlueprint())
         } else {
             pages.add(SummaryPageBlueprint())
@@ -82,6 +84,8 @@ class OnboardingPageManagerWithTrackerBlocking(
 
     private fun shouldShowDefaultBrowserPage(): Boolean {
         return defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration()
+                && !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ExistingNoCTA)
+                && !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)
     }
 
     private fun isFinalPage(position: Int) = position == pageCount() - 1

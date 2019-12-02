@@ -26,6 +26,7 @@ import com.duckduckgo.app.cta.ui.HomePanelCta.*
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -40,7 +41,8 @@ class CtaViewModel @Inject constructor(
     private val pixel: Pixel,
     private val surveyDao: SurveyDao,
     private val widgetCapabilities: WidgetCapabilities,
-    private val dismissedCtaDao: DismissedCtaDao
+    private val dismissedCtaDao: DismissedCtaDao,
+    private val variantManager: VariantManager
 ) {
 
     data class CtaViewState(
@@ -61,7 +63,9 @@ class CtaViewModel @Inject constructor(
 
     fun onSurveyChanged(survey: Survey?) {
         activeSurvey = survey
-        refreshCta()
+        if (activeSurvey != null) {
+            refreshCta()
+        }
     }
 
     fun refreshCta(site: Site? = null) {
@@ -72,11 +76,19 @@ class CtaViewModel @Inject constructor(
 
         Schedulers.io().scheduleDirect {
             when {
+                canShowDaxIntroCta() -> {
+                    ctaViewState.postValue(currentViewState.copy(cta = DaxBubbleCta.DaxIntroCta))
+                }
+                canShowDaxCtaEndOfJourney() -> {
+                    ctaViewState.postValue(currentViewState.copy(cta = DaxBubbleCta.DaxEndCta))
+                }
+                shouldShowDaxCta(site) != null -> {
+                    ctaViewState.postValue(currentViewState.copy(cta = shouldShowDaxCta(site)))
+                }
                 canShowWidgetCta() -> {
                     val ctaType = if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
                     ctaViewState.postValue(currentViewState.copy(cta = ctaType))
                 }
-                canShowDaxDialogCta() -> ctaViewState.postValue(currentViewState.copy(cta = typeDaxDialogCta(site)))
                 else -> ctaViewState.postValue(currentViewState.copy(cta = null))
             }
         }
@@ -98,35 +110,54 @@ class CtaViewModel @Inject constructor(
     private fun canShowWidgetCta(): Boolean {
         return widgetCapabilities.supportsStandardWidgetAdd &&
                 !widgetCapabilities.hasInstalledWidgets &&
-                dismissedCtaDao.exists(CtaId.DAX_DIALOG) &&
-                !dismissedCtaDao.exists(CtaId.ADD_WIDGET)
+                dismissedCtaDao.exists(CtaId.DAX_INTRO) &&
+                !canShowDaxCtaEndOfJourney() &&
+                !dismissedCtaDao.exists(CtaId.ADD_WIDGET) &&
+                !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) &&
+                !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ExistingNoCTA)
     }
 
     @WorkerThread
-    private fun canShowDaxDialogCta(): Boolean = !dismissedCtaDao.exists(CtaId.DAX_DIALOG)
+    private fun canShowDaxIntroCta(): Boolean = !dismissedCtaDao.exists(CtaId.DAX_INTRO) &&
+            variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)
 
-    private fun typeDaxDialogCta(site: Site?): Cta {
+    @WorkerThread
+    private fun canShowDaxCtaEndOfJourney(): Boolean = !dismissedCtaDao.exists(CtaId.DAX_END) && dismissedCtaDao.exists(CtaId.DAX_INTRO) &&
+            variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) &&
+            (dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK) || dismissedCtaDao.exists(CtaId.DAX_DIALOG_OTHER) ||
+                    dismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP) || dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND))
 
+    @WorkerThread
+    private fun shouldShowDaxCta(site: Site?): Cta? {
+        if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)) {
+            return null
+        }
         site?.let {
             // is major network
             if (it.memberNetwork != null) {
                 val network = site.memberNetwork
-                if (DaxDialogCta.MAIN_TRACKER_NETWORKS.contains(network?.name)) {
+                if (DaxDialogCta.MAIN_TRACKER_NETWORKS.contains(network?.name) && !dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)) {
                     return DaxDialogCta.DaxMainNetworkCta(network!!.name)
                 }
             }
             // is serp
-            if (it.url.contains(DaxDialogCta.SERP)) {
+            if (it.url.contains(DaxDialogCta.SERP) && !dismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)) {
                 return DaxDialogCta.DaxSerpCta
             }
             // trackers blocked
-            return if (it.trackerCount > 0) {
+            return if (!it.url.contains(DaxDialogCta.SERP) && it.trackerCount > 0 && !dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)) {
                 DaxDialogCta.DaxTrackersBlockedCta(it.trackingEvents)
-            } else {
+            } else if (!it.url.contains(DaxDialogCta.SERP) &&
+                !dismissedCtaDao.exists(CtaId.DAX_DIALOG_OTHER) &&
+                !dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND) &&
+                !dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)
+            ) {
                 DaxDialogCta.DaxNoSerpCta
+            } else {
+                null
             }
         }
-        return DaxBubbleCta.DaxIntroCta
+        return null
     }
 
     fun onCtaShown() {
@@ -146,6 +177,10 @@ class CtaViewModel @Inject constructor(
                 is HomePanelCta.Survey -> {
                     activeSurvey = null
                     surveyDao.cancelScheduledSurveys()
+                }
+                is DaxBubbleCta, is DaxDialogCta -> {
+                    dismissedCtaDao.insert(DismissedCta(cta.ctaId))
+                    return@scheduleDirect
                 }
                 else -> {
                     dismissedCtaDao.insert(DismissedCta(cta.ctaId))

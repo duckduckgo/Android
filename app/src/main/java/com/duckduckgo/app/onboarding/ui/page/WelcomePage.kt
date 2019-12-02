@@ -27,22 +27,9 @@ import com.duckduckgo.app.browser.R
 import kotlinx.android.synthetic.main.include_dax_dialog.*
 import kotlinx.android.synthetic.main.content_onboarding_welcome.*
 import kotlinx.android.synthetic.main.content_onboarding_welcome.longDescriptionContainer
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlin.coroutines.CoroutineContext
 
 
-class WelcomePage : OnboardingPageFragment(), CoroutineScope {
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + animationJob
-
-    private val animationJob: Job = Job()
-    private var typingAnimationJob: Job? = null
+class WelcomePage : OnboardingPageFragment() {
 
     override fun layoutResource(): Int = R.layout.content_onboarding_welcome
 
@@ -66,9 +53,7 @@ class WelcomePage : OnboardingPageFragment(), CoroutineScope {
                     .alpha(1f)
                     .setDuration(400)
                     .withEndAction {
-                        typingAnimationJob = launch {
-                            startTypingAnimation(daxText)
-                        }
+                        dialogText.startTypingAnimation(daxText)
                     }
             }
     }
@@ -86,16 +71,5 @@ class WelcomePage : OnboardingPageFragment(), CoroutineScope {
             statusBarColor = Color.TRANSPARENT
         }
         ViewCompat.requestApplyInsets(longDescriptionContainer)
-    }
-
-    private suspend fun startTypingAnimation(inputText: CharSequence) {
-        withContext(Dispatchers.Main) {
-            launch {
-                inputText.mapIndexed { index, _ ->
-                    dialogText.text = inputText.subSequence(0, index + 1)
-                    delay(20)
-                }
-            }
-        }
     }
 }

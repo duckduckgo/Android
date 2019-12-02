@@ -21,6 +21,7 @@
     <string name="onboardingWelcomeTitle">"Welcome to DuckDuckGo!"</string>
     <string name="onboardingLetsDoItButton">Let\'s Do It!</string>
     <string name="daxIntroCtaText"><![CDATA[Try visiting one of your favorite sites!<br/><br/>I\'ll block trackers so they can\'t spy on you. I\'ll also upgrade the security of your connection if possible. 🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[You\'ve got this!<br/><br/>Remember: every time your browse with me a creepy ad loses its wings. 👌]]></string>
     <string name="daxSerpCtaText">Your DuckDuckGo searches are anonymous and I never store your search history. Ever. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="zero"><![CDATA[&#160;tried to hide tracking code on this page! 👀<br/><br/>Nope. Not in my browser, blocked.<br/><br/>If you ever want to know more, just tap the privacy grade.]]></item>
