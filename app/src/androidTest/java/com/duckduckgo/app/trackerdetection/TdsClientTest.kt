@@ -88,7 +88,7 @@ class TdsClientTest {
     }
 
     @Test
-    fun whenUrlMatchesRuleWithNoExceptionsNoRuleActionAndDefaultActionIsBlockThenMatchesIsTrue() {
+    fun whenUrlMatchesDomainWithDefaultBlockAndRuleWithNoExceptionsAndNoActionThenMatchesIsTrue() {
         val rule = Rule("api\\.tracker\\.com\\/auth", null, null)
         val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, listOf(rule)))
         val testee = TdsClient(ClientName.TDS, data)
@@ -96,11 +96,11 @@ class TdsClientTest {
     }
 
     @Test
-    fun whenUrlMatchesRuleWithNoExceptionsNoRuleActionAndDefaultActionIsIgnoreThenMatchesIsFalse() {
+    fun whenUrlMatchesDomainWithDefaultIgnoreAndRuleWithNoExceptionsAndNoActionThenMatchesIsTrue() {
         val rule = Rule("api\\.tracker\\.com\\/auth", null, null)
         val data = listOf(TdsTracker("tracker.com", IGNORE, OWNER, listOf(rule)))
         val testee = TdsClient(ClientName.TDS, data)
-        assertFalse(testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, RESOURCE_TYPE))
+        assertTrue(testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, RESOURCE_TYPE))
     }
 
     @Test
@@ -146,7 +146,7 @@ class TdsClientTest {
         assertFalse(testeeBlockWithRuleIgnore.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, RESOURCE_TYPE))
         assertFalse(testeeIgnoreWithRuleIgnore.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, RESOURCE_TYPE))
         assertTrue(testeeBlockWithRuleNone.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, RESOURCE_TYPE))
-        assertFalse(testeeIgnoreWithRuleNone.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, RESOURCE_TYPE))
+        assertTrue(testeeIgnoreWithRuleNone.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, RESOURCE_TYPE))
     }
 
     @Test

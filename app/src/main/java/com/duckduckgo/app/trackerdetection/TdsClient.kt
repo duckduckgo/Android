@@ -34,9 +34,10 @@ class TdsClient(override val name: Client.ClientName, private val trackers: List
                 if (matchedException(rule.exceptions, documentUrl)) {
                     return false
                 }
-                if (rule.action != null) {
-                    return rule.action != IGNORE
+                if (rule.action == IGNORE) {
+                    return false
                 }
+                return true
             }
         }
 
