@@ -35,6 +35,7 @@ interface AppInstallationReferrerStateListener {
 
     fun initialiseReferralRetrieval()
     suspend fun retrieveReferralCode(): ParsedReferrerResult
+
 }
 
 class PlayStoreAppReferrerStateListener @Inject constructor(
@@ -58,6 +59,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
 
             if (appReferrerDataStore.referrerCheckedPreviously) {
                 referralResult = loadPreviousReferrerData()
+                Timber.i("Already inspected this referrer data. Took ${System.currentTimeMillis() - initialisationStartTime}ms to load from disk")
                 return
             }
 
@@ -118,6 +120,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
 
         Timber.i("Referrer: Retrieving referral code from Play Store referrer service")
 
+        // poll, awaiting referral result to become available
         while (referralResult == ReferrerInitialising) {
             Timber.v("Still initialising - waiting")
             delay(10)

@@ -35,7 +35,7 @@ class LaunchActivity : DuckDuckGoActivity() {
 
         // this is a good time to 'start the clock' and measure how much of a delay waiting for referral might impose
         triggerAppInstallationReferrerRetrieval()
-        
+
         configureObservers()
     }
 
