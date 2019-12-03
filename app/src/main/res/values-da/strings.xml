@@ -1,7 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
-    <string name="appDescription">Privatlivets fred, forenklet</string>
     <string name="yes">Ja</string>
     <string name="no">Nej</string>
 

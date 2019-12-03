@@ -1,7 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">DuckDuckGo logó</string>
-    <string name="appDescription">Adatvédelem, egyszerűsítve</string>
     <string name="yes">Igen</string>
     <string name="no">Nem</string>
 

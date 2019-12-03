@@ -1,7 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Лого на DuckDuckGo</string>
-    <string name="appDescription">Поверителност, опростена</string>
     <string name="yes">да</string>
     <string name="no">Не</string>
 
