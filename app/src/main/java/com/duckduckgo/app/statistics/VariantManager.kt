@@ -27,9 +27,8 @@ interface VariantManager {
 
     sealed class VariantFeature {
         // variant-dependant features listed here
-
-        object LightThemeExperiment : VariantFeature()
         object ConceptTest : VariantFeature()
+
         object ExistingNoCTA : VariantFeature()
     }
 
@@ -44,8 +43,6 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "mp", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "mo", weight = 1.0, features = listOf(VariantFeature.LightThemeExperiment), filterBy = { noFilter() }),
             Variant(key = "mc", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
             Variant(key = "me", weight = 1.0, features = listOf(VariantFeature.ConceptTest), filterBy = { isEnglishLocale() }),
             Variant(key = "md", weight = 1.0, features = listOf(VariantFeature.ExistingNoCTA), filterBy = { isEnglishLocale() })

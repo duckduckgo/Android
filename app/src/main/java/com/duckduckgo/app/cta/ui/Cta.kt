@@ -91,9 +91,9 @@ sealed class DaxDialogCta(
             val size = trackers.size - trackersFiltered.size
             val quantityString =
                 if (size == 0) {
-                    activity.resources.getString(R.string.daxTrackersBlockedCtaZeroText, host)
+                    activity.resources.getString(R.string.daxTrackersBlockedCtaZeroText, host.removePrefix("www."))
                 } else {
-                    activity.resources.getQuantityString(description, size, size, host)
+                    activity.resources.getQuantityString(description, size, size, host.removePrefix("www."))
                 }
             return "<b>$trackersText</b>$quantityString"
         }
@@ -118,11 +118,11 @@ sealed class DaxDialogCta(
         private fun firstParagraph(activity: FragmentActivity): String {
             val percentage = NETWORK_PROPERTY_PERCENTAGES[network]
             return if (percentage != null)
-                activity.resources.getString(R.string.daxMainNetworkStep21CtaText, host, percentage)
+                activity.resources.getString(R.string.daxMainNetworkStep21CtaText, getNetworkName(), percentage)
             else ""
         }
 
-        override fun getDaxText(activity: FragmentActivity): String = activity.resources.getString(description, getNetworkName(), getNetworkName())
+        override fun getDaxText(activity: FragmentActivity): String = activity.resources.getString(description, host.removePrefix("www."), getNetworkName())
 
         override fun apply(view: View?, activity: FragmentActivity?) {
             activity?.let {

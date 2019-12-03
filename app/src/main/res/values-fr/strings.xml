@@ -1,7 +1,6 @@
 ﻿<resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
-    <string name="appDescription">Le respect de votre vie privée, simplifié</string>
     <string name="yes">Oui</string>
     <string name="no">Non</string>
 

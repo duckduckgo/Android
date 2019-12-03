@@ -32,6 +32,7 @@ import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -79,7 +80,7 @@ class CtaViewModel @Inject constructor(
                 canShowDaxIntroCta() -> {
                     ctaViewState.postValue(currentViewState.copy(cta = DaxBubbleCta.DaxIntroCta))
                 }
-                canShowDaxCtaEndOfJourney() -> {
+                canShowDaxCtaEndOfJourney(site) -> {
                     ctaViewState.postValue(currentViewState.copy(cta = DaxBubbleCta.DaxEndCta))
                 }
                 shouldShowDaxCta(site) != null -> {
@@ -110,8 +111,6 @@ class CtaViewModel @Inject constructor(
     private fun canShowWidgetCta(): Boolean {
         return widgetCapabilities.supportsStandardWidgetAdd &&
                 !widgetCapabilities.hasInstalledWidgets &&
-                dismissedCtaDao.exists(CtaId.DAX_INTRO) &&
-                !canShowDaxCtaEndOfJourney() &&
                 !dismissedCtaDao.exists(CtaId.ADD_WIDGET) &&
                 !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) &&
                 !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ExistingNoCTA)
@@ -122,8 +121,9 @@ class CtaViewModel @Inject constructor(
             variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)
 
     @WorkerThread
-    private fun canShowDaxCtaEndOfJourney(): Boolean = !dismissedCtaDao.exists(CtaId.DAX_END) && dismissedCtaDao.exists(CtaId.DAX_INTRO) &&
+    private fun canShowDaxCtaEndOfJourney(site: Site?): Boolean = !dismissedCtaDao.exists(CtaId.DAX_END) && dismissedCtaDao.exists(CtaId.DAX_INTRO) &&
             variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) &&
+            site == null &&
             (dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK) || dismissedCtaDao.exists(CtaId.DAX_DIALOG_OTHER) ||
                     dismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP) || dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND))
 
@@ -180,6 +180,7 @@ class CtaViewModel @Inject constructor(
                 }
                 is DaxBubbleCta, is DaxDialogCta -> {
                     dismissedCtaDao.insert(DismissedCta(cta.ctaId))
+                    Timber.d("Marcos dismissed ${cta.ctaId}")
                     return@scheduleDirect
                 }
                 else -> {

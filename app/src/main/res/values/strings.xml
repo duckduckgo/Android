@@ -2,7 +2,7 @@
 
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
-    <string name="appDescription">Privacy, simplified</string>
+    <string name="appDescription" translatable="false">DuckDuckGo&#160;</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
 
