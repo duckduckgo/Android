@@ -16,7 +16,8 @@
 
 package com.duckduckgo.app.statistics
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.fail
 import org.junit.Test
 
 class VariantManagerTest {
@@ -24,16 +25,16 @@ class VariantManagerTest {
     private val variants = VariantManager.ACTIVE_VARIANTS
 
     @Test
-    fun serpAndSharedControlVariantInactive() {
+    fun serpAndSharedControlVariantActive() {
         val variant = variants.firstOrNull { it.key == "sc" }
-        assertEqualsDouble(0.0, variant!!.weight)
+        assertEqualsDouble(1.0, variant!!.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
-    fun serpExperimentalVariantInactive() {
+    fun serpExperimentalVariantActive() {
         val variant = variants.firstOrNull { it.key == "se" }
-        assertEqualsDouble(0.0, variant!!.weight)
+        assertEqualsDouble(1.0, variant!!.weight)
         assertEquals(0, variant.features.size)
     }
 
