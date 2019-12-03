@@ -21,7 +21,7 @@ import retrofit2.http.GET
 
 interface TrackerListService {
 
-    @GET("https://staticcdn.duckduckgo.com/trackerblocking/tds.json")
+    @GET("https://staticcdn.duckduckgo.com/trackerblocking/v2/tds.json")
     fun tds(): Call<TdsJson>
 
     @GET("/contentblocking/trackers-whitelist-temporary.txt")
