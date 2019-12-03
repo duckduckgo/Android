@@ -89,6 +89,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
+import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
@@ -481,6 +482,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.SaveCredentials -> saveBasicAuthCredentials(it.request, it.credentials)
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
+            is Command.ShowErrorWithAction -> {
+                Snackbar
+                    .make(rootView, "The webpage could not be displayed.", Snackbar.LENGTH_INDEFINITE)
+                    .setBehavior(object : BaseTransientBottomBar.Behavior() {
+                        override fun canSwipeDismissView(child: View) = false
+                    })
+                    .setAction("Reload") { _ -> it.action }.show()
+            }
         }
     }
 
@@ -1125,12 +1134,21 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {
             renderIfChanged(viewState, lastSeenGlobalViewState) {
+                if (lastSeenGlobalViewState is GlobalLayoutViewState.Invalidated) {
+                    throw IllegalStateException("Can't recover from Invalidated State")
+                }
+
                 lastSeenGlobalViewState = viewState
 
-                if (viewState.isNewTabState) {
-                    browserLayout.hide()
-                } else {
-                    browserLayout.show()
+                when (viewState) {
+                    is GlobalLayoutViewState.Browser -> {
+                        if (viewState.isNewTabState) {
+                            browserLayout.hide()
+                        } else {
+                            browserLayout.show()
+                        }
+                    }
+                    is GlobalLayoutViewState.Invalidated -> destroyWebView()
                 }
             }
         }

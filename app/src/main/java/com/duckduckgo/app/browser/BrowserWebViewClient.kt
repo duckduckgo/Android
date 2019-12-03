@@ -175,7 +175,9 @@ class BrowserWebViewClient(
         } else {
             offlinePixelCountDataStore.webRendererGoneKilledCount += 1
         }
-        return super.onRenderProcessGone(view, detail)
+
+        webViewClientListener?.recoverFromRenderProcessGone()
+        return true
     }
 
     @UiThread
