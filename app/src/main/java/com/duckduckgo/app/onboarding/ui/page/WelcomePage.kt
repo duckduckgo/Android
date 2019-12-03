@@ -24,6 +24,7 @@ import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.view.html
 import kotlinx.android.synthetic.main.include_dax_dialog.*
 import kotlinx.android.synthetic.main.content_onboarding_welcome.*
 import kotlinx.android.synthetic.main.content_onboarding_welcome.longDescriptionContainer
@@ -38,8 +39,8 @@ class WelcomePage : OnboardingPageFragment() {
 
         primaryCta.setOnClickListener { onContinuePressed() }
 
-        val daxText = "The Internet can be kinda creepy.\n\nNot to worry! Searching and browsing privately is easier than you think."
-        hiddenText.text = daxText
+        val daxText = requireContext().getString(R.string.onboardingDaxText)
+        hiddenText.text = daxText.html(requireContext())
         dialogText.setTextColor(ContextCompat.getColor(requireContext(), R.color.grayishBrown))
         triangle.setImageResource(R.drawable.ic_triangle_bubble_white)
         cardView.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.white)

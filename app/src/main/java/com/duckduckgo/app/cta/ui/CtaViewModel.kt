@@ -137,7 +137,7 @@ class CtaViewModel @Inject constructor(
             if (it.memberNetwork != null) {
                 val network = site.memberNetwork
                 if (DaxDialogCta.MAIN_TRACKER_NETWORKS.contains(network?.name) && !dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)) {
-                    return DaxDialogCta.DaxMainNetworkCta(network!!.name)
+                    return DaxDialogCta.DaxMainNetworkCta(network!!.name, it.uri!!.host!!)
                 }
             }
             // is serp
@@ -146,7 +146,7 @@ class CtaViewModel @Inject constructor(
             }
             // trackers blocked
             return if (!it.url.contains(DaxDialogCta.SERP) && it.trackerCount > 0 && !dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)) {
-                DaxDialogCta.DaxTrackersBlockedCta(it.trackingEvents)
+                DaxDialogCta.DaxTrackersBlockedCta(it.trackingEvents, it.uri!!.host!!)
             } else if (!it.url.contains(DaxDialogCta.SERP) &&
                 !dismissedCtaDao.exists(CtaId.DAX_DIALOG_OTHER) &&
                 !dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND) &&

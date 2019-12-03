@@ -1111,6 +1111,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
                 if (viewState.isEditing) {
                     omniBarContainer.background = null
+                    cancelTrackersAnimation()
                 } else {
                     omniBarContainer.setBackgroundResource(R.drawable.omnibar_field_background)
                 }
@@ -1137,7 +1138,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     progress = viewState.progress
                 }
 
-                if (viewState.progress <= 10 && viewState.isLoading) {
+                if (lastSeenOmnibarViewState?.isEditing == true) {
+                    cancelTrackersAnimation()
+                }
+
+                if (viewState.progress <= 10 && viewState.isLoading && lastSeenOmnibarViewState?.isEditing != true) {
                     val fadeClearTextButtonOut = animateFadeOut(clearTextButton)
                     val fadeTextInputOut = animateFadeOut(omnibarTextInput)
                     val fadeGradeOut = animateFadeOut(privacyGradeButton)
@@ -1156,28 +1161,42 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
                 }
 
-                // TODO change
                 if (viewState.progress == 100) {
                     withDelay(500) {
-                        if (loadingAnimation.isRunning) {
-                            loadingAnimation.end()
-                        }
-                        genericDelay = 3000L
-                        val animateOmnibarIn = animateOmnibarIn()
-                        val fadeLogosOut = animateFadeOut(networksContainer)
+                        if (lastSeenOmnibarViewState?.isEditing != true) {
+                            if (loadingAnimation.isRunning) {
+                                loadingAnimation.end()
+                            }
+                            genericDelay = 3000L
+                            val animateOmnibarIn = animateOmnibarIn()
+                            val fadeLogosOut = animateFadeOut(networksContainer)
 
-                        if (!finishAnimation.isRunning) {
-                            finishAnimation = AnimatorSet().apply {
-                                play(runAnimations())
-                                play(fadeLogosOut).after(genericDelay).before(animateOmnibarIn)
-                                start()
+                            if (!finishAnimation.isRunning) {
+                                finishAnimation = AnimatorSet().apply {
+                                    play(runAnimations())
+                                    play(fadeLogosOut).after(genericDelay).before(animateOmnibarIn)
+                                    start()
+                                }
                             }
                         }
-
                         ctaViewModel.refreshCta(viewModel.siteLiveData.value)
                     }
                 }
             }
+        }
+
+        private fun cancelTrackersAnimation() {
+            if (loadingAnimation.isRunning) {
+                loadingAnimation.end()
+                loadingText.alpha = 0f
+            }
+            if (finishAnimation.isRunning) {
+                finishAnimation.end()
+                networksContainer.alpha = 0f
+            }
+            clearTextButton.alpha = 1f
+            omnibarTextInput.alpha = 1f
+            privacyGradeButton.alpha = 1f
         }
 
         private var genericDelay: Long = 3000L
@@ -1270,7 +1289,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
         }
 
-        fun withDelay(delay : Long, block : () -> Unit) {
+        fun withDelay(delay: Long, block: () -> Unit) {
             Handler().postDelayed(Runnable(block), delay)
         }
 

@@ -71,7 +71,7 @@ sealed class DaxDialogCta(
         }
     }
 
-    class DaxTrackersBlockedCta(val trackers: List<TrackingEvent>) : DaxDialogCta(
+    class DaxTrackersBlockedCta(val trackers: List<TrackingEvent>, val host: String) : DaxDialogCta(
         CtaId.DAX_DIALOG_TRACKERS_FOUND,
         R.plurals.daxTrackersBlockedCtaText,
         R.string.daxDialogHighFive,
@@ -83,12 +83,19 @@ sealed class DaxDialogCta(
             val trackersFiltered = trackers.asSequence()
                 .filter { MAIN_TRACKER_NETWORKS.contains(it.trackerNetwork?.name) }
                 .map { MAIN_TRACKER_NETWORKS_NAMES[it.trackerNetwork?.name] }
+                .distinct()
                 .take(MAX_TRACKERS_SHOWS)
                 .toList()
 
-            val trackersText = trackersFiltered.joinToString(",")
+            val trackersText = trackersFiltered.joinToString(", ")
             val size = trackers.size - trackersFiltered.size
-            return "<b>$trackersText</b>" + activity.resources.getQuantityString(description, size, size)
+            val quantityString =
+                if (size == 0) {
+                    activity.resources.getString(R.string.daxTrackersBlockedCtaZeroText, host)
+                } else {
+                    activity.resources.getQuantityString(description, size, size, host)
+                }
+            return "<b>$trackersText</b>$quantityString"
         }
 
         override fun apply(view: View?, activity: FragmentActivity?) {
@@ -98,7 +105,7 @@ sealed class DaxDialogCta(
         }
     }
 
-    class DaxMainNetworkCta(val network: String) : DaxDialogCta(
+    class DaxMainNetworkCta(val network: String, val host: String) : DaxDialogCta(
         CtaId.DAX_DIALOG_NETWORK,
         R.string.daxMainNetworkStep1CtaText,
         R.string.daxDialogNext,
@@ -111,7 +118,7 @@ sealed class DaxDialogCta(
         private fun firstParagraph(activity: FragmentActivity): String {
             val percentage = NETWORK_PROPERTY_PERCENTAGES[network]
             return if (percentage != null)
-                activity.resources.getString(R.string.daxMainNetworkStep21CtaText, getNetworkName(), percentage)
+                activity.resources.getString(R.string.daxMainNetworkStep21CtaText, host, percentage)
             else ""
         }
 
@@ -122,7 +129,7 @@ sealed class DaxDialogCta(
                 createDialog(activity).apply {
                     setPrimaryCTAClickListener {
                         val firstParagraph = firstParagraph(it)
-                        daxText = it.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph, getNetworkName(), getNetworkName())
+                        daxText = it.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph, getNetworkName())
                         buttonText = it.resources.getString(R.string.daxDialogGotIt)
                         setPrimaryCTAClickListener { dismiss() }
                         setDialogAndStartAnimation()
