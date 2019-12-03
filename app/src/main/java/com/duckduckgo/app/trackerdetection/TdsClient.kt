@@ -19,13 +19,12 @@ package com.duckduckgo.app.trackerdetection
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
 import com.duckduckgo.app.trackerdetection.model.Action.IGNORE
-import com.duckduckgo.app.trackerdetection.model.ResourceType
 import com.duckduckgo.app.trackerdetection.model.RuleExceptions
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
 
 class TdsClient(override val name: Client.ClientName, private val trackers: List<TdsTracker>) : Client {
 
-    override fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean {
+    override fun matches(url: String, documentUrl: String): Boolean {
 
         var tracker = trackers.firstOrNull { sameOrSubdomain(url, it.domain) } ?: return false
 

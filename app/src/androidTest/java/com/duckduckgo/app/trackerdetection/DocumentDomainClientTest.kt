@@ -18,7 +18,6 @@ package com.duckduckgo.app.trackerdetection
 
 import com.duckduckgo.app.trackerdetection.Client.ClientName.TEMPORARY_WHITELIST
 import com.duckduckgo.app.trackerdetection.model.DomainContainer
-import com.duckduckgo.app.trackerdetection.model.ResourceType
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -29,27 +28,26 @@ class DocumentDomainClientTest {
     fun whenDocumentUrlMatchesDomainThenMatchesIsTrue() {
         val data = listOf(DomainHolder("whitelisteddomain.com"))
         val testee = DocumentDomainClient(CLIENT_NAME, data)
-        assertTrue(testee.matches("http://tracker.com/script.js", "whitelisteddomain.com/abc", RESOURCE_TYPE))
+        assertTrue(testee.matches("http://tracker.com/script.js", "whitelisteddomain.com/abc"))
     }
 
     @Test
     fun whenDocumentUrlIsSubdomainOfDomainThenMatchesIsTrue() {
         val data = listOf(DomainHolder("whitelisteddomain.com"))
         val testee = DocumentDomainClient(CLIENT_NAME, data)
-        assertTrue(testee.matches("http://tracker.com/script.js", "subdomain.whitelisteddomain.com/abc", RESOURCE_TYPE))
+        assertTrue(testee.matches("http://tracker.com/script.js", "subdomain.whitelisteddomain.com/abc"))
     }
 
     @Test
     fun whenDocumentUrlDoesNotMatchDomainThenMatchesIsFalse() {
         val data = listOf(DomainHolder("whitelisteddomain.com"))
         val testee = DocumentDomainClient(CLIENT_NAME, data)
-        assertFalse(testee.matches("http://tracker.com/script.js", "anotherdomain.com/abc", RESOURCE_TYPE))
+        assertFalse(testee.matches("http://tracker.com/script.js", "anotherdomain.com/abc"))
     }
 
     class DomainHolder(override val domain: String) : DomainContainer
 
     companion object {
         private val CLIENT_NAME = TEMPORARY_WHITELIST
-        private val RESOURCE_TYPE = ResourceType.UNKNOWN
     }
 }

@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.trackerdetection
 
-import com.duckduckgo.app.trackerdetection.model.ResourceType
-
 interface Client {
 
     enum class ClientType {
@@ -38,6 +36,6 @@ interface Client {
 
     val name: ClientName
 
-    fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean
+    fun matches(url: String, documentUrl: String): Boolean
 
 }

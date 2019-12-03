@@ -310,7 +310,7 @@ class WebViewRequestInterceptorTest {
             trackerNetwork = null
         )
         whenever(mockRequest.isForMainFrame).thenReturn(false)
-        whenever(mockTrackerDetector.evaluate(any(), any(), any())).thenReturn(blockTrackingEvent)
+        whenever(mockTrackerDetector.evaluate(any(), any())).thenReturn(blockTrackingEvent)
     }
 
     private fun configureShouldUpgrade() = runBlocking<Unit> {

@@ -16,9 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection
 
-
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
-import com.duckduckgo.app.trackerdetection.model.ResourceType
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.nhaarman.mockitokotlin2.any
@@ -43,15 +41,15 @@ class TrackerDetectorClientTypeTest {
     fun before() {
         whenever(mockSettingStore.privacyOn).thenReturn(true)
 
-        whenever(mockBlockingClient.matches(eq(Url.BLOCKED), any(), any())).thenReturn(true)
-        whenever(mockBlockingClient.matches(eq(Url.BLOCKED_AND_WHITELISTED), any(), any())).thenReturn(true)
-        whenever(mockBlockingClient.matches(eq(Url.WHITELISTED), any(), any())).thenReturn(false)
+        whenever(mockBlockingClient.matches(eq(Url.BLOCKED), any())).thenReturn(true)
+        whenever(mockBlockingClient.matches(eq(Url.BLOCKED_AND_WHITELISTED), any())).thenReturn(true)
+        whenever(mockBlockingClient.matches(eq(Url.WHITELISTED), any())).thenReturn(false)
         whenever(mockBlockingClient.name).thenReturn(Client.ClientName.TDS)
         testee.addClient(mockBlockingClient)
 
-        whenever(mockWhitelistClient.matches(eq(Url.BLOCKED), any(), any())).thenReturn(false)
-        whenever(mockWhitelistClient.matches(eq(Url.BLOCKED_AND_WHITELISTED), any(), any())).thenReturn(true)
-        whenever(mockWhitelistClient.matches(eq(Url.WHITELISTED), any(), any())).thenReturn(true)
+        whenever(mockWhitelistClient.matches(eq(Url.BLOCKED), any())).thenReturn(false)
+        whenever(mockWhitelistClient.matches(eq(Url.BLOCKED_AND_WHITELISTED), any())).thenReturn(true)
+        whenever(mockWhitelistClient.matches(eq(Url.WHITELISTED), any())).thenReturn(true)
         whenever(mockWhitelistClient.name).thenReturn(Client.ClientName.TEMPORARY_WHITELIST)
         testee.addClient(mockWhitelistClient)
     }
@@ -60,30 +58,29 @@ class TrackerDetectorClientTypeTest {
     fun whenUrlMatchesOnlyInBlockingClientThenEvaluateReturnsTrackingEvent() {
         val url = Url.BLOCKED
         val expected = TrackingEvent(documentUrl, url, null, true)
-        assertEquals(expected, testee.evaluate(url, documentUrl, resourceType))
+        assertEquals(expected, testee.evaluate(url, documentUrl))
     }
 
     @Test
     fun whenUrlMatchesOnlyInWhitelistedClientThenEvaluateReturnsNull() {
         val url = Url.WHITELISTED
-        assertNull(testee.evaluate(url, documentUrl, resourceType))
+        assertNull(testee.evaluate(url, documentUrl))
     }
 
     @Test
     fun whenUrlMatchesInBlockingAndWhitelistedClientThenEvaluateReturnsNull() {
         val url = Url.BLOCKED_AND_WHITELISTED
-        assertNull(testee.evaluate(url, documentUrl, resourceType))
+        assertNull(testee.evaluate(url, documentUrl))
     }
 
     @Test
     fun whenUrlDoesNotMatchInAnyClientsThenEvaluateReturnsNull() {
         val url = Url.UNLISTED
-        assertNull(testee.evaluate(url, documentUrl, resourceType))
+        assertNull(testee.evaluate(url, documentUrl))
     }
 
     companion object {
         private const val documentUrl = "http://example.com"
-        private val resourceType = ResourceType.UNKNOWN
     }
 
     object Url {

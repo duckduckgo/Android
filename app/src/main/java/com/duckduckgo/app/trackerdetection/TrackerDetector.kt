@@ -18,7 +18,6 @@ package com.duckduckgo.app.trackerdetection
 
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
-import com.duckduckgo.app.trackerdetection.model.ResourceType
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import timber.log.Timber
@@ -26,7 +25,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 interface TrackerDetector {
     fun addClient(client: Client)
-    fun evaluate(url: String, documentUrl: String, resourceType: ResourceType): TrackingEvent?
+    fun evaluate(url: String, documentUrl: String): TrackingEvent?
 }
 
 class TrackerDetectorImpl(
@@ -44,9 +43,9 @@ class TrackerDetectorImpl(
         clients.add(client)
     }
 
-    override fun evaluate(url: String, documentUrl: String, resourceType: ResourceType): TrackingEvent? {
+    override fun evaluate(url: String, documentUrl: String): TrackingEvent? {
 
-        if (whitelisted(url, documentUrl, resourceType)) {
+        if (whitelisted(url, documentUrl)) {
             Timber.v("$documentUrl resource $url is whitelisted")
             return null
         }
@@ -59,8 +58,7 @@ class TrackerDetectorImpl(
         val matches = clients.any {
             it.name.type == Client.ClientType.BLOCKING && it.matches(
                 url,
-                documentUrl,
-                resourceType
+                documentUrl
             )
         }
 
@@ -73,8 +71,8 @@ class TrackerDetectorImpl(
         return null
     }
 
-    private fun whitelisted(url: String, documentUrl: String, resourceType: ResourceType): Boolean {
-        return clients.any { it.name.type == Client.ClientType.WHITELIST && it.matches(url, documentUrl, resourceType) }
+    private fun whitelisted(url: String, documentUrl: String): Boolean {
+        return clients.any { it.name.type == Client.ClientType.WHITELIST && it.matches(url, documentUrl) }
     }
 
     private fun firstParty(firstUrl: String, secondUrl: String): Boolean =

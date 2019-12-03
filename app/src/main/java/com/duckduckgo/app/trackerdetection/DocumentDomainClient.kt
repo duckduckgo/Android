@@ -18,7 +18,6 @@ package com.duckduckgo.app.trackerdetection
 
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.trackerdetection.model.DomainContainer
-import com.duckduckgo.app.trackerdetection.model.ResourceType
 
 /**
  * Performs matching of the top level document url to the domains. This is commonly used for whitelisting where
@@ -26,7 +25,7 @@ import com.duckduckgo.app.trackerdetection.model.ResourceType
  */
 class DocumentDomainClient(override val name: Client.ClientName, private val domains: List<DomainContainer>) : Client {
 
-    override fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean {
+    override fun matches(url: String, documentUrl: String): Boolean {
         return domains.any { sameOrSubdomain(documentUrl, it.domain) }
     }
 }
