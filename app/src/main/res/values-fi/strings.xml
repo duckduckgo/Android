@@ -1,7 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
-    <string name="appDescription">Tietosuojaa, yksinkertaisesti</string>
     <string name="yes">Joo</string>
     <string name="no">Ei</string>
 
