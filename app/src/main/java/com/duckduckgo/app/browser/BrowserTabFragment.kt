@@ -89,7 +89,6 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
-import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
@@ -204,6 +203,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private var webView: WebView? = null
 
+    private val errorSnackbar: Snackbar by lazy {
+        Snackbar.make(rootView, "The webpage could not be displayed.", Snackbar.LENGTH_INDEFINITE)
+            .setBehavior(NonDismissibleBehavior())
+    }
+
     private val findInPageTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
             viewModel.userFindingInPage(findInPageInput.text.toString())
@@ -295,7 +299,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         super.onResume()
         addTextChangedListeners()
         appBarLayout.setExpanded(true)
-        viewModel.onViewVisible()
+        viewModel.onViewVisible(isVisible)
         logoHidingListener.onResume()
     }
 
@@ -482,14 +486,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.SaveCredentials -> saveBasicAuthCredentials(it.request, it.credentials)
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
-            is Command.ShowErrorWithAction -> {
-                Snackbar
-                    .make(rootView, "The webpage could not be displayed.", Snackbar.LENGTH_INDEFINITE)
-                    .setBehavior(object : BaseTransientBottomBar.Behavior() {
-                        override fun canSwipeDismissView(child: View) = false
-                    })
-                    .setAction("Reload") { _ -> it.action }.show()
-            }
+            is Command.ShowErrorWithAction -> showErrorSnackbar(it)
+        }
+    }
+
+    private fun showErrorSnackbar(command: Command.ShowErrorWithAction) {
+        if (!errorSnackbar.view.isAttachedToWindow) {
+            errorSnackbar.setAction("Reload") { command.action() }.show()
         }
     }
 
@@ -912,7 +915,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             webView?.onPause()
         } else {
             webView?.onResume()
-            viewModel.onViewVisible()
+            viewModel.onViewVisible(true)
         }
     }
 
@@ -1133,11 +1136,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {
-            renderIfChanged(viewState, lastSeenGlobalViewState) {
-                if (lastSeenGlobalViewState is GlobalLayoutViewState.Invalidated) {
-                    throw IllegalStateException("Can't recover from Invalidated State")
-                }
+            if (lastSeenGlobalViewState is GlobalLayoutViewState.Invalidated &&
+                viewState is GlobalLayoutViewState.Browser) {
+                throw IllegalStateException("Invalid state transition")
+            }
 
+            renderIfChanged(viewState, lastSeenGlobalViewState) {
                 lastSeenGlobalViewState = viewState
 
                 when (viewState) {
