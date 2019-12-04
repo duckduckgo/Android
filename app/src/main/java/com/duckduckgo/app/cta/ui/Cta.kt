@@ -107,11 +107,18 @@ sealed class DaxDialogCta(
             val percentage = NETWORK_PROPERTY_PERCENTAGES[network]
             return if (percentage != null)
                 activity.resources.getString(R.string.daxMainNetworkStep21CtaText, getNetworkName(), percentage)
-            else ""
+            else activity.resources.getString(R.string.daxMainNetworkStep211CtaText, getNetworkName())
         }
 
-        override fun getDaxText(activity: FragmentActivity): String =
-            activity.resources.getString(description, host.removePrefix("www."), getNetworkName())
+        override fun getDaxText(activity: FragmentActivity): String {
+            val isFromSameNetworkDomain = MAIN_TRACKER_DOMAINS.filter { host.contains(it) }.isNotEmpty()
+
+            return if (isFromSameNetworkDomain) {
+                activity.resources.getString(description, "This website", getNetworkName())
+            } else {
+                activity.resources.getString(description, host.removePrefix("www."), getNetworkName())
+            }
+        }
 
         override fun createDialog(activity: FragmentActivity): DaxDialog {
             return DaxDialog(getDaxText(activity), activity.resources.getString(okButton)).apply {
@@ -148,6 +155,7 @@ sealed class DaxDialogCta(
         private const val TAG = "DaxDialog"
         private const val MAX_TRACKERS_SHOWS = 2
         const val SERP = "duckduckgo"
+        val MAIN_TRACKER_DOMAINS = listOf("facebook", "amazon", "twitter", "google")
         val MAIN_TRACKER_NETWORKS = listOf("Facebook", "Amazon.com", "Twitter", "Google")
         val MAIN_TRACKER_NETWORKS_NAMES =
             mapOf(Pair("Facebook", "Facebook"), Pair("Amazon.com", "Amazon"), Pair("Twitter", "Twitter"), Pair("Google", "Google"))

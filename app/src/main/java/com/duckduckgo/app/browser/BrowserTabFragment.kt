@@ -1178,7 +1178,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 }
 
                 if (viewState.progress == 100) {
-                    withDelay(500) {
+                    withDelay(1000) {
                         if (lastSeenOmnibarViewState?.isEditing != true) {
                             if (loadingAnimation.isRunning) {
                                 Timber.d("MARCOS cancel loading animation")
