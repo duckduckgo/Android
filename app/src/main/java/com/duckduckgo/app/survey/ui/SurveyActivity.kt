@@ -165,5 +165,10 @@ class SurveyActivity : DuckDuckGoActivity() {
                 viewModel.onSurveyFailedToLoad()
             }
         }
+
+        override fun onRenderProcessGone(view: WebView?, detail: RenderProcessGoneDetail?): Boolean {
+            viewModel.onSurveyFailedToLoad()
+            return true
+        }
     }
 }
