@@ -39,7 +39,6 @@ interface Cta {
     val shownPixel: Pixel.PixelName?
     val okPixel: Pixel.PixelName?
     val cancelPixel: Pixel.PixelName?
-    fun apply(view: View?, activity: FragmentActivity?)
 }
 
 sealed class DaxDialogCta(
@@ -53,8 +52,9 @@ sealed class DaxDialogCta(
 
     open fun getDaxText(activity: FragmentActivity): String = activity.getString(description)
 
-    fun createDialog(activity: FragmentActivity): DaxDialog =
-        DaxDialog(getDaxText(activity), activity.resources.getString(okButton))
+    fun apply(activity: FragmentActivity): DaxDialog = createDialog(activity)
+
+    open fun createDialog(activity: FragmentActivity): DaxDialog = DaxDialog(getDaxText(activity), activity.resources.getString(okButton))
 
     object DaxSerpCta : DaxDialogCta(
         CtaId.DAX_DIALOG_SERP,
@@ -63,13 +63,7 @@ sealed class DaxDialogCta(
         null,
         null,
         null
-    ) {
-        override fun apply(view: View?, activity: FragmentActivity?) {
-            activity?.let {
-                createDialog(activity).show(it.supportFragmentManager, TAG)
-            }
-        }
-    }
+    )
 
     class DaxTrackersBlockedCta(val trackers: List<TrackingEvent>, val host: String) : DaxDialogCta(
         CtaId.DAX_DIALOG_TRACKERS_FOUND,
@@ -97,12 +91,6 @@ sealed class DaxDialogCta(
                 }
             return "<b>$trackersText</b>$quantityString"
         }
-
-        override fun apply(view: View?, activity: FragmentActivity?) {
-            activity?.let {
-                createDialog(activity).show(it.supportFragmentManager, TAG)
-            }
-        }
     }
 
     class DaxMainNetworkCta(val network: String, val host: String) : DaxDialogCta(
@@ -122,19 +110,17 @@ sealed class DaxDialogCta(
             else ""
         }
 
-        override fun getDaxText(activity: FragmentActivity): String = activity.resources.getString(description, host.removePrefix("www."), getNetworkName())
+        override fun getDaxText(activity: FragmentActivity): String =
+            activity.resources.getString(description, host.removePrefix("www."), getNetworkName())
 
-        override fun apply(view: View?, activity: FragmentActivity?) {
-            activity?.let {
-                createDialog(activity).apply {
-                    setPrimaryCTAClickListener {
-                        val firstParagraph = firstParagraph(it)
-                        daxText = it.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph, getNetworkName())
-                        buttonText = it.resources.getString(R.string.daxDialogGotIt)
-                        setPrimaryCTAClickListener { dismiss() }
-                        setDialogAndStartAnimation()
-                    }
-                    show(it.supportFragmentManager, TAG)
+        override fun createDialog(activity: FragmentActivity): DaxDialog {
+            return DaxDialog(getDaxText(activity), activity.resources.getString(okButton)).apply {
+                setPrimaryCTAClickListener {
+                    val firstParagraph = firstParagraph(activity)
+                    daxText = activity.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph, getNetworkName())
+                    buttonText = activity.resources.getString(R.string.daxDialogGotIt)
+                    setPrimaryCTAClickListener { dismiss() }
+                    setDialogAndStartAnimation()
                 }
             }
         }
@@ -148,14 +134,11 @@ sealed class DaxDialogCta(
         null,
         null
     ) {
-        override fun apply(view: View?, activity: FragmentActivity?) {
-            activity?.let {
-                createDialog(activity).apply {
-                    val fireButton = activity.findViewById<View>(R.id.fire)
-                    onAnimationFinishedListener {
-                        startHighlightViewAnimation(fireButton)
-                    }
-                    show(it.supportFragmentManager, TAG)
+        override fun createDialog(activity: FragmentActivity): DaxDialog {
+            return DaxDialog(getDaxText(activity), activity.resources.getString(okButton)).apply {
+                val fireButton = activity.findViewById<View>(R.id.fire)
+                onAnimationFinishedListener {
+                    startHighlightViewAnimation(fireButton)
                 }
             }
         }
@@ -198,14 +181,12 @@ sealed class DaxBubbleCta(
         null
     )
 
-    override fun apply(view: View?, activity: FragmentActivity?) {
-        view?.let {
-            val daxText = view.context.getString(description)
-            view.alpha = 1f
-            view.hiddenText.text = daxText.html(view.context)
-            view.primaryCta.hide()
-            view.dialogText.startTypingAnimation(daxText, true, afterAnimation = afterAnimation)
-        }
+    fun apply(view: View) {
+        val daxText = view.context.getString(description)
+        view.alpha = 1f
+        view.hiddenText.text = daxText.html(view.context)
+        view.primaryCta.hide()
+        view.dialogText.startTypingAnimation(daxText, true, afterAnimation = afterAnimation)
     }
 }
 
@@ -221,14 +202,12 @@ sealed class HomePanelCta(
     override val cancelPixel: Pixel.PixelName?
 ) : Cta {
 
-    override fun apply(view: View?, activity: FragmentActivity?) {
-        view?.let {
-            view.ctaIcon.setImageResource(image)
-            view.ctaTitle.text = view.context.getString(title)
-            view.ctaSubtitle.text = view.context.getString(description)
-            view.ctaOkButton.text = view.context.getString(okButton)
-            view.ctaDismissButton.text = view.context.getString(dismissButton)
-        }
+    fun apply(view: View) {
+        view.ctaIcon.setImageResource(image)
+        view.ctaTitle.text = view.context.getString(title)
+        view.ctaSubtitle.text = view.context.getString(description)
+        view.ctaOkButton.text = view.context.getString(okButton)
+        view.ctaDismissButton.text = view.context.getString(dismissButton)
     }
 
     data class Survey(val survey: com.duckduckgo.app.survey.model.Survey) : HomePanelCta(

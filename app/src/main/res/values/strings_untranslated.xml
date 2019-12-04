@@ -45,4 +45,8 @@
     <string name="daxDialogNext">Next</string>
     <string name="daxDialogHighFive">High Five!</string>
     <string name="daxDialogGotIt">Got It</string>
+
+    <string name="hideTipsTitle">Hide remaining tips?</string>
+    <string name="hideTipsText">There are only a few, and we tried to make them informative.</string>
+    <string name="hideTipsButton">Hide tips forever</string>
 </resources>

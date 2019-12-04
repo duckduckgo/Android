@@ -1423,8 +1423,32 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private fun showDaxDialogCta(configuration: DaxDialogCta) {
             hideHomeCta()
             hideDaxCta()
-            configuration.apply(null, activity)
-            ctaViewModel.onCtaDismissed()
+            activity?.let { activity ->
+                configuration.apply(activity).apply {
+                    setHideClickListener {
+                        dismiss()
+                        launchHideTipsDialog(activity)
+                    }
+                    show(activity.supportFragmentManager, "DaxDialog")
+                    ctaViewModel.onCtaDismissed()
+                }
+            }
+        }
+
+        private fun launchHideTipsDialog(context: Context) {
+            AlertDialog.Builder(context)
+                .setTitle(R.string.hideTipsTitle)
+                .setMessage(getString(R.string.hideTipsText))
+                .setPositiveButton(R.string.hideTipsButton) { dialog, _ ->
+                    dialog.dismiss()
+                    launch {
+                        ctaViewModel.hideTipsForever()
+                    }
+                }
+                .setNegativeButton(android.R.string.no) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
         }
 
         private fun showDaxCta(configuration: DaxBubbleCta) {
@@ -1434,7 +1458,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             configuration.afterAnimation = {
                 ctaViewModel.onCtaDismissed()
             }
-            configuration.apply(daxDialog, null)
+            configuration.apply(daxDialog)
         }
 
         private fun showHomeCta(configuration: HomePanelCta) {
@@ -1442,7 +1466,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             if (ctaContainer.isEmpty()) {
                 renderHomeCta()
             }
-            configuration.apply(ctaContainer, null)
+            configuration.apply(ctaContainer)
             ctaContainer.show()
         }
 
@@ -1457,14 +1481,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         fun renderHomeCta() {
             val context = context ?: return
-            val configuration = lastSeenCtaViewState?.cta ?: return
+            val cta = lastSeenCtaViewState?.cta ?: return
+            val configuration = if (cta is HomePanelCta) cta else return
 
             ctaContainer.removeAllViews()
 
             inflate(context, R.layout.include_cta, ctaContainer)
             logoHidingListener.callToActionView = ctaContainer
 
-            configuration.apply(ctaContainer, null)
+            configuration.apply(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {
                 viewModel.onUserLaunchedCta()
             }

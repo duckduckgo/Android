@@ -26,6 +26,7 @@ import com.duckduckgo.app.cta.ui.HomePanelCta.*
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
@@ -43,7 +44,8 @@ class CtaViewModel @Inject constructor(
     private val surveyDao: SurveyDao,
     private val widgetCapabilities: WidgetCapabilities,
     private val dismissedCtaDao: DismissedCtaDao,
-    private val variantManager: VariantManager
+    private val variantManager: VariantManager,
+    private val settingsDataStore: SettingsDataStore
 ) {
 
     data class CtaViewState(
@@ -95,6 +97,10 @@ class CtaViewModel @Inject constructor(
         }
     }
 
+    fun hideTipsForever() {
+        settingsDataStore.hideTips = true
+    }
+
     private fun surveyCta(): HomePanelCta.Survey? {
         val survey = activeSurvey
         if (survey?.url != null) {
@@ -118,18 +124,20 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private fun canShowDaxIntroCta(): Boolean = !dismissedCtaDao.exists(CtaId.DAX_INTRO) &&
+            !settingsDataStore.hideTips &&
             variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)
 
     @WorkerThread
     private fun canShowDaxCtaEndOfJourney(site: Site?): Boolean = !dismissedCtaDao.exists(CtaId.DAX_END) && dismissedCtaDao.exists(CtaId.DAX_INTRO) &&
             variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) &&
+            !settingsDataStore.hideTips &&
             site == null &&
             (dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK) || dismissedCtaDao.exists(CtaId.DAX_DIALOG_OTHER) ||
                     dismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP) || dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND))
 
     @WorkerThread
     private fun shouldShowDaxCta(site: Site?): Cta? {
-        if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)) {
+        if (settingsDataStore.hideTips || !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)) {
             return null
         }
         site?.let {
