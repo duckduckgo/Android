@@ -126,6 +126,7 @@ class BrowserTabViewModel(
         val canAddBookmarks: Boolean = false,
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
+        val canReportSite: Boolean = true,
         val addToHomeEnabled: Boolean = false,
         val addToHomeVisible: Boolean = false
     )
@@ -901,7 +902,8 @@ class BrowserTabViewModel(
         globalLayoutState.value = Invalidated()
         browserViewState.value = currentBrowserViewState().copy(
             canGoBack = false,
-            canGoForward = false
+            canGoForward = false,
+            canReportSite = false
         )
         loadingViewState.value = LoadingViewState()
         findInPageViewState.value = FindInPageViewState()
