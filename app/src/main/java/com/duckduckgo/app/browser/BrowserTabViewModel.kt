@@ -330,19 +330,18 @@ class BrowserTabViewModel(
         pixel.fire(pixelName, params)
     }
 
-    fun onUserSubmittedQuery(input: String) {
-        if (input.isBlank()) {
+    fun onUserSubmittedQuery(query: String) {
+        if (query.isBlank()) {
             return
         }
 
         if (currentGlobalLayoutState() is Invalidated) {
-            viewModelScope.launch { closeCurrentTab() }
-            command.value = OpenInNewTab(input)
+            recoverTabWithQuery(query)
             return
         }
 
         command.value = HideKeyboard
-        val trimmedInput = input.trim()
+        val trimmedInput = query.trim()
 
         viewModelScope.launch(dispatchers.io()) {
             searchCountDao.incrementSearchCount()
@@ -383,6 +382,14 @@ class BrowserTabViewModel(
             command.value = Refresh
         } else {
             command.value = NavigateForward
+        }
+    }
+
+    fun onRefreshRequested() {
+        if(currentGlobalLayoutState() is Invalidated){
+            recoverTabWithQuery(url.orEmpty())
+        } else {
+            command.value = Refresh
         }
     }
 
@@ -911,6 +918,11 @@ class BrowserTabViewModel(
 
     private fun showErrorWithAction() {
         command.value = ShowErrorWithAction { this.onUserSubmittedQuery(url.orEmpty()) }
+    }
+
+    private fun recoverTabWithQuery(query: String) {
+        viewModelScope.launch { closeCurrentTab() }
+        command.value = OpenInNewTab(query)
     }
 
     private fun GlobalLayoutViewState.copy(isVisible: Boolean): GlobalLayoutViewState {

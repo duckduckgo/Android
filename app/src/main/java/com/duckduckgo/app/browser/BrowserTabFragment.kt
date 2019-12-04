@@ -314,7 +314,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         popupMenu.apply {
             onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
             onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
-            onMenuItemClicked(view.refreshPopupMenuItem) { refresh() }
+            onMenuItemClicked(view.refreshPopupMenuItem) { viewModel.onRefreshRequested() }
             onMenuItemClicked(view.newTabPopupMenuItem) { viewModel.userRequestedOpeningNewTab() }
             onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
             onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
@@ -401,6 +401,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         hideKeyboard()
         renderer.hideFindInPage()
         webView?.loadUrl(url)
+    }
+
+    fun onRefreshRequested() {
+        viewModel.onRefreshRequested()
     }
 
     fun refresh() {
