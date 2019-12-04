@@ -18,7 +18,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
     <!-- Omnbibar Animation -->
-    <string name="trackersAnimationText">finding trackers…</string>
+    <string name="trackersAnimationText">Scanning</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Welcome to DuckDuckGo!"</string>

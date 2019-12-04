@@ -416,6 +416,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun processCommand(it: Command?) {
+        renderer.cancelTrackersAnimation()
         when (it) {
             Command.Refresh -> refresh()
             is Command.OpenInNewTab -> {
@@ -1128,7 +1129,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         private var loadingAnimation: AnimatorSet = AnimatorSet()
         private var finishAnimation: AnimatorSet = AnimatorSet()
+        private var typingAnimationJob: Job? = null
 
+        @SuppressLint("SetTextI18n")
         fun renderLoadingIndicator(viewState: LoadingViewState) {
             renderIfChanged(viewState, lastSeenLoadingViewState) {
                 lastSeenLoadingViewState = viewState
@@ -1159,12 +1162,26 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                         }
                     }
 
+                    if (typingAnimationJob == null) {
+                        typingAnimationJob = launch {
+                            while (true) {
+                                if (loadingText.text.contains("...")) {
+                                    loadingText.text = getString(R.string.trackersAnimationText)
+                                } else {
+                                    loadingText.text = "${loadingText.text}."
+                                }
+                                delay(340)
+                            }
+                        }
+                    }
+
                 }
 
                 if (viewState.progress == 100) {
                     withDelay(500) {
                         if (lastSeenOmnibarViewState?.isEditing != true) {
                             if (loadingAnimation.isRunning) {
+                                Timber.d("MARCOS cancel loading animation")
                                 loadingAnimation.end()
                             }
                             genericDelay = 3000L
@@ -1172,6 +1189,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                             val fadeLogosOut = animateFadeOut(networksContainer)
 
                             if (!finishAnimation.isRunning) {
+                                typingAnimationJob?.cancel()
+                                typingAnimationJob = null
                                 finishAnimation = AnimatorSet().apply {
                                     play(runAnimations())
                                     play(fadeLogosOut).after(genericDelay).before(animateOmnibarIn)
@@ -1185,15 +1204,21 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
         }
 
-        private fun cancelTrackersAnimation() {
+        fun cancelTrackersAnimation() {
+            Timber.d("MARCOS cancel trackers animation")
+            typingAnimationJob?.cancel()
+            typingAnimationJob = null
             if (loadingAnimation.isRunning) {
+                Timber.d("MARCOS cancel loading animation")
                 loadingAnimation.end()
-                loadingText.alpha = 0f
             }
             if (finishAnimation.isRunning) {
+                Timber.d("MARCOS cancel finish animation")
                 finishAnimation.end()
-                networksContainer.alpha = 0f
+
             }
+            networksContainer.alpha = 0f
+            loadingText.alpha = 0f
             clearTextButton.alpha = 1f
             omnibarTextInput.alpha = 1f
             privacyGradeButton.alpha = 1f
