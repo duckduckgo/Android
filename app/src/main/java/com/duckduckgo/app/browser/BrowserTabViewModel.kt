@@ -334,6 +334,12 @@ class BrowserTabViewModel(
             return
         }
 
+        if (currentGlobalLayoutState() is Invalidated) {
+            viewModelScope.launch { closeCurrentTab() }
+            command.value = OpenInNewTab(input)
+            return
+        }
+
         command.value = HideKeyboard
         val trimmedInput = input.trim()
 
