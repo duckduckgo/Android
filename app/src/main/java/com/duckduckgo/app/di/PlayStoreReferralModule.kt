@@ -52,8 +52,8 @@ class PlayStoreReferralModule {
         referrerStateListener: AppInstallationReferrerStateListener,
         durationBucketMapper: DurationBucketMapper,
         pixel: Pixel
-    ): DurationMeasuringReferrerRetriever {
-        return DurationMeasuringReferrerRetriever(referrerStateListener, durationBucketMapper, pixel)
+    ): ReferrerRetrievalTimer {
+        return ReferrerRetrievalTimer(referrerStateListener, durationBucketMapper, pixel)
     }
 
     @Provides

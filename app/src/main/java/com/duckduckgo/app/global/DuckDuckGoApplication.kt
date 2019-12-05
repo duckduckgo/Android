@@ -43,7 +43,7 @@ import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
-import com.duckduckgo.app.referral.DurationMeasuringReferrerRetriever
+import com.duckduckgo.app.referral.ReferrerRetrievalTimer
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
 import com.duckduckgo.app.statistics.api.OfflinePixelSender
@@ -152,7 +152,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     lateinit var referralStateListener: AppInstallationReferrerStateListener
 
     @Inject
-    lateinit var durationMeasuringReferrerRetriever: DurationMeasuringReferrerRetriever
+    lateinit var referrerRetrievalTimer: ReferrerRetrievalTimer
 
     private var launchedByFireAction: Boolean = false
 
@@ -209,7 +209,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
      */
     fun measureAppInstallationReferrer() {
         GlobalScope.launch {
-            durationMeasuringReferrerRetriever.measureReferrerRetrieval()
+            referrerRetrievalTimer.measureReferrerRetrieval()
         }
     }
 

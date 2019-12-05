@@ -26,7 +26,7 @@ import timber.log.Timber
  * This is likely to be a fairly temporary class since it's being used to find out typical timings
  * of referrer data being made available.
  */
-class DurationMeasuringReferrerRetriever(
+class ReferrerRetrievalTimer(
     private val referrerStateListener: AppInstallationReferrerStateListener,
     private val durationBucketMapper: DurationBucketMapper,
     private val pixel: Pixel
@@ -38,7 +38,6 @@ class DurationMeasuringReferrerRetriever(
             return@withTimeoutOrNull referrerStateListener.retrieveReferralCode()
         }
 
-        // we are only interested in the the non-cached timings; i.e., the first time the app is opened.
         if (result?.fromCache == true) {
             Timber.v("Referrer result is from cache, so won't measure timing")
             return
@@ -78,8 +77,6 @@ class DurationMeasuringReferrerRetriever(
     }
 
     companion object {
-
-        // if it hasn't appeared within this amount of time, there's no point in waiting any longer for it
         private const val MAX_WAIT_TIME_MS = 10_000L
 
         private const val DURATION_KEY = "d"
