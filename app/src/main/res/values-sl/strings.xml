@@ -1,7 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logotip DuckDuckGo</string>
-    <string name="appDescription">Poenostavljena zasebnost</string>
     <string name="yes">Da</string>
     <string name="no">Ne</string>
 

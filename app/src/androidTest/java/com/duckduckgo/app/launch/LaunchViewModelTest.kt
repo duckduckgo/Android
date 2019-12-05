@@ -21,6 +21,7 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Home
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Onboarding
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -37,10 +38,11 @@ class LaunchViewModelTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private var onboardingStore: OnboardingStore = mock()
+    private var appInstallationReferrerStateListener: AppInstallationReferrerStateListener = mock()
     private var mockCommandObserver: Observer<LaunchViewModel.Command> = mock()
 
     private val testee: LaunchViewModel by lazy {
-        LaunchViewModel(onboardingStore)
+        LaunchViewModel(onboardingStore, appInstallationReferrerStateListener)
     }
 
     @After

@@ -16,7 +16,8 @@
 
 package com.duckduckgo.app.statistics
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.fail
 import org.junit.Test
 
 class VariantManagerTest {
@@ -24,42 +25,17 @@ class VariantManagerTest {
     private val variants = VariantManager.ACTIVE_VARIANTS
 
     @Test
-    fun serpAndSharedControlVariantInactive() {
+    fun serpAndSharedControlVariantActive() {
         val variant = variants.firstOrNull { it.key == "sc" }
-        assertEqualsDouble(0.0, variant!!.weight)
+        assertEqualsDouble(1.0, variant!!.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
-    fun serpExperimentalVariantInactive() {
+    fun serpExperimentalVariantActive() {
         val variant = variants.firstOrNull { it.key == "se" }
-        assertEqualsDouble(0.0, variant!!.weight)
+        assertEqualsDouble(1.0, variant!!.weight)
         assertEquals(0, variant.features.size)
-    }
-
-    @Test
-    fun defaultLightThemeExperimentVariantActive() {
-        val variant = variants.firstOrNull { it.key == "mo" }
-        assertEqualsDouble(1.0, variant!!.weight)
-    }
-
-    @Test
-    fun defaultLightThemeExperimentVariantHasExperimentalFeatureForLightTheme() {
-        val variant = variants.firstOrNull { it.key == "mo" }
-        assertEquals(1, variant!!.features.size)
-        assertTrue(variant.hasFeature(VariantManager.VariantFeature.LightThemeExperiment))
-    }
-
-    @Test
-    fun defaultLightThemeControlGroupVariantActive() {
-        val variant = variants.firstOrNull { it.key == "mp" }
-        assertEqualsDouble(1.0, variant!!.weight)
-    }
-
-    @Test
-    fun defaultLightThemeControlGroupVariantHasNoExperimentFeatures() {
-        val variant = variants.firstOrNull { it.key == "mp" }
-        assertEquals(0, variant!!.features.size)
     }
 
     @Suppress("SameParameterValue")
