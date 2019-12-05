@@ -25,13 +25,10 @@ import com.squareup.moshi.Types
 
 @Entity(tableName = "tds_tracker")
 data class TdsTracker(
-    @PrimaryKey
-    val domain: String,
-
+    @PrimaryKey val domain: String,
     val defaultAction: Action,
-
     val ownerName: String,
-
+    val categories: List<String>,
     val rules: List<Rule>
 )
 
@@ -64,21 +61,39 @@ class ActionTypeConverter {
     }
 }
 
-class RuleTypeConverter() {
+class RuleTypeConverter {
 
     @TypeConverter
     fun toRules(value: String): List<Rule> {
-        return jsonAdapter.fromJson(value)
+        return Adapters.ruleListAdapter.fromJson(value)
     }
 
     @TypeConverter
     fun fromRules(value: List<Rule>): String {
-        return jsonAdapter.toJson(value)
+        return Adapters.ruleListAdapter.toJson(value)
+    }
+}
+
+class CategoriesTypeConverter {
+
+    @TypeConverter
+    fun toCategories(value: String): List<String> {
+        return Adapters.stringListAdapter.fromJson(value)
     }
 
+    @TypeConverter
+    fun fromCategories(value: List<String>): String {
+        return Adapters.stringListAdapter.toJson(value)
+    }
+}
+
+class Adapters {
     companion object {
-        private val type = Types.newParameterizedType(List::class.java, Rule::class.java)
-        private val jsonAdapter: JsonAdapter<List<Rule>> = JsonModule().moshi().adapter(type)
+        private val moshi = JsonModule().moshi()
+        private val ruleListType = Types.newParameterizedType(List::class.java, Rule::class.java)
+        private val stringListType = Types.newParameterizedType(List::class.java, String::class.java)
+        val ruleListAdapter: JsonAdapter<List<Rule>> = moshi.adapter(ruleListType)
+        val stringListAdapter: JsonAdapter<List<String>> = moshi.adapter(stringListType)
     }
 }
 

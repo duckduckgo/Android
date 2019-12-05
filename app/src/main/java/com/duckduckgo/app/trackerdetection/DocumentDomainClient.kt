@@ -17,6 +17,7 @@
 package com.duckduckgo.app.trackerdetection
 
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
+import com.duckduckgo.app.trackerdetection.Client.Result
 import com.duckduckgo.app.trackerdetection.model.DomainContainer
 
 /**
@@ -25,7 +26,7 @@ import com.duckduckgo.app.trackerdetection.model.DomainContainer
  */
 class DocumentDomainClient(override val name: Client.ClientName, private val domains: List<DomainContainer>) : Client {
 
-    override fun matches(url: String, documentUrl: String): Boolean {
-        return domains.any { sameOrSubdomain(documentUrl, it.domain) }
+    override fun matches(url: String, documentUrl: String): Result {
+        return Result(domains.any { sameOrSubdomain(documentUrl, it.domain) })
     }
 }

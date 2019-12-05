@@ -23,7 +23,7 @@ import com.duckduckgo.app.global.model.SiteFactory.SitePrivacyData
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
-import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 
 interface Site {
@@ -45,7 +45,7 @@ interface Site {
     var hasHttpResources: Boolean
 
     val privacyPractices: PrivacyPractices.Practices
-    val memberNetwork: TrackerNetwork?
+    val entity: Entity?
     val trackingEvents: List<TrackingEvent>
     val trackerCount: Int
     val distinctTrackersByNetwork: Map<String, List<TrackingEvent>>

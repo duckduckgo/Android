@@ -17,12 +17,12 @@
 package com.duckduckgo.app.privacy.ui
 
 import android.app.Activity
-import androidx.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.core.content.ContextCompat
 import android.view.View
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.model.Site

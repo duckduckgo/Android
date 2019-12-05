@@ -23,6 +23,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -43,6 +44,11 @@ class TabsDaoTest {
             .allowMainThreadQueries()
             .build()
         testee = database.tabsDao()
+    }
+
+    @After
+    fun after() {
+        database.close()
     }
 
     @Test

@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 16,
-    "identityHash": "2a1c6e1ea3c97f95e1c8e349edba4a97",
+    "identityHash": "b4a80827da0b9a86b943613b4d88d664",
     "entities": [
       {
         "tableName": "tds_tracker",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, `defaultAction` TEXT NOT NULL, `ownerName` TEXT NOT NULL, `rules` TEXT NOT NULL, PRIMARY KEY(`domain`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, `defaultAction` TEXT NOT NULL, `ownerName` TEXT NOT NULL, `categories` TEXT NOT NULL, `rules` TEXT NOT NULL, PRIMARY KEY(`domain`))",
         "fields": [
           {
             "fieldPath": "domain",
@@ -23,6 +23,12 @@
           {
             "fieldPath": "ownerName",
             "columnName": "ownerName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "categories",
+            "columnName": "categories",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -68,6 +74,32 @@
         "primaryKey": {
           "columnNames": [
             "name"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "tds_domain_entity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, `entityName` TEXT NOT NULL, PRIMARY KEY(`domain`))",
+        "fields": [
+          {
+            "fieldPath": "domain",
+            "columnName": "domain",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "entityName",
+            "columnName": "entityName",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "domain"
           ],
           "autoGenerate": false
         },
@@ -375,32 +407,6 @@
         "foreignKeys": []
       },
       {
-        "tableName": "entity_list",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domainName` TEXT NOT NULL, `entityName` TEXT NOT NULL, PRIMARY KEY(`domainName`))",
-        "fields": [
-          {
-            "fieldPath": "domainName",
-            "columnName": "domainName",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "entityName",
-            "columnName": "entityName",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "domainName"
-          ],
-          "autoGenerate": false
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
         "tableName": "survey",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`surveyId` TEXT NOT NULL, `url` TEXT, `daysInstalled` INTEGER, `status` TEXT NOT NULL, PRIMARY KEY(`surveyId`))",
         "fields": [
@@ -630,7 +636,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2a1c6e1ea3c97f95e1c8e349edba4a97')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b4a80827da0b9a86b943613b4d88d664')"
     ]
   }
 }

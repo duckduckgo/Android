@@ -34,8 +34,13 @@ interface Client {
         TRACKERSWHITELIST(ClientType.WHITELIST)
     }
 
+    data class Result(
+        val matches: Boolean,
+        val entityName: String? = null,
+        val categories: List<String>? = null
+    )
+
     val name: ClientName
 
-    fun matches(url: String, documentUrl: String): Boolean
-
+    fun matches(url: String, documentUrl: String): Result
 }

@@ -27,9 +27,8 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.model.PrivacyPractices
-import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.tabs.db.TabsDao
-import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
+import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -61,10 +60,7 @@ class TabDataRepositoryTest {
     private lateinit var mockPrivacyPractices: PrivacyPractices
 
     @Mock
-    private lateinit var mockPrevalenceStore: PrevalenceStore
-
-    @Mock
-    private lateinit var mockTrackerNetworks: TrackerNetworks
+    private lateinit var mockEntityLookup: EntityLookup
 
     @Mock
     private lateinit var mockWebViewPreviewPersister: WebViewPreviewPersister
@@ -79,7 +75,7 @@ class TabDataRepositoryTest {
             whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
             testee = TabDataRepository(
                 mockDao,
-                SiteFactory(mockPrivacyPractices, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore),
+                SiteFactory(mockPrivacyPractices, mockEntityLookup),
                 mockWebViewPreviewPersister
             )
         }

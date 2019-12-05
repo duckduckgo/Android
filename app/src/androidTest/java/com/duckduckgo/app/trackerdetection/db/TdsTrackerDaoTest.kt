@@ -95,7 +95,7 @@ class TdsTrackerDaoTest {
     }
 
     private fun createTracker(domain: String): TdsTracker {
-        return TdsTracker(domain, BLOCK, "", arrayListOf())
+        return TdsTracker(domain, BLOCK, "", emptyList(), emptyList())
     }
 
     companion object {

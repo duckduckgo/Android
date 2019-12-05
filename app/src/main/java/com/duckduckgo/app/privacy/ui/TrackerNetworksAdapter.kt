@@ -37,10 +37,11 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     companion object {
         const val HEADER = 0
         const val ROW = 1
+        val DISPLAY_CATEGORIES = listOf("Analytics", "Advertising", "Social Network")
     }
 
     interface ViewData
-    data class Header(val networkName: String) : ViewData
+    data class Header(val networkName: String, val networkDisplayName: String) : ViewData
     data class Row(val tracker: TrackingEvent) : ViewData
 
     class HeaderViewHolder(
@@ -82,7 +83,9 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private fun onBindRow(holder: RowViewHolder, viewElement: Row) {
         holder.host.text = Uri.parse(viewElement.tracker.trackerUrl).baseHost
-        holder.category.text = viewElement.tracker.trackerNetwork?.category
+        viewElement.tracker.categories?.let { categories ->
+            holder.category.text = DISPLAY_CATEGORIES.firstOrNull { categories.contains(it) }
+        }
     }
 
     private fun onBindHeader(holder: HeaderViewHolder, viewElement: Header) {
@@ -90,7 +93,7 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         if (iconResource != null) {
             holder.icon.setImageResource(iconResource)
         }
-        holder.network.text = viewElement.networkName
+        holder.network.text = viewElement.networkDisplayName
     }
 
     override fun getItemCount(): Int {
@@ -102,7 +105,7 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     fun updateData(data: Map<String, List<TrackingEvent>>) {
-        val majorNetworkKeys = data.map { if (it.value.find { it.trackerNetwork?.isMajor == true } != null) it.key else null }.filterNotNull()
+        val majorNetworkKeys = data.map { if (it.value.find { it.entity?.isMajor == true } != null) it.key else null }.filterNotNull()
         val otherKeys = data.keys.filter { !majorNetworkKeys.contains(it) }.sorted()
 
         val oldViewData = viewData
@@ -117,8 +120,10 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private fun generateViewData(keys: List<String>, data: Map<String, List<TrackingEvent>>): List<ViewData> {
         val viewData = ArrayList<ViewData>().toMutableList()
         for (key: String in keys) {
-            viewData.add(Header(key))
-            data[key]!!.mapTo(viewData) { Row(it) }
+            val trackerEvents = data[key]
+            val displayName = trackerEvents?.first()?.entity?.displayName ?: key
+            viewData.add(Header(key, displayName))
+            trackerEvents?.mapTo(viewData) { Row(it) }
         }
         return viewData
     }

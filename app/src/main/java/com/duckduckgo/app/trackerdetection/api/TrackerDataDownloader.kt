@@ -21,6 +21,8 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
+import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
+import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
 import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
 import com.duckduckgo.app.trackerdetection.model.TemporaryTrackingWhitelistedDomain
@@ -29,17 +31,18 @@ import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 
-
 class TrackerDataDownloader @Inject constructor(
     private val trackerListService: TrackerListService,
     private val binaryDataStore: BinaryDataStore,
     private val trackerDataLoader: TrackerDataLoader,
     private val tdsTrackerDao: TdsTrackerDao,
+    private val tdsEntityDao: TdsEntityDao,
+    private val tdsDomainEntityDao: TdsDomainEntityDao,
     private val temporaryTrackingWhitelistDao: TemporaryTrackingWhitelistDao,
     private val appDatabase: AppDatabase
 ) {
 
-    fun downloadTdsList(): Completable {
+    fun downloadTds(): Completable {
 
         return Completable.fromAction {
 
@@ -58,11 +61,11 @@ class TrackerDataDownloader @Inject constructor(
                 val body = response.body()!!
 
                 appDatabase.runInTransaction {
-                    val trackers = body.trackers.toTdsTrackers()
-                    tdsTrackerDao.updateAll(trackers.values)
+                    tdsEntityDao.updateAll(body.jsonToEntities())
+                    tdsDomainEntityDao.updateAll(body.jsonToDomainEntities())
+                    tdsTrackerDao.updateAll(body.jsonToTrackers().values)
                     trackerDataLoader.loadTdsTrackerData()
                 }
-
             } else {
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
@@ -100,13 +103,11 @@ class TrackerDataDownloader @Inject constructor(
 
     fun clearLegacyLists(): Completable {
         return Completable.fromAction {
-
             listOf(EASYLIST, EASYPRIVACY, TRACKERSWHITELIST).forEach {
                 if (binaryDataStore.hasData(it.name)) {
                     binaryDataStore.clearData(it.name)
                 }
             }
-
             return@fromAction
         }
     }

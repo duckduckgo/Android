@@ -20,7 +20,6 @@ import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.trackerdetection.Client.ClientName
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYLIST
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYPRIVACY
-import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -30,9 +29,9 @@ import org.mockito.ArgumentMatchers.anyString
 
 class TrackerDetectorTest {
 
-    private val mockNetworkTrackers: TrackerNetworks = mock()
+    private val mockEntityLookup: EntityLookup = mock()
     private val settingStore: PrivacySettingsStore = mock()
-    private val trackerDetector = TrackerDetectorImpl(mockNetworkTrackers, settingStore)
+    private val trackerDetector = TrackerDetectorImpl(mockEntityLookup, settingStore)
 
     @Test
     fun whenThereAreNoClientsThenClientCountIsZero() {
@@ -80,7 +79,7 @@ class TrackerDetectorTest {
         whenever(settingStore.privacyOn).thenReturn(true)
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
-        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, true)
+        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, null, true)
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
         assertEquals(expected, actual)
     }
@@ -90,7 +89,7 @@ class TrackerDetectorTest {
         whenever(settingStore.privacyOn).thenReturn(false)
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
-        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, false)
+        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, null, false)
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
         assertEquals(expected, actual)
     }
@@ -100,7 +99,7 @@ class TrackerDetectorTest {
         whenever(settingStore.privacyOn).thenReturn(true)
         trackerDetector.addClient(neverMatchingClient(CLIENT_A))
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
-        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, true)
+        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, null, true)
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
         assertEquals(expected, actual)
     }
@@ -110,7 +109,7 @@ class TrackerDetectorTest {
         whenever(settingStore.privacyOn).thenReturn(false)
         trackerDetector.addClient(neverMatchingClient(CLIENT_A))
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
-        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, false)
+        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, null, false)
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
         assertEquals(expected, actual)
     }
@@ -136,14 +135,14 @@ class TrackerDetectorTest {
     private fun alwaysMatchingClient(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
-        whenever(client.matches(anyString(), anyString())).thenReturn(true)
+        whenever(client.matches(anyString(), anyString())).thenReturn(Client.Result(true))
         return client
     }
 
     private fun neverMatchingClient(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
-        whenever(client.matches(anyString(), anyString())).thenReturn(false)
+        whenever(client.matches(anyString(), anyString())).thenReturn(Client.Result(false))
         return client
     }
 

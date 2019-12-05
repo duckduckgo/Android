@@ -56,8 +56,9 @@ class TrackersRenderer {
 
     private fun networkIcon(context: Context, networkName: String, prefix: String): Int? {
         val drawable = "$prefix$networkName"
-            .replace(" ", "")
+            .replace(" ", "_")
             .replace(".", "")
+            .replace(",", "")
             .toLowerCase()
         val resource = context.resources.getIdentifier(drawable, "drawable", context.packageName)
         return if (resource != 0) resource else null

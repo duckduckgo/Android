@@ -16,36 +16,51 @@
 
 package com.duckduckgo.app.trackerdetection.api
 
-import com.duckduckgo.app.trackerdetection.model.Action
-import com.duckduckgo.app.trackerdetection.model.Rule
-import com.duckduckgo.app.trackerdetection.model.TdsTracker
+import com.duckduckgo.app.trackerdetection.model.*
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.ToJson
 
 class TdsJson {
+
+    lateinit var entities: Map<String, TdsJsonEntity>
+    lateinit var domains: Map<String, String?>
     lateinit var trackers: Map<String, TdsJsonTracker>
+
+    fun jsonToEntities(): List<TdsEntity> {
+        return entities.mapNotNull { (key, value) ->
+            TdsEntity(key, value.displayName ?: key, value.prevalence)
+        }
+    }
+
+    fun jsonToDomainEntities(): List<TdsDomainEntity> {
+        return domains.mapNotNull { (key, value) ->
+            if (value == null) null
+            else TdsDomainEntity(key, value)
+        }
+    }
+
+    fun jsonToTrackers(): Map<String, TdsTracker> {
+        return trackers.mapNotNull { (key, value) ->
+            val domain = value.domain ?: return@mapNotNull null
+            val default = value.default ?: return@mapNotNull null
+            val owner = value.owner ?: return@mapNotNull null
+            key to TdsTracker(domain, default, owner.name, value.categories ?: emptyList(), value.rules ?: emptyList())
+        }.toMap()
+    }
 }
 
-fun Map<String, TdsJsonTracker>.toTdsTrackers(): Map<String, TdsTracker> {
-    return mapNotNull { (key, value) ->
-        value.toTdsTracker()?.let {
-            return@let key to it
-        }
-    }.toMap()
-}
+class TdsJsonEntity(
+    val displayName: String?,
+    val prevalence: Double
+)
 
 data class TdsJsonTracker(
     val domain: String?,
     val default: Action?,
     val owner: TdsJsonOwner?,
+    val categories: List<String>?,
     val rules: List<Rule>?
-) {
-
-    fun toTdsTracker(): TdsTracker? {
-        if (domain == null || default == null || owner == null) return null
-        return TdsTracker(domain, default, owner.name, rules ?: emptyList())
-    }
-}
+)
 
 data class TdsJsonOwner(
     val name: String

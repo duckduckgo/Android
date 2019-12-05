@@ -28,21 +28,24 @@ class DocumentDomainClientTest {
     fun whenDocumentUrlMatchesDomainThenMatchesIsTrue() {
         val data = listOf(DomainHolder("whitelisteddomain.com"))
         val testee = DocumentDomainClient(CLIENT_NAME, data)
-        assertTrue(testee.matches("http://tracker.com/script.js", "whitelisteddomain.com/abc"))
+        val result = testee.matches("http://tracker.com/script.js", "whitelisteddomain.com/abc")
+        assertTrue(result.matches)
     }
 
     @Test
     fun whenDocumentUrlIsSubdomainOfDomainThenMatchesIsTrue() {
         val data = listOf(DomainHolder("whitelisteddomain.com"))
         val testee = DocumentDomainClient(CLIENT_NAME, data)
-        assertTrue(testee.matches("http://tracker.com/script.js", "subdomain.whitelisteddomain.com/abc"))
+        val result = testee.matches("http://tracker.com/script.js", "subdomain.whitelisteddomain.com/abc")
+        assertTrue(result.matches)
     }
 
     @Test
     fun whenDocumentUrlDoesNotMatchDomainThenMatchesIsFalse() {
         val data = listOf(DomainHolder("whitelisteddomain.com"))
         val testee = DocumentDomainClient(CLIENT_NAME, data)
-        assertFalse(testee.matches("http://tracker.com/script.js", "anotherdomain.com/abc"))
+        val result = testee.matches("http://tracker.com/script.js", "anotherdomain.com/abc")
+        assertFalse(result.matches)
     }
 
     class DomainHolder(override val domain: String) : DomainContainer

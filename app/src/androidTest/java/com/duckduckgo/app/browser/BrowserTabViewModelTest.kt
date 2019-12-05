@@ -55,7 +55,6 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
-import com.duckduckgo.app.privacy.store.PrevalenceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
@@ -64,8 +63,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
-import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
+import com.duckduckgo.app.trackerdetection.EntityLookup
+import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
@@ -102,10 +101,7 @@ class BrowserTabViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     @Mock
-    private lateinit var mockPrevalenceStore: PrevalenceStore
-
-    @Mock
-    private lateinit var mockTrackerNetworks: TrackerNetworks
+    private lateinit var mockEntityLookup: EntityLookup
 
     @Mock
     private lateinit var mockNetworkLeaderboardDao: NetworkLeaderboardDao
@@ -200,7 +196,7 @@ class BrowserTabViewModelTest {
             mockDismissedCtaDao
         )
 
-        val siteFactory = SiteFactory(mockPrivacyPractices, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore)
+        val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)
         runBlockingTest {
             whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
             whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
@@ -337,7 +333,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenTrackerDetectedThenNetworkLeaderboardUpdated() {
-        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", TrackerNetwork("Network1", "www.tracker.com"), false)
+        val networkEntity = TdsEntity("Network1", "Network1", 10.0)
+        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), networkEntity, false)
         testee.trackerDetected(event)
         verify(mockNetworkLeaderboardDao).incrementNetworkCount("Network1")
     }
@@ -520,8 +517,9 @@ class BrowserTabViewModelTest {
     fun whenEnoughTrackersDetectedThenPrivacyGradeIsUpdated() {
         val grade = testee.privacyGrade.value
         loadUrl("https://example.com")
+        val entity = TdsEntity("Network1", "Network1", 10.0)
         for (i in 1..10) {
-            testee.trackerDetected(TrackingEvent("https://example.com", "", null, false))
+            testee.trackerDetected(TrackingEvent("https://example.com", "", null, entity, false))
         }
         assertNotEquals(grade, testee.privacyGrade.value)
     }

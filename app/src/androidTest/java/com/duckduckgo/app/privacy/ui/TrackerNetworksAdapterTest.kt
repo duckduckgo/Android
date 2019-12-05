@@ -47,7 +47,7 @@ class TrackerNetworksAdapterTest {
     }
 
     private fun data(): HashMap<String, ArrayList<TrackingEvent>> {
-        val trackingEvent = TrackingEvent("", "", null, true)
+        val trackingEvent = TrackingEvent("", "", null, null, true)
         val listA = arrayListOf(trackingEvent, trackingEvent)
         val listB = arrayListOf(trackingEvent, trackingEvent)
         return hashMapOf("Label A" to listA, "Label B" to listB)

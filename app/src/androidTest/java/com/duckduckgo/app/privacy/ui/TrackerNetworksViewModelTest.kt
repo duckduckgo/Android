@@ -64,7 +64,7 @@ class TrackerNetworksViewModelTest {
 
     @Test
     fun whenTrackersUpdatedThenViewModelTrackersUpdated() {
-        val trackersByNetwork = hashMapOf("Network" to arrayListOf(TrackingEvent("", "", null, true)))
+        val trackersByNetwork = hashMapOf("Network" to arrayListOf(TrackingEvent("", "", null, null, true)))
         testee.onSiteChanged(site(trackersByNetwork = trackersByNetwork))
         val viewState = testee.viewState.value!!
         assertEquals(trackersByNetwork, viewState.trackingEventsByNetwork)

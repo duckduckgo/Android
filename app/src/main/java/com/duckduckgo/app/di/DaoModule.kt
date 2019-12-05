@@ -33,6 +33,12 @@ class DaoModule {
     fun providesTdsTrackDao(database: AppDatabase) = database.tdsTrackerDao()
 
     @Provides
+    fun providesTdsEntityDao(database: AppDatabase) = database.tdsEntityDao()
+
+    @Provides
+    fun providesTdsDomainEntityDao(database: AppDatabase) = database.tdsDomainEntityDao()
+
+    @Provides
     fun providesTemporaryTrackingWhitelist(database: AppDatabase) = database.temporaryTrackingWhitelistDao()
 
     @Provides
@@ -46,9 +52,6 @@ class DaoModule {
 
     @Provides
     fun appConfigurationDao(database: AppDatabase) = database.appConfigurationDao()
-
-    @Provides
-    fun networkEntityDao(database: AppDatabase) = database.networkEntityDao()
 
     @Provides
     fun surveyDao(database: AppDatabase) = database.surveyDao()

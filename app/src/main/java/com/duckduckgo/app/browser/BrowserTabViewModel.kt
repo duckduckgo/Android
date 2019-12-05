@@ -550,7 +550,7 @@ class BrowserTabViewModel(
     }
 
     private fun updateNetworkLeaderboard(event: TrackingEvent) {
-        val networkName = event.trackerNetwork?.name ?: return
+        val networkName = event.entity?.name ?: return
         networkLeaderboardDao.incrementNetworkCount(networkName)
     }
 
