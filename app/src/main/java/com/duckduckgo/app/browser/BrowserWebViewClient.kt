@@ -44,7 +44,6 @@ class BrowserWebViewClient(
 
     var webViewClientListener: WebViewClientListener? = null
     private var lastPageStarted: String? = null
-    private var pageStartTime: Long? = null
 
     /**
      * This is the new method of url overriding available from API 24 onwards
@@ -118,7 +117,6 @@ class BrowserWebViewClient(
 
     @UiThread
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
-        pageStartTime = System.currentTimeMillis()
         try {
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
@@ -136,12 +134,6 @@ class BrowserWebViewClient(
 
     @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
-
-        pageStartTime?.let {
-            Timber.d("PAGE LOAD TIME ${System.currentTimeMillis() - it}")
-            pageStartTime = null
-        }
-
         try {
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
