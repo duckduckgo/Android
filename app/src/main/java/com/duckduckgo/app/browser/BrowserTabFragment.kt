@@ -299,7 +299,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         super.onResume()
         addTextChangedListeners()
         appBarLayout.setExpanded(true)
-        viewModel.onViewVisible(isVisible)
+        viewModel.onViewVisible()
         logoHidingListener.onResume()
     }
 
@@ -920,7 +920,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             webView?.onPause()
         } else {
             webView?.onResume()
-            viewModel.onViewVisible(true)
+            viewModel.onViewVisible()
         }
     }
 

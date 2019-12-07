@@ -106,11 +106,9 @@ class BrowserTabViewModel(
 
     private var buildingSiteFactoryJob: Job? = null
 
-    sealed class GlobalLayoutViewState(open val isVisible: Boolean) {
-        data class Browser(override val isVisible: Boolean = true,
-                           val isNewTabState: Boolean = true) : GlobalLayoutViewState(isVisible)
-
-        data class Invalidated(override val isVisible: Boolean = true) : GlobalLayoutViewState(isVisible)
+    sealed class GlobalLayoutViewState {
+        data class Browser(val isNewTabState: Boolean = true) : GlobalLayoutViewState()
+        object Invalidated : GlobalLayoutViewState()
     }
 
     data class BrowserViewState(
@@ -298,18 +296,13 @@ class BrowserTabViewModel(
         browserChromeClient.webViewClientListener = this
     }
 
-    fun onViewVisible(isVisible: Boolean) {
+    fun onViewVisible() {
         command.value = if (!currentBrowserViewState().browserShowing) ShowKeyboard else HideKeyboard
         ctaViewModel.refreshCta()
-
-        globalLayoutState.value = currentGlobalLayoutState().copy(isVisible)
-        currentGlobalLayoutState()
-            .takeIf { it.isVisible && it is Invalidated }
-            ?.let { showErrorWithAction() }
+        if (currentGlobalLayoutState() is Invalidated) showErrorWithAction()
     }
 
     fun onViewHidden() {
-        globalLayoutState.value = currentGlobalLayoutState().copy(isVisible = false)
         skipHome = false
     }
 
@@ -386,7 +379,7 @@ class BrowserTabViewModel(
     }
 
     fun onRefreshRequested() {
-        if(currentGlobalLayoutState() is Invalidated){
+        if (currentGlobalLayoutState() is Invalidated) {
             recoverTabWithQuery(url.orEmpty())
         } else {
             command.value = Refresh
@@ -923,12 +916,5 @@ class BrowserTabViewModel(
     private fun recoverTabWithQuery(query: String) {
         viewModelScope.launch { closeCurrentTab() }
         command.value = OpenInNewTab(query)
-    }
-
-    private fun GlobalLayoutViewState.copy(isVisible: Boolean): GlobalLayoutViewState {
-        return when (this) {
-            is Invalidated -> this.copy(isVisible = isVisible)
-            is Browser -> this.copy(isVisible = isVisible)
-        }
     }
 }
