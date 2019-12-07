@@ -39,6 +39,8 @@
     <string name="refresh">Refresh</string>
     <string name="back">Back</string>
     <string name="forward">Forward</string>
+    <string name="crashedWebViewErrorMessage" translatable="false">"The webpage could not be displayed."</string>
+    <string name="crashedWebViewErrorAction" translatable="false">"Reload"</string>
 
     <string name="omnibarInputHint">Search or type URL</string>
     <string name="clearButtonContentDescription">Clear search input</string>

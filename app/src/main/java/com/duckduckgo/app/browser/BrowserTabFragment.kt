@@ -204,7 +204,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private var webView: WebView? = null
 
     private val errorSnackbar: Snackbar by lazy {
-        Snackbar.make(rootView, "The webpage could not be displayed.", Snackbar.LENGTH_INDEFINITE)
+        Snackbar.make(rootView, R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
             .setBehavior(NonDismissibleBehavior())
     }
 
@@ -495,8 +495,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun showErrorSnackbar(command: Command.ShowErrorWithAction) {
-        if (!errorSnackbar.view.isAttachedToWindow) {
-            errorSnackbar.setAction("Reload") { command.action() }.show()
+        //Snackbar is global and it should appear only the foreground fragment
+        if (!errorSnackbar.view.isAttachedToWindow && isVisible) {
+            errorSnackbar.setAction(R.string.crashedWebViewErrorAction) { command.action() }.show()
         }
     }
 
