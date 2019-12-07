@@ -115,6 +115,7 @@ class BrowserTabViewModel(
         val browserShowing: Boolean = false,
         val isFullScreen: Boolean = false,
         val isDesktopBrowsingMode: Boolean = false,
+        val canChangeBrowsingMode: Boolean = true,
         val showPrivacyGrade: Boolean = false,
         val showClearButton: Boolean = false,
         val showTabsButton: Boolean = true,
@@ -903,7 +904,8 @@ class BrowserTabViewModel(
         browserViewState.value = currentBrowserViewState().copy(
             canGoBack = false,
             canGoForward = false,
-            canReportSite = false
+            canReportSite = false,
+            canChangeBrowsingMode = false
         )
         loadingViewState.value = LoadingViewState()
         findInPageViewState.value = FindInPageViewState()

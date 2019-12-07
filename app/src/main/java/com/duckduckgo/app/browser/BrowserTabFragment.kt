@@ -1202,6 +1202,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
                 sharePageMenuItem?.isEnabled = viewState.canSharePage
                 brokenSitePopupMenuItem?.isEnabled = viewState.canReportSite
+                requestDesktopSiteCheckMenuItem?.isEnabled = viewState.canChangeBrowsingMode
 
                 addToHome?.let {
                     it.visibility = if (viewState.addToHomeVisible) VISIBLE else GONE
