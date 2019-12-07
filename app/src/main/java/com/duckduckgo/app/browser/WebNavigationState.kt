@@ -37,10 +37,14 @@ sealed class WebNavigationStateChange {
     data class UrlUpdated(val url: String) : WebNavigationStateChange()
     object PageCleared : WebNavigationStateChange()
     object Unchanged : WebNavigationStateChange()
+    object PageNavigationCleared : WebNavigationStateChange()
     object Other : WebNavigationStateChange()
 }
 
 fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStateChange {
+
+    if (this is EmptyNavigationState)
+        return PageNavigationCleared
 
     if (this == previous) {
         return Unchanged
@@ -120,6 +124,30 @@ data class WebViewNavigationState(private val stack: WebBackForwardList) : WebNa
         result = 31 * result + hasNavigationHistory.hashCode()
         return result
     }
+}
+
+@Suppress("DataClassPrivateConstructor")
+data class EmptyNavigationState private constructor(override val originalUrl: String?,
+                                                    override val currentUrl: String?,
+                                                    override val title: String?) : WebNavigationState {
+    companion object {
+        operator fun invoke(webNavigationState: WebNavigationState): EmptyNavigationState {
+            return EmptyNavigationState(
+                webNavigationState.originalUrl,
+                webNavigationState.currentUrl,
+                webNavigationState.title
+            )
+        }
+    }
+
+    override val stepsToPreviousPage: Int
+        get() = 0
+    override val canGoBack: Boolean
+        get() = false
+    override val canGoForward: Boolean
+        get() = false
+    override val hasNavigationHistory: Boolean
+        get() = false
 }
 
 private val WebBackForwardList.originalUrl: String?

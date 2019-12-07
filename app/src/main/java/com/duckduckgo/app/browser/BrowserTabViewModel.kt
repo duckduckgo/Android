@@ -457,6 +457,7 @@ class BrowserTabViewModel(
             is NewPage -> pageChanged(stateChange.url, stateChange.title)
             is PageCleared -> pageCleared()
             is UrlUpdated -> urlUpdated(stateChange.url)
+            is PageNavigationCleared -> disableUserNavigation()
         }
     }
 
@@ -878,7 +879,10 @@ class BrowserTabViewModel(
     }
 
     override fun recoverFromRenderProcessGone() {
-        invalidateUserNavigation()
+        webNavigationState?.let {
+            navigationStateChanged(EmptyNavigationState(it))
+        }
+        invalidateBrowsingActions()
         showErrorWithAction()
     }
 
@@ -899,16 +903,19 @@ class BrowserTabViewModel(
         command.value = LaunchTabSwitcher
     }
 
-    private fun invalidateUserNavigation() {
-        globalLayoutState.value = Invalidated()
+    private fun invalidateBrowsingActions() {
+        globalLayoutState.value = Invalidated
+        loadingViewState.value = LoadingViewState()
+        findInPageViewState.value = FindInPageViewState()
+    }
+
+    private fun disableUserNavigation() {
         browserViewState.value = currentBrowserViewState().copy(
             canGoBack = false,
             canGoForward = false,
             canReportSite = false,
             canChangeBrowsingMode = false
         )
-        loadingViewState.value = LoadingViewState()
-        findInPageViewState.value = FindInPageViewState()
     }
 
     private fun showErrorWithAction() {

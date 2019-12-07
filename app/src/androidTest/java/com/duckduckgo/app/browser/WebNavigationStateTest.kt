@@ -92,13 +92,6 @@ class WebNavigationStateComparisonTest {
     }
 
     @Test
-    fun whenPreviousContainsAnOriginalUrlAndCurrentUrlAndLatestContainsSameOriginalUrlAndNoCurrentUrlThenCompareReturnsOther() {
-        val previousState = buildState("http://same.com", "http://subdomain.previous.com")
-        val latestState = buildState("http://same.com", null)
-        assertEquals(Other, latestState.compare(previousState))
-    }
-
-    @Test
     fun whenPreviousContainsAnOriginalUrlAndCurrentUrlAndLatestStateContainsNoOriginalUrlAndNoCurrentUrlThenCompareReturnsPageCleared() {
         val previousState = buildState("http://previous.com", "http://subdomain.previous.com")
         val latestState = buildState(null, null)
@@ -110,6 +103,20 @@ class WebNavigationStateComparisonTest {
         val previousState = buildState("http://previous.com", "http://subdomain.previous.com")
         val latestState = buildState(null, "http://subdomain.latest.com")
         assertEquals(PageCleared, latestState.compare(previousState))
+    }
+
+    @Test
+    fun whenLatestStateIsEmptyNavigationCompareReturnsPageNavigationCleared() {
+        val previousState = buildState("http://previous.com", "http://subdomain.previous.com")
+        val latestState = EmptyNavigationState(previousState)
+        assertEquals(PageNavigationCleared, latestState.compare(previousState))
+    }
+
+    @Test
+    fun whenPreviousContainsAnOriginalUrlAndCurrentUrlAndLatestContainsSameOriginalUrlAndNoCurrentUrlThenCompareReturnsOther() {
+        val previousState = buildState("http://same.com", "http://subdomain.previous.com")
+        val latestState = buildState("http://same.com", null)
+        assertEquals(Other, latestState.compare(previousState))
     }
 
     @Test
@@ -131,13 +138,3 @@ class WebNavigationStateComparisonTest {
         )
     }
 }
-
-data class TestNavigationState(
-    override val originalUrl: String?,
-    override val currentUrl: String?,
-    override val title: String?,
-    override val stepsToPreviousPage: Int,
-    override val canGoBack: Boolean,
-    override val canGoForward: Boolean,
-    override val hasNavigationHistory: Boolean
-) : WebNavigationState
