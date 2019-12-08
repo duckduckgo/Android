@@ -68,7 +68,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
             } else {
                 referralResult = ParseFailure(ReferralServiceUnavailable)
             }
-        } catch (e: IllegalStateException) {
+        } catch (e: RuntimeException) {
             Timber.w(e, "Failed to obtain referrer information")
             referralResult = ParseFailure(UnknownError)
         }
