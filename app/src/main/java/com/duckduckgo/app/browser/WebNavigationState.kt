@@ -42,13 +42,12 @@ sealed class WebNavigationStateChange {
 }
 
 fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStateChange {
-
-    if (this is EmptyNavigationState)
-        return PageNavigationCleared
-
     if (this == previous) {
         return Unchanged
     }
+
+    if (this is EmptyNavigationState)
+        return PageNavigationCleared
 
     if (originalUrl == null && previous?.originalUrl != null) {
         return PageCleared
@@ -140,14 +139,10 @@ data class EmptyNavigationState private constructor(override val originalUrl: St
         }
     }
 
-    override val stepsToPreviousPage: Int
-        get() = 0
-    override val canGoBack: Boolean
-        get() = false
-    override val canGoForward: Boolean
-        get() = false
-    override val hasNavigationHistory: Boolean
-        get() = false
+    override val stepsToPreviousPage: Int = 0
+    override val canGoBack: Boolean = false
+    override val canGoForward: Boolean = false
+    override val hasNavigationHistory: Boolean = false
 }
 
 private val WebBackForwardList.originalUrl: String?

@@ -298,7 +298,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenInvalidatedGlobalLayoutRestoredAndVisibleThenErrorIsShown() {
+    fun whenInvalidatedGlobalLayoutRestoredThenErrorIsShown() {
         givenInvalidatedGlobalLayout()
         testee.onViewVisible()
         assertCommandIssued<Command.ShowErrorWithAction>()
