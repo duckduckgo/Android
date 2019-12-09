@@ -1455,7 +1455,23 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                         launchHideTipsDialog(activity)
                     }
                     show(activity.supportFragmentManager, "DaxDialog")
-                    ctaViewModel.onCtaDismissed()
+                    ctaViewModel.registerDaxCtaShown()
+                    if (configuration is DaxDialogCta.DaxMainNetworkCta) {
+                        setPrimaryCTAClickListener {
+                            ctaViewModel.onCtaLaunched()
+                            configuration.ctaPixelParam = Pixel.PixelValues.DAX_NETWORK_CTA_2
+                            val firstParagraph = configuration.firstParagraph(activity)
+                            daxText = activity.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph, configuration.getNetworkName())
+                            buttonText = activity.resources.getString(R.string.daxDialogGotIt)
+                            setPrimaryCTAClickListener { dismiss() }
+                            setDialogAndStartAnimation()
+                        }
+                    } else {
+                        setPrimaryCTAClickListener {
+                            dismiss()
+                            ctaViewModel.onCtaLaunched()
+                        }
+                    }
                 }
             }
         }
@@ -1466,6 +1482,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 .setMessage(getString(R.string.hideTipsText))
                 .setPositiveButton(R.string.hideTipsButton) { dialog, _ ->
                     dialog.dismiss()
+                    ctaViewModel.onCtaDismissed()
                     launch {
                         ctaViewModel.hideTipsForever()
                     }
@@ -1481,7 +1498,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             hideHomeCta()
             daxDialog.show()
             configuration.afterAnimation = {
-                ctaViewModel.onCtaDismissed()
+                ctaViewModel.registerDaxCtaShown()
             }
             configuration.apply(daxDialog)
         }

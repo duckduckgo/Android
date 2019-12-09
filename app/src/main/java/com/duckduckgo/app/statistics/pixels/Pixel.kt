@@ -64,6 +64,9 @@ interface Pixel {
         ONBOARDING_DEFAULT_BROWSER_LAUNCHED("m_odb_l"),
         ONBOARDING_DEFAULT_BROWSER_SKIPPED("m_odb_s"),
         ONBOARDING_DEFAULT_BROWSER_SELECTED_JUST_ONCE("m_odb_jo"),
+        ONBOARDING_DAX_CTA_SHOWN("m_odc_s"),
+        ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
+        ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
 
         PRIVACY_DASHBOARD_OPENED("mp"),
         PRIVACY_DASHBOARD_SCORECARD("mp_c"),
@@ -156,6 +159,7 @@ interface Pixel {
         const val DEFAULT_BROWSER_BEHAVIOUR_TRIGGERED = "bt"
         const val DEFAULT_BROWSER_SET_FROM_ONBOARDING = "fo"
         const val DEFAULT_BROWSER_SET_ORIGIN = "dbo"
+        const val CTA_SHOWN = "cta"
     }
 
     object PixelValues {
@@ -164,6 +168,13 @@ interface Pixel {
         const val DEFAULT_BROWSER_DIALOG_DISMISSED = "dd"
         const val DEFAULT_BROWSER_JUST_ONCE_MAX = "jom"
         const val DEFAULT_BROWSER_EXTERNAL = "e"
+        const val DAX_INITIAL_CTA = "i"
+        const val DAX_END_CTA = "e"
+        const val DAX_SERP_CTA = "s"
+        const val DAX_NETWORK_CTA_1 = "n"
+        const val DAX_NETWORK_CTA_2 = "n"
+        const val DAX_TRACKERS_BLOCKED_CTA = "t"
+        const val DAX_NO_TRACKERS_CTA = "nt"
     }
 
     fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap())
@@ -186,9 +197,9 @@ class ApiBasedPixel @Inject constructor(
         fireCompletable(pixelName, parameters)
             .subscribeOn(Schedulers.io())
             .subscribe({
-                Timber.v("Pixel sent: $pixelName")
+                Timber.v("Pixel sent: $pixelName with params: $parameters")
             }, {
-                Timber.w("Pixel failed: $pixelName")
+                Timber.w("Pixel failed: $pixelName with params: $parameters")
             })
     }
 

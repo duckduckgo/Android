@@ -26,6 +26,7 @@ import com.duckduckgo.app.cta.ui.HomePanelCta.*
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -45,7 +46,8 @@ class CtaViewModel @Inject constructor(
     private val widgetCapabilities: WidgetCapabilities,
     private val dismissedCtaDao: DismissedCtaDao,
     private val variantManager: VariantManager,
-    private val settingsDataStore: SettingsDataStore
+    private val settingsDataStore: SettingsDataStore,
+    private val onboardingStore: OnboardingStore
 ) {
 
     data class CtaViewState(
@@ -80,10 +82,10 @@ class CtaViewModel @Inject constructor(
         Schedulers.io().scheduleDirect {
             when {
                 canShowDaxIntroCta() -> {
-                    ctaViewState.postValue(currentViewState.copy(cta = DaxBubbleCta.DaxIntroCta))
+                    ctaViewState.postValue(currentViewState.copy(cta = DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)))
                 }
                 canShowDaxCtaEndOfJourney(site) -> {
-                    ctaViewState.postValue(currentViewState.copy(cta = DaxBubbleCta.DaxEndCta))
+                    ctaViewState.postValue(currentViewState.copy(cta = DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)))
                 }
                 shouldShowDaxCta(site) != null -> {
                     ctaViewState.postValue(currentViewState.copy(cta = shouldShowDaxCta(site)))
@@ -145,22 +147,22 @@ class CtaViewModel @Inject constructor(
             if (it.memberNetwork != null) {
                 val network = site.memberNetwork
                 if (DaxDialogCta.MAIN_TRACKER_NETWORKS.contains(network?.name) && !dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)) {
-                    return DaxDialogCta.DaxMainNetworkCta(network!!.name, it.uri!!.host!!)
+                    return DaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, network!!.name, it.uri!!.host!!)
                 }
             }
             // is serp
             if (it.url.contains(DaxDialogCta.SERP) && !dismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)) {
-                return DaxDialogCta.DaxSerpCta
+                return DaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
             }
             // trackers blocked
             return if (!it.url.contains(DaxDialogCta.SERP) && it.trackerCount > 0 && !dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)) {
-                DaxDialogCta.DaxTrackersBlockedCta(it.trackingEvents, it.uri!!.host!!)
+                DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.trackingEvents, it.uri!!.host!!)
             } else if (!it.url.contains(DaxDialogCta.SERP) &&
                 !dismissedCtaDao.exists(CtaId.DAX_DIALOG_OTHER) &&
                 !dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND) &&
                 !dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)
             ) {
-                DaxDialogCta.DaxNoSerpCta
+                DaxDialogCta.DaxNoSerpCta(onboardingStore, appInstallStore)
             } else {
                 null
             }
@@ -169,15 +171,27 @@ class CtaViewModel @Inject constructor(
     }
 
     fun onCtaShown() {
-        currentViewState.cta?.shownPixel?.let {
-            pixel.fire(it)
+        val cta = currentViewState.cta ?: return
+        cta.shownPixel?.let {
+            pixel.fire(it, cta.pixelShownParameters())
+        }
+    }
+
+    fun registerDaxCtaShown() {
+        val cta = currentViewState.cta ?: return
+        Schedulers.io().scheduleDirect {
+            if (cta is DaxBubbleCta || cta is DaxDialogCta ) {
+                dismissedCtaDao.insert(DismissedCta(cta.ctaId))
+                Timber.d("Marcos dismissed ${cta.ctaId}")
+                return@scheduleDirect
+            }
         }
     }
 
     fun onCtaDismissed() {
         val cta = currentViewState.cta ?: return
         cta.cancelPixel?.let {
-            pixel.fire(it)
+            pixel.fire(it, cta.pixelCancelParameters())
         }
 
         Schedulers.io().scheduleDirect {
@@ -187,8 +201,8 @@ class CtaViewModel @Inject constructor(
                     surveyDao.cancelScheduledSurveys()
                 }
                 is DaxBubbleCta, is DaxDialogCta -> {
-                    dismissedCtaDao.insert(DismissedCta(cta.ctaId))
-                    Timber.d("Marcos dismissed ${cta.ctaId}")
+                    //dismissedCtaDao.insert(DismissedCta(cta.ctaId))
+                    //Timber.d("Marcos dismissed ${cta.ctaId}")
                     return@scheduleDirect
                 }
                 else -> {
