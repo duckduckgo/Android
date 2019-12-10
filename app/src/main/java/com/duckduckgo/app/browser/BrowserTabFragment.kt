@@ -379,6 +379,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun showHome() {
+        errorSnackbar.dismiss()
         newTabLayout.show()
         showKeyboardImmediately()
         appBarLayout.setExpanded(true)

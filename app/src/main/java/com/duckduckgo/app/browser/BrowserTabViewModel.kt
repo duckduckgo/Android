@@ -300,7 +300,9 @@ class BrowserTabViewModel(
     fun onViewVisible() {
         command.value = if (!currentBrowserViewState().browserShowing) ShowKeyboard else HideKeyboard
         ctaViewModel.refreshCta()
-        if (currentGlobalLayoutState() is Invalidated) showErrorWithAction()
+        if (currentGlobalLayoutState() is Invalidated && currentBrowserViewState().browserShowing) {
+            showErrorWithAction()
+        }
     }
 
     fun onViewHidden() {
