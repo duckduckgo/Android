@@ -204,7 +204,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private var webView: WebView? = null
 
     private val errorSnackbar: Snackbar by lazy {
-        Snackbar.make(rootView, R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
+        Snackbar.make(browserLayout, R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
             .setBehavior(NonDismissibleBehavior())
     }
 
