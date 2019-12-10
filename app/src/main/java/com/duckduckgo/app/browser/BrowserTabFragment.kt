@@ -413,7 +413,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private fun processCommand(it: Command?) {
         when (it) {
-            Command.Refresh -> refresh()
+            is Command.Refresh -> refresh()
             is Command.OpenInNewTab -> {
                 browserActivity?.openInNewTab(it.query)
             }
@@ -428,10 +428,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.NavigateBack -> {
                 webView?.goBackOrForward(-it.steps)
             }
-            Command.NavigateForward -> {
+            is Command.NavigateForward -> {
                 webView?.goForward()
             }
-            Command.ResetHistory -> {
+            is Command.ResetHistory -> {
                 resetWebView()
             }
             is Command.DialNumber -> {
@@ -448,10 +448,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${it.telephoneNumber}"))
                 openExternalDialog(intent)
             }
-            Command.ShowKeyboard -> {
+            is Command.ShowKeyboard -> {
                 showKeyboard()
             }
-            Command.HideKeyboard -> {
+            is Command.HideKeyboard -> {
                 hideKeyboard()
             }
             is Command.BrokenSiteFeedback -> {
@@ -467,7 +467,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
             is Command.DownloadImage -> requestImageDownload(it.url)
             is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
-            Command.DismissFindInPage -> webView?.findAllAsync(null)
+            is Command.DismissFindInPage -> webView?.findAllAsync(null)
             is Command.ShareLink -> launchSharePageChooser(it.url)
             is Command.CopyLink -> {
                 clipboardManager.primaryClip = ClipData.newPlainText(null, it.url)
