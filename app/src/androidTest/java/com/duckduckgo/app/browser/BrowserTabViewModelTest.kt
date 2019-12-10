@@ -300,6 +300,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenInvalidatedGlobalLayoutRestoredThenErrorIsShown() {
         givenInvalidatedGlobalLayout()
+        setBrowserShowing(true)
         testee.onViewVisible()
         assertCommandIssued<Command.ShowErrorWithAction>()
     }
@@ -834,6 +835,15 @@ class BrowserTabViewModelTest {
         assertTrue(browserViewState().canGoForward)
     }
 
+    @Test
+    fun whenHomeShowingByPressingBackOnInvalidatedBrowserThenForwardButtonInactive() {
+        setupNavigation(isBrowsing = true)
+        givenInvalidatedGlobalLayout()
+        testee.onUserPressedBack()
+        assertFalse(browserViewState().browserShowing)
+        assertFalse(browserViewState().canGoForward)
+    }
+    
     @Test
     fun whenBrowserShowingAndCanGoForwardThenForwardButtonActive() {
         setupNavigation(isBrowsing = true, canGoForward = true)
