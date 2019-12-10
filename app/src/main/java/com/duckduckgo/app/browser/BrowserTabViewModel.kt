@@ -422,7 +422,7 @@ class BrowserTabViewModel(
         browserViewState.value = currentBrowserViewState().copy(
             browserShowing = false,
             canGoBack = false,
-            canGoForward = true
+            canGoForward = currentGlobalLayoutState() !is Invalidated
         )
         omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = "", shouldMoveCaretToEnd = false)
         loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
