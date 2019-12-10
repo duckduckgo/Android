@@ -1122,7 +1122,9 @@ class BrowserTabViewModelTest {
 
         showErrorWithAction.action()
 
-        assertCommandIssued<Command.OpenInNewTab>()
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertEquals("https://example.com", query)
+        }
     }
 
     @Test
@@ -1278,10 +1280,11 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
     }
 
-    private inline fun <reified T : Command> assertCommandIssued() {
+    private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is T }
         assertNotNull(issuedCommand)
+        (issuedCommand as T).apply { instanceAssertions() }
     }
 
     private fun pixelParams(showedBookmarks: Boolean, bookmarkCapable: Boolean) = mapOf(
