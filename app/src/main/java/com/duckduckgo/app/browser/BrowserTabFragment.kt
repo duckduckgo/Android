@@ -379,6 +379,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun showHome() {
+        newTabLayout.show()
         showKeyboardImmediately()
         appBarLayout.setExpanded(true)
         webView?.onPause()
@@ -388,6 +389,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun showBrowser() {
+        newTabLayout.gone()
         webView?.show()
         webView?.onResume()
         omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
