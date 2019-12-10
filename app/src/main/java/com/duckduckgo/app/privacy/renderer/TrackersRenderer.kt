@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.annotation.DrawableRes
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
+import java.util.*
 
 
 class TrackersRenderer {
@@ -59,7 +60,7 @@ class TrackersRenderer {
             .replace(" ", "_")
             .replace(".", "")
             .replace(",", "")
-            .toLowerCase()
+            .toLowerCase(Locale.ROOT)
         val resource = context.resources.getIdentifier(drawable, "drawable", context.packageName)
         return if (resource != 0) resource else null
     }

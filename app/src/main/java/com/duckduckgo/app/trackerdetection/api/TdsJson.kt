@@ -19,6 +19,7 @@ package com.duckduckgo.app.trackerdetection.api
 import com.duckduckgo.app.trackerdetection.model.*
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.ToJson
+import java.util.*
 
 class TdsJson {
 
@@ -68,13 +69,8 @@ data class TdsJsonOwner(
 
 class ActionJsonAdapter {
 
-    @ToJson
-    fun toJson(action: Action): String {
-        return action.name.toLowerCase()
-    }
-
     @FromJson
     fun fromJson(actionName: String): Action? {
-        return Action.values().firstOrNull { it.name == actionName.toUpperCase() }
+        return Action.values().firstOrNull { it.name == actionName.toUpperCase(Locale.ROOT) }
     }
 }

@@ -18,7 +18,7 @@ package com.duckduckgo.app.global.model
 
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyPractices
-import com.duckduckgo.app.trackerdetection.model.TdsEntity
+import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -37,8 +37,8 @@ class SiteMonitorTest {
 
         private const val majorNetworkTracker = "http://majorNetworkTracker.com/script.js"
 
-        private val network = TdsEntity("Network", "Network", 1.0)
-        private val majorNetwork = TdsEntity("MajorNetwork", "MajorNetwork", 10.0)
+        private val network = TestEntity("Network", "Network", 1.0)
+        private val majorNetwork = TestEntity("MajorNetwork", "MajorNetwork", 10.0)
 
         private val unknownPractices = PrivacyPractices.UNKNOWN
     }
@@ -114,30 +114,5 @@ class SiteMonitorTest {
         testee.trackerDetected(TrackingEvent(document, trackerA, null, majorNetwork, true))
         testee.trackerDetected(TrackingEvent(document, trackerB, null, majorNetwork, true))
         assertEquals(1, testee.majorNetworkCount)
-    }
-
-    @Test
-    fun whenNoTrackersDetectedThenDistinctTrackerByNetworkIsEmpty() {
-        val testee = SiteMonitor(document, null)
-        assertEquals(0, testee.distinctTrackersByNetwork.size)
-    }
-
-    @Test
-    fun whenTrackersDetectedThenDistinctTrackersByNetworkMapsTrackerByNetworkOrHost() {
-        val testee = SiteMonitor(document, null)
-
-        // Two distinct trackers, trackerA and tracker B for network A
-        testee.trackerDetected(TrackingEvent(document, trackerA, null, network, true))
-        testee.trackerDetected(TrackingEvent(document, trackerA, null, network, true))
-        testee.trackerDetected(TrackingEvent(document, trackerB, null, network, true))
-        testee.trackerDetected(TrackingEvent(document, trackerB, null, network, true))
-
-        // One distinct trackerC with no network
-        testee.trackerDetected(TrackingEvent(document, trackerC, null, null, true))
-        testee.trackerDetected(TrackingEvent(document, trackerC, null, null, true))
-
-        val result = testee.distinctTrackersByNetwork
-        assertEquals(2, result["Network"]!!.size)
-        assertEquals(1, result["standalonetrackerC.com"]!!.size)
     }
 }

@@ -19,7 +19,6 @@ package com.duckduckgo.app.global.model
 
 import android.net.Uri
 import androidx.core.net.toUri
-import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.global.model.Site.SiteGrades
 import com.duckduckgo.app.global.model.SiteFactory.SitePrivacyData
@@ -65,18 +64,6 @@ class SiteMonitor(
 
     override val trackerCount: Int
         get() = trackingEvents.size
-
-    override val distinctTrackersByNetwork: Map<String, List<TrackingEvent>>
-        get() {
-            val networks = HashMap<String, MutableList<TrackingEvent>>().toMutableMap()
-            for (event: TrackingEvent in trackingEvents.distinctBy { Uri.parse(it.trackerUrl).baseHost }) {
-                val network = event.entity?.name ?: Uri.parse(event.trackerUrl).baseHost ?: event.trackerUrl
-                val events = networks[network] ?: ArrayList()
-                events.add(event)
-                networks[network] = events
-            }
-            return networks
-        }
 
     override val majorNetworkCount: Int
         get() = trackingEvents.distinctBy { it.entity?.name }.count { it.entity?.isMajor ?: false }

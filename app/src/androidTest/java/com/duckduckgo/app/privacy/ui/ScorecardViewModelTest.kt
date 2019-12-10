@@ -24,9 +24,9 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Practices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.GOOD
+import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.trackerdetection.model.Entity
-import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.After
@@ -116,14 +116,14 @@ class ScorecardViewModelTest {
 
     @Test
     fun whenIsMemberOfMajorNetworkThenShowIsMemberOfMajorNetworkIsTrue() {
-        val site = site(entity = TdsEntity("", "", 10.0))
+        val site = site(entity = TestEntity("", "", 10.0))
         testee.onSiteChanged(site)
         assertTrue(testee.viewState.value!!.showIsMemberOfMajorNetwork)
     }
 
     @Test
     fun whenIsNotMemberOfMajorNetworkThenShowIsMemberOfMajorNetworkIsFalse() {
-        val site = site(entity = TdsEntity("", "", 0.0))
+        val site = site(entity = TestEntity("", "", 0.0))
         testee.onSiteChanged(site)
         assertFalse(testee.viewState.value!!.showIsMemberOfMajorNetwork)
     }

@@ -132,7 +132,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         privacyToggle.isChecked = enabled
     }
 
-    fun onScorecardClicked() {
+    private fun onScorecardClicked() {
         pixel.fire(PRIVACY_DASHBOARD_SCORECARD)
         startActivity(ScorecardActivity.intent(this, intent.tabId!!))
     }

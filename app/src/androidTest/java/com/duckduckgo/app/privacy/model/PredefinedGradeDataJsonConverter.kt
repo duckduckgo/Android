@@ -19,7 +19,6 @@ package com.duckduckgo.app.privacy.model
 import com.duckduckgo.app.privacy.model.PredefinedGradeDataJsonConverter.GradeTestCase.Input
 import com.duckduckgo.app.privacy.model.PredefinedGradeDataJsonConverter.GradeTestCase.Tracker
 import com.duckduckgo.app.trackerdetection.model.Entity
-import com.duckduckgo.app.trackerdetection.model.TdsEntity
 
 class PredefinedGradeDataJsonConverter {
 
@@ -69,6 +68,6 @@ fun PredefinedGradeDataJsonConverter.JsonGradeTestCase.toGradeTestCase(): Predef
 }
 
 private fun entity(name: String?, prevalence: Double?): Entity {
-    if (name == null) return TdsEntity("", "", 0.0)
-    return TdsEntity(name, name, prevalence ?: 0.0)
+    if (name == null) return TestEntity("", "", 0.0)
+    return TestEntity(name, name, prevalence ?: 0.0)
 }

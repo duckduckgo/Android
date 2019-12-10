@@ -27,9 +27,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import kotlinx.android.synthetic.main.item_tracker_network_element.view.*
 import kotlinx.android.synthetic.main.item_tracker_network_header.view.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -104,12 +107,9 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         return if (viewData[position] is Header) HEADER else ROW
     }
 
-    fun updateData(data: Map<String, List<TrackingEvent>>) {
-        val majorNetworkKeys = data.map { if (it.value.find { it.entity?.isMajor == true } != null) it.key else null }.filterNotNull()
-        val otherKeys = data.keys.filter { !majorNetworkKeys.contains(it) }.sorted()
-
+    fun updateData(data: SortedMap<Entity, List<TrackingEvent>>) {
         val oldViewData = viewData
-        val newViewData = generateViewData(majorNetworkKeys, data) + generateViewData(otherKeys, data)
+        val newViewData = generateViewData(data)
         val diffCallback = DiffCallback(oldViewData, newViewData)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
 
@@ -117,13 +117,11 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         diffResult.dispatchUpdatesTo(this)
     }
 
-    private fun generateViewData(keys: List<String>, data: Map<String, List<TrackingEvent>>): List<ViewData> {
+    private fun generateViewData(data: SortedMap<Entity, List<TrackingEvent>>): List<ViewData> {
         val viewData = ArrayList<ViewData>().toMutableList()
-        for (key: String in keys) {
-            val trackerEvents = data[key]
-            val displayName = trackerEvents?.first()?.entity?.displayName ?: key
-            viewData.add(Header(key, displayName))
-            trackerEvents?.mapTo(viewData) { Row(it) }
+        for ((entity: Entity, trackingEvents: List<TrackingEvent>) in data) {
+            viewData.add(Header(entity.name, entity.displayName))
+            trackingEvents?.mapTo(viewData) { Row(it) }
         }
         return viewData
     }

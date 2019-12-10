@@ -55,6 +55,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
+import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
@@ -64,7 +65,6 @@ import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.EntityLookup
-import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
@@ -333,7 +333,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenTrackerDetectedThenNetworkLeaderboardUpdated() {
-        val networkEntity = TdsEntity("Network1", "Network1", 10.0)
+        val networkEntity = TestEntity("Network1", "Network1", 10.0)
         val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), networkEntity, false)
         testee.trackerDetected(event)
         verify(mockNetworkLeaderboardDao).incrementNetworkCount("Network1")
@@ -517,7 +517,7 @@ class BrowserTabViewModelTest {
     fun whenEnoughTrackersDetectedThenPrivacyGradeIsUpdated() {
         val grade = testee.privacyGrade.value
         loadUrl("https://example.com")
-        val entity = TdsEntity("Network1", "Network1", 10.0)
+        val entity = TestEntity("Network1", "Network1", 10.0)
         for (i in 1..10) {
             testee.trackerDetected(TrackingEvent("https://example.com", "", null, entity, false))
         }

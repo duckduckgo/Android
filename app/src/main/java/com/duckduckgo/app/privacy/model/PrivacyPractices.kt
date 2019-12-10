@@ -58,13 +58,11 @@ class PrivacyPracticesImpl @Inject constructor(
             val url = it.name ?: return@forEach
             val derivedScore = it.derivedScore
 
-            entityLookup.entityForUrl(url)?.let {
-
-                val entityScore = entityScores[it.name]
+            entityLookup.entityForUrl(url)?.let { entity ->
+                val entityScore = entityScores[entity.name]
                 if (entityScore == null || entityScore < derivedScore) {
-                    entityScores[it.name] = derivedScore
+                    entityScores[entity.name] = derivedScore
                 }
-
             }
         }
 

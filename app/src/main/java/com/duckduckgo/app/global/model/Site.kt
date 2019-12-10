@@ -48,7 +48,6 @@ interface Site {
     val entity: Entity?
     val trackingEvents: List<TrackingEvent>
     val trackerCount: Int
-    val distinctTrackersByNetwork: Map<String, List<TrackingEvent>>
     val majorNetworkCount: Int
     val allTrackersBlocked: Boolean
     fun trackerDetected(event: TrackingEvent)
