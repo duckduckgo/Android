@@ -161,7 +161,7 @@ sealed class DaxDialogCta(
             return if (isFromSameNetworkDomain()) {
                 activity.resources.getString(R.string.daxMainNetworkStep1CtaText, network)
             } else {
-                activity.resources.getString(R.string.daxMainNetworkStep1OwnedCtaText, Uri.parse(host).toDesktopUri().baseHost, network)
+                activity.resources.getString(R.string.daxMainNetworkStep1OwnedCtaText, Uri.parse(host).baseHost?.removePrefix("m."), network)
             }
         }
 
