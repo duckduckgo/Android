@@ -20,8 +20,15 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
+import com.duckduckgo.app.referral.ParsedReferrerResult
+import kotlinx.coroutines.withTimeoutOrNull
+import timber.log.Timber
 
-class LaunchViewModel(onboardingStore: OnboardingStore, referralStateListener: AppInstallationReferrerStateListener) : ViewModel() {
+class LaunchViewModel(
+    private val onboardingStore: OnboardingStore,
+    private val appReferrerStateListener: AppInstallationReferrerStateListener
+) :
+    ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
@@ -30,11 +37,33 @@ class LaunchViewModel(onboardingStore: OnboardingStore, referralStateListener: A
         data class Home(val replaceExistingSearch: Boolean = false) : Command()
     }
 
-    init {
+    suspend fun determineViewToShow() {
+        val referrer = withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) {
+            Timber.d("Waiting for referrer")
+            return@withTimeoutOrNull appReferrerStateListener.retrieveReferralCode()
+        }
+
+        when (referrer) {
+            is ParsedReferrerResult.ReferrerFound -> {
+                Timber.i("Referrer information delivered; matching campaign suffix is ${referrer.campaignSuffix}")
+            }
+            is ParsedReferrerResult.ReferrerNotFound -> {
+                Timber.i("Referrer information delivered but no matching campaign suffix")
+            }
+            is ParsedReferrerResult.ParseFailure -> {
+                Timber.w("Failure to parse referrer data ${referrer.reason}")
+            }
+            null -> Timber.w("Timed out waiting for referrer data")
+        }
+
         if (onboardingStore.shouldShow) {
             command.value = Command.Onboarding
         } else {
             command.value = Command.Home()
         }
+    }
+
+    companion object {
+        private const val MAX_REFERRER_WAIT_TIME_MS = 1_500L
     }
 }

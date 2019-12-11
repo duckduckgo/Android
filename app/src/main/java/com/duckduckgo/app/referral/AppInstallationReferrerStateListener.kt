@@ -27,6 +27,7 @@ import com.duckduckgo.app.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_P
 import com.duckduckgo.app.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_REFERRAL_SERVICE
 import com.duckduckgo.app.referral.ParseFailureReason.*
 import com.duckduckgo.app.referral.ParsedReferrerResult.*
+import com.duckduckgo.app.statistics.VariantManager
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import javax.inject.Inject
@@ -42,7 +43,8 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
     val context: Context,
     private val packageManager: PackageManager,
     private val appInstallationReferrerParser: AppInstallationReferrerParser,
-    private val appReferrerDataStore: AppReferrerDataStore
+    private val appReferrerDataStore: AppReferrerDataStore,
+    private val variantManager: VariantManager
 ) : InstallReferrerStateListener, AppInstallationReferrerStateListener {
 
     private val referralClient = InstallReferrerClient.newBuilder(context).build()
@@ -144,7 +146,9 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
         referralResult = result
 
         if (result is ReferrerFound) {
+            variantManager.updateAppReferrerVariant(result.campaignSuffix)
             appReferrerDataStore.campaignSuffix = result.campaignSuffix
+
         }
         appReferrerDataStore.referrerCheckedPreviously = true
     }
