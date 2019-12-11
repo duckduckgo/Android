@@ -38,10 +38,13 @@ class LaunchViewModel(
     }
 
     suspend fun determineViewToShow() {
+        val startTime = System.currentTimeMillis()
         val referrer = withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) {
             Timber.d("Waiting for referrer")
             return@withTimeoutOrNull appReferrerStateListener.retrieveReferralCode()
         }
+
+        Timber.d("Waiting ${System.currentTimeMillis() - startTime}ms for referrer")
 
         when (referrer) {
             is ParsedReferrerResult.ReferrerFound -> {
