@@ -117,7 +117,7 @@ class LaunchViewModelTest {
     }
 
     class StubAppReferrerFoundStateListener(private val referrer: String, private val mockDelayMs: Long = 0) : AppInstallationReferrerStateListener {
-        override suspend fun retrieveReferralCode(): ParsedReferrerResult {
+        override suspend fun waitForReferrerCode(): ParsedReferrerResult {
             if (mockDelayMs > 0) delay(mockDelayMs)
 
             return ParsedReferrerResult.ReferrerFound(referrer)

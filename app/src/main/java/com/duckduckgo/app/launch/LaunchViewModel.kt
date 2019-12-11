@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
+import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
 import com.duckduckgo.app.referral.ParsedReferrerResult
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
@@ -41,7 +42,7 @@ class LaunchViewModel(
         val startTime = System.currentTimeMillis()
         val referrer = withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) {
             Timber.d("Waiting for referrer")
-            return@withTimeoutOrNull appReferrerStateListener.retrieveReferralCode()
+            return@withTimeoutOrNull appReferrerStateListener.waitForReferrerCode()
         }
 
         Timber.d("Waiting ${System.currentTimeMillis() - startTime}ms for referrer")
@@ -64,9 +65,5 @@ class LaunchViewModel(
         } else {
             command.value = Command.Home()
         }
-    }
-
-    companion object {
-        private const val MAX_REFERRER_WAIT_TIME_MS = 1_500L
     }
 }

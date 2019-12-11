@@ -107,6 +107,7 @@ class ExperimentationVariantManager(
     }
 
     override fun updateAppReferrerVariant(variant: String) {
+        Timber.i("Updating variant for app referer: $variant")
         store.variant = variant
         store.referrerVariant = variant
     }

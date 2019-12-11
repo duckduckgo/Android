@@ -35,7 +35,11 @@ import javax.inject.Inject
 interface AppInstallationReferrerStateListener {
 
     fun initialiseReferralRetrieval()
-    suspend fun retrieveReferralCode(): ParsedReferrerResult
+    suspend fun waitForReferrerCode(): ParsedReferrerResult
+
+    companion object {
+        const val MAX_REFERRER_WAIT_TIME_MS = 1_500L
+    }
 
 }
 
@@ -114,9 +118,9 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
      *
      * It is the caller's responsibility to guard against this function not returning a result in a timely manner, or not returning a result ever.
      */
-    override suspend fun retrieveReferralCode(): ParsedReferrerResult {
+    override suspend fun waitForReferrerCode(): ParsedReferrerResult {
         if (referralResult != ReferrerInitialising) {
-            Timber.i("Referrer already determined; immediately answering")
+            Timber.d("Referrer already determined; immediately answering")
             return referralResult
         }
 

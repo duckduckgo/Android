@@ -44,6 +44,7 @@ import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
 import com.duckduckgo.app.statistics.api.OfflinePixelSender
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -149,6 +150,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
 
     @Inject
     lateinit var referralStateListener: AppInstallationReferrerStateListener
+
+    @Inject
+    lateinit var atbInitializer: AtbInitializer
 
     private var launchedByFireAction: Boolean = false
 
@@ -288,12 +292,10 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onAppResumed() {
         notificationRegistrar.updateStatus()
-        GlobalScope.launch { notificationScheduler.scheduleNextNotification() }
+        GlobalScope.launch {
+            notificationScheduler.scheduleNextNotification()
 
-        if (statisticsDataStore.hasInstallationStatistics) {
-            statisticsUpdater.refreshAppRetentionAtb()
-        } else {
-            statisticsUpdater.initializeAtb()
+            atbInitializer.initializeAfterReferrerAvailable()
         }
     }
 
