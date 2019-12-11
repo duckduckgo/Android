@@ -45,6 +45,7 @@ class DaxDialog(
     private var onAnimationFinished: () -> Unit = {}
     private var primaryCtaClickListener: () -> Unit = { dismiss() }
     private var hideClickListener: () -> Unit = { dismiss() }
+    private var dismissListener: () -> Unit = { dismiss() }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.content_dax_dialog, container, false)
@@ -74,9 +75,10 @@ class DaxDialog(
         dialogText.startTypingAnimation(daxText, true, onAnimationFinished)
     }
 
-    override fun onCancel(dialog: DialogInterface) {
+    override fun onDismiss(dialog: DialogInterface) {
         dialogText.cancelAnimation()
-        super.onCancel(dialog)
+        dismissListener()
+        super.onDismiss(dialog)
     }
 
     fun setDialogAndStartAnimation() {
@@ -95,6 +97,10 @@ class DaxDialog(
 
     fun setHideClickListener(clickListener: () -> Unit) {
         hideClickListener = clickListener
+    }
+
+    fun setDismissListener(clickListener: () -> Unit) {
+        dismissListener = clickListener
     }
 
     fun startHighlightViewAnimation(targetView: View, duration: Long = 400, timesBigger: Float = 0f) {

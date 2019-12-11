@@ -232,6 +232,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private var alertDialog: AlertDialog? = null
 
+    private var daxDialog: DaxDialog? = null
+
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
@@ -408,6 +410,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private fun navigate(url: String) {
         hideKeyboard()
         renderer.hideFindInPage()
+        viewModel.registerDaxBubbleCtaShown()
         webView?.loadUrl(url)
     }
 
@@ -1090,7 +1093,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private var lastSeenBrowserViewState: BrowserViewState? = null
         private var lastSeenGlobalViewState: GlobalLayoutViewState? = null
         private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
-        private var lastSeenCtaViewState: CtaViewModel.CtaViewState? = null
+        private var lastSeenCtaViewState: CtaViewState? = null
 
         fun renderAutocomplete(viewState: AutoCompleteViewState) {
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
@@ -1181,7 +1184,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     withDelay(1000) {
                         if (lastSeenOmnibarViewState?.isEditing != true) {
                             if (loadingAnimation.isRunning) {
-                                Timber.d("MARCOS cancel loading animation")
                                 loadingAnimation.end()
                             }
                             genericDelay = 3000L
@@ -1198,22 +1200,19 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                                 }
                             }
                         }
-                        ctaViewModel.refreshCta(viewModel.siteLiveData.value)
+                        viewModel.refreshCta(false)
                     }
                 }
             }
         }
 
         fun cancelTrackersAnimation() {
-            Timber.d("MARCOS cancel trackers animation")
             typingAnimationJob?.cancel()
             typingAnimationJob = null
             if (loadingAnimation.isRunning) {
-                Timber.d("MARCOS cancel loading animation")
                 loadingAnimation.end()
             }
             if (finishAnimation.isRunning) {
-                Timber.d("MARCOS cancel finish animation")
                 finishAnimation.end()
 
             }
@@ -1423,7 +1422,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
         }
 
-        fun renderCtaViewState(viewState: CtaViewModel.CtaViewState) {
+        fun renderCtaViewState(viewState: CtaViewState) {
             renderIfChanged(viewState, lastSeenCtaViewState) {
                 ddgLogo.show()
                 lastSeenCtaViewState = viewState
@@ -1442,49 +1441,62 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 is DaxBubbleCta -> showDaxCta(configuration)
                 is DaxDialogCta -> showDaxDialogCta(configuration)
             }
-            ctaViewModel.onCtaShown()
+
+            if (configuration !is DaxBubbleCta) {
+                viewModel.onCtaShown()
+            }
         }
 
         private fun showDaxDialogCta(configuration: DaxDialogCta) {
             hideHomeCta()
             hideDaxCta()
             activity?.let { activity ->
-                configuration.apply(activity).apply {
-                    setHideClickListener {
-                        dismiss()
-                        launchHideTipsDialog(activity)
-                    }
-                    show(activity.supportFragmentManager, "DaxDialog")
-                    ctaViewModel.registerDaxCtaShown()
-                    if (configuration is DaxDialogCta.DaxMainNetworkCta) {
-                        setPrimaryCTAClickListener {
-                            ctaViewModel.onCtaLaunched()
-                            configuration.ctaPixelParam = Pixel.PixelValues.DAX_NETWORK_CTA_2
-                            val firstParagraph = configuration.firstParagraph(activity)
-                            daxText = activity.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph, configuration.getNetworkName())
-                            buttonText = activity.resources.getString(R.string.daxDialogGotIt)
-                            setPrimaryCTAClickListener { dismiss() }
-                            setDialogAndStartAnimation()
+                val isShowing = daxDialog?.dialog?.isShowing
+                if (isShowing != true) {
+                    daxDialog = configuration.apply(activity).apply {
+                        setDismissListener {
+                            viewModel.onUserDismissedCta()
                         }
-                    } else {
-                        setPrimaryCTAClickListener {
+                        setHideClickListener {
                             dismiss()
-                            ctaViewModel.onCtaLaunched()
+                            launchHideTipsDialog(activity, configuration)
+                        }
+                        if (configuration is DaxDialogCta.DaxMainNetworkCta) {
+                            setPrimaryCTAClickListener {
+                                viewModel.onUserClickCtaOkButton()
+                                configuration.ctaPixelParam = Pixel.PixelValues.DAX_NETWORK_CTA_2
+                                viewModel.onManualCtaShown(configuration)
+                                val firstParagraph = configuration.firstParagraph(activity)
+                                daxText =
+                                    activity.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph, configuration.getNetworkName())
+                                buttonText = activity.resources.getString(R.string.daxDialogGotIt)
+
+                                setPrimaryCTAClickListener {
+                                    viewModel.onUserClickCtaOkButton()
+                                    dismiss()
+                                }
+                                setDialogAndStartAnimation()
+                            }
+                        } else {
+                            setPrimaryCTAClickListener {
+                                viewModel.onUserClickCtaOkButton()
+                                dismiss()
+                            }
                         }
                     }
+                    daxDialog?.show(activity.supportFragmentManager, "DaxDialog")
                 }
             }
         }
 
-        private fun launchHideTipsDialog(context: Context) {
+        private fun launchHideTipsDialog(context: Context, cta: Cta) {
             AlertDialog.Builder(context)
                 .setTitle(R.string.hideTipsTitle)
                 .setMessage(getString(R.string.hideTipsText))
                 .setPositiveButton(R.string.hideTipsButton) { dialog, _ ->
                     dialog.dismiss()
-                    ctaViewModel.onCtaDismissed()
                     launch {
-                        ctaViewModel.hideTipsForever()
+                        ctaViewModel.hideTipsForever(cta)
                     }
                 }
                 .setNegativeButton(android.R.string.no) { dialog, _ ->
@@ -1494,13 +1506,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         private fun showDaxCta(configuration: DaxBubbleCta) {
+            daxCtaContainer.alpha = 1f
+            daxCtaContainer.show()
             ddgLogo.hide()
             hideHomeCta()
-            daxDialog.show()
-            configuration.afterAnimation = {
-                ctaViewModel.registerDaxCtaShown()
-            }
-            configuration.apply(daxDialog)
+            configuration.apply(daxCtaContainer)
         }
 
         private fun showHomeCta(configuration: HomePanelCta) {
@@ -1514,7 +1524,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         private fun hideDaxCta() {
             dialogText.cancelAnimation()
-            daxDialog.gone()
+            daxCtaContainer.hide()
         }
 
         private fun hideHomeCta() {
@@ -1533,7 +1543,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
             configuration.apply(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {
-                viewModel.onUserLaunchedCta()
+                viewModel.onUserClickCtaOkButton()
             }
 
             ctaContainer.ctaDismissButton.setOnClickListener {

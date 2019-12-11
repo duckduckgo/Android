@@ -49,6 +49,7 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
+import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.global.*
@@ -106,6 +107,10 @@ class BrowserTabViewModel(
 
     data class GlobalLayoutViewState(
         val isNewTabState: Boolean = true
+    )
+
+    data class CtaViewState(
+        val cta: Cta? = null
     )
 
     data class BrowserViewState(
@@ -190,7 +195,7 @@ class BrowserTabViewModel(
     val loadingViewState: MutableLiveData<LoadingViewState> = MutableLiveData()
     val omnibarViewState: MutableLiveData<OmnibarViewState> = MutableLiveData()
     val findInPageViewState: MutableLiveData<FindInPageViewState> = MutableLiveData()
-    val ctaViewState: MutableLiveData<CtaViewModel.CtaViewState> = ctaViewModel.ctaViewState
+    val ctaViewState: MutableLiveData<CtaViewState> = MutableLiveData()
 
     var skipHome = false
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
@@ -293,7 +298,7 @@ class BrowserTabViewModel(
 
     fun onViewVisible() {
         command.value = if (!currentBrowserViewState().browserShowing) ShowKeyboard else HideKeyboard
-        ctaViewModel.refreshCta()
+        refreshCta(true)
     }
 
     fun onViewHidden() {
@@ -588,6 +593,7 @@ class BrowserTabViewModel(
     private fun currentFindInPageViewState(): FindInPageViewState = findInPageViewState.value!!
     private fun currentOmnibarViewState(): OmnibarViewState = omnibarViewState.value!!
     private fun currentLoadingViewState(): LoadingViewState = loadingViewState.value!!
+    private fun currentCtaViewState(): CtaViewState = ctaViewState.value!!
 
     fun onOmnibarInputStateChanged(query: String, hasFocus: Boolean, hasQueryChanged: Boolean) {
 
@@ -753,6 +759,7 @@ class BrowserTabViewModel(
         autoCompleteViewState.value = AutoCompleteViewState()
         omnibarViewState.value = OmnibarViewState()
         findInPageViewState.value = FindInPageViewState()
+        ctaViewState.value = CtaViewState()
     }
 
     fun onShareSelected() {
@@ -827,22 +834,51 @@ class BrowserTabViewModel(
     }
 
     fun onSurveyChanged(survey: Survey?) {
-        ctaViewModel.onSurveyChanged(survey)
+        val activeSurvey = ctaViewModel.onSurveyChanged(survey)
+        if (activeSurvey != null) {
+            refreshCta(true)
+        }
     }
 
-    fun onUserLaunchedCta() {
+    fun onCtaShown() {
         val cta = ctaViewState.value?.cta ?: return
+        ctaViewModel.onCtaShown(cta)
+    }
+
+    fun onManualCtaShown(cta: Cta) {
+        ctaViewModel.onCtaShown(cta)
+    }
+
+    fun refreshCta(isNewTab: Boolean) {
+        viewModelScope.launch {
+            val cta = withContext(dispatchers.io()) {
+                ctaViewModel.refreshCta(dispatchers.io(), isNewTab, siteLiveData.value)
+            }
+            ctaViewState.postValue(currentCtaViewState().copy(cta = cta))
+        }
+    }
+
+    fun registerDaxBubbleCtaShown() {
+        val cta = ctaViewState.value?.cta ?: return
+        ctaViewModel.registerDaxBubbleCtaShown(cta)
+    }
+
+    fun onUserClickCtaOkButton() {
+        val cta = ctaViewState.value?.cta ?: return
+        ctaViewModel.onUserClickCtaOkButton(cta)
         command.value = when (cta) {
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto -> LaunchAddWidget
             is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
             else -> return
         }
-        ctaViewModel.onCtaLaunched()
     }
 
     fun onUserDismissedCta() {
-        ctaViewModel.onCtaDismissed()
+        val cta = ctaViewState.value?.cta ?: return
+
+        ctaViewModel.onUserDismissedCta(cta)
+        ctaViewState.postValue(currentCtaViewState().copy(cta = null))
     }
 
     fun updateTabPreview(tabId: String, fileName: String) {

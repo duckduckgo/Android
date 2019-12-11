@@ -15,7 +15,7 @@
   ~ limitations under the License.
   -->
 <androidx.constraintlayout.widget.ConstraintLayout
-    android:id="@+id/daxDialog"
+    android:id="@+id/daxCtaContainer"
     android:alpha="0"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

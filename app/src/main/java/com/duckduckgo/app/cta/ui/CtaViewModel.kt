@@ -18,7 +18,6 @@ package com.duckduckgo.app.cta.ui
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -34,9 +33,10 @@ import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.CoroutineContext
 
 @Singleton
 class CtaViewModel @Inject constructor(
@@ -50,57 +50,42 @@ class CtaViewModel @Inject constructor(
     private val onboardingStore: OnboardingStore
 ) {
 
-    data class CtaViewState(
-        val cta: Cta? = null
-    )
-
-    val ctaViewState: MutableLiveData<CtaViewState> = MutableLiveData()
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
-
-    private val currentViewState: CtaViewState
-        get() = ctaViewState.value!!
 
     private var activeSurvey: Survey? = null
 
-    init {
-        ctaViewState.value = CtaViewState()
-    }
-
-    fun onSurveyChanged(survey: Survey?) {
+    fun onSurveyChanged(survey: Survey?): Survey? {
         activeSurvey = survey
-        if (activeSurvey != null) {
-            refreshCta()
-        }
+        return activeSurvey
     }
 
-    fun refreshCta(site: Site? = null) {
+    suspend fun refreshCta(dispatcher: CoroutineContext, isNewTab: Boolean, site: Site? = null): Cta? {
         surveyCta()?.let {
-            ctaViewState.postValue(currentViewState.copy(cta = it))
-            return
+            return it
         }
 
-        Schedulers.io().scheduleDirect {
+        return withContext(dispatcher) {
             when {
-                canShowDaxIntroCta() -> {
-                    ctaViewState.postValue(currentViewState.copy(cta = DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)))
+                canShowDaxIntroCta() && isNewTab -> {
+                    DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
                 }
-                canShowDaxCtaEndOfJourney(site) -> {
-                    ctaViewState.postValue(currentViewState.copy(cta = DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)))
+                canShowDaxCtaEndOfJourney(site) && isNewTab -> {
+                    DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
                 }
-                shouldShowDaxCta(site) != null -> {
-                    ctaViewState.postValue(currentViewState.copy(cta = shouldShowDaxCta(site)))
+                shouldShowDaxCta(site) != null && !isNewTab -> {
+                    shouldShowDaxCta(site)
                 }
-                canShowWidgetCta() -> {
-                    val ctaType = if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
-                    ctaViewState.postValue(currentViewState.copy(cta = ctaType))
+                canShowWidgetCta() && isNewTab -> {
+                    if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
                 }
-                else -> ctaViewState.postValue(currentViewState.copy(cta = null))
+                else -> null
             }
         }
     }
 
-    fun hideTipsForever() {
+    fun hideTipsForever(cta: Cta) {
         settingsDataStore.hideTips = true
+        pixel.fire(Pixel.PixelName.ONBOARDING_DAX_ALL_CTA_HIDDEN, cta.pixelCancelParameters())
     }
 
     private fun surveyCta(): HomePanelCta.Survey? {
@@ -170,26 +155,22 @@ class CtaViewModel @Inject constructor(
         return null
     }
 
-    fun onCtaShown() {
-        val cta = currentViewState.cta ?: return
+    fun onCtaShown(cta: Cta) {
         cta.shownPixel?.let {
             pixel.fire(it, cta.pixelShownParameters())
         }
     }
 
-    fun registerDaxCtaShown() {
-        val cta = currentViewState.cta ?: return
+    fun registerDaxBubbleCtaShown(cta: Cta) {
         Schedulers.io().scheduleDirect {
-            if (cta is DaxBubbleCta || cta is DaxDialogCta ) {
+            if (cta is DaxBubbleCta) {
+                onCtaShown(cta)
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
-                Timber.d("Marcos dismissed ${cta.ctaId}")
-                return@scheduleDirect
             }
         }
     }
 
-    fun onCtaDismissed() {
-        val cta = currentViewState.cta ?: return
+    fun onUserDismissedCta(cta: Cta) {
         cta.cancelPixel?.let {
             pixel.fire(it, cta.pixelCancelParameters())
         }
@@ -200,23 +181,18 @@ class CtaViewModel @Inject constructor(
                     activeSurvey = null
                     surveyDao.cancelScheduledSurveys()
                 }
-                is DaxBubbleCta, is DaxDialogCta -> {
-                    //dismissedCtaDao.insert(DismissedCta(cta.ctaId))
-                    //Timber.d("Marcos dismissed ${cta.ctaId}")
-                    return@scheduleDirect
-                }
                 else -> {
                     dismissedCtaDao.insert(DismissedCta(cta.ctaId))
                 }
             }
-            ctaViewState.postValue(currentViewState.copy(cta = null))
-            refreshCta()
+            //ctaViewState.postValue(currentViewState.copy(cta = null))
+            //refreshCta()
         }
     }
 
-    fun onCtaLaunched() {
-        currentViewState.cta?.okPixel?.let {
-            pixel.fire(it)
+    fun onUserClickCtaOkButton(cta: Cta) {
+        cta.okPixel?.let {
+            pixel.fire(it, cta.pixelOkParameters())
         }
     }
 }

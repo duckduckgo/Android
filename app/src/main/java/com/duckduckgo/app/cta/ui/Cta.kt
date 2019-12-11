@@ -28,6 +28,7 @@ import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.view.DaxDialog
 import com.duckduckgo.app.global.view.hide
 import com.duckduckgo.app.global.view.html
+import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -90,7 +91,7 @@ sealed class DaxDialogCta(
         R.string.daxDialogPhew,
         Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
         Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-        Pixel.PixelName.ONBOARDING_DAX_ALL_CTA_HIDDEN,
+        null,
         Pixel.PixelValues.DAX_SERP_CTA,
         onboarding,
         appStore
@@ -103,15 +104,15 @@ sealed class DaxDialogCta(
             R.string.daxDialogHighFive,
             Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
             Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-            Pixel.PixelName.ONBOARDING_DAX_ALL_CTA_HIDDEN,
+            null,
             Pixel.PixelValues.DAX_TRACKERS_BLOCKED_CTA,
             onboarding,
             appStore
         ) {
         override fun getDaxText(activity: FragmentActivity): String {
             val trackersFiltered = trackers.asSequence()
-                .filter { MAIN_TRACKER_NETWORKS.contains(it.trackerNetwork?.name) }
-                .map { MAIN_TRACKER_NETWORKS_NAMES[it.trackerNetwork?.name] }
+                .filter { it.trackerNetwork?.isMajor == true }
+                .map { it.trackerNetwork?.name }
                 .distinct()
                 .take(MAX_TRACKERS_SHOWS)
                 .toList()
@@ -134,7 +135,7 @@ sealed class DaxDialogCta(
         R.string.daxDialogNext,
         Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
         Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-        Pixel.PixelName.ONBOARDING_DAX_ALL_CTA_HIDDEN,
+        null,
         Pixel.PixelValues.DAX_NETWORK_CTA_1,
         onboarding,
         appStore
@@ -149,7 +150,7 @@ sealed class DaxDialogCta(
         }
 
         override fun getDaxText(activity: FragmentActivity): String {
-            val isFromSameNetworkDomain = MAIN_TRACKER_DOMAINS.filter { host.contains(it) }.isNotEmpty()
+            val isFromSameNetworkDomain = MAIN_TRACKER_DOMAINS.any { host.contains(it) }
 
             return if (isFromSameNetworkDomain) {
                 activity.resources.getString(description, "This website", getNetworkName())
@@ -169,7 +170,7 @@ sealed class DaxDialogCta(
         R.string.daxDialogGotIt,
         Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
         Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-        Pixel.PixelName.ONBOARDING_DAX_ALL_CTA_HIDDEN,
+        null,
         Pixel.PixelValues.DAX_NO_TRACKERS_CTA,
         onboarding,
         appStore
@@ -189,10 +190,10 @@ sealed class DaxDialogCta(
         private const val TAG = "DaxDialog"
         private const val MAX_TRACKERS_SHOWS = 2
         const val SERP = "duckduckgo"
-        val MAIN_TRACKER_DOMAINS = listOf("facebook", "amazon", "twitter", "google")
-        val MAIN_TRACKER_NETWORKS = listOf("Facebook", "Amazon.com", "Twitter", "Google")
+        val MAIN_TRACKER_DOMAINS = listOf("facebook", "google")
+        val MAIN_TRACKER_NETWORKS = listOf("Facebook", "Google")
         val MAIN_TRACKER_NETWORKS_NAMES =
-            mapOf(Pair("Facebook", "Facebook"), Pair("Amazon.com", "Amazon"), Pair("Twitter", "Twitter"), Pair("Google", "Google"))
+            mapOf(Pair("Facebook", "Facebook"), Pair("Google", "Google"))
         val NETWORK_PROPERTY_PERCENTAGES = mapOf(Pair("Google", "90%"), Pair("Facebook", "40%"))
     }
 }
@@ -233,7 +234,7 @@ sealed class DaxBubbleCta(
         R.string.daxIntroCtaText,
         Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
         Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-        Pixel.PixelName.ONBOARDING_DAX_ALL_CTA_HIDDEN,
+        null,
         Pixel.PixelValues.DAX_INITIAL_CTA,
         onboarding,
         appStore
@@ -244,7 +245,7 @@ sealed class DaxBubbleCta(
         R.string.daxEndCtaText,
         Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
         Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-        Pixel.PixelName.ONBOARDING_DAX_ALL_CTA_HIDDEN,
+        null,
         Pixel.PixelValues.DAX_END_CTA,
         onboarding,
         appStore
@@ -252,6 +253,7 @@ sealed class DaxBubbleCta(
 
     fun apply(view: View) {
         val daxText = view.context.getString(description)
+        view.show()
         view.alpha = 1f
         view.hiddenText.text = daxText.html(view.context)
         view.primaryCta.hide()

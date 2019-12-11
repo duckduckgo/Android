@@ -50,7 +50,7 @@ class WelcomePage : OnboardingPageFragment() {
             .setDuration(400)
             .setStartDelay(1000)
             .withEndAction {
-                ViewCompat.animate(daxDialog)
+                ViewCompat.animate(daxCtaContainer)
                     .alpha(1f)
                     .setDuration(400)
                     .withEndAction {
