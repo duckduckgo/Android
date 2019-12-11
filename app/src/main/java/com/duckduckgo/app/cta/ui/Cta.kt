@@ -109,10 +109,14 @@ sealed class DaxDialogCta(
             onboarding,
             appStore
         ) {
+
+        override fun createDialog(activity: FragmentActivity): DaxDialog =
+            DaxDialog(getDaxText(activity), activity.resources.getString(okButton), false)
+
         override fun getDaxText(activity: FragmentActivity): String {
             val trackersFiltered = trackers.asSequence()
                 .filter { it.trackerNetwork?.isMajor == true }
-                .map { it.trackerNetwork?.name }
+                .map { MAIN_TRACKER_NETWORKS_NAMES[it.trackerNetwork?.name] ?: it.trackerNetwork?.name }
                 .distinct()
                 .take(MAX_TRACKERS_SHOWS)
                 .toList()
@@ -140,22 +144,21 @@ sealed class DaxDialogCta(
         onboarding,
         appStore
     ) {
-        fun getNetworkName(): String? = MAIN_TRACKER_NETWORKS_NAMES[network]
 
         fun firstParagraph(activity: FragmentActivity): String {
             val percentage = NETWORK_PROPERTY_PERCENTAGES[network]
             return if (percentage != null)
-                activity.resources.getString(R.string.daxMainNetworkStep21CtaText, getNetworkName(), percentage)
-            else activity.resources.getString(R.string.daxMainNetworkStep211CtaText, getNetworkName())
+                activity.resources.getString(R.string.daxMainNetworkStep21CtaText, network, percentage)
+            else activity.resources.getString(R.string.daxMainNetworkStep211CtaText, network)
         }
 
         override fun getDaxText(activity: FragmentActivity): String {
             val isFromSameNetworkDomain = MAIN_TRACKER_DOMAINS.any { host.contains(it) }
 
             return if (isFromSameNetworkDomain) {
-                activity.resources.getString(description, "This website", getNetworkName())
+                activity.resources.getString(description, "This website", network)
             } else {
-                activity.resources.getString(description, host.removePrefix("www."), getNetworkName())
+                activity.resources.getString(description, host.removePrefix("www."), network)
             }
         }
 
@@ -192,8 +195,7 @@ sealed class DaxDialogCta(
         const val SERP = "duckduckgo"
         val MAIN_TRACKER_DOMAINS = listOf("facebook", "google")
         val MAIN_TRACKER_NETWORKS = listOf("Facebook", "Google")
-        val MAIN_TRACKER_NETWORKS_NAMES =
-            mapOf(Pair("Facebook", "Facebook"), Pair("Google", "Google"))
+        val MAIN_TRACKER_NETWORKS_NAMES = mapOf(Pair("Amazon.com", "Amazon"))
         val NETWORK_PROPERTY_PERCENTAGES = mapOf(Pair("Google", "90%"), Pair("Facebook", "40%"))
     }
 }

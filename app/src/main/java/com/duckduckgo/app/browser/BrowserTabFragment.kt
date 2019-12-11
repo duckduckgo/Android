@@ -1181,7 +1181,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 }
 
                 if (viewState.progress == 100) {
-                    withDelay(1000) {
+                    launch {
+                        delay(700)
+                        viewModel.refreshCta(false)
+                        delay(300)
                         if (lastSeenOmnibarViewState?.isEditing != true) {
                             if (loadingAnimation.isRunning) {
                                 loadingAnimation.end()
@@ -1193,16 +1196,32 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                             if (!finishAnimation.isRunning) {
                                 typingAnimationJob?.cancel()
                                 typingAnimationJob = null
-                                finishAnimation = AnimatorSet().apply {
-                                    play(runAnimations())
-                                    play(fadeLogosOut).after(genericDelay).before(animateOmnibarIn)
-                                    start()
+                                Timber.d("Marcos cta is ${viewModel.ctaViewState.value?.cta}")
+                                finishAnimation = if (lastSeenCtaViewState?.cta is DaxDialogCta.DaxTrackersBlockedCta) {
+                                    AnimatorSet().apply {
+                                        play(runAnimations())
+                                        start()
+                                    }
+                                } else {
+                                    AnimatorSet().apply {
+                                        play(runAnimations())
+                                        play(fadeLogosOut).after(genericDelay).before(animateOmnibarIn)
+                                        start()
+                                    }
                                 }
                             }
                         }
-                        viewModel.refreshCta(false)
                     }
                 }
+            }
+        }
+
+        private fun finishTrackerAnimation() {
+            val animateOmnibarIn = animateOmnibarIn()
+            val fadeLogosOut = animateFadeOut(networksContainer)
+            finishAnimation = AnimatorSet().apply {
+                play(fadeLogosOut).before(animateOmnibarIn)
+                start()
             }
         }
 
@@ -1311,10 +1330,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             return AnimatorSet().apply {
                 play(fadeLogosIn).after(fadeLoadingOut)
             }
-        }
-
-        fun withDelay(delay: Long, block: () -> Unit) {
-            Handler().postDelayed(Runnable(block), delay)
         }
 
         @SuppressLint("ObjectAnimatorBinding")
@@ -1454,8 +1469,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 val isShowing = daxDialog?.dialog?.isShowing
                 if (isShowing != true) {
                     daxDialog = configuration.apply(activity).apply {
-                        setDismissListener {
-                            viewModel.onUserDismissedCta()
+                        if (configuration is DaxDialogCta.DaxTrackersBlockedCta) {
+                            setDismissListener {
+                                finishTrackerAnimation()
+                                viewModel.onUserDismissedCta()
+                            }
+                        } else {
+                            setDismissListener {
+                                viewModel.onUserDismissedCta()
+                            }
                         }
                         setHideClickListener {
                             dismiss()
@@ -1468,7 +1490,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                                 viewModel.onManualCtaShown(configuration)
                                 val firstParagraph = configuration.firstParagraph(activity)
                                 daxText =
-                                    activity.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph, configuration.getNetworkName())
+                                    activity.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph, configuration.network)
                                 buttonText = activity.resources.getString(R.string.daxDialogGotIt)
 
                                 setPrimaryCTAClickListener {

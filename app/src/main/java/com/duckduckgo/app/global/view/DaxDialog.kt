@@ -34,10 +34,12 @@ import android.view.animation.OvershootInterpolator
 import android.view.animation.ScaleAnimation
 import android.widget.ImageView
 import android.widget.RelativeLayout
+import androidx.core.content.ContextCompat
 
 class DaxDialog(
     var daxText: String,
     var buttonText: String,
+    private val toolbarDimmed: Boolean = true,
     private val dismissible: Boolean = true,
     private val typingDelayInMs: Long = 20
 ) : DialogFragment() {
@@ -65,6 +67,7 @@ class DaxDialog(
 
     override fun onStart() {
         super.onStart()
+        dialog?.window?.attributes?.dimAmount = 0f
         dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
     }
 
@@ -138,6 +141,9 @@ class DaxDialog(
 
     private fun setDialog() {
         context?.let {
+            val toolbarColor =
+                if (toolbarDimmed) ContextCompat.getColor(it, R.color.dimmed) else ContextCompat.getColor(it, android.R.color.transparent)
+            toolbarDialogLayout.setBackgroundColor(toolbarColor)
             hiddenText.text = daxText.html(it)
             primaryCta.text = buttonText
             dialogText.typingDelayInMs = typingDelayInMs
