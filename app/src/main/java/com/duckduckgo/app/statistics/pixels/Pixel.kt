@@ -197,7 +197,7 @@ class ApiBasedPixel @Inject constructor(
         fireCompletable(pixelName, parameters)
             .subscribeOn(Schedulers.io())
             .subscribe({
-                Timber.v("Marcos Pixel sent: $pixelName with params: $parameters")
+                Timber.v("Pixel sent: $pixelName with params: $parameters")
             }, {
                 Timber.w("Pixel failed: $pixelName with params: $parameters")
             })

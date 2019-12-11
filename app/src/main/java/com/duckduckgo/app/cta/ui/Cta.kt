@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.cta.ui
 
+import android.net.Uri
 import android.view.View
 import androidx.annotation.AnyRes
 import androidx.annotation.DrawableRes
@@ -23,8 +24,10 @@ import androidx.annotation.StringRes
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
+import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.global.view.DaxDialog
 import com.duckduckgo.app.global.view.hide
 import com.duckduckgo.app.global.view.html
@@ -127,7 +130,7 @@ sealed class DaxDialogCta(
                 if (size == 0) {
                     activity.resources.getString(R.string.daxTrackersBlockedCtaZeroText, host.removePrefix("www."))
                 } else {
-                    activity.resources.getQuantityString(description, size, size, host.removePrefix("www."))
+                    activity.resources.getQuantityString(description, size, size, Uri.parse(host).toDesktopUri().baseHost)
                 }
             return "<b>$trackersText</b>$quantityString"
         }
@@ -152,18 +155,25 @@ sealed class DaxDialogCta(
             else activity.resources.getString(R.string.daxMainNetworkStep211CtaText, network)
         }
 
-        override fun getDaxText(activity: FragmentActivity): String {
-            val isFromSameNetworkDomain = MAIN_TRACKER_DOMAINS.any { host.contains(it) }
+        private fun isFromSameNetworkDomain() = MAIN_TRACKER_DOMAINS.any { host.contains(it) }
 
-            return if (isFromSameNetworkDomain) {
-                activity.resources.getString(description, "This website", network)
+        override fun getDaxText(activity: FragmentActivity): String {
+            return if (isFromSameNetworkDomain()) {
+                activity.resources.getString(R.string.daxMainNetworkStep1CtaText, network)
             } else {
-                activity.resources.getString(description, host.removePrefix("www."), network)
+                activity.resources.getString(R.string.daxMainNetworkStep1OwnedCtaText, Uri.parse(host).toDesktopUri().baseHost, network)
             }
         }
 
         override fun createDialog(activity: FragmentActivity): DaxDialog {
-            return DaxDialog(getDaxText(activity), activity.resources.getString(okButton))
+            return DaxDialog(getDaxText(activity), activity.resources.getString(okButton)).apply {
+                val privacyGradeButton = activity.findViewById<View>(R.id.privacyGradeButton)
+                onAnimationFinishedListener {
+                    if (isFromSameNetworkDomain()) {
+                        startHighlightViewAnimation(privacyGradeButton, timesBigger = 0.7f)
+                    }
+                }
+            }
         }
     }
 

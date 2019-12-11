@@ -1492,7 +1492,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                                 daxText =
                                     activity.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph, configuration.network)
                                 buttonText = activity.resources.getString(R.string.daxDialogGotIt)
+                                onAnimationFinishedListener {
 
+                                }
                                 setPrimaryCTAClickListener {
                                     viewModel.onUserClickCtaOkButton()
                                     dismiss()
