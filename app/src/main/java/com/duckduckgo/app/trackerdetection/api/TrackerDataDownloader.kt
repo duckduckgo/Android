@@ -21,8 +21,6 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
-import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
-import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
 import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
 import com.duckduckgo.app.trackerdetection.model.TemporaryTrackingWhitelistedDomain
@@ -36,8 +34,6 @@ class TrackerDataDownloader @Inject constructor(
     private val binaryDataStore: BinaryDataStore,
     private val trackerDataLoader: TrackerDataLoader,
     private val tdsTrackerDao: TdsTrackerDao,
-    private val tdsEntityDao: TdsEntityDao,
-    private val tdsDomainEntityDao: TdsDomainEntityDao,
     private val temporaryTrackingWhitelistDao: TemporaryTrackingWhitelistDao,
     private val appDatabase: AppDatabase
 ) {
@@ -51,23 +47,19 @@ class TrackerDataDownloader @Inject constructor(
             val call = trackerListService.tds()
             val response = call.execute()
 
+            if (!response.isSuccessful) {
+                throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
+            }
             if (response.isCached && tdsTrackerDao.count() != 0) {
                 Timber.d("Tds data already cached and stored")
                 return@fromAction
             }
 
-            if (response.isSuccessful) {
-                Timber.d("Updating tds data from server")
-                val body = response.body()!!
-
-                appDatabase.runInTransaction {
-                    tdsEntityDao.updateAll(body.jsonToEntities())
-                    tdsDomainEntityDao.updateAll(body.jsonToDomainEntities())
-                    tdsTrackerDao.updateAll(body.jsonToTrackers().values)
-                    trackerDataLoader.loadTdsTrackerData()
-                }
-            } else {
-                throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
+            Timber.d("Updating tds data from server")
+            val body = response.body()!!
+            appDatabase.runInTransaction {
+                trackerDataLoader.persistTds(body)
+                trackerDataLoader.loadTrackers()
             }
         }
     }
@@ -81,22 +73,20 @@ class TrackerDataDownloader @Inject constructor(
             val call = trackerListService.temporaryWhitelist()
             val response = call.execute()
 
+            if (!response.isSuccessful) {
+                throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
+            }
             if (response.isCached && temporaryTrackingWhitelistDao.count() != 0) {
                 Timber.d("Temporary whitelist data already cached and stored")
                 return@fromAction
             }
 
-            if (response.isSuccessful) {
-                Timber.d("Updating temporary tracking whitelist data from server")
-                val body = response.body()!!
+            Timber.d("Updating temporary tracking whitelist data from server")
+            val body = response.body()!!
 
-                appDatabase.runInTransaction {
-                    temporaryTrackingWhitelistDao.updateAll(body.lines().map { TemporaryTrackingWhitelistedDomain(it) })
-                    trackerDataLoader.loadTemporaryWhitelistData()
-                }
-
-            } else {
-                throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
+            appDatabase.runInTransaction {
+                temporaryTrackingWhitelistDao.updateAll(body.lines().map { TemporaryTrackingWhitelistedDomain(it) })
+                trackerDataLoader.loadTemporaryWhitelist()
             }
         }
     }
