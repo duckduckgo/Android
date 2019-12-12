@@ -25,8 +25,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.Theming.Constants.BROADCAST_THEME_CHANGED
 import com.duckduckgo.app.global.Theming.Constants.THEME_MAP
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
-
 
 enum class DuckDuckGoTheme {
     DARK,
@@ -35,13 +33,9 @@ enum class DuckDuckGoTheme {
 
 object Theming {
 
-    fun initializeTheme(settingsDataStore: SettingsDataStore, variantManager: VariantManager) {
+    fun initializeTheme(settingsDataStore: SettingsDataStore) {
         if (settingsDataStore.theme == null) {
-            if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.LightThemeExperiment)) {
-                settingsDataStore.theme = DuckDuckGoTheme.LIGHT
-            } else {
-                settingsDataStore.theme = DuckDuckGoTheme.DARK
-            }
+            settingsDataStore.theme = DuckDuckGoTheme.DARK
         }
     }
 

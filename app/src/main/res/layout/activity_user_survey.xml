@@ -24,6 +24,7 @@
     tools:context="com.duckduckgo.app.feedback.ui.common.FeedbackActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/surveyActivityContainerViewGroup"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/survey_background">

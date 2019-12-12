@@ -1,7 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Λογότυπο DuckDuckGo</string>
-    <string name="appDescription">Ιδιωτικότητα, απλοποιημένη</string>
     <string name="yes">Ναι</string>
     <string name="no">Οχι</string>
 

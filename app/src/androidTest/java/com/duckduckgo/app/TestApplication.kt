@@ -34,8 +34,4 @@ class TestApplication : DuckDuckGoApplication() {
             .build()
         daggerAppComponent.inject(this)
     }
-
-    // We don't need to actually use leak canary for tests
-    override fun installLeakCanary(): Boolean = true
-
 }

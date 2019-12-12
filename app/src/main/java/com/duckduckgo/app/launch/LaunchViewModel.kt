@@ -19,8 +19,9 @@ package com.duckduckgo.app.launch
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 
-class LaunchViewModel(onboardingStore: OnboardingStore) : ViewModel() {
+class LaunchViewModel(onboardingStore: OnboardingStore, referralStateListener: AppInstallationReferrerStateListener) : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
