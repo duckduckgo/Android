@@ -57,7 +57,7 @@ class LaunchViewModelTest {
     }
 
     @Test
-    fun whenOnboardingShouldShowAndReferrerDataReturnsQuicklyShouldShowThenCommandIsOnboarding() = runBlockingTest {
+    fun whenOnboardingShouldShowAndReferrerDataReturnsQuicklyThenCommandIsOnboarding() = runBlockingTest {
         testee = LaunchViewModel(onboardingStore, StubAppReferrerFoundStateListener("xx"))
         whenever(onboardingStore.shouldShow).thenReturn(true)
         testee.command.observeForever(mockCommandObserver)
@@ -68,7 +68,7 @@ class LaunchViewModelTest {
     }
 
     @Test
-    fun whenOnboardingShouldShowAndReferrerDataReturnsButNotInstantlyThenShouldShowThenCommandIsOnboarding() = runBlockingTest {
+    fun whenOnboardingShouldShowAndReferrerDataReturnsButNotInstantlyThenCommandIsOnboarding() = runBlockingTest {
         testee = LaunchViewModel(onboardingStore, StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000))
         whenever(onboardingStore.shouldShow).thenReturn(true)
         testee.command.observeForever(mockCommandObserver)
@@ -79,7 +79,7 @@ class LaunchViewModelTest {
     }
 
     @Test
-    fun whenOnboardingShouldShowAndReferrerDataTimesOutShouldShowThenCommandIsOnboarding() = runBlockingTest {
+    fun whenOnboardingShouldShowAndReferrerDataTimesOutThenCommandIsOnboarding() = runBlockingTest {
         testee = LaunchViewModel(onboardingStore, StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE))
         whenever(onboardingStore.shouldShow).thenReturn(true)
         testee.command.observeForever(mockCommandObserver)
@@ -90,7 +90,7 @@ class LaunchViewModelTest {
     }
 
     @Test
-    fun whenOnboardingShouldNotShowAndReferrerDataReturnsQuicklyShouldShowThenCommandIsHome() = runBlockingTest {
+    fun whenOnboardingShouldNotShowAndReferrerDataReturnsQuicklyThenCommandIsHome() = runBlockingTest {
         testee = LaunchViewModel(onboardingStore, StubAppReferrerFoundStateListener("xx"))
         whenever(onboardingStore.shouldShow).thenReturn(false)
         testee.command.observeForever(mockCommandObserver)
@@ -99,7 +99,7 @@ class LaunchViewModelTest {
     }
 
     @Test
-    fun whenOnboardingShouldNotShowAndReferrerDataReturnsButNotInstantlyThenShouldShowThenCommandIsHome() = runBlockingTest {
+    fun whenOnboardingShouldNotShowAndReferrerDataReturnsButNotInstantlyThenCommandIsHome() = runBlockingTest {
         testee = LaunchViewModel(onboardingStore, StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000))
         whenever(onboardingStore.shouldShow).thenReturn(false)
         testee.command.observeForever(mockCommandObserver)
@@ -108,7 +108,7 @@ class LaunchViewModelTest {
     }
 
     @Test
-    fun whenOnboardingShouldNotShowAndReferrerDataTimesOutThenShouldShowThenCommandIsHome() = runBlockingTest {
+    fun whenOnboardingShouldNotShowAndReferrerDataTimesOutThenCommandIsHome() = runBlockingTest {
         testee = LaunchViewModel(onboardingStore, StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE))
         whenever(onboardingStore.shouldShow).thenReturn(false)
         testee.command.observeForever(mockCommandObserver)
@@ -126,6 +126,4 @@ class LaunchViewModelTest {
         override fun initialiseReferralRetrieval() {
         }
     }
-
-
 }

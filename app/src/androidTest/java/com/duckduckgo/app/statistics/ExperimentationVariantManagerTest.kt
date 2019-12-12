@@ -131,7 +131,6 @@ class ExperimentationVariantManagerTest {
     @Test
     fun whenReferrerVariantSetWithNoActiveVariantsThenReferrerVariantReturned() {
         val referrerVariantKey = "xx"
-
         mockUpdateScenario(referrerVariantKey)
 
         val variant = testee.getVariant(emptyList())
@@ -141,7 +140,6 @@ class ExperimentationVariantManagerTest {
     @Test
     fun whenReferrerVariantSetWithActiveVariantsThenReferrerVariantReturned() {
         val referrerVariantKey = "xx"
-
         mockUpdateScenario(referrerVariantKey)
 
         activeVariants.add(Variant("foo", 100.0, filterBy = { true }))
@@ -152,7 +150,7 @@ class ExperimentationVariantManagerTest {
     }
 
     @Test
-    fun whenUpdatingReferrerVariantTheDataStoreHasItsDataUpdated() {
+    fun whenUpdatingReferrerVariantThenDataStoreHasItsDataUpdated() {
         testee.updateAppReferrerVariant("xx")
         verify(mockStore).referrerVariant = "xx"
         verify(mockStore).variant = "xx"

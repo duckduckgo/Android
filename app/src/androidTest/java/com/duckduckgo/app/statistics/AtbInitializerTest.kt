@@ -65,13 +65,6 @@ class AtbInitializerTest {
     }
 
     @Test
-    fun whenAlreadyInitializedThenRefreshCalled() = runBlockingTest {
-        configureAlreadyInitialized()
-        testee.initializeAfterReferrerAvailable()
-        verify(statisticsUpdater).refreshAppRetentionAtb()
-    }
-
-    @Test
     fun whenReferrerInformationTimesOutThenAtbInitialized() = runBlockingTest {
         whenever(statisticsDataStore.hasInstallationStatistics).thenReturn(false)
         whenever(appReferrerStateListener.waitForReferrerCode()).thenAnswer(referrerAnswer(Long.MAX_VALUE))
@@ -79,6 +72,13 @@ class AtbInitializerTest {
         testee.initializeAfterReferrerAvailable()
 
         verify(statisticsUpdater).initializeAtb()
+    }
+
+    @Test
+    fun whenAlreadyInitializedThenRefreshCalled() = runBlockingTest {
+        configureAlreadyInitialized()
+        testee.initializeAfterReferrerAvailable()
+        verify(statisticsUpdater).refreshAppRetentionAtb()
     }
 
     private suspend fun configureAlreadyInitialized() {

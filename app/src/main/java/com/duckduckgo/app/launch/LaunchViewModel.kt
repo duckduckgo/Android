@@ -21,7 +21,6 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
-import com.duckduckgo.app.referral.ParsedReferrerResult
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 
@@ -39,31 +38,23 @@ class LaunchViewModel(
     }
 
     suspend fun determineViewToShow() {
-        val startTime = System.currentTimeMillis()
-        val referrer = withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) {
-            Timber.d("Waiting for referrer")
-            return@withTimeoutOrNull appReferrerStateListener.waitForReferrerCode()
-        }
-
-        Timber.d("Waiting ${System.currentTimeMillis() - startTime}ms for referrer")
-
-        when (referrer) {
-            is ParsedReferrerResult.ReferrerFound -> {
-                Timber.i("Referrer information delivered; matching campaign suffix is ${referrer.campaignSuffix}")
-            }
-            is ParsedReferrerResult.ReferrerNotFound -> {
-                Timber.i("Referrer information delivered but no matching campaign suffix")
-            }
-            is ParsedReferrerResult.ParseFailure -> {
-                Timber.w("Failure to parse referrer data ${referrer.reason}")
-            }
-            null -> Timber.w("Timed out waiting for referrer data")
-        }
+        waitForReferrerData()
 
         if (onboardingStore.shouldShow) {
             command.value = Command.Onboarding
         } else {
             command.value = Command.Home()
         }
+    }
+
+    private suspend fun waitForReferrerData() {
+        val startTime = System.currentTimeMillis()
+
+        withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) {
+            Timber.d("Waiting for referrer")
+            return@withTimeoutOrNull appReferrerStateListener.waitForReferrerCode()
+        }
+
+        Timber.d("Waited ${System.currentTimeMillis() - startTime}ms for referrer")
     }
 }
