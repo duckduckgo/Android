@@ -101,8 +101,8 @@ class SurveyActivity : DuckDuckGoActivity() {
 
     private fun showError() {
         progress.gone()
-        webView.gone()
         errorView.show()
+        destroyWebView()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -126,6 +126,13 @@ class SurveyActivity : DuckDuckGoActivity() {
     private fun onSurveyDismissed() {
         pixel.fire(SURVEY_SURVEY_DISMISSED)
         viewModel.onSurveyDismissed()
+    }
+
+    private fun destroyWebView() {
+        webView.gone()
+        surveyActivityContainerViewGroup.removeView(webView)
+        webView.destroy()
+        webView.webViewClient = null
     }
 
     companion object {
@@ -164,6 +171,11 @@ class SurveyActivity : DuckDuckGoActivity() {
             if (request.isForMainFrame) {
                 viewModel.onSurveyFailedToLoad()
             }
+        }
+
+        override fun onRenderProcessGone(view: WebView?, detail: RenderProcessGoneDetail?): Boolean {
+            viewModel.onSurveyFailedToLoad()
+            return true
         }
     }
 }
