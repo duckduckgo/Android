@@ -22,5 +22,27 @@ data class TestEntity(
     override val name: String,
     override val displayName: String,
     override val prevalence: Double
-) : Entity
+) : Entity {
+
+    // Override required for same reasons as TdsEntity
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + displayName.hashCode()
+        result = 31 * result + prevalence.toString().hashCode()
+        return result
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as TestEntity
+
+        if (name != other.name) return false
+        if (displayName != other.displayName) return false
+        if (prevalence != other.prevalence) return false
+
+        return true
+    }
+}
 

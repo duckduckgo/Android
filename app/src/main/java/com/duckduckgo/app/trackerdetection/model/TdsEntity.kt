@@ -24,6 +24,36 @@ data class TdsEntity(
     @PrimaryKey override val name: String,
     override val displayName: String,
     override val prevalence: Double
-) : com.duckduckgo.app.trackerdetection.model.Entity
+) : com.duckduckgo.app.trackerdetection.model.Entity {
+
+    /**
+     * Override required as hashcode implementation for Double (and other numbers) changed in kotlin and is
+     * not supported in API <24. Can delete this and equals once we drop support for APIs <24
+     */
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + displayName.hashCode()
+
+        // We call prevalence.toString().hashCode() rather than prevalence.hashCode()
+        // as the latter changed implementation and does not work on APIs <24
+        // https://stackoverflow.com/questions/45935788/nosuchmethoderror-java-lang-long-hashcode
+        result = 31 * result + prevalence.toString().hashCode()
+
+        return result
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as TdsEntity
+
+        if (name != other.name) return false
+        if (displayName != other.displayName) return false
+        if (prevalence != other.prevalence) return false
+
+        return true
+    }
+}
 
 
