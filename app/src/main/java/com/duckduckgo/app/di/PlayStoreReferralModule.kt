@@ -19,6 +19,7 @@ package com.duckduckgo.app.di
 import android.content.Context
 import android.content.pm.PackageManager
 import com.duckduckgo.app.referral.*
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.Module
 import dagger.Provides
@@ -42,23 +43,10 @@ class PlayStoreReferralModule {
         context: Context,
         packageManager: PackageManager,
         appInstallationReferrerParser: AppInstallationReferrerParser,
-        appReferrerDataStore: AppReferrerDataStore
+        appReferrerDataStore: AppReferrerDataStore,
+        variantManager: VariantManager
     ): AppInstallationReferrerStateListener {
-        return PlayStoreAppReferrerStateListener(context, packageManager, appInstallationReferrerParser, appReferrerDataStore)
-    }
-
-    @Provides
-    fun durationMeasuringReferrerRetriever(
-        referrerStateListener: AppInstallationReferrerStateListener,
-        durationBucketMapper: DurationBucketMapper,
-        pixel: Pixel
-    ): ReferrerRetrievalTimer {
-        return ReferrerRetrievalTimer(referrerStateListener, durationBucketMapper, pixel)
-    }
-
-    @Provides
-    fun durationBucketMapper(): DurationBucketMapper {
-        return DurationBucketMapper()
+        return PlayStoreAppReferrerStateListener(context, packageManager, appInstallationReferrerParser, appReferrerDataStore, variantManager)
     }
 
     @Provides

@@ -27,6 +27,7 @@ import com.duckduckgo.app.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_P
 import com.duckduckgo.app.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_REFERRAL_SERVICE
 import com.duckduckgo.app.referral.ParseFailureReason.*
 import com.duckduckgo.app.referral.ParsedReferrerResult.*
+import com.duckduckgo.app.statistics.VariantManager
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import javax.inject.Inject
@@ -34,7 +35,11 @@ import javax.inject.Inject
 interface AppInstallationReferrerStateListener {
 
     fun initialiseReferralRetrieval()
-    suspend fun retrieveReferralCode(): ParsedReferrerResult
+    suspend fun waitForReferrerCode(): ParsedReferrerResult
+
+    companion object {
+        const val MAX_REFERRER_WAIT_TIME_MS = 1_500L
+    }
 
 }
 
@@ -42,7 +47,8 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
     val context: Context,
     private val packageManager: PackageManager,
     private val appInstallationReferrerParser: AppInstallationReferrerParser,
-    private val appReferrerDataStore: AppReferrerDataStore
+    private val appReferrerDataStore: AppReferrerDataStore,
+    private val variantManager: VariantManager
 ) : InstallReferrerStateListener, AppInstallationReferrerStateListener {
 
     private val referralClient = InstallReferrerClient.newBuilder(context).build()
@@ -112,9 +118,9 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
      *
      * It is the caller's responsibility to guard against this function not returning a result in a timely manner, or not returning a result ever.
      */
-    override suspend fun retrieveReferralCode(): ParsedReferrerResult {
+    override suspend fun waitForReferrerCode(): ParsedReferrerResult {
         if (referralResult != ReferrerInitialising) {
-            Timber.i("Referrer already determined; immediately answering")
+            Timber.d("Referrer already determined; immediately answering")
             return referralResult
         }
 
@@ -144,7 +150,9 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
         referralResult = result
 
         if (result is ReferrerFound) {
+            variantManager.updateAppReferrerVariant(result.campaignSuffix)
             appReferrerDataStore.campaignSuffix = result.campaignSuffix
+
         }
         appReferrerDataStore.referrerCheckedPreviously = true
     }

@@ -35,8 +35,12 @@ class StatisticsRequester(
     private val variantManager: VariantManager
 ) : StatisticsUpdater {
 
+    /**
+     * This should only be called after AppInstallationReferrerStateListener has had a chance to consume referer data
+     */
     @SuppressLint("CheckResult")
     override fun initializeAtb() {
+        Timber.i("Initializing ATB")
 
         if (store.hasInstallationStatistics) {
             Timber.v("Atb already initialized")
@@ -57,10 +61,12 @@ class StatisticsRequester(
                 Timber.i("$atb")
                 store.saveAtb(atb)
                 val atbWithVariant = atb.formatWithVariant(variantManager.getVariant())
+
+                Timber.i("Initialized ATB: $atbWithVariant")
                 service.exti(atbWithVariant)
             }
             .subscribe({
-                Timber.v("Atb initialization succeeded")
+                Timber.d("Atb initialization succeeded")
             }, {
                 store.clearAtb()
                 Timber.w("Atb initialization failed ${it.localizedMessage}")
