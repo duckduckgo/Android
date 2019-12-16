@@ -19,13 +19,13 @@
     <string name="unifiedOnboardingBrowsingProtectionTitle">Nettleserbeskyttelse</string>
     <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Blokker sporing og ha sikker internettbruk som standard.</string>
     <string name="unifiedOnboardingDataClearingTitle">Datasletting</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Slett dine nettleserdata ved å trykke på en knapp.</string>
+    <string name="unifiedOnboardingDataClearingSubtitle">Slett dine nettleserdata med et tastetrykk.</string>
     <string name="unifiedOnboardingCustomizationTitle">Tilpasning</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Velg et tema og tilpass personvernfunksjonene.</string>
+    <string name="unifiedOnboardingCustomizationSubtitle">Velg tema og tilpass personvernfunksjonene.</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Kan ikke åpne skjermen for appens standardinnstillinger</string>
-    <string name="settingsDefaultBrowserEnabled">Bruk nettleser som standard</string>
+    <string name="settingsDefaultBrowserEnabled">Gjør til standard nettleser</string>
     <string name="defaultBrowserMaybeLater">Kanskje senere</string>
     <string name="defaultBrowserLetsDoIt">La oss gjøre det!</string>
     <string name="defaultBrowserDescriptionNoDefault">Åpne lenker med ro i sinnet, hver gang.</string>
@@ -36,7 +36,7 @@
     <string name="browserPopupMenu">Nettlesermeny</string>
     <string name="refresh">Oppdater</string>
     <string name="back">Tilbake</string>
-    <string name="forward">Videre</string>
+    <string name="forward">Fremover</string>
 
     <string name="omnibarInputHint">Søk eller skriv URL</string>
     <string name="clearButtonContentDescription">Tøm søkefeltet</string>
@@ -53,9 +53,9 @@
 
     <!-- Sharing options -->
     <string name="options">Alternativer</string>
-    <string name="shareLink">Delingskobling</string>
+    <string name="shareLink">Del lenke</string>
     <string name="shareMenuTitle">Del …</string>
-    <string name="copyUrl">Kopier koblingsadresse</string>
+    <string name="copyUrl">Kopier lenke</string>
 
     <!-- Find in page -->
     <string name="findInPageMenuTitle">Finn på side</string>
@@ -201,10 +201,10 @@
     <string name="bookmarkUrlHint">Bokmerke-URL</string>
     <string name="bookmarkSave">Lagre</string>
     <string name="bookmarkTitleEdit">Rediger bokmerke</string>
-    <string name="noBookmarks">Det har ennå ikke blitt lagt til et bokmerke</string>
+    <string name="noBookmarks">Ingen bokmerker lagt til ennå</string>
     <string name="bookmarkOverflowContentDescription">Flere alternativer for bokmerket %s</string>
     <string name="delete">Slett</string>
-    <string name="edit">Rediger</string>4
+    <string name="edit">Rediger</string>
     <string name="bookmarkEdited">Bokmerke lagt til</string>
 
     <!-- Widget -->
@@ -244,7 +244,7 @@
     <string name="appEnjoymentDialogTitle">Liker du DuckDuckGo?</string>
     <string name="appEnjoymentDialogMessage">Vi vil gjerne høre dine tanker</string>
     <string name="appEnjoymentDialogPositiveButton">Jeg liker det</string>
-    <string name="appEnjoymentDialogNegativeButton">Det burde jobbes litt med det</string>
+    <string name="appEnjoymentDialogNegativeButton">Det trengs forbedringer</string>
 
     <string name="rateAppDialogTitle">Vurder appen</string>
     <string name="rateAppDialogMessage">Tilbakemeldingen din er viktig. Del kjærligheten med en anmeldelse.</string>
@@ -287,14 +287,14 @@
 
     <!-- App feedback disambiguation -->
     <string name="feedbackActivityTitle">Del tilbakemeldingen din</string>
-    <string name="missingBrowserFeaturesTitleLong">Nettleserfunksjoner mangler eller hindres</string>
+    <string name="missingBrowserFeaturesTitleLong">Nettleserfunksjoner mangler eller fungerer dårlig</string>
     <string name="missingBrowserFeaturesTitleShort">Problemer med nettleserfunksjoner</string>
     <string name="missingBrowserFeaturesSubtitle">Hvilken nettleserfunksjon kan vi legge til eller forbedre?</string>
     <string name="missingBrowserFeatureSubReasonNavigation">Gå videre, tilbake, oppdatere</string>
     <string name="missingBrowserFeatureSubReasonTabManagement">Opprette og håndtere faner</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Blokkering av reklame og popuper</string>
+    <string name="missingBrowserFeatureSubReasonAdPopups">Blokkering av reklame og pop-uper</string>
     <string name="missingBrowserFeatureSubReasonVideos">Se videoer</string>
-    <string name="missingBrowserFeatureSubReasonImages">Samhandle med bilder</string>
+    <string name="missingBrowserFeatureSubReasonImages">Bruk av bilder</string>
     <string name="missingBrowserFeatureSubReasonBookmarks">Opprette og håndtere bokmerker</string>
     <string name="missingBrowserFeatureSubReasonOther">Ingen av disse</string>
 
@@ -306,7 +306,7 @@
     <string name="searchNotGoodEnoughTitleShort">DuckDuckGo-søkeproblemer</string>
     <string name="searchNotGoodEnoughSubtitle">Hvilken søkefunksjon kan vi legge til eller forbedre?</string>
     <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programmerings- og tekniske søk</string>
-    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Layouten burde ligne mer på Google</string>
+    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Layout burde ligne mer på Google</string>
     <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Raskere innlasting</string>
     <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Søk på et bestemt språk eller i en bestemt region</string>
     <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Bedre autofullføring</string>
