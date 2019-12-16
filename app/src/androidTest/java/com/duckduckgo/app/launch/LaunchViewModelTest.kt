@@ -75,7 +75,7 @@ class LaunchViewModelTest {
 
         testee.determineViewToShow()
 
-        verify(mockCommandObserver).onChanged(any())
+        verify(mockCommandObserver).onChanged(any(Onboarding::class.java))
     }
 
     @Test
@@ -86,7 +86,7 @@ class LaunchViewModelTest {
 
         testee.determineViewToShow()
 
-        verify(mockCommandObserver).onChanged(any())
+        verify(mockCommandObserver).onChanged(any(Onboarding::class.java))
     }
 
     @Test
