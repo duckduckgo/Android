@@ -105,48 +105,44 @@ class CtaViewModel @Inject constructor(
         return widgetCapabilities.supportsStandardWidgetAdd &&
                 !widgetCapabilities.hasInstalledWidgets &&
                 !dismissedCtaDao.exists(CtaId.ADD_WIDGET) &&
-                !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) &&
-                !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ExistingNoCTA)
+                !isFromConceptTestVariant() &&
+                !isFromNoCtaVariant()
     }
 
     @WorkerThread
-    private fun canShowDaxIntroCta(): Boolean = !dismissedCtaDao.exists(CtaId.DAX_INTRO) &&
-            !settingsDataStore.hideTips &&
-            variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)
+    private fun canShowDaxIntroCta(): Boolean = isFromConceptTestVariant() && !daxDialogIntroShown() && !settingsDataStore.hideTips
 
     @WorkerThread
-    private fun canShowDaxCtaEndOfJourney(site: Site?): Boolean = !dismissedCtaDao.exists(CtaId.DAX_END) && dismissedCtaDao.exists(CtaId.DAX_INTRO) &&
-            variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) &&
+    private fun canShowDaxCtaEndOfJourney(site: Site?): Boolean = isFromConceptTestVariant() &&
+            !daxDialogEndShown() &&
+            daxDialogIntroShown() &&
             !settingsDataStore.hideTips &&
             site == null &&
-            (dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK) || dismissedCtaDao.exists(CtaId.DAX_DIALOG_OTHER) ||
-                    dismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP) || dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND))
+            (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogSerpShown() || daxDialogTrackersFoundShown())
 
     @WorkerThread
     private fun shouldShowDaxCta(site: Site?): Cta? {
-        if (settingsDataStore.hideTips || !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)) {
+        if (settingsDataStore.hideTips || !isFromConceptTestVariant()) {
             return null
         }
         site?.let {
-            // is major network
-            if (it.memberNetwork != null) {
-                val network = site.memberNetwork
-                if (DaxDialogCta.MAIN_TRACKER_NETWORKS.contains(network?.name) && !dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)) {
-                    return DaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, network!!.name, it.uri!!.host!!)
+            // Is major network
+            val host = it.uri?.host
+            if (it.memberNetwork != null && host != null) {
+                it.memberNetwork?.let { network ->
+                    if (!daxDialogNetworkShown() && DaxDialogCta.MAIN_TRACKER_NETWORKS.contains(network.name)) {
+                        return DaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, network.name, host)
+                    }
                 }
             }
-            // is serp
-            if (it.url.contains(DaxDialogCta.SERP) && !dismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)) {
+            // Is Serp
+            if (!daxDialogSerpShown() && isSerpUrl(it.url)) {
                 return DaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
             }
-            // trackers blocked
-            return if (!it.url.contains(DaxDialogCta.SERP) && it.trackerCount > 0 && !dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)) {
-                DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.trackingEvents, it.uri!!.host!!)
-            } else if (!it.url.contains(DaxDialogCta.SERP) &&
-                !dismissedCtaDao.exists(CtaId.DAX_DIALOG_OTHER) &&
-                !dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND) &&
-                !dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)
-            ) {
+            // Trackers blocked
+            return if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.trackerCount > 0 && host != null) {
+                DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.trackingEvents, host)
+            } else if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
                 DaxDialogCta.DaxNoSerpCta(onboardingStore, appInstallStore)
             } else {
                 null
@@ -154,6 +150,7 @@ class CtaViewModel @Inject constructor(
         }
         return null
     }
+
 
     fun onCtaShown(cta: Cta) {
         cta.shownPixel?.let {
@@ -185,8 +182,6 @@ class CtaViewModel @Inject constructor(
                     dismissedCtaDao.insert(DismissedCta(cta.ctaId))
                 }
             }
-            //ctaViewState.postValue(currentViewState.copy(cta = null))
-            //refreshCta()
         }
     }
 
@@ -195,4 +190,22 @@ class CtaViewModel @Inject constructor(
             pixel.fire(it, cta.pixelOkParameters())
         }
     }
+
+    private fun isFromConceptTestVariant(): Boolean = variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)
+
+    private fun isFromNoCtaVariant(): Boolean = variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ExistingNoCta)
+
+    private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
+
+    private fun daxDialogEndShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_END)
+
+    private fun daxDialogSerpShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)
+
+    private fun daxDialogOtherShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_OTHER)
+
+    private fun daxDialogTrackersFoundShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)
+
+    private fun daxDialogNetworkShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)
+
+    private fun isSerpUrl(url: String): Boolean = url.contains(DaxDialogCta.SERP)
 }

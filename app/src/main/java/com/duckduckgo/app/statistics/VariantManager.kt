@@ -29,7 +29,7 @@ interface VariantManager {
         // variant-dependant features listed here
         object ConceptTest : VariantFeature()
 
-        object ExistingNoCTA : VariantFeature()
+        object ExistingNoCta : VariantFeature()
     }
 
     companion object {
@@ -45,7 +45,7 @@ interface VariantManager {
             Variant(key = "se", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "mc", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
             Variant(key = "me", weight = 1.0, features = listOf(VariantFeature.ConceptTest), filterBy = { isEnglishLocale() }),
-            Variant(key = "md", weight = 1.0, features = listOf(VariantFeature.ExistingNoCTA), filterBy = { isEnglishLocale() })
+            Variant(key = "md", weight = 1.0, features = listOf(VariantFeature.ExistingNoCta), filterBy = { isEnglishLocale() })
 
             // All groups in an experiment (control and variants) MUST use the same filters
         )

@@ -84,7 +84,7 @@ class OnboardingPageManagerWithTrackerBlocking(
 
     private fun shouldShowDefaultBrowserPage(): Boolean {
         return defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration()
-                && !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ExistingNoCTA)
+                && !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ExistingNoCta)
                 && !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)
     }
 
