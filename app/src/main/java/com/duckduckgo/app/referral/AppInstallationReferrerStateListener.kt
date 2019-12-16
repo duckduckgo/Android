@@ -88,22 +88,28 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
     override fun onInstallReferrerSetupFinished(responseCode: Int) {
         val referrerRetrievalDurationMs = System.currentTimeMillis() - initialisationStartTime
         Timber.i("Took ${referrerRetrievalDurationMs}ms to get initial referral data callback")
+        try {
+            when (responseCode) {
+                OK -> {
+                    Timber.d("Successfully connected to Referrer service")
+                    val response = referralClient.installReferrer
+                    val referrer = response.installReferrer
+                    val parsedResult = appInstallationReferrerParser.parse(referrer)
+                    referralResultReceived(parsedResult)
+                }
+                FEATURE_NOT_SUPPORTED -> referralResultFailed(FeatureNotSupported)
+                SERVICE_UNAVAILABLE -> referralResultFailed(ServiceUnavailable)
+                DEVELOPER_ERROR -> referralResultFailed(DeveloperError)
+                SERVICE_DISCONNECTED -> referralResultFailed(ServiceDisconnected)
+                else -> referralResultFailed(UnknownError)
 
-        when (responseCode) {
-            OK -> {
-                Timber.d("Successfully connected to Referrer service")
-                val response = referralClient.installReferrer
-                val referrer = response.installReferrer
-                val parsedResult = appInstallationReferrerParser.parse(referrer)
-                referralResultReceived(parsedResult)
             }
-            FEATURE_NOT_SUPPORTED -> referralResultFailed(FeatureNotSupported)
-            SERVICE_UNAVAILABLE -> referralResultFailed(ServiceUnavailable)
-            DEVELOPER_ERROR -> referralResultFailed(DeveloperError)
-            SERVICE_DISCONNECTED -> referralResultFailed(ServiceDisconnected)
-            else -> referralResultFailed(UnknownError)
+
+            referralClient.endConnection()
+        } catch (e: RuntimeException) {
+            Timber.w(e, "Failed to retrieve referrer data")
+            referralResultFailed(UnknownError)
         }
-        referralClient.endConnection()
     }
 
     /**
