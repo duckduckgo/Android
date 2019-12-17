@@ -217,6 +217,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private var webView: WebView? = null
 
+    private val errorSnackbar: Snackbar by lazy {
+        Snackbar.make(browserLayout, R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
+            .setBehavior(NonDismissibleBehavior())
+    }
+
     private val findInPageTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
             viewModel.userFindingInPage(findInPageInput.text.toString())
@@ -325,7 +330,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         popupMenu.apply {
             onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
             onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
-            onMenuItemClicked(view.refreshPopupMenuItem) { refresh() }
+            onMenuItemClicked(view.refreshPopupMenuItem) { viewModel.onRefreshRequested() }
             onMenuItemClicked(view.newTabPopupMenuItem) { viewModel.userRequestedOpeningNewTab() }
             onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
             onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
@@ -390,6 +395,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun showHome() {
+        errorSnackbar.dismiss()
+        newTabLayout.show()
         showKeyboardImmediately()
         appBarLayout.setExpanded(true)
         webView?.onPause()
@@ -399,6 +406,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun showBrowser() {
+        newTabLayout.gone()
         webView?.show()
         webView?.onResume()
         omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
@@ -415,6 +423,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         webView?.loadUrl(url)
     }
 
+    fun onRefreshRequested() {
+        viewModel.onRefreshRequested()
+    }
+
     fun refresh() {
         webView?.reload()
     }
@@ -422,7 +434,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private fun processCommand(it: Command?) {
         renderer.cancelTrackersAnimation()
         when (it) {
-            Command.Refresh -> refresh()
+            is Command.Refresh -> refresh()
             is Command.OpenInNewTab -> {
                 browserActivity?.openInNewTab(it.query)
             }
@@ -437,10 +449,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.NavigateBack -> {
                 webView?.goBackOrForward(-it.steps)
             }
-            Command.NavigateForward -> {
+            is Command.NavigateForward -> {
                 webView?.goForward()
             }
-            Command.ResetHistory -> {
+            is Command.ResetHistory -> {
                 resetWebView()
             }
             is Command.DialNumber -> {
@@ -457,10 +469,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${it.telephoneNumber}"))
                 openExternalDialog(intent)
             }
-            Command.ShowKeyboard -> {
+            is Command.ShowKeyboard -> {
                 showKeyboard()
             }
-            Command.HideKeyboard -> {
+            is Command.HideKeyboard -> {
                 hideKeyboard()
             }
             is Command.BrokenSiteFeedback -> {
@@ -476,7 +488,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
             is Command.DownloadImage -> requestImageDownload(it.url)
             is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
-            Command.DismissFindInPage -> webView?.findAllAsync(null)
+            is Command.DismissFindInPage -> webView?.findAllAsync(null)
             is Command.ShareLink -> launchSharePageChooser(it.url)
             is Command.CopyLink -> {
                 clipboardManager.primaryClip = ClipData.newPlainText(null, it.url)
@@ -499,6 +511,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.SaveCredentials -> saveBasicAuthCredentials(it.request, it.credentials)
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
+            is Command.ShowErrorWithAction -> showErrorSnackbar(it)
+        }
+    }
+
+    private fun showErrorSnackbar(command: Command.ShowErrorWithAction) {
+        //Snackbar is global and it should appear only the foreground fragment
+        if (!errorSnackbar.view.isAttachedToWindow && isVisible) {
+            errorSnackbar.setAction(R.string.crashedWebViewErrorAction) { command.action() }.show()
         }
     }
 
@@ -1328,7 +1348,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
             val viewIds = views.map { it.id }.toIntArray()
 
-            if (viewIds.isNotEmpty()) {
+            if (viewIds.size > 1) {
                 constraints.createHorizontalChain(
                     ConstraintSet.PARENT_ID,
                     ConstraintSet.LEFT,
@@ -1383,13 +1403,23 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {
+            if (lastSeenGlobalViewState is GlobalLayoutViewState.Invalidated &&
+                viewState is GlobalLayoutViewState.Browser) {
+                throw IllegalStateException("Invalid state transition")
+            }
+
             renderIfChanged(viewState, lastSeenGlobalViewState) {
                 lastSeenGlobalViewState = viewState
 
-                if (viewState.isNewTabState) {
-                    browserLayout.hide()
-                } else {
-                    browserLayout.show()
+                when (viewState) {
+                    is GlobalLayoutViewState.Browser -> {
+                        if (viewState.isNewTabState) {
+                            browserLayout.hide()
+                        } else {
+                            browserLayout.show()
+                        }
+                    }
+                    is GlobalLayoutViewState.Invalidated -> destroyWebView()
                 }
             }
         }
@@ -1433,6 +1463,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 newTabPopupMenuItem.isEnabled = browserShowing
                 addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
                 sharePageMenuItem?.isEnabled = viewState.canSharePage
+                brokenSitePopupMenuItem?.isEnabled = viewState.canReportSite
+                requestDesktopSiteCheckMenuItem?.isEnabled = viewState.canChangeBrowsingMode
 
                 addToHome?.let {
                     it.visibility = if (viewState.addToHomeVisible) VISIBLE else GONE

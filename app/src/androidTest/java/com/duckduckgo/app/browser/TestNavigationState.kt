@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics.store
+package com.duckduckgo.app.browser
 
-import com.duckduckgo.app.statistics.model.Atb
-
-interface StatisticsDataStore {
-
-    val hasInstallationStatistics: Boolean
-
-    var atb: Atb?
-    var appRetentionAtb: String?
-    var searchRetentionAtb: String?
-    var variant: String?
-    var referrerVariant: String?
-
-    fun saveAtb(atb: Atb)
-    fun clearAtb()
-}
+data class TestNavigationState(
+    override val originalUrl: String?,
+    override val currentUrl: String?,
+    override val title: String?,
+    override val stepsToPreviousPage: Int,
+    override val canGoBack: Boolean,
+    override val canGoForward: Boolean,
+    override val hasNavigationHistory: Boolean
+) : WebNavigationState

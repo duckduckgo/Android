@@ -117,6 +117,15 @@ class BrowserWebViewClientTest {
         verify(offlinePixelCountDataStore, times(1)).webRendererGoneKilledCount = 1
     }
 
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun whenRenderProcessGoneThenEmitEventIntoListener() {
+        val detail: RenderProcessGoneDetail = mock()
+        whenever(detail.didCrash()).thenReturn(true)
+        testee.onRenderProcessGone(webView, detail)
+        verify(listener, times(1)).recoverFromRenderProcessGone()
+    }
+
     private class TestWebView(context: Context) : WebView(context)
 
     companion object {

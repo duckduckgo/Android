@@ -21,12 +21,18 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import com.duckduckgo.app.onboarding.ui.OnboardingActivityExperiment
+import com.duckduckgo.app.statistics.VariantManager
+import javax.inject.Inject
 
 
 class LaunchActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var variantManager: VariantManager
 
     private val viewModel: LaunchViewModel by bindViewModel()
 
@@ -34,10 +40,9 @@ class LaunchActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
 
-        // this is a good time to 'start the clock' and measure how much of a delay waiting for referral might impose
-        triggerAppInstallationReferrerRetrieval()
-
         configureObservers()
+
+        MainScope().launch { viewModel.determineViewToShow() }
     }
 
     private fun configureObservers() {
@@ -57,13 +62,8 @@ class LaunchActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun triggerAppInstallationReferrerRetrieval() {
-        val app = application as DuckDuckGoApplication
-        app.measureAppInstallationReferrer()
-    }
-
     private fun showOnboarding() {
-        if (true) {
+        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)) {
             startActivity(OnboardingActivityExperiment.intent(this))
         } else {
             startActivity(OnboardingActivity.intent(this))

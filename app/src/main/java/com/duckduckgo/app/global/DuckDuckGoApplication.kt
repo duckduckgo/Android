@@ -43,8 +43,8 @@ import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
-import com.duckduckgo.app.referral.ReferrerRetrievalTimer
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
 import com.duckduckgo.app.statistics.api.OfflinePixelSender
@@ -153,7 +153,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     lateinit var referralStateListener: AppInstallationReferrerStateListener
 
     @Inject
-    lateinit var referrerRetrievalTimer: ReferrerRetrievalTimer
+    lateinit var atbInitializer: AtbInitializer
 
     @Inject
     lateinit var variantManager: VariantManager
@@ -199,21 +199,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         GlobalScope.launch {
             referralStateListener.initialiseReferralRetrieval()
             appDataLoader.loadData()
-        }
-    }
-
-    /**
-     * This is a temporary addition, used to allow other class to trigger a read of the referrer data
-     *
-     * The idea here is that the absolute time to get referrer data isn't all that useful, due to it being highly
-     * device-dependent. Whether it takes the app 100ms or 5,000ms to initialise isn't too helpful for this.
-     *
-     * What is more useful is knowing how much of an *additional delay* waiting for referrer data would impose.
-     * This method can be called at a time when we'd choose to block the UI or not.
-     */
-    fun measureAppInstallationReferrer() {
-        GlobalScope.launch {
-            referrerRetrievalTimer.measureReferrerRetrieval()
         }
     }
 
@@ -311,12 +296,10 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onAppResumed() {
         notificationRegistrar.updateStatus()
-        GlobalScope.launch { notificationScheduler.scheduleNextNotification() }
+        GlobalScope.launch {
+            notificationScheduler.scheduleNextNotification()
 
-        if (statisticsDataStore.hasInstallationStatistics) {
-            statisticsUpdater.refreshAppRetentionAtb()
-        } else {
-            statisticsUpdater.initializeAtb()
+            atbInitializer.initializeAfterReferrerAvailable()
         }
     }
 
