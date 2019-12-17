@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.job
 
-import com.duckduckgo.app.global.db.AppConfigurationEntity
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeDataDownloader
 import com.duckduckgo.app.surrogates.api.ResourceSurrogateListDownloader
 import com.duckduckgo.app.survey.api.SurveyDownloader
@@ -33,8 +31,7 @@ class AppConfigurationDownloader(
     private val trackerDataDownloader: TrackerDataDownloader,
     private val httpsUpgradeDataDownloader: HttpsUpgradeDataDownloader,
     private val resourceSurrogateDownloader: ResourceSurrogateListDownloader,
-    private val surveyDownloader: SurveyDownloader,
-    private val appDatabase: AppDatabase
+    private val surveyDownloader: SurveyDownloader
 ) : ConfigurationDownloader {
 
     override fun downloadTask(): Completable {
@@ -56,8 +53,6 @@ class AppConfigurationDownloader(
             )
         ).doOnComplete {
             Timber.i("Download task completed successfully")
-            val appConfiguration = AppConfigurationEntity(appConfigurationDownloaded = true)
-            appDatabase.appConfigurationDao().configurationDownloadSuccessful(appConfiguration)
         }
     }
 }

@@ -51,9 +51,6 @@ class DaoModule {
     fun providesTabsDao(database: AppDatabase) = database.tabsDao()
 
     @Provides
-    fun appConfigurationDao(database: AppDatabase) = database.appConfigurationDao()
-
-    @Provides
     fun surveyDao(database: AppDatabase) = database.surveyDao()
 
     @Provides

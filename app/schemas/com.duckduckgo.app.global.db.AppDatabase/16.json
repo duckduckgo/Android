@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 16,
-    "identityHash": "b4a80827da0b9a86b943613b4d88d664",
+    "identityHash": "b7242fd6e728986eae81afb93d5ed598",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -223,32 +223,6 @@
           {
             "fieldPath": "count",
             "columnName": "count",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "key"
-          ],
-          "autoGenerate": false
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "app_configuration",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` TEXT NOT NULL, `appConfigurationDownloaded` INTEGER NOT NULL, PRIMARY KEY(`key`))",
-        "fields": [
-          {
-            "fieldPath": "key",
-            "columnName": "key",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "appConfigurationDownloaded",
-            "columnName": "appConfigurationDownloaded",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -636,7 +610,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b4a80827da0b9a86b943613b4d88d664')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b7242fd6e728986eae81afb93d5ed598')"
     ]
   }
 }

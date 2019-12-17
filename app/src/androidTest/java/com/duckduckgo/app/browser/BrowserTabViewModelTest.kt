@@ -48,8 +48,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.global.db.AppConfigurationDao
-import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
@@ -173,8 +171,6 @@ class BrowserTabViewModelTest {
 
     private lateinit var db: AppDatabase
 
-    private lateinit var appConfigurationDao: AppConfigurationDao
-
     private lateinit var testee: BrowserTabViewModel
 
     private val selectedTabLiveData = MutableLiveData<TabEntity>()
@@ -186,8 +182,6 @@ class BrowserTabViewModelTest {
         db = Room.inMemoryDatabaseBuilder(getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-
-        appConfigurationDao = db.appConfigurationDao()
 
         mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao)
 
@@ -219,7 +213,6 @@ class BrowserTabViewModelTest {
             appSettingsPreferencesStore = mockSettingsStore,
             bookmarksDao = mockBookmarksDao,
             longPressHandler = mockLongPressHandler,
-            appConfigurationDao = appConfigurationDao,
             webViewSessionStorage = webViewSessionStorage,
             specialUrlDetector = SpecialUrlDetectorImpl(),
             faviconDownloader = mockFaviconDownloader,
@@ -560,45 +553,35 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlUpdatedAfterConfigDownloadThenPrivacyGradeIsShown() {
-        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
+    fun whenUrlUpdatedThenPrivacyGradeIsShown() {
         loadUrl("")
         assertTrue(browserViewState().showPrivacyGrade)
     }
 
     @Test
-    fun whenUrlUpdatedBeforeConfigDownloadThenPrivacyGradeIsShown() {
-        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = false))
-        loadUrl("")
+    fun whenBrowserNotShownAndOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsNotShown() {
+        testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
         assertFalse(browserViewState().showPrivacyGrade)
     }
 
     @Test
-    fun whenOmnibarInputDoesNotHaveFocusAndAppConfigDownloadedAndBrowserShownThenPrivacyGradeIsShown() {
+    fun whenBrowserShownAndOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsShown() {
         testee.onUserSubmittedQuery("foo")
-        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
         assertTrue(browserViewState().showPrivacyGrade)
     }
 
     @Test
-    fun whenOmnibarInputDoesNotHaveFocusAndAppConfigDownloadedButBrowserNotShownThenPrivacyGradeIsHidden() {
-        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
-        testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
-        assertFalse(browserViewState().showPrivacyGrade)
-    }
-
-    @Test
-    fun whenOmnibarInputDoesNotHaveFocusAndAppConfigNotDownloadedThenPrivacyGradeIsNotShown() {
-        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = false))
-        testee.onOmnibarInputStateChanged("", false, hasQueryChanged = false)
-        assertFalse(browserViewState().showPrivacyGrade)
-    }
-
-    @Test
-    fun whenOmnibarInputHasFocusThenPrivacyGradeIsNotShown() {
+    fun whenBrowserNotShownAndOmnibarInputHasFocusThenPrivacyGradeIsNotShown() {
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
         assertFalse(browserViewState().showPrivacyGrade)
+    }
+
+    @Test
+    fun whenBrowserShownAndOmnibarInputHasFocusThenPrivacyGradeIsShown() {
+        testee.onUserSubmittedQuery("foo")
+        testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
+        assertTrue(browserViewState().showPrivacyGrade)
     }
 
     @Test

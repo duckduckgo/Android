@@ -68,7 +68,6 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         HttpsWhitelistedDomain::class,
         NetworkLeaderboardEntry::class,
         SitesVisitedEntity::class,
-        AppConfigurationEntity::class,
         TabEntity::class,
         TabSelectionEntity::class,
         BookmarkEntity::class,
@@ -102,7 +101,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun httpsWhitelistedDao(): HttpsWhitelistDao
     abstract fun httpsBloomFilterSpecDao(): HttpsBloomFilterSpecDao
     abstract fun networkLeaderboardDao(): NetworkLeaderboardDao
-    abstract fun appConfigurationDao(): AppConfigurationDao
     abstract fun tabsDao(): TabsDao
     abstract fun bookmarksDao(): BookmarksDao
     abstract fun surveyDao(): SurveyDao
@@ -225,6 +223,7 @@ abstract class AppDatabase : RoomDatabase() {
 
         val MIGRATION_15_TO_16: Migration = object : Migration(15, 16) {
             override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DROP TABLE `app_configuration`")
                 database.execSQL("DROP TABLE `disconnect_tracker`")
                 database.execSQL("DROP TABLE `entity_list`")
                 database.execSQL("DELETE FROM `network_leaderboard`")
