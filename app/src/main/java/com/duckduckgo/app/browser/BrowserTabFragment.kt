@@ -78,7 +78,6 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
-import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -132,9 +131,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
-
-    @Inject
-    lateinit var dismissedCtaDao: DismissedCtaDao
 
     @Inject
     lateinit var deviceInfo: DeviceInfo
@@ -234,7 +230,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
     }
 
-    private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo, dismissedCtaDao) }
+    private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
 
     private var alertDialog: AlertDialog? = null
 
@@ -1536,7 +1532,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             activity?.let { activity ->
                 val isShowing = daxDialog?.dialog?.isShowing
                 if (isShowing != true) {
-                    daxDialog = configuration.apply(activity).apply {
+                    daxDialog = configuration.createDialogCta(activity).apply {
                         if (configuration is DaxDialogCta.DaxTrackersBlockedCta) {
                             setDismissListener {
                                 finishTrackerAnimation()

@@ -38,12 +38,15 @@ class WelcomePage : OnboardingPageFragment() {
         super.onActivityCreated(savedInstanceState)
 
         primaryCta.setOnClickListener { onContinuePressed() }
+        var daxText = ""
 
-        val daxText = requireContext().getString(R.string.onboardingDaxText)
-        hiddenText.text = daxText.html(requireContext())
-        dialogText.setTextColor(ContextCompat.getColor(requireContext(), R.color.grayishBrown))
+        context?.let {
+            daxText = it.getString(R.string.onboardingDaxText)
+            hiddenText.text = daxText.html(it)
+            dialogText.setTextColor(ContextCompat.getColor(it, R.color.grayishBrown))
+            cardView.backgroundTintList = ContextCompat.getColorStateList(it, R.color.white)
+        }
         triangle.setImageResource(R.drawable.ic_triangle_bubble_white)
-        cardView.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.white)
 
         ViewCompat.animate(welcomeContent as View)
             .alpha(0f)

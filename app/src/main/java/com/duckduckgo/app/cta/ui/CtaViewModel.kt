@@ -71,8 +71,8 @@ class CtaViewModel @Inject constructor(
     }
 
     fun registerDaxBubbleCtaShown(cta: Cta) {
-        Schedulers.io().scheduleDirect {
-            if (cta is DaxBubbleCta) {
+        if (cta is DaxBubbleCta) {
+            Schedulers.io().scheduleDirect {
                 onCtaShown(cta)
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }
@@ -85,14 +85,11 @@ class CtaViewModel @Inject constructor(
         }
 
         Schedulers.io().scheduleDirect {
-            when (cta) {
-                is HomePanelCta.Survey -> {
-                    activeSurvey = null
-                    surveyDao.cancelScheduledSurveys()
-                }
-                else -> {
-                    dismissedCtaDao.insert(DismissedCta(cta.ctaId))
-                }
+            if (cta is HomePanelCta.Survey) {
+                activeSurvey = null
+                surveyDao.cancelScheduledSurveys()
+            } else {
+                dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }
         }
     }

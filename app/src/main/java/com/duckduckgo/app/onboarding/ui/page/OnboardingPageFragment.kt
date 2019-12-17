@@ -39,10 +39,9 @@ abstract class OnboardingPageFragment : Fragment() {
     }
 
     fun onContinuePressed() {
-        if (true) {
-            (activity as OnboardingActivityExperiment).onContinueClicked()
-        } else {
-            (activity as OnboardingActivity).onContinueClicked()
+        when (activity) {
+            is OnboardingActivityExperiment -> (activity as OnboardingActivityExperiment).onContinueClicked()
+            is OnboardingActivity -> (activity as OnboardingActivity).onContinueClicked()
         }
     }
 

@@ -73,9 +73,7 @@ class DaxDialog(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setDialog()
-        setListeners()
-        dialogText.startTypingAnimation(daxText, true, onAnimationFinished)
+        setDialogAndStartAnimation()
     }
 
     override fun onDismiss(dialog: DialogInterface) {
