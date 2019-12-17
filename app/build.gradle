@@ -88,7 +88,7 @@ ext {
     architectureComponents = "1.1.1"
     architectureComponentsExtensions = "1.1.1"
     androidKtx = "1.0.2"
-    fragmentKtx = "1.1.0"
+    fragmentKtx = "1.0.0"
     constraintLayout = "2.0.0-beta1"
     lifecycle = "2.1.0-alpha04"
     room = "2.1.0"
