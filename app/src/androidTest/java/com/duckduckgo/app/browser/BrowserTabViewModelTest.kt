@@ -48,11 +48,13 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.PrevalenceStore
@@ -62,6 +64,7 @@ import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
+import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
@@ -162,6 +165,9 @@ class BrowserTabViewModelTest {
     private lateinit var mockPixel: Pixel
 
     @Mock
+    private lateinit var mockOnboardingStore: OnboardingStore
+
+    @Mock
     private lateinit var mockAutoCompleteService: AutoCompleteService
 
     @Mock
@@ -197,7 +203,10 @@ class BrowserTabViewModelTest {
             mockPixel,
             mockSurveyDao,
             mockWidgetCapabilities,
-            mockDismissedCtaDao
+            mockDismissedCtaDao,
+            mockVariantManager,
+            mockSettingsStore,
+            mockOnboardingStore
         )
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore)
@@ -1155,6 +1164,96 @@ class BrowserTabViewModelTest {
         setupNavigation(isBrowsing = true, canGoBack = false, skipHome = false)
         testee.onUserPressedBack()
         verifyGenerateWebViewPreviewCommandNotIssued()
+    }
+
+    @Test
+    fun whenScheduledSurveyChangesAndInstalledDaysMatchThenCtaIsSurvey() {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, Survey.Status.SCHEDULED))
+        assertTrue(testee.ctaViewState.value!!.cta is HomePanelCta.Survey)
+    }
+
+    @Test
+    fun whenScheduledSurveyChangesAndInstalledDaysDontMatchThenCtaIsNotSurvey() {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", 2, Survey.Status.SCHEDULED))
+        assertFalse(testee.ctaViewState.value!!.cta is HomePanelCta.Survey)
+    }
+
+    @Test
+    fun whenScheduledSurveyIsNullThenCtaIsNotSurvey() {
+        testee.onSurveyChanged(null)
+        assertFalse(testee.ctaViewState.value!!.cta is HomePanelCta.Survey)
+    }
+
+    @Test
+    fun whenSurveyCtaDismissedAndNotOtherCtaPossibleCtaIsNull() {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, Survey.Status.SCHEDULED))
+        testee.onUserDismissedCta()
+        assertNull(testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenSurveyCtaDismissedAndWidgetCtaIsPossibleThenNextCtaIsWidget() {
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+
+        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, Survey.Status.SCHEDULED))
+        testee.onUserDismissedCta()
+        assertEquals(HomePanelCta.AddWidgetAuto, testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenCtaRefreshedAndAutoAddSupportedAndWidgetNotInstalledThenCtaIsAutoWidget() = runBlockingTest {
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        testee.refreshCta(true)
+        assertEquals(HomePanelCta.AddWidgetAuto, testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenCtaRefreshedAndAutoAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = runBlockingTest {
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        testee.refreshCta(true)
+        assertNull(testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenCtaRefreshedAndOnlyStandardAddSupportedAndWidgetNotInstalledThenCtaIsInstructionsWidget() = runBlockingTest {
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        testee.refreshCta(true)
+        assertEquals(HomePanelCta.AddWidgetInstructions, testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenCtaRefreshedAndOnlyStandardAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = runBlockingTest {
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        testee.refreshCta(true)
+        assertNull(testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenCtaRefreshedAndStandardAddNotSupportedAndWidgetNotInstalledThenCtaIsNull() = runBlockingTest {
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(false)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        testee.refreshCta(true)
+        assertNull(testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenCtaRefreshedAndAddStandardAddNotSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = runBlockingTest {
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(false)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        testee.refreshCta(true)
+        assertNull(testee.ctaViewState.value!!.cta)
     }
 
     private fun verifyGenerateWebViewPreviewCommandIssued() {

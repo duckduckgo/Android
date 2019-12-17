@@ -59,6 +59,50 @@ class CtaViewModel @Inject constructor(
         return activeSurvey
     }
 
+    fun hideTipsForever(cta: Cta) {
+        settingsDataStore.hideTips = true
+        pixel.fire(Pixel.PixelName.ONBOARDING_DAX_ALL_CTA_HIDDEN, cta.pixelCancelParameters())
+    }
+
+    fun onCtaShown(cta: Cta) {
+        cta.shownPixel?.let {
+            pixel.fire(it, cta.pixelShownParameters())
+        }
+    }
+
+    fun registerDaxBubbleCtaShown(cta: Cta) {
+        Schedulers.io().scheduleDirect {
+            if (cta is DaxBubbleCta) {
+                onCtaShown(cta)
+                dismissedCtaDao.insert(DismissedCta(cta.ctaId))
+            }
+        }
+    }
+
+    fun onUserDismissedCta(cta: Cta) {
+        cta.cancelPixel?.let {
+            pixel.fire(it, cta.pixelCancelParameters())
+        }
+
+        Schedulers.io().scheduleDirect {
+            when (cta) {
+                is HomePanelCta.Survey -> {
+                    activeSurvey = null
+                    surveyDao.cancelScheduledSurveys()
+                }
+                else -> {
+                    dismissedCtaDao.insert(DismissedCta(cta.ctaId))
+                }
+            }
+        }
+    }
+
+    fun onUserClickCtaOkButton(cta: Cta) {
+        cta.okPixel?.let {
+            pixel.fire(it, cta.pixelOkParameters())
+        }
+    }
+
     suspend fun refreshCta(dispatcher: CoroutineContext, isNewTab: Boolean, site: Site? = null): Cta? {
         surveyCta()?.let {
             return it
@@ -81,11 +125,6 @@ class CtaViewModel @Inject constructor(
                 else -> null
             }
         }
-    }
-
-    fun hideTipsForever(cta: Cta) {
-        settingsDataStore.hideTips = true
-        pixel.fire(Pixel.PixelName.ONBOARDING_DAX_ALL_CTA_HIDDEN, cta.pixelCancelParameters())
     }
 
     private fun surveyCta(): HomePanelCta.Survey? {
@@ -149,46 +188,6 @@ class CtaViewModel @Inject constructor(
             }
         }
         return null
-    }
-
-
-    fun onCtaShown(cta: Cta) {
-        cta.shownPixel?.let {
-            pixel.fire(it, cta.pixelShownParameters())
-        }
-    }
-
-    fun registerDaxBubbleCtaShown(cta: Cta) {
-        Schedulers.io().scheduleDirect {
-            if (cta is DaxBubbleCta) {
-                onCtaShown(cta)
-                dismissedCtaDao.insert(DismissedCta(cta.ctaId))
-            }
-        }
-    }
-
-    fun onUserDismissedCta(cta: Cta) {
-        cta.cancelPixel?.let {
-            pixel.fire(it, cta.pixelCancelParameters())
-        }
-
-        Schedulers.io().scheduleDirect {
-            when (cta) {
-                is HomePanelCta.Survey -> {
-                    activeSurvey = null
-                    surveyDao.cancelScheduledSurveys()
-                }
-                else -> {
-                    dismissedCtaDao.insert(DismissedCta(cta.ctaId))
-                }
-            }
-        }
-    }
-
-    fun onUserClickCtaOkButton(cta: Cta) {
-        cta.okPixel?.let {
-            pixel.fire(it, cta.pixelOkParameters())
-        }
     }
 
     private fun isFromConceptTestVariant(): Boolean = variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)

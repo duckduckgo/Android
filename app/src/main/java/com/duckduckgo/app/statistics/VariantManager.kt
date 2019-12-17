@@ -108,7 +108,7 @@ class ExperimentationVariantManager(
 
     private fun generateVariant(activeVariants: List<Variant>): Variant {
         // TODO remove return after testing
-        return Variant(key = "me", weight = 1.0, features = listOf(VariantManager.VariantFeature.ConceptTest), filterBy = { true })
+        //return Variant(key = "me", weight = 1.0, features = listOf(VariantManager.VariantFeature.ConceptTest), filterBy = { true })
         val weightSum = activeVariants.sumByDouble { it.weight }
         if (weightSum == 0.0) {
             Timber.v("No variants active; allocating default")

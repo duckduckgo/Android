@@ -878,7 +878,11 @@ class BrowserTabViewModel(
         val cta = ctaViewState.value?.cta ?: return
 
         ctaViewModel.onUserDismissedCta(cta)
-        ctaViewState.postValue(currentCtaViewState().copy(cta = null))
+        if (cta is HomePanelCta) {
+            refreshCta(true)
+        } else {
+            ctaViewState.postValue(currentCtaViewState().copy(cta = null))
+        }
     }
 
     fun updateTabPreview(tabId: String, fileName: String) {

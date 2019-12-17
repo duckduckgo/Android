@@ -61,4 +61,9 @@ class TypeAnimationTextView @JvmOverloads constructor(
     }
 
     fun cancelAnimation() = typingAnimationJob?.cancel()
+
+    override fun onDetachedFromWindow() {
+        cancelAnimation()
+        super.onDetachedFromWindow()
+    }
 }
