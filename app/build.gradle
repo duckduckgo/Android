@@ -39,6 +39,7 @@ android {
     }
     buildTypes {
         debug {
+            applicationIdSuffix ".debug"
             pseudoLocalesEnabled false
         }
         release {
@@ -110,19 +111,23 @@ ext {
     rxAndroid = "2.0.2"
     timber = "4.7.1"
     rxRelay = "2.0.0"
-    leakCanary = "1.6.2"
+    leakCanary = "2.0-beta-4"
     mockito = "2.18.3"
     mockitoKotlin = "2.0.0"
     commonsMath = "3.6.1"
+    referrerLibrary = "1.0"
 }
 
 
 dependencies {
     implementation "androidx.legacy:legacy-support-v4:$legacySupport"
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanary"
-    releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakCanary"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    //noinspection GradleDependency - 1.1 has a bug which causes a crash
+    implementation "com.android.installreferrer:installreferrer:$referrerLibrary"
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines"
     androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines"

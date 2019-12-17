@@ -42,7 +42,9 @@ import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.NotificationScheduler
+import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
 import com.duckduckgo.app.statistics.api.OfflinePixelSender
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -53,7 +55,6 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.usage.app.AppDaysUsedRecorder
-import com.squareup.leakcanary.LeakCanary
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
@@ -147,14 +148,18 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     @Inject
     lateinit var alertingUncaughtExceptionHandler: AlertingUncaughtExceptionHandler
 
+    @Inject
+    lateinit var referralStateListener: AppInstallationReferrerStateListener
+
+    @Inject
+    lateinit var atbInitializer: AtbInitializer
+
     private var launchedByFireAction: Boolean = false
 
     open lateinit var daggerAppComponent: AppComponent
 
     override fun onCreate() {
         super.onCreate()
-
-        if (!installLeakCanary()) return
 
         configureLogging()
         configureDependencyInjection()
@@ -187,7 +192,10 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         initializeHttpsUpgrader()
         submitUnsentFirePixels()
 
-        GlobalScope.launch { appDataLoader.loadData() }
+        GlobalScope.launch {
+            referralStateListener.initialiseReferralRetrieval()
+            appDataLoader.loadData()
+        }
     }
 
     private fun configureUncaughtExceptionHandler() {
@@ -198,14 +206,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         if (!appInstallStore.hasInstallTimestampRecorded()) {
             appInstallStore.installTimestamp = System.currentTimeMillis()
         }
-    }
-
-    protected open fun installLeakCanary(): Boolean {
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            return false
-        }
-        LeakCanary.install(this)
-        return true
     }
 
     private fun appIsRestarting(): Boolean {
@@ -292,12 +292,10 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onAppResumed() {
         notificationRegistrar.updateStatus()
-        GlobalScope.launch { notificationScheduler.scheduleNextNotification() }
+        GlobalScope.launch {
+            notificationScheduler.scheduleNextNotification()
 
-        if (statisticsDataStore.hasInstallationStatistics) {
-            statisticsUpdater.refreshAppRetentionAtb()
-        } else {
-            statisticsUpdater.initializeAtb()
+            atbInitializer.initializeAfterReferrerAvailable()
         }
     }
 

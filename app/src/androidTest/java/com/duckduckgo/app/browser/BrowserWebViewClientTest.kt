@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.content.Context
 import android.os.Build
+import android.webkit.CookieManager
 import android.webkit.HttpAuthHandler
 import android.webkit.RenderProcessGoneDetail
 import android.webkit.WebView
@@ -40,6 +41,7 @@ class BrowserWebViewClientTest {
     private val specialUrlDetector: SpecialUrlDetector = mock()
     private val requestInterceptor: RequestInterceptor = mock()
     private val listener: WebViewClientListener = mock()
+    private val cookieManager: CookieManager = mock()
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore = mock()
     private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
 
@@ -52,7 +54,8 @@ class BrowserWebViewClientTest {
             specialUrlDetector,
             requestInterceptor,
             offlinePixelCountDataStore,
-            uncaughtExceptionRepository
+            uncaughtExceptionRepository,
+            cookieManager
         )
         testee.webViewClientListener = listener
     }
@@ -112,6 +115,15 @@ class BrowserWebViewClientTest {
         whenever(detail.didCrash()).thenReturn(false)
         testee.onRenderProcessGone(webView, detail)
         verify(offlinePixelCountDataStore, times(1)).webRendererGoneKilledCount = 1
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun whenRenderProcessGoneThenEmitEventIntoListener() {
+        val detail: RenderProcessGoneDetail = mock()
+        whenever(detail.didCrash()).thenReturn(true)
+        testee.onRenderProcessGone(webView, detail)
+        verify(listener, times(1)).recoverFromRenderProcessGone()
     }
 
     private class TestWebView(context: Context) : WebView(context)

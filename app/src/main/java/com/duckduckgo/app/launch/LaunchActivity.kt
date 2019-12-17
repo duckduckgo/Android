@@ -22,6 +22,8 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 
 class LaunchActivity : DuckDuckGoActivity() {
@@ -31,7 +33,10 @@ class LaunchActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
+
         configureObservers()
+
+        MainScope().launch { viewModel.determineViewToShow() }
     }
 
     private fun configureObservers() {

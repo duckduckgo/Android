@@ -202,6 +202,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private var webView: WebView? = null
 
+    private val errorSnackbar: Snackbar by lazy {
+        Snackbar.make(browserLayout, R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
+            .setBehavior(NonDismissibleBehavior())
+    }
+
     private val findInPageTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
             viewModel.userFindingInPage(findInPageInput.text.toString())
@@ -215,6 +220,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
+
+    private var alertDialog: AlertDialog? = null
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -318,7 +325,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         popupMenu.apply {
             onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
             onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
-            onMenuItemClicked(view.refreshPopupMenuItem) { refresh() }
+            onMenuItemClicked(view.refreshPopupMenuItem) { viewModel.onRefreshRequested() }
             onMenuItemClicked(view.newTabPopupMenuItem) { viewModel.userRequestedOpeningNewTab() }
             onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
             onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
@@ -383,6 +390,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun showHome() {
+        errorSnackbar.dismiss()
+        newTabLayout.show()
         showKeyboardImmediately()
         appBarLayout.setExpanded(true)
         webView?.onPause()
@@ -392,6 +401,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun showBrowser() {
+        newTabLayout.gone()
         webView?.show()
         webView?.onResume()
         omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
@@ -407,13 +417,17 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         webView?.loadUrl(url)
     }
 
+    fun onRefreshRequested() {
+        viewModel.onRefreshRequested()
+    }
+
     fun refresh() {
         webView?.reload()
     }
 
     private fun processCommand(it: Command?) {
         when (it) {
-            Command.Refresh -> refresh()
+            is Command.Refresh -> refresh()
             is Command.OpenInNewTab -> {
                 browserActivity?.openInNewTab(it.query)
             }
@@ -431,30 +445,30 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.NavigateBack -> {
                 webView?.goBackOrForward(-it.steps)
             }
-            Command.NavigateForward -> {
+            is Command.NavigateForward -> {
                 webView?.goForward()
             }
-            Command.ResetHistory -> {
+            is Command.ResetHistory -> {
                 resetWebView()
             }
             is Command.DialNumber -> {
                 val intent = Intent(Intent.ACTION_DIAL)
                 intent.data = Uri.parse("tel:${it.telephoneNumber}")
-                activity?.launchExternalActivity(intent)
+                openExternalDialog(intent, null, false)
             }
             is Command.SendEmail -> {
                 val intent = Intent(Intent.ACTION_SENDTO)
                 intent.data = Uri.parse(it.emailAddress)
-                activity?.launchExternalActivity(intent)
+                openExternalDialog(intent)
             }
             is Command.SendSms -> {
                 val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${it.telephoneNumber}"))
-                startActivity(intent)
+                openExternalDialog(intent)
             }
-            Command.ShowKeyboard -> {
+            is Command.ShowKeyboard -> {
                 showKeyboard()
             }
-            Command.HideKeyboard -> {
+            is Command.HideKeyboard -> {
                 hideKeyboard()
             }
             is Command.BrokenSiteFeedback -> {
@@ -470,7 +484,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
             is Command.DownloadImage -> requestImageDownload(it.url)
             is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
-            Command.DismissFindInPage -> webView?.findAllAsync(null)
+            is Command.DismissFindInPage -> webView?.findAllAsync(null)
             is Command.ShareLink -> launchSharePageChooser(it.url)
             is Command.CopyLink -> {
                 clipboardManager.primaryClip = ClipData.newPlainText(null, it.url)
@@ -484,7 +498,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 }
             }
             is Command.HandleExternalAppLink -> {
-                externalAppLinkClicked(it)
+                openExternalDialog(it.appLink.intent, it.appLink.fallbackUrl, false)
             }
             is Command.LaunchSurvey -> launchSurvey(it.survey)
             is Command.LaunchAddWidget -> launchAddWidget()
@@ -493,6 +507,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.SaveCredentials -> saveBasicAuthCredentials(it.request, it.credentials)
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
+            is Command.ShowErrorWithAction -> showErrorSnackbar(it)
+        }
+    }
+
+    private fun showErrorSnackbar(command: Command.ShowErrorWithAction) {
+        //Snackbar is global and it should appear only the foreground fragment
+        if (!errorSnackbar.view.isAttachedToWindow && isVisible) {
+            errorSnackbar.setAction(R.string.crashedWebViewErrorAction) { command.action() }.show()
         }
     }
 
@@ -525,42 +547,53 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
     }
 
-    private fun externalAppLinkClicked(appLinkCommand: Command.HandleExternalAppLink) {
+    private fun openExternalDialog(intent: Intent, fallbackUrl: String? = null, useFirstActivityFound: Boolean = true) {
         context?.let {
             val pm = it.packageManager
-            val intent = appLinkCommand.appLink.intent
             val activities = pm.queryIntentActivities(intent, 0)
 
-            Timber.i("Found ${activities.size} that could consume ${appLinkCommand.appLink.url}")
-
-            when (activities.size) {
-                0 -> {
-                    if (appLinkCommand.appLink.fallbackUrl != null) {
-                        webView?.loadUrl(appLinkCommand.appLink.fallbackUrl)
-                    } else {
-                        showToast(R.string.unableToOpenLink)
-                    }
-                    return
+            if (activities.isEmpty()) {
+                if (fallbackUrl != null) {
+                    webView?.loadUrl(fallbackUrl)
+                } else {
+                    showToast(R.string.unableToOpenLink)
                 }
-                1 -> {
+            } else {
+                if (activities.size == 1 || useFirstActivityFound) {
                     val activity = activities.first()
                     val appTitle = activity.loadLabel(pm)
                     Timber.i("Exactly one app available for intent: $appTitle")
-
-                    AlertDialog.Builder(it)
-                        .setTitle(R.string.launchingExternalApp)
-                        .setMessage(getString(R.string.confirmOpenExternalApp))
-                        .setPositiveButton(R.string.openExternalApp) { _, _ -> it.startActivity(intent) }
-                        .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
-                        .show()
-                }
-                else -> {
+                    launchExternalAppDialog(it) { it.startActivity(intent) }
+                } else {
                     val title = getString(R.string.openExternalApp)
                     val intentChooser = Intent.createChooser(intent, title)
-                    it.startActivity(intentChooser)
+                    launchExternalAppDialog(it) { it.startActivity(intentChooser) }
                 }
             }
+        }
+    }
 
+    private fun launchExternalAppDialog(context: Context, onClick: () -> Unit) {
+        val isShowing = alertDialog?.isShowing
+
+        if (isShowing != true) {
+            alertDialog = AlertDialog.Builder(context)
+                .setTitle(R.string.launchingExternalApp)
+                .setMessage(getString(R.string.confirmOpenExternalApp))
+                .setPositiveButton(R.string.yes) { _, _ ->
+                    onClick()
+                }
+                .setNeutralButton(R.string.closeTab) { dialog, _ ->
+                    dialog.dismiss()
+                    launch {
+                        viewModel.closeCurrentTab()
+                        destroyWebView()
+                    }
+                }
+                .setNegativeButton(R.string.no) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
         }
     }
 
@@ -641,7 +674,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
-            Timber.i("Observed grade: $it")
+            Timber.d("Observed grade: $it")
             it?.let { privacyGrade ->
                 val drawable = context?.getDrawable(privacyGrade.icon()) ?: return@let
                 privacyGradeButton?.setImageDrawable(drawable)
@@ -1127,13 +1160,23 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {
+            if (lastSeenGlobalViewState is GlobalLayoutViewState.Invalidated &&
+                viewState is GlobalLayoutViewState.Browser) {
+                throw IllegalStateException("Invalid state transition")
+            }
+
             renderIfChanged(viewState, lastSeenGlobalViewState) {
                 lastSeenGlobalViewState = viewState
 
-                if (viewState.isNewTabState) {
-                    browserLayout.hide()
-                } else {
-                    browserLayout.show()
+                when (viewState) {
+                    is GlobalLayoutViewState.Browser -> {
+                        if (viewState.isNewTabState) {
+                            browserLayout.hide()
+                        } else {
+                            browserLayout.show()
+                        }
+                    }
+                    is GlobalLayoutViewState.Invalidated -> destroyWebView()
                 }
             }
         }
@@ -1177,6 +1220,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 newTabPopupMenuItem.isEnabled = browserShowing
                 addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
                 sharePageMenuItem?.isEnabled = viewState.canSharePage
+                brokenSitePopupMenuItem?.isEnabled = viewState.canReportSite
+                requestDesktopSiteCheckMenuItem?.isEnabled = viewState.canChangeBrowsingMode
 
                 addToHome?.let {
                     it.visibility = if (viewState.addToHomeVisible) VISIBLE else GONE

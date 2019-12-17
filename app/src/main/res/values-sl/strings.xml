@@ -1,7 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logotip DuckDuckGo</string>
-    <string name="appDescription">Poenostavljena zasebnost</string>
+    <string name="yes">Da</string>
+    <string name="no">Ne</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Vsakič obiščite Nastavitve za iskanje in brskanje z DuckDuckGo.</string>
@@ -83,6 +84,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Zapri</string>
     <string name="closeAllTabsMenuItem">Zapri vse zavihke</string>
+    <string name="closeTab">Zapri zavihek</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Nadzorna plošča zasebnosti</string>

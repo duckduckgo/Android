@@ -48,5 +48,6 @@
     <attr name="feedbackListItemSeparatorColor" format="color" />
     <attr name="feedbackEditTextBackgroundColor" format="color" />
     <attr name="feedbackEditTextHintColor" format="color" />
+    <attr name="daxDialogBackgroundColor" format="color" />
 
 </resources>

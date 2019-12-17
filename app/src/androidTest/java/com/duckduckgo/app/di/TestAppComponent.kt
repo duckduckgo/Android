@@ -68,7 +68,8 @@ import javax.inject.Singleton
         RatingModule::class,
         AppUsageModule::class,
         FileModule::class,
-        UncaughtExceptionModule::class
+        UncaughtExceptionModule::class,
+        PlayStoreReferralModule::class
     ]
 )
 interface TestAppComponent : AppComponent {

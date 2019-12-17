@@ -1,7 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
-    <string name="appDescription">Personvern gjort enkelt</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nei</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Åpne innstillinger for å søke og bruke nettleseren med DuckDuckGo hver gang.</string>
@@ -83,6 +84,7 @@
     <string name="faviconContentDescription">Favorittikon</string>
     <string name="closeContentDescription">Lukk</string>
     <string name="closeAllTabsMenuItem">Lukk alle faner</string>
+    <string name="closeTab">Lukk fane</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Dashbord for personvern</string>

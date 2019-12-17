@@ -1,7 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
-    <string name="appDescription">Ochrana soukromí, zjednodušená</string>
+    <string name="yes">Ano</string>
+    <string name="no">Ne</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Přejděte do Nastavení a vždy vyhledávejte a prohlížejte s DuckDuckGo.</string>
@@ -83,6 +84,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Zavřít</string>
     <string name="closeAllTabsMenuItem">Zavřít všechny karty</string>
+    <string name="closeTab">Zavřít karta</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Deska ochrany soukromí</string>

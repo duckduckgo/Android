@@ -1,7 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Λογότυπο DuckDuckGo</string>
-    <string name="appDescription">Ιδιωτικότητα, απλοποιημένη</string>
+    <string name="yes">Ναι</string>
+    <string name="no">Οχι</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Επισκεφθείτε τις Ρυθμίσεις για να εκτελείτε κάθε φορά αναζήτηση και περιήγηση με το DuckDuckGo.</string>
@@ -83,6 +84,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Κλείσιμο</string>
     <string name="closeAllTabsMenuItem">Κλείσιμο όλων των καρτελών</string>
+    <string name="closeTab">Κλείσιμο καρτέλα</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Πίνακας εργαλείων ιδιωτικότητας</string>

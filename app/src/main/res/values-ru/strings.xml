@@ -17,7 +17,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Логотип DuckDuckGo</string>
-    <string name="appDescription">Максимум конфиденциальности, минимум усилий</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Чтобы сделать DuckDuckGo поисковой системой по умолчанию, перейдите в «Настройки».</string>
@@ -99,6 +100,7 @@
     <string name="faviconContentDescription">Значок сайта</string>
     <string name="closeContentDescription">Закрыть</string>
     <string name="closeAllTabsMenuItem">Закрыть все вкладки</string>
+    <string name="closeTab">Закрыть вкладка</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Панель конфиденциальности</string>

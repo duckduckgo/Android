@@ -1,7 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
-    <string name="appDescription">Privacy, vereenvoudigd</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nee</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Ga naar Instellingen om elke keer te zoeken en te browsen met DuckDuckGo.</string>
@@ -83,6 +84,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Sluiten</string>
     <string name="closeAllTabsMenuItem">Alle tabbladen sluiten</string>
+    <string name="closeTab">Tabblad sluiten</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Privacydashboard</string>

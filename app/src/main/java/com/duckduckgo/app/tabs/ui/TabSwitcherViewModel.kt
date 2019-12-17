@@ -29,7 +29,6 @@ class TabSwitcherViewModel(private val tabRepository: TabRepository, private val
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
-    var selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
 
     sealed class Command {
         data class DisplayMessage(@StringRes val messageId: Int) : Command()

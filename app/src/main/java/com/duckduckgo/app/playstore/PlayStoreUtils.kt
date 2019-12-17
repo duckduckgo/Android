@@ -93,8 +93,9 @@ class PlayStoreAndroidUtils(val context: Context) : PlayStoreUtils {
     }
 
     companion object {
+        const val PLAY_STORE_PACKAGE = "com.android.vending"
+        const val PLAY_STORE_REFERRAL_SERVICE = "com.google.android.finsky.externalreferrer.GetInstallReferrerService"
         private const val PLAY_STORE_URI = "https://play.google.com/store/apps/details?id="
-        private const val PLAY_STORE_PACKAGE = "com.android.vending"
         private const val DDG_APP_PACKAGE = "com.duckduckgo.mobile.android"
     }
 }

@@ -62,6 +62,7 @@ import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
+import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
 import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
@@ -74,6 +75,7 @@ import io.reactivex.Single
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.withContext
 import org.junit.After
@@ -179,6 +181,8 @@ class BrowserTabViewModelTest {
 
     private lateinit var testee: BrowserTabViewModel
 
+    private val selectedTabLiveData = MutableLiveData<TabEntity>()
+
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
@@ -200,11 +204,13 @@ class BrowserTabViewModelTest {
         )
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore)
-        runBlockingTest {
-            whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
-            whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
-            whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        }
+
+        whenever(mockOmnibarConverter.convertQueryToUrl(any())).thenReturn("duckduckgo.com")
+        whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
+        whenever(mockTabsRepository.liveSelectedTab).thenReturn(selectedTabLiveData)
+        whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
+        whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -231,9 +237,6 @@ class BrowserTabViewModelTest {
 
         testee.loadData("abc", null, false)
         testee.command.observeForever(mockCommandObserver)
-
-        whenever(mockOmnibarConverter.convertQueryToUrl(any())).thenReturn("duckduckgo.com")
-        whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
     }
 
     @ExperimentalCoroutinesApi
@@ -268,7 +271,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOpenInNewBackgroundRequestedThenTabRepositoryUpdatedAndCommandIssued() = runBlockingTest {
+    fun whenOpenInNewBackgroundRequestedThenTabRepositoryUpdatedAndCommandIssued() = ruleRunBlockingTest {
         val url = "http://www.example.com"
         testee.openInNewBackgroundTab(url)
 
@@ -292,6 +295,14 @@ class BrowserTabViewModelTest {
         testee.onViewVisible()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
+    }
+
+    @Test
+    fun whenInvalidatedGlobalLayoutRestoredThenErrorIsShown() {
+        givenInvalidatedGlobalLayout()
+        setBrowserShowing(true)
+        testee.onViewVisible()
+        assertCommandIssued<Command.ShowErrorWithAction>()
     }
 
     @Test
@@ -319,13 +330,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBookmarkEditedThenDaoIsUpdated() = runBlockingTest {
+    fun whenBookmarkEditedThenDaoIsUpdated() = ruleRunBlockingTest {
         testee.editBookmark(0, "A title", "www.example.com")
         verify(mockBookmarksDao).update(BookmarkEntity(title = "A title", url = "www.example.com"))
     }
 
     @Test
-    fun whenBookmarkAddedThenDaoIsUpdatedAndUserNotified() = runBlockingTest {
+    fun whenBookmarkAddedThenDaoIsUpdatedAndUserNotified() = ruleRunBlockingTest {
         loadUrl("www.example.com", "A title")
 
         testee.onBookmarkAddRequested()
@@ -342,7 +353,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenEmptyInputQueryThenQueryNavigateCommandNotSubmittedToActivityActivity() {
+    fun whenEmptyInputQueryThenQueryNavigateCommandNotSubmittedToActivity() {
         testee.onUserSubmittedQuery("")
         verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
     }
@@ -361,7 +372,27 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowsingAndUrlLoadedThenSiteVisitedEntryAddedToLeaderboardDao() = runBlockingTest {
+    fun whenInvalidatedGlobalLayoutAndNonEmptyInputThenOpenInNewTab() {
+        givenOneActiveTabSelected()
+        givenInvalidatedGlobalLayout()
+        testee.onUserSubmittedQuery("foo")
+        assertCommandIssued<Command.OpenInNewTab>()
+    }
+
+    @Test
+    fun whenInvalidatedGlobalLayoutAndNonEmptyInputThenCloseCurrentTab() {
+        givenOneActiveTabSelected()
+        givenInvalidatedGlobalLayout()
+
+        testee.onUserSubmittedQuery("foo")
+
+        ruleRunBlockingTest {
+            verify(mockTabsRepository).delete(selectedTabLiveData.value!!)
+        }
+    }
+
+    @Test
+    fun whenBrowsingAndUrlLoadedThenSiteVisitedEntryAddedToLeaderboardDao() = ruleRunBlockingTest {
         loadUrl("http://example.com/abc", isBrowserShowing = true)
         verify(mockNetworkLeaderboardDao).incrementSitesVisited()
     }
@@ -430,7 +461,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenViewModelNotifiedThatUrlGotFocusThenViewStateIsUpdated() = runBlockingTest {
+    fun whenViewModelNotifiedThatUrlGotFocusThenViewStateIsUpdated() = ruleRunBlockingTest {
         withContext(Dispatchers.Main) {
             testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
             assertTrue(omnibarViewState().isEditing)
@@ -498,7 +529,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlClearedThenPrivacyGradeIsCleared() = runBlockingTest {
+    fun whenUrlClearedThenPrivacyGradeIsCleared() = ruleRunBlockingTest {
         withContext(Dispatchers.Main) {
             loadUrl("https://duckduckgo.com")
             assertNotNull(testee.privacyGrade.value)
@@ -508,7 +539,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlLoadedThenPrivacyGradeIsReset() = runBlockingTest {
+    fun whenUrlLoadedThenPrivacyGradeIsReset() = ruleRunBlockingTest {
         withContext(Dispatchers.Main) {
             loadUrl("https://duckduckgo.com")
             assertNotNull(testee.privacyGrade.value)
@@ -805,6 +836,15 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenHomeShowingByPressingBackOnInvalidatedBrowserThenForwardButtonInactive() {
+        setupNavigation(isBrowsing = true)
+        givenInvalidatedGlobalLayout()
+        testee.onUserPressedBack()
+        assertFalse(browserViewState().browserShowing)
+        assertFalse(browserViewState().canGoForward)
+    }
+    
+    @Test
     fun whenBrowserShowingAndCanGoForwardThenForwardButtonActive() {
         setupNavigation(isBrowsing = true, canGoForward = true)
         assertTrue(browserViewState().canGoForward)
@@ -856,6 +896,34 @@ class BrowserTabViewModelTest {
         testee.onUserPressedForward()
         assertTrue(browserViewState().browserShowing)
         assertTrue(captureCommands().lastValue == Command.Refresh)
+    }
+
+    @Test
+    fun whenRefreshRequestedWithInvalidatedGlobalLayoutThenOpenCurrentUrlInNewTab() {
+        givenOneActiveTabSelected()
+        givenInvalidatedGlobalLayout()
+
+        testee.onRefreshRequested()
+
+        assertCommandIssued<Command.OpenInNewTab>()
+    }
+
+    @Test
+    fun whenRefreshRequestedWithInvalidatedGlobalLayoutThenCloseCurrentTab() {
+        givenOneActiveTabSelected()
+        givenInvalidatedGlobalLayout()
+
+        testee.onRefreshRequested()
+
+        ruleRunBlockingTest {
+            verify(mockTabsRepository).delete(selectedTabLiveData.value!!)
+        }
+    }
+
+    @Test
+    fun whenRefreshRequestedWithBrowserGlobalLayoutThenRefresh() {
+        testee.onRefreshRequested()
+        assertCommandIssued<Command.Refresh>()
     }
 
     @Test
@@ -935,7 +1003,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSiteLoadedAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithUrlAndTitle() = runBlockingTest {
+    fun whenSiteLoadedAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithUrlAndTitle() = ruleRunBlockingTest {
         loadUrl("foo.com")
         testee.titleReceived("Foo Title")
         testee.onBookmarkAddRequested()
@@ -945,7 +1013,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkAddedWithBlankTitleAndUrl() = runBlockingTest {
+    fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkAddedWithBlankTitleAndUrl() = ruleRunBlockingTest {
         whenever(mockBookmarksDao.insert(any())).thenReturn(1)
         testee.onBookmarkAddRequested()
         verify(mockBookmarksDao).insert(BookmarkEntity(title = "", url = ""))
@@ -964,7 +1032,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithUrl() = runBlockingTest {
+    fun whenOnSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithUrl() = ruleRunBlockingTest {
         loadUrl("foo.com", isBrowserShowing = true)
         testee.onBrokenSiteSelected()
         val command = captureCommands().value as Command.BrokenSiteFeedback
@@ -988,7 +1056,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenWebSessionRestoredThenGlobalLayoutSwitchedToShowingBrowser() {
         testee.onWebSessionRestored()
-        assertFalse(globalLayoutViewState().isNewTabState)
+        assertFalse(browserGlobalLayoutViewState().isNewTabState)
     }
 
     @Test
@@ -1019,11 +1087,11 @@ class BrowserTabViewModelTest {
     fun whenWebViewSessionRestorableThenSessionRestored() {
         whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(true)
         testee.restoreWebViewState(null, "")
-        assertFalse(globalLayoutViewState().isNewTabState)
+        assertFalse(browserGlobalLayoutViewState().isNewTabState)
     }
 
     @Test
-    fun whenUrlNullThenSetBrowserNotShowing() = runBlockingTest {
+    fun whenUrlNullThenSetBrowserNotShowing() = ruleRunBlockingTest {
         withContext(Dispatchers.Main) {
             testee.loadData("id", null, false)
             testee.determineShowBrowser()
@@ -1032,7 +1100,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlBlankThenSetBrowserNotShowing() = runBlockingTest {
+    fun whenUrlBlankThenSetBrowserNotShowing() = ruleRunBlockingTest {
         withContext(Dispatchers.Main) {
             testee.loadData("id", "  ", false)
             testee.determineShowBrowser()
@@ -1041,7 +1109,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlPresentThenSetBrowserShowing() = runBlockingTest {
+    fun whenUrlPresentThenSetBrowserShowing() = ruleRunBlockingTest {
         withContext(Dispatchers.Main) {
             testee.loadData("id", "https://example.com", false)
             testee.determineShowBrowser()
@@ -1059,6 +1127,74 @@ class BrowserTabViewModelTest {
         assertTrue(command is Command.OpenInNewTab)
         command as Command.OpenInNewTab
         assertEquals(url, command.query)
+    }
+
+    @Test
+    fun whenRecoveringFromProcessGoneThenShowErrorWithAction() {
+        testee.recoverFromRenderProcessGone()
+        assertCommandIssued<Command.ShowErrorWithAction>()
+    }
+
+    @Test
+    fun whenUserClicksOnErrorActionThenOpenCurrentUrlInNewTab() {
+        givenOneActiveTabSelected()
+        testee.recoverFromRenderProcessGone()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val showErrorWithAction = commandCaptor.value as Command.ShowErrorWithAction
+
+        showErrorWithAction.action()
+
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertEquals("https://example.com", query)
+        }
+    }
+
+    @Test
+    fun whenUserClicksOnErrorActionThenOpenCurrentTabIsClosed() {
+        givenOneActiveTabSelected()
+        testee.recoverFromRenderProcessGone()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val showErrorWithAction = commandCaptor.value as Command.ShowErrorWithAction
+
+        showErrorWithAction.action()
+
+        ruleRunBlockingTest {
+            verify(mockTabsRepository).delete(selectedTabLiveData.value!!)
+        }
+    }
+
+    @Test
+    fun whenRecoveringFromProcessGoneThenGlobalLayoutIsInvalidated() {
+        testee.recoverFromRenderProcessGone()
+
+        assertTrue(globalLayoutViewState() is BrowserTabViewModel.GlobalLayoutViewState.Invalidated)
+    }
+
+    @Test
+    fun whenRecoveringFromProcessGoneThenLoadingIsReset() {
+        testee.recoverFromRenderProcessGone()
+
+        assertEquals(loadingViewState(), BrowserTabViewModel.LoadingViewState())
+    }
+
+    @Test
+    fun whenRecoveringFromProcessGoneThenFindInPageIsReset() {
+        testee.recoverFromRenderProcessGone()
+
+        assertEquals(findInPageViewState(), BrowserTabViewModel.FindInPageViewState())
+    }
+
+    @Test
+    fun whenRecoveringFromProcessGoneThenExpectedBrowserOptionsAreDisabled() {
+        setupNavigation(skipHome = true, isBrowsing = true, canGoForward = true, canGoBack = true, stepsToPreviousPage = 1)
+
+        testee.recoverFromRenderProcessGone()
+
+        assertFalse(browserViewState().canGoBack)
+        assertFalse(browserViewState().canGoForward)
+        assertFalse(browserViewState().canReportSite)
+        assertFalse(browserViewState().canChangeBrowsingMode)
+        assertFalse(findInPageViewState().canFindInPage)
     }
 
     @Test
@@ -1116,7 +1252,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSelectToEditQueryThenMoveCaretToTheEnd() = runBlockingTest {
+    fun whenUserSelectToEditQueryThenMoveCaretToTheEnd() = ruleRunBlockingTest {
         withContext(Dispatchers.Main) {
             testee.onUserSelectedToEditQuery("foo")
             assertTrue(omnibarViewState().shouldMoveCaretToEnd)
@@ -1146,35 +1282,46 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenCloseCurrentTabSelectedThenTabDeletedFromRepository() = runBlocking {
+        givenOneActiveTabSelected()
+        testee.closeCurrentTab()
+        verify(mockTabsRepository).delete(selectedTabLiveData.value!!)
+    }
+
+    @Test
     fun whenUserPressesBackAndSkippingHomeThenWebViewPreviewGenerated() {
         setupNavigation(isBrowsing = true, canGoBack = false, skipHome = true)
         testee.onUserPressedBack()
-        verifyGenerateWebViewPreviewCommandIssued()
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
     }
 
     @Test
     fun whenUserPressesBackAndNotSkippingHomeThenWebViewPreviewNotGenerated() {
         setupNavigation(isBrowsing = true, canGoBack = false, skipHome = false)
         testee.onUserPressedBack()
-        verifyGenerateWebViewPreviewCommandNotIssued()
+        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
     }
 
-    private fun verifyGenerateWebViewPreviewCommandIssued() {
+    private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val generatedPreviewCommand = commandCaptor.allValues.find { it is Command.GenerateWebViewPreviewImage }
-        assertNotNull(generatedPreviewCommand)
-    }
-
-    private fun verifyGenerateWebViewPreviewCommandNotIssued() {
-        verify(mockCommandObserver, atLeast(0)).onChanged(commandCaptor.capture())
-        val generatedPreviewCommand = commandCaptor.allValues.find { it is Command.GenerateWebViewPreviewImage }
-        assertNull(generatedPreviewCommand)
+        val issuedCommand = commandCaptor.allValues.find { it is T }
+        assertNotNull(issuedCommand)
+        (issuedCommand as T).apply { instanceAssertions() }
     }
 
     private fun pixelParams(showedBookmarks: Boolean, bookmarkCapable: Boolean) = mapOf(
         Pixel.PixelParameter.SHOWED_BOOKMARKS to showedBookmarks.toString(),
         Pixel.PixelParameter.BOOKMARK_CAPABLE to bookmarkCapable.toString()
     )
+
+    private fun givenInvalidatedGlobalLayout() {
+        testee.globalLayoutState.value = BrowserTabViewModel.GlobalLayoutViewState.Invalidated
+    }
+
+    private fun givenOneActiveTabSelected() {
+        selectedTabLiveData.value = TabEntity("TAB_ID", "https://example.com", "", skipHome = false, viewed = true, position = 0)
+        testee.loadData("TAB_ID", "https://example.com", false)
+    }
 
     private fun setBrowserShowing(isBrowsing: Boolean) {
         testee.browserViewState.value = browserViewState().copy(browserShowing = isBrowsing)
@@ -1185,6 +1332,7 @@ class BrowserTabViewModelTest {
         testee.navigationStateChanged(buildWebNavigation(originalUrl = url, currentUrl = url, title = title))
     }
 
+    @Suppress("SameParameterValue")
     private fun updateUrl(originalUrl: String?, currentUrl: String?, isBrowserShowing: Boolean) {
         setBrowserShowing(isBrowserShowing)
         testee.navigationStateChanged(buildWebNavigation(originalUrl = originalUrl, currentUrl = currentUrl))
@@ -1232,4 +1380,8 @@ class BrowserTabViewModelTest {
     private fun autoCompleteViewState() = testee.autoCompleteViewState.value!!
     private fun findInPageViewState() = testee.findInPageViewState.value!!
     private fun globalLayoutViewState() = testee.globalLayoutState.value!!
+    private fun browserGlobalLayoutViewState() = testee.globalLayoutState.value!! as BrowserTabViewModel.GlobalLayoutViewState.Browser
+
+    private fun ruleRunBlockingTest(block: suspend TestCoroutineScope.() -> Unit) =
+        coroutineRule.testDispatcher.runBlockingTest(block)
 }

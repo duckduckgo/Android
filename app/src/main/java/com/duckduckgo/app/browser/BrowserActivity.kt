@@ -246,7 +246,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
         Timber.i("Processing command: $command")
         when (command) {
             is Query -> currentTab?.submitQuery(command.query)
-            is Refresh -> currentTab?.refresh()
+            is Refresh -> currentTab?.onRefreshRequested()
             is Command.DisplayMessage -> applicationContext?.longToast(command.messageId)
             is Command.LaunchPlayStore -> launchPlayStore()
             is Command.ShowAppEnjoymentPrompt -> showAppEnjoymentPrompt(AppEnjoymentDialogFragment.create(command.promptCount, viewModel))
