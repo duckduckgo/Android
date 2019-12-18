@@ -32,6 +32,7 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
+import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
@@ -40,7 +41,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
-import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
@@ -230,7 +231,7 @@ class CtaViewModelTest {
     fun whenRefreshCtaOnExistingTabAndHideTipsIsTrueThenReturnNull() = runBlockingTest {
         setConceptTestVariant()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
-        val site = site(url = "http://www.facebook.com", memberNetwork = TrackerNetwork("Facebook"))
+        val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = false, site = site)
         assertNull(value)
@@ -239,7 +240,7 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaOnExistingTabAndVariantIsNotConceptTestThenReturnNull() = runBlockingTest {
         setDefaultVariant()
-        val site = site(url = "http://www.facebook.com", memberNetwork = TrackerNetwork("Facebook"))
+        val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = false, site = site)
         assertNull(value)
@@ -347,7 +348,7 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaOnExistingTabThenReturnNetworkCta() = runBlockingTest {
         setConceptTestVariant()
-        val site = site(url = "http://www.facebook.com", memberNetwork = TrackerNetwork("Facebook"))
+        val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
         val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = false, site = site)
 
         assertTrue(value is DaxDialogCta.DaxMainNetworkCta)
@@ -425,7 +426,12 @@ class CtaViewModelTest {
     }
 
     private fun setNoCtaVariant() {
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("test", features = listOf(VariantManager.VariantFeature.ExistingNoCta), filterBy = { true }))
+        whenever(mockVariantManager.getVariant()).thenReturn(
+            Variant(
+                "test",
+                features = listOf(VariantManager.VariantFeature.ExistingNoCta),
+                filterBy = { true })
+        )
     }
 
     private fun site(
@@ -436,7 +442,7 @@ class CtaViewModelTest {
         majorNetworkCount: Int = 0,
         allTrackersBlocked: Boolean = true,
         privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN,
-        memberNetwork: TrackerNetwork? = null,
+        entity: Entity? = null,
         grade: PrivacyGrade = PrivacyGrade.UNKNOWN,
         improvedGrade: PrivacyGrade = PrivacyGrade.UNKNOWN
     ): Site {
@@ -444,7 +450,7 @@ class CtaViewModelTest {
         whenever(site.url).thenReturn(url)
         whenever(site.uri).thenReturn(uri)
         whenever(site.https).thenReturn(https)
-        whenever(site.memberNetwork).thenReturn(memberNetwork)
+        whenever(site.entity).thenReturn(entity)
         whenever(site.trackerCount).thenReturn(trackerCount)
         whenever(site.majorNetworkCount).thenReturn(majorNetworkCount)
         whenever(site.allTrackersBlocked).thenReturn(allTrackersBlocked)

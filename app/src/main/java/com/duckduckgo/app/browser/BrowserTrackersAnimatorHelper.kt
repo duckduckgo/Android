@@ -25,8 +25,8 @@ import android.view.View
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import com.duckduckgo.app.privacy.renderer.TrackersRenderer
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import java.util.Locale
 import javax.inject.Inject
 
 class BrowserTrackersAnimatorHelper @Inject constructor() {
@@ -75,11 +75,10 @@ class BrowserTrackersAnimatorHelper @Inject constructor() {
         if (events.isNullOrEmpty() || packageName == null) return emptyList()
 
         return events.asSequence().mapNotNull {
-            it.trackerNetwork
+            it.entity
         }.map {
-            val logoName = "${LOGO_RES_PREFIX}${it.name.toLowerCase(Locale.getDefault()).replace(".", "")}"
-            activity.resources.getIdentifier(logoName, "drawable", packageName)
-        }.toList().filter { it != 0 }.distinct().take(MAX_LOGOS_SHOWN).toList()
+            TrackersRenderer().networkLogoIcon(activity, it.name)
+        }.filterNotNull().distinct().take(MAX_LOGOS_SHOWN).toList()
     }
 
     private fun animateBlockedLogos(views: List<View>) {

@@ -164,10 +164,10 @@ class CtaViewModel @Inject constructor(
         site?.let {
             // Is major network
             val host = it.uri?.host
-            if (it.memberNetwork != null && host != null) {
-                it.memberNetwork?.let { network ->
-                    if (!daxDialogNetworkShown() && DaxDialogCta.MAIN_TRACKER_NETWORKS.contains(network.name)) {
-                        return DaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, network.name, host)
+            if (it.entity != null && host != null) {
+                it.entity?.let { entity ->
+                    if (!daxDialogNetworkShown() && DaxDialogCta.MAIN_TRACKER_NETWORKS.contains(entity.displayName)) {
+                        return DaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
                     }
                 }
             }

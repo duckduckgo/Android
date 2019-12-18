@@ -120,8 +120,9 @@ sealed class DaxDialogCta(
 
         override fun getDaxText(activity: FragmentActivity): String {
             val trackersFiltered = trackers.asSequence()
-                .filter { it.trackerNetwork?.isMajor == true }
-                .map { MAIN_TRACKER_NETWORKS_NAMES[it.trackerNetwork?.name] ?: it.trackerNetwork?.name }
+                .filter { it.entity?.isMajor == true }
+                .map { it.entity?.displayName }
+                .filterNotNull()
                 .distinct()
                 .take(MAX_TRACKERS_SHOWS)
                 .toList()
@@ -214,7 +215,6 @@ sealed class DaxDialogCta(
         const val SERP = "duckduckgo"
         val MAIN_TRACKER_DOMAINS = listOf("facebook", "google")
         val MAIN_TRACKER_NETWORKS = listOf("Facebook", "Google")
-        val MAIN_TRACKER_NETWORKS_NAMES = mapOf(Pair("Amazon.com", "Amazon"))
         val NETWORK_PROPERTY_PERCENTAGES = mapOf(Pair("Google", "90%"), Pair("Facebook", "40%"))
     }
 }
