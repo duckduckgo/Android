@@ -17,7 +17,7 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
-    <!-- Omnbibar Animation -->
+    <!-- Omnibar Animation -->
     <string name="trackersAnimationText">Scanning</string>
 
     <!-- New Onboarding Experience -->
@@ -39,7 +39,6 @@
         <item quantity="other"><![CDATA[&#160;and <b>%d others</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> Tap the privacy grade to learn more about your privacy on %s.]]></item>
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText"><![CDATA[&#160;was trying to track you here. <br/><br/>I blocked it!<br/><br/> Tap the privacy grade to learn more about your privacy on %s.]]></string>
-
 
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">HIDE</string>

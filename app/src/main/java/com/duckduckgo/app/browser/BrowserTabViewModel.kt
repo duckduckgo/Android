@@ -202,6 +202,7 @@ class BrowserTabViewModel(
     val omnibarViewState: MutableLiveData<OmnibarViewState> = MutableLiveData()
     val findInPageViewState: MutableLiveData<FindInPageViewState> = MutableLiveData()
     val ctaViewState: MutableLiveData<CtaViewState> = MutableLiveData()
+    var siteLiveData: MutableLiveData<Site> = MutableLiveData()
 
     var skipHome = false
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
@@ -226,7 +227,6 @@ class BrowserTabViewModel(
     private var appConfigurationDownloaded = false
     private val appConfigurationObservable = appConfigurationDao.appConfigurationStatus()
     private val autoCompletePublishSubject = PublishRelay.create<String>()
-    var siteLiveData = MutableLiveData<Site>()
     private var site: Site? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
@@ -878,7 +878,7 @@ class BrowserTabViewModel(
             val cta = withContext(dispatchers.io()) {
                 ctaViewModel.refreshCta(dispatchers.io(), isNewTab, siteLiveData.value)
             }
-            ctaViewState.postValue(currentCtaViewState().copy(cta = cta))
+            ctaViewState.value = currentCtaViewState().copy(cta = cta)
         }
     }
 
@@ -905,7 +905,7 @@ class BrowserTabViewModel(
         if (cta is HomePanelCta) {
             refreshCta(true)
         } else {
-            ctaViewState.postValue(currentCtaViewState().copy(cta = null))
+            ctaViewState.value = currentCtaViewState().copy(cta = null)
         }
     }
 

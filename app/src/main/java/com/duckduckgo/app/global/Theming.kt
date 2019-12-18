@@ -27,7 +27,6 @@ import com.duckduckgo.app.global.Theming.Constants.THEME_MAP
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 
-
 enum class DuckDuckGoTheme {
     DARK,
     LIGHT;

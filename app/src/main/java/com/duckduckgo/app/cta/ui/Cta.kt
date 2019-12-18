@@ -90,7 +90,7 @@ sealed class DaxDialogCta(
 
     open fun getDaxText(activity: FragmentActivity): String = activity.getString(description)
 
-    class DaxSerpCta(onboarding: OnboardingStore, appStore: AppInstallStore) : DaxDialogCta(
+    class DaxSerpCta(onboardingStore: OnboardingStore, appInstallStore: AppInstallStore) : DaxDialogCta(
         CtaId.DAX_DIALOG_SERP,
         R.string.daxSerpCtaText,
         R.string.daxDialogPhew,
@@ -98,11 +98,11 @@ sealed class DaxDialogCta(
         Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
         Pixel.PixelValues.DAX_SERP_CTA,
-        onboarding,
-        appStore
+        onboardingStore,
+        appInstallStore
     )
 
-    class DaxTrackersBlockedCta(onboarding: OnboardingStore, appStore: AppInstallStore, val trackers: List<TrackingEvent>, val host: String) :
+    class DaxTrackersBlockedCta(onboardingStore: OnboardingStore, appInstallStore: AppInstallStore, val trackers: List<TrackingEvent>, val host: String) :
         DaxDialogCta(
             CtaId.DAX_DIALOG_TRACKERS_FOUND,
             R.plurals.daxTrackersBlockedCtaText,
@@ -111,8 +111,8 @@ sealed class DaxDialogCta(
             Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
             null,
             Pixel.PixelValues.DAX_TRACKERS_BLOCKED_CTA,
-            onboarding,
-            appStore
+            onboardingStore,
+            appInstallStore
         ) {
 
         override fun createDialogCta(activity: FragmentActivity): DaxDialog =
@@ -139,7 +139,7 @@ sealed class DaxDialogCta(
         }
     }
 
-    class DaxMainNetworkCta(onboarding: OnboardingStore, appStore: AppInstallStore, val network: String, val host: String) : DaxDialogCta(
+    class DaxMainNetworkCta(onboardingStore: OnboardingStore, appInstallStore: AppInstallStore, val network: String, val host: String) : DaxDialogCta(
         CtaId.DAX_DIALOG_NETWORK,
         R.string.daxMainNetworkStep1CtaText,
         R.string.daxDialogNext,
@@ -147,8 +147,8 @@ sealed class DaxDialogCta(
         Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
         Pixel.PixelValues.DAX_NETWORK_CTA_1,
-        onboarding,
-        appStore
+        onboardingStore,
+        appInstallStore
     ) {
 
         override fun getDaxText(activity: FragmentActivity): String {
@@ -187,7 +187,7 @@ sealed class DaxDialogCta(
         private fun isFromSameNetworkDomain() = MAIN_TRACKER_DOMAINS.any { host.contains(it) }
     }
 
-    class DaxNoSerpCta(onboarding: OnboardingStore, appStore: AppInstallStore) : DaxDialogCta(
+    class DaxNoSerpCta(onboardingStore: OnboardingStore, appInstallStore: AppInstallStore) : DaxDialogCta(
         CtaId.DAX_DIALOG_OTHER,
         R.string.daxNonSerpCtaText,
         R.string.daxDialogGotIt,
@@ -195,8 +195,8 @@ sealed class DaxDialogCta(
         Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
         Pixel.PixelValues.DAX_NO_TRACKERS_CTA,
-        onboarding,
-        appStore
+        onboardingStore,
+        appInstallStore
     ) {
 
         override fun createDialogCta(activity: FragmentActivity): DaxDialog {
@@ -229,6 +229,17 @@ sealed class DaxBubbleCta(
     val onboardingStore: OnboardingStore,
     val appInstallStore: AppInstallStore
 ) : Cta {
+
+    override fun apply(view: View) {
+        val daxText = view.context.getString(description)
+        view.show()
+        view.alpha = 1f
+        view.hiddenTextCta.text = daxText.html(view.context)
+        view.primaryCta.hide()
+        view.dialogTextCta.startTypingAnimation(daxText, true)
+    }
+
+    override fun createDialogCta(activity: FragmentActivity): DaxDialog? = null
 
     override fun pixelCancelParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
@@ -269,17 +280,6 @@ sealed class DaxBubbleCta(
         onboardingStore,
         appInstallStore
     )
-
-    override fun apply(view: View) {
-        val daxText = view.context.getString(description)
-        view.show()
-        view.alpha = 1f
-        view.hiddenTextCta.text = daxText.html(view.context)
-        view.primaryCta.hide()
-        view.dialogTextCta.startTypingAnimation(daxText, true)
-    }
-
-    override fun createDialogCta(activity: FragmentActivity): DaxDialog? = null
 }
 
 sealed class HomePanelCta(
