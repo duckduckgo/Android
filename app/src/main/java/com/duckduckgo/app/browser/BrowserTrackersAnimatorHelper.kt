@@ -31,10 +31,9 @@ import javax.inject.Inject
 
 class BrowserTrackersAnimatorHelper @Inject constructor() {
 
-    var logosStayOnScreenDuration: Long = 3000L
+    var logosStayOnScreenDuration: Long = TRACKER_LOGOS_DELAY_ON_SCREEN
 
     fun createLoadingAnimation(fadeOutViews: List<View>, fadeInView: View): AnimatorSet {
-        logosStayOnScreenDuration = 3000L
 
         val animators = fadeOutViews.map {
             animateFadeOut(it)
@@ -142,8 +141,10 @@ class BrowserTrackersAnimatorHelper @Inject constructor() {
             )
         }
 
-        if (viewIds.isEmpty()) {
-            logosStayOnScreenDuration = 0L
+        logosStayOnScreenDuration = if (viewIds.isEmpty()) {
+            TRACKER_LOGOS_REMOVE_DELAY
+        } else {
+            TRACKER_LOGOS_DELAY_ON_SCREEN
         }
 
         constraints.applyTo(container)
@@ -173,6 +174,8 @@ class BrowserTrackersAnimatorHelper @Inject constructor() {
     }
 
     companion object {
+        private const val TRACKER_LOGOS_REMOVE_DELAY = 0L
+        private const val TRACKER_LOGOS_DELAY_ON_SCREEN = 3000L
         private const val DEFAULT_ANIMATION_DURATION = 250L
         private const val MAX_LOGOS_SHOWN = 4
         private const val LOGO_RES_PREFIX = "network_logo_"

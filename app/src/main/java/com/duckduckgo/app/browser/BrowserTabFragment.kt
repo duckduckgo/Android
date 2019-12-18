@@ -424,7 +424,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun processCommand(it: Command?) {
-        renderer.cancelTrackersAnimation()
+        renderer.cancelAllAnimations()
         when (it) {
             is Command.Refresh -> refresh()
             is Command.OpenInNewTab -> {
@@ -1090,7 +1090,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private const val MAX_PROGRESS = 100
         private const val TRACKERS_INI_DELAY = 700L
         private const val TRACKERS_SECONDARY_DELAY = 300L
-        private const val DEFAULT_ANIMATION_DURATION = 250L
 
         fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
             val fragment = BrowserTabFragment()
@@ -1116,7 +1115,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private var lastSeenCtaViewState: CtaViewState? = null
 
         private var loadingAnimation: AnimatorSet = AnimatorSet()
-        private var finishAnimation: AnimatorSet = AnimatorSet()
+        private var trackersAnimation: AnimatorSet = AnimatorSet()
         private var typingAnimationJob: Job? = null
 
         fun renderAutocomplete(viewState: AutoCompleteViewState) {
@@ -1139,7 +1138,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
                 if (viewState.isEditing) {
                     omniBarContainer.background = null
-                    cancelTrackersAnimation()
+                    cancelAllAnimations()
                 } else {
                     omniBarContainer.setBackgroundResource(R.drawable.omnibar_field_background)
                 }
@@ -1167,7 +1166,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)) {
 
                     if (lastSeenOmnibarViewState?.isEditing == true) {
-                        cancelTrackersAnimation()
+                        cancelAllAnimations()
                     }
 
                     if (viewState.progress <= MIN_PROGRESS && viewState.isLoading && lastSeenOmnibarViewState?.isEditing != true) {
@@ -1190,15 +1189,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     if (loadingAnimation.isRunning) {
                         loadingAnimation.end()
                     }
-                    val animateOmnibarIn = browserTrackersAnimatorHelper.animateOmnibarIn(omnibarViews())
-                    val fadeLogosOut = browserTrackersAnimatorHelper.animateFadeOut(networksContainer)
 
-                    if (!finishAnimation.isRunning) {
+                    if (!trackersAnimation.isRunning) {
                         typingAnimationJob?.cancel()
                         typingAnimationJob = null
                         val site = viewModel.siteLiveData.value
                         val events = site?.trackingEvents
-                        finishAnimation = if (lastSeenCtaViewState?.cta is DaxDialogCta.DaxTrackersBlockedCta) {
+                        trackersAnimation = if (lastSeenCtaViewState?.cta is DaxDialogCta.DaxTrackersBlockedCta) {
                             AnimatorSet().apply {
                                 play(browserTrackersAnimatorHelper.createTrackersAnimation(activity!!, networksContainer, loadingText, events))
                                 start()
@@ -1206,7 +1203,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                         } else {
                             AnimatorSet().apply {
                                 play(browserTrackersAnimatorHelper.createTrackersAnimation(activity!!, networksContainer, loadingText, events))
-                                play(fadeLogosOut).after(browserTrackersAnimatorHelper.logosStayOnScreenDuration).before(animateOmnibarIn)
+                                play(browserTrackersAnimatorHelper.animateFadeOut(networksContainer))
+                                    .after(browserTrackersAnimatorHelper.logosStayOnScreenDuration)
+                                    .before(browserTrackersAnimatorHelper.animateOmnibarIn(omnibarViews()))
                                 start()
                             }
                         }
@@ -1216,7 +1215,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         private fun createLoadingAnimation() {
-            if (!loadingAnimation.isRunning && !finishAnimation.isRunning) {
+            if (!loadingAnimation.isRunning && !trackersAnimation.isRunning) {
                 loadingAnimation = browserTrackersAnimatorHelper.createLoadingAnimation(omnibarViews(), loadingText).apply {
                     start()
                 }
@@ -1241,15 +1240,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
         }
 
-        fun cancelTrackersAnimation() {
+        fun cancelAllAnimations() {
             typingAnimationJob?.cancel()
             typingAnimationJob = null
             if (loadingAnimation.isRunning) {
                 loadingAnimation.end()
             }
-            if (finishAnimation.isRunning) {
-                finishAnimation.end()
-
+            if (trackersAnimation.isRunning) {
+                trackersAnimation.end()
             }
             networksContainer.alpha = 0f
             loadingText.alpha = 0f
@@ -1391,6 +1389,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private fun showDaxDialogCta(configuration: DaxDialogCta) {
             hideHomeCta()
             hideDaxCta()
+            val container = networksContainer
             activity?.let { activity ->
                 val daxDialog = configuration.createDialogCta(activity).apply {
                     setHideClickListener {
@@ -1399,7 +1398,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     }
                     setDismissListener {
                         if (configuration is DaxDialogCta.DaxTrackersBlockedCta) {
-                            finishAnimation = browserTrackersAnimatorHelper.finishTrackerAnimation(omnibarViews(), networksContainer)
+                            trackersAnimation = browserTrackersAnimatorHelper.finishTrackerAnimation(omnibarViews(), container)
                         }
                         viewModel.onUserDismissedCta()
                     }
