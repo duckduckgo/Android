@@ -32,7 +32,7 @@ interface EntityLookup {
     fun entityForUrl(url: String): Entity?
 
     @WorkerThread
-    fun entityFoName(name: String): Entity?
+    fun entityForName(name: String): Entity?
 }
 
 @Singleton
@@ -58,7 +58,7 @@ class TdsEntityLookup @Inject constructor(
     }
 
     @WorkerThread
-    override fun entityFoName(name: String): Entity? {
+    override fun entityForName(name: String): Entity? {
         return entityDao.get(name)
     }
 

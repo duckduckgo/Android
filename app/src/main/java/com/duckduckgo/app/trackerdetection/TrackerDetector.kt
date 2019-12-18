@@ -61,7 +61,7 @@ class TrackerDetectorImpl(
 
         if (result != null) {
             Timber.v("$documentUrl resource $url WAS identified as a tracker")
-            val entity = if (result.entityName != null) entityLookup.entityFoName(result.entityName) else null
+            val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else null
             return TrackingEvent(documentUrl, url, result.categories, entity, settings.privacyOn)
         }
 

@@ -45,7 +45,7 @@ class TdsEntityJsonTest {
     }
 
     @Test
-    fun whenEntityIsMissingPrevlaendeThenPrevalenceIsSetToZero() {
+    fun whenEntityIsMissingPrevalenceThenPrevalenceIsSetToZero() {
         val json = loadText("json/tds_entities.json")
         val entities = jsonAdapter.fromJson(json)!!.jsonToEntities()
         val entity = entities[1]

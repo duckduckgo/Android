@@ -47,8 +47,8 @@ class TrackerDataLoader @Inject constructor(
         loadTemporaryWhitelist()
     }
 
-    fun loadTds() {
-        var count = tdsTrackerDao.count()
+    private fun loadTds() {
+        val count = tdsTrackerDao.count()
         if (count == 0) {
             updateTdsFromFile()
         }
@@ -71,7 +71,7 @@ class TrackerDataLoader @Inject constructor(
     }
 
     fun loadTrackers() {
-        var trackers = tdsTrackerDao.getAll()
+        val trackers = tdsTrackerDao.getAll()
         Timber.d("Loaded ${trackers.size} tds trackers from DB")
         val client = TdsClient(Client.ClientName.TDS, trackers)
         trackerDetector.addClient(client)
