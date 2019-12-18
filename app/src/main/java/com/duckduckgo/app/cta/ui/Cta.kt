@@ -170,7 +170,14 @@ sealed class DaxDialogCta(
             }
         }
 
-        fun firstParagraph(activity: FragmentActivity): String {
+        fun setSecondDialog(dialog: DaxDialog, activity: FragmentActivity) {
+            ctaPixelParam = Pixel.PixelValues.DAX_NETWORK_CTA_2
+            dialog.daxText = activity.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph(activity), network)
+            dialog.buttonText = activity.resources.getString(R.string.daxDialogGotIt)
+            dialog.setDialogAndStartAnimation()
+        }
+
+        private fun firstParagraph(activity: FragmentActivity): String {
             val percentage = NETWORK_PROPERTY_PERCENTAGES[network]
             return if (percentage != null)
                 activity.resources.getString(R.string.daxMainNetworkStep21CtaText, network, percentage)

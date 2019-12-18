@@ -234,8 +234,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private var alertDialog: AlertDialog? = null
 
-    private var daxDialog: DaxDialog? = null
-
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
@@ -1531,44 +1529,32 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             hideHomeCta()
             hideDaxCta()
             activity?.let { activity ->
-                val isShowing = daxDialog?.dialog?.isShowing
-                if (isShowing != true) {
-                    daxDialog = configuration.createDialogCta(activity).apply {
-                        setHideClickListener {
-                            dismiss()
-                            launchHideTipsDialog(activity, configuration)
+                val daxDialog = configuration.createDialogCta(activity).apply {
+                    setHideClickListener {
+                        dismiss()
+                        launchHideTipsDialog(activity, configuration)
+                    }
+                    setDismissListener {
+                        if (configuration is DaxDialogCta.DaxTrackersBlockedCta) {
+                            finishTrackerAnimation()
                         }
-                        setDismissListener {
-                            if (configuration is DaxDialogCta.DaxTrackersBlockedCta) {
-                                finishTrackerAnimation()
-                            }
-                            viewModel.onUserDismissedCta()
-                        }
-                        setPrimaryCTAClickListener {
-                            if (configuration is DaxDialogCta.DaxMainNetworkCta) {
+                        viewModel.onUserDismissedCta()
+                    }
+                    setPrimaryCtaClickListener {
+                        viewModel.onUserClickCtaOkButton()
+                        if (configuration is DaxDialogCta.DaxMainNetworkCta) {
+                            setPrimaryCtaClickListener {
                                 viewModel.onUserClickCtaOkButton()
-                                configuration.ctaPixelParam = Pixel.PixelValues.DAX_NETWORK_CTA_2
-                                viewModel.onManualCtaShown(configuration)
-                                val firstParagraph = configuration.firstParagraph(activity)
-                                daxText =
-                                    activity.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph, configuration.network)
-                                buttonText = activity.resources.getString(R.string.daxDialogGotIt)
-                                onAnimationFinishedListener {
-
-                                }
-                                setPrimaryCTAClickListener {
-                                    viewModel.onUserClickCtaOkButton()
-                                    dismiss()
-                                }
-                                setDialogAndStartAnimation()
-                            } else {
                                 dismiss()
                             }
-                            viewModel.onUserClickCtaOkButton()
+                            configuration.setSecondDialog(this, activity)
+                            viewModel.onManualCtaShown(configuration)
+                        } else {
+                            dismiss()
                         }
                     }
-                    daxDialog?.show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
                 }
+                daxDialog.show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
             }
         }
 

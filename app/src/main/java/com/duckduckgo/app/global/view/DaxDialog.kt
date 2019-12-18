@@ -92,7 +92,7 @@ class DaxDialog(
         this.onAnimationFinished = onAnimationFinished
     }
 
-    fun setPrimaryCTAClickListener(clickListener: () -> Unit) {
+    fun setPrimaryCtaClickListener(clickListener: () -> Unit) {
         primaryCtaClickListener = clickListener
     }
 
