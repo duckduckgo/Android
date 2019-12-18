@@ -20,6 +20,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.privacy.model.PrivacyProtectionCountsEntity
+import org.junit.After
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -36,6 +37,11 @@ class PrivacyProtectionCountDaoTest {
             .allowMainThreadQueries()
             .build()
         dao = db.privacyProtectionCountsDao()
+    }
+
+    @After
+    fun after() {
+        db.close()
     }
 
     @Test

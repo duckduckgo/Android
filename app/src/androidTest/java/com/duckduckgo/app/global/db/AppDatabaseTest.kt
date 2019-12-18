@@ -143,6 +143,10 @@ class AppDatabaseTest {
         createDatabaseAndMigrate(14, 15, AppDatabase.MIGRATION_14_TO_15)
     }
 
+    @Test
+    fun whenMigratingFromVersion15To16ThenValidationSucceeds() {
+        createDatabaseAndMigrate(15, 16, AppDatabase.MIGRATION_15_TO_16)
+    }
 
     private fun createDatabase(version: Int) {
         testHelper.createDatabase(TEST_DB_NAME, version).close()

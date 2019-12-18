@@ -20,6 +20,8 @@ import android.content.Context
 import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
+import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
+import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.*
 import com.duckduckgo.app.statistics.pixels.ApiBasedPixel
@@ -30,6 +32,7 @@ import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
 import javax.inject.Named
+import javax.inject.Singleton
 
 
 @Module
@@ -65,4 +68,13 @@ class StatisticsModule {
     @Provides
     fun deviceInfo(context: Context): DeviceInfo = ContextDeviceInfo(context)
 
+    @Provides
+    @Singleton
+    fun atbInitializer(
+        statisticsDataStore: StatisticsDataStore,
+        statisticsUpdater: StatisticsUpdater,
+        appReferrerStateListener: AppInstallationReferrerStateListener
+    ): AtbInitializer {
+        return AtbInitializer(statisticsDataStore, statisticsUpdater, appReferrerStateListener)
+    }
 }

@@ -20,6 +20,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.notification.model.Notification
+import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -34,6 +35,11 @@ class NotificationDaoTest {
     fun before() {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java).build()
         dao = db.notificationDao()
+    }
+
+    @After
+    fun after() {
+        db.close()
     }
 
     @Test

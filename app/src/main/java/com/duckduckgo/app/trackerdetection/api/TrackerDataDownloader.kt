@@ -19,101 +19,86 @@ package com.duckduckgo.app.trackerdetection.api
 import com.duckduckgo.app.global.api.isCached
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.store.BinaryDataStore
-import com.duckduckgo.app.trackerdetection.AdBlockClient
-import com.duckduckgo.app.trackerdetection.Client
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
-import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
+import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
+import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
+import com.duckduckgo.app.trackerdetection.model.TemporaryTrackingWhitelistedDomain
 import io.reactivex.Completable
-import okhttp3.ResponseBody
-import retrofit2.Call
 import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
-
 
 class TrackerDataDownloader @Inject constructor(
     private val trackerListService: TrackerListService,
     private val binaryDataStore: BinaryDataStore,
     private val trackerDataLoader: TrackerDataLoader,
-    private val trackerDataDao: TrackerDataDao,
+    private val tdsTrackerDao: TdsTrackerDao,
+    private val temporaryTrackingWhitelistDao: TemporaryTrackingWhitelistDao,
     private val appDatabase: AppDatabase
 ) {
 
-    fun downloadList(clientName: Client.ClientName): Completable {
-
-        return when (clientName) {
-            DISCONNECT -> downloadDisconnectList()
-            TRACKERSWHITELIST -> downloadAdblockList(clientName) { trackerListService.trackersWhitelist() }
-            EASYLIST, EASYPRIVACY -> removeLegacyList(clientName)
-        }
-    }
-
-    private fun downloadDisconnectList(): Completable {
+    fun downloadTds(): Completable {
 
         return Completable.fromAction {
 
-            Timber.d("Downloading disconnect data")
+            Timber.d("Downloading tds.json")
 
-            val call = trackerListService.disconnect()
+            val call = trackerListService.tds()
             val response = call.execute()
 
-            if (response.isCached && trackerDataDao.count() != 0) {
-                Timber.d("Disconnect data already cached and stored")
+            if (!response.isSuccessful) {
+                throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
+            }
+            if (response.isCached && tdsTrackerDao.count() != 0) {
+                Timber.d("Tds data already cached and stored")
                 return@fromAction
             }
 
-            if (response.isSuccessful) {
-                Timber.d("Updating disconnect data from server")
-                val body = response.body()!!
+            Timber.d("Updating tds data from server")
+            val body = response.body()!!
+            appDatabase.runInTransaction {
+                trackerDataLoader.persistTds(body)
+                trackerDataLoader.loadTrackers()
+            }
+        }
+    }
 
-                appDatabase.runInTransaction {
-                    trackerDataDao.updateAll(body.trackers)
-                    trackerDataLoader.loadDisconnectData()
+    fun downloadTemporaryWhitelist(): Completable {
+
+        return Completable.fromAction {
+
+            Timber.d("Downloading temporary tracking whitelist")
+
+            val call = trackerListService.temporaryWhitelist()
+            val response = call.execute()
+
+            if (!response.isSuccessful) {
+                throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
+            }
+            if (response.isCached && temporaryTrackingWhitelistDao.count() != 0) {
+                Timber.d("Temporary whitelist data already cached and stored")
+                return@fromAction
+            }
+
+            Timber.d("Updating temporary tracking whitelist data from server")
+            val body = response.body()!!
+
+            appDatabase.runInTransaction {
+                temporaryTrackingWhitelistDao.updateAll(body.lines().map { TemporaryTrackingWhitelistedDomain(it) })
+                trackerDataLoader.loadTemporaryWhitelist()
+            }
+        }
+    }
+
+    fun clearLegacyLists(): Completable {
+        return Completable.fromAction {
+            listOf(EASYLIST, EASYPRIVACY, TRACKERSWHITELIST).forEach {
+                if (binaryDataStore.hasData(it.name)) {
+                    binaryDataStore.clearData(it.name)
                 }
-
-            } else {
-                throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
-            }
-        }
-    }
-
-    private fun downloadAdblockList(clientName: Client.ClientName, callFactory: (clientName: Client.ClientName) -> Call<ResponseBody>): Completable {
-        return Completable.fromAction {
-
-            Timber.d("Downloading ${clientName.name} data")
-            val call = callFactory(clientName)
-            val response = call.execute()
-
-            if (response.isCached && binaryDataStore.hasData(clientName.name)) {
-                Timber.d("${clientName.name} data already cached and stored")
-                return@fromAction
-            }
-
-            if (response.isSuccessful) {
-                val bodyBytes = response.body()!!.bytes()
-                Timber.d("Updating ${clientName.name} data store with new data")
-                persistTrackerData(clientName, bodyBytes)
-                trackerDataLoader.loadAdblockData(clientName)
-            } else {
-                throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
-            }
-        }
-    }
-
-    private fun persistTrackerData(clientName: Client.ClientName, bodyBytes: ByteArray) {
-        val client = AdBlockClient(clientName)
-        client.loadBasicData(bodyBytes)
-        binaryDataStore.saveData(clientName.name, client.getProcessedData())
-    }
-
-    private fun removeLegacyList(clientName: Client.ClientName): Completable {
-        return Completable.fromAction {
-            if (binaryDataStore.hasData(clientName.name)) {
-                binaryDataStore.clearData(clientName.name)
             }
             return@fromAction
         }
     }
-
 }

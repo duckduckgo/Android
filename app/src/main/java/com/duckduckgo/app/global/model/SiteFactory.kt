@@ -19,9 +19,8 @@ package com.duckduckgo.app.global.model
 import androidx.annotation.AnyThread
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.privacy.model.PrivacyPractices
-import com.duckduckgo.app.privacy.store.PrevalenceStore
-import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
-import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
+import com.duckduckgo.app.trackerdetection.EntityLookup
+import com.duckduckgo.app.trackerdetection.model.Entity
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -29,8 +28,7 @@ import javax.inject.Singleton
 @Singleton
 class SiteFactory @Inject constructor(
     private val privacyPractices: PrivacyPractices,
-    private val trackerNetworks: TrackerNetworks,
-    private val prevalenceStore: PrevalenceStore
+    private val entityLookup: EntityLookup
 ) {
 
     /**
@@ -40,7 +38,7 @@ class SiteFactory @Inject constructor(
      */
     @AnyThread
     fun buildSite(url: String, title: String? = null): Site {
-        return SiteMonitor(url, title, prevalenceStore)
+        return SiteMonitor(url, title)
     }
 
     /**
@@ -51,22 +49,14 @@ class SiteFactory @Inject constructor(
     @WorkerThread
     fun loadFullSiteDetails(site: Site) {
         val practices = privacyPractices.privacyPracticesFor(site.url)
-        val memberNetwork = trackerNetworks.network(site.url)
-        val prevalence = determinePrevalence(memberNetwork)
-        val siteDetails = SitePrivacyData(site.url, practices, memberNetwork, prevalence)
+        val memberNetwork = entityLookup.entityForUrl(site.url)
+        val siteDetails = SitePrivacyData(site.url, practices, memberNetwork, memberNetwork?.prevalence ?: 0.0)
         site.updatePrivacyData(siteDetails)
-    }
-
-    private fun determinePrevalence(memberNetwork: TrackerNetwork?): Double? {
-        if (memberNetwork == null) {
-            return null
-        }
-        return prevalenceStore.findPrevalenceOf(memberNetwork.name)
     }
 
     data class SitePrivacyData(
         val url: String, val practices: PrivacyPractices.Practices,
-        val memberNetwork: TrackerNetwork?,
+        val entity: Entity?,
         val prevalence: Double?
     )
 }

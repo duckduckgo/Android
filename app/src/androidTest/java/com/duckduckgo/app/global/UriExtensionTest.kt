@@ -137,7 +137,7 @@ class UriExtensionTest {
     }
 
     @Test
-    fun whenValidIpAddressWithPortParsedWithSchemeThenPortNumberParsedSuccessfully(){
+    fun whenValidIpAddressWithPortParsedWithSchemeThenPortNumberParsedSuccessfully() {
         assertEquals(999, Uri.parse("121.33.2.11:999").withScheme().port)
     }
 

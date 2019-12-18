@@ -58,8 +58,4 @@ abstract class StoreModule {
 
     @Binds
     abstract fun bindOfflinePixelDataStore(store: OfflinePixelCountSharedPreferences): OfflinePixelCountDataStore
-
-    @Binds
-    abstract fun bindPrevalenceStore(store: PrevalenceRawStore): PrevalenceStore
-
 }

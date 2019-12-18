@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.di
 
-import com.duckduckgo.app.entities.api.EntityListDownloader
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeDataDownloader
 import com.duckduckgo.app.job.AppConfigurationDownloader
@@ -35,18 +34,14 @@ open class AppConfigurationDownloaderModule {
         trackerDataDownloader: TrackerDataDownloader,
         httpsUpgradeDataDownloader: HttpsUpgradeDataDownloader,
         resourceSurrogateDownloader: ResourceSurrogateListDownloader,
-        entityListDownloader: EntityListDownloader,
-        surveyDownloader: SurveyDownloader,
-        appDatabase: AppDatabase
+        surveyDownloader: SurveyDownloader
     ): ConfigurationDownloader {
 
         return AppConfigurationDownloader(
             trackerDataDownloader,
             httpsUpgradeDataDownloader,
             resourceSurrogateDownloader,
-            entityListDownloader,
-            surveyDownloader,
-            appDatabase
+            surveyDownloader
         )
     }
 }

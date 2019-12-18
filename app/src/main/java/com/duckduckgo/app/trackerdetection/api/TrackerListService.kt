@@ -16,20 +16,15 @@
 
 package com.duckduckgo.app.trackerdetection.api
 
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.GET
-import retrofit2.http.Query
 
 interface TrackerListService {
 
-    @GET("/contentblocking.js")
-    fun list(@Query("l") list: String): Call<ResponseBody>
+    @GET("https://staticcdn.duckduckgo.com/trackerblocking/v2/tds.json")
+    fun tds(): Call<TdsJson>
 
-    @GET("/contentblocking/trackers-whitelist.txt")
-    fun trackersWhitelist(): Call<ResponseBody>
-
-    @GET("/contentblocking.js?l=disconnect")
-    fun disconnect(): Call<DisconnectListJson>
+    @GET("/contentblocking/trackers-whitelist-temporary.txt")
+    fun temporaryWhitelist(): Call<String>
 
 }
