@@ -16,11 +16,12 @@
 
 package com.duckduckgo.app.fire
 
+import android.os.SystemClock
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import timber.log.Timber
 
 interface BackgroundTimeKeeper {
-    fun hasEnoughTimeElapsed(timeNow: Long = System.currentTimeMillis(), backgroundedTimestamp: Long, clearWhenOption: ClearWhenOption): Boolean
+    fun hasEnoughTimeElapsed(timeNow: Long = SystemClock.elapsedRealtime(), backgroundedTimestamp: Long, clearWhenOption: ClearWhenOption): Boolean
 }
 
 class DataClearerTimeKeeper : BackgroundTimeKeeper {
