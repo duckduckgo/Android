@@ -17,6 +17,7 @@
 package com.duckduckgo.app.statistics
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
 
@@ -27,15 +28,54 @@ class VariantManagerTest {
     @Test
     fun serpAndSharedControlVariantActive() {
         val variant = variants.firstOrNull { it.key == "sc" }
-        assertEqualsDouble(1.0, variant!!.weight)
+        assertEqualsDouble(0.0, variant!!.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
     fun serpExperimentalVariantActive() {
         val variant = variants.firstOrNull { it.key == "se" }
+        assertEqualsDouble(0.0, variant!!.weight)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun conceptTestControlGroupVariantActive() {
+        val variant = variants.firstOrNull { it.key == "mc" }
         assertEqualsDouble(1.0, variant!!.weight)
         assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun conceptTestControlGroupVariantHasNoExperimentFeatures() {
+        val variant = variants.firstOrNull { it.key == "mc" }
+        assertEquals(0, variant!!.features.size)
+    }
+
+    @Test
+    fun conceptTestExistingNoCtaExperimentVariantActive() {
+        val variant = variants.firstOrNull { it.key == "md" }
+        assertEqualsDouble(1.0, variant!!.weight)
+    }
+
+    @Test
+    fun conceptTestExistingNoCtaExperimentVariantHasExperimentalExistingNoCta() {
+        val variant = variants.firstOrNull { it.key == "md" }
+        assertEquals(1, variant!!.features.size)
+        assertTrue(variant.hasFeature(VariantManager.VariantFeature.ExistingNoCta))
+    }
+
+    @Test
+    fun conceptTestExperimentVariantActive() {
+        val variant = variants.firstOrNull { it.key == "me" }
+        assertEqualsDouble(1.0, variant!!.weight)
+    }
+
+    @Test
+    fun conceptTestExperimentVariantHasExperimentalExistingNoCta() {
+        val variant = variants.firstOrNull { it.key == "me" }
+        assertEquals(1, variant!!.features.size)
+        assertTrue(variant.hasFeature(VariantManager.VariantFeature.ConceptTest))
     }
 
     @Suppress("SameParameterValue")

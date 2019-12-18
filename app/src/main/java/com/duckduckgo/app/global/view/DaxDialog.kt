@@ -47,7 +47,7 @@ class DaxDialog(
     private var onAnimationFinished: () -> Unit = {}
     private var primaryCtaClickListener: () -> Unit = { dismiss() }
     private var hideClickListener: () -> Unit = { dismiss() }
-    private var dismissListener: () -> Unit = { dismiss() }
+    private var dismissListener: () -> Unit = { }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.content_dax_dialog, container, false)
