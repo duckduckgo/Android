@@ -20,7 +20,6 @@ import android.Manifest
 import android.animation.AnimatorSet
 import android.animation.LayoutTransition.CHANGING
 import android.animation.LayoutTransition.DISAPPEARING
-import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
@@ -28,7 +27,6 @@ import android.appwidget.AppWidgetManager
 import android.content.*
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.graphics.drawable.AnimatedVectorDrawable
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
@@ -44,7 +42,6 @@ import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
 import android.webkit.WebView.HitTestResult.*
 import android.widget.EditText
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
@@ -94,7 +91,6 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
@@ -112,7 +108,6 @@ import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
 import java.io.File
-import java.util.Locale
 import javax.inject.Inject
 import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
@@ -170,6 +165,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     @Inject
     lateinit var variantManager: VariantManager
+
+    @Inject
+    lateinit var browserTrackersAnimatorHelper: BrowserTrackersAnimatorHelper
 
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
@@ -1090,13 +1088,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         private const val MIN_PROGRESS = 10
         private const val MAX_PROGRESS = 100
-        private const val MAX_LOGOS_SHOWN = 4
         private const val TRACKERS_INI_DELAY = 700L
         private const val TRACKERS_SECONDARY_DELAY = 300L
         private const val DEFAULT_ANIMATION_DURATION = 250L
-        private const val LOGO_RES_PREFIX = "network_logo_"
-
-        private var logosStayOnScreenDuration = 3000L
 
         fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
             val fragment = BrowserTabFragment()
@@ -1196,22 +1190,23 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     if (loadingAnimation.isRunning) {
                         loadingAnimation.end()
                     }
-                    logosStayOnScreenDuration = 3000L
-                    val animateOmnibarIn = animateOmnibarIn()
-                    val fadeLogosOut = animateFadeOut(networksContainer)
+                    val animateOmnibarIn = browserTrackersAnimatorHelper.animateOmnibarIn(omnibarViews())
+                    val fadeLogosOut = browserTrackersAnimatorHelper.animateFadeOut(networksContainer)
 
                     if (!finishAnimation.isRunning) {
                         typingAnimationJob?.cancel()
                         typingAnimationJob = null
+                        val site = viewModel.siteLiveData.value
+                        val events = site?.trackingEvents
                         finishAnimation = if (lastSeenCtaViewState?.cta is DaxDialogCta.DaxTrackersBlockedCta) {
                             AnimatorSet().apply {
-                                play(createTrackersAnimation())
+                                play(browserTrackersAnimatorHelper.createTrackersAnimation(activity!!, networksContainer, loadingText, events))
                                 start()
                             }
                         } else {
                             AnimatorSet().apply {
-                                play(createTrackersAnimation())
-                                play(fadeLogosOut).after(logosStayOnScreenDuration).before(animateOmnibarIn)
+                                play(browserTrackersAnimatorHelper.createTrackersAnimation(activity!!, networksContainer, loadingText, events))
+                                play(fadeLogosOut).after(browserTrackersAnimatorHelper.logosStayOnScreenDuration).before(animateOmnibarIn)
                                 start()
                             }
                         }
@@ -1221,18 +1216,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         private fun createLoadingAnimation() {
-            val fadeClearTextButtonOut = animateFadeOut(clearTextButton)
-            val fadeTextInputOut = animateFadeOut(omnibarTextInput)
-            val fadeGradeOut = animateFadeOut(privacyGradeButton)
-
-            val fadeLoadingIn = animateFadeIn(loadingText)
-            val transition = AnimatorSet().apply {
-                play(fadeClearTextButtonOut).with(fadeTextInputOut).with(fadeGradeOut).after(250)
-            }
-
             if (!loadingAnimation.isRunning && !finishAnimation.isRunning) {
-                loadingAnimation = AnimatorSet().apply {
-                    play(fadeLoadingIn).after(transition)
+                loadingAnimation = browserTrackersAnimatorHelper.createLoadingAnimation(omnibarViews(), loadingText).apply {
                     start()
                 }
             }
@@ -1256,15 +1241,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
         }
 
-        private fun finishTrackerAnimation() {
-            val animateOmnibarIn = animateOmnibarIn()
-            val fadeLogosOut = animateFadeOut(networksContainer)
-            finishAnimation = AnimatorSet().apply {
-                play(fadeLogosOut).before(animateOmnibarIn)
-                start()
-            }
-        }
-
         fun cancelTrackersAnimation() {
             typingAnimationJob?.cancel()
             typingAnimationJob = null
@@ -1282,120 +1258,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             privacyGradeButton.alpha = 1f
         }
 
-        private fun animateOmnibarIn(): AnimatorSet {
-            val fadeClearTextButtonIn = animateFadeIn(clearTextButton)
-            val fadeTextInputIn = animateFadeIn(omnibarTextInput)
-            val fadeGradeIn = animateFadeIn(privacyGradeButton)
-            return AnimatorSet().apply {
-                play(fadeClearTextButtonIn).with(fadeTextInputIn).with(fadeGradeIn)
-            }
-        }
-
-        private fun createLogosViewList(resourcesId: List<Int>?): List<View> {
-            return resourcesId?.map {
-                val imageView = ImageView(requireContext())
-                imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-                imageView.setImageResource(R.drawable.network_cross_anim)
-                imageView.setBackgroundResource(it)
-                imageView.id = generateViewId()
-                networksContainer.addView(imageView)
-                return@map imageView
-            }.orEmpty().toList()
-        }
-
-        private fun createResourcesIdList(events: List<TrackingEvent>?): List<Int>? {
-            val packageName = activity?.packageName
-            if (events.isNullOrEmpty() || packageName == null) return emptyList()
-
-            return events.asSequence().mapNotNull {
-                it.trackerNetwork
-            }.map {
-                val logoName = "$LOGO_RES_PREFIX${it.name.toLowerCase(Locale.getDefault()).replace(".", "")}"
-                resources.getIdentifier(logoName, "drawable", packageName)
-            }.toList().filter { it != 0 }.distinct().take(MAX_LOGOS_SHOWN).toList()
-        }
-
-        private fun animateBlockedLogos(views: List<View>) {
-            views.map {
-                if (it is ImageView) {
-                    val frameAnimation = it.drawable as AnimatedVectorDrawable
-                    frameAnimation.start()
-                }
-            }
-        }
-
-        private fun applyConstraintSet(views: List<View>) {
-            val constraints = ConstraintSet()
-            constraints.clone(networksContainer)
-
-            views.mapIndexed { index, view ->
-                constraints.connect(view.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
-                constraints.connect(view.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
-                if (index == 0) {
-                    constraints.connect(view.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
-                } else {
-                    constraints.connect(view.id, ConstraintSet.START, views[index - 1].id, ConstraintSet.END, 10)
-                }
-                if (index == views.size - 1) {
-                    constraints.connect(view.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-                }
-            }
-
-            val viewIds = views.map { it.id }.toIntArray()
-
-            if (viewIds.size > 1) {
-                constraints.createHorizontalChain(
-                    ConstraintSet.PARENT_ID,
-                    ConstraintSet.LEFT,
-                    ConstraintSet.PARENT_ID,
-                    ConstraintSet.RIGHT,
-                    viewIds,
-                    null,
-                    ConstraintSet.CHAIN_SPREAD
-                )
-            }
-
-            if (viewIds.isEmpty()) {
-                logosStayOnScreenDuration = 0L
-            }
-            constraints.applyTo(networksContainer)
-        }
-
-        private fun createTrackersAnimation(): AnimatorSet {
-            val site = viewModel.siteLiveData.value
-            val events = site?.trackingEvents
-
-            networksContainer.removeAllViews()
-            networksContainer.alpha = 0f
-
-            val logos = createResourcesIdList(events)
-            val views: List<View> = createLogosViewList(logos)
-
-            applyConstraintSet(views)
-
-            val fadeLoadingOut = animateFadeOut(loadingText)
-            val fadeLogosIn = animateFadeIn(networksContainer)
-
-            animateBlockedLogos(views)
-
-            return AnimatorSet().apply {
-                play(fadeLogosIn).after(fadeLoadingOut)
-            }
-        }
-
-        @SuppressLint("ObjectAnimatorBinding")
-        private fun animateFadeOut(view: Any): ObjectAnimator {
-            return ObjectAnimator.ofFloat(view, "alpha", 1f, 0f).apply {
-                duration = DEFAULT_ANIMATION_DURATION
-            }
-        }
-
-        @SuppressLint("ObjectAnimatorBinding")
-        private fun animateFadeIn(view: Any): ObjectAnimator {
-            return ObjectAnimator.ofFloat(view, "alpha", 0f, 1f).apply {
-                duration = DEFAULT_ANIMATION_DURATION
-            }
-        }
+        private fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, privacyGradeButton)
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {
             if (lastSeenGlobalViewState is GlobalLayoutViewState.Invalidated &&
@@ -1536,7 +1399,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     }
                     setDismissListener {
                         if (configuration is DaxDialogCta.DaxTrackersBlockedCta) {
-                            finishTrackerAnimation()
+                            finishAnimation = browserTrackersAnimatorHelper.finishTrackerAnimation(omnibarViews(), networksContainer)
                         }
                         viewModel.onUserDismissedCta()
                     }
