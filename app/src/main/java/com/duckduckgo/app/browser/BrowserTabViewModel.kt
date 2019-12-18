@@ -55,8 +55,6 @@ import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.global.*
-import com.duckduckgo.app.global.db.AppConfigurationDao
-import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domainMatchesUrl
@@ -101,7 +99,6 @@ class BrowserTabViewModel(
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
     private val variantManager: VariantManager,
-    appConfigurationDao: AppConfigurationDao,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
 
@@ -210,22 +207,12 @@ class BrowserTabViewModel(
     val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    @VisibleForTesting
-    val appConfigurationObserver: Observer<AppConfigurationEntity> = Observer { appConfiguration ->
-        appConfiguration?.let {
-            Timber.i("App configuration downloaded: ${it.appConfigurationDownloaded}")
-            appConfigurationDownloaded = it.appConfigurationDownloaded
-        }
-    }
-
     val url: String?
         get() = site?.url
 
     val title: String?
         get() = site?.title
 
-    private var appConfigurationDownloaded = false
-    private val appConfigurationObservable = appConfigurationDao.appConfigurationStatus()
     private val autoCompletePublishSubject = PublishRelay.create<String>()
     private var site: Site? = null
     private lateinit var tabId: String
@@ -233,8 +220,6 @@ class BrowserTabViewModel(
 
     init {
         initializeViewStates()
-
-        appConfigurationObservable.observeForever(appConfigurationObserver)
         configureAutoComplete()
     }
 
@@ -294,7 +279,6 @@ class BrowserTabViewModel(
     public override fun onCleared() {
         super.onCleared()
         buildingSiteFactoryJob?.cancel()
-        appConfigurationObservable.removeObserver(appConfigurationObserver)
     }
 
     fun registerWebViewListener(browserWebViewClient: BrowserWebViewClient, browserChromeClient: BrowserChromeClient) {
@@ -485,7 +469,7 @@ class BrowserTabViewModel(
                 addToHomeEnabled = true,
                 addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
                 canSharePage = true,
-                showPrivacyGrade = appConfigurationDownloaded
+                showPrivacyGrade = true
             )
         )
 
@@ -578,7 +562,7 @@ class BrowserTabViewModel(
     }
 
     private fun updateNetworkLeaderboard(event: TrackingEvent) {
-        val networkName = event.trackerNetwork?.name ?: return
+        val networkName = event.entity?.name ?: return
         networkLeaderboardDao.incrementNetworkCount(networkName)
     }
 
@@ -638,7 +622,7 @@ class BrowserTabViewModel(
 
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
-            showPrivacyGrade = appConfigurationDownloaded && currentBrowserViewState.browserShowing,
+            showPrivacyGrade = currentBrowserViewState.browserShowing,
             showTabsButton = showControls,
             showFireButton = showControls,
             showMenuButton = showControls,

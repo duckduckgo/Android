@@ -18,8 +18,8 @@
 package com.duckduckgo.app.privacy.model
 
 import com.duckduckgo.app.FileUtilities
-import com.duckduckgo.app.privacy.store.PrevalenceStore
-import com.nhaarman.mockitokotlin2.mock
+import com.duckduckgo.app.privacy.model.PredefinedGradeDataJsonConverter.GradeTestCase
+import com.duckduckgo.app.privacy.model.PredefinedGradeDataJsonConverter.JsonGradeTestCase
 import com.squareup.moshi.Moshi
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -27,25 +27,22 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import timber.log.Timber
 
+
 @RunWith(Parameterized::class)
 class PredefinedGradeAvailableTest(private val testCase: GradeTestCase) {
-
-    private var mockPrevalenceStore: PrevalenceStore = mock()
 
     @Test
     fun predefinedGradeTests() {
 
-        val grade = Grade(testCase.input.https, testCase.input.httpsAutoUpgrade, prevalenceStore = mockPrevalenceStore)
-        grade.updateData(testCase.input.privacyScore, testCase.input.parentEntity, testCase.input.parentTrackerPrevalence)
+        val grade = Grade(testCase.input.https, testCase.input.httpsAutoUpgrade)
+        grade.updateData(testCase.input.privacyScore, testCase.input.parentEntity)
 
         for (tracker in testCase.input.trackers) {
-
             if (tracker.blocked) {
-                grade.addEntityBlocked(tracker.parentEntity, tracker.prevalence)
+                grade.addEntityBlocked(tracker.parentEntity)
             } else {
-                grade.addEntityNotBlocked(tracker.parentEntity, tracker.prevalence)
+                grade.addEntityNotBlocked(tracker.parentEntity)
             }
-
         }
 
         Timber.d("testCase ${testCase.url}")
@@ -55,28 +52,15 @@ class PredefinedGradeAvailableTest(private val testCase: GradeTestCase) {
 
     companion object {
 
-        class GradeTestCase(val expected: Grade.Scores.ScoresAvailable, val input: Input, val url: String) {
-
-            class Input(
-                val https: Boolean,
-                val httpsAutoUpgrade: Boolean,
-                val parentEntity: String?,
-                val privacyScore: Int?,
-                val trackers: Array<Tracker>,
-                val parentTrackerPrevalence: Double?
-            )
-
-            class Tracker(val blocked: Boolean, val parentEntity: String, val prevalence: Double?)
-
-        }
-
         @JvmStatic
         @Parameterized.Parameters
         fun data(): Array<GradeTestCase> {
             val json = FileUtilities.loadText("privacy-grade/test/data/grade-cases.json")
             val moshi = Moshi.Builder().build()
-            val jsonAdapter = moshi.adapter<Array<GradeTestCase>>(Array<GradeTestCase>::class.java)
+            val jsonAdapter = moshi.adapter<Array<JsonGradeTestCase>>(Array<JsonGradeTestCase>::class.java)
             return jsonAdapter.fromJson(json)
+                .map { it.toGradeTestCase() }
+                .toTypedArray()
         }
     }
 }

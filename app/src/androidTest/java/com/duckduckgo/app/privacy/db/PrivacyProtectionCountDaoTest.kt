@@ -20,6 +20,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.privacy.model.PrivacyProtectionCountsEntity
+import org.junit.After
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -38,6 +39,11 @@ class PrivacyProtectionCountDaoTest {
         dao = db.privacyProtectionCountsDao()
     }
 
+    @After
+    fun after() {
+        db.close()
+    }
+
     @Test
     fun whenDbInitialisedThenCountsDefaultTo0() {
         assertEquals(0, dao.getTrackersBlockedCount())
@@ -54,7 +60,7 @@ class PrivacyProtectionCountDaoTest {
     fun whenTrackerCountIncrementedFrom1ThenNewCountIs2() {
         dao.incrementBlockedTrackerCount()
         dao.incrementBlockedTrackerCount()
-        Assert.assertEquals(2, dao.getTrackersBlockedCount())
+        assertEquals(2, dao.getTrackersBlockedCount())
     }
 
     @Test

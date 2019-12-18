@@ -19,7 +19,6 @@ package com.duckduckgo.app.global.model
 
 import android.net.Uri
 import androidx.core.net.toUri
-import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.global.model.Site.SiteGrades
 import com.duckduckgo.app.global.model.SiteFactory.SitePrivacyData
@@ -27,16 +26,13 @@ import com.duckduckgo.app.privacy.model.Grade
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
-import com.duckduckgo.app.privacy.store.PrevalenceStore
-import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import java.util.concurrent.CopyOnWriteArrayList
 
 class SiteMonitor(
     url: String,
-    override var title: String?,
-    val prevalenceStore: PrevalenceStore
-
+    override var title: String?
 ) : Site {
 
     override var url: String = url
@@ -62,27 +58,15 @@ class SiteMonitor(
 
     override var privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN
 
-    override var memberNetwork: TrackerNetwork? = null
+    override var entity: Entity? = null
 
     override val trackingEvents = CopyOnWriteArrayList<TrackingEvent>()
 
     override val trackerCount: Int
         get() = trackingEvents.size
 
-    override val distinctTrackersByNetwork: Map<String, List<TrackingEvent>>
-        get() {
-            val networks = HashMap<String, MutableList<TrackingEvent>>().toMutableMap()
-            for (event: TrackingEvent in trackingEvents.distinctBy { Uri.parse(it.trackerUrl).baseHost }) {
-                val network = event.trackerNetwork?.name ?: Uri.parse(event.trackerUrl).baseHost ?: event.trackerUrl
-                val events = networks[network] ?: ArrayList()
-                events.add(event)
-                networks[network] = events
-            }
-            return networks
-        }
-
     override val majorNetworkCount: Int
-        get() = trackingEvents.distinctBy { it.trackerNetwork?.name }.count { it.trackerNetwork?.isMajor ?: false }
+        get() = trackingEvents.distinctBy { it.entity?.name }.count { it.entity?.isMajor ?: false }
 
     override val allTrackersBlocked: Boolean
         get() = trackingEvents.none { !it.blocked }
@@ -93,13 +77,13 @@ class SiteMonitor(
         val isHttps = https != HttpsStatus.NONE
 
         // httpsAutoUpgrade is not supported yet; for now, keep it equal to isHttps and don't penalise sites
-        gradeCalculator = Grade(https = isHttps, httpsAutoUpgrade = isHttps, prevalenceStore = prevalenceStore)
+        gradeCalculator = Grade(https = isHttps, httpsAutoUpgrade = isHttps)
     }
 
     override fun updatePrivacyData(sitePrivacyData: SitePrivacyData) {
         this.privacyPractices = sitePrivacyData.practices
-        this.memberNetwork = sitePrivacyData.memberNetwork
-        gradeCalculator.updateData(privacyPractices.score, memberNetwork?.name, sitePrivacyData.prevalence)
+        this.entity = sitePrivacyData.entity
+        gradeCalculator.updateData(privacyPractices.score, entity)
     }
 
     private fun httpsStatus(): HttpsStatus {
@@ -116,13 +100,11 @@ class SiteMonitor(
     override fun trackerDetected(event: TrackingEvent) {
         trackingEvents.add(event)
 
-        val entity = event.entity
-        val prevalence = prevalenceStore.findPrevalenceOf(entity)
-
+        val entity = event.entity ?: return
         if (event.blocked) {
-            gradeCalculator.addEntityBlocked(entity, prevalence)
+            gradeCalculator.addEntityBlocked(entity)
         } else {
-            gradeCalculator.addEntityNotBlocked(entity, prevalence)
+            gradeCalculator.addEntityNotBlocked(entity)
         }
     }
 

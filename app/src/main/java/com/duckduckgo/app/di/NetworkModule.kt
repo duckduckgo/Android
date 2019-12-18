@@ -21,7 +21,6 @@ import android.content.Context
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
-import com.duckduckgo.app.entities.api.EntityListService
 import com.duckduckgo.app.feedback.api.FeedbackService
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
@@ -48,6 +47,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.io.File
 import javax.inject.Named
 import javax.inject.Singleton
@@ -84,6 +84,7 @@ class NetworkModule {
         return Retrofit.Builder()
             .baseUrl(Url.API)
             .client(okHttpClient)
+            .addConverterFactory(ScalarsConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .addConverterFactory(MoshiConverterFactory.create(moshi))
@@ -109,39 +110,41 @@ class NetworkModule {
 
     @Provides
     fun trackerListService(@Named("api") retrofit: Retrofit): TrackerListService =
-            retrofit.create(TrackerListService::class.java)
+        retrofit.create(TrackerListService::class.java)
 
     @Provides
     fun httpsUpgradeService(@Named("api") retrofit: Retrofit): HttpsUpgradeService =
-            retrofit.create(HttpsUpgradeService::class.java)
+        retrofit.create(HttpsUpgradeService::class.java)
 
     @Provides
     fun autoCompleteService(@Named("nonCaching") retrofit: Retrofit): AutoCompleteService =
-            retrofit.create(AutoCompleteService::class.java)
+        retrofit.create(AutoCompleteService::class.java)
 
     @Provides
     fun surrogatesService(@Named("api") retrofit: Retrofit): ResourceSurrogateListService =
-            retrofit.create(ResourceSurrogateListService::class.java)
-
-    @Provides
-    fun entityListService(@Named("api") retrofit: Retrofit): EntityListService =
-            retrofit.create(EntityListService::class.java)
+        retrofit.create(ResourceSurrogateListService::class.java)
 
     @Provides
     fun brokenSiteSender(statisticsStore: StatisticsDataStore, variantManager: VariantManager, feedbackService: FeedbackService): BrokenSiteSender =
-            BrokenSiteSubmitter(statisticsStore, variantManager, feedbackService)
+        BrokenSiteSubmitter(statisticsStore, variantManager, feedbackService)
 
     @Provides
     fun surveyService(@Named("api") retrofit: Retrofit): SurveyService =
-            retrofit.create(SurveyService::class.java)
+        retrofit.create(SurveyService::class.java)
 
     @Provides
-    fun feedbackSubmitter(feedbackService: FeedbackService, variantManager: VariantManager, apiKeyMapper: SubReasonApiMapper, statisticsStore: StatisticsDataStore, pixel: Pixel): FeedbackSubmitter =
-            FireAndForgetFeedbackSubmitter(feedbackService, variantManager, apiKeyMapper, statisticsStore, pixel)
+    fun feedbackSubmitter(
+        feedbackService: FeedbackService,
+        variantManager: VariantManager,
+        apiKeyMapper: SubReasonApiMapper,
+        statisticsStore: StatisticsDataStore,
+        pixel: Pixel
+    ): FeedbackSubmitter =
+        FireAndForgetFeedbackSubmitter(feedbackService, variantManager, apiKeyMapper, statisticsStore, pixel)
 
     @Provides
     fun feedbackService(@Named("api") retrofit: Retrofit): FeedbackService =
-            retrofit.create(FeedbackService::class.java)
+        retrofit.create(FeedbackService::class.java)
 
     @Provides
     @Singleton

@@ -51,15 +51,13 @@ import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.global.db.AppConfigurationDao
-import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
-import com.duckduckgo.app.privacy.store.PrevalenceStore
+import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
@@ -69,8 +67,7 @@ import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
-import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
+import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
@@ -108,10 +105,7 @@ class BrowserTabViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     @Mock
-    private lateinit var mockPrevalenceStore: PrevalenceStore
-
-    @Mock
-    private lateinit var mockTrackerNetworks: TrackerNetworks
+    private lateinit var mockEntityLookup: EntityLookup
 
     @Mock
     private lateinit var mockNetworkLeaderboardDao: NetworkLeaderboardDao
@@ -185,8 +179,6 @@ class BrowserTabViewModelTest {
 
     private lateinit var db: AppDatabase
 
-    private lateinit var appConfigurationDao: AppConfigurationDao
-
     private lateinit var testee: BrowserTabViewModel
 
     private val selectedTabLiveData = MutableLiveData<TabEntity>()
@@ -198,8 +190,6 @@ class BrowserTabViewModelTest {
         db = Room.inMemoryDatabaseBuilder(getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-
-        appConfigurationDao = db.appConfigurationDao()
 
         mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao)
 
@@ -214,7 +204,7 @@ class BrowserTabViewModelTest {
             mockOnboardingStore
         )
 
-        val siteFactory = SiteFactory(mockPrivacyPractices, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore)
+        val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)
 
         whenever(mockOmnibarConverter.convertQueryToUrl(any())).thenReturn("duckduckgo.com")
         whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
@@ -234,7 +224,6 @@ class BrowserTabViewModelTest {
             appSettingsPreferencesStore = mockSettingsStore,
             bookmarksDao = mockBookmarksDao,
             longPressHandler = mockLongPressHandler,
-            appConfigurationDao = appConfigurationDao,
             webViewSessionStorage = webViewSessionStorage,
             specialUrlDetector = SpecialUrlDetectorImpl(),
             faviconDownloader = mockFaviconDownloader,
@@ -358,7 +347,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenTrackerDetectedThenNetworkLeaderboardUpdated() {
-        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", TrackerNetwork("Network1", "www.tracker.com"), false)
+        val networkEntity = TestEntity("Network1", "Network1", 10.0)
+        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), networkEntity, false)
         testee.trackerDetected(event)
         verify(mockNetworkLeaderboardDao).incrementNetworkCount("Network1")
     }
@@ -561,8 +551,9 @@ class BrowserTabViewModelTest {
     fun whenEnoughTrackersDetectedThenPrivacyGradeIsUpdated() {
         val grade = testee.privacyGrade.value
         loadUrl("https://example.com")
+        val entity = TestEntity("Network1", "Network1", 10.0)
         for (i in 1..10) {
-            testee.trackerDetected(TrackingEvent("https://example.com", "", null, false))
+            testee.trackerDetected(TrackingEvent("https://example.com", "", null, entity, false))
         }
         assertNotEquals(grade, testee.privacyGrade.value)
     }
@@ -573,45 +564,35 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlUpdatedAfterConfigDownloadThenPrivacyGradeIsShown() {
-        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
+    fun whenUrlUpdatedThenPrivacyGradeIsShown() {
         loadUrl("")
         assertTrue(browserViewState().showPrivacyGrade)
     }
 
     @Test
-    fun whenUrlUpdatedBeforeConfigDownloadThenPrivacyGradeIsShown() {
-        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = false))
-        loadUrl("")
+    fun whenBrowserNotShownAndOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsNotShown() {
+        testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
         assertFalse(browserViewState().showPrivacyGrade)
     }
 
     @Test
-    fun whenOmnibarInputDoesNotHaveFocusAndAppConfigDownloadedAndBrowserShownThenPrivacyGradeIsShown() {
+    fun whenBrowserShownAndOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsShown() {
         testee.onUserSubmittedQuery("foo")
-        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
         assertTrue(browserViewState().showPrivacyGrade)
     }
 
     @Test
-    fun whenOmnibarInputDoesNotHaveFocusAndAppConfigDownloadedButBrowserNotShownThenPrivacyGradeIsHidden() {
-        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
-        testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
-        assertFalse(browserViewState().showPrivacyGrade)
-    }
-
-    @Test
-    fun whenOmnibarInputDoesNotHaveFocusAndAppConfigNotDownloadedThenPrivacyGradeIsNotShown() {
-        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = false))
-        testee.onOmnibarInputStateChanged("", false, hasQueryChanged = false)
-        assertFalse(browserViewState().showPrivacyGrade)
-    }
-
-    @Test
-    fun whenOmnibarInputHasFocusThenPrivacyGradeIsNotShown() {
+    fun whenBrowserNotShownAndOmnibarInputHasFocusThenPrivacyGradeIsNotShown() {
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
         assertFalse(browserViewState().showPrivacyGrade)
+    }
+
+    @Test
+    fun whenBrowserShownAndOmnibarInputHasFocusThenPrivacyGradeIsShown() {
+        testee.onUserSubmittedQuery("foo")
+        testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
+        assertTrue(browserViewState().showPrivacyGrade)
     }
 
     @Test
@@ -854,7 +835,7 @@ class BrowserTabViewModelTest {
         assertFalse(browserViewState().browserShowing)
         assertFalse(browserViewState().canGoForward)
     }
-
+    
     @Test
     fun whenBrowserShowingAndCanGoForwardThenForwardButtonActive() {
         setupNavigation(isBrowsing = true, canGoForward = true)

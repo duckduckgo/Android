@@ -18,8 +18,8 @@
 package com.duckduckgo.app.privacy.model
 
 import com.duckduckgo.app.FileUtilities
-import com.duckduckgo.app.privacy.store.PrevalenceStore
-import com.nhaarman.mockitokotlin2.mock
+import com.duckduckgo.app.privacy.model.PredefinedGradeDataJsonConverter.GradeTestCase
+import com.duckduckgo.app.privacy.model.PredefinedGradeDataJsonConverter.JsonGradeTestCase
 import com.squareup.moshi.Moshi
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -27,40 +27,27 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import timber.log.Timber
 
+
 @RunWith(Parameterized::class)
 class PredefinedGradeUnavailableTest(private val testCase: GradeTestCase) {
 
-    private var mockPrevalenceStore: PrevalenceStore = mock()
 
     @Test
     fun predefinedGradeTests() {
 
-        val grade = Grade(testCase.input.https, testCase.input.httpsAutoUpgrade, prevalenceStore = mockPrevalenceStore)
-
+        val grade = Grade(testCase.input.https, testCase.input.httpsAutoUpgrade)
         for (tracker in testCase.input.trackers) {
 
             if (tracker.blocked) {
-                grade.addEntityBlocked(tracker.parentEntity, tracker.prevalence)
+                grade.addEntityBlocked(tracker.parentEntity)
             } else {
-                grade.addEntityNotBlocked(tracker.parentEntity, tracker.prevalence)
+                grade.addEntityNotBlocked(tracker.parentEntity)
             }
 
         }
 
         Timber.d("testCase ${testCase.url}")
         assertTrue(grade.calculateScore() is Grade.Scores.ScoresUnavailable)
-    }
-
-    class GradeTestCase(val expected: Grade.Scores.ScoresAvailable, val input: Input, val url: String) {
-
-        class Input(
-            val https: Boolean,
-            val httpsAutoUpgrade: Boolean,
-            val trackers: Array<Tracker>
-        )
-
-        class Tracker(val blocked: Boolean, val parentEntity: String, val prevalence: Double?)
-
     }
 
     companion object {
@@ -70,10 +57,11 @@ class PredefinedGradeUnavailableTest(private val testCase: GradeTestCase) {
         fun data(): Array<GradeTestCase> {
             val json = FileUtilities.loadText("privacy-grade/test/data/grade-cases.json")
             val moshi = Moshi.Builder().build()
-            val jsonAdapter = moshi.adapter<Array<GradeTestCase>>(Array<GradeTestCase>::class.java)
+            val jsonAdapter = moshi.adapter<Array<JsonGradeTestCase>>(Array<JsonGradeTestCase>::class.java)
             return jsonAdapter.fromJson(json)
+                .map { it.toGradeTestCase() }
+                .toTypedArray()
         }
-
     }
 }
 

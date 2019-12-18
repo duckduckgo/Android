@@ -114,26 +114,26 @@ class TrackersRendererTest {
 
     @Test
     fun whenNetworkNameMatchesPillIconThenResourceIsReturned() {
-        val resource = testee.networkPillIcon(context, "facebook")
-        assertEquals(R.drawable.network_pill_facebook, resource)
+        val resource = testee.networkPillIcon(context, "outbrain")
+        assertEquals(R.drawable.network_pill_outbrain, resource)
     }
 
     @Test
     fun whenNetworkNameMatchesLogoIconThenResourceIsReturned() {
-        val resource = testee.networkLogoIcon(context, "facebook")
-        assertEquals(R.drawable.network_logo_facebook, resource)
+        val resource = testee.networkLogoIcon(context, "outbrain")
+        assertEquals(R.drawable.network_logo_outbrain, resource)
     }
 
     @Test
-    fun whenNetworkNameSansDotsMatchesLogoIconThenResourceIsReturned() {
-        val resource = testee.networkLogoIcon(context, "amazon.com")
-        assertEquals(R.drawable.network_logo_amazoncom, resource)
+    fun whenNetworkNameSansSpecialCharactersAndWithUnderscoresForSpacesMatchesLogoIconThenResourceIsReturned() {
+        val resource = testee.networkLogoIcon(context, "Amazon Technologies, Inc.")
+        assertEquals(R.drawable.network_logo_amazon_technologies_inc, resource)
     }
 
     @Test
-    fun whenNetworkNameSansSpacesMatchesPillIconThenResourceIsReturned() {
-        val resource = testee.networkLogoIcon(context, "fox one stop media")
-        assertEquals(R.drawable.network_logo_foxonestopmedia, resource)
+    fun whenNetworkNameSansSpecialCharactersAndWithUnderscoresForSpacesMatchesPillIconWithUnderscoresThenResourceIsReturned() {
+        val resource = testee.networkPillIcon(context, "Amazon Technologies, Inc.")
+        assertEquals(R.drawable.network_pill_amazon_technologies_inc, resource)
     }
 
     @Test
