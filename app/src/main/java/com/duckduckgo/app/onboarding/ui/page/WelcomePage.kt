@@ -25,7 +25,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.html
-import kotlinx.android.synthetic.main.include_dax_dialog.*
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.content_onboarding_welcome.*
 import kotlinx.android.synthetic.main.content_onboarding_welcome.longDescriptionContainer
 
@@ -42,8 +42,8 @@ class WelcomePage : OnboardingPageFragment() {
 
         context?.let {
             daxText = it.getString(R.string.onboardingDaxText)
-            hiddenText.text = daxText.html(it)
-            dialogText.setTextColor(ContextCompat.getColor(it, R.color.grayishBrown))
+            hiddenTextCta.text = daxText.html(it)
+            dialogTextCta.setTextColor(ContextCompat.getColor(it, R.color.grayishBrown))
             cardView.backgroundTintList = ContextCompat.getColorStateList(it, R.color.white)
         }
         triangle.setImageResource(R.drawable.ic_triangle_bubble_white)
@@ -57,7 +57,7 @@ class WelcomePage : OnboardingPageFragment() {
                     .alpha(1f)
                     .setDuration(400)
                     .withEndAction {
-                        dialogText.startTypingAnimation(daxText)
+                        dialogTextCta.startTypingAnimation(daxText)
                     }
             }
     }

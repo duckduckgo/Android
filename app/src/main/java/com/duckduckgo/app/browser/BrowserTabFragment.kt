@@ -99,7 +99,7 @@ import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.include_dax_dialog.*
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
@@ -1088,6 +1088,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private const val URL_BUNDLE_KEY = "url"
 
         private const val AUTHENTICATION_DIALOG_TAG = "AUTH_DIALOG_TAG"
+        private const val DAX_DIALOG_DIALOG_TAG = "DAX_DIALOG_TAG"
 
         private const val MIN_PROGRESS = 10
         private const val MAX_PROGRESS = 100
@@ -1533,22 +1534,18 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 val isShowing = daxDialog?.dialog?.isShowing
                 if (isShowing != true) {
                     daxDialog = configuration.createDialogCta(activity).apply {
-                        if (configuration is DaxDialogCta.DaxTrackersBlockedCta) {
-                            setDismissListener {
-                                finishTrackerAnimation()
-                                viewModel.onUserDismissedCta()
-                            }
-                        } else {
-                            setDismissListener {
-                                viewModel.onUserDismissedCta()
-                            }
-                        }
                         setHideClickListener {
                             dismiss()
                             launchHideTipsDialog(activity, configuration)
                         }
-                        if (configuration is DaxDialogCta.DaxMainNetworkCta) {
-                            setPrimaryCTAClickListener {
+                        setDismissListener {
+                            if (configuration is DaxDialogCta.DaxTrackersBlockedCta) {
+                                finishTrackerAnimation()
+                            }
+                            viewModel.onUserDismissedCta()
+                        }
+                        setPrimaryCTAClickListener {
+                            if (configuration is DaxDialogCta.DaxMainNetworkCta) {
                                 viewModel.onUserClickCtaOkButton()
                                 configuration.ctaPixelParam = Pixel.PixelValues.DAX_NETWORK_CTA_2
                                 viewModel.onManualCtaShown(configuration)
@@ -1564,15 +1561,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                                     dismiss()
                                 }
                                 setDialogAndStartAnimation()
-                            }
-                        } else {
-                            setPrimaryCTAClickListener {
-                                viewModel.onUserClickCtaOkButton()
+                            } else {
                                 dismiss()
                             }
+                            viewModel.onUserClickCtaOkButton()
                         }
                     }
-                    daxDialog?.show(activity.supportFragmentManager, "DaxDialog")
+                    daxDialog?.show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
                 }
             }
         }
@@ -1611,7 +1606,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         private fun hideDaxCta() {
-            dialogText.cancelAnimation()
+            dialogTextCta.cancelAnimation()
             daxCtaContainer.hide()
         }
 

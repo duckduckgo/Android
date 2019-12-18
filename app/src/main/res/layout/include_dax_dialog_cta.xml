@@ -52,7 +52,7 @@
             app:layout_behavior="@string/bottom_sheet_behavior">
 
             <TextView
-                android:id="@+id/hiddenText"
+                android:id="@+id/hiddenTextCta"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -68,7 +68,7 @@
                 app:layout_constraintBottom_toBottomOf="parent" />
 
             <com.duckduckgo.app.global.view.TypeAnimationTextView
-                android:id="@+id/dialogText"
+                android:id="@+id/dialogTextCta"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginStart="16dp"
@@ -81,7 +81,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="@id/hiddenText" />
+                app:layout_constraintBottom_toBottomOf="@id/hiddenTextCta" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

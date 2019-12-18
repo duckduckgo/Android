@@ -36,9 +36,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_content.view.*
-import kotlinx.android.synthetic.main.include_dax_dialog.view.dialogText
-import kotlinx.android.synthetic.main.include_dax_dialog.view.hiddenText
-import kotlinx.android.synthetic.main.include_dax_dialog.view.primaryCta
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.dialogTextCta
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.hiddenTextCta
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.primaryCta
 
 interface Cta {
     val ctaId: CtaId
@@ -267,9 +267,9 @@ sealed class DaxBubbleCta(
         val daxText = view.context.getString(description)
         view.show()
         view.alpha = 1f
-        view.hiddenText.text = daxText.html(view.context)
+        view.hiddenTextCta.text = daxText.html(view.context)
         view.primaryCta.hide()
-        view.dialogText.startTypingAnimation(daxText, true)
+        view.dialogTextCta.startTypingAnimation(daxText, true)
     }
 
     override fun createDialogCta(activity: FragmentActivity): DaxDialog? = null
