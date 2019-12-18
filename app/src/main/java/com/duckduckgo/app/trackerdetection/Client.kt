@@ -16,28 +16,31 @@
 
 package com.duckduckgo.app.trackerdetection
 
-import com.duckduckgo.app.trackerdetection.model.ResourceType
-
 interface Client {
 
     enum class ClientType {
-
         BLOCKING,
         WHITELIST
-
     }
 
     enum class ClientName(val type: ClientType) {
+        // current clients
+        TDS(ClientType.BLOCKING),
+        TEMPORARY_WHITELIST(ClientType.WHITELIST),
 
+        // legacy clients
         EASYLIST(ClientType.BLOCKING),
         EASYPRIVACY(ClientType.BLOCKING),
-        TRACKERSWHITELIST(ClientType.WHITELIST),
-        DISCONNECT(ClientType.BLOCKING)
-
+        TRACKERSWHITELIST(ClientType.WHITELIST)
     }
+
+    data class Result(
+        val matches: Boolean,
+        val entityName: String? = null,
+        val categories: List<String>? = null
+    )
 
     val name: ClientName
 
-    fun matches(url: String, documentUrl: String, resourceType: ResourceType): Boolean
-
+    fun matches(url: String, documentUrl: String): Result
 }

@@ -23,6 +23,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.rating.PromptCount
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -50,6 +51,11 @@ class AppEnjoymentDatabaseRepositoryTest {
 
         dao = database.appEnjoymentDao()
         testee = AppEnjoymentDatabaseRepository(dao)
+    }
+
+    @After
+    fun after() {
+        database.close()
     }
 
     @Test

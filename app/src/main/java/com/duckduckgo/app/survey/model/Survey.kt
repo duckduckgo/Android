@@ -30,6 +30,7 @@ data class Survey(
     val daysInstalled: Int?,
     var status: Status
 ) : Serializable {
+
     enum class Status {
         NOT_ALLOCATED,
         SCHEDULED,

@@ -46,7 +46,7 @@ class UserAgentProviderTest {
 
     @Before
     fun before() {
-        whenever (deviceInfo.majorAppVersion).thenReturn("5")
+        whenever(deviceInfo.majorAppVersion).thenReturn("5")
     }
 
     @Test

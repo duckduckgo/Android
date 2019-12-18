@@ -60,7 +60,6 @@ import javax.inject.Singleton
         OnboardingModule::class,
         VariantModule::class,
         FaviconModule::class,
-        TrackersModule::class,
         PrivacyModule::class,
         WidgetModule::class,
         RatingModule::class,

@@ -17,9 +17,9 @@
 package com.duckduckgo.app.trackerdetection.di
 
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetectorImpl
-import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -30,7 +30,7 @@ class TrackerDetectionModule {
 
     @Provides
     @Singleton
-    fun trackerDetector(networkTrackers: TrackerNetworks, settings: PrivacySettingsStore): TrackerDetector {
-        return TrackerDetectorImpl(networkTrackers, settings)
+    fun trackerDetector(entityLookup: EntityLookup, settings: PrivacySettingsStore): TrackerDetector {
+        return TrackerDetectorImpl(entityLookup, settings)
     }
 }

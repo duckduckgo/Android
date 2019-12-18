@@ -16,9 +16,12 @@
 
 package com.duckduckgo.app.privacy.ui
 
+import com.duckduckgo.app.privacy.model.TestEntity
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import java.util.*
 
 class TrackerNetworksAdapterTest {
 
@@ -46,10 +49,13 @@ class TrackerNetworksAdapterTest {
         assertEquals(TrackerNetworksAdapter.ROW, testee.getItemViewType(5))
     }
 
-    private fun data(): HashMap<String, ArrayList<TrackingEvent>> {
-        val trackingEvent = TrackingEvent("", "", null, true)
-        val listA = arrayListOf(trackingEvent, trackingEvent)
-        val listB = arrayListOf(trackingEvent, trackingEvent)
-        return hashMapOf("Label A" to listA, "Label B" to listB)
+    private fun data(): SortedMap<Entity, List<TrackingEvent>> {
+        val trackingEvent = TrackingEvent("", "", null, null, true)
+        val minorNetworkList = arrayListOf(trackingEvent, trackingEvent)
+        val majorNetworkList = arrayListOf(trackingEvent, trackingEvent)
+        return mapOf(
+            TestEntity("A", "A", 0.0) to minorNetworkList,
+            TestEntity("B", "B", 0.0) to majorNetworkList
+        ).toSortedMap(compareBy { it.displayName })
     }
 }
