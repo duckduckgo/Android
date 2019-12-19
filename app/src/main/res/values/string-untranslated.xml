@@ -17,4 +17,38 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="crashedWebViewErrorMessage">"The webpage could not be displayed."</string>
     <string name="crashedWebViewErrorAction">"Reload"</string>
+
+    <!-- Omnibar Animation -->
+    <string name="trackersAnimationText">Scanning</string>
+
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">"Welcome to DuckDuckGo!"</string>
+    <string name="onboardingDaxText"><![CDATA[The Internet can be kinda creepy.<br/><br/>Not to worry! Searching and browsing privately is easier than you think.]]></string>
+    <string name="onboardingLetsDoItButton">Let\'s Do It!</string>
+    <string name="daxIntroCtaText"><![CDATA[Try visiting one of your favorite sites!<br/><br/>I\'ll block trackers so they can\'t spy on you. I\'ll also upgrade the security of your connection if possible. 🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[You\'ve got this!<br/><br/>Remember: every time you browse with me a creepy ad loses its wings. 👍]]></string>
+    <string name="daxSerpCtaText">Your DuckDuckGo searches are anonymous and I never store your search history. Ever. 🙌</string>
+    <string name="daxNonSerpCtaText"><![CDATA[Every site has a privacy grade. Tap it to see how I protected your privacy.<br/><br/>Want to get fancy? Try clearing your data by hitting the fire button.]]></string>
+    <string name="daxMainNetworkStep1CtaText"><![CDATA[Heads up!<br/><br/> %s runs a major tracking network.<br/><br/>A low privacy grade will tip you off to sites like this.]]></string>
+    <string name="daxMainNetworkStep1OwnedCtaText"><![CDATA[Heads up!<br/><br/> %s is owned by %s, which runs a major tracking network.]]></string>
+    <string name="daxMainNetworkStep21CtaText"><![CDATA[In fact, %s trackers lurk on about %s of top sites. 😱<br/><br/>]]></string>
+    <string name="daxMainNetworkStep211CtaText"><![CDATA[In fact, %s trackers lurk all over the internet. 😱<br/><br/>]]></string>
+    <string name="daxMainNetworkStep2CtaText">%sI\'ll block these trackers when you\'re browsing non-%s sites.</string>
+
+    <plurals name="daxTrackersBlockedCtaText">
+        <item quantity="one"><![CDATA[&#160;and <b>%d other</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> Tap the privacy grade to learn more about your privacy on %s.]]></item>
+        <item quantity="other"><![CDATA[&#160;and <b>%d others</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> Tap the privacy grade to learn more about your privacy on %s.]]></item>
+    </plurals>
+    <string name="daxTrackersBlockedCtaZeroText"><![CDATA[&#160;was trying to track you here. <br/><br/>I blocked it!<br/><br/> Tap the privacy grade to learn more about your privacy on %s.]]></string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">HIDE</string>
+    <string name="daxDialogPhew">Phew!</string>
+    <string name="daxDialogNext">Next</string>
+    <string name="daxDialogHighFive">High Five!</string>
+    <string name="daxDialogGotIt">Got It</string>
+
+    <string name="hideTipsTitle">Hide remaining tips?</string>
+    <string name="hideTipsText">There are only a few, and we tried to make them informative.</string>
+    <string name="hideTipsButton">Hide tips forever</string>
 </resources>
