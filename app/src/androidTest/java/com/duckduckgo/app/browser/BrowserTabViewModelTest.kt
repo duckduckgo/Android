@@ -1301,7 +1301,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSurveyCtaDismissedAndNotOtherCtaPossibleCtaIsNull() {
+    fun whenSurveyCtaDismissedAndNoOtherCtaPossibleCtaIsNull() {
         testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
         testee.onUserDismissedCta()
         assertNull(testee.ctaViewState.value!!.cta)
