@@ -53,8 +53,8 @@ class WelcomePage : OnboardingPageFragment() {
         applyFullScreenFlags()
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onDestroy() {
+        super.onDestroy()
         welcomeAnimation?.cancel()
         typingAnimation?.cancel()
     }
