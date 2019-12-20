@@ -23,6 +23,7 @@ import android.view.View
 import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.ViewPropertyAnimatorCompat
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.html
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
@@ -33,6 +34,8 @@ import kotlinx.android.synthetic.main.content_onboarding_welcome.longDescription
 class WelcomePage : OnboardingPageFragment() {
 
     private var ctaText: String = ""
+    private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
+    private var typingAnimation: ViewPropertyAnimatorCompat? = null
 
     override fun layoutResource(): Int = R.layout.content_onboarding_welcome
 
@@ -48,6 +51,12 @@ class WelcomePage : OnboardingPageFragment() {
     override fun onResume() {
         super.onResume()
         applyFullScreenFlags()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        welcomeAnimation?.cancel()
+        typingAnimation?.cancel()
     }
 
     private fun applyFullScreenFlags() {
@@ -74,12 +83,12 @@ class WelcomePage : OnboardingPageFragment() {
     }
 
     private fun beginWelcomeAnimation(ctaText: String) {
-        ViewCompat.animate(welcomeContent as View)
+        welcomeAnimation = ViewCompat.animate(welcomeContent as View)
             .alpha(MIN_ALPHA)
             .setDuration(ANIMATION_DURATION)
             .setStartDelay(ANIMATION_DELAY)
             .withEndAction {
-                ViewCompat.animate(daxCtaContainer)
+                typingAnimation = ViewCompat.animate(daxCtaContainer)
                     .alpha(MAX_ALPHA)
                     .setDuration(ANIMATION_DURATION)
                     .withEndAction {
