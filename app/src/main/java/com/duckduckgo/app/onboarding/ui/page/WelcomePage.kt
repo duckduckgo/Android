@@ -23,16 +23,20 @@ import android.view.View
 import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.ViewPropertyAnimatorCompat
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.html
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.content_onboarding_welcome.*
 import kotlinx.android.synthetic.main.content_onboarding_welcome.longDescriptionContainer
+import timber.log.Timber
 
 
 class WelcomePage : OnboardingPageFragment() {
 
     private var ctaText: String = ""
+    private var animator: ViewPropertyAnimatorCompat? = null
+    private var animator2: ViewPropertyAnimatorCompat? = null
 
     override fun layoutResource(): Int = R.layout.content_onboarding_welcome
 
@@ -48,6 +52,13 @@ class WelcomePage : OnboardingPageFragment() {
     override fun onResume() {
         super.onResume()
         applyFullScreenFlags()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Timber.d("MARCOS on pause")
+        animator?.cancel()
+        animator2?.cancel()
     }
 
     private fun applyFullScreenFlags() {
@@ -74,12 +85,12 @@ class WelcomePage : OnboardingPageFragment() {
     }
 
     private fun beginWelcomeAnimation(ctaText: String) {
-        ViewCompat.animate(welcomeContent as View)
+        animator = ViewCompat.animate(welcomeContent as View)
             .alpha(MIN_ALPHA)
             .setDuration(ANIMATION_DURATION)
             .setStartDelay(ANIMATION_DELAY)
             .withEndAction {
-                ViewCompat.animate(daxCtaContainer)
+                animator2 = ViewCompat.animate(daxCtaContainer)
                     .alpha(MAX_ALPHA)
                     .setDuration(ANIMATION_DURATION)
                     .withEndAction {
