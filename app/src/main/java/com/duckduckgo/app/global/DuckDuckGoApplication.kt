@@ -45,6 +45,7 @@ import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.AtbInitializer
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
 import com.duckduckgo.app.statistics.api.OfflinePixelSender
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -154,6 +155,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     @Inject
     lateinit var atbInitializer: AtbInitializer
 
+    @Inject
+    lateinit var variantManager: VariantManager
+
     private var launchedByFireAction: Boolean = false
 
     open lateinit var daggerAppComponent: AppComponent
@@ -182,7 +186,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         }
 
         recordInstallationTimestamp()
-        initializeTheme(settingsDataStore)
+        initializeTheme(settingsDataStore, variantManager)
         loadTrackerData()
         configureDataDownloader()
         scheduleOfflinePixels()

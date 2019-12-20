@@ -64,6 +64,39 @@
                     android:paddingStart="6dp"
                     android:paddingEnd="6dp">
 
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guideline"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintGuide_percent="0.4"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/loadingText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:alpha="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/trackersAnimationText"
+                        android:textAlignment="textStart"
+                        android:textColor="?attr/omnibarTextColor"
+                        android:textSize="13sp"
+                        android:textStyle="normal"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guideline"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/networksContainer"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent" />
+
                     <ImageButton
                         android:id="@+id/privacyGradeButton"
                         android:layout_width="wrap_content"

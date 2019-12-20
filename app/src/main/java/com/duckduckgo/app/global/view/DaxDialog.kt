@@ -34,11 +34,12 @@ import android.view.animation.OvershootInterpolator
 import android.view.animation.ScaleAnimation
 import android.widget.ImageView
 import android.widget.RelativeLayout
-import timber.log.Timber
+import androidx.core.content.ContextCompat.getColor
 
 class DaxDialog(
-    private val daxText: String,
-    private val buttonText: String,
+    var daxText: String,
+    var buttonText: String,
+    private val toolbarDimmed: Boolean = true,
     private val dismissible: Boolean = true,
     private val typingDelayInMs: Long = 20
 ) : DialogFragment() {
@@ -46,6 +47,7 @@ class DaxDialog(
     private var onAnimationFinished: () -> Unit = {}
     private var primaryCtaClickListener: () -> Unit = { dismiss() }
     private var hideClickListener: () -> Unit = { dismiss() }
+    private var dismissListener: () -> Unit = { }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.content_dax_dialog, container, false)
@@ -65,31 +67,41 @@ class DaxDialog(
 
     override fun onStart() {
         super.onStart()
+        dialog?.window?.attributes?.dimAmount = 0f
         dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setDialogAndStartAnimation()
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        dialogText.cancelAnimation()
+        dismissListener()
+        super.onDismiss(dialog)
+    }
+
+    fun setDialogAndStartAnimation() {
         setDialog()
         setListeners()
         dialogText.startTypingAnimation(daxText, true, onAnimationFinished)
-    }
-
-    override fun onCancel(dialog: DialogInterface) {
-        dialogText.cancelAnimation()
-        super.onCancel(dialog)
     }
 
     fun onAnimationFinishedListener(onAnimationFinished: () -> Unit) {
         this.onAnimationFinished = onAnimationFinished
     }
 
-    fun setPrimaryCTAClickListener(clickListener: () -> Unit) {
+    fun setPrimaryCtaClickListener(clickListener: () -> Unit) {
         primaryCtaClickListener = clickListener
     }
 
     fun setHideClickListener(clickListener: () -> Unit) {
         hideClickListener = clickListener
+    }
+
+    fun setDismissListener(clickListener: () -> Unit) {
+        dismissListener = clickListener
     }
 
     fun startHighlightViewAnimation(targetView: View, duration: Long = 400, timesBigger: Float = 0f) {
@@ -126,9 +138,18 @@ class DaxDialog(
     }
 
     private fun setDialog() {
-        hiddenText.text = daxText
-        primaryCta.text = buttonText
-        dialogText.typingDelayInMs = typingDelayInMs
+        if (context == null) {
+            dismiss()
+            return
+        }
+
+        context?.let {
+            val toolbarColor = if (toolbarDimmed) getColor(it, R.color.dimmed) else getColor(it, android.R.color.transparent)
+            toolbarDialogLayout.setBackgroundColor(toolbarColor)
+            hiddenText.text = daxText.html(it)
+            primaryCta.text = buttonText
+            dialogText.typingDelayInMs = typingDelayInMs
+        }
     }
 
     private fun addHighlightView(targetView: View, timesBigger: Float): View? {

@@ -41,12 +41,12 @@ data class Survey(
     class StatusTypeConverter {
 
         @TypeConverter
-        fun toStatus(value: String): Survey.Status {
-            return Survey.Status.valueOf(value)
+        fun toStatus(value: String): Status {
+            return Status.valueOf(value)
         }
 
         @TypeConverter
-        fun fromStatus(value: Survey.Status): String {
+        fun fromStatus(value: Status): String {
             return value.name
         }
     }

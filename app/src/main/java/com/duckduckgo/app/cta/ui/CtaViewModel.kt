@@ -16,29 +16,28 @@
 
 package com.duckduckgo.app.cta.ui
 
-import android.view.View
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.cta.ui.CtaConfiguration.*
+import com.duckduckgo.app.cta.ui.HomePanelCta.*
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
+import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.include_cta_buttons.view.*
-import kotlinx.android.synthetic.main.include_cta_content.view.*
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.CoroutineContext
 
 @Singleton
 class CtaViewModel @Inject constructor(
@@ -46,47 +45,88 @@ class CtaViewModel @Inject constructor(
     private val pixel: Pixel,
     private val surveyDao: SurveyDao,
     private val widgetCapabilities: WidgetCapabilities,
-    private val dismissedCtaDao: DismissedCtaDao
+    private val dismissedCtaDao: DismissedCtaDao,
+    private val variantManager: VariantManager,
+    private val settingsDataStore: SettingsDataStore,
+    private val onboardingStore: OnboardingStore,
+    private val settingsPrivacySettingsStore: PrivacySettingsStore
 ) {
 
-    data class CtaViewState(
-        val cta: CtaConfiguration? = null
-    )
-
-    val ctaViewState: MutableLiveData<CtaViewState> = MutableLiveData()
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
-
-    private val currentViewState: CtaViewState
-        get() = ctaViewState.value!!
 
     private var activeSurvey: Survey? = null
 
-    init {
-        ctaViewState.value = CtaViewState()
-    }
-
-    fun onSurveyChanged(survey: Survey?) {
+    fun onSurveyChanged(survey: Survey?): Survey? {
         activeSurvey = survey
-        refreshCta()
+        return activeSurvey
     }
 
-    fun refreshCta() {
-        surveyCta()?.let {
-            ctaViewState.postValue(currentViewState.copy(cta = it))
-            return
-        }
+    fun hideTipsForever(cta: Cta) {
+        settingsDataStore.hideTips = true
+        pixel.fire(Pixel.PixelName.ONBOARDING_DAX_ALL_CTA_HIDDEN, cta.pixelCancelParameters())
+    }
 
-        Schedulers.io().scheduleDirect {
-            if (canShowWidgetCta()) {
-                val ctaType = if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
-                ctaViewState.postValue(currentViewState.copy(cta = ctaType))
-            } else {
-                ctaViewState.postValue(currentViewState.copy(cta = null))
+    fun onCtaShown(cta: Cta) {
+        cta.shownPixel?.let {
+            pixel.fire(it, cta.pixelShownParameters())
+        }
+    }
+
+    fun registerDaxBubbleCtaShown(cta: Cta) {
+        if (cta is DaxBubbleCta) {
+            Schedulers.io().scheduleDirect {
+                onCtaShown(cta)
+                dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }
         }
     }
 
-    private fun surveyCta(): CtaConfiguration.Survey? {
+    fun onUserDismissedCta(cta: Cta) {
+        cta.cancelPixel?.let {
+            pixel.fire(it, cta.pixelCancelParameters())
+        }
+
+        Schedulers.io().scheduleDirect {
+            if (cta is HomePanelCta.Survey) {
+                activeSurvey = null
+                surveyDao.cancelScheduledSurveys()
+            } else {
+                dismissedCtaDao.insert(DismissedCta(cta.ctaId))
+            }
+        }
+    }
+
+    fun onUserClickCtaOkButton(cta: Cta) {
+        cta.okPixel?.let {
+            pixel.fire(it, cta.pixelOkParameters())
+        }
+    }
+
+    suspend fun refreshCta(dispatcher: CoroutineContext, isNewTab: Boolean, site: Site? = null): Cta? {
+        surveyCta()?.let {
+            return it
+        }
+
+        return withContext(dispatcher) {
+            when {
+                canShowDaxIntroCta() && isNewTab -> {
+                    DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
+                }
+                canShowDaxCtaEndOfJourney(site) && isNewTab -> {
+                    DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
+                }
+                shouldShowDaxCta(site) != null && !isNewTab -> {
+                    shouldShowDaxCta(site)
+                }
+                canShowWidgetCta() && isNewTab -> {
+                    if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
+                }
+                else -> null
+            }
+        }
+    }
+
+    private fun surveyCta(): HomePanelCta.Survey? {
         val survey = activeSurvey
         if (survey?.url != null) {
             val showOnDay = survey.daysInstalled?.toLong()
@@ -102,96 +142,73 @@ class CtaViewModel @Inject constructor(
     private fun canShowWidgetCta(): Boolean {
         return widgetCapabilities.supportsStandardWidgetAdd &&
                 !widgetCapabilities.hasInstalledWidgets &&
-                !dismissedCtaDao.exists(CtaId.ADD_WIDGET)
+                !dismissedCtaDao.exists(CtaId.ADD_WIDGET) &&
+                !isFromConceptTestVariant() &&
+                !isFromNoCtaVariant()
     }
 
-    fun onCtaShown() {
-        currentViewState.cta?.shownPixel?.let {
-            pixel.fire(it)
-        }
-    }
+    @WorkerThread
+    private fun canShowDaxIntroCta(): Boolean = isFromConceptTestVariant() && !daxDialogIntroShown() && !settingsDataStore.hideTips
 
-    fun onCtaDismissed() {
-        val cta = currentViewState.cta ?: return
-        cta.cancelPixel?.let {
-            pixel.fire(it)
+    @WorkerThread
+    private fun canShowDaxCtaEndOfJourney(site: Site?): Boolean = isFromConceptTestVariant() &&
+            hasPrivacySettingsOn() &&
+            !daxDialogEndShown() &&
+            daxDialogIntroShown() &&
+            !settingsDataStore.hideTips &&
+            site == null &&
+            (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogSerpShown() || daxDialogTrackersFoundShown())
+
+    @WorkerThread
+    private fun shouldShowDaxCta(site: Site?): Cta? {
+        if (settingsDataStore.hideTips || !isFromConceptTestVariant() || !hasPrivacySettingsOn()) {
+            return null
         }
 
-        Schedulers.io().scheduleDirect {
-            when (cta) {
-                is CtaConfiguration.Survey -> {
-                    activeSurvey = null
-                    surveyDao.cancelScheduledSurveys()
-                }
-                else -> {
-                    dismissedCtaDao.insert(DismissedCta(cta.ctaId))
+        val nonNullSite = site ?: return null
+
+        nonNullSite.let {
+            // Is major network
+            val host = it.uri?.host
+            if (it.entity != null && host != null) {
+                it.entity?.let { entity ->
+                    if (!daxDialogNetworkShown() && DaxDialogCta.MAIN_TRACKER_NETWORKS.contains(entity.displayName)) {
+                        return DaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
+                    }
                 }
             }
-            ctaViewState.postValue(currentViewState.copy(cta = null))
-            refreshCta()
+            // Is Serp
+            if (!daxDialogSerpShown() && isSerpUrl(it.url)) {
+                return DaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
+            }
+            // Trackers blocked
+            return if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.trackerCount > 0 && host != null) {
+                DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.trackingEvents, host)
+            } else if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
+                DaxDialogCta.DaxNoSerpCta(onboardingStore, appInstallStore)
+            } else {
+                null
+            }
         }
     }
 
-    fun onCtaLaunched() {
-        currentViewState.cta?.okPixel?.let {
-            pixel.fire(it)
-        }
-    }
-}
+    private fun hasPrivacySettingsOn(): Boolean = settingsPrivacySettingsStore.privacyOn
 
-sealed class CtaConfiguration(
-    open val ctaId: CtaId,
-    @DrawableRes open val image: Int,
-    @StringRes open val title: Int,
-    @StringRes open val description: Int,
-    @StringRes open val okButton: Int,
-    @StringRes open val dismissButton: Int,
-    open val shownPixel: Pixel.PixelName?,
-    open val okPixel: Pixel.PixelName?,
-    open val cancelPixel: Pixel.PixelName?
-) {
+    private fun isFromConceptTestVariant(): Boolean = variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)
 
-    data class Survey(val survey: com.duckduckgo.app.survey.model.Survey) : CtaConfiguration(
-        CtaId.SURVEY,
-        R.drawable.survey_cta_icon,
-        R.string.surveyCtaTitle,
-        R.string.surveyCtaDescription,
-        R.string.surveyCtaLaunchButton,
-        R.string.surveyCtaDismissButton,
-        SURVEY_CTA_SHOWN,
-        SURVEY_CTA_LAUNCHED,
-        SURVEY_CTA_DISMISSED
-    )
+    private fun isFromNoCtaVariant(): Boolean = variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ExistingNoCta)
 
-    object AddWidgetAuto : CtaConfiguration(
-        CtaId.ADD_WIDGET,
-        R.drawable.add_widget_cta_icon,
-        R.string.addWidgetCtaTitle,
-        R.string.addWidgetCtaDescription,
-        R.string.addWidgetCtaAutoLaunchButton,
-        R.string.addWidgetCtaDismissButton,
-        null,
-        null,
-        null
-    )
+    private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
 
-    object AddWidgetInstructions : CtaConfiguration(
-        CtaId.ADD_WIDGET,
-        R.drawable.add_widget_cta_icon,
-        R.string.addWidgetCtaTitle,
-        R.string.addWidgetCtaDescription,
-        R.string.addWidgetCtaInstructionsLaunchButton,
-        R.string.addWidgetCtaDismissButton,
-        null,
-        null,
-        null
-    )
+    private fun daxDialogEndShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_END)
 
-    fun apply(view: View) {
-        view.ctaIcon.setImageResource(image)
-        view.ctaTitle.text = view.context.getString(title)
-        view.ctaSubtitle.text = view.context.getString(description)
-        view.ctaOkButton.text = view.context.getString(okButton)
-        view.ctaDismissButton.text = view.context.getString(dismissButton)
-    }
+    private fun daxDialogSerpShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)
+
+    private fun daxDialogOtherShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_OTHER)
+
+    private fun daxDialogTrackersFoundShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)
+
+    private fun daxDialogNetworkShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)
+
+    private fun isSerpUrl(url: String): Boolean = url.contains(DaxDialogCta.SERP)
 }

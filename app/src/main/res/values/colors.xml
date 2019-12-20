@@ -31,6 +31,7 @@
     <color name="webViewScrollbarThumbColor">#ffababab</color>
 
     <!-- Universal -->
+    <color name="dimmed">#99000000</color>
     <color name="white">#ffffff</color>
     <color name="whiteSemiTransparent">#d6ffffff</color>
     <color name="whiteTwo">#e4e4e4</color>

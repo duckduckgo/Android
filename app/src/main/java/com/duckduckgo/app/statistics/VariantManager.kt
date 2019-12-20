@@ -28,6 +28,9 @@ interface VariantManager {
 
     sealed class VariantFeature {
         // variant-dependant features listed here
+        object ConceptTest : VariantFeature()
+
+        object ExistingNoCta : VariantFeature()
     }
 
     companion object {
@@ -39,8 +42,11 @@ interface VariantManager {
 
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
-            Variant(key = "sc", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "se", weight = 1.0, features = emptyList(), filterBy = { noFilter() })
+            Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "mc", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "me", weight = 1.0, features = listOf(VariantFeature.ConceptTest), filterBy = { isEnglishLocale() }),
+            Variant(key = "md", weight = 1.0, features = listOf(VariantFeature.ExistingNoCta), filterBy = { isEnglishLocale() })
 
             // All groups in an experiment (control and variants) MUST use the same filters
         )

@@ -75,7 +75,7 @@ interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
     interface Builder {
 
         @BindsInstance
-        fun application(application: Application): AppComponent.Builder
+        fun application(application: Application): Builder
 
         fun build(): AppComponent
     }

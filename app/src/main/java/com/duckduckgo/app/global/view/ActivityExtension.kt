@@ -46,7 +46,7 @@ fun Context.launchDefaultAppActivity() {
         startActivity(intent)
     } catch (e: ActivityNotFoundException) {
         val errorMessage = getString(R.string.cannotLaunchDefaultAppSettings)
-        Timber.w(e, errorMessage)
+        Timber.w(errorMessage)
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
     }
 }
@@ -59,9 +59,9 @@ fun Context.fadeTransitionConfig(): Bundle? {
 fun FragmentActivity.toggleFullScreen() {
 
     val newUiOptions = window.decorView.systemUiVisibility
-        .xor(android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
-        .xor(android.view.View.SYSTEM_UI_FLAG_FULLSCREEN)
-        .xor(android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+        .xor(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
+        .xor(View.SYSTEM_UI_FLAG_FULLSCREEN)
+        .xor(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
 
     window.decorView.systemUiVisibility = newUiOptions
 }

@@ -60,7 +60,7 @@ class PrivacyProtectionCountDaoTest {
     fun whenTrackerCountIncrementedFrom1ThenNewCountIs2() {
         dao.incrementBlockedTrackerCount()
         dao.incrementBlockedTrackerCount()
-        Assert.assertEquals(2, dao.getTrackersBlockedCount())
+        assertEquals(2, dao.getTrackersBlockedCount())
     }
 
     @Test
