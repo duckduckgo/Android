@@ -1202,12 +1202,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         fun cancelAllAnimations() {
-            animatorHelper.cancelAnimations()
-            networksContainer.alpha = 0f
-            loadingText.alpha = 0f
-            clearTextButton.alpha = 1f
-            omnibarTextInput.alpha = 1f
-            privacyGradeButton.alpha = 1f
+            if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)) {
+                animatorHelper.cancelAnimations()
+                networksContainer.alpha = 0f
+                loadingText.alpha = 0f
+                clearTextButton.alpha = 1f
+                omnibarTextInput.alpha = 1f
+                privacyGradeButton.alpha = 1f
+            }
         }
 
         private fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, privacyGradeButton)
