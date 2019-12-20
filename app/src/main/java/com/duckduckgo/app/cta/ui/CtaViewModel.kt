@@ -26,6 +26,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -47,7 +48,8 @@ class CtaViewModel @Inject constructor(
     private val dismissedCtaDao: DismissedCtaDao,
     private val variantManager: VariantManager,
     private val settingsDataStore: SettingsDataStore,
-    private val onboardingStore: OnboardingStore
+    private val onboardingStore: OnboardingStore,
+    private val settingsPrivacySettingsStore: PrivacySettingsStore
 ) {
 
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
@@ -150,6 +152,7 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private fun canShowDaxCtaEndOfJourney(site: Site?): Boolean = isFromConceptTestVariant() &&
+            hasPrivacySettingsOn() &&
             !daxDialogEndShown() &&
             daxDialogIntroShown() &&
             !settingsDataStore.hideTips &&
@@ -158,10 +161,13 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private fun shouldShowDaxCta(site: Site?): Cta? {
-        if (settingsDataStore.hideTips || !isFromConceptTestVariant()) {
+        if (settingsDataStore.hideTips || !isFromConceptTestVariant() || !hasPrivacySettingsOn()) {
             return null
         }
-        site?.let {
+
+        val nonNullSite = site ?: return null
+
+        nonNullSite.let {
             // Is major network
             val host = it.uri?.host
             if (it.entity != null && host != null) {
@@ -184,8 +190,9 @@ class CtaViewModel @Inject constructor(
                 null
             }
         }
-        return null
     }
+
+    private fun hasPrivacySettingsOn(): Boolean = settingsPrivacySettingsStore.privacyOn
 
     private fun isFromConceptTestVariant(): Boolean = variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)
 

@@ -33,6 +33,7 @@ import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
+import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
@@ -101,6 +102,9 @@ class CtaViewModelTest {
     @Mock
     private lateinit var mockOnboardingStore: OnboardingStore
 
+    @Mock
+    private lateinit var mockPrivacySettingsStore: PrivacySettingsStore
+
     private lateinit var testee: CtaViewModel
 
     @Before
@@ -113,6 +117,7 @@ class CtaViewModelTest {
             .build()
 
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+        whenever(mockPrivacySettingsStore.privacyOn).thenReturn(true)
 
         testee = CtaViewModel(
             mockAppInstallStore,
@@ -122,7 +127,8 @@ class CtaViewModelTest {
             mockDismissedCtaDao,
             mockVariantManager,
             mockSettingsDataStore,
-            mockOnboardingStore
+            mockOnboardingStore,
+            mockPrivacySettingsStore
         )
     }
 
@@ -231,6 +237,16 @@ class CtaViewModelTest {
     fun whenRefreshCtaOnExistingTabAndHideTipsIsTrueThenReturnNull() = runBlockingTest {
         setConceptTestVariant()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = false, site = site)
+        assertNull(value)
+    }
+
+    @Test
+    fun whenRefreshCtaOnExistingTabAndPrivacyOffThenReturnNull() = runBlockingTest {
+        setConceptTestVariant()
+        whenever(mockPrivacySettingsStore.privacyOn).thenReturn(false)
         val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = false, site = site)

@@ -20,6 +20,7 @@
 
     <!-- Omnibar Animation -->
     <string name="trackersAnimationText">Scanning</string>
+    <string name="trackersAnimationDotText">%s.</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Welcome to DuckDuckGo!"</string>

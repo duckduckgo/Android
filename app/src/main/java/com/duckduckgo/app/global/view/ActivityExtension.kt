@@ -16,20 +16,15 @@
 
 package com.duckduckgo.app.global.view
 
-import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.View
 import android.widget.Toast
-import androidx.annotation.AttrRes
-import androidx.annotation.ColorInt
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityOptionsCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
@@ -74,13 +69,4 @@ fun FragmentActivity.toggleFullScreen() {
 fun FragmentActivity.isImmersiveModeEnabled(): Boolean {
     val uiOptions = window.decorView.systemUiVisibility
     return uiOptions or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY == uiOptions
-}
-
-@SuppressLint("ResourceAsColor")
-@ColorInt
-fun Context.getColorResCompat(@AttrRes id: Int): Int {
-    val resolvedAttr = TypedValue()
-    this.theme.resolveAttribute(id, resolvedAttr, true)
-    val colorRes = resolvedAttr.run { if (resourceId != 0) resourceId else data }
-    return ContextCompat.getColor(this, colorRes)
 }

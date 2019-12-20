@@ -77,7 +77,6 @@ sealed class DaxDialogCta(
     override fun pixelShownParameters(): Map<String, String?> {
         val param = onboardingStore.onboardingDialogJourney?.split("-")
             .orEmpty()
-            .map { it }
             .toMutableList()
         param.add("$ctaPixelParam:${appInstallStore.daysInstalled().toInt()}")
         val finalParam = param.joinToString("-")
@@ -248,7 +247,6 @@ sealed class DaxBubbleCta(
     override fun pixelShownParameters(): Map<String, String?> {
         val param = onboardingStore.onboardingDialogJourney?.split("-")
             .orEmpty()
-            .map { it }
             .toMutableList()
         param.add("$ctaPixelParam:${appInstallStore.daysInstalled().toInt()}")
         val finalParam = param.joinToString("-")

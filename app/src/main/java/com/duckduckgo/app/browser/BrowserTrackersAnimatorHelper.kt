@@ -20,39 +20,110 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.res.Resources
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import com.duckduckgo.app.cta.ui.Cta
+import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
-class BrowserTrackersAnimatorHelper @Inject constructor() {
+class BrowserTrackersAnimatorHelper @Inject constructor(): CoroutineScope {
+
+    override val coroutineContext: CoroutineContext
+        get() = SupervisorJob() + Dispatchers.Main
 
     var logosStayOnScreenDuration: Long = TRACKER_LOGOS_DELAY_ON_SCREEN
 
-    fun createLoadingAnimation(fadeOutViews: List<View>, fadeInView: View): AnimatorSet {
+    private var loadingAnimation: AnimatorSet = AnimatorSet()
+    private var trackersAnimation: AnimatorSet = AnimatorSet()
+    private var typingAnimationJob: Job? = null
 
-        val animators = fadeOutViews.map {
-            animateFadeOut(it)
-        }
-
-        val fadeLoadingIn = animateFadeIn(fadeInView)
-        val transition = AnimatorSet().apply {
-            playTogether(animators)
-        }
-
-        return AnimatorSet().apply {
-            play(fadeLoadingIn).after(transition)
+    private fun createScanningAnimation(resources: Resources, loadingText: TextView): Job {
+        return launch {
+            while (true) {
+                if (loadingText.text.contains("...")) {
+                    loadingText.text = resources.getString(R.string.trackersAnimationText)
+                } else {
+                    loadingText.text = resources.getString(R.string.trackersAnimationDotText,loadingText.text)
+                }
+                delay(SCANNING_DELAY)
+            }
         }
     }
 
-    fun finishTrackerAnimation(fadeInViews: List<View>, container: ConstraintLayout): AnimatorSet {
+    fun createLoadedAnimation(cta: Cta?, activity: Activity, container: ConstraintLayout, loadingText: View, views: List<View>, events: List<TrackingEvent>?) {
+        if (loadingAnimation.isRunning) {
+            loadingAnimation.end()
+        }
+
+        if (!trackersAnimation.isRunning) {
+            typingAnimationJob?.cancel()
+            typingAnimationJob = null
+            trackersAnimation = if (cta is DaxDialogCta.DaxTrackersBlockedCta) {
+                createTrackersAnimation(activity, container, loadingText, events).apply {
+                    start()
+                }
+            } else {
+                createCompleteTrackersAnimation(activity, container, loadingText, views, events).apply {
+                    start()
+                }
+            }
+        }
+    }
+
+    fun cancelAnimations() {
+        typingAnimationJob?.cancel()
+        typingAnimationJob = null
+        if (loadingAnimation.isRunning) {
+            loadingAnimation.end()
+        }
+        if (trackersAnimation.isRunning) {
+            trackersAnimation.end()
+        }
+    }
+
+    fun createLoadingAnimation(resources: Resources, fadeOutViews: List<View>, fadeInView: View) {
+        if (!loadingAnimation.isRunning && !trackersAnimation.isRunning) {
+
+            val animators = fadeOutViews.map {
+                animateFadeOut(it)
+            }
+
+            val fadeLoadingIn = animateFadeIn(fadeInView)
+            val transition = AnimatorSet().apply {
+                playTogether(animators)
+            }
+
+            loadingAnimation = AnimatorSet().apply {
+                play(fadeLoadingIn).after(transition)
+                start()
+            }
+
+            if (typingAnimationJob == null) {
+                if (fadeInView is TextView) {
+                    typingAnimationJob = createScanningAnimation(resources, fadeInView)
+                }
+            }
+        }
+    }
+
+    fun finishTrackerAnimation(fadeInViews: List<View>, container: ConstraintLayout) {
         val animateOmnibarIn = animateOmnibarIn(fadeInViews)
         val fadeLogosOut = animateFadeOut(container)
-        return AnimatorSet().apply {
+        trackersAnimation = AnimatorSet().apply {
             play(fadeLogosOut).before(animateOmnibarIn)
             start()
         }
@@ -67,7 +138,7 @@ class BrowserTrackersAnimatorHelper @Inject constructor() {
             imageView.id = View.generateViewId()
             container.addView(imageView)
             return@map imageView
-        }.orEmpty().toList()
+        }.orEmpty()
     }
 
     private fun createResourcesIdList(activity: Activity, events: List<TrackingEvent>?): List<Int>? {
@@ -90,7 +161,16 @@ class BrowserTrackersAnimatorHelper @Inject constructor() {
         }
     }
 
-    fun createTrackersAnimation(activity: Activity, container: ConstraintLayout, loadingText: View, events: List<TrackingEvent>?): AnimatorSet {
+    private fun createCompleteTrackersAnimation(activity: Activity, container: ConstraintLayout, loadingText: View, views: List<View>, events: List<TrackingEvent>?): AnimatorSet {
+        return AnimatorSet().apply {
+            play(createTrackersAnimation(activity, container, loadingText, events))
+            play(animateFadeOut(container))
+                .after(logosStayOnScreenDuration)
+                .before(animateOmnibarIn(views))
+        }
+    }
+
+    private fun createTrackersAnimation(activity: Activity, container: ConstraintLayout, loadingText: View, events: List<TrackingEvent>?): AnimatorSet {
         container.removeAllViews()
         container.alpha = 0f
 
@@ -149,7 +229,7 @@ class BrowserTrackersAnimatorHelper @Inject constructor() {
         constraints.applyTo(container)
     }
 
-    fun animateOmnibarIn(views: List<View>): AnimatorSet {
+    private fun animateOmnibarIn(views: List<View>): AnimatorSet {
         val animators = views.map {
             animateFadeIn(it)
         }
@@ -177,6 +257,6 @@ class BrowserTrackersAnimatorHelper @Inject constructor() {
         private const val TRACKER_LOGOS_DELAY_ON_SCREEN = 3000L
         private const val DEFAULT_ANIMATION_DURATION = 250L
         private const val MAX_LOGOS_SHOWN = 4
-        private const val LOGO_RES_PREFIX = "network_logo_"
+        const val SCANNING_DELAY = 340L
     }
 }

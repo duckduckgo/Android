@@ -32,39 +32,25 @@ import kotlinx.android.synthetic.main.content_onboarding_welcome.longDescription
 
 class WelcomePage : OnboardingPageFragment() {
 
+    private var ctaText: String = ""
+
     override fun layoutResource(): Int = R.layout.content_onboarding_welcome
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
         primaryCta.setOnClickListener { onContinuePressed() }
-        var daxText = ""
 
-        context?.let {
-            daxText = it.getString(R.string.onboardingDaxText)
-            hiddenTextCta.text = daxText.html(it)
-            dialogTextCta.setTextColor(ContextCompat.getColor(it, R.color.grayishBrown))
-            cardView.backgroundTintList = ContextCompat.getColorStateList(it, R.color.white)
-        }
-        triangle.setImageResource(R.drawable.ic_triangle_bubble_white)
-
-        ViewCompat.animate(welcomeContent as View)
-            .alpha(0f)
-            .setDuration(400)
-            .setStartDelay(1000)
-            .withEndAction {
-                ViewCompat.animate(daxCtaContainer)
-                    .alpha(1f)
-                    .setDuration(400)
-                    .withEndAction {
-                        dialogTextCta.startTypingAnimation(daxText)
-                    }
-            }
+        configureDaxCta()
+        beginWelcomeAnimation(ctaText)
     }
 
     override fun onResume() {
         super.onResume()
+        applyFullScreenFlags()
+    }
 
+    private fun applyFullScreenFlags() {
         activity?.window?.apply {
             clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
             addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
@@ -75,5 +61,37 @@ class WelcomePage : OnboardingPageFragment() {
             statusBarColor = Color.TRANSPARENT
         }
         ViewCompat.requestApplyInsets(longDescriptionContainer)
+    }
+
+    private fun configureDaxCta() {
+        context?.let {
+            ctaText = it.getString(R.string.onboardingDaxText)
+            hiddenTextCta.text = ctaText.html(it)
+            dialogTextCta.setTextColor(ContextCompat.getColor(it, R.color.grayishBrown))
+            cardView.backgroundTintList = ContextCompat.getColorStateList(it, R.color.white)
+        }
+        triangle.setImageResource(R.drawable.ic_triangle_bubble_white)
+    }
+
+    private fun beginWelcomeAnimation(ctaText: String) {
+        ViewCompat.animate(welcomeContent as View)
+            .alpha(MIN_ALPHA)
+            .setDuration(ANIMATION_DURATION)
+            .setStartDelay(ANIMATION_DELAY)
+            .withEndAction {
+                ViewCompat.animate(daxCtaContainer)
+                    .alpha(MAX_ALPHA)
+                    .setDuration(ANIMATION_DURATION)
+                    .withEndAction {
+                        dialogTextCta.startTypingAnimation(ctaText)
+                    }
+            }
+    }
+
+    companion object {
+        private const val MIN_ALPHA = 0f
+        private const val MAX_ALPHA = 1f
+        private const val ANIMATION_DURATION = 400L
+        private const val ANIMATION_DELAY = 1000L
     }
 }

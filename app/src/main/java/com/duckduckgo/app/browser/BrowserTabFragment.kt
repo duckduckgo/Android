@@ -85,6 +85,7 @@ import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
+import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.model.Survey
@@ -167,7 +168,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     lateinit var variantManager: VariantManager
 
     @Inject
-    lateinit var browserTrackersAnimatorHelper: BrowserTrackersAnimatorHelper
+    lateinit var privacySettingsStore: PrivacySettingsStore
+
+    @Inject
+    lateinit var animatorHelper: BrowserTrackersAnimatorHelper
 
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
@@ -1114,10 +1118,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
         private var lastSeenCtaViewState: CtaViewState? = null
 
-        private var loadingAnimation: AnimatorSet = AnimatorSet()
-        private var trackersAnimation: AnimatorSet = AnimatorSet()
-        private var typingAnimationJob: Job? = null
-
         fun renderAutocomplete(viewState: AutoCompleteViewState) {
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
                 lastSeenAutoCompleteViewState = viewState
@@ -1163,14 +1163,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     progress = viewState.progress
                 }
 
-                if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)) {
+                if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) && privacySettingsStore.privacyOn ) {
 
                     if (lastSeenOmnibarViewState?.isEditing == true) {
                         cancelAllAnimations()
                     }
 
                     if (viewState.progress <= MIN_PROGRESS && viewState.isLoading && lastSeenOmnibarViewState?.isEditing != true) {
-                        createLoadingAnimation()
+                        animatorHelper.createLoadingAnimation(resources, omnibarViews(), loadingText)
                     }
 
                     if (viewState.progress == MAX_PROGRESS) {
@@ -1186,69 +1186,23 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 viewModel.refreshCta(false)
                 delay(TRACKERS_SECONDARY_DELAY)
                 if (lastSeenOmnibarViewState?.isEditing != true) {
-                    if (loadingAnimation.isRunning) {
-                        loadingAnimation.end()
-                    }
+                    val site = viewModel.siteLiveData.value
+                    val events = site?.trackingEvents
 
-                    if (!trackersAnimation.isRunning) {
-                        typingAnimationJob?.cancel()
-                        typingAnimationJob = null
-                        val site = viewModel.siteLiveData.value
-                        val events = site?.trackingEvents
-                        trackersAnimation = if (lastSeenCtaViewState?.cta is DaxDialogCta.DaxTrackersBlockedCta) {
-                            AnimatorSet().apply {
-                                play(browserTrackersAnimatorHelper.createTrackersAnimation(activity!!, networksContainer, loadingText, events))
-                                start()
-                            }
-                        } else {
-                            AnimatorSet().apply {
-                                play(browserTrackersAnimatorHelper.createTrackersAnimation(activity!!, networksContainer, loadingText, events))
-                                play(browserTrackersAnimatorHelper.animateFadeOut(networksContainer))
-                                    .after(browserTrackersAnimatorHelper.logosStayOnScreenDuration)
-                                    .before(browserTrackersAnimatorHelper.animateOmnibarIn(omnibarViews()))
-                                start()
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private fun createLoadingAnimation() {
-            if (!loadingAnimation.isRunning && !trackersAnimation.isRunning) {
-                loadingAnimation = browserTrackersAnimatorHelper.createLoadingAnimation(omnibarViews(), loadingText).apply {
-                    start()
-                }
-            }
-
-            if (typingAnimationJob == null) {
-                typingAnimationJob = createScanningAnimation()
-            }
-        }
-
-        @SuppressLint("SetTextI18n")
-        private fun createScanningAnimation(): Job? {
-            return launch {
-                while (true) {
-                    if (loadingText.text.contains("...")) {
-                        loadingText.text = getString(R.string.trackersAnimationText)
-                    } else {
-                        loadingText.text = "${loadingText.text}."
-                    }
-                    delay(340)
+                    animatorHelper.createLoadedAnimation(
+                        lastSeenCtaViewState?.cta,
+                        requireActivity(),
+                        networksContainer,
+                        loadingText,
+                        omnibarViews(),
+                        events
+                    )
                 }
             }
         }
 
         fun cancelAllAnimations() {
-            typingAnimationJob?.cancel()
-            typingAnimationJob = null
-            if (loadingAnimation.isRunning) {
-                loadingAnimation.end()
-            }
-            if (trackersAnimation.isRunning) {
-                trackersAnimation.end()
-            }
+            animatorHelper.cancelAnimations()
             networksContainer.alpha = 0f
             loadingText.alpha = 0f
             clearTextButton.alpha = 1f
@@ -1398,7 +1352,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     }
                     setDismissListener {
                         if (configuration is DaxDialogCta.DaxTrackersBlockedCta) {
-                            trackersAnimation = browserTrackersAnimatorHelper.finishTrackerAnimation(omnibarViews(), container)
+                            animatorHelper.finishTrackerAnimation(omnibarViews(), container)
                         }
                         viewModel.onUserDismissedCta()
                     }
