@@ -78,7 +78,7 @@
                         android:id="@+id/loadingText"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:alpha="1"
+                        android:alpha="0"
                         android:fontFamily="sans-serif-medium"
                         android:text="@string/trackersAnimationText"
                         android:textAlignment="textStart"
