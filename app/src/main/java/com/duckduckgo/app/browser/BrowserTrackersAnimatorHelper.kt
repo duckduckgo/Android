@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-class BrowserTrackersAnimatorHelper @Inject constructor(): CoroutineScope {
+class BrowserTrackersAnimatorHelper @Inject constructor() : CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = SupervisorJob() + Dispatchers.Main
@@ -57,19 +57,29 @@ class BrowserTrackersAnimatorHelper @Inject constructor(): CoroutineScope {
                 if (loadingText.text.contains("...")) {
                     loadingText.text = resources.getString(R.string.trackersAnimationText)
                 } else {
-                    loadingText.text = resources.getString(R.string.trackersAnimationDotText,loadingText.text)
+                    loadingText.text = resources.getString(R.string.trackersAnimationDotText, loadingText.text)
                 }
                 delay(SCANNING_DELAY)
             }
         }
     }
 
-    fun createLoadedAnimation(cta: Cta?, activity: Activity, container: ConstraintLayout, loadingText: View, views: List<View>, events: List<TrackingEvent>?) {
+    fun createLoadedAnimation(
+        cta: Cta?,
+        activity: Activity,
+        container: ConstraintLayout,
+        loadingText: View,
+        views: List<View>,
+        events: List<TrackingEvent>?
+    ) {
         if (loadingAnimation.isRunning) {
             loadingAnimation.end()
         }
 
         if (!trackersAnimation.isRunning) {
+            views.map {
+                it.alpha = 0f
+            }
             typingAnimationJob?.cancel()
             typingAnimationJob = null
             trackersAnimation = if (cta is DaxDialogCta.DaxTrackersBlockedCta) {
@@ -161,7 +171,13 @@ class BrowserTrackersAnimatorHelper @Inject constructor(): CoroutineScope {
         }
     }
 
-    private fun createCompleteTrackersAnimation(activity: Activity, container: ConstraintLayout, loadingText: View, views: List<View>, events: List<TrackingEvent>?): AnimatorSet {
+    private fun createCompleteTrackersAnimation(
+        activity: Activity,
+        container: ConstraintLayout,
+        loadingText: View,
+        views: List<View>,
+        events: List<TrackingEvent>?
+    ): AnimatorSet {
         return AnimatorSet().apply {
             play(createTrackersAnimation(activity, container, loadingText, events))
             play(animateFadeOut(container))
@@ -170,7 +186,12 @@ class BrowserTrackersAnimatorHelper @Inject constructor(): CoroutineScope {
         }
     }
 
-    private fun createTrackersAnimation(activity: Activity, container: ConstraintLayout, loadingText: View, events: List<TrackingEvent>?): AnimatorSet {
+    private fun createTrackersAnimation(
+        activity: Activity,
+        container: ConstraintLayout,
+        loadingText: View,
+        events: List<TrackingEvent>?
+    ): AnimatorSet {
         container.removeAllViews()
         container.alpha = 0f
 
