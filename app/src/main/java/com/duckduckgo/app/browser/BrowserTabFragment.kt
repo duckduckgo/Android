@@ -1189,18 +1189,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     val site = viewModel.siteLiveData.value
                     val events = site?.trackingEvents
 
-                    val act = activity
-                    if (act != null) {
+                    activity?.let { activity ->
                         animatorHelper.createLoadedAnimation(
                             lastSeenCtaViewState?.cta,
-                            act,
+                            activity,
                             networksContainer,
                             loadingText,
                             omnibarViews(),
                             events
                         )
-                    } else {
-                        cancelAllAnimations()
                     }
                 }
             }
