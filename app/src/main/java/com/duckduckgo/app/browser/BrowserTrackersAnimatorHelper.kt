@@ -45,7 +45,7 @@ class BrowserTrackersAnimatorHelper @Inject constructor() : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = SupervisorJob() + Dispatchers.Main
 
-    var logosStayOnScreenDuration: Long = TRACKER_LOGOS_DELAY_ON_SCREEN
+    private var logosStayOnScreenDuration: Long = TRACKER_LOGOS_DELAY_ON_SCREEN
 
     private var loadingAnimation: AnimatorSet = AnimatorSet()
     private var trackersAnimation: AnimatorSet = AnimatorSet()
