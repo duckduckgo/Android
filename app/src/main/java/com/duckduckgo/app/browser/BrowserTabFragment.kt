@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser
 
 import android.Manifest
-import android.animation.AnimatorSet
 import android.animation.LayoutTransition.CHANGING
 import android.animation.LayoutTransition.DISAPPEARING
 import android.annotation.SuppressLint
@@ -116,8 +115,10 @@ import kotlin.coroutines.CoroutineContext
 
 class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
+    private val supervisorJob = SupervisorJob()
+
     override val coroutineContext: CoroutineContext
-        get() = SupervisorJob() + Dispatchers.Main
+        get() = supervisorJob + Dispatchers.Main
 
     @Inject
     lateinit var webViewClient: BrowserWebViewClient
@@ -963,6 +964,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     override fun onDestroy() {
+        supervisorJob.cancel()
         popupMenu.dismiss()
         destroyWebView()
         super.onDestroy()
@@ -1093,7 +1095,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private const val MIN_PROGRESS = 10
         private const val MAX_PROGRESS = 100
         private const val TRACKERS_INI_DELAY = 700L
-        private const val TRACKERS_SECONDARY_DELAY = 300L
+        private const val TRACKERS_SECONDARY_DELAY = 7000L
 
         fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
             val fragment = BrowserTabFragment()
