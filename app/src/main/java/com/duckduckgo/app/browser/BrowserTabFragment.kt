@@ -1095,7 +1095,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private const val MIN_PROGRESS = 10
         private const val MAX_PROGRESS = 100
         private const val TRACKERS_INI_DELAY = 700L
-        private const val TRACKERS_SECONDARY_DELAY = 7000L
+        private const val TRACKERS_SECONDARY_DELAY = 300L
 
         fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
             val fragment = BrowserTabFragment()
