@@ -77,7 +77,7 @@ class DaxDialog(
     }
 
     override fun onDismiss(dialog: DialogInterface) {
-        dialogText.cancelAnimation()
+        dialogText?.cancelAnimation()
         dismissListener()
         super.onDismiss(dialog)
     }
