@@ -36,10 +36,13 @@ class AndroidAppCacheClearer(private val context: Context, private val fileDelet
     companion object {
 
         /*
-         * Exclude this WebView cache directory, based on warning from Firefox Focus:
+         * Exclude the WebView cache directories, based on warning from Firefox Focus:
          *   "If the folder or its contents are deleted, WebView will stop using the disk cache entirely."
+         *
+         * To date, there are two known WebView cache directories; only one is present at a time but which is used is based on WebView version.
          */
-        private const val WEBVIEW_CACHE_DIR = "org.chromium.android_webview"
+        private const val WEBVIEW_CACHE_DIR_LEGACY = "org.chromium.android_webview"
+        private const val WEBVIEW_CACHE_DIR = "WebView"
 
         /*
          * Exclude the OkHttp networking cache from being deleted. This doesn't contain any sensitive information.
@@ -49,6 +52,7 @@ class AndroidAppCacheClearer(private val context: Context, private val fileDelet
 
         private val FILENAMES_EXCLUDED_FROM_DELETION = listOf(
             WEBVIEW_CACHE_DIR,
+            WEBVIEW_CACHE_DIR_LEGACY,
             NETWORK_CACHE_DIR
         )
     }
