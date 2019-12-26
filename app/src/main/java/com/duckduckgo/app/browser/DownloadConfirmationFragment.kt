@@ -18,16 +18,19 @@ package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Toast
 import androidx.core.content.FileProvider.getUriForFile
-import com.duckduckgo.app.browser.downloader.NetworkFileDownloader.DownloadFileData
-import com.duckduckgo.app.browser.downloader.NetworkFileDownloader.UserDownloadAction
+import com.duckduckgo.app.browser.downloader.NetworkFileDownloadManager.DownloadFileData
+import com.duckduckgo.app.browser.downloader.NetworkFileDownloadManager.UserDownloadAction
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.show
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.download_confirmation.view.*
+import timber.log.Timber
 
 class DownloadConfirmationFragment(
     private val downloadFileData: DownloadFileData,
@@ -82,9 +85,15 @@ class DownloadConfirmationFragment(
             downloadFileData.file
         )
         val mime = activity?.contentResolver?.getType(uri)
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.setDataAndType(uri, mime)
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        startActivity(intent)
+
+        try {
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.setDataAndType(uri, mime)
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Timber.e(e,"No suitable activity found")
+            Toast.makeText(activity, "Can't open file", Toast.LENGTH_SHORT).show()
+        }
     }
 }
