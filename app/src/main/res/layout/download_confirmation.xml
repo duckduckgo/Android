@@ -16,11 +16,11 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:custom="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:background="@color/white"
+    android:orientation="vertical"
     android:padding="16dp">
 
 
@@ -28,36 +28,71 @@
         android:id="@+id/download_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        custom:text="sample-file.pdf ?"
         android:textColor="@android:color/black"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        custom:text="Save sample-file.pdf ?" />
+
 
     <LinearLayout
+        android:layout_marginTop="16dp"
+        android:id="@+id/continue_download"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:orientation="horizontal">
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingTop="8dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="8dp">
 
-        <Button
-            android:id="@+id/cancel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_weight="1"
-            android:background="@android:color/black"
-            android:text="@string/fireCancel"
-            android:textColor="@android:color/white" />
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="32dp"
+            android:src="@android:drawable/ic_menu_save"
+            android:tint="#737373" />
 
-        <Button
-            android:id="@+id/continue_download"
-            android:layout_width="0dp"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1"
-            android:background="@android:color/black"
+            android:layout_gravity="center_vertical"
             android:text="@string/fireContinue"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/black"
+            android:textSize="16sp" />
 
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/cancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingTop="8dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="8dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="32dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:tint="#737373" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/fireCancel"
+            android:textColor="@android:color/black"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
 
 </LinearLayout>
