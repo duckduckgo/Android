@@ -148,6 +148,8 @@
     <string name="fireMenu">Clear Data</string>
     <string name="fireClearAll">Clear All Tabs and Data</string>
     <string name="fireCancel">Cancel</string>
+    <string name="fireContinue">Continue</string>
+    <string name="download_filename">Download %1$s ?</string>
     <string name="fireDataCleared">Data cleared</string>
     <string name="fireProcessName" translatable="false">:fire</string>
 

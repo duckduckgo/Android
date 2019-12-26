@@ -62,6 +62,7 @@ import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAda
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
+import com.duckduckgo.app.browser.downloader.NetworkFileDownloader.UserDownloadAction
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -1010,6 +1011,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         pendingFileDownload = null
         thread {
             fileDownloader.download(pendingDownload, object : FileDownloader.FileDownloadListener {
+                override fun confirmDownload(fileName: String, userDownloadAction: UserDownloadAction) {
+                    val downloadConfirmationFragment = DownloadConfirmationFragment(fileName, userDownloadAction)
+                    downloadConfirmationFragment.show(fragmentManager!!, DOWNLAOD_CONFIRM_TAG)
+                }
+
                 override fun downloadStarted() {
                     fileDownloadNotificationManager.showDownloadInProgressNotification()
                 }
@@ -1090,6 +1096,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private const val URL_BUNDLE_KEY = "url"
 
         private const val AUTHENTICATION_DIALOG_TAG = "AUTH_DIALOG_TAG"
+        private const val DOWNLAOD_CONFIRM_TAG = "DOWNLAOD_CONFIRM_TAG"
         private const val DAX_DIALOG_DIALOG_TAG = "DAX_DIALOG_TAG"
 
         private const val MIN_PROGRESS = 10

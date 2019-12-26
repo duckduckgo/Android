@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.downloader
 import android.os.Environment
 import android.webkit.URLUtil
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.browser.downloader.NetworkFileDownloader.UserDownloadAction
 import java.io.File
 import javax.inject.Inject
 
@@ -28,14 +29,14 @@ class FileDownloader @Inject constructor(
 ) {
 
     @WorkerThread
-    fun download(pending: PendingFileDownload?, callback: FileDownloadListener?) {
+    fun download(pending: PendingFileDownload?, callback: FileDownloadListener) {
 
         if (pending == null) {
             return
         }
 
         when {
-            URLUtil.isNetworkUrl(pending.url) -> networkDownloader.download(pending)
+            URLUtil.isNetworkUrl(pending.url) -> networkDownloader.download(pending, callback)
             URLUtil.isDataUrl(pending.url) -> dataUriDownloader.download(pending, callback)
             else -> callback?.downloadFailed("Not supported")
         }
@@ -50,6 +51,7 @@ class FileDownloader @Inject constructor(
     )
 
     interface FileDownloadListener {
+        fun confirmDownload(fileName: String, userDownloadAction: UserDownloadAction)
         fun downloadStarted()
         fun downloadFinished(file: File, mimeType: String?)
         fun downloadFailed(message: String)
