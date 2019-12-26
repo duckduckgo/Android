@@ -23,24 +23,39 @@ import android.webkit.URLUtil
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.downloader.FileDownloader.FileDownloadListener
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 class NetworkFileDownloader @Inject constructor(private val context: Context) {
 
-    fun download(pendingDownload: FileDownloader.PendingFileDownload, callback: FileDownloadListener) {
+    fun download(
+        pendingDownload: FileDownloader.PendingFileDownload,
+        callback: FileDownloadListener
+    ) {
         val guessedFileName = guessFileName(pendingDownload)
-        callback.confirmDownload(guessedFileName, object : UserDownloadAction {
-            override fun accept() {
-                initiateDownload(pendingDownload, guessedFileName)
-            }
+        val alreadyDownloaded = File(pendingDownload.directory, guessedFileName).exists()
+        callback.confirmDownload(
+            DownloadFileData(guessedFileName, alreadyDownloaded),
+            object : UserDownloadAction {
+                override fun acceptAndReplace() {
+                    File(pendingDownload.directory, guessedFileName).delete()
+                    initiateDownload(pendingDownload, guessedFileName)
+                }
 
-            override fun cancel() {
-                Timber.i("Cancelled download for url ${pendingDownload.url}")
-            }
-        })
+                override fun accept() {
+                    initiateDownload(pendingDownload, guessedFileName)
+                }
+
+                override fun cancel() {
+                    Timber.i("Cancelled download for url ${pendingDownload.url}")
+                }
+            })
     }
 
-    private fun initiateDownload(pendingDownload: FileDownloader.PendingFileDownload, guessedFileName: String?) {
+    private fun initiateDownload(
+        pendingDownload: FileDownloader.PendingFileDownload,
+        guessedFileName: String?
+    ) {
         val request = DownloadManager.Request(pendingDownload.url.toUri()).apply {
             allowScanningByMediaScanner()
             addRequestHeader("Cookie", CookieManager.getInstance().getCookie(pendingDownload.url))
@@ -52,13 +67,17 @@ class NetworkFileDownloader @Inject constructor(private val context: Context) {
     }
 
     private fun guessFileName(pending: FileDownloader.PendingFileDownload): String {
-        val guessedFileName = URLUtil.guessFileName(pending.url, pending.contentDisposition, pending.mimeType)
+        val guessedFileName =
+            URLUtil.guessFileName(pending.url, pending.contentDisposition, pending.mimeType)
         Timber.i("Guessed filename of $guessedFileName for url ${pending.url}")
         return guessedFileName
     }
 
     interface UserDownloadAction {
         fun accept()
+        fun acceptAndReplace()
         fun cancel()
     }
+
+    class DownloadFileData(val fileName: String, val alreadyDownloaded: Boolean)
 }

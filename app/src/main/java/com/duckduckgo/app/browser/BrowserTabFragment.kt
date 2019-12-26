@@ -62,6 +62,7 @@ import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAda
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
+import com.duckduckgo.app.browser.downloader.NetworkFileDownloader
 import com.duckduckgo.app.browser.downloader.NetworkFileDownloader.UserDownloadAction
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
@@ -1011,8 +1012,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         pendingFileDownload = null
         thread {
             fileDownloader.download(pendingDownload, object : FileDownloader.FileDownloadListener {
-                override fun confirmDownload(fileName: String, userDownloadAction: UserDownloadAction) {
-                    val downloadConfirmationFragment = DownloadConfirmationFragment(fileName, userDownloadAction)
+                override fun confirmDownload(
+                    downloadFileData: NetworkFileDownloader.DownloadFileData,
+                    userDownloadAction: UserDownloadAction
+                ) {
+                    val downloadConfirmationFragment =
+                        DownloadConfirmationFragment(downloadFileData, userDownloadAction)
                     downloadConfirmationFragment.show(fragmentManager!!, DOWNLAOD_CONFIRM_TAG)
                 }
 

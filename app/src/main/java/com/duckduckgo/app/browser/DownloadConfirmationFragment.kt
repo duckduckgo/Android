@@ -19,19 +19,38 @@ package com.duckduckgo.app.browser
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.view.LayoutInflater
-import com.duckduckgo.app.browser.downloader.NetworkFileDownloader
+import android.view.View
+import com.duckduckgo.app.browser.downloader.NetworkFileDownloader.DownloadFileData
+import com.duckduckgo.app.browser.downloader.NetworkFileDownloader.UserDownloadAction
+import com.duckduckgo.app.global.view.gone
+import com.duckduckgo.app.global.view.show
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.download_confirmation.view.*
 
-class DownloadConfirmationFragment(private val fileName: String, private val userDownloadAction: NetworkFileDownloader.UserDownloadAction) : BottomSheetDialogFragment() {
+class DownloadConfirmationFragment(
+    private val downloadFileData: DownloadFileData,
+    private val userDownloadAction: UserDownloadAction
+) : BottomSheetDialogFragment() {
 
     @SuppressLint("RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
         super.setupDialog(dialog, style)
         val view = LayoutInflater.from(context).inflate(R.layout.download_confirmation, null)
         dialog.setContentView(view)
+        setupViews(view)
+    }
 
-        view.download_message.text = getString(R.string.download_filename, fileName)
+    private fun setupViews(view: View) {
+        view.download_message.text =
+            getString(R.string.download_filename, downloadFileData.fileName)
+        view.replace.setOnClickListener {
+            userDownloadAction.acceptAndReplace()
+            dismiss()
+        }
+        view.keep_both.setOnClickListener {
+            userDownloadAction.accept()
+            dismiss()
+        }
         view.continue_download.setOnClickListener {
             userDownloadAction.accept()
             dismiss()
@@ -39,6 +58,14 @@ class DownloadConfirmationFragment(private val fileName: String, private val use
         view.cancel.setOnClickListener {
             userDownloadAction.cancel()
             dismiss()
+        }
+
+        if (downloadFileData.alreadyDownloaded) {
+            view.already_downloaded_options.show()
+            view.continue_download.gone()
+        } else {
+            view.already_downloaded_options.gone()
+            view.continue_download.show()
         }
     }
 }

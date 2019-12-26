@@ -51,7 +51,10 @@ class FileDownloader @Inject constructor(
     )
 
     interface FileDownloadListener {
-        fun confirmDownload(fileName: String, userDownloadAction: UserDownloadAction)
+        fun confirmDownload(
+            downloadFileData: NetworkFileDownloader.DownloadFileData,
+            userDownloadAction: UserDownloadAction
+        )
         fun downloadStarted()
         fun downloadFinished(file: File, mimeType: String?)
         fun downloadFailed(message: String)
