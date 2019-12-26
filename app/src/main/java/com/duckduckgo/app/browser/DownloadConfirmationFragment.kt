@@ -18,8 +18,10 @@ package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
+import androidx.core.content.FileProvider.getUriForFile
 import com.duckduckgo.app.browser.downloader.NetworkFileDownloader.DownloadFileData
 import com.duckduckgo.app.browser.downloader.NetworkFileDownloader.UserDownloadAction
 import com.duckduckgo.app.global.view.gone
@@ -42,7 +44,11 @@ class DownloadConfirmationFragment(
 
     private fun setupViews(view: View) {
         view.download_message.text =
-            getString(R.string.download_filename, downloadFileData.fileName)
+            getString(R.string.download_filename, downloadFileData.file.name)
+        view.open_with.setOnClickListener {
+            openFile()
+            dismiss()
+        }
         view.replace.setOnClickListener {
             userDownloadAction.acceptAndReplace()
             dismiss()
@@ -67,5 +73,18 @@ class DownloadConfirmationFragment(
             view.already_downloaded_options.gone()
             view.continue_download.show()
         }
+    }
+
+    private fun openFile() {
+        val uri = getUriForFile(
+            context!!,
+            "${BuildConfig.APPLICATION_ID}.provider",
+            downloadFileData.file
+        )
+        val mime = activity?.contentResolver?.getType(uri)
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.setDataAndType(uri, mime)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        startActivity(intent)
     }
 }

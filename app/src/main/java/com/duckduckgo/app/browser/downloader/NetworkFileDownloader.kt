@@ -33,9 +33,10 @@ class NetworkFileDownloader @Inject constructor(private val context: Context) {
         callback: FileDownloadListener
     ) {
         val guessedFileName = guessFileName(pendingDownload)
-        val alreadyDownloaded = File(pendingDownload.directory, guessedFileName).exists()
+        val fileToDownload = File(pendingDownload.directory, guessedFileName)
+        val alreadyDownloaded = fileToDownload.exists()
         callback.confirmDownload(
-            DownloadFileData(guessedFileName, alreadyDownloaded),
+            DownloadFileData(fileToDownload, alreadyDownloaded),
             object : UserDownloadAction {
                 override fun acceptAndReplace() {
                     File(pendingDownload.directory, guessedFileName).delete()
@@ -79,5 +80,5 @@ class NetworkFileDownloader @Inject constructor(private val context: Context) {
         fun cancel()
     }
 
-    class DownloadFileData(val fileName: String, val alreadyDownloaded: Boolean)
+    class DownloadFileData(val file: File, val alreadyDownloaded: Boolean)
 }

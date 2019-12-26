@@ -152,6 +152,8 @@
     <string name="download_filename">Save %1$s ?</string>
     <string name="keep_both">Keep both</string>
     <string name="replace">Replace</string>
+    <string name="open_with">Open with…</string>
+    <string name="file_already_downloaded">File already downloaded</string>
     <string name="fireDataCleared">Data cleared</string>
     <string name="fireProcessName" translatable="false">:fire</string>
 

@@ -39,6 +39,51 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <RelativeLayout
+            android:id="@+id/open_with"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingTop="8dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="8dp">
+
+            <ImageView
+                android:id="@+id/open_with_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="32dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ic_menu_archive"
+                android:tint="#737373" />
+
+            <TextView
+                android:layout_toEndOf="@id/open_with_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/open_with"
+                android:textColor="@android:color/black"
+                android:id="@+id/open_with_text"
+                android:textSize="16sp" />
+            <TextView
+                android:layout_below="@+id/open_with_text"
+                android:layout_toEndOf="@id/open_with_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/file_already_downloaded"
+                android:textColor="@color/brownishGray"
+                android:textSize="12sp" />
+
+        </RelativeLayout>
+
+
         <LinearLayout
             android:id="@+id/replace"
             android:layout_width="match_parent"
