@@ -16,48 +16,72 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import android.content.Context
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.global.store.BinaryDataStore
-import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
+import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.trackerdetection.api.TdsJson
+import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
+import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
+import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
+import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
+import com.squareup.moshi.Moshi
 import timber.log.Timber
 import javax.inject.Inject
 
 @WorkerThread
 class TrackerDataLoader @Inject constructor(
     private val trackerDetector: TrackerDetector,
-    private val binaryDataStore: BinaryDataStore,
-    private val trackerDataDao: TrackerDataDao
+    private val tdsTrackerDao: TdsTrackerDao,
+    private val tdsEntityDao: TdsEntityDao,
+    private val tdsDomainEntityDao: TdsDomainEntityDao,
+    private val tempWhitelistDao: TemporaryTrackingWhitelistDao,
+    private val context: Context,
+    private val appDatabase: AppDatabase,
+    private val moshi: Moshi
 ) {
 
     fun loadData() {
-
-        Timber.d("Loading Tracker data")
-
-        // this is stored to disk, then fed to the C++ adblock module
-        loadAdblockData(Client.ClientName.TRACKERSWHITELIST)
-
-        // stored in DB, then read into memory
-        loadDisconnectData()
+        Timber.d("Loading tracker data")
+        loadTds()
+        loadTemporaryWhitelist()
     }
 
-    fun loadAdblockData(name: Client.ClientName) {
-        Timber.d("Looking for adblock tracker ${name.name} to load")
+    private fun loadTds() {
+        val count = tdsTrackerDao.count()
+        if (count == 0) {
+            updateTdsFromFile()
+        }
+        loadTrackers()
+    }
 
-        if (binaryDataStore.hasData(name.name)) {
-            Timber.d("Found adblock tracker ${name.name}")
-            val client = AdBlockClient(name)
-            client.loadProcessedData(binaryDataStore.loadData(name.name))
-            trackerDetector.addClient(client)
-        } else {
-            Timber.d("No adblock tracker ${name.name} found")
+    private fun updateTdsFromFile() {
+        Timber.d("Updating tds from file")
+        val json = context.resources.openRawResource(R.raw.tds).bufferedReader().use { it.readText() }
+        val adapter = moshi.adapter(TdsJson::class.java)
+        persistTds(adapter.fromJson(json))
+    }
+
+    fun persistTds(tdsJson: TdsJson) {
+        appDatabase.runInTransaction {
+            tdsEntityDao.updateAll(tdsJson.jsonToEntities())
+            tdsDomainEntityDao.updateAll(tdsJson.jsonToDomainEntities())
+            tdsTrackerDao.updateAll(tdsJson.jsonToTrackers().values)
         }
     }
 
-    fun loadDisconnectData() {
-        val trackers = trackerDataDao.getAll()
-        Timber.d("Loaded ${trackers.size} disconnect trackers from DB")
+    fun loadTrackers() {
+        val trackers = tdsTrackerDao.getAll()
+        Timber.d("Loaded ${trackers.size} tds trackers from DB")
+        val client = TdsClient(Client.ClientName.TDS, trackers)
+        trackerDetector.addClient(client)
+    }
 
-        val client = DisconnectClient(Client.ClientName.DISCONNECT, trackers)
+    fun loadTemporaryWhitelist() {
+        val whitelist = tempWhitelistDao.getAll()
+        Timber.d("Loaded ${whitelist.size} temporarily whitelisted domains from DB")
+
+        val client = DocumentDomainClient(Client.ClientName.TEMPORARY_WHITELIST, whitelist)
         trackerDetector.addClient(client)
     }
 }

@@ -46,7 +46,7 @@ class WebViewDataManager @Inject constructor(
         clearFormData(webView, webViewDatabase)
         clearAuthentication(webViewDatabase)
         clearExternalCookies()
-        clearWebViewDirectory(exclusions = WEBVIEW_FILES_EXCLUDED_FROM_DELETION)
+        clearWebViewDirectories(exclusions = WEBVIEW_FILES_EXCLUDED_FROM_DELETION)
     }
 
     private fun clearWebViewCache(webView: WebView) {
@@ -69,9 +69,18 @@ class WebViewDataManager @Inject constructor(
         }
     }
 
-    private suspend fun clearWebViewDirectory(exclusions: List<String>) {
-        val webViewDataDirectory = File(context.applicationInfo.dataDir, WEBVIEW_DATA_DIRECTORY_NAME)
-        fileDeleter.deleteContents(webViewDataDirectory, exclusions)
+    /**
+     * Deletes web view directory content. The Cookies file is kept as we clear cookies separately to avoid a crash and maintain ddg cookies.
+     * Cookies may appear in files:
+     *   app_webview/Cookies
+     *   app_webview/Default/Cookies
+     */
+    private suspend fun clearWebViewDirectories(exclusions: List<String>) {
+        val dataDir = context.applicationInfo.dataDir
+        fileDeleter.deleteContents(File(dataDir, WEBVIEW_DATA_DIRECTORY_NAME), exclusions)
+
+        // We don't delete the Default dir as Cookies may be inside however we do clear any other content
+        fileDeleter.deleteContents(File(dataDir, WEBVIEW_DEFAULT_DIRECTORY_NAME), exclusions)
     }
 
     /**
@@ -96,8 +105,10 @@ class WebViewDataManager @Inject constructor(
 
     companion object {
         private const val WEBVIEW_DATA_DIRECTORY_NAME = "app_webview"
+        private const val WEBVIEW_DEFAULT_DIRECTORY_NAME = "app_webview/Default"
 
         private val WEBVIEW_FILES_EXCLUDED_FROM_DELETION = listOf(
+            "Default",
             "Cookies"
         )
     }

@@ -17,13 +17,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
+    <string name="yes">Sì</string>
+    <string name="no">No</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Naviga sempre in modo anonimo</string>
     <string name="onboardingDefaultBrowserDescription">Visita la sezione Impostazioni per effettuare ricerche e navigare sempre con DuckDuckGo.</string>
-    <string name="onboardingDefaultBrowserGoToSettingsAction">Vai a Impostazioni</string>
     <string name="onboardingContinue">Continua</string>
     <string name="onboardingContinueFinalPage">Inizia la navigazione</string>
+    <string name="onboardingDefaultBrowserTitle">Imposta DuckDuckGo come predefinito</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Saluta la pace della mente</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Benvenuto in\nDuckDuckGo!</string>
@@ -40,6 +42,11 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Impossibile aprire la schermata delle impostazioni predefinite dell\'app</string>
     <string name="settingsDefaultBrowserEnabled">Imposta come Browser predefinito</string>
+    <string name="defaultBrowserMaybeLater">Forse più tardi</string>
+    <string name="defaultBrowserLetsDoIt">Facciamolo!</string>
+    <string name="defaultBrowserDescriptionNoDefault">Apri i collegamenti con la massima tranquillità, ogni volta.</string>
+    <string name="defaultBrowserDescriptionDefaultSet">Con DuckDuckGo, i tuoi dati online sono più privati ​​per impostazione predefinita, ovunque ti porti Internet.</string>
+    <string name="defaultBrowserInstructions">Seleziona DuckDuckGo e clicca su <font color="#678fff">Sempre</font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Menu del browser</string>
@@ -92,10 +99,8 @@
     <string name="openImageInNewTab">Apri l\'immagine in una scheda in secondo piano</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Chiudi</string>
-    <string name="tapFireDirective">Tocca </string>
-    <string name="tapFireIconDescription">l\'icona a forma di fiamma</string>
-    <string name="tapFireExplanation"> per eliminare tutto</string>
     <string name="closeAllTabsMenuItem">Chiudi tutte le schede</string>
+    <string name="closeTab">Chiudi scheda</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Dashboard sulla privacy</string>
@@ -216,6 +221,7 @@
     <string name="bookmarkOverflowContentDescription">Ulteriori opzioni per il segnalibro %s</string>
     <string name="delete">Cancella</string>
     <string name="edit">Modifica</string>
+    <string name="bookmarkEdited">Segnalibro aggiunto</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Cerca con DuckDuckGo</string>

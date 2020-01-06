@@ -28,6 +28,7 @@ interface SettingsDataStore {
 
     var lastExecutedJobId: String?
     var theme: DuckDuckGoTheme?
+    var hideTips: Boolean
     var autoCompleteSuggestionsEnabled: Boolean
 
     /**
@@ -65,6 +66,10 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
             return DuckDuckGoTheme.valueOf(themeName)
         }
         set(theme) = preferences.edit { putString(KEY_THEME, theme.toString()) }
+
+    override var hideTips: Boolean
+        get() = preferences.getBoolean(KEY_HIDE_TIPS, false)
+        set(enabled) = preferences.edit { putBoolean(KEY_HIDE_TIPS, enabled) }
 
     override var autoCompleteSuggestionsEnabled: Boolean
         get() = preferences.getBoolean(KEY_AUTOCOMPLETE_ENABLED, true)
@@ -126,5 +131,6 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         const val KEY_APP_BACKGROUNDED_TIMESTAMP = "APP_BACKGROUNDED_TIMESTAMP"
         const val KEY_APP_NOTIFICATIONS_ENABLED = "APP_NOTIFCATIONS_ENABLED"
         const val KEY_APP_USED_SINCE_LAST_CLEAR = "APP_USED_SINCE_LAST_CLEAR"
+        const val KEY_HIDE_TIPS = "HIDE_TIPS"
     }
 }

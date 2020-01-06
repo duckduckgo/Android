@@ -1,13 +1,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logoul DuckDuckGo</string>
+    <string name="yes">Da</string>
+    <string name="no">Nu</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Setați „Confidențial” ca implicit</string>
     <string name="onboardingDefaultBrowserDescription">Accesați „Setări” pentru a căuta și naviga cu DuckDuckGo de fiecare dată.</string>
-    <string name="onboardingDefaultBrowserGoToSettingsAction">Accesați „Setări”</string>
     <string name="onboardingContinue">Continuare</string>
     <string name="onboardingContinueFinalPage">Începere navigare</string>
+    <string name="onboardingDefaultBrowserTitle">Fă DuckDuckGo Aplicația Ta Implicită</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Salută Liniștea Sufletească</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Bine ați venit la\nDuckDuckGo!</string>
@@ -24,6 +26,11 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nu se poate lansa ecranul de setări implicite ale aplicației</string>
     <string name="settingsDefaultBrowserEnabled">Setare ca browser implicit</string>
+    <string name="defaultBrowserMaybeLater">Poate Mai Târziu</string>
+    <string name="defaultBrowserLetsDoIt">Hai să o facem!</string>
+    <string name="defaultBrowserDescriptionNoDefault">Deschide link-urile cu liniște sufletească, de fiecare dată.</string>
+    <string name="defaultBrowserDescriptionDefaultSet">Cu DuckDuckGo, datele tale online sunt mai confidențiale în mod implicit, oriunde te poartă internetul.</string>
+    <string name="defaultBrowserInstructions">Selectează DuckDuckGo și atinge <font color="#678fff"> Întotdeauna </font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Meniu browser</string>
@@ -76,10 +83,8 @@
     <string name="openImageInNewTab">Deschide imaginea în fila de fundal</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Închidere</string>
-    <string name="tapFireDirective">Apăsați butonul </string>
-    <string name="tapFireIconDescription">„Fire”</string>
-    <string name="tapFireExplanation"> pentru a uita totul</string>
     <string name="closeAllTabsMenuItem">Închidere toate filele</string>
+    <string name="closeTab">Închidere nouă</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Tabloul de bord privind confidențialitatea</string>
@@ -204,6 +209,7 @@
     <string name="bookmarkOverflowContentDescription">Mai multe opțiuni pentru semnul de carte %s</string>
     <string name="delete">Ștergere</string>
     <string name="edit">Editare</string>
+    <string name="bookmarkEdited">Semn de carte adăugat</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Căutare DuckDuckGo</string>

@@ -16,13 +16,13 @@
 
 package com.duckduckgo.app.tabs.db
 
-import android.database.sqlite.SQLiteConstraintException
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -43,6 +43,11 @@ class TabsDaoTest {
             .allowMainThreadQueries()
             .build()
         testee = database.tabsDao()
+    }
+
+    @After
+    fun after() {
+        database.close()
     }
 
     @Test
@@ -104,12 +109,6 @@ class TabsDaoTest {
         testee.insertTab(tab)
         testee.insertTabSelection(tabSelection)
         assertEquals(tab, testee.selectedTab())
-    }
-
-    @Test(expected = SQLiteConstraintException::class)
-    fun whenTabSelectionInsertedWithUnknownForeignKeyThenExceptionThrown() {
-        val tabSelection = TabSelectionEntity(1, "TAB_ID")
-        testee.insertTabSelection(tabSelection)
     }
 
     @Test

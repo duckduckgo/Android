@@ -1,13 +1,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Лого на DuckDuckGo</string>
+    <string name="yes">да</string>
+    <string name="no">Не</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Поверителността да стане Ваша настройка по подразбиране</string>
     <string name="onboardingDefaultBrowserDescription">Посетете Настройки, за да търсите и сърфирате с DuckDuckGo всеки път.</string>
-    <string name="onboardingDefaultBrowserGoToSettingsAction">Към настройките</string>
     <string name="onboardingContinue">Напред</string>
     <string name="onboardingContinueFinalPage">Начало на сърфирането</string>
+    <string name="onboardingDefaultBrowserTitle">Направете DuckDuckGo Вашият браузър по подразбиране</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Кажете \"Здравей\" на спокойствието</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Добре дошли в\nDuckDuckGo!</string>
@@ -24,6 +26,11 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Екранът за настройки на приложения по подразбиране не може да бъде стартиран</string>
     <string name="settingsDefaultBrowserEnabled">Задаване като браузър по подразбиране</string>
+    <string name="defaultBrowserMaybeLater">Може би по-късно</string>
+    <string name="defaultBrowserLetsDoIt">Да го направим!</string>
+    <string name="defaultBrowserDescriptionNoDefault">Отваряйте връзки без притеснения</string>
+    <string name="defaultBrowserDescriptionDefaultSet">С DuckDuckGo Вашите онлайн данни са защитени по подразбиране, където и да търсите в интернет.</string>
+    <string name="defaultBrowserInstructions">Изберете DuckDuckGo и докоснете <font color="#678fff">Винаги</font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Меню на браузъра</string>
@@ -76,10 +83,8 @@
     <string name="openImageInNewTab">Отваряне на изображението във фоновия подпрозорец</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Затваряне</string>
-    <string name="tapFireDirective">Докоснете </string>
-    <string name="tapFireIconDescription">бутона Fire</string>
-    <string name="tapFireExplanation"> за изтриване на цялата информация</string>
     <string name="closeAllTabsMenuItem">Затваряне на всички подпрозорци</string>
+    <string name="closeTab">Затваряне подпрозорец</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Табло за управление на поверителността</string>
@@ -200,6 +205,7 @@
     <string name="bookmarkOverflowContentDescription">Още опции за отметка %s</string>
     <string name="delete">Изтриване</string>
     <string name="edit">Редактиране</string>
+    <string name="bookmarkEdited">Маркерът е добавен</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Търсене с DuckDuckGo</string>

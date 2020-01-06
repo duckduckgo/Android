@@ -29,6 +29,10 @@ class StatisticsSharedPreferences @Inject constructor(private val context: Conte
         get() = preferences.getString(KEY_VARIANT, null)
         set(value) = preferences.edit { putString(KEY_VARIANT, value) }
 
+    override var referrerVariant: String?
+        get() = preferences.getString(KEY_REFERRER_VARIANT, null)
+        set(value) = preferences.edit { putString(KEY_REFERRER_VARIANT, value) }
+
     override val hasInstallationStatistics: Boolean
         get() = preferences.contains(KEY_ATB)
 
@@ -68,5 +72,6 @@ class StatisticsSharedPreferences @Inject constructor(private val context: Conte
         private const val KEY_SEARCH_RETENTION_ATB = "com.duckduckgo.app.statistics.retentionatb"
         private const val KEY_APP_RETENTION_ATB = "com.duckduckgo.app.statistics.appretentionatb"
         private const val KEY_VARIANT = "com.duckduckgo.app.statistics.variant"
+        private const val KEY_REFERRER_VARIANT = "com.duckduckgo.app.statistics.referrerVariant"
     }
 }

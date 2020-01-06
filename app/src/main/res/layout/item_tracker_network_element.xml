@@ -57,7 +57,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/network_pill_facebook"
+        tools:src="@drawable/network_pill_facebook_inc"
         tools:text="Advertising" />
 
 

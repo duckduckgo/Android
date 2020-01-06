@@ -26,7 +26,6 @@ import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.model.TrustedSites
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.trackerdetection.TrackerDetector
-import com.duckduckgo.app.trackerdetection.model.ResourceType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -115,7 +114,7 @@ class WebViewRequestInterceptor(
             return false
         }
 
-        val trackingEvent = trackerDetector.evaluate(url, documentUrl, ResourceType.from(request)) ?: return false
+        val trackingEvent = trackerDetector.evaluate(url, documentUrl) ?: return false
         webViewClientListener?.trackerDetected(trackingEvent)
         return trackingEvent.blocked
     }

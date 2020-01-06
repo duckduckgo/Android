@@ -16,15 +16,29 @@
 
 package com.duckduckgo.app.global
 
-import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
+import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
+import com.duckduckgo.app.global.exception.UncaughtExceptionSource
+import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 class AlertingUncaughtExceptionHandler(
     private val originalHandler: Thread.UncaughtExceptionHandler,
-    private val offlinePixelDataStore: OfflinePixelDataStore
+    private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
+    private val uncaughtExceptionRepository: UncaughtExceptionRepository
 ) : Thread.UncaughtExceptionHandler {
 
-    override fun uncaughtException(t: Thread?, e: Throwable?) {
-        offlinePixelDataStore.applicationCrashCount += 1
-        originalHandler.uncaughtException(t, e)
+    override fun uncaughtException(t: Thread?, originalException: Throwable?) {
+
+        // block until the exception has been fully processed
+        runBlocking {
+            withContext(Dispatchers.IO) {
+                uncaughtExceptionRepository.recordUncaughtException(originalException, UncaughtExceptionSource.GLOBAL)
+                offlinePixelCountDataStore.applicationCrashCount += 1
+            }
+        }
+        originalHandler.uncaughtException(t, originalException)
     }
+
 }

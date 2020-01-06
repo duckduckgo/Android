@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.privacy.model
 
-import com.duckduckgo.app.entities.EntityMapping
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.global.initialization.DataLoadable
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
+import com.duckduckgo.app.trackerdetection.EntityLookup
 import javax.inject.Inject
 
 interface PrivacyPractices : DataLoadable {
@@ -45,7 +45,7 @@ interface PrivacyPractices : DataLoadable {
 
 class PrivacyPracticesImpl @Inject constructor(
     private val termsOfServiceStore: TermsOfServiceStore,
-    private val entityMapping: EntityMapping
+    private val entityLookup: EntityLookup
 ) : PrivacyPractices {
 
 
@@ -58,13 +58,11 @@ class PrivacyPracticesImpl @Inject constructor(
             val url = it.name ?: return@forEach
             val derivedScore = it.derivedScore
 
-            entityMapping.entityForUrl(url)?.let {
-
-                val entityScore = entityScores[it.entityName]
+            entityLookup.entityForUrl(url)?.let { entity ->
+                val entityScore = entityScores[entity.name]
                 if (entityScore == null || entityScore < derivedScore) {
-                    entityScores[it.entityName] = derivedScore
+                    entityScores[entity.name] = derivedScore
                 }
-
             }
         }
 
@@ -72,9 +70,9 @@ class PrivacyPracticesImpl @Inject constructor(
     }
 
     override fun privacyPracticesFor(url: String): PrivacyPractices.Practices {
-        val entity = entityMapping.entityForUrl(url)
+        val entity = entityLookup.entityForUrl(url)
         val terms = termsOfServiceStore.terms.find { sameOrSubdomain(url, it.name ?: "") } ?: return PrivacyPractices.UNKNOWN
-        val score = entityScores[entity?.entityName] ?: terms.derivedScore
+        val score = entityScores[entity?.name] ?: terms.derivedScore
         return PrivacyPractices.Practices(score, terms.practices, terms.goodPrivacyTerms, terms.badPrivacyTerms)
     }
 

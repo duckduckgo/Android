@@ -37,7 +37,6 @@ import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeed
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingViewModel
 import com.duckduckgo.app.fire.DataClearer
-import com.duckduckgo.app.global.db.AppConfigurationDao
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
@@ -46,7 +45,7 @@ import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
-import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageExperimentViewModel
+import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel
 import com.duckduckgo.app.onboarding.ui.page.TrackerBlockingSelectionViewModel
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
@@ -55,6 +54,7 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel
 import com.duckduckgo.app.privacy.ui.PrivacyPracticesViewModel
 import com.duckduckgo.app.privacy.ui.ScorecardViewModel
 import com.duckduckgo.app.privacy.ui.TrackerNetworksViewModel
+import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.settings.SettingsViewModel
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
@@ -81,7 +81,6 @@ class ViewModelFactory @Inject constructor(
     private val tabRepository: TabRepository,
     private val privacySettingsStore: PrivacySettingsSharedPreferences,
     private val siteFactory: SiteFactory,
-    private val appConfigurationDao: AppConfigurationDao,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
     private val surveyDao: SurveyDao,
@@ -103,13 +102,14 @@ class ViewModelFactory @Inject constructor(
     private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
     private val playStoreUtils: PlayStoreUtils,
     private val feedbackSubmitter: FeedbackSubmitter,
-    private val onboardingPageManager: OnboardingPageManager
+    private val onboardingPageManager: OnboardingPageManager,
+    private val appInstallationReferrerStateListener: AppInstallationReferrerStateListener
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
         with(modelClass) {
             when {
-                isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboardingStore)
+                isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboardingStore, appInstallationReferrerStateListener)
                 isAssignableFrom(OnboardingViewModel::class.java) -> onboardingViewModel()
                 isAssignableFrom(BrowserViewModel::class.java) -> browserViewModel()
                 isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
@@ -129,13 +129,13 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(ShareOpenEndedNegativeFeedbackViewModel::class.java) -> ShareOpenEndedNegativeFeedbackViewModel()
                 isAssignableFrom(BrokenSiteNegativeFeedbackViewModel::class.java) -> BrokenSiteNegativeFeedbackViewModel()
                 isAssignableFrom(TrackerBlockingSelectionViewModel::class.java) -> TrackerBlockingSelectionViewModel(privacySettingsStore)
-                isAssignableFrom(DefaultBrowserPageExperimentViewModel::class.java) -> defaultBrowserPageExperiment()
+                isAssignableFrom(DefaultBrowserPageViewModel::class.java) -> defaultBrowserPage()
 
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
         } as T
 
-    private fun defaultBrowserPageExperiment() = DefaultBrowserPageExperimentViewModel(defaultBrowserDetector, pixel, appInstallStore)
+    private fun defaultBrowserPage() = DefaultBrowserPageViewModel(defaultBrowserDetector, pixel, appInstallStore)
 
     private fun onboardingViewModel() = OnboardingViewModel(onboardingStore, onboardingPageManager)
 
@@ -176,7 +176,6 @@ class ViewModelFactory @Inject constructor(
         bookmarksDao = bookmarksDao,
         autoCompleteApi = autoCompleteApi,
         appSettingsPreferencesStore = appSettingsPreferencesStore,
-        appConfigurationDao = appConfigurationDao,
         longPressHandler = webViewLongPressHandler,
         webViewSessionStorage = webViewSessionStorage,
         specialUrlDetector = specialUrlDetector,

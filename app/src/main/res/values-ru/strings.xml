@@ -17,13 +17,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Логотип DuckDuckGo</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Обеспечение конфиденциальности по умолчанию</string>
     <string name="onboardingDefaultBrowserDescription">Чтобы сделать DuckDuckGo поисковой системой по умолчанию, перейдите в «Настройки».</string>
-    <string name="onboardingDefaultBrowserGoToSettingsAction">Перейти в раздел «Настройки»</string>
     <string name="onboardingContinue">Продолжить</string>
     <string name="onboardingContinueFinalPage">Запустить браузер</string>
+    <string name="onboardingDefaultBrowserTitle">Сделайте DuckDuckGo вашим поисковиком по умолчанию</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Да пребудет с вами душевное спокойствие</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Добро пожаловать в\nDuckDuckGo!</string>
@@ -40,6 +42,11 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Не удаётся открыть экран настроек приложения по умолчанию</string>
     <string name="settingsDefaultBrowserEnabled">Сделать браузером по умолчанию</string>
+    <string name="defaultBrowserMaybeLater">Может быть позже</string>
+    <string name="defaultBrowserLetsDoIt">Давайте это сделаем!</string>
+    <string name="defaultBrowserDescriptionNoDefault">Каждый раз открывайте ссылки, ни о чем не беспокоясь</string>
+    <string name="defaultBrowserDescriptionDefaultSet">Благодаря DuckDuckGo ваши онлайн-данные в любом месте станут более конфиденциальными.</string>
+    <string name="defaultBrowserInstructions">Выберите DuckDuckGo и нажмите <font color="#678fff">Всегда</font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Меню браузера</string>
@@ -92,10 +99,8 @@
     <string name="openImageInNewTab">Открыть изображение в фоновой вкладке</string>
     <string name="faviconContentDescription">Значок сайта</string>
     <string name="closeContentDescription">Закрыть</string>
-    <string name="tapFireDirective">Нажмите на значок </string>
-    <string name="tapFireIconDescription">огня,</string>
-    <string name="tapFireExplanation"> чтобы очистить всю историю</string>
     <string name="closeAllTabsMenuItem">Закрыть все вкладки</string>
+    <string name="closeTab">Закрыть вкладка</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Панель конфиденциальности</string>
@@ -223,6 +228,7 @@
     <string name="bookmarkOverflowContentDescription">Другие параметры управления закладкой %s</string>
     <string name="delete">Удалить</string>
     <string name="edit">Редактировать</string>
+    <string name="bookmarkEdited">Закладка добавлена</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Найти через DuckDuckGo</string>

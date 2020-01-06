@@ -17,13 +17,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">DuckDuckGos logotyp</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nej</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Ange "Sekretess" som standard</string>
     <string name="onboardingDefaultBrowserDescription">Gå till "Inställningar" för att söka och bläddra med DuckDuckGo varje gång.</string>
-    <string name="onboardingDefaultBrowserGoToSettingsAction">Gå till "Inställningar"</string>
     <string name="onboardingContinue">Fortsätt</string>
     <string name="onboardingContinueFinalPage">Starta bläddring</string>
+    <string name="onboardingDefaultBrowserTitle">Ställ in DuckDuckGo som standard</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Du kommer aldrig att behöva oroa dig igen</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Välkommen till\nDuckDuckGo!</string>
@@ -40,6 +42,11 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Kan inte starta standardinställningssidan för appar</string>
     <string name="settingsDefaultBrowserEnabled">Ställ in som standardwebbläsare</string>
+    <string name="defaultBrowserMaybeLater">Kanske senare</string>
+    <string name="defaultBrowserLetsDoIt">Vi gör det!</string>
+    <string name="defaultBrowserDescriptionNoDefault">Öppna länkar utan att behöva oroa dig, varje gång.</string>
+    <string name="defaultBrowserDescriptionDefaultSet">Med DuckDuckGo är dina onlinedata som standard mer privata, var än på internet du beger dig.</string>
+    <string name="defaultBrowserInstructions">Välj DuckDuckGo och tryck på <font color="#678fff">Alltid</font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Webbläsarmeny</string>
@@ -92,10 +99,8 @@
     <string name="openImageInNewTab">Öppna bild i bakgrundsflik</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Stäng</string>
-    <string name="tapFireDirective">Tryck på </string>
-    <string name="tapFireIconDescription">fire</string>
-    <string name="tapFireExplanation"> för att glömma allt</string>
     <string name="closeAllTabsMenuItem">Stäng alla flikar</string>
+    <string name="closeTab">Stäng flik</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Sekretesspanel</string>
@@ -216,6 +221,7 @@
     <string name="bookmarkOverflowContentDescription">Fler alternativ för bokmärke %s</string>
     <string name="delete">Ta bort</string>
     <string name="edit">Redigera</string>
+    <string name="bookmarkEdited">Bokmärke sparat</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Sök DuckDuckGo</string>

@@ -19,14 +19,14 @@ package com.duckduckgo.app.onboarding.ui
 import android.os.Bundle
 import androidx.annotation.StringRes
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
-import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageExperiment
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.app.onboarding.ui.page.UnifiedSummaryPage
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage
 
 interface OnboardingPageBuilder {
+    fun buildWelcomePage(@StringRes continueButtonTextResourceId: Int?): WelcomePage
     fun buildSummaryPage(@StringRes continueButtonTextResourceId: Int?): UnifiedSummaryPage
     fun buildDefaultBrowserPage(@StringRes continueButtonTextResourceId: Int?): DefaultBrowserPage
-    fun buildDefaultBrowserPageExperiment(@StringRes continueButtonTextResourceId: Int?): DefaultBrowserPageExperiment
 
     sealed class OnboardingPageBlueprint(@StringRes open var continueButtonTextResourceId: Int) {
 
@@ -35,10 +35,25 @@ interface OnboardingPageBuilder {
 
         data class DefaultBrowserBlueprint(override var continueButtonTextResourceId: Int = 0) :
             OnboardingPageBlueprint(continueButtonTextResourceId)
+
+        data class WelcomeBlueprint(override var continueButtonTextResourceId: Int = 0) :
+            OnboardingPageBlueprint(continueButtonTextResourceId)
     }
 }
 
 class OnboardingFragmentPageBuilder : OnboardingPageBuilder {
+
+    override fun buildWelcomePage(@StringRes continueButtonTextResourceId: Int?): WelcomePage {
+        val bundle = Bundle()
+
+        if (continueButtonTextResourceId != null) {
+            bundle.putInt(OnboardingPageFragment.CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA, continueButtonTextResourceId)
+        }
+
+        val fragment = WelcomePage()
+        fragment.arguments = bundle
+        return fragment
+    }
 
     override fun buildSummaryPage(@StringRes continueButtonTextResourceId: Int?): UnifiedSummaryPage {
         val bundle = Bundle()
@@ -60,18 +75,6 @@ class OnboardingFragmentPageBuilder : OnboardingPageBuilder {
         }
 
         val fragment = DefaultBrowserPage()
-        fragment.arguments = bundle
-        return fragment
-    }
-
-    override fun buildDefaultBrowserPageExperiment(continueButtonTextResourceId: Int?): DefaultBrowserPageExperiment {
-        val bundle = Bundle()
-
-        if (continueButtonTextResourceId != null) {
-            bundle.putInt(OnboardingPageFragment.CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA, continueButtonTextResourceId)
-        }
-
-        val fragment = DefaultBrowserPageExperiment()
         fragment.arguments = bundle
         return fragment
     }

@@ -24,7 +24,7 @@
         <!-- Disable WorkManager's default initialization so we can use Dagger with it -->
         <provider
             android:name="androidx.work.impl.WorkManagerInitializer"
-            android:authorities="com.duckduckgo.app.browser.workmanager-init"
+            android:authorities="${applicationId}.workmanager-init"
             android:enabled="false"
             android:exported="false"
             tools:replace="android:authorities" />
@@ -52,7 +52,13 @@
             android:theme="@style/AppTheme.Dark.Transparent" />
 
         <activity
+            android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivityExperiment"
+            android:label="@string/appName"
+            android:theme="@style/AppTheme.Dark.Transparent" />
+
+        <activity
             android:name=".BrowserActivity"
+            android:label="@string/appDescription"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize|stateHidden">
@@ -66,6 +72,10 @@
 
                 <data android:scheme="https" />
                 <data android:scheme="http" />
+
+                <data android:mimeType="text/html" />
+                <data android:mimeType="text/plain" />
+                <data android:mimeType="application/xhtml+xml" />
             </intent-filter>
 
             <!-- Allows apps to consume links and text shared from other apps e.g chrome -->
@@ -103,10 +113,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name="com.duckduckgo.app.tabs.ui.old.TabSwitcherActivityLegacy"
-            android:label="@string/tabActivityTitle" />
 
         <activity
             android:name="com.duckduckgo.app.tabs.ui.TabSwitcherActivity"

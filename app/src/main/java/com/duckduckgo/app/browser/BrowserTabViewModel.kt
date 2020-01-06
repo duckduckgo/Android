@@ -38,6 +38,8 @@ import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment.EditBookmarkListener
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
+import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Browser
+import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Invalidated
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
 import com.duckduckgo.app.browser.WebNavigationStateChange.*
@@ -49,11 +51,10 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
-import com.duckduckgo.app.cta.ui.CtaConfiguration
+import com.duckduckgo.app.cta.ui.Cta
+import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.global.*
-import com.duckduckgo.app.global.db.AppConfigurationDao
-import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domainMatchesUrl
@@ -61,7 +62,6 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.TabSwitcherGrid
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
@@ -74,7 +74,6 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -100,19 +99,25 @@ class BrowserTabViewModel(
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
     private val variantManager: VariantManager,
-    appConfigurationDao: AppConfigurationDao
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
 
     private var buildingSiteFactoryJob: Job? = null
 
-    data class GlobalLayoutViewState(
-        val isNewTabState: Boolean = true
+    sealed class GlobalLayoutViewState {
+        data class Browser(val isNewTabState: Boolean = true) : GlobalLayoutViewState()
+        object Invalidated : GlobalLayoutViewState()
+    }
+
+    data class CtaViewState(
+        val cta: Cta? = null
     )
 
     data class BrowserViewState(
         val browserShowing: Boolean = false,
         val isFullScreen: Boolean = false,
         val isDesktopBrowsingMode: Boolean = false,
+        val canChangeBrowsingMode: Boolean = true,
         val showPrivacyGrade: Boolean = false,
         val showClearButton: Boolean = false,
         val showTabsButton: Boolean = true,
@@ -122,6 +127,7 @@ class BrowserTabViewModel(
         val canAddBookmarks: Boolean = false,
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
+        val canReportSite: Boolean = true,
         val addToHomeEnabled: Boolean = false,
         val addToHomeVisible: Boolean = false
     )
@@ -158,6 +164,7 @@ class BrowserTabViewModel(
         object NavigateForward : Command()
         class OpenInNewTab(val query: String) : Command()
         class OpenInNewBackgroundTab(val query: String) : Command()
+        object LaunchNewTab : Command()
         object ResetHistory : Command()
         class DialNumber(val telephoneNumber: String) : Command()
         class SendSms(val telephoneNumber: String) : Command()
@@ -180,9 +187,9 @@ class BrowserTabViewModel(
         object LaunchLegacyAddWidget : Command()
         class RequiresAuthentication(val request: BasicAuthenticationRequest) : Command()
         class SaveCredentials(val request: BasicAuthenticationRequest, val credentials: BasicAuthenticationCredentials) : Command()
-        class GenerateWebViewPreviewImage(val forceImmediate: Boolean) : Command()
+        object GenerateWebViewPreviewImage : Command()
         object LaunchTabSwitcher : Command()
-        object LaunchTabSwitcherLegacy : Command()
+        class ShowErrorWithAction(val action: () -> Unit) : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -191,7 +198,8 @@ class BrowserTabViewModel(
     val loadingViewState: MutableLiveData<LoadingViewState> = MutableLiveData()
     val omnibarViewState: MutableLiveData<OmnibarViewState> = MutableLiveData()
     val findInPageViewState: MutableLiveData<FindInPageViewState> = MutableLiveData()
-    val ctaViewState: MutableLiveData<CtaViewModel.CtaViewState> = ctaViewModel.ctaViewState
+    val ctaViewState: MutableLiveData<CtaViewState> = MutableLiveData()
+    var siteLiveData: MutableLiveData<Site> = MutableLiveData()
 
     var skipHome = false
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
@@ -199,32 +207,19 @@ class BrowserTabViewModel(
     val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    @VisibleForTesting
-    val appConfigurationObserver: Observer<AppConfigurationEntity> = Observer { appConfiguration ->
-        appConfiguration?.let {
-            Timber.i("App configuration downloaded: ${it.appConfigurationDownloaded}")
-            appConfigurationDownloaded = it.appConfigurationDownloaded
-        }
-    }
-
     val url: String?
         get() = site?.url
 
     val title: String?
         get() = site?.title
 
-    private var appConfigurationDownloaded = false
-    private val appConfigurationObservable = appConfigurationDao.appConfigurationStatus()
     private val autoCompletePublishSubject = PublishRelay.create<String>()
-    private var siteLiveData = MutableLiveData<Site>()
     private var site: Site? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
 
     init {
         initializeViewStates()
-
-        appConfigurationObservable.observeForever(appConfigurationObserver)
         configureAutoComplete()
     }
 
@@ -252,13 +247,13 @@ class BrowserTabViewModel(
 
         site = siteFactory.buildSite(url, title)
         onSiteChanged()
-        buildingSiteFactoryJob = viewModelScope.launch(Dispatchers.IO) {
+        buildingSiteFactoryJob = viewModelScope.launch {
             site?.let {
-                siteFactory.loadFullSiteDetails(it)
+                withContext(dispatchers.io()) {
+                    siteFactory.loadFullSiteDetails(it)
+                    onSiteChanged()
+                }
             }
-        }
-        site?.let {
-            onSiteChanged()
         }
     }
 
@@ -284,7 +279,6 @@ class BrowserTabViewModel(
     public override fun onCleared() {
         super.onCleared()
         buildingSiteFactoryJob?.cancel()
-        appConfigurationObservable.removeObserver(appConfigurationObserver)
     }
 
     fun registerWebViewListener(browserWebViewClient: BrowserWebViewClient, browserChromeClient: BrowserChromeClient) {
@@ -294,7 +288,10 @@ class BrowserTabViewModel(
 
     fun onViewVisible() {
         command.value = if (!currentBrowserViewState().browserShowing) ShowKeyboard else HideKeyboard
-        ctaViewModel.refreshCta()
+        refreshCta(true)
+        if (currentGlobalLayoutState() is Invalidated && currentBrowserViewState().browserShowing) {
+            showErrorWithAction()
+        }
     }
 
     fun onViewHidden() {
@@ -303,7 +300,7 @@ class BrowserTabViewModel(
 
     suspend fun fireAutocompletePixel(suggestion: AutoCompleteSuggestion) {
         val currentViewState = currentAutoCompleteViewState()
-        val hasBookmarks = withContext(Dispatchers.IO) {
+        val hasBookmarks = withContext(dispatchers.io()) {
             bookmarksDao.hasBookmarks()
         }
         val params = mapOf(
@@ -318,15 +315,20 @@ class BrowserTabViewModel(
         pixel.fire(pixelName, params)
     }
 
-    fun onUserSubmittedQuery(input: String) {
-        if (input.isBlank()) {
+    fun onUserSubmittedQuery(query: String) {
+        if (query.isBlank()) {
+            return
+        }
+
+        if (currentGlobalLayoutState() is Invalidated) {
+            recoverTabWithQuery(query)
             return
         }
 
         command.value = HideKeyboard
-        val trimmedInput = input.trim()
+        val trimmedInput = query.trim()
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatchers.io()) {
             searchCountDao.incrementSearchCount()
         }
 
@@ -340,7 +342,7 @@ class BrowserTabViewModel(
             command.value = Navigate(queryUrlConverter.convertQueryToUrl(trimmedInput))
         }
 
-        globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
+        globalLayoutState.value = Browser(isNewTabState = false)
         findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
         omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = trimmedInput, shouldMoveCaretToEnd = false)
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
@@ -352,12 +354,27 @@ class BrowserTabViewModel(
         return !currentBrowserViewState().browserShowing && navigation.hasNavigationHistory
     }
 
+    suspend fun closeCurrentTab() {
+        val currentTab = tabRepository.liveSelectedTab.value
+        currentTab?.let {
+            tabRepository.delete(currentTab)
+        }
+    }
+
     fun onUserPressedForward() {
         if (!currentBrowserViewState().browserShowing) {
             browserViewState.value = currentBrowserViewState().copy(browserShowing = true)
             command.value = Refresh
         } else {
             command.value = NavigateForward
+        }
+    }
+
+    fun onRefreshRequested() {
+        if (currentGlobalLayoutState() is Invalidated) {
+            recoverTabWithQuery(url.orEmpty())
+        } else {
+            command.value = Refresh
         }
     }
 
@@ -382,6 +399,8 @@ class BrowserTabViewModel(
             return true
         }
 
+        Timber.d("User pressed back and tab is set to skip home; need to generate WebView preview now")
+        command.value = GenerateWebViewPreviewImage
         return false
     }
 
@@ -392,7 +411,7 @@ class BrowserTabViewModel(
         browserViewState.value = currentBrowserViewState().copy(
             browserShowing = false,
             canGoBack = false,
-            canGoForward = true
+            canGoForward = currentGlobalLayoutState() !is Invalidated
         )
         omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = "", shouldMoveCaretToEnd = false)
         loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
@@ -429,6 +448,7 @@ class BrowserTabViewModel(
             is NewPage -> pageChanged(stateChange.url, stateChange.title)
             is PageCleared -> pageCleared()
             is UrlUpdated -> urlUpdated(stateChange.url)
+            is PageNavigationCleared -> disableUserNavigation()
         }
     }
 
@@ -449,7 +469,7 @@ class BrowserTabViewModel(
                 addToHomeEnabled = true,
                 addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
                 canSharePage = true,
-                showPrivacyGrade = appConfigurationDownloaded
+                showPrivacyGrade = true
             )
         )
 
@@ -504,10 +524,6 @@ class BrowserTabViewModel(
         val isLoading = newProgress < 100
         val progress = currentLoadingViewState()
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = newProgress)
-
-        if (!isLoading && variantManager.getVariant().hasFeature(TabSwitcherGrid)) {
-            updateOrDeleteWebViewPreview(forceImmediate = false)
-        }
     }
 
     private fun registerSiteVisit() {
@@ -546,7 +562,7 @@ class BrowserTabViewModel(
     }
 
     private fun updateNetworkLeaderboard(event: TrackingEvent) {
-        val networkName = event.trackerNetwork?.name ?: return
+        val networkName = event.entity?.name ?: return
         networkLeaderboardDao.incrementNetworkCount(networkName)
     }
 
@@ -558,10 +574,20 @@ class BrowserTabViewModel(
     }
 
     private fun onSiteChanged() {
-        siteLiveData.postValue(site)
-        privacyGrade.postValue(site?.calculateGrades()?.improvedGrade)
-        viewModelScope.launch(Dispatchers.IO) {
-            tabRepository.update(tabId, site)
+        viewModelScope.launch {
+
+            val improvedGrade = withContext(dispatchers.io()) {
+                site?.calculateGrades()?.improvedGrade
+            }
+
+            withContext(dispatchers.main()) {
+                siteLiveData.value = site
+                privacyGrade.value = improvedGrade
+            }
+
+            withContext(dispatchers.io()) {
+                tabRepository.update(tabId, site)
+            }
         }
     }
 
@@ -569,11 +595,13 @@ class BrowserTabViewModel(
         command.value = ShowFileChooser(filePathCallback, fileChooserParams)
     }
 
+    private fun currentGlobalLayoutState(): GlobalLayoutViewState = globalLayoutState.value!!
     private fun currentAutoCompleteViewState(): AutoCompleteViewState = autoCompleteViewState.value!!
     private fun currentBrowserViewState(): BrowserViewState = browserViewState.value!!
     private fun currentFindInPageViewState(): FindInPageViewState = findInPageViewState.value!!
     private fun currentOmnibarViewState(): OmnibarViewState = omnibarViewState.value!!
     private fun currentLoadingViewState(): LoadingViewState = loadingViewState.value!!
+    private fun currentCtaViewState(): CtaViewState = ctaViewState.value!!
 
     fun onOmnibarInputStateChanged(query: String, hasFocus: Boolean, hasQueryChanged: Boolean) {
 
@@ -594,7 +622,7 @@ class BrowserTabViewModel(
 
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
-            showPrivacyGrade = appConfigurationDownloaded && currentBrowserViewState.browserShowing,
+            showPrivacyGrade = currentBrowserViewState.browserShowing,
             showTabsButton = showControls,
             showFireButton = showControls,
             showMenuButton = showControls,
@@ -611,22 +639,22 @@ class BrowserTabViewModel(
     suspend fun onBookmarkAddRequested() {
         val url = url ?: ""
         val title = title ?: ""
-        val id = withContext(Dispatchers.IO) {
+        val id = withContext(dispatchers.io()) {
             bookmarksDao.insert(BookmarkEntity(title = title, url = url))
         }
-        withContext(Dispatchers.Main) {
+        withContext(dispatchers.main()) {
             command.value = ShowBookmarkAddedConfirmation(id, title, url)
         }
     }
 
     override fun onBookmarkEdited(id: Long, title: String, url: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatchers.io()) {
             editBookmark(id, title, url)
         }
     }
 
     suspend fun editBookmark(id: Long, title: String, url: String) {
-        withContext(Dispatchers.IO) {
+        withContext(dispatchers.io()) {
             bookmarksDao.update(BookmarkEntity(id, title, url))
         }
     }
@@ -652,10 +680,12 @@ class BrowserTabViewModel(
 
         return when (requiredAction) {
             is RequiredAction.OpenInNewTab -> {
+                command.value = GenerateWebViewPreviewImage
                 command.value = OpenInNewTab(requiredAction.url)
                 true
             }
             is RequiredAction.OpenInNewBackgroundTab -> {
+                command.value = GenerateWebViewPreviewImage
                 viewModelScope.launch { openInNewBackgroundTab(requiredAction.url) }
                 true
             }
@@ -712,7 +742,7 @@ class BrowserTabViewModel(
     }
 
     fun onWebSessionRestored() {
-        globalLayoutState.value = GlobalLayoutViewState(isNewTabState = false)
+        globalLayoutState.value = Browser(isNewTabState = false)
     }
 
     fun onDesktopSiteModeToggled(desktopSiteRequested: Boolean) {
@@ -731,12 +761,13 @@ class BrowserTabViewModel(
     }
 
     private fun initializeViewStates() {
-        globalLayoutState.value = GlobalLayoutViewState()
+        globalLayoutState.value = Browser()
         browserViewState.value = BrowserViewState().copy(addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported())
         loadingViewState.value = LoadingViewState()
         autoCompleteViewState.value = AutoCompleteViewState()
         omnibarViewState.value = OmnibarViewState()
         findInPageViewState.value = FindInPageViewState()
+        ctaViewState.value = CtaViewState()
     }
 
     fun onShareSelected() {
@@ -805,29 +836,68 @@ class BrowserTabViewModel(
             })
     }
 
-    fun onSurveyChanged(survey: Survey?) {
-        ctaViewModel.onSurveyChanged(survey)
+    fun userRequestedOpeningNewTab() {
+        command.value = GenerateWebViewPreviewImage
+        command.value = LaunchNewTab
     }
 
-    fun onUserLaunchedCta() {
-        val cta = ctaViewState.value?.cta ?: return
-        command.value = when (cta) {
-            is CtaConfiguration.Survey -> LaunchSurvey(cta.survey)
-            is CtaConfiguration.AddWidgetAuto -> LaunchAddWidget
-            is CtaConfiguration.AddWidgetInstructions -> LaunchLegacyAddWidget
+    fun onSurveyChanged(survey: Survey?) {
+        val activeSurvey = ctaViewModel.onSurveyChanged(survey)
+        if (activeSurvey != null) {
+            refreshCta(true)
         }
-        ctaViewModel.onCtaLaunched()
+    }
+
+    fun onCtaShown() {
+        val cta = ctaViewState.value?.cta ?: return
+        ctaViewModel.onCtaShown(cta)
+    }
+
+    fun onManualCtaShown(cta: Cta) {
+        ctaViewModel.onCtaShown(cta)
+    }
+
+    fun refreshCta(isNewTab: Boolean) {
+        viewModelScope.launch {
+            val cta = withContext(dispatchers.io()) {
+                ctaViewModel.refreshCta(dispatchers.io(), isNewTab, siteLiveData.value)
+            }
+            ctaViewState.value = currentCtaViewState().copy(cta = cta)
+        }
+    }
+
+    fun registerDaxBubbleCtaShown() {
+        val cta = ctaViewState.value?.cta ?: return
+        ctaViewModel.registerDaxBubbleCtaShown(cta)
+    }
+
+    fun onUserClickCtaOkButton() {
+        val cta = ctaViewState.value?.cta ?: return
+        ctaViewModel.onUserClickCtaOkButton(cta)
+        command.value = when (cta) {
+            is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
+            is HomePanelCta.AddWidgetAuto -> LaunchAddWidget
+            is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
+            else -> return
+        }
     }
 
     fun onUserDismissedCta() {
-        ctaViewModel.onCtaDismissed()
+        val cta = ctaViewState.value?.cta ?: return
+
+        ctaViewModel.onUserDismissedCta(cta)
+        if (cta is HomePanelCta) {
+            refreshCta(true)
+        } else {
+            ctaViewState.value = currentCtaViewState().copy(cta = null)
+        }
     }
 
     fun updateTabPreview(tabId: String, fileName: String) {
         tabRepository.updateTabPreviewImage(tabId, fileName)
     }
 
-    private fun deleteTabPreview(tabId: String) {
+    fun deleteTabPreview(tabId: String) {
         tabRepository.updateTabPreviewImage(tabId, null)
     }
 
@@ -837,6 +907,14 @@ class BrowserTabViewModel(
 
     override fun openInNewTab(url: String?) {
         command.value = OpenInNewTab(url.orEmpty())
+    }
+
+    override fun recoverFromRenderProcessGone() {
+        webNavigationState?.let {
+            navigationStateChanged(EmptyNavigationState(it))
+        }
+        invalidateBrowsingActions()
+        showErrorWithAction()
     }
 
     override fun requiresAuthentication(request: BasicAuthenticationRequest) {
@@ -853,22 +931,30 @@ class BrowserTabViewModel(
     }
 
     fun userLaunchingTabSwitcher() {
-        if (variantManager.getVariant().hasFeature(TabSwitcherGrid)) {
-            updateOrDeleteWebViewPreview(forceImmediate = true)
-
-            command.value = LaunchTabSwitcher
-        } else {
-            command.value = LaunchTabSwitcherLegacy
-        }
+        command.value = LaunchTabSwitcher
     }
 
-    private fun updateOrDeleteWebViewPreview(forceImmediate: Boolean) {
-        val url = site?.url
-        Timber.d("Updating or deleting WebView preview for $url")
-        if (url == null) {
-            deleteTabPreview(tabId)
-        } else {
-            command.value = GenerateWebViewPreviewImage(forceImmediate)
-        }
+    private fun invalidateBrowsingActions() {
+        globalLayoutState.value = Invalidated
+        loadingViewState.value = LoadingViewState()
+        findInPageViewState.value = FindInPageViewState()
+    }
+
+    private fun disableUserNavigation() {
+        browserViewState.value = currentBrowserViewState().copy(
+            canGoBack = false,
+            canGoForward = false,
+            canReportSite = false,
+            canChangeBrowsingMode = false
+        )
+    }
+
+    private fun showErrorWithAction() {
+        command.value = ShowErrorWithAction { this.onUserSubmittedQuery(url.orEmpty()) }
+    }
+
+    private fun recoverTabWithQuery(query: String) {
+        viewModelScope.launch { closeCurrentTab() }
+        command.value = OpenInNewTab(query)
     }
 }

@@ -16,13 +16,13 @@
 
 package com.duckduckgo.app.privacy.ui
 
-import androidx.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.annotation.DrawableRes
 import android.view.View
 import android.widget.TextView
+import androidx.annotation.DrawableRes
+import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.model.Site

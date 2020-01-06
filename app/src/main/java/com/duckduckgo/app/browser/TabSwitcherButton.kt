@@ -44,6 +44,10 @@ class TabSwitcherButton(context: Context) : FrameLayout(context) {
         clickZone.setOnClickListener {
             super.callOnClick()
         }
+
+        clickZone.setOnLongClickListener {
+            super.performLongClick()
+        }
     }
 
     fun increment(callback: () -> Unit) {

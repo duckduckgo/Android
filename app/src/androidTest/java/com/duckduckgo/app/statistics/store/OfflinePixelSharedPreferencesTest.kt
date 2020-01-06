@@ -25,14 +25,14 @@ import org.junit.Test
 
 class OfflinePixelSharedPreferencesTest {
 
-    private lateinit var testee: OfflinePixelSharedPreferences
+    private lateinit var testee: OfflinePixelCountSharedPreferences
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     @Before
     fun setup() {
-        context.getSharedPreferences(OfflinePixelSharedPreferences.FILENAME, Context.MODE_PRIVATE).edit { clear() }
-        testee = OfflinePixelSharedPreferences(context)
+        context.getSharedPreferences(OfflinePixelCountSharedPreferences.FILENAME, Context.MODE_PRIVATE).edit { clear() }
+        testee = OfflinePixelCountSharedPreferences(context)
     }
 
     @Test

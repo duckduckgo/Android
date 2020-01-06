@@ -1,13 +1,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">DuckDuckGo logó</string>
+    <string name="yes">Igen</string>
+    <string name="no">Nem</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Adatvédelem alapértelmezett beállítása</string>
     <string name="onboardingDefaultBrowserDescription">A Beállítások oldalon bármikor kereshetsz és böngészhetsz a DuckDuckGo segítségével.</string>
-    <string name="onboardingDefaultBrowserGoToSettingsAction">Tovább a Beállításokhoz</string>
     <string name="onboardingContinue">Folytatás</string>
     <string name="onboardingContinueFinalPage">Böngészés indítása</string>
+    <string name="onboardingDefaultBrowserTitle">Tedd a DuckDuckGót az alapértelmezett keresőoldaladdá</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Köszönj a Peace of Mindnak</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Üdvözöl a\nDuckDuckGo!</string>
@@ -24,6 +26,11 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Az alkalmazás alapértelmezett beállítású képernyője nem indítható el</string>
     <string name="settingsDefaultBrowserEnabled">Beállítás alapértelmezett böngészőként</string>
+    <string name="defaultBrowserMaybeLater">Talán később</string>
+    <string name="defaultBrowserLetsDoIt">Csináljuk!</string>
+    <string name="defaultBrowserDescriptionNoDefault">Nyugodtan kattints a linkekre, mindig.</string>
+    <string name="defaultBrowserDescriptionDefaultSet">A DuckDuckGo használatával az online adatok alapértelmezés szerint sokkal jobban védettek, bárhová is visz az internet.</string>
+    <string name="defaultBrowserInstructions">Válaszd ki a DuckDuckGót, majd koppints a <font color="#678fff"> Mindig </font> elemre.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Böngészési menü</string>
@@ -76,10 +83,8 @@
     <string name="openImageInNewTab">Kép megnyitása háttérben lévő lapon</string>
     <string name="faviconContentDescription">Kedvenc ikon</string>
     <string name="closeContentDescription">Bezárás</string>
-    <string name="tapFireDirective">Koppints </string>
-    <string name="tapFireIconDescription">a tűz ikonra</string>
-    <string name="tapFireExplanation"> a beállítások törléséhez</string>
     <string name="closeAllTabsMenuItem">Összes lap bezárása</string>
+    <string name="closeTab">Lap bezárása</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Adatvédelmi műszerfal</string>
@@ -200,6 +205,7 @@
     <string name="bookmarkOverflowContentDescription">%s könyvjelző további lehetőségei</string>
     <string name="delete">Törlés</string>
     <string name="edit">Szerkesztés</string>
+    <string name="bookmarkEdited">Könyvjelző hozzáadva</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Keresés a DuckDuckGo alkalmazásban</string>

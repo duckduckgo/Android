@@ -1,13 +1,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">„DuckDuckGo“ logotipas</string>
+    <string name="yes">Taip</string>
+    <string name="no">Ne</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Privatumas – jūsų numatytoji nuostata</string>
     <string name="onboardingDefaultBrowserDescription">Jei visada norite ieškoti ir naršyti naudojant „DuckDuckGo“, apsilankykite nustatymuose.</string>
-    <string name="onboardingDefaultBrowserGoToSettingsAction">Nueikite į nustatymus</string>
     <string name="onboardingContinue">Tęsti</string>
     <string name="onboardingContinueFinalPage">Pradėti naršyti</string>
+    <string name="onboardingDefaultBrowserTitle">Nustatykite „DuckDuckGo“ savo numatytuoju puslapiu</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Ištarkite „Sveiki“ ir nebesijaudinkite</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Sveiki prisijungę prie\n„DuckDuckGo“!</string>
@@ -24,6 +26,11 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nepavyko paleisti numatytųjų programos nustatymų ekrano</string>
     <string name="settingsDefaultBrowserEnabled">Nustatyti kaip numatytąją naršyklę</string>
+    <string name="defaultBrowserMaybeLater">Galbūt vėliau</string>
+    <string name="defaultBrowserLetsDoIt">Padarykime tai!</string>
+    <string name="defaultBrowserDescriptionNoDefault">Kiekvieną kartą be jaudulio atverkite nuorodas.</string>
+    <string name="defaultBrowserDescriptionDefaultSet">Naudodamiesi „DuckDuckGo“, jūsų internetiniai duomenys pagal numatytus parametrus yra labiau apsaugoti, nesvarbu kur benaršytumėte.</string>
+    <string name="defaultBrowserInstructions">Pasirinkite „DuckDuckGo“ ir bakstelėkite <font color="#678fff"> „Always“ (visada) </font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Naršyklės meniu</string>
@@ -76,10 +83,8 @@
     <string name="openImageInNewTab">Atverti paveikslėlį fono kortelėje</string>
     <string name="faviconContentDescription">Parankinio piktograma</string>
     <string name="closeContentDescription">Uždaryti</string>
-    <string name="tapFireDirective">Palieskite </string>
-    <string name="tapFireIconDescription">liepsną</string>
-    <string name="tapFireExplanation"> viską pamiršti</string>
     <string name="closeAllTabsMenuItem">Uždaryti visas korteles</string>
+    <string name="closeTab">Uždaryti kortelė</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Privatumo valdymo skydelis</string>
@@ -204,6 +209,7 @@
     <string name="bookmarkOverflowContentDescription">Daugiau parinkčių žymelei %s</string>
     <string name="delete">Trinti</string>
     <string name="edit">Redaguoti</string>
+    <string name="bookmarkEdited">Žymelė pridėta</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Ieškoti „DuckDuckGo“</string>

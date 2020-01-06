@@ -22,16 +22,27 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import com.duckduckgo.app.onboarding.ui.OnboardingActivityExperiment
+import com.duckduckgo.app.statistics.VariantManager
+import javax.inject.Inject
 
 
 class LaunchActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var variantManager: VariantManager
 
     private val viewModel: LaunchViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
+
         configureObservers()
+
+        MainScope().launch { viewModel.determineViewToShow() }
     }
 
     private fun configureObservers() {
@@ -52,7 +63,11 @@ class LaunchActivity : DuckDuckGoActivity() {
     }
 
     private fun showOnboarding() {
-        startActivity(OnboardingActivity.intent(this))
+        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)) {
+            startActivity(OnboardingActivityExperiment.intent(this))
+        } else {
+            startActivity(OnboardingActivity.intent(this))
+        }
         finish()
     }
 

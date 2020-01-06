@@ -1,13 +1,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logotip DuckDuckGo</string>
+    <string name="yes">Da</string>
+    <string name="no">Ne</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Učinite zaštitu privatnosti zadanom.</string>
     <string name="onboardingDefaultBrowserDescription">Posjetite Postavke kako biste svaki put pretraživali i pregledavali uz DuckDuckGo.</string>
-    <string name="onboardingDefaultBrowserGoToSettingsAction">Idite na Postavke</string>
     <string name="onboardingContinue">Nastavi</string>
     <string name="onboardingContinueFinalPage">Započni pregledavanje</string>
+    <string name="onboardingDefaultBrowserTitle">Učinite DuckDuckGo vašom zadanom tražilicom</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Recite bok spokoju</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Dobrodošli u\naDuckDuckGo!</string>
@@ -24,6 +26,11 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Ne mogu pokrenuti zaslon zadanih postavki u aplikaciji</string>
     <string name="settingsDefaultBrowserEnabled">Postavi kao zadani preglednik</string>
+    <string name="defaultBrowserMaybeLater">Možda kasnije</string>
+    <string name="defaultBrowserLetsDoIt">Učinimo to!</string>
+    <string name="defaultBrowserDescriptionNoDefault">Otvarajte veze spokojno, svaki put.</string>
+    <string name="defaultBrowserDescriptionDefaultSet">Uz DuckDuckGo, vaši su internetski podaci prema zadanim postavkama privatniji, bez obzira gdje vas Internet vodio.</string>
+    <string name="defaultBrowserInstructions">Odaberite DuckDuckGo i dodirnite <font color="#678fff"> Uvijek </font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Izbornik preglednika</string>
@@ -76,10 +83,8 @@
     <string name="openImageInNewTab">Otvori sliku u kartici u pozadini</string>
     <string name="faviconContentDescription">Pohranjena ikona</string>
     <string name="closeContentDescription">Zatvori</string>
-    <string name="tapFireDirective">Dodirni </string>
-    <string name="tapFireIconDescription">brisanje</string>
-    <string name="tapFireExplanation"> za potpuno uklanjanje</string>
     <string name="closeAllTabsMenuItem">Zatvori sve kartice</string>
+    <string name="closeTab">Zatvori kartica</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Nadzorna ploča zaštite privatnosti</string>
@@ -200,6 +205,7 @@
     <string name="bookmarkOverflowContentDescription">Više opcija za knjižnu oznaku %s</string>
     <string name="delete">Izbriši</string>
     <string name="edit">Uredi</string>
+    <string name="bookmarkEdited">Obilježivač je dodan</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Pretraži DuckDuckGo</string>

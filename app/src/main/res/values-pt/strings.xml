@@ -1,13 +1,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logótipo do DuckDuckGo</string>
+    <string name="yes">Sim</string>
+    <string name="no">Não</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Tornar a privacidade a sua predefinição</string>
     <string name="onboardingDefaultBrowserDescription">Visite as Definições para pesquisar e navegar sempre com DuckDuckGo.</string>
-    <string name="onboardingDefaultBrowserGoToSettingsAction">Aceder às Definições</string>
     <string name="onboardingContinue">Continuar</string>
     <string name="onboardingContinueFinalPage">Iniciar navegação</string>
+    <string name="onboardingDefaultBrowserTitle">Faça do DuckDuckGo o seu predefinido</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Diga Olá à Tranquilidade</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Bem-vindo ao\nDuckDuckGo!</string>
@@ -24,6 +26,11 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Não é possível iniciar o ecrã predefinido de definições da aplicação</string>
     <string name="settingsDefaultBrowserEnabled">Definir como navegador padrão</string>
+    <string name="defaultBrowserMaybeLater">Talvez mais tarde</string>
+    <string name="defaultBrowserLetsDoIt">Vamos lá!</string>
+    <string name="defaultBrowserDescriptionNoDefault">Abra links com tranquilidade, sempre.</string>
+    <string name="defaultBrowserDescriptionDefaultSet">Com o DuckDuckGo, os seus dados on-line são mais privados por defeito, onde quer que a Internet o leve.</string>
+    <string name="defaultBrowserInstructions">Selecione DuckDuckGo e toque em <font color="#678fff">Sempre</font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Menu do navegador</string>
@@ -76,10 +83,8 @@
     <string name="openImageInNewTab">Abrir imagem em separador em segundo plano</string>
     <string name="faviconContentDescription">Ícone de favorito</string>
     <string name="closeContentDescription">Fechar</string>
-    <string name="tapFireDirective">Tocar em </string>
-    <string name="tapFireIconDescription">fogo</string>
-    <string name="tapFireExplanation"> para esquecer tudo</string>
     <string name="closeAllTabsMenuItem">Fechar todos os separadores</string>
+    <string name="closeTab">Fechar separador</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Painel de privacidade</string>
@@ -200,6 +205,7 @@
     <string name="bookmarkOverflowContentDescription">Mais opções para o marcador %s</string>
     <string name="delete">Eliminar</string>
     <string name="edit">Editar</string>
+    <string name="bookmarkEdited">Favorito adicionado</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Pesquisar no DuckDuckGo</string>

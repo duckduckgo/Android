@@ -24,10 +24,11 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
-import com.duckduckgo.app.statistics.store.OfflinePixelDataStore
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
+import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
+import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.URI
 
@@ -36,12 +37,13 @@ class BrowserWebViewClient(
     private val requestRewriter: RequestRewriter,
     private val specialUrlDetector: SpecialUrlDetector,
     private val requestInterceptor: RequestInterceptor,
-    private val offlinePixelDataStore: OfflinePixelDataStore
+    private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
+    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
+    private val cookieManager: CookieManager
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
     private var lastPageStarted: String? = null
-
 
     /**
      * This is the new method of url overriding available from API 24 onwards
@@ -64,32 +66,48 @@ class BrowserWebViewClient(
      * API-agnostic implementation of deciding whether to override url or not
      */
     private fun shouldOverride(webView: WebView, url: Uri): Boolean {
-        Timber.v("shouldOverride $url")
+        try {
+            Timber.v("shouldOverride $url")
 
-        val urlType = specialUrlDetector.determineType(url)
-
-        return when (urlType) {
-            is SpecialUrlDetector.UrlType.Email -> consume { webViewClientListener?.sendEmailRequested(urlType.emailAddress) }
-            is SpecialUrlDetector.UrlType.Telephone -> consume { webViewClientListener?.dialTelephoneNumberRequested(urlType.telephoneNumber) }
-            is SpecialUrlDetector.UrlType.Sms -> consume { webViewClientListener?.sendSmsRequested(urlType.telephoneNumber) }
-            is SpecialUrlDetector.UrlType.IntentType -> consume {
-                Timber.i("Found intent type link for $urlType.url")
-                launchExternalApp(urlType)
-            }
-            is SpecialUrlDetector.UrlType.Unknown -> {
-                Timber.w("Unable to process link type for ${urlType.url}")
-                webView.loadUrl(webView.originalUrl)
-                return false
-            }
-            is SpecialUrlDetector.UrlType.SearchQuery -> return false
-            is SpecialUrlDetector.UrlType.Web -> {
-                if (requestRewriter.shouldRewriteRequest(url)) {
-                    val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(url)
-                    webView.loadUrl(newUri.toString())
-                    return true
+            return when (val urlType = specialUrlDetector.determineType(url)) {
+                is SpecialUrlDetector.UrlType.Email -> {
+                    webViewClientListener?.sendEmailRequested(urlType.emailAddress)
+                    true
                 }
-                return false
+                is SpecialUrlDetector.UrlType.Telephone -> {
+                    webViewClientListener?.dialTelephoneNumberRequested(urlType.telephoneNumber)
+                    true
+                }
+                is SpecialUrlDetector.UrlType.Sms -> {
+                    webViewClientListener?.sendSmsRequested(urlType.telephoneNumber)
+                    true
+                }
+                is SpecialUrlDetector.UrlType.IntentType -> {
+                    Timber.i("Found intent type link for $urlType.url")
+                    launchExternalApp(urlType)
+                    true
+                }
+                is SpecialUrlDetector.UrlType.Unknown -> {
+                    Timber.w("Unable to process link type for ${urlType.url}")
+                    webView.loadUrl(webView.originalUrl)
+                    false
+                }
+                is SpecialUrlDetector.UrlType.SearchQuery -> false
+                is SpecialUrlDetector.UrlType.Web -> {
+                    if (requestRewriter.shouldRewriteRequest(url)) {
+                        val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(url)
+                        webView.loadUrl(newUri.toString())
+                        return true
+                    }
+                    false
+                }
             }
+        } catch (e: Throwable) {
+            GlobalScope.launch {
+                uncaughtExceptionRepository.recordUncaughtException(e, SHOULD_OVERRIDE_REQUEST)
+                throw e
+            }
+            return false
         }
     }
 
@@ -99,56 +117,93 @@ class BrowserWebViewClient(
 
     @UiThread
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
-        webViewClientListener?.navigationStateChanged(WebViewNavigationState(webView.copyBackForwardList()))
-        if (url != null && url == lastPageStarted) {
-            webViewClientListener?.pageRefreshed(url)
+        try {
+            val navigationList = webView.safeCopyBackForwardList() ?: return
+            webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
+            if (url != null && url == lastPageStarted) {
+                webViewClientListener?.pageRefreshed(url)
+            }
+            lastPageStarted = url
+        } catch (e: Throwable) {
+            GlobalScope.launch {
+                uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)
+                throw e
+            }
         }
-        lastPageStarted = url
     }
 
     @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
-        webViewClientListener?.navigationStateChanged(WebViewNavigationState(webView.copyBackForwardList()))
+        try {
+            val navigationList = webView.safeCopyBackForwardList() ?: return
+            webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
+            flushCookies()
+        } catch (e: Throwable) {
+            GlobalScope.launch {
+                uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_FINISHED)
+                throw e
+            }
+        }
+    }
+
+    private fun flushCookies() {
+        GlobalScope.launch(Dispatchers.IO) {
+            cookieManager.flush()
+        }
     }
 
     @WorkerThread
     override fun shouldInterceptRequest(webView: WebView, request: WebResourceRequest): WebResourceResponse? {
         return runBlocking {
-            val documentUrl = withContext(Dispatchers.Main) { webView.url }
-            Timber.v("Intercepting resource ${request.url} on page $documentUrl")
-            requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
+            try {
+                val documentUrl = withContext(Dispatchers.Main) { webView.url }
+                Timber.v("Intercepting resource ${request.url} on page $documentUrl")
+                requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
+            } catch (e: Throwable) {
+                uncaughtExceptionRepository.recordUncaughtException(e, SHOULD_INTERCEPT_REQUEST)
+                throw e
+            }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onRenderProcessGone(view: WebView?, detail: RenderProcessGoneDetail?): Boolean {
+        Timber.w("onRenderProcessGone. Did it crash? ${detail?.didCrash()}")
         if (detail?.didCrash() == true) {
-            offlinePixelDataStore.webRendererGoneCrashCount += 1
+            offlinePixelCountDataStore.webRendererGoneCrashCount += 1
         } else {
-            offlinePixelDataStore.webRendererGoneKilledCount += 1
+            offlinePixelCountDataStore.webRendererGoneKilledCount += 1
         }
-        return super.onRenderProcessGone(view, detail)
+
+        webViewClientListener?.recoverFromRenderProcessGone()
+        return true
     }
 
     @UiThread
     override fun onReceivedHttpAuthRequest(view: WebView?, handler: HttpAuthHandler?, host: String?, realm: String?) {
-        Timber.v("onReceivedHttpAuthRequest ${view?.url} $realm, $host")
+        try {
+            Timber.v("onReceivedHttpAuthRequest ${view?.url} $realm, $host")
+            if (handler != null) {
+                Timber.v("onReceivedHttpAuthRequest - useHttpAuthUsernamePassword [${handler.useHttpAuthUsernamePassword()}]")
+                if (handler.useHttpAuthUsernamePassword()) {
+                    val credentials = buildAuthenticationCredentials(host.orEmpty(), realm.orEmpty(), view)
 
-        if (handler != null) {
-            Timber.v("onReceivedHttpAuthRequest - useHttpAuthUsernamePassword [${handler.useHttpAuthUsernamePassword()}]")
-            if (handler.useHttpAuthUsernamePassword()) {
-                val credentials = buildAuthenticationCredentials(host.orEmpty(), realm.orEmpty(), view)
-
-                if (credentials != null) {
-                    handler.proceed(credentials[0], credentials[1])
+                    if (credentials != null) {
+                        handler.proceed(credentials[0], credentials[1])
+                    } else {
+                        showAuthenticationDialog(view, handler, host, realm)
+                    }
                 } else {
                     showAuthenticationDialog(view, handler, host, realm)
                 }
             } else {
-                showAuthenticationDialog(view, handler, host, realm)
+                super.onReceivedHttpAuthRequest(view, handler, host, realm)
             }
-        } else {
-            super.onReceivedHttpAuthRequest(view, handler, host, realm)
+        } catch (e: Throwable) {
+            GlobalScope.launch {
+                uncaughtExceptionRepository.recordUncaughtException(e, ON_HTTP_AUTH_REQUEST)
+                throw e
+            }
         }
     }
 
@@ -187,15 +242,5 @@ class BrowserWebViewClient(
 
             it.requiresAuthentication(request)
         }
-    }
-
-    /**
-     * Utility to function to execute a function, and then return true
-     *
-     * Useful to reduce clutter in repeatedly including `return true` after doing the real work.
-     */
-    private inline fun consume(function: () -> Unit): Boolean {
-        function()
-        return true
     }
 }

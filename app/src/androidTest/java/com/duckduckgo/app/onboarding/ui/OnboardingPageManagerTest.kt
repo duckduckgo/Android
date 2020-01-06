@@ -18,6 +18,7 @@ package com.duckduckgo.app.onboarding.ui
 
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -34,6 +35,7 @@ class OnboardingPageManagerTest {
 
     @Before
     fun setup() {
+        whenever(variantManager.getVariant()).thenReturn(Variant("test", features = emptyList(), filterBy = { true }))
         testee = OnboardingPageManagerWithTrackerBlocking(onboardingPageBuilder, mockDefaultBrowserDetector, variantManager)
     }
 

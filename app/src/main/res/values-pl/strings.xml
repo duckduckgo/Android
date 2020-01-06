@@ -1,13 +1,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
+    <string name="yes">Tak</string>
+    <string name="no">Nie</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Prywatność z założenia</string>
     <string name="onboardingDefaultBrowserDescription">Zmień ustawienia, aby zawsze wyszukiwać i przeglądać strony za pośrednictwem DuckDuckGo.</string>
-    <string name="onboardingDefaultBrowserGoToSettingsAction">Przejdź do ustawień</string>
     <string name="onboardingContinue">Dalej</string>
     <string name="onboardingContinueFinalPage">Zacznij przeglądać sieć</string>
+    <string name="onboardingDefaultBrowserTitle">Ustaw DuckDuckGo jako domyślny</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Wybierz spokój</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Witamy w DuckDuckGo!</string>
@@ -24,6 +26,11 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nie mogę otworzyć domyślnego ekranu ustawień aplikacji</string>
     <string name="settingsDefaultBrowserEnabled">Ustaw jako domyślną przeglądarkę</string>
+    <string name="defaultBrowserMaybeLater">Może później</string>
+    <string name="defaultBrowserLetsDoIt">Zróbmy to!</string>
+    <string name="defaultBrowserDescriptionNoDefault">Zawsze otwieraj linki ze spokojem.</string>
+    <string name="defaultBrowserDescriptionDefaultSet">Dzięki DuckDuckGo Twoje dane online są domyślnie bardziej prywatne, niezależnie od tego, gdzie prowadzi Cię Internet.</string>
+    <string name="defaultBrowserInstructions">Wybierz DuckDuckGo i dotknij <font color="#678fff"> Zawsze </font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Menu przeglądarki</string>
@@ -76,10 +83,8 @@
     <string name="openImageInNewTab">Otwórz obraz w karcie w tle</string>
     <string name="faviconContentDescription">Ikona skrótu</string>
     <string name="closeContentDescription">Zamknij</string>
-    <string name="tapFireDirective">Naciśnij </string>
-    <string name="tapFireIconDescription">„Fire”</string>
-    <string name="tapFireExplanation"> aby usunąć całą pamięć</string>
     <string name="closeAllTabsMenuItem">Zamknij wszystkie karty</string>
+    <string name="closeTab">Zamknij karta</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Panel zarządzania prywatnością</string>
@@ -208,6 +213,7 @@
     <string name="bookmarkOverflowContentDescription">Więcej opcji dla zakładki %s</string>
     <string name="delete">Usuń</string>
     <string name="edit">Edytuj</string>
+    <string name="bookmarkEdited">Dodano zakładkę</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Szukaj w DuckDuckGo</string>

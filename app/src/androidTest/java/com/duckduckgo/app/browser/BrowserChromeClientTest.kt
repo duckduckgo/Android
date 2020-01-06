@@ -25,6 +25,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.nhaarman.mockitokotlin2.*
 import org.junit.Before
 import org.junit.Test
@@ -34,12 +35,14 @@ class BrowserChromeClientTest {
     private lateinit var testee: BrowserChromeClient
     private lateinit var webView: TestWebView
     private lateinit var mockWebViewClientListener: WebViewClientListener
+    private lateinit var mockUncaughtExceptionRepository: UncaughtExceptionRepository
     private val fakeView = View(getInstrumentation().targetContext)
 
     @UiThreadTest
     @Before
     fun setup() {
-        testee = BrowserChromeClient()
+        mockUncaughtExceptionRepository = mock()
+        testee = BrowserChromeClient(mockUncaughtExceptionRepository)
         mockWebViewClientListener = mock()
         testee.webViewClientListener = mockWebViewClientListener
         webView = TestWebView(getInstrumentation().targetContext)

@@ -1,13 +1,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Λογότυπο DuckDuckGo</string>
+    <string name="yes">Ναι</string>
+    <string name="no">Οχι</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserTitle">Κάντε την ιδιωτικότητα προεπιλογή σας</string>
     <string name="onboardingDefaultBrowserDescription">Επισκεφθείτε τις Ρυθμίσεις για να εκτελείτε κάθε φορά αναζήτηση και περιήγηση με το DuckDuckGo.</string>
-    <string name="onboardingDefaultBrowserGoToSettingsAction">Μετάβαση στις Ρυθμίσεις</string>
     <string name="onboardingContinue">Συνέχεια</string>
     <string name="onboardingContinueFinalPage">Έναρξη περιήγησης</string>
+    <string name="onboardingDefaultBrowserTitle">Κάντε το DuckDuckGo το δικό σας προεπιλεγμένο πρόγραμμα περιήγησης</string>
+    <string name="onboardingDefaultBrowserTitleDefaultSet">Πείτε γεια, καλωσορίστε και εναγκαλιστείτε με την ασφάλεια και την ηρεμία</string>
 
     <!-- Unified Welcome Page -->
     <string name="unifiedOnboardingTitleFirstVisit">Καλώς ορίσατε στο\nDuckDuckGo!</string>
@@ -24,6 +26,11 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Αδυναμία εκκίνησης προεπιλεγμένης οθόνης ρυθμίσεων εφαρμογής</string>
     <string name="settingsDefaultBrowserEnabled">Ορισμός ως προεπιλεγμένο πρόγραμμα περιήγησης</string>
+    <string name="defaultBrowserMaybeLater">Ισως αργότερα</string>
+    <string name="defaultBrowserLetsDoIt">Ας το κάνουμε!</string>
+    <string name="defaultBrowserDescriptionNoDefault">Ανοίξτε συνδέσμους με ηρεμία και ασφάλεια, κάθε φορά.</string>
+    <string name="defaultBrowserDescriptionDefaultSet">Με το DuckDuckGo, τα δεδομένα σας στο διαδίκτυο είναι πιο ιδιωτικά κατά προεπιλογή, όπου κι αν σας ταξιδέψει το διαδίκτυο.</string>
+    <string name="defaultBrowserInstructions">Επιλέξτε DuckDuckGo και πιέστε <font color="#678fff"> Always </font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Μενού προγράμματος περιήγησης</string>
@@ -76,10 +83,8 @@
     <string name="openImageInNewTab">Άνοιγμα εικόνας στην καρτέλα παρασκηνίου</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Κλείσιμο</string>
-    <string name="tapFireDirective">Πατήστε </string>
-    <string name="tapFireIconDescription">πυροδότηση</string>
-    <string name="tapFireExplanation"> για να τα ξεχάσετε όλα</string>
     <string name="closeAllTabsMenuItem">Κλείσιμο όλων των καρτελών</string>
+    <string name="closeTab">Κλείσιμο καρτέλα</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Πίνακας εργαλείων ιδιωτικότητας</string>
@@ -200,6 +205,7 @@
     <string name="bookmarkOverflowContentDescription">Περισσότερες επιλογές για σελιδοδείκτη %s</string>
     <string name="delete">Διαγραφή</string>
     <string name="edit">Επεξεργασία</string>
+    <string name="bookmarkEdited">Προστέθηκε σελιδοδείκτης</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Αναζήτηση DuckDuckGo</string>

@@ -86,7 +86,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenTabDeletedThenRepositoryNotified()  = runBlocking<Unit>{
+    fun whenTabDeletedThenRepositoryNotified() = runBlocking<Unit> {
         val entity = TabEntity("abc", "", "", position = 0)
         testee.onTabDeleted(entity)
         verify(mockTabRepository).delete(entity)
