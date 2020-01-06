@@ -27,9 +27,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import kotlinx.android.synthetic.main.item_tracker_network_element.view.*
 import kotlinx.android.synthetic.main.item_tracker_network_header.view.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -37,10 +40,11 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     companion object {
         const val HEADER = 0
         const val ROW = 1
+        val DISPLAY_CATEGORIES = listOf("Analytics", "Advertising", "Social Network")
     }
 
     interface ViewData
-    data class Header(val networkName: String) : ViewData
+    data class Header(val networkName: String, val networkDisplayName: String) : ViewData
     data class Row(val tracker: TrackingEvent) : ViewData
 
     class HeaderViewHolder(
@@ -82,7 +86,9 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private fun onBindRow(holder: RowViewHolder, viewElement: Row) {
         holder.host.text = Uri.parse(viewElement.tracker.trackerUrl).baseHost
-        holder.category.text = viewElement.tracker.trackerNetwork?.category
+        viewElement.tracker.categories?.let { categories ->
+            holder.category.text = DISPLAY_CATEGORIES.firstOrNull { categories.contains(it) }
+        }
     }
 
     private fun onBindHeader(holder: HeaderViewHolder, viewElement: Header) {
@@ -90,7 +96,7 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         if (iconResource != null) {
             holder.icon.setImageResource(iconResource)
         }
-        holder.network.text = viewElement.networkName
+        holder.network.text = viewElement.networkDisplayName
     }
 
     override fun getItemCount(): Int {
@@ -101,12 +107,9 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         return if (viewData[position] is Header) HEADER else ROW
     }
 
-    fun updateData(data: Map<String, List<TrackingEvent>>) {
-        val majorNetworkKeys = data.map { if (it.value.find { it.trackerNetwork?.isMajor == true } != null) it.key else null }.filterNotNull()
-        val otherKeys = data.keys.filter { !majorNetworkKeys.contains(it) }.sorted()
-
+    fun updateData(data: SortedMap<Entity, List<TrackingEvent>>) {
         val oldViewData = viewData
-        val newViewData = generateViewData(majorNetworkKeys, data) + generateViewData(otherKeys, data)
+        val newViewData = generateViewData(data)
         val diffCallback = DiffCallback(oldViewData, newViewData)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
 
@@ -114,11 +117,11 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         diffResult.dispatchUpdatesTo(this)
     }
 
-    private fun generateViewData(keys: List<String>, data: Map<String, List<TrackingEvent>>): List<ViewData> {
+    private fun generateViewData(data: SortedMap<Entity, List<TrackingEvent>>): List<ViewData> {
         val viewData = ArrayList<ViewData>().toMutableList()
-        for (key: String in keys) {
-            viewData.add(Header(key))
-            data[key]!!.mapTo(viewData) { Row(it) }
+        for ((entity: Entity, trackingEvents: List<TrackingEvent>) in data) {
+            viewData.add(Header(entity.name, entity.displayName))
+            trackingEvents?.mapTo(viewData) { Row(it) }
         }
         return viewData
     }

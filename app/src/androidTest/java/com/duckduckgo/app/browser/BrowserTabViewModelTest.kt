@@ -47,25 +47,28 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.global.db.AppConfigurationDao
-import com.duckduckgo.app.global.db.AppConfigurationEntity
+import com.duckduckgo.app.cta.ui.DaxBubbleCta
+import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
-import com.duckduckgo.app.privacy.store.PrevalenceStore
+import com.duckduckgo.app.privacy.model.TestEntity
+import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
+import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.app.trackerdetection.model.TrackerNetwork
-import com.duckduckgo.app.trackerdetection.model.TrackerNetworks
+import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
@@ -103,10 +106,7 @@ class BrowserTabViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     @Mock
-    private lateinit var mockPrevalenceStore: PrevalenceStore
-
-    @Mock
-    private lateinit var mockTrackerNetworks: TrackerNetworks
+    private lateinit var mockEntityLookup: EntityLookup
 
     @Mock
     private lateinit var mockNetworkLeaderboardDao: NetworkLeaderboardDao
@@ -163,10 +163,16 @@ class BrowserTabViewModelTest {
     private lateinit var mockPixel: Pixel
 
     @Mock
+    private lateinit var mockOnboardingStore: OnboardingStore
+
+    @Mock
     private lateinit var mockAutoCompleteService: AutoCompleteService
 
     @Mock
     private lateinit var mockWidgetCapabilities: WidgetCapabilities
+
+    @Mock
+    private lateinit var mockPrivacySettingsStore: PrivacySettingsStore
 
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
 
@@ -176,8 +182,6 @@ class BrowserTabViewModelTest {
     private lateinit var commandCaptor: ArgumentCaptor<Command>
 
     private lateinit var db: AppDatabase
-
-    private lateinit var appConfigurationDao: AppConfigurationDao
 
     private lateinit var testee: BrowserTabViewModel
 
@@ -191,8 +195,6 @@ class BrowserTabViewModelTest {
             .allowMainThreadQueries()
             .build()
 
-        appConfigurationDao = db.appConfigurationDao()
-
         mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao)
 
         ctaViewModel = CtaViewModel(
@@ -200,10 +202,14 @@ class BrowserTabViewModelTest {
             mockPixel,
             mockSurveyDao,
             mockWidgetCapabilities,
-            mockDismissedCtaDao
+            mockDismissedCtaDao,
+            mockVariantManager,
+            mockSettingsStore,
+            mockOnboardingStore,
+            mockPrivacySettingsStore
         )
 
-        val siteFactory = SiteFactory(mockPrivacyPractices, mockTrackerNetworks, prevalenceStore = mockPrevalenceStore)
+        val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)
 
         whenever(mockOmnibarConverter.convertQueryToUrl(any())).thenReturn("duckduckgo.com")
         whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
@@ -211,6 +217,7 @@ class BrowserTabViewModelTest {
         whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+        whenever(mockPrivacySettingsStore.privacyOn).thenReturn(true)
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -223,7 +230,6 @@ class BrowserTabViewModelTest {
             appSettingsPreferencesStore = mockSettingsStore,
             bookmarksDao = mockBookmarksDao,
             longPressHandler = mockLongPressHandler,
-            appConfigurationDao = appConfigurationDao,
             webViewSessionStorage = webViewSessionStorage,
             specialUrlDetector = SpecialUrlDetectorImpl(),
             faviconDownloader = mockFaviconDownloader,
@@ -347,7 +353,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenTrackerDetectedThenNetworkLeaderboardUpdated() {
-        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", TrackerNetwork("Network1", "www.tracker.com"), false)
+        val networkEntity = TestEntity("Network1", "Network1", 10.0)
+        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), networkEntity, false)
         testee.trackerDetected(event)
         verify(mockNetworkLeaderboardDao).incrementNetworkCount("Network1")
     }
@@ -550,8 +557,9 @@ class BrowserTabViewModelTest {
     fun whenEnoughTrackersDetectedThenPrivacyGradeIsUpdated() {
         val grade = testee.privacyGrade.value
         loadUrl("https://example.com")
+        val entity = TestEntity("Network1", "Network1", 10.0)
         for (i in 1..10) {
-            testee.trackerDetected(TrackingEvent("https://example.com", "", null, false))
+            testee.trackerDetected(TrackingEvent("https://example.com", "", null, entity, false))
         }
         assertNotEquals(grade, testee.privacyGrade.value)
     }
@@ -562,45 +570,35 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlUpdatedAfterConfigDownloadThenPrivacyGradeIsShown() {
-        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
+    fun whenUrlUpdatedThenPrivacyGradeIsShown() {
         loadUrl("")
         assertTrue(browserViewState().showPrivacyGrade)
     }
 
     @Test
-    fun whenUrlUpdatedBeforeConfigDownloadThenPrivacyGradeIsShown() {
-        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = false))
-        loadUrl("")
+    fun whenBrowserNotShownAndOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsNotShown() {
+        testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
         assertFalse(browserViewState().showPrivacyGrade)
     }
 
     @Test
-    fun whenOmnibarInputDoesNotHaveFocusAndAppConfigDownloadedAndBrowserShownThenPrivacyGradeIsShown() {
+    fun whenBrowserShownAndOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsShown() {
         testee.onUserSubmittedQuery("foo")
-        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
         assertTrue(browserViewState().showPrivacyGrade)
     }
 
     @Test
-    fun whenOmnibarInputDoesNotHaveFocusAndAppConfigDownloadedButBrowserNotShownThenPrivacyGradeIsHidden() {
-        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = true))
-        testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
-        assertFalse(browserViewState().showPrivacyGrade)
-    }
-
-    @Test
-    fun whenOmnibarInputDoesNotHaveFocusAndAppConfigNotDownloadedThenPrivacyGradeIsNotShown() {
-        testee.appConfigurationObserver.onChanged(AppConfigurationEntity(appConfigurationDownloaded = false))
-        testee.onOmnibarInputStateChanged("", false, hasQueryChanged = false)
-        assertFalse(browserViewState().showPrivacyGrade)
-    }
-
-    @Test
-    fun whenOmnibarInputHasFocusThenPrivacyGradeIsNotShown() {
+    fun whenBrowserNotShownAndOmnibarInputHasFocusThenPrivacyGradeIsNotShown() {
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
         assertFalse(browserViewState().showPrivacyGrade)
+    }
+
+    @Test
+    fun whenBrowserShownAndOmnibarInputHasFocusThenPrivacyGradeIsShown() {
+        testee.onUserSubmittedQuery("foo")
+        testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
+        assertTrue(browserViewState().showPrivacyGrade)
     }
 
     @Test
@@ -1300,6 +1298,212 @@ class BrowserTabViewModelTest {
         setupNavigation(isBrowsing = true, canGoBack = false, skipHome = false)
         testee.onUserPressedBack()
         verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
+    }
+
+    @Test
+    fun whenScheduledSurveyChangesAndInstalledDaysMatchThenCtaIsSurvey() {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
+        assertTrue(testee.ctaViewState.value!!.cta is HomePanelCta.Survey)
+    }
+
+    @Test
+    fun whenScheduledSurveyChangesAndInstalledDaysDontMatchThenCtaIsNull() {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 2, status = Survey.Status.SCHEDULED))
+        assertNull(testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenScheduledSurveyIsNullThenCtaIsNotSurvey() {
+        testee.onSurveyChanged(null)
+        assertFalse(testee.ctaViewState.value!!.cta is HomePanelCta.Survey)
+    }
+
+    @Test
+    fun whenSurveyCtaDismissedAndNoOtherCtaPossibleCtaIsNull() {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
+        testee.onUserDismissedCta()
+        assertNull(testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenSurveyCtaDismissedAndWidgetCtaIsPossibleThenNextCtaIsWidget() {
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+
+        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
+        testee.onUserDismissedCta()
+        assertEquals(HomePanelCta.AddWidgetAuto, testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenCtaRefreshedAndAutoAddSupportedAndWidgetNotInstalledThenCtaIsAutoWidget() = ruleRunBlockingTest {
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        testee.refreshCta(true)
+        assertEquals(HomePanelCta.AddWidgetAuto, testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenCtaRefreshedAndAutoAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = ruleRunBlockingTest {
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        testee.refreshCta(true)
+        assertNull(testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenCtaRefreshedAndOnlyStandardAddSupportedAndWidgetNotInstalledThenCtaIsInstructionsWidget() = ruleRunBlockingTest {
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        testee.refreshCta(true)
+        assertEquals(HomePanelCta.AddWidgetInstructions, testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenCtaRefreshedAndOnlyStandardAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = ruleRunBlockingTest {
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        testee.refreshCta(true)
+        assertNull(testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenCtaRefreshedAndStandardAddNotSupportedAndWidgetNotInstalledThenCtaIsNull() = ruleRunBlockingTest {
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(false)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        testee.refreshCta(true)
+        assertNull(testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenCtaRefreshedAndStandardAddNotSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = ruleRunBlockingTest {
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(false)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        testee.refreshCta(true)
+        assertNull(testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenCtaRefreshedAndIsNewTabIsFalseThenReturnNull() = ruleRunBlockingTest {
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        testee.refreshCta(false)
+        assertNull(testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenCtaShownThenFirePixel() {
+        val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
+        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+
+        testee.onCtaShown()
+        verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
+    }
+
+    @Test
+    fun whenManualCtaShownThenFirePixel() {
+        val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
+
+        testee.onManualCtaShown(cta)
+        verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
+    }
+
+    @Test
+    fun whenRegisterDaxBubbleCtaShownThenFirePixel() {
+        val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
+        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+
+        testee.registerDaxBubbleCtaShown()
+        verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
+    }
+
+    @Test
+    fun whenRegisterDaxBubbleCtaShownThenRegisterInDatabase() {
+        val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
+        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+
+        testee.registerDaxBubbleCtaShown()
+        verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
+    }
+
+    @Test
+    fun whenUserClickedCtaButtonThenFirePixel() {
+        val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
+        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+
+        testee.onUserClickCtaOkButton()
+        verify(mockPixel).fire(cta.okPixel!!, cta.pixelOkParameters())
+    }
+
+    @Test
+    fun whenUserClickedCtaButtonThenLaunchSurveyCommand() {
+        val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
+        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+
+        testee.onUserClickCtaOkButton()
+        assertCommandIssued<Command.LaunchSurvey>()
+    }
+
+    @Test
+    fun whenUserClickedCtaButtonThenLaunchAddWidgetCommand() {
+        val cta = HomePanelCta.AddWidgetAuto
+        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+
+        testee.onUserClickCtaOkButton()
+        assertCommandIssued<Command.LaunchAddWidget>()
+    }
+
+    @Test
+    fun whenUserClickedCtaButtonThenLaunchLegacyAddWidgetCommand() {
+        val cta = HomePanelCta.AddWidgetInstructions
+        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+
+        testee.onUserClickCtaOkButton()
+        assertCommandIssued<Command.LaunchLegacyAddWidget>()
+    }
+
+    @Test
+    fun whenUserDismissedCtaThenFirePixel() {
+        val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
+        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+
+        testee.onUserDismissedCta()
+        verify(mockPixel).fire(cta.cancelPixel!!, cta.pixelCancelParameters())
+    }
+
+    @Test
+    fun whenUserDismissedCtaThenRegisterInDatabase() {
+        val cta = HomePanelCta.AddWidgetAuto
+        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+
+        testee.onUserDismissedCta()
+        verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
+    }
+
+    @Test
+    fun whenUserDismissedSurveyCtaThenDoNotRegisterInDatabase() {
+        val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
+        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+
+        testee.onUserDismissedCta()
+        verify(mockDismissedCtaDao, never()).insert(DismissedCta(cta.ctaId))
+    }
+
+    @Test
+    fun whenUserDismissedSurveyCtaThenCancelScheduledSurveys() {
+        val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
+        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+
+        testee.onUserDismissedCta()
+        verify(mockSurveyDao).cancelScheduledSurveys()
     }
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {

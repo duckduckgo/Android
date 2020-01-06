@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.fire
 
+import android.os.SystemClock
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption.*
 import org.junit.Assert.assertEquals
@@ -37,7 +38,7 @@ class DataClearerTimeKeeperTest(private val testCase: TestCase) {
         @Parameters(name = "Test case: {index} - {0}")
         fun testData(): Array<TestCase> {
 
-            val timeNow = System.currentTimeMillis()
+            val timeNow = SystemClock.elapsedRealtime()
 
             return arrayOf(
                 // APP_EXIT_ONLY shouldn't be passed to this method - always expected to return false regardless of other configuration/inputs
@@ -74,7 +75,7 @@ class DataClearerTimeKeeperTest(private val testCase: TestCase) {
         assertEquals(testCase.expected, testee.hasEnoughTimeElapsed(backgroundedTimestamp = timestamp, clearWhenOption = testCase.clearWhenOption))
     }
 
-    private fun getPastTimestamp(millisPreviously: Long, timeNow: Long = System.currentTimeMillis()): Long {
+    private fun getPastTimestamp(millisPreviously: Long, timeNow: Long = SystemClock.elapsedRealtime()): Long {
         return Calendar.getInstance().also {
             it.timeInMillis = timeNow
             it.add(Calendar.MILLISECOND, (-millisPreviously).toInt())

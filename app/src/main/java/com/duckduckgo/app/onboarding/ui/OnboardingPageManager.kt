@@ -22,9 +22,12 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.DefaultBrowserBlueprint
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.SummaryPageBlueprint
+import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.WelcomeBlueprint
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.app.onboarding.ui.page.UnifiedSummaryPage
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage
+import com.duckduckgo.app.statistics.VariantManager
 
 interface OnboardingPageManager {
     fun pageCount(): Int
@@ -35,7 +38,8 @@ interface OnboardingPageManager {
 
 class OnboardingPageManagerWithTrackerBlocking(
     private val onboardingPageBuilder: OnboardingPageBuilder,
-    private val defaultWebBrowserCapability: DefaultBrowserDetector
+    private val defaultWebBrowserCapability: DefaultBrowserDetector,
+    private val variantManager: VariantManager
 ) : OnboardingPageManager {
 
     private val pages = mutableListOf<OnboardingPageBlueprint>()
@@ -45,7 +49,11 @@ class OnboardingPageManagerWithTrackerBlocking(
     override fun buildPageBlueprints() {
         pages.clear()
 
-        pages.add(SummaryPageBlueprint())
+        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)) {
+            pages.add(WelcomeBlueprint())
+        } else {
+            pages.add(SummaryPageBlueprint())
+        }
 
         if (shouldShowDefaultBrowserPage()) {
             pages.add((DefaultBrowserBlueprint()))
@@ -58,6 +66,7 @@ class OnboardingPageManagerWithTrackerBlocking(
 
     override fun buildPage(position: Int): OnboardingPageFragment? {
         return when (val blueprint = pages.getOrNull(position)) {
+            is WelcomeBlueprint -> buildWelcomePage(blueprint)
             is SummaryPageBlueprint -> buildSummaryPage(blueprint)
             is DefaultBrowserBlueprint -> buildDefaultBrowserPage(blueprint)
             else -> null
@@ -75,6 +84,8 @@ class OnboardingPageManagerWithTrackerBlocking(
 
     private fun shouldShowDefaultBrowserPage(): Boolean {
         return defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration()
+                && !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ExistingNoCta)
+                && !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)
     }
 
     private fun isFinalPage(position: Int) = position == pageCount() - 1
@@ -86,5 +97,9 @@ class OnboardingPageManagerWithTrackerBlocking(
 
     private fun buildDefaultBrowserPage(blueprint: DefaultBrowserBlueprint): DefaultBrowserPage {
         return onboardingPageBuilder.buildDefaultBrowserPage(blueprint.continueButtonTextResourceId)
+    }
+
+    private fun buildWelcomePage(blueprint: WelcomeBlueprint): WelcomePage {
+        return onboardingPageBuilder.buildWelcomePage(blueprint.continueButtonTextResourceId)
     }
 }

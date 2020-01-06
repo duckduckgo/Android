@@ -52,11 +52,10 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
-import com.duckduckgo.app.cta.ui.CtaConfiguration
+import com.duckduckgo.app.cta.ui.Cta
+import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.global.*
-import com.duckduckgo.app.global.db.AppConfigurationDao
-import com.duckduckgo.app.global.db.AppConfigurationEntity
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domainMatchesUrl
@@ -101,7 +100,6 @@ class BrowserTabViewModel(
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
     private val variantManager: VariantManager,
-    appConfigurationDao: AppConfigurationDao,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
 
@@ -111,6 +109,10 @@ class BrowserTabViewModel(
         data class Browser(val isNewTabState: Boolean = true) : GlobalLayoutViewState()
         object Invalidated : GlobalLayoutViewState()
     }
+
+    data class CtaViewState(
+        val cta: Cta? = null
+    )
 
     data class BrowserViewState(
         val browserShowing: Boolean = false,
@@ -198,7 +200,8 @@ class BrowserTabViewModel(
     val loadingViewState: MutableLiveData<LoadingViewState> = MutableLiveData()
     val omnibarViewState: MutableLiveData<OmnibarViewState> = MutableLiveData()
     val findInPageViewState: MutableLiveData<FindInPageViewState> = MutableLiveData()
-    val ctaViewState: MutableLiveData<CtaViewModel.CtaViewState> = ctaViewModel.ctaViewState
+    val ctaViewState: MutableLiveData<CtaViewState> = MutableLiveData()
+    var siteLiveData: MutableLiveData<Site> = MutableLiveData()
 
     var skipHome = false
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
@@ -206,32 +209,19 @@ class BrowserTabViewModel(
     val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    @VisibleForTesting
-    val appConfigurationObserver: Observer<AppConfigurationEntity> = Observer { appConfiguration ->
-        appConfiguration?.let {
-            Timber.i("App configuration downloaded: ${it.appConfigurationDownloaded}")
-            appConfigurationDownloaded = it.appConfigurationDownloaded
-        }
-    }
-
     val url: String?
         get() = site?.url
 
     val title: String?
         get() = site?.title
 
-    private var appConfigurationDownloaded = false
-    private val appConfigurationObservable = appConfigurationDao.appConfigurationStatus()
     private val autoCompletePublishSubject = PublishRelay.create<String>()
-    private var siteLiveData = MutableLiveData<Site>()
     private var site: Site? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
 
     init {
         initializeViewStates()
-
-        appConfigurationObservable.observeForever(appConfigurationObserver)
         configureAutoComplete()
     }
 
@@ -295,7 +285,6 @@ class BrowserTabViewModel(
     public override fun onCleared() {
         super.onCleared()
         buildingSiteFactoryJob?.cancel()
-        appConfigurationObservable.removeObserver(appConfigurationObserver)
     }
 
     fun registerWebViewListener(browserWebViewClient: BrowserWebViewClient, browserChromeClient: BrowserChromeClient) {
@@ -305,7 +294,7 @@ class BrowserTabViewModel(
 
     fun onViewVisible() {
         command.value = if (!currentBrowserViewState().browserShowing) ShowKeyboard else HideKeyboard
-        ctaViewModel.refreshCta()
+        refreshCta(true)
         if (currentGlobalLayoutState() is Invalidated && currentBrowserViewState().browserShowing) {
             showErrorWithAction()
         }
@@ -486,7 +475,7 @@ class BrowserTabViewModel(
                 addToHomeEnabled = true,
                 addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
                 canSharePage = true,
-                showPrivacyGrade = appConfigurationDownloaded
+                showPrivacyGrade = true
             )
         )
 
@@ -579,7 +568,7 @@ class BrowserTabViewModel(
     }
 
     private fun updateNetworkLeaderboard(event: TrackingEvent) {
-        val networkName = event.trackerNetwork?.name ?: return
+        val networkName = event.entity?.name ?: return
         networkLeaderboardDao.incrementNetworkCount(networkName)
     }
 
@@ -618,6 +607,7 @@ class BrowserTabViewModel(
     private fun currentFindInPageViewState(): FindInPageViewState = findInPageViewState.value!!
     private fun currentOmnibarViewState(): OmnibarViewState = omnibarViewState.value!!
     private fun currentLoadingViewState(): LoadingViewState = loadingViewState.value!!
+    private fun currentCtaViewState(): CtaViewState = ctaViewState.value!!
 
     fun onOmnibarInputStateChanged(query: String, hasFocus: Boolean, hasQueryChanged: Boolean) {
 
@@ -638,7 +628,7 @@ class BrowserTabViewModel(
 
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
-            showPrivacyGrade = appConfigurationDownloaded && currentBrowserViewState.browserShowing,
+            showPrivacyGrade = currentBrowserViewState.browserShowing,
             showTabsButton = showControls,
             showFireButton = showControls,
             showMenuButton = showControls,
@@ -783,6 +773,7 @@ class BrowserTabViewModel(
         autoCompleteViewState.value = AutoCompleteViewState()
         omnibarViewState.value = OmnibarViewState()
         findInPageViewState.value = FindInPageViewState()
+        ctaViewState.value = CtaViewState()
     }
 
     fun onShareSelected() {
@@ -864,21 +855,55 @@ class BrowserTabViewModel(
     }
 
     fun onSurveyChanged(survey: Survey?) {
-        ctaViewModel.onSurveyChanged(survey)
+        val activeSurvey = ctaViewModel.onSurveyChanged(survey)
+        if (activeSurvey != null) {
+            refreshCta(true)
+        }
     }
 
-    fun onUserLaunchedCta() {
+    fun onCtaShown() {
         val cta = ctaViewState.value?.cta ?: return
-        command.value = when (cta) {
-            is CtaConfiguration.Survey -> LaunchSurvey(cta.survey)
-            is CtaConfiguration.AddWidgetAuto -> LaunchAddWidget
-            is CtaConfiguration.AddWidgetInstructions -> LaunchLegacyAddWidget
+        ctaViewModel.onCtaShown(cta)
+    }
+
+    fun onManualCtaShown(cta: Cta) {
+        ctaViewModel.onCtaShown(cta)
+    }
+
+    fun refreshCta(isNewTab: Boolean) {
+        viewModelScope.launch {
+            val cta = withContext(dispatchers.io()) {
+                ctaViewModel.refreshCta(dispatchers.io(), isNewTab, siteLiveData.value)
+            }
+            ctaViewState.value = currentCtaViewState().copy(cta = cta)
         }
-        ctaViewModel.onCtaLaunched()
+    }
+
+    fun registerDaxBubbleCtaShown() {
+        val cta = ctaViewState.value?.cta ?: return
+        ctaViewModel.registerDaxBubbleCtaShown(cta)
+    }
+
+    fun onUserClickCtaOkButton() {
+        val cta = ctaViewState.value?.cta ?: return
+        ctaViewModel.onUserClickCtaOkButton(cta)
+        command.value = when (cta) {
+            is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
+            is HomePanelCta.AddWidgetAuto -> LaunchAddWidget
+            is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
+            else -> return
+        }
     }
 
     fun onUserDismissedCta() {
-        ctaViewModel.onCtaDismissed()
+        val cta = ctaViewState.value?.cta ?: return
+
+        ctaViewModel.onUserDismissedCta(cta)
+        if (cta is HomePanelCta) {
+            refreshCta(true)
+        } else {
+            ctaViewState.value = currentCtaViewState().copy(cta = null)
+        }
     }
 
     fun updateTabPreview(tabId: String, fileName: String) {

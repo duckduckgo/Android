@@ -23,6 +23,7 @@ import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
+import com.duckduckgo.app.onboarding.ui.OnboardingActivityExperiment
 
 abstract class OnboardingPageFragment : Fragment() {
 
@@ -38,8 +39,10 @@ abstract class OnboardingPageFragment : Fragment() {
     }
 
     fun onContinuePressed() {
-        val onboardingActivity = activity as OnboardingActivity
-        onboardingActivity.onContinueClicked()
+        when (activity) {
+            is OnboardingActivityExperiment -> (activity as OnboardingActivityExperiment).onContinueClicked()
+            is OnboardingActivity -> (activity as OnboardingActivity).onContinueClicked()
+        }
     }
 
     companion object {

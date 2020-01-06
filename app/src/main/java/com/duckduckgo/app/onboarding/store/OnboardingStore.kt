@@ -21,6 +21,8 @@ interface OnboardingStore {
 
     val shouldShow: Boolean
 
+    var onboardingDialogJourney: String?
+
     fun onboardingShown()
 
 }

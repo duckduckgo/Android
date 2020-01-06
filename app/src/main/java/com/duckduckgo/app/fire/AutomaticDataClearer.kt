@@ -17,6 +17,7 @@
 package com.duckduckgo.app.fire
 
 import android.os.Handler
+import android.os.SystemClock
 import androidx.annotation.UiThread
 import androidx.core.os.postDelayed
 import androidx.lifecycle.*
@@ -101,11 +102,12 @@ class AutomaticDataClearer(
     @UiThread
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onAppBackgrounded() {
-        Timber.i("Recording when app backgrounded")
+        val timeNow = SystemClock.elapsedRealtime()
+        Timber.i("Recording when app backgrounded ($timeNow)")
 
         dataClearerState.value = INITIALIZING
 
-        settingsDataStore.appBackgroundedTimestamp = System.currentTimeMillis()
+        settingsDataStore.appBackgroundedTimestamp = timeNow
 
         val clearWhenOption = settingsDataStore.automaticallyClearWhenOption
         val clearWhatOption = settingsDataStore.automaticallyClearWhatOption

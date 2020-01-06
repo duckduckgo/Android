@@ -45,7 +45,6 @@ class BrowserWebViewClient(
     var webViewClientListener: WebViewClientListener? = null
     private var lastPageStarted: String? = null
 
-
     /**
      * This is the new method of url overriding available from API 24 onwards
      */

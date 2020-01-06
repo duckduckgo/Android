@@ -16,12 +16,10 @@
 
 package com.duckduckgo.app.trackerdetection.model
 
-import com.duckduckgo.app.global.UriString.Companion.host
-
 data class TrackingEvent(
     val documentUrl: String,
     val trackerUrl: String,
-    val trackerNetwork: TrackerNetwork?,
-    val blocked: Boolean,
-    val entity: String = trackerNetwork?.name ?: host(trackerUrl) ?: trackerUrl
+    val categories: List<String>?,
+    val entity: Entity?,
+    val blocked: Boolean
 )

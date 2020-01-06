@@ -29,8 +29,7 @@ import com.duckduckgo.app.browser.rating.db.AppEnjoymentTypeConverter
 import com.duckduckgo.app.browser.rating.db.PromptCountConverter
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.entities.db.EntityListDao
-import com.duckduckgo.app.entities.db.EntityListEntity
+import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.global.exception.UncaughtExceptionDao
 import com.duckduckgo.app.global.exception.UncaughtExceptionEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionSourceConverter
@@ -50,25 +49,28 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
-import com.duckduckgo.app.trackerdetection.db.TrackerDataDao
-import com.duckduckgo.app.trackerdetection.model.DisconnectTracker
+import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
+import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
+import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
+import com.duckduckgo.app.trackerdetection.model.*
 import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedEntity
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 15, entities = [
-        DisconnectTracker::class,
+    exportSchema = true, version = 16, entities = [
+        TdsTracker::class,
+        TdsEntity::class,
+        TdsDomainEntity::class,
+        TemporaryTrackingWhitelistedDomain::class,
         HttpsBloomFilterSpec::class,
         HttpsWhitelistedDomain::class,
         NetworkLeaderboardEntry::class,
         SitesVisitedEntity::class,
-        AppConfigurationEntity::class,
         TabEntity::class,
         TabSelectionEntity::class,
         BookmarkEntity::class,
-        EntityListEntity::class,
         Survey::class,
         DismissedCta::class,
         SearchCountEntity::class,
@@ -85,18 +87,22 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
     DismissedCta.IdTypeConverter::class,
     AppEnjoymentTypeConverter::class,
     PromptCountConverter::class,
+    ActionTypeConverter::class,
+    RuleTypeConverter::class,
+    CategoriesTypeConverter::class,
     UncaughtExceptionSourceConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
 
-    abstract fun trackerDataDao(): TrackerDataDao
+    abstract fun tdsTrackerDao(): TdsTrackerDao
+    abstract fun tdsEntityDao(): TdsEntityDao
+    abstract fun tdsDomainEntityDao(): TdsDomainEntityDao
+    abstract fun temporaryTrackingWhitelistDao(): TemporaryTrackingWhitelistDao
     abstract fun httpsWhitelistedDao(): HttpsWhitelistDao
     abstract fun httpsBloomFilterSpecDao(): HttpsBloomFilterSpecDao
     abstract fun networkLeaderboardDao(): NetworkLeaderboardDao
-    abstract fun appConfigurationDao(): AppConfigurationDao
     abstract fun tabsDao(): TabsDao
     abstract fun bookmarksDao(): BookmarksDao
-    abstract fun networkEntityDao(): EntityListDao
     abstract fun surveyDao(): SurveyDao
     abstract fun dismissedCtaDao(): DismissedCtaDao
     abstract fun searchCountDao(): SearchCountDao
@@ -215,6 +221,19 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_15_TO_16: Migration = object : Migration(15, 16) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DROP TABLE `app_configuration`")
+                database.execSQL("DROP TABLE `disconnect_tracker`")
+                database.execSQL("DROP TABLE `entity_list`")
+                database.execSQL("DELETE FROM `network_leaderboard`")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `tds_tracker` (`domain` TEXT NOT NULL, `defaultAction` TEXT NOT NULL, `ownerName` TEXT NOT NULL, `rules` TEXT NOT NULL, `categories` TEXT NOT NULL, PRIMARY KEY(`domain`))")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `tds_entity` (`name` TEXT NOT NULL, `displayName` TEXT NOT NULL, `prevalence` REAL NOT NULL, PRIMARY KEY(`name`))")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `tds_domain_entity` (`domain` TEXT NOT NULL, `entityName` TEXT NOT NULL, PRIMARY KEY(`domain`))")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `temporary_tracking_whitelist` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
+            }
+        }
+
         val ALL_MIGRATIONS: List<Migration>
             get() = listOf(
                 MIGRATION_1_TO_2,
@@ -230,7 +249,8 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_11_TO_12,
                 MIGRATION_12_TO_13,
                 MIGRATION_13_TO_14,
-                MIGRATION_14_TO_15
+                MIGRATION_14_TO_15,
+                MIGRATION_15_TO_16
             )
     }
 }

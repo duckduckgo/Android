@@ -52,6 +52,11 @@
             android:theme="@style/AppTheme.Dark.Transparent" />
 
         <activity
+            android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivityExperiment"
+            android:label="@string/appName"
+            android:theme="@style/AppTheme.Dark.Transparent" />
+
+        <activity
             android:name=".BrowserActivity"
             android:label="@string/appDescription"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -67,6 +72,10 @@
 
                 <data android:scheme="https" />
                 <data android:scheme="http" />
+
+                <data android:mimeType="text/html" />
+                <data android:mimeType="text/plain" />
+                <data android:mimeType="application/xhtml+xml" />
             </intent-filter>
 
             <!-- Allows apps to consume links and text shared from other apps e.g chrome -->

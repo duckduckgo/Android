@@ -24,6 +24,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <View
+            android:id="@+id/toolbarDialogLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/dimmed"
+            app:layout_constraintBottom_toTopOf="@id/hideText" />
+
+        <View
+            android:id="@+id/dialogLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/dimmed"
+            app:layout_constraintTop_toTopOf="@id/hideText" />
+
         <TextView
             android:id="@+id/hideText"
             android:layout_width="wrap_content"
@@ -44,18 +58,18 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginBottom="16dp"
-            app:srcCompat="@drawable/ic_dax_icon"
             app:layout_constraintBottom_toTopOf="@id/cardView"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/ic_dax_icon" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/triangle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_triangle_bubble"
             app:layout_constraintBottom_toTopOf="@+id/cardView"
             app:layout_constraintEnd_toEndOf="@id/logo"
-            app:layout_constraintStart_toStartOf="@id/logo" />
+            app:layout_constraintStart_toStartOf="@id/logo"
+            app:srcCompat="@drawable/ic_triangle_bubble" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
