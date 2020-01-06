@@ -44,7 +44,6 @@ interface WebViewClientListener {
     fun externalAppLinkClicked(appLink: SpecialUrlDetector.UrlType.IntentType)
     fun openInNewTab(url: String?)
     fun openMessageInNewTab(message: Message)
-
     fun recoverFromRenderProcessGone()
     fun requiresAuthentication(request: BasicAuthenticationRequest)
 }
