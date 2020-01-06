@@ -291,19 +291,9 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
 
     fun openMessageInNewTab(message: Message) {
         launch {
-            val tabId= viewModel.onNewTabRequested()
-            val fragment = BrowserTabFragment.newInstance(tabId, null, false)
-            val transaction = supportFragmentManager.beginTransaction()
-            val tab = currentTab
-            if (tab == null) {
-                transaction.replace(R.id.fragmentContainer, fragment, tabId)
-            } else {
-                transaction.hide(tab)
-                transaction.add(R.id.fragmentContainer, fragment, tabId)
-            }
-            transaction.commit()
+            val tabId = viewModel.onNewTabRequested()
+            val fragment = openNewTab(tabId, null, false)
             fragment.messageFromPreviousTab = message
-            currentTab = fragment
         }
     }
 

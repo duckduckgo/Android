@@ -21,7 +21,6 @@ import android.os.Message
 import android.view.View
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
-import android.webkit.WebView
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 

@@ -787,7 +787,7 @@ class BrowserTabViewModel(
         browserViewState.value = currentBrowserViewState().copy(browserShowing = showBrowser)
     }
 
-    fun showBrowser() {
+    private fun showBrowser() {
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true)
         globalLayoutState.value = Browser(isNewTabState = false)
     }
