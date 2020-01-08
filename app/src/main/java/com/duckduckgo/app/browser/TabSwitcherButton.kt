@@ -67,6 +67,16 @@ class TabSwitcherButton(context: Context) : FrameLayout(context) {
         anim.playAnimation()
     }
 
+    fun animateCount() {
+        anim.progress = 0.0f
+
+        fadeOutCount {
+            fadeInCount()
+        }
+
+        anim.playAnimation()
+    }
+
     private fun fadeOutCount(callback: () -> Unit) {
         val listener = object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {

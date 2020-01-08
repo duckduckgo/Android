@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Message
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
@@ -163,6 +164,7 @@ class BrowserTabViewModel(
         class NavigateBack(val steps: Int) : Command()
         object NavigateForward : Command()
         class OpenInNewTab(val query: String) : Command()
+        class OpenMessageInNewTab(val message: Message) : Command()
         class OpenInNewBackgroundTab(val query: String) : Command()
         object LaunchNewTab : Command()
         object ResetHistory : Command()
@@ -236,6 +238,10 @@ class BrowserTabViewModel(
         url?.let {
             onUserSubmittedQuery(it)
         }
+    }
+
+    fun onMessageProcessed() {
+        showBrowser()
     }
 
     private fun buildSiteFactory(url: String, title: String? = null) {
@@ -777,10 +783,17 @@ class BrowserTabViewModel(
     }
 
     fun determineShowBrowser() {
-        browserViewState.value = currentBrowserViewState().copy(browserShowing = !url.isNullOrBlank())
+        val showBrowser = currentBrowserViewState().browserShowing || !url.isNullOrBlank()
+        browserViewState.value = currentBrowserViewState().copy(browserShowing = showBrowser)
+    }
+
+    private fun showBrowser() {
+        browserViewState.value = currentBrowserViewState().copy(browserShowing = true)
+        globalLayoutState.value = Browser(isNewTabState = false)
     }
 
     private fun removeAtbAndSourceParamsFromSearch(url: String): String {
+
         if (!duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             return url
         }
@@ -903,6 +916,14 @@ class BrowserTabViewModel(
 
     override fun externalAppLinkClicked(appLink: IntentType) {
         command.value = HandleExternalAppLink(appLink)
+    }
+
+    override fun openInNewTab(url: String?) {
+        command.value = OpenInNewTab(url.orEmpty())
+    }
+
+    override fun openMessageInNewTab(message: Message) {
+        command.value = OpenMessageInNewTab(message)
     }
 
     override fun recoverFromRenderProcessGone() {

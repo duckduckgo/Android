@@ -19,16 +19,14 @@
 package com.duckduckgo.app.browser
 
 import android.content.Context
+import android.os.Message
 import android.view.View
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.*
 import org.junit.Before
 import org.junit.Test
 
@@ -91,6 +89,26 @@ class BrowserChromeClientTest {
     fun whenOnProgressChangedCalledThenListenerInstructedToUpdateNavigationState() {
         testee.onProgressChanged(webView, 10)
         verify(mockWebViewClientListener).navigationStateChanged(any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnCreateWindowWithUserGestureThenMessageOpenedInNewTab() {
+        testee.onCreateWindow(webView, isDialog = false, isUserGesture = true, resultMsg = mockMsg)
+        verify(mockWebViewClientListener).openMessageInNewTab(eq(mockMsg))
+        verifyNoMoreInteractions(mockWebViewClientListener)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnCreateWindowWithoutUserGestureThenNewTabNotOpened() {
+        testee.onCreateWindow(webView, isDialog = false, isUserGesture = false, resultMsg = mockMsg)
+        verifyZeroInteractions(mockWebViewClientListener)
+    }
+
+    private val mockMsg = Message().apply {
+        target = mock()
+        obj = mock<WebView.WebViewTransport>()
     }
 
     private class TestWebView(context: Context) : WebView(context)
