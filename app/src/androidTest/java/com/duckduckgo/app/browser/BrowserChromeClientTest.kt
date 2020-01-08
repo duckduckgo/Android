@@ -93,15 +93,15 @@ class BrowserChromeClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnCreateWindowWithUserGestureThenOpenUrlInNewTab() {
+    fun whenOnCreateWindowWithUserGestureThenMessageOpenedInNewTab() {
         testee.onCreateWindow(webView, isDialog = false, isUserGesture = true, resultMsg = mockMsg)
-        verify(mockWebViewClientListener).openInNewTab(anyOrNull())
+        verify(mockWebViewClientListener).openMessageInNewTab(eq(mockMsg))
         verifyNoMoreInteractions(mockWebViewClientListener)
     }
 
     @UiThreadTest
     @Test
-    fun whenOnCreateWindowNoUserGestureThenOpenUrlInNewTab() {
+    fun whenOnCreateWindowWithoutUserGestureThenNewTabNotOpened() {
         testee.onCreateWindow(webView, isDialog = false, isUserGesture = false, resultMsg = mockMsg)
         verifyZeroInteractions(mockWebViewClientListener)
     }

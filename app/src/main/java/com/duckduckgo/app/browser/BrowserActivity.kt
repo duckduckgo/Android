@@ -22,6 +22,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
 import android.os.Bundle
+import android.os.Message
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
@@ -113,7 +114,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
         }
     }
 
-    private fun openNewTab(tabId: String, url: String? = null, skipHome: Boolean) {
+    private fun openNewTab(tabId: String, url: String? = null, skipHome: Boolean): BrowserTabFragment {
         Timber.i("Opening new tab, url: $url, tabId: $tabId")
         val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome)
         val transaction = supportFragmentManager.beginTransaction()
@@ -126,6 +127,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
         }
         transaction.commit()
         currentTab = fragment
+        return fragment
     }
 
     private fun selectTab(tab: TabEntity?) {
@@ -285,6 +287,14 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
 
     fun openInNewTab(query: String) {
         launch { viewModel.onOpenInNewTabRequested(query) }
+    }
+
+    fun openMessageInNewTab(message: Message) {
+        launch {
+            val tabId = viewModel.onNewTabRequested()
+            val fragment = openNewTab(tabId, null, false)
+            fragment.messageFromPreviousTab = message
+        }
     }
 
     fun launchBrokenSiteFeedback(url: String?) {
