@@ -25,7 +25,7 @@ class BookmarksEntityQueryListener(
 ) : SearchView.OnQueryTextListener {
 
     override fun onQueryTextChange(newText: String): Boolean {
-        if (bookmarks != null){
+        if (bookmarks != null) {
             adapter.bookmarks = filter(newText, bookmarks)
             adapter.notifyDataSetChanged()
         }
@@ -38,6 +38,9 @@ class BookmarksEntityQueryListener(
 
     private fun filter(query: String, bookmarks: List<BookmarkEntity>): List<BookmarkEntity> {
         val toLowerCaseQuery = query.toLowerCase()
-        return bookmarks.filter { it.title?.toLowerCase()?.contains(toLowerCaseQuery) == true }
+        return bookmarks.filter {
+            it.title?.toLowerCase()?.contains(toLowerCaseQuery) == true ||
+                    it.url.contains(toLowerCaseQuery)
+        }
     }
 }
