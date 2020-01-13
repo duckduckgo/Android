@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app
+package com.duckduckgo.app.bookmarks.ui
 
 import androidx.appcompat.widget.SearchView
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
-import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
-import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
 
-class QueryListener(
-    val adapter: BookmarksActivity.BookmarksAdapter,
-    val bookMarks: BookmarksViewModel
+class BookmarksEntityQueryListener(
+        val bookmarks: List<BookmarkEntity>?,
+        val adapter: BookmarksActivity.BookmarksAdapter
 ) : SearchView.OnQueryTextListener {
 
-
     override fun onQueryTextChange(newText: String): Boolean {
-        adapter.bookmarks = filter(newText, bookMarks.viewState.value?.bookmarks)!!
-        adapter.notifyDataSetChanged()
+        if (bookmarks != null){
+            adapter.bookmarks = filter(newText, bookmarks)
+            adapter.notifyDataSetChanged()
+        }
         return true
     }
 
@@ -37,8 +36,8 @@ class QueryListener(
         return false
     }
 
-    private fun filter(query: String, bookMarks: List<BookmarkEntity>?): List<BookmarkEntity>? {
+    private fun filter(query: String, bookmarks: List<BookmarkEntity>): List<BookmarkEntity> {
         val toLowerCaseQuery = query.toLowerCase()
-        return bookMarks?.filter { it.title?.toLowerCase()!!.contains(toLowerCaseQuery) }
+        return bookmarks.filter { it.title?.toLowerCase()?.contains(toLowerCaseQuery) == true }
     }
 }

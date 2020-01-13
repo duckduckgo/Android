@@ -32,7 +32,6 @@ import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView.*
-import com.duckduckgo.app.QueryListener
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
@@ -99,7 +98,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         menuInflater.inflate(bookmark_activity_menu, menu)
         val searchItem = menu?.findItem(action_search)
         val searchView = searchItem?.actionView as SearchView
-        searchView.setOnQueryTextListener(QueryListener(adapter, viewModel))
+        searchView.setOnQueryTextListener(BookmarksEntityQueryListener(viewModel.viewState.value?.bookmarks, adapter))
         return super.onCreateOptionsMenu(menu)
     }
 
