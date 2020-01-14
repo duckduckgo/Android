@@ -41,8 +41,8 @@ class AndroidAppCacheClearer(private val context: Context, private val fileDelet
          *
          * To date, there are two known WebView cache directories; only one is present at a time but which is used is based on WebView version.
          */
-        private const val WEBVIEW_CACHE_DIR_LEGACY = "org.chromium.android_webview"
         private const val WEBVIEW_CACHE_DIR = "WebView"
+        private const val WEBVIEW_CACHE_DIR_LEGACY = "org.chromium.android_webview"
 
         /*
          * Exclude the OkHttp networking cache from being deleted. This doesn't contain any sensitive information.
