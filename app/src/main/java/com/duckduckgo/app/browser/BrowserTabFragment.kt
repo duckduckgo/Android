@@ -546,7 +546,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     val fileName = previewPersister.save(preview, tabId)
                     viewModel.updateTabPreview(tabId, fileName)
                     Timber.d("Saved and updated tab preview")
-                } catch (e: RuntimeException) {
+                } catch (e: Exception) {
                     Timber.d(e, "Failed to generate WebView preview")
                 }
             }
