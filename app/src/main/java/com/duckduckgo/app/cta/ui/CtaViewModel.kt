@@ -193,16 +193,13 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun hasTrackersInformation(events: List<TrackingEvent>): Boolean {
-        if (events.isNullOrEmpty()) return false
-
-        return events.asSequence()
+    private fun hasTrackersInformation(events: List<TrackingEvent>): Boolean =
+        events.asSequence()
             .filter { it.entity?.isMajor == true }
             .map { it.entity?.displayName }
             .filterNotNull()
             .distinct()
             .toList().isNotEmpty()
-    }
 
     private fun hasPrivacySettingsOn(): Boolean = settingsPrivacySettingsStore.privacyOn
 
