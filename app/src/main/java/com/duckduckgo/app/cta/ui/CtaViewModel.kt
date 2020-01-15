@@ -32,6 +32,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.withContext
@@ -182,7 +183,7 @@ class CtaViewModel @Inject constructor(
                 return DaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
             }
             // Trackers blocked
-            return if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.trackerCount > 0 && host != null) {
+            return if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && hasTrackersInformation(it.trackingEvents) && host != null) {
                 DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.trackingEvents, host)
             } else if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
                 DaxDialogCta.DaxNoSerpCta(onboardingStore, appInstallStore)
@@ -190,6 +191,17 @@ class CtaViewModel @Inject constructor(
                 null
             }
         }
+    }
+
+    private fun hasTrackersInformation(events: List<TrackingEvent>): Boolean {
+        if (events.isNullOrEmpty()) return false
+
+        return events.asSequence()
+            .filter { it.entity?.isMajor == true }
+            .map { it.entity?.displayName }
+            .filterNotNull()
+            .distinct()
+            .toList().isNotEmpty()
     }
 
     private fun hasPrivacySettingsOn(): Boolean = settingsPrivacySettingsStore.privacyOn
