@@ -128,12 +128,11 @@ sealed class DaxDialogCta(
 
             val trackersText = trackersFiltered.joinToString(", ")
             val size = trackers.size - trackersFiltered.size
-            val url = Uri.parse(host).baseHost?.removePrefix("m.")
             val quantityString =
                 if (size == 0) {
-                    activity.resources.getString(R.string.daxTrackersBlockedCtaZeroText, url)
+                    activity.resources.getString(R.string.daxTrackersBlockedCtaZeroText)
                 } else {
-                    activity.resources.getQuantityString(description, size, size, url)
+                    activity.resources.getQuantityString(description, size, size)
                 }
             return "<b>$trackersText</b>$quantityString"
         }

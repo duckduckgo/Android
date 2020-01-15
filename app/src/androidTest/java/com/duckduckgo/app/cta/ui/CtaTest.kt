@@ -53,8 +53,8 @@ class CtaTest {
         MockitoAnnotations.initMocks(this)
 
         whenever(mockActivity.resources).thenReturn(mockResources)
-        whenever(mockResources.getString(any(), any())).thenReturn("withZero")
-        whenever(mockResources.getQuantityString(any(), any(), any(), any())).thenReturn("withMultiple")
+        whenever(mockResources.getString(any())).thenReturn("withZero")
+        whenever(mockResources.getQuantityString(any(), any(), any())).thenReturn("withMultiple")
     }
 
     @Test
