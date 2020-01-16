@@ -31,6 +31,7 @@ class BookmarksViewModel(val dao: BookmarksDao) : EditBookmarkListener, ViewMode
 
     data class ViewState(
         val showBookmarks: Boolean = false,
+        val enableSearch: Boolean = false,
         val bookmarks: List<BookmarkEntity> = emptyList()
     )
 
@@ -65,7 +66,11 @@ class BookmarksViewModel(val dao: BookmarksDao) : EditBookmarkListener, ViewMode
     }
 
     private fun onBookmarksChanged(bookmarks: List<BookmarkEntity>) {
-        viewState.value = viewState.value?.copy(showBookmarks = bookmarks.isNotEmpty(), bookmarks = bookmarks)
+        viewState.value = viewState.value?.copy(
+                showBookmarks = bookmarks.isNotEmpty(),
+                bookmarks = bookmarks,
+                enableSearch = bookmarks.size > 3
+        )
     }
 
     fun onSelected(bookmark: BookmarkEntity) {

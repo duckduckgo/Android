@@ -82,6 +82,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
             viewState?.let {
                 if (it.showBookmarks) showBookmarks() else hideBookmarks()
                 adapter.bookmarks = it.bookmarks
+                invalidateOptionsMenu()
             }
         })
 
@@ -100,6 +101,11 @@ class BookmarksActivity : DuckDuckGoActivity() {
         val searchView = searchItem?.actionView as SearchView
         searchView.setOnQueryTextListener(BookmarksEntityQueryListener(viewModel.viewState.value?.bookmarks, adapter))
         return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        menu?.findItem(action_search)?.isVisible = viewModel.viewState.value?.enableSearch == true
+        return super.onPrepareOptionsMenu(menu)
     }
 
     private fun showEditBookmarkDialog(bookmark: BookmarkEntity) {
