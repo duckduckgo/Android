@@ -323,8 +323,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         super.onResume()
         addTextChangedListeners()
         appBarLayout.setExpanded(true)
-        viewModel.onViewVisible()
+        viewModel.onViewResumed()
         logoHidingListener.onResume()
+        if(isVisible) { viewModel.onViewVisible() }
     }
 
     override fun onPause() {
@@ -954,7 +955,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             webView?.onPause()
         } else {
             webView?.onResume()
-            viewModel.onViewVisible()
         }
     }
 
@@ -1201,7 +1201,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private fun createLoadedAnimation() {
             launch {
                 delay(TRACKERS_INI_DELAY)
-                viewModel.refreshCta(false)
+                viewModel.refreshCta()
                 delay(TRACKERS_SECONDARY_DELAY)
                 if (lastSeenOmnibarViewState?.isEditing != true) {
                     val site = viewModel.siteLiveData.value
@@ -1338,6 +1338,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         fun renderCtaViewState(viewState: CtaViewState) {
+            if (!isVisible) return
+
             renderIfChanged(viewState, lastSeenCtaViewState) {
                 ddgLogo.show()
                 lastSeenCtaViewState = viewState
