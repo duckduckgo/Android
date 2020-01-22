@@ -29,6 +29,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.ValueCaptorObserver
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
@@ -304,11 +305,30 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenViewBecomesVisibleThenRefreshCtaIsCalled() {
+    fun whenViewBecomesVisibleAndHomeShowingThenRefreshCtaIsCalled() {
         ruleRunBlockingTest {
-            givenExpectedCtaAddWidgetInstructions()
+            setBrowserShowing(false)
+            val observer = ValueCaptorObserver<BrowserTabViewModel.CtaViewState>()
+            testee.ctaViewState.observeForever(observer)
+
             testee.onViewVisible()
-            assertEquals(HomePanelCta.AddWidgetInstructions, testee.ctaViewState.value!!.cta)
+
+            testee.ctaViewState.removeObserver(observer)
+            assertTrue(observer.hasReceivedValue)
+        }
+    }
+
+    @Test
+    fun whenViewBecomesVisibleAndBrowserShowingThenRefreshCtaIsNotCalled() {
+        ruleRunBlockingTest {
+            setBrowserShowing(true)
+            val observer = ValueCaptorObserver<BrowserTabViewModel.CtaViewState>()
+            testee.ctaViewState.observeForever(observer)
+
+            testee.onViewVisible()
+
+            testee.ctaViewState.removeObserver(observer)
+            assertFalse(observer.hasReceivedValue)
         }
     }
 
@@ -850,7 +870,7 @@ class BrowserTabViewModelTest {
         assertFalse(browserViewState().browserShowing)
         assertFalse(browserViewState().canGoForward)
     }
-    
+
     @Test
     fun whenBrowserShowingAndCanGoForwardThenForwardButtonActive() {
         setupNavigation(isBrowsing = true, canGoForward = true)

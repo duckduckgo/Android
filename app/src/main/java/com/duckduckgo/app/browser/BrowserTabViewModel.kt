@@ -300,7 +300,10 @@ class BrowserTabViewModel(
     }
 
     fun onViewVisible() {
-        refreshCta()
+        //we expect refreshCta to be called when site is loaded if user is browsing to have trackers info.
+        if (!currentBrowserViewState().browserShowing) {
+            refreshCta()
+        }
     }
 
     fun onViewHidden() {
