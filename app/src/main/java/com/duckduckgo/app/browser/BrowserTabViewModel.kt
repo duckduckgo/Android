@@ -300,7 +300,7 @@ class BrowserTabViewModel(
     }
 
     fun onViewVisible() {
-        //we expect refreshCta to be called when site is loaded if user is browsing to have trackers info.
+        //we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
         if (!currentBrowserViewState().browserShowing) {
             refreshCta()
         }
