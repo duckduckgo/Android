@@ -377,7 +377,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenRefreshCtaOnExistingTabAndConceptTestFeatureActiveAndNoTrackersInformationThenReturnNoSerpCta() = runBlockingTest {
-        setConceptTestVariant()
+        setConceptTestFeature()
         val site = site(url = "http://www.cnn.com", trackerCount = 1)
         val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = false, site = site)
         assertTrue(value is DaxDialogCta.DaxNoSerpCta)

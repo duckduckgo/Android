@@ -50,8 +50,7 @@ interface VariantManager {
             Variant(key = "me", weight = 0.0, features = listOf(ConceptTest, SuppressWidgetCta, SuppressDefaultBrowserCta), filterBy = { isEnglishLocale() }),
             Variant(key = "md", weight = 0.0, features = listOf(SuppressWidgetCta, SuppressDefaultBrowserCta), filterBy = { isEnglishLocale() }),
 
-            // Validate CTA performance experiment
-
+            // Validate CTAs experiment
             Variant(key = "mq", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "mr", weight = 1.0, features = listOf(SuppressDefaultBrowserCta), filterBy = { noFilter() }),
             Variant(key = "ms", weight = 1.0, features = listOf(SuppressWidgetCta), filterBy = { noFilter() }),
