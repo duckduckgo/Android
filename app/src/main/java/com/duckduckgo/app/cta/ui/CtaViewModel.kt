@@ -198,8 +198,7 @@ class CtaViewModel @Inject constructor(
             .filter { it.entity?.isMajor == true }
             .map { it.entity?.displayName }
             .filterNotNull()
-            .distinct()
-            .toList().isNotEmpty()
+            .any()
 
     private fun hasPrivacySettingsOn(): Boolean = settingsPrivacySettingsStore.privacyOn
 
