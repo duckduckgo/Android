@@ -28,7 +28,10 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ConceptTest
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.SuppressWidgetCta
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -143,8 +146,7 @@ class CtaViewModel @Inject constructor(
         return widgetCapabilities.supportsStandardWidgetAdd &&
                 !widgetCapabilities.hasInstalledWidgets &&
                 !dismissedCtaDao.exists(CtaId.ADD_WIDGET) &&
-                !isFromConceptTestVariant() &&
-                !isFromNoCtaVariant()
+                !variant().hasFeature(SuppressWidgetCta)
     }
 
     @WorkerThread
@@ -194,9 +196,9 @@ class CtaViewModel @Inject constructor(
 
     private fun hasPrivacySettingsOn(): Boolean = settingsPrivacySettingsStore.privacyOn
 
-    private fun isFromConceptTestVariant(): Boolean = variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)
+    private fun variant(): Variant = variantManager.getVariant()
 
-    private fun isFromNoCtaVariant(): Boolean = variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ExistingNoCta)
+    private fun isFromConceptTestVariant(): Boolean = variantManager.getVariant().hasFeature(ConceptTest)
 
     private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
 

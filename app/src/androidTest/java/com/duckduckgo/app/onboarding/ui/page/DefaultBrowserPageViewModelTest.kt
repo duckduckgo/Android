@@ -72,8 +72,16 @@ class DefaultBrowserPageViewModelTest {
     }
 
     @Test
-    fun whenInitializeThenSendPixel() {
-        verify(mockPixel).fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_VISUALIZED)
+    fun whenPageBecomesVisibleThenPixelSent() {
+        testee.pageBecameVisible()
+        verify(mockPixel, times(1)).fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_VISUALIZED)
+    }
+
+    @Test
+    fun whenPageBecomesVisibleSubsequentTimeThenAdditionalPixelNotSent() {
+        testee.pageBecameVisible()
+        testee.pageBecameVisible()
+        verify(mockPixel, times(1)).fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_VISUALIZED)
     }
 
     @Test

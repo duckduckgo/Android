@@ -52,12 +52,20 @@ class DefaultBrowserPageViewModel(
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
     var timesPressedJustOnce: Int = 0
 
+    private var viewHasShown: Boolean = false
+
     init {
         viewState.value = ViewState(
             showOnlyContinue = defaultBrowserDetector.isDefaultBrowser(),
             showSettingsUi = defaultBrowserDetector.hasDefaultBrowser()
         )
-        pixel.fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_VISUALIZED)
+    }
+
+    fun pageBecameVisible() {
+        if (!viewHasShown) {
+            viewHasShown = true
+            pixel.fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_VISUALIZED)
+        }
     }
 
     fun loadUI() {
