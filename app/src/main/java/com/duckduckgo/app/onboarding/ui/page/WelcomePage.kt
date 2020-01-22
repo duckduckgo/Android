@@ -101,6 +101,6 @@ class WelcomePage : OnboardingPageFragment() {
         private const val MIN_ALPHA = 0f
         private const val MAX_ALPHA = 1f
         private const val ANIMATION_DURATION = 400L
-        private const val ANIMATION_DELAY = 1000L
+        private const val ANIMATION_DELAY = 1400L
     }
 }

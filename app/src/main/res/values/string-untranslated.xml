@@ -37,10 +37,10 @@
     <string name="daxMainNetworkStep2CtaText">%sI\'ll block these trackers when you\'re browsing non-%s sites.</string>
 
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[&#160;and <b>%d other</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> Tap the privacy grade to learn more about your privacy on %s.]]></item>
-        <item quantity="other"><![CDATA[&#160;and <b>%d others</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> Tap the privacy grade to learn more about your privacy on %s.]]></item>
+        <item quantity="one"><![CDATA[&#160;and <b>%d other</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></item>
+        <item quantity="other"><![CDATA[&#160;and <b>%d others</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText"><![CDATA[&#160;was trying to track you here. <br/><br/>I blocked it!<br/><br/> Tap the privacy grade to learn more about your privacy on %s.]]></string>
+    <string name="daxTrackersBlockedCtaZeroText"><![CDATA[&#160;was trying to track you here. <br/><br/>I blocked it!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></string>
 
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">HIDE</string>
