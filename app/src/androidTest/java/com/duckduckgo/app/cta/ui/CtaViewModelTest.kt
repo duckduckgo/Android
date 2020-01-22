@@ -44,6 +44,7 @@ import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -367,10 +368,19 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaOnExistingTabAndConceptTestFeatureActiveThenReturnTrackersBlockedCta() = runBlockingTest {
         setConceptTestFeature()
-        val site = site(url = "http://www.cnn.com", trackerCount = 1)
+        val trackingEvent = TrackingEvent("test.com", "test.com", null, TestEntity("test", "test", 9.0), true)
+        val site = site(url = "http://www.cnn.com", trackerCount = 1, events = listOf(trackingEvent))
         val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = false, site = site)
 
         assertTrue(value is DaxDialogCta.DaxTrackersBlockedCta)
+    }
+
+    @Test
+    fun whenRefreshCtaOnExistingTabAndConceptTestFeatureActiveAndNoTrackersInformationThenReturnNoSerpCta() = runBlockingTest {
+        setConceptTestVariant()
+        val site = site(url = "http://www.cnn.com", trackerCount = 1)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = false, site = site)
+        assertTrue(value is DaxDialogCta.DaxNoSerpCta)
     }
 
     @Test
@@ -442,6 +452,7 @@ class CtaViewModelTest {
         uri: Uri? = Uri.parse(url),
         https: HttpsStatus = HttpsStatus.SECURE,
         trackerCount: Int = 0,
+        events: List<TrackingEvent> = emptyList(),
         majorNetworkCount: Int = 0,
         allTrackersBlocked: Boolean = true,
         privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN,
@@ -454,6 +465,7 @@ class CtaViewModelTest {
         whenever(site.uri).thenReturn(uri)
         whenever(site.https).thenReturn(https)
         whenever(site.entity).thenReturn(entity)
+        whenever(site.trackingEvents).thenReturn(events)
         whenever(site.trackerCount).thenReturn(trackerCount)
         whenever(site.majorNetworkCount).thenReturn(majorNetworkCount)
         whenever(site.allTrackersBlocked).thenReturn(allTrackersBlocked)
