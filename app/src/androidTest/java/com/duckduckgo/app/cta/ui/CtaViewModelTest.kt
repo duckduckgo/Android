@@ -223,7 +223,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnExistingTabAndAndConceptTestFeatureIsActiveAndSiteIsNullThenReturnNull() = runBlockingTest {
+    fun whenRefreshCtaOnExistingTabAndConceptTestFeatureIsActiveAndSiteIsNullThenReturnNull() = runBlockingTest {
         setConceptTestFeature()
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = false, site = null)
@@ -231,7 +231,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnExistingTabAndAndConceptTestFeatureIsActiveHideTipsIsTrueThenReturnNull() = runBlockingTest {
+    fun whenRefreshCtaOnExistingTabAndConceptTestFeatureIsActiveAndHideTipsIsTrueThenReturnNull() = runBlockingTest {
         setConceptTestFeature()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
@@ -241,7 +241,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnExistingTabAndAndConceptTestFeatureIsActivePrivacyOffThenReturnNull() = runBlockingTest {
+    fun whenRefreshCtaOnExistingTabAndConceptTestFeatureIsActiveAndPrivacyOffThenReturnNull() = runBlockingTest {
         setConceptTestFeature()
         whenever(mockPrivacySettingsStore.privacyOn).thenReturn(false)
         val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
