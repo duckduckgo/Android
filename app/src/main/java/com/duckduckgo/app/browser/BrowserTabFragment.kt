@@ -325,7 +325,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         appBarLayout.setExpanded(true)
         viewModel.onViewResumed()
         logoHidingListener.onResume()
-        if(isVisible) { viewModel.onViewVisible() }
+        if (isVisible) {
+            viewModel.onViewVisible()
+        }
     }
 
     override fun onPause() {
@@ -1181,7 +1183,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     progress = viewState.progress
                 }
 
-                if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) && privacySettingsStore.privacyOn ) {
+                if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) && privacySettingsStore.privacyOn) {
 
                     if (lastSeenOmnibarViewState?.isEditing == true) {
                         cancelAllAnimations()
@@ -1236,7 +1238,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {
             if (lastSeenGlobalViewState is GlobalLayoutViewState.Invalidated &&
-                viewState is GlobalLayoutViewState.Browser) {
+                viewState is GlobalLayoutViewState.Browser
+            ) {
                 throw IllegalStateException("Invalid state transition")
             }
 
