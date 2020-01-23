@@ -215,7 +215,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnNewTabAndConceptTestFeatureIsActiveThenReturnDaxIntroCta() = runBlockingTest {
+    fun whenRefreshCtaOnNewTabAndConceptTestFeatureActiveThenReturnDaxIntroCta() = runBlockingTest {
         setConceptTestFeature()
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = true)
@@ -223,7 +223,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnExistingTabAndConceptTestFeatureIsActiveAndSiteIsNullThenReturnNull() = runBlockingTest {
+    fun whenRefreshCtaOnExistingTabAndConceptTestFeatureActiveAndSiteIsNullThenReturnNull() = runBlockingTest {
         setConceptTestFeature()
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = false, site = null)
@@ -231,7 +231,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnExistingTabAndConceptTestFeatureIsActiveAndHideTipsIsTrueThenReturnNull() = runBlockingTest {
+    fun whenRefreshCtaOnExistingTabAndConceptTestFeatureActiveAndHideTipsIsTrueThenReturnNull() = runBlockingTest {
         setConceptTestFeature()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
@@ -241,7 +241,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnExistingTabAndConceptTestFeatureIsActiveAndPrivacyOffThenReturnNull() = runBlockingTest {
+    fun whenRefreshCtaOnExistingTabAndConceptTestFeatureActiveAndPrivacyOffThenReturnNull() = runBlockingTest {
         setConceptTestFeature()
         whenever(mockPrivacySettingsStore.privacyOn).thenReturn(false)
         val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
@@ -333,7 +333,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnNewTabAndSuppressedWidgetCtaActiveThenReturnNullWhenTryngToShowWidgetCta() = runBlockingTest {
+    fun whenRefreshCtaOnNewTabAndSuppressWidgetCtaFeatureActiveThenReturnNullWhenTryngToShowWidgetCta() = runBlockingTest {
         setSuppressWidgetCtaFeature()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
@@ -345,7 +345,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnNewTabAndSuppressedWidgetCtaActiveThenReturnNullWhenTryngToShowWidgetInstructionsCta() = runBlockingTest {
+    fun whenRefreshCtaOnNewTabAndSuppressWidgetCtaFeatureActiveThenReturnNullWhenTryngToShowWidgetInstructionsCta() = runBlockingTest {
         setSuppressWidgetCtaFeature()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
