@@ -332,9 +332,9 @@ sealed class HomePanelCta(
         R.string.addWidgetCtaDescription,
         R.string.addWidgetCtaAutoLaunchButton,
         R.string.addWidgetCtaDismissButton,
-        null,
-        null,
-        null
+        Pixel.PixelName.WIDGET_CTA_SHOWN,
+        Pixel.PixelName.WIDGET_CTA_LAUNCHED,
+        Pixel.PixelName.WIDGET_CTA_DISMISSED
     )
 
     object AddWidgetInstructions : HomePanelCta(
@@ -344,8 +344,8 @@ sealed class HomePanelCta(
         R.string.addWidgetCtaDescription,
         R.string.addWidgetCtaInstructionsLaunchButton,
         R.string.addWidgetCtaDismissButton,
-        null,
-        null,
-        null
+        Pixel.PixelName.WIDGET_LEGACY_CTA_SHOWN,
+        Pixel.PixelName.WIDGET_LEGACY_CTA_LAUNCHED,
+        Pixel.PixelName.WIDGET_LEGACY_CTA_DISMISSED
     )
 }
