@@ -106,27 +106,41 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun refreshCta(dispatcher: CoroutineContext, isNewTab: Boolean, site: Site? = null): Cta? {
+    suspend fun refreshCta(dispatcher: CoroutineContext, isBrowserShowing: Boolean, site: Site? = null): Cta? {
         surveyCta()?.let {
             return it
         }
 
         return withContext(dispatcher) {
-            when {
-                canShowDaxIntroCta() && isNewTab -> {
-                    DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
-                }
-                canShowDaxCtaEndOfJourney(site) && isNewTab -> {
-                    DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
-                }
-                shouldShowDaxCta(site) != null && !isNewTab -> {
-                    shouldShowDaxCta(site)
-                }
-                canShowWidgetCta() && isNewTab -> {
-                    if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
-                }
-                else -> null
+            if (isBrowserShowing) {
+                getBrowserCta(site)
+            } else {
+                getHomeCta()
             }
+        }
+    }
+
+    private fun getHomeCta(): Cta? {
+        return when {
+            canShowDaxIntroCta() -> {
+                DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
+            }
+            canShowDaxCtaEndOfJourney() -> {
+                DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
+            }
+            canShowWidgetCta() -> {
+                if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
+            }
+            else -> null
+        }
+    }
+
+    private fun getBrowserCta(site: Site?): Cta? {
+        return when {
+            canShowDaxDialogCta() -> {
+                getDaxDialogCta(site)
+            }
+            else -> null
         }
     }
 
@@ -154,20 +168,22 @@ class CtaViewModel @Inject constructor(
     private fun canShowDaxIntroCta(): Boolean = isFromConceptTestVariant() && !daxDialogIntroShown() && !settingsDataStore.hideTips
 
     @WorkerThread
-    private fun canShowDaxCtaEndOfJourney(site: Site?): Boolean = isFromConceptTestVariant() &&
+    private fun canShowDaxCtaEndOfJourney(): Boolean = isFromConceptTestVariant() &&
             hasPrivacySettingsOn() &&
             !daxDialogEndShown() &&
             daxDialogIntroShown() &&
             !settingsDataStore.hideTips &&
-            site == null &&
             (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogSerpShown() || daxDialogTrackersFoundShown())
 
-    @WorkerThread
-    private fun shouldShowDaxCta(site: Site?): Cta? {
+    private fun canShowDaxDialogCta(): Boolean {
         if (settingsDataStore.hideTips || !isFromConceptTestVariant() || !hasPrivacySettingsOn()) {
-            return null
+            return false
         }
+        return true
+    }
 
+    @WorkerThread
+    private fun getDaxDialogCta(site: Site?): Cta? {
         val nonNullSite = site ?: return null
 
         nonNullSite.let {
