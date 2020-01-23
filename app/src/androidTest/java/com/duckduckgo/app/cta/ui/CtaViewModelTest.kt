@@ -219,225 +219,213 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnNewTabThenReturnDaxIntroCta() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabThenReturnDaxIntroCta() = runBlockingTest {
         setConceptTestVariant()
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = true)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
         assertTrue(value is DaxBubbleCta.DaxIntroCta)
     }
 
     @Test
-    fun whenRefreshCtaOnExistingTabAndSiteIsNullThenReturnNull() = runBlockingTest {
+    fun whenRefreshCtaWhileBrowsingAndSiteIsNullThenReturnNull() = runBlockingTest {
         setConceptTestVariant()
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = false, site = null)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = null)
         assertNull(value)
     }
 
     @Test
-    fun whenRefreshCtaOnExistingTabAndHideTipsIsTrueThenReturnNull() = runBlockingTest {
+    fun whenRefreshCtaWhileBrowsingAndHideTipsIsTrueThenReturnNull() = runBlockingTest {
         setConceptTestVariant()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = false, site = site)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
         assertNull(value)
     }
 
     @Test
-    fun whenRefreshCtaOnExistingTabAndPrivacyOffThenReturnNull() = runBlockingTest {
+    fun whenRefreshCtaWhileBrowsingAndPrivacyOffThenReturnNull() = runBlockingTest {
         setConceptTestVariant()
         whenever(mockPrivacySettingsStore.privacyOn).thenReturn(false)
         val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = false, site = site)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
         assertNull(value)
     }
 
     @Test
-    fun whenRefreshCtaOnExistingTabAndVariantIsNotConceptTestThenReturnNull() = runBlockingTest {
+    fun whenRefreshCtaWhileBrowsingAndVariantIsNotConceptTestThenReturnNull() = runBlockingTest {
         setDefaultVariant()
         val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = false, site = site)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
         assertNull(value)
     }
 
     @Test
-    fun whenRefreshCtaOnNewTabThenReturnDaxEndCta() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabThenReturnDaxEndCta() = runBlockingTest {
         setConceptTestVariant()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)).thenReturn(true)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = true)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
         assertTrue(value is DaxBubbleCta.DaxEndCta)
     }
 
     @Test
-    fun whenRefreshCtaOnNewTabAndHideTipsIsTrueThenReturnNull() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueThenReturnNull() = runBlockingTest {
         setConceptTestVariant()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = true)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true)
         assertNull(value)
     }
 
     @Test
-    fun whenRefreshCtaOnNewTabAndVarianIstNotConceptTestThenReturnNull() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabAndVarianIstNotConceptTestThenReturnNull() = runBlockingTest {
         setDefaultVariant()
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = true)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true)
         assertNull(value)
     }
 
     @Test
-    fun whenRefreshCtaOnNewTabAndVariantIsConceptTestThenDoNotShowWidgetAutoCta() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabAndVariantIsConceptTestThenDoNotShowWidgetAutoCta() = runBlockingTest {
         setConceptTestVariant()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = true)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true)
         assertTrue(value !is HomePanelCta.AddWidgetAuto)
     }
 
     @Test
-    fun whenRefreshCtaOnNewTabAndVariantIsConceptTestThenDoNotShowWidgetInstructionsCta() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabAndVariantIsConceptTestThenDoNotShowWidgetInstructionsCta() = runBlockingTest {
         setConceptTestVariant()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = true)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true)
         assertTrue(value !is HomePanelCta.AddWidgetInstructions)
     }
 
     @Test
-    fun whenRefreshCtaOnNewTabAndHideTipsIsTrueThenReturnWidgetAutoCta() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueThenReturnWidgetAutoCta() = runBlockingTest {
         setDefaultVariant()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = true)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
         assertTrue(value is HomePanelCta.AddWidgetAuto)
     }
 
     @Test
-    fun whenRefreshCtaOnNewTabAndHideTipsIsTrueThenReturnWidgetInstructionsCta() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueThenReturnWidgetInstructionsCta() = runBlockingTest {
         setDefaultVariant()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = true)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
         assertTrue(value is HomePanelCta.AddWidgetInstructions)
     }
 
     @Test
-    fun whenRefreshCtaOnNewTabVariantIsNoCtaReturnNullWhenTryngToShowWidgetCta() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabVariantIsNoCtaReturnNullWhenTryngToShowWidgetCta() = runBlockingTest {
         setNoCtaVariant()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = true)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true)
         assertNull(value)
     }
 
     @Test
-    fun whenRefreshCtaOnNewTabVariantIsNoCtaReturnNullWhenTryngToShowWidgetInstructionsCta() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabVariantIsNoCtaReturnNullWhenTryngToShowWidgetInstructionsCta() = runBlockingTest {
         setNoCtaVariant()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = true)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true)
         assertNull(value)
     }
 
     @Test
-    fun whenRefreshCtaOnExistingTabThenReturnNetworkCta() = runBlockingTest {
+    fun whenRefreshCtaWhileBrowsingThenReturnNetworkCta() = runBlockingTest {
         setConceptTestVariant()
         val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = false, site = site)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
 
         assertTrue(value is DaxDialogCta.DaxMainNetworkCta)
     }
 
     @Test
-    fun whenRefreshCtaOnExistingTabThenReturnTrackersBlockedCta() = runBlockingTest {
+    fun whenRefreshCtaWhileBrowsingThenReturnTrackersBlockedCta() = runBlockingTest {
         setConceptTestVariant()
         val trackingEvent = TrackingEvent("test.com", "test.com", null, TestEntity("test", "test", 9.0), true)
         val site = site(url = "http://www.cnn.com", trackerCount = 1, events = listOf(trackingEvent))
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = false, site = site)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
 
         assertTrue(value is DaxDialogCta.DaxTrackersBlockedCta)
     }
 
     @Test
-    fun whenRefreshCtaOnExistingTabButNoTrackersInformationThenReturnNoSerpCta() = runBlockingTest {
+    fun whenRefreshCtaWhileBrowsingButNoTrackersInformationThenReturnNoSerpCta() = runBlockingTest {
         setConceptTestVariant()
         val site = site(url = "http://www.cnn.com", trackerCount = 1)
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = false, site = site)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
 
         assertTrue(value is DaxDialogCta.DaxNoSerpCta)
     }
 
     @Test
-    fun whenRefreshCtaOnExistingTabThenReturnSerpCta() = runBlockingTest {
+    fun whenRefreshCtaWhileBrowsingThenReturnSerpCta() = runBlockingTest {
         setConceptTestVariant()
         val site = site(url = "http://www.duckduckgo.com")
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = false, site = site)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
 
         assertTrue(value is DaxDialogCta.DaxSerpCta)
     }
 
     @Test
-    fun whenRefreshCtaOnExistingTabThenReturnNoSerpCta() = runBlockingTest {
+    fun whenRefreshCtaWhileBrowsingThenReturnNoSerpCta() = runBlockingTest {
         setConceptTestVariant()
         val site = site(url = "http://www.wikipedia.com")
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = false, site = site)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
 
         assertTrue(value is DaxDialogCta.DaxNoSerpCta)
     }
 
     @Test
-    fun whenRefreshCtaOnNewTabThenValueReturnedIsNotDaxDialogCtaType() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabThenValueReturnedIsNotDaxDialogCtaType() = runBlockingTest {
         setConceptTestVariant()
         val site = site(url = "http://www.wikipedia.com")
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = true, site = site)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = site)
 
         assertTrue(value !is DaxDialogCta)
     }
 
     @Test
-    fun whenRefreshCtaOnNewTabAndJourneyCompletedAndSiteIsNotNullReturnNull() = runBlockingTest {
-        setConceptTestVariant()
-        val site = site(url = "http://www.wikipedia.com")
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)).thenReturn(true)
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = true, site = site)
-        assertNull(value)
-    }
-
-    @Test
-    fun whenRefreshCtaOnNewTabEndCtaNotShownIfIntroCtaWasNotPreviouslyShown() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabEndCtaNotShownIfIntroCtaWasNotPreviouslyShown() = runBlockingTest {
         setConceptTestVariant()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(false)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)).thenReturn(true)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isNewTab = true)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true)
         assertTrue(value !is DaxBubbleCta.DaxEndCta)
     }
-
 
     private fun setConceptTestVariant() {
         whenever(mockVariantManager.getVariant()).thenReturn(

@@ -166,5 +166,4 @@ class BrowserViewModelTest {
     companion object {
         const val TAB_ID = "TAB_ID"
     }
-
 }

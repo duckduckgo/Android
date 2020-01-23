@@ -292,11 +292,17 @@ class BrowserTabViewModel(
         browserChromeClient.webViewClientListener = this
     }
 
-    fun onViewVisible() {
+    fun onViewResumed() {
         command.value = if (!currentBrowserViewState().browserShowing) ShowKeyboard else HideKeyboard
-        refreshCta(true)
         if (currentGlobalLayoutState() is Invalidated && currentBrowserViewState().browserShowing) {
             showErrorWithAction()
+        }
+    }
+
+    fun onViewVisible() {
+        //we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
+        if (!currentBrowserViewState().browserShowing) {
+            refreshCta()
         }
     }
 
@@ -857,7 +863,7 @@ class BrowserTabViewModel(
     fun onSurveyChanged(survey: Survey?) {
         val activeSurvey = ctaViewModel.onSurveyChanged(survey)
         if (activeSurvey != null) {
-            refreshCta(true)
+            refreshCta()
         }
     }
 
@@ -870,12 +876,14 @@ class BrowserTabViewModel(
         ctaViewModel.onCtaShown(cta)
     }
 
-    fun refreshCta(isNewTab: Boolean) {
-        viewModelScope.launch {
-            val cta = withContext(dispatchers.io()) {
-                ctaViewModel.refreshCta(dispatchers.io(), isNewTab, siteLiveData.value)
+    fun refreshCta() {
+        if (currentGlobalLayoutState() is Browser) {
+            viewModelScope.launch {
+                val cta = withContext(dispatchers.io()) {
+                    ctaViewModel.refreshCta(dispatchers.io(), currentBrowserViewState().browserShowing, siteLiveData.value)
+                }
+                ctaViewState.value = currentCtaViewState().copy(cta = cta)
             }
-            ctaViewState.value = currentCtaViewState().copy(cta = cta)
         }
     }
 
@@ -900,7 +908,7 @@ class BrowserTabViewModel(
 
         ctaViewModel.onUserDismissedCta(cta)
         if (cta is HomePanelCta) {
-            refreshCta(true)
+            refreshCta()
         } else {
             ctaViewState.value = currentCtaViewState().copy(cta = null)
         }
