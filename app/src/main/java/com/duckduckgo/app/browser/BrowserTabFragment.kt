@@ -28,10 +28,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
+import android.os.*
 import android.text.Editable
 import android.view.*
 import android.view.View.*
@@ -178,6 +175,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     lateinit var userAgentProvider: UserAgentProvider
 
+    var messageFromPreviousTab: Message? = null
+
     private val initialUrl get() = arguments!!.getString(URL_EXTRA_ARG)
 
     private val skipHome get() = arguments!!.getBoolean(SKIP_HOME_ARG)
@@ -267,6 +266,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
+            messageFromPreviousTab?.let {
+                processMessage(it)
+            }
         }
 
         lifecycle.addObserver(object : LifecycleObserver {
@@ -277,6 +279,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 }
             }
         })
+    }
+
+    private fun processMessage(message: Message) {
+        val transport = message.obj as WebView.WebViewTransport
+        transport.webView = webView
+        message.sendToTarget()
+        val tabsButton = tabsButton?.actionView as TabSwitcherButton
+        tabsButton.animateCount()
+        viewModel.onMessageProcessed()
     }
 
     private fun updateOrDeleteWebViewPreview() {
@@ -312,8 +323,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         super.onResume()
         addTextChangedListeners()
         appBarLayout.setExpanded(true)
-        viewModel.onViewVisible()
+        viewModel.onViewResumed()
         logoHidingListener.onResume()
+        if (isVisible) {
+            viewModel.onViewVisible()
+        }
     }
 
     override fun onPause() {
@@ -435,6 +449,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.OpenInNewTab -> {
                 browserActivity?.openInNewTab(it.query)
             }
+            is Command.OpenMessageInNewTab -> {
+                browserActivity?.openMessageInNewTab(it.message)
+            }
             is Command.OpenInNewBackgroundTab -> {
                 openInNewBackgroundTab()
             }
@@ -532,7 +549,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     val fileName = previewPersister.save(preview, tabId)
                     viewModel.updateTabPreview(tabId, fileName)
                     Timber.d("Saved and updated tab preview")
-                } catch (e: RuntimeException) {
+                } catch (e: Exception) {
                     Timber.d(e, "Failed to generate WebView preview")
                 }
             }
@@ -754,6 +771,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             webViewContainer,
             true
         ).findViewById(R.id.browserWebView) as WebView
+
         webView?.let {
             userAgentProvider = UserAgentProvider(it.settings.userAgentString, deviceInfo)
 
@@ -769,6 +787,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 builtInZoomControls = true
                 displayZoomControls = false
                 mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+                setSupportMultipleWindows(true)
                 disableWebSql(this)
                 setSupportZoom(true)
             }
@@ -938,7 +957,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             webView?.onPause()
         } else {
             webView?.onResume()
-            viewModel.onViewVisible()
         }
     }
 
@@ -1165,7 +1183,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     progress = viewState.progress
                 }
 
-                if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) && privacySettingsStore.privacyOn ) {
+                if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) && privacySettingsStore.privacyOn) {
 
                     if (lastSeenOmnibarViewState?.isEditing == true) {
                         cancelAllAnimations()
@@ -1185,7 +1203,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private fun createLoadedAnimation() {
             launch {
                 delay(TRACKERS_INI_DELAY)
-                viewModel.refreshCta(false)
+                viewModel.refreshCta()
                 delay(TRACKERS_SECONDARY_DELAY)
                 if (lastSeenOmnibarViewState?.isEditing != true) {
                     val site = viewModel.siteLiveData.value
@@ -1220,7 +1238,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {
             if (lastSeenGlobalViewState is GlobalLayoutViewState.Invalidated &&
-                viewState is GlobalLayoutViewState.Browser) {
+                viewState is GlobalLayoutViewState.Browser
+            ) {
                 throw IllegalStateException("Invalid state transition")
             }
 
@@ -1322,6 +1341,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         fun renderCtaViewState(viewState: CtaViewState) {
+            if (!isVisible) return
+
             renderIfChanged(viewState, lastSeenCtaViewState) {
                 ddgLogo.show()
                 lastSeenCtaViewState = viewState

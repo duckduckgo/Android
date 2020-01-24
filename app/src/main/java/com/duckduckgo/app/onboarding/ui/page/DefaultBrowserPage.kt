@@ -63,6 +63,13 @@ class DefaultBrowserPage : OnboardingPageFragment() {
         super.onAttach(context)
     }
 
+    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
+        super.setUserVisibleHint(isVisibleToUser)
+        if (isVisibleToUser) {
+            viewModel.pageBecameVisible()
+        }
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         defaultCard = activity?.findViewById(R.id.defaultCard)

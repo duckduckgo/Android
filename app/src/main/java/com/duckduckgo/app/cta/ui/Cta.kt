@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.cta.ui
 
+import android.content.Context
 import android.net.Uri
 import android.view.View
 import androidx.annotation.AnyRes
@@ -87,7 +88,7 @@ sealed class DaxDialogCta(
         )
     }
 
-    open fun getDaxText(activity: FragmentActivity): String = activity.getString(description)
+    open fun getDaxText(context: Context): String = context.getString(description)
 
     class DaxSerpCta(onboardingStore: OnboardingStore, appInstallStore: AppInstallStore) : DaxDialogCta(
         CtaId.DAX_DIALOG_SERP,
@@ -101,7 +102,12 @@ sealed class DaxDialogCta(
         appInstallStore
     )
 
-    class DaxTrackersBlockedCta(onboardingStore: OnboardingStore, appInstallStore: AppInstallStore, val trackers: List<TrackingEvent>, val host: String) :
+    class DaxTrackersBlockedCta(
+        onboardingStore: OnboardingStore,
+        appInstallStore: AppInstallStore,
+        val trackers: List<TrackingEvent>,
+        val host: String
+    ) :
         DaxDialogCta(
             CtaId.DAX_DIALOG_TRACKERS_FOUND,
             R.plurals.daxTrackersBlockedCtaText,
@@ -117,7 +123,7 @@ sealed class DaxDialogCta(
         override fun createDialogCta(activity: FragmentActivity): DaxDialog =
             DaxDialog(getDaxText(activity), activity.resources.getString(okButton), false)
 
-        override fun getDaxText(activity: FragmentActivity): String {
+        override fun getDaxText(context: Context): String {
             val trackersFiltered = trackers.asSequence()
                 .filter { it.entity?.isMajor == true }
                 .map { it.entity?.displayName }
@@ -128,12 +134,11 @@ sealed class DaxDialogCta(
 
             val trackersText = trackersFiltered.joinToString(", ")
             val size = trackers.size - trackersFiltered.size
-            val url = Uri.parse(host).baseHost?.removePrefix("m.")
             val quantityString =
                 if (size == 0) {
-                    activity.resources.getString(R.string.daxTrackersBlockedCtaZeroText, url)
+                    context.resources.getString(R.string.daxTrackersBlockedCtaZeroText)
                 } else {
-                    activity.resources.getQuantityString(description, size, size, url)
+                    context.resources.getQuantityString(description, size, size)
                 }
             return "<b>$trackersText</b>$quantityString"
         }
@@ -151,11 +156,11 @@ sealed class DaxDialogCta(
         appInstallStore
     ) {
 
-        override fun getDaxText(activity: FragmentActivity): String {
+        override fun getDaxText(context: Context): String {
             return if (isFromSameNetworkDomain()) {
-                activity.resources.getString(R.string.daxMainNetworkStep1CtaText, network)
+                context.resources.getString(R.string.daxMainNetworkStep1CtaText, network)
             } else {
-                activity.resources.getString(R.string.daxMainNetworkStep1OwnedCtaText, Uri.parse(host).baseHost?.removePrefix("m."), network)
+                context.resources.getString(R.string.daxMainNetworkStep1OwnedCtaText, Uri.parse(host).baseHost?.removePrefix("m."), network)
             }
         }
 
@@ -327,9 +332,9 @@ sealed class HomePanelCta(
         R.string.addWidgetCtaDescription,
         R.string.addWidgetCtaAutoLaunchButton,
         R.string.addWidgetCtaDismissButton,
-        null,
-        null,
-        null
+        Pixel.PixelName.WIDGET_CTA_SHOWN,
+        Pixel.PixelName.WIDGET_CTA_LAUNCHED,
+        Pixel.PixelName.WIDGET_CTA_DISMISSED
     )
 
     object AddWidgetInstructions : HomePanelCta(
@@ -339,8 +344,8 @@ sealed class HomePanelCta(
         R.string.addWidgetCtaDescription,
         R.string.addWidgetCtaInstructionsLaunchButton,
         R.string.addWidgetCtaDismissButton,
-        null,
-        null,
-        null
+        Pixel.PixelName.WIDGET_LEGACY_CTA_SHOWN,
+        Pixel.PixelName.WIDGET_LEGACY_CTA_LAUNCHED,
+        Pixel.PixelName.WIDGET_LEGACY_CTA_DISMISSED
     )
 }

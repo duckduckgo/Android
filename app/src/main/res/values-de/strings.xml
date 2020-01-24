@@ -38,11 +38,11 @@
     <string name="back">Zurück</string>
     <string name="forward">Weiter</string>
 
-    <string name="omnibarInputHint">URL suchen oder eingeben</string>
+    <string name="omnibarInputHint">URL eingeben oder suchen</string>
     <string name="clearButtonContentDescription">Sucheingabe löschen</string>
     <string name="no_compatible_third_party_app_installed">Keine kompatible App installiert</string>
     <string name="addBookmarkMenuTitle">Lesezeichen hinzufügen</string>
-    <string name="requestDesktopSiteMenuTitle">Desktop-Site</string>
+    <string name="requestDesktopSiteMenuTitle">Desktop-Seite</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Bild herunterladen</string>
@@ -54,7 +54,7 @@
     <!-- Sharing options -->
     <string name="options">Optionen</string>
     <string name="shareLink">Link teilen</string>
-    <string name="shareMenuTitle">Teilen …</string>
+    <string name="shareMenuTitle">Teilen…</string>
     <string name="copyUrl">Link-Adresse kopieren</string>
 
     <!-- Find in page -->
@@ -87,7 +87,7 @@
     <string name="closeTab">Alle tab</string>
 
     <!-- Privacy Dashboard Activities -->
-    <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
+    <string name="privacyDashboardActivityTitle">Privatsphäre-Dashboard</string>
     <string name="privacyProtectionEnabled">PRIVATSPHÄRENSCHUTZ AKTIVIERT</string>
     <string name="privacyProtectionDisabled">PRIVATSPHÄRENSCHUTZ DEAKTIVIERT</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">VERBESSERT VON &lt;img src="%d" /&gt; AUF &lt;img src="%d" /&gt;</string>
@@ -122,7 +122,7 @@
     </plurals>
 
     <string name="scorecardActivityTitle">Datenschutzstufe</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Diese Website ist ein großes Tracker-Netzwerk</string>
+    <string name="scorecardSiteIsMemberOfMajorNetwork">Diese Website gehört zu einem großen Tracker-Netzwerk</string>
     <string name="scorecardPrivacyGrade">Datenschutzstufe</string>
     <string name="scorecardEnhancedGrade">Erhöhte Stufe</string>
 
@@ -142,7 +142,7 @@
 
     <!-- Fire -->
     <string name="fireMenu">Daten löschen</string>
-    <string name="fireClearAll">Alle Tabs und Daten löschen</string>
+    <string name="fireClearAll">Alle Tabs schließen und Daten löschen</string>
     <string name="fireCancel">Abbrechen</string>
     <string name="fireDataCleared">Daten gelöscht</string>
 
@@ -152,7 +152,7 @@
     <string name="settingsHeadingGeneral">Allgemeines</string>
     <string name="settingsHeadingOther">Sonstiges</string>
     <string name="settingsHeadingPrivacy">Privatsphäre</string>
-    <string name="settingsLightTheme">Light Theme</string>
+    <string name="settingsLightTheme">Helles Design</string>
     <string name="settingsAboutDuckduckgo">Über DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Feedback hinterlassen</string>
@@ -160,12 +160,12 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Speichern</string>
 
-    <string name="settingsAutomaticallyClearWhat">Automatisches Löschen von …</string>
+    <string name="settingsAutomaticallyClearWhat">Automatisches Löschen von…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">gar nichts</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabs</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tabs und Daten</string>
 
-    <string name="settingsAutomaticallyClearWhen">Löschen …</string>
+    <string name="settingsAutomaticallyClearWhen">Löschen…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">nur beim Verlassen der App</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">beim Verlassen der App, 5 Sekunden lang inaktiv</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">beim Verlassen der App, 5 Minuten lang inaktiv</string>
@@ -226,7 +226,7 @@
 
     <!-- Add widget -->
     <string name="addWidgetCtaTitle">Probiere unser Such-Widget aus!</string>
-    <string name="addWidgetCtaDescription">Füge unser Such-Widget zu deinem Startbildschirm hinzu für einen schnellen und einfachen Zugriff.</string>
+    <string name="addWidgetCtaDescription">Füge unser Such-Widget für einen schnellen und einfachen Zugriff zu deinem Startbildschirm hinzu.</string>
     <string name="addWidgetCtaAutoLaunchButton">Widget hinzufügen</string>
     <string name="addWidgetCtaInstructionsLaunchButton">Anzeigen</string>
     <string name="addWidgetCtaDismissButton">Verwerfen</string>
@@ -258,7 +258,7 @@
 
     <!-- Notification Channel Names -->
     <string name="notificationChannelFileDownloading">Datei wird heruntergeladen</string>
-    <string name="notificationChannelFileDownloaded">Datei heruntergeladen</string>
+    <string name="notificationChannelFileDownloaded">Datei erfolgreich heruntergeladen</string>
     <string name="notificationChannelTutorials">Tutorials</string>
 
     <!-- Clear Notification -->
@@ -292,7 +292,7 @@
     <string name="missingBrowserFeaturesSubtitle">Welche Browserfunktionen können wir hinzufügen oder verbessern?</string>
     <string name="missingBrowserFeatureSubReasonNavigation">Vorwärts, rückwärts navigieren, aktualisieren</string>
     <string name="missingBrowserFeatureSubReasonTabManagement">Tabs erstellen und verwalten</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Blockieren von Ads und Pop-ups</string>
+    <string name="missingBrowserFeatureSubReasonAdPopups">Blockieren von Werbungen und Pop-ups</string>
     <string name="missingBrowserFeatureSubReasonVideos">Videos anschauen</string>
     <string name="missingBrowserFeatureSubReasonImages">Mit Bildern interagieren</string>
     <string name="missingBrowserFeatureSubReasonBookmarks">Lesezeichen erstellen und verwalten</string>
@@ -314,7 +314,7 @@
 
     <string name="needMoreCustomizationTitleLong">Es gibt nicht genügend Möglichkeiten zur individuellen Anpassung der App</string>
     <string name="needMoreCustomizationTitleShort">Anpassungsprobleme</string>
-    <string name="needMoreCustomizationSubtitle">Welche Anpassungsoption können wir hinzufügen oder verbessern?</string>
+    <string name="needMoreCustomizationSubtitle">Welche Anpassung können wir hinzufügen oder verbessern?</string>
     <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Konfiguration des Startbildschirms</string>
     <string name="needMoreCustomizationSubReasonTabDisplay">Wie Tabs angezeigt werden</string>
     <string name="needMoreCustomizationSubReasonAppLooks">Wie die App aussieht</string>

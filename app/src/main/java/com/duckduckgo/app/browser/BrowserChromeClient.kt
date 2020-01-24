@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
+import android.os.Message
 import android.view.View
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
@@ -112,5 +113,13 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
             filePathCallback.onReceiveValue(null)
             true
         }
+    }
+
+    override fun onCreateWindow(view: WebView?, isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message?): Boolean {
+        if (isUserGesture && resultMsg?.obj is WebView.WebViewTransport) {
+            webViewClientListener?.openMessageInNewTab(resultMsg)
+            return true
+        }
+        return false
     }
 }

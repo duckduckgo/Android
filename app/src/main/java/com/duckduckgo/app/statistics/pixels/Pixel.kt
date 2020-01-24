@@ -61,6 +61,7 @@ interface Pixel {
         ONBOARDING_DEFAULT_BROWSER_LAUNCHED("m_odb_l"),
         ONBOARDING_DEFAULT_BROWSER_SKIPPED("m_odb_s"),
         ONBOARDING_DEFAULT_BROWSER_SELECTED_JUST_ONCE("m_odb_jo"),
+
         ONBOARDING_DAX_CTA_SHOWN("m_odc_s"),
         ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
         ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
@@ -85,6 +86,13 @@ interface Pixel {
         DEFAULT_BROWSER_SET("m_db_s"),
         DEFAULT_BROWSER_NOT_SET("m_db_ns"),
         DEFAULT_BROWSER_UNSET("m_db_u"),
+
+        WIDGET_CTA_SHOWN("m_wc_s"),
+        WIDGET_CTA_LAUNCHED("m_wc_l"),
+        WIDGET_CTA_DISMISSED("m_wc_d"),
+        WIDGET_LEGACY_CTA_SHOWN("m_wlc_s"),
+        WIDGET_LEGACY_CTA_LAUNCHED("m_wlc_l"),
+        WIDGET_LEGACY_CTA_DISMISSED("m_wlc_d"),
         WIDGETS_ADDED(pixelName = "m_w_a"),
         WIDGETS_DELETED(pixelName = "m_w_d"),
         WIDGET_LAUNCHED(pixelName = "m_w_l"),

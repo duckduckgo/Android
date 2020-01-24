@@ -29,6 +29,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.ValueCaptorObserver
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
@@ -288,26 +289,54 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenViewBecomesVisibleAndBrowserShowingThenKeyboardHidden() {
+    fun whenViewIsResumedAndBrowserShowingThenKeyboardHidden() {
         setBrowserShowing(true)
-        testee.onViewVisible()
+        testee.onViewResumed()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.contains(Command.HideKeyboard))
     }
 
     @Test
-    fun whenViewBecomesVisibleAndHomeShowingThenKeyboardShown() {
+    fun whenViewIsResumedAndHomeShowingThenKeyboardShown() {
         setBrowserShowing(false)
-        testee.onViewVisible()
+        testee.onViewResumed()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
+    }
+
+    @Test
+    fun whenViewBecomesVisibleAndHomeShowingThenRefreshCtaIsCalled() {
+        ruleRunBlockingTest {
+            setBrowserShowing(false)
+            val observer = ValueCaptorObserver<BrowserTabViewModel.CtaViewState>()
+            testee.ctaViewState.observeForever(observer)
+
+            testee.onViewVisible()
+
+            testee.ctaViewState.removeObserver(observer)
+            assertTrue(observer.hasReceivedValue)
+        }
+    }
+
+    @Test
+    fun whenViewBecomesVisibleAndBrowserShowingThenRefreshCtaIsNotCalled() {
+        ruleRunBlockingTest {
+            setBrowserShowing(true)
+            val observer = ValueCaptorObserver<BrowserTabViewModel.CtaViewState>()
+            testee.ctaViewState.observeForever(observer)
+
+            testee.onViewVisible()
+
+            testee.ctaViewState.removeObserver(observer)
+            assertFalse(observer.hasReceivedValue)
+        }
     }
 
     @Test
     fun whenInvalidatedGlobalLayoutRestoredThenErrorIsShown() {
         givenInvalidatedGlobalLayout()
         setBrowserShowing(true)
-        testee.onViewVisible()
+        testee.onViewResumed()
         assertCommandIssued<Command.ShowErrorWithAction>()
     }
 
@@ -841,7 +870,7 @@ class BrowserTabViewModelTest {
         assertFalse(browserViewState().browserShowing)
         assertFalse(browserViewState().canGoForward)
     }
-    
+
     @Test
     fun whenBrowserShowingAndCanGoForwardThenForwardButtonActive() {
         setupNavigation(isBrowsing = true, canGoForward = true)
@@ -1116,6 +1145,18 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOpenInNewTabThenOpenInNewTabCommandWithCorrectUrlSent() {
+        val url = "https://example.com"
+        testee.openInNewTab(url)
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue
+        assertTrue(command is Command.OpenInNewTab)
+        command as Command.OpenInNewTab
+        assertEquals(url, command.query)
+    }
+
+    @Test
     fun whenRecoveringFromProcessGoneThenShowErrorWithAction() {
         testee.recoverFromRenderProcessGone()
         assertCommandIssued<Command.ShowErrorWithAction>()
@@ -1329,7 +1370,7 @@ class BrowserTabViewModelTest {
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
-        testee.refreshCta(true)
+        testee.refreshCta()
         assertEquals(HomePanelCta.AddWidgetAuto, testee.ctaViewState.value!!.cta)
     }
 
@@ -1338,16 +1379,14 @@ class BrowserTabViewModelTest {
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
-        testee.refreshCta(true)
+        testee.refreshCta()
         assertNull(testee.ctaViewState.value!!.cta)
     }
 
     @Test
     fun whenCtaRefreshedAndOnlyStandardAddSupportedAndWidgetNotInstalledThenCtaIsInstructionsWidget() = ruleRunBlockingTest {
-        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
-        testee.refreshCta(true)
+        givenExpectedCtaAddWidgetInstructions()
+        testee.refreshCta()
         assertEquals(HomePanelCta.AddWidgetInstructions, testee.ctaViewState.value!!.cta)
     }
 
@@ -1356,7 +1395,7 @@ class BrowserTabViewModelTest {
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
-        testee.refreshCta(true)
+        testee.refreshCta()
         assertNull(testee.ctaViewState.value!!.cta)
     }
 
@@ -1365,7 +1404,7 @@ class BrowserTabViewModelTest {
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
-        testee.refreshCta(true)
+        testee.refreshCta()
         assertNull(testee.ctaViewState.value!!.cta)
     }
 
@@ -1374,16 +1413,17 @@ class BrowserTabViewModelTest {
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
-        testee.refreshCta(true)
+        testee.refreshCta()
         assertNull(testee.ctaViewState.value!!.cta)
     }
 
     @Test
     fun whenCtaRefreshedAndIsNewTabIsFalseThenReturnNull() = ruleRunBlockingTest {
+        setBrowserShowing(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
-        testee.refreshCta(false)
+        testee.refreshCta()
         assertNull(testee.ctaViewState.value!!.cta)
     }
 
@@ -1505,6 +1545,13 @@ class BrowserTabViewModelTest {
         Pixel.PixelParameter.SHOWED_BOOKMARKS to showedBookmarks.toString(),
         Pixel.PixelParameter.BOOKMARK_CAPABLE to bookmarkCapable.toString()
     )
+
+    private fun givenExpectedCtaAddWidgetInstructions() {
+        setBrowserShowing(false)
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+    }
 
     private fun givenInvalidatedGlobalLayout() {
         testee.globalLayoutState.value = BrowserTabViewModel.GlobalLayoutViewState.Invalidated
