@@ -41,6 +41,15 @@ import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.dialogTextCta
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.hiddenTextCta
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.primaryCta
 
+interface BrowserCta {
+    fun showCta(activity: FragmentActivity): DaxDialog
+}
+
+
+interface HomeCta {
+    fun showCta(view: View)
+}
+
 interface Cta {
     val ctaId: CtaId
     val shownPixel: Pixel.PixelName?
@@ -50,9 +59,6 @@ interface Cta {
     fun pixelShownParameters(): Map<String, String?>
     fun pixelCancelParameters(): Map<String, String?>
     fun pixelOkParameters(): Map<String, String?>
-
-    fun apply(view: View)
-    fun createDialogCta(activity: FragmentActivity): DaxDialog?
 }
 
 sealed class DaxDialogCta(
@@ -65,11 +71,9 @@ sealed class DaxDialogCta(
     var ctaPixelParam: String,
     val onboardingStore: OnboardingStore,
     val appInstallStore: AppInstallStore
-) : Cta {
+) : Cta, BrowserCta {
 
-    override fun apply(view: View) {}
-
-    override fun createDialogCta(activity: FragmentActivity) = DaxDialog(getDaxText(activity), activity.resources.getString(okButton))
+    override fun showCta(activity: FragmentActivity) = DaxDialog(getDaxText(activity), activity.resources.getString(okButton))
 
     override fun pixelCancelParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
@@ -120,7 +124,7 @@ sealed class DaxDialogCta(
             appInstallStore
         ) {
 
-        override fun createDialogCta(activity: FragmentActivity): DaxDialog =
+        override fun showCta(activity: FragmentActivity): DaxDialog =
             DaxDialog(getDaxText(activity), activity.resources.getString(okButton), false)
 
         override fun getDaxText(context: Context): String {
@@ -164,7 +168,7 @@ sealed class DaxDialogCta(
             }
         }
 
-        override fun createDialogCta(activity: FragmentActivity): DaxDialog {
+        override fun showCta(activity: FragmentActivity): DaxDialog {
             return DaxDialog(getDaxText(activity), activity.resources.getString(okButton)).apply {
                 val privacyGradeButton = activity.findViewById<View>(R.id.privacyGradeButton)
                 onAnimationFinishedListener {
@@ -204,7 +208,7 @@ sealed class DaxDialogCta(
         appInstallStore
     ) {
 
-        override fun createDialogCta(activity: FragmentActivity): DaxDialog {
+        override fun showCta(activity: FragmentActivity): DaxDialog {
             return DaxDialog(getDaxText(activity), activity.resources.getString(okButton)).apply {
                 val fireButton = activity.findViewById<View>(R.id.fire)
                 onAnimationFinishedListener {
@@ -232,9 +236,9 @@ sealed class DaxBubbleCta(
     val ctaPixelParam: String,
     val onboardingStore: OnboardingStore,
     val appInstallStore: AppInstallStore
-) : Cta {
+) : Cta, HomeCta {
 
-    override fun apply(view: View) {
+    override fun showCta(view: View) {
         val daxText = view.context.getString(description)
         view.show()
         view.alpha = 1f
@@ -242,8 +246,6 @@ sealed class DaxBubbleCta(
         view.primaryCta.hide()
         view.dialogTextCta.startTypingAnimation(daxText, true)
     }
-
-    override fun createDialogCta(activity: FragmentActivity): DaxDialog? = null
 
     override fun pixelCancelParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
@@ -295,17 +297,15 @@ sealed class HomePanelCta(
     override val shownPixel: Pixel.PixelName?,
     override val okPixel: Pixel.PixelName?,
     override val cancelPixel: Pixel.PixelName?
-) : Cta {
+) : Cta, HomeCta {
 
-    override fun apply(view: View) {
+    override fun showCta(view: View) {
         view.ctaIcon.setImageResource(image)
         view.ctaTitle.text = view.context.getString(title)
         view.ctaSubtitle.text = view.context.getString(description)
         view.ctaOkButton.text = view.context.getString(okButton)
         view.ctaDismissButton.text = view.context.getString(dismissButton)
     }
-
-    override fun createDialogCta(activity: FragmentActivity): DaxDialog? = null
 
     override fun pixelCancelParameters(): Map<String, String?> = emptyMap()
 
