@@ -18,6 +18,7 @@ package com.duckduckgo.app.cta.ui
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
+import com.duckduckgo.app.cta.CtaHelper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -25,7 +26,6 @@ import com.duckduckgo.app.cta.ui.HomePanelCta.*
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
@@ -52,7 +52,7 @@ class CtaViewModel @Inject constructor(
     private val dismissedCtaDao: DismissedCtaDao,
     private val variantManager: VariantManager,
     private val settingsDataStore: SettingsDataStore,
-    private val onboardingStore: OnboardingStore,
+    private val ctaHelper: CtaHelper,
     private val settingsPrivacySettingsStore: PrivacySettingsStore
 ) {
 
@@ -123,10 +123,10 @@ class CtaViewModel @Inject constructor(
     private fun getHomeCta(): Cta? {
         return when {
             canShowDaxIntroCta() -> {
-                DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
+                DaxBubbleCta.DaxIntroCta(ctaHelper)
             }
             canShowDaxCtaEndOfJourney() -> {
-                DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
+                DaxBubbleCta.DaxEndCta(ctaHelper)
             }
             canShowWidgetCta() -> {
                 if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
@@ -192,19 +192,19 @@ class CtaViewModel @Inject constructor(
             if (it.entity != null && host != null) {
                 it.entity?.let { entity ->
                     if (!daxDialogNetworkShown() && DaxDialogCta.MAIN_TRACKER_NETWORKS.contains(entity.displayName)) {
-                        return DaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
+                        return DaxDialogCta.DaxMainNetworkCta(ctaHelper, entity.displayName, host)
                     }
                 }
             }
             // Is Serp
             if (!daxDialogSerpShown() && isSerpUrl(it.url)) {
-                return DaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
+                return DaxDialogCta.DaxSerpCta(ctaHelper)
             }
             // Trackers blocked
             return if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && hasTrackersInformation(it.trackingEvents) && host != null) {
-                DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.trackingEvents, host)
+                DaxDialogCta.DaxTrackersBlockedCta(ctaHelper, it.trackingEvents, host)
             } else if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
-                DaxDialogCta.DaxNoSerpCta(onboardingStore, appInstallStore)
+                DaxDialogCta.DaxNoSerpCta(ctaHelper)
             } else {
                 null
             }

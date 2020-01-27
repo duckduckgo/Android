@@ -22,6 +22,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.cta.CtaHelper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -98,10 +99,10 @@ class CtaViewModelTest {
     private lateinit var mockSettingsDataStore: SettingsDataStore
 
     @Mock
-    private lateinit var mockOnboardingStore: OnboardingStore
+    private lateinit var mockPrivacySettingsStore: PrivacySettingsStore
 
     @Mock
-    private lateinit var mockPrivacySettingsStore: PrivacySettingsStore
+    private lateinit var ctaHelper: CtaHelper
 
     private lateinit var testee: CtaViewModel
 
@@ -125,7 +126,7 @@ class CtaViewModelTest {
             mockDismissedCtaDao,
             mockVariantManager,
             mockSettingsDataStore,
-            mockOnboardingStore,
+            ctaHelper,
             mockPrivacySettingsStore
         )
     }
@@ -193,25 +194,25 @@ class CtaViewModelTest {
 
     @Test
     fun whenRegisterDaxBubbleIntroCtaThenDatabaseNotified() {
-        testee.registerDaxBubbleCtaShown(DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore))
+        testee.registerDaxBubbleCtaShown(DaxBubbleCta.DaxIntroCta(ctaHelper))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO))
     }
 
     @Test
     fun whenRegisterDaxBubbleIntroCtaThenPixelIsFired() {
-        testee.registerDaxBubbleCtaShown(DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore))
+        testee.registerDaxBubbleCtaShown(DaxBubbleCta.DaxIntroCta(ctaHelper))
         verify(mockPixel).fire(eq(ONBOARDING_DAX_CTA_SHOWN), any())
     }
 
     @Test
     fun whenRegisterDaxBubbleEndCtaThenDatabaseNotified() {
-        testee.registerDaxBubbleCtaShown(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
+        testee.registerDaxBubbleCtaShown(DaxBubbleCta.DaxEndCta(ctaHelper))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_END))
     }
 
     @Test
     fun whenRegisterDaxBubbleEndCtaThenPixelIsFired() {
-        testee.registerDaxBubbleCtaShown(DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore))
+        testee.registerDaxBubbleCtaShown(DaxBubbleCta.DaxIntroCta(ctaHelper))
         verify(mockPixel).fire(eq(ONBOARDING_DAX_CTA_SHOWN), any())
     }
 

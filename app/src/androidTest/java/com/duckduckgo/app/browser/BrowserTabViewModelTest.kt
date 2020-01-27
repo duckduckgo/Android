@@ -47,6 +47,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.cta.CtaHelper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -164,9 +165,6 @@ class BrowserTabViewModelTest {
     private lateinit var mockPixel: Pixel
 
     @Mock
-    private lateinit var mockOnboardingStore: OnboardingStore
-
-    @Mock
     private lateinit var mockAutoCompleteService: AutoCompleteService
 
     @Mock
@@ -174,6 +172,9 @@ class BrowserTabViewModelTest {
 
     @Mock
     private lateinit var mockPrivacySettingsStore: PrivacySettingsStore
+
+    @Mock
+    private lateinit var mockCtaHelper: CtaHelper
 
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
 
@@ -206,7 +207,7 @@ class BrowserTabViewModelTest {
             mockDismissedCtaDao,
             mockVariantManager,
             mockSettingsStore,
-            mockOnboardingStore,
+            mockCtaHelper,
             mockPrivacySettingsStore
         )
 
@@ -1446,7 +1447,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenRegisterDaxBubbleCtaShownThenFirePixel() {
-        val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
+        whenever(mockCtaHelper.addCtaToHistory(anyString())).thenReturn("")
+        val cta = DaxBubbleCta.DaxIntroCta(mockCtaHelper)
         testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
 
         testee.registerDaxBubbleCtaShown()
@@ -1455,7 +1457,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenRegisterDaxBubbleCtaShownThenRegisterInDatabase() {
-        val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
+        whenever(mockCtaHelper.addCtaToHistory(anyString())).thenReturn("")
+        val cta = DaxBubbleCta.DaxIntroCta(mockCtaHelper)
         testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
 
         testee.registerDaxBubbleCtaShown()
@@ -1464,7 +1467,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedCtaButtonThenFirePixel() {
-        val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = DaxBubbleCta.DaxIntroCta(mockCtaHelper)
         testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
 
         testee.onUserClickCtaOkButton()
