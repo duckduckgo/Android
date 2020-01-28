@@ -25,6 +25,7 @@ If you know any of the following languages and would like to help us improve the
 1. Slovenian (sl)
 1. Spanish (es)
 1. Swedish (sv)
+1. Turkish (tr)
 
 ## How to help
 
