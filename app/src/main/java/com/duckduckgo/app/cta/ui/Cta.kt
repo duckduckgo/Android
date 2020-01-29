@@ -41,12 +41,12 @@ import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.dialogTextCta
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.hiddenTextCta
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.primaryCta
 
-interface BrowserCta {
+interface DialogCta {
     fun showCta(activity: FragmentActivity): DaxDialog
 }
 
 
-interface HomeCta {
+interface ViewCta {
     fun showCta(view: View)
 }
 
@@ -71,7 +71,7 @@ sealed class DaxDialogCta(
     var ctaPixelParam: String,
     val onboardingStore: OnboardingStore,
     val appInstallStore: AppInstallStore
-) : Cta, BrowserCta {
+) : Cta, DialogCta {
 
     override fun showCta(activity: FragmentActivity) = DaxDialog(getDaxText(activity), activity.resources.getString(okButton))
 
@@ -236,7 +236,7 @@ sealed class DaxBubbleCta(
     val ctaPixelParam: String,
     val onboardingStore: OnboardingStore,
     val appInstallStore: AppInstallStore
-) : Cta, HomeCta {
+) : Cta, ViewCta {
 
     override fun showCta(view: View) {
         val daxText = view.context.getString(description)
@@ -297,7 +297,7 @@ sealed class HomePanelCta(
     override val shownPixel: Pixel.PixelName?,
     override val okPixel: Pixel.PixelName?,
     override val cancelPixel: Pixel.PixelName?
-) : Cta, HomeCta {
+) : Cta, ViewCta {
 
     override fun showCta(view: View) {
         view.ctaIcon.setImageResource(image)
